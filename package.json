@@ -10,5 +10,8 @@
     "translation",
     "internationalisation"
   ],
-  "author": ""
+  "author": "",
+  "dependencies": {
+    "format-message": "^6.2.3"
+  }
 }
