@@ -45,5 +45,5 @@ module.exports = {
   localeNames,
   setupI18n,
   getCurrentLocale,
-  formatMessage: i18n,
+  t: i18n,
 }
