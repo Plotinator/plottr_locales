@@ -1,5 +1,4 @@
 const i18n = require('format-message')
-const { app, remote } = require('electron')
 
 const locales = {
   en: require('./en.json'),
@@ -35,9 +34,10 @@ function setupI18n(settings) {
 
 function getCurrentLocale(settings) {
   const userSetLocale = settings ? settings.get('locale') : null
-  const appFRD = app || (remote && remote.app)
+  const electron = settings.electron
+  const appFRD = electron && (electron.app || (electron.remote && electron.remote.app))
 
-  return userSetLocale || appFRD.getLocale() || 'en'
+  return userSetLocale || (appFRD && appFRD.getLocale()) || 'en'
 }
 
 module.exports = {
