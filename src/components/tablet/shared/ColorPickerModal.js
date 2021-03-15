@@ -4,7 +4,7 @@ import { View, Button, Icon } from 'native-base'
 import { DetailsWrapper, DetailsLeft, DetailsRight } from './Details'
 import ColorPickerList from '../../shared/ColorPickerList'
 import tinycolor from 'tinycolor2'
-import t from 'format-message'
+import { t } from 'plottr_locales'
 import Metrics from '../../../utils/Metrics'
 import { Text } from '../../shared/common'
 

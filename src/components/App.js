@@ -17,7 +17,7 @@ import {
 } from '../utils/user_info'
 import { sendVerificationEmail } from '../utils/api'
 import AppErrorBoundary from './AppErrorBoundary'
-import t from 'format-message'
+import { t } from 'plottr_locales'
 import AlertDialog, { showAlert } from './shared/common/AlertDialog'
 import Metrics from '../utils/Metrics'
 import Main from './Main'

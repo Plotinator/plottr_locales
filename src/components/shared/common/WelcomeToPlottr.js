@@ -4,7 +4,7 @@ import Text from './Text'
 import * as Animatable from 'react-native-animatable'
 import styles from './WelcomeToPlottrStyles'
 import images from '../../../images'
-import t from 'format-message'
+import { t } from 'plottr_locales'
 
 const { PLOTTR_ICON, PLOTTR_TEXT } = images
 

@@ -8,7 +8,7 @@ import RootPhoneNavigator from './phone/navigators/RootPhoneNavigator'
 import RootTabletNavigator from './tablet/navigators/RootTabletNavigator'
 import { MIGRATION_VERSION } from '../utils/constants'
 import { Alert, Platform } from 'react-native'
-import t from 'format-message'
+import { t } from 'plottr_locales'
 
 export default function DocumentRoot (props) {
   useEffect(

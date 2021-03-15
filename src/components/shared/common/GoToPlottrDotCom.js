@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Linking } from 'react-native'
-import t from 'format-message'
+import { t } from 'plottr_locales'
 import ShellButton from './ShellButton'
 import Text from './Text'
 

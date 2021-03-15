@@ -3,7 +3,7 @@ import { Picker, Icon } from 'native-base'
 import PropTypes from 'react-proptypes'
 import { connect } from 'react-redux'
 import { selectors } from 'pltr/v2'
-import t from 'format-message'
+import { t } from 'plottr_locales'
 import Fonts from '../../fonts'
 import Colors from '../../utils/Colors'
 

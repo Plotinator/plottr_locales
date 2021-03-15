@@ -5,7 +5,7 @@ import { bindActionCreators } from 'redux'
 import { actions, selectors } from 'pltr/v2'
 import { StyleSheet, FlatList } from 'react-native'
 import { Icon, H1, H3, Container, Content, ListItem, CheckBox, Body, View, Badge } from 'native-base'
-import t from 'format-message'
+import { t } from 'plottr_locales'
 import { Text } from '../../shared/common'
 import Metrics from '../../../utils/Metrics'
 

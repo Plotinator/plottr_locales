@@ -1,4 +1,4 @@
-import t from 'format-message'
+import { t } from 'plottr_locales'
 import { showAlert } from '../components/shared/common/AlertDialog'
 
 let autoSaveCallback = null

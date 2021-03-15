@@ -1,6 +1,6 @@
 import React from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
-import t from 'format-message'
+import { t } from 'plottr_locales'
 import OutlineHome from '../outline/OutlineHome'
 import ProjectHome from '../project/ProjectHome'
 import SceneDetails from '../outline/SceneDetails'

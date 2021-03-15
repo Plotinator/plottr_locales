@@ -1,6 +1,6 @@
 import React from 'react'
 import Text from './Text'
-import t from 'format-message'
+import { t } from 'plottr_locales'
 
 const Title = ({ title }) => {
   return (

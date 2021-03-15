@@ -1,6 +1,6 @@
 import { createStackNavigator } from '@react-navigation/stack'
 import React from 'react'
-import t from 'format-message'
+import { t } from 'plottr_locales'
 import AddButton from '../../ui/AddButton'
 import DrawerButton from '../../ui/DrawerButton'
 import TagsHome from '../tags/TagsHome'

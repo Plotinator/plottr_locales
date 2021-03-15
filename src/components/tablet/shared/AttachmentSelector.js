@@ -15,7 +15,7 @@ import {
   Right
 } from 'native-base'
 import Popover from 'react-native-popover-view'
-import t from 'format-message'
+import { t } from 'plottr_locales'
 import { attachmentItemText } from '../../../utils/attachment_titles'
 import { ShellButton, Text } from '../../shared/common'
 import Colors from '../../../utils/Colors'

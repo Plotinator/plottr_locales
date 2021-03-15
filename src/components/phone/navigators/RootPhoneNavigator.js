@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
 import { Drawer } from 'native-base'
-import t from 'format-message'
+import { t } from 'plottr_locales'
 import MainTabs from './MainTabs'
 import CustomAttributesScreen from '../../shared/customAttributes/CustomAttributesScreen'
 import { attachmentHeaderTitles } from '../../../utils/attachment_titles'

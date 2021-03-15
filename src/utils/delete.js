@@ -1,5 +1,5 @@
 import { Alert, LayoutAnimation } from 'react-native'
-import t from 'format-message'
+import { t } from 'plottr_locales'
 
 export function askToDelete (name, onDelete) {
   Alert.alert(t('Delete'), t('Are you sure you want to delete {name}?', {name}), [
