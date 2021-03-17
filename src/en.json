@@ -473,7 +473,7 @@
   "Enter a new name for {chapter}": {
     "message": "Enter a new name for \"{chapter}\""
   },
-  "Enter Chapter\'s name or enter": {
+  "Enter Chapter's name or enter": {
     "message": "Enter Chapter's name or enter \"auto\" \n(without quotes) for auto naming."
   },
   "Enter some text...": {
