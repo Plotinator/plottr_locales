@@ -48,7 +48,8 @@ export default class RichTextEditor extends Component {
       editorStyle,
       toolbarStyle,
       initialValue,
-      initialHTMLText
+      initialHTMLText,
+      disabled
     } = this.props
 
     const containerStyles = [styles.editorContainer]
@@ -81,6 +82,7 @@ export default class RichTextEditor extends Component {
           initialContentHTML={initialText}
           onChange={this.handleOnChange}
           editorInitializedCallback={this.handleEditorInitialized}
+          disabled={disabled?true:false}
         />
         <RichToolbar
           style={toolbarStyles}

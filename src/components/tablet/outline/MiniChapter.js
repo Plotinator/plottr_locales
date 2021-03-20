@@ -5,6 +5,7 @@ import { View, Text, Button } from 'native-base'
 import { helpers } from 'pltr/v2'
 import cx from 'classnames'
 import tinycolor from 'tinycolor2'
+import { grays } from 'pltr/v2/constants/CSScolors'
 
 function MiniChapter (props) {
   const { chapter, idx, cards, linesById, sortedLines, positionOffset } = props
@@ -43,13 +44,13 @@ function MiniChapter (props) {
   return (
     <TouchableHighlight onPress={props.onPress}>
       <View style={styles.container}>
-        <View style={[styles.container, styles.chapterWrapper]}>
+        <View style={styles.chapterWrapper}>
           <Text style={styles.indexText}>{`${idx + 1}.  `}</Text>
           <Text style={styles.titleText}>
             {helpers.beats.beatTitle(chapter, positionOffset)}
           </Text>
         </View>
-        <View style={[styles.container, styles.dotWrapper]}>
+        <View style={styles.dotWrapper}>
           {renderCardDots()}
         </View>
       </View>
@@ -59,18 +60,25 @@ function MiniChapter (props) {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    alignItems: 'center'
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    paddingBottom: 5,
+    borderBottomColor: "#f7f7f7",
+    borderBottomWidth: 1
   },
   chapterWrapper: {
-    paddingVertical: 6
+    paddingVertical: 6,
+    flexDirection: 'row',
+    alignItems: 'flex-start'
+
   },
   indexText: {
     color: 'hsl(210, 83%, 53%)' // blue-5
   },
   titleText: {},
   dotWrapper: {
-    marginLeft: 'auto'
+    marginLeft: 'auto',
+    flexDirection:'row'
   },
   dot: {
     height: 10,
