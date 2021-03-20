@@ -3,27 +3,20 @@ import React, { Component } from 'react'
 import PropTypes from 'react-proptypes'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { View, Label, Item, Icon } from 'native-base'
-import { selectors, actions, initialState } from 'pltr/v2'
-import { StyleSheet, Modal, KeyboardAvoidingView } from 'react-native'
+import { View, Icon } from 'native-base'
+import { selectors, actions, helpers, initialState } from 'pltr/v2'
+import { Modal, ScrollView, KeyboardAvoidingView } from 'react-native'
 import t from 'format-message'
-import AttachmentList from '../../shared/attachments/AttachmentList'
-import ChapterPicker from '../../ui/ChapterPicker'
-import LinePicker from '../../ui/LinePicker'
-import { DetailsWrapper, DetailsRight, DetailsLeft } from '../shared/Details'
 import {
   Input,
   Text,
   Button,
   RichEditor,
   ShellButton,
-  Attachments,
+  Attachments
 } from '../../shared/common'
 import styles from './CardModalStyles'
-import Popover, {
-  PopoverMode,
-  PopoverPlacement
-} from 'react-native-popover-view'
+import Popover, { PopoverPlacement } from 'react-native-popover-view'
 import Collapsible from 'react-native-collapsible'
 
 class CardModal extends Component {
@@ -33,15 +26,19 @@ class CardModal extends Component {
     const { cards, card, isNewCard, beatId, lineId } = props
     let cardObj = {}
     if (isNewCard) {
-      cardObj = state.card || {...cloneDeep(initialState.card), beatId, lineId}
+      cardObj = state.card || {
+        ...cloneDeep(initialState.card),
+        beatId,
+        lineId
+      }
     } else {
-      const cardFromRedux = cards.find(c => c.id == card.id)
-      cardObj = state.changes ? state.card : (cardFromRedux || state.card)
+      const cardFromRedux = cards.find((c) => c.id == card.id)
+      cardObj = state.changes ? state.card : cardFromRedux || state.card
     }
     return {
       card: cardObj,
       isNewCard: state.isNewCard === undefined ? isNewCard : state.isNewCard,
-      changes: state.changes === undefined ? isNewCard : state.changes,
+      changes: state.changes === undefined ? isNewCard : state.changes
     }
   }
 
@@ -59,17 +56,17 @@ class CardModal extends Component {
       console.log(card.id, card.title, card.description)
       this.props.actions.editCard(card.id, card.title, card.description, [], {})
     }
-    this.setState({isNewCard: false, changes: false})
+    this.setState({ isNewCard: false, changes: false })
     this.props.onClose()
   }
 
   changeChapter = (val) => {
-    this.setState({card: {...this.state.card, beatId: val}})
+    this.setState({ card: { ...this.state.card, beatId: val } })
     this.props.actions.changeBeat(this.state.card.id, val, this.props.bookId)
   }
 
   changeLine = (val) => {
-    this.setState({card: {...this.state.card, lineId: val}})
+    this.setState({ card: { ...this.state.card, lineId: val } })
     this.props.actions.changeLine(this.state.card.id, val, this.props.bookId)
   }
 
@@ -85,12 +82,12 @@ class CardModal extends Component {
 
   handleSetTitle = (title) => {
     const { card } = this.state
-    this.setState({ card: {...card, title }, changes: true })
+    this.setState({ card: { ...card, title }, changes: true })
   }
 
-  handleSetDescription = description => {
+  handleSetDescription = (description) => {
     const { card } = this.state
-    this.setState({ card: {...card, description }, changes: true })
+    this.setState({ card: { ...card, description }, changes: true })
   }
 
   renderBeatMenuItem = (beat, i) => {
@@ -134,8 +131,8 @@ class CardModal extends Component {
     const { lines = [] } = this.props
     const { card } = this.state
     const { lineId } = card
-    const line = lines.filter(line => line.id == lineId)[0]
-    const lineTitle = line && line.title || 'Unnamed Plotline'
+    const line = lines.filter((line) => line.id == lineId)[0]
+    const lineTitle = (line && line.title) || 'Unnamed Plotline'
     return lineTitle
   }
 
@@ -148,15 +145,8 @@ class CardModal extends Component {
       showTags = false
     } = this.state
     const { beats, lines, positionOffset } = this.props
-    const {
-      id: cardId,
-      title,
-      description,
-      beatId,
-      characters,
-      places,
-      tags
-    } = card || {}
+    const { id: cardId, title, description, beatId, characters, places, tags } =
+      card || {}
     const beat = this.getBeatById(beatId)
     return (
       <Modal
@@ -177,9 +167,7 @@ class CardModal extends Component {
                   placement={PopoverPlacement.RIGHT}
                   from={
                     <ShellButton style={styles.crumb}>
-                      <Text
-                        numberOfLines={1}
-                        style={styles.chapterText}>
+                      <Text numberOfLines={1} style={styles.chapterText}>
                         {helpers.beats.beatTitle(beat, positionOffset)}
                       </Text>
                       <Icon
@@ -199,9 +187,7 @@ class CardModal extends Component {
                   // placement={PopoverPlacement.RIGHT}
                   from={
                     <ShellButton style={styles.crumb}>
-                      <Text
-                        numberOfLines={1}
-                        style={styles.chapterText}>
+                      <Text numberOfLines={1} style={styles.chapterText}>
                         {this.renderLineTitle()}
                       </Text>
                       <Icon
@@ -225,10 +211,6 @@ class CardModal extends Component {
                     inputStyle={styles.inputText}
                     onChangeText={this.handleSetTitle}
                     inset
-                    label={t('Title')}
-                    value={card.title}
-                    onChangeText={text => this.setState({card: {...card, title: text}, changes: true})}
-                    autoCapitalize='sentences'
                   />
                 </View>
                 <View style={styles.row}>
@@ -266,7 +248,8 @@ class CardModal extends Component {
                       cardId={cardId}
                       attachments={characters}
                       type={'character'}
-                      sourceType={'card'} />
+                      sourceType={'card'}
+                    />
                   </Collapsible>
                 </View>
                 <View style={styles.row}>
@@ -296,7 +279,8 @@ class CardModal extends Component {
                       cardId={cardId}
                       attachments={places}
                       type={'place'}
-                      sourceType={'card'} />
+                      sourceType={'card'}
+                    />
                   </Collapsible>
                 </View>
                 <View style={styles.row}>
@@ -326,7 +310,8 @@ class CardModal extends Component {
                       cardId={cardId}
                       attachments={tags}
                       type={'tag'}
-                      sourceType={'card'} />
+                      sourceType={'card'}
+                    />
                   </Collapsible>
                 </View>
               </View>
@@ -346,75 +331,25 @@ class CardModal extends Component {
   }
 }
 
-const styles = StyleSheet.create({
-  closeButton: {
-    borderRadius: 50,
-    marginBottom: 20
-  },
-  left: {
-    paddingTop: 20
-  },
-  editor: {
-    paddingTop: 20
-  },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 10,
-  },
-  contentWrapper: {
-    width: '85%',
-    height: '80%',
-  },
-  buttonWrapper: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    width: '100%',
-  },
-  buttonFooter: {
-    marginTop: 16,
-    marginRight: 16,
-    marginBottom: 8,
-  },
-  button: {
-    // backgroundColor: '#f4f4f4',
-    backgroundColor: 'white',
-    borderColor: '#f4f4f4',
-  },
-  label: {
-    marginBottom: 16,
-  },
-  afterList: {
-    marginTop: 4,
-  },
-  formRightItems: {
-    paddingRight: 8,
-  },
-  rceView: {
-    flex: 1,
-  },
-})
-
 CardModal.propTypes = {
   card: PropTypes.object,
   beatId: PropTypes.number.isRequired,
   lineId: PropTypes.number.isRequired,
   closeDialog: PropTypes.func,
   lines: PropTypes.array.isRequired,
-  chapters: PropTypes.array.isRequired,
+  beats: PropTypes.array.isRequired,
   actions: PropTypes.object.isRequired,
   positionOffset: PropTypes.number.isRequired,
   cards: PropTypes.array.isRequired,
   bookId: PropTypes.number.isRequired,
   navigation: PropTypes.object.isRequired,
-  route: PropTypes.object.isRequired,
+  route: PropTypes.object.isRequired
 }
 
 function mapStateToProps (state) {
   return {
     positionOffset: selectors.positionOffsetSelector(state),
-    chapters: selectors.sortedBeatsByBookSelector(state),
+    beats: selectors.sortedBeatsByBookSelector(state),
     lines: selectors.sortedLinesByBookSelector(state),
     bookId: selectors.currentTimelineSelector(state),
     cards: state.cards
@@ -424,11 +359,8 @@ function mapStateToProps (state) {
 function mapDispatchToProps (dispatch) {
   return {
     actions: bindActionCreators(actions.card, dispatch),
-    uiActions: bindActionCreators(actions.ui, dispatch),
+    uiActions: bindActionCreators(actions.ui, dispatch)
   }
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(CardModal)
+export default connect(mapStateToProps, mapDispatchToProps)(CardModal)
