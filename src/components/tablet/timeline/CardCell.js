@@ -14,8 +14,7 @@ import { Text } from '../../shared/common'
 import Metrics from '../../../utils/Metrics'
 
 export default function CardCell (props) {
-  const { color, card } = props
-  const [showModal, setModal] = useState(false)
+  const { color, card, onEditCard } = props
   const [pan, setPan] = useState(new Animated.ValueXY())
   const [panResponder, setResponder] = useState(null)
   const [cellRef, measure] = useRegisterCoordinates(
@@ -58,19 +57,8 @@ export default function CardCell (props) {
 
   if (!panResponder) return null
 
-  const showCardModal = () => {
-    setModal(true)
-  }
-
-  const renderModal = () => {
-    if (!showModal) return null
-    return (
-      <CardModal
-        card={card}
-        navigation={props.navigation}
-        onClose={() => setModal(false)}
-      />
-    )
+  const handleEditCard = () => {
+    onEditCard && onEditCard(card)
   }
 
   const colorObj = tinycolor(color)
@@ -94,7 +82,7 @@ export default function CardCell (props) {
           </Text>
         </View>
         <TouchableOpacity
-          onPress={showCardModal}
+          onPress={handleEditCard}
           style={styles.cardButton}
           hitSlop={{ top: 20, bottom: 25, left: 25, right: 25 }}>
           <View style={styles.cardButtonColor}>
@@ -105,7 +93,7 @@ export default function CardCell (props) {
           <Icon type='FontAwesome5' name='pen' style={styles.pen} />
         </TouchableOpacity>
       </Animated.View>
-      {renderModal()}
+      {/* renderModal() */}
     </Cell>
   )
 }

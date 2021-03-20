@@ -17,6 +17,7 @@ import ChapterTitleCell from './ChapterTitleCell'
 import { BlankCell } from './BlankCell'
 import Cell from '../shared/Cell'
 import CardCell from './CardCell'
+import CardModal from './CardModal'
 import { CELL_HEIGHT, CELL_WIDTH } from '../../../utils/constants'
 import { Icon } from 'native-base'
 import tinycolor from 'tinycolor2'
@@ -48,6 +49,7 @@ class Timeline extends Component {
       { useNativeDriver: false }
     )
     this.state = {
+      showCardModal: false,
       lineMapKeys: {},
       showColorPicker: false,
       currentLine: {}
@@ -332,12 +334,38 @@ class Timeline extends Component {
     this.props.lineActions.reorderLines(Newlines, bookId)
   }
 
+  handleEditCard = (card) => {
+    this.setState({
+      showCardModal: true,
+      card
+    })
+  }
+
+  handleHideCardModal = () => {
+    this.setState({
+      showCardModal: false
+    })
+  }
+
   getMaxCards (id) {
     const { linesMaxCards } = this.props
     return (linesMaxCards[id] || 1) - 1
   }
 
   setPlotModalRef = (ref) => (this._PlotModal = ref)
+
+  renderCardModal () {
+    const { showCardModal, card } = this.state
+    const { navigation } = this.props
+    if (!showCardModal) return null
+    return (
+      <CardModal
+        card={card}
+        navigation={navigation}
+        onClose={this.handleHideCardModal}
+      />
+    )
+  }
 
   renderBlankLineTitleCell (key) {
     return <Cell key={key} style={styles.lineTitleCell} />
@@ -385,6 +413,7 @@ class Timeline extends Component {
                 register={this.registerDropCoordinate}
                 handleDrop={this.dropCard}
                 navigation={this.props.navigation}
+                onEditCard={this.handleEditCard}
               />
             )
           )
@@ -575,7 +604,7 @@ class Timeline extends Component {
   render () {
     let body = this.renderBody()
     let data = [{ key: 'body', render: body }]
-
+    const { showCardModal } = this.state
     return (
       <View style={styles.container}>
         {this.renderBeatTitles()}
@@ -586,6 +615,7 @@ class Timeline extends Component {
           onScroll={this.verticalScrollEvent}
         />
         {this.renderPlotlineModal()}
+        {this.renderCardModal()}
       </View>
     )
   }
