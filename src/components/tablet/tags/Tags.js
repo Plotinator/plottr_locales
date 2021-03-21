@@ -6,12 +6,13 @@ import { StyleSheet, TouchableOpacity, ScrollView } from 'react-native'
 import t from 'format-message'
 import cx from 'classnames'
 import { selectors, actions, newIds } from 'pltr/v2'
-import { View, H3, Text, Button, H1, Icon, Content } from 'native-base'
+import { View, Button, Icon, Content } from 'native-base'
 import Toolbar from '../shared/Toolbar'
 import NewButton from '../../ui/NewButton'
 import tinycolor from 'tinycolor2'
 import prompt from 'react-native-prompt-android'
 import DrawerButton from '../../ui/DrawerButton'
+import { Text } from '../../shared/common'
 
 class Tags extends Component {
 
@@ -44,7 +45,7 @@ class Tags extends Component {
     }
     return <TouchableOpacity key={tag.id}>
       <View style={[styles.tagItem, borderColor]}>
-        <Text>{tag.title || t('New Tag')}</Text>
+        <Text center fontSize='h7' fontStyle='regular'>{tag.title || t('New Tag')}</Text>
       </View>
     </TouchableOpacity>
   }
@@ -63,7 +64,7 @@ class Tags extends Component {
         <NewButton onPress={this.promptToCreate}/>
       </Toolbar>
       <View style={styles.content}>
-        <H1 style={styles.title}>{t('Tags')}</H1>
+        <Text fontSize='h5' fontStyle='semiBold' style={styles.title}>{t('Tags')}</Text>
         { this.renderTagList() }
       </View>
     </View>
@@ -90,13 +91,15 @@ const styles = StyleSheet.create({
   tagItem: {
     height: 60,
     width: 160,
-    marginVertical: 25,
-    marginHorizontal: 20,
+    marginVertical: 20,
+    marginHorizontal: 18,
     backgroundColor: 'white',
     flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
-    padding: 8,
-    borderRadius: 4,
+    padding: 15,
+    paddingVertical: 10,
+    borderRadius: 20,
     borderColor: 'hsl(0, 0%, 87%)', //bootstrap default
     borderWidth: 1,
   },

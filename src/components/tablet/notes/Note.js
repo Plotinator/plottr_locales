@@ -5,6 +5,7 @@ import { StyleSheet } from 'react-native'
 import AttachmentList from '../../shared/attachments/AttachmentList'
 import { DetailsWrapper, DetailsLeft, DetailsRight } from '../shared/Details'
 import { RichEditor } from '../../shared/common'
+import DetailImage from '../shared/DetailImage'
 
 export default function Note (props) {
   const { note } = props
@@ -31,6 +32,7 @@ export default function Note (props) {
   return (
     <DetailsWrapper>
       <DetailsLeft contentContainerStyle={{ flex: 1 }}>
+        <DetailImage image={note.image && note.image.data} />
         <Item inlineLabel style={styles.label}>
           <Label>{t('Title')}</Label>
           <Input
@@ -81,6 +83,6 @@ const styles = StyleSheet.create({
     paddingRight: 8
   },
   rceView: {
-    flex: 1
+    // flex: 1
   }
 })

@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import t from 'format-message'
 import { View, Input, Label, Item, Text, Button } from 'native-base'
-import { StyleSheet, ScrollView } from 'react-native'
+import { StyleSheet, ScrollView, Image } from 'react-native'
 import AttachmentList from '../../shared/attachments/AttachmentList'
 import { DetailsWrapper, DetailsLeft, DetailsRight } from '../shared/Details'
 import { RichEditor } from '../../shared/common'
+import DetailImage from '../shared/DetailImage'
 
 export default function Character (props) {
   const { character, customAttributes } = props
@@ -124,6 +125,7 @@ export default function Character (props) {
   return (
     <DetailsWrapper>
       <DetailsLeft>
+        <DetailImage image={character.image && character.image.data} />
         <Item inlineLabel style={styles.label}>
           <Label>{t('Name')}</Label>
           <Input
