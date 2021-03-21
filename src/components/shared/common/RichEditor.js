@@ -7,10 +7,9 @@ import Text from './Text'
 import { Colors, HTMLToSlate, SlateToHTML } from '../../../utils'
 
 export default class RichTextEditor extends Component {
-
   getEditor = () => this.richText
 
-  setEditor = ref => this.richText = ref
+  setEditor = (ref) => (this.richText = ref)
 
   handleEditorInitialized = () => {
     //
@@ -22,12 +21,10 @@ export default class RichTextEditor extends Component {
     onChange && onChange(SLATE)
   }
 
-  renderTitleIcons = (
-    title,
-    size = 18,
-    style = 'bold',
-    props = {}
-  ) => ({ tintColor, selected }) => {
+  renderTitleIcons = (title, size = 18, style = 'bold', props = {}) => ({
+    tintColor,
+    selected
+  }) => {
     return (
       <Text
         {...props}
@@ -82,32 +79,36 @@ export default class RichTextEditor extends Component {
           initialContentHTML={initialText}
           onChange={this.handleOnChange}
           editorInitializedCallback={this.handleEditorInitialized}
-          disabled={disabled?true:false}
+          disabled={disabled ? true : false}
         />
-        <RichToolbar
-          style={toolbarStyles}
-          iconSize={20}
-          iconMap={{
-            bold: this.renderTitleIcons('B', 20),
-            italic: this.renderTitleIcons('I', 20, 'semiBoldItalic'),
-            underline: this.renderTitleIcons('U', 18, 'semiBold', { underlined: true }),
-            heading2: this.renderTitleIcons('H1'),
-            heading3: this.renderTitleIcons('H2')
-          }}
-          editor={this.richText}
-          getEditor={this.getEditor}
-          selectedIconTint={Colors.orange}
-          actions={[
-            actions.setBold,
-            actions.setItalic,
-            actions.setUnderline,
-            actions.setStrikethrough,
-            actions.heading2,
-            actions.heading3,
-            actions.insertOrderedList,
-            actions.insertBulletsList
-          ]}
-        />
+        {disabled ? null : (
+          <RichToolbar
+            style={toolbarStyles}
+            iconSize={20}
+            iconMap={{
+              bold: this.renderTitleIcons('B', 20),
+              italic: this.renderTitleIcons('I', 20, 'semiBoldItalic'),
+              underline: this.renderTitleIcons('U', 18, 'semiBold', {
+                underlined: true
+              }),
+              heading2: this.renderTitleIcons('H1'),
+              heading3: this.renderTitleIcons('H2')
+            }}
+            editor={this.richText}
+            getEditor={this.getEditor}
+            selectedIconTint={Colors.orange}
+            actions={[
+              actions.setBold,
+              actions.setItalic,
+              actions.setUnderline,
+              actions.setStrikethrough,
+              actions.heading2,
+              actions.heading3,
+              actions.insertOrderedList,
+              actions.insertBulletsList
+            ]}
+          />
+        )}
       </View>
     )
   }
