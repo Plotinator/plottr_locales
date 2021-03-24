@@ -230,9 +230,14 @@ export default class Main extends Component {
       })
   }
 
-  readDocument = ({ url }) => {
-    this.readDocumentFile(url)
-  }
+  readDocument = ({ url, name }) => {
+    let fileName = String(name)
+    .replace(/\s+/gi, '_')
+    .replace(/[^a-zA-Z0-9_\-]/gi)
+    const filePath = rnfs.DocumentDirectoryPath + `/${fileName}.pltr`
+    // let finalURL = rnfs.DocumentDirectoryPath + '/' + name.replace(/ /g,"_") + '.pltr';
+    this.readDocumentFile(filePath);
+}
 
   // selectDocument = () => {
   //   try {
