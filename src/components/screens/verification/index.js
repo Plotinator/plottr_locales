@@ -59,7 +59,7 @@ class Verification extends Component {
       if (!result || error) {
         return this.showError(error || t("Your email didn't verify. Try again or try another email."), false)
       }
-      if (result.length > 1) {
+      if (result.length > 1 || result[0] && result[0].licenses?.length > 1) {
         // when you have more than one licenses
         navigation.navigate('VerificationLicenses', { Licenses: result })
         console.log('LICENSES', result)
