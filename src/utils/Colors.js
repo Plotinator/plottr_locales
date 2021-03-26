@@ -22,6 +22,7 @@ const Colors = {
   textGray: '#888888',
   textLightGray: '#A8A8A8',
   lightGray: '#9F9F9F',
+  lightenGray: '#b3b3b3',
   lighterGray: '#CBCBCB'
 }
 
