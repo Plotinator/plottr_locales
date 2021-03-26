@@ -1,11 +1,3 @@
-
 node_modules
-*.bundle.js
-*.bundle.js.map
-screenshots/*
 .env
 .DS_Store
-data/*
-*.map
-.prev
-bin/electron_main.js
