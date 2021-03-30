@@ -11,6 +11,8 @@ import Subscription from './screens/subscription'
 import SubscriptionConfirmation from './screens/subscription/Confirmation'
 import ErrorBoundary from './shared/ErrorBoundary'
 import { cloneDeep } from 'lodash'
+import App from './App'
+import MainTabs from './tablet/navigators/MainTabs'
 
 const noHeader = { headerShown: false }
 const AuthStack = createStackNavigator()
@@ -24,24 +26,29 @@ const AuthReducer = (state = [], { type, data }) => {
   }
 }
 const _AuthStore = createStore(AuthReducer, AuthInitialState)
-const _UpdateData = (data) => _AuthStore.dispatch({ type: 'UPDATE_DATA', data })
+export const _UpdateData = (data, type = 'UPDATE_DATA') => _AuthStore.dispatch({ type: type, data })
 let _Navigator
 
 export default class AuthenticatorRoot extends Component {
   constructor (props) {
     super(props)
-    const { user, verifying, navigation } = props
-    const data = { user: cloneDeep(user), verifying }
+    const { user, verifying, navigation, skipVerificationDetails } = props
+    const data = { 
+      user: cloneDeep(user),
+      verifying,
+      skipVerificationDetails: cloneDeep(skipVerificationDetails)
+    }
 
     this.state = { ...data }
     _UpdateData(data)
   }
 
   static getDerivedStateFromProps (nextProps, prevState) {
-    const { user, verifying } = nextProps
+    const { user, verifying, skipVerificationDetails } = nextProps
     const data = {
       user: cloneDeep(user),
-      verifying
+      verifying,
+      skipVerificationDetails: cloneDeep(skipVerificationDetails)
     }
     const wasVerifying = !verifying && prevState.verifying
     const isVerified = user && user.verified && !prevState.user.verified

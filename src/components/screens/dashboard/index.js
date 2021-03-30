@@ -11,13 +11,17 @@ import images from '../../../images'
 import * as Animatable from 'react-native-animatable'
 import t from 'format-message'
 import { Spinner } from 'native-base'
+import { SKIP_VERIFICATION_DURATION } from '../../../utils/constants'
 
 const { PLOTTR_FILE } = images
 
 export default class Dashboard extends Component {
-  renderCTAButtons () {
-    const { createDocument, openDocument, logout, loading, noLogout } = this.props
 
+  renderCTAButtons () {
+    const { createDocument, openDocument, logout, loading, noLogout, skipVerificationDetails, forceVerify } = this.props
+    const currentTime = new Date().getTime();
+    const timeLapsedSeconds = (parseInt(currentTime) - parseInt(skipVerificationDetails.skipVerificationStartTime)) / 1000;
+    const remainingHours = Math.floor( (SKIP_VERIFICATION_DURATION - timeLapsedSeconds) / 3600) + " hrs";
     return [
       <Button
         block
@@ -36,13 +40,22 @@ export default class Dashboard extends Component {
         onPress={openDocument}>
         {t('SELECT A PROJECT FILE')}
       </Button>,
-      !noLogout && (
+      !noLogout && !skipVerificationDetails.skipVerification && (
         <ShellButton
           key={'logout'}
           disabled={loading}
           style={styles.logout}
           onPress={logout}>
           <Text color='lightgray'>{t('(Logout)')}</Text>
+        </ShellButton>
+      ),
+      skipVerificationDetails?.skipVerification && (
+        <ShellButton
+          key={'logout'}
+          disabled={loading}
+          style={styles.logout}
+          onPress={()=>{forceVerify(true)}}>
+          <Text color='textGray'>{t('Please verify the license in')}{remainingHours} </Text>
         </ShellButton>
       )
     ]
@@ -127,6 +140,7 @@ export default class Dashboard extends Component {
     )
   }
 }
+
 
 class RecentDocument extends Component {
   handleSelect = () => {

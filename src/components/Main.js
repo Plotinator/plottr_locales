@@ -16,12 +16,13 @@ import AsyncStorage from '@react-native-community/async-storage'
 import { setDocumentURL } from '../middlewares/DocumentSaver'
 import { ifIphoneX } from 'react-native-iphone-x-helper'
 import { Changes } from '../utils'
+import { SKIP_VERIFICATION_DURATION } from '../utils/constants'
 
 const {
   DocumentViewController,
   ReactNativeEventEmitter,
   DocumentBrowser,
-  AndroidDocumentBrowser,
+  AndroidDocumentBrowser
 } = NativeModules
 const { IS_IOS } = Metrics
 const DocumentEvents = new NativeEventEmitter(
@@ -36,7 +37,8 @@ export default class Main extends Component {
     appState: 'active',
     loading: false,
     isSubscribed: false,
-    recentDocuments: []
+    recentDocuments: [],
+    forceVerification: false
   }
 
   setLoading = (loading) => this.setState({ loading })
@@ -46,6 +48,12 @@ export default class Main extends Component {
     this.setState({ document })
   }
 
+  forceVerify = (value) => {
+    this.setState({
+      forceVerification: value
+    });
+  }
+
   closeDocument = () => {
     this.setDocument(null)
     store = configureStore({})
@@ -53,7 +61,7 @@ export default class Main extends Component {
     if (IS_IOS) DocumentViewController.closeDocument()
   }
 
-  componentDidMount () {
+  componentDidMount() {
     console.log('Changes', Changes)
     DocumentEvents.addListener('onOpenDocument', this.handleDocumentOpened)
     this.getRecentDocuments()
@@ -61,12 +69,12 @@ export default class Main extends Component {
     AppState.addEventListener('change', this.handleAppState)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     // clean up
     AppState.removeEventListener('change', this.handleAppState)
   }
 
-  handleAppState = newState => {
+  handleAppState = (newState) => {
     const { document, appState } = this.state
     const state = { appState: newState }
     const isInActive = newState !== 'active' && appState === 'active'
@@ -111,59 +119,60 @@ export default class Main extends Component {
     const filePath = DocumentDirectoryPath + `/${fileName}.pltr`
     const fileData = `{"storyName": "${input}", "newFile": true}`
     const writeProjectFile = () => {
-      rnfs.writeFile(filePath, fileData, 'utf8')
-        .then(() => this.handleDocumentOpened({
-          data: fileData,
-          documentURL: filePath,
-          isInDocuments: true,
-        }))
+      rnfs
+        .writeFile(filePath, fileData, 'utf8')
+        .then(() =>
+          this.handleDocumentOpened({
+            data: fileData,
+            documentURL: filePath,
+            isInDocuments: true
+          })
+        )
         .catch((err) => {
           this.showCreateFileError()
         })
     }
-    rnfs.exists(filePath)
-      .then((exists) => {
-        if(exists) {
-          const actions = [
-            {
-              positive: true,
-              name: t('OVERWRITE'),
-              callback: writeProjectFile
-            },
-            {
-              name: t('Cancel').toUpperCase(),
-              callback: () => this.setLoading(false)
-            }
-          ]
-          showAlert({
-            title: t('LOOK OUT!'),
-            message: t(
-              'You already have a file named {file}',
-              { file: `"${fileName}.pltr"` }
-            ),
-            actions
-          })
-        } else writeProjectFile()
-      })
+    rnfs.exists(filePath).then((exists) => {
+      if (exists) {
+        const actions = [
+          {
+            positive: true,
+            name: t('OVERWRITE'),
+            callback: writeProjectFile
+          },
+          {
+            name: t('Cancel').toUpperCase(),
+            callback: () => this.setLoading(false)
+          }
+        ]
+        showAlert({
+          title: t('LOOK OUT!'),
+          message: t('You already have a file named {file}', {
+            file: `"${fileName}.pltr"`
+          }),
+          actions
+        })
+      } else writeProjectFile()
+    })
   }
 
-  getRecentDocuments () {
+  getRecentDocuments() {
     // used to reset recents
     // AsyncStorage.setItem('recentDocuments', JSON.stringify([]))
 
-    AsyncStorage.getItem('recentDocuments').then(data => {
-      if(data) {
+    AsyncStorage.getItem('recentDocuments').then((data) => {
+      if (data) {
         try {
           const recentDocuments = JSON.parse(data || '[]')
           this.setState({ recentDocuments })
-        } catch(e) {
+        } catch (e) {
           console.log('corrupt recent docs', e)
         }
       }
     })
   }
 
-  addRecentDocument ({ data, documentURL }) {
+  addRecentDocument({ data, documentURL }) {
     const { recentDocuments = [] } = this.state
     const documentObject = JSON.parse(data)
     const { storyName, series } = documentObject
@@ -171,7 +180,7 @@ export default class Main extends Component {
 
     recentDocuments.forEach((document, i) => {
       const { name, url } = document
-      if(url == documentURL && name == projetName) {
+      if (url == documentURL && name == projetName) {
         recentDocuments.splice(i, 1)
       }
     })
@@ -186,7 +195,7 @@ export default class Main extends Component {
     AsyncStorage.setItem('recentDocuments', JSON.stringify(newRecent))
   }
 
-  showFileProcessingError () {
+  showFileProcessingError() {
     showAlert({
       title: t('UH-OH!'),
       message: t('We had a problem processing your file')
@@ -194,7 +203,7 @@ export default class Main extends Component {
     this.setLoading(false)
   }
 
-  showInValidFileError () {
+  showInValidFileError() {
     showAlert({
       title: t('UH-OH!'),
       message: t('Please select a valid Plottr file')
@@ -202,7 +211,7 @@ export default class Main extends Component {
     this.setLoading(false)
   }
 
-  showCreateFileError () {
+  showCreateFileError() {
     showAlert({
       title: t('UH-OH!'),
       message: t('We had a problem creating a new project')
@@ -210,13 +219,14 @@ export default class Main extends Component {
     this.setLoading(false)
   }
 
-  readDocumentFile (uri, setRecent = true) {
+  readDocumentFile(uri, setRecent = true) {
     this.setLoading(true)
     // if (IS_IOS) {
     //   DocumentViewController.readDocument(decodeURI(uri))
     // } else {
     // }
-    rnfs.readFile(decodeURI(uri), 'utf8')
+    rnfs
+      .readFile(decodeURI(uri), 'utf8')
       .then((data) => {
         const document = {
           data,
@@ -232,12 +242,12 @@ export default class Main extends Component {
 
   readDocument = ({ url, name }) => {
     let fileName = String(name)
-    .replace(/\s+/gi, '_')
-    .replace(/[^a-zA-Z0-9_\-]/gi)
+      .replace(/\s+/gi, '_')
+      .replace(/[^a-zA-Z0-9_\-]/gi)
     const filePath = rnfs.DocumentDirectoryPath + `/${fileName}.pltr`
     // let finalURL = rnfs.DocumentDirectoryPath + '/' + name.replace(/ /g,"_") + '.pltr';
-    this.readDocumentFile(filePath);
-}
+    this.readDocumentFile(filePath)
+  }
 
   // selectDocument = () => {
   //   try {
@@ -305,7 +315,7 @@ export default class Main extends Component {
     this.setDocument(null)
   }
 
-  renderProjectDocument () {
+  renderProjectDocument() {
     const { logout } = this.props
     const { document } = this.state
     const { documentURL } = document || {}
@@ -322,33 +332,31 @@ export default class Main extends Component {
     )
   }
 
-  renderDashboard (bypass) {
+  renderDashboard(bypass) {
     const {
       readDocument,
       createDocument,
       selectDocument,
-      state: {
-        loading,
-        recentDocuments
-      },
-      props: {
-        logout
-      }
+      forceVerify,
+      state: { loading, recentDocuments },
+      props: { logout, skipVerificationDetails, sendVerificationEmail, user }
     } = this
     return (
       <Dashboard
         logout={logout}
         loading={loading}
         noLogout={bypass}
+        skipVerificationDetails={skipVerificationDetails}
         readDocument={readDocument}
         recentDocuments={recentDocuments}
         createDocument={createDocument}
         openDocument={selectDocument}
+        forceVerify={forceVerify}
       />
     )
   }
 
-  renderAuthenticator () {
+  renderAuthenticator() {
     const {
       user,
       verifying,
@@ -356,6 +364,7 @@ export default class Main extends Component {
       verifyLicense,
       subscribeUser,
       sendVerificationEmail,
+      skipVerificationDetails
     } = this.props
     const { verified } = user
 
@@ -366,31 +375,53 @@ export default class Main extends Component {
         verifyCode={verifyCode}
         verifyLicense={verifyLicense}
         subscribeUser={subscribeUser}
-        sendVerificationEmail={sendVerificationEmail} />
+        sendVerificationEmail={sendVerificationEmail}
+        skipVerificationDetails={skipVerificationDetails}
+      />
     )
   }
 
+  shouldSkipVerification = (skipVerification, skipVerificationStartTime) => {
+    let currentTime = new Date().getTime();
+    let timeLapsedSeconds = (parseInt(currentTime) - parseInt(skipVerificationStartTime)) / 1000;
+    return skipVerification && timeLapsedSeconds < SKIP_VERIFICATION_DURATION;
+  }
+
   render() {
-    const { document } = this.state
+    const { document, tryVerification } = this.state
     const { user = {} } = this.props
-    const { verified, validLicense, validSubscription, noAutoRedirect } = user
-    const bypassForDevs = __DEV__ // false
+    const { skipVerificationDetails = {} } = this.props
+    const {
+      verified,
+      validLicense,
+      validSubscription,
+      noAutoRedirect,
+    } = user
+    const {
+      skipVerification,
+      skipVerificationStartTime
+    } = skipVerificationDetails
+    // const bypassForDevs = __DEV__ // false
+    const bypassForDevs = false
 
     // if the user is verified and valid
     // or has a valid subscription
     // or we have a dev bypass (bypassForDevs)
     const userIsVerifiedAndValid =
-      verified && validLicense || validSubscription || bypassForDevs
+      !this.state.forceVerification &&
+      ( (verified && validLicense) ||
+      validSubscription ||
+      this.shouldSkipVerification(skipVerification,skipVerificationStartTime) ||
+      bypassForDevs)
 
     // only if a document is loaded we will
     // show the project document for manipulation
-    if(userIsVerifiedAndValid && document)
-      return this.renderProjectDocument()
+    if (userIsVerifiedAndValid && document) return this.renderProjectDocument()
 
     // if the user is verified and valid
     // or we are developing or there isn't
     // a noAutoRedirect flag, we show the dashboard
-    if(userIsVerifiedAndValid && !noAutoRedirect)
+    if (userIsVerifiedAndValid && !noAutoRedirect)
       return this.renderDashboard(bypassForDevs)
 
     // else we don't know who you are! :-(

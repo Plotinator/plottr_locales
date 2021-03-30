@@ -589,5 +589,11 @@
   },
   "Other": {
     "message": "Other"
+  },
+  "Skip for a day": {
+    "message": "Skip Verification (for a day)"
+  },
+  "Please verify the license in": {
+    "message": "Please verify the license in "
   }
 }

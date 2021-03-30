@@ -8,13 +8,18 @@ import {
   TESTR_CODE,
   BASE_URL,
   USER_KEY,
+  SKIP_VERIFICATION_KEY,
   OLD_PRODUCT_IDS,
   PRO_PRODUCT_IDS
 } from './constants'
 
 export async function getUserVerification () {
-  const info = await AsyncStorage.getItem(USER_KEY)
+  const info = await AsyncStorage.getItem(USER_KEY);
   return info ? JSON.parse(info) : null
+}
+export async function getSkipVerificationDetails () {
+  const verificationInfo = await AsyncStorage.getItem(SKIP_VERIFICATION_KEY);
+  return verificationInfo ? JSON.parse(verificationInfo) : null
 }
 
 export async function setSubscribedUser (data) {

@@ -14,6 +14,11 @@ import images from '../../../images'
 import * as Animatable from 'react-native-animatable'
 import t from 'format-message'
 import Metrics from '../../../utils/Metrics'
+import AsyncStorage from '@react-native-community/async-storage'
+import { SKIP_VERIFICATION_KEY } from '../../../utils/constants'
+import { _UpdateData } from '../../AuthenticatorRoot'
+import { cloneDeep } from 'lodash'
+
 
 const { IS_ANDROID } = Metrics
 
@@ -23,16 +28,14 @@ class VerificationConfirmation extends Component {
     submitted: false,
     resent: false
   }
-
-  static getDerivedStateFromProps (nextProps, prevState) {
+  static getDerivedStateFromProps(nextProps, prevState) {
     const { verifying } = nextProps
     const { submitted } = prevState
-    if(!verifying && submitted == true)
-      prevState.submitted = false
+    if (!verifying && submitted == true) prevState.submitted = false
     return prevState
   }
 
-  componentDidUpdate () {
+  componentDidUpdate() {
     const { user, verifying } = this.props
     if (!verifying && user && user.email && user.verified) {
       // user is now valid and logged in and
@@ -69,9 +72,31 @@ class VerificationConfirmation extends Component {
     navigation.navigate('Verification')
   }
 
-  render () {
+  handleSkipVerification = () => {
+    const {
+      verifying,
+      user
+    } = this.props
+    let skipVerificationInfo = {}
+    skipVerificationInfo['skipVerification'] = true
+    skipVerificationInfo['skipVerificationStartTime'] = new Date().getTime()
+    AsyncStorage.setItem(SKIP_VERIFICATION_KEY, JSON.stringify(skipVerificationInfo));
+    const data = {
+      user: cloneDeep(user),
+      verifying,
+      skipVerificationDetails: cloneDeep(skipVerificationInfo)
+    }
+    _UpdateData(data);
+    this.props.navigation.navigate('Main');
+  }
+
+  render() {
     const { code, resent, submitted } = this.state
-    const { verifying, user: { email } } = this.props
+    const {
+      verifying,
+      user: { email },
+      skipVerificationDetails
+    } = this.props
     const isValidCode = code && !code.match(/[^0-9]/)
     console.log('isValidCode', isValidCode, code)
     return (
@@ -100,7 +125,8 @@ class VerificationConfirmation extends Component {
                 disabled={verifying}
                 keyboardType='numeric'
                 placeholder={t('CODE')}
-                onChangeText={this.handleCodeText} />
+                onChangeText={this.handleCodeText}
+              />
               <Button
                 block
                 disabled={verifying || !isValidCode}
@@ -147,6 +173,20 @@ class VerificationConfirmation extends Component {
                 onPress={this.handleDifferentEmail}>
                 {t('Use a different email').toUpperCase()}
               </Button>
+              {/* <View style={styles.or}>
+                <Text fontStyle={'bold'}>{t('or')}</Text>
+              </View> */}
+              {/* <ShellButton */}
+              {skipVerificationDetails?.skipVerification && (
+                <ShellButton
+                  block
+                  disabled={verifying}
+                  style={styles.button}
+                  buttonColor='lightGray'
+                  onPress={this.handleSkipVerification}>
+                  <Text>{t('Skip for a day')}</Text>
+                </ShellButton>
+              )}
               {IS_ANDROID && <GoToPlottrDotCom />}
             </Animatable.View>
           </View>
@@ -156,8 +196,13 @@ class VerificationConfirmation extends Component {
   }
 }
 
-const mapStateToProps = ({ data: { user, verifying } }) => {
-  return { user: user || {}, verifying }
+const mapStateToProps = (data) => {
+  const  { user, verifying, skipVerificationDetails } = data.data;
+  return { 
+    user: user || {},
+    verifying,
+    skipVerificationDetails: skipVerificationDetails || {} 
+  }
 }
 
 export default connect(mapStateToProps)(VerificationConfirmation)
