@@ -15,7 +15,7 @@ import * as Animatable from 'react-native-animatable'
 import t from 'format-message'
 import Metrics from '../../../utils/Metrics'
 import AsyncStorage from '@react-native-community/async-storage'
-import { SKIP_VERIFICATION_KEY } from '../../../utils/constants'
+import { SKIP_VERIFICATION_DURATION, SKIP_VERIFICATION_KEY } from '../../../utils/constants'
 import { _UpdateData } from '../../AuthenticatorRoot'
 import { cloneDeep } from 'lodash'
 
@@ -58,12 +58,13 @@ class VerificationConfirmation extends Component {
 
   handleResendEmail = () => {
     const {
-      user: { email },
+      // user: { email },
+      user,
       route: {
-        params: { verifyLicense }
+        params: { sendVerificationEmail }
       }
     } = this.props
-    verifyLicense(email)
+    sendVerificationEmail(user)
     this.setState({ resent: true })
   }
 
@@ -75,11 +76,19 @@ class VerificationConfirmation extends Component {
   handleSkipVerification = () => {
     const {
       verifying,
-      user
+      user,
+      route: {
+        params: { updateSkipVerification, forceVerify }
+      },
+      skipVerificationDetails
     } = this.props
-    let skipVerificationInfo = {}
-    skipVerificationInfo['skipVerification'] = true
-    skipVerificationInfo['skipVerificationStartTime'] = new Date().getTime()
+    let skipVerificationInfo = {
+      'skipVerification': true,
+      'skipVerificationStartTime':
+        skipVerificationDetails?.skipVerificationStartTime ?
+          skipVerificationDetails?.skipVerificationStartTime :
+          new Date().getTime()
+    }
     AsyncStorage.setItem(SKIP_VERIFICATION_KEY, JSON.stringify(skipVerificationInfo));
     const data = {
       user: cloneDeep(user),
@@ -87,7 +96,16 @@ class VerificationConfirmation extends Component {
       skipVerificationDetails: cloneDeep(skipVerificationInfo)
     }
     _UpdateData(data);
-    this.props.navigation.navigate('Main');
+    updateSkipVerification(skipVerificationInfo);
+    forceVerify(false);
+  }
+
+  didTimeLapse = (skipVerificationDetails) => {
+    const { skipVerification, skipVerificationStartTime } = skipVerificationDetails;
+    const currentTime = new Date().getTime();
+    const timeLapsedSeconds =
+      skipVerification === undefined ? 0 : (parseInt(currentTime) - parseInt(skipVerificationStartTime)) / 1000;
+    return timeLapsedSeconds < SKIP_VERIFICATION_DURATION;
   }
 
   render() {
@@ -177,16 +195,15 @@ class VerificationConfirmation extends Component {
                 <Text fontStyle={'bold'}>{t('or')}</Text>
               </View> */}
               {/* <ShellButton */}
-              {!skipVerificationDetails?.skipVerification && (
-                <ShellButton
-                  block
-                  disabled={verifying}
-                  style={styles.button}
-                  buttonColor='lightGray'
-                  onPress={this.handleSkipVerification}>
-                  <Text>{t('Skip for a day')}</Text>
-                </ShellButton>
-              )}
+              {this.didTimeLapse(skipVerificationDetails) && <ShellButton
+                block
+                disabled={verifying}
+                style={styles.button}
+                buttonColor='lightGray'
+                onPress={this.handleSkipVerification}>
+                <Text>{!skipVerificationDetails?.skipVerification ? t('Skip verification for a day') : t('I will verify later')}</Text>
+              </ShellButton>
+              }
               {IS_ANDROID && <GoToPlottrDotCom />}
             </Animatable.View>
           </View>
@@ -197,11 +214,11 @@ class VerificationConfirmation extends Component {
 }
 
 const mapStateToProps = (data) => {
-  const  { user, verifying, skipVerificationDetails } = data.data;
-  return { 
+  const { user, verifying, skipVerificationDetails } = data.data;
+  return {
     user: user || {},
     verifying,
-    skipVerificationDetails: skipVerificationDetails || {} 
+    skipVerificationDetails: skipVerificationDetails || {}
   }
 }
 

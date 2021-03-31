@@ -43,11 +43,11 @@ export default class App extends Component {
     this.setState({ userInfo, skipVerificationDetails }, info && checkLicense && this.checkUserLicense)
   }
 
-  // updateSkipVerification = (skipVerificationDetails) =>{
-  //   this.setState({
-  //     skipVerificationDetails: skipVerificationDetails
-  //   })
-  // }
+  updateSkipVerification = (skipVerificationDetails) =>{
+    this.setState({
+      skipVerificationDetails: skipVerificationDetails
+    })
+  }
 
   setVerifying(verifying) {
     this.setState({ verifying })
@@ -186,7 +186,8 @@ export default class App extends Component {
       handleCodeVerification,
       addUserSubscription,
       handleSetUserInfo,
-      handleLogout
+      handleLogout,
+      updateSkipVerification
     } = this
 
     console.log('userInfo', userInfo)
@@ -204,13 +205,14 @@ export default class App extends Component {
                 <Main
                   v2
                   user={userInfo}
-                  skipVerificationDetails={skipVerificationDetails?skipVerificationDetails:{}}
+                  skipVerificationDetails={this.state.skipVerificationDetails?this.state.skipVerificationDetails:{}}
                   verifying={verifying}
                   logout={handleLogout}
                   verifyCode={handleCodeVerification}
                   verifyByEmail={handleEmailVerification}
                   sendVerificationEmail={handleSendVerificationEmail}
-                  subscribeUser={addUserSubscription} />
+                  subscribeUser={addUserSubscription}
+                  updateSkipVerification={updateSkipVerification} />
               </AppErrorBoundary>
               <AlertDialog />
             </View>

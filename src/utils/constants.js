@@ -11,7 +11,6 @@ export const RCE_URL = 'https://plottr-web-rce.vercel.app/'
 export const CELL_WIDTH = 175
 export const CELL_HEIGHT = 93
 export const LEFT_COLUMN_WIDTH = 150
-// export const SKIP_VERIFICATION_DURATION = 2000; // 24 hours in seconds
 export const SKIP_VERIFICATION_DURATION = 86400; // 24 hours in seconds
 
 // licensing

@@ -17,11 +17,15 @@ const { PLOTTR_FILE } = images
 
 export default class Dashboard extends Component {
 
-  renderCTAButtons () {
+  renderCTAButtons() {
     const { createDocument, openDocument, logout, loading, noLogout, skipVerificationDetails, forceVerify } = this.props
     const currentTime = new Date().getTime();
     const timeLapsedSeconds = (parseInt(currentTime) - parseInt(skipVerificationDetails?.skipVerificationStartTime)) / 1000;
-    const remainingHours = Math.floor( (SKIP_VERIFICATION_DURATION - timeLapsedSeconds) / 3600) + " hrs";
+    let remainingHours = Math.floor((SKIP_VERIFICATION_DURATION - timeLapsedSeconds) / 3600) + " hrs";
+    // handle 0 hrs
+    remainingHours = (remainingHours === '0 hrs') ?
+      Math.floor((SKIP_VERIFICATION_DURATION - timeLapsedSeconds) / 60) + " mins" :
+      remainingHours;
     return [
       <Button
         block
@@ -54,14 +58,14 @@ export default class Dashboard extends Component {
           key={'logout'}
           disabled={loading}
           style={styles.logout}
-          onPress={()=>{forceVerify(true)}}>
-          <Text color='textGray'>{t('Please verify the license in')}{remainingHours} </Text>
+          onPress={() => { forceVerify(true) }}>
+          <Text color='textGray'>{t('Please verify your license in')}{remainingHours} </Text>
         </ShellButton>
       )
     ]
   }
 
-  renderLoader () {
+  renderLoader() {
     return (
       <View style={styles.loader}>
         <Spinner color='orange' />
@@ -81,7 +85,7 @@ export default class Dashboard extends Component {
     )
   }
 
-  renderRecentDocuments (hasRecent) {
+  renderRecentDocuments(hasRecent) {
     const { loading, recentDocuments } = this.props
     return hasRecent ? (
       [
@@ -101,13 +105,13 @@ export default class Dashboard extends Component {
           animation='fadeInUp'
           easing='ease-out-expo'
           style={styles.or}>
-            <Text fontStyle={'bold'}>{t('or').toUpperCase()}</Text>
+          <Text fontStyle={'bold'}>{t('or').toUpperCase()}</Text>
         </Animatable.View>
       ]
     ) : null
   }
 
-  render () {
+  render() {
     const { loading, recentDocuments } = this.props
     const hasRecentDocuments = (recentDocuments || []).length
     return (
@@ -147,7 +151,7 @@ class RecentDocument extends Component {
     const { index, document, onPress } = this.props
     onPress(document, index)
   }
-  render () {
+  render() {
     const { index, document: { name } } = this.props
     return (
       <ShellButton

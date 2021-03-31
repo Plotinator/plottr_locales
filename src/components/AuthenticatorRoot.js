@@ -82,9 +82,11 @@ export default class AuthenticatorRoot extends Component {
       verifyCode,
       verifyLicense,
       subscribeUser,
-      sendVerificationEmail
+      sendVerificationEmail,
+      updateSkipVerification,
+      forceVerify
     } = this.props
-    const actions = { logout, verifyCode, verifyLicense, subscribeUser, sendVerificationEmail }
+    const actions = { logout, verifyCode, verifyLicense, subscribeUser, sendVerificationEmail, updateSkipVerification, forceVerify }
     const needConfirmation = user && user.email && !user.verified
     const initialRouteName = needConfirmation
       ? 'VerificationConfirmation'

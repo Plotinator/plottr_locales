@@ -364,7 +364,8 @@ export default class Main extends Component {
       verifyLicense,
       subscribeUser,
       sendVerificationEmail,
-      skipVerificationDetails
+      skipVerificationDetails,
+      updateSkipVerification
     } = this.props
     const { verified } = user
 
@@ -377,6 +378,8 @@ export default class Main extends Component {
         subscribeUser={subscribeUser}
         sendVerificationEmail={sendVerificationEmail}
         skipVerificationDetails={skipVerificationDetails}
+        updateSkipVerification={updateSkipVerification}
+        forceVerify={this.forceVerify}
       />
     )
   }

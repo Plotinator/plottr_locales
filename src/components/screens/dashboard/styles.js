@@ -52,7 +52,7 @@ export default ScaledSheet.create({
   actionButtons: {
     // minHeight: 150,
     width: '90%',
-    maxWidth: 400,
+    maxWidth: 450,
     justifyContent: 'center',
     alignItems: 'center'
   },
