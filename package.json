@@ -12,6 +12,7 @@
   ],
   "author": "",
   "dependencies": {
+    "flip": "^1.0.0",
     "format-message": "^6.2.3"
   }
 }
