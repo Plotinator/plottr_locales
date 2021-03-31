@@ -114,10 +114,12 @@ const styles = StyleSheet.create({
   rowView: {
     flexDirection: 'row',
     alignItems: 'center',
+    width: '96%'
   },
   badge: {
     marginTop: Metrics.baseMargin / 2.5,
-    marginLeft: Metrics.baseMargin
+    marginLeft: Metrics.baseMargin,
+    alignSelf: 'center',
   },
   hex: {
     paddingHorizontal: Metrics.baseMargin / 2,
