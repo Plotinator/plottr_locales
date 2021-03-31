@@ -14,17 +14,20 @@
   "Access to all the features": {
     "message": "(╯°□°）╯︵ sǝɹnʇɐǝɟ ǝɥʇ ʃʃɐ oʇ ssǝɔɔ∀"
   },
-  "Account Information": {
-    "message": "(╯°□°）╯︵ uoıʇɐɯɹoɟuI ʇunoɔɔ∀"
-  },
   "Account": {
     "message": "(╯°□°）╯︵ ʇunoɔɔ∀"
+  },
+  "Account Information": {
+    "message": "(╯°□°）╯︵ uoıʇɐɯɹoɟuI ʇunoɔɔ∀"
   },
   "Actions": {
     "message": "(╯°□°）╯︵ suoıʇɔ∀"
   },
   "Activate License": {
     "message": "(╯°□°）╯︵ ǝsuǝɔı⅂ ǝʇɐʌıʇɔ∀"
+  },
+  "Add": {
+    "message": "(╯°□°）╯︵ pp∀"
   },
   "Add Chapter": {
     "message": "(╯°□°）╯︵ ɹǝʇdɐɥↃ pp∀"
@@ -43,9 +46,6 @@
   },
   "Add new scenes or chapters here": {
     "message": "(╯°□°）╯︵ ǝɹǝɥ sɹǝʇdɐɥɔ ɹo sǝuǝɔs ʍǝu pp∀"
-  },
-  "Add": {
-    "message": "(╯°□°）╯︵ pp∀"
   },
   "Advanced Export Options": {
     "message": "(╯°□°）╯︵ suoıʇdO ʇɹodxƎ pǝɔuɐʌp∀"
@@ -296,6 +296,9 @@
   "Copy": {
     "message": "(╯°□°）╯︵ ʎdoↃ"
   },
+  "Create": {
+    "message": "(╯°□°）╯︵ ǝʇɐǝɹↃ"
+  },
   "Create Blank Project": {
     "message": "(╯°□°）╯︵ ʇɔǝɾoɹԀ ʞuɐʃ၁2 ǝʇɐǝɹↃ"
   },
@@ -313,9 +316,6 @@
   },
   "Create unlimited project files": {
     "message": "(╯°□°）╯︵ sǝʃıɟ ʇɔǝɾoɹd pǝʇıɯıʃun ǝʇɐǝɹↃ"
-  },
-  "Create": {
-    "message": "(╯°□°）╯︵ ǝʇɐǝɹↃ"
   },
   "Created By": {
     "message": "(╯°□°）╯︵ ʎ၁2 pǝʇɐǝɹↃ"
@@ -919,6 +919,7 @@
   },
   "Plottr Mobile": {
     "message": "(╯°□°）╯︵ ǝʃıqoW ɹʇʇoʃԀ"
+
   },
   "Plottr Support": {
     "message": "(╯°□°）╯︵ ʇɹoddnS ɹʇʇoʃԀ"
