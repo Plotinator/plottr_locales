@@ -204,7 +204,7 @@ export default class App extends Component {
                 <Main
                   v2
                   user={userInfo}
-                  skipVerificationDetails={skipVerificationDetails}
+                  skipVerificationDetails={skipVerificationDetails?skipVerificationDetails:{}}
                   verifying={verifying}
                   logout={handleLogout}
                   verifyCode={handleCodeVerification}

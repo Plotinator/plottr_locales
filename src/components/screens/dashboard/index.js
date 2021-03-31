@@ -20,7 +20,7 @@ export default class Dashboard extends Component {
   renderCTAButtons () {
     const { createDocument, openDocument, logout, loading, noLogout, skipVerificationDetails, forceVerify } = this.props
     const currentTime = new Date().getTime();
-    const timeLapsedSeconds = (parseInt(currentTime) - parseInt(skipVerificationDetails.skipVerificationStartTime)) / 1000;
+    const timeLapsedSeconds = (parseInt(currentTime) - parseInt(skipVerificationDetails?.skipVerificationStartTime)) / 1000;
     const remainingHours = Math.floor( (SKIP_VERIFICATION_DURATION - timeLapsedSeconds) / 3600) + " hrs";
     return [
       <Button
@@ -40,7 +40,7 @@ export default class Dashboard extends Component {
         onPress={openDocument}>
         {t('SELECT A PROJECT FILE')}
       </Button>,
-      !noLogout && !skipVerificationDetails.skipVerification && (
+      !noLogout && !skipVerificationDetails?.skipVerification && (
         <ShellButton
           key={'logout'}
           disabled={loading}

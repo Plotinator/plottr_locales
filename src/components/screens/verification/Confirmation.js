@@ -177,7 +177,7 @@ class VerificationConfirmation extends Component {
                 <Text fontStyle={'bold'}>{t('or')}</Text>
               </View> */}
               {/* <ShellButton */}
-              {skipVerificationDetails?.skipVerification && (
+              {!skipVerificationDetails?.skipVerification && (
                 <ShellButton
                   block
                   disabled={verifying}
