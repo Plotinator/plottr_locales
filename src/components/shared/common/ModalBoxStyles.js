@@ -53,7 +53,7 @@ export default ScaledSheet.create({
     alignItems: 'center'
   },
   closeButton: {
-    padding: baseMargin * 1.5,
+    padding: baseMargin * 1.3,
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'flex-end',

@@ -89,7 +89,7 @@ export default class ModalBox extends Component {
             <Icon type='FontAwesome5' name='times' style={styles.closeIcon} />
           </ShellButton>
           <View style={styles.dialogTitle}>
-            <Text style={styles.titleText} fontSize='h3' fontStyle='bold' center>
+            <Text style={styles.titleText} fontSize='h4' fontStyle='bold' center>
               {title}
             </Text>
           </View>

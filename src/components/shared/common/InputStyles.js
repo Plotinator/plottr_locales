@@ -30,6 +30,11 @@ export default ScaledSheet.create({
     fontSize: size.h4,
     flex: 1
   },
+  multiline: {
+    height: 'auto',
+    paddingTop: baseMargin,
+    maxHeight: '120@ms'
+  },
   inputSmall: {
     fontSize: size.small
   },
