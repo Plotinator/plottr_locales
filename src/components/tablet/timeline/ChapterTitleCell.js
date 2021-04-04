@@ -119,7 +119,12 @@ class ChapterTitleCell extends PureComponent {
         <Cell style={styles.cell}
           onPress={this.askToRename}
           ref={r => this.ref = r}>
-          <Text fontStyle='bold' style={styles.text}>{beatTitle}</Text>
+          <Text
+            fontStyle='bold'
+            style={styles.text}
+            numberOfLines={3}>
+            {beatTitle}
+          </Text>
         </Cell>
       </View>
     )
@@ -134,7 +139,7 @@ const styles = StyleSheet.create({
   },
   text: {
     textAlign: 'center',
-    fontSize: 18,
+    fontSize: 14,
     paddingHorizontal: 10,
     backgroundColor: 'hsl(210, 36%, 96%)'
   },

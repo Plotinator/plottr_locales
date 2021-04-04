@@ -105,15 +105,16 @@ const styles = StyleSheet.create({
   },
   title: {
     ...fontStyles.bold,
+    fontSize: fontSizes.tiny,
     paddingRight: Metrics.baseMargin
   },
   caret: {
-    fontSize: fontSizes.small,
+    fontSize: fontSizes.tiny,
     marginTop: 3,
     color: Colors.textBlack
   },
   text: {
-    fontSize: fontSizes.small
+    fontSize: fontSizes.tiny
   }
 })
 

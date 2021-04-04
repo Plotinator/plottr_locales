@@ -64,7 +64,10 @@ export default class LineTitleCell extends PureComponent {
         <Cell
           style={styles.lineTitleCell}
           onPress={this.handleEdit}>
-          <Text fontStyle='bold' style={styles.lineTitle}>
+          <Text
+            fontStyle='bold'
+            style={styles.lineTitle}
+            numberOfLines={3}>
             {line.title}
           </Text>
         </Cell>
@@ -83,7 +86,8 @@ const styles = StyleSheet.create({
   lineTitle: {
     paddingVertical: 10,
     backgroundColor: 'hsl(210, 36%, 96%)',
-    fontSize: 18
+    textAlign: 'right',
+    fontSize: 14
   }
 })
 
