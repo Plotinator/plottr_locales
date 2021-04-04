@@ -10,6 +10,7 @@ import Cell from '../shared/Cell'
 import { showAlert, showInputAlert } from '../../shared/common/AlertDialog'
 import { Text, ShellButton } from '../../shared/common'
 import { CELL_WIDTH } from '../../../utils/constants'
+import { moderateScale } from 'react-native-size-matters'
 
 class ChapterTitleCell extends PureComponent {
   state = {
@@ -139,7 +140,7 @@ const styles = StyleSheet.create({
   },
   text: {
     textAlign: 'center',
-    fontSize: 14,
+    fontSize: moderateScale(10),
     paddingHorizontal: 10,
     backgroundColor: 'hsl(210, 36%, 96%)'
   },
