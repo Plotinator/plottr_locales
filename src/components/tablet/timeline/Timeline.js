@@ -577,6 +577,8 @@ class Timeline extends Component {
           <Input
             inset
             small
+            multiline
+            numberOfLines={3}
             label={t('Title')}
             value={title}
             autoCapitalize='sentences'
