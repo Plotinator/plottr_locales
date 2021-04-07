@@ -12,11 +12,11 @@ Use the following commands to push and pull as a subtree (if you're
 working inside of an application).
 
 ```bash
-    git subtree push --prefix=lib/pltr/ pltr <your-branch-name-here>
+    git subtree push --prefix=lib/plottr_components/ plottr_components <your-branch-name-here>
 ```
 
 ```bash
-    git subtree pull --prefix lib/pltr pltr master --squash
+    git subtree pull --prefix lib/plottr_components plottr_components master --squash
 ```
 
 ### Dependency on Other Plottr Libraries
