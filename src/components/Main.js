@@ -248,7 +248,7 @@ export default class Main extends Component {
     // let finalURL = rnfs.DocumentDirectoryPath + '/' + name.replace(/ /g,"_") + '.pltr';
     this.readDocumentFile(filePath);
   }
-  
+
   // selectDocument = () => {
   //   try {
   //     DocumentPicker.pick({
@@ -404,8 +404,7 @@ export default class Main extends Component {
       skipVerification,
       skipVerificationStartTime
     } = skipVerificationDetails
-    // const bypassForDevs = __DEV__ // false
-    const bypassForDevs = false
+    const bypassForDevs = __DEV__ // false
 
     // if the user is verified and valid
     // or has a valid subscription
