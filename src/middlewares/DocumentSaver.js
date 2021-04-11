@@ -4,7 +4,7 @@ import { Platform, NativeModules } from 'react-native'
 const { DocumentViewController } = NativeModules
 
 const { FILE_SAVED, FILE_LOADED, NEW_FILE, EDIT_CARD_DETAILS } = ActionTypes
-const BLACKLIST = [FILE_SAVED, FILE_LOADED, EDIT_CARD_DETAILS] // card details because it edits details and then coordinates and 2 like that screw up iOS
+const BLACKLIST = [FILE_SAVED, FILE_LOADED]
 let documentURL = ''
 
 export const setDocumentURL = URL => (documentURL = decodeURI(URL))

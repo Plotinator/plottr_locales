@@ -63,7 +63,7 @@ class Verification extends Component {
         // when you have more than one licenses
         navigation.navigate('VerificationLicenses', { Licenses: result })
         console.log('LICENSES', result)
-      } else {
+      } else if(result[0]) {
         // only one license
         console.log('ONLY ONE')
         if (result[0].email === TESTR_EMAIL) {
@@ -82,6 +82,8 @@ class Verification extends Component {
           const message = (hasMessage ? `\n${hasMessage}` : '')
           this.showError(error + message, false)
         }
+      } else {
+        this.showError('You currently have no available licenses for this email.')
       }
     })
     this.setState({ submitted: false, verifying: false })

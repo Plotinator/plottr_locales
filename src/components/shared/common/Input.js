@@ -70,6 +70,9 @@ export default class Input extends Component {
       containerStyles.push(styles.inset)
       inputStyles.push(styles.insetText)
     }
+    if (multiline) {
+      inputStyles.push(styles.multiline)
+    }
     if (bordered) containerStyles.push(styles.bordered)
     if (center) inputStyles.push(styles.center)
     if (darkMode) inputStyles.push(styles.darkMode)
