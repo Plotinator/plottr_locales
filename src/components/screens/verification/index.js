@@ -59,11 +59,11 @@ class Verification extends Component {
       if (!result || error) {
         return this.showError(error || t("Your email didn't verify. Try again or try another email."), false)
       }
-      if (result.length > 1) {
+      if (result.length > 1 || result[0] && result[0].licenses?.length > 1) {
         // when you have more than one licenses
         navigation.navigate('VerificationLicenses', { Licenses: result })
         console.log('LICENSES', result)
-      } else {
+      } else if(result[0]) {
         // only one license
         console.log('ONLY ONE')
         if (result[0].email === TESTR_EMAIL) {
@@ -82,6 +82,8 @@ class Verification extends Component {
           const message = (hasMessage ? `\n${hasMessage}` : '')
           this.showError(error + message, false)
         }
+      } else {
+        this.showError('You currently have no available licenses for this email.')
       }
     })
     this.setState({ submitted: false, verifying: false })

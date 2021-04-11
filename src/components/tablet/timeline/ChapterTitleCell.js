@@ -10,6 +10,7 @@ import Cell from '../shared/Cell'
 import { showAlert, showInputAlert } from '../../shared/common/AlertDialog'
 import { Text, ShellButton } from '../../shared/common'
 import { CELL_WIDTH } from '../../../utils/constants'
+import { moderateScale } from 'react-native-size-matters'
 
 class ChapterTitleCell extends PureComponent {
   state = {
@@ -36,7 +37,7 @@ class ChapterTitleCell extends PureComponent {
       this.setState({ offsetX: 0 })
       if (dx === 0) {
         // click
-        this.askToRename()
+        this.handleEditBeat()
       }
     },
     onPanResponderMove: (event, gestureState) => {
@@ -46,62 +47,10 @@ class ChapterTitleCell extends PureComponent {
     }
   });
 
-  handleNewBeatName = ({ input }) => {
-    const { actions, beatActions, beatId } = this.props
-    const newName = input || 'auto'
-    actions.editBeatTitle(beatId, newName)
-  }
-
-  handleDeleteBeat = () => {
-    setTimeout(() => {
-      // delay for 1 sec
-      const { beatId, beatTitle, bookId } = this.props
-      showAlert({
-        title: t('Delete Chapter'),
-        message: t('Delete Chapter {name}?', { name: beatTitle }),
-        actions: [{
-          beatId,
-          bookId,
-          icon: 'trash',
-          danger: true,
-          name: t('Delete Chapter'),
-          callback: this.deleteBeat
-        },
-        {
-          name: t('Cancel')
-        }]
-      })
-    }, 300)
-  }
-
-  deleteBeat = ({ beatId, bookId }) => {
-    const { actions, beatActions } = this.props
-    actions.deleteBeat(beatId, bookId)
-  }
-
-  askToRename = () => {
-    const { beatTitle, beat } = this.props
-    const beatName =  beat.title || 'auto'
-    showInputAlert({
-      title: beatTitle,
-      message: t('Enter Chapter\'s name or enter'),
-      inputText: beatName,
-      actions: [
-        {
-          name: t('Rename'),
-          icon: 'pen',
-          positive: true,
-          callback: this.handleNewBeatName
-        },
-        { name: t('Cancel') },
-        {
-          name: t('Delete'),
-          icon: 'trash',
-          danger: 1,
-          callback: this.handleDeleteBeat
-        }
-      ]
-    })
+  handleEditBeat = () => {
+    const { beat, onEditBeat } = this.props
+    beat.title = beat.title || 'auto'
+    onEditBeat && onEditBeat(beat)
   }
 
   render () {
@@ -117,9 +66,14 @@ class ChapterTitleCell extends PureComponent {
         {...this._panResponder.panHandlers}
         style={moveStyles}>
         <Cell style={styles.cell}
-          onPress={this.askToRename}
+          onPress={this.handleEditBeat}
           ref={r => this.ref = r}>
-          <Text fontStyle='bold' style={styles.text}>{beatTitle}</Text>
+          <Text
+            fontStyle='bold'
+            style={styles.text}
+            numberOfLines={3}>
+            {beatTitle}
+          </Text>
         </Cell>
       </View>
     )
@@ -134,7 +88,7 @@ const styles = StyleSheet.create({
   },
   text: {
     textAlign: 'center',
-    fontSize: 18,
+    fontSize: moderateScale(10),
     paddingHorizontal: 10,
     backgroundColor: 'hsl(210, 36%, 96%)'
   },

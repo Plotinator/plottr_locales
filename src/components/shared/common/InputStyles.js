@@ -27,8 +27,14 @@ export default ScaledSheet.create({
     ...style.inputText,
     color: textGray,
     paddingVertical: IS_IOS ? 5 : null,
+    minHeight: '35@ms',
     fontSize: size.h4,
     flex: 1
+  },
+  multiline: {
+    height: 'auto',
+    paddingTop: baseMargin,
+    maxHeight: '120@ms'
   },
   inputSmall: {
     fontSize: size.small

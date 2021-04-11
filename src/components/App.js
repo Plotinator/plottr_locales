@@ -10,6 +10,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import {
   checkForActiveLicense,
   getUserVerification,
+  getSkipVerificationDetails,
   checkStoredLicense,
   setSubscribedUser,
   verifyUser,
@@ -36,10 +37,16 @@ export default class App extends Component {
     this.retrieveUserSession()
   }
 
-  setUserInfo(info, checkLicense) {
+  setUserInfo = async(info, checkLicense, skipVerification = null) => {
+    const skipVerificationDetails = skipVerification ? skipVerification : await getSkipVerificationDetails();
     const userInfo = info && cloneDeep(info) || {}
-    console.log('SETTING USER INFO:', userInfo)
-    this.setState({ userInfo }, info && checkLicense && this.checkUserLicense)
+    this.setState({ userInfo, skipVerificationDetails }, info && checkLicense && this.checkUserLicense)
+  }
+
+  updateSkipVerification = (skipVerificationDetails) =>{
+    this.setState({
+      skipVerificationDetails: skipVerificationDetails
+    })
   }
 
   setVerifying(verifying) {
@@ -173,13 +180,14 @@ export default class App extends Component {
   render () {
     const flexContainer = { flex: 1 }
     const {
-      state: { userInfo, verifying },
+      state: { userInfo, verifying, skipVerificationDetails },
       handleSendVerificationEmail,
       handleEmailVerification,
       handleCodeVerification,
       addUserSubscription,
       handleSetUserInfo,
-      handleLogout
+      handleLogout,
+      updateSkipVerification
     } = this
 
     console.log('userInfo', userInfo)
@@ -197,12 +205,14 @@ export default class App extends Component {
                 <Main
                   v2
                   user={userInfo}
+                  skipVerificationDetails={this.state.skipVerificationDetails?this.state.skipVerificationDetails:{}}
                   verifying={verifying}
                   logout={handleLogout}
                   verifyCode={handleCodeVerification}
                   verifyByEmail={handleEmailVerification}
                   sendVerificationEmail={handleSendVerificationEmail}
-                  subscribeUser={addUserSubscription} />
+                  subscribeUser={addUserSubscription}
+                  updateSkipVerification={updateSkipVerification} />
               </AppErrorBoundary>
               <AlertDialog />
             </View>

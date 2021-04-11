@@ -31,8 +31,9 @@ class Chapter extends Component {
   navigateToNewCard = () => {
     this.props.navigation.push('SceneDetails', {
       isNewCard: true,
-      beatId: this.props.chapter.id
-    })
+      beatId: this.props.chapter.id,  // Maintaining this since this is a shared component
+      chapterId: this.props.chapter.id
+    });
   }
 
   autoSortChapter = () => {

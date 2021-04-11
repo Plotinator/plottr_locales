@@ -11,13 +11,21 @@ import images from '../../../images'
 import * as Animatable from 'react-native-animatable'
 import { t } from 'plottr_locales'
 import { Spinner } from 'native-base'
+import { SKIP_VERIFICATION_DURATION } from '../../../utils/constants'
 
 const { PLOTTR_FILE } = images
 
 export default class Dashboard extends Component {
-  renderCTAButtons () {
-    const { createDocument, openDocument, logout, loading, noLogout } = this.props
 
+  renderCTAButtons() {
+    const { createDocument, openDocument, logout, loading, noLogout, skipVerificationDetails, forceVerify } = this.props
+    const currentTime = new Date().getTime();
+    const timeLapsedSeconds = (parseInt(currentTime) - parseInt(skipVerificationDetails?.skipVerificationStartTime)) / 1000;
+    let remainingHours = Math.floor((SKIP_VERIFICATION_DURATION - timeLapsedSeconds) / 3600) + " hrs";
+    // handle 0 hrs
+    remainingHours = (remainingHours === '0 hrs') ?
+      Math.floor((SKIP_VERIFICATION_DURATION - timeLapsedSeconds) / 60) + " mins" :
+      remainingHours;
     return [
       <Button
         block
@@ -36,7 +44,7 @@ export default class Dashboard extends Component {
         onPress={openDocument}>
         {t('SELECT A PROJECT FILE')}
       </Button>,
-      !noLogout && (
+      !noLogout && !skipVerificationDetails?.skipVerification && (
         <ShellButton
           key={'logout'}
           disabled={loading}
@@ -44,11 +52,20 @@ export default class Dashboard extends Component {
           onPress={logout}>
           <Text color='lightgray'>{t('(Logout)')}</Text>
         </ShellButton>
+      ),
+      skipVerificationDetails?.skipVerification && (
+        <ShellButton
+          key={'logout'}
+          disabled={loading}
+          style={styles.logout}
+          onPress={() => { forceVerify(true) }}>
+          <Text color='textGray'>{t('Please verify your license in')}{remainingHours} </Text>
+        </ShellButton>
       )
     ]
   }
 
-  renderLoader () {
+  renderLoader() {
     return (
       <View style={styles.loader}>
         <Spinner color='orange' />
@@ -68,7 +85,7 @@ export default class Dashboard extends Component {
     )
   }
 
-  renderRecentDocuments (hasRecent) {
+  renderRecentDocuments(hasRecent) {
     const { loading, recentDocuments } = this.props
     return hasRecent ? (
       [
@@ -88,13 +105,13 @@ export default class Dashboard extends Component {
           animation='fadeInUp'
           easing='ease-out-expo'
           style={styles.or}>
-            <Text fontStyle={'bold'}>{t('or').toUpperCase()}</Text>
+          <Text fontStyle={'bold'}>{t('or').toUpperCase()}</Text>
         </Animatable.View>
       ]
     ) : null
   }
 
-  render () {
+  render() {
     const { loading, recentDocuments } = this.props
     const hasRecentDocuments = (recentDocuments || []).length
     return (
@@ -128,12 +145,13 @@ export default class Dashboard extends Component {
   }
 }
 
+
 class RecentDocument extends Component {
   handleSelect = () => {
     const { index, document, onPress } = this.props
     onPress(document, index)
   }
-  render () {
+  render() {
     const { index, document: { name } } = this.props
     return (
       <ShellButton

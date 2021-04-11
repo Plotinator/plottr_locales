@@ -17,6 +17,7 @@ import ChapterTitleCell from './ChapterTitleCell'
 import { BlankCell } from './BlankCell'
 import Cell from '../shared/Cell'
 import CardCell from './CardCell'
+import CardModal from './CardModal'
 import { CELL_HEIGHT, CELL_WIDTH } from '../../../utils/constants'
 import { Icon } from 'native-base'
 import tinycolor from 'tinycolor2'
@@ -28,6 +29,7 @@ import { showAlert } from '../../shared/common/AlertDialog'
 import { cloneDeep } from 'lodash'
 
 const {
+  beats: beatTitle,
   lists: { reorderList, positionReset }
 } = helpers
 
@@ -48,9 +50,11 @@ class Timeline extends Component {
       { useNativeDriver: false }
     )
     this.state = {
+      showCardModal: false,
       lineMapKeys: {},
       showColorPicker: false,
-      currentLine: {}
+      currentLine: {},
+      currentBeat: {},
     }
     this.dropCoordinates = []
   }
@@ -167,6 +171,65 @@ class Timeline extends Component {
       let scrollX = e.nativeEvent.contentOffset.x
       this.headerScrollView.scrollTo({ x: scrollX, animated: false })
     }
+  }
+
+  handleEditBeat = (beat) => {
+    this.setState(
+      {
+        currentBeat: { ...beat }
+      },
+      () => {
+        this._BeatModal.show()
+      }
+    )
+  }
+
+  handleHideBeatModal = () => this._BeatModal.hide()
+
+  handleSetBeatTitle = (title) => {
+    const { currentBeat } = this.state
+    currentBeat.title = title
+    this.setState({ currentBeat })
+  }
+
+  handleClearCurrentBeat = (title) => {
+    this.setState({ currentBeat: {} })
+  }
+
+  handleSaveBeat = () => {
+    const { currentBeat: { id, bookId, title } } = this.state
+    const { beatActions } = this.props
+    this._BeatModal.hide()
+    beatActions.editBeatTitle(id, title || 'auto')
+    this.handleClearCurrentBeat()
+  }
+
+  handleAskToDeleteBeat = () => {
+    // delay for 1 sec
+    const { currentBeat, currentBeat: { title } } = this.state
+    const { positionOffset } = this.props
+    const name = helpers.beats.beatTitle(currentBeat, positionOffset)
+    showAlert({
+      title: t('Delete Chapter'),
+      message: t('Delete Chapter {name}?', { name }),
+      actions: [{
+        icon: 'trash',
+        danger: true,
+        name: t('Delete Chapter'),
+        callback: this.handleDeleteBeat
+      },
+      {
+        name: t('Cancel')
+      }]
+    })
+  }
+
+  handleDeleteBeat = () => {
+    const { currentBeat: { id, bookId } } = this.state
+    const { beatActions } = this.props
+    this._BeatModal.hide()
+    beatActions.deleteBeat(id, bookId)
+    this.handleClearCurrentBeat()
   }
 
   handleHideColorPicker = () => this.setState({ showColorPicker: false })
@@ -332,12 +395,39 @@ class Timeline extends Component {
     this.props.lineActions.reorderLines(Newlines, bookId)
   }
 
+  handleEditCard = (card) => {
+    this.setState({
+      showCardModal: true,
+      card
+    })
+  }
+
+  handleHideCardModal = () => {
+    this.setState({
+      showCardModal: false
+    })
+  }
+
   getMaxCards (id) {
     const { linesMaxCards } = this.props
     return (linesMaxCards[id] || 1) - 1
   }
 
   setPlotModalRef = (ref) => (this._PlotModal = ref)
+  setBeatModalRef = (ref) => (this._BeatModal = ref)
+
+  renderCardModal () {
+    const { showCardModal, card } = this.state
+    const { navigation } = this.props
+    if (!showCardModal) return null
+    return (
+      <CardModal
+        card={card}
+        navigation={navigation}
+        onClose={this.handleHideCardModal}
+      />
+    )
+  }
 
   renderBlankLineTitleCell (key) {
     return <Cell key={key} style={styles.lineTitleCell} />
@@ -385,6 +475,7 @@ class Timeline extends Component {
                 register={this.registerDropCoordinate}
                 handleDrop={this.dropCard}
                 navigation={this.props.navigation}
+                onEditCard={this.handleEditCard}
               />
             )
           )
@@ -430,6 +521,7 @@ class Timeline extends Component {
         beatId={ch.id}
         bookId={bookId}
         moveBeat={this.handleMoveBeat}
+        onEditBeat={this.handleEditBeat}
       />
     ))
     cols.push(this.renderPlusButton('new-chapter', this.handleAppendBeat))
@@ -485,6 +577,8 @@ class Timeline extends Component {
           <Input
             inset
             small
+            multiline
+            numberOfLines={3}
             label={t('Title')}
             value={title}
             autoCapitalize='sentences'
@@ -522,6 +616,54 @@ class Timeline extends Component {
               buttonColor='transparent'
               style={styles.trashButton}
               onPress={this.handleDeletePlotline}>
+              <Icon name='trash' type='FontAwesome5' style={styles.trash} />
+            </Button>
+          </View>
+        </View>
+      </ModalBox>
+    )
+  }
+
+  renderBeatModal () {
+    const {
+      currentBeat: { title }
+    } = this.state
+    return (
+      <ModalBox
+        title={t('Edit Chapter')}
+        ref={this.setBeatModalRef}
+        onHide={this.handleClearCurrentBeat}>
+        <View style={styles.row}>
+          <Text center fontStyle='semiBold' fontSize='tiny'>
+            {t('Enter Chapter\'s name or enter')}
+          </Text>
+        </View>
+        <View style={styles.row}>
+          <Input
+            inset
+            small
+            multiline
+            // numberOfLines={3}
+            label={t('Title')}
+            value={title}
+            placeholder='auto'
+            autoCapitalize='sentences'
+            onChangeText={this.handleSetBeatTitle}
+          />
+        </View>
+        <View style={[styles.row, styles.last]}>
+          <View style={styles.ctaButtons}>
+            <Button
+              center
+              style={styles.button}
+              onPress={this.handleSaveBeat}>
+              {t('Save Chapter')}
+            </Button>
+            <Button
+              center
+              buttonColor='transparent'
+              style={styles.trashButton}
+              onPress={this.handleAskToDeleteBeat}>
               <Icon name='trash' type='FontAwesome5' style={styles.trash} />
             </Button>
           </View>
@@ -575,7 +717,7 @@ class Timeline extends Component {
   render () {
     let body = this.renderBody()
     let data = [{ key: 'body', render: body }]
-
+    const { showCardModal } = this.state
     return (
       <View style={styles.container}>
         {this.renderBeatTitles()}
@@ -586,6 +728,8 @@ class Timeline extends Component {
           onScroll={this.verticalScrollEvent}
         />
         {this.renderPlotlineModal()}
+        {this.renderCardModal()}
+        {this.renderBeatModal()}
       </View>
     )
   }
@@ -614,6 +758,7 @@ function mapStateToProps (state) {
     nextBeatId: nextBeatId,
     lines: selectors.sortedLinesByBookSelector(state),
     cardMap: selectors.cardMapSelector(state),
+    positionOffset: selectors.positionOffsetSelector(state),
     ui: state.ui,
     bookId: bookId
   }

@@ -8,7 +8,7 @@ import { Card, CardItem, View, Left, Right } from 'native-base'
 import { StyleSheet } from 'react-native'
 import { isTablet } from 'react-native-device-info'
 import RichTextEditor from '../RichTextEditor'
-import { Text } from '../common'
+import { RichEditor, Text } from '../common'
 import Metrics from '../../../utils/Metrics'
 import Colors from '../../../utils/Colors'
 
@@ -25,10 +25,11 @@ class SceneCard extends Component {
     const { card } = this.props
 
     return <View style={{padding: 16}}>
-      <RichTextEditor
+      <RichEditor
+      // <RichTextEditor
         initialValue={card.description}
         onChange={() => {}}
-        readOnly
+        disabled
       />
     </View>
   }

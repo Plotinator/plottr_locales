@@ -38,7 +38,12 @@ export default ScaledSheet.create({
     borderRadius: cornerRadius * 1.5,
     width: '80%',
     maxHeight: '75%',
-    padding: doubleBaseMargin
+    padding: doubleBaseMargin,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+
   },
   closeButton: {
     backgroundColor: white,
@@ -66,10 +71,13 @@ export default ScaledSheet.create({
     borderRadius: cornerRadius
   },
   crumb: {
+    // flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: baseMargin,
-    paddingVertical: baseMargin
+    paddingVertical: baseMargin,
+    paddingRight: doubleBaseMargin,
+    maxWidth: '50%'
   },
   chapterText: {
     ...style.bold,
@@ -125,59 +133,12 @@ export default ScaledSheet.create({
   inputText: {
     ...style.semiBold,
     color: textGray,
+    paddingVertical: 0,
     paddingHorizontal: baseMargin / 2,
     fontSize: size.small
   },
   multiInput: {
     marginTop: 0
-  },
-  tabsBase: {
-    backgroundColor: cloudWhite,
-    flexDirection: 'row',
-    alignItems: 'center',
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: borderGray,
-    borderRadius: cornerRadius * 1.25,
-    padding: baseMargin / 1.5
-  },
-  tabCell: {
-    borderWidth: 1,
-    borderColor: borderGray,
-    borderRadius: cornerRadius,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: baseMargin / 4,
-    marginRight: baseMargin / 1.5
-  },
-  tabName: {
-    ...style.semiBoldItalic,
-    fontSize: size.small,
-    color: textGray,
-    paddingLeft: baseMargin / 1.25
-  },
-  removeButton: {
-    padding: baseMargin / 1.5
-  },
-  removeIcon: {
-    fontSize: size.micro,
-    color: textBlack,
-    opacity: 0.25
-  },
-  addButton: {
-    width: '23@ms',
-    height: '23@ms',
-    position: 'absolute',
-    right: baseMargin / 1.4,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 50,
-    borderWidth: 1.5,
-    borderColor: orange
-  },
-  addIcon: {
-    fontSize: size.micro,
-    color: orange
   },
   collapseButton: {
     flexDirection: 'row',
@@ -195,6 +156,10 @@ export default ScaledSheet.create({
     color: textGray,
     marginTop: 5,
     marginLeft: baseMargin / 4
+  },
+  collapsedIcon: {
+    marginTop: 2,
+    transform: [{ rotate: '-90deg' }]
   },
   actions: {
     justifyContent: 'center',
