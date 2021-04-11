@@ -6133,6 +6133,11 @@ plist@^3.0.1:
     xmlbuilder "^9.0.7"
     xmldom "0.1.x"
 
+"plottr_locales@file:./lib/plottr_locales":
+  version "0.0.1"
+  dependencies:
+    format-message "^6.2.3"
+
 "pltr@https://github.com/Plotinator/pltr.git#v2.2.17":
   version "2.2.11"
   resolved "https://github.com/Plotinator/pltr.git#f23f395c2babd9567828bf9dbcbf79a214ed0833"
