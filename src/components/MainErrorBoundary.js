@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import t from 'format-message'
+import { t } from 'plottr_locales'
 import { View, H1, Text, Button, Icon } from 'native-base'
 import { StyleSheet, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native'
 

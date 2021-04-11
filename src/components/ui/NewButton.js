@@ -1,7 +1,7 @@
 import React from 'react'
 import { StyleSheet } from 'react-native'
 import { Icon } from 'native-base'
-import t from 'format-message'
+import { t } from 'plottr_locales'
 import Metrics from '../../utils/Metrics'
 import Colors from '../../utils/Colors'
 import Fonts from '../../fonts'

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import t from 'format-message'
+import { t } from 'plottr_locales'
 import { View, Input, Label, Item, Text, Button } from 'native-base'
 import { StyleSheet } from 'react-native'
 import AttachmentList from '../../shared/attachments/AttachmentList'

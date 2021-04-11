@@ -18,7 +18,7 @@ import {
 } from '../../shared/common'
 import images from '../../../images'
 import * as Animatable from 'react-native-animatable'
-import t from 'format-message'
+import { t } from 'plottr_locales'
 import Metrics from '../../../utils/Metrics'
 import { checkLicense, getLicenses } from '../../../utils/user_info'
 import { TESTR_EMAIL } from '../../../utils/constants'

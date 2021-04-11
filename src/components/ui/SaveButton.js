@@ -1,5 +1,5 @@
 import React from 'react'
-import t from 'format-message'
+import { t } from 'plottr_locales'
 import { StyleSheet } from 'react-native'
 import { Text, ShellButton } from '../shared/common'
 import Metrics from '../../utils/Metrics'

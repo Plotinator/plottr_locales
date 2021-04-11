@@ -12,7 +12,7 @@ import {
 } from '../../shared/common'
 import images from '../../../images'
 import * as Animatable from 'react-native-animatable'
-import t from 'format-message'
+import { t } from 'plottr_locales'
 import Metrics from '../../../utils/Metrics'
 
 const { IS_ANDROID } = Metrics

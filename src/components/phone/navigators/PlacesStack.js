@@ -1,5 +1,5 @@
 import React from 'react'
-import t from 'format-message'
+import { t } from 'plottr_locales'
 import { createStackNavigator } from '@react-navigation/stack'
 import PlacesHome from '../places/PlacesHome'
 import PlaceDetails from '../places/PlaceDetails'

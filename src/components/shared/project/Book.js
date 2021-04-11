@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, ImageBackground } from 'react-native'
-import t from 'format-message'
+import { t } from 'plottr_locales'
 import { Text, ShellButton } from '../../shared/common'
 import styles from './BookStyles'
 import Images from '../../../images'

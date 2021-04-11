@@ -3,7 +3,7 @@ import { WebView } from 'react-native-webview'
 import { RCE_URL } from '../../utils/constants'
 import { StyleSheet, Platform } from 'react-native'
 import { Spinner, View, Text, Icon } from 'native-base'
-import t from 'format-message'
+import { t } from 'plottr_locales'
 
 const isAndroid = Platform.OS == 'android'
 

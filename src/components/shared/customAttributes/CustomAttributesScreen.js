@@ -24,7 +24,7 @@ import {
   Right
 } from 'native-base'
 import { SwipeListView } from 'react-native-swipe-list-view'
-import t from 'format-message'
+import { t } from 'plottr_locales'
 import RenameButton from '../../ui/RenameButton'
 import TrashButton from '../../ui/TrashButton'
 import { askToDelete } from '../../../utils/delete'

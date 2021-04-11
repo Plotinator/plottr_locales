@@ -6,7 +6,7 @@ import Text from './Text'
 import ShellButton from './ShellButton'
 import Input from './Input'
 import { Icon } from 'native-base'
-import t from 'format-message'
+import { t } from 'plottr_locales'
 
 let MasterAlert
 

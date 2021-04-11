@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 // import setupRollbar from '../../common/utils/rollbar'
 // import log from 'electron-log'
-import t from 'format-message'
+import { t } from 'plottr_locales'
 import { View, H1, Text, Button, Icon } from 'native-base'
 import { StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
 // const rollbar = setupRollbar('ErrorBoundary')

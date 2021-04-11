@@ -1,6 +1,6 @@
 import React from 'react'
 import { Button, Text } from 'native-base'
-import t from 'format-message'
+import { t } from 'plottr_locales'
 
 export default function EditButton (props) {
   const noop = () => {}

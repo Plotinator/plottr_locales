@@ -11,7 +11,7 @@ import {
   Vibration
 } from 'react-native'
 import { bindActionCreators } from 'redux'
-import t from 'format-message'
+import { t } from 'plottr_locales'
 import { actions, selectors, helpers, newIds } from 'pltr/v2'
 import ChapterTitleCell from './ChapterTitleCell'
 import { BlankCell } from './BlankCell'

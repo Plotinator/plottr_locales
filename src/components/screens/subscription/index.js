@@ -15,7 +15,7 @@ import {
   GoToPlottrDotCom
 } from '../../shared/common'
 import * as Animatable from 'react-native-animatable'
-import t from 'format-message'
+import { t } from 'plottr_locales'
 import { Spinner } from 'native-base'
 import {
   endSession,
