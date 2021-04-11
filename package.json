@@ -1,6 +1,6 @@
 {
   "name": "plottr_mobile",
-  "version": "2.1.2",
+  "version": "2.1.4",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
