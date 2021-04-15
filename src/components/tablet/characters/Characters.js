@@ -16,7 +16,7 @@ import NewButton from '../../ui/NewButton'
 import { askToDelete } from '../../../utils/delete'
 import DrawerButton from '../../ui/DrawerButton'
 import SideButton from '../shared/SideButton'
-import { Text } from '../../shared/common'
+import { Text, AttributesButton } from '../../shared/common'
 
 class Characters extends Component {
   state = {
@@ -181,14 +181,14 @@ class Characters extends Component {
         <Toolbar>
           <DrawerButton openDrawer={this.props.openDrawer} />
           <NewButton onPress={this.createNewCharacter} />
+          <View style={styles.additionals}>
+            <AttributesButton onPress={this.navigateToCustomAttributes} />
+          </View>
         </Toolbar>
         <Grid style={{ flex: 1 }}>
           <Col size={4}>{this.renderCharacterList()}</Col>
           <Col size={10}>{this.renderCharacterDetail()}</Col>
         </Grid>
-        <Button full info onPress={this.navigateToCustomAttributes}>
-          <Text white>{t('Custom Attributes')}</Text>
-        </Button>
       </View>
     )
   }
@@ -241,6 +241,11 @@ const styles = StyleSheet.create({
     marginRight: 10,
     width: 30,
     height: 30
+  },
+  additionals: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end'
   }
 })
 
