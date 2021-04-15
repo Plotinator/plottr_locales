@@ -23,7 +23,15 @@ const styles = ScaledSheet.create({
     borderRadius: Metrics.cornerRadius / 2,
     alignSelf: 'center',
     backgroundColor: onTablet ? 'white' : 'transparent',
-    marginRight: onTablet ? 20 : 0
+    marginRight: onTablet ? 20 : 0,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2
   },
   tabletIcon: {
     fontSize: '18@ms'

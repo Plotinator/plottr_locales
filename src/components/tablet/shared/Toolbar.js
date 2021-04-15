@@ -20,15 +20,16 @@ const styles = StyleSheet.create({
     paddingBottom: Metrics.baseMargin * 1.5,
     // height: 90,
     // backgroundColor: 'hsl(212, 33%, 89%)', // gray-8
+    backgroundColor: 'hsl(210, 36%, 96%)',
     alignItems: 'flex-start',
     paddingHorizontal: Metrics.doubleBaseMargin,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: Colors.borderGray, // gray-6
     borderRadius: 0,
-    shadowColor: '#000',
+    shadowColor: '#00000030',
     shadowOffset: {
       width: 0,
-      height: 1
+      height: 2
     },
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
