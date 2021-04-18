@@ -359,6 +359,12 @@
   "Days of Backup": {
     "message": "Days of Backup"
   },
+  "Delete Book": {
+    "message": "Delete Book"
+  },
+  "Delete Book {name}?": {
+    "message": "Delete Book \"{name}\"?"
+  },
   "Default Colors": {
     "message": "Default Colors"
   },
