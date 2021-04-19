@@ -1115,6 +1115,12 @@
   "See the outline here": {
     "message": "See the outline here"
   },
+  "See More": {
+    "message": "See More"
+  },
+  "See Less": {
+    "message": "See Less"
+  },
   "Select All": {
     "message": "Select All"
   },
