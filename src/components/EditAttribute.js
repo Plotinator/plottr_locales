@@ -21,7 +21,6 @@ const EditAttributeConnector = (connector) => {
     removeAttribute,
     editAttribute,
     reorderAttribute,
-    openExternal,
     log,
   }) => {
     const [deleting, setDeleting] = useState(false)
@@ -108,7 +107,6 @@ const EditAttributeConnector = (connector) => {
               editable
               autofocus={false}
               darkMode={ui.darkMode}
-              openExternal={openExternal}
               log={log}
             />
           </div>
@@ -136,6 +134,7 @@ const EditAttributeConnector = (connector) => {
     index: PropTypes.number.isRequired,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
     inputId: PropTypes.string,
+    entityType: PropTypes.string.isRequired,
     entity: PropTypes.object.isRequired,
     ui: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
@@ -145,44 +144,43 @@ const EditAttributeConnector = (connector) => {
     removeAttribute: PropTypes.func.isRequired,
     editAttribute: PropTypes.func.isRequired,
     reorderAttribute: PropTypes.func.isRequired,
-    openExternal: PropTypes.func.isRequired,
     log: PropTypes.object.isRequired,
   }
 
   const {
     redux,
-    platform: { openExternal, log },
-    pltr: { CustomAttributeActions },
+    platform: { log },
+    pltr: { actions },
   } = connector
 
   if (redux) {
     const { connect, bindActionCreators } = redux
     const mapDispatchToProps = (dispatch, { entityType }) => {
-      const actions = bindActionCreators(CustomAttributeActions, dispatch)
+      const customAttributeActions = bindActionCreators(actions.customAttribute, dispatch)
 
       switch (entityType) {
         case 'character':
           return {
-            addAttribute: actions.addCharacterAttr,
-            removeAttribute: actions.removeCharacterAttr,
-            editAttribute: actions.editCharacterAttr,
-            reorderAttribute: actions.reorderCharacterAttribute,
+            addAttribute: customAttributeActions.addCharacterAttr,
+            removeAttribute: customAttributeActions.removeCharacterAttr,
+            editAttribute: customAttributeActions.editCharacterAttr,
+            reorderAttribute: customAttributeActions.reorderCharacterAttribute,
           }
 
         case 'place':
           return {
-            addAttribute: actions.addPlaceAttr,
-            removeAttribute: actions.removePlaceAttr,
-            editAttribute: actions.editPlaceAttr,
-            reorderAttribute: actions.reorderPlacesAttribute,
+            addAttribute: customAttributeActions.addPlaceAttr,
+            removeAttribute: customAttributeActions.removePlaceAttr,
+            editAttribute: customAttributeActions.editPlaceAttr,
+            reorderAttribute: customAttributeActions.reorderPlacesAttribute,
           }
 
         case 'scene':
           return {
-            addAttribute: actions.addCardAttr,
-            removeAttribute: actions.removeCardAttr,
-            editAttribute: actions.editCardAttr,
-            reorderAttribute: actions.reorderCardsAttribute,
+            addAttribute: customAttributeActions.addCardAttr,
+            removeAttribute: customAttributeActions.removeCardAttr,
+            editAttribute: customAttributeActions.editCardAttr,
+            reorderAttribute: customAttributeActions.reorderCardsAttribute,
           }
 
         default:
@@ -196,7 +194,7 @@ const EditAttributeConnector = (connector) => {
       }
     }
 
-    return connect(() => ({ openExternal, log }), mapDispatchToProps)(EditAttribute)
+    return connect(() => ({ log }), mapDispatchToProps)(EditAttribute)
   }
 
   throw new Error('No connecter found for EditAttribute')
