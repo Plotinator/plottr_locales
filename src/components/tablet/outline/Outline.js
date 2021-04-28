@@ -31,6 +31,10 @@ class Outline extends Component {
     }
   }
 
+  handleScrollFail = () => {
+    // handle scroll to index failure
+  }
+
   renderCardDots () {
     return sortedCards.map((c) => {
       let line = findCard(c)
@@ -119,6 +123,7 @@ class Outline extends Component {
           this.outlineListRef = ref
         }}
         initialNumToRender={2}
+        onScrollToIndexFailed={this.handleScrollFail}
       />
     )
   }
