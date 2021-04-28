@@ -100,7 +100,7 @@ export default class RichTextEditor extends Component {
               heading2: this.renderTitleIcons('H1'),
               heading3: this.renderTitleIcons('H2')
             }}
-            // editor={this.richText}
+            editor={this.richText}
             getEditor={this.getEditor}
             selectedIconTint={Colors.orange}
             actions={[
