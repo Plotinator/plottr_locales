@@ -50,6 +50,7 @@ export async function verifyUser (userInfo) {
 
 export async function reset () {
   await AsyncStorage.removeItem(USER_KEY)
+  await AsyncStorage.removeItem(SKIP_VERIFICATION_KEY)
   return null
 }
 
@@ -253,6 +254,7 @@ function newUserInfoTemplate (email, sales, idToVerify, validKeys) {
   return {
     email,
     verified: email === TESTR_EMAIL,
+    validLicense: email === TESTR_EMAIL,
     chancesLeft: 3,
     isV2: true,
     sales,

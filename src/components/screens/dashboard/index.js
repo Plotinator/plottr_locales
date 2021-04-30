@@ -1,12 +1,7 @@
 import React, { Component } from 'react'
 import { View, Image, ScrollView, TouchableWithoutFeedback } from 'react-native'
 import styles from './styles'
-import {
-  Text,
-  ShellButton,
-  Button,
-  WelcomeToPlottr
-} from '../../shared/common'
+import { Text, ShellButton, Button, WelcomeToPlottr } from '../../shared/common'
 import images from '../../../images'
 import * as Animatable from 'react-native-animatable'
 import { t } from 'plottr_locales'
@@ -16,16 +11,31 @@ import { SKIP_VERIFICATION_DURATION } from '../../../utils/constants'
 const { PLOTTR_FILE } = images
 
 export default class Dashboard extends Component {
+  handleFourceVerify = () => this.props.forceVerify(true)
 
   renderCTAButtons() {
-    const { createDocument, openDocument, logout, loading, noLogout, skipVerificationDetails, forceVerify } = this.props
-    const currentTime = new Date().getTime();
-    const timeLapsedSeconds = (parseInt(currentTime) - parseInt(skipVerificationDetails?.skipVerificationStartTime)) / 1000;
-    let remainingHours = Math.floor((SKIP_VERIFICATION_DURATION - timeLapsedSeconds) / 3600) + " hrs";
+    const {
+      createDocument,
+      openDocument,
+      logout,
+      loading,
+      noLogout,
+      skipVerificationDetails
+    } = this.props
+    const currentTime = new Date().getTime()
+    const timeLapsedSeconds =
+      (parseInt(currentTime) -
+        parseInt(skipVerificationDetails?.skipVerificationStartTime)) /
+      1000
+    let remainingHours =
+      Math.floor((SKIP_VERIFICATION_DURATION - timeLapsedSeconds) / 3600) +
+      ' hrs'
     // handle 0 hrs
-    remainingHours = (remainingHours === '0 hrs') ?
-      Math.floor((SKIP_VERIFICATION_DURATION - timeLapsedSeconds) / 60) + " mins" :
-      remainingHours;
+    remainingHours =
+      remainingHours === '0 hrs'
+        ? Math.floor((SKIP_VERIFICATION_DURATION - timeLapsedSeconds) / 60) +
+          ' mins'
+        : remainingHours
     return [
       <Button
         block
@@ -55,11 +65,15 @@ export default class Dashboard extends Component {
       ),
       skipVerificationDetails?.skipVerification && (
         <ShellButton
-          key={'logout'}
+          key={'skip'}
           disabled={loading}
           style={styles.logout}
-          onPress={() => { forceVerify(true) }}>
-          <Text color='textGray'>{t('Please verify your license in')}{remainingHours} </Text>
+          onPress={this.handleFourceVerify}>
+          <Text color='textGray'>
+            {t('Please verify your license in {time}', {
+              time: remainingHours
+            })}
+          </Text>
         </ShellButton>
       )
     ]
@@ -87,28 +101,28 @@ export default class Dashboard extends Component {
 
   renderRecentDocuments(hasRecent) {
     const { loading, recentDocuments } = this.props
-    return hasRecent ? (
-      [
-        <Animatable.View
-          key={'recents'}
-          delay={100}
-          duration={1000}
-          animation='fadeInUp'
-          easing='ease-out-expo'
-          style={styles.recentFiles}>
-          {recentDocuments.map(this.renderRecentDocument)}
-        </Animatable.View>,
-        <Animatable.View
-          key={'or'}
-          delay={120}
-          duration={1000}
-          animation='fadeInUp'
-          easing='ease-out-expo'
-          style={styles.or}>
-          <Text fontStyle={'bold'}>{t('or').toUpperCase()}</Text>
-        </Animatable.View>
-      ]
-    ) : null
+    return hasRecent
+      ? [
+          <Animatable.View
+            key={'recents'}
+            delay={100}
+            duration={1000}
+            animation='fadeInUp'
+            easing='ease-out-expo'
+            style={styles.recentFiles}>
+            {recentDocuments.map(this.renderRecentDocument)}
+          </Animatable.View>,
+          <Animatable.View
+            key={'or'}
+            delay={120}
+            duration={1000}
+            animation='fadeInUp'
+            easing='ease-out-expo'
+            style={styles.or}>
+            <Text fontStyle={'bold'}>{t('or').toUpperCase()}</Text>
+          </Animatable.View>
+        ]
+      : null
   }
 
   render() {
@@ -120,11 +134,18 @@ export default class Dashboard extends Component {
           <View style={styles.container}>
             <WelcomeToPlottr>
               {hasRecentDocuments ? (
-                <Text fontStyle='light' color='black' style={styles.welcomeText}>
+                <Text
+                  fontStyle='light'
+                  color='black'
+                  style={styles.welcomeText}>
                   {t('Open one of your most recent projects')}
                 </Text>
               ) : (
-                <Text fontStyle='light' color='black' center style={styles.welcomeText}>
+                <Text
+                  fontStyle='light'
+                  color='black'
+                  center
+                  style={styles.welcomeText}>
                   {t('You may create a new project')}
                 </Text>
               )}
@@ -145,14 +166,16 @@ export default class Dashboard extends Component {
   }
 }
 
-
 class RecentDocument extends Component {
   handleSelect = () => {
     const { index, document, onPress } = this.props
     onPress(document, index)
   }
   render() {
-    const { index, document: { name } } = this.props
+    const {
+      index,
+      document: { name }
+    } = this.props
     return (
       <ShellButton
         delay={300 + index * 100}

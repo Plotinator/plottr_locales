@@ -51,7 +51,7 @@ export default class Main extends Component {
   forceVerify = (value) => {
     this.setState({
       forceVerification: value
-    });
+    })
   }
 
   closeDocument = () => {
@@ -242,11 +242,11 @@ export default class Main extends Component {
 
   readDocument = ({ url, name }) => {
     let fileName = String(name)
-    .replace(/\s+/gi, '_')
-    .replace(/[^a-zA-Z0-9_\-]/gi)
+      .replace(/\s+/gi, '_')
+      .replace(/[^a-zA-Z0-9_\-]/gi)
     const filePath = rnfs.DocumentDirectoryPath + `/${fileName}.pltr`
     // let finalURL = rnfs.DocumentDirectoryPath + '/' + name.replace(/ /g,"_") + '.pltr';
-    this.readDocumentFile(filePath);
+    this.readDocumentFile(filePath)
   }
 
   // selectDocument = () => {
@@ -385,36 +385,35 @@ export default class Main extends Component {
   }
 
   shouldSkipVerification = (skipVerification, skipVerificationStartTime) => {
-    let currentTime = new Date().getTime();
-    let timeLapsedSeconds = (parseInt(currentTime) - parseInt(skipVerificationStartTime)) / 1000;
-    return skipVerification && timeLapsedSeconds < SKIP_VERIFICATION_DURATION;
+    let currentTime = new Date().getTime()
+    let timeLapsedSeconds =
+      (parseInt(currentTime) - parseInt(skipVerificationStartTime)) / 1000
+    return skipVerification && timeLapsedSeconds < SKIP_VERIFICATION_DURATION
   }
 
   render() {
     const { document, tryVerification } = this.state
     const { user = {} } = this.props
     const { skipVerificationDetails = {} } = this.props
-    const {
-      verified,
-      validLicense,
-      validSubscription,
-      noAutoRedirect,
-    } = user
+    const { verified, validLicense, validSubscription, noAutoRedirect } = user
     const {
       skipVerification,
       skipVerificationStartTime
     } = skipVerificationDetails
-    const bypassForDevs = __DEV__ // false
+    const bypassForDevs = false // __DEV__ // false
 
     // if the user is verified and valid
     // or has a valid subscription
     // or we have a dev bypass (bypassForDevs)
     const userIsVerifiedAndValid =
       !this.state.forceVerification &&
-      ( (verified && validLicense) ||
-      validSubscription ||
-      this.shouldSkipVerification(skipVerification,skipVerificationStartTime) ||
-      bypassForDevs)
+      ((verified && validLicense) ||
+        validSubscription ||
+        this.shouldSkipVerification(
+          skipVerification,
+          skipVerificationStartTime
+        ) ||
+        bypassForDevs)
 
     // only if a document is loaded we will
     // show the project document for manipulation

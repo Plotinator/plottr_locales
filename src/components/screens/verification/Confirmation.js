@@ -15,10 +15,12 @@ import * as Animatable from 'react-native-animatable'
 import { t } from 'plottr_locales'
 import Metrics from '../../../utils/Metrics'
 import AsyncStorage from '@react-native-community/async-storage'
-import { SKIP_VERIFICATION_DURATION, SKIP_VERIFICATION_KEY } from '../../../utils/constants'
+import {
+  SKIP_VERIFICATION_DURATION,
+  SKIP_VERIFICATION_KEY
+} from '../../../utils/constants'
 import { _UpdateData } from '../../AuthenticatorRoot'
 import { cloneDeep } from 'lodash'
-
 
 const { IS_ANDROID } = Metrics
 
@@ -70,6 +72,7 @@ class VerificationConfirmation extends Component {
 
   handleDifferentEmail = () => {
     const { navigation } = this.props
+    console.log('this.props', this.props)
     navigation.navigate('Verification')
   }
 
@@ -83,29 +86,36 @@ class VerificationConfirmation extends Component {
       skipVerificationDetails
     } = this.props
     let skipVerificationInfo = {
-      'skipVerification': true,
-      'skipVerificationStartTime':
-        skipVerificationDetails?.skipVerificationStartTime ?
-          skipVerificationDetails?.skipVerificationStartTime :
-          new Date().getTime()
+      skipVerification: true,
+      skipVerificationStartTime: skipVerificationDetails?.skipVerificationStartTime
+        ? skipVerificationDetails?.skipVerificationStartTime
+        : new Date().getTime()
     }
-    AsyncStorage.setItem(SKIP_VERIFICATION_KEY, JSON.stringify(skipVerificationInfo));
+    AsyncStorage.setItem(
+      SKIP_VERIFICATION_KEY,
+      JSON.stringify(skipVerificationInfo)
+    )
     const data = {
       user: cloneDeep(user),
       verifying,
       skipVerificationDetails: cloneDeep(skipVerificationInfo)
     }
-    _UpdateData(data);
-    updateSkipVerification(skipVerificationInfo);
-    forceVerify(false);
+    _UpdateData(data)
+    updateSkipVerification(skipVerificationInfo)
+    forceVerify(false)
   }
 
   didTimeLapse = (skipVerificationDetails) => {
-    const { skipVerification, skipVerificationStartTime } = skipVerificationDetails;
-    const currentTime = new Date().getTime();
+    const {
+      skipVerification,
+      skipVerificationStartTime
+    } = skipVerificationDetails
+    const currentTime = new Date().getTime()
     const timeLapsedSeconds =
-      skipVerification === undefined ? 0 : (parseInt(currentTime) - parseInt(skipVerificationStartTime)) / 1000;
-    return timeLapsedSeconds < SKIP_VERIFICATION_DURATION;
+      skipVerification === undefined
+        ? 0
+        : (parseInt(currentTime) - parseInt(skipVerificationStartTime)) / 1000
+    return timeLapsedSeconds < SKIP_VERIFICATION_DURATION
   }
 
   render() {
@@ -195,15 +205,20 @@ class VerificationConfirmation extends Component {
                 <Text fontStyle={'bold'}>{t('or')}</Text>
               </View> */}
               {/* <ShellButton */}
-              {this.didTimeLapse(skipVerificationDetails) && <ShellButton
-                block
-                disabled={verifying}
-                style={styles.button}
-                buttonColor='lightGray'
-                onPress={this.handleSkipVerification}>
-                <Text>{!skipVerificationDetails?.skipVerification ? t('Skip verification for a day') : t('I will verify later')}</Text>
-              </ShellButton>
-              }
+              {this.didTimeLapse(skipVerificationDetails) && (
+                <ShellButton
+                  block
+                  disabled={verifying}
+                  style={styles.button}
+                  buttonColor='lightGray'
+                  onPress={this.handleSkipVerification}>
+                  <Text>
+                    {!skipVerificationDetails?.skipVerification
+                      ? t('Skip verification for a day')
+                      : t('I will verify later')}
+                  </Text>
+                </ShellButton>
+              )}
               {IS_ANDROID && <GoToPlottrDotCom />}
             </Animatable.View>
           </View>
@@ -214,7 +229,7 @@ class VerificationConfirmation extends Component {
 }
 
 const mapStateToProps = (data) => {
-  const { user, verifying, skipVerificationDetails } = data.data;
+  const { user, verifying, skipVerificationDetails } = data.data
   return {
     user: user || {},
     verifying,

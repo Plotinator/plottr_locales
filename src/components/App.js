@@ -30,26 +30,33 @@ const { IS_ANDROID } = Metrics
 export default class App extends Component {
   state = {
     userInfo: {},
-    verifying: false,
+    verifying: false
   }
 
   componentDidMount () {
     this.retrieveUserSession()
   }
 
-  setUserInfo = async(info, checkLicense, skipVerification = null) => {
-    const skipVerificationDetails = skipVerification ? skipVerification : await getSkipVerificationDetails();
-    const userInfo = info && cloneDeep(info) || {}
-    this.setState({ userInfo, skipVerificationDetails }, info && checkLicense && this.checkUserLicense)
+  setUserInfo = async (info, checkLicense, skipVerification = null) => {
+    const skipVerificationDetails = skipVerification
+      ? skipVerification
+      : info
+      ? await getSkipVerificationDetails()
+      : null
+    const userInfo = (info && cloneDeep(info)) || {}
+    this.setState(
+      { userInfo, skipVerificationDetails },
+      info && checkLicense && this.checkUserLicense
+    )
   }
 
-  updateSkipVerification = (skipVerificationDetails) =>{
+  updateSkipVerification = (skipVerificationDetails) => {
     this.setState({
       skipVerificationDetails: skipVerificationDetails
     })
   }
 
-  setVerifying(verifying) {
+  setVerifying (verifying) {
     this.setState({ verifying })
   }
 
@@ -104,9 +111,11 @@ export default class App extends Component {
       this.handleSendVerificationEmail(userInfo)
     } else {
       this.setVerifying(false)
-      const error = t("Your email didn't verify. Try again or try another email.")
+      const error = t(
+        "Your email didn't verify. Try again or try another email."
+      )
       const hasMessage = userInfo && userInfo.message
-      const message = (hasMessage ? `\n${hasMessage}` : '')
+      const message = hasMessage ? `\n${hasMessage}` : ''
       this.showError(error + message, false)
     }
   }
@@ -158,7 +167,7 @@ export default class App extends Component {
         this.showError(reason)
       }
     } else {
-      this.showError("That code was invalid. Try again.")
+      this.showError('That code was invalid. Try again.')
     }
     this.setVerifying(false)
   }
@@ -201,18 +210,25 @@ export default class App extends Component {
             style={flexContainer}>
             <View style={flexContainer}>
               <StatusBar barStyle='dark-content' />
-              <AppErrorBoundary reset={this.handleAppReset} recover={this.handleAppReset}>
+              <AppErrorBoundary
+                reset={this.handleAppReset}
+                recover={this.handleAppReset}>
                 <Main
                   v2
                   user={userInfo}
-                  skipVerificationDetails={this.state.skipVerificationDetails?this.state.skipVerificationDetails:{}}
+                  skipVerificationDetails={
+                    this.state.skipVerificationDetails
+                      ? this.state.skipVerificationDetails
+                      : {}
+                  }
                   verifying={verifying}
                   logout={handleLogout}
                   verifyCode={handleCodeVerification}
                   verifyByEmail={handleEmailVerification}
                   sendVerificationEmail={handleSendVerificationEmail}
                   subscribeUser={addUserSubscription}
-                  updateSkipVerification={updateSkipVerification} />
+                  updateSkipVerification={updateSkipVerification}
+                />
               </AppErrorBoundary>
               <AlertDialog />
             </View>
