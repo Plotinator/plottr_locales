@@ -914,6 +914,9 @@
   "Please verify your license": {
     "message": "Please verify your license"
   },
+  "Please verify your license in {time}": {
+    "message": "Please verify your license in {time}"
+  },
   "Plotline Details": {
     "message": "Plotline Details"
   },
