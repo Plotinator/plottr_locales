@@ -12,13 +12,12 @@ import {
 } from 'react-native'
 import { bindActionCreators } from 'redux'
 import { t } from 'plottr_locales'
-import { actions, selectors, helpers, newIds } from 'pltr/v2'
 import ChapterTitleCell from './ChapterTitleCell'
 import { BlankCell } from './BlankCell'
 import Cell from '../shared/Cell'
 import CardCell from './CardCell'
 import CardModal from './CardModal'
-import { CELL_HEIGHT, CELL_WIDTH } from '../../../utils/constants'
+import { CELL_HEIGHT, CELL_WIDTH, MIGRATION_VERSION } from '../../../utils/constants'
 import { Icon } from 'native-base'
 import tinycolor from 'tinycolor2'
 import LineTitleCell from './LineTitleCell'
@@ -28,10 +27,17 @@ import styles from './TimelineStyles'
 import { showAlert } from '../../shared/common/AlertDialog'
 import { cloneDeep } from 'lodash'
 
+import { actions, selectors, helpers, newIds } from 'pltr/v2'
+import Migrator from '../../../../lib/pltr/v2/migrator/migrator'
 const {
-  beats: beatTitle,
-  lists: { reorderList, positionReset }
+  beats: { nextId },
+  lists: { reorderList },
 } = helpers
+
+const {
+  visibleSortedBeatsByBookSelector,
+  sortedLinesByBookSelector,
+} = selectors
 
 class Timeline extends Component {
   constructor (props) {
@@ -748,15 +754,15 @@ Timeline.propTypes = {
 }
 
 function mapStateToProps (state) {
-  let nextBeatId = -1
+   let nextBeatId = -1
   const bookId = selectors.currentTimelineSelector(state)
-  nextBeatId = newIds.nextId(state.beats)
+  nextBeatId = nextId(state.beats)
   return {
-    beats: selectors.sortedBeatsByBookSelector(state),
-    lineMap: selectors.linePositionMappingSelector(state),
-    linesMaxCards: selectors.lineMaxCardsSelector(state),
+    beats: visibleSortedBeatsByBookSelector(state),
+    lineMap: sortedLinesByBookSelector(state),
+    linesMaxCards: 0,
     nextBeatId: nextBeatId,
-    lines: selectors.sortedLinesByBookSelector(state),
+    lines: sortedLinesByBookSelector(state),
     cardMap: selectors.cardMapSelector(state),
     positionOffset: selectors.positionOffsetSelector(state),
     ui: state.ui,
