@@ -15,9 +15,12 @@ import DeleteConfirmModal from './dialogs/DeleteConfirmModal'
 import CustomAttributeModal from './dialogs/CustomAttributeModal'
 import ItemsManagerModal, { ListItem } from './dialogs/ItemsManagerModal'
 import InputModal from './dialogs/InputModal'
+import ActsConfigModal from './dialogs/ActsConfigModal'
+import AskToSaveModal from './dialogs/AskToSaveModal'
 
 // Containers
 import ErrorBoundary from './containers/ErrorBoundary'
+import DashboardErrorBoundary from './containers/DashboardErrorBoundary'
 import SubNav from './containers/SubNav'
 
 // Filter List
@@ -27,6 +30,8 @@ import CharactersFilterList from './filterLists/CharactersFilterList'
 import PlacesFilterList from './filterLists/PlacesFilterList'
 import TagFilterList from './filterLists/TagFilterList'
 import GenericFilterList from './filterLists/GenericFilterList'
+import CardColorFilterList from './filterLists/CardColorFilterList'
+import FilterList from './filterLists/FilterList'
 
 // RCE
 import RichText from './rce/RichText'
@@ -46,6 +51,30 @@ import CharacterView from './characters/CharacterView'
 
 // Project
 import BookSelectList from './project/BookSelectList'
+import BookList from './project/BookList'
+import EditSeries from './project/EditSeries'
+import FileLocation from './project/FileLocation'
+import BookChooser from './project/BookChooser'
+
+// Tag
+import TagView from './tag/TagView'
+import TagListView from './tag/TagListView'
+
+// Export
+import ExportDialog from './export/ExportDialog'
+import ExportNavItem from './export/ExportNavItem'
+
+// Notes
+import NoteListView from './notes/NoteListView'
+
+// Outline
+import OutlineView from './outline/OutlineView'
+
+// Places
+import PlaceListView from './places/PlaceListView'
+
+// Timeline
+import TimelineWrapper from './timeline/TimelineWrapper'
 
 // Root components
 import ColorPickerColor from './ColorPickerColor'
@@ -70,6 +99,7 @@ export {
   ListItem,
   PlottrModal,
   EditAttribute,
+  FilterList,
   RichText,
   editorRegistry,
   Image,
@@ -100,10 +130,26 @@ export {
   PlacesFilterList,
   TagFilterList,
   GenericFilterList,
+  CardColorFilterList,
   SortList,
   CharacterView,
   BookSelectList,
+  BookList,
+  EditSeries,
+  FileLocation,
+  BookChooser,
+  TagView,
+  TagListView,
+  ExportDialog,
+  ExportNavItem,
+  NoteListView,
+  OutlineView,
+  PlaceListView,
+  TimelineWrapper,
+  ActsConfigModal,
+  AskToSaveModal,
   ErrorBoundary,
+  DashboardErrorBoundary,
   SelectList,
   TagLabel,
   CustomAttributeModal,
