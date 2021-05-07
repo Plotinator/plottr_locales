@@ -82,6 +82,6 @@ export default ScaledSheet.create({
   trash: {
     // fontSize: size.h5,
     width: '50%',
-    color: Colors.red
+    color: Colors.lightGray
   }
 })
