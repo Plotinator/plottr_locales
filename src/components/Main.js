@@ -400,7 +400,7 @@ export default class Main extends Component {
       skipVerification,
       skipVerificationStartTime
     } = skipVerificationDetails
-    const bypassForDevs = false // __DEV__ // false
+    const bypassForDevs = __DEV__ // false
 
     // if the user is verified and valid
     // or has a valid subscription
