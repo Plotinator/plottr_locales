@@ -6138,9 +6138,8 @@ plist@^3.0.1:
   dependencies:
     format-message "^6.2.3"
 
-"pltr@https://github.com/Plotinator/pltr.git#v2.2.17":
+"pltr@file:./lib/pltr":
   version "2.2.11"
-  resolved "https://github.com/Plotinator/pltr.git#f23f395c2babd9567828bf9dbcbf79a214ed0833"
   dependencies:
     dom-parser "^0.1.6"
     image-extensions "^1.1.0"
