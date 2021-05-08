@@ -31,6 +31,10 @@ export function BlankCell (props) {
     )
   }
 
+  const handlePress = () => {
+    props.beatId !== 'new' && toggleModal(true)
+  }
+
   const { color } = props
   const colorObj = tinycolor(color)
   return (
@@ -38,7 +42,7 @@ export function BlankCell (props) {
       style={styles.cell}
       ref={cellRef}
       onLayout={onLayout}
-      onPress={() => toggleModal(true)}>
+      onPress={() => handlePress()}>
       <View
         style={[styles.coloredLine, { borderColor: colorObj.toHexString() }]}
       />
