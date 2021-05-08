@@ -571,7 +571,7 @@ class Timeline extends Component {
         />
       )
       // start at 1 because the first cell is the title cell
-      for (i = 1; i < linesMaxCards[line.id]; i++) {
+      for (let i = 1; i < linesMaxCards[line.id]; i++) {
         acc.push(this.renderBlankLineTitleCell(`${line.id}-blank-${i}`))
       }
       return acc
