@@ -28,8 +28,8 @@ class Outline extends Component {
   setRowReferrer = ref_name => ref => this.referrers[ref_name] = ref
   deleteRowReferrer = ref_name => delete this.referrers[ref_name]
 
-  renameChapter = ({ chapterId, input: chapterName }) => {
-    this.props.beatActions.editBeatTitle(chapterId, chapterName)
+  renameChapter = ({ chapterId, input: chapterName, bookId }) => {
+    this.props.beatActions.editBeatTitle(chapterId, bookId, chapterName)
   }
 
   deleteChapter = ({ chapterId, input: chapterName, bookId }) => {
@@ -69,7 +69,7 @@ class Outline extends Component {
   }
 
   handleRenameChapter = (chapter) => {
-    const { position, title, id: chapterId } = chapter
+    const { position, title, id: chapterId, bookId } = chapter
     const chapterNumber = position + 1
     const isAuto = title == 'auto'
     const autoChapter = t('Chapter {number}', { number: chapterNumber })
@@ -81,6 +81,7 @@ class Outline extends Component {
       inputText: chapterName,
       actions: [{
         chapterId,
+        bookId,
         positive: true,
         name: t('Save Chapter'),
         callback: this.renameChapter

@@ -56,7 +56,14 @@ class Outline extends Component {
   }
 
   renderMiniChapter (chapter, index, cardMap) {
-    const { positionOffset, lines } = this.props
+    const {
+      positionOffset,
+      lines,
+      beatTree,
+      hierarchyLevels,
+      isSeries,
+      hierarchyEnabled
+    } = this.props
 
     return (
       <MiniChapter
@@ -68,6 +75,10 @@ class Outline extends Component {
         linesById={this.state.linesById}
         sortedLines={lines}
         positionOffset={positionOffset}
+        beatTree={beatTree}
+        hierarchyLevels={hierarchyLevels}
+        isSeries={isSeries}
+        hierarchyEnabled={hierarchyEnabled}
       />
     )
   }
@@ -189,7 +200,11 @@ Outline.propTypes = {
   file: PropTypes.object.isRequired,
   ui: PropTypes.object.isRequired,
   positionOffset: PropTypes.number.isRequired,
-  navigation: PropTypes.object.isRequired
+  navigation: PropTypes.object.isRequired,
+  beatTree: PropTypes.object.isRequired,
+  hierarchyLevels: PropTypes.array.isRequired,
+  isSeries: PropTypes.bool.isRequired,
+  hierarchyEnabled: PropTypes.bool
 }
 
 function mapStateToProps (state) {
@@ -199,7 +214,11 @@ function mapStateToProps (state) {
     card2Dmap: selectors.cardMapSelector(state),
     file: state.file,
     ui: state.ui,
-    positionOffset: selectors.positionOffsetSelector(state)
+    positionOffset: selectors.positionOffsetSelector(state),
+    beatTree: selectors.beatsByBookSelector(state),
+    hierarchyLevels: selectors.sortedHierarchyLevels(state),
+    isSeries: selectors.isSeriesSelector(state),
+    hierarchyEnabled: selectors.beatHierarchyIsOn(state)
   }
 }
 

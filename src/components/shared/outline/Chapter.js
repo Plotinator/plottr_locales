@@ -38,7 +38,7 @@ class Chapter extends Component {
 
   autoSortChapter = () => {
     const { beatActions, chapter } = this.props
-    beatActions.autoSortBeat(chapter.id)
+    beatActions.autoSortBeat(chapter.id, chapter.bookId)
   }
 
   reorderCards = ({ current, currentIndex, dropped }) => {
@@ -137,10 +137,26 @@ class Chapter extends Component {
   }
 
   render () {
-    const { chapter, cards, activeFilter, positionOffset } = this.props
+    const {
+      beatTree,
+      chapter,
+      cards,
+      activeFilter,
+      positionOffset,
+      isSeries,
+      hierarchyEnabled,
+      hierarchyLevels
+    } = this.props
     if (activeFilter && !cards.length) return null
 
-    const chapterTitle = helpers.beats.beatTitle(chapter, positionOffset)
+    const chapterTitle = helpers.beats.beatTitle(
+      beatTree,
+      chapter,
+      hierarchyLevels,
+      positionOffset,
+      hierarchyEnabled,
+      isSeries
+    )
     const renderedCards = this.renderCards()
     const manualSort = this.renderManualSort()
     return (
@@ -200,20 +216,28 @@ const styles = StyleSheet.create({
 
 Chapter.propTypes = {
   chapter: PropTypes.object.isRequired,
+  beatTree: PropTypes.object.isRequired,
+  hierarchyLevels: PropTypes.array.isRequired,
+  isSeries: PropTypes.bool.isRequired,
   cards: PropTypes.array.isRequired,
   activeFilter: PropTypes.bool.isRequired,
   ui: PropTypes.object.isRequired,
   lines: PropTypes.array.isRequired,
   positionOffset: PropTypes.number.isRequired,
   navigation: PropTypes.object.isRequired,
-  render: PropTypes.func.isRequired
+  render: PropTypes.func.isRequired,
+  hierarchyEnabled: PropTypes.bool
 }
 
 function mapStateToProps (state) {
   return {
     ui: state.ui,
     lines: selectors.sortedLinesByBookSelector(state),
-    positionOffset: selectors.positionOffsetSelector(state)
+    positionOffset: selectors.positionOffsetSelector(state),
+    beatTree: selectors.beatsByBookSelector(state),
+    hierarchyLevels: selectors.sortedHierarchyLevels(state),
+    isSeries: selectors.isSeriesSelector(state),
+    hierarchyEnabled: selectors.beatHierarchyIsOn(state)
   }
 }
 

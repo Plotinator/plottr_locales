@@ -204,17 +204,36 @@ class Timeline extends Component {
 
   handleSaveBeat = () => {
     const { currentBeat: { id, bookId, title } } = this.state
-    const { beatActions } = this.props
+    const {
+      beatActions,
+      beatTree,
+      hierarchyLevels,
+      isSeries,
+      hierarchyEnabled
+    } = this.props
     this._BeatModal.hide()
-    beatActions.editBeatTitle(id, title || 'auto')
+    beatActions.editBeatTitle(id, bookId, title || 'auto')
     this.handleClearCurrentBeat()
   }
 
   handleAskToDeleteBeat = () => {
     // delay for 1 sec
     const { currentBeat, currentBeat: { title } } = this.state
-    const { positionOffset } = this.props
-    const name = helpers.beats.beatTitle(currentBeat, positionOffset)
+    const {
+      positionOffset,
+      beatTree,
+      hierarchyLevels,
+      isSeries,
+      hierarchyEnabled
+    } = this.props
+    const name = helpers.beats.beatTitle(
+      beatTree,
+      currentBeat,
+      hierarchyLevels,
+      positionOffset,
+      hierarchyEnabled,
+      isSeries
+    )
     showAlert({
       title: t('Delete Chapter'),
       message: t('Delete Chapter {name}?', { name }),
@@ -327,24 +346,14 @@ class Timeline extends Component {
     this.setState({ currentLine: {} })
   }
 
-  handleMoveBeat = (NewPosition, beat) => {
+  handleMoveBeat = (newBeatPosition, beat) => {
     const { beats, bookId } = this.props
-    const { position } = beat
-    const maxBeats = beats.length - 1
-    const NewBeatPosition =
-      NewPosition < 0 ? 0 : NewPosition > maxBeats ? maxBeats : NewPosition
-    const SortedBeats = cloneDeep(beats).sort((beatA, beatB) =>
-      beatA.position > beatB ? -1 : 1
+    if (!newBeatPosition || !beats[newBeatPosition]) return
+    this.props.beatActions.reorderBeats(
+      beat.id,
+      beats[newBeatPosition].id,
+      bookId
     )
-    // const CloneBeats = cloneDeep(beats)
-    const PreBeats = SortedBeats.slice(0, position)
-    const PostBeats = SortedBeats.slice(position + 1, beats.length)
-    console.log('PreBeats', PreBeats)
-    console.log('PostBeats', PostBeats)
-    const NewBeats = [].concat(PreBeats).concat(PostBeats)
-    NewBeats.splice(NewPosition, 0, cloneDeep(beat))
-    console.log('NewBeats', NewBeats)
-    this.props.beatActions.reorderBeats(NewBeats, bookId)
   }
 
   handleMoveLine = (NewPosition, line) => {
@@ -750,7 +759,11 @@ Timeline.propTypes = {
   cardMap: PropTypes.object.isRequired,
   ui: PropTypes.object.isRequired,
   bookId: PropTypes.any,
-  navigation: PropTypes.object.isRequired
+  navigation: PropTypes.object.isRequired,
+  beatTree: PropTypes.object.isRequired,
+  hierarchyLevels: PropTypes.array.isRequired,
+  isSeries: PropTypes.bool.isRequired,
+  hierarchyEnabled: PropTypes.bool
 }
 
 function mapStateToProps (state) {
@@ -766,7 +779,11 @@ function mapStateToProps (state) {
     cardMap: selectors.cardMapSelector(state),
     positionOffset: selectors.positionOffsetSelector(state),
     ui: state.ui,
-    bookId: bookId
+    bookId: bookId,
+    beatTree: selectors.beatsByBookSelector(state),
+    hierarchyLevels: selectors.sortedHierarchyLevels(state),
+    isSeries: selectors.isSeriesSelector(state),
+    hierarchyEnabled: selectors.beatHierarchyIsOn(state)
   }
 }
 

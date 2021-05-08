@@ -8,7 +8,18 @@ import tinycolor from 'tinycolor2'
 import { grays } from 'pltr/v2/constants/CSScolors'
 
 function MiniChapter (props) {
-  const { chapter, idx, cards, linesById, sortedLines, positionOffset } = props
+  const {
+    chapter,
+    idx,
+    cards,
+    linesById,
+    sortedLines,
+    positionOffset,
+    beatTree,
+    hierarchyLevels,
+    isSeries,
+    hierarchyEnabled
+  } = props
   const [sortedCards, setSortedCards] = useState([])
 
   useEffect(
@@ -47,7 +58,14 @@ function MiniChapter (props) {
         <View style={styles.chapterWrapper}>
           <Text style={styles.indexText}>{`${idx + 1}.  `}</Text>
           <Text style={styles.titleText}>
-            {helpers.beats.beatTitle(chapter, positionOffset)}
+            {helpers.beats.beatTitle(
+              beatTree,
+              chapter,
+              hierarchyLevels,
+              positionOffset,
+              hierarchyEnabled,
+              isSeries
+            )}
           </Text>
         </View>
         <View style={styles.dotWrapper}>
@@ -93,7 +111,11 @@ MiniChapter.propTypes = {
   cards: PropTypes.array.isRequired,
   sortedLines: PropTypes.array.isRequired,
   linesById: PropTypes.object.isRequired,
-  positionOffset: PropTypes.number.isRequired
+  positionOffset: PropTypes.number.isRequired,
+  beatTree: PropTypes.object.isRequired,
+  hierarchyLevels: PropTypes.array.isRequired,
+  isSeries: PropTypes.bool.isRequired,
+  hierarchyEnabled: PropTypes.bool
 }
 
 export default MiniChapter

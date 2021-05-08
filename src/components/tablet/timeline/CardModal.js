@@ -91,7 +91,13 @@ class CardModal extends Component {
   }
 
   renderBeatMenuItem = (beat, i) => {
-    const { positionOffset } = this.props
+    const {
+      positionOffset,
+      beatTree,
+      hierarchyLevels,
+      isSeries,
+      hierarchyEnabled
+    } = this.props
     const { card = {} } = this.state
     const isSelected = card.beatId == beat.id
     const color = isSelected ? 'orange' : 'textGray'
@@ -103,7 +109,14 @@ class CardModal extends Component {
         style={styles.menuItem}
         onPress={this.changeChapter}>
         <Text fontStyle={fontStyle} color={color}>
-          {helpers.beats.beatTitle(beat, positionOffset)}
+          {helpers.beats.beatTitle(
+            beatTree,
+            beat,
+            hierarchyLevels,
+            positionOffset,
+            hierarchyEnabled,
+            isSeries
+          )}
         </Text>
       </ShellButton>
     )
@@ -144,7 +157,15 @@ class CardModal extends Component {
       showPlaces = false,
       showTags = false
     } = this.state
-    const { beats, lines, positionOffset } = this.props
+    const {
+      beats,
+      lines,
+      positionOffset,
+      beatTree,
+      hierarchyLevels,
+      isSeries,
+      hierarchyEnabled
+    } = this.props
     const { id: cardId, title, description, beatId, characters, places, tags } =
       card || {}
     const beat = this.getBeatById(beatId)
@@ -168,7 +189,14 @@ class CardModal extends Component {
                   from={
                     <ShellButton style={styles.crumb}>
                       <Text numberOfLines={1} style={styles.chapterText}>
-                        {helpers.beats.beatTitle(beat, positionOffset)}
+                        {helpers.beats.beatTitle(
+                          beatTree,
+                          beat,
+                          hierarchyLevels,
+                          positionOffset,
+                          hierarchyEnabled,
+                          isSeries
+                        )}
                       </Text>
                       <Icon
                         style={styles.crumbIcon}
@@ -343,7 +371,11 @@ CardModal.propTypes = {
   cards: PropTypes.array.isRequired,
   bookId: PropTypes.number.isRequired,
   navigation: PropTypes.object.isRequired,
-  route: PropTypes.object.isRequired
+  route: PropTypes.object.isRequired,
+  beatTree: PropTypes.object.isRequired,
+  hierarchyLevels: PropTypes.array.isRequired,
+  isSeries: PropTypes.bool.isRequired,
+  hierarchyEnabled: PropTypes.bool
 }
 
 function mapStateToProps (state) {
@@ -352,7 +384,11 @@ function mapStateToProps (state) {
     beats: selectors.sortedBeatsByBookSelector(state),
     lines: selectors.sortedLinesByBookSelector(state),
     bookId: selectors.currentTimelineSelector(state),
-    cards: state.cards
+    cards: state.cards,
+    beatTree: selectors.beatsByBookSelector(state),
+    hierarchyLevels: selectors.sortedHierarchyLevels(state),
+    isSeries: selectors.isSeriesSelector(state),
+    hierarchyEnabled: selectors.beatHierarchyIsOn(state)
   }
 }
 

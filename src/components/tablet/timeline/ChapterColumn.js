@@ -26,7 +26,7 @@ class Chapter extends Component {
 
   autoSortChapter = () => {
     const { beatActions, chapter } = this.props
-    beatActions.autoSortBeat(chapter.id)
+    beatActions.autoSortBeat(chapter.id, chapter.bookId)
   }
 
   renderSceneCard = (value) => {

@@ -12,7 +12,15 @@ import Colors from '../../utils/Colors'
 
 class ChapterPicker extends Component {
   renderTablet () {
-    const { selectedId, chapters, positionOffset } = this.props
+    const {
+      selectedId,
+      chapters,
+      positionOffset,
+      beatTree,
+      hierarchyLevels,
+      isSeries,
+      hierarchyEnabled
+    } = this.props
     const selected = chapters.find(ch => ch.id == selectedId)
     return (
       <Popover
@@ -20,7 +28,14 @@ class ChapterPicker extends Component {
           <Button bordered dark iconRight style={styles.picker}>
             <Text>
               {selected
-                ? helpers.beats.beatTitle(selected, positionOffset)
+                ? helpers.beats.beatTitle(
+                    beatTree,
+                    selected,
+                    hierarchyLevels,
+                    positionOffset,
+                    hierarchyEnabled,
+                    isSeries
+                  )
                 : t('Select a Chapter')}
             </Text>
             <Icon
@@ -36,7 +51,16 @@ class ChapterPicker extends Component {
   }
 
   renderTabletItems () {
-    const { chapters, positionOffset, onChange, selectedId } = this.props
+    const {
+      chapters,
+      positionOffset,
+      onChange,
+      selectedId,
+      beatTree,
+      hierarchyLevels,
+      isSeries,
+      hierarchyEnabled
+    } = this.props
     return chapters.map(ch => {
       return (
         <ListItem
@@ -45,19 +69,41 @@ class ChapterPicker extends Component {
           onPress={() => onChange(ch.id)}
           noIndent
           selected={ch.id == selectedId}>
-          <Text>{helpers.beats.beatTitle(ch, positionOffset)}</Text>
+          <Text>{
+            helpers.beats.beatTitle(
+              beatTree,
+              ch,
+              hierarchyLevels,
+              positionOffset,
+              hierarchyEnabled,
+              isSeries
+            )}</Text>
         </ListItem>
       )
     })
   }
 
   renderPhoneItems () {
-    const { chapters, positionOffset } = this.props
+    const {
+      chapters,
+      positionOffset,
+      beatTree,
+      hierarchyLevels,
+      isSeries,
+      hierarchyEnabled
+    } = this.props
     return chapters.map(ch => {
       return (
         <Picker.Item
           key={ch.id}
-          label={helpers.beats.beatTitle(ch, positionOffset)}
+          label={helpers.beats.beatTitle(
+            beatTree,
+            ch,
+            hierarchyLevels,
+            positionOffset,
+            hierarchyEnabled,
+            isSeries
+          )}
           value={ch.id}
         />
       )
@@ -124,13 +170,21 @@ ChapterPicker.propTypes = {
   chapters: PropTypes.array.isRequired,
   positionOffset: PropTypes.number.isRequired,
   selectedId: PropTypes.number,
-  onChange: PropTypes.func.isRequired
+  onChange: PropTypes.func.isRequired,
+  beatTree: PropTypes.object.isRequired,
+  hierarchyLevels: PropTypes.array.isRequired,
+  isSeries: PropTypes.bool.isRequired,
+  hierarchyEnabled: PropTypes.bool
 }
 
 function mapStateToProps (state) {
   return {
     chapters: selectors.sortedBeatsByBookSelector(state),
-    positionOffset: selectors.positionOffsetSelector(state)
+    positionOffset: selectors.positionOffsetSelector(state),
+    beatTree: selectors.beatsByBookSelector(state),
+    hierarchyLevels: selectors.sortedHierarchyLevels(state),
+    isSeries: selectors.isSeriesSelector(state),
+    hierarchyEnabled: selectors.beatHierarchyIsOn(state)
   }
 }
 
