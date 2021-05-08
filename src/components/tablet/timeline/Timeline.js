@@ -37,6 +37,7 @@ const {
 const {
   visibleSortedBeatsByBookSelector,
   sortedLinesByBookSelector,
+  linePositionMappingSelector
 } = selectors
 
 class Timeline extends Component {
@@ -346,9 +347,10 @@ class Timeline extends Component {
     this.setState({ currentLine: {} })
   }
 
-  handleMoveBeat = (newBeatPosition, beat) => {
+  handleMoveBeat = (unboundedBeatPosition, beat) => {
     const { beats, bookId } = this.props
-    if (!newBeatPosition || !beats[newBeatPosition]) return
+    const newBeatPosition = unboundedBeatPosition < 0 ? 0 : unboundedBeatPosition;
+    if (!beats[newBeatPosition]) return
     this.props.beatActions.reorderBeats(
       beat.id,
       beats[newBeatPosition].id,
@@ -773,7 +775,7 @@ function mapStateToProps (state) {
   return {
     beats: visibleSortedBeatsByBookSelector(state),
     lineMap: sortedLinesByBookSelector(state),
-    linesMaxCards: 0,
+    linesMaxCards: selectors.lineMaxCardsSelector(state),
     nextBeatId: nextBeatId,
     lines: sortedLinesByBookSelector(state),
     cardMap: selectors.cardMapSelector(state),
