@@ -101,7 +101,7 @@ class DocumentViewController: UIViewController {
   @objc func updateDocument(_ fileURL: String, withData data: String) -> Void {
     let docViewController = DocumentViewController._sharedInstance
     var doc = docViewController?.document
-    if (doc == nil || doc?.fileURL == nil) {
+    if (doc == nil || doc?.fileURL != URL(fileURLWithPath: fileURL)) {
       doc = PlottrDocument(fileURL: URL(fileURLWithPath: fileURL))
       DocumentViewController._sharedInstance?.document = doc
     }
