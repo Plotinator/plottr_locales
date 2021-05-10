@@ -116,7 +116,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
 
   func presentDocument(at documentURL: URL, json: String) {
     let initialData:NSDictionary = [
-      "documentURL": documentURL.absoluteString,
+      "documentURL": documentURL.path,
       "data": json
     ]
     DocEvents.openDocument(data: initialData)
