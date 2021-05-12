@@ -1,5 +1,11 @@
 import { BEAT_HIERARCHY_FLAG } from '../constants/featureFlags'
 
-export const beatHierarchyIsOn = (state) => state.featureFlags[BEAT_HIERARCHY_FLAG]
+// WARNING: THIS SHOULD NOT BE MERGED INTO PLTR!!
+// IT IS HERE FOR NOW TO MAKE THE MOBILE APP NOT USE STRUCTURE.
+export const beatHierarchyIsOn = (state) => false
 
-export const featureFlags = (state) => state.featureFlags
+// WARNING: THIS SHOULD NOT BE MERGED INTO PLTR!!
+// IT IS HERE FOR NOW TO MAKE THE MOBILE APP NOT USE STRUCTURE.
+export const featureFlags = (state) => {
+  BEAT_HIERARCHY: false
+}
