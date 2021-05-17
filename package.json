@@ -5,7 +5,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "lint": "eslint .",
+    "format:check": "prettier . --check",
+    "format:write": "prettier . --write",
+    "validate": "npm-run-all format:check lint"
   },
   "dependencies": {
     "next": "10.2.0",
