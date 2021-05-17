@@ -14,7 +14,10 @@
   "dependencies": {
     "next": "10.2.0",
     "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react-dom": "17.0.2",
+    "plottr_components": "file:./lib/plottr_components",
+    "plottr_locales": "file:./lib/plottr_locales",
+    "pltr": "file:./lib/pltr"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
