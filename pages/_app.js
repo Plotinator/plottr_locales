@@ -3,9 +3,15 @@ import PropTypes from 'prop-types'
 
 import { wrapper } from '../lib/redux'
 
-import '../styles/globals.css'
+import '../styles/globals.scss'
 
-const Plottr = ({ Component, pageProps }) => <Component {...pageProps} />
+const Plottr = ({ Component, pageProps }) => (
+  <>
+    <main>
+      <Component {...pageProps} />
+    </main>
+  </>
+)
 
 Plottr.propTypes = {
   Component: PropTypes.func.isRequired,

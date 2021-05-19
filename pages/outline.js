@@ -1,6 +1,6 @@
 import Navigation from '../components/navigation'
 
-const Characters = () => {
+const Outline = () => {
   return (
     <>
       <Navigation />
@@ -9,4 +9,4 @@ const Characters = () => {
   )
 }
 
-export default Characters
+export default Outline
