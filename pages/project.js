@@ -38,6 +38,8 @@ export default function Project() {
   )
 }
 
-export async function getServerSideProps(context) {
-  return props
-}
+// export async function getServerSideProps(context) {
+//   return {
+//     props: {},
+//   }
+// }

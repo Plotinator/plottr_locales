@@ -1,9 +1,9 @@
+import React from 'react'
 import PropTypes from 'prop-types'
 
-import '../styles/globals.css'
-
-import React from 'react'
 import { wrapper } from '../lib/redux'
+
+import '../styles/globals.css'
 
 const Plottr = ({ Component, pageProps }) => <Component {...pageProps} />
 
