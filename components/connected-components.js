@@ -43,7 +43,11 @@ const platform = {
   moveFromTemp: () => {},
   showItemInFolder: (fileName) => {},
   tempFilesPath: '',
-  mpq: {},
+  mpq: {
+    push: () => {
+      console.warn('TODO: implement MPQ!')
+    },
+  },
 }
 
 const components = connections.pltr(platform)
