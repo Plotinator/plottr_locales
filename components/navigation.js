@@ -43,37 +43,37 @@ function Navigation({ currentView, changeCurrentView, darkMode }) {
       <Nav activeKey={currentView} bsStyle="pills">
         <BookChooser />
         <li role="presentation" className={cx({ active: currentView === 'project' })}>
-          <Link to="/project" onClick={changeTo('project')}>
+          <Link role="button" to="/project" onClick={changeTo('project')}>
             {i18n('Project')}
           </Link>
         </li>
         <li role="presentation" className={cx({ active: currentView === 'timeline' })}>
-          <Link to="/timeline" onClick={changeTo('timeline')}>
+          <Link role="button" to="/timeline" onClick={changeTo('timeline')}>
             {i18n('Timeline')}
           </Link>
         </li>
         <li role="presentation" className={cx({ active: currentView === 'outline' })}>
-          <Link to="/outline" onClick={changeTo('outline')}>
+          <Link role="button" to="/outline" onClick={changeTo('outline')}>
             {i18n('Outline')}
           </Link>
         </li>
         <li role="presentation" className={cx({ active: currentView === 'notes' })}>
-          <Link to="/notes" onClick={changeTo('notes')}>
+          <Link role="button" to="/notes" onClick={changeTo('notes')}>
             {i18n('Notes')}
           </Link>
         </li>
         <li role="presentation" className={cx({ active: currentView === 'characters' })}>
-          <Link to="/characters" onClick={changeTo('characters')}>
+          <Link role="button" to="/characters" onClick={changeTo('characters')}>
             {i18n('Characters')}
           </Link>
         </li>
         <li role="presentation" className={cx({ active: currentView === 'places' })}>
-          <Link to="/places" onClick={changeTo('places')}>
+          <Link role="button" to="/places" onClick={changeTo('places')}>
             {i18n('Places')}
           </Link>
         </li>
         <li role="presentation" className={cx({ active: currentView === 'tags' })}>
-          <Link to="/tags" onClick={changeTo('tags')}>
+          <Link role="button" to="/tags" onClick={changeTo('tags')}>
             {i18n('Tags')}
           </Link>
         </li>
