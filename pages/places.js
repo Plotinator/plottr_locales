@@ -1,12 +1,5 @@
-import Navigation from '../components/navigation'
+import Root from '../components/root'
 
-const Places = () => {
-  return (
-    <>
-      <Navigation />
-      <div>placeholder</div>
-    </>
-  )
-}
+const Places = () => <Root />
 
 export default Places

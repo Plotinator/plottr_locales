@@ -27,6 +27,8 @@
     "react-icons": "^3.11.0",
     "react-proptypes": "^1.0.0",
     "react-redux": "^4.4.10",
+    "react-router": "^5.2.0",
+    "react-router-dom": "^5.2.0",
     "redux": "^3.5.2",
     "redux-undo": "^1.0.1",
     "regenerator-runtime": "^0.13.7",

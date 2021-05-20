@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react'
 import PropTypes from 'react-proptypes'
+import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { Navbar, Nav, Button } from 'react-bootstrap'
 import { t as i18n } from 'plottr_locales'
 import { Beamer, BookChooser } from 'connected-components'
 import { FaKey } from 'react-icons/fa'
-import Link from 'next/link'
 import cx from 'classnames'
 
 import { actions } from 'pltr/v2'
@@ -39,25 +39,25 @@ function Navigation({ currentView, changeCurrentView, darkMode }) {
       <Nav activeKey={currentView} bsStyle="pills">
         <BookChooser />
         <li role="presentation" className={cx({ active: currentView === 'project' })}>
-          <Link href="/project">{i18n('Project')}</Link>
+          <Link to="/project">{i18n('Project')}</Link>
         </li>
         <li role="presentation" className={cx({ active: currentView === 'timeline' })}>
-          <Link href="/timeline">{i18n('Timeline')}</Link>
+          <Link to="/timeline">{i18n('Timeline')}</Link>
         </li>
         <li role="presentation" className={cx({ active: currentView === 'outline' })}>
-          <Link href="/outline">{i18n('Outline')}</Link>
+          <Link to="/outline">{i18n('Outline')}</Link>
         </li>
         <li role="presentation" className={cx({ active: currentView === 'notes' })}>
-          <Link href="/notes">{i18n('Notes')}</Link>
+          <Link to="/notes">{i18n('Notes')}</Link>
         </li>
         <li role="presentation" className={cx({ active: currentView === 'characters' })}>
-          <Link href="/characters">{i18n('Characters')}</Link>
+          <Link to="/characters">{i18n('Characters')}</Link>
         </li>
         <li role="presentation" className={cx({ active: currentView === 'places' })}>
-          <Link href="/places">{i18n('Places')}</Link>
+          <Link to="/places">{i18n('Places')}</Link>
         </li>
         <li role="presentation" className={cx({ active: currentView === 'tags' })}>
-          <Link href="/tags">{i18n('Tags')}</Link>
+          <Link to="/tags">{i18n('Tags')}</Link>
         </li>
       </Nav>
       <Beamer inNavigation />

@@ -1,12 +1,5 @@
-import Navigation from '../components/navigation'
+import Root from '../components/root'
 
-const Outline = () => {
-  return (
-    <>
-      <Navigation />
-      <div>placeholder</div>
-    </>
-  )
-}
+const Outline = () => <Root />
 
 export default Outline
