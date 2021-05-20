@@ -32,8 +32,8 @@ import { clone } from 'lodash'
 
 const INITIAL_STATE = {
   1: {
-    children: { null: 1, 1: [] },
-    heap: { null: [1] },
+    children: { null: [1], 1: [] },
+    heap: { 1: null },
     index: { 1: defaultBeat },
   },
 }
