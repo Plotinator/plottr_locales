@@ -34,30 +34,48 @@ function Navigation({ currentView, changeCurrentView, darkMode }) {
     )
   }
 
+  const changeTo = (newLocation) => () => {
+    changeCurrentView(newLocation)
+  }
+
   return (
     <Navbar className="project-nav" fluid inverse={darkMode}>
       <Nav activeKey={currentView} bsStyle="pills">
         <BookChooser />
         <li role="presentation" className={cx({ active: currentView === 'project' })}>
-          <Link to="/project">{i18n('Project')}</Link>
+          <Link to="/project" onClick={changeTo('project')}>
+            {i18n('Project')}
+          </Link>
         </li>
         <li role="presentation" className={cx({ active: currentView === 'timeline' })}>
-          <Link to="/timeline">{i18n('Timeline')}</Link>
+          <Link to="/timeline" onClick={changeTo('timeline')}>
+            {i18n('Timeline')}
+          </Link>
         </li>
         <li role="presentation" className={cx({ active: currentView === 'outline' })}>
-          <Link to="/outline">{i18n('Outline')}</Link>
+          <Link to="/outline" onClick={changeTo('outline')}>
+            {i18n('Outline')}
+          </Link>
         </li>
         <li role="presentation" className={cx({ active: currentView === 'notes' })}>
-          <Link to="/notes">{i18n('Notes')}</Link>
+          <Link to="/notes" onClick={changeTo('notes')}>
+            {i18n('Notes')}
+          </Link>
         </li>
         <li role="presentation" className={cx({ active: currentView === 'characters' })}>
-          <Link to="/characters">{i18n('Characters')}</Link>
+          <Link to="/characters" onClick={changeTo('characters')}>
+            {i18n('Characters')}
+          </Link>
         </li>
         <li role="presentation" className={cx({ active: currentView === 'places' })}>
-          <Link to="/places">{i18n('Places')}</Link>
+          <Link to="/places" onClick={changeTo('places')}>
+            {i18n('Places')}
+          </Link>
         </li>
         <li role="presentation" className={cx({ active: currentView === 'tags' })}>
-          <Link to="/tags">{i18n('Tags')}</Link>
+          <Link to="/tags" onClick={changeTo('tags')}>
+            {i18n('Tags')}
+          </Link>
         </li>
       </Nav>
       <Beamer inNavigation />
