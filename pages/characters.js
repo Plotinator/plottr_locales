@@ -1,12 +1,5 @@
-import Navigation from '../components/navigation'
+import Root from '../components/root'
 
-const Characters = () => {
-  return (
-    <>
-      <Navigation />
-      <div>placeholder</div>
-    </>
-  )
-}
+const Characters = () => <Root />
 
 export default Characters

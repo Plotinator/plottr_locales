@@ -1,12 +1,5 @@
-import Navigation from '../components/navigation'
+import Root from '../components/root'
 
-const Notes = () => {
-  return (
-    <>
-      <Navigation />
-      <div>placeholder</div>
-    </>
-  )
-}
+const Notes = () => <Root />
 
 export default Notes

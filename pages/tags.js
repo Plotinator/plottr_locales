@@ -1,12 +1,5 @@
-import Navigation from '../components/navigation'
+import Root from '../components/root'
 
-const Tags = () => {
-  return (
-    <>
-      <Navigation />
-      <div>placeholder</div>
-    </>
-  )
-}
+const Tags = () => <Root />
 
 export default Tags
