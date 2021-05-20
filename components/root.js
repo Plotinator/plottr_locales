@@ -10,6 +10,7 @@ import Outline from './outline'
 import Notes from './notes'
 import Characters from './characters'
 import Places from './places'
+import Tags from './tags'
 
 const Root = () => (
   <Router history={history}>
@@ -21,6 +22,7 @@ const Root = () => (
       <Route path="/notes" component={Notes} />
       <Route path="/characters" component={Characters} />
       <Route path="/places" component={Places} />
+      <Route path="/tags" component={Tags} />
     </Switch>
   </Router>
 )
