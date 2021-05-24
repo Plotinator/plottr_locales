@@ -15,15 +15,17 @@ import Tags from './tags'
 const Root = () => (
   <Router history={history}>
     <Navigation />
-    <Switch>
-      <Route path="/project" component={Project} />
-      <Route path="/timeline" component={Timeline} />
-      <Route path="/outline" component={Outline} />
-      <Route path="/notes" component={Notes} />
-      <Route path="/characters" component={Characters} />
-      <Route path="/places" component={Places} />
-      <Route path="/tags" component={Tags} />
-    </Switch>
+    <main className="project-main tour-end">
+      <Switch>
+        <Route path="/project" component={Project} />
+        <Route path="/timeline" component={Timeline} />
+        <Route path="/outline" component={Outline} />
+        <Route path="/notes" component={Notes} />
+        <Route path="/characters" component={Characters} />
+        <Route path="/places" component={Places} />
+        <Route path="/tags" component={Tags} />
+      </Switch>
+    </main>
   </Router>
 )
 
