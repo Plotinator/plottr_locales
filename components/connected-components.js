@@ -1,4 +1,5 @@
 import { connections } from 'plottr_components'
+import { history } from '../lib/history'
 
 const platform = {
   appVersion: process.env.VERSION,
@@ -61,6 +62,8 @@ const platform = {
       console.warn('TODO: implement MPQ!')
     },
   },
+  browserHistory: history,
+  inBrowser: true,
 }
 
 const components = connections.pltr(platform)
