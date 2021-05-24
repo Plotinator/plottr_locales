@@ -7,9 +7,7 @@ import '../styles/globals.scss'
 
 const Plottr = ({ Component, pageProps }) => (
   <>
-    <main>
-      <Component {...pageProps} />
-    </main>
+    <Component {...pageProps} />
   </>
 )
 
