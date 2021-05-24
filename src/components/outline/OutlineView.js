@@ -20,6 +20,10 @@ const OutlineViewConnector = (connector) => {
   const ExportNavItem = UnconnectedExportNavItem(connector)
   const SubNav = UnconnectedSubNav(connector)
 
+  const {
+    platform: { exportDisabled },
+  } = connector
+
   class OutlineView extends Component {
     constructor(props) {
       super(props)
@@ -120,9 +124,11 @@ const OutlineViewConnector = (connector) => {
               {filterDeclaration}
             </NavItem>
           </Nav>
-          <Nav pullRight>
-            <ExportNavItem />
-          </Nav>
+          {!exportDisabled && (
+            <Nav pullRight>
+              <ExportNavItem />
+            </Nav>
+          )}
         </SubNav>
       )
     }
