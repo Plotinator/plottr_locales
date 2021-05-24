@@ -133,6 +133,7 @@ const connector = {
 //   }
 //   inBrowser: bool,
 //   browserHistory: object,
+//   templatesDisabled: bool,
 // }
 
 export default (platform) => {

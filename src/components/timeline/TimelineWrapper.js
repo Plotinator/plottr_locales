@@ -39,10 +39,9 @@ const TimelineWrapperConnector = (connector) => {
   const ClearNavItem = UnconnectedClearNavItem(connector)
 
   const {
-    platform: { mpq },
+    platform: { mpq, exportDisabled, templatesDisabled },
   } = connector
   const saveAsTemplate = connector.platform.template.startSaveAsTemplate
-  const templatesDisabled = connector.platform.templatesDisabled
 
   class TimelineWrapper extends Component {
     constructor(props) {
@@ -371,7 +370,7 @@ const TimelineWrapperConnector = (connector) => {
               </Button>
             </NavItem>
             <ClearNavItem />
-            <ExportNavItem />
+            {!exportDisabled && <ExportNavItem />}
           </Nav>
         </SubNav>
       )
