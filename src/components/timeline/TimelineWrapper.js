@@ -39,8 +39,10 @@ const TimelineWrapperConnector = (connector) => {
   const ClearNavItem = UnconnectedClearNavItem(connector)
 
   const {
-    platform: { saveAsTemplate, mpq },
+    platform: { mpq },
   } = connector
+  const saveAsTemplate = connector.platform.template.startSaveAsTemplate
+  const templatesDisabled = connector.platform.templatesDisabled
 
   class TimelineWrapper extends Component {
     constructor(props) {
@@ -360,7 +362,11 @@ const TimelineWrapperConnector = (connector) => {
               </ButtonGroup>
             </NavItem>
             <NavItem>
-              <Button bsSize="small" onClick={this.startSaveAsTemplate}>
+              <Button
+                bsSize="small"
+                disabled={templatesDisabled}
+                onClick={this.startSaveAsTemplate}
+              >
                 <FaSave className="svg-save-template" /> {i18n('Save as Template')}
               </Button>
             </NavItem>
