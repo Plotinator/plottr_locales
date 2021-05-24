@@ -64,6 +64,7 @@ const platform = {
   },
   browserHistory: history,
   inBrowser: true,
+  templatesDisabled: true,
 }
 
 const components = connections.pltr(platform)
