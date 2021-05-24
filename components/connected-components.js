@@ -40,7 +40,20 @@ const platform = {
   store: {
     useExportConfigInfo: () => {},
   },
-  moveFromTemp: () => {},
+  // Save file.
+  moveFromTemp: (fullFileState) => {
+    const data = new Blob([JSON.stringify(fullFileState, null, 2)], { type: 'text/json' })
+    const link = document.createElement('a')
+    link.download = 'untitled.pltr'
+    link.href = window.URL.createObjectURL(data)
+    link.dataset.downloadurl = `text/json:${link.download}:${link.href}`
+    link.dispatchEvent(new MouseEvent('click'), {
+      view: window,
+      bubbles: true,
+      cancelable: true,
+    })
+    link.remove()
+  },
   showItemInFolder: (fileName) => {},
   tempFilesPath: '',
   mpq: {
