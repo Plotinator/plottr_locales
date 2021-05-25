@@ -25,13 +25,7 @@ function Navigation({ currentView, changeCurrentView, darkMode }) {
   const renderTrialLinks = () => {
     if (!trialMode || isDev) return null
 
-    return (
-      <Navbar.Form pullRight style={{ marginRight: '15px' }}>
-        <Button bsStyle="link" onClick={() => console.warn('TODO: implement get a licence link')}>
-          <FaKey /> {i18n('Get a License')}
-        </Button>
-      </Navbar.Form>
-    )
+    return null
   }
 
   const changeTo = (newLocation) => () => {
