@@ -1,5 +1,7 @@
 import { connections } from 'plottr_components'
 import { history } from '../lib/history'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 
 const platform = {
   appVersion: process.env.VERSION,
@@ -66,6 +68,10 @@ const platform = {
   inBrowser: true,
   templatesDisabled: true,
   exportDisabled: true,
+  redux: {
+    connect,
+    bindActionCreators,
+  },
 }
 
 const components = connections.pltr(platform)
