@@ -19,6 +19,8 @@ module.exports = {
         // If a better solution arose since this was written then feel
         // free to replace this! :)
         react: path.resolve('./node_modules/react'),
+        redux: path.resolve('./node_modules/redux'),
+        'react-redux': path.resolve('./node_modules/react-redux'),
         'react-dom': path.resolve('./node_modules/react-dom'),
       },
     }

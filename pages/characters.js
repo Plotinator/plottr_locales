@@ -1,4 +1,8 @@
-import Root from '../components/root'
+import dynamic from 'next/dynamic'
+
+const Root = dynamic(() => import('../components/root'), {
+  ssr: false,
+})
 
 const Characters = () => <Root />
 
