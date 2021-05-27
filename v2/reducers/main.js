@@ -17,10 +17,7 @@ import hierarchyLevels from './hierarchy'
 import featureFlags from './featureFlags'
 import tour from './tours'
 
-// normally it would make more sense to alphabetize them
-// but for customer service, it helps a lot to have them in a specific order
-// to pick out some important things at the top
-const mainReducer = combineReducers({
+export const mainReducer = combineReducers({
   file,
   ui,
   featureFlags,

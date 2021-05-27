@@ -40,7 +40,7 @@ function characters(state = [], action) {
       return newFileCustomAttributes['characters']
 
     case FILE_LOADED:
-      return action.data.customAttributes['characters']
+      return action.data.customAttributes['characters'] || []
 
     case REORDER_CHARACTER_ATTRIBUTE: {
       let { toIndex, attribute } = action
@@ -75,7 +75,7 @@ function places(state = [], action) {
       return newFileCustomAttributes['places']
 
     case FILE_LOADED:
-      return action.data.customAttributes['places']
+      return action.data.customAttributes['places'] || []
 
     case REORDER_PLACES_ATTRIBUTE: {
       let { toIndex, attribute } = action
@@ -123,7 +123,7 @@ function scenes(state = [], action) {
       return newFileCustomAttributes['scenes']
 
     case FILE_LOADED:
-      return action.data.customAttributes['scenes']
+      return action.data.customAttributes['scenes'] || []
 
     default:
       return state
@@ -144,7 +144,7 @@ function lines(state = [], action) {
       return newFileCustomAttributes['lines']
 
     case FILE_LOADED:
-      return action.data.customAttributes['lines']
+      return action.data.customAttributes['lines'] || []
 
     default:
       return state
