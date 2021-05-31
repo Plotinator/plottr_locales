@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "seed-firestore": "node seed/seed.js",
     "start-emulators": "firebase emulators:start",
     "postinstall": "npm --prefix lib/plottr_components install",
     "dev": "npm-run-all --parallel dev:*",
@@ -21,6 +22,7 @@
     "classnames": "^2.3.1",
     "core-js": "^3.12.1",
     "firebase": "^8.6.2",
+    "firebase-admin": "^9.9.0",
     "next": "10.2.0",
     "plottr_components": "link:./lib/plottr_components",
     "plottr_locales": "link:./lib/plottr_locales",

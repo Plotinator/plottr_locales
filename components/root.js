@@ -3,7 +3,7 @@ import { Router, Switch, Route } from 'react-router-dom'
 import { Provider } from 'react-redux'
 
 import { history } from '../lib/history'
-import { configureStore } from '../lib/redux'
+import { store } from '../lib/redux'
 
 import Navigation from './navigation'
 import Project from './project'
@@ -15,15 +15,11 @@ import Places from './places'
 import Tags from './tags'
 import { listen, signIn } from '../lib/firebase'
 
-import goldilocks from '../lib/goldilocks.json'
-
-const store = configureStore(goldilocks)
-
 const Root = () => {
   useEffect(() => {
     signIn('test@test.com', 'tester', (user) => {
       // TODO: file id?
-      const FILE_ID = 1
+      const FILE_ID = 'i2fjaT38IeEnW2VkPvoh'
       listen(user.uid, FILE_ID)
     })
   }, [])
