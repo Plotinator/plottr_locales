@@ -746,55 +746,7 @@
     "lines": [],
     "notes": []
   },
-  "lines": [
-    {
-      "id": 4,
-      "bookId": 1,
-      "title": "Scene 4",
-      "color": "#ff7f32",
-      "position": 3,
-      "expanded": null,
-      "fromTemplateId": null
-    },
-    {
-      "id": 3,
-      "bookId": 1,
-      "title": "Scene 3",
-      "color": "#e5554f",
-      "position": 2,
-      "expanded": true,
-      "fromTemplateId": null
-    },
-    {
-      "id": 2,
-      "bookId": 1,
-      "title": "Scene 2",
-      "color": "#78be20",
-      "position": 1,
-      "expanded": null,
-      "fromTemplateId": null
-    },
-    {
-      "id": 1,
-      "bookId": 1,
-      "color": "#6cace4",
-      "title": "Scene 1",
-      "position": 0,
-      "characterId": null,
-      "expanded": true,
-      "fromTemplateId": null
-    },
-    {
-      "id": 5,
-      "bookId": "series",
-      "color": "#6cace4",
-      "title": "Main Plot",
-      "position": 0,
-      "characterId": null,
-      "expanded": null,
-      "fromTemplateId": null
-    }
-  ],
+  "lines": [],
   "notes": [
     {
       "id": 1,
