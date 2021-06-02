@@ -4,12 +4,15 @@ import { findDOMNode } from 'react-dom'
 import { keyBy } from 'lodash'
 import { Nav, NavItem } from 'react-bootstrap'
 import cx from 'classnames'
-import MiniBeat from './MiniBeat'
+import MiniBeatConnector from './MiniBeat'
 import { selectors } from 'pltr/v2'
+import { emptyCard } from 'pltr/v2/helpers/cards'
 
 const targetPosition = 115
 
 const MiniMapConnector = (connector) => {
+  const MiniBeat = MiniBeatConnector(connector)
+
   class MiniMap extends Component {
     constructor(props) {
       super(props)
@@ -46,21 +49,20 @@ const MiniMapConnector = (connector) => {
       const {
         lines,
         beats,
-        beatsTree,
         activeFilter,
+        allCards,
         cardMapping,
         positionOffset,
         actions,
         beatActions,
         ui,
-        hierarchyLevels,
-        hierarchyEnabled,
-        isSeries,
       } = this.props
       const linesById = keyBy(lines, 'id')
+      let beatsWithCards = allCards.map((card) => card.beatId)
       return beats.map((beat, idx) => {
         if (this.state.firstRender && idx > 20) return null
-        const beatCards = cardMapping[beat.id]
+        let hasCards = beatsWithCards.includes(beat.id)
+        const beatCards = hasCards ? cardMapping[beat.id] : [emptyCard(idx, beat, lines[0])]
         if (activeFilter && !beatCards.length) return null
 
         return (
@@ -72,8 +74,6 @@ const MiniMapConnector = (connector) => {
             <MiniBeat
               bookId={ui.currentTimeline}
               beat={beat}
-              beats={beatsTree}
-              hierarchyLevels={hierarchyLevels}
               idx={idx + positionOffset}
               cards={beatCards}
               linesById={linesById}
@@ -81,8 +81,6 @@ const MiniMapConnector = (connector) => {
               positionOffset={positionOffset}
               reorderCardsWithinLine={actions.reorderCardsWithinLine}
               reorderCardsInBeat={actions.reorderCardsInBeat}
-              hierarchyEnabled={hierarchyEnabled}
-              isSeries={isSeries}
               reorderBeats={beatActions.reorderBeats}
               handleActive={this.props.handleActive}
             />
@@ -127,18 +125,15 @@ const MiniMapConnector = (connector) => {
   MiniMap.propTypes = {
     active: PropTypes.number.isRequired,
     cardMapping: PropTypes.object.isRequired,
+    allCards: PropTypes.array,
     activeFilter: PropTypes.bool.isRequired,
-    beatsTree: PropTypes.object.isRequired,
     beats: PropTypes.array.isRequired,
-    hierarchyLevels: PropTypes.array.isRequired,
     lines: PropTypes.array.isRequired,
     ui: PropTypes.object.isRequired,
     positionOffset: PropTypes.number.isRequired,
     actions: PropTypes.object.isRequired,
     beatActions: PropTypes.object.isRequired,
     handleActive: PropTypes.func,
-    hierarchyEnabled: PropTypes.bool,
-    isSeries: PropTypes.bool,
   }
 
   const {
@@ -148,13 +143,10 @@ const MiniMapConnector = (connector) => {
   const CardActions = actions.card
   const BeatActions = actions.beat
   const {
-    beatsByBookSelector,
     sortedBeatsByBookSelector,
     positionOffsetSelector,
     sortedLinesByBookSelector,
-    sortedHierarchyLevels,
-    beatHierarchyIsOn,
-    isSeriesSelector,
+    allCardsSelector,
   } = selectors
 
   if (redux) {
@@ -164,13 +156,10 @@ const MiniMapConnector = (connector) => {
       (state) => {
         return {
           beats: sortedBeatsByBookSelector(state.present),
-          beatsTree: beatsByBookSelector(state.present),
-          hierarchyLevels: sortedHierarchyLevels(state.present),
           lines: sortedLinesByBookSelector(state.present),
+          allCards: allCardsSelector(state.present),
           ui: state.present.ui,
           positionOffset: positionOffsetSelector(state.present),
-          hierarchyEnabled: beatHierarchyIsOn(state.present),
-          isSeries: isSeriesSelector(state.present),
         }
       },
       (dispatch) => {

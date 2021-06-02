@@ -55,8 +55,11 @@ const EditOrDisplayConnector = (connector) => {
                 value={stagedValue}
                 onChange={(event) => {
                   const valueToSet =
-                    type === 'number' ? parseInt(event.target.value) : event.target.value
-                  if (valueToSet) setStagedValue(valueToSet)
+                    type === 'number'
+                      ? parseInt(event.target.value) || undefined
+                      : event.target.value
+                  if (valueToSet || valueToSet === '' || valueToSet === undefined)
+                    setStagedValue(valueToSet)
                 }}
                 ref={controlRef}
                 onKeyDown={(event) => {
@@ -115,6 +118,7 @@ const EditOrDisplayConnector = (connector) => {
                   setEditing(true)
                 }}
                 style={{ margin: '2px' }}
+                buttonStyle={{ border: '1px solid black' }}
               />
               <Button
                 bsSize="xs"

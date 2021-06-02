@@ -8,6 +8,7 @@ import UnconnectedExportNavItem from '../export/ExportNavItem'
 import UnconnectedSubNav from '../containers/SubNav'
 import { t as i18n } from 'plottr_locales'
 import { helpers } from 'pltr/v2'
+import { emptyCard } from 'pltr/v2/helpers/cards'
 
 const {
   card: { cardMapping },
@@ -128,16 +129,20 @@ const OutlineViewConnector = (connector) => {
     }
 
     renderBeats(cardMapping) {
-      const { beats, ui } = this.props
+      const { beats, ui, allCards, lines } = this.props
+      let beatsWithCards = allCards.map((card) => card.beatId)
+
       return (
         !!beats.length &&
         beats.map((beat, idx) => {
           if (this.state.firstRender && idx > 2) return null
+          let hasCards = beatsWithCards.includes(beat.id)
+          const beatCards = hasCards ? cardMapping[beat.id] : [emptyCard(idx, beat, lines[0])]
           return (
             <ErrorBoundary key={beat.id}>
               <BeatView
                 beat={beat}
-                cards={cardMapping[beat.id]}
+                cards={beatCards}
                 waypoint={this.fixMe}
                 activeFilter={!!ui.outlineFilter}
               />
@@ -181,6 +186,7 @@ const OutlineViewConnector = (connector) => {
     beats: PropTypes.array.isRequired,
     lines: PropTypes.array.isRequired,
     card2Dmap: PropTypes.object.isRequired,
+    allCards: PropTypes.array,
     ui: PropTypes.object.isRequired,
     isSeries: PropTypes.bool,
     actions: PropTypes.object.isRequired,
@@ -195,6 +201,7 @@ const OutlineViewConnector = (connector) => {
     sortedBeatsByBookSelector,
     sortedLinesByBookSelector,
     isSeriesSelector,
+    allCardsSelector,
   } = selectors
 
   if (redux) {
@@ -206,6 +213,7 @@ const OutlineViewConnector = (connector) => {
           beats: sortedBeatsByBookSelector(state.present),
           lines: sortedLinesByBookSelector(state.present),
           card2Dmap: cardMapSelector(state.present),
+          allCards: allCardsSelector(state.present),
           ui: state.present.ui,
           isSeries: isSeriesSelector(state.present),
         }
