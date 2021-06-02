@@ -19,6 +19,8 @@ import {
   SET_CHARACTER_FILTER,
   SET_CHARACTER_SORT,
   SET_DARK_MODE,
+  SET_NOTE_FILTER,
+  SET_NOTE_SORT,
   SET_OUTLINE_FILTER,
   SET_PLACE_FILTER,
   SET_PLACE_SORT,
@@ -64,6 +66,12 @@ export default function ui(state = defaultUI, action) {
 
     case SET_PLACE_SORT:
       return Object.assign({}, state, { placeSort: `${action.attr}~${action.direction}` })
+
+    case SET_NOTE_SORT:
+      return Object.assign({}, state, { noteSort: `${action.attr}~${action.direction}` })
+
+    case SET_NOTE_FILTER:
+      return Object.assign({}, state, { noteFilter: action.filter })
 
     case SET_CHARACTER_FILTER:
       return Object.assign({}, state, { characterFilter: action.filter })

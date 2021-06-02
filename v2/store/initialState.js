@@ -173,6 +173,7 @@ export const customAttributes = {
   cards: [],
   scenes: [],
   lines: [],
+  notes: [],
 }
 
 export const attribute = {
@@ -220,7 +221,7 @@ export const hierarchyLevel = {
 export const featureFlags = {}
 
 export const tour = {
-  showTour: true,
+  showTour: false,
   // feature:{
   //   name:'',
   //   id:0,

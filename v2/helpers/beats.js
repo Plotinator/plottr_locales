@@ -22,15 +22,26 @@ export function beatName(beats, beat, sortedHierarchyLevels, hierarchyEnabled, i
   return (hierarchyLevel && hierarchyLevel.name) || `Level-${depth}`
 }
 
-export function beatTitle(beats, beat, sortedHierarchyLevels, offset, hierarchyEnabled, isSeries) {
+export function beatTitle(
+  beatIndex,
+  beats,
+  beat,
+  sortedHierarchyLevels,
+  offset,
+  hierarchyEnabled,
+  isSeries
+) {
+  const level = beatName(beats, beat, sortedHierarchyLevels, hierarchyEnabled, isSeries)
+
   return beat.title == 'auto'
-    ? i18n(`${beatName(beats, beat, sortedHierarchyLevels, hierarchyEnabled, isSeries)} {number}`, {
-        number: beat.position + offset + 1,
+    ? i18n(`${level} {number}`, {
+        number: beatIndex,
       })
     : beat.title
 }
 
 export function editingBeatLabel(
+  beatIndex,
   beats,
   beat,
   sortedHierarchyLevels,
@@ -40,13 +51,12 @@ export function editingBeatLabel(
 ) {
   return i18n(
     `${beatName(beats, beat, sortedHierarchyLevels, hierarchyEnabled, isSeries)} {number} title`,
-    {
-      number: beat.position + offset + 1,
-    }
+    { number: beatIndex }
   )
 }
 
 export function beatPositionTitle(
+  beatIndex,
   beats,
   beat,
   sortedHierarchyLevels,
@@ -56,9 +66,7 @@ export function beatPositionTitle(
 ) {
   return i18n(
     `${beatName(beats, beat, sortedHierarchyLevels, hierarchyEnabled, isSeries)} {number}`,
-    {
-      number: beat.position + offset + 1,
-    }
+    { number: beatIndex }
   )
 }
 
@@ -108,10 +116,6 @@ export function moveNextToSibling(items, toMove, droppedOntoId) {
   const depthToMove = tree.depth(items, toMove)
   const siblingDepth = tree.depth(items, droppedOntoId)
 
-  if (depthToMove !== siblingDepth) {
-    return items
-  }
-
   const parentId = tree.nodeParent(items, droppedOntoId)
   const sameParent = tree.nodeParent(items, toMove) === parentId
   const siblings = sortBy(tree.children(items, parentId), 'position')
@@ -126,7 +130,17 @@ export function moveNextToSibling(items, toMove, droppedOntoId) {
   }
   const modifiedPosition = positionDroppedOnto + positionModifier
 
-  const withNodeMoved = tree.moveNode(items, toMove, parentId)
+  let withNodeMoved = tree.moveNode(items, toMove, parentId)
+
+  if (depthToMove !== siblingDepth) {
+    if (depthToMove - siblingDepth === 1) {
+      withNodeMoved = tree.moveNode(items, toMove, droppedOntoId)
+      return positionReset(tree.editNode(withNodeMoved, toMove, { position: -0.5 }))
+    } else {
+      return items
+    }
+  }
+
   return positionReset(tree.editNode(withNodeMoved, toMove, { position: modifiedPosition }))
 }
 
@@ -210,4 +224,25 @@ export const adjustHierarchyLevels = (targetHierarchyDepth) => (
 
 export const beatIds = (beatTree) => {
   return tree.reduce('id')(beatTree, (acc, { id }) => [...acc, id], [])
+}
+
+export const beatsByPosition = (predicate) => (beats) => {
+  function iter(beats, id) {
+    const currentBeat = id === null ? [] : [tree.findNode(beats, id)]
+    if (currentBeat.length && !predicate(currentBeat[0])) return currentBeat
+    const sortedChildren = sortBy(tree.children(beats, id), 'position')
+    return [...currentBeat, ...sortedChildren.flatMap((child) => iter(beats, child.id))]
+  }
+  return iter(beats, null)
+}
+
+export const numberOfPriorChildrenAtSameDepth = (beatTree, beatId) => {
+  const beatDepth = tree.depth(beatTree, beatId)
+  const beatsAtLeastAsDeap = beatsByPosition((beat) => tree.depth(beatTree, beat.id) <= beatDepth)
+  return (
+    1 +
+    beatsAtLeastAsDeap(beatTree)
+      .filter((beat) => tree.depth(beatTree, beat.id) === beatDepth)
+      .findIndex((beat) => beat.id === beatId)
+  )
 }

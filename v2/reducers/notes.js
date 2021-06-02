@@ -18,6 +18,8 @@ import {
   DELETE_IMAGE,
   ATTACH_BOOK_TO_NOTE,
   REMOVE_BOOK_FROM_NOTE,
+  EDIT_NOTES_ATTRIBUTE,
+  DELETE_NOTE_CATEGORY,
 } from '../constants/ActionTypes'
 import { note } from '../store/initialState'
 import { newFileNotes } from '../store/newFileState'
@@ -45,6 +47,34 @@ export default function notes(state = initialState, action) {
       )
     }
 
+    case EDIT_NOTES_ATTRIBUTE:
+      if (
+        action.oldAttribute.type != 'text' &&
+        action.oldAttribute.name == action.newAttribute.name
+      )
+        return state
+
+      return state.map((n) => {
+        let note = cloneDeep(n)
+
+        if (action.oldAttribute.name != action.newAttribute.name) {
+          note[action.newAttribute.name] = note[action.oldAttribute.name]
+          delete note[action.oldAttribute.name]
+        }
+
+        // reset value to blank string
+        // (if changing to something other than text type)
+        // see ../selectors/customAttributes.js for when this is allowed
+        if (action.oldAttribute.type == 'text') {
+          let desc = note[action.newAttribute.name]
+          if (desc && desc.length && typeof desc !== 'string') {
+            desc = ''
+          }
+          note[action.newAttribute.name] = desc
+        }
+        return note
+      })
+
     case DELETE_NOTE:
       return state.filter((note) => note.id !== action.id)
 
@@ -67,6 +97,20 @@ export default function notes(state = initialState, action) {
         let places = cloneDeep(note.places)
         places.push(action.placeId)
         return note.id === action.id ? Object.assign({}, note, { places: places }) : note
+      })
+
+    case DELETE_NOTE_CATEGORY:
+      return state.map((note) => {
+        // In one case the ids are strings and the other they are numbers
+        // so just to be safe string them both
+        if (String(note.categoryId) !== String(action.category.id)) {
+          return note
+        }
+
+        return {
+          ...note,
+          categoryId: null,
+        }
       })
 
     case REMOVE_PLACE_FROM_NOTE:
