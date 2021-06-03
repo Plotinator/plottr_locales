@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Router, Switch, Route } from 'react-router-dom'
 import { Provider } from 'react-redux'
 
@@ -13,21 +13,26 @@ import Notes from './notes'
 import Characters from './characters'
 import Places from './places'
 import Tags from './tags'
-import { listen, signIn } from '../lib/firebase'
+import Listener from './listener'
+import { signIn, fetchFiles } from '../lib/firebase'
 
 const Root = () => {
+  const [userId, setUserId] = useState(null)
+  const [files, setFiles] = useState([])
+  const [selectedFile, setSelectedFile] = useState(null)
+
   useEffect(() => {
     signIn('test@test.com', 'tester', (user) => {
-      // TODO: file id?
-      const FILE_ID = 'i2fjaT38IeEnW2VkPvoh'
-      listen(user.uid, FILE_ID)
+      setUserId(user.uid)
+      fetchFiles(user.uid).then(setFiles)
     })
   }, [])
 
   return (
     <Provider store={store}>
       <Router history={history}>
-        <Navigation />
+        <Listener userId={userId} selectedFile={selectedFile} />
+        <Navigation selectedFile={selectedFile} files={files} selectFile={setSelectedFile} />
         <main className="project-main tour-end">
           <Switch>
             <Route path="/project" component={Project} />

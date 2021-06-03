@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import PropTypes from 'react-proptypes'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { Navbar, Nav } from 'react-bootstrap'
+import { Navbar, Nav, NavDropdown, MenuItem } from 'react-bootstrap'
 import { t as i18n } from 'plottr_locales'
 import { Beamer, BookChooser } from 'connected-components'
 import cx from 'classnames'
@@ -13,7 +13,7 @@ import { basePath } from '../lib/basePath'
 const trialMode = true // TODO
 const isDev = process.env.NODE_ENV == 'development'
 
-function Navigation({ currentView, changeCurrentView, darkMode }) {
+function Navigation({ currentView, changeCurrentView, darkMode, selectedFile, files, selectFile }) {
   useEffect(() => {
     const path = basePath()
     if (path !== '' && path !== currentView) {
@@ -70,6 +70,30 @@ function Navigation({ currentView, changeCurrentView, darkMode }) {
             {i18n('Tags')}
           </Link>
         </li>
+        {files && files.length && (
+          <NavDropdown id="file_chooser" title="Select a File" style={{ margin: '0 16px 0 8px' }}>
+            {selectedFile && (
+              <MenuItem
+                onSelect={() => {
+                  selectFile(selectedFile)
+                }}
+              >
+                {selectedFile.fileName}
+              </MenuItem>
+            )}
+            <MenuItem divider />
+            {files.map((file) => (
+              <MenuItem
+                key={file.id}
+                onSelect={() => {
+                  selectFile(file)
+                }}
+              >
+                {file.fileName}
+              </MenuItem>
+            ))}
+          </NavDropdown>
+        )}
       </Nav>
       <Beamer inNavigation />
       {renderTrialLinks()}
@@ -81,6 +105,9 @@ Navigation.propTypes = {
   currentView: PropTypes.object.isRequired,
   changeCurrentView: PropTypes.func.isRequired,
   darkMode: PropTypes.bool.isRequired,
+  selectedFile: PropTypes.object,
+  files: PropTypes.array.isRequired,
+  selectFile: PropTypes.func.isRequired,
 }
 
 function mapStateToProps(state) {
