@@ -71,7 +71,12 @@ function Navigation({ currentView, changeCurrentView, darkMode, selectedFile, fi
           </Link>
         </li>
         {files && files.length && (
-          <NavDropdown id="file_chooser" title="Select a File" style={{ margin: '0 16px 0 8px' }}>
+          <NavDropdown
+            onClick={(e) => e.stopPropagation(e)}
+            id="file_chooser"
+            title="Select a File"
+            style={{ margin: '0 16px 0 8px' }}
+          >
             {selectedFile && (
               <MenuItem
                 onSelect={() => {
