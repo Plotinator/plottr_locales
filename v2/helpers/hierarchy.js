@@ -1,7 +1,9 @@
-import { nextColor } from '../../v1/store/lineColors'
+import { nextColor, nextDarkColor } from '../../v2/store/lineColors'
 import { DASHED, DOTTED, nextBorderStyle, NONE, SOLID } from '../store/borderStyle'
 import { hierarchyLevel } from '../store/initialState'
 import { t } from 'plottr_locales'
+
+import { getTextColor } from './colors'
 
 export const borderStyleToCss = (borderStyle) => {
   switch (borderStyle) {
@@ -25,12 +27,14 @@ const noneIsTransparent = (borderStyle, borderColor) => {
 }
 
 export const hierarchyToStyles = (
-  { level, textColor, textSize, borderColor, borderStyle, backgroundColor },
+  { level, textSize, borderStyle, backgroundColor },
   timelineSize,
-  hovering
+  hovering,
+  theme,
+  isDarkMode
 ) => ({
   ...{
-    color: nullIfNone(textColor),
+    color: nullIfNone(getTextColor(theme.textColor, isDarkMode)),
     lineHeight: `${textSize}px`,
     backgroundColor: nullIfNone(backgroundColor),
   },
@@ -38,7 +42,7 @@ export const hierarchyToStyles = (
     ? {
         border: `3px ${borderStyleToCss(borderStyle)} ${noneIsTransparent(
           borderStyle,
-          borderColor
+          theme.borderColor
         )}`,
       }
     : {}),
@@ -61,8 +65,16 @@ export const newHierarchyLevel = (allHierarchyLevels) => {
     ...hierarchyLevel,
     name: nextLevelName(allHierarchyLevels.length),
     level: 0,
+    borderStyle: nextBorderStyle(allHierarchyLevels.length),
     textColor: nextColor(allHierarchyLevels.length),
     borderColor: nextColor(allHierarchyLevels.length),
-    borderStyle: nextBorderStyle(allHierarchyLevels.length),
+    dark: {
+      textColor: nextDarkColor(allHierarchyLevels.length),
+      borderColor: nextDarkColor(allHierarchyLevels.length),
+    },
+    light: {
+      textColor: nextColor(allHierarchyLevels.length),
+      borderColor: nextColor(allHierarchyLevels.length),
+    },
   }
 }
