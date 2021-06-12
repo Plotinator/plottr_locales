@@ -5,6 +5,7 @@ import { isSeries as isSeriesString } from './books'
 import * as tree from '../reducers/tree'
 
 export function beatOneIsPrologue(sortedBookBeats) {
+  if (!sortedBookBeats.length) return false
   return sortedBookBeats[0].title == i18n('Prologue')
 }
 
@@ -237,13 +238,20 @@ export const beatsByPosition = (predicate) => (beats) => {
   return iter(beats, null)
 }
 
-export const numberOfPriorChildrenAtSameDepth = (beatTree, beatId) => {
+export const numberOfPriorChildrenAtSameDepth = (beatTree, beats, beatId) => {
+  if (beats.length === 0) return null
   const beatDepth = tree.depth(beatTree, beatId)
-  const beatsAtLeastAsDeap = beatsByPosition((beat) => tree.depth(beatTree, beat.id) <= beatDepth)
-  return (
-    1 +
-    beatsAtLeastAsDeap(beatTree)
-      .filter((beat) => tree.depth(beatTree, beat.id) === beatDepth)
-      .findIndex((beat) => beat.id === beatId)
-  )
+  let priorChildren = 0
+  let found = false
+  for (let i = 0; i < beats.length; ++i) {
+    const { id } = beats[i]
+    const otherBeatDepth = tree.depth(beatTree, id)
+    if (id === beatId) {
+      found = true
+      break
+    }
+    if (otherBeatDepth === beatDepth) ++priorChildren
+  }
+  if (!found) return null
+  return 1 + priorChildren
 }
