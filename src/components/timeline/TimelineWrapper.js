@@ -39,8 +39,9 @@ const TimelineWrapperConnector = (connector) => {
   const ClearNavItem = UnconnectedClearNavItem(connector)
 
   const {
-    platform: { saveAsTemplate, mpq },
+    platform: { mpq },
   } = connector
+  const saveAsTemplate = connector.platform.template.startSaveAsTemplate
 
   class TimelineWrapper extends Component {
     constructor(props) {
@@ -383,7 +384,14 @@ const TimelineWrapperConnector = (connector) => {
             wrapperRef={(ref) => (this.tableRef = ref)}
             className={cx({ darkmode: ui.darkMode, vertical: ui.orientation == 'vertical' })}
           >
-            {this.state.mounted ? <TimelineTable tableRef={this.tableRef} /> : <FunSpinner />}
+            {this.state.mounted ? (
+              <TimelineTable
+                tableRef={this.tableRef}
+                scrollTo={(position) => this.scrollTo(position)}
+              />
+            ) : (
+              <FunSpinner />
+            )}
           </StickyTable>
         )
       }
@@ -403,7 +411,9 @@ const TimelineWrapperConnector = (connector) => {
       return helpers.featureFlags.gatedByBeatHierarchy(this.props.featureFlags)(() => {
         if (!this.state.beatConfigIsOpen) return null
 
-        return <ActsConfigModal closeDialog={this.closeBeatConfig} />
+        return (
+          <ActsConfigModal isDarkMode={this.props.ui.darkMode} closeDialog={this.closeBeatConfig} />
+        )
       })
     }
 
