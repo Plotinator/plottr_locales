@@ -116,7 +116,8 @@ const ui = (dataRepairers) => (state = defaultUI, action) => {
       return Object.assign({}, state, { timelineFilter: action.filter })
 
     case SET_OUTLINE_FILTER:
-      if (!action.filter) filter = null
+      if (!action.filter || !Object.values(action.filter)) filter = null
+      else if (typeof action.filter === 'object') filter = action.filter
       else if (Array.isArray(state.outlineFilter) && state.outlineFilter.includes(action.filter))
         filter = state.outlineFilter.filter((item) => item !== action.filter)
       else if (!Array.isArray(state.outlineFilter)) filter = [action.filter]
