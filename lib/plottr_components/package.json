@@ -76,6 +76,7 @@
     "web-vitals": "^1.0.1"
   },
   "dependencies": {
+    "axios": "^0.21.1",
     "pretty-date": "^0.2.0",
     "react-beautiful-dnd": "^13.1.0",
     "react-floater": "^0.7.2",
