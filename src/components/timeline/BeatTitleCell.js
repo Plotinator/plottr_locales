@@ -58,59 +58,13 @@ const BeatTitleCellConnector = (connector) => {
     handleAddBeat = (e) => {
       this.props.actions.insertBeat(this.props.ui.currentTimeline, this.props.beat.id)
       if (this.props.tour.run === true) this.props.tourActions.tourNext('next')
-
-      let SCENE_CELL_WIDTH = this.props.isMedium ? 90 : 175 + 17
-      let SCENE_CELL_HEIGHT = this.props.isMedium ? 85 : 94 + 17
-
       this.props.actions.expandBeat(this.props.beat.id, this.props.ui.currentTimeline)
-      // if (this.props.tour.run === true) this.props.tourActions.tourNext('next')
-
-      let children = this.props.beats.children[this.props.beat.id]
-      let numChildren = children.length
-
-      let expandedChildren = 0
-      children.forEach((child) => {
-        if (this.props.beats.children[child].length > 0 && this.props.beats.index[child].expanded) {
-          expandedChildren += this.props.beats.children[child].length
-        }
-      })
-      //scroll based on how many children and grandChildren cards there are between clicked card and newly added card
-      const target =
-        this.props.ui.orientation === 'vertical'
-          ? this.props.ui.timelineScrollPosition.y +
-            (numChildren + expandedChildren) * SCENE_CELL_HEIGHT
-          : this.props.ui.timelineScrollPosition.x +
-            (numChildren + expandedChildren) * SCENE_CELL_WIDTH
-
-      if (!this.props.tour.showTour) this.props.scrollTo(target)
     }
 
     handleAddChild = (e) => {
-      let SCENE_CELL_WIDTH = this.props.isMedium ? 90 : 175 + 17
-      let SCENE_CELL_HEIGHT = this.props.isMedium ? 85 : 94 + 17
-
       this.props.actions.expandBeat(this.props.beat.id, this.props.ui.currentTimeline)
       this.props.actions.addBeat(this.props.ui.currentTimeline, this.props.beat.id)
       if (this.props.tour.run === true) this.props.tourActions.tourNext('next')
-
-      let children = this.props.beats.children[this.props.beat.id]
-      let numChildren = children.length
-
-      let expandedChildren = 0
-      children.forEach((child) => {
-        if (this.props.beats.children[child].length > 0 && this.props.beats.index[child].expanded) {
-          expandedChildren += this.props.beats.children[child].length
-        }
-      })
-      //scroll based on how many children and grandChildren cards there are between clicked card and newly added card
-      const target =
-        this.props.ui.orientation === 'vertical'
-          ? this.props.ui.timelineScrollPosition.y +
-            (numChildren + expandedChildren) * SCENE_CELL_HEIGHT
-          : this.props.ui.timelineScrollPosition.x +
-            (numChildren + expandedChildren) * SCENE_CELL_WIDTH
-
-      this.props.scrollTo(target)
     }
 
     handleToggleExpanded = (e) => {
