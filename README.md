@@ -3,6 +3,24 @@
 This repository contains the source code for Plottr Web.  The web
 version of the Plottr app.
 
+# Starting and Seeding the Firebase Emulators
+
+This project uses `Firebase`'s `Authentication` and `Firestore`.  You
+can develop against local emulators of those services.  To do so, run
+the following commands:
+
+```bash
+  yarn start-emulators
+```
+
+and when that's finished starting up (note that it lists ports for
+admin UIs) you can run the next command to seed the database and
+create a test user:
+
+```bash
+  yarn seed-firestore
+```
+
 # `Pltr` Library
 
 The core feature set of `Plottr` is modelled using actions, reducers
