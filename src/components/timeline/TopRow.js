@@ -74,7 +74,6 @@ const TopRowConnector = (connector) => {
 
       const lastBeat = !beats || beats.length === 0 ? null : beats[beats.length - 1]
       return (
-        // XXXXXX - final interstitial control adding a scene
         <BeatInsertCell
           key="second-last-insert"
           isInBeatList={true}
@@ -148,7 +147,6 @@ const TopRowConnector = (connector) => {
               hovering={this.state.hovering}
               onMouseEnter={() => this.startHovering(beat.id)}
               onMouseLeave={this.stopHovering}
-              scrollTo={(position) => this.props.scrollTo(position)}
             />
           )
         }
@@ -167,7 +165,6 @@ const TopRowConnector = (connector) => {
             hovering={this.state.hovering}
             onMouseEnter={() => this.startHovering(beat.id)}
             onMouseLeave={this.stopHovering}
-            scrollTo={(position) => this.props.scrollTo(position)}
           />
         )
         return cells
@@ -250,7 +247,6 @@ const TopRowConnector = (connector) => {
   TopRow.propTypes = {
     currentTimeline: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     orientation: PropTypes.string.isRequired,
-    scrollTo: PropTypes.func.isRequired,
     isSeries: PropTypes.bool,
     isSmall: PropTypes.bool,
     isMedium: PropTypes.bool,
