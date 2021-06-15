@@ -9,6 +9,7 @@ import cx from 'classnames'
 
 import { actions } from 'pltr/v2'
 import { basePath } from '../lib/basePath'
+import { authentication } from '../lib/api-clients'
 
 const trialMode = true // TODO
 const isDev = process.env.NODE_ENV == 'development'
@@ -101,6 +102,7 @@ function Navigation({ currentView, changeCurrentView, darkMode, selectedFile, fi
         )}
       </Nav>
       <Beamer inNavigation />
+      <a href="/api/logout">logout</a>
       {renderTrialLinks()}
     </Navbar>
   )

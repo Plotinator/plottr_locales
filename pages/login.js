@@ -50,7 +50,7 @@ export default function Login({ email }) {
     const email = form['0'].value
     const password = form['1'].value
     authentication.logIn(email, password).then((response) => {
-      console.log("We're in!")
+      window.location.href = '/timeline'
     })
   }
 
@@ -94,7 +94,7 @@ Login.propTypes = {
 
 export async function getServerSideProps({ req }) {
   const sessionCookie = serverOnlySessionCookie(req)
-  if (sessionCookie) {
+  if (sessionCookie && sessionCookie.email) {
     return {
       props: {
         email: sessionCookie.email,
