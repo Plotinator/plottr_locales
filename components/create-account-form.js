@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { PropTypes } from 'prop-types'
 
 import { withEventTargetValue } from '../lib/withEventTargetValue'
+import { withEventTargetPreventingDefault } from '../lib/withEventTargetPreventingDefault'
 
 const CreateAccountForm = ({ onSubmit }) => {
   const [firstName, setFirstName] = useState('')
@@ -9,7 +10,7 @@ const CreateAccountForm = ({ onSubmit }) => {
   const [password, setPassword] = useState('')
 
   return (
-    <form onSubmit={withEventTargetValue(onSubmit)} className="login__form">
+    <form onSubmit={withEventTargetPreventingDefault(onSubmit)} className="login__form">
       <label htmlFor="first-name">First Name</label>
       <input
         id="first-name"

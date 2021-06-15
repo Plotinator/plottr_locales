@@ -7,6 +7,7 @@ import CreateAccountForm from '../components/create-account-form'
 import LoginForm from '../components/login-form'
 
 import { serverOnlySessionCookie } from '../lib/session'
+import { authentication } from '../lib/api-clients'
 
 export default function Login({ userName }) {
   useEffect(() => {
@@ -45,6 +46,18 @@ export default function Login({ userName }) {
     </p>
   )
 
+  const handleSubmitLoginForm = (form) => {
+    const email = form['0'].value
+    const password = form['1'].value
+    authentication.logIn(email, password).then((response) => {
+      console.log("We're in!")
+    })
+  }
+
+  const handleSubmitCreateAccountForm = (form) => {
+    console.log('form:', form)
+  }
+
   return (
     <div className="login">
       <Head>
@@ -57,7 +70,11 @@ export default function Login({ userName }) {
         <div className="login__left">
           <h1>Welcome to Plottr</h1>
           {isCreatingAccount ? <SwitchToLogin /> : <SwitchToCreateAccount />}
-          {isCreatingAccount ? <CreateAccountForm /> : <LoginForm />}
+          {isCreatingAccount ? (
+            <CreateAccountForm onSubmit={handleSubmitCreateAccountForm} />
+          ) : (
+            <LoginForm onSubmit={handleSubmitLoginForm} />
+          )}
         </div>
         <div className="login__right">
           <div className="login__logo">
