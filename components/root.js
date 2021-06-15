@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { PropTypes } from 'prop-types'
 import { Router, Switch, Route } from 'react-router-dom'
 import { Provider } from 'react-redux'
 
@@ -14,18 +15,32 @@ import Characters from './characters'
 import Places from './places'
 import Tags from './tags'
 import Listener from './listener'
-import { signIn, fetchFiles } from '../lib/firebase'
+import { fetchFiles } from '../lib/firebase'
+import { userIdFromCookie } from 'lib/session'
 
-const Root = () => {
+const Root = ({ email }) => {
+  console.log('Email: ', email)
+
   const [userId, setUserId] = useState(null)
   const [files, setFiles] = useState([])
   const [selectedFile, setSelectedFile] = useState(null)
 
+  // Server side login check
   useEffect(() => {
-    signIn('test@test.com', 'tester', (user) => {
-      setUserId(user.uid)
-      fetchFiles(user.uid).then(setFiles)
-    })
+    if (!email) {
+      window.location.href = '/login'
+    }
+  }, [email])
+
+  // Client side login check
+  useEffect(() => {
+    if (!email) return
+    const userId = userIdFromCookie()
+    if (!userId) {
+      window.location.href = '/login'
+    }
+    setUserId(userId)
+    fetchFiles(userId).then(setFiles)
   }, [])
 
   return (
@@ -47,6 +62,10 @@ const Root = () => {
       </Router>
     </Provider>
   )
+}
+
+Root.propTypes = {
+  email: PropTypes.string,
 }
 
 export default Root
