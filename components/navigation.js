@@ -2,14 +2,13 @@ import React, { useEffect } from 'react'
 import PropTypes from 'react-proptypes'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { Navbar, Nav, NavDropdown, MenuItem } from 'react-bootstrap'
+import { Button, Navbar, Nav, NavDropdown, MenuItem } from 'react-bootstrap'
 import { t as i18n } from 'plottr_locales'
 import { Beamer, BookChooser } from 'connected-components'
 import cx from 'classnames'
 
 import { actions } from 'pltr/v2'
 import { basePath } from '../lib/basePath'
-import { authentication } from '../lib/api-clients'
 
 const trialMode = true // TODO
 const isDev = process.env.NODE_ENV == 'development'
@@ -71,14 +70,14 @@ function Navigation({ currentView, changeCurrentView, darkMode, selectedFile, fi
             {i18n('Tags')}
           </Link>
         </li>
-        {files && files.length && (
-          <NavDropdown
-            onClick={(e) => e.stopPropagation(e)}
-            id="file_chooser"
-            title="Select a File"
-            style={{ margin: '0 16px 0 8px' }}
-          >
-            {selectedFile && (
+        <NavDropdown
+          onClick={(e) => e.stopPropagation(e)}
+          id="file_chooser"
+          title="Select a File"
+          style={{ margin: '0 16px 0 8px' }}
+        >
+          {selectedFile ? (
+            <>
               <MenuItem
                 onSelect={() => {
                   selectFile(selectedFile)
@@ -86,23 +85,31 @@ function Navigation({ currentView, changeCurrentView, darkMode, selectedFile, fi
               >
                 {selectedFile.fileName}
               </MenuItem>
-            )}
-            <MenuItem divider />
-            {files.map((file) => (
-              <MenuItem
-                key={file.id}
-                onSelect={() => {
-                  selectFile(file)
-                }}
-              >
-                {file.fileName}
-              </MenuItem>
-            ))}
-          </NavDropdown>
-        )}
+              <MenuItem divider />
+            </>
+          ) : null}
+          {files && files.length
+            ? files.map((file) => (
+                <MenuItem
+                  key={file.id}
+                  onSelect={() => {
+                    selectFile(file)
+                  }}
+                >
+                  {file.fileName}
+                </MenuItem>
+              ))
+            : null}
+        </NavDropdown>
       </Nav>
       <Beamer inNavigation />
-      <a href="/api/logout">logout</a>
+      <Navbar.Form pullRight style={{ marginRight: '15px' }}>
+        <Button bsStyle="link">
+          <a className="logout" href="/api/logout">
+            {i18n('logout')}
+          </a>
+        </Button>
+      </Navbar.Form>
       {renderTrialLinks()}
     </Navbar>
   )
