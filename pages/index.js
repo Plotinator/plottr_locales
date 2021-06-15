@@ -15,7 +15,7 @@ export default function Home() {
           <h1>Welcome to Plottr</h1>
           <p>Click &quot;Get started&quot; to start Plottr in your browser.</p>
           <div className="home__controls">
-            <a className="home__button" href="/timeline">
+            <a className="home__button" href="/login">
               Get started
             </a>
           </div>
