@@ -9,12 +9,12 @@ import LoginForm from '../components/login-form'
 import { serverOnlySessionCookie } from '../lib/session'
 import { authentication } from '../lib/api-clients'
 
-export default function Login({ userName }) {
+export default function Login({ email }) {
   useEffect(() => {
-    if (userName) {
+    if (email) {
       window.location.href = '/timeline'
     }
-  }, [userName])
+  }, [email])
 
   const [isCreatingAccount, setIsCreatingAccount] = useState(true)
 
@@ -89,7 +89,7 @@ export default function Login({ userName }) {
 }
 
 Login.propTypes = {
-  userName: PropTypes.string,
+  email: PropTypes.string,
 }
 
 export async function getServerSideProps({ req }) {
@@ -97,7 +97,7 @@ export async function getServerSideProps({ req }) {
   if (sessionCookie) {
     return {
       props: {
-        userName: sessionCookie.userName,
+        email: sessionCookie.email,
       },
     }
   }
