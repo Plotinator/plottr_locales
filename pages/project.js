@@ -13,7 +13,7 @@ export default Project
 export async function getServerSideProps({ req }) {
   const sessionCookie = serverOnlySessionCookie(req)
   console.log('session', sessionCookie)
-  if (sessionCookie) {
+  if (sessionCookie && sessionCookie.email) {
     return {
       props: {
         email: sessionCookie.email,

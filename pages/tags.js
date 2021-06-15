@@ -12,7 +12,7 @@ export default Tags
 
 export async function getServerSideProps({ req }) {
   const sessionCookie = serverOnlySessionCookie(req)
-  if (sessionCookie) {
+  if (sessionCookie && sessionCookie.email) {
     return {
       props: {
         email: sessionCookie.email,
