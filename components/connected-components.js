@@ -72,6 +72,7 @@ const platform = {
     connect,
     bindActionCreators,
   },
+  rootElementSelectors: ['#__next'],
 }
 
 const components = connections.pltr(platform)
