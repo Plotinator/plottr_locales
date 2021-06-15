@@ -55,7 +55,12 @@ export default function Login({ email }) {
   }
 
   const handleSubmitCreateAccountForm = (form) => {
-    console.log('form:', form)
+    const firstName = form['0'].value
+    const email = form['1'].value
+    const password = form['2'].value
+    authentication.createAccount(firstName, email, password).then((response) => {
+      window.location.href = '/timeline'
+    })
   }
 
   return (
