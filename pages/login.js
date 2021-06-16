@@ -17,19 +17,24 @@ export default function Login({ email }) {
   }, [email])
 
   const [isCreatingAccount, setIsCreatingAccount] = useState(true)
+  const [posting, setPosting] = useState(false)
 
   const handleClickSwitchToLogin = () => {
-    setIsCreatingAccount(false)
+    if (!posting) setIsCreatingAccount(false)
   }
 
   const handleClickSwitchToCreate = () => {
-    setIsCreatingAccount(true)
+    if (!posting) setIsCreatingAccount(true)
   }
 
   const SwitchToLogin = () => (
     <p>
       Create an account (or
-      <button onClick={handleClickSwitchToLogin} className="login__switch-form-type-button">
+      <button
+        disabled={posting}
+        onClick={handleClickSwitchToLogin}
+        className="login__switch-form-type-button"
+      >
         log in
       </button>
       )
@@ -39,7 +44,11 @@ export default function Login({ email }) {
   const SwitchToCreateAccount = () => (
     <p>
       Log into an account (or
-      <button onClick={handleClickSwitchToCreate} className="login__switch-form-type-button">
+      <button
+        disabled={posting}
+        onClick={handleClickSwitchToCreate}
+        className="login__switch-form-type-button"
+      >
         create an account
       </button>
       )
@@ -47,17 +56,23 @@ export default function Login({ email }) {
   )
 
   const handleSubmitLoginForm = (form) => {
+    if (posting) return
+    setPosting(true)
     const email = form['0'].value
     const password = form['1'].value
+    // TODO: if request fails then unset posting
     authentication.logIn(email, password).then((response) => {
       window.location.href = '/timeline'
     })
   }
 
   const handleSubmitCreateAccountForm = (form) => {
+    if (posting) return
+    setPosting(true)
     const firstName = form['0'].value
     const email = form['1'].value
     const password = form['2'].value
+    // TODO: if request fails then unset posting
     authentication.createAccount(firstName, email, password).then((response) => {
       window.location.href = '/timeline'
     })
@@ -76,9 +91,9 @@ export default function Login({ email }) {
           <h1>Welcome to Plottr</h1>
           {isCreatingAccount ? <SwitchToLogin /> : <SwitchToCreateAccount />}
           {isCreatingAccount ? (
-            <CreateAccountForm onSubmit={handleSubmitCreateAccountForm} />
+            <CreateAccountForm onSubmit={handleSubmitCreateAccountForm} posting={posting} />
           ) : (
-            <LoginForm onSubmit={handleSubmitLoginForm} />
+            <LoginForm onSubmit={handleSubmitLoginForm} posting={posting} />
           )}
         </div>
         <div className="login__right">

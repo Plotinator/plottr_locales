@@ -4,7 +4,7 @@ import { PropTypes } from 'prop-types'
 import { withEventTargetValue } from '../lib/withEventTargetValue'
 import { withEventTargetPreventingDefault } from '../lib/withEventTargetPreventingDefault'
 
-const CreateAccountForm = ({ onSubmit }) => {
+const CreateAccountForm = ({ onSubmit, posting }) => {
   const [firstName, setFirstName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -27,13 +27,19 @@ const CreateAccountForm = ({ onSubmit }) => {
         value={password}
         onChange={withEventTargetValue(setPassword)}
       />
-      <input type="submit" className="login__button" value="Create Account" />
+      <input
+        disabled={posting}
+        type="submit"
+        className="login__button"
+        value={posting ? 'Loading...' : 'Create Account'}
+      />
     </form>
   )
 }
 
 CreateAccountForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
+  posting: PropTypes.bool.isRequired,
 }
 
 export default CreateAccountForm
