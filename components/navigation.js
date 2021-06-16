@@ -9,6 +9,7 @@ import cx from 'classnames'
 
 import { actions } from 'pltr/v2'
 import { basePath } from '../lib/basePath'
+import { logOut, onSessionChange } from '../lib/firebase'
 
 const trialMode = true // TODO
 const isDev = process.env.NODE_ENV == 'development'
@@ -19,6 +20,16 @@ function Navigation({ currentView, changeCurrentView, darkMode, selectedFile, fi
     if (path !== '' && path !== currentView) {
       changeCurrentView(path)
     }
+  }, [])
+
+  useEffect(() => {
+    onSessionChange((user) => {
+      if (!user) {
+        // window.location.href = '/login'
+      } else {
+        // Maybe we should go to login when the user changes too.
+      }
+    })
   }, [])
 
   const renderTrialLinks = () => {
@@ -104,10 +115,8 @@ function Navigation({ currentView, changeCurrentView, darkMode, selectedFile, fi
       </Nav>
       <Beamer inNavigation />
       <Navbar.Form pullRight style={{ marginRight: '15px' }}>
-        <Button bsStyle="link">
-          <a className="logout" href="/api/logout">
-            {i18n('logout')}
-          </a>
+        <Button bsStyle="link" onClick={logOut}>
+          {i18n('logout')}
         </Button>
       </Navbar.Form>
       {renderTrialLinks()}
