@@ -23,6 +23,7 @@
     "core-js": "^3.12.1",
     "firebase": "^8.6.2",
     "firebase-admin": "^9.9.0",
+    "firebaseui": "^4.8.0",
     "js-cookie": "^2.2.1",
     "next": "10.2.0",
     "plottr_components": "link:./lib/plottr_components",

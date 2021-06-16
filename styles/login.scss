@@ -28,6 +28,7 @@ $font-size: 20px;
   display: flex;
   flex-direction: column;
   padding-top: 80px;
+  padding-right: 40px;
   width: 50%;
   height: 100%;
   display: flex;
@@ -84,4 +85,20 @@ $font-size: 20px;
   flex-direction: column;
   justify-content: space-between;
   align-items: flex-start;
+}
+
+@import "firebase-ui-auth.css";
+
+#firebase-login {
+  margin-top: 20px;
+  width: 100%;
+
+  .firebaseui-page-provider-sign-in {
+    display: flex;
+    justify-content: flex-start;
+    padding: 0;
+    .firebaseui-card-content {
+      padding: 0;
+    }
+  }
 }
