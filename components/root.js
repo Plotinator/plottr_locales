@@ -15,32 +15,23 @@ import Characters from './characters'
 import Places from './places'
 import Tags from './tags'
 import Listener from './listener'
-import { fetchFiles } from '../lib/firebase'
-import { userIdFromCookie } from 'lib/session'
+import { fetchFiles, onSessionChange } from '../lib/firebase'
 
-const Root = ({ email }) => {
-  console.log('Email: ', email)
-
+const Root = () => {
   const [userId, setUserId] = useState(null)
   const [files, setFiles] = useState([])
   const [selectedFile, setSelectedFile] = useState(null)
 
-  // Server side login check
   useEffect(() => {
-    if (!email) {
-      window.location.href = '/login'
-    }
-  }, [email])
-
-  // Client side login check
-  useEffect(() => {
-    if (!email) return
-    const userId = userIdFromCookie()
-    if (!userId) {
-      window.location.href = '/login'
-    }
-    setUserId(userId)
-    fetchFiles(userId).then(setFiles)
+    onSessionChange((user) => {
+      if (!user) {
+        console.log('user', user)
+        window.location.href = '/login'
+      } else {
+        setUserId(user.uid)
+        fetchFiles(user.uid).then(setFiles)
+      }
+    })
   }, [])
 
   return (
