@@ -57,6 +57,11 @@ $font-size: 20px;
   margin-top: 20px;
 }
 
+.login__button:disabled {
+  background-color: $neutral-gray-5;
+  cursor: not-allowed;
+}
+
 .login__button:hover, .login__button:focus {
   color: white;
 }
