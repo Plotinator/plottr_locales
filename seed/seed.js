@@ -21,16 +21,19 @@ function seedDatabase() {
 function createExampleFiles() {
   files.map((record) => {
     database
-      .collection('files')
+      .collection('file')
       .add(record.file)
       .then((documentReference) => {
         const id = documentReference.id
         Object.keys(record).forEach((key) => {
           if (key === 'file') return
-          database.collection(key).add({
-            ...record[key],
-            fileId: id,
-          })
+          database
+            .collection(key)
+            .doc(id)
+            .set({
+              ...record[key],
+              fileId: id,
+            })
         })
       })
   })

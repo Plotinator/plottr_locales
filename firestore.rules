@@ -1,212 +1,95 @@
 rules_version = '2';
 service cloud.firestore {
-  match /databases/{database}/documents/beats {
-    match /{document=**} {
-      allow read, write: if false;
+  match /databases/{database}/documents {
+    match /beats/{document} {
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'collaborator';
+      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'viewer';
     }
-  }
-  match /databases/{database}/documents/beats {
-    match /{document} {
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'owner';
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'collaborator';
-      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'viewer';
+    match /books/{document} {
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'collaborator';
+      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'viewer';
     }
-  }
-  match /databases/{database}/documents/books {
-    match /{document=**} {
-      allow read, write: if false;
+    match /cards/{document} {
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'collaborator';
+      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'viewer';
     }
-  }
-  match /databases/{database}/documents/books {
-    match /{document} {
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'owner';
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'collaborator';
-      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'viewer';
+    match /categories/{document} {
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'collaborator';
+      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'viewer';
     }
-  }
-  match /databases/{database}/documents/cards {
-    match /{document=**} {
-      allow read, write: if false;
+    match /characters/{document} {
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'collaborator';
+      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'viewer';
     }
-  }
-  match /databases/{database}/documents/cards {
-    match /{document} {
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'owner';
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'collaborator';
-      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'viewer';
+    match /customAttributes/{document} {
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'collaborator';
+      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'viewer';
     }
-  }
-  match /databases/{database}/documents/categories {
-    match /{document=**} {
-      allow read, write: if false;
+    match /featureFlags/{document} {
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'collaborator';
+      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'viewer';
     }
-  }
-  match /databases/{database}/documents/categories {
-    match /{document} {
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'owner';
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'collaborator';
-      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'viewer';
+    match /file/{document} {
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'collaborator';
+      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'viewer';
     }
-  }
-  match /databases/{database}/documents/characters {
-    match /{document=**} {
-      allow read, write: if false;
+    match /hierarchyLevels/{document} {
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'collaborator';
+      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'viewer';
     }
-  }
-  match /databases/{database}/documents/characters {
-    match /{document} {
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'owner';
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'collaborator';
-      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'viewer';
+    match /images/{document} {
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'collaborator';
+      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'viewer';
     }
-  }
-  match /databases/{database}/documents/customAttributes {
-    match /{document=**} {
-      allow read, write: if false;
+    match /lines/{document} {
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'collaborator';
+      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'viewer';
     }
-  }
-  match /databases/{database}/documents/customAttributes {
-    match /{document} {
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'owner';
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'collaborator';
-      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'viewer';
+    match /notes/{document} {
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'collaborator';
+      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'viewer';
     }
-  }
-  match /databases/{database}/documents/featureFlags {
-    match /{document=**} {
-      allow read, write: if false;
+    match /places/{document} {
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'collaborator';
+      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'viewer';
     }
-  }
-  match /databases/{database}/documents/featureFlags {
-    match /{document} {
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'owner';
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'collaborator';
-      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'viewer';
+    match /series/{document} {
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'collaborator';
+      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'viewer';
     }
-  }
-  match /databases/{database}/documents/files {
-    match /{document=**} {
-      allow read, write: if false;
+    match /tags/{document} {
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'collaborator';
+      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'viewer';
     }
-  }
-  match /databases/{database}/documents/files {
-    match /{document} {
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'owner';
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'collaborator';
-      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'viewer';
+    match /tour/{document} {
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'collaborator';
+      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'viewer';
     }
-  }
-  match /databases/{database}/documents/hierarchyLevels {
-    match /{document=**} {
-      allow read, write: if false;
-    }
-  }
-  match /databases/{database}/documents/hierarchyLevels {
-    match /{document} {
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'owner';
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'collaborator';
-      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'viewer';
-    }
-  }
-  match /databases/{database}/documents/images {
-    match /{document=**} {
-      allow read, write: if false;
-    }
-  }
-  match /databases/{database}/documents/images {
-    match /{document} {
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'owner';
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'collaborator';
-      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'viewer';
-    }
-  }
-  match /databases/{database}/documents/lines {
-    match /{document=**} {
-      allow read, write: if false;
-    }
-  }
-  match /databases/{database}/documents/lines {
-    match /{document} {
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'owner';
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'collaborator';
-      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'viewer';
-    }
-  }
-  match /databases/{database}/documents/notes {
-    match /{document=**} {
-      allow read, write: if false;
-    }
-  }
-  match /databases/{database}/documents/notes {
-    match /{document} {
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'owner';
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'collaborator';
-      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'viewer';
-    }
-  }
-  match /databases/{database}/documents/places {
-    match /{document=**} {
-      allow read, write: if false;
-    }
-  }
-  match /databases/{database}/documents/places {
-    match /{document} {
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'owner';
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'collaborator';
-      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'viewer';
-    }
-  }
-  match /databases/{database}/documents/series {
-    match /{document=**} {
-      allow read, write: if false;
-    }
-  }
-  match /databases/{database}/documents/series {
-    match /{document} {
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'owner';
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'collaborator';
-      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'viewer';
-    }
-  }
-  match /databases/{database}/documents/tags {
-    match /{document=**} {
-      allow read, write: if false;
-    }
-  }
-  match /databases/{database}/documents/tags {
-    match /{document} {
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'owner';
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'collaborator';
-      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'viewer';
-    }
-  }
-  match /databases/{database}/documents/tour {
-    match /{document=**} {
-      allow read, write: if false;
-    }
-  }
-  match /databases/{database}/documents/tour {
-    match /{document} {
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'owner';
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'collaborator';
-      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'viewer';
-    }
-  }
-  match /databases/{database}/documents/ui {
-    match /{document=**} {
-      allow read, write: if false;
-    }
-  }
-  match /databases/{database}/documents/ui {
-    match /{document} {
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'owner';
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'collaborator';
-      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/$(document)).permission == 'viewer';
+    match /ui/{document} {
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
+      allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'collaborator';
+      allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'viewer';
     }
   }
   match /databases/{databsae}/documents/authorisation/{userId} {
     match /{document=**} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write, update: if request.auth != null && request.auth.uid == userId;
     }
   }
 }

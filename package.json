@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "seed-firestore": "node seed/seed.js",
+    "grant-all-permissions": "node seed/grant-all-permissions-to-all-users.js",
     "start-emulators": "firebase emulators:start",
     "postinstall": "npm --prefix lib/plottr_components install",
     "dev": "npm-run-all --parallel dev:*",
