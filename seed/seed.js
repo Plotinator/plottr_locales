@@ -11,25 +11,29 @@ const database = admin.firestore()
 
 function seedDatabase() {
   try {
-    files.map((record) => {
-      database
-        .collection('files')
-        .add(record.file)
-        .then((documentReference) => {
-          const id = documentReference.id
-          Object.keys(record).forEach((key) => {
-            if (key === 'file') return
-            database.collection(key).add({
-              ...record[key],
-              fileId: id,
-            })
-          })
-        })
-    })
+    createExampleFiles()
     console.log('database seed was successful')
   } catch (error) {
     console.log(error, 'database seed failed')
   }
+}
+
+function createExampleFiles() {
+  files.map((record) => {
+    database
+      .collection('files')
+      .add(record.file)
+      .then((documentReference) => {
+        const id = documentReference.id
+        Object.keys(record).forEach((key) => {
+          if (key === 'file') return
+          database.collection(key).add({
+            ...record[key],
+            fileId: id,
+          })
+        })
+      })
+  })
 }
 
 function createTestUser() {
