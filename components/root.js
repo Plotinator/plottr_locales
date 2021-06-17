@@ -25,7 +25,6 @@ const Root = () => {
   useEffect(() => {
     onSessionChange((user) => {
       if (!user) {
-        console.log('user', user)
         window.location.href = '/login'
       } else {
         setUserId(user.uid)
