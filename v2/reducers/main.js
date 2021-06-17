@@ -16,6 +16,8 @@ import ui from './ui'
 import hierarchyLevels from './hierarchy'
 import featureFlags from './featureFlags'
 import tour from './tours'
+import error from './error'
+import permission from './permission'
 
 // normally it would make more sense to alphabetize them
 // but for customer service, it helps a lot to have them in a specific order
@@ -39,6 +41,8 @@ const mainReducer = (dataRepairers) =>
     hierarchyLevels: hierarchyLevels(dataRepairers),
     tour: tour(dataRepairers),
     images: images(dataRepairers),
+    error: error(dataRepairers),
+    permission: permission(dataRepairers),
   })
 
 export default mainReducer

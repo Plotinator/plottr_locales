@@ -175,3 +175,10 @@ export const UNSET_FEATURE_FLAG = 'UNSET_FEATURE_FLAG'
 export const SET_TOUR_FEATURE = 'SET_TOUR_FEATURE'
 export const TOUR_NEXT = 'TOUR_NEXT'
 export const TOUR_RESTART = 'TOUR_RESTART'
+
+// error actions
+export const PERMISSION_ERROR = 'PERMISSION_ERROR'
+export const CLEAR_ERROR = 'CLEAR_ERROR'
+
+// permission actions
+export const SET_PERMISSION = 'SET_PERMISSION'
