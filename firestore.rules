@@ -1,6 +1,86 @@
 rules_version = '2';
 service cloud.firestore {
-  match /databases/{database}/documents {
+  match /databases/{database}/documents/beats {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+  match /databases/{database}/documents/books {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+  match /databases/{database}/documents/cards {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+  match /databases/{database}/documents/categories {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+  match /databases/{database}/documents/characters {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+  match /databases/{database}/documents/customAttributes {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+  match /databases/{database}/documents/featureFlags {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+  match /databases/{database}/documents/files {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+  match /databases/{database}/documents/hierarchyLevels {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+  match /databases/{database}/documents/images {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+  match /databases/{database}/documents/lines {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+  match /databases/{database}/documents/notes {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+  match /databases/{database}/documents/places {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+  match /databases/{database}/documents/series {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+  match /databases/{database}/documents/tags {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+  match /databases/{database}/documents/tour {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+  match /databases/{database}/documents/ui {
     match /{document=**} {
       allow read, write: if request.auth != null;
     }
