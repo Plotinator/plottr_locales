@@ -6,6 +6,8 @@ import { Button, Navbar, Nav, NavDropdown, MenuItem } from 'react-bootstrap'
 import { t as i18n } from 'plottr_locales'
 import { Beamer, BookChooser } from 'connected-components'
 import cx from 'classnames'
+import { AiOutlineTeam, AiOutlineRead } from 'react-icons/ai'
+import { GiQuillInk } from 'react-icons/gi'
 
 import { actions } from 'pltr/v2'
 import { basePath } from '../lib/basePath'
@@ -40,6 +42,19 @@ function Navigation({ currentView, changeCurrentView, darkMode, selectedFile, fi
 
   const changeTo = (newLocation) => () => {
     changeCurrentView(newLocation)
+  }
+
+  const renderPermissionIcon = (permission) => {
+    switch (permission) {
+      case 'collaborator':
+        return <AiOutlineTeam />
+      case 'viewer':
+        return <AiOutlineRead />
+      case 'owner':
+        return <GiQuillInk />
+      default:
+        return null
+    }
   }
 
   return (
@@ -107,7 +122,7 @@ function Navigation({ currentView, changeCurrentView, darkMode, selectedFile, fi
                     selectFile(file)
                   }}
                 >
-                  {file.fileName}
+                  {renderPermissionIcon(file.permission)} - {file.fileName}
                 </MenuItem>
               ))
             : null}
