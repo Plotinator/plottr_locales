@@ -18,7 +18,7 @@ function grantAllPermissions() {
       documents.forEach(({ id }) => {
         auth.listUsers().then((response) => {
           response.users.forEach(({ uid }) => {
-            console.log(`Granting owner for user: ${uid}, to: ${id}`)
+            console.log(`Granting ${PERMISSIONS[i]} for user: ${uid}, to: ${id}`)
             database
               .collection(`authorisation/${uid}/granted`)
               .doc(id)
