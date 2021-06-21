@@ -15,6 +15,7 @@ import Characters from './characters'
 import Places from './places'
 import Tags from './tags'
 import Listener from './listener'
+import Error from './error'
 import { fetchFiles, onSessionChange } from '../lib/firebase'
 
 const Root = () => {
@@ -38,6 +39,7 @@ const Root = () => {
       <Router history={history}>
         <Listener userId={userId} selectedFile={selectedFile} />
         <Navigation selectedFile={selectedFile} files={files} selectFile={setSelectedFile} />
+        <Error />
         <main className="project-main tour-end">
           <Switch>
             <Route path="/project" component={Project} />
