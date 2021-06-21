@@ -3,6 +3,54 @@
 This repository contains the source code for Plottr Web.  The web
 version of the Plottr app.
 
+# Running Locally
+
+There are a few steps to start the project locally.
+
+## Step One (Emulate Firebase)
+
+The first is to start the emulators.  See [the section on
+emulators](Starting and Seeding the Firebase Emulators) for details
+about the emulating Firebase locally.
+
+## Step Two (Run Plottr on a Different Host Name)
+
+The second step is to run Plottr on a different host name.  If you try
+to access Plottr via `http://localhost:3000` (as the development
+server suggests) then our CORS calls will fail because of security
+restrictions and you'll not be able to get very far with your
+development.  The solution to this problem is to create an alias for
+`localhost` in your `hosts` file.  To create an alias, first open up
+the hosts file with super user permissions:
+
+```bash
+sude nano /etc/hosts
+```
+
+Then add an alias for local host by adding the line: 
+
+```
+127.0.0.1	plottr.local
+```
+
+My hosts file looks like this after I edited it:
+
+```
+##
+# Host Database
+#
+# localhost is used to configure the loopback interface
+# when the system is booting.  Do not change this entry.
+##
+127.0.0.1	plottr.local
+127.0.0.1	localhost
+255.255.255.255	broadcasthost
+::1             localhost
+```
+
+Once you've made this modification, you'll be able to access Plottr
+locally using the following URL: `http://plottr.local:3000`.
+
 # Starting and Seeding the Firebase Emulators
 
 This project uses `Firebase`'s `Authentication` and `Firestore`.  You
