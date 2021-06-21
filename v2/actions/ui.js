@@ -25,6 +25,8 @@ import {
   SET_NOTE_FILTER,
   SET_OUTLINE_FILTER,
   SET_NOTES_FILTER,
+  LOAD_UI,
+  LOAD_FILE,
 } from '../constants/ActionTypes'
 
 export function changeCurrentView(view) {
@@ -37,10 +39,6 @@ export function changeOrientation(orientation) {
 
 export function loadFile(fileName, dirty, payload, version) {
   return { type: FILE_LOADED, data: payload, fileName, dirty, version }
-}
-
-export function patchFile(fileName, dirty, payload, version) {
-  return { type: FILE_LOADED, data: payload, fileName, dirty, version, patching: true }
 }
 
 export function newFile(fileName) {
@@ -133,4 +131,8 @@ export function openAttributesDialog() {
 
 export function closeAttributesDialog() {
   return { type: CLOSE_ATTRIBUTES_DIALOG }
+}
+
+export function patchFile(patching, file) {
+  return { type: LOAD_FILE, patching, file }
 }
