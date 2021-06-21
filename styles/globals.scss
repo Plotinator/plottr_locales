@@ -10,6 +10,10 @@ $text-color: u$gray-0;
 
 @import '../lib/plottr_components/dist/components/components.css';
 
+.alert {
+  margin-bottom: 0px;
+}
+
 @import 'darkmode';
 
 @keyframes fadein {
