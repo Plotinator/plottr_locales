@@ -52,16 +52,19 @@ const BeatTitleCellConnector = (connector) => {
 
     handleDelete = (e) => {
       e.stopPropagation()
+      if (this.props.readOnly) return
       this.setState({ deleting: true, hovering: null })
     }
 
     handleAddBeat = (e) => {
+      if (this.props.readOnly) return
       this.props.actions.insertBeat(this.props.currentTimeline, this.props.beat.id)
       if (this.props.tour.run === true) this.props.tourActions.tourNext('next')
       this.props.actions.expandBeat(this.props.beat.id, this.props.currentTimeline)
     }
 
     handleAddChild = (e) => {
+      if (this.props.readOnly) return
       this.props.actions.expandBeat(this.props.beat.id, this.props.currentTimeline)
       this.props.actions.addBeat(this.props.currentTimeline, this.props.beat.id)
       if (this.props.tour.run === true) this.props.tourActions.tourNext('next')
@@ -73,7 +76,10 @@ const BeatTitleCellConnector = (connector) => {
         beat: { id, expanded },
         currentTimeline,
         tour,
+        readOnly,
       } = this.props
+
+      if (readOnly) return
 
       if (expanded === true && tour.run === true) this.props.tourActions.tourNext('next')
 
@@ -152,15 +158,18 @@ const BeatTitleCellConnector = (connector) => {
     }
 
     startEditing = () => {
+      if (this.props.readOnly) return
       this.setState({ editing: true, hovering: null })
     }
 
     startHovering = () => {
+      if (this.props.readOnly) return
       this.props.onMouseEnter()
       this.setState({ hovering: this.props.onMouseEnter() })
     }
 
     stopHovering = () => {
+      if (this.props.readOnly) return
       this.props.onMouseLeave()
       this.setState({ hovering: null })
     }
@@ -414,6 +423,7 @@ const BeatTitleCellConnector = (connector) => {
         isSeries,
         orientation,
         timelineSize,
+        readOnly,
       } = this.props
       const { hovering, inDropZone } = this.state
       const innerKlass = cx(orientedClassName('beat__body', orientation), {
@@ -424,6 +434,7 @@ const BeatTitleCellConnector = (connector) => {
             Object.values(this.props.beats.index)[Object.values(this.props.beats.index).length - 1]
               .id,
         dropping: inDropZone,
+        disabled: readOnly,
       })
       const beatKlass = cx(orientedClassName('beat__cell', orientation), {
         'medium-timeline': isMedium,
@@ -458,7 +469,7 @@ const BeatTitleCellConnector = (connector) => {
                 isSeries
               )}
               onClick={hovering ? this.stopHovering : this.startHovering}
-              draggable
+              draggable={!readOnly}
               onDragStart={this.handleDragStart}
               onDragEnd={this.handleDragEnd}
             >
@@ -503,7 +514,7 @@ const BeatTitleCellConnector = (connector) => {
                 )}
                 className={innerKlass}
                 onClick={this.startEditing}
-                draggable
+                draggable={!readOnly}
                 onDragStart={this.handleDragStart}
                 onDragEnd={this.handleDragEnd}
                 onDragEnter={this.handleDragEnter}
@@ -545,6 +556,7 @@ const BeatTitleCellConnector = (connector) => {
     onMouseLeave: PropTypes.func.isRequired,
     onMouseEnter: PropTypes.func.isRequired,
     hovering: PropTypes.number,
+    readOnly: PropTypes.bool,
   }
 
   const {
@@ -577,6 +589,7 @@ const BeatTitleCellConnector = (connector) => {
           hierarchyEnabled: selectors.beatHierarchyIsOn(state.present),
           isSeries: selectors.isSeriesSelector(state.present),
           tour: selectors.tourSelector(state.present),
+          readOnly: !selectors.canWriteSelector(state.present),
         }
       }
     }
