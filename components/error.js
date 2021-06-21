@@ -29,7 +29,7 @@ const modalStyles = {
 
 const switchErrorTitle = (error) => {
   switch (error) {
-    case 'permission-error':
+    case 'permission-denied':
       return 'Permission Error'
     default:
       return 'Something went wrong'
@@ -38,14 +38,30 @@ const switchErrorTitle = (error) => {
 
 const switchErrorBody = (error) => {
   switch (error) {
-    case 'permission-error':
+    case 'permission-denied':
       return "You aren't allowed to do that!"
     default:
       return 'Try again or submit an error report'
   }
 }
 
-const Error = ({ error, clearError }) => {
+const shouldDisplayError = (error, storeKey) => {
+  switch (error) {
+    case 'permission-denied':
+      switch (storeKey) {
+        case 'ui':
+          return false
+        default:
+          return true
+      }
+    default:
+      return true
+  }
+}
+
+const Error = ({ error, clearError, storeKey }) => {
+  if (!shouldDisplayError(error, storeKey)) return null
+
   const title = switchErrorTitle(error)
   const body = switchErrorBody(error)
 
@@ -74,12 +90,19 @@ const Error = ({ error, clearError }) => {
 Error.propTypes = {
   error: PropTypes.string.isRequired,
   clearError: PropTypes.func.isRequired,
+  storeKey: PropTypes.string.isRequired,
 }
 
 const {
   error: { clearError },
 } = actions
 
-export default connect((state) => ({ error: selectors.errorMessageSelector(state.present) }), {
-  clearError,
-})(Error)
+export default connect(
+  (state) => ({
+    error: selectors.errorMessageSelector(state.present),
+    storeKey: selectors.partOfStoreWhereErrorOccured(state.present),
+  }),
+  {
+    clearError,
+  }
+)(Error)
