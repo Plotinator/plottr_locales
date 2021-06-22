@@ -38,6 +38,7 @@
     "react-proptypes": "^1.0.0",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
+    "redux-thunk": "^2.3.0",
     "redux-undo": "^1.0.1",
     "regenerator-runtime": "^0.13.7",
     "semver": "^7.1.3"

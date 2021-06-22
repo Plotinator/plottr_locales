@@ -24,6 +24,7 @@ function Navigation({
   selectedFile,
   files,
   selectFile,
+  withFullFileState,
 }) {
   const [saving, setSaving] = useState(false)
   const [fileName, setFileName] = useState('')
@@ -152,8 +153,10 @@ function Navigation({
                       }
                       if (event.which === 13) {
                         if (!userId) return
-                        newFile(userId, fileName).then((results) => {
-                          setSaving(false)
+                        withFullFileState((state) => {
+                          newFile(userId, fileName, state).then((results) => {
+                            setSaving(false)
+                          })
                         })
                       }
                     }}
@@ -166,8 +169,10 @@ function Navigation({
                   <Button
                     onClick={() => {
                       if (!userId) return
-                      newFile(userId, fileName).then((results) => {
-                        setSaving(false)
+                      withFullFileState((state) => {
+                        newFile(userId, fileName, state).then((results) => {
+                          setSaving(false)
+                        })
                       })
                     }}
                   >
@@ -209,6 +214,7 @@ Navigation.propTypes = {
   selectedFile: PropTypes.object,
   files: PropTypes.array.isRequired,
   selectFile: PropTypes.func.isRequired,
+  withFullFileState: PropTypes.func.isRequired,
 }
 
 function mapStateToProps(state) {
@@ -218,6 +224,7 @@ function mapStateToProps(state) {
   }
 }
 
-export default connect(mapStateToProps, { changeCurrentView: actions.ui.changeCurrentView })(
-  Navigation
-)
+export default connect(mapStateToProps, {
+  changeCurrentView: actions.ui.changeCurrentView,
+  withFullFileState: actions.project.withFullFileState,
+})(Navigation)
