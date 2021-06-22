@@ -88,9 +88,9 @@ const Error = ({ error, clearError, storeKey }) => {
 }
 
 Error.propTypes = {
-  error: PropTypes.string.isRequired,
   clearError: PropTypes.func.isRequired,
-  storeKey: PropTypes.string.isRequired,
+  error: PropTypes.string,
+  storeKey: PropTypes.string,
 }
 
 const {
