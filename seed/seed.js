@@ -11,32 +11,38 @@ const database = admin.firestore()
 
 function seedDatabase() {
   try {
-    createExampleFiles()
+    const result = createExampleFiles()
     console.log('database seed was successful')
+    return result
   } catch (error) {
     console.log(error, 'database seed failed')
+    throw new error(error)
   }
 }
 
 function createExampleFiles() {
-  files.map((record) => {
-    database
-      .collection('file')
-      .add(record.file)
-      .then((documentReference) => {
-        const id = documentReference.id
-        Object.keys(record).forEach((key) => {
-          if (key === 'file') return
-          database
-            .collection(key)
-            .doc(id)
-            .set({
-              ...record[key],
-              fileId: id,
+  return Promise.all(
+    files.map((record) => {
+      return database
+        .collection('file')
+        .add(record.file)
+        .then((documentReference) => {
+          const id = documentReference.id
+          return Promise.all(
+            Object.keys(record).map((key) => {
+              if (key === 'file') return
+              database
+                .collection(key)
+                .doc(id)
+                .set({
+                  ...record[key],
+                  fileId: id,
+                })
             })
+          )
         })
-      })
-  })
+    })
+  )
 }
 
 function createTestUser() {
@@ -59,5 +65,6 @@ function createTestUser() {
     })
 }
 
-seedDatabase()
-createTestUser()
+seedDatabase().then((results) => {
+  createTestUser()
+})
