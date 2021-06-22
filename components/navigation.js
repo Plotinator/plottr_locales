@@ -140,7 +140,7 @@ function Navigation({ currentView, changeCurrentView, darkMode, selectedFile, fi
 }
 
 Navigation.propTypes = {
-  currentView: PropTypes.object.isRequired,
+  currentView: PropTypes.string.isRequired,
   changeCurrentView: PropTypes.func.isRequired,
   darkMode: PropTypes.bool.isRequired,
   selectedFile: PropTypes.object,
