@@ -67,6 +67,18 @@ $text-color: $gray-0;
       }
     }
 
+    .navbar-save-controls {
+      height: 50px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      flex-grow: 1;
+      li {
+        margin-left: 10px;
+      }
+    }
+
     &.navbar-inverse {
       .navbar-toggle {
         border-color: hsl(0, 0%, 20%);

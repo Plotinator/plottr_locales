@@ -2,7 +2,7 @@ const admin = require('firebase-admin')
 
 process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099'
 process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080'
-const projectId = 'plottr-firestore-poc-2'
+const projectId = 'plottr'
 admin.initializeApp({ projectId })
 
 const database = admin.firestore()

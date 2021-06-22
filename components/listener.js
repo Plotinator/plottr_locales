@@ -6,7 +6,8 @@ import { listen } from '../lib/firebase'
 
 const Listener = ({ userId, selectedFile, setPermission }) => {
   useEffect(() => {
-    if (!userId || !selectedFile || !selectedFile.id) return
+    if (!userId || !selectedFile || !selectedFile.id || selectedFile.none) return
+    // TODO: when the file changes, stop listening
     listen(userId, selectedFile.id)
     setPermission(selectedFile.permission)
   }, [selectedFile, userId])

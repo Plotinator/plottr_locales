@@ -3,7 +3,7 @@ const firebase = require('firebase/app')
 const files = require('./files.json')
 require('firebase/auth')
 
-const projectId = 'plottr-firestore-poc-2'
+const projectId = 'plottr'
 process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080'
 admin.initializeApp({ projectId })
 
