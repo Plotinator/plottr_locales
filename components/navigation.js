@@ -59,7 +59,7 @@ function Navigation({ currentView, changeCurrentView, darkMode, selectedFile, fi
 
   return (
     <Navbar className="project-nav" fluid inverse={darkMode}>
-      <Nav activeKey={currentView} bsStyle="pills">
+      <Nav bsStyle="pills">
         <BookChooser />
         <li role="presentation" className={cx({ active: currentView === 'project' })}>
           <Link role="button" to="/project" onClick={changeTo('project')}>
