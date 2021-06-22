@@ -29,7 +29,9 @@ const Root = () => {
         window.location.href = '/login'
       } else {
         setUserId(user.uid)
-        fetchFiles(user.uid).then(setFiles)
+        fetchFiles(user.uid).then((files) => {
+          setFiles([{ fileName: 'New file', none: true, id: -1 }, ...files])
+        })
       }
     })
   }, [])
@@ -38,7 +40,12 @@ const Root = () => {
     <Provider store={store}>
       <Router history={history}>
         <Listener userId={userId} selectedFile={selectedFile} />
-        <Navigation selectedFile={selectedFile} files={files} selectFile={setSelectedFile} />
+        <Navigation
+          userId={userId}
+          selectedFile={selectedFile}
+          files={files}
+          selectFile={setSelectedFile}
+        />
         <Error />
         <main className="project-main tour-end">
           <Switch>

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'react-proptypes'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
@@ -6,17 +6,28 @@ import { Button, Navbar, Nav, NavDropdown, MenuItem } from 'react-bootstrap'
 import { t as i18n } from 'plottr_locales'
 import { Beamer, BookChooser } from 'connected-components'
 import cx from 'classnames'
-import { AiOutlineTeam, AiOutlineRead } from 'react-icons/ai'
+import { AiOutlineSave, AiOutlineTeam, AiOutlineRead } from 'react-icons/ai'
 import { GiQuillInk } from 'react-icons/gi'
 
 import { actions } from 'pltr/v2'
 import { basePath } from '../lib/basePath'
-import { logOut, onSessionChange } from '../lib/firebase'
+import { logOut, onSessionChange, newFile } from '../lib/firebase'
 
 const trialMode = true // TODO
 const isDev = process.env.NODE_ENV == 'development'
 
-function Navigation({ currentView, changeCurrentView, darkMode, selectedFile, files, selectFile }) {
+function Navigation({
+  userId,
+  currentView,
+  changeCurrentView,
+  darkMode,
+  selectedFile,
+  files,
+  selectFile,
+}) {
+  const [saving, setSaving] = useState(false)
+  const [fileName, setFileName] = useState('')
+
   useEffect(() => {
     const path = basePath()
     if (path !== '' && path !== currentView) {
@@ -102,7 +113,7 @@ function Navigation({ currentView, changeCurrentView, darkMode, selectedFile, fi
           title="Select a File"
           style={{ margin: '0 16px 0 8px' }}
         >
-          {selectedFile ? (
+          {selectedFile && !selectedFile.none ? (
             <>
               <MenuItem
                 onSelect={() => {
@@ -127,6 +138,57 @@ function Navigation({ currentView, changeCurrentView, darkMode, selectedFile, fi
               ))
             : null}
         </NavDropdown>
+        {!selectedFile || selectedFile.none ? (
+          <div className="navbar-save-controls">
+            {saving ? (
+              <>
+                <li role="presentation" className="file-name">
+                  <input
+                    type="text"
+                    value={fileName}
+                    onKeyDown={(event) => {
+                      if (event.which === 27) {
+                        setSaving(false)
+                      }
+                      if (event.which === 13) {
+                        if (!userId) return
+                        newFile(userId, fileName).then((results) => {
+                          setSaving(false)
+                        })
+                      }
+                    }}
+                    onChange={(event) => {
+                      setFileName(event.target.value)
+                    }}
+                  />
+                </li>
+                <li>
+                  <Button
+                    onClick={() => {
+                      if (!userId) return
+                      newFile(userId, fileName).then((results) => {
+                        setSaving(false)
+                      })
+                    }}
+                  >
+                    <AiOutlineSave />
+                  </Button>
+                </li>
+              </>
+            ) : (
+              <li role="presentation">
+                <a
+                  role="button"
+                  onClick={() => {
+                    setSaving(true)
+                  }}
+                >
+                  Save new file
+                </a>
+              </li>
+            )}
+          </div>
+        ) : null}
       </Nav>
       <Beamer inNavigation />
       <Navbar.Form pullRight style={{ marginRight: '15px' }}>
@@ -140,6 +202,7 @@ function Navigation({ currentView, changeCurrentView, darkMode, selectedFile, fi
 }
 
 Navigation.propTypes = {
+  userId: PropTypes.string,
   currentView: PropTypes.string.isRequired,
   changeCurrentView: PropTypes.func.isRequired,
   darkMode: PropTypes.bool.isRequired,
