@@ -32,11 +32,17 @@ export default function Login() {
   const renderMain = () => {
     return (
       <>
-        <div className="login__left" style={{ hidden: !sessionChecked }}>
+        <div
+          className="login__left"
+          style={{ ...{ display: !sessionChecked ? 'none' : undefined } }}
+        >
           <h1>Welcome to Plottr</h1>
           <div id="firebase-login" ref={firebaseLoginComponentRef}></div>
         </div>
-        <div className="login__right" style={{ hidden: !sessionChecked }}>
+        <div
+          className="login__right"
+          style={{ ...{ display: !sessionChecked ? 'none' : undefined } }}
+        >
           <div className="login__logo">
             <Image src="/logo_28_500.png" alt="Plottr Logo" width="358" height="500" />
           </div>
