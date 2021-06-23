@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react'
-import { PropTypes } from 'prop-types'
+import React, { useState } from 'react'
 import { Router, Switch, Route } from 'react-router-dom'
 import { Provider } from 'react-redux'
 
@@ -16,36 +15,17 @@ import Places from './places'
 import Tags from './tags'
 import Listener from './listener'
 import Error from './error'
-import { fetchFiles, onSessionChange } from '../lib/firebase'
+import SessionObserver from './session-observer'
 
 const Root = () => {
   const [userId, setUserId] = useState(null)
-  const [files, setFiles] = useState([])
-  const [selectedFile, setSelectedFile] = useState(null)
-
-  useEffect(() => {
-    onSessionChange((user) => {
-      if (!user) {
-        window.location.href = '/login'
-      } else {
-        setUserId(user.uid)
-        fetchFiles(user.uid).then((files) => {
-          setFiles([{ fileName: 'New file', none: true, id: -1 }, ...files])
-        })
-      }
-    })
-  }, [])
 
   return (
     <Provider store={store}>
+      <SessionObserver userId={userId} setUserId={setUserId} />
+      <Listener userId={userId} />
       <Router history={history}>
-        <Listener userId={userId} selectedFile={selectedFile} />
-        <Navigation
-          userId={userId}
-          selectedFile={selectedFile}
-          files={files}
-          selectFile={setSelectedFile}
-        />
+        <Navigation userId={userId} />
         <Error />
         <main className="project-main tour-end">
           <Switch>
@@ -61,10 +41,6 @@ const Root = () => {
       </Router>
     </Provider>
   )
-}
-
-Root.propTypes = {
-  email: PropTypes.string,
 }
 
 export default Root
