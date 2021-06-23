@@ -18,6 +18,7 @@ import featureFlags from './featureFlags'
 import tour from './tours'
 import error from './error'
 import permission from './permission'
+import project from './project'
 
 // normally it would make more sense to alphabetize them
 // but for customer service, it helps a lot to have them in a specific order
@@ -43,6 +44,7 @@ const mainReducer = (dataRepairers) =>
     images: images(dataRepairers),
     error: error(dataRepairers),
     permission: permission(dataRepairers),
+    project,
   })
 
 export default mainReducer

@@ -54,6 +54,7 @@ import * as featureFlagSelectors from './selectors/featureFlags'
 import * as tourSelector from './selectors/tours'
 import * as errorSelectors from './selectors/error'
 import * as permissionSelectors from './selectors/permission'
+import * as projectSelectors from './selectors/project'
 
 import rootReducer from './reducers/root'
 import mainReducer from './reducers/main'
@@ -125,6 +126,7 @@ const selectors = {
   ...tourSelector,
   ...errorSelectors,
   ...permissionSelectors,
+  ...projectSelectors,
 }
 
 const actions = {
