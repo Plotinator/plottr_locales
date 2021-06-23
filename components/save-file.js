@@ -7,7 +7,7 @@ import { AiOutlineSave } from 'react-icons/ai'
 import { actions, selectors } from 'pltr/v2'
 import { newFile } from '../lib/firebase'
 
-const SaveFile = ({ selectedFile, userId, withFullFileState, setFileList }) => {
+const SaveFile = ({ selectedFile, userId, withFullFileState, setFileList, selectFile }) => {
   const [saving, setSaving] = useState(false)
   const [fileName, setFileName] = useState('')
 
@@ -16,7 +16,7 @@ const SaveFile = ({ selectedFile, userId, withFullFileState, setFileList }) => {
   const saveFile = () => {
     if (!userId) return
     withFullFileState((state) => {
-      newFile(userId, fileName, state, setFileList).then((results) => {
+      newFile(userId, fileName, state, setFileList, selectFile).then((results) => {
         setSaving(false)
       })
     })
@@ -71,6 +71,7 @@ SaveFile.propTypes = {
   userId: PropTypes.string,
   withFullFileState: PropTypes.func.isRequired,
   setFileList: PropTypes.func.isRequired,
+  selectFile: PropTypes.func.isRequired,
 }
 
 export default connect(
@@ -81,5 +82,6 @@ export default connect(
   {
     withFullFileState: actions.project.withFullFileState,
     setFileList: actions.project.setFileList,
+    selectFile: actions.project.selectFile,
   }
 )(SaveFile)

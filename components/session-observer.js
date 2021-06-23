@@ -13,7 +13,7 @@ const SessionObserver = ({ userId, setUserId, setFileList }) => {
       } else {
         setUserId(user.uid)
         fetchFiles(user.uid).then((files) => {
-          setFileList([{ fileName: 'New file', none: true, id: -1 }, ...files])
+          setFileList(files)
         })
       }
     })
