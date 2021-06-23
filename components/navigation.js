@@ -9,6 +9,7 @@ import cx from 'classnames'
 
 import FileChooser from './file-chooser'
 import SaveFile from './save-file'
+import Share from './share'
 import { actions } from 'pltr/v2'
 import { basePath } from '../lib/basePath'
 import { logOut, onSessionChange } from '../lib/firebase'
@@ -16,13 +17,7 @@ import { logOut, onSessionChange } from '../lib/firebase'
 const trialMode = true // TODO
 const isDev = process.env.NODE_ENV == 'development'
 
-function Navigation({
-  userId,
-  currentView,
-  changeCurrentView,
-  darkMode,
-  withFullFileState,
-}) {
+function Navigation({ userId, currentView, changeCurrentView, darkMode, withFullFileState }) {
   useEffect(() => {
     const path = basePath()
     if (path !== '' && path !== currentView) {
@@ -97,6 +92,7 @@ function Navigation({
         <Button bsStyle="link" onClick={logOut}>
           {i18n('logout')}
         </Button>
+        <Share />
       </Navbar.Form>
       {renderTrialLinks()}
     </Navbar>
