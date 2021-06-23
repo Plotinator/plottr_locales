@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react'
 import PropTypes from 'react-proptypes'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { Button, Navbar, Nav, NavDropdown, MenuItem } from 'react-bootstrap'
+import { Button, Navbar, Nav } from 'react-bootstrap'
 import { t as i18n } from 'plottr_locales'
 import { Beamer, BookChooser } from 'connected-components'
 import cx from 'classnames'
-import { AiOutlineSave, AiOutlineTeam, AiOutlineRead } from 'react-icons/ai'
-import { GiQuillInk } from 'react-icons/gi'
+import { AiOutlineSave } from 'react-icons/ai'
 
+import FileChooser from './file-chooser'
 import { actions } from 'pltr/v2'
 import { basePath } from '../lib/basePath'
 import { logOut, onSessionChange, newFile } from '../lib/firebase'
@@ -56,19 +56,6 @@ function Navigation({
     changeCurrentView(newLocation)
   }
 
-  const renderPermissionIcon = (permission) => {
-    switch (permission) {
-      case 'collaborator':
-        return <AiOutlineTeam />
-      case 'viewer':
-        return <AiOutlineRead />
-      case 'owner':
-        return <GiQuillInk />
-      default:
-        return null
-    }
-  }
-
   return (
     <Navbar className="project-nav" fluid inverse={darkMode}>
       <Nav bsStyle="pills">
@@ -108,37 +95,7 @@ function Navigation({
             {i18n('Tags')}
           </Link>
         </li>
-        <NavDropdown
-          onClick={(e) => e.stopPropagation(e)}
-          id="file_chooser"
-          title="Select a File"
-          style={{ margin: '0 16px 0 8px' }}
-        >
-          {selectedFile && !selectedFile.none ? (
-            <>
-              <MenuItem
-                onSelect={() => {
-                  selectFile(selectedFile)
-                }}
-              >
-                {selectedFile.fileName}
-              </MenuItem>
-              <MenuItem divider />
-            </>
-          ) : null}
-          {files && files.length
-            ? files.map((file) => (
-                <MenuItem
-                  key={file.id}
-                  onSelect={() => {
-                    selectFile(file)
-                  }}
-                >
-                  {renderPermissionIcon(file.permission)} - {file.fileName}
-                </MenuItem>
-              ))
-            : null}
-        </NavDropdown>
+        <FileChooser selectedFile={selectedFile} selectFile={selectFile} files={files} />
         {!selectedFile || selectedFile.none ? (
           <div className="navbar-save-controls">
             {saving ? (
