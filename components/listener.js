@@ -1,7 +1,8 @@
 import { useEffect } from 'react'
+import { PropTypes } from 'prop-types'
 import { connect } from 'react-redux'
 
-import { actions } from 'pltr/v2'
+import { actions, selectors } from 'pltr/v2'
 import { listen } from '../lib/firebase'
 
 const Listener = ({ userId, selectedFile, setPermission }) => {
@@ -15,8 +16,15 @@ const Listener = ({ userId, selectedFile, setPermission }) => {
   return null
 }
 
-const {
-  permission: { setPermission },
-} = actions
+Listener.propTypes = {
+  userId: PropTypes.string,
+  selectedFile: PropTypes.func.isRequired,
+  setPermission: PropTypes.func.isRequired,
+}
 
-export default connect(null, { setPermission })(Listener)
+export default connect(
+  (state) => ({
+    selectedFile: selectors.selectedFileSelector(state.present),
+  }),
+  { setPermission: actions.permission.setPermission }
+)(Listener)

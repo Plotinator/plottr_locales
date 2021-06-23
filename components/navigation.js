@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'react-proptypes'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
@@ -6,12 +6,12 @@ import { Button, Navbar, Nav } from 'react-bootstrap'
 import { t as i18n } from 'plottr_locales'
 import { Beamer, BookChooser } from 'connected-components'
 import cx from 'classnames'
-import { AiOutlineSave } from 'react-icons/ai'
 
 import FileChooser from './file-chooser'
+import SaveFile from './save-file'
 import { actions } from 'pltr/v2'
 import { basePath } from '../lib/basePath'
-import { logOut, onSessionChange, newFile } from '../lib/firebase'
+import { logOut, onSessionChange } from '../lib/firebase'
 
 const trialMode = true // TODO
 const isDev = process.env.NODE_ENV == 'development'
@@ -21,14 +21,8 @@ function Navigation({
   currentView,
   changeCurrentView,
   darkMode,
-  selectedFile,
-  files,
-  selectFile,
   withFullFileState,
 }) {
-  const [saving, setSaving] = useState(false)
-  const [fileName, setFileName] = useState('')
-
   useEffect(() => {
     const path = basePath()
     if (path !== '' && path !== currentView) {
@@ -95,62 +89,8 @@ function Navigation({
             {i18n('Tags')}
           </Link>
         </li>
-        <FileChooser selectedFile={selectedFile} selectFile={selectFile} files={files} />
-        {!selectedFile || selectedFile.none ? (
-          <div className="navbar-save-controls">
-            {saving ? (
-              <>
-                <li role="presentation" className="file-name">
-                  <input
-                    type="text"
-                    value={fileName}
-                    onKeyDown={(event) => {
-                      if (event.which === 27) {
-                        setSaving(false)
-                      }
-                      if (event.which === 13) {
-                        if (!userId) return
-                        withFullFileState((state) => {
-                          newFile(userId, fileName, state).then((results) => {
-                            setSaving(false)
-                          })
-                        })
-                      }
-                    }}
-                    onChange={(event) => {
-                      setFileName(event.target.value)
-                    }}
-                  />
-                </li>
-                <li>
-                  <Button
-                    onClick={() => {
-                      if (!userId) return
-                      withFullFileState((state) => {
-                        newFile(userId, fileName, state).then((results) => {
-                          setSaving(false)
-                        })
-                      })
-                    }}
-                  >
-                    <AiOutlineSave />
-                  </Button>
-                </li>
-              </>
-            ) : (
-              <li role="presentation">
-                <a
-                  role="button"
-                  onClick={() => {
-                    setSaving(true)
-                  }}
-                >
-                  Save new file
-                </a>
-              </li>
-            )}
-          </div>
-        ) : null}
+        <FileChooser />
+        <SaveFile userId={userId} />
       </Nav>
       <Beamer inNavigation />
       <Navbar.Form pullRight style={{ marginRight: '15px' }}>
@@ -168,9 +108,6 @@ Navigation.propTypes = {
   currentView: PropTypes.string.isRequired,
   changeCurrentView: PropTypes.func.isRequired,
   darkMode: PropTypes.bool.isRequired,
-  selectedFile: PropTypes.object,
-  files: PropTypes.array.isRequired,
-  selectFile: PropTypes.func.isRequired,
   withFullFileState: PropTypes.func.isRequired,
 }
 
@@ -183,5 +120,4 @@ function mapStateToProps(state) {
 
 export default connect(mapStateToProps, {
   changeCurrentView: actions.ui.changeCurrentView,
-  withFullFileState: actions.project.withFullFileState,
 })(Navigation)
