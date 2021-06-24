@@ -201,4 +201,3 @@ export const SET_PERMISSION = 'SET_PERMISSION'
 // project actions
 export const SET_FILE_LIST = 'SET_FILE_LIST'
 export const SELECT_FILE = 'SELECT_FILE'
-export const SET_USERNAME_SEARCH_RESULTS = 'SET_USERNAME_SEARCH_RESULTS'

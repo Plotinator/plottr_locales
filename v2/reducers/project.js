@@ -1,4 +1,4 @@
-import { SET_FILE_LIST, SELECT_FILE, SET_USERNAME_SEARCH_RESULTS } from '../constants/ActionTypes'
+import { SET_FILE_LIST, SELECT_FILE } from '../constants/ActionTypes'
 
 const INITIAL_STATE = {
   fileList: [],
@@ -17,11 +17,6 @@ const projectReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         selectedFile: action.selectedFile,
-      }
-    case SET_USERNAME_SEARCH_RESULTS:
-      return {
-        ...state,
-        userNameSearchresults: action.userNameSearchresults,
       }
     default:
       return state
