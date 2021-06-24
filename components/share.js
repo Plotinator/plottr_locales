@@ -2,12 +2,13 @@ import { useState } from 'react'
 import { connect } from 'react-redux'
 import { PropTypes } from 'prop-types'
 import { FiShare } from 'react-icons/fi'
-import { Button, Form, FormGroup, Label, Table } from 'react-bootstrap'
+import { Button, Form, FormGroup, Table } from 'react-bootstrap'
 import { GrFormEdit } from 'react-icons/gr'
 
 import { selectors } from 'pltr/v2'
 import { PlottrModal } from 'connected-components'
 import { withEventTargetValue } from '../lib/withEventTargetValue'
+import { shareDocument } from '../lib/firebase'
 
 const modalStyles = {
   overlay: {
@@ -31,6 +32,20 @@ const Share = ({ selectedFile }) => {
   const [sharing, setSharing] = useState(false)
   const [emailToShareWith, setEmailToShareWith] = useState('')
 
+  const handleKeyDown = (event) => {
+    if (event.which === 13) {
+      event.preventDefault()
+      shareDocument(selectedFile.id, emailToShareWith)
+      setEmailToShareWith('')
+    }
+  }
+
+  const handleShare = (event) => {
+    event.preventDefault()
+    shareDocument(selectedFile.id, emailToShareWith)
+    setEmailToShareWith('')
+  }
+
   return (
     <>
       <PlottrModal
@@ -43,24 +58,24 @@ const Share = ({ selectedFile }) => {
         <h3>Share this file</h3>
         <Form>
           <FormGroup>
-            <Label>User name</Label>
+            <h6>Email Address</h6>
             <input
               type="text"
               value={emailToShareWith}
               onChange={withEventTargetValue(setEmailToShareWith)}
+              onKeyDown={handleKeyDown}
             />
+            <Button onClick={handleShare}>
+              <FiShare /> Share
+            </Button>
           </FormGroup>
         </Form>
         <Table striped bordered condensed hover>
           <thead>
             <tr>
               <th>Email address</th>
-            </tr>
-            <tr>
               <th>Permission</th>
-            </tr>
-            <tr>
-              <th>&nbsp;</th>
+              <th>Edit</th>
             </tr>
           </thead>
           <tbody>
@@ -96,5 +111,5 @@ Share.propTypes = {
 }
 
 export default connect((state) => ({
-  selectedFile: selectors.selectedFileIdSelector(state.present),
+  selectedFile: selectors.selectedFileSelector(state.present),
 }))(Share)
