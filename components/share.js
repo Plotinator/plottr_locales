@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react'
-import { PropTypes } from 'prop-types'
+import { useState } from 'react'
 import { connect } from 'react-redux'
+import { PropTypes } from 'prop-types'
 import { FiShare } from 'react-icons/fi'
-import { Form, FormGroup, Label } from 'react-bootstrap'
+import { Button, Form, FormGroup, Label, Table } from 'react-bootstrap'
+import { GrFormEdit } from 'react-icons/gr'
 
-import { actions, selectors } from 'pltr/v2'
+import { selectors } from 'pltr/v2'
 import { PlottrModal } from 'connected-components'
 import { withEventTargetValue } from '../lib/withEventTargetValue'
-import { searchForUsersByName } from '../lib/firebase'
 
 const modalStyles = {
   overlay: {
@@ -27,30 +27,12 @@ const modalStyles = {
   },
 }
 
-const UserSearcher = connect(null, {
-  setUserNameSearchResults: actions.project.setUserNameSearchResults,
-})(({ searchTerm, setUserNameSearchResults }) => {
-  useEffect(() => {
-    searchForUsersByName(searchTerm, setUserNameSearchResults).catch((error) => {
-      console.error(error)
-    })
-  }, [searchTerm])
-
-  return null
-})
-
-UserSearcher.propTypes = {
-  searchTerm: PropTypes.string,
-  setUserNameSearchResults: PropTypes.func.isRequired,
-}
-
-const Share = ({ userNameSearchResults }) => {
+const Share = ({ selectedFile }) => {
   const [sharing, setSharing] = useState(false)
-  const [searchedName, setSearchedName] = useState('')
+  const [emailToShareWith, setEmailToShareWith] = useState('')
 
   return (
     <>
-      <UserSearcher searchTerm={searchedName} />
       <PlottrModal
         isOpen={sharing}
         onRequestClose={() => {
@@ -64,11 +46,39 @@ const Share = ({ userNameSearchResults }) => {
             <Label>User name</Label>
             <input
               type="text"
-              value={searchedName}
-              onChange={withEventTargetValue(setSearchedName)}
+              value={emailToShareWith}
+              onChange={withEventTargetValue(setEmailToShareWith)}
             />
           </FormGroup>
         </Form>
+        <Table striped bordered condensed hover>
+          <thead>
+            <tr>
+              <th>Email address</th>
+            </tr>
+            <tr>
+              <th>Permission</th>
+            </tr>
+            <tr>
+              <th>&nbsp;</th>
+            </tr>
+          </thead>
+          <tbody>
+            {selectedFile &&
+              selectedFile.shareRecords &&
+              selectedFile.shareRecords.map(({ emailAddress, permission }) => (
+                <tr key={emailAddress}>
+                  <td>{emailAddress}</td>
+                  <td>{permission}</td>
+                  <td>
+                    <Button>
+                      <GrFormEdit />
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </Table>
       </PlottrModal>
       <button
         onClick={() => {
@@ -82,10 +92,9 @@ const Share = ({ userNameSearchResults }) => {
 }
 
 Share.propTypes = {
-  userNameSearchResults: PropTypes.array.isRequired,
-  setUserNameSearchResults: PropTypes.func.isrequired,
+  selectedFile: PropTypes.object,
 }
 
 export default connect((state) => ({
-  userNameSearchResults: selectors.userNameSearchResultsSelector(state.present),
+  selectedFile: selectors.selectedFileIdSelector(state.present),
 }))(Share)

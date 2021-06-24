@@ -15,8 +15,9 @@ const SaveFile = ({ selectedFile, userId, withFullFileState, setFileList, select
 
   const saveFile = () => {
     if (!userId) return
+    const emailAddress = 'TODO-SomeUser@test.com'
     withFullFileState((state) => {
-      newFile(userId, fileName, state, setFileList, selectFile).then((results) => {
+      newFile(emailAddress, userId, fileName, state, setFileList, selectFile).then((results) => {
         setSaving(false)
       })
     })
