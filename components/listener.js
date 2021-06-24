@@ -28,7 +28,7 @@ const Listener = ({ userId, selectedFile, setPermission, patchFile }) => {
 
 Listener.propTypes = {
   userId: PropTypes.string,
-  selectedFile: PropTypes.func.isRequired,
+  selectedFile: PropTypes.object.isRequired,
   setPermission: PropTypes.func.isRequired,
 }
 
