@@ -7,7 +7,7 @@ if (!admin.apps.length) {
     admin.initializeApp({ projectId })
   } else if (process.env.FIREBASE_ENV === 'production' || process.env.FIREBASE_ENV === 'preview') {
     const serviceAccount = JSON.parse(process.env.FIREBASE_KEY)
-    admin.initializeApp(serviceAccount)
+    admin.initializeApp({ credential: admin.credential.cert(serviceAccount) })
   }
 }
 
