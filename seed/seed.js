@@ -3,7 +3,7 @@ const firebase = require('firebase/app')
 const files = require('./files.json')
 require('firebase/auth')
 
-const projectId = 'plottr'
+const projectId = 'plottr-ci'
 process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080'
 admin.initializeApp({ projectId })
 
@@ -47,12 +47,13 @@ function createExampleFiles() {
 
 function createTestUser() {
   const firebaseConfig = {
-    apiKey: 'AIzaSyBhfNFWZjphkIWz9U36yJ6VLWxVYHTmy_I',
-    authDomain: 'plottr-firestore-poc-2.firebaseapp.com',
-    projectId: 'plottr-firestore-poc-2',
-    storageBucket: 'plottr-firestore-poc-2.appspot.com',
-    messagingSenderId: '692909170189',
-    appId: '1:692909170189:web:1218c1e699ce99bbff3f44',
+    apiKey: 'AIzaSyAwvdLWqVoyhEXbT26aTx0HL_qybstxLFY',
+    authDomain: 'plottr-ci.firebaseapp.com',
+    projectId: 'plottr-ci',
+    storageBucket: 'plottr-ci.appspot.com',
+    messagingSenderId: '733541501381',
+    appId: '1:733541501381:web:66827ee4e4cbe58ac8e3ac',
+    measurementId: 'G-XHGVVN7KYL',
   }
   firebase.initializeApp(firebaseConfig)
   const auth = firebase.auth()
