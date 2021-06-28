@@ -428,11 +428,7 @@ const BeatTitleCellConnector = (connector) => {
       const { hovering, inDropZone } = this.state
       const innerKlass = cx(orientedClassName('beat__body', orientation), {
         'medium-timeline': isMedium,
-        hover:
-          hovering === this.props.beat.id ||
-          this.props.beat.id ===
-            Object.values(this.props.beats.index)[Object.values(this.props.beats.index).length - 1]
-              .id,
+        hover: hovering === this.props.beat.id,
         dropping: inDropZone,
         disabled: readOnly,
       })
@@ -501,12 +497,7 @@ const BeatTitleCellConnector = (connector) => {
                 style={hierarchyToStyles(
                   this.props.hierarchyLevel,
                   timelineSize,
-                  this.props.beat.id ===
-                    Object.values(this.props.beats.index)[
-                      Object.values(this.props.beats.index).length - 1
-                    ].id ||
-                    this.state.hovering === this.props.beat.id ||
-                    this.state.inDropZone,
+                  this.state.hovering === this.props.beat.id || this.state.inDropZone,
                   this.props.darkMode === true
                     ? this.props.hierarchyLevel.dark
                     : this.props.hierarchyLevel.light,
