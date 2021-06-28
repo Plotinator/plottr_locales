@@ -32,6 +32,7 @@ import {
   RESET_TIMELINE,
   DELETE_BOOK,
   LOAD_CARDS,
+  EDIT_CARD_TEMPLATE_ATTRIBUTES,
 } from '../constants/ActionTypes'
 import { newFileCards } from '../store/newFileState'
 import { card as defaultCard } from '../store/initialState'
@@ -90,6 +91,20 @@ const cards =
           card.id === action.id ? Object.assign({}, card, diffObj) : card
         )
       }
+
+      case EDIT_CARD_TEMPLATE_ATTRIBUTES:
+        return state.map((card) => {
+          if (card.id === action.id) {
+            return {
+              ...card,
+              templates: {
+                ...card.templates,
+                [action.name]: action.value,
+              },
+            }
+          }
+          return card
+        })
 
       case CHANGE_LINE: {
         const diffObj = {

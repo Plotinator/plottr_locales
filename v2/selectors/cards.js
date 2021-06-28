@@ -9,6 +9,44 @@ export const allCardsSelector = (state) => state.cards
 
 export const nextCardIdSelector = createSelector(allCardsSelector, (cards) => nextId(cards))
 
+export const cardIdSelector = (state, cardId) => cardId
+
+export const cardByIdSelector = createSelector(
+  cardIdSelector,
+  allCardsSelector,
+  (cardId, cards) => {
+    return cards.find((card) => card.id === cardId)
+  }
+)
+
+export const cardDescriptionByIdSelector = createSelector(
+  cardByIdSelector,
+  (card) => card && card.description
+)
+
+export const cardMetaDataSelector = createSelector(cardByIdSelector, (card) => {
+  if (!card) return null
+
+  const { id, tags, color, places, characters, bookId, title, templates } = card
+
+  return {
+    id,
+    tags,
+    color,
+    places,
+    characters,
+    bookId,
+    title,
+    templates,
+  }
+})
+
+export const attributeValueSelector = (cardId, attributeName) => (state) =>
+  cardByIdSelector(state, cardId)[attributeName]
+
+export const templateAttributeValueSelector = (cardId, templateId, attributeName) => (state) =>
+  cardByIdSelector(state, cardId).templates[templateId][attributeName]
+
 export const collapsedBeatSelector = createSelector(
   beatsByBookSelector,
   sortedBeatsByBookSelector,
