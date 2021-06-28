@@ -7,12 +7,12 @@ import {
   Button,
   ButtonGroup,
   Popover,
-  OverlayTrigger,
   Alert,
   Grid,
   Row,
   Col,
 } from 'react-bootstrap'
+import OverlayTrigger from '../OverlayTrigger'
 import CustomAttrFilterListConnector from '../CustomAttrFilterList'
 import UnconnectedSortList from '../SortList'
 import CharacterViewConnector from './CharacterView'
@@ -37,6 +37,8 @@ const CharacterListViewConnector = (connector) => {
   const TemplatePicker = TemplatePickerConnector(connector)
   const CharacterCategoriesModal = CharacterCategoriesModalConnector(connector)
   const SubNav = SubNavConnector(connector)
+
+  const templatesDisabled = connector.platform.templatesDisabled
 
   class CharacterListView extends Component {
     constructor(props) {
@@ -157,7 +159,7 @@ const CharacterListViewConnector = (connector) => {
 
     renderSubNav() {
       const { filterIsEmpty, ui, uiActions } = this.props
-      let filterPopover = (
+      const filterPopover = () => (
         <Popover id="filter">
           <CustomAttrFilterList type="characters" />
         </Popover>
@@ -172,7 +174,7 @@ const CharacterListViewConnector = (connector) => {
       if (filterIsEmpty) {
         filterDeclaration = <span></span>
       }
-      let sortPopover = (
+      const sortPopover = () => (
         <Popover id="sort">
           <SortList type={'characters'} />
         </Popover>
@@ -187,7 +189,11 @@ const CharacterListViewConnector = (connector) => {
                 <Button bsSize="small" onClick={this.handleCreateNewCharacter}>
                   <Glyphicon glyph="plus" /> {i18n('New')}
                 </Button>
-                <Button bsSize="small" onClick={() => this.setState({ showTemplatePicker: true })}>
+                <Button
+                  disabled={templatesDisabled}
+                  bsSize="small"
+                  onClick={() => this.setState({ showTemplatePicker: true })}
+                >
                   {i18n('Use Template')}
                 </Button>
               </ButtonGroup>
