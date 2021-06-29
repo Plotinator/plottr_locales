@@ -6,11 +6,21 @@ import { ReactEditor, useSlate } from 'slate-react'
 const UnMemoisedFontSizeChooser = () => {
   const editor = useSlate()
   const [currentSize, setCurrentSize] = useState(getCurrentSize(editor))
+  const [updateSizeTimer, setUpdateSizeTimer] = useState(null)
 
   useEffect(() => {
     if (ReactEditor.isFocused(editor)) {
-      setCurrentSize(getCurrentSize(editor))
+      if (updateSizeTimer) {
+        clearTimeout(updateSizeTimer)
+      }
+      setUpdateSizeTimer(
+        setTimeout(() => {
+          const newSize = getCurrentSize(editor)
+          if (newSize !== currentSize) setCurrentSize(newSize)
+        }, 100)
+      )
     }
+    return () => {}
   }, [editor.selection])
 
   const changeSize = (size) => {
