@@ -3,7 +3,7 @@ import { DropdownButton, MenuItem } from 'react-bootstrap'
 import { Editor } from 'slate'
 import { ReactEditor, useSlate } from 'slate-react'
 
-export const FontSizeChooser = () => {
+const UnMemoisedFontSizeChooser = () => {
   const editor = useSlate()
   const [currentSize, setCurrentSize] = useState(getCurrentSize(editor))
 
@@ -43,6 +43,8 @@ export const FontSizeChooser = () => {
     </DropdownButton>
   )
 }
+
+export const FontSizeChooser = React.memo(UnMemoisedFontSizeChooser)
 
 const getCurrentSize = (editor) => {
   const [node] = Editor.nodes(editor, { match: (n) => n.fontSize })
