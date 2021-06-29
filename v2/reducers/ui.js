@@ -10,6 +10,7 @@ import {
   EDIT_PLACES_ATTRIBUTE,
   EXPAND_TIMELINE,
   FILE_LOADED,
+  LOAD_UI,
   NAVIGATE_TO_BOOK_TIMELINE,
   NEW_FILE,
   OPEN_ATTRIBUTES_DIALOG,
@@ -161,7 +162,6 @@ const ui = (dataRepairers) => (state = defaultUI, action) => {
     default:
       return state
   }
-}
 
 function timeline(state = defaultUI.timeline, action) {
   switch (action.type) {
