@@ -12,7 +12,6 @@ import {
   ControlLabel,
   Overlay,
 } from 'react-bootstrap'
-import { isEqual } from 'lodash'
 import { t as i18n } from 'plottr_locales'
 import cx from 'classnames'
 import tinycolor from 'tinycolor2'
@@ -67,34 +66,6 @@ const CardDialogConnector = (connector) => {
       if (this.newAttributeInputRef.current) this.newAttributeInputRef.current.focus()
     }
 
-    shouldComponentUpdate(nextProps) {
-      const {
-        cardMetaData,
-        beats,
-        lines,
-        tags,
-        characters,
-        places,
-        customAttributes,
-        ui,
-        books,
-        isSeries,
-      } = this.props
-
-      return (
-        !isEqual(cardMetaData, nextProps.cardMetaData) ||
-        beats !== nextProps.beats ||
-        lines !== nextProps.lines ||
-        tags !== nextProps.tags ||
-        characters !== nextProps.characters ||
-        places !== nextProps.places ||
-        customAttributes !== nextProps.customAttributes ||
-        ui !== nextProps.ui ||
-        books !== nextProps.books ||
-        isSeries !== nextProps.isSeries
-      )
-    }
-
     componentWillUnmount() {
       if (!this.state.cancelling) this.saveEdit()
       window.SCROLLWITHKEYS = true
@@ -127,7 +98,7 @@ const CardDialogConnector = (connector) => {
     }
 
     handleAttrChange = (attrName) => (desc) => {
-      this.editCardAttributes({
+      this.props.actions.editCardAttributes(this.props.cardId, {
         [attrName]: desc,
       })
     }
