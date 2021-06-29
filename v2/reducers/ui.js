@@ -162,6 +162,7 @@ const ui = (dataRepairers) => (state = defaultUI, action) => {
     default:
       return state
   }
+}
 
 function timeline(state = defaultUI.timeline, action) {
   switch (action.type) {
