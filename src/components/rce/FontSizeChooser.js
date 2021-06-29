@@ -1,24 +1,23 @@
 import React, { useState, useEffect } from 'react'
+import { PropTypes } from 'prop-types'
 import { DropdownButton, MenuItem } from 'react-bootstrap'
 import { Editor } from 'slate'
-import { ReactEditor, useSlate } from 'slate-react'
+import { ReactEditor } from 'slate-react'
 
-const UnMemoisedFontSizeChooser = () => {
-  const editor = useSlate()
+const UnMemoisedFontSizeChooser = ({ editor }) => {
   const [currentSize, setCurrentSize] = useState(getCurrentSize(editor))
-  const [updateSizeTimer, setUpdateSizeTimer] = useState(null)
 
   useEffect(() => {
     if (ReactEditor.isFocused(editor)) {
-      if (updateSizeTimer) {
-        clearTimeout(updateSizeTimer)
+      const timer = setTimeout(() => {
+        const newSize = getCurrentSize(editor)
+        if (newSize !== currentSize) {
+          setCurrentSize(newSize)
+        }
+      }, 100)
+      return () => {
+        clearTimeout(timer)
       }
-      setUpdateSizeTimer(
-        setTimeout(() => {
-          const newSize = getCurrentSize(editor)
-          if (newSize !== currentSize) setCurrentSize(newSize)
-        }, 100)
-      )
     }
     return () => {}
   }, [editor.selection])
@@ -52,6 +51,10 @@ const UnMemoisedFontSizeChooser = () => {
       {renderSizes()}
     </DropdownButton>
   )
+}
+
+UnMemoisedFontSizeChooser.propTypes = {
+  editor: PropTypes.object.isRequired,
 }
 
 export const FontSizeChooser = React.memo(UnMemoisedFontSizeChooser)
