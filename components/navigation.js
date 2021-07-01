@@ -10,14 +10,14 @@ import cx from 'classnames'
 import FileChooser from './file-chooser'
 import SaveFile from './save-file'
 import Share from './share'
-import { actions } from 'pltr/v2'
+import { actions, selectors } from 'pltr/v2'
 import { basePath } from '../lib/basePath'
 import { logOut, onSessionChange } from '../lib/firebase'
 
 const trialMode = true // TODO
 const isDev = process.env.NODE_ENV == 'development'
 
-function Navigation({ userId, currentView, changeCurrentView, darkMode, withFullFileState }) {
+function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
   useEffect(() => {
     const path = basePath()
     if (path !== '' && path !== currentView) {
@@ -104,13 +104,13 @@ Navigation.propTypes = {
   currentView: PropTypes.string.isRequired,
   changeCurrentView: PropTypes.func.isRequired,
   darkMode: PropTypes.bool.isRequired,
-  withFullFileState: PropTypes.func.isRequired,
 }
 
 function mapStateToProps(state) {
   return {
     currentView: state.present.ui.currentView,
     darkMode: state.present.ui.darkMode,
+    userId: selectors.userIdSelector(state.present),
   }
 }
 

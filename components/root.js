@@ -1,4 +1,3 @@
-import React, { useState } from 'react'
 import { Router, Switch, Route } from 'react-router-dom'
 import { Provider } from 'react-redux'
 
@@ -16,16 +15,16 @@ import Tags from './tags'
 import Listener from './listener'
 import Error from './error'
 import SessionObserver from './session-observer'
+import ClientIdMinter from './client-id-minter'
 
 const Root = () => {
-  const [userId, setUserId] = useState(null)
-
   return (
     <Provider store={store}>
-      <SessionObserver userId={userId} setUserId={setUserId} />
-      <Listener userId={userId} />
+      <SessionObserver />
+      <Listener />
+      <ClientIdMinter />
       <Router history={history}>
-        <Navigation userId={userId} />
+        <Navigation />
         <Error />
         <main className="project-main tour-end">
           <Switch>
