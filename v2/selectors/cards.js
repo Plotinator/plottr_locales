@@ -1,4 +1,6 @@
 import { createSelector } from 'reselect'
+import { createSelectorCreator, defaultMemoize } from 'reselect'
+import { isEqual } from 'lodash'
 import { sortBy } from 'lodash'
 import { timelineFilterIsEmptySelector, timelineFilterSelector } from './ui'
 import { findNode, nodeParent } from '../reducers/tree'
@@ -6,6 +8,48 @@ import { nextId } from '../store/newIds'
 import { beatsByBookSelector, sortedBeatsByBookSelector } from './beats'
 
 export const allCardsSelector = (state) => state.cards
+
+const templateMetadata = (template) => {
+  return {
+    ...template,
+    attributes: template.attributes.map((attribute) => {
+      const { name, type } = attribute
+      return { name, type }
+    }),
+  }
+}
+
+const cardMetaData = (card) => {
+  const {
+    id,
+    beatId,
+    lineId,
+    tags,
+    color,
+    places,
+    characters,
+    bookId,
+    title,
+    templates,
+    positionWithinLine,
+  } = card
+
+  return {
+    id,
+    beatId,
+    lineId,
+    tags,
+    color,
+    places,
+    characters,
+    bookId,
+    title,
+    templates: templates.map(templateMetadata),
+    positionWithinLine,
+  }
+}
+
+export const allCardMetaDataSelector = (state) => state.cards.map(cardMetaData)
 
 export const nextCardIdSelector = createSelector(allCardsSelector, (cards) => nextId(cards))
 
@@ -27,25 +71,19 @@ export const cardDescriptionByIdSelector = createSelector(
 export const cardMetaDataSelector = createSelector(cardByIdSelector, (card) => {
   if (!card) return null
 
-  const { id, tags, color, places, characters, bookId, title, templates } = card
-
-  return {
-    id,
-    tags,
-    color,
-    places,
-    characters,
-    bookId,
-    title,
-    templates,
-  }
+  return cardMetaData(card)
 })
 
 export const attributeValueSelector = (cardId, attributeName) => (state) =>
   cardByIdSelector(state, cardId)[attributeName]
 
-export const templateAttributeValueSelector = (cardId, templateId, attributeName) => (state) =>
-  cardByIdSelector(state, cardId).templates[templateId][attributeName]
+export const templateAttributeValueSelector = (cardId, templateId, attributeName) => (state) => {
+  const card = cardByIdSelector(state, cardId)
+  const templateOnCard = card && card.templates.find(({ id }) => id === templateId)
+  return (
+    templateOnCard && templateOnCard.attributes.find(({ name }) => name === attributeName).value
+  )
+}
 
 export const collapsedBeatSelector = createSelector(
   beatsByBookSelector,
@@ -80,6 +118,20 @@ export const collapsedBeatSelector = createSelector(
 
 export const cardMapSelector = createSelector(
   allCardsSelector,
+  collapsedBeatSelector,
+  sortedBeatsByBookSelector,
+  (cards, collapsedBeats, allSortedBeats) => {
+    const beatIds = allSortedBeats.map(({ id }) => id)
+    const beatPositions = beatIds.map((x) => x)
+    beatIds.forEach((beatId, index) => (beatPositions[beatId] = index))
+    return cards.reduce(cardReduce('lineId', 'beatId', collapsedBeats, beatPositions), {})
+  }
+)
+
+const createDeepEqualSelector = createSelectorCreator(defaultMemoize, isEqual)
+
+export const cardMetaDataMapSelector = createDeepEqualSelector(
+  allCardMetaDataSelector,
   collapsedBeatSelector,
   sortedBeatsByBookSelector,
   (cards, collapsedBeats, allSortedBeats) => {

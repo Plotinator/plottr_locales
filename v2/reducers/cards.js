@@ -31,7 +31,8 @@ import {
   RESET,
   RESET_TIMELINE,
   DELETE_BOOK,
-  EDIT_CARD_TEMPLATE_ATTRIBUTES,
+  LOAD_CARDS,
+  EDIT_CARD_TEMPLATE_ATTRIBUTE,
 } from '../constants/ActionTypes'
 import { newFileCards } from '../store/newFileState'
 import { card as defaultCard } from '../store/initialState'
@@ -91,15 +92,23 @@ const cards =
         )
       }
 
-      case EDIT_CARD_TEMPLATE_ATTRIBUTES:
+      case EDIT_CARD_TEMPLATE_ATTRIBUTE:
         return state.map((card) => {
           if (card.id === action.id) {
             return {
               ...card,
-              templates: {
-                ...card.templates,
-                [action.name]: action.value,
-              },
+              templates: card.templates.map((template) =>
+                template.id === action.templateId
+                  ? {
+                      ...template,
+                      attributes: template.attributes.map((attribute) =>
+                        attribute.name === action.name
+                          ? { ...attribute, value: action.value }
+                          : attribute
+                      ),
+                    }
+                  : template
+              ),
             }
           }
           return card
@@ -315,6 +324,9 @@ const cards =
 
       case NEW_FILE:
         return newFileCards
+
+      case LOAD_CARDS:
+        return action.cards
 
       default:
         return state || INITIAL_STATE
