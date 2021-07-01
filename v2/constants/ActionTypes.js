@@ -202,3 +202,7 @@ export const SET_PERMISSION = 'SET_PERMISSION'
 // project actions
 export const SET_FILE_LIST = 'SET_FILE_LIST'
 export const SELECT_FILE = 'SELECT_FILE'
+
+// client actions
+export const SET_USER_ID = 'SET_USER_ID'
+export const SET_CLIENT_ID = 'SET_CLIENT_ID'
