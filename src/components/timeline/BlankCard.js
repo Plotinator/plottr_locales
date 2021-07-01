@@ -216,7 +216,7 @@ const BlankCardConnector = (connector) => {
               onMouseLeave={this.onAddWithTemplateLeave}
               style={addWithTemplateStyle}
             >
-              {i18n('Use Template')}
+              {i18n('Templates')}
             </div>
           )}
           <div
