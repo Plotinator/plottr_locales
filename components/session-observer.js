@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { actions } from 'pltr/v2'
 import { fetchFiles, onSessionChange } from '../lib/firebase'
 
-const SessionObserver = ({ userId, setUserId, setFileList }) => {
+const SessionObserver = ({ setUserId, setFileList }) => {
   useEffect(() => {
     onSessionChange((user) => {
       if (!user) {
@@ -23,8 +23,10 @@ const SessionObserver = ({ userId, setUserId, setFileList }) => {
 }
 
 SessionObserver.propTypes = {
-  userId: PropTypes.string,
   setUserId: PropTypes.func.isRequired,
 }
 
-export default connect(null, { setFileList: actions.project.setFileList })(SessionObserver)
+export default connect(null, {
+  setFileList: actions.project.setFileList,
+  setUserId: actions.client.setUserId,
+})(SessionObserver)
