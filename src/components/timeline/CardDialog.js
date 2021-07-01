@@ -12,7 +12,6 @@ import {
   ControlLabel,
   Overlay,
 } from 'react-bootstrap'
-import { isEqual } from 'lodash'
 import { t as i18n } from 'plottr_locales'
 import cx from 'classnames'
 import tinycolor from 'tinycolor2'
@@ -45,7 +44,6 @@ const CardDialogConnector = (connector) => {
         selected: 'Description',
         addingAttribute: false,
         newAttributeType: 'text',
-        cancelling: false,
         showColorPicker: false,
       }
       this.newAttributeInputRef = React.createRef()
@@ -67,36 +65,8 @@ const CardDialogConnector = (connector) => {
       if (this.newAttributeInputRef.current) this.newAttributeInputRef.current.focus()
     }
 
-    shouldComponentUpdate(nextProps) {
-      const {
-        cardMetaData,
-        beats,
-        lines,
-        tags,
-        characters,
-        places,
-        customAttributes,
-        ui,
-        books,
-        isSeries,
-      } = this.props
-
-      return (
-        !isEqual(cardMetaData, nextProps.cardMetaData) ||
-        beats !== nextProps.beats ||
-        lines !== nextProps.lines ||
-        tags !== nextProps.tags ||
-        characters !== nextProps.characters ||
-        places !== nextProps.places ||
-        customAttributes !== nextProps.customAttributes ||
-        ui !== nextProps.ui ||
-        books !== nextProps.books ||
-        isSeries !== nextProps.isSeries
-      )
-    }
-
     componentWillUnmount() {
-      if (!this.state.cancelling) this.saveEdit()
+      this.saveEdit()
       window.SCROLLWITHKEYS = true
     }
 
@@ -127,13 +97,13 @@ const CardDialogConnector = (connector) => {
     }
 
     handleAttrChange = (attrName) => (desc) => {
-      this.editCardAttributes({
+      this.props.actions.editCardAttributes(this.props.cardId, {
         [attrName]: desc,
       })
     }
 
-    handleTemplateAttrChange = (id, name) => (value) => {
-      this.props.actions.editCardTemplateAttributes(id, name, value)
+    handleTemplateAttrChange = (templateId, name) => (value) => {
+      this.props.actions.editCardTemplateAttribute(this.props.cardId, templateId, name, value)
     }
 
     saveEdit = () => {
@@ -184,15 +154,6 @@ const CardDialogConnector = (connector) => {
       this.setState({
         addingAttribute: true,
       })
-    }
-
-    closeWithoutSaving = () => {
-      this.setState(
-        {
-          cancelling: true,
-        },
-        this.props.closeDialog
-      )
     }
 
     chooseCardColor = (color) => {
@@ -276,7 +237,7 @@ const CardDialogConnector = (connector) => {
               templateAttribute
               index={index}
               entityType="scene"
-              valueSelector={selectors.attributeValueSelector(cardId, t.id, attr.name)}
+              valueSelector={selectors.templateAttributeValueSelector(cardId, t.id, attr.name)}
               ui={ui}
               inputId={`${t.id}-${attr.name}Input`}
               onChange={this.handleTemplateAttrChange(t.id, attr.name)}
@@ -362,10 +323,7 @@ const CardDialogConnector = (connector) => {
     renderButtonBar() {
       return (
         <ButtonToolbar className="card-dialog__button-bar">
-          <Button onClick={this.closeWithoutSaving}>{i18n('Cancel')}</Button>
-          <Button bsStyle="success" onClick={this.saveAndClose}>
-            {i18n('Save')}
-          </Button>
+          <Button onClick={this.saveAndClose}>{i18n('Close')}</Button>
           <Button className="card-dialog__delete" onClick={this.handleDelete}>
             {i18n('Delete')}
           </Button>
@@ -532,6 +490,7 @@ const CardDialogConnector = (connector) => {
                 chooseColor={this.chooseCardColor}
                 el={this.colorButtonRef}
                 close={() => this.setState({ showColorPicker: false })}
+                position={{ left: 118 }}
               />
             </Overlay>
           </div>

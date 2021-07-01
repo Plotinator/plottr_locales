@@ -180,12 +180,16 @@
     text-align: center;
   }
   &.medium-timeline {
-    flex-direction: column;
+    flex-direction: column-reverse;
     margin-bottom: 0;
     div.template {
       font-size: 12px;
     }
   }
+}
+
+.blank-card__body.disabled {
+  cursor: not-allowed;
 }
 
 .vertical-blank-card__body {
@@ -209,11 +213,15 @@
   }
   &.medium-timeline {
     font-size: 12px;
-    flex-direction: column;
+    flex-direction: column-reverse;
     div {
       padding: 6px 4px;
     }
   }
+}
+
+.vertical-blank-card__body.disabled {
+  cursor: not-allowed;
 }
 
 .blank-card__body.hover {
