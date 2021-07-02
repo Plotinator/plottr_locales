@@ -1,0 +1,118 @@
+* Introduction
+  The Web experience of Plottr involves more than porting the code
+  from the Electron version to the web.  Both the user experience and
+  the feature set of a desktop application necessarily differ from the
+  website.  In this document I'll enumerate the work that needs to be
+  completed for the website in terms of both its user experience and
+  the functional requirements that remain to be implemented.
+
+* Functional Requirements
+  The website is, for the most part, a functioning version of the
+  desktop app that's served from a web server.  The following is an
+  exhaustive list of the feature set of Plottr, indicating which of
+  the features are available on the desktop and web versions of the
+  application at the time of writing this document.
+
+** Features Available on the Website Today
+*** Landing Page
+    A landing page to start users off on at the site was developed.
+    This is accessible at the root of the website and prompts the user
+    to start their experience.  See screenshot:
+
+    #+CAPTION: Landing page for the website.  Users arrive here when they access the root url (~/~).
+    [[./landing-page][Landing Page]]
+
+*** Login Page
+    A log in page was developed which provides the following features
+    (see screenshots):
+     - user login with email and password,
+     - user registration with email and password (accessed by
+       attempting to log in with an email address that doesn't exist
+       in the database yet.),
+     - user login via email link,
+     - UI for logging in via Google, Facebook or Twitter (these
+       require application verification processes on their respective
+       platforms and for the outcomes of those processes to be logged
+       on the Firebase console).
+     - detection of active session to redirect to the timeline.
+
+    #+CAPTION: Login page with all login options available as buttons.
+    [[./login-page.png][Login Page]]
+
+    #+CAPTION: Login page with email address input selected
+    [[./enter-email-address.png][User to enter email address to continue]]
+
+    #+CAPTION: User registration via email and password.
+    [[./user-creation-with-email-and-password.png][Email and Password User Registration]]
+
+    #+CAPTION: Login to an existing account with email and password.
+    [[./login-to-existing-account.png][Log In to Existing Account]]
+
+*** Web-Session Features
+    - Detect whether the user is logged out and redirect to the login
+      page.
+
+*** File Management
+    - start with blank timeline associated to no file,
+    - drop down of all files available to user and "New File" option
+      on toolbar (see screenshot),
+    - create new file from current timeline,
+
+    #+CAPTION: Drop down control that allows a user to select a file that they have permissions on or create a new file.
+    [[./file-selection-and-creation.png][Selecting or creating a file]]
+
+    #+CAPTION: Input box which allows the user to enter the name for a new file
+    [[./entering-new-file-name.png][New File Name]]
+
+*** Permissions and Authorisation
+    Three permission states exist in the application:
+     - "owner",
+     - "collaborator", and
+     - "viewer".
+
+    Permissions are enforced by a set of Firebase rules.
+
+    Only owners can change "file" records for files.  This data
+    includes the file name and meta data.
+
+    Planned but not yet implemented: Only "owners" can add
+    collaboration records for other users.
+
+    Collaborators and owners can change any of the other data.  This
+    includes values at the keys:
+     - ~beats/~
+     - ~books/~
+     - ~cards/~
+     - ~categories/~
+     - ~characters/~
+     - ~customAttributes/~
+     - ~featureFlags/~
+     - ~hierarchyLevels/~
+     - ~images/~
+     - ~lines/~
+     - ~notes/~
+     - ~places/~
+     - ~series/~
+     - ~tags/~
+     - ~tour/~
+     - ~ui/~
+
+    New sharing 
+
+*** Collaboration
+    
+
+*** Project Tab
+*** Timeline Tab
+*** Outline Tab
+*** Notes
+*** Characters
+*** Places
+*** Tags
+
+** Features Available Only On the Desktop Today
+   
+
+* Non Functional Requirements
+    - Identify each distinct tab's messages to server (
+    - Firestore schema and permission rule set.
