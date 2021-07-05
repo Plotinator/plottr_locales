@@ -21,7 +21,9 @@ const platform = {
   isDevelopment: process.env.NODE_ENV === 'development',
   isWindows: false,
   isMacOS: false,
-  openExternal: (url) => {},
+  openExternal: (url) => {
+    window.location.href = url
+  },
   createErrorReport: () => {},
   log: {
     info: () => {},
