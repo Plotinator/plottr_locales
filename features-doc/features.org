@@ -1,10 +1,30 @@
+#+options: ':nil *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline
+#+options: author:t broken-links:nil c:nil creator:nil
+#+options: d:(not "LOGBOOK") date:t e:t email:nil f:t inline:t num:t
+#+options: p:nil pri:nil prop:nil stat:t tags:t tasks:t tex:t
+#+options: timestamp:t title:t toc:t todo:t |:t
+#+title: Plottr Web Feature Specification
+#+author: Edward John Steere
+#+email: edward.steere@gmail.com
+#+language: en
+#+select_tags: export
+#+exclude_tags: noexport
+#+creator: Emacs 28.0.50 (Org mode 9.4.4)
+#+latex_class: article
+#+latex_class_options:
+#+latex_header:
+#+latex_header_extra:
+#+description:
+#+keywords:
+#+subtitle: A near-exhaustive list of the features in Plottr Web
+#+latex_compiler: pdflatex
+#+date: \today
+
+
 * Introduction
-  The Web experience of Plottr involves more than porting the code
-  from the Electron version to the web.  Both the user experience and
-  the feature set of a desktop application necessarily differ from the
-  website.  In this document I'll enumerate the work that needs to be
-  completed for the website in terms of both its user experience and
-  the functional requirements that remain to be implemented.
+  This document enumerates the features of Plottr Web and details
+  outstanding work where features are incomplete.  It also serves as a
+  near-exhaustive list of Plottr's features.
 
 * Functional Requirements
   The website is, for the most part, a functioning version of the
@@ -13,24 +33,22 @@
   the features are available on the desktop and web versions of the
   application at the time of writing this document.
 
-** Features Available on the Website Today
-*** Landing Page
-    A landing page to start users off on at the site was developed.
-    This is accessible at the root of the website and prompts the user
-    to start their experience.  See screenshot:
+** Landing Page (Web Only)
+    The landing page starts users off and prompts them to start the
+    application.  The page is accessible at the root of the website.
+    See screenshot:
 
     #+CAPTION: Landing page for the website.  Users arrive here when they access the root url (~/~).
     [[./landing-page][Landing Page]]
 
-*** Login Page
-    A log in page was developed which provides the following features
-    (see screenshots):
+** Login Page (Web Only)
+    The log in page provides the following features (see screenshots):
      - user login with email and password,
      - user registration with email and password (accessed by
        attempting to log in with an email address that doesn't exist
        in the database yet.),
      - user login via email link,
-     - UI for logging in via Google, Facebook or Twitter (these
+     - UI to access Google, Facebook or Twitter federated login (these
        require application verification processes on their respective
        platforms and for the outcomes of those processes to be logged
        on the Firebase console).
@@ -48,12 +66,14 @@
     #+CAPTION: Login to an existing account with email and password.
     [[./login-to-existing-account.png][Log In to Existing Account]]
 
-*** Web-Session Features
+** Web-Session Features (Web Only)
     - Detect whether the user is logged out and redirect to the login
       page.
+    - Integrates with Firebase authentication and manage user logged
+      in state in Redux.
 
-*** File Management
-    - start with blank timeline associated to no file,
+** File Management (Web Only)
+    - start with blank timeline not associated to any file,
     - drop down of all files available to user and "New File" option
       on toolbar (see screenshot),
     - create new file from current timeline,
@@ -61,19 +81,27 @@
     #+CAPTION: Drop down control that allows a user to select a file that they have permissions on or create a new file.
     [[./file-selection-and-creation.png][Selecting or creating a file]]
 
-    #+CAPTION: Input box which allows the user to enter the name for a new file
+    #+CAPTION: Input box which allows the user to enter the name for a new file.
     [[./entering-new-file-name.png][New File Name]]
 
-*** Permissions and Authorisation
-    Three permission states exist in the application:
+** Permissions and Authorisation
+    - users start with "owner" permission and can grant "collaborator"
+      and "viewer" permission to others.  (Granting permission is a
+      work in progress).
+
+    Three permission states exist in the application and are stored as
+    "authorisation" documents in Firestore at the path:
+    ~/authorisation/{userId}/{ducomentId}/~ and have the schema: ~{
+    "permission": "(owner)|(collaborator)|(viewer)" }~.:
      - "owner",
      - "collaborator", and
      - "viewer".
 
-    Permissions are enforced by a set of Firebase rules.
+    Permissions are enforced by a set of Firebase rules that are
+    checked into the repository.
 
-    Only owners can change "file" records for files.  This data
-    includes the file name and meta data.
+    Only owners can change "file" records in Firestore.  This data
+    includes the file name and metadata.
 
     Planned but not yet implemented: Only "owners" can add
     collaboration records for other users.
@@ -97,22 +125,440 @@
      - ~tour/~
      - ~ui/~
 
-    New sharing 
+    The new "Share" dialog enables a user to view the current
+    permissions for the loaded file (see screenshot):
 
-*** Collaboration
-    
+    #+CAPTION: File share dialog.  The current user's permission record is the only entry.
+    [[./sharing-dialog.png][File Sharing Dialog]]
 
-*** Project Tab
-*** Timeline Tab
-*** Outline Tab
-*** Notes
-*** Characters
-*** Places
-*** Tags
+** Collaboration
+    - users see each others edits to the same file as they're made.
 
-** Features Available Only On the Desktop Today
-   
+    Changes to the Redux store are mirrored to Firestore by comparing
+    the latest version of the store with the most recent version in
+    the undo-history.  The comparison proceeds by deep comparison of
+    each root-level key of the Redux store.
 
-* Non Functional Requirements
-    - Identify each distinct tab's messages to server (
-    - Firestore schema and permission rule set.
+    Some actions do not cause a synchronisation call to Firestore.
+    This is usually because the details communicated would not be
+    relevant to other users or pertain to parts of the store that are
+    never stored in Firestore.  The following criteria are used to
+    decide whether an action should prompt a corresponding change in
+    Firestore:
+    1. the action must not be of type ~PERMISSION_ERROR~, ~CLEAR_ERROR~ or
+       ~FILE_LOADED~.
+    2. The root level key is one of: ~error~, ~permission~, ~ui~, or
+       ~project~.
+    3. A special attribute called ~patching~ is present on the action
+       (useful when an action knows that it shouldn't affect
+       Firestore).
+
+    Firestore doesn't support arrays as the root type of a document.
+    All arrays are transformed into objects and from objects back into
+    arrays when dispatched to and received from Firestore by the
+    synchronisation logic.
+
+    When data is synchronised to Firestore, Plottr adds a ~clientId~ to
+    the document.  It indicates which session modified the document
+    last, where each tab in a browser and each separate browser is
+    considered a separate session.  This value enables Plottr to
+    differentiate between edits that the were made by other clients
+    and the current client.  It's important to be able to
+    differentiate between the two because every edit made to Firestore
+    is echoed back by snapshot listeners in the Firebase SDK.
+
+** Project Tab
+    - Select current book.
+    - Select current tab (Timeline, Notes etc.).
+    - Create new book.
+    - Change project "Name", "Premise", "Genre" and "Theme".
+    - edit book "Title", "Premise", "Genre" and "Theme".
+    - select cover image.
+    - 
+
+    #+CAPTION: Project tab with one book and the add book control.
+    [[./project-tab.png][Project Tab]]
+
+    #+CAPTION: Edit book dialog.
+    [[./edit-book.png][Edit Book]]
+
+    #+CAPTION: Select the image for a book cover from gallery.
+    [[./cover-image.png][Select Book Cover Image]]
+
+** Image Picker
+    - image gallery;
+    - Add image to gallery from local machine.
+    - Add image to gallery from URL.
+
+    #+CAPTION: Select image from image gallery.
+    [[./cover-image.png][Image Gallery]]
+
+    #+CAPTION: Upload file from local machine.
+    [[./upload-image.png][Upload Image]]
+
+    #+CAPTION: Upload file from local machine.
+    [[./image-from-url.png][Add Image from URL]]
+
+** Timeline Tab
+    - Select current book.
+    - Select current tab (Project, Notes etc.)
+    - Display all plot lines, as horizontal lines in a table.
+    - Display all beats as columns.
+    - Where lines intersect beats, and there's a card, render a card.
+    - Filter visible cards by characters, places, tags, colours and
+      attributes.
+    - "Vertical" orientation.  i.e. beats along the y-axis and plot
+      lines along the x-axis.
+    - card description and tag preview from timeline,
+    - edit, change colour, collapse one, collapse all and delete a
+      plot line.
+    - add card at intersection of beat and plot line.
+    - add beat in between two beats.
+    - drag and drop beats.
+    - drag and drop scene cards to new positions on the timeline.
+    - drag and drop scene cards to stack on top of other scene cards
+      on the timeline.
+    - drag and drop timelines.
+    - add beat at end.
+    - add plot line.
+    - scroll forwards, backwards, to start, middle and end of
+      timeline.
+    - save current timeline as a timeline template.
+    - clear everything from the current timeline.
+
+    #+CAPTION: The timeline tab.
+    [[./timeline-tab.png][The Timeline Tab]]
+
+    #+CAPTION: Filter the visible cards on the timeline.
+    [[./filter-timeline.png][Filter Visible Cards on Timeline]]
+
+    #+CAPTION: Flipped (Vertical) timeline.
+    [[./vertical-timeline.png][Vertical Timeline]]
+
+    #+CAPTION: Scene card preview on hover.
+    [[./card-preview.png][Scene Card Preview]]
+
+    #+CAPTION: Save, delete or edit a beat.
+    [[./beat-title-hover-controls.png][Beat Title Controls]]
+
+    #+CAPTION: Change plot line details with hover controls.
+    [[./plotline-controls.png][Change plot line details]]
+
+    #+CAPTION: Add a card to the timeline.
+    [[./add-scene-card.png][Add Scene Card]]
+
+    #+CAPTION: Insert a beat between two beats.
+    [[./insert-beat][Insert Beat]]
+
+    #+CAPTION: Add beat at the end of the timeline.
+    [[./add-beat-at-end.png][Add Beat At End]]
+
+    #+CAPTION: Add plot line.
+    [[./add-plotline.png][Add plotline]]
+
+    #+CAPTION: Medium timeline.
+    [[./medium-timeline.png][Medium timeline]]
+
+    #+CAPTION: Medium vertical timeline.
+    [[./medium-vertical-timeline.png][Medium vertical timeline]]
+
+    #+CAPTION: Small timeline.
+    [[./small-timeline.png][Small timeline]]
+
+    #+CAPTION: Small vertical timeline.
+    [[./small-vertical-timeline.png][Small vertical timeline]]
+
+    #+CAPTION: Scroll the timeline.
+    [[./scroll-timeline.png][Scroll the timeline]]
+
+** Card Dialog
+    - display card description and metadata,
+    - change card beat,
+    - change card plot line,
+    - change card characters,
+    - change card places,
+    - change card tags,
+    - change card colour,
+    - edit card title,
+    - edit card description,
+    - view custom & template attributes,
+    - add a custom attribute,
+    - edit custom attribute name,
+    - delete custom attribute,
+    - access custom attributes dialog,
+    - change type of custom attribute,
+
+    #+CAPTION: Display card metadata with editing tools
+    [[./card-dialog.png][Card Dialog]]
+
+    #+CAPTION: Display card colour picker as a mini colour picker.
+    [[./card-colour-picker.png][Card Colour Picker]]
+
+    #+CAPTION: Edit card custom attributes.
+    [[./card-custom-attributes.png][Card Custom Attributes]]
+
+** Rich Text Editor
+    - editing area,
+    - toolbar,
+    - text selection,
+    - font selection per region,
+    - bold font,
+    - italic font,
+    - underline font,
+    - strike-through font,
+    - font colours,
+    - titles,
+    - quote blocks,
+    - numbered lists,
+    - bullet lists,
+    - hyper links,
+    - images,
+
+    #+CAPTION: Rich text editor with controls.
+    [[./rce.png][Rich Text Editor]]
+
+    #+CAPTION: Font face selection per region.
+    [[./font-selection.png][Select font per region]]
+
+    #+CAPTION: Font size selection per region.
+    [[./font-size-selection.png][Select font size per region]]
+
+    #+CAPTION: Bolded font.
+    [[./bold.png][Bold Font]]
+
+    #+CAPTION: Italicised font.
+    [[./italic.png][Italic Font]]
+
+    #+CAPTION: Underlined font.
+    [[./underline.png][Underline Font]]
+
+    #+CAPTION: Strike-through font.
+    [[./strike-through.png][Strike-Through Font]]
+
+    #+CAPTION: Font colours per region.
+    [[./font-colour.png][Font Colour]]
+
+    #+CAPTION: Titles
+    [[./title.png][Titles]]
+
+    #+CAPTION: Sub titles
+    [[./sub-title.png][Sub Title]]
+
+    #+CAPTION: Quote blocks
+    [[./quote.png][Quote blocks]]
+
+    #+CAPTION: Numbered lists.
+    [[./numbered-lists.png][Numbered Lists]]
+
+    #+CAPTION: Bullet lists.
+    [[./bullet-lists.png][Bullet Lists]]
+
+    #+CAPTION: Hyper links.
+    [[./hyper-links.png][Hyper Links]]
+
+    #+CAPTION: Images
+    [[./images.png][Images]]
+
+** Custom Attributes Dialog
+    - list all custom attributes,
+    - add a custom attribute,
+    - change custom attribute type,
+    - save list of custom attributes as a template (not supported on
+      web)
+    - delete custom attribute.
+
+    #+CAPTION: Edit custom attributes
+    [[./custom-attributes-dialog.png][Edit Custom Attributes]]
+
+** Outline Tab
+    - filter outline to specific timelines,
+    - mini map of outline,
+    - edit scene card,
+    - display scene card: plotline, characters, places, tags, and
+      title.
+    - drag and drop scene cards between chapters.
+    - reorder scene cards across plot lines within same beat by
+      dragging in between each other,
+    - drag scene card onto beat on minimap to change it's beat to that
+      beat.
+
+    #+CAPTION: Filter the outline to only show specific plotlines.
+    [[./filter-outline-by-plotline.png][Filter the Outline by Plotline]]
+
+    #+CAPTION: Navigate to different parts of the outline via minimap.
+    [[./minimap-of-outline.png][Scroll to positions on outline by minimap]]
+
+** Categories Dialog
+    - add category,
+    - remove category,
+    - rename category (click on title),
+    - list categories,
+
+    #+CAPTION: Controls for viewing, adding and removing categories
+    [[./categories.png][Categories Dialog]]
+
+** Notes
+    - list all notes,
+    - add new note,
+    - delete a note,
+    - attributes dialog for notes (same dialog but controls notes),
+    - categorise notes,
+    - filter notes by book, characters, places, categories, tags and
+      custom attributes,
+    - change note books, places, characters, and tags.
+    - change note description,
+    - edit note title,
+    - add or remove a note image,
+    - sort notes by name, description and custom attributes.
+
+    #+CAPTION: Notes tab
+    [[./notes.png][Notes Tab]]
+
+    #+CAPTION: Add new note
+    [[./add-new-note.png][Add new note]]
+
+    #+CAPTION: Delete a note
+    [[./delete-note.png][Delete Note]]
+
+    #+CAPTION: Filter notes by their properties and attributes
+    [[./filter-notes.png][Filter Notes]]
+
+    #+CAPTION: Categorise notes
+    [[./categorise-notes.png][Categorise notes]]
+
+    #+CAPTION: Add or remove a note image.
+    [[./add-remove-note-image.png][Edit Note Image]]
+
+    #+CAPTION: Sort notes by their name, desrcription and custom attributes
+    [[./sort-notes.png][Sort Notes]]
+
+** Characters
+    - list characters and character details,
+    - create new character,
+    - delete a character,
+    - create a character from a template (not available on web),
+    - create a template from a character (not available on web),
+    - add/remove/delete character custom attributes (same dialog as
+      other custom attribute dialogs),
+    - add/remove/rename character categories (same dialog as other
+      category dialogs),
+    - filter characters by books, categories, tags and custom
+      attributes.
+    - sort by name, description and custom attributes.
+
+    #+CAPTION: View the list of characters, by category, with all of their details
+    [[./characters-tab.png][Characters Tab]]
+
+    #+CAPTION: Create a new character
+    [[./new-character.png][New Character]]
+
+    #+CAPTION: Delete a character
+    [[./delete-character.png][Delete Character]]
+
+** Places
+    - list places and place details,
+    - create new place,
+    - add/remove/edit custom attributes for places (same dialog as
+      other custom attributes),
+    - filter places by books, tags and custom attributes,
+    - sort places by name, description and custom attributes,
+    - add books and tags associated with places,
+
+    #+CAPTION: Places and place details
+    [[./places-tab][Places Tab]]
+
+    #+CAPTION: Create a new place with required details
+    [[./create-new-place.png][Create Place]]
+
+    #+CAPTION: Filter places
+    [[./filter-places.png][Filter Places]]
+
+    #+CAPTION: Sort places
+    [[./sort-places.png][Sort Places]]
+
+    #+CAPTION: Add books and tags to places
+    [[./place-books-tags.png][Add Tags and Books to Places]]
+
+** Tags
+    - list tags and display them by category,
+    - add/rename/delete categories for tags,
+    - rename/change-colour/remove-colour/delete tags by hover
+      controls,
+    - edit tags,
+
+    #+CAPTION: List tags and their categories.
+    [[./tags-tab.png][Display tags by their category with controls to add tags by category]]
+
+    #+CAPTION: Hover controls to edit/colourise/delete a tag
+    [[./tag-hover-controls.png][Tag Hover Controls]]
+
+    #+CAPTION: Edit tag names and categories
+    [[./edit-tag.png][Edit Tag]]
+
+* Summary of Remaining Features from Desktop
+** Create Character from Template
+   Turned off.  Problem is where to store the template.  We can start
+   a collection in Firestore quite easily.
+** Create Project from Template
+   Turned off.  Templates from Github not wired up (requires server
+   call).
+** Create Template from Timeline
+   Turned off.  Problem is where to store the template.  We can start
+   a collection in Firestore quite easily.
+** Create Template from Character
+   Turned off.  Problem is where to store the template.  We can start
+   a collection in Firestore quite easily.
+** Save list of custom attributes as template
+   Turned off.  Problem is where to store the template.  We can start
+   a collection in Firestore quite easily.
+** File Export
+   Not yet implemented or available on UI.  Word export should be
+   doable in-browser.  Scrivener requires a server call.
+** Account Management
+   To be decided: no integration with existing licence server and no
+   logic to prevent users from using the website without a license.
+** Backup
+   To be decided: no decision taken on undo/history and backup.
+** Dashboard Features
+   No dashboard exists.
+*** Account Management
+    No dashboard exists.
+**** Apply License Key
+     No dashboard exists.
+**** Apply for More Days
+     No dashboard exists.
+*** Settings
+**** Change Appearance
+     Dark versus light mode exists in the app, but there's no way of
+     toggling between the two.
+**** Change Language
+     Language management exists throughout the app, but it doesn't
+     hook into existing browser standards nor is there a control on a
+     dashboard for convenience.
+**** Turn Off/On Act Structure
+     No dashboard exists yet.
+*** Help
+    No dashboard exists yet.
+** Error Reporting
+   Function currently stubbed out.
+** Logging
+   Need to use a service such as log rocket, or build our own.
+** Export Configuration Management
+   We could use browser local storage.
+** MPQ
+   It's currently a stub.
+
+* Summary of Remaining Web-Only Features
+** Share File with Other User
+   UI is incomplete for sharing a document with another user.
+** Simultaneously Edit RCEs Robustly
+   i.e. without clobbering each other's data.
+** Download File
+   Lacks a UI to trigger download.
+** Upload File
+   No UI or wiring in the app exists to handle loading a file, but
+   this feature would be very simple.
+** File Versioning
+   Functionally to upgrade files exists.  There is no file version at
+   the moment.  It should match desktop to ensure robust upgrades
+   between versions.
