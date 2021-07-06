@@ -9,6 +9,7 @@ $text-color: $gray-0;
 @import 'login';
 
 @import '../lib/plottr_components/dist/components/components.css';
+@import '../lib/plottr_components/dist/components/components-tailwind.css';
 
 .alert {
   margin-bottom: 0px;
