@@ -12,7 +12,7 @@
 #+creator: Emacs 28.0.50 (Org mode 9.4.4)
 #+latex_class: article
 #+latex_class_options:
-#+latex_header:
+#+latex_header: \usepackage{a4wide}
 #+latex_header_extra:
 #+description:
 #+keywords:
@@ -34,12 +34,12 @@
   application at the time of writing this document.
 
 ** Landing Page (Web Only)
-    The landing page starts users off and prompts them to start the
-    application.  The page is accessible at the root of the website.
-    See screenshot:
+    The landing page prompts a user to start the application.  The
+    page is accessible at the root of the website.  See the following
+    screenshot:
 
     #+CAPTION: Landing page for the website.  Users arrive here when they access the root url (~/~).
-    [[./landing-page][Landing Page]]
+    [[./landing-page.png]]
 
 ** Login Page (Web Only)
     The log in page provides the following features (see screenshots):
@@ -55,16 +55,16 @@
      - detection of active session to redirect to the timeline.
 
     #+CAPTION: Login page with all login options available as buttons.
-    [[./login-page.png][Login Page]]
+    [[./login-page.png]]
 
     #+CAPTION: Login page with email address input selected
-    [[./enter-email-address.png][User to enter email address to continue]]
+    [[./enter-email-address.png]]
 
     #+CAPTION: User registration via email and password.
-    [[./user-creation-with-email-and-password.png][Email and Password User Registration]]
+    [[./user-creation-with-email-and-password.png]]
 
     #+CAPTION: Login to an existing account with email and password.
-    [[./login-to-existing-account.png][Log In to Existing Account]]
+    [[./login-to-existing-account.png]]
 
 ** Web-Session Features (Web Only)
     - Detect whether the user is logged out and redirect to the login
@@ -76,13 +76,13 @@
     - start with blank timeline not associated to any file,
     - drop down of all files available to user and "New File" option
       on toolbar (see screenshot),
-    - create new file from current timeline,
+    - user can create a new file from current timeline,
 
-    #+CAPTION: Drop down control that allows a user to select a file that they have permissions on or create a new file.
-    [[./file-selection-and-creation.png][Selecting or creating a file]]
+    #+CAPTION: Drop down control that allows a user to select a file that they have permissions to access or to create a new file.
+    [[./file-selection-and-creation.png]]
 
     #+CAPTION: Input box which allows the user to enter the name for a new file.
-    [[./entering-new-file-name.png][New File Name]]
+    [[./entering-new-file-name.png]]
 
 ** Permissions and Authorisation
     - users start with "owner" permission and can grant "collaborator"
@@ -129,7 +129,7 @@
     permissions for the loaded file (see screenshot):
 
     #+CAPTION: File share dialog.  The current user's permission record is the only entry.
-    [[./sharing-dialog.png][File Sharing Dialog]]
+    [[./sharing-dialog.png]]
 
 ** Collaboration
     - users see each others edits to the same file as they're made.
@@ -147,11 +147,11 @@
     Firestore:
     1. the action must not be of type ~PERMISSION_ERROR~, ~CLEAR_ERROR~ or
        ~FILE_LOADED~.
-    2. The root level key is one of: ~error~, ~permission~, ~ui~, or
-       ~project~.
-    3. A special attribute called ~patching~ is present on the action
-       (useful when an action knows that it shouldn't affect
-       Firestore).
+    2. The root level key must not be one of: ~error~, ~permission~, ~ui~,
+       or ~project~.
+    3. If a special attribute called ~patching~ is present on the action
+       then it shouldn't trigger an update to Firestore (useful when
+       an action knows that it shouldn't affect Firestore).
 
     Firestore doesn't support arrays as the root type of a document.
     All arrays are transformed into objects and from objects back into
@@ -174,16 +174,15 @@
     - Change project "Name", "Premise", "Genre" and "Theme".
     - edit book "Title", "Premise", "Genre" and "Theme".
     - select cover image.
-    - 
 
     #+CAPTION: Project tab with one book and the add book control.
-    [[./project-tab.png][Project Tab]]
+    [[./project-tab.png]]
 
     #+CAPTION: Edit book dialog.
-    [[./edit-book.png][Edit Book]]
+    [[./edit-book.png]]
 
     #+CAPTION: Select the image for a book cover from gallery.
-    [[./cover-image.png][Select Book Cover Image]]
+    [[./cover-image.png]]
 
 ** Image Picker
     - image gallery;
@@ -191,13 +190,13 @@
     - Add image to gallery from URL.
 
     #+CAPTION: Select image from image gallery.
-    [[./cover-image.png][Image Gallery]]
+    [[./cover-image.png]]
 
     #+CAPTION: Upload file from local machine.
-    [[./upload-image.png][Upload Image]]
+    [[./upload-image.png]]
 
     #+CAPTION: Upload file from local machine.
-    [[./image-from-url.png][Add Image from URL]]
+    [[./image-from-url.png]]
 
 ** Timeline Tab
     - Select current book.
@@ -210,8 +209,8 @@
     - "Vertical" orientation.  i.e. beats along the y-axis and plot
       lines along the x-axis.
     - card description and tag preview from timeline,
-    - edit, change colour, collapse one, collapse all and delete a
-      plot line.
+    - edit, change colour, collapse one, collapse all and delete plot
+      lines.
     - add card at intersection of beat and plot line.
     - add beat in between two beats.
     - drag and drop beats.
@@ -227,49 +226,49 @@
     - clear everything from the current timeline.
 
     #+CAPTION: The timeline tab.
-    [[./timeline-tab.png][The Timeline Tab]]
+    [[./timeline-tab.png]]
 
     #+CAPTION: Filter the visible cards on the timeline.
-    [[./filter-timeline.png][Filter Visible Cards on Timeline]]
+    [[./filter-timeline.png]]
 
     #+CAPTION: Flipped (Vertical) timeline.
-    [[./vertical-timeline.png][Vertical Timeline]]
+    [[./vertical-timeline.png]]
 
     #+CAPTION: Scene card preview on hover.
-    [[./card-preview.png][Scene Card Preview]]
+    [[./card-preview.png]]
 
     #+CAPTION: Save, delete or edit a beat.
-    [[./beat-title-hover-controls.png][Beat Title Controls]]
+    [[./beat-title-hover-controls.png]]
 
     #+CAPTION: Change plot line details with hover controls.
-    [[./plotline-controls.png][Change plot line details]]
+    [[./plotline-controls.png]]
 
     #+CAPTION: Add a card to the timeline.
-    [[./add-scene-card.png][Add Scene Card]]
+    [[./add-scene-card.png]]
 
     #+CAPTION: Insert a beat between two beats.
-    [[./insert-beat][Insert Beat]]
+    [[./insert-beat.png]]
 
     #+CAPTION: Add beat at the end of the timeline.
-    [[./add-beat-at-end.png][Add Beat At End]]
+    [[./add-beat-at-end.png]]
 
     #+CAPTION: Add plot line.
-    [[./add-plotline.png][Add plotline]]
+    [[./add-plotline.png]]
 
     #+CAPTION: Medium timeline.
-    [[./medium-timeline.png][Medium timeline]]
+    [[./medium-timeline.png]]
 
     #+CAPTION: Medium vertical timeline.
-    [[./medium-vertical-timeline.png][Medium vertical timeline]]
+    [[./medium-vertical-timeline.png]]
 
     #+CAPTION: Small timeline.
-    [[./small-timeline.png][Small timeline]]
+    [[./small-timeline.png]]
 
     #+CAPTION: Small vertical timeline.
-    [[./small-vertical-timeline.png][Small vertical timeline]]
+    [[./small-vertical-timeline.png]]
 
     #+CAPTION: Scroll the timeline.
-    [[./scroll-timeline.png][Scroll the timeline]]
+    [[./scroll-timeline.png]]
 
 ** Card Dialog
     - display card description and metadata,
@@ -289,13 +288,13 @@
     - change type of custom attribute,
 
     #+CAPTION: Display card metadata with editing tools
-    [[./card-dialog.png][Card Dialog]]
+    [[./card-dialog.png]]
 
     #+CAPTION: Display card colour picker as a mini colour picker.
-    [[./card-colour-picker.png][Card Colour Picker]]
+    [[./card-colour-picker.png]]
 
     #+CAPTION: Edit card custom attributes.
-    [[./card-custom-attributes.png][Card Custom Attributes]]
+    [[./card-custom-attributes.png]]
 
 ** Rich Text Editor
     - editing area,
@@ -315,49 +314,49 @@
     - images,
 
     #+CAPTION: Rich text editor with controls.
-    [[./rce.png][Rich Text Editor]]
+    [[./rce.png]]
 
     #+CAPTION: Font face selection per region.
-    [[./font-selection.png][Select font per region]]
+    [[./font-selection.png]]
 
     #+CAPTION: Font size selection per region.
-    [[./font-size-selection.png][Select font size per region]]
+    [[./font-size-selection.png]]
 
     #+CAPTION: Bolded font.
-    [[./bold.png][Bold Font]]
+    [[./bold.png]]
 
     #+CAPTION: Italicised font.
-    [[./italic.png][Italic Font]]
+    [[./italic.png]]
 
     #+CAPTION: Underlined font.
-    [[./underline.png][Underline Font]]
+    [[./underline.png]]
 
     #+CAPTION: Strike-through font.
-    [[./strike-through.png][Strike-Through Font]]
+    [[./strike-through.png]]
 
     #+CAPTION: Font colours per region.
-    [[./font-colour.png][Font Colour]]
+    [[./font-colour.png]]
 
     #+CAPTION: Titles
-    [[./title.png][Titles]]
+    [[./title.png]]
 
     #+CAPTION: Sub titles
-    [[./sub-title.png][Sub Title]]
+    [[./sub-title.png]]
 
     #+CAPTION: Quote blocks
-    [[./quote.png][Quote blocks]]
+    [[./quote.png]]
 
     #+CAPTION: Numbered lists.
-    [[./numbered-lists.png][Numbered Lists]]
+    [[./numbered-lists.png]]
 
     #+CAPTION: Bullet lists.
-    [[./bullet-lists.png][Bullet Lists]]
+    [[./bullet-lists.png]]
 
     #+CAPTION: Hyper links.
-    [[./hyper-links.png][Hyper Links]]
+    [[./hyper-links.png]]
 
     #+CAPTION: Images
-    [[./images.png][Images]]
+    [[./images.png]]
 
 ** Custom Attributes Dialog
     - list all custom attributes,
@@ -368,7 +367,7 @@
     - delete custom attribute.
 
     #+CAPTION: Edit custom attributes
-    [[./custom-attributes-dialog.png][Edit Custom Attributes]]
+    [[./custom-attributes-dialog.png]]
 
 ** Outline Tab
     - filter outline to specific timelines,
@@ -383,10 +382,10 @@
       beat.
 
     #+CAPTION: Filter the outline to only show specific plotlines.
-    [[./filter-outline-by-plotline.png][Filter the Outline by Plotline]]
+    [[./filter-outline-by-plotline.png]]
 
     #+CAPTION: Navigate to different parts of the outline via minimap.
-    [[./minimap-of-outline.png][Scroll to positions on outline by minimap]]
+    [[./minimap-of-outline.png]]
 
 ** Categories Dialog
     - add category,
@@ -395,7 +394,7 @@
     - list categories,
 
     #+CAPTION: Controls for viewing, adding and removing categories
-    [[./categories.png][Categories Dialog]]
+    [[./categories.png]]
 
 ** Notes
     - list all notes,
@@ -412,25 +411,25 @@
     - sort notes by name, description and custom attributes.
 
     #+CAPTION: Notes tab
-    [[./notes.png][Notes Tab]]
+    [[./notes.png]]
 
     #+CAPTION: Add new note
-    [[./add-new-note.png][Add new note]]
+    [[./add-new-note.png]]
 
     #+CAPTION: Delete a note
-    [[./delete-note.png][Delete Note]]
+    [[./delete-note.png]]
 
     #+CAPTION: Filter notes by their properties and attributes
-    [[./filter-notes.png][Filter Notes]]
+    [[./filter-notes.png]]
 
     #+CAPTION: Categorise notes
-    [[./categorise-notes.png][Categorise notes]]
+    [[./categorise-notes.png]]
 
     #+CAPTION: Add or remove a note image.
-    [[./add-remove-note-image.png][Edit Note Image]]
+    [[./add-remove-note-image.png]]
 
     #+CAPTION: Sort notes by their name, desrcription and custom attributes
-    [[./sort-notes.png][Sort Notes]]
+    [[./sort-notes.png]]
 
 ** Characters
     - list characters and character details,
@@ -447,13 +446,13 @@
     - sort by name, description and custom attributes.
 
     #+CAPTION: View the list of characters, by category, with all of their details
-    [[./characters-tab.png][Characters Tab]]
+    [[./characters-tab.png]]
 
     #+CAPTION: Create a new character
-    [[./new-character.png][New Character]]
+    [[./new-character.png]]
 
     #+CAPTION: Delete a character
-    [[./delete-character.png][Delete Character]]
+    [[./delete-character.png]]
 
 ** Places
     - list places and place details,
@@ -465,19 +464,19 @@
     - add books and tags associated with places,
 
     #+CAPTION: Places and place details
-    [[./places-tab][Places Tab]]
+    [[./places-tab]]
 
     #+CAPTION: Create a new place with required details
-    [[./create-new-place.png][Create Place]]
+    [[./create-new-place.png]]
 
     #+CAPTION: Filter places
-    [[./filter-places.png][Filter Places]]
+    [[./filter-places.png]]
 
     #+CAPTION: Sort places
-    [[./sort-places.png][Sort Places]]
+    [[./sort-places.png]]
 
     #+CAPTION: Add books and tags to places
-    [[./place-books-tags.png][Add Tags and Books to Places]]
+    [[./place-books-tags.png]]
 
 ** Tags
     - list tags and display them by category,
@@ -487,13 +486,13 @@
     - edit tags,
 
     #+CAPTION: List tags and their categories.
-    [[./tags-tab.png][Display tags by their category with controls to add tags by category]]
+    [[./tags-tab.png]]
 
     #+CAPTION: Hover controls to edit/colourise/delete a tag
-    [[./tag-hover-controls.png][Tag Hover Controls]]
+    [[./tag-hover-controls.png]]
 
     #+CAPTION: Edit tag names and categories
-    [[./edit-tag.png][Edit Tag]]
+    [[./edit-tag.png]]
 
 * Summary of Remaining Features from Desktop
 ** Create Character from Template
@@ -520,7 +519,6 @@
 ** Backup
    To be decided: no decision taken on undo/history and backup.
 ** Dashboard Features
-   No dashboard exists.
 *** Account Management
     No dashboard exists.
 **** Apply License Key
@@ -559,6 +557,43 @@
    No UI or wiring in the app exists to handle loading a file, but
    this feature would be very simple.
 ** File Versioning
-   Functionally to upgrade files exists.  There is no file version at
+   Functionality to upgrade files exists.  There is no file version at
    the moment.  It should match desktop to ensure robust upgrades
    between versions.
+
+* Priorities
+  I recommend the following priorities for remaining features (based
+  on what will get the application to a minimal viable product
+  soonest):
+  1. File versioning
+  2. Account management
+  3. Change language
+  4. Help page
+  5. Templates
+  6. File export to word and Scrivener
+  7. Robust simultaneous RCE editing
+  8. Backup/auditing
+  9. Error reporting
+  10. Logging
+  11. File sharing
+  12. Download file
+  13. Upload File
+  14. MPQ
+  15. Export configuration management
+  16. Change appearance
+  17. Turn off/on act structure beta 
+
+* Conclusion
+  Plottr Web is nearly a complete replicate of the desktop version.
+  It lacks functional requirements such as templates, exporting,
+  license management and dashboard features such as help, and feedback
+  submissions.  Account management and backup are still to be
+  discussed and are subject to change.
+
+  In addition, owing to the nature of web applications and user
+  expectations the following non-functional features are required and
+  incomplete: integration's with MPQ and a logging service.
+  Simultaneous edits for RCE content exists but is not robust.
+
+  Functionality to support appearance, language and toggling beta
+  features exists, but UI designs are yet to be resolved.
