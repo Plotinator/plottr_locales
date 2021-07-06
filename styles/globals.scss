@@ -8,8 +8,13 @@ $text-color: $gray-0;
 @import 'home';
 @import 'login';
 
-@import '../lib/plottr_components/dist/components/components.css';
 @import '../lib/plottr_components/dist/components/components-tailwind.css';
+@import '../lib/plottr_components/dist/components/components.css';
+
+/* Tailwind sets these to display: block, but the website assumes inline. */
+svg {
+  display: inline;
+}
 
 .alert {
   margin-bottom: 0px;
