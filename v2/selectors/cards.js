@@ -68,10 +68,16 @@ export const cardDescriptionByIdSelector = createSelector(
   (card) => card && card.description
 )
 
-export const cardMetaDataSelector = createSelector(cardByIdSelector, (card) => {
+const createDeepEqualSelector = createSelectorCreator(defaultMemoize, isEqual)
+
+const _cardMetaDataSelector = createSelector(cardByIdSelector, (card) => {
   if (!card) return null
 
   return cardMetaData(card)
+})
+
+export const cardMetaDataSelector = createDeepEqualSelector(_cardMetaDataSelector, (metadata) => {
+  return metadata
 })
 
 export const attributeValueSelector = (cardId, attributeName) => (state) =>
@@ -127,8 +133,6 @@ export const cardMapSelector = createSelector(
     return cards.reduce(cardReduce('lineId', 'beatId', collapsedBeats, beatPositions), {})
   }
 )
-
-const createDeepEqualSelector = createSelectorCreator(defaultMemoize, isEqual)
 
 export const cardMetaDataMapSelector = createDeepEqualSelector(
   allCardMetaDataSelector,
