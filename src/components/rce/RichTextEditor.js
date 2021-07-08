@@ -19,7 +19,7 @@ const HOTKEYS = {
 
 const RichTextEditorConnector = (connector) => {
   const {
-    platform: { openExternal },
+    platform: { openExternal, publishRCEOperations, listenForRCEOperations },
   } = connector
 
   const ToolBar = UnconnectedToolBar(connector)
@@ -40,6 +40,16 @@ const RichTextEditorConnector = (connector) => {
       setValue(useTextConverter(props.text)) // eslint-disable-line
     }, [])
 
+    const editorId = props.id
+
+    useEffect(() => {
+      if (listenForRCEOperations && editorId) {
+        listenForRCEOperations(editorId, (operations) => {
+          operations.forEach(editor.apply)
+        })
+      }
+    }, [])
+
     const registerEditor = useRegisterEditor(editor)
 
     if (!value) return null
@@ -50,6 +60,9 @@ const RichTextEditorConnector = (connector) => {
       // (e.g. this event could fire with a selection change, but the text is the same)
       if (value !== newVal) {
         props.onChange(newVal)
+        if (publishRCEOperations && editorId) {
+          publishRCEOperations(editorId, editor.operations)
+        }
       }
     }
 
@@ -134,6 +147,7 @@ const RichTextEditorConnector = (connector) => {
 
   RichTextEditor.propTypes = {
     text: PropTypes.any,
+    id: PropTypes.string,
     onChange: PropTypes.func,
     autoFocus: PropTypes.bool,
     darkMode: PropTypes.bool,
