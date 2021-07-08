@@ -37,12 +37,8 @@ const RichTextEditorConnector = (connector) => {
     const [editorWrapperRef, setEditorWrapperRef] = useState(null)
     const key = useRef(Math.random().toString(16))
     useEffect(() => {
-      if (!value) {
-        setValue(useTextConverter(props.text)) // eslint-disable-line
-      } else {
-        setValue(props.text)
-      }
-    }, [props.text])
+      setValue(useTextConverter(props.text)) // eslint-disable-line
+    }, [])
 
     const registerEditor = useRegisterEditor(editor)
 
