@@ -41,14 +41,15 @@ const RichTextEditorConnector = (connector) => {
     }, [])
 
     const editorId = props.id
+    const fileId = props.id
 
     useEffect(() => {
-      if (listenForRCEOperations && editorId) {
-        listenForRCEOperations(editorId, (operations) => {
+      if (listenForRCEOperations && fileId && editorId) {
+        listenForRCEOperations(fileId, editorId, (operations) => {
           operations.forEach(editor.apply)
         })
       }
-    }, [])
+    }, [fileId, editorId])
 
     const registerEditor = useRegisterEditor(editor)
 
@@ -60,8 +61,8 @@ const RichTextEditorConnector = (connector) => {
       // (e.g. this event could fire with a selection change, but the text is the same)
       if (value !== newVal) {
         props.onChange(newVal)
-        if (publishRCEOperations && editorId) {
-          publishRCEOperations(editorId, editor.operations)
+        if (publishRCEOperations && fileId && editorId) {
+          publishRCEOperations(fileId, editorId, editor.operations)
         }
       }
     }
@@ -148,6 +149,7 @@ const RichTextEditorConnector = (connector) => {
   RichTextEditor.propTypes = {
     text: PropTypes.any,
     id: PropTypes.string,
+    fileId: PropTypes.string,
     onChange: PropTypes.func,
     autoFocus: PropTypes.bool,
     darkMode: PropTypes.bool,
