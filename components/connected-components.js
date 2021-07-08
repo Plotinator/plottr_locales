@@ -3,6 +3,8 @@ import { history } from '../lib/history'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
+import { publishRCEOperations, listenForRCEOperations } from '../lib/firebase'
+
 const platform = {
   appVersion: process.env.VERSION,
   template: {
@@ -75,6 +77,8 @@ const platform = {
     bindActionCreators,
   },
   rootElementSelectors: ['#__next'],
+  publishRCEOperations,
+  listenForRCEOperations,
 }
 
 const components = connections.pltr(platform)
