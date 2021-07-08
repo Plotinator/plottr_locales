@@ -61,8 +61,16 @@ const CardDialogConnector = (connector) => {
       window.SCROLLWITHKEYS = false
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps, prevState) {
       if (this.newAttributeInputRef.current) this.newAttributeInputRef.current.focus()
+      Object.entries(this.props).forEach(([key, val]) =>
+        prevProps[key] !== val && console.log(`Prop '${key}' changed`)
+      );
+      if (this.state) {
+        Object.entries(this.state).forEach(([key, val]) =>
+          prevState[key] !== val && console.log(`State '${key}' changed`)
+        );
+      }
     }
 
     componentWillUnmount() {
