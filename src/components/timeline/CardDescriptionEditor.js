@@ -13,13 +13,14 @@ const areEqual = (prevProps, nextProps) => {
 const CardDescriptionEditorConnector = (connector) => {
   const RichText = UnconnectedRichText(connector)
 
-  const CardDescriptionEditor = ({ cardId, description, darkMode, editCardAttributes }) => {
+  const CardDescriptionEditor = ({ fileId, cardId, description, darkMode, editCardAttributes }) => {
     const handleDescriptionChange = (newDescription) => {
       editCardAttributes(cardId, { description: newDescription })
     }
 
     return (
       <RichText
+        id={`${fileId}-card.description-${cardId}`}
         description={description}
         onChange={handleDescriptionChange}
         editable={true}
@@ -34,6 +35,7 @@ const CardDescriptionEditorConnector = (connector) => {
     description: PropTypes.array.isRequired,
     editCardAttributes: PropTypes.func.isRequired,
     darkMode: PropTypes.bool.isRequired,
+    fileId: PropTypes.string,
   }
 
   const {
@@ -48,6 +50,7 @@ const CardDescriptionEditorConnector = (connector) => {
       (state, ownProps) => ({
         description: selectors.cardDescriptionByIdSelector(state.present, ownProps.cardId),
         darkMode: selectors.isDarkModeSelector(state.present),
+        fileId: selectors.selectedFileIdSelector(state.present),
       }),
       { editCardAttributes: actions.card.editCardAttributes }
     )(React.memo(CardDescriptionEditor, areEqual))

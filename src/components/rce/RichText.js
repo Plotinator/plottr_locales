@@ -17,6 +17,7 @@ const RichTextConnector = (connector) => {
     if (props.editable) {
       body = (
         <RichTextEditor
+          id={props.id}
           className={props.className}
           onChange={props.onChange}
           autoFocus={props.autofocus}
@@ -25,6 +26,7 @@ const RichTextConnector = (connector) => {
         />
       )
     } else {
+      // TODO: support live watching(?)
       body = (
         <RichTextViewer
           text={props.description}
@@ -43,6 +45,7 @@ const RichTextConnector = (connector) => {
   }
 
   RichText.propTypes = {
+    id: PropTypes.string,
     description: PropTypes.any,
     onChange: PropTypes.func,
     editable: PropTypes.bool,
