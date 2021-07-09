@@ -87,8 +87,15 @@ service cloud.firestore {
       allow read, write, update: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'collaborator';
       allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'viewer';
     }
+    match /rce/{document} {
+      match /{subDocument=**} {
+        allow read, write, update, create: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
+        allow read, write, update, create: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'collaborator';
+        allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'viewer';
+      }
+    }
   }
-  match /databases/{databsae}/documents/authorisation/{userId} {
+  match /databases/{database}/documents/authorisation/{userId} {
     match /{document=**} {
       allow read: if request.auth != null && request.auth.uid == userId;
     }
