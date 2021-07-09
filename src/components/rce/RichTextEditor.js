@@ -10,6 +10,8 @@ import Leaf from './Leaf'
 import Element from './Element'
 import { useTextConverter, createEditor } from './helpers'
 import { useRegisterEditor } from './editor-registry'
+import { newEditQueue, enqueue } from './editQueue'
+import { drainQueue } from '../../../dist/components/rce/editQueue'
 
 const HOTKEYS = {
   'mod+b': 'bold',
@@ -19,7 +21,7 @@ const HOTKEYS = {
 
 const RichTextEditorConnector = (connector) => {
   const {
-    platform: { openExternal, publishRCEOperations, listenForRCEOperations },
+    platform: { openExternal, publishRCEOperations, fetchRCEOperations },
   } = connector
 
   const ToolBar = UnconnectedToolBar(connector)
@@ -41,31 +43,78 @@ const RichTextEditorConnector = (connector) => {
     }, [])
 
     const editorId = props.id
-    const fileId = props.id
-
-    useEffect(() => {
-      if (listenForRCEOperations && fileId && editorId) {
-        listenForRCEOperations(fileId, editorId, (operations) => {
-          operations.forEach(editor.apply)
-        })
-      }
-    }, [fileId, editorId])
+    const fileId = props.fileId
 
     const registerEditor = useRegisterEditor(editor)
 
-    if (!value) return null
+    const [editCount, setEditCount] = useState(0)
+
+    const applyingOtherEdits = useRef(false)
 
     const updateValue = (newVal) => {
       setValue(newVal)
+      if (applyingOtherEdits.current) {
+        applyingOtherEdits.current = false
+        return
+      }
       // only update if it changed
       // (e.g. this event could fire with a selection change, but the text is the same)
       if (value !== newVal) {
         props.onChange(newVal)
         if (publishRCEOperations && fileId && editorId) {
-          publishRCEOperations(fileId, editorId, editor.operations)
+          let individualEditCount = editCount
+          publishRCEOperations(
+            fileId,
+            editorId,
+            editor.operations.map((operation) => ({
+              editorKey: key.current,
+              operation,
+              created: new Date(),
+              editNumber: individualEditCount++,
+            }))
+          )
+          setEditCount(individualEditCount)
         }
       }
     }
+
+    const editQueue = useRef(newEditQueue())
+
+    useEffect(() => {
+      if (fetchRCEOperations && fileId && editorId) {
+        const Search = () => {
+          let latestSearch = new Date()
+
+          return function () {
+            fetchRCEOperations(fileId, editorId, latestSearch, (operations) => {
+              operations.forEach((operation) => {
+                if (operation.editorKey !== key.current) {
+                  enqueue(
+                    editQueue.current,
+                    operation.editorKey,
+                    operation.operation,
+                    operation.editNumber
+                  )
+                }
+              })
+              latestSearch = operations[operations.length - 1].created
+              const operationsToApply = drainQueue(editQueue.current)
+              if (operationsToApply.length) {
+                applyingOtherEdits.current = true
+                operationsToApply.forEach((operation) => {
+                  editor.apply(operation)
+                })
+              }
+            })
+          }
+        }
+        const interval = setInterval(new Search(), 100)
+        return () => {
+          clearInterval(interval)
+        }
+      }
+      return () => {}
+    }, [fileId, editorId])
 
     const handleKeyDown = (event) => {
       for (const hotkey in HOTKEYS) {
@@ -114,6 +163,8 @@ const RichTextEditorConnector = (connector) => {
       // document.execCommand('selectAll', false, null)
       // document.getSelection().collapseToEnd()
     }
+
+    if (!value) return null
 
     const otherProps = {
       autoFocus: props.autoFocus,
