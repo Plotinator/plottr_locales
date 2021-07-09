@@ -81,6 +81,7 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
+    "fastpriorityqueue": "^0.7.1",
     "pretty-date": "^0.2.0",
     "react": "^16.8.6",
     "react-beautiful-dnd": "^13.1.0",
