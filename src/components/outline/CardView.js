@@ -125,7 +125,6 @@ const CardViewConnector = (connector) => {
             onKeyPress={this.handleEnter}
             onKeyDown={this.handleEsc}
             type="text"
-            autoFocus
             inputRef={(ref) => {
               this.titleInputRef = ref
             }}
@@ -140,6 +139,7 @@ const CardViewConnector = (connector) => {
       return (
         <div className="outline__description__editing">
           <RichText
+            autofocus
             className="outline__description"
             onChange={(desc) => this.setState({ description: desc })}
             description={description}
@@ -225,7 +225,7 @@ const CardViewConnector = (connector) => {
                 onDragEnd={this.handleDragEnd}
               >
                 <FaGripLinesVertical />
-                {this.state.editing ? null : <h3>{card.title}</h3>}
+                {this.state.editing ? null : <h5>{card.title}</h5>}
               </div>
             </div>
             <div
