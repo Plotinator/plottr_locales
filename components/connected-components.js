@@ -4,12 +4,13 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
 import { publishRCEOperations, fetchRCEOperations } from '../lib/firebase'
+import { listTemplates } from '../lib/templates'
 
 const platform = {
   appVersion: process.env.VERSION,
   template: {
-    listTemplates: () => {},
-    listCustomTemplates: () => {},
+    listTemplates,
+    listCustomTemplates: () => [],
     deleteTemplate: () => {},
     editTemplateDetails: () => {},
     startSaveAsTemplate: (itemType) => {},
@@ -70,7 +71,7 @@ const platform = {
   },
   browserHistory: history,
   inBrowser: true,
-  templatesDisabled: true,
+  templatesDisabled: false,
   exportDisabled: true,
   redux: {
     connect,
