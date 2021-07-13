@@ -210,15 +210,17 @@ const CardConnector = (connector) => {
         // use location of the card on the screen if possible
         const cardPos = this.cardRef.current ? this.cardRef.current.getBoundingClientRect() : null
         // #root is used by storybook, we cannot control where it renders the react app to.
-        const rootElem = (
+        const rootElem =
           document.querySelector('#react-root') ||
           document.querySelector('#root') ||
           document.querySelector('#__next')
-        ).getBoundingClientRect()
-        const midPoint = rootElem.width / 2
-        if (cardPos) {
-          if (cardPos.x > midPoint) placement = 'left'
-          if (cardPos.x < midPoint) placement = 'right'
+        if (rootElem) {
+          const rootElemDimensions = rootElem.getBoundingClientRect()
+          const midPoint = rootElemDimensions.width / 2
+          if (cardPos) {
+            if (cardPos.x > midPoint) placement = 'left'
+            if (cardPos.x < midPoint) placement = 'right'
+          }
         }
 
         title = (
@@ -236,11 +238,15 @@ const CardConnector = (connector) => {
       var cardStyle = {
         borderColor: card.color ? tinycolor(card.color).darken(10).toHslString() : color,
       }
+      let cardCircleStyle = { backgroundColor: color }
+
       if (this.state.dragging) {
         cardStyle.opacity = '0.5'
+        cardCircleStyle.opacity = '0.5'
       }
       if (!isVisible) {
         cardStyle.opacity = '0.1'
+        cardCircleStyle.opacity = '0.1'
       }
 
       if (isSmall) {
@@ -256,7 +262,7 @@ const CardConnector = (connector) => {
             {this.renderDialog()}
             <div
               className="card-circle"
-              style={{ backgroundColor: color }}
+              style={cardCircleStyle}
               draggable
               onDragStart={this.handleDragStart}
               onDragEnd={this.handleDragEnd}
