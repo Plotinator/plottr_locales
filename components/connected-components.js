@@ -4,24 +4,31 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
 import { publishRCEOperations, fetchRCEOperations } from '../lib/firebase'
-import { listTemplates } from '../lib/templates'
+import {
+  listTemplates,
+  listCustomTemplates,
+  startSaveAsTemplate,
+  messageToSaveNewTemplate,
+  messageToEditTemplate,
+  messageToDeleteTemplate,
+} from '../lib/templates'
 
 const platform = {
-  appVersion: process.env.VERSION,
+  appVersion: process.env.NEXT_PUBLIC_VERSION,
   template: {
     listTemplates,
-    listCustomTemplates: () => [],
-    deleteTemplate: () => {},
-    editTemplateDetails: () => {},
-    startSaveAsTemplate: (itemType) => {},
-    saveTemplate: (payload) => {},
+    listCustomTemplates,
+    deleteTemplate: messageToDeleteTemplate,
+    editTemplateDetails: messageToEditTemplate,
+    startSaveAsTemplate,
+    saveTemplate: messageToSaveNewTemplate,
   },
   settings: {},
   user: {
     get: () => {},
   },
   os: 'unknown',
-  isDevelopment: process.env.NODE_ENV === 'development',
+  isDevelopment: process.env.NEXT_PUBLIC_NODE_ENV === 'development',
   isWindows: false,
   isMacOS: false,
   openExternal: (url) => {
@@ -35,10 +42,10 @@ const platform = {
   },
   dialog: {},
   node: {
-    env: process.env.NODE_ENV === 'development' ? 'development' : 'production',
+    env: process.env.NEXT_PUBLIC_NODE_ENV === 'development' ? 'development' : 'production',
   },
   rollbar: {
-    rollbarAccessToken: process.env.ROLLBAR_ACCESS_TOKEN || '',
+    rollbarAccessToken: process.env.NEXT_PUBLIC_ROLLBAR_ACCESS_TOKEN || '',
     platform: '',
   },
   export: {

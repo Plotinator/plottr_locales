@@ -3,7 +3,7 @@ import { PropTypes } from 'prop-types'
 import { connect } from 'react-redux'
 
 import { actions, selectors } from 'pltr/v2'
-import { listen, stopListening } from '../lib/firebase'
+import { listen, listenToCustomTemplates, stopListening } from '../lib/firebase'
 
 const Listener = ({ userId, selectedFile, setPermission, patchFile, clientId }) => {
   useEffect(() => {
@@ -22,6 +22,16 @@ const Listener = ({ userId, selectedFile, setPermission, patchFile, clientId }) 
       setPermission('viewer')
     }
   }, [selectedFile, userId, clientId])
+
+  useEffect(() => {
+    if (userId) {
+      const unsubscribe = listenToCustomTemplates(userId)
+      return () => {
+        unsubscribe()
+      }
+    }
+    return () => {}
+  }, [userId])
 
   return null
 }

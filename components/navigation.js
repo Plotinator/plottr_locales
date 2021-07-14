@@ -15,7 +15,7 @@ import { basePath } from '../lib/basePath'
 import { logOut, onSessionChange } from '../lib/firebase'
 
 const trialMode = true // TODO
-const isDev = process.env.NODE_ENV == 'development'
+const isDev = process.env.NEXT_PUBLIC_NODE_ENV == 'development'
 
 function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
   useEffect(() => {
