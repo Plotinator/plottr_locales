@@ -13,6 +13,7 @@ import Characters from './characters'
 import Places from './places'
 import Tags from './tags'
 import Listener from './listener'
+import SaveTemplate from './save-template'
 import Error from './error'
 import SessionObserver from './session-observer'
 import ClientIdMinter from './client-id-minter'
@@ -23,6 +24,7 @@ const Root = () => {
       <SessionObserver />
       <Listener />
       <ClientIdMinter />
+      <SaveTemplate />
       <Router history={history}>
         <Navigation />
         <Error />

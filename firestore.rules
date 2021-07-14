@@ -88,9 +88,7 @@ service cloud.firestore {
       allow read: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'viewer';
     }
     match /templates/{user} {
-      match /{subDocument=**} {
-        allow read, write, update, create: if request.auth != null && request.auth.uid == user;
-      }
+      allow read, write, update, create: if request.auth != null && request.auth.uid == user;
     }
     match /rce/{document} {
       match /{subDocument=**} {
