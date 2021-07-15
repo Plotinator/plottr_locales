@@ -17,8 +17,8 @@ const Listener = ({ userId, selectedFile, setPermission, patchFile, clientId, lo
     if (!userId || !clientId || !selectedFile || !selectedFile.id) {
       return () => {}
     }
-    initialFetch(userId, selectedFile.id, clientId).then((file) => {
-      setUnsubscribeFunctions(listen(userId, selectedFile.id, clientId))
+    initialFetch(userId, selectedFile.id, clientId, selectedFile.version).then((file) => {
+      setUnsubscribeFunctions(listen(userId, selectedFile.id, clientId, selectedFile.version))
       setPermission(selectedFile.permission)
     })
 
