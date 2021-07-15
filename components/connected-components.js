@@ -3,6 +3,7 @@ import { history } from '../lib/history'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
+import { appVersion } from '../lib/version'
 import { publishRCEOperations, fetchRCEOperations } from '../lib/firebase'
 import {
   listTemplates,
@@ -14,7 +15,7 @@ import {
 } from '../lib/templates'
 
 const platform = {
-  appVersion: process.env.NEXT_PUBLIC_VERSION,
+  appVersion: appVersion(),
   template: {
     listTemplates,
     listCustomTemplates,
