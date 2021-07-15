@@ -2313,17 +2313,11 @@
     }
   },
   {
-    "file": {
-      "fileName": "Goldilocks and The Three Bears.pltr",
-      "loaded": true,
-      "dirty": true,
-      "version": "2021.6.9"
-    },
     "ui": {
       "currentView": "story",
       "currentTimeline": 1,
       "orientation": "horizontal",
-      "darkMode": true,
+      "darkMode": false,
       "characterSort": "name~asc",
       "characterFilter": {
         "Species": []
@@ -2332,18 +2326,16 @@
       "placeFilter": null,
       "noteSort": "title~asc",
       "noteFilter": null,
+      "zoomState": null,
+      "zoomIndex": 4,
       "timelineIsExpanded": true,
-      "timelineFilter": null,
-      "timelineScrollPosition": {
-        "x": 0,
-        "y": 0
-      },
-      "timeline": {
-        "size": "large"
-      }
+      "timelineFilter": null
     },
-    "featureFlags": {
-      "BEAT_HIERARCHY": true
+    "file": {
+      "fileName": "Goldilocks and The Three Bears",
+      "loaded": true,
+      "dirty": true,
+      "version": "2020.7.30"
     },
     "series": {
       "name": "Goldilocks and The Three Bears",
@@ -2360,578 +2352,11 @@
         "genre": "",
         "theme": "",
         "templates": [],
-        "imageId": "7",
-        "timelineTemplates": []
+        "imageId": "7"
       },
       "allIds": [
         1
       ]
-    },
-    "beats": {
-      "1": {
-        "children": {
-          "2": [],
-          "3": [],
-          "4": [],
-          "5": [],
-          "6": [],
-          "null": [
-            2,
-            3,
-            4,
-            5,
-            6
-          ]
-        },
-        "heap": {
-          "2": null,
-          "3": null,
-          "4": null,
-          "5": null,
-          "6": null
-        },
-        "index": {
-          "2": {
-            "id": 2,
-            "bookId": 1,
-            "position": 0,
-            "title": "Exposition",
-            "time": 0,
-            "templates": [],
-            "autoOutlineSort": true,
-            "fromTemplateId": null,
-            "expanded": true
-          },
-          "3": {
-            "id": 3,
-            "bookId": 1,
-            "position": 1,
-            "title": "Rising Action",
-            "time": 0,
-            "templates": [],
-            "autoOutlineSort": true,
-            "fromTemplateId": null,
-            "expanded": true
-          },
-          "4": {
-            "id": 4,
-            "bookId": 1,
-            "position": 2,
-            "title": "Climax",
-            "time": 0,
-            "templates": [],
-            "autoOutlineSort": true,
-            "fromTemplateId": null,
-            "expanded": true
-          },
-          "5": {
-            "id": 5,
-            "bookId": 1,
-            "position": 3,
-            "title": "Falling Action",
-            "time": 0,
-            "templates": [],
-            "autoOutlineSort": true,
-            "fromTemplateId": null,
-            "expanded": true
-          },
-          "6": {
-            "id": 6,
-            "bookId": 1,
-            "position": 4,
-            "title": "Resolution",
-            "time": 0,
-            "templates": [],
-            "autoOutlineSort": true,
-            "fromTemplateId": null,
-            "expanded": true
-          }
-        }
-      },
-      "series": {
-        "children": {
-          "1": [],
-          "null": [
-            1
-          ]
-        },
-        "heap": {
-          "1": null
-        },
-        "index": {
-          "1": {
-            "id": 1,
-            "position": 0,
-            "title": "Beat 1",
-            "time": 0,
-            "templates": [],
-            "autoOutlineSort": true,
-            "bookId": "series",
-            "expanded": true
-          }
-        }
-      }
-    },
-    "cards": [
-      {
-        "id": 11,
-        "lineId": 4,
-        "beatId": 4,
-        "seriesLineId": null,
-        "bookId": null,
-        "positionWithinLine": 0,
-        "positionInChapter": 0,
-        "title": "They discover Goldilocks in bed",
-        "description": [
-          {
-            "children": [
-              {
-                "text": ""
-              }
-            ]
-          }
-        ],
-        "tags": [
-          7,
-          1
-        ],
-        "characters": [
-          2,
-          1,
-          4,
-          3
-        ],
-        "places": [
-          2
-        ],
-        "templates": [],
-        "imageId": null,
-        "fromTemplateId": null
-      },
-      {
-        "id": 10,
-        "lineId": 3,
-        "beatId": 4,
-        "seriesLineId": null,
-        "bookId": null,
-        "positionWithinLine": 0,
-        "positionInChapter": 0,
-        "title": "They discover their chairs have been used",
-        "description": [
-          {
-            "children": [
-              {
-                "text": ""
-              }
-            ]
-          }
-        ],
-        "tags": [
-          6,
-          1
-        ],
-        "characters": [],
-        "places": [],
-        "templates": [],
-        "imageId": null,
-        "fromTemplateId": null
-      },
-      {
-        "id": 9,
-        "lineId": 2,
-        "beatId": 4,
-        "seriesLineId": null,
-        "bookId": null,
-        "positionWithinLine": 1,
-        "positionInChapter": 0,
-        "title": "They discover their porridge has been eaten",
-        "description": [
-          {
-            "children": [
-              {
-                "text": ""
-              }
-            ]
-          }
-        ],
-        "tags": [
-          8,
-          1
-        ],
-        "characters": [],
-        "places": [],
-        "templates": [],
-        "imageId": null,
-        "fromTemplateId": null
-      },
-      {
-        "id": 8,
-        "lineId": 4,
-        "beatId": 3,
-        "seriesLineId": null,
-        "bookId": null,
-        "position": 0,
-        "title": "She tries three beds until she finds the right one",
-        "description": [
-          {
-            "children": [
-              {
-                "text": "Very tired, Goldilocks goes upstairs to the bedroom..."
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "children": [
-              {
-                "text": "The first bed is too hard. "
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "children": [
-              {
-                "text": "The second bed is too soft."
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "children": [
-              {
-                "text": "The third bed is just right!"
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "children": [
-              {
-                "text": "And then she falls asleep."
-              }
-            ]
-          }
-        ],
-        "tags": [
-          3,
-          7
-        ],
-        "characters": [],
-        "places": [
-          2
-        ],
-        "templates": [],
-        "imageId": null,
-        "positionWithinLine": 0,
-        "positionInChapter": null,
-        "fromTemplateId": null
-      },
-      {
-        "id": 7,
-        "lineId": 3,
-        "beatId": 3,
-        "seriesLineId": null,
-        "bookId": null,
-        "position": 0,
-        "title": "She tries three chairs until she finds the right one",
-        "description": [
-          {
-            "children": [
-              {
-                "text": "Tired, Golidocks decides to sit on a chair..."
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "children": [
-              {
-                "text": "The first chair is too big. "
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "children": [
-              {
-                "text": "The second chair is also too big."
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "children": [
-              {
-                "text": "The third (and smallest) chair is just right!"
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "children": [
-              {
-                "text": "But as she sits on the chair, it breaks into pieces."
-              }
-            ]
-          }
-        ],
-        "tags": [
-          3,
-          6
-        ],
-        "characters": [
-          1
-        ],
-        "places": [
-          2
-        ],
-        "templates": [],
-        "imageId": null,
-        "positionWithinLine": 0,
-        "positionInChapter": null,
-        "fromTemplateId": null
-      },
-      {
-        "id": 6,
-        "lineId": 2,
-        "beatId": 3,
-        "seriesLineId": null,
-        "bookId": null,
-        "position": 0,
-        "title": "She tries each bowl until she finds the right one",
-        "description": [
-          {
-            "type": "paragraph",
-            "children": [
-              {
-                "text": "The first bowl is too hot. "
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "children": [
-              {
-                "text": "The second bowl is too cold."
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "children": [
-              {
-                "text": "The third bowl is just right!"
-              }
-            ]
-          }
-        ],
-        "tags": [
-          3,
-          8
-        ],
-        "characters": [
-          1
-        ],
-        "places": [],
-        "templates": [],
-        "imageId": null,
-        "positionWithinLine": 0,
-        "positionInChapter": null,
-        "fromTemplateId": null
-      },
-      {
-        "id": 5,
-        "lineId": 1,
-        "beatId": 6,
-        "seriesLineId": null,
-        "bookId": null,
-        "position": 0,
-        "title": "Goldilocks runs away, never to return again",
-        "description": [
-          {
-            "children": [
-              {
-                "text": "She runs out the door, into the forest."
-              }
-            ]
-          }
-        ],
-        "tags": [
-          1,
-          4
-        ],
-        "characters": [
-          1
-        ],
-        "places": [
-          2,
-          1
-        ],
-        "templates": [],
-        "imageId": null,
-        "positionWithinLine": 0,
-        "positionInChapter": null,
-        "fromTemplateId": null
-      },
-      {
-        "id": 4,
-        "lineId": 1,
-        "beatId": 5,
-        "seriesLineId": null,
-        "bookId": null,
-        "position": 0,
-        "title": "Goldilocks wakes up to realize she's in the bears' home",
-        "description": [
-          {
-            "children": [
-              {
-                "text": "She sees the bears, screams for help, and runs out of the room."
-              }
-            ]
-          }
-        ],
-        "tags": [
-          1
-        ],
-        "characters": [
-          1,
-          2,
-          4,
-          3
-        ],
-        "places": [
-          2
-        ],
-        "templates": [],
-        "imageId": null,
-        "positionWithinLine": 0,
-        "positionInChapter": null,
-        "fromTemplateId": null
-      },
-      {
-        "id": 3,
-        "lineId": 1,
-        "beatId": 4,
-        "seriesLineId": null,
-        "bookId": null,
-        "position": 0,
-        "title": "The three bears come home",
-        "description": [
-          {
-            "children": [
-              {
-                "text": "They are not pleased by what they discover."
-              }
-            ]
-          }
-        ],
-        "tags": [
-          1
-        ],
-        "characters": [
-          1,
-          4,
-          3,
-          2
-        ],
-        "places": [
-          2
-        ],
-        "templates": [],
-        "imageId": null,
-        "positionWithinLine": 0,
-        "positionInChapter": null,
-        "fromTemplateId": null
-      },
-      {
-        "id": 2,
-        "lineId": 1,
-        "beatId": 3,
-        "seriesLineId": null,
-        "bookId": null,
-        "position": 0,
-        "title": "Goldilocks enters and finds three bowls of porridge",
-        "description": [
-          {
-            "children": [
-              {
-                "text": "Goldilocks is hungry."
-              }
-            ]
-          }
-        ],
-        "tags": [
-          3,
-          8
-        ],
-        "characters": [
-          1
-        ],
-        "places": [
-          2
-        ],
-        "templates": [],
-        "imageId": null,
-        "positionWithinLine": 0,
-        "positionInChapter": null,
-        "fromTemplateId": null
-      },
-      {
-        "id": 1,
-        "lineId": 1,
-        "beatId": 2,
-        "seriesLineId": null,
-        "bookId": null,
-        "position": 0,
-        "title": "Goldilocks takes a walk in the forest and finds a cottage",
-        "description": [
-          {
-            "children": [
-              {
-                "text": "She knocks on the door and walks right in when nobody answers."
-              }
-            ]
-          }
-        ],
-        "tags": [
-          2,
-          5
-        ],
-        "characters": [
-          1
-        ],
-        "places": [
-          1
-        ],
-        "templates": [],
-        "imageId": null,
-        "positionWithinLine": 0,
-        "positionInChapter": null,
-        "fromTemplateId": null
-      }
-    ],
-    "categories": {
-      "characters": [
-        {
-          "id": 1,
-          "name": "Main",
-          "position": 0
-        },
-        {
-          "id": 2,
-          "name": "Supporting",
-          "position": 1
-        },
-        {
-          "id": 3,
-          "name": "Other",
-          "position": 2
-        }
-      ],
-      "places": [],
-      "notes": [],
-      "tags": []
     },
     "characters": [
       {
@@ -3048,18 +2473,488 @@
         "Species": "Bear"
       }
     ],
-    "customAttributes": {
-      "characters": [
-        {
-          "name": "Species",
-          "type": "text"
-        }
-      ],
-      "places": [],
-      "scenes": [],
-      "lines": [],
-      "notes": []
-    },
+    "chapters": [
+      {
+        "id": 1,
+        "bookId": 1,
+        "position": 0,
+        "title": "Exposition",
+        "time": 0,
+        "templates": [],
+        "autoOutlineSort": true
+      },
+      {
+        "id": 2,
+        "bookId": 1,
+        "position": 1,
+        "title": "Rising Action",
+        "time": 0,
+        "autoOutlineSort": true
+      },
+      {
+        "id": 3,
+        "bookId": 1,
+        "position": 2,
+        "title": "Climax",
+        "time": 0,
+        "autoOutlineSort": true
+      },
+      {
+        "id": 4,
+        "bookId": 1,
+        "position": 3,
+        "title": "Falling Action",
+        "time": 0,
+        "autoOutlineSort": true
+      },
+      {
+        "id": 5,
+        "bookId": 1,
+        "position": 4,
+        "title": "Resolution",
+        "time": 0,
+        "autoOutlineSort": true
+      }
+    ],
+    "cards": [
+      {
+        "id": 11,
+        "lineId": 4,
+        "chapterId": 3,
+        "beatId": null,
+        "seriesLineId": null,
+        "bookId": null,
+        "positionWithinLine": 0,
+        "positionInChapter": 0,
+        "title": "They discover Goldilocks in bed",
+        "description": [
+          {
+            "children": [
+              {
+                "text": ""
+              }
+            ]
+          }
+        ],
+        "tags": [
+          7,
+          1
+        ],
+        "characters": [
+          2,
+          1,
+          4,
+          3
+        ],
+        "places": [
+          2
+        ],
+        "templates": [],
+        "imageId": null
+      },
+      {
+        "id": 10,
+        "lineId": 3,
+        "chapterId": 3,
+        "beatId": null,
+        "seriesLineId": null,
+        "bookId": null,
+        "positionWithinLine": 0,
+        "positionInChapter": 0,
+        "title": "They discover their chairs have been used",
+        "description": [
+          {
+            "children": [
+              {
+                "text": ""
+              }
+            ]
+          }
+        ],
+        "tags": [
+          6,
+          1
+        ],
+        "characters": [],
+        "places": [],
+        "templates": [],
+        "imageId": null
+      },
+      {
+        "id": 9,
+        "lineId": 2,
+        "chapterId": 3,
+        "beatId": null,
+        "seriesLineId": null,
+        "bookId": null,
+        "positionWithinLine": 1,
+        "positionInChapter": 0,
+        "title": "They discover their porridge has been eaten",
+        "description": [
+          {
+            "children": [
+              {
+                "text": ""
+              }
+            ]
+          }
+        ],
+        "tags": [
+          8,
+          1
+        ],
+        "characters": [],
+        "places": [],
+        "templates": [],
+        "imageId": null
+      },
+      {
+        "id": 8,
+        "lineId": 4,
+        "chapterId": 2,
+        "beatId": null,
+        "seriesLineId": null,
+        "bookId": null,
+        "position": 0,
+        "title": "She tries three beds until she finds the right one",
+        "description": [
+          {
+            "children": [
+              {
+                "text": "Very tired, Goldilocks goes upstairs to the bedroom..."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "text": "The first bed is too hard. "
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "text": "The second bed is too soft."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "text": "The third bed is just right!"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "text": "And then she falls asleep."
+              }
+            ]
+          }
+        ],
+        "tags": [
+          3,
+          7
+        ],
+        "characters": [],
+        "places": [
+          2
+        ],
+        "templates": [],
+        "imageId": null,
+        "positionWithinLine": 0,
+        "positionInChapter": null
+      },
+      {
+        "id": 7,
+        "lineId": 3,
+        "chapterId": 2,
+        "beatId": null,
+        "seriesLineId": null,
+        "bookId": null,
+        "position": 0,
+        "title": "She tries three chairs until she finds the right one",
+        "description": [
+          {
+            "children": [
+              {
+                "text": "Tired, Golidocks decides to sit on a chair..."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "text": "The first chair is too big. "
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "text": "The second chair is also too big."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "text": "The third (and smallest) chair is just right!"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "text": "But as she sits on the chair, it breaks into pieces."
+              }
+            ]
+          }
+        ],
+        "tags": [
+          3,
+          6
+        ],
+        "characters": [
+          1
+        ],
+        "places": [
+          2
+        ],
+        "templates": [],
+        "imageId": null,
+        "positionWithinLine": 0,
+        "positionInChapter": null
+      },
+      {
+        "id": 6,
+        "lineId": 2,
+        "chapterId": 2,
+        "beatId": null,
+        "seriesLineId": null,
+        "bookId": null,
+        "position": 0,
+        "title": "She tries each bowl until she finds the right one",
+        "description": [
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "text": "The first bowl is too hot. "
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "text": "The second bowl is too cold."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "text": "The third bowl is just right!"
+              }
+            ]
+          }
+        ],
+        "tags": [
+          3,
+          8
+        ],
+        "characters": [
+          1
+        ],
+        "places": [],
+        "templates": [],
+        "imageId": null,
+        "positionWithinLine": 0,
+        "positionInChapter": null
+      },
+      {
+        "id": 5,
+        "lineId": 1,
+        "chapterId": 5,
+        "beatId": null,
+        "seriesLineId": null,
+        "bookId": null,
+        "position": 0,
+        "title": "Goldilocks runs away, never to return again",
+        "description": [
+          {
+            "children": [
+              {
+                "text": "She runs out the door, into the forest."
+              }
+            ]
+          }
+        ],
+        "tags": [
+          1,
+          4
+        ],
+        "characters": [
+          1
+        ],
+        "places": [
+          2,
+          1
+        ],
+        "templates": [],
+        "imageId": null,
+        "positionWithinLine": 0,
+        "positionInChapter": null
+      },
+      {
+        "id": 4,
+        "lineId": 1,
+        "chapterId": 4,
+        "beatId": null,
+        "seriesLineId": null,
+        "bookId": null,
+        "position": 0,
+        "title": "Goldilocks wakes up to realize she's in the bears' home",
+        "description": [
+          {
+            "children": [
+              {
+                "text": "She sees the bears, screams for help, and runs out of the room."
+              }
+            ]
+          }
+        ],
+        "tags": [
+          1
+        ],
+        "characters": [
+          1,
+          2,
+          4,
+          3
+        ],
+        "places": [
+          2
+        ],
+        "templates": [],
+        "imageId": null,
+        "positionWithinLine": 0,
+        "positionInChapter": null
+      },
+      {
+        "id": 3,
+        "lineId": 1,
+        "chapterId": 3,
+        "beatId": null,
+        "seriesLineId": null,
+        "bookId": null,
+        "position": 0,
+        "title": "The three bears come home",
+        "description": [
+          {
+            "children": [
+              {
+                "text": "They are not pleased by what they discover."
+              }
+            ]
+          }
+        ],
+        "tags": [
+          1
+        ],
+        "characters": [
+          1,
+          4,
+          3,
+          2
+        ],
+        "places": [
+          2
+        ],
+        "templates": [],
+        "imageId": null,
+        "positionWithinLine": 0,
+        "positionInChapter": null
+      },
+      {
+        "id": 2,
+        "lineId": 1,
+        "chapterId": 2,
+        "beatId": null,
+        "seriesLineId": null,
+        "bookId": null,
+        "position": 0,
+        "title": "Goldilocks enters and finds three bowls of porridge",
+        "description": [
+          {
+            "children": [
+              {
+                "text": "Goldilocks is hungry."
+              }
+            ]
+          }
+        ],
+        "tags": [
+          3,
+          8
+        ],
+        "characters": [
+          1
+        ],
+        "places": [
+          2
+        ],
+        "templates": [],
+        "imageId": null,
+        "positionWithinLine": 0,
+        "positionInChapter": null
+      },
+      {
+        "id": 1,
+        "lineId": 1,
+        "chapterId": 1,
+        "beatId": null,
+        "seriesLineId": null,
+        "bookId": null,
+        "position": 0,
+        "title": "Goldilocks takes a walk in the forest and finds a cottage",
+        "description": [
+          {
+            "children": [
+              {
+                "text": "She knocks on the door and walks right in when nobody answers."
+              }
+            ]
+          }
+        ],
+        "tags": [
+          2,
+          5
+        ],
+        "characters": [
+          1
+        ],
+        "places": [
+          1
+        ],
+        "templates": [],
+        "imageId": null,
+        "positionWithinLine": 0,
+        "positionInChapter": null
+      }
+    ],
     "lines": [
       {
         "id": 4,
@@ -3067,8 +2962,7 @@
         "title": "Scene 4",
         "color": "#ff7f32",
         "position": 3,
-        "expanded": null,
-        "fromTemplateId": null
+        "expanded": null
       },
       {
         "id": 3,
@@ -3076,8 +2970,7 @@
         "title": "Scene 3",
         "color": "#e5554f",
         "position": 2,
-        "expanded": true,
-        "fromTemplateId": null
+        "expanded": true
       },
       {
         "id": 2,
@@ -3085,8 +2978,7 @@
         "title": "Scene 2",
         "color": "#78be20",
         "position": 1,
-        "expanded": null,
-        "fromTemplateId": null
+        "expanded": null
       },
       {
         "id": 1,
@@ -3095,396 +2987,21 @@
         "title": "Scene 1",
         "position": 0,
         "characterId": null,
-        "expanded": true,
-        "fromTemplateId": null
-      },
-      {
-        "id": 5,
-        "bookId": "series",
-        "color": "#6cace4",
-        "title": "Main Plot",
-        "position": 0,
-        "characterId": null,
-        "expanded": null,
-        "fromTemplateId": null
+        "expanded": true
       }
     ],
-    "notes": [
-      {
-        "id": 1,
-        "title": "Rule of Threes",
-        "content": [
-          {
-            "type": "bulleted-list",
-            "children": [
-              {
-                "children": [
-                  {
-                    "text": "Three bears"
-                  }
-                ],
-                "type": "list-item"
-              },
-              {
-                "children": [
-                  {
-                    "text": "Three bowls of porridge"
-                  }
-                ],
-                "type": "list-item"
-              },
-              {
-                "children": [
-                  {
-                    "text": "Three chairs"
-                  }
-                ],
-                "type": "list-item"
-              },
-              {
-                "children": [
-                  {
-                    "text": "Three beds "
-                  }
-                ],
-                "type": "list-item"
-              },
-              {
-                "children": [
-                  {
-                    "text": "Three indiscretions "
-                  }
-                ],
-                "type": "list-item"
-              }
-            ]
-          }
-        ],
-        "tags": [
-          4
-        ],
-        "characters": [],
-        "places": [],
-        "lastEdited": 1597213167350,
-        "templates": [],
-        "imageId": null,
-        "bookIds": [],
-        "description": [
-          {
-            "type": "bulleted-list",
-            "children": [
-              {
-                "children": [
-                  {
-                    "text": "Three bears"
-                  }
-                ],
-                "type": "list-item"
-              },
-              {
-                "children": [
-                  {
-                    "text": "Three bowls of porridge"
-                  }
-                ],
-                "type": "list-item"
-              },
-              {
-                "children": [
-                  {
-                    "text": "Three chairs"
-                  }
-                ],
-                "type": "list-item"
-              },
-              {
-                "children": [
-                  {
-                    "text": "Three beds "
-                  }
-                ],
-                "type": "list-item"
-              },
-              {
-                "children": [
-                  {
-                    "text": "Three indiscretions "
-                  }
-                ],
-                "type": "list-item"
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "id": 2,
-        "title": "Theme: Trust",
-        "content": [
-          {
-            "type": "bulleted-list",
-            "children": [
-              {
-                "children": [
-                  {
-                    "text": "The bears leave their door unlocked, trusting no one will enter. "
-                  }
-                ],
-                "type": "list-item"
-              },
-              {
-                "children": [
-                  {
-                    "text": "Goldilocks breaks their trust and runs away before she has to suffer repercussions. "
-                  }
-                ],
-                "type": "list-item"
-              }
-            ]
-          }
-        ],
-        "tags": [
-          2
-        ],
-        "characters": [],
-        "places": [],
-        "lastEdited": 1597183091866,
-        "templates": [],
-        "imageId": null,
-        "bookIds": [],
-        "description": [
-          {
-            "type": "bulleted-list",
-            "children": [
-              {
-                "children": [
-                  {
-                    "text": "The bears leave their door unlocked, trusting no one will enter. "
-                  }
-                ],
-                "type": "list-item"
-              },
-              {
-                "children": [
-                  {
-                    "text": "Goldilocks breaks their trust and runs away before she has to suffer repercussions. "
-                  }
-                ],
-                "type": "list-item"
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "id": 3,
-        "title": "Theme: Stranger Danger",
-        "content": [
-          {
-            "children": [
-              {
-                "text": "Strangers can be dangerous: "
-              }
-            ]
-          },
-          {
-            "type": "bulleted-list",
-            "children": [
-              {
-                "children": [
-                  {
-                    "text": "Goldilocks (a stranger) entered and caused damaged to the bears' home."
-                  }
-                ],
-                "type": "list-item"
-              },
-              {
-                "type": "list-item",
-                "children": [
-                  {
-                    "text": "Goldilocks could be seriously harmed if the bears (strangers to her) find her."
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "tags": [
-          1
-        ],
-        "characters": [],
-        "places": [],
-        "lastEdited": 1597186957639,
-        "templates": [],
-        "imageId": null,
-        "bookIds": [],
-        "description": [
-          {
-            "children": [
-              {
-                "text": "Strangers can be dangerous: "
-              }
-            ],
-            "type": "paragraph"
-          },
-          {
-            "type": "bulleted-list",
-            "children": [
-              {
-                "children": [
-                  {
-                    "text": "Goldilocks (a stranger) entered and caused damaged to the bears' home."
-                  }
-                ],
-                "type": "list-item"
-              },
-              {
-                "type": "list-item",
-                "children": [
-                  {
-                    "text": "Goldilocks could be seriously harmed if the bears (strangers to her) find her."
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "id": 4,
-        "title": "Theme: Greed",
-        "content": [
-          {
-            "type": "bulleted-list",
-            "children": [
-              {
-                "children": [
-                  {
-                    "text": "Goldilocks invites herself into their house, disrespecting the bears' space. "
-                  }
-                ],
-                "type": "list-item"
-              },
-              {
-                "children": [
-                  {
-                    "text": "Furthermore, she invites herself to their food and furniture. "
-                  }
-                ],
-                "type": "list-item"
-              }
-            ]
-          }
-        ],
-        "tags": [
-          3
-        ],
-        "characters": [],
-        "places": [],
-        "lastEdited": 1597186607532,
-        "templates": [],
-        "imageId": null,
-        "bookIds": [],
-        "description": [
-          {
-            "type": "bulleted-list",
-            "children": [
-              {
-                "children": [
-                  {
-                    "text": "Goldilocks invites herself into their house, disrespecting the bears' space. "
-                  }
-                ],
-                "type": "list-item"
-              },
-              {
-                "children": [
-                  {
-                    "text": "Furthermore, she invites herself to their food and furniture. "
-                  }
-                ],
-                "type": "list-item"
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "id": 5,
-        "title": "Brainstorm: Animals?",
-        "content": [
-          {
-            "type": "bulleted-list",
-            "children": [
-              {
-                "children": [
-                  {
-                    "text": "Goldilocks & The Three Pigs"
-                  }
-                ],
-                "type": "list-item"
-              },
-              {
-                "children": [
-                  {
-                    "text": "Goldilocks & The Three Wolves"
-                  }
-                ],
-                "type": "list-item"
-              },
-              {
-                "children": [
-                  {
-                    "text": "Goldilocks & The Three Bears"
-                  }
-                ],
-                "type": "list-item"
-              }
-            ]
-          }
-        ],
-        "tags": [
-          5
-        ],
-        "characters": [],
-        "places": [],
-        "lastEdited": 1597183102925,
-        "templates": [],
-        "imageId": null,
-        "bookIds": [],
-        "description": [
-          {
-            "type": "bulleted-list",
-            "children": [
-              {
-                "children": [
-                  {
-                    "text": "Goldilocks & The Three Pigs"
-                  }
-                ],
-                "type": "list-item"
-              },
-              {
-                "children": [
-                  {
-                    "text": "Goldilocks & The Three Wolves"
-                  }
-                ],
-                "type": "list-item"
-              },
-              {
-                "children": [
-                  {
-                    "text": "Goldilocks & The Three Bears"
-                  }
-                ],
-                "type": "list-item"
-              }
-            ]
-          }
-        ]
-      }
-    ],
+    "customAttributes": {
+      "characters": [
+        {
+          "name": "Species",
+          "type": "text"
+        }
+      ],
+      "places": [],
+      "cards": [],
+      "scenes": [],
+      "lines": []
+    },
     "places": [
       {
         "id": 1,
@@ -3582,41 +3099,267 @@
         "color": "#0b1117"
       }
     ],
-    "hierarchyLevels": {
-      "0": {
-        "name": "Scene",
-        "level": 0,
-        "autoNumber": true,
-        "textSize": 24,
-        "borderStyle": "NONE",
-        "backgroundColor": "none",
-        "textColor": "#6cace4",
-        "borderColor": "#6cace4",
-        "dark": {
-          "borderColor": "#c9e6ff",
-          "textColor": "#c9e6ff"
-        },
-        "light": {
-          "borderColor": "#6cace4",
-          "textColor": "#6cace4"
-        }
-      }
-    },
-    "tour": {
-      "showTour": false,
-      "feature": {
-        "name": "acts",
+    "notes": [
+      {
         "id": 1,
-        "endStep": 8
+        "title": "Rule of Threes",
+        "content": [
+          {
+            "type": "bulleted-list",
+            "children": [
+              {
+                "children": [
+                  {
+                    "text": "Three bears"
+                  }
+                ],
+                "type": "list-item"
+              },
+              {
+                "children": [
+                  {
+                    "text": "Three bowls of porridge"
+                  }
+                ],
+                "type": "list-item"
+              },
+              {
+                "children": [
+                  {
+                    "text": "Three chairs"
+                  }
+                ],
+                "type": "list-item"
+              },
+              {
+                "children": [
+                  {
+                    "text": "Three beds "
+                  }
+                ],
+                "type": "list-item"
+              },
+              {
+                "children": [
+                  {
+                    "text": "Three indiscretions "
+                  }
+                ],
+                "type": "list-item"
+              }
+            ]
+          }
+        ],
+        "tags": [
+          4
+        ],
+        "characters": [],
+        "places": [],
+        "lastEdited": 1597213167350,
+        "templates": [],
+        "imageId": null,
+        "bookIds": []
       },
-      "run": true,
-      "stepIndex": 0,
-      "steps": [],
-      "loading": false,
-      "action": "start",
-      "transitioning": false,
-      "b2bTransition": false,
-      "toursTaken": {}
+      {
+        "id": 2,
+        "title": "Theme: Trust",
+        "content": [
+          {
+            "type": "bulleted-list",
+            "children": [
+              {
+                "children": [
+                  {
+                    "text": "The bears leave their door unlocked, trusting no one will enter. "
+                  }
+                ],
+                "type": "list-item"
+              },
+              {
+                "children": [
+                  {
+                    "text": "Goldilocks breaks their trust and runs away before she has to suffer repercussions. "
+                  }
+                ],
+                "type": "list-item"
+              }
+            ]
+          }
+        ],
+        "tags": [
+          2
+        ],
+        "characters": [],
+        "places": [],
+        "lastEdited": 1597183091866,
+        "templates": [],
+        "imageId": null,
+        "bookIds": []
+      },
+      {
+        "id": 3,
+        "title": "Theme: Stranger Danger",
+        "content": [
+          {
+            "children": [
+              {
+                "text": "Strangers can be dangerous: "
+              }
+            ]
+          },
+          {
+            "type": "bulleted-list",
+            "children": [
+              {
+                "children": [
+                  {
+                    "text": "Goldilocks (a stranger) entered and caused damaged to the bears' home."
+                  }
+                ],
+                "type": "list-item"
+              },
+              {
+                "type": "list-item",
+                "children": [
+                  {
+                    "text": "Goldilocks could be seriously harmed if the bears (strangers to her) find her."
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "tags": [
+          1
+        ],
+        "characters": [],
+        "places": [],
+        "lastEdited": 1597186957639,
+        "templates": [],
+        "imageId": null,
+        "bookIds": []
+      },
+      {
+        "id": 4,
+        "title": "Theme: Greed",
+        "content": [
+          {
+            "type": "bulleted-list",
+            "children": [
+              {
+                "children": [
+                  {
+                    "text": "Goldilocks invites herself into their house, disrespecting the bears' space. "
+                  }
+                ],
+                "type": "list-item"
+              },
+              {
+                "children": [
+                  {
+                    "text": "Furthermore, she invites herself to their food and furniture. "
+                  }
+                ],
+                "type": "list-item"
+              }
+            ]
+          }
+        ],
+        "tags": [
+          3
+        ],
+        "characters": [],
+        "places": [],
+        "lastEdited": 1597186607532,
+        "templates": [],
+        "imageId": null,
+        "bookIds": []
+      },
+      {
+        "id": 5,
+        "title": "Brainstorm: Animals?",
+        "content": [
+          {
+            "type": "bulleted-list",
+            "children": [
+              {
+                "children": [
+                  {
+                    "text": "Goldilocks & The Three Pigs"
+                  }
+                ],
+                "type": "list-item"
+              },
+              {
+                "children": [
+                  {
+                    "text": "Goldilocks & The Three Wolves"
+                  }
+                ],
+                "type": "list-item"
+              },
+              {
+                "children": [
+                  {
+                    "text": "Goldilocks & The Three Bears"
+                  }
+                ],
+                "type": "list-item"
+              }
+            ]
+          }
+        ],
+        "tags": [
+          5
+        ],
+        "characters": [],
+        "places": [],
+        "lastEdited": 1597183102925,
+        "templates": [],
+        "imageId": null,
+        "bookIds": []
+      }
+    ],
+    "beats": [
+      {
+        "id": 1,
+        "position": 0,
+        "title": "Beat 1",
+        "time": 0,
+        "templates": [],
+        "autoOutlineSort": true
+      }
+    ],
+    "seriesLines": [
+      {
+        "id": 1,
+        "color": "#6cace4",
+        "title": "Main Plot",
+        "position": 0,
+        "expanded": null
+      }
+    ],
+    "categories": {
+      "characters": [
+        {
+          "id": 1,
+          "name": "Main",
+          "position": 0
+        },
+        {
+          "id": 2,
+          "name": "Supporting",
+          "position": 1
+        },
+        {
+          "id": 3,
+          "name": "Other",
+          "position": 2
+        }
+      ],
+      "places": [],
+      "notes": [],
+      "tags": []
     },
     "images": {
       "1": {
