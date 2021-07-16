@@ -80,7 +80,7 @@ const platform = {
   browserHistory: history,
   inBrowser: true,
   templatesDisabled: false,
-  exportDisabled: true,
+  exportDisabled: false,
   redux: {
     connect,
     bindActionCreators,
