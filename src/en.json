@@ -380,6 +380,9 @@
   "Delete Chapter": {
     "message": "Delete Chapter"
   },
+  "Delete Chapter?": {
+    "message": "Delete Chapter?"
+  },
   "Delete Character": {
     "message": "Delete Character"
   },
