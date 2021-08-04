@@ -6,6 +6,7 @@ import { timelineFilterIsEmptySelector, timelineFilterSelector } from './ui'
 import { findNode, nodeParent } from '../reducers/tree'
 import { nextId } from '../store/newIds'
 import { beatsByBookSelector, sortedBeatsByBookSelector } from './beats'
+import { beatHierarchyIsOn } from './featureFlags'
 
 export const allCardsSelector = (state) => state.cards
 
@@ -126,11 +127,15 @@ export const cardMapSelector = createSelector(
   allCardsSelector,
   collapsedBeatSelector,
   sortedBeatsByBookSelector,
-  (cards, collapsedBeats, allSortedBeats) => {
+  beatHierarchyIsOn,
+  (cards, collapsedBeats, allSortedBeats, hierarchyIsOn) => {
     const beatIds = allSortedBeats.map(({ id }) => id)
     const beatPositions = beatIds.map((x) => x)
     beatIds.forEach((beatId, index) => (beatPositions[beatId] = index))
-    return cards.reduce(cardReduce('lineId', 'beatId', collapsedBeats, beatPositions), {})
+    return cards.reduce(
+      cardReduce('lineId', 'beatId', hierarchyIsOn && collapsedBeats, beatPositions),
+      {}
+    )
   }
 )
 
@@ -138,11 +143,15 @@ export const cardMetaDataMapSelector = createDeepEqualSelector(
   allCardMetaDataSelector,
   collapsedBeatSelector,
   sortedBeatsByBookSelector,
-  (cards, collapsedBeats, allSortedBeats) => {
+  beatHierarchyIsOn,
+  (cards, collapsedBeats, allSortedBeats, hierarchyIsOn) => {
     const beatIds = allSortedBeats.map(({ id }) => id)
     const beatPositions = beatIds.map((x) => x)
     beatIds.forEach((beatId, index) => (beatPositions[beatId] = index))
-    return cards.reduce(cardReduce('lineId', 'beatId', collapsedBeats, beatPositions), {})
+    return cards.reduce(
+      cardReduce('lineId', 'beatId', hierarchyIsOn && collapsedBeats, beatPositions),
+      {}
+    )
   }
 )
 
