@@ -6,6 +6,7 @@ import { bindActionCreators } from 'redux'
 import { appVersion } from '../lib/version'
 import { publishRCEOperations, fetchRCEOperations } from '../lib/firebase'
 import {
+  getTemplateById,
   listTemplates,
   listCustomTemplates,
   startSaveAsTemplate,
@@ -14,7 +15,9 @@ import {
   messageToDeleteTemplate,
 } from '../lib/templates'
 import { useExportConfigInfo } from '../lib/exportConfig'
-import askToExport from '../lib'
+// import askToExport from '../lib'
+
+const askToExport = () => {}
 
 const platform = {
   appVersion: appVersion(),
@@ -25,6 +28,7 @@ const platform = {
     editTemplateDetails: messageToEditTemplate,
     startSaveAsTemplate,
     saveTemplate: messageToSaveNewTemplate,
+    getTemplateById,
   },
   settings: {},
   user: {
