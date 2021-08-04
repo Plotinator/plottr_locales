@@ -13,6 +13,8 @@ import {
   messageToEditTemplate,
   messageToDeleteTemplate,
 } from '../lib/templates'
+import { useExportConfigInfo } from '../lib/exportConfig'
+import askToExport from '../lib'
 
 const platform = {
   appVersion: appVersion(),
@@ -50,11 +52,11 @@ const platform = {
     platform: '',
   },
   export: {
-    askToExport: () => {},
+    askToExport,
     export_config: {},
   },
   store: {
-    useExportConfigInfo: () => {},
+    useExportConfigInfo,
   },
   // Save file.
   moveFromTemp: (fullFileState) => {
