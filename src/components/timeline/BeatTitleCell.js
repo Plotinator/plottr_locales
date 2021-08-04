@@ -301,7 +301,7 @@ const BeatTitleCellConnector = (connector) => {
         <Button
           title="Insert Peer"
           className={!isFirst && tour.run ? 'acts-tour-step6' : null}
-          bsSize={isSmall ? 'small' : undefined}
+          bsSize="xs"
           block
           onClick={this.handleAddBeat}
           style={isMedium ? (isHigherLevel ? { marginTop: '0px' } : { marginTop: '19px' }) : null}
@@ -314,7 +314,7 @@ const BeatTitleCellConnector = (connector) => {
         <Button
           title="Insert Child"
           className={'acts-tour-step8'}
-          bsSize={isSmall ? 'small' : undefined}
+          bsSize="xs"
           block
           style={{ marginTop: '0px' }}
           onClick={this.handleAddChild}
@@ -471,25 +471,21 @@ const BeatTitleCellConnector = (connector) => {
     render() {
       window.SCROLLWITHKEYS = !this.state.editing
       const {
-        beats,
-        beatIndex,
-        hierarchyLevels,
+        hierarchyLevel,
         beat,
-        positionOffset,
         beatTitle,
         isSmall,
         isMedium,
-        hierarchyEnabled,
-        isSeries,
         orientation,
         timelineSize,
         readOnly,
         featureFlags,
+        darkMode,
       } = this.props
       const { hovering, inDropZone } = this.state
       const innerKlass = cx(orientedClassName('beat__body', orientation), {
         'medium-timeline': isMedium,
-        hover: hovering === this.props.beat.id,
+        hover: hovering === beat.id,
         dropping: inDropZone,
         disabled: readOnly,
       })
@@ -504,15 +500,6 @@ const BeatTitleCellConnector = (connector) => {
           'row-header': !isHorizontal,
           dropping: inDropZone,
         }
-        const beatTitle = beatPositionTitle(
-          beatIndex,
-          beats,
-          beat,
-          hierarchyLevels,
-          positionOffset,
-          hierarchyEnabled,
-          isSeries
-        )
         return (
           <th
             className={cx(klasses)}
@@ -549,13 +536,11 @@ const BeatTitleCellConnector = (connector) => {
               {this.renderDelete()}
               <div
                 style={hierarchyToStyles(
-                  this.props.hierarchyLevel,
+                  hierarchyLevel,
                   timelineSize,
-                  this.state.hovering === this.props.beat.id || this.state.inDropZone,
-                  this.props.darkMode === true
-                    ? this.props.hierarchyLevel.dark
-                    : this.props.hierarchyLevel.light,
-                  this.props.darkMode,
+                  hovering === beat.id || inDropZone,
+                  darkMode === true ? hierarchyLevel.dark : hierarchyLevel.light,
+                  darkMode,
                   featureFlags
                 )}
                 className={innerKlass}
