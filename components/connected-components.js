@@ -15,9 +15,8 @@ import {
   messageToDeleteTemplate,
 } from '../lib/templates'
 import { useExportConfigInfo } from '../lib/exportConfig'
-// import askToExport from '../lib'
-
-const askToExport = () => {}
+import export_config from '../lib/exporter/default_config'
+import { exportFile } from '../lib/export'
 
 const platform = {
   appVersion: appVersion(),
@@ -56,7 +55,7 @@ const platform = {
     platform: '',
   },
   export: {
-    askToExport,
+    askToExport: exportFile,
     export_config: {},
   },
   store: {
