@@ -86,6 +86,11 @@ import * as borderStyle from './store/borderStyle'
 
 import * as tree from './reducers/tree'
 
+// Slate serialisers
+import serializeToRTF from './slate_serializers/to_rtf'
+import { serialize as serializeToPlain } from './slate_serializers/to_plain_text'
+import serializeToWord from './slate_serializers/to_word'
+
 const reducers = {
   customAttributes: customAttributesReducer,
   lines: linesReducer,
@@ -164,6 +169,12 @@ const helpers = {
   colors: colorHelpers,
 }
 
+const slate = {
+  rtf: { serialize: serializeToRTF },
+  word: { serialize: serializeToWord },
+  plain: { serialize: serializeToPlain },
+}
+
 export {
   actions,
   ActionTypes,
@@ -182,4 +193,5 @@ export {
   template,
   tree,
   borderStyle,
+  slate,
 }
