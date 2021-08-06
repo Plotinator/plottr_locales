@@ -11,6 +11,7 @@ import FileChooser from './file-chooser'
 import SaveFile from './save-file'
 import Share from './share'
 import Download from './download'
+import Upload from './upload'
 import { actions, selectors } from 'pltr/v2'
 import { basePath } from '../lib/basePath'
 import { logOut, onSessionChange } from '../lib/firebase'
@@ -90,6 +91,7 @@ function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
       </Nav>
       <Beamer inNavigation />
       <Navbar.Form pullRight style={{ marginRight: '15px' }}>
+        <Upload />
         <Button bsStyle="link" onClick={logOut}>
           {i18n('logout')}
         </Button>
