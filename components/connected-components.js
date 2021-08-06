@@ -46,7 +46,11 @@ const platform = {
     warn: () => {},
     error: () => {},
   },
-  dialog: {},
+  dialog: {
+    showErrorBox: (error) => {
+      alert(error)
+    },
+  },
   node: {
     env: process.env.NEXT_PUBLIC_NODE_ENV === 'development' ? 'development' : 'production',
   },
