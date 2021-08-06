@@ -5,7 +5,15 @@ import { connect } from 'react-redux'
 import { actions, selectors } from 'pltr/v2'
 import { initialFetch, listen, listenToCustomTemplates, stopListening } from '../lib/firebase'
 
-const Listener = ({ userId, selectedFile, setPermission, patchFile, clientId, loadFile }) => {
+const Listener = ({
+  userId,
+  selectedFile,
+  setPermission,
+  patchFile,
+  clientId,
+  loadFile,
+  darkMode,
+}) => {
   const [unsubscribeFunctions, setUnsubscribeFunctions] = useState([])
 
   useEffect(() => {
@@ -39,6 +47,16 @@ const Listener = ({ userId, selectedFile, setPermission, patchFile, clientId, lo
     return () => {}
   }, [userId])
 
+  useEffect(() => {
+    const bodyElement = document.querySelector('body')
+    if (bodyElement) {
+      if (darkMode !== bodyElement.classList.contains('darkmode')) {
+        bodyElement.classList.toggle('darkmode')
+        return
+      }
+    }
+  }, [darkMode])
+
   return null
 }
 
@@ -48,6 +66,7 @@ Listener.propTypes = {
   selectedFile: PropTypes.object,
   clientId: PropTypes.string,
   loadFile: PropTypes.func.isRequired,
+  darkMode: PropTypes.bool,
 }
 
 export default connect(
@@ -55,6 +74,7 @@ export default connect(
     selectedFile: selectors.selectedFileSelector(state.present),
     userId: selectors.userIdSelector(state.present),
     clientId: selectors.clientIdSelector(state.present),
+    darkMode: selectors.isDarkModeSelector(state.present),
   }),
   {
     setPermission: actions.permission.setPermission,
