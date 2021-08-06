@@ -205,6 +205,7 @@ export const SET_PERMISSION = 'SET_PERMISSION'
 // project actions
 export const SET_FILE_LIST = 'SET_FILE_LIST'
 export const SELECT_FILE = 'SELECT_FILE'
+export const SELECT_EMPTY_FILE = 'SELECT_EMPTY_FILE'
 
 // client actions
 export const SET_USER_ID = 'SET_USER_ID'
