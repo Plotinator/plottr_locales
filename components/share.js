@@ -95,13 +95,13 @@ const Share = ({ selectedFile }) => {
           </tbody>
         </Table>
       </PlottrModal>
-      <button
+      <Button
         onClick={() => {
           setSharing(!sharing)
         }}
       >
         <FiShare />
-      </button>
+      </Button>
     </>
   )
 }
