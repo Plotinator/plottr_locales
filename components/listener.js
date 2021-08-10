@@ -9,6 +9,7 @@ const Listener = ({
   userId,
   selectedFile,
   setPermission,
+  setFileLoaded,
   patchFile,
   clientId,
   loadFile,
@@ -28,6 +29,7 @@ const Listener = ({
     initialFetch(userId, selectedFile.id, clientId, selectedFile.version).then((file) => {
       setUnsubscribeFunctions(listen(userId, selectedFile.id, clientId, selectedFile.version))
       setPermission(selectedFile.permission)
+      setFileLoaded()
     })
 
     return () => {
@@ -64,6 +66,7 @@ Listener.propTypes = {
   userId: PropTypes.string,
   setPermission: PropTypes.func.isRequired,
   selectedFile: PropTypes.object,
+  setFileLoaded: PropTypes.func.isRequired,
   clientId: PropTypes.string,
   loadFile: PropTypes.func.isRequired,
   darkMode: PropTypes.bool,
@@ -80,5 +83,6 @@ export default connect(
     setPermission: actions.permission.setPermission,
     patchFile: actions.ui.patchFile,
     loadFile: actions.ui.loadFile,
+    setFileLoaded: actions.project.setFileLoaded,
   }
 )(Listener)
