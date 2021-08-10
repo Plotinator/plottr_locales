@@ -581,7 +581,7 @@
   13. [X] Download file
   14. [X] Upload File
   15. [ ] MPQ
-  16. [ ] Export configuration management
+  16. [X] Export configuration management
   17. [ ] Change appearance
   18. [ ] Turn off/on act structure beta
 
