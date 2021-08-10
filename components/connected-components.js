@@ -60,7 +60,7 @@ const platform = {
   },
   export: {
     askToExport: exportFile,
-    export_config: {},
+    export_config,
   },
   store: {
     useExportConfigInfo,
