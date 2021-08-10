@@ -565,23 +565,25 @@
   I recommend the following priorities for remaining features (based
   on what will get the application to a minimal viable product
   soonest):
-  1. File versioning
-  2. Account management
-  3. Change language
-  4. Help page
-  5. Templates
-  6. File export to word and Scrivener
-  7. Robust simultaneous RCE editing
-  8. Backup/auditing
-  9. Error reporting
-  10. Logging
-  11. File sharing
-  12. Download file
-  13. Upload File
-  14. MPQ
-  15. Export configuration management
-  16. Change appearance
-  17. Turn off/on act structure beta 
+  1. [X] File versioning
+  2. [ ] Account management
+  3. [X] Change language (via browser default)
+  4. [ ] Change language via options
+  5. [ ] Help page
+  6. [X] Templates
+  7. [ ] File export to word and Scrivener (done partially.  Needs
+         file storage somewhere to put the file for download.)
+  8. [ ] Robust simultaneous RCE editing
+  9. [X] Backup/auditing
+  10. [ ] Error reporting
+  11. [ ] Logging
+  12. [ ] File sharing
+  13. [X] Download file
+  14. [X] Upload File
+  15. [ ] MPQ
+  16. [ ] Export configuration management
+  17. [ ] Change appearance
+  18. [ ] Turn off/on act structure beta
 
 * Conclusion
   Plottr Web is nearly a complete replicate of the desktop version.
