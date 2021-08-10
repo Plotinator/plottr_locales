@@ -575,15 +575,16 @@
          file storage somewhere to put the file for download.)
   8. [ ] Robust simultaneous RCE editing
   9. [X] Backup/auditing
-  10. [ ] Error reporting
-  11. [ ] Logging
-  12. [ ] File sharing
-  13. [X] Download file
-  14. [X] Upload File
-  15. [ ] MPQ
-  16. [X] Export configuration management
-  17. [ ] Change appearance
-  18. [ ] Turn off/on act structure beta
+  10. [ ] Error reporting (rollbar)
+  11. [ ] Generate error report
+  12. [ ] Logging
+  13. [ ] File sharing
+  14. [X] Download file
+  15. [X] Upload File
+  16. [ ] MPQ
+  17. [X] Export configuration management
+  18. [ ] Change appearance
+  19. [ ] Turn off/on act structure beta
 
 * Conclusion
   Plottr Web is nearly a complete replicate of the desktop version.
