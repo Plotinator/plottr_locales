@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { v4 as uuidv4 } from 'uuid'
 
+import { actions } from 'pltr/v2'
 import { appVersion } from '../lib/version'
 import { publishRCEOperations, fetchRCEOperations } from '../lib/firebase'
 import {
@@ -18,12 +19,16 @@ import {
 import { useExportConfigInfo } from '../lib/exportConfig'
 import export_config from '../lib/exporter/default_config'
 import { exportFile } from '../lib/export'
+import { store } from '../lib/redux'
+import { useLicenseInfo } from '../lib/store_hooks'
+import { useTrialStatus } from '../lib/trialManager'
+import { settings } from '../lib/settings'
 
 const platform = {
   appVersion: appVersion(),
   defaultBackupLocation: 'TODO',
   setDarkMode: (value) => {
-    // TODO!
+    store.dispatch(actions.ui.setDarkMode(value))
   },
   file: {
     createNew: (template) => {
@@ -109,15 +114,11 @@ const platform = {
     // TODO
   },
   license: {
-    useLicenseInfo: () => {
-      // TODO
-    },
+    useLicenseInfo,
     checkForActiveLicense: () => {
       // TODO
     },
-    useTrialStatus: () => {
-      // TODO
-    },
+    useTrialStatus,
     licenseStore: () => {
       // TODO
     },
@@ -148,7 +149,7 @@ const platform = {
       // TODO
     },
   },
-  settings: {},
+  settings,
   useSettingsInfo: () => {
     // TODO
   },
@@ -303,3 +304,4 @@ export const EditSeries = components.EditSeries
 export const FileLocation = components.FileLocation
 export const BookChooser = components.BookChooser
 export const TimelineWrapper = components.TimelineWrapper
+export const DashboardBody = components.DashboardBody
