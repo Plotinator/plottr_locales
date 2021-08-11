@@ -2,6 +2,7 @@ import { connections } from 'plottr_components'
 import { history } from '../lib/history'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
+import { v4 as uuidv4 } from 'uuid'
 
 import { appVersion } from '../lib/version'
 import { publishRCEOperations, fetchRCEOperations } from '../lib/firebase'
@@ -233,6 +234,9 @@ const platform = {
   rootElementSelectors: ['#__next'],
   publishRCEOperations,
   fetchRCEOperations,
+  machineIdSync: () => {
+    return uuidv4()
+  },
 }
 
 const components = connections.pltr(platform)
