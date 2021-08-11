@@ -1,5 +1,5 @@
-import { partition, sortBy } from 'lodash'
-import { t as i18n } from 'plottr_locales'
+import { cloneDeep, sortBy } from 'lodash'
+import { t } from 'plottr_locales'
 import {
   ADD_LINE,
   ADD_LINE_WITH_TITLE,
@@ -21,6 +21,7 @@ import {
   DELETE_BOOK,
   LOAD_LINES,
   ADD_BOOK_FROM_TEMPLATE,
+  ADD_BOOK,
 } from '../constants/ActionTypes'
 import { line } from '../store/initialState'
 import { newFileLines, newFileSeriesLines } from '../store/newFileState'
@@ -39,7 +40,7 @@ const initialState = [...newFileLines, ...newFileSeriesLines]
 const lines =
   (dataRepairers) =>
   (state = initialState, action) => {
-    const actionBookId = associateWithBroadestScope(action.bookId)
+    const actionBookId = associateWithBroadestScope(action.bookId || action.newBookId)
 
     switch (action.type) {
       case ADD_LINE: {
@@ -58,6 +59,7 @@ const lines =
         ]
       }
 
+      case ADD_BOOK:
       case ADD_LINE_WITH_TITLE: {
         const linesInBook_ = state.filter((l) => l.bookId == actionBookId).length
         return [
@@ -65,7 +67,7 @@ const lines =
             ...line,
             id: nextId(state),
             bookId: actionBookId,
-            title: action.title,
+            title: action.title || t('Main Plot'),
             color: nextColor(linesInBook_),
             position: nextPositionInBook(state, actionBookId),
           },
@@ -73,17 +75,18 @@ const lines =
         ]
       }
 
-      case ADD_LINES_FROM_TEMPLATE: {
-        const [_, notBook] = partition(state, (l) => l.bookId == actionBookId)
-        return [...notBook, ...action.lines]
-      }
-
+      case ADD_LINES_FROM_TEMPLATE:
       case ADD_BOOK_FROM_TEMPLATE: {
-        const newLines = action.templateData.lines.map((l) => {
-          l.id = l.id + action.nextLineId // give it a new id
-          l.bookId = action.newBookId // add it to the new book
-          l.fromTemplateId = action.templateData.id
-          return l
+        const linesInBook_ = state.filter((l) => l.bookId == actionBookId).length
+        const newLines = action.templateData.lines.map((l, index) => {
+          const newLine = cloneDeep(l)
+          newLine.id = newLine.id + action.nextLineId // give it a new id
+          newLine.bookId = actionBookId // add it to the new/current book
+          newLine.fromTemplateId = action.templateData.id
+          if (!newLine.color || newLine.color == nextColor(0)) {
+            newLine.color = nextColor(linesInBook_ + index)
+          }
+          return newLine
         })
         return [...state, ...newLines]
       }
@@ -155,7 +158,7 @@ const lines =
           {
             id: nextId(state),
             bookId: actionBookId,
-            title: i18n('Main Plot'),
+            title: t('Main Plot'),
             color: nextColor(0),
             position: 0,
             expanded: null,
