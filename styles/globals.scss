@@ -1,5 +1,6 @@
 @import 'colors';
 @import 'vars';
+@import 'bootstrap_configuration';
 
 $text-color: $gray-0;
 
@@ -10,6 +11,8 @@ $text-color: $gray-0;
 
 @import '../lib/plottr_components/dist/components/components-tailwind.css';
 @import '../lib/plottr_components/dist/components/components.css';
+
+@import 'dashboard/dashboard';
 
 /* Tailwind sets these to display: block, but the website assumes inline. */
 svg {
