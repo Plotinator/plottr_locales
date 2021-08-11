@@ -20,16 +20,137 @@ import { exportFile } from '../lib/export'
 
 const platform = {
   appVersion: appVersion(),
+  defaultBackupLocation: 'TODO',
+  setDarkMode: (value) => {
+    // TODO!
+  },
+  file: {
+    createNew: (template) => {
+      // TODO
+    },
+    openExistingFile: () => {
+      // TODO
+    },
+    doesFileExist: () => {
+      // TODO
+    },
+    useSortedKnownFiles: () => {
+      // TODO
+    },
+    isTempFile: () => {
+      // TODO
+    },
+    pathSep: 'todo',
+    basename: () => {
+      // TODO
+    },
+    openKnownFile: (filePath, id, unknown) => {
+      // TODO
+    },
+    deleteKnownFile: (id, path) => {
+      // TODO
+    },
+    editKnownFilePath: (oldFilePath, newFilePath) => {
+      // TODO
+    },
+    removeFromKnownFiles: (id) => {
+      // TODO
+    },
+    saveFile: (filePath, file) => {
+      // TODO
+    },
+    readFileSync: () => {
+      // TODO
+    },
+    moveItemToTrash: () => {
+      // TODO
+    },
+    createFromSnowflake: (importedPath) => {
+      // TODO
+    },
+    joinPath: () => {
+      // TODO
+    },
+  },
+  update: {
+    quitToInstall: () => {
+      // TODO
+    },
+    downloadUpdate: () => {
+      // TODO
+    },
+    checkForUpdates: () => {
+      // TODO
+    },
+    onUpdateError: (cb) => {
+      // TODO
+    },
+    onUpdaterUpdateAvailable: (cb) => {
+      // TODO
+    },
+    onUpdaterUpdateNotAvailable: (cb) => {
+      // TODO
+    },
+    onUpdaterDownloadProgress: (cb) => {
+      // TODO
+    },
+    onUpdatorUpdateDownloaded: (cb) => {
+      // TODO
+    },
+    deregisterUpdateListeners: () => {
+      // TODO
+    },
+  },
+  updateLanguage: (newLanguage) => {
+    // TODO
+  },
+  updateBeatHierarchyFlag: (newValue) => {
+    // TODO
+  },
+  license: {
+    useLicenseInfo: () => {
+      // TODO
+    },
+    checkForActiveLicense: () => {
+      // TODO
+    },
+    useTrialStatus: () => {
+      // TODO
+    },
+    licenseStore: () => {
+      // TODO
+    },
+    verifyLicense: () => {
+      // TODO
+    },
+    trial90days: [],
+  },
+  reloadMenu: () => {
+    // NO-OP
+  },
   template: {
+    TemplateFetcher: null, // TODO
     listTemplates,
     listCustomTemplates,
+    getTemplateById,
     deleteTemplate: messageToDeleteTemplate,
     editTemplateDetails: messageToEditTemplate,
     startSaveAsTemplate,
     saveTemplate: messageToSaveNewTemplate,
-    getTemplateById,
+    useFilteredSortedTemplates: () => {
+      // TODO
+    },
+    useCustomTemplatesInfo: () => {
+      // TODO
+    },
+    useTemplatesInfo: () => {
+      // TODO
+    },
   },
   settings: {},
+  useSettingsInfo: () => {
+    // TODO
+  },
   user: {
     get: () => {},
   },
@@ -40,23 +161,37 @@ const platform = {
   openExternal: (url) => {
     window.location.href = url
   },
-  createErrorReport: () => {},
+  createErrorReport: () => {
+    // TODO
+  },
   log: {
-    info: () => {},
-    warn: () => {},
-    error: () => {},
+    info: () => {
+      // TODO
+    },
+    warn: () => {
+      // TODO
+    },
+    error: () => {
+      // TODO
+    },
   },
   dialog: {
     showErrorBox: (error) => {
       alert(error)
     },
   },
+  showSaveDialogSync: () => {
+    // TODO
+  },
+  showOpenDialogSync: () => {
+    // TODO
+  },
   node: {
     env: process.env.NEXT_PUBLIC_NODE_ENV === 'development' ? 'development' : 'production',
   },
   rollbar: {
     rollbarAccessToken: process.env.NEXT_PUBLIC_ROLLBAR_ACCESS_TOKEN || '',
-    platform: '',
+    platform: 'TODO',
   },
   export: {
     askToExport: exportFile,
@@ -65,7 +200,6 @@ const platform = {
   store: {
     useExportConfigInfo,
   },
-  // Save file.
   moveFromTemp: (fullFileState) => {
     const data = new Blob([JSON.stringify(fullFileState, null, 2)], { type: 'text/json' })
     const link = document.createElement('a')
@@ -79,8 +213,10 @@ const platform = {
     })
     link.remove()
   },
-  showItemInFolder: (fileName) => {},
-  tempFilesPath: '',
+  showItemInFolder: (fileName) => {
+    // NO-OP
+  },
+  tempFilesPath: 'TODO',
   mpq: {
     push: () => {
       console.warn('TODO: implement MPQ!')
