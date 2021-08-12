@@ -18,8 +18,9 @@
     border-top: 1px solid $neutral-gray-7;
   }
 
-  webview {
+  iframe, webview {
     height: calc(100% - 49px);
+    width: 100%;
     border: 1px solid $neutral-gray-7;
   }
 }
