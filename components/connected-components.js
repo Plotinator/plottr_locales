@@ -31,6 +31,7 @@ import { useTrialStatus } from '../lib/trialManager'
 import { settings } from '../lib/settings'
 import { useSortedKnownFiles } from '../lib/files'
 import { useBackupFolders } from '../lib/backups'
+import { createErrorReport } from '../lib/createErrorReport'
 
 const platform = {
   appVersion: appVersion(),
@@ -161,9 +162,7 @@ const platform = {
   openExternal: (url) => {
     window.location.href = url
   },
-  createErrorReport: () => {
-    // TODO
-  },
+  createErrorReport,
   log: {
     info: () => {
       // TODO
