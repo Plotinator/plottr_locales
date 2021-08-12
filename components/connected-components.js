@@ -20,7 +20,7 @@ import { useExportConfigInfo } from '../lib/exportConfig'
 import export_config from '../lib/exporter/default_config'
 import { exportFile } from '../lib/export'
 import { store } from '../lib/redux'
-import { useLicenseInfo } from '../lib/store_hooks'
+import { useLicenseInfo, useSettingsInfo } from '../lib/store_hooks'
 import { useTrialStatus } from '../lib/trialManager'
 import { settings } from '../lib/settings'
 import { useSortedKnownFiles } from '../lib/files'
@@ -149,9 +149,7 @@ const platform = {
     },
   },
   settings,
-  useSettingsInfo: () => {
-    // TODO
-  },
+  useSettingsInfo,
   user: {
     get: () => {},
   },
