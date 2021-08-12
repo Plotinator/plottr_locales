@@ -1352,6 +1352,12 @@
   "Use Template": {
     "message": "Use Template"
   },
+  "Use Book\nTemplate": {
+    "message": "Use Book\nTemplate"
+  },
+  "Use Scene\nTemplate": {
+    "message": "Use Scene\nTemplate"
+  },
   "Use a different email": {
     "message": "Use a different email"
   },
