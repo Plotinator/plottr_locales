@@ -15,12 +15,13 @@ import {
   messageToSaveNewTemplate,
   messageToEditTemplate,
   messageToDeleteTemplate,
+  useFilteredSortedTemplates,
 } from '../lib/templates'
 import { useExportConfigInfo } from '../lib/exportConfig'
 import export_config from '../lib/exporter/default_config'
 import { exportFile } from '../lib/export'
 import { store } from '../lib/redux'
-import { useLicenseInfo, useSettingsInfo } from '../lib/store_hooks'
+import { useCustomTemplatesInfo, useLicenseInfo, useSettingsInfo, useTemplatesInfo } from '../lib/store_hooks'
 import { useTrialStatus } from '../lib/trialManager'
 import { settings } from '../lib/settings'
 import { useSortedKnownFiles } from '../lib/files'
@@ -138,15 +139,9 @@ const platform = {
     editTemplateDetails: messageToEditTemplate,
     startSaveAsTemplate,
     saveTemplate: messageToSaveNewTemplate,
-    useFilteredSortedTemplates: () => {
-      // TODO
-    },
-    useCustomTemplatesInfo: () => {
-      // TODO
-    },
-    useTemplatesInfo: () => {
-      // TODO
-    },
+    useFilteredSortedTemplates,
+    useCustomTemplatesInfo,
+    useTemplatesInfo,
   },
   settings,
   useSettingsInfo,
