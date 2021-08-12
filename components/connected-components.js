@@ -21,10 +21,16 @@ import { useExportConfigInfo } from '../lib/exportConfig'
 import export_config from '../lib/exporter/default_config'
 import { exportFile } from '../lib/export'
 import { store } from '../lib/redux'
-import { useCustomTemplatesInfo, useLicenseInfo, useSettingsInfo, useTemplatesInfo } from '../lib/store_hooks'
+import {
+  useCustomTemplatesInfo,
+  useLicenseInfo,
+  useSettingsInfo,
+  useTemplatesInfo,
+} from '../lib/store_hooks'
 import { useTrialStatus } from '../lib/trialManager'
 import { settings } from '../lib/settings'
 import { useSortedKnownFiles } from '../lib/files'
+import { useBackupFolders } from '../lib/backups'
 
 const platform = {
   appVersion: appVersion(),
@@ -194,6 +200,7 @@ const platform = {
   store: {
     useExportConfigInfo,
   },
+  useBackupFolders,
   moveFromTemp: (fullFileState) => {
     const data = new Blob([JSON.stringify(fullFileState, null, 2)], { type: 'text/json' })
     const link = document.createElement('a')
