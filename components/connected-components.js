@@ -23,6 +23,7 @@ import { store } from '../lib/redux'
 import { useLicenseInfo } from '../lib/store_hooks'
 import { useTrialStatus } from '../lib/trialManager'
 import { settings } from '../lib/settings'
+import { useSortedKnownFiles } from '../lib/files'
 
 const platform = {
   appVersion: appVersion(),
@@ -40,9 +41,7 @@ const platform = {
     doesFileExist: () => {
       // TODO
     },
-    useSortedKnownFiles: () => {
-      // TODO
-    },
+    useSortedKnownFiles,
     isTempFile: () => {
       // TODO
     },
