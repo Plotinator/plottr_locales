@@ -10,6 +10,7 @@ const RecentFilesConnector = (connector) => {
   const {
     platform: {
       file: { isTempFile, doesFileExist, useSortedKnownFiles, pathSep, basename, openKnownFile },
+      log,
     },
   } = connector
 
@@ -24,7 +25,12 @@ const RecentFilesConnector = (connector) => {
     useEffect(() => {
       let newMissing = [...missingFiles]
       sortedIds.forEach((id) => {
-        if (!doesFileExist(filesById[`${id}`].path)) {
+        const filePath = filesById[`${id}`].path
+        if (!filePath) {
+          log.warn(`File with id: ${id}, doesn't have a "filePath"`)
+          return
+        }
+        if (!doesFileExist(filePath)) {
           newMissing.push(id)
         }
       })
@@ -42,17 +48,20 @@ const RecentFilesConnector = (connector) => {
 
       const renderedFiles = sortedIds.map((id, idx) => {
         const f = filesById[`${id}`]
-        if (!f || !f.path) return null
+        if (!f) return null
 
-        const lastOpen = new Date(f.lastOpened)
-        const fileBasename = basename(f.path)
+        // TODO: where do web last save dates come from?  Backups perhaps?
+        const lastOpen = (f.lastOpened && new Date(f.lastOpened)) || new Date()
+        const fileBasename = (f.path && basename(f.path)) || f.fileName
         let formattedPath = ''
-        if (!isTempFile(f.path)) {
+        if (f.path && !isTempFile(f.path)) {
           formattedPath = f.path
             .replace(fileBasename, '')
             .split(pathSep)
             .filter(Boolean)
             .join(' » ')
+        } else {
+          formattedPath = f.fileName
         }
         let missing = null
         if (missingFiles.includes(id)) {
