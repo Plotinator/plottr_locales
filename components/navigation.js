@@ -9,8 +9,6 @@ import cx from 'classnames'
 import { FaRegUser } from 'react-icons/fa'
 
 import DashboardModal from './dashboard-modal'
-import FileChooser from './file-chooser'
-import SaveFile from './save-file'
 import Share from './share'
 import Download from './download'
 import Upload from './upload'
@@ -151,8 +149,6 @@ function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
               {t('Tags')}
             </Link>
           </li>
-          <FileChooser />
-          <SaveFile userId={userId} />
         </Nav>
         <Beamer inNavigation />
         <Navbar.Form pullRight style={{ marginRight: '15px' }}>
