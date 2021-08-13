@@ -74,7 +74,6 @@ const Upload = ({
 
   return (
     <>
-      <Button onClick={onUpload}>Upload</Button>
       <input
         ref={fileInputRef}
         onChange={onChangeSelection}
