@@ -38,6 +38,15 @@ function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
   }, [])
 
   useEffect(() => {
+    const listener = document.addEventListener('close-dashboard', () => {
+      setDashboardView(null)
+    })
+    return () => {
+      document.removeEventListener('close-dashboard', listener)
+    }
+  }, [])
+
+  useEffect(() => {
     if (firstTime || trialExpired) setDashboardView('account')
   }, [firstTime, trialExpired, dashboardView])
 

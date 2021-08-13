@@ -1,13 +1,34 @@
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Button } from 'react-bootstrap'
 import { PropTypes } from 'prop-types'
 
-import { actions, migrateIfNeeded } from 'pltr/v2'
+import { actions, migrateIfNeeded, selectors } from 'pltr/v2'
 import { appVersion } from '../lib/version'
+import { newFile } from '../lib/firebase'
+import { closeDashboard } from '../lib/dashboard'
 
-const Upload = ({ loadFile, selectEmptyfile }) => {
+const Upload = ({
+  userId,
+  emailAddress,
+  loadFile,
+  selectEmptyfile,
+  setFileList,
+  selectFile,
+  withFullFileState,
+}) => {
   const fileInputRef = useRef(null)
+
+  useEffect(() => {
+    const listener = document.addEventListener('open-existing-file', () => {
+      if (fileInputRef.current) {
+        fileInputRef.current.click()
+      }
+    })
+    return () => {
+      document.removeEventListener('open-existing-file', listener)
+    }
+  }, [fileInputRef, loadFile, selectEmptyfile])
 
   const onUpload = () => {
     if (fileInputRef.current) {
@@ -34,6 +55,18 @@ const Upload = ({ loadFile, selectEmptyfile }) => {
         }
         selectEmptyfile()
         loadFile(data.file.fileName, true, data, data.file.version)
+        withFullFileState((state) =>
+          newFile(
+            emailAddress,
+            userId,
+            state.present.file.fileName,
+            state,
+            setFileList,
+            selectFile
+          ).then(() => {
+            closeDashboard()
+          })
+        )
       })
     }
     fileReader.readAsText(fileList[0])
@@ -53,11 +86,25 @@ const Upload = ({ loadFile, selectEmptyfile }) => {
 }
 
 Upload.propTypes = {
+  userId: PropTypes.string.isRequired,
+  emailAddress: PropTypes.string.isRequired,
   loadFile: PropTypes.func.isRequired,
   selectEmptyfile: PropTypes.func.isRequired,
+  setFileList: PropTypes.func.isRequired,
+  selectFile: PropTypes.func.isRequired,
+  withFullFileState: PropTypes.func.isRequired,
 }
 
-export default connect(null, {
-  loadFile: actions.ui.loadFile,
-  selectEmptyfile: actions.project.selectEmptyFile,
-})(Upload)
+export default connect(
+  (state) => ({
+    userId: selectors.userIdSelector(state.present),
+    emailAddress: selectors.emailAddressSelector(state.present),
+  }),
+  {
+    loadFile: actions.ui.loadFile,
+    selectEmptyfile: actions.project.selectEmptyFile,
+    setFileList: actions.project.setFileList,
+    selectFile: actions.project.selectFile,
+    withFullFileState: actions.project.withFullFileState,
+  }
+)(Upload)

@@ -4,9 +4,10 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { v4 as uuidv4 } from 'uuid'
 
+import { t } from 'plottr_locales'
 import { actions } from 'pltr/v2'
 import { appVersion } from '../lib/version'
-import { publishRCEOperations, fetchRCEOperations } from '../lib/firebase'
+import { publishRCEOperations, fetchRCEOperations, newFile } from '../lib/firebase'
 import {
   getTemplateById,
   listTemplates,
@@ -29,23 +30,41 @@ import {
 } from '../lib/store_hooks'
 import { useTrialStatus } from '../lib/trialManager'
 import { settings } from '../lib/settings'
-import { useSortedKnownFiles } from '../lib/files'
+import { messageOpenExistingFile, newEmptyFile, useSortedKnownFiles } from '../lib/files'
 import { useBackupFolders } from '../lib/backups'
 import { createErrorReport } from '../lib/createErrorReport'
+import { closeDashboard } from '../lib/dashboard'
 
 const platform = {
   appVersion: appVersion(),
-  defaultBackupLocation: 'TODO',
+  defaultBackupLocation: 'cloud',
   setDarkMode: (value) => {
     store.dispatch(actions.ui.setDarkMode(value))
   },
   file: {
     createNew: (template) => {
-      // TODO
+      const state = store.getState()
+      const {
+        client: { emailAddress, userId, clientId },
+        project: { fileList },
+      } = state.present
+      const untitledFileList = fileList.filter(({ fileName }) => fileName.match(/Untitled/g))
+      const fileName = t('Untitled') + ` - ${untitledFileList.length}`
+      const setFileList = (...args) => store.dispatch(actions.project.setFileList(...args))
+      const selectFile = (...args) => store.dispatch(actions.project.selectFile(...args))
+      newFile(
+        emailAddress,
+        userId,
+        fileName,
+        { present: newEmptyFile(fileName, appVersion(), state.present) },
+        setFileList,
+        selectFile,
+        clientId
+      ).then(() => {
+        closeDashboard()
+      })
     },
-    openExistingFile: () => {
-      // TODO
-    },
+    openExistingFile: messageOpenExistingFile,
     doesFileExist: () => {
       // TODO
     },
@@ -176,6 +195,7 @@ const platform = {
   },
   dialog: {
     showErrorBox: (error) => {
+      console.error(error)
       alert(error)
     },
   },
