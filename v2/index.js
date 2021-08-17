@@ -15,6 +15,9 @@ import * as undoActions from './actions/undo'
 import * as hierarchyActions from './actions/hierarchy'
 import * as featureFlagActions from './actions/featureFlags'
 import * as tourActions from './actions/tours'
+import * as errorActions from './actions/error'
+import * as permissionActions from './actions/permission'
+import * as projectActions from './actions/project'
 
 import * as ActionTypes from './constants/ActionTypes'
 import * as colors from './constants/CSScolors'
@@ -49,6 +52,9 @@ import * as hierarchySelectors from './selectors/hierarchy'
 import * as hierarchyLevelSelectors from './selectors/hierarchyLevel'
 import * as featureFlagSelectors from './selectors/featureFlags'
 import * as tourSelector from './selectors/tours'
+import * as errorSelectors from './selectors/error'
+import * as permissionSelectors from './selectors/permission'
+import * as projectSelectors from './selectors/project'
 
 import rootReducer from './reducers/root'
 import mainReducer from './reducers/main'
@@ -69,6 +75,8 @@ import uiReducer from './reducers/ui'
 import hierarchyReducer from './reducers/hierarchy'
 import featureFlagReducer from './reducers/featureFlags'
 import tourReducer from './reducers/tours'
+import errorReducer from './reducers/error'
+import permissionReducer from './reducers/permission'
 
 import * as initialState from './store/initialState'
 import * as lineColors from './store/lineColors'
@@ -77,6 +85,11 @@ import * as newIds from './store/newIds'
 import * as borderStyle from './store/borderStyle'
 
 import * as tree from './reducers/tree'
+
+// Slate serialisers
+import serializeToRTF from './slate_serializers/to_rtf'
+import { serialize as serializeToPlain } from './slate_serializers/to_plain_text'
+import serializeToWord from './slate_serializers/to_word'
 
 const reducers = {
   customAttributes: customAttributesReducer,
@@ -96,6 +109,8 @@ const reducers = {
   hierarchyLevels: hierarchyReducer,
   featureFlags: featureFlagReducer,
   tour: tourReducer,
+  error: errorReducer,
+  permission: permissionReducer,
 }
 
 const selectors = {
@@ -114,6 +129,9 @@ const selectors = {
   ...hierarchyLevelSelectors,
   ...featureFlagSelectors,
   ...tourSelector,
+  ...errorSelectors,
+  ...permissionSelectors,
+  ...projectSelectors,
 }
 
 const actions = {
@@ -134,6 +152,9 @@ const actions = {
   hierarchyLevels: hierarchyActions,
   featureFlags: featureFlagActions,
   tour: tourActions,
+  error: errorActions,
+  permission: permissionActions,
+  project: projectActions,
 }
 
 const helpers = {
@@ -146,6 +167,12 @@ const helpers = {
   hierarchyLevels: hierarchyHelpers,
   featureFlags: featureFlagHelpers,
   colors: colorHelpers,
+}
+
+const slate = {
+  rtf: { serialize: serializeToRTF },
+  word: { serialize: serializeToWord },
+  plain: { serialize: serializeToPlain },
 }
 
 export {
@@ -166,4 +193,5 @@ export {
   template,
   tree,
   borderStyle,
+  slate,
 }

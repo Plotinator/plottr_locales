@@ -25,6 +25,8 @@ import {
   SET_NOTE_FILTER,
   SET_OUTLINE_FILTER,
   SET_NOTES_FILTER,
+  LOAD_UI,
+  LOAD_FILE,
 } from '../constants/ActionTypes'
 
 export function changeCurrentView(view) {
@@ -87,7 +89,11 @@ export function changeCurrentTimeline(id) {
   return { type: CHANGE_CURRENT_TIMELINE, id }
 }
 
-export function navigateToBookTimeline(bookId) {
+export function navigateToBookTimeline(bookId, inBrowser, history) {
+  if (inBrowser && history) {
+    history.push(`/timeline`)
+  }
+
   return { type: NAVIGATE_TO_BOOK_TIMELINE, bookId }
 }
 
@@ -125,4 +131,8 @@ export function openAttributesDialog() {
 
 export function closeAttributesDialog() {
   return { type: CLOSE_ATTRIBUTES_DIALOG }
+}
+
+export function patchFile(patching, file) {
+  return { type: LOAD_FILE, patching, file }
 }

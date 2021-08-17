@@ -6,6 +6,8 @@ import {
   ATTACH_TAG_TO_CHARACTER,
   DELETE_CHARACTER,
   EDIT_CHARACTER,
+  LOAD_CHARACTERS,
+  ADD_TEMPLATE_TO_CHARACTER,
   REMOVE_BOOK_FROM_CHARACTER,
   REMOVE_TAG_FROM_CHARACTER,
 } from '../constants/ActionTypes'
@@ -38,6 +40,10 @@ export function editCharacter(id, attributes) {
   return { type: EDIT_CHARACTER, id, attributes }
 }
 
+export function addTemplateToCharacter(id, templateData) {
+  return { type: ADD_TEMPLATE_TO_CHARACTER, id, templateData }
+}
+
 export function deleteCharacter(id) {
   return { type: DELETE_CHARACTER, id }
 }
@@ -56,4 +62,8 @@ export function removeTag(id, tagId) {
 
 export function removeBook(id, bookId) {
   return { type: REMOVE_BOOK_FROM_CHARACTER, id, bookId }
+}
+
+export function load(patching, characters) {
+  return { type: LOAD_CHARACTERS, patching, characters }
 }

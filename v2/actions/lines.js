@@ -9,6 +9,7 @@ import {
   DELETE_LINE,
   EXPAND_LINE,
   COLLAPSE_LINE,
+  LOAD_LINES,
 } from '../constants/ActionTypes'
 
 // N.B. if one does not supply a book ID, then it is assumed that the
@@ -23,8 +24,8 @@ export function addLineWithTitle(title, bookId) {
   return { type: ADD_LINE_WITH_TITLE, title, bookId }
 }
 
-export function addLinesFromTemplate(cards, lines, beats, template, bookId) {
-  return { type: ADD_LINES_FROM_TEMPLATE, cards, lines, beats, template, bookId }
+export function addLinesFromTemplate(templateData) {
+  return { type: ADD_LINES_FROM_TEMPLATE, templateData }
 }
 
 export function editLine(id, title, color) {
@@ -53,4 +54,8 @@ export function expandLine(id) {
 
 export function collapseLine(id) {
   return { type: COLLAPSE_LINE, id }
+}
+
+export function load(patching, lines) {
+  return { type: LOAD_LINES, patching, lines }
 }
