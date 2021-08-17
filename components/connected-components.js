@@ -71,11 +71,13 @@ const platform = {
     },
     useSortedKnownFiles,
     isTempFile: () => {
-      // TODO
+      // There's no such thing as a temp file with cloud storage
+      return false
     },
     pathSep: 'todo',
-    basename: () => {
-      // TODO
+    basename: (filePath) => {
+      // There's no such thing as a 'basename' in cloud storage
+      return filePath
     },
     openKnownFile: (fileId, id, unknown) => {
       const state = store.getState()
