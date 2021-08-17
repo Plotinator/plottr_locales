@@ -7,7 +7,13 @@ import { v4 as uuidv4 } from 'uuid'
 import { t } from 'plottr_locales'
 import { actions } from 'pltr/v2'
 import { appVersion } from '../lib/version'
-import { publishRCEOperations, fetchRCEOperations, newFile, initialFetch } from '../lib/firebase'
+import {
+  publishRCEOperations,
+  fetchRCEOperations,
+  newFile,
+  initialFetch,
+  deleteFile,
+} from '../lib/firebase'
 import {
   getTemplateById,
   listTemplates,
@@ -27,6 +33,7 @@ import {
   useLicenseInfo,
   useSettingsInfo,
   useTemplatesInfo,
+  removeFileFromList,
 } from '../lib/store_hooks'
 import { useTrialStatus } from '../lib/trialManager'
 import { settings } from '../lib/settings'
@@ -86,8 +93,14 @@ const platform = {
       } = state.present
       initialFetch(userId, fileId, clientId, appVersion()).then(closeDashboard)
     },
-    deleteKnownFile: (id, path) => {
-      // TODO
+    deleteKnownFile: (position, fileId) => {
+      const state = store.getState()
+      const {
+        client: { userId, clientId },
+      } = state.present
+      deleteFile(fileId, userId, clientId).then(() => {
+        removeFileFromList(fileId)
+      })
     },
     editKnownFilePath: (oldFilePath, newFilePath) => {
       // TODO
@@ -107,8 +120,8 @@ const platform = {
     createFromSnowflake: (importedPath) => {
       // TODO
     },
-    joinPath: () => {
-      // TODO
+    joinPath: (path, backup) => {
+      return `${path}/${backup}`
     },
   },
   update: {
