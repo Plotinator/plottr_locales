@@ -66,7 +66,8 @@ const platform = {
     },
     openExistingFile: messageOpenExistingFile,
     doesFileExist: () => {
-      // TODO
+      // NOP.  We don't expect the API to reply with non-existant files.
+      return true
     },
     useSortedKnownFiles,
     isTempFile: () => {
