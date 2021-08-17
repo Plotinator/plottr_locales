@@ -13,7 +13,8 @@ const SessionObserver = ({ setUserId, setFileList }) => {
       } else {
         setUserId(user.uid)
         fetchFiles(user.uid).then((files) => {
-          setFileList(files)
+          const activeFiles = files.filter(({ deleted }) => !deleted)
+          setFileList(activeFiles)
         })
       }
     })

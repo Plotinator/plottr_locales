@@ -1,6 +1,5 @@
 import { useRef, useEffect } from 'react'
 import { connect } from 'react-redux'
-import { Button } from 'react-bootstrap'
 import { PropTypes } from 'prop-types'
 
 import { actions, migrateIfNeeded, selectors } from 'pltr/v2'
@@ -29,12 +28,6 @@ const Upload = ({
       document.removeEventListener('open-existing-file', listener)
     }
   }, [fileInputRef, loadFile, selectEmptyfile])
-
-  const onUpload = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click()
-    }
-  }
 
   const onChangeSelection = (event) => {
     const fileList = event.target.files

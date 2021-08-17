@@ -17,10 +17,12 @@ import SaveTemplate from './save-template'
 import Error from './error'
 import SessionObserver from './session-observer'
 import ClientIdMinter from './client-id-minter'
+import FileListListener from './file-list-listener'
 
 const Root = () => {
   return (
     <Provider store={store}>
+      <FileListListener />
       <SessionObserver />
       <Listener />
       <ClientIdMinter />
