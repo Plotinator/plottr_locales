@@ -16,12 +16,15 @@ import {
   COLLAPSE_BEAT,
   EXPAND_BEAT,
   SET_HIERARCHY_LEVELS,
+  LOAD_BEATS,
+  ADD_BOOK_FROM_TEMPLATE,
+  ADD_BOOK,
 } from '../constants/ActionTypes'
 import { beat as defaultBeat } from '../store/initialState'
 import { newFileBeats } from '../store/newFileState'
 import { positionReset, nextPositionInBook, moveNextToSibling } from '../helpers/beats'
 import { associateWithBroadestScope } from '../helpers/lines'
-import { addNode, deleteNode, editNode, nodeParent, filter, newTree, findNode } from './tree'
+import * as tree from './tree'
 import { nextId, adjustHierarchyLevels } from '../helpers/beats'
 import { clone } from 'lodash'
 
@@ -30,9 +33,15 @@ import { clone } from 'lodash'
 //  - bookId: Number,
 //  - "series": String literal,
 
-const INITIAL_STATE = [defaultBeat]
+const add = tree.addNode('id')
+const newTree = tree.newTree('id')
 
-const add = addNode('id')
+const defaultBeats = add(clone(newTree), null, defaultBeat)
+
+const INITIAL_STATE = {
+  1: defaultBeats,
+  series: defaultBeats,
+}
 
 const addNodeToState = (state, bookId, position, title, parentId) => {
   const node = {
@@ -45,187 +54,226 @@ const addNodeToState = (state, bookId, position, title, parentId) => {
     title: title,
     expanded: true,
   }
-  const tree = state[bookId] || newTree('id')
+  const tree = state[bookId] || clone(newTree)
   return {
     ...state,
     [bookId]: add(tree, parentId, node),
   }
 }
 
-const beats = (dataReparires) => (state = INITIAL_STATE, action) => {
-  const actionBookId = associateWithBroadestScope(action.bookId)
+const beats =
+  (dataReparires) =>
+  (state = INITIAL_STATE, action) => {
+    const actionBookId = associateWithBroadestScope(action.bookId || action.newBookId)
 
-  switch (action.type) {
-    case ADD_BEAT: {
-      // If we don't get a parent id then make this a root node
-      const parentId = action.parentId || null
-      const position = nextPositionInBook(state, actionBookId, parentId)
-      return addNodeToState(state, actionBookId, position, action.title, parentId)
-    }
-
-    case ADD_LINES_FROM_TEMPLATE: {
-      return {
-        ...state,
-        [actionBookId]: action.beats.reduce(
-          (acc, nextBeat) => add(acc, null, nextBeat),
-          newTree('id')
-        ),
+    switch (action.type) {
+      case ADD_BOOK:
+      case ADD_BEAT: {
+        // If we don't get a parent id then make this a root node
+        const title = action.title || defaultBeat.title
+        const parentId = action.parentId || null
+        const position = nextPositionInBook(state, actionBookId, parentId)
+        return addNodeToState(state, actionBookId, position, title, parentId)
       }
-    }
 
-    case SET_HIERARCHY_LEVELS: {
-      const { hierarchyLevels } = action
-      const targetHierarchyDepth = hierarchyLevels.length - 1
-      const adjustHierarchy = adjustHierarchyLevels(targetHierarchyDepth)
+      case ADD_LINES_FROM_TEMPLATE: {
+        if (action.createdNewBeats) {
+          return {
+            ...state,
+            [actionBookId]: action.newTree,
+          }
+        } else {
+          return state
+        }
+      }
 
-      return Object.keys(state).reduce((newState, bookId) => {
+      case ADD_BOOK_FROM_TEMPLATE: {
+        const beats = action.templateData.beats['1']
+        const idMap = {}
+        // this recreates the template's tree but with new ids
+        const newBeats = tree.reduce('id')(
+          beats,
+          (newBeatTree, nextBeat, parentId) => {
+            const newId = action.nextBeatId + nextBeat.id // give it a new id
+            idMap[nextBeat.id] = newId
+            const newParentId = idMap[parentId] || null
+            const newBeat = {
+              ...clone(nextBeat),
+              id: newId,
+              bookId: actionBookId, // add it to the new book
+              fromTemplateId: action.templateData.id,
+            }
+            return tree.addNode('id')(newBeatTree, newParentId, newBeat)
+          },
+          clone(newTree)
+        )
         return {
-          ...newState,
-          [bookId]: adjustHierarchy(newState[bookId], nextId(state), bookId),
+          ...state,
+          [actionBookId]: newBeats,
         }
-      }, state)
-    }
-
-    case EDIT_BEAT_TITLE:
-      return {
-        ...state,
-        [actionBookId]: editNode(state[actionBookId], action.id, { title: action.title }),
       }
 
-    case DELETE_BOOK: {
-      const newState = clone(state)
-      delete newState[actionBookId]
-      return newState
-    }
+      case SET_HIERARCHY_LEVELS: {
+        const { hierarchyLevels } = action
+        const targetHierarchyDepth = hierarchyLevels.length - 1
+        const adjustHierarchy = adjustHierarchyLevels(targetHierarchyDepth)
 
-    case DELETE_BEAT: {
-      return {
-        ...state,
-        [actionBookId]: positionReset(deleteNode(state[actionBookId], action.id)),
-      }
-    }
-
-    case REORDER_BEATS:
-      return {
-        ...state,
-        [actionBookId]: moveNextToSibling(
-          state[actionBookId],
-          action.beatId,
-          action.beatDroppedOnto
-        ),
+        return Object.keys(state).reduce((newState, bookId) => {
+          return {
+            ...newState,
+            [bookId]: adjustHierarchy(newState[bookId], nextId(state), bookId),
+          }
+        }, state)
       }
 
-    case INSERT_BEAT: {
-      if (!action.peerBeatId) {
-        const newState = addNodeToState(state, actionBookId, -0.5, 'auto', null)
-
+      case EDIT_BEAT_TITLE:
         return {
-          ...newState,
-          [actionBookId]: positionReset(newState[actionBookId]),
+          ...state,
+          [actionBookId]: tree.editNode(state[actionBookId], action.id, { title: action.title }),
+        }
+
+      case DELETE_BOOK: {
+        const newState = clone(state)
+        delete newState[actionBookId]
+        return newState
+      }
+
+      case DELETE_BEAT: {
+        return {
+          ...state,
+          [actionBookId]: positionReset(tree.deleteNode(state[actionBookId], action.id)),
         }
       }
-      // If we don't get a parent id then make this a root node
-      const parentId = nodeParent(state[actionBookId], action.peerBeatId) || null
-      const position = findNode(state[actionBookId], action.peerBeatId).position + 0.5 // new same-level cards now appear BEFORE so user can see they have been added
-      const node = {
-        autoOutlineSort: true,
-        bookId: actionBookId,
-        fromTemplateId: null,
-        id: nextId(state),
-        // Will be reset by `moveNextToSibling'
-        position,
-        time: 0,
-        title: 'auto',
-      }
-      const newState = add(state[actionBookId], parentId, node)
-      return {
-        ...state,
-        [actionBookId]: positionReset(newState),
-      }
-    }
 
-    case REORDER_CARDS_IN_BEAT:
-      return {
-        ...state,
-        [actionBookId]: editNode(state[actionBookId], action.beatId, { autoOutlineSort: false }),
-      }
-
-    case AUTO_SORT_BEAT:
-      return {
-        ...state,
-        [actionBookId]: editNode(state[actionBookId], action.id, { autoOutlineSort: true }),
-      }
-
-    case CLEAR_TEMPLATE_FROM_TIMELINE: {
-      return {
-        ...state,
-        [actionBookId]: positionReset(
-          filter(state[actionBookId], ({ fromTemplateId }) => fromTemplateId !== action.templateId)
-        ),
-      }
-    }
-
-    case RESET_TIMELINE: {
-      const withBeatsRemoved = {
-        ...state,
-        [actionBookId]: newTree('id'),
-      }
-      const newNode = {
-        id: nextId(withBeatsRemoved),
-        bookId: actionBookId,
-        position: 0,
-        title: 'auto',
-        time: 0,
-        autoOutlineSort: true,
-        fromTemplateId: null,
-      }
-      return {
-        ...withBeatsRemoved,
-        [actionBookId]: add(withBeatsRemoved[actionBookId], null, newNode),
-      }
-    }
-
-    case COLLAPSE_BEAT:
-      return {
-        ...state,
-        [actionBookId]: editNode(state[actionBookId], action.id, { expanded: false }),
-      }
-
-    case EXPAND_BEAT:
-      return {
-        ...state,
-        [actionBookId]: editNode(state[actionBookId], action.id, { expanded: true }),
-      }
-
-    case RESET:
-    case FILE_LOADED: {
-      const {
-        data: { beats },
-      } = action
-      let fixedBeats = beats
-      if (!beats.series) {
-        fixedBeats = {
-          ...fixedBeats,
-          series: newTree('id'),
+      case REORDER_BEATS:
+        return {
+          ...state,
+          [actionBookId]: moveNextToSibling(
+            state[actionBookId],
+            action.beatId,
+            action.beatDroppedOnto
+          ),
         }
-      }
-      action.data.books.allIds.forEach((id) => {
-        if (!beats[id]) {
-          fixedBeats = {
-            ...fixedBeats,
-            [id]: newTree('id'),
+
+      case INSERT_BEAT: {
+        if (!action.peerBeatId) {
+          const newState = addNodeToState(state, actionBookId, -0.5, 'auto', null)
+
+          return {
+            ...newState,
+            [actionBookId]: positionReset(newState[actionBookId]),
           }
         }
-      })
-      return fixedBeats
+        // If we don't get a parent id then make this a root node
+        const parentId = tree.nodeParent(state[actionBookId], action.peerBeatId) || null
+        const position = tree.findNode(state[actionBookId], action.peerBeatId).position + 0.5 // new same-level cards now appear BEFORE so user can see they have been added
+        const node = {
+          autoOutlineSort: true,
+          bookId: actionBookId,
+          fromTemplateId: null,
+          id: nextId(state),
+          // Will be reset by `moveNextToSibling'
+          position,
+          time: 0,
+          title: 'auto',
+        }
+        const newState = add(state[actionBookId], parentId, node)
+        return {
+          ...state,
+          [actionBookId]: positionReset(newState),
+        }
+      }
+
+      case REORDER_CARDS_IN_BEAT:
+        return {
+          ...state,
+          [actionBookId]: tree.editNode(state[actionBookId], action.beatId, {
+            autoOutlineSort: false,
+          }),
+        }
+
+      case AUTO_SORT_BEAT:
+        return {
+          ...state,
+          [actionBookId]: tree.editNode(state[actionBookId], action.id, { autoOutlineSort: true }),
+        }
+
+      case CLEAR_TEMPLATE_FROM_TIMELINE: {
+        return {
+          ...state,
+          [actionBookId]: positionReset(
+            tree.filter(
+              state[actionBookId],
+              ({ fromTemplateId }) => fromTemplateId !== action.templateId
+            )
+          ),
+        }
+      }
+
+      case RESET_TIMELINE: {
+        const withBeatsRemoved = {
+          ...state,
+          [actionBookId]: clone(newTree),
+        }
+        const newNode = {
+          id: nextId(withBeatsRemoved),
+          bookId: actionBookId,
+          position: 0,
+          title: 'auto',
+          time: 0,
+          autoOutlineSort: true,
+          fromTemplateId: null,
+        }
+        return {
+          ...withBeatsRemoved,
+          [actionBookId]: add(withBeatsRemoved[actionBookId], null, newNode),
+        }
+      }
+
+      case COLLAPSE_BEAT:
+        return {
+          ...state,
+          [actionBookId]: tree.editNode(state[actionBookId], action.id, { expanded: false }),
+        }
+
+      case EXPAND_BEAT:
+        return {
+          ...state,
+          [actionBookId]: tree.editNode(state[actionBookId], action.id, { expanded: true }),
+        }
+
+      case RESET:
+      case FILE_LOADED: {
+        const {
+          data: { beats },
+        } = action
+        let fixedBeats = beats
+        if (!beats.series) {
+          fixedBeats = {
+            ...fixedBeats,
+            series: clone(newTree),
+          }
+        }
+        action.data.books.allIds.forEach((id) => {
+          if (!beats[id]) {
+            fixedBeats = {
+              ...fixedBeats,
+              [id]: clone(newTree),
+            }
+          }
+        })
+        return fixedBeats
+      }
+
+      case NEW_FILE:
+        return newFileBeats
+
+      case LOAD_BEATS:
+        return action.beats
+
+      default:
+        return state
     }
-
-    case NEW_FILE:
-      return newFileBeats
-
-    default:
-      return state
   }
-}
 
 export default beats

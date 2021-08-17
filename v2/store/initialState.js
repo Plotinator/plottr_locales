@@ -208,7 +208,7 @@ export const image = {
 // ]
 
 export const hierarchyLevel = {
-  name: nextLevelName(0),
+  name: nextLevelName('default'),
   level: 0,
   autoNumber: true,
   textSize: 24,
@@ -222,11 +222,13 @@ export const hierarchyLevel = {
   },
   light: {
     borderColor: nextColor(0),
-    textColor: nextColor(0),
+    textColor: nextColor('default'),
   },
 }
 
-export const featureFlags = {}
+export const featureFlags = {
+  BEAT_HIERARCHY: false,
+}
 
 export const tour = {
   showTour: false,
