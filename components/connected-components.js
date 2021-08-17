@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { t } from 'plottr_locales'
 import { actions } from 'pltr/v2'
 import { appVersion } from '../lib/version'
-import { publishRCEOperations, fetchRCEOperations, newFile } from '../lib/firebase'
+import { publishRCEOperations, fetchRCEOperations, newFile, initialFetch } from '../lib/firebase'
 import {
   getTemplateById,
   listTemplates,
@@ -76,8 +76,12 @@ const platform = {
     basename: () => {
       // TODO
     },
-    openKnownFile: (filePath, id, unknown) => {
-      // TODO
+    openKnownFile: (fileId, id, unknown) => {
+      const state = store.getState()
+      const {
+        client: { userId, clientId },
+      } = state.present
+      initialFetch(userId, fileId, clientId, appVersion()).then(closeDashboard)
     },
     deleteKnownFile: (id, path) => {
       // TODO
