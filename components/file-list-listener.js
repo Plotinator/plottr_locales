@@ -11,7 +11,7 @@ const FileListListener = ({ fileList, userId, setFileList }) => {
 
     const listener = document.addEventListener('delete-file', (event) => {
       fetchFiles(userId).then((files) => {
-        setFileList(files)
+        setFileList(files.filter(({ deleted }) => !deleted))
       })
     })
     return () => {
