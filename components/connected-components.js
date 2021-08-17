@@ -103,13 +103,14 @@ const platform = {
       })
     },
     editKnownFilePath: (oldFilePath, newFilePath) => {
-      // TODO
+      // Nop: you can't change where a file is on the web.
     },
     removeFromKnownFiles: (id) => {
-      // TODO
+      // TODO: not sure what the best thing to do is if all we have is
+      // a position id.
     },
     saveFile: (filePath, file) => {
-      // TODO
+      // Nop: files are saved as we go.
     },
     readFileSync: () => {
       // TODO
