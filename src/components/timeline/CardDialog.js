@@ -57,6 +57,8 @@ const CardDialogConnector = (connector) => {
         newAttributeType: 'text',
         showColorPicker: false,
         showTemplatePicker: false,
+        removing: false,
+        removeWhichTemplate: null,
         activeTab: 1,
       }
       this.newAttributeInputRef = React.createRef()
@@ -92,6 +94,27 @@ const CardDialogConnector = (connector) => {
       this.setState({ deleting: true })
     }
 
+    beginRemoveTemplate = (templateId) => {
+      this.setState({ removing: true, removeWhichTemplate: templateId })
+    }
+
+    finishRemoveTemplate = (e) => {
+      e.stopPropagation()
+      const { actions, cardId } = this.props
+      const { removeWhichTemplate, activeTab } = this.state
+      actions.removeTemplateFromCard(cardId, removeWhichTemplate)
+      this.setState({
+        removing: false,
+        removeWhichTemplate: null,
+        activeTab: activeTab - 1,
+      })
+    }
+
+    cancelRemoveTemplate = (e) => {
+      e.stopPropagation()
+      this.setState({ removing: false, removeWhichTemplate: null })
+    }
+
     saveAndClose = () => {
       // componentWillUnmount saves the data (otherwise we get a duplicate event)
       this.props.closeDialog()
@@ -103,14 +126,37 @@ const CardDialogConnector = (connector) => {
       this.setState({ showColorPicker: true })
     }
 
-    handleAttrChange = (attrName) => (desc) => {
-      this.props.actions.editCardAttributes(this.props.cardId, {
-        [attrName]: desc,
-      })
+    handleAttrChange = (attrName) => (desc, selection) => {
+      const editorPath = helpers.editors.cardCustomAttributeEditorPath(
+        this.props.cardMetaData.id,
+        attrName
+      )
+      this.props.actions.editCardAttributes(
+        this.props.cardId,
+        helpers.editors.attrIfPresent(attrName, desc),
+        editorPath,
+        selection
+      )
     }
 
-    handleTemplateAttrChange = (templateId, name) => (value) => {
-      this.props.actions.editCardTemplateAttribute(this.props.cardId, templateId, name, value)
+    handleTemplateAttrChange = (templateId, name) => (value, selection) => {
+      const editorPath = helpers.editors.cardTemplateAttributeEditorPath(
+        this.props.cardMetaData.id,
+        templateId,
+        name
+      )
+      if (!value) {
+        this.props.actions.editCardAttributes(this.props.cardId, {}, editorPath, selection)
+        return
+      }
+      this.props.actions.editCardTemplateAttribute(
+        this.props.cardId,
+        templateId,
+        name,
+        value,
+        editorPath,
+        selection
+      )
     }
 
     saveEdit = () => {
@@ -233,6 +279,21 @@ const CardDialogConnector = (connector) => {
       )
     }
 
+    renderRemoveTemplate() {
+      if (!this.state.removing) return null
+      const templateData = getTemplateById(this.state.removeWhichTemplate)
+      return (
+        <DeleteConfirmModal
+          customText={t(
+            'Are you sure you want to remove the {template} template and all its data?',
+            { template: templateData.name }
+          )}
+          onDelete={this.finishRemoveTemplate}
+          onCancel={this.cancelRemoveTemplate}
+        />
+      )
+    }
+
     renderTemplatePicker() {
       if (!this.state.showTemplatePicker) return null
 
@@ -250,6 +311,10 @@ const CardDialogConnector = (connector) => {
     renderEditingCustomAttributes() {
       const { cardId, ui, customAttributes } = this.props
       return customAttributes.map((attr, index) => {
+        const editorPath = helpers.editors.cardCustomAttributeEditorPath(
+          this.props.cardMetaData.id,
+          attr.name
+        )
         return (
           <React.Fragment key={`custom-attribute-${index}-${attr.name}`}>
             <EditAttribute
@@ -257,9 +322,10 @@ const CardDialogConnector = (connector) => {
               entityType="scene"
               valueSelector={selectors.attributeValueSelector(cardId, attr.name)}
               ui={ui}
+              editorPath={editorPath}
               onChange={this.handleAttrChange(attr.name)}
-              onShortDescriptionKeyDown={this.handleEsc}
-              onShortDescriptionKeyPress={this.handleEnter}
+              onSave={this.saveEdit}
+              onSaveAndClose={this.saveAndClose}
               name={attr.name}
               type={attr.type}
             />
@@ -274,25 +340,37 @@ const CardDialogConnector = (connector) => {
         cardMetaData: { templates },
         ui,
       } = this.props
-      return templates.map((t, idx) => {
-        const templateData = getTemplateById(t.id)
-        const attrs = t.attributes.map((attr, index) => (
-          <React.Fragment key={`template-attribute-${index}-${t.id}-${attr.name}`}>
-            <EditAttribute
-              templateAttribute
-              index={index}
-              entityType="scene"
-              valueSelector={selectors.templateAttributeValueSelector(cardId, t.id, attr.name)}
-              ui={ui}
-              inputId={`${t.id}-${attr.name}Input`}
-              onChange={this.handleTemplateAttrChange(t.id, attr.name)}
-              onShortDescriptionKeyDown={this.handleEsc}
-              onShortDescriptionKeyPress={this.handleEnter}
-              name={attr.name}
-              type={attr.type}
-            />
-          </React.Fragment>
-        ))
+      return templates.map((template, idx) => {
+        const templateData = getTemplateById(template.id)
+        const attrs = template.attributes.map((attr, index) => {
+          const editorPath = helpers.editors.cardCustomAttributeEditorPath(
+            this.props.cardMetaData,
+            attr.name,
+            t.id
+          )
+          return (
+            <React.Fragment key={`template-attribute-${index}-${template.id}-${attr.name}`}>
+              <EditAttribute
+                templateAttribute
+                index={index}
+                entityType="scene"
+                editorPath={editorPath}
+                valueSelector={selectors.templateAttributeValueSelector(
+                  cardId,
+                  template.id,
+                  attr.name
+                )}
+                ui={ui}
+                inputId={`${template.id}-${attr.name}Input`}
+                onChange={this.handleTemplateAttrChange(template.id, attr.name)}
+                onSave={this.saveEdit}
+                onSaveAndClose={this.saveAndClose}
+                name={attr.name}
+                type={attr.type}
+              />
+            </React.Fragment>
+          )
+        })
         let link = null
         if (templateData.link) {
           link = (
@@ -307,10 +385,19 @@ const CardDialogConnector = (connector) => {
         }
         return (
           <Tab eventKey={idx + 3} title={templateData.name} key={`tab-${idx}`}>
-            <p>
-              {templateData.description}
-              {link}
-            </p>
+            <div className="template-tab__details">
+              <p>
+                {templateData.description}
+                {link}
+              </p>
+              <Button
+                bsStyle="link"
+                className="text-danger"
+                onClick={() => this.beginRemoveTemplate(template.id)}
+              >
+                {t('Remove template')}
+              </Button>
+            </div>
             {attrs}
           </Tab>
         )
@@ -569,6 +656,7 @@ const CardDialogConnector = (connector) => {
       return (
         <PlottrModal isOpen={true} onRequestClose={this.saveAndClose}>
           {this.renderDelete()}
+          {this.renderRemoveTemplate()}
           {this.renderTemplatePicker()}
           <div className={cx('card-dialog', { darkmode: ui.darkMode })}>
             <div className="card-dialog__body">
