@@ -36,6 +36,7 @@ const RichTextEditorConnector = (connector) => {
     className,
     autoFocus,
     onChange,
+    fileId,
   }) => {
     const editor = useMemo(() => {
       return createEditor()
@@ -68,7 +69,6 @@ const RichTextEditorConnector = (connector) => {
     }, [autoFocus, editorWrapperRef])
 
     const editorId = id
-    const fileId = fileId
 
     const registerEditor = useRegisterEditor(editor)
 
@@ -80,6 +80,20 @@ const RichTextEditorConnector = (connector) => {
       if (applyingOtherEdits.current) {
         applyingOtherEdits.current = false
         return
+      }
+      if (publishRCEOperations && fileId && editorId) {
+        let individualEditCount = editCount
+        publishRCEOperations(
+          fileId,
+          editorId,
+          editor.operations.map((operation) => ({
+            editorKey: key.current,
+            operation,
+            created: new Date(),
+            editNumber: individualEditCount++,
+          }))
+        )
+        setEditCount(individualEditCount)
       }
       if (!isEqual(editorSelection, editor.selection)) {
         // Rules for changing are complicated because we need to support
@@ -98,23 +112,9 @@ const RichTextEditorConnector = (connector) => {
           } else {
             onChange(null, { ...editor.selection })
           }
-        } else if (value !== newVal) {
-          onChange(newVal)
         }
-        if (publishRCEOperations && fileId && editorId) {
-          let individualEditCount = editCount
-          publishRCEOperations(
-            fileId,
-            editorId,
-            editor.operations.map((operation) => ({
-              editorKey: key.current,
-              operation,
-              created: new Date(),
-              editNumber: individualEditCount++,
-            }))
-          )
-          setEditCount(individualEditCount)
-        }
+      } else if (value !== newVal) {
+        onChange(newVal)
       }
     }
 
