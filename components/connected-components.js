@@ -42,6 +42,16 @@ import { useBackupFolders } from '../lib/backups'
 import { createErrorReport } from '../lib/createErrorReport'
 import { closeDashboard } from '../lib/dashboard'
 
+const deleteFileOnFirestore = (fileId) => {
+  const state = store.getState()
+  const {
+    client: { userId, clientId },
+  } = state.present
+  deleteFile(fileId, userId, clientId).then(() => {
+    removeFileFromList(fileId)
+  })
+}
+
 const platform = {
   appVersion: appVersion(),
   defaultBackupLocation: 'cloud',
@@ -105,13 +115,7 @@ const platform = {
       })
     },
     deleteKnownFile: (position, fileId) => {
-      const state = store.getState()
-      const {
-        client: { userId, clientId },
-      } = state.present
-      deleteFile(fileId, userId, clientId).then(() => {
-        removeFileFromList(fileId)
-      })
+      deleteFileOnFirestore(fileId)
     },
     editKnownFilePath: (oldFilePath, newFilePath) => {
       // Nop: you can't change where a file is on the web.
@@ -124,11 +128,10 @@ const platform = {
       // Nop: files are saved as we go.
     },
     readFileSync: () => {
-      // TODO
+      // Nop: no such thing as reading synchronously from the file
+      // system when we're using cloud storage.
     },
-    moveItemToTrash: () => {
-      // TODO
-    },
+    moveItemToTrash: deleteFileOnFirestore,
     createFromSnowflake: (importedPath) => {
       // TODO
     },
@@ -138,38 +141,44 @@ const platform = {
   },
   update: {
     quitToInstall: () => {
-      // TODO
+      // Nop
     },
     downloadUpdate: () => {
-      // TODO
+      // Nop
     },
     checkForUpdates: () => {
-      // TODO
+      // Nop
     },
     onUpdateError: (cb) => {
-      // TODO
+      // Nop
     },
     onUpdaterUpdateAvailable: (cb) => {
-      // TODO
+      // Nop
     },
     onUpdaterUpdateNotAvailable: (cb) => {
-      // TODO
+      // Nop
     },
     onUpdaterDownloadProgress: (cb) => {
-      // TODO
+      // Nop
     },
     onUpdatorUpdateDownloaded: (cb) => {
-      // TODO
+      // Nop
     },
     deregisterUpdateListeners: () => {
-      // TODO
+      // Nop
     },
   },
   updateLanguage: (newLanguage) => {
-    // TODO
+    // TODO: Not working:
+    // settings.set('locale', newLanguage)
+    // setupI18n(settings, {})
   },
   updateBeatHierarchyFlag: (newValue) => {
-    // TODO
+    if (newValue) {
+      store.dispatch(actions.featureFlags.setBeatHierarchy())
+    } else {
+      store.dispatch(actions.featureFlags.unsetBeatHierarchy())
+    }
   },
   license: {
     useLicenseInfo,
@@ -266,7 +275,7 @@ const platform = {
     link.remove()
   },
   showItemInFolder: (fileName) => {
-    // NO-OP
+    // Nop
   },
   tempFilesPath: 'TODO',
   mpq: {
