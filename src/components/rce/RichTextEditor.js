@@ -28,6 +28,7 @@ const RichTextEditorConnector = (connector) => {
   const ToolBar = UnconnectedToolBar(connector)
 
   const RichTextEditor = ({
+    id,
     undoId,
     text,
     selection,
@@ -66,8 +67,8 @@ const RichTextEditorConnector = (connector) => {
       }
     }, [autoFocus, editorWrapperRef])
 
-    const editorId = props.id
-    const fileId = props.fileId
+    const editorId = id
+    const fileId = fileId
 
     const registerEditor = useRegisterEditor(editor)
 
@@ -81,16 +82,15 @@ const RichTextEditorConnector = (connector) => {
         return
       }
       if (!isEqual(editorSelection, editor.selection)) {
-
         // Rules for changing are complicated because we need to support
         // editors which don't use programatic undo and therefore don't
         // track the current selection.
         if (
           selection &&
-            editor.selection &&
-            !isEqual(editorSelection, editor.selection) &&
-            editor.selection.anchor &&
-            editor.selection.focus
+          editor.selection &&
+          !isEqual(editorSelection, editor.selection) &&
+          editor.selection.anchor &&
+          editor.selection.focus
         ) {
           setEditorSelection({ ...editor.selection })
           if (value !== newVal) {
@@ -116,143 +116,143 @@ const RichTextEditorConnector = (connector) => {
           setEditCount(individualEditCount)
         }
       }
+    }
 
-      const editQueue = useRef(newEditQueue())
+    const editQueue = useRef(newEditQueue())
 
-      useEffect(() => {
-        if (fetchRCEOperations && fileId && editorId) {
-          const Search = () => {
-            let latestSearch = new Date()
+    useEffect(() => {
+      if (fetchRCEOperations && fileId && editorId) {
+        const Search = () => {
+          let latestSearch = new Date()
 
-            return function () {
-              fetchRCEOperations(fileId, editorId, latestSearch, (operations) => {
-                operations.forEach((operation) => {
-                  if (operation.editorKey !== key.current) {
-                    enqueue(
-                      editQueue.current,
-                      operation.editorKey,
-                      operation.operation,
-                      operation.editNumber
-                    )
-                  }
-                })
-                latestSearch = operations[operations.length - 1].created
-                const operationsToApply = drainQueue(editQueue.current)
-                if (operationsToApply.length) {
-                  applyingOtherEdits.current = true
-                  operationsToApply.forEach((operation) => {
-                    editor.apply(operation)
-                  })
+          return function () {
+            fetchRCEOperations(fileId, editorId, latestSearch, (operations) => {
+              operations.forEach((operation) => {
+                if (operation.editorKey !== key.current) {
+                  enqueue(
+                    editQueue.current,
+                    operation.editorKey,
+                    operation.operation,
+                    operation.editNumber
+                  )
                 }
               })
-            }
-          }
-          const interval = setInterval(new Search(), 100)
-          return () => {
-            clearInterval(interval)
+              latestSearch = operations[operations.length - 1].created
+              const operationsToApply = drainQueue(editQueue.current)
+              if (operationsToApply.length) {
+                applyingOtherEdits.current = true
+                operationsToApply.forEach((operation) => {
+                  editor.apply(operation)
+                })
+              }
+            })
           }
         }
-        return () => {}
-      }, [fileId, editorId])
+        const interval = setInterval(new Search(), 100)
+        return () => {
+          clearInterval(interval)
+        }
+      }
+      return () => {}
+    }, [fileId, editorId])
 
-      const handleKeyDown = (event) => {
-        // If we don't have a selection, then the editor can't support
-        // programatic undo.  This isn't desirable because built-in undo
-        // leads to strange interactions when, e.g. the user undoes
-        // something, selections outside the RCE and then undoes again.
-        // (The result could be that text in the RCE is redone!)
-        //
-        // To ensure that the RCE has a selection, make sure that the on
-        // change handlers create actions that add `editorMetadata`.
-        // See the `editors` reducer for schema.
-        if (selection && event.key === 'z' && (event.ctrlKey || event.metaKey)) {
-          event.preventDefault()
-          if (event.shiftKey) {
-            redo()
-          } else {
-            undo()
-          }
-          return
-        }
-        // On Linux, redo is CTRL+y
-        if (selection && event.key === 'y' && event.ctrlKey) {
-          event.preventDefault()
+    const handleKeyDown = (event) => {
+      // If we don't have a selection, then the editor can't support
+      // programatic undo.  This isn't desirable because built-in undo
+      // leads to strange interactions when, e.g. the user undoes
+      // something, selections outside the RCE and then undoes again.
+      // (The result could be that text in the RCE is redone!)
+      //
+      // To ensure that the RCE has a selection, make sure that the on
+      // change handlers create actions that add `editorMetadata`.
+      // See the `editors` reducer for schema.
+      if (selection && event.key === 'z' && (event.ctrlKey || event.metaKey)) {
+        event.preventDefault()
+        if (event.shiftKey) {
           redo()
-          return
+        } else {
+          undo()
         }
-        for (const hotkey in HOTKEYS) {
-          if (isHotkey(hotkey, event)) {
-            event.preventDefault()
-            const mark = HOTKEYS[hotkey]
-            toggleMark(editor, mark)
-          }
-        }
+        return
       }
-
-      const handleKeyUp = () => {
-        // scroll to the cursor
-        if (editor.selection == null) return
-        try {
-          const domPoint = ReactEditor.toDOMPoint(editor, editor.selection.focus)
-          const node = domPoint[0]
-          let isElem = false
-          let parent = node.parentElement
-          // find the closest parent that is a slate element
-          while (!isElem) {
-            if (parent == null) {
-              isElem = true
-              return
-            }
-            if (parent.dataset.slateNode == 'element') {
-              isElem = true
-            } else {
-              parent = parent.parentElement
-            }
-          }
-          parent.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-        } catch (e) {
-          // Do nothing if there is an error.
+      // On Linux, redo is CTRL+y
+      if (selection && event.key === 'y' && event.ctrlKey) {
+        event.preventDefault()
+        redo()
+        return
+      }
+      for (const hotkey in HOTKEYS) {
+        if (isHotkey(hotkey, event)) {
+          event.preventDefault()
+          const mark = HOTKEYS[hotkey]
+          toggleMark(editor, mark)
         }
       }
-
-      const handleClickEditable = (event) => {
-        if (!editorWrapperRef) return
-        if (editorWrapperRef.firstChild.contains(event.target)) return
-
-        // Focus the Editable content
-        editorWrapperRef.firstChild.focus()
-      }
-
-      if (!value) return null
-
-      const otherProps = {}
-      return (
-        <Slate editor={editor} value={value} onChange={updateValue} key={key.current}>
-          <div className={cx('slate-editor__wrapper', className)}>
-            <ToolBar editor={editor} darkMode={darkMode} selection={editorSelection} />
-            <div
-        // the firstChild will be the contentEditable dom node
-              ref={(e) => {
-                registerEditor(e && e.firstChild)
-                setEditorWrapperRef(e)
-              }}
-              onClick={handleClickEditable}
-              className={cx('slate-editor__editor', { darkmode: darkMode })}
-            >
-              <Editable
-                spellCheck
-                {...otherProps}
-                renderLeaf={renderLeaf}
-                renderElement={renderElement}
-                placeholder={i18n('Enter some text...')}
-                onKeyDown={handleKeyDown}
-                onKeyUp={handleKeyUp}
-              />
-            </div>
-          </div>
-        </Slate>
-      )
     }
+
+    const handleKeyUp = () => {
+      // scroll to the cursor
+      if (editor.selection == null) return
+      try {
+        const domPoint = ReactEditor.toDOMPoint(editor, editor.selection.focus)
+        const node = domPoint[0]
+        let isElem = false
+        let parent = node.parentElement
+        // find the closest parent that is a slate element
+        while (!isElem) {
+          if (parent == null) {
+            isElem = true
+            return
+          }
+          if (parent.dataset.slateNode == 'element') {
+            isElem = true
+          } else {
+            parent = parent.parentElement
+          }
+        }
+        parent.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      } catch (e) {
+        // Do nothing if there is an error.
+      }
+    }
+
+    const handleClickEditable = (event) => {
+      if (!editorWrapperRef) return
+      if (editorWrapperRef.firstChild.contains(event.target)) return
+
+      // Focus the Editable content
+      editorWrapperRef.firstChild.focus()
+    }
+
+    if (!value) return null
+
+    const otherProps = {}
+    return (
+      <Slate editor={editor} value={value} onChange={updateValue} key={key.current}>
+        <div className={cx('slate-editor__wrapper', className)}>
+          <ToolBar editor={editor} darkMode={darkMode} selection={editorSelection} />
+          <div
+            // the firstChild will be the contentEditable dom node
+            ref={(e) => {
+              registerEditor(e && e.firstChild)
+              setEditorWrapperRef(e)
+            }}
+            onClick={handleClickEditable}
+            className={cx('slate-editor__editor', { darkmode: darkMode })}
+          >
+            <Editable
+              spellCheck
+              {...otherProps}
+              renderLeaf={renderLeaf}
+              renderElement={renderElement}
+              placeholder={i18n('Enter some text...')}
+              onKeyDown={handleKeyDown}
+              onKeyUp={handleKeyUp}
+            />
+          </div>
+        </div>
+      </Slate>
+    )
   }
 
   RichTextEditor.propTypes = {
