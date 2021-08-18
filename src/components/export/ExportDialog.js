@@ -14,9 +14,9 @@ const ExportDialogConnector = (connector) => {
     platform: {
       log,
       dialog,
-      isWindows,
       store: { useExportConfigInfo },
       export: { askToExport },
+      isWindows,
     },
   } = connector
 
@@ -37,40 +37,33 @@ const ExportDialogConnector = (connector) => {
       const defaultPath =
         bookId == 'series' ? seriesName + ' ' + t('(Series View)') : books[`${bookId}`].title
 
-      askToExport(
-        defaultPath,
-        fullState,
-        type,
-        options[type],
-        (error, success) => {
-          if (saveOptions) {
-            saveExportConfig('savedType', type)
-            // We don't want to maintain the filter across projects
-            // because they have different plot lines and different
-            // numbers of plot lines.
-            saveExportConfig(type, {
-              ...options[type],
-              filter: null,
-            })
-          }
+      askToExport(defaultPath, fullState, type, options[type], isWindows, (error, success) => {
+        if (saveOptions) {
+          saveExportConfig('savedType', type)
+          // We don't want to maintain the filter across projects
+          // because they have different plot lines and different
+          // numbers of plot lines.
+          saveExportConfig(type, {
+            ...options[type],
+            filter: null,
+          })
+        }
 
-          if (error) {
-            log.error(error)
-            dialog.showErrorBox(t('Error'), t('There was an error doing that. Try again'))
-            return
-          }
+        if (error) {
+          log.error(error)
+          dialog.showErrorBox(t('Error'), t('There was an error doing that. Try again'))
+          return
+        }
 
-          if (success) {
-            props.close()
-          }
-        },
-        isWindows
-      )
+        if (success) {
+          props.close()
+        }
+      })
     }
 
     const Chooser = () => {
       return (
-        <Nav bsStyle="pills" activeKey={type} onSelect={setType}>
+        <Nav bsStyle="pills" className="navbar-nav" activeKey={type} onSelect={setType}>
           <NavItem eventKey="word" title={t('.docx')}>
             {t('MS Word')}
           </NavItem>

@@ -36,14 +36,14 @@ const ExportNavItemConnector = (connector) => {
         fullState,
         type,
         export_config[type],
+        isWindows,
         (error, success) => {
           if (error) {
             log.error(error)
             dialog.showErrorBox(t('Error'), t('There was an error doing that. Try again'))
             return
           }
-        },
-        isWindows
+        }
       )
     }
 

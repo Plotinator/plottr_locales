@@ -83,6 +83,8 @@ const connector = {
 //
 // It should provide the following functions:
 // {
+//   undo: () => IO,
+//   redo: () => IO,
 //   electron: Object?,
 //   openExternal: (Url) => IO,
 //   log: {
@@ -120,6 +122,7 @@ const connector = {
 //     basename: String => String,
 //     deleteKnownFile: (String, String) => IO,
 //     editKnownFilePath: (String, String) => IO,
+//     renameFile: (String) => IO,
 //     removeFromKnownFiles: String => IO,
 //     saveFile: (String, Object) => IO,
 //     readFileSync: (String, String) => IO,

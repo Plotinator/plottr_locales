@@ -22,6 +22,7 @@ const RichTextConnector = (connector) => {
           className={props.className}
           onChange={props.onChange}
           autoFocus={props.autofocus}
+          selection={props.selection}
           text={props.description}
           darkMode={props.darkMode}
         />
@@ -39,7 +40,7 @@ const RichTextConnector = (connector) => {
     }
 
     return (
-      <RCEBoundary createErrorReport={createErrorReport} log={log} openExternal={openExternal}>
+      <RCEBoundary createErrorReport={createErrorReport} openExternal={openExternal}>
         {body}
       </RCEBoundary>
     )
@@ -49,6 +50,7 @@ const RichTextConnector = (connector) => {
     id: PropTypes.string,
     fileId: PropTypes.string,
     description: PropTypes.any,
+    selection: PropTypes.object,
     onChange: PropTypes.func,
     editable: PropTypes.bool,
     autofocus: PropTypes.bool,
