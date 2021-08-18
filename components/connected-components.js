@@ -90,8 +90,15 @@ const platform = {
       const state = store.getState()
       const {
         client: { userId, clientId },
+        project: { fileList },
       } = state.present
-      initialFetch(userId, fileId, clientId, appVersion()).then(closeDashboard)
+      const selectedFile = fileList.find((thatFile) => thatFile.id === fileId)
+      if (!selectedFile) return
+
+      initialFetch(userId, fileId, clientId, appVersion()).then(() => {
+        store.dispatch(actions.project.selectFile(selectedFile))
+        closeDashboard()
+      })
     },
     deleteKnownFile: (position, fileId) => {
       const state = store.getState()
