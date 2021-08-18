@@ -59,11 +59,15 @@ const platform = {
       const fileName = t('Untitled') + ` - ${untitledFileList.length}`
       const setFileList = (...args) => store.dispatch(actions.project.setFileList(...args))
       const selectFile = (...args) => store.dispatch(actions.project.selectFile(...args))
+      const newFileState = Object.assign(
+        newEmptyFile(fileName, appVersion(), state.present),
+        template || {}
+      )
       newFile(
         emailAddress,
         userId,
         fileName,
-        { present: newEmptyFile(fileName, appVersion(), state.present) },
+        { present: newFileState },
         setFileList,
         selectFile,
         clientId
