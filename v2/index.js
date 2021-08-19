@@ -18,6 +18,7 @@ import * as tourActions from './actions/tours'
 import * as errorActions from './actions/error'
 import * as permissionActions from './actions/permission'
 import * as projectActions from './actions/project'
+import * as editorActions from './actions/editors'
 
 import * as ActionTypes from './constants/ActionTypes'
 import * as colors from './constants/CSScolors'
@@ -32,6 +33,7 @@ import * as orientedClassNameHelpers from './helpers/orientedClassName'
 import * as hierarchyHelpers from './helpers/hierarchy'
 import * as featureFlagHelpers from './helpers/featureFlags'
 import * as colorHelpers from './helpers/colors'
+import * as editorHelpers from './helpers/editors'
 
 import * as template from './template'
 
@@ -55,9 +57,12 @@ import * as tourSelector from './selectors/tours'
 import * as errorSelectors from './selectors/error'
 import * as permissionSelectors from './selectors/permission'
 import * as projectSelectors from './selectors/project'
+import * as actionSelectors from './selectors/actions'
+import * as editorsSelectors from './selectors/editors'
 
 import rootReducer from './reducers/root'
 import mainReducer from './reducers/main'
+import { SYSTEM_REDUCER_KEYS } from './reducers/systemReducers'
 import customAttributesReducer from './reducers/customAttributes'
 import linesReducer from './reducers/lines'
 import beatsReducer from './reducers/beats'
@@ -77,6 +82,7 @@ import featureFlagReducer from './reducers/featureFlags'
 import tourReducer from './reducers/tours'
 import errorReducer from './reducers/error'
 import permissionReducer from './reducers/permission'
+import editorsReducer from './reducers/editors'
 
 import * as initialState from './store/initialState'
 import * as lineColors from './store/lineColors'
@@ -111,6 +117,7 @@ const reducers = {
   tour: tourReducer,
   error: errorReducer,
   permission: permissionReducer,
+  editors: editorsReducer,
 }
 
 const selectors = {
@@ -132,6 +139,8 @@ const selectors = {
   ...errorSelectors,
   ...permissionSelectors,
   ...projectSelectors,
+  ...actionSelectors,
+  ...editorsSelectors,
 }
 
 const actions = {
@@ -155,6 +164,7 @@ const actions = {
   error: errorActions,
   permission: permissionActions,
   project: projectActions,
+  editors: editorActions,
 }
 
 const helpers = {
@@ -167,6 +177,7 @@ const helpers = {
   hierarchyLevels: hierarchyHelpers,
   featureFlags: featureFlagHelpers,
   colors: colorHelpers,
+  editors: editorHelpers,
 }
 
 const slate = {
@@ -184,6 +195,7 @@ export {
   migrateIfNeeded,
   rootReducer,
   mainReducer,
+  SYSTEM_REDUCER_KEYS,
   reducers,
   selectors,
   initialState,

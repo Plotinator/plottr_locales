@@ -18,7 +18,9 @@ import {
   LOAD_CARDS,
   EDIT_CARD_TEMPLATE_ATTRIBUTE,
   ADD_TEMPLATE_TO_CARD,
+  REMOVE_TEMPLATE_FROM_CARD,
 } from '../constants/ActionTypes'
+import { editorMetadataIfPresent } from '../helpers/editors'
 
 export function addCard(card) {
   return { type: ADD_CARD, card }
@@ -32,8 +34,13 @@ export function editCard(id, title, description, templates, attrs) {
   return { type: EDIT_CARD_DETAILS, id, attributes: { title, description, templates, ...attrs } }
 }
 
-export function editCardAttributes(id, attributes) {
-  return { type: EDIT_CARD_DETAILS, id, attributes }
+export function editCardAttributes(id, attributes, editorPath, selection) {
+  return {
+    type: EDIT_CARD_DETAILS,
+    id,
+    attributes,
+    ...editorMetadataIfPresent(editorPath, selection),
+  }
 }
 
 export function editCardCoordinates(id, lineId, beatId, bookId) {
@@ -44,8 +51,15 @@ export function addTemplateToCard(id, templateData) {
   return { type: ADD_TEMPLATE_TO_CARD, id, templateData }
 }
 
-export function editCardTemplateAttribute(id, templateId, name, value) {
-  return { type: EDIT_CARD_TEMPLATE_ATTRIBUTE, id, templateId, name, value }
+export function editCardTemplateAttribute(id, templateId, name, value, editorPath, selection) {
+  return {
+    type: EDIT_CARD_TEMPLATE_ATTRIBUTE,
+    id,
+    templateId,
+    name,
+    value,
+    ...editorMetadataIfPresent(editorPath, selection),
+  }
 }
 
 export function changeLine(id, lineId, bookId) {
@@ -109,6 +123,10 @@ export function removePlace(id, placeId) {
 
 export function removeTag(id, tagId) {
   return { type: REMOVE_TAG_FROM_CARD, id, tagId }
+}
+
+export function removeTemplateFromCard(id, templateId) {
+  return { type: REMOVE_TEMPLATE_FROM_CARD, id, templateId }
 }
 
 export function load(patching, cards) {
