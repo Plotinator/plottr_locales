@@ -3,7 +3,8 @@ import { PropTypes } from 'prop-types'
 import { connect } from 'react-redux'
 
 import { actions, selectors } from 'pltr/v2'
-import { initialFetch, listen, listenToCustomTemplates, stopListening } from '../lib/firebase'
+import { initialFetch, listen, stopListening } from '../lib/firebase'
+import { listenToCustomTemplates } from '../lib/templates'
 
 const Listener = ({
   userId,

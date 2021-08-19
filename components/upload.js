@@ -4,7 +4,7 @@ import { PropTypes } from 'prop-types'
 
 import { actions, migrateIfNeeded, selectors } from 'pltr/v2'
 import { appVersion } from '../lib/version'
-import { newFile } from '../lib/firebase'
+import { newFile } from '../lib/files'
 import { closeDashboard } from '../lib/dashboard'
 
 const Upload = ({

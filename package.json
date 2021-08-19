@@ -35,6 +35,7 @@
     "plottr_components": "link:./lib/plottr_components",
     "plottr_locales": "link:./lib/plottr_locales",
     "pltr": "link:./lib/pltr",
+    "plottr_firebase": "link:./lib/plottr_firebase",
     "react": "16.14.0",
     "react-bootstrap": "^0.32.4",
     "react-dom": "16.14.0",
