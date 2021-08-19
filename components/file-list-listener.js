@@ -9,13 +9,19 @@ const FileListListener = ({ fileList, userId, setFileList }) => {
   useEffect(() => {
     if (!fileList || fileList.length === 0) return () => {}
 
-    const listener = document.addEventListener('delete-file', (event) => {
+    const deleteListener = document.addEventListener('delete-file', (event) => {
+      fetchFiles(userId).then((files) => {
+        setFileList(files.filter(({ deleted }) => !deleted))
+      })
+    })
+    const fetchListener = document.addEventListener('fetch-file-list', (event) => {
       fetchFiles(userId).then((files) => {
         setFileList(files.filter(({ deleted }) => !deleted))
       })
     })
     return () => {
-      document.removeEventListener('delete-file', listener)
+      document.removeEventListener('delete-file', deleteListener)
+      document.removeEventListener('fetch-file-list', fetchListener)
     }
   }, [fileList, userId, setFileList])
 

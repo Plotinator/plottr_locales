@@ -18,10 +18,12 @@ import Error from './error'
 import SessionObserver from './session-observer'
 import ClientIdMinter from './client-id-minter'
 import FileListListener from './file-list-listener'
+import Renamer from './renamer'
 
 const Root = () => {
   return (
     <Provider store={store}>
+      <Renamer />
       <FileListListener />
       <SessionObserver />
       <Listener />
