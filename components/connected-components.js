@@ -7,13 +7,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { t } from 'plottr_locales'
 import { actions } from 'pltr/v2'
 import { appVersion } from '../lib/version'
-import {
-  publishRCEOperations,
-  fetchRCEOperations,
-  newFile,
-  initialFetch,
-  deleteFile,
-} from '../lib/firebase'
+import { publishRCEOperations, fetchRCEOperations, initialFetch, deleteFile } from '../lib/firebase'
 import {
   getTemplateById,
   listTemplates,
@@ -42,6 +36,7 @@ import {
   messageRenameFile,
   newEmptyFile,
   useSortedKnownFiles,
+  newFile,
 } from '../lib/files'
 import { useBackupFolders } from '../lib/backups'
 import { createErrorReport } from '../lib/createErrorReport'
