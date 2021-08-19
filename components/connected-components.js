@@ -37,7 +37,7 @@ import {
 } from '../lib/store_hooks'
 import { useTrialStatus } from '../lib/trialManager'
 import { settings } from '../lib/settings'
-import { messageOpenExistingFile, newEmptyFile, useSortedKnownFiles } from '../lib/files'
+import { messageOpenExistingFile, messageRenameFile, newEmptyFile, useSortedKnownFiles } from '../lib/files'
 import { useBackupFolders } from '../lib/backups'
 import { createErrorReport } from '../lib/createErrorReport'
 import { closeDashboard } from '../lib/dashboard'
@@ -138,6 +138,7 @@ const platform = {
     joinPath: (path, backup) => {
       return `${path}/${backup}`
     },
+    renameFile: messageRenameFile,
   },
   update: {
     quitToInstall: () => {
