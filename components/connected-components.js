@@ -199,7 +199,7 @@ const platform = {
     // NO-OP
   },
   template: {
-    TemplateFetcher: null, // TODO
+    TemplateFetcher: {}, // TODO
     listTemplates,
     listCustomTemplates,
     getTemplateById,
