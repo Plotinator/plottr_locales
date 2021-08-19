@@ -1,10 +1,41 @@
 import React, { useState, useEffect } from 'react'
+import { AiOutlineTeam, AiOutlineRead } from 'react-icons/ai'
+import { GiQuillInk } from 'react-icons/gi'
+
 import { t } from 'plottr_locales'
 import cx from 'classnames'
 import { StickyTable, Row, Cell } from 'react-sticky-table'
 import MissingIndicator from './MissingIndicator'
 import UnconnectedFileActions from './FileActions'
 import RecentsHeader from './RecentsHeader'
+
+const renderPermission = (permission) => {
+  switch (permission) {
+    case 'collaborator':
+      return (
+        <div>
+          <AiOutlineTeam />
+          Collaborator
+        </div>
+      )
+    case 'viewer':
+      return (
+        <div>
+          <AiOutlineRead />
+          Viewer
+        </div>
+      )
+    case 'owner':
+      return (
+        <div>
+          <GiQuillInk />
+          Owner
+        </div>
+      )
+    default:
+      return null
+  }
+}
 
 const RecentFilesConnector = (connector) => {
   const {
@@ -92,6 +123,7 @@ const RecentFilesConnector = (connector) => {
                 />
               </div>
             </Cell>
+            {f.permission ? <Cell>{renderPermission(f.permission)}</Cell> : null}
             <Cell>
               <div className="lastOpen">{t('{date, date, monthDay}', { date: lastOpen })}</div>
             </Cell>
@@ -104,6 +136,9 @@ const RecentFilesConnector = (connector) => {
           <StickyTable leftStickyColumnCount={0}>
             <Row>
               <Cell>{t('Name')}</Cell>
+              {Object.values(filesById).some(({ permission }) => permission) ? (
+                <Cell>{t('Permission')}</Cell>
+              ) : null}
               <Cell>{t('Last opened by you')}</Cell>
             </Row>
             {renderedFiles}
