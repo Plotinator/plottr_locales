@@ -68,11 +68,55 @@ managed by the library.
 # API Documentation
 The library exposes the following functions:
 
-## `editFileName(fileId: String, newName: String): Promise<Any>`
-Update the `file` document with id `fileId` to have `fileName`
-`newName`.
+## Fetching And Subscriptions
 
-## `listen(store: ReduxStore, userId: String, fileId: String, clientId: String, fileVersion: String): Promise<Function[]>`
+### Fetch Files
+
+`fetchFiles(userId: String): Promise<File[]>`
+
+Produce a `Promise` that will be resolved with an array of files that
+the user with id `userId` has access to.  Each of those records will
+identify the access that the user has to the corresponding Plottr file
+in the `permission` field.
+
+### Initial Fetch
+
+`initialFetch(userId: String, fileId: String, clientId: String, version: String): Promise<PlottrFile>`
+
+Fetch all the documents in Firestore corresponding to the Plottr file
+accessed by user with id `userId`, belonging to file with id `fileId`
+at paths:
+ - `files`,
+ - `cards`,
+ - `series`,
+ - `books`,
+ - `categories`,
+ - `characters`,
+ - `customAttributes`,
+ - `lines`,
+ - `notes`,
+ - `places`,
+ - `tags`,
+ - `hierarchyLevels`,
+ - `images`, and
+ - `client`.
+
+The `clientId` must uniquely identify the running process that made
+the call so that other clients can differentiate between themselves
+and this process.  This is important for collaborative editing
+features.
+
+The `fileVersion` must correspond with the current version of file
+loaded from Firestore.  It's needed for edge cases where the schema of
+a key changed.  (See `index.js:listenToBeats`).
+
+Produce a `Promise` containing the `PlottrFile` **prior** to migrating
+the file.
+
+### Listen
+
+`listen(store: ReduxStore, userId: String, fileId: String, clientId: String, fileVersion: String): Promise<Function[]>`
+
 Start listening to changes in the documents in Firestore to update the
 given `store` with those changes.  The file is accessed by user with
 id `userId`, belonging to file with id `fileId` at paths:
@@ -110,14 +154,12 @@ iterate through the returned functions and call them.  The functions
 are produced by the Firebase library and may be called to cancel a
 subscription.
 
-## `withFileId(fileId: String, file: PlottrFile): PlottrFile`
-Produce a copy of `file` with the `file.id` in `file` to `fileId`.
+## Updating
 
-## `toFirestoreArray(array: Any[]): Object`
-Produce an object whose keys correspond to the indices in `array` and
-whose values correspond to the values in `array`.
+### Overwrite All Keys
 
-## `overwriteAllKeys(fileId: String, clientId: String, state: PlottrFile): Promise<Any[]>`
+`overwriteAllKeys(fileId: String, clientId: String, state: PlottrFile): Promise<Any[]>`
+
 For the file with id `fileId`, edited by process with id `clientId`,
 overwrite all keys in Firestore with the values in the corresponding
 slots in `state`.
@@ -125,82 +167,17 @@ slots in `state`.
 `clientId` must uniquely identify the running process requesting the
 change for the purposes of collaborative editing.
 
-## `initialFetch(userId: String, fileId: String, clientId: String, version: String): Promise<PlottrFile>`
-Fetch all the documents in Firestore corresponding to the Plottr file
-accessed by user with id `userId`, belonging to file with id `fileId`
-at paths:
- - `files`,
- - `cards`,
- - `series`,
- - `books`,
- - `categories`,
- - `characters`,
- - `customAttributes`,
- - `lines`,
- - `notes`,
- - `places`,
- - `tags`,
- - `hierarchyLevels`,
- - `images`, and
- - `client`.
+### Edit File Name
 
-The `clientId` must uniquely identify the running process that made
-the call so that other clients can differentiate between themselves
-and this process.  This is important for collaborative editing
-features.
+`editFileName(fileId: String, newName: String): Promise<Any>`
 
-The `fileVersion` must correspond with the current version of file
-loaded from Firestore.  It's needed for edge cases where the schema of
-a key changed.  (See `index.js:listenToBeats`).
+Update the `file` document with id `fileId` to have `fileName`
+`newName`.
 
-Produce a `Promise` containing the `PlottrFile` **prior** to migrating
-the file.
+### Patch
 
-## `deleteFile(fileId: String, userId: String, clientId: String): Promise<Any[]>`
-Mark all the documents in Firestore corresponding to file with id
-`fileId`, as deleted.
+`patch(path: String, fileId: String, payload: Object, clientId: String): Promise<Any>`
 
-The change is requested by user with id `userId` and from a client
-with id, that uniquely identifies this running process, `clientId`.
-
-Note that the file is not actually removed from Firestore.  It's the
-responsibility of the client library to exclude deleted files from the
-client's UI.
-
-Produce a `Promise` with an array of update results in it.
-
-## `stopListening(unsubscribeFunctions: Function[]): Void`
-Call each of the given `unsubscribeFunctions`.
-
-## `fetchFiles(userId: String): Promise<File[]>`
-Produce a `Promise` that will be resolved with an array of files that
-the user with id `userId` has access to.  Each of those records will
-identify the access that the user has to the corresponding Plottr file
-in the `permission` field.
-
-## `logOut(): Promise<Void>`
-Produce a `Promise` which, when resolved, indicates that the current
-user was logged out.
-
-## `onSessionChange(cb: (User | Null => Void)): Void`
-Register `cb`, a callback function, to be called by Firebase whenever
-the session changes.  The callback function is called with the current
-user if there is on.
-
-## `firebaseUI(): AuthUI`
-Produce an instantiated singleton instance of the Firebase Auth UI.
-See [https://firebase.google.com/docs/auth/web/firebaseui].
-
-## `startUI(firebaseUI: AuthUI, queryString: String): Void`
-Instruct Firebase to mount the authentication interface corresponding
-to `firebaseUI` to the DOM node corresponding to `queryString`.
-
-## `hasUndefinedValue(object: Object): Bool`
-Produce `true` if any key or sub key recursively in `object` has value
-`undefined`.  This is useful for debugging update/set requests to
-Firestore that fail because Firestore doesn't support undefined values.
-
-## `patch(path: String, fileId: String, payload: Object, clientId: String): Promise<Any>`
 Update the document at `path` that has file id `fileId` with the
 values in `payload` from the process that can be uniquely identified
 by `clientId`.
@@ -208,7 +185,10 @@ by `clientId`.
 Produce a `Promise` which, when resolved, indicates that the action
 was completed.
 
-## `owerwrite(path: String, fileId: String, payload: Object, clientId: String): Promise<Any>`
+### Owerwrite
+
+`owerwrite(path: String, fileId: String, payload: Object, clientId: String): Promise<Any>`
+
 Overwrite the contents of the document at `path` that has file id
 `fileId` with the values in `payload` from the process that can be
 uniquely identified by `clientId`.
@@ -216,7 +196,10 @@ uniquely identified by `clientId`.
 Produce a `Promise` which, when resolved, indicates that the action
 was completed.
 
-## `shareDocument(fileId: String, emailAddress: String): Promise<String>`
+### Share Document
+
+`shareDocument(fileId: String, emailAddress: String): Promise<String>`
+
 Share file with id `fileId` (owned by the current user and if not then
 produce a failed Promise) with user that has email address
 `emailAddress`.
@@ -225,7 +208,10 @@ Produce a `Promise` which, when resolved, contains the unique token
 that should be emailed to the user for them to accept the invitation
 when logging in.
 
-## `publishRCEOperations(fileId: String, editorId: String, operations: SlateOperation[]): Promise<Any[]>`
+### Publish RCE Operations
+
+`publishRCEOperations(fileId: String, editorId: String, operations: SlateOperation[]): Promise<Any[]>`
+
 Publish an array of RCE `operations` made in file with id `fileId` to
 the editor editing specific RCE content in a Plottr file that can be
 uniquely identified across all open instances of Plottr editing the
@@ -238,32 +224,45 @@ id 1 in the file with id `fileId`.
 Produce a `Promise` which, when resolved, indicates that the
 operations were published.
 
-## `fetchRCEOperations(fileId: String, editorId: String, since: Date, cb: (SlateOperation[] => Void)): Void`
+### Fetch RCE Operations
+
+`fetchRCEOperations(fileId: String, editorId: String, since: Date, cb: (SlateOperation[] => Void)): Void`
+
 Poll Firebase for editor operations corresponding to the file with id
 `fileId` made to the editor that can be uniquely identified across all
 open instances of Plottr editing the file by `editorId` after the
 `Date` `since`.  Call `cb` with an array of operations that meet those
 criteria.
 
-## `listenToCustomTemplates(userId: String, callback: (Template => Void)): Promise<Function[]>`
+### Listen To Custom Templates
+
+`listenToCustomTemplates(userId: String, callback: (Template => Void)): Promise<Function[]>`
+
 Register a `callback` with Firebase to be called every time that the
 templates owned by user with id `userId` are updated.
 
 The callback is also called initially.
 
-## `saveCustomTemplate(userId: String, template: Template): Promise<Any>`
+### Save Custom Template
+
+`saveCustomTemplate(userId: String, template: Template): Promise<Any>`
+
 Save `template` to user with id `userId`s custom templates in
 Firebase.
 
 Produce a `Promise` which, when resolved, indicates whether the
 operation was successful.
 
-## TODO `editCustomTemplate`
-Discovered missing when writing doc.
-## TODO `deleteCustomTemplate`
+### TODO Edit Custom Template
+
+`editCustomTemplate`
+
 Discovered missing when writing doc.
 
-## `saveBackup(userId: String, file: PlottrFile): Promise<Any>`
+### Save Backup
+
+`saveBackup(userId: String, file: PlottrFile): Promise<Any>`
+
 Take a backup of `file` belonging to user with id `userId` and produce
 a `Promise` which, when resolved, indicates that the appropriate
 backup was taken.
@@ -275,3 +274,87 @@ Strategy is:
  
 The strategy results in at-most two backups per day.  Backups are
 cleared on a 30 day rolling window when they exceed 60 backups.
+
+## Deleting
+
+### Delete File
+
+`deleteFile(fileId: String, userId: String, clientId: String): Promise<Any[]>`
+
+Mark all the documents in Firestore corresponding to file with id
+`fileId`, as deleted.
+
+The change is requested by user with id `userId` and from a client
+with id, that uniquely identifies this running process, `clientId`.
+
+Note that the file is not actually removed from Firestore.  It's the
+responsibility of the client library to exclude deleted files from the
+client's UI.
+
+Produce a `Promise` with an array of update results in it.
+
+### TODO Delete Custom Template
+
+`editCustomTemplate`
+
+Discovered missing when writing doc.
+
+## Session Management
+
+### Log Out
+
+`logOut(): Promise<Void>`
+
+Produce a `Promise` which, when resolved, indicates that the current
+user was logged out.
+
+### On Session Change
+
+`onSessionChange(cb: (User | Null => Void)): Void`
+
+Register `cb`, a callback function, to be called by Firebase whenever
+the session changes.  The callback function is called with the current
+user if there is on.
+
+### Firebase UI
+
+`firebaseUI(): AuthUI`
+
+Produce an instantiated singleton instance of the Firebase Auth UI.
+See [https://firebase.google.com/docs/auth/web/firebaseui].
+
+### Start UI
+
+`startUI(firebaseUI: AuthUI, queryString: String): Void`
+
+Instruct Firebase to mount the authentication interface corresponding
+to `firebaseUI` to the DOM node corresponding to `queryString`.
+
+## Utilities
+
+### Stop Listening
+
+`stopListening(unsubscribeFunctions: Function[]): Void`
+
+Call each of the given `unsubscribeFunctions`.
+
+### With File Id
+
+`withFileId(fileId: String, file: PlottrFile): PlottrFile`
+
+Produce a copy of `file` with the `file.id` in `file` to `fileId`.
+
+### To Firestore Array
+
+`toFirestoreArray(array: Any[]): Object`
+
+Produce an object whose keys correspond to the indices in `array` and
+whose values correspond to the values in `array`.
+
+### Has Undefined Value
+
+`hasUndefinedValue(object: Object): Bool`
+
+Produce `true` if any key or sub key recursively in `object` has value
+`undefined`.  This is useful for debugging update/set requests to
+Firestore that fail because Firestore doesn't support undefined values.
