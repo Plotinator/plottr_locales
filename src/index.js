@@ -7,7 +7,7 @@ import { DateTime } from 'luxon'
 
 import { actions, ARRAY_KEYS } from 'pltr/v2'
 
-export const firebaseConfig =
+const firebaseConfig =
   process.env.NEXT_PUBLIC_FIREBASE_ENV === 'production'
     ? {
         apiKey: 'AIzaSyDyxfuXIrmXyN4YLlIRBkjA82Guh4XGUEE',
@@ -170,19 +170,19 @@ const listenToBeats = (store, userId, fileId, clientId, version) => {
     .onSnapshot(onSnapshot(store, fileId, 'beats', transform, true, clientId))
 }
 
-export const listenToCards = listenForArrayAtPath('cards')
-export const listenToSeries = listenForObjectAtPath('series')
-export const listenToBooks = listenForObjectAtPath('books')
-export const listenToCategories = listenForObjectAtPath('categories')
-export const listenToCharacters = listenForArrayAtPath('characters')
-export const listenToCustomAttributes = listenForObjectAtPath('customAttributes')
-export const listenToLines = listenForArrayAtPath('lines')
-export const listenToNotes = listenForArrayAtPath('notes')
-export const listenToPlaces = listenForArrayAtPath('places')
-export const listenToTags = listenForArrayAtPath('tags')
-export const listenTohierarchyLevels = listenForObjectAtPath('hierarchyLevels')
-export const listenToImages = listenForObjectAtPath('images')
-export const listenToClient = listenForObjectAtPath('client')
+const listenToCards = listenForArrayAtPath('cards')
+const listenToSeries = listenForObjectAtPath('series')
+const listenToBooks = listenForObjectAtPath('books')
+const listenToCategories = listenForObjectAtPath('categories')
+const listenToCharacters = listenForArrayAtPath('characters')
+const listenToCustomAttributes = listenForObjectAtPath('customAttributes')
+const listenToLines = listenForArrayAtPath('lines')
+const listenToNotes = listenForArrayAtPath('notes')
+const listenToPlaces = listenForArrayAtPath('places')
+const listenToTags = listenForArrayAtPath('tags')
+const listenTohierarchyLevels = listenForObjectAtPath('hierarchyLevels')
+const listenToImages = listenForObjectAtPath('images')
+const listenToClient = listenForObjectAtPath('client')
 
 export const listen = (store, userId, fileId, clientId, fileVersion) => {
   const unsubscribeFunctions = [
@@ -249,21 +249,21 @@ const fetchBeats = (userId, fileId, clientId, version) => {
     .then(onFetched(fileId, 'beats', transform, clientId))
 }
 
-export const fetchFile = fetchObjectAtPath('file')
-export const fetchChapters = fetchArrayAtPath('chapters')
-export const fetchCards = fetchArrayAtPath('cards')
-export const fetchSeries = fetchObjectAtPath('series')
-export const fetchBooks = fetchObjectAtPath('books')
-export const fetchCategories = fetchObjectAtPath('categories')
-export const fetchCharacters = fetchArrayAtPath('characters')
-export const fetchCustomAttributes = fetchObjectAtPath('customAttributes')
-export const fetchLines = fetchArrayAtPath('lines')
-export const fetchNotes = fetchArrayAtPath('notes')
-export const fetchPlaces = fetchArrayAtPath('places')
-export const fetchTags = fetchArrayAtPath('tags')
-export const fetchhierarchyLevels = fetchObjectAtPath('hierarchyLevels')
-export const fetchImages = fetchObjectAtPath('images')
-export const fetchClient = fetchObjectAtPath('client')
+const fetchFile = fetchObjectAtPath('file')
+const fetchChapters = fetchArrayAtPath('chapters')
+const fetchCards = fetchArrayAtPath('cards')
+const fetchSeries = fetchObjectAtPath('series')
+const fetchBooks = fetchObjectAtPath('books')
+const fetchCategories = fetchObjectAtPath('categories')
+const fetchCharacters = fetchArrayAtPath('characters')
+const fetchCustomAttributes = fetchObjectAtPath('customAttributes')
+const fetchLines = fetchArrayAtPath('lines')
+const fetchNotes = fetchArrayAtPath('notes')
+const fetchPlaces = fetchArrayAtPath('places')
+const fetchTags = fetchArrayAtPath('tags')
+const fetchhierarchyLevels = fetchObjectAtPath('hierarchyLevels')
+const fetchImages = fetchObjectAtPath('images')
+const fetchClient = fetchObjectAtPath('client')
 
 export const withFileId = (fileId, file) => ({
   ...file,
@@ -359,25 +359,6 @@ export const fetchFiles = (userId) => {
       })
       return Promise.all(authorisedDocuments)
     })
-}
-
-export const signIn = (email, password) => {
-  return firebase
-    .auth()
-    .setPersistence(firebase.auth.Auth.Persistence.SESSION)
-    .then(() => {
-      return auth().signInWithEmailAndPassword(email, password)
-    })
-}
-
-export const userSession = () => {
-  return auth().currentUser
-}
-
-export const createAccount = (userName, email, password) => {
-  // TODO: do we need the userName?  We could put this in Firestore
-  // for later(!)
-  return auth().createUserWithEmailAndPassword(email, password)
 }
 
 export const logOut = () => {
@@ -509,15 +490,7 @@ export const saveCustomTemplate = (userId, template) => {
   return database().collection(`templates/${userId}/custom`).add(template)
 }
 
-export const setCustomTemplates = (userId, templates) => {
-  if (templates.length === 0) {
-    return database().collection('templates').doc(userId).delete()
-  }
-  return database()
-    .collection('templates')
-    .doc(userId)
-    .set({ ...templates })
-}
+// TODO: add an edit and a delete for custom templates...
 
 const getSingleDocument = (documentRef) => {
   const documents = []
