@@ -7,6 +7,11 @@ storage.
 This library provides a number of convenience scripts to help develop
 applications against Plottr's Firebase instance.
 
+## Specifying the Project
+Before running the emulators etc. you need to tell Firebase which
+project to use.  You can do this with the command `firebase use
+plottr-ci`.
+
 ## Emulators
 The local emulators are provided by Google to enable development in
 sandbox environment.  The command `yarn start-emulators` will launch a
