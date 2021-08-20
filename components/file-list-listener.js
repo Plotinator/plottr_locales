@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 import { connect } from 'react-redux'
 
 import { actions, selectors } from 'pltr/v2'
-import { fetchFiles } from '../lib/firebase'
+import { fetchFiles } from 'plottr_firebase'
 
 const FileListListener = ({ fileList, userId, setFileList }) => {
   useEffect(() => {

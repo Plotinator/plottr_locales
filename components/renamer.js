@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 
 import { t } from 'plottr_locales'
 import { InputModal } from 'connected-components'
-import { editFileName } from '../lib/firebase'
+import { editFileName } from 'plottr_firebase'
 
 const Renamer = () => {
   const [visible, setVisible] = useState(false)

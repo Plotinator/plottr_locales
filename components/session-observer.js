@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 import { connect } from 'react-redux'
 
 import { actions } from 'pltr/v2'
-import { fetchFiles, onSessionChange } from '../lib/firebase'
+import { fetchFiles, onSessionChange } from 'plottr_firebase'
 
 const SessionObserver = ({ setUserId, setFileList }) => {
   useEffect(() => {
