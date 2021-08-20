@@ -8,7 +8,7 @@ import { GrFormEdit } from 'react-icons/gr'
 import { selectors } from 'pltr/v2'
 import { PlottrModal } from 'connected-components'
 import { withEventTargetValue } from '../lib/withEventTargetValue'
-import { shareDocument } from '../lib/firebase'
+import { shareDocument } from 'plottr_firebase'
 
 const modalStyles = {
   overlay: {

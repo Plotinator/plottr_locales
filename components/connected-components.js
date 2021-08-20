@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { t } from 'plottr_locales'
 import { actions } from 'pltr/v2'
 import { appVersion } from '../lib/version'
-import { publishRCEOperations, fetchRCEOperations, initialFetch, deleteFile } from '../lib/firebase'
+import { publishRCEOperations, fetchRCEOperations, deleteFile } from 'plottr_firebase'
 import {
   getTemplateById,
   listTemplates,
@@ -37,6 +37,7 @@ import {
   newEmptyFile,
   useSortedKnownFiles,
   newFile,
+  openFile,
 } from '../lib/files'
 import { useBackupFolders } from '../lib/backups'
 import { createErrorReport } from '../lib/createErrorReport'
@@ -109,7 +110,7 @@ const platform = {
       const selectedFile = fileList.find((thatFile) => thatFile.id === fileId)
       if (!selectedFile) return
 
-      initialFetch(userId, fileId, clientId, appVersion()).then(() => {
+      openFile(userId, fileId, clientId, appVersion()).then(() => {
         store.dispatch(actions.project.selectFile(selectedFile))
         closeDashboard()
       })

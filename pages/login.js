@@ -4,7 +4,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 
 import { FunSpinner } from 'connected-components'
-import { onSessionChange, firebaseUI, startUI } from '../lib/firebase'
+import { onSessionChange, firebaseUI, startUI } from 'plottr_firebase'
 
 export default function Login() {
   const [sessionChecked, setSessionChecked] = useState(false)

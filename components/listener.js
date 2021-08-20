@@ -3,8 +3,10 @@ import { PropTypes } from 'prop-types'
 import { connect } from 'react-redux'
 
 import { actions, selectors } from 'pltr/v2'
-import { initialFetch, listen, stopListening } from '../lib/firebase'
+import { listen, stopListening } from 'plottr_firebase'
 import { listenToCustomTemplates } from '../lib/templates'
+import { openFile } from '../lib/files'
+import { store } from '../lib/redux'
 
 const Listener = ({
   userId,
@@ -27,8 +29,10 @@ const Listener = ({
     if (!userId || !clientId || !selectedFile || !selectedFile.id) {
       return () => {}
     }
-    initialFetch(userId, selectedFile.id, clientId, selectedFile.version).then((file) => {
-      setUnsubscribeFunctions(listen(userId, selectedFile.id, clientId, selectedFile.version))
+    openFile(userId, selectedFile.id, clientId, selectedFile.version).then((file) => {
+      setUnsubscribeFunctions(
+        listen(store, userId, selectedFile.id, clientId, selectedFile.version)
+      )
       setPermission(selectedFile.permission)
       setFileLoaded()
     })
