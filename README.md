@@ -154,6 +154,15 @@ iterate through the returned functions and call them.  The functions
 are produced by the Firebase library and may be called to cancel a
 subscription.
 
+### Listen To Custom Templates
+
+`listenToCustomTemplates(userId: String, callback: (Template => Void)): Promise<Function[]>`
+
+Register a `callback` with Firebase to be called every time that the
+templates owned by user with id `userId` are updated.
+
+The callback is also called initially.
+
 ## Updating
 
 ### Overwrite All Keys
@@ -233,15 +242,6 @@ Poll Firebase for editor operations corresponding to the file with id
 open instances of Plottr editing the file by `editorId` after the
 `Date` `since`.  Call `cb` with an array of operations that meet those
 criteria.
-
-### Listen To Custom Templates
-
-`listenToCustomTemplates(userId: String, callback: (Template => Void)): Promise<Function[]>`
-
-Register a `callback` with Firebase to be called every time that the
-templates owned by user with id `userId` are updated.
-
-The callback is also called initially.
 
 ### Save Custom Template
 
