@@ -1448,6 +1448,9 @@
   "You cannot delete the last chapter.": {
     "message": "You cannot delete the last chapter."
   },
+  "You cannot delete the last plotline.": {
+    "message": "You cannot delete the last plotline."
+  },
   "You have unsaved changes": {
     "message": "You have unsaved changes.\nDo you want to save?"
   },
