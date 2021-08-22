@@ -725,6 +725,9 @@
   "Main": {
     "message": "Main"
   },
+  "Manage the Categories you wish to place your characters in.": {
+    "message": "Manage the Categories you wish to place your characters in."
+  },
   "Manually Sorted": {
     "message": "Manually Sorted"
   },
@@ -1531,6 +1534,9 @@
   },
   "Character": {
     "message": "Character"
+  },
+  "Character's Categories": {
+    "message": "Character's Categories"
   },
   "custom character attribute": {
     "message": "custom character attribute"
