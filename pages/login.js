@@ -8,7 +8,6 @@ import { onSessionChange, firebaseUI, startUI } from 'plottr_firebase'
 
 export default function Login() {
   const [sessionChecked, setSessionChecked] = useState(false)
-  const [ui, setUI] = useState(null)
 
   useEffect(() => {
     if (sessionChecked) return
@@ -23,9 +22,8 @@ export default function Login() {
   const firebaseLoginComponentRef = useRef()
   useEffect(() => {
     if (firebaseLoginComponentRef.current) {
-      const _ui = firebaseUI()
-      setUI(_ui)
-      startUI(_ui, '#firebase-login')
+      const ui = firebaseUI()
+      startUI(ui, '#firebase-login')
     }
   }, [])
 
