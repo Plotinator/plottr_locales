@@ -11,6 +11,8 @@ import Leaf from './Leaf'
 import Element from './Element'
 import { useTextConverter, createEditor } from './helpers'
 import { useRegisterEditor } from './editor-registry'
+import { newEditQueue, enqueue } from './editQueue'
+import { drainQueue } from '../../../dist/components/rce/editQueue'
 
 const HOTKEYS = {
   'mod+b': 'bold',
@@ -20,12 +22,13 @@ const HOTKEYS = {
 
 const RichTextEditorConnector = (connector) => {
   const {
-    platform: { openExternal, undo, redo },
+    platform: { openExternal, publishRCEOperations, fetchRCEOperations, undo, redo },
   } = connector
 
   const ToolBar = UnconnectedToolBar(connector)
 
   const RichTextEditor = ({
+    id,
     undoId,
     text,
     selection,
@@ -33,6 +36,7 @@ const RichTextEditorConnector = (connector) => {
     className,
     autoFocus,
     onChange,
+    fileId,
   }) => {
     const editor = useMemo(() => {
       return createEditor()
@@ -64,33 +68,93 @@ const RichTextEditorConnector = (connector) => {
       }
     }, [autoFocus, editorWrapperRef])
 
+    const editorId = id
+
     const registerEditor = useRegisterEditor(editor)
 
-    if (!value) return null
+    const [editCount, setEditCount] = useState(0)
+    const applyingOtherEdits = useRef(false)
 
     const updateValue = (newVal) => {
       setValue(newVal)
-
-      // Rules for changing are complicated because we need to support
-      // editors which don't use programatic undo and therefore don't
-      // track the current selection.
-      if (
-        selection &&
-        editor.selection &&
-        !isEqual(editorSelection, editor.selection) &&
-        editor.selection.anchor &&
-        editor.selection.focus
-      ) {
-        setEditorSelection({ ...editor.selection })
-        if (value !== newVal) {
-          onChange(newVal, { ...editor.selection })
-        } else {
-          onChange(null, { ...editor.selection })
+      if (applyingOtherEdits.current) {
+        applyingOtherEdits.current = false
+        return
+      }
+      if (publishRCEOperations && fileId && editorId) {
+        let individualEditCount = editCount
+        publishRCEOperations(
+          fileId,
+          editorId,
+          editor.operations.map((operation) => ({
+            editorKey: key.current,
+            operation,
+            created: new Date(),
+            editNumber: individualEditCount++,
+          }))
+        )
+        setEditCount(individualEditCount)
+      }
+      if (!isEqual(editorSelection, editor.selection)) {
+        // Rules for changing are complicated because we need to support
+        // editors which don't use programatic undo and therefore don't
+        // track the current selection.
+        if (
+          selection &&
+          editor.selection &&
+          !isEqual(editorSelection, editor.selection) &&
+          editor.selection.anchor &&
+          editor.selection.focus
+        ) {
+          setEditorSelection({ ...editor.selection })
+          if (value !== newVal) {
+            onChange(newVal, { ...editor.selection })
+          } else {
+            onChange(null, { ...editor.selection })
+          }
         }
       } else if (value !== newVal) {
         onChange(newVal)
       }
     }
+
+    const editQueue = useRef(newEditQueue())
+
+    useEffect(() => {
+      if (fetchRCEOperations && fileId && editorId) {
+        const Search = () => {
+          let latestSearch = new Date()
+
+          return function () {
+            fetchRCEOperations(fileId, editorId, latestSearch, (operations) => {
+              operations.forEach((operation) => {
+                if (operation.editorKey !== key.current) {
+                  enqueue(
+                    editQueue.current,
+                    operation.editorKey,
+                    operation.operation,
+                    operation.editNumber
+                  )
+                }
+              })
+              latestSearch = operations[operations.length - 1].created
+              const operationsToApply = drainQueue(editQueue.current)
+              if (operationsToApply.length) {
+                applyingOtherEdits.current = true
+                operationsToApply.forEach((operation) => {
+                  editor.apply(operation)
+                })
+              }
+            })
+          }
+        }
+        const interval = setInterval(new Search(), 100)
+        return () => {
+          clearInterval(interval)
+        }
+      }
+      return () => {}
+    }, [fileId, editorId])
 
     const handleKeyDown = (event) => {
       // If we don't have a selection, then the editor can't support
@@ -160,6 +224,8 @@ const RichTextEditorConnector = (connector) => {
       editorWrapperRef.firstChild.focus()
     }
 
+    if (!value) return null
+
     const otherProps = {}
     return (
       <Slate editor={editor} value={value} onChange={updateValue} key={key.current}>
@@ -191,6 +257,8 @@ const RichTextEditorConnector = (connector) => {
 
   RichTextEditor.propTypes = {
     text: PropTypes.any,
+    id: PropTypes.string,
+    fileId: PropTypes.string,
     selection: PropTypes.object,
     onChange: PropTypes.func,
     autoFocus: PropTypes.bool,
