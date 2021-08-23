@@ -479,7 +479,7 @@ export const listenToCustomTemplates = (userId, callback) => {
       console.log('Received updated custom templates.')
       const documents = []
       documentsRef.forEach((document) => {
-        document.push(document)
+        documents.push(document)
       })
       callback(documents)
       return documents
