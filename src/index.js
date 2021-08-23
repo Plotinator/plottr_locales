@@ -475,11 +475,12 @@ export const fetchRCEOperations = (fileId, editorId, since, cb) => {
 export const listenToCustomTemplates = (userId, callback) => {
   return database()
     .collection(`templates/${userId}/custom`)
+    .where('deleted', '!=', true)
     .onSnapshot((documentsRef) => {
       console.log('Received updated custom templates.')
       const documents = []
       documentsRef.forEach((document) => {
-        document.push(document)
+        documents.push(document.data())
       })
       callback(documents)
       return documents
@@ -487,10 +488,20 @@ export const listenToCustomTemplates = (userId, callback) => {
 }
 
 export const saveCustomTemplate = (userId, template) => {
-  return database().collection(`templates/${userId}/custom`).add(template)
+  return database().collection(`templates/${userId}/custom`).doc(template.id).set(template)
 }
 
-// TODO: add an edit and a delete for custom templates...
+export const editCustomTemplate = (userId, template) => {
+  return database()
+    .doc(`templates/${userId}/custom/${template.id}`)
+    .update(template, { merge: true })
+}
+
+export const deleteCustomTemplate = (userId, templateId) => {
+  return database()
+    .doc(`templates/${userId}/custom/${templateId}`)
+    .update({ deleted: true }, { merge: true })
+}
 
 const getSingleDocument = (documentRef) => {
   const documents = []
