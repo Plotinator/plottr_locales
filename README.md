@@ -253,11 +253,14 @@ Firebase.
 Produce a `Promise` which, when resolved, indicates whether the
 operation was successful.
 
-### TODO Edit Custom Template
+### Edit Custom Template
 
-`editCustomTemplate`
+`editCustomTemplate(userId: String, template: Object): Promise<Any>`
 
-Discovered missing when writing doc.
+Edit `template` belonging to user with id `userId` in Firebase.
+
+Produce a `Promise` which, when resolved, indicates whether the
+operation was successful.
 
 ### Save Backup
 
@@ -293,11 +296,16 @@ client's UI.
 
 Produce a `Promise` with an array of update results in it.
 
-### TODO Delete Custom Template
+### Delete Custom Template
 
-`editCustomTemplate`
+`deleteCustomTemplate(userId: String, templateId: String): Promise<Any>`
 
-Discovered missing when writing doc.
+Mark the template with id `templateId` that belongs to user with id
+`userId` as deleted.  The template is not actually removed from
+Firebase.
+
+Produces a `Promise` which, when resolved, indicates whether the
+operation was successful.
 
 ## Session Management
 
