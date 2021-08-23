@@ -103,7 +103,9 @@ service cloud.firestore {
       }
     }
     match /templates/{user} {
-      allow read, write, update, create: if request.auth != null && request.auth.uid == user;
+      match /{subDocument=**} {
+        allow read, write, update, create: if request.auth != null && request.auth.uid == user;
+      }
     }
     match /rce/{document} {
       match /{subDocument=**} {
