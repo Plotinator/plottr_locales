@@ -47,7 +47,7 @@ function createExampleFiles() {
 
 function createTestUser() {
   const firebaseConfig = {
-    apiKey: FIREBASE_KEY,
+    apiKey: process.env.FIREBASE_KEY,
     authDomain: 'plottr-ci.firebaseapp.com',
     projectId: 'plottr-ci',
     storageBucket: 'plottr-ci.appspot.com',
