@@ -7,7 +7,7 @@ import { fetchFiles } from 'plottr_firebase'
 
 const FileListListener = ({ fileList, userId, setFileList }) => {
   useEffect(() => {
-    if (!fileList || fileList.length === 0) return () => {}
+    if (!fileList || fileList.length === 0 || !userId) return () => {}
 
     const deleteListener = document.addEventListener('delete-file', (event) => {
       fetchFiles(userId).then((files) => {
@@ -30,8 +30,8 @@ const FileListListener = ({ fileList, userId, setFileList }) => {
 
 FileListListener.propTypes = {
   fileList: PropTypes.array.isRequired,
-  userId: PropTypes.string.isRequired,
-  setUserId: PropTypes.func.isRequired,
+  userId: PropTypes.string,
+  setFileList: PropTypes.func.isRequired,
 }
 
 export default connect(
