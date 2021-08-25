@@ -1,3 +1,6 @@
- - [X] Change an attribute from text to paragraph on the timeline of
-       Three Little Pigs... boom!
+ - [X] Change an attribute from text to paragraph on the timeline of Three Little Pigs... boom!
+ - [ ] Changing beta setting doesn't persist across refreshes (or the hierarchy isn't persisted?)
+ - [ ] Outline renders duplicate Chapter 1's for three little pigs
+ - [ ] Saving a note triggers an undefined property error patching firebase because uncategorised is undefined category :/
+ - [ ] Editing anything in notes triggers the undefined category error in three little pigs
 
