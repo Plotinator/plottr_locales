@@ -78,8 +78,8 @@ const Upload = ({
 }
 
 Upload.propTypes = {
-  userId: PropTypes.string.isRequired,
-  emailAddress: PropTypes.string.isRequired,
+  userId: PropTypes.string,
+  emailAddress: PropTypes.string,
   loadFile: PropTypes.func.isRequired,
   selectEmptyfile: PropTypes.func.isRequired,
   setFileList: PropTypes.func.isRequired,
