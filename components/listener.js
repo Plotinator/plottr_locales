@@ -5,7 +5,6 @@ import { connect } from 'react-redux'
 import { actions, selectors } from 'pltr/v2'
 import { listen, stopListening } from 'plottr_firebase'
 import { listenToCustomTemplates } from '../lib/templates'
-import { openFile } from '../lib/files'
 import { store } from '../lib/redux'
 
 const Listener = ({
