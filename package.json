@@ -5,6 +5,7 @@
   "scripts": {
     "seed-firestore": "yarn --cwd lib/plottr_firebase seed-firestore",
     "grant-all-permissions": "yarn --cwd lib/plottr_firebase grant-all-permissions",
+    "grant-collab-permissions": "yarn --cwd lib/plottr_firebase grant-collab-permissions",
     "grant-test-permissions": "yarn --cwd lib/plottr_firebase grant-test-permissions",
     "start-emulators": "yarn --cwd lib/plottr_firebase firebase emulators:start",
     "postinstall": "npm --prefix lib/plottr_components install && yarn --cwd lib/plottr_firebase",
