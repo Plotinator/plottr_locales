@@ -122,6 +122,11 @@ const onSnapshot =
       return
     }
     if (data.clientId === clientId) return
+    const patchAction = patchActions(path)
+    if (!patchAction) {
+      console.error('No patch action for ', path)
+      return
+    }
     delete data.fileId
     delete data.clientId
     store.dispatch(
