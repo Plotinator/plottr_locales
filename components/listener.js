@@ -29,13 +29,9 @@ const Listener = ({
     if (!userId || !clientId || !selectedFile || !selectedFile.id) {
       return () => {}
     }
-    openFile(userId, selectedFile.id, clientId, selectedFile.version).then((file) => {
-      setUnsubscribeFunctions(
-        listen(store, userId, selectedFile.id, clientId, selectedFile.version)
-      )
-      setPermission(selectedFile.permission)
-      setFileLoaded()
-    })
+    setUnsubscribeFunctions(listen(store, userId, selectedFile.id, clientId, selectedFile.version))
+    setPermission(selectedFile.permission)
+    setFileLoaded()
 
     return () => {
       stopListening(unsubscribeFunctions)
