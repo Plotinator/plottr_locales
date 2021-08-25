@@ -3,5 +3,5 @@
  - [ ] Changing beta setting doesn't persist across refreshes (or the hierarchy isn't persisted?)
  - [ ] Outline renders duplicate Chapter 1's for three little pigs
  - [X] Saving a note triggers an undefined property error patching firebase because uncategorised is undefined category :/
- - [ ] Editing anything in notes triggers the undefined category error in three little pigs
+ - [X] Editing anything in notes triggers the undefined category error in three little pigs
 
