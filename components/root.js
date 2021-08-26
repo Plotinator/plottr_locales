@@ -1,6 +1,7 @@
 import { Router, Switch, Route } from 'react-router-dom'
 import { Provider } from 'react-redux'
 
+import { PlottrModal } from 'connected-components'
 import { history } from '../lib/history'
 import { store } from '../lib/redux'
 
@@ -19,12 +20,34 @@ import SessionObserver from './session-observer'
 import ClientIdMinter from './client-id-minter'
 import FileListListener from './file-list-listener'
 import Renamer from './renamer'
-import PasswordModal from './password-modal'
+import PasswordForm from './password-form'
+
+const modalStyles = {
+  overlay: {
+    zIndex: 1000,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  content: {
+    padding: 0,
+    borderRadius: 0,
+    overflow: 'hidden',
+    width: '100%',
+    position: 'relative',
+    left: '0',
+    top: '0',
+    minHeight: '100vh',
+    maxHeight: '100vh',
+  },
+}
 
 const Root = () => {
   return (
     <Provider store={store}>
-      <PasswordModal />
+      <PlottrModal isOpen={true} style={modalStyles}>
+        <PasswordForm />
+      </PlottrModal>
       <Renamer />
       <FileListListener />
       <SessionObserver />
