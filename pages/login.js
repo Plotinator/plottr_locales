@@ -5,6 +5,7 @@ import Image from 'next/image'
 
 import { FunSpinner } from 'connected-components'
 import { onSessionChange, firebaseUI, startUI } from 'plottr_firebase'
+import PasswordForm, { passwordSet } from '../components/password-form'
 
 export default function Login() {
   const [sessionChecked, setSessionChecked] = useState(false)
@@ -30,6 +31,7 @@ export default function Login() {
   const renderMain = () => {
     return (
       <>
+        {!passwordSet() ? <PasswordForm /> : null}
         <div
           className="login__left"
           style={{ ...{ display: !sessionChecked ? 'none' : undefined } }}
