@@ -19,10 +19,12 @@ import SessionObserver from './session-observer'
 import ClientIdMinter from './client-id-minter'
 import FileListListener from './file-list-listener'
 import Renamer from './renamer'
+import PasswordModal from './password-modal'
 
 const Root = () => {
   return (
     <Provider store={store}>
+      <PasswordModal />
       <Renamer />
       <FileListListener />
       <SessionObserver />
