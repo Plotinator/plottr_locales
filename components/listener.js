@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import { actions, selectors } from 'pltr/v2'
 import { listen, stopListening } from 'plottr_firebase'
 import { listenToCustomTemplates } from '../lib/templates'
+import { settings } from '../lib/settings'
 import { store } from '../lib/redux'
 
 const Listener = ({
@@ -16,6 +17,9 @@ const Listener = ({
   clientId,
   loadFile,
   darkMode,
+  actStructureIsOn,
+  setBeatHierarchy,
+  unsetBeatHierarchy,
 }) => {
   const [unsubscribeFunctions, setUnsubscribeFunctions] = useState([])
 
@@ -31,6 +35,11 @@ const Listener = ({
     setUnsubscribeFunctions(listen(store, userId, selectedFile.id, clientId, selectedFile.version))
     setPermission(selectedFile.permission)
     setFileLoaded()
+    if (settings.user.beatHierarchy && !actStructureIsOn) {
+      setBeatHierarchy()
+    } else if (!settings.user.beatHierarchy && actStructureIsOn) {
+      unsetBeatHierarchy()
+    }
 
     return () => {
       stopListening(unsubscribeFunctions)
@@ -70,6 +79,9 @@ Listener.propTypes = {
   clientId: PropTypes.string,
   loadFile: PropTypes.func.isRequired,
   darkMode: PropTypes.bool,
+  actStructureIsOn: PropTypes.bool,
+  setBeatHierarchy: PropTypes.func.isRequired,
+  unsetBeatHierarchy: PropTypes.func.isRequired,
 }
 
 export default connect(
@@ -78,11 +90,14 @@ export default connect(
     userId: selectors.userIdSelector(state.present),
     clientId: selectors.clientIdSelector(state.present),
     darkMode: selectors.isDarkModeSelector(state.present),
+    actStructureIsOn: selectors.beatHierarchyIsOn(state.present),
   }),
   {
     setPermission: actions.permission.setPermission,
     patchFile: actions.ui.patchFile,
     loadFile: actions.ui.loadFile,
     setFileLoaded: actions.project.setFileLoaded,
+    setBeatHierarchy: actions.featureFlags.setBeatHierarchy,
+    unsetBeatHierarchy: actions.featureFlags.unsetBeatHierarchy,
   }
 )(Listener)
