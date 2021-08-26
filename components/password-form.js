@@ -13,6 +13,7 @@ const PasswordForm = () => {
       if (event.target.value === process.env.NEXT_PUBLIC_ROBOT) {
         window.localStorage.setItem('robot-preventor', process.env.NEXT_PUBLIC_ROBOT)
         setPasswordEntered(true)
+        window.location.reload()
       }
     }
   }

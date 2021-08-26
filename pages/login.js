@@ -29,12 +29,14 @@ export default function Login() {
   }, [])
 
   const renderMain = () => {
+    const passwordNotSet = !passwordSet()
+
     return (
       <>
-        {!passwordSet() ? <PasswordForm /> : null}
+        {passwordNotSet ? <PasswordForm /> : null}
         <div
           className="login__left"
-          style={{ ...{ display: !sessionChecked ? 'none' : undefined } }}
+          style={{ ...{ display: !sessionChecked || passwordNotSet ? 'none' : undefined } }}
         >
           <h1>Welcome to Plottr</h1>
           <div id="firebase-login" ref={firebaseLoginComponentRef}></div>
