@@ -86,6 +86,8 @@ const patchActions = (path) => {
       return actions.character
     case 'customAttributes':
       return actions.customAttribute
+    case 'featureFlags':
+      return actions.featureFlags
     case 'lines':
       return actions.line
     case 'notes':
@@ -181,6 +183,7 @@ const listenToBooks = listenForObjectAtPath('books')
 const listenToCategories = listenForObjectAtPath('categories')
 const listenToCharacters = listenForArrayAtPath('characters')
 const listenToCustomAttributes = listenForObjectAtPath('customAttributes')
+const listenToFeatureFlags = listenForObjectAtPath('featureFlags')
 const listenToLines = listenForArrayAtPath('lines')
 const listenToNotes = listenForArrayAtPath('notes')
 const listenToPlaces = listenForArrayAtPath('places')
@@ -199,6 +202,7 @@ export const listen = (store, userId, fileId, clientId, fileVersion) => {
     listenToCategories(store, userId, fileId, clientId),
     listenToCharacters(store, userId, fileId, clientId),
     listenToCustomAttributes(store, userId, fileId, clientId),
+    listenToFeatureFlags(store, userId, fileId, clientId),
     listenToLines(store, userId, fileId, clientId),
     listenToNotes(store, userId, fileId, clientId),
     listenToPlaces(store, userId, fileId, clientId),
@@ -262,6 +266,7 @@ const fetchBooks = fetchObjectAtPath('books')
 const fetchCategories = fetchObjectAtPath('categories')
 const fetchCharacters = fetchArrayAtPath('characters')
 const fetchCustomAttributes = fetchObjectAtPath('customAttributes')
+const fetchEditors = fetchObjectAtPath('featureFlags')
 const fetchLines = fetchArrayAtPath('lines')
 const fetchNotes = fetchArrayAtPath('notes')
 const fetchPlaces = fetchArrayAtPath('places')
@@ -306,6 +311,7 @@ export const initialFetch = (userId, fileId, clientId, version) => {
     fetchCategories(userId, fileId, clientId),
     fetchCharacters(userId, fileId, clientId),
     fetchCustomAttributes(userId, fileId, clientId),
+    fetchEditors(userId, fileId, clientId),
     fetchLines(userId, fileId, clientId),
     fetchNotes(userId, fileId, clientId),
     fetchPlaces(userId, fileId, clientId),
