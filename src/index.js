@@ -632,7 +632,8 @@ const withoutStoProtocal = (path) => {
 }
 
 const backupToStorage = (userId, file, date, startOfSession) => {
-  const filePath = toBackupPath(userId, file.file.id, date, startOfSession)
+  const fileId = file.project.selectedFile.id
+  const filePath = toBackupPath(userId, fileId, date, startOfSession)
   const storageTask = storage()
     .ref()
     .child(withoutStoProtocal(filePath))
