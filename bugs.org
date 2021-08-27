@@ -1,7 +1,0 @@
- - [X] Change an attribute from text to paragraph on the timeline of Three Little Pigs... boom!
- - [X] Path is wrong for first time edit of an old file
- - [X] Changing beta setting doesn't persist across refreshes (or the hierarchy isn't persisted?)
- - [X] Outline renders duplicate Chapter 1's for three little pigs (haven't been able to duplicate it since fixing the migrator)
- - [X] Saving a note triggers an undefined property error patching firebase because uncategorised is undefined category :/
- - [X] Editing anything in notes triggers the undefined category error in three little pigs
-
