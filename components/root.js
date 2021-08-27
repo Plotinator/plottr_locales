@@ -20,7 +20,7 @@ import SessionObserver from './session-observer'
 import ClientIdMinter from './client-id-minter'
 import FileListListener from './file-list-listener'
 import Renamer from './renamer'
-import PasswordForm from './password-form'
+import PasswordForm, { passwordSet } from './password-form'
 
 const modalStyles = {
   overlay: {
@@ -45,7 +45,7 @@ const modalStyles = {
 const Root = () => {
   return (
     <Provider store={store}>
-      <PlottrModal isOpen={true} style={modalStyles}>
+      <PlottrModal isOpen={!passwordSet()} style={modalStyles}>
         <PasswordForm />
       </PlottrModal>
       <Renamer />
