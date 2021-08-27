@@ -74,8 +74,13 @@ const auth = () => {
 let _storage = null
 const storage = () => {
   if (_storage) return _storage
-  _storage = firebase.storage()
-  _storage.useEmulator('localhost', 9199)
+  if (
+    process.env.NEXT_PUBLIC_NODE_ENV === 'development' ||
+    (window && window.location.hostname === 'plottr.local')
+  ) {
+    _storage = firebase.storage()
+    _storage.useEmulator('localhost', 9199)
+  }
   return _storage
 }
 
