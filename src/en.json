@@ -521,6 +521,9 @@
   "Error sending email! Check your email and Try again.": {
     "message": "Error sending email! Check your email and Try again."
   },
+  "Error sharing file": {
+    "message": "Error sharing file"
+  },
   "Error: {error}": {
     "message": "Error: { error }"
   },
@@ -613,6 +616,9 @@
   },
   "Help": {
     "message": "Help"
+  },
+  "Hey, check out my Plottr project \"{project}\"": {
+    "message": "Hey, check out my Plottr project \"{project}\""
   },
   "Hide Others": {
     "message": "Hide Others"
@@ -1288,6 +1294,9 @@
   },
   "There was an error doing that. Try again": {
     "message": "There was an error doing that. Try again"
+  },
+  "There was an error while sharing your file. Try Again.": {
+    "message": "There was an error while sharing your file. Try Again."
   },
   "This is a plotline": {
     "message": "This is a plotline"
