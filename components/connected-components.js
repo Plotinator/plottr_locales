@@ -13,6 +13,7 @@ import {
   fetchRCEOperations,
   deleteFile,
   imagePublicURL,
+  isStorageURL,
 } from 'plottr_firebase'
 import {
   getTemplateById,
@@ -317,6 +318,8 @@ const platform = {
       if (!storageUrl) return null
       return imagePublicURL(storageUrl)
     },
+    isStorageURL,
+    imagePublicURL,
   },
 }
 
