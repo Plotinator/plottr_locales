@@ -679,3 +679,7 @@ export const saveImageToStorageFromURL = (userId, imageName, imageUrl) => {
 export const imagePublicURL = (storageProtocolURL) => {
   return storage().ref().child(withoutStorageProtocal(storageProtocolURL)).getDownloadURL()
 }
+
+export const isStorageURL = (string) => {
+  return string.startsWith('storage://')
+}
