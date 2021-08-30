@@ -80,6 +80,8 @@ const storage = () => {
   ) {
     _storage = firebase.storage()
     _storage.useEmulator('localhost', 9199)
+  } else {
+    _storage = firebase.storage()
   }
   return _storage
 }
