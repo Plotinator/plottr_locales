@@ -14,6 +14,7 @@ import {
   deleteFile,
   imagePublicURL,
   isStorageURL,
+  listenForChangesToEditor,
 } from 'plottr_firebase'
 import {
   getTemplateById,
@@ -303,6 +304,7 @@ const platform = {
   rootElementSelectors: ['#__next'],
   publishRCEOperations,
   fetchRCEOperations,
+  listenForChangesToEditor,
   machineIdSync: () => {
     return uuidv4()
   },
