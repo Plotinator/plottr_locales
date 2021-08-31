@@ -56,11 +56,8 @@ const UNDO_OR_REDO = 'UNDO_OR_REDO'
  *      other editors know whether they missed one of our edits.
  *   - handlingKeyDown.  Indicates that we're in the middle of
  *      the key down handler.
- *   - latestSearch.  Tracks the date of the last edit that we got from
- *     Firestore.  (It might be worth tracking the editors
- *     individually and using edit numbers instead of the time of the
- *     edit!!!  That way I wont have to worry about missing edits or
- *     about date-strangeness.)
+ *   - latestEdits.  Tracks where we've read to and what the goal edit
+ *     number is for each registered editor for this RCE.
  */
 export const withEditState = (
   editor,
@@ -78,6 +75,7 @@ export const withEditState = (
 ) => {
   // Constants
   const key = useRef(Math.random().toString(16))
+  const openTime = useRef(new Date())
 
   // Re-rendering state
   const [value, setValue] = useState(initialValue)
@@ -200,6 +198,8 @@ export const withEditState = (
         if (latestEdits.current[operation.editorKey].read < operation.editNumber) {
           latestEdits.current[operation.editorKey].read = operation.editNumber
         }
+        // Don't re-apply old edits.
+        if (operation.created.toDate() < openTime.current) return
         editor.apply(operation.operation)
       })
     }
