@@ -168,8 +168,13 @@ export const withEditState = (
     if (!undoId || !value || !selection) {
       setValue(useTextConverter(initialValue)) // eslint-disable-line
       if (selection && selection.anchor && selection.focus) {
-        editor.selection = selection
-        setSelection(selection)
+        try {
+          editor.selection = selection
+          setSelection(selection)
+        } catch (error) {
+          console.error("Couldn't set seleciton, ", error)
+          setSelection({})
+        }
       } else {
         setSelection({ ...editor.selection })
       }
