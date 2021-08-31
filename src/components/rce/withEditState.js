@@ -7,28 +7,43 @@ import { useTextConverter } from './helpers'
 /**
  * # Introduction
  *
- * This hook manages simultaneous editing.
+ *   This hook manages simultaneous editing.
  *
- * It turns out, that modelling simultaneous edits are tricky.
+ *   It turns out, that modelling simultaneous edits is a tricky
+ *   business.
  *
- * There are several competing asynchronous events that may happen in
- * an inconvenient sequence or at an inconvenient time.  In this hook,
- * we model all of those events as state transitions in a Finite State
- * Machine (FSM).
+ *   There are several competing asynchronous events that may happen
+ *   in an inconvenient sequence or at an inconvenient time.  In this
+ *   hook, we model all of those events as state transitions in a
+ *   Finite State Machine (FSM).
  *
  * # Events
  *
- * TODO
+ *   1. User key down.
+ *   2. Signal change received from other editor.
+ *   3. Our query for other editor operations returned with data.
+ *   4. Redux gave us a new value for the editor.
+ *   5. Undo/Redo called by user.
  *
  * # Pieces of State
  *
- * TODO
+ * ## State that Should Cause a Re-Render
  *
- * # Note:
+ *   The following pieces of state are involved in how the RCE is
+ *   drawn and should cause it to re-draw every time that they change.
  *
- * At this point, I'm just refactoring the logic that handles values
- * into this file so that the RCE is clean again and then I'm going to
- * break it down into state transitions etc.
+ *   - value.  The value (tree) of the RCE.
+ *   - selection.  The cursor and anchor point for the RCE.
+ *
+ * ## State that Shouldn't Cause a Re-Render
+ *
+ *   The following pieces of state are involved in tracking edits and
+ *   editing states.  They're not involved in how the RCE looks so we
+ *   use `useRef` to remove them from re-draw cycles.
+ *
+ *   - editCount.  A tracker for the number of edits we made.  Helps
+ *     other editors know whether they missed one of our edits.
+ *   - handlingKeyDown
  */
 export const withEditState = (
   editor,
@@ -50,12 +65,12 @@ export const withEditState = (
   // Re-rendering state
   const [value, setValue] = useState(initialValue)
   const [selection, setSelection] = useState(selection)
-  const [editCount, setEditCount] = useState(0)
-  const [handlingKeyDown, setHandlingKeyDown] = useState(false)
 
   // Non-re-rendering state
   const applyingOtherEdits = useRef(false)
   const editQueue = useRef(newEditQueue())
+  const editCount = useRef(0)
+  const handlingKeyDown = useRef(false)
 
   // Handle changes in initial value
   useEffect(() => {
@@ -103,7 +118,7 @@ export const withEditState = (
           })
         }
         function delayIfNecessary() {
-          if (handlingKeyDown) {
+          if (handlingKeyDown.current) {
             setTimeout(delayIfNecessary, 100)
           }
           handleChange()
@@ -122,7 +137,6 @@ export const withEditState = (
       return
     }
     if (publishOperations && fileId && editorId) {
-      let individualEditCount = editCount
       // editor.operations.forEach((operation) => {
       //   console.log('Publishing: ', operation)
       // })
@@ -134,10 +148,9 @@ export const withEditState = (
           editorKey: key.current,
           operation,
           created: new Date(),
-          editNumber: individualEditCount++,
+          editNumber: editCount.current++,
         }))
       )
-      setEditCount(individualEditCount)
     }
     if (!isEqual(selection, editor.selection)) {
       // Rules for changing are complicated because we need to support
@@ -187,9 +200,9 @@ export const withEditState = (
       redo()
       return
     }
-    setHandlingKeyDown(true)
+    handlingKeyDown.current = true
     setTimeout(() => {
-      setHandlingKeyDown(false)
+      handlingKeyDown.current = false
     }, 100)
   }
 
