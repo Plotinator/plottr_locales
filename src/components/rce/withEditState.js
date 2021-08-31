@@ -88,7 +88,7 @@ export const withEditState = (
   const editQueue = useRef(newEditQueue())
   const editCount = useRef(0)
   const handlingKeyDown = useRef(false)
-  const latestSearch = useRef(new Date())
+  const latestEdits = useRef({})
 
   // Transitions
   const handleKeyDown = (event) => {
@@ -129,13 +129,10 @@ export const withEditState = (
       return
     }
     if (publishOperations && fileId && editorId) {
-      // editor.operations.forEach((operation) => {
-      //   console.log('Publishing: ', operation)
-      // })
       publishOperations(
         fileId,
         editorId,
-        clientId,
+        key.current,
         editor.operations.map((operation) => ({
           editorKey: key.current,
           operation,
@@ -181,23 +178,29 @@ export const withEditState = (
   }
 
   const handleOtherEditorChange = (latestEditsPerEditor) => {
-    // TODO: update the goals for up to when to fetch per editor.
+    latestEditsPerEditor.forEach(({ editNumber, editorKey }) => {
+      if (!latestEdits.current[editorKey]) {
+        latestEdits.current[editorKey] = { read: -1 }
+      }
+      latestEdits.current[editorKey].goal = editNumber
+    })
   }
 
   const handleReceiveEditorOperations = (operations) => {
     operations.forEach((operation) => {
       if (operation.editorKey !== key.current) {
-        enqueue(editQueue.current, operation.editorKey, operation.operation, operation.editNumber)
+        enqueue(editQueue.current, operation.editorKey, operation, operation.editNumber)
       }
     })
-    latestSearch.current = operations[operations.length - 1].created
+    // Should I drain the queue straight away or defer it??
     const operationsToApply = drainQueue(editQueue.current)
-    console.log('Operations to apply ', operationsToApply)
     if (operationsToApply.length) {
       applyingOtherEdits.current = true
-      // Might need to defer these edits too...
       operationsToApply.forEach((operation) => {
-        editor.apply(operation)
+        if (latestEdits.current[operation.editorKey].read < operation.editNumber) {
+          latestEdits.current[operation.editorKey].read = operation.editNumber
+        }
+        editor.apply(operation.operation)
       })
     }
   }
@@ -237,8 +240,12 @@ export const withEditState = (
       listenForChangeSignals(fileId, editorId, (editTimestamps) => {
         handleEvent(OTHER_EDITOR_CHANGE_SIGNAL, editTimestamps)
         const handleChange = () => {
-          fetchOperations(fileId, editorId, latestSearch.current, (operations) => {
-            handleEvent(RECEIVE_EDITOR_OPERATIONS, operations)
+          Object.entries(latestEdits.current).forEach(([editorKey, { goal, read }]) => {
+            if (goal > read) {
+              fetchOperations(fileId, editorId, read, editorKey, (operations) => {
+                handleEvent(RECEIVE_EDITOR_OPERATIONS, operations)
+              })
+            }
           })
         }
         function delayIfNecessary() {
