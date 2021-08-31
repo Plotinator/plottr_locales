@@ -192,12 +192,14 @@ export const withEditState = (
       }
     })
     // Should I drain the queue straight away or defer it??
-    const operationsToApply = drainQueue(editQueue.current)
+    //
+    // Don't re-apply old edits.
+    const operationsToApply = drainQueue(editQueue.current).filter((operation) => {
+      return operation.created.toDate() > openTime.current
+    })
     if (operationsToApply.length) {
       applyingOtherEdits.current = true
       operationsToApply.forEach((operation) => {
-        // Don't re-apply old edits.
-        if (operation.created.toDate() < openTime.current) return
         editor.apply(operation.operation)
         if (latestEdits.current[operation.editorKey].read < operation.editNumber) {
           latestEdits.current[operation.editorKey].read = operation.editNumber
