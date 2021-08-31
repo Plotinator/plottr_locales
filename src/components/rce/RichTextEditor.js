@@ -1,6 +1,5 @@
-import React, { useCallback, useMemo, useState, useEffect, useRef } from 'react'
+import React, { useCallback, useMemo, useState, useEffect } from 'react'
 import PropTypes from 'react-proptypes'
-import { isEqual } from 'lodash'
 import cx from 'classnames'
 import { t as i18n } from 'plottr_locales'
 import isHotkey from 'is-hotkey'
@@ -9,10 +8,9 @@ import UnconnectedToolBar from './ToolBar'
 import { toggleMark } from './MarkButton'
 import Leaf from './Leaf'
 import Element from './Element'
-import { useTextConverter, createEditor } from './helpers'
+import { createEditor } from './helpers'
 import { useRegisterEditor } from './editor-registry'
-import { newEditQueue, enqueue } from './editQueue'
-import { drainQueue } from '../../../dist/components/rce/editQueue'
+import { withEditState } from './withEditState'
 
 const HOTKEYS = {
   'mod+b': 'bold',
@@ -47,9 +45,13 @@ const RichTextEditorConnector = (connector) => {
     fileId,
     clientId,
   }) => {
+    // Editor instance
     const editor = useMemo(() => {
       return createEditor()
     }, [])
+    const registerEditor = useRegisterEditor(editor)
+
+    // Rendering helpers
     const renderLeaf = useCallback((props) => <Leaf {...props} />, [])
     const renderElement = useCallback(
       (innerProps) => (
@@ -62,151 +64,31 @@ const RichTextEditorConnector = (connector) => {
       ),
       [openExternal]
     )
-    const [value, setValue] = useState(null)
-    const [editorSelection, setEditorSelection] = useState({ ...editor.selection })
+
+    // Focus on first render
     const [editorWrapperRef, setEditorWrapperRef] = useState(null)
-    const key = useRef(Math.random().toString(16))
-    useEffect(() => {
-      // undoId goes null when we undo.
-      if (!undoId || !value || !editorSelection) {
-        setValue(useTextConverter(text)) // eslint-disable-line
-        if (selection && selection.anchor && selection.focus) {
-          editor.selection = selection
-          setEditorSelection(selection)
-        } else {
-          setEditorSelection({ ...editor.selection })
-        }
-      }
-    }, [text, undoId])
     useEffect(() => {
       if (autoFocus && editorWrapperRef && editorWrapperRef.firstChild) {
         editorWrapperRef.firstChild.focus()
       }
     }, [autoFocus, editorWrapperRef])
 
-    const editorId = id
+    // State management
+    const [value, currentSelection, key, onValueChanged, onKeyDown] = withEditState(
+      editor,
+      id,
+      fileId,
+      clientId,
+      publishRCEOperations,
+      fetchRCEOperations,
+      listenForChangesToEditor,
+      undo,
+      redo,
+      text,
+      selection
+    )
 
-    const registerEditor = useRegisterEditor(editor)
-
-    const [editCount, setEditCount] = useState(0)
-    const applyingOtherEdits = useRef(false)
-
-    const updateValue = (newVal) => {
-      setValue(newVal)
-      if (applyingOtherEdits.current) {
-        applyingOtherEdits.current = false
-        return
-      }
-      if (publishRCEOperations && fileId && editorId) {
-        let individualEditCount = editCount
-        // editor.operations.forEach((operation) => {
-        //   console.log('Publishing: ', operation)
-        // })
-        publishRCEOperations(
-          fileId,
-          editorId,
-          clientId,
-          editor.operations.map((operation) => ({
-            editorKey: key.current,
-            operation,
-            created: new Date(),
-            editNumber: individualEditCount++,
-          }))
-        )
-        setEditCount(individualEditCount)
-      }
-      if (!isEqual(editorSelection, editor.selection)) {
-        // Rules for changing are complicated because we need to support
-        // editors which don't use programatic undo and therefore don't
-        // track the current selection.
-        if (
-          selection &&
-          editor.selection &&
-          !isEqual(editorSelection, editor.selection) &&
-          editor.selection.anchor &&
-          editor.selection.focus
-        ) {
-          setEditorSelection({ ...editor.selection })
-          if (value !== newVal) {
-            onChange(newVal, { ...editor.selection })
-          } else {
-            onChange(null, { ...editor.selection })
-          }
-        }
-      } else if (value !== newVal) {
-        onChange(newVal)
-      }
-    }
-
-    const editQueue = useRef(newEditQueue())
-
-    useEffect(() => {
-      if (fetchRCEOperations && fileId && editorId) {
-        let latestSearch = new Date()
-        listenForChangesToEditor(fileId, editorId, (editTimestamps) => {
-          // console.log('Receiving...')
-          const handleChange = () => {
-            fetchRCEOperations(fileId, editorId, latestSearch, (operations) => {
-              operations.forEach((operation) => {
-                // console.log('Operation: ', operation)
-                if (operation.editorKey !== key.current) {
-                  enqueue(
-                    editQueue.current,
-                    operation.editorKey,
-                    operation.operation,
-                    operation.editNumber
-                  )
-                }
-              })
-              latestSearch = operations[operations.length - 1].created
-              const operationsToApply = drainQueue(editQueue.current)
-              if (operationsToApply.length) {
-                applyingOtherEdits.current = true
-                // Might need to defer these edits too...
-                operationsToApply.forEach((operation) => {
-                  editor.apply(operation)
-                })
-              }
-            })
-          }
-          function delayIfNecessary() {
-            if (handlingKeyDown) {
-              setTimeout(delayIfNecessary, 100)
-            }
-            handleChange()
-          }
-          delayIfNecessary()
-        })
-      }
-      return () => {}
-    }, [fileId, editorId])
-
-    const [handlingKeyDown, setHandlingKeyDown] = useState(false)
     const handleKeyDown = (event) => {
-      // If we don't have a selection, then the editor can't support
-      // programatic undo.  This isn't desirable because built-in undo
-      // leads to strange interactions when, e.g. the user undoes
-      // something, selections outside the RCE and then undoes again.
-      // (The result could be that text in the RCE is redone!)
-      //
-      // To ensure that the RCE has a selection, make sure that the on
-      // change handlers create actions that add `editorMetadata`.
-      // See the `editors` reducer for schema.
-      if (selection && event.key === 'z' && (event.ctrlKey || event.metaKey)) {
-        event.preventDefault()
-        if (event.shiftKey) {
-          redo()
-        } else {
-          undo()
-        }
-        return
-      }
-      // On Linux, redo is CTRL+y
-      if (selection && event.key === 'y' && event.ctrlKey) {
-        event.preventDefault()
-        redo()
-        return
-      }
       for (const hotkey in HOTKEYS) {
         if (isHotkey(hotkey, event)) {
           event.preventDefault()
@@ -214,10 +96,7 @@ const RichTextEditorConnector = (connector) => {
           toggleMark(editor, mark)
         }
       }
-      setHandlingKeyDown(true)
-      setTimeout(() => {
-        setHandlingKeyDown(false)
-      }, 100)
+      onKeyDown(event)
     }
 
     const handleKeyUp = () => {
@@ -258,9 +137,9 @@ const RichTextEditorConnector = (connector) => {
 
     const otherProps = {}
     return (
-      <Slate editor={editor} value={value} onChange={updateValue} key={key.current}>
+      <Slate editor={editor} value={value} onChange={onValueChanged} key={key.current}>
         <div className={cx('slate-editor__wrapper', className)}>
-          <ToolBar editor={editor} darkMode={darkMode} selection={editorSelection} />
+          <ToolBar editor={editor} darkMode={darkMode} selection={currentSelection} />
           <div
             // the firstChild will be the contentEditable dom node
             ref={(e) => {
