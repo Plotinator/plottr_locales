@@ -88,7 +88,7 @@ export const withEditState = (
   const editQueue = useRef(newEditQueue())
   const editCount = useRef(0)
   const handlingKeyDown = useRef(false)
-  const latestSearch = useRef(null)
+  const latestSearch = useRef(new Date())
 
   // Transitions
   const handleKeyDown = (event) => {
@@ -180,6 +180,28 @@ export const withEditState = (
     }
   }
 
+  const handleOtherEditorChange = (latestEditsPerEditor) => {
+    // TODO: update the goals for up to when to fetch per editor.
+  }
+
+  const handleReceiveEditorOperations = (operations) => {
+    operations.forEach((operation) => {
+      if (operation.editorKey !== key.current) {
+        enqueue(editQueue.current, operation.editorKey, operation.operation, operation.editNumber)
+      }
+    })
+    latestSearch.current = operations[operations.length - 1].created
+    const operationsToApply = drainQueue(editQueue.current)
+    console.log('Operations to apply ', operationsToApply)
+    if (operationsToApply.length) {
+      applyingOtherEdits.current = true
+      // Might need to defer these edits too...
+      operationsToApply.forEach((operation) => {
+        editor.apply(operation)
+      })
+    }
+  }
+
   // Event handler
   const handleEvent = (event, payload) => {
     switch (event) {
@@ -191,6 +213,12 @@ export const withEditState = (
         break
       case NEW_VALUE_FROM_REDUX:
         handleNewValueFromRedux()
+        break
+      case OTHER_EDITOR_CHANGE_SIGNAL:
+        handleOtherEditorChange(payload)
+        break
+      case RECEIVE_EDITOR_OPERATIONS:
+        handleReceiveEditorOperations(payload)
         break
     }
     return
@@ -206,32 +234,11 @@ export const withEditState = (
   // Listen for and fetch edits made by other editors
   useEffect(() => {
     if (fetchOperations && fileId && editorId) {
-      latestSearch.current = new Date()
       listenForChangeSignals(fileId, editorId, (editTimestamps) => {
-        // console.log('Receiving...')
+        handleEvent(OTHER_EDITOR_CHANGE_SIGNAL, editTimestamps)
         const handleChange = () => {
           fetchOperations(fileId, editorId, latestSearch.current, (operations) => {
-            operations.forEach((operation) => {
-              // console.log('Operation: ', operation)
-              if (operation.editorKey !== key.current) {
-                enqueue(
-                  editQueue.current,
-                  operation.editorKey,
-                  operation.operation,
-                  operation.editNumber
-                )
-              }
-            })
-            latestSearch.current = operations[operations.length - 1].created
-            const operationsToApply = drainQueue(editQueue.current)
-            console.log('Operations to apply ', operationsToApply)
-            if (operationsToApply.length) {
-              applyingOtherEdits.current = true
-              // Might need to defer these edits too...
-              operationsToApply.forEach((operation) => {
-                editor.apply(operation)
-              })
-            }
+            handleEvent(RECEIVE_EDITOR_OPERATIONS, operations)
           })
         }
         function delayIfNecessary() {
