@@ -470,15 +470,19 @@ export const shareDocument = (fileId, emailAddress) => {
     })
 }
 
-export const publishRCEOperations = (fileId, editorId, clientId, operations) => {
+export const publishRCEOperations = (fileId, editorId, editorKey, operations) => {
   const modificationsRef = database().collection(`rce/${fileId}/editors/${editorId}/changes`)
-  const updateTimestampJob = database()
-    .doc(`rce/${fileId}/editors/${editorId}/editTimestamps/${clientId}`)
-    .set({
-      timeStamp: new Date(),
-    })
+  const updateEditNumbersJob = operations.length
+    ? database()
+        .doc(`rce/${fileId}/editors/${editorId}/editTimestamps/${editorKey}`)
+        .set({
+          timeStamp: new Date(),
+          editNumber: operations[operations.length - 1].editNumber,
+          editorKey,
+        })
+    : Promise.resolve([])
   return Promise.all([
-    updateTimestampJob,
+    updateEditNumbersJob,
     ...operations.map((operation) => {
       modificationsRef.add(operation)
     }),
@@ -488,20 +492,23 @@ export const publishRCEOperations = (fileId, editorId, clientId, operations) => 
 export const listenForChangesToEditor = (fileId, editorId, cb) => {
   database()
     .collection(`rce/${fileId}/editors/${editorId}/editTimestamps`)
-    .onSnapshot((documentRef) => {
-      cb(documentRef.data)
+    .onSnapshot((documentsRef) => {
+      const documents = []
+      documentsRef.forEach((document) => {
+        documents.push(document.data())
+      })
+      cb(documents)
     })
 }
 
 // Orders the edits by time, then tries to keep edits from the same
 // editor together while finally ordiring by the number from that
 // editor.
-export const fetchRCEOperations = (fileId, editorId, since, cb) => {
+export const fetchRCEOperations = (fileId, editorId, since, editorKey, cb) => {
   database()
     .collection(`rce/${fileId}/editors/${editorId}/changes`)
-    .where('created', '>', since)
-    .orderBy('created')
-    .orderBy('editorKey')
+    .where('editorKey', '==', editorKey)
+    .where('editNumber', '>', since)
     .orderBy('editNumber')
     .get()
     .then((documentRef) => {
