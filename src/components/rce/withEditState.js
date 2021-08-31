@@ -4,6 +4,12 @@ import { useEffect, useState, useRef } from 'react'
 import { newEditQueue, enqueue, drainQueue } from './editQueue'
 import { useTextConverter } from './helpers'
 
+const USER_KEY_DOWN = 'USER_KEY_DOWN'
+const OTHER_EDITOR_CHANGE_SIGNAL = 'OTHER_EDITOR_CHANGE_SIGNAL'
+const RECEIVE_EDITOR_OPERATIONS = 'RECEIVE_EDITOR_OPERATIONS'
+const NEW_VALUE_FROM_REDUX = 'NEW_VALUE_FROM_REDUX'
+const UNDO_OR_REDO = 'UNDO_OR_REDO'
+
 /**
  * # Introduction
  *
@@ -76,6 +82,47 @@ export const withEditState = (
   const editQueue = useRef(newEditQueue())
   const editCount = useRef(0)
   const handlingKeyDown = useRef(false)
+
+  // Transitions
+  const handleKeyDown = (event) => {
+    // If we don't have a selection, then the editor can't support
+    // programatic undo.  This isn't desirable because built-in undo
+    // leads to strange interactions when, e.g. the user undoes
+    // something, selections outside the RCE and then undoes again.
+    // (The result could be that text in the RCE is redone!)
+    //
+    // To ensure that the RCE has a selection, make sure that the on
+    // change handlers create actions that add `editorMetadata`.
+    // See the `editors` reducer for schema.
+    if (selection && event.key === 'z' && (event.ctrlKey || event.metaKey)) {
+      event.preventDefault()
+      if (event.shiftKey) {
+        redo()
+      } else {
+        undo()
+      }
+      return
+    }
+    // On Linux, redo is CTRL+y
+    if (selection && event.key === 'y' && event.ctrlKey) {
+      event.preventDefault()
+      redo()
+      return
+    }
+    handlingKeyDown.current = true
+    setTimeout(() => {
+      handlingKeyDown.current = false
+    }, 100)
+  }
+
+  // Event handler
+  const handleEvent = (event, payload) => {
+    switch (event) {
+      case USER_KEY_DOWN:
+        handleKeyDown(payload)
+    }
+    return
+  }
 
   // Handle changes in initial value
   useEffect(() => {
@@ -180,35 +227,9 @@ export const withEditState = (
     }
   }
 
+  // Callbacks (stimuli)
   const onKeyDown = (event) => {
-    // If we don't have a selection, then the editor can't support
-    // programatic undo.  This isn't desirable because built-in undo
-    // leads to strange interactions when, e.g. the user undoes
-    // something, selections outside the RCE and then undoes again.
-    // (The result could be that text in the RCE is redone!)
-    //
-    // To ensure that the RCE has a selection, make sure that the on
-    // change handlers create actions that add `editorMetadata`.
-    // See the `editors` reducer for schema.
-    if (selection && event.key === 'z' && (event.ctrlKey || event.metaKey)) {
-      event.preventDefault()
-      if (event.shiftKey) {
-        redo()
-      } else {
-        undo()
-      }
-      return
-    }
-    // On Linux, redo is CTRL+y
-    if (selection && event.key === 'y' && event.ctrlKey) {
-      event.preventDefault()
-      redo()
-      return
-    }
-    handlingKeyDown.current = true
-    setTimeout(() => {
-      handlingKeyDown.current = false
-    }, 100)
+    handleEvent(USER_KEY_DOWN, event)
   }
 
   return [value, selection, key, onChange, onKeyDown]
