@@ -99,9 +99,9 @@ const RichTextEditorConnector = (connector) => {
       }
       if (publishRCEOperations && fileId && editorId) {
         let individualEditCount = editCount
-        editor.operations.forEach((operation) => {
-          console.log('Publishing: ', operation)
-        })
+        // editor.operations.forEach((operation) => {
+        //   console.log('Publishing: ', operation)
+        // })
         publishRCEOperations(
           fileId,
           editorId,
@@ -144,31 +144,44 @@ const RichTextEditorConnector = (connector) => {
       if (fetchRCEOperations && fileId && editorId) {
         let latestSearch = new Date()
         listenForChangesToEditor(fileId, editorId, (editTimestamps) => {
-          fetchRCEOperations(fileId, editorId, latestSearch, (operations) => {
-            operations.forEach((operation) => {
-              if (operation.editorKey !== key.current) {
-                enqueue(
-                  editQueue.current,
-                  operation.editorKey,
-                  operation.operation,
-                  operation.editNumber
-                )
+          // console.log('Receiving...')
+          const handleChange = () => {
+            fetchRCEOperations(fileId, editorId, latestSearch, (operations) => {
+              operations.forEach((operation) => {
+                // console.log('Operation: ', operation)
+                if (operation.editorKey !== key.current) {
+                  enqueue(
+                    editQueue.current,
+                    operation.editorKey,
+                    operation.operation,
+                    operation.editNumber
+                  )
+                }
+              })
+              latestSearch = operations[operations.length - 1].created
+              const operationsToApply = drainQueue(editQueue.current)
+              if (operationsToApply.length) {
+                applyingOtherEdits.current = true
+                // Might need to defer these edits too...
+                operationsToApply.forEach((operation) => {
+                  editor.apply(operation)
+                })
               }
             })
-            latestSearch = operations[operations.length - 1].created
-            const operationsToApply = drainQueue(editQueue.current)
-            if (operationsToApply.length) {
-              applyingOtherEdits.current = true
-              operationsToApply.forEach((operation) => {
-                editor.apply(operation)
-              })
+          }
+          function delayIfNecessary() {
+            if (handlingKeyDown) {
+              setTimeout(delayIfNecessary, 100)
             }
-          })
+            handleChange()
+          }
+          delayIfNecessary()
         })
       }
       return () => {}
     }, [fileId, editorId])
 
+    const [handlingKeyDown, setHandlingKeyDown] = useState(false)
     const handleKeyDown = (event) => {
       // If we don't have a selection, then the editor can't support
       // programatic undo.  This isn't desirable because built-in undo
@@ -201,6 +214,10 @@ const RichTextEditorConnector = (connector) => {
           toggleMark(editor, mark)
         }
       }
+      setHandlingKeyDown(true)
+      setTimeout(() => {
+        setHandlingKeyDown(false)
+      }, 100)
     }
 
     const handleKeyUp = () => {
