@@ -56,6 +56,11 @@ const UNDO_OR_REDO = 'UNDO_OR_REDO'
  *      other editors know whether they missed one of our edits.
  *   - handlingKeyDown.  Indicates that we're in the middle of
  *      the key down handler.
+ *   - latestSearch.  Tracks the date of the last edit that we got from
+ *     Firestore.  (It might be worth tracking the editors
+ *     individually and using edit numbers instead of the time of the
+ *     edit!!!  That way I wont have to worry about missing edits or
+ *     about date-strangeness.)
  */
 export const withEditState = (
   editor,
@@ -83,6 +88,7 @@ export const withEditState = (
   const editQueue = useRef(newEditQueue())
   const editCount = useRef(0)
   const handlingKeyDown = useRef(false)
+  const latestSearch = useRef(null)
 
   // Transitions
   const handleKeyDown = (event) => {
@@ -200,11 +206,11 @@ export const withEditState = (
   // Listen for and fetch edits made by other editors
   useEffect(() => {
     if (fetchOperations && fileId && editorId) {
-      let latestSearch = new Date()
+      latestSearch.current = new Date()
       listenForChangeSignals(fileId, editorId, (editTimestamps) => {
         // console.log('Receiving...')
         const handleChange = () => {
-          fetchOperations(fileId, editorId, latestSearch, (operations) => {
+          fetchOperations(fileId, editorId, latestSearch.current, (operations) => {
             operations.forEach((operation) => {
               // console.log('Operation: ', operation)
               if (operation.editorKey !== key.current) {
@@ -216,7 +222,7 @@ export const withEditState = (
                 )
               }
             })
-            latestSearch = operations[operations.length - 1].created
+            latestSearch.current = operations[operations.length - 1].created
             const operationsToApply = drainQueue(editQueue.current)
             console.log('Operations to apply ', operationsToApply)
             if (operationsToApply.length) {
