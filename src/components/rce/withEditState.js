@@ -64,6 +64,7 @@ export const withEditState = (
   editorId,
   fileId,
   clientId,
+  onValueChanged,
   publishOperations,
   fetchOperations,
   listenForChangeSignals,
@@ -79,7 +80,7 @@ export const withEditState = (
 
   // Re-rendering state
   const [value, setValue] = useState(initialValue)
-  const [selection, setSelection] = useState(selection)
+  const [selection, setSelection] = useState(initialSelection)
 
   // Non-re-rendering state
   const applyingOtherEdits = useRef(false)
@@ -152,13 +153,13 @@ export const withEditState = (
       ) {
         setSelection({ ...editor.selection })
         if (value !== newValue) {
-          // onChange(newValue, { ...editor.selection })
+          onValueChanged(newValue, { ...editor.selection })
         } else {
-          // onChange(null, { ...editor.selection })
+          onValueChanged(null, { ...editor.selection })
         }
       }
     } else if (value !== newValue) {
-      onChange(newValue)
+      onValueChanged(newValue)
     }
   }
 
@@ -195,12 +196,12 @@ export const withEditState = (
     if (operationsToApply.length) {
       applyingOtherEdits.current = true
       operationsToApply.forEach((operation) => {
-        if (latestEdits.current[operation.editorKey].read < operation.editNumber) {
-          latestEdits.current[operation.editorKey].read = operation.editNumber
-        }
         // Don't re-apply old edits.
         if (operation.created.toDate() < openTime.current) return
         editor.apply(operation.operation)
+        if (latestEdits.current[operation.editorKey].read < operation.editNumber) {
+          latestEdits.current[operation.editorKey].read = operation.editNumber
+        }
       })
     }
   }
