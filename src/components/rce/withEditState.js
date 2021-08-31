@@ -42,13 +42,13 @@ import { useTextConverter } from './helpers'
  *   use `useRef` to remove them from re-draw cycles.
  *
  *   - applyingOtherEdits.  A flag that indicates whether we're
- *     currently applying edits from the queue
+ *      currently applying edits from the queue
  *   - editQueue.  A collection of priority queues that tracks the edits
- *     that we still need to apply from other editors.
+ *      that we still need to apply from other editors.
  *   - editCount.  A tracker for the number of edits we made.  Helps
- *     other editors know whether they missed one of our edits.
+ *      other editors know whether they missed one of our edits.
  *   - handlingKeyDown.  Indicates that we're in the middle of
- *     the key down handler.
+ *      the key down handler.
  */
 export const withEditState = (
   editor,
