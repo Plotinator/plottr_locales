@@ -79,6 +79,7 @@ const RichTextEditorConnector = (connector) => {
       id,
       fileId,
       clientId,
+      onChange,
       publishRCEOperations,
       fetchRCEOperations,
       listenForChangesToEditor,
