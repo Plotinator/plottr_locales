@@ -161,21 +161,7 @@ export const withEditState = (
     }
   }
 
-  // Event handler
-  const handleEvent = (event, payload) => {
-    switch (event) {
-      case USER_KEY_DOWN:
-        handleKeyDown(payload)
-        break
-      case NEW_VALUE_FROM_SLATE:
-        handleNewValueFromSlate(payload)
-        break
-    }
-    return
-  }
-
-  // Handle changes in initial value
-  useEffect(() => {
+  const handleNewValueFromRedux = () => {
     // undoId goes null when we undo.
     if (!undoId || !value || !selection) {
       setValue(useTextConverter(initialValue)) // eslint-disable-line
@@ -186,6 +172,29 @@ export const withEditState = (
         setSelection({ ...editor.selection })
       }
     }
+  }
+
+  // Event handler
+  const handleEvent = (event, payload) => {
+    switch (event) {
+      case USER_KEY_DOWN:
+        handleKeyDown(payload)
+        break
+      case NEW_VALUE_FROM_SLATE:
+        handleNewValueFromSlate(payload)
+        break
+      case NEW_VALUE_FROM_REDUX:
+        handleNewValueFromRedux()
+        break
+    }
+    return
+  }
+
+  // # Incoming Events
+
+  // Handle changes in initial value
+  useEffect(() => {
+    handleEvent(NEW_VALUE_FROM_REDUX)
   }, [initialValue, undoId])
 
   // Listen for and fetch edits made by other editors
