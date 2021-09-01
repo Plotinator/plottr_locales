@@ -74,22 +74,23 @@ export const withEditState = (
   initialSelection,
   undoId
 ) => {
-  // Constants
+  // # Constants
   const key = useRef(Math.random().toString(16))
   const openTime = useRef(new Date())
 
-  // Re-rendering state
+  // # Re-rendering state
   const [value, setValue] = useState(initialValue)
   const [selection, setSelection] = useState(initialSelection)
 
-  // Non-re-rendering state
+  // # Non-re-rendering state
   const applyingOtherEdits = useRef(false)
   const editQueue = useRef(newEditQueue())
   const editCount = useRef(0)
   const handlingKeyDown = useRef(false)
   const latestEdits = useRef({})
 
-  // Transitions
+  // # Transitions
+
   const handleKeyDown = (event) => {
     // If we don't have a selection, then the editor can't support
     // programatic undo.  This isn't desirable because built-in undo
@@ -213,7 +214,8 @@ export const withEditState = (
     }
   }
 
-  // Event handler
+  // # Event Handler
+
   const handleEvent = (event, payload) => {
     switch (event) {
       case USER_KEY_DOWN:
@@ -268,12 +270,14 @@ export const withEditState = (
     return () => {}
   }, [fileId, editorId])
 
+  // # Callbacks (stimuli)
+
   // Handle editor changed events
   const onChange = (newValue) => {
     handleEvent(NEW_VALUE_FROM_SLATE, newValue)
   }
 
-  // Callbacks (stimuli)
+  // Handle user typing
   const onKeyDown = (event) => {
     handleEvent(USER_KEY_DOWN, event)
   }
