@@ -15,6 +15,8 @@ import {
   imagePublicURL,
   isStorageURL,
   listenForChangesToEditor,
+  deleteChangeSignal,
+  deleteOldChanges,
 } from 'plottr_firebase'
 import {
   getTemplateById,
@@ -303,6 +305,8 @@ const platform = {
   },
   rootElementSelectors: ['#__next'],
   publishRCEOperations,
+  deleteChangeSignal,
+  deleteOldChanges,
   fetchRCEOperations,
   listenForChangesToEditor,
   machineIdSync: () => {
