@@ -4,7 +4,7 @@ import 'firebase/auth'
 import 'firebase/firestore'
 import 'firebase/storage'
 import { v4 as uuidv4 } from 'uuid'
-import { DateTime } from 'luxon'
+import { DateTime, Duration } from 'luxon'
 
 import { actions, ARRAY_KEYS } from 'pltr/v2'
 
@@ -475,11 +475,16 @@ export const publishRCEOperations = (fileId, editorId, editorKey, operations) =>
   const updateEditNumbersJob = operations.length
     ? database()
         .doc(`rce/${fileId}/editors/${editorId}/editTimestamps/${editorKey}`)
-        .set({
-          timeStamp: new Date(),
-          editNumber: operations[operations.length - 1].editNumber,
-          editorKey,
-        })
+        .set(
+          {
+            timeStamp: new Date(),
+            editNumber: operations[operations.length - 1].editNumber,
+            editorKey,
+          },
+          {
+            merge: true,
+          }
+        )
     : Promise.resolve([])
   return Promise.all([
     updateEditNumbersJob,
@@ -487,6 +492,15 @@ export const publishRCEOperations = (fileId, editorId, editorKey, operations) =>
       modificationsRef.add(operation)
     }),
   ])
+}
+
+export const catchupEditsSeen = (fileId, editorId, myEditorKey, otherEditorKey, since) => {
+  database()
+    .doc(`rce/${fileId}/editors/${editorId}/editTimestamps/${myEditorKey}`)
+    .update({
+      timeStamp: new Date(),
+      [otherEditorKey]: since,
+    })
 }
 
 export const listenForChangesToEditor = (fileId, editorId, cb) => {
@@ -499,6 +513,30 @@ export const listenForChangesToEditor = (fileId, editorId, cb) => {
       })
       cb(documents)
     })
+}
+
+const deleteResults = (documentsRef) => {
+  const deleteTasks = []
+  documentsRef.docs.forEach((document) => {
+    deleteTasks.push(document.ref.delete())
+  })
+  return Promise.all(deleteTasks)
+}
+
+export const deleteChangeSignal = (fileId, editorId, editorKey) => {
+  return database().doc(`rce/${fileId}/editors/${editorId}/editTimestamps/${editorKey}`).delete()
+}
+
+const ONE_MINUTE = 60 * 1000
+
+export const deleteOldChanges = (fileId, editorId) => {
+  const aMinuteAgo = DateTime.now().minus(Duration.fromMillis(ONE_MINUTE)).toJSDate()
+
+  return database()
+    .collection(`rce/${fileId}/editors/${editorId}/changes`)
+    .where('created', '<', aMinuteAgo)
+    .get()
+    .then(deleteResults)
 }
 
 // Orders the edits by time, then tries to keep edits from the same
