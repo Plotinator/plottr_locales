@@ -1,4 +1,5 @@
 import { isEqual } from 'lodash'
+import { v4 as uuidv4 } from 'uuid'
 
 import { useEffect, useState, useRef } from 'react'
 import { newEditQueue, enqueue, drainQueue } from './editQueue'
@@ -10,6 +11,8 @@ const OTHER_EDITOR_CHANGE_SIGNAL = 'OTHER_EDITOR_CHANGE_SIGNAL'
 const RECEIVE_EDITOR_OPERATIONS = 'RECEIVE_EDITOR_OPERATIONS'
 const NEW_VALUE_FROM_REDUX = 'NEW_VALUE_FROM_REDUX'
 const UNDO_OR_REDO = 'UNDO_OR_REDO'
+
+const ONE_MINUTE = 60 * 1000
 
 /**
  * # Introduction
@@ -58,6 +61,24 @@ const UNDO_OR_REDO = 'UNDO_OR_REDO'
  *      the key down handler.
  *   - latestEdits.  Tracks where we've read to and what the goal edit
  *     number is for each registered editor for this RCE.
+ *
+ * # Cleaning Up Afterwards
+ *
+ *   Every editor pushes changes to Firestore for other editors to
+ *   read.  These build up over time, and we want to clean these up
+ *   before they use up all of our storage.
+ *
+ *   There are two mechanisms that we use:
+ *
+ *   1. Every time that an editor changes, we delete any changes older
+ *      than a minute ago.
+ *
+ *   2. Every time that changes are signalled, if any of the editor
+ *      change records is older than a minute then we delete it.
+ *
+ *   This is partly handled by the the Firebase library, but I've
+ *   documented it here because I think that this is where it's most
+ *   useful to know about it.
  */
 export const withEditState = (
   editor,
@@ -68,6 +89,8 @@ export const withEditState = (
   publishOperations,
   fetchOperations,
   listenForChangeSignals,
+  deleteChangeSignal,
+  deleteOldChanges,
   undo,
   redo,
   initialValue,
@@ -75,7 +98,7 @@ export const withEditState = (
   undoId
 ) => {
   // # Constants
-  const key = useRef(Math.random().toString(16))
+  const key = useRef(uuidv4())
   const openTime = useRef(new Date())
 
   // # Re-rendering state
@@ -244,11 +267,20 @@ export const withEditState = (
     handleEvent(NEW_VALUE_FROM_REDUX)
   }, [initialValue, undoId])
 
+  const cleanUp = (editTimestamps) => {
+    editTimestamps.forEach(({ editorKey, timeStamp }) => {
+      if (new Date() - timeStamp.toDate() > ONE_MINUTE) {
+        deleteChangeSignal(fileId, editorId, editorKey)
+      }
+    })
+  }
+
   // Listen for and fetch edits made by other editors
   useEffect(() => {
     if (fetchOperations && fileId && editorId) {
       listenForChangeSignals(fileId, editorId, (editTimestamps) => {
         handleEvent(OTHER_EDITOR_CHANGE_SIGNAL, editTimestamps)
+        cleanUp(editTimestamps)
         const handleChange = () => {
           Object.entries(latestEdits.current).forEach(([editorKey, { goal, read }]) => {
             if (goal > read) {
@@ -274,6 +306,7 @@ export const withEditState = (
 
   // Handle editor changed events
   const onChange = (newValue) => {
+    deleteOldChanges(fileId, editorId)
     handleEvent(NEW_VALUE_FROM_SLATE, newValue)
   }
 
