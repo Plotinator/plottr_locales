@@ -16,7 +16,7 @@ const UNDO_OR_REDO = 'UNDO_OR_REDO'
 
 // States
 const INITIALISED = 'INITIALISATION'
-const RECEIVED_OPERATIONS = 'RECEIVING_OPERATIONS'
+const RECEIVED_OPERATIONS = 'RECEIVED_OPERATIONS'
 const CONTENT_EDITED = 'CONTENT_EDITED'
 const UPDATED_EDIT_TIME_STAMPS = 'UPDATED_EDIT_TIME_STAMPS'
 const UPDATED_FROM_INITIAL_VALUE = 'UPDATED_FROM_INITIAL_VALUE'
@@ -148,15 +148,11 @@ export const withEditState = (
   const latestEdits = useRef({})
   const lastPublished = useRef(-1)
   const editHistory = useRef(newOperationHistory())
-  const previousValue = useRef(initialValue)
-  const previousSelection = useRef(initialSelection)
 
   // # State Updaters
 
   // Might want a flag for rolling back in time...?
   const setEditorState = (value, selection) => {
-    previousValue.current = valueAndSelection.current
-    previousSelection.current = valueAndSelection.current
     setValueAndSelection({
       value,
       selection,
@@ -202,12 +198,10 @@ export const withEditState = (
       })
       const editsAfter = findEditsAfter(editHistory.current, oldestOperation)
       if (editsAfter.length) {
-        console.log('editsAfter: ', editsAfter)
         const operation = editsAfter[0]
         setEditorState(operation.value, operation.selection)
       }
       operationsToApply.forEach((operation) => {
-        console.log('Applying: ', operation)
         editor.apply(operation.operation)
         if (latestEdits.current[operation.editorKey].read < operation.editNumber) {
           latestEdits.current[operation.editorKey].read = operation.editNumber
@@ -220,10 +214,15 @@ export const withEditState = (
   }, [state])
 
   const cleanUp = (editTimestamps) => {
-    Object.values(editTimestamps).forEach(({ editorKey, timeStamp }) => {
+    const editorKeysToRemove = []
+    Object.entries(editTimestamps).forEach(([editorKey, { timeStamp }]) => {
       if (new Date() - timeStamp.toDate() > ONE_MINUTE) {
         deleteChangeSignal(fileId, editorId, editorKey)
+        editorKeysToRemove.push(editorKey)
       }
+    })
+    editorKeysToRemove.forEach((editorKey) => {
+      delete editTimestamps[editorKey]
     })
   }
 
@@ -361,7 +360,7 @@ export const withEditState = (
   // # Event Handler
 
   function handleEvent(event, payload) {
-    console.log(`Heard ${event}, with payload`, payload)
+    console.log(event)
     switch (event) {
       case USER_KEY_DOWN:
         handleKeyDown(payload)
