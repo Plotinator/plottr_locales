@@ -7,7 +7,14 @@ import { v4 as uuidv4 } from 'uuid'
 import { t } from 'plottr_locales'
 import { actions } from 'pltr/v2'
 import { appVersion } from '../lib/version'
-import { publishRCEOperations, fetchRCEOperations, deleteFile } from 'plottr_firebase'
+import {
+  saveImageToStorageBlob as saveImageToStorageBlobInFirebase,
+  publishRCEOperations,
+  fetchRCEOperations,
+  deleteFile,
+  imagePublicURL,
+  isStorageURL,
+} from 'plottr_firebase'
 import {
   getTemplateById,
   listTemplates,
@@ -298,6 +305,21 @@ const platform = {
   fetchRCEOperations,
   machineIdSync: () => {
     return uuidv4()
+  },
+  storage: {
+    saveImageToStorageBlob: (blob, name) => {
+      const state = store.getState()
+      const {
+        client: { userId },
+      } = state.present
+      return saveImageToStorageBlobInFirebase(userId, name, blob)
+    },
+    resolveToPublicUrl: (storageUrl) => {
+      if (!storageUrl) return null
+      return imagePublicURL(storageUrl)
+    },
+    isStorageURL,
+    imagePublicURL,
   },
 }
 
