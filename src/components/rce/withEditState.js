@@ -42,7 +42,7 @@ const findEditsAfter = (edits, operation) => {
   return editsAfter
 }
 
-const pathIsAfter = (thisPath, thatPath) => {
+export const pathIsAfter = (thisPath, thatPath) => {
   const maxDepth = Math.max(thisPath, thatPath)
   for (let i = 0; i < maxDepth; ++i) {
     const thatNode = thatPath[i]
@@ -54,7 +54,7 @@ const pathIsAfter = (thisPath, thatPath) => {
   return false
 }
 
-const pathToNumber = (path) => {
+export const pathToNumber = (path) => {
   if (!path) return Number.POSITIVE_INFINITY
 
   return path.reduce((acc, next, index) => {
@@ -62,7 +62,7 @@ const pathToNumber = (path) => {
   }, 0)
 }
 
-const editsConflict = (editsAfter, operationsToApply) => {
+export const editsConflict = (editsAfter, operationsToApply) => {
   const editsImpactSameLine = editsAfter.some((afterEdit) => {
     const afterPath = afterEdit.operation.operation.path
     return operationsToApply.some((toApplyOperation) => {
