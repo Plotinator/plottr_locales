@@ -504,7 +504,7 @@ export const catchupEditsSeen = (fileId, editorId, myEditorKey, otherEditorKey, 
 }
 
 export const listenForChangesToEditor = (fileId, editorId, cb) => {
-  database()
+  return database()
     .collection(`rce/${fileId}/editors/${editorId}/editTimestamps`)
     .onSnapshot((documentsRef) => {
       const documents = []
