@@ -2,7 +2,6 @@ import React from 'react'
 import { PropTypes } from 'prop-types'
 
 import UnconnectedRichText from '../rce/RichText'
-import { withFullFileState } from '../../../../pltr/v2/actions/project'
 
 const areEqual = (prevProps, nextProps) => {
   return Object.keys(prevProps).reduce((acc, key) => {
@@ -14,6 +13,10 @@ const areEqual = (prevProps, nextProps) => {
 const CardDescriptionEditorConnector = (connector) => {
   const RichText = UnconnectedRichText(connector)
 
+  const {
+    pltr: { helpers, selectors },
+  } = connector
+
   const CardDescriptionEditor = ({
     fileId,
     cardId,
@@ -21,12 +24,8 @@ const CardDescriptionEditorConnector = (connector) => {
     selection,
     darkMode,
     editCardAttributes,
-    fetchCurrentValue,
+    withFullFileState,
   }) => {
-    const {
-      pltr: { helpers },
-    } = connector
-
     const editorPath = helpers.editors.cardDescriptionEditorPath(cardId)
 
     const handleDescriptionChange = (newDescription, selection) => {
@@ -41,7 +40,13 @@ const CardDescriptionEditorConnector = (connector) => {
     return (
       <RichText
         id={`card.description-${cardId}`}
-        fetchCurrentValue={fetchCurrentValue}
+        fetchCurrentValue={() =>
+          new Promise((resolve) =>
+            withFullFileState((currentState) =>
+              resolve(selectors.cardDescriptionByIdSelector(currentState.present, cardId))
+            )
+          )
+        }
         fileId={fileId}
         description={description}
         selection={selection}
@@ -60,11 +65,12 @@ const CardDescriptionEditorConnector = (connector) => {
     editCardAttributes: PropTypes.func.isRequired,
     darkMode: PropTypes.bool.isRequired,
     fileId: PropTypes.string,
+    withFullFileState: PropTypes.func,
   }
 
   const {
     redux,
-    pltr: { selectors, actions, helpers },
+    pltr: { actions },
   } = connector
 
   if (redux) {
@@ -77,16 +83,13 @@ const CardDescriptionEditorConnector = (connector) => {
           state.present,
           helpers.editors.cardDescriptionEditorPath(ownProps.cardId)
         ),
-        fetchCurrentValue: () =>
-          new Promise((resolve) =>
-            withFullFileState((currentState) =>
-              selectors.cardDescriptionByIdSelector(currentState.present, ownProps.cardId)
-            )
-          ),
         darkMode: selectors.isDarkModeSelector(state.present),
         fileId: selectors.selectedFileIdSelector(state.present),
       }),
-      { editCardAttributes: actions.card.editCardAttributes }
+      {
+        editCardAttributes: actions.card.editCardAttributes,
+        withFullFileState: actions.project.withFullFileState,
+      }
     )(React.memo(CardDescriptionEditor, areEqual))
   }
 
