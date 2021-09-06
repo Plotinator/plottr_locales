@@ -2,6 +2,7 @@ import React from 'react'
 import { PropTypes } from 'prop-types'
 
 import UnconnectedRichText from '../rce/RichText'
+import { withFullFileState } from '../../../../pltr/v2/actions/project'
 
 const areEqual = (prevProps, nextProps) => {
   return Object.keys(prevProps).reduce((acc, key) => {
@@ -20,6 +21,7 @@ const CardDescriptionEditorConnector = (connector) => {
     selection,
     darkMode,
     editCardAttributes,
+    fetchCurrentValue,
   }) => {
     const {
       pltr: { helpers },
@@ -39,6 +41,7 @@ const CardDescriptionEditorConnector = (connector) => {
     return (
       <RichText
         id={`card.description-${cardId}`}
+        fetchCurrentValue={fetchCurrentValue}
         fileId={fileId}
         description={description}
         selection={selection}
@@ -74,6 +77,12 @@ const CardDescriptionEditorConnector = (connector) => {
           state.present,
           helpers.editors.cardDescriptionEditorPath(ownProps.cardId)
         ),
+        fetchCurrentValue: () =>
+          new Promise((resolve) =>
+            withFullFileState((currentState) =>
+              selectors.cardDescriptionByIdSelector(currentState.present, ownProps.cardId)
+            )
+          ),
         darkMode: selectors.isDarkModeSelector(state.present),
         fileId: selectors.selectedFileIdSelector(state.present),
       }),
