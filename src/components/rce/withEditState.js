@@ -12,6 +12,8 @@ const OTHER_EDITOR_CHANGE_SIGNAL = 'OTHER_EDITOR_CHANGE_SIGNAL'
 const RECEIVE_EDITOR_OPERATIONS = 'RECEIVE_EDITOR_OPERATIONS'
 const RECEIVE_NEW_INITIAL_VALUE = 'RECEIVE_NEW_INITIAL_VALUE'
 const UNDO_OR_REDO = 'UNDO_OR_REDO'
+const EDITOR_DRIFT = 'EDITOR_DRIFT'
+const RESET = 'RESET'
 
 // States
 const INITIALISED = 'INITIALISATION'
@@ -20,6 +22,8 @@ const CONTENT_EDITED = 'CONTENT_EDITED'
 const UPDATED_EDIT_TIME_STAMPS = 'UPDATED_EDIT_TIME_STAMPS'
 const UPDATED_FROM_INITIAL_VALUE = 'UPDATED_FROM_INITIAL_VALUE'
 const KEY_PRESSED = 'KEY_PRESSED'
+const CONFLICT_DETECTED = 'CONFLICT_DETECTED'
+const RESET_FROM_INITIAL_VALUE = 'RESET_FROM_INITIAL_VALUE'
 
 const ONE_MINUTE = 60 * 1000
 
@@ -27,16 +31,16 @@ const enqueueOperation = (queue, value, selection, operation) => {
   queue.push({ created: operation.created, value, selection, operation })
 }
 
-// const findEditsAfter = (edits, operation) => {
-//   const editsAfter = []
-//   const created = operation.created.toDate()
-//   edits.forEach((operation) => {
-//     if (operation.created > created) {
-//       editsAfter.push(operation)
-//     }
-//   })
-//   return editsAfter
-// }
+const findEditsAfter = (edits, operation) => {
+  const editsAfter = []
+  const created = operation.created.toDate()
+  edits.forEach((operation) => {
+    if (operation.created > created) {
+      editsAfter.push(operation)
+    }
+  })
+  return editsAfter
+}
 
 /**
  * # Introduction
@@ -119,7 +123,8 @@ export const withEditState = (
   redo,
   initialValue,
   initialSelection,
-  undoId
+  undoId,
+  fetchCurrentValue
 ) => {
   // # Constants
   const key = useRef(uuidv4())
@@ -135,7 +140,6 @@ export const withEditState = (
   const state = useRef(INITIALISED)
 
   // # Non-re-rendering state
-  const applyingOtherEdits = useRef(false)
   const editQueue = useRef(newEditQueue())
   const editCount = useRef(0)
   const handlingKeyDown = useRef(false)
@@ -179,29 +183,25 @@ export const withEditState = (
       return operation.created.toDate() > openTime.current
     })
     if (operationsToApply.length) {
-      applyingOtherEdits.current = true
-      // Commented stuff is rewind.
-      //
-      // const oldestOperation = operationsToApply.reduce((oldestOperation, nextOperation) => {
-      //   if (nextOperation.created.toDate() < nextOperation.created.toDate()) {
-      //     return nextOperation
-      //   }
-      //   return oldestOperation
-      // })
-      // const editsAfter = findEditsAfter(editHistory.current, oldestOperation)
-      // if (editsAfter.length) {
-      //   const operation = editsAfter[0]
-      //   setEditorState(operation.value, operation.selection)
-      // }
+      const oldestOperation = operationsToApply.reduce((oldestOperation, nextOperation) => {
+        if (nextOperation.created.toDate() < nextOperation.created.toDate()) {
+          return nextOperation
+        }
+        return oldestOperation
+      })
+      const editsAfter = findEditsAfter(editHistory.current, oldestOperation)
+      if (editsAfter.length) {
+        if (state.current === RESET_FROM_INITIAL_VALUE) return
+        handleEvent(EDITOR_DRIFT, { editsAfter, operationsToApply })
+        return
+      }
+
       operationsToApply.forEach((operation) => {
         editor.apply(operation.operation)
         if (latestEdits.current[operation.editorKey].read < operation.editNumber) {
           latestEdits.current[operation.editorKey].read = operation.editNumber
         }
       })
-      // editsAfter.forEach(({ operation }) => {
-      //   editor.apply(operation)
-      // })
     }
   }
 
@@ -227,6 +227,8 @@ export const withEditState = (
       Object.entries(latestEdits.current).forEach(([editorKey, { goal, read }]) => {
         if (goal > read && editorKey !== key.current) {
           fetchOperations(fileId, editorId, read, editorKey, (operations) => {
+            if (state.current === RESET_FROM_INITIAL_VALUE) return
+
             handleEvent(RECEIVE_EDITOR_OPERATIONS, operations)
           })
         }
@@ -241,11 +243,21 @@ export const withEditState = (
     delayIfNecessary()
   }
 
+  const handleConflict = () => {
+    if (state.current !== CONFLICT_DETECTED) return
+
+    fetchCurrentValue().then((value) => {
+      setEditorState(value, null)
+      handleEvent(RESET)
+    })
+  }
+
   const effect = () => {
     setTimeout(() => {
       handleContentEdited()
       handleReceivedOperations()
       handleUpdatedEditTimeStamps()
+      handleConflict()
     }, 0)
   }
 
@@ -303,20 +315,9 @@ export const withEditState = (
   const handleNewInitialValue = () => {
     const { value, selection } = valueAndSelection
     // undoId goes null when we undo.
-    if (!undoId) {
+    if (!undoId || !value || !selection) {
       state.current = UPDATED_FROM_INITIAL_VALUE
       setEditorState(initialValue, initialSelection)
-    } else {
-      if (!value || !selection) {
-        state.current = UPDATED_FROM_INITIAL_VALUE
-        const nextSelection = initialSelection || editor.selection
-        setValueAndSelection(initialValue, nextSelection)
-        try {
-          editor.selection = nextSelection
-        } catch (error) {
-          console.error("Couldn't set seleciton, ", error)
-        }
-      }
     }
   }
 
@@ -340,6 +341,14 @@ export const withEditState = (
     state.current = RECEIVED_OPERATIONS
   }
 
+  const handleEditorDrift = ({ editsAfter, operationsToApply }) => {
+    state.current = CONFLICT_DETECTED
+  }
+
+  const handleResetEditor = () => {
+    state.current = RESET_FROM_INITIAL_VALUE
+  }
+
   // # Event Handler
 
   function handleEvent(event, payload) {
@@ -359,6 +368,12 @@ export const withEditState = (
       case RECEIVE_EDITOR_OPERATIONS:
         handleReceiveEditorOperations(payload)
         break
+      case EDITOR_DRIFT:
+        handleEditorDrift(payload)
+        break
+      case RESET:
+        handleResetEditor()
+        break
     }
     effect()
     return
@@ -368,6 +383,8 @@ export const withEditState = (
 
   // Handle changes in initial value
   useEffect(() => {
+    if (state.current === RESET_FROM_INITIAL_VALUE) return
+
     handleEvent(RECEIVE_NEW_INITIAL_VALUE)
   }, [initialValue, undoId])
 
@@ -375,6 +392,8 @@ export const withEditState = (
   useEffect(() => {
     if (fetchOperations && fileId && editorId) {
       listenForChangeSignals(fileId, editorId, (editTimestamps) => {
+        if (state.current === RESET_FROM_INITIAL_VALUE) return
+
         handleEvent(OTHER_EDITOR_CHANGE_SIGNAL, editTimestamps)
       })
     }
@@ -383,11 +402,15 @@ export const withEditState = (
 
   // Handle editor changed events
   const onChange = (newValue) => {
+    if (state.current === RESET_FROM_INITIAL_VALUE) return
+
     deleteOldChanges(fileId, editorId)
     handleEvent(NEW_VALUE_FROM_SLATE, newValue)
   }
 
   const handleUndoRedo = (event) => {
+    if (state.current === RESET_FROM_INITIAL_VALUE) return
+
     // If we don't have a selection, then the editor can't support
     // programatic undo.  This isn't desirable because built-in undo
     // leads to strange interactions when, e.g. the user undoes
@@ -417,6 +440,8 @@ export const withEditState = (
 
   // Handle user typing
   const onKeyDown = (event) => {
+    if (state.current === RESET_FROM_INITIAL_VALUE) return
+
     handleUndoRedo(event)
     handleEvent(USER_KEY_DOWN, event)
   }
