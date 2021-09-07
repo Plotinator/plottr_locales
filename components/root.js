@@ -1,3 +1,4 @@
+import React from 'react'
 import { Router, Switch, Route } from 'react-router-dom'
 import { Provider } from 'react-redux'
 
@@ -45,30 +46,32 @@ const modalStyles = {
 const Root = () => {
   return (
     <Provider store={store}>
-      <PlottrModal isOpen={!passwordSet()} style={modalStyles}>
-        <PasswordForm />
-      </PlottrModal>
-      <Renamer />
-      <FileListListener />
-      <SessionObserver />
-      <Listener />
-      <ClientIdMinter />
-      <SaveTemplate />
-      <Router history={history}>
-        <Navigation />
-        <Error />
-        <main className="project-main tour-end">
-          <Switch>
-            <Route path="/project" component={Project} />
-            <Route path="/timeline" component={Timeline} />
-            <Route path="/outline" component={Outline} />
-            <Route path="/notes" component={Notes} />
-            <Route path="/characters" component={Characters} />
-            <Route path="/places" component={Places} />
-            <Route path="/tags" component={Tags} />
-          </Switch>
-        </main>
-      </Router>
+      <React.StrictMode>
+        <PlottrModal isOpen={!passwordSet()} style={modalStyles}>
+          <PasswordForm />
+        </PlottrModal>
+        <Renamer />
+        <FileListListener />
+        <SessionObserver />
+        <Listener />
+        <ClientIdMinter />
+        <SaveTemplate />
+        <Router history={history}>
+          <Navigation />
+          <Error />
+          <main className="project-main tour-end">
+            <Switch>
+              <Route path="/project" component={Project} />
+              <Route path="/timeline" component={Timeline} />
+              <Route path="/outline" component={Outline} />
+              <Route path="/notes" component={Notes} />
+              <Route path="/characters" component={Characters} />
+              <Route path="/places" component={Places} />
+              <Route path="/tags" component={Tags} />
+            </Switch>
+          </main>
+        </Router>
+      </React.StrictMode>
     </Provider>
   )
 }
