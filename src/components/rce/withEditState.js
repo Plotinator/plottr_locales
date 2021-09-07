@@ -218,8 +218,7 @@ export const withEditState = (
   redo,
   initialValue,
   initialSelection,
-  undoId,
-  fetchCurrentValue
+  undoId
 ) => {
   // # Constants
   const key = useRef(uuidv4())
@@ -341,12 +340,13 @@ export const withEditState = (
 
   const handleConflict = () => {
     if (state.current !== CONFLICT_DETECTED) return
+    handleEvent(RESET)
 
-    fetchCurrentValue().then((value) => {
-      setEditorState(value, null)
-      editor.selection = null
-      handleEvent(RESET)
-    })
+    // This is where I thought I could fetch the current state of the
+    // value, but this approach is flawed because we don't know how
+    // long it'll be between us updating redux with what we thought
+    // the value should be and when we receive a (potentially)
+    // conflicting edit from a peer.
   }
 
   const effect = () => {
@@ -449,6 +449,15 @@ export const withEditState = (
   }
 
   const handleEditorDrift = ({ editsAfter, operationsToApply }) => {
+    editor.selection = null
+    setEditorState(editsAfter[0].value, null)
+    operationsToApply.forEach((operation) => {
+      editor.apply(operation)
+      if (latestEdits.current[operation.editorKey].read < operation.editNumber) {
+        latestEdits.current[operation.editorKey].read = operation.editNumber
+      }
+    })
+    lastPublished.current = editHistory.current.length
     state.current = CONFLICT_DETECTED
   }
 

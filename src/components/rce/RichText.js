@@ -29,7 +29,6 @@ const RichTextConnector = (connector) => {
           autoFocus={props.autofocus}
           selection={props.selection}
           text={props.description}
-          fetchCurrentValue={props.fetchCurrentValue}
           darkMode={props.darkMode}
         />
       )
@@ -63,7 +62,6 @@ const RichTextConnector = (connector) => {
     editable: PropTypes.bool,
     autofocus: PropTypes.bool,
     className: PropTypes.string,
-    fetchCurrentValue: PropTypes.func,
     darkMode: PropTypes.bool.isRequired,
     isStorageURL: PropTypes.func.isRequired,
     imagePublicURL: PropTypes.func.isRequired,

@@ -24,7 +24,6 @@ const CardDescriptionEditorConnector = (connector) => {
     selection,
     darkMode,
     editCardAttributes,
-    withFullFileState,
   }) => {
     const editorPath = helpers.editors.cardDescriptionEditorPath(cardId)
 
@@ -40,13 +39,6 @@ const CardDescriptionEditorConnector = (connector) => {
     return (
       <RichText
         id={`card.description-${cardId}`}
-        fetchCurrentValue={() =>
-          new Promise((resolve) =>
-            withFullFileState((currentState) =>
-              resolve(selectors.cardDescriptionByIdSelector(currentState.present, cardId))
-            )
-          )
-        }
         fileId={fileId}
         description={description}
         selection={selection}
@@ -65,7 +57,6 @@ const CardDescriptionEditorConnector = (connector) => {
     editCardAttributes: PropTypes.func.isRequired,
     darkMode: PropTypes.bool.isRequired,
     fileId: PropTypes.string,
-    withFullFileState: PropTypes.func,
   }
 
   const {
@@ -86,10 +77,7 @@ const CardDescriptionEditorConnector = (connector) => {
         darkMode: selectors.isDarkModeSelector(state.present),
         fileId: selectors.selectedFileIdSelector(state.present),
       }),
-      {
-        editCardAttributes: actions.card.editCardAttributes,
-        withFullFileState: actions.project.withFullFileState,
-      }
+      { editCardAttributes: actions.card.editCardAttributes }
     )(React.memo(CardDescriptionEditor, areEqual))
   }
 

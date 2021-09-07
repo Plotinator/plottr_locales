@@ -39,7 +39,6 @@ const RichTextEditorConnector = (connector) => {
     id,
     undoId,
     text,
-    fetchCurrentValue,
     selection,
     darkMode,
     className,
@@ -92,8 +91,7 @@ const RichTextEditorConnector = (connector) => {
       redo,
       text,
       selection,
-      undoId,
-      fetchCurrentValue
+      undoId
     )
 
     const handleKeyDown = (event) => {
@@ -189,7 +187,6 @@ const RichTextEditorConnector = (connector) => {
     className: PropTypes.string,
     undoId: PropTypes.string,
     clientId: PropTypes.string,
-    fetchCurrentValue: PropTypes.func,
   }
 
   const {
