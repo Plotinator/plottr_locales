@@ -6,11 +6,16 @@ import { FormControl, FormGroup, ControlLabel, Glyphicon, Button } from 'react-b
 import cx from 'classnames'
 
 const areEqual = (prevProps, nextProps) => {
-  for (const key in Object.keys(prevProps)) {
-    if (key === 'value' && nextProps.type === prevProps.type && nextProps.type === 'paragraph') {
+  for (const key of Object.keys(prevProps)) {
+    if (
+      key === 'selection' ||
+      ('value' && nextProps.type === prevProps.type && nextProps.type === 'paragraph')
+    ) {
       continue
     }
-    if (prevProps[key] !== nextProps[key]) return false
+    if (prevProps[key] !== nextProps[key]) {
+      return false
+    }
   }
   return true
 }

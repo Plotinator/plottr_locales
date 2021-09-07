@@ -5,7 +5,7 @@ import UnconnectedRichText from '../rce/RichText'
 
 const areEqual = (prevProps, nextProps) => {
   return Object.keys(prevProps).reduce((acc, key) => {
-    if (key === 'description') return acc
+    if (key === 'description' || key === 'selection') return acc
     return prevProps[key] === nextProps[key] && acc
   }, true)
 }
