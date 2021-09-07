@@ -36,7 +36,7 @@ export const drainQueue = (editorQueue) => {
         edit = next.edit
       }
 
-      while (editNumber - lastDequeued === 1) {
+      while (editNumber - lastDequeued >= 1) {
         toConsume.push(edit)
         queue.poll()
         editorQueue[editorId].lastDequeued = editNumber
