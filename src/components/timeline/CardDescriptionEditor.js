@@ -3,6 +3,8 @@ import { PropTypes } from 'prop-types'
 
 import UnconnectedRichText from '../rce/RichText'
 
+import { checkDependencies } from '../checkDependencies'
+
 const areEqual = (prevProps, nextProps) => {
   return Object.keys(prevProps).reduce((acc, key) => {
     if (key === 'description' || key === 'selection') return acc
@@ -26,6 +28,7 @@ const CardDescriptionEditorConnector = (connector) => {
     } = connector
 
     const editorPath = helpers.editors.cardDescriptionEditorPath(cardId)
+    checkDependencies({ editorPath })
 
     const handleDescriptionChange = (newDescription, selection) => {
       editCardAttributes(
@@ -63,6 +66,7 @@ const CardDescriptionEditorConnector = (connector) => {
     redux,
     pltr: { selectors, actions, helpers },
   } = connector
+  checkDependencies({ redux, selectors, actions, helpers })
 
   if (redux) {
     const { connect } = redux
@@ -75,7 +79,6 @@ const CardDescriptionEditorConnector = (connector) => {
           helpers.editors.cardDescriptionEditorPath(ownProps.cardId)
         ),
         darkMode: selectors.isDarkModeSelector(state.present),
-        fileId: selectors.selectedFileIdSelector(state.present),
       }),
       { editCardAttributes: actions.card.editCardAttributes }
     )(React.memo(CardDescriptionEditor, areEqual))

@@ -11,6 +11,7 @@ import UnconnectedTopRow from './TopRow'
 import UnconnectedBeatTitleCell from './BeatTitleCell'
 import UnconnectedAddLineRow from './AddLineRow'
 import { helpers, initialState } from 'pltr/v2'
+import { checkDependencies } from '../checkDependencies'
 
 const { card } = initialState
 
@@ -168,6 +169,7 @@ const TimelineTableConnector = (connector) => {
                 beatToLeft={beats[idx - 1]}
                 isInBeatList={false}
                 handleInsert={this.handleInsertNewBeat}
+                scrollTo={(position) => this.props.scrollTo(position)}
                 color={line.color}
                 showLine={beat.position == 0}
                 tableLength={this.state.tableLength}
@@ -183,6 +185,7 @@ const TimelineTableConnector = (connector) => {
           <BeatTitleCell
             beatId={beat.id}
             handleReorder={this.handleReorderBeats}
+            scrollTo={(position) => this.props.scrollTo(position)}
             hovering={this.state.hovering}
             onMouseEnter={() => this.startHovering(beat.id)}
             onMouseLeave={this.stopHovering}
@@ -250,7 +253,12 @@ const TimelineTableConnector = (connector) => {
                 beatToLeft={lastBeat}
                 handleInsertChild={() => this.handleInsertChildBeat(lastBeat.id)}
                 expanded={lastBeat && lastBeat.expanded}
+                scrollTo={(position) => this.props.scrollTo(position)}
                 toggleExpanded={beatToggler(lastBeat)}
+                hovering={this.state.hovering}
+                onMouseEnter={() => this.startHovering(lastBeat.id)}
+                onMouseLeave={this.stopHovering}
+                isEmpty={!beats.length}
               />
             </Row>
           )
@@ -281,6 +289,7 @@ const TimelineTableConnector = (connector) => {
               isInBeatList={false}
               lineId={line.id}
               handleInsert={this.handleInsertNewBeat}
+              scrollTo={(position) => this.props.scrollTo(position)}
               beatToLeft={beats[beatPosition - 1]}
               showLine={beatPosition == 0}
               color={line.color}
@@ -359,7 +368,10 @@ const TimelineTableConnector = (connector) => {
           </div>
         )
       } else {
-        return [<TopRow key="top-row" />, this.renderRows()]
+        return [
+          <TopRow key="top-row" scrollTo={(position) => this.props.scrollTo(position)} />,
+          this.renderRows(),
+        ]
       }
     }
   }
@@ -373,6 +385,7 @@ const TimelineTableConnector = (connector) => {
     lines: PropTypes.array,
     cardMap: PropTypes.object.isRequired,
     ui: PropTypes.object.isRequired,
+    scrollTo: PropTypes.func.isRequired,
     isSeries: PropTypes.bool,
     isSmall: PropTypes.bool,
     isMedium: PropTypes.bool,
@@ -388,6 +401,7 @@ const TimelineTableConnector = (connector) => {
     redux,
     pltr: { selectors, actions },
   } = connector
+  checkDependencies({ redux, selectors, actions })
 
   if (redux) {
     const { connect, bindActionCreators } = redux
