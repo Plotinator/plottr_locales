@@ -27,6 +27,8 @@ const FileActionsConnector = (connector) => {
 
   const osIsUnknown = os === 'unknown'
 
+  const osIsUnknown = os === 'unknown'
+
   let showInMessage = t('Show in File Explorer')
   if (isMacOS) {
     showInMessage = t('Show in Finder')

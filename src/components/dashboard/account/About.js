@@ -30,6 +30,8 @@ const AboutConnector = (connector) => {
 
   const osIsUnknown = os === 'unknown'
 
+  const osIsUnknown = os === 'unknown'
+
   const About = (props) => {
     const { started, expired } = useTrialStatus()
 
