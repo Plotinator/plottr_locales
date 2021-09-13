@@ -217,6 +217,7 @@ export const UNSET_FILE_LOADED = 'UNSET_FILE_LOADED'
 // client actions
 export const SET_USER_ID = 'SET_USER_ID'
 export const SET_CLIENT_ID = 'SET_CLIENT_ID'
+
 // action actions (for undo)
 export const RECORD_LAST_ACTION = 'RECORD_LAST_ACTION'
 export const RESET_ACTION_RECORDER = 'RESET_ACTION_RECORDER'
