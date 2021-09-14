@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import PropTypes from 'react-proptypes'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { Button, Navbar, Nav, NavItem, Dropdown, MenuItem } from 'react-bootstrap'
+import { Navbar, Nav, NavItem, Dropdown, MenuItem } from 'react-bootstrap'
 import { t } from 'plottr_locales'
 import { Beamer, BookChooser } from 'connected-components'
 import cx from 'classnames'
@@ -92,6 +92,10 @@ function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
     setDashboardView('help')
   }
 
+  const selectLogout = () => {
+    logOut()
+  }
+
   const resetDashboardView = () => {
     if (firstTime || trialExpired) return
     setDashboardView(null)
@@ -153,9 +157,6 @@ function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
         <Beamer inNavigation />
         <Navbar.Form pullRight style={{ marginRight: '15px' }}>
           <Upload />
-          <Button bsStyle="link" onClick={logOut}>
-            {t('logout')}
-          </Button>
           <Download />
           <Share />
         </Navbar.Form>
@@ -163,16 +164,17 @@ function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
         <Nav pullRight className="project-nav__options">
           <NavItem>
             <Dropdown id="dashboard-dropdown-menu">
-              <Dropdown.Toggle noCaret bsSize="small">
+              <Dropdown.Toggle noCaret bsSize="small" bsStyle="link">
                 <FaRegUser />
               </Dropdown.Toggle>
               <Dropdown.Menu>
-                <MenuItem onSelect={selectAccount}>{t('Account')}</MenuItem>
-                <MenuItem onSelect={selectOptions}>{t('Options')}</MenuItem>
                 <MenuItem onSelect={selectFiles}>{t('Files')}</MenuItem>
-                <MenuItem onSelect={selectTemplates}>{t('Templates')}</MenuItem>
+                <MenuItem onSelect={selectOptions}>{t('Settings')}</MenuItem>
+                <MenuItem onSelect={selectAccount}>{t('Account')}</MenuItem>
                 <MenuItem onSelect={selectBackups}>{t('Backups')}</MenuItem>
+                <MenuItem onSelect={selectTemplates}>{t('Templates')}</MenuItem>
                 <MenuItem onSelect={selectHelp}>{t('Help')}</MenuItem>
+                <MenuItem onSelect={selectLogout}>{t('Logout')}</MenuItem>
               </Dropdown.Menu>
             </Dropdown>
           </NavItem>
