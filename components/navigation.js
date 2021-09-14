@@ -22,7 +22,7 @@ const trialMode = true // TODO
 const isDev = process.env.NEXT_PUBLIC_NODE_ENV == 'development'
 
 function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
-  const [dashboardView, setDashboardView] = useState(null)
+  const [dashboardView, setDashboardView] = useState('files')
   const trialInfo = useTrialStatus()
   const [_licenseInfo, licenseInfoSize] = useLicenseInfo()
   const firstTime = !licenseInfoSize && !trialInfo.started
