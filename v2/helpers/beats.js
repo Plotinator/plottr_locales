@@ -5,17 +5,12 @@ import { isSeries as isSeriesString } from './books'
 import * as tree from '../reducers/tree'
 
 export function beatOneIsPrologue(sortedBookBeats) {
+  if (!sortedBookBeats.length) return false
   return sortedBookBeats[0].title == i18n('Prologue')
 }
 
 export function beatName(beats, beat, sortedHierarchyLevels, hierarchyEnabled, isSeries) {
-  if (!hierarchyEnabled) {
-    if (isSeries) {
-      return 'Beat'
-    } else {
-      return 'Chapter'
-    }
-  }
+  if (!hierarchyEnabled && isSeries) return i18n('Beat')
 
   const depth = tree.depth(beats, beat.id)
   const hierarchyLevel = sortedHierarchyLevels[depth]
@@ -196,32 +191,29 @@ export const removeLevelFromHierarchy = (currentTree) => {
   return newTree
 }
 
-export const adjustHierarchyLevels = (targetHierarchyDepth) => (
-  currentTree,
-  nextParentId,
-  bookId
-) => {
-  const maximumDepth = maxDepth(currentTree)
-  if (targetHierarchyDepth === maximumDepth) {
-    return currentTree
-  }
+export const adjustHierarchyLevels =
+  (targetHierarchyDepth) => (currentTree, nextParentId, bookId) => {
+    const maximumDepth = maxDepth(currentTree)
+    if (targetHierarchyDepth === maximumDepth) {
+      return currentTree
+    }
 
-  let newTree = currentTree
-  if (targetHierarchyDepth > maximumDepth) {
-    // We cannot exceed a depth of 3
-    if (maximumDepth === 2) return currentTree
-    let currentParentId = nextParentId
-    for (let i = 0; i < targetHierarchyDepth - maximumDepth; ++i) {
-      newTree = addLevelToHierarchy(newTree, currentParentId, bookId)
-      ++currentParentId
+    let newTree = currentTree
+    if (targetHierarchyDepth > maximumDepth) {
+      // We cannot exceed a depth of 3
+      if (maximumDepth === 2) return currentTree
+      let currentParentId = nextParentId
+      for (let i = 0; i < targetHierarchyDepth - maximumDepth; ++i) {
+        newTree = addLevelToHierarchy(newTree, currentParentId, bookId)
+        ++currentParentId
+      }
+    } else {
+      for (let i = 0; i < maximumDepth - targetHierarchyDepth; ++i) {
+        newTree = removeLevelFromHierarchy(newTree)
+      }
     }
-  } else {
-    for (let i = 0; i < maximumDepth - targetHierarchyDepth; ++i) {
-      newTree = removeLevelFromHierarchy(newTree)
-    }
+    return newTree
   }
-  return newTree
-}
 
 export const beatIds = (beatTree) => {
   return tree.reduce('id')(beatTree, (acc, { id }) => [...acc, id], [])
@@ -237,13 +229,20 @@ export const beatsByPosition = (predicate) => (beats) => {
   return iter(beats, null)
 }
 
-export const numberOfPriorChildrenAtSameDepth = (beatTree, beatId) => {
+export const numberOfPriorChildrenAtSameDepth = (beatTree, beats, beatId) => {
+  if (beats.length === 0) return null
   const beatDepth = tree.depth(beatTree, beatId)
-  const beatsAtLeastAsDeap = beatsByPosition((beat) => tree.depth(beatTree, beat.id) <= beatDepth)
-  return (
-    1 +
-    beatsAtLeastAsDeap(beatTree)
-      .filter((beat) => tree.depth(beatTree, beat.id) === beatDepth)
-      .findIndex((beat) => beat.id === beatId)
-  )
+  let priorChildren = 0
+  let found = false
+  for (let i = 0; i < beats.length; ++i) {
+    const { id } = beats[i]
+    const otherBeatDepth = tree.depth(beatTree, id)
+    if (id === beatId) {
+      found = true
+      break
+    }
+    if (otherBeatDepth === beatDepth) ++priorChildren
+  }
+  if (!found) return null
+  return 1 + priorChildren
 }

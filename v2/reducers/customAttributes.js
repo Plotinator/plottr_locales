@@ -20,6 +20,7 @@ import {
   REORDER_PLACES_ATTRIBUTE,
   REORDER_CARDS_ATTRIBUTE,
   REORDER_NOTES_ATTRIBUTE,
+  LOAD_CUSTOM_ATTRIBUTES,
 } from '../constants/ActionTypes'
 import { combineReducers } from 'redux'
 import { newFileCustomAttributes } from '../store/newFileState'
@@ -44,7 +45,7 @@ function characters(state = [], action) {
       return newFileCustomAttributes['characters']
 
     case FILE_LOADED:
-      return action.data.customAttributes['characters']
+      return action.data.customAttributes['characters'] || []
 
     case REORDER_CHARACTER_ATTRIBUTE: {
       let { toIndex, attribute } = action
@@ -54,6 +55,9 @@ function characters(state = [], action) {
       copy.splice(toIndex, 0, attribute)
       return copy
     }
+
+    case LOAD_CUSTOM_ATTRIBUTES:
+      return action.customAttributes.characters || []
 
     default:
       return state
@@ -79,7 +83,7 @@ function places(state = [], action) {
       return newFileCustomAttributes['places']
 
     case FILE_LOADED:
-      return action.data.customAttributes['places']
+      return action.data.customAttributes['places'] || []
 
     case REORDER_PLACES_ATTRIBUTE: {
       let { toIndex, attribute } = action
@@ -89,6 +93,9 @@ function places(state = [], action) {
       copy.splice(toIndex, 0, attribute)
       return copy
     }
+
+    case LOAD_CUSTOM_ATTRIBUTES:
+      return action.customAttributes.places || []
 
     default:
       return state
@@ -127,7 +134,10 @@ function scenes(state = [], action) {
       return newFileCustomAttributes['scenes']
 
     case FILE_LOADED:
-      return action.data.customAttributes['scenes']
+      return action.data.customAttributes['scenes'] || []
+
+    case LOAD_CUSTOM_ATTRIBUTES:
+      return action.customAttributes.scenes || []
 
     default:
       return state
@@ -164,6 +174,9 @@ function notes(state = [], action) {
       return copy
     }
 
+    case LOAD_CUSTOM_ATTRIBUTES:
+      return action.customAttributes.notes || []
+
     default:
       return state || []
   }
@@ -183,7 +196,10 @@ function lines(state = [], action) {
       return newFileCustomAttributes['lines']
 
     case FILE_LOADED:
-      return action.data.customAttributes['lines']
+      return action.data.customAttributes['lines'] || []
+
+    case LOAD_CUSTOM_ATTRIBUTES:
+      return action.customAttributes.lines || []
 
     default:
       return state

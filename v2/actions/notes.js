@@ -1,6 +1,7 @@
 import {
   ADD_NOTE,
   EDIT_NOTE,
+  EDIT_NOTE_TEMPLATE_ATTRIBUTE,
   DELETE_NOTE,
   ATTACH_CHARACTER_TO_NOTE,
   ATTACH_PLACE_TO_NOTE,
@@ -10,7 +11,9 @@ import {
   REMOVE_TAG_FROM_NOTE,
   REMOVE_BOOK_FROM_NOTE,
   ATTACH_BOOK_TO_NOTE,
+  LOAD_NOTES,
 } from '../constants/ActionTypes'
+import { editorMetadataIfPresent } from '../helpers/editors'
 import { note } from '../store/initialState'
 
 export function addNote() {
@@ -21,8 +24,19 @@ export function addNoteWithValues(title, content) {
   return { type: ADD_NOTE, title, content }
 }
 
-export function editNote(id, attributes) {
-  return { type: EDIT_NOTE, id, attributes }
+export function editNote(id, attributes, editorPath, selection) {
+  return { type: EDIT_NOTE, id, attributes, ...editorMetadataIfPresent(editorPath, selection) }
+}
+
+export function editNoteTemplateAttribute(id, templateId, name, value, editorPath, selection) {
+  return {
+    type: EDIT_NOTE_TEMPLATE_ATTRIBUTE,
+    id,
+    templateId,
+    name,
+    value,
+    ...editorMetadataIfPresent(editorPath, selection),
+  }
 }
 
 export function deleteNote(id) {
@@ -59,4 +73,8 @@ export function removeTag(id, tagId) {
 
 export function removeBook(id, bookId) {
   return { type: REMOVE_BOOK_FROM_NOTE, id, bookId }
+}
+
+export function load(patching, notes) {
+  return { type: LOAD_NOTES, patching, notes }
 }

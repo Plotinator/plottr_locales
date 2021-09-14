@@ -5,9 +5,12 @@ import {
   ATTACH_TAG_TO_PLACE,
   DELETE_PLACE,
   EDIT_PLACE,
+  EDIT_PLACE_TEMPLATE_ATTRIBUTE,
+  LOAD_PLACES,
   REMOVE_BOOK_FROM_PLACE,
   REMOVE_TAG_FROM_PLACE,
 } from '../constants/ActionTypes'
+import { editorMetadataIfPresent } from '../helpers/editors'
 import { place } from '../store/initialState'
 
 export function addPlace() {
@@ -18,8 +21,19 @@ export function addPlaceWithValues(place) {
   return { type: ADD_PLACE_WITH_VALUES, place }
 }
 
-export function editPlace(id, attributes) {
-  return { type: EDIT_PLACE, id, attributes }
+export function editPlace(id, attributes, editorPath, selection) {
+  return { type: EDIT_PLACE, id, attributes, ...editorMetadataIfPresent(editorPath, selection) }
+}
+
+export function editPlaceTemplateAttribute(id, templateId, name, value, editorPath, selection) {
+  return {
+    type: EDIT_PLACE_TEMPLATE_ATTRIBUTE,
+    id,
+    templateId,
+    name,
+    value,
+    ...editorMetadataIfPresent(editorPath, selection),
+  }
 }
 
 export function deletePlace(id) {
@@ -40,4 +54,8 @@ export function removeTag(id, tagId) {
 
 export function removeBook(id, bookId) {
   return { type: REMOVE_BOOK_FROM_PLACE, id, bookId }
+}
+
+export function load(patching, places) {
+  return { type: LOAD_PLACES, patching, places }
 }
