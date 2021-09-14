@@ -431,7 +431,7 @@ export const useEditState = (
     // undoId goes null when we undo.
     if (!undoId || !value || !selection) {
       state.current = UPDATED_FROM_INITIAL_VALUE
-      setEditorState(initialValue, initialSelection)
+      setEditorState(useTextConverter(initialValue), initialSelection)
     }
   }
 
