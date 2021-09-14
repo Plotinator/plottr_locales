@@ -47,9 +47,9 @@ const RecentFilesConnector = (connector) => {
 
   const FileActions = UnconnectedFileActions(connector)
 
-  const RecentFiles = (props) => {
+  const RecentFiles = ({ fileList }) => {
     const [searchTerm, setSearchTerm] = useState('')
-    const [sortedIds, filesById] = useSortedKnownFiles(searchTerm)
+    const [sortedIds, filesById] = useSortedKnownFiles(searchTerm, fileList)
     const [missingFiles, setMissing] = useState([])
     const [selectedFile, selectFile] = useState(null)
 
@@ -155,7 +155,20 @@ const RecentFilesConnector = (connector) => {
     )
   }
 
-  return RecentFiles
+  const {
+    pltr: { selectors },
+    redux,
+  } = connector
+
+  if (redux) {
+    const { connect } = redux
+
+    return connect((state) => ({
+      fileList: selectors.fileListSelector(state.present),
+    }))(RecentFiles)
+  }
+
+  throw new Error('Could not connect RecentFiles')
 }
 
 export default RecentFilesConnector
