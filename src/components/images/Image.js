@@ -17,9 +17,10 @@ const ImageConnector = (connector) => {
     useEffect(() => {
       if (!image) return
 
-      const imageSrcPromise = osIsUnknown
-        ? resolveToPublicUrl(image.path)
-        : Promise.resolve(image.data)
+      const imageSrcPromise =
+        osIsUnknown && image.path.startsWith('storage://')
+          ? resolveToPublicUrl(image.path)
+          : Promise.resolve(image.data)
       imageSrcPromise.then(setImageSrc)
     }, [])
 
