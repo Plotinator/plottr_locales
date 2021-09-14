@@ -21,227 +21,298 @@ import {
   ATTACH_BOOK_TO_CHARACTER,
   REMOVE_BOOK_FROM_CHARACTER,
   DELETE_CHARACTER_CATEGORY,
+  DELETE_TAG,
+  LOAD_CHARACTERS,
+  ADD_TEMPLATE_TO_CHARACTER,
+  REMOVE_TEMPLATE_FROM_CHARACTER,
+  EDIT_CHARACTER_TEMPLATE_ATTRIBUTE,
 } from '../constants/ActionTypes'
-import { character } from '../store/initialState'
+import { character as defaultCharacter } from '../store/initialState'
 import { newFileCharacters } from '../store/newFileState'
 import { nextId } from '../store/newIds'
 import { applyToCustomAttributes } from './applyToCustomAttributes'
 import { repairIfPresent } from './repairIfPresent'
 
-const initialState = [character]
+const initialState = [defaultCharacter]
 
-const characters = (dataRepairers) => (state = initialState, action) => {
-  const repair = repairIfPresent(dataRepairers)
+const characters =
+  (dataRepairers) =>
+  (state = initialState, action) => {
+    const repair = repairIfPresent(dataRepairers)
 
-  switch (action.type) {
-    case ADD_CHARACTER:
-      return [
-        ...state,
-        {
-          ...character,
-          id: nextId(state),
-          name: action.name,
-          description: action.description,
-          notes: action.notes,
-        },
-      ]
+    switch (action.type) {
+      case ADD_CHARACTER:
+        return [
+          ...state,
+          {
+            ...defaultCharacter,
+            id: nextId(state),
+            name: action.name,
+            description: action.description,
+            notes: action.notes,
+          },
+        ]
 
-    case ADD_CHARACTER_WITH_VALUES:
-      return [
-        ...state,
-        {
-          ...character,
-          ...action.character,
-          id: nextId(state),
-        },
-      ]
+      case ADD_CHARACTER_WITH_VALUES:
+        return [
+          ...state,
+          {
+            ...defaultCharacter,
+            ...action.character,
+            id: nextId(state),
+          },
+        ]
 
-    case ADD_CHARACTER_WITH_TEMPLATE: {
-      const templateData = {
-        id: action.templateData.id,
-        version: action.templateData.version,
-        attributes: action.templateData.attributes,
-        value: '',
+      case ADD_CHARACTER_WITH_TEMPLATE: {
+        const templateData = {
+          id: action.templateData.id,
+          version: action.templateData.version,
+          attributes: action.templateData.attributes,
+          value: '',
+        }
+        return [
+          ...state,
+          {
+            ...defaultCharacter,
+            id: nextId(state),
+            name: action.name,
+            description: action.description,
+            notes: action.notes,
+            templates: [templateData],
+          },
+        ]
       }
-      return [
-        ...state,
-        {
-          ...character,
-          id: nextId(state),
-          name: action.name,
-          description: action.description,
-          notes: action.notes,
-          templates: [templateData],
-        },
-      ]
-    }
 
-    case EDIT_CHARACTER:
-      return state.map((character) =>
-        character.id === action.id ? Object.assign({}, character, action.attributes) : character
-      )
+      case EDIT_CHARACTER:
+        return state.map((character) =>
+          character.id === action.id ? Object.assign({}, character, action.attributes) : character
+        )
 
-    case EDIT_CHARACTER_ATTRIBUTE:
-      if (
-        action.oldAttribute.type != 'text' &&
-        action.oldAttribute.name == action.newAttribute.name
-      )
-        return state
-
-      return state.map((c) => {
-        let ch = cloneDeep(c)
-
-        if (action.oldAttribute.name != action.newAttribute.name) {
-          ch[action.newAttribute.name] = ch[action.oldAttribute.name]
-          delete ch[action.oldAttribute.name]
-        }
-
-        // reset value to blank string
-        // (if changing to something other than text type)
-        // see ../selectors/customAttributes.js for when this is allowed
-        if (action.oldAttribute.type == 'text') {
-          let desc = ch[action.newAttribute.name]
-          if (desc && desc.length && typeof desc !== 'string') {
-            desc = ''
+      case EDIT_CHARACTER_TEMPLATE_ATTRIBUTE: {
+        return state.map((character) => {
+          if (character.id === action.id) {
+            return {
+              ...character,
+              templates: character.templates.map((template) => {
+                if (template.id === action.templateId) {
+                  return {
+                    ...template,
+                    [action.name]: action.value,
+                  }
+                }
+                return template
+              }),
+            }
           }
-          ch[action.newAttribute.name] = desc
-        }
-        return ch
-      })
-
-    case ATTACH_CHARACTER_TO_CARD:
-      return state.map((character) => {
-        let cards = cloneDeep(character.cards)
-        cards.push(action.id)
-        return character.id === action.characterId
-          ? Object.assign({}, character, { cards: cards })
-          : character
-      })
-
-    case REMOVE_CHARACTER_FROM_CARD:
-      return state.map((character) => {
-        let cards = cloneDeep(character.cards)
-        cards.splice(cards.indexOf(action.id), 1)
-        return character.id === action.characterId
-          ? Object.assign({}, character, { cards: cards })
-          : character
-      })
-
-    case ATTACH_CHARACTER_TO_NOTE:
-      return state.map((character) => {
-        let notes = cloneDeep(character.noteIds)
-        notes.push(action.id)
-        return character.id === action.characterId
-          ? Object.assign({}, character, { noteIds: notes })
-          : character
-      })
-
-    case REMOVE_CHARACTER_FROM_NOTE:
-      return state.map((character) => {
-        let notes = cloneDeep(character.noteIds)
-        notes.splice(notes.indexOf(action.id), 1)
-        return character.id === action.characterId
-          ? Object.assign({}, character, { noteIds: notes })
-          : character
-      })
-
-    case ATTACH_TAG_TO_CHARACTER:
-      return state.map((character) => {
-        let tags = cloneDeep(character.tags)
-        tags.push(action.tagId)
-        return character.id === action.id ? Object.assign({}, character, { tags: tags }) : character
-      })
-
-    case REMOVE_TAG_FROM_CHARACTER:
-      return state.map((character) => {
-        let tags = cloneDeep(character.tags)
-        tags.splice(tags.indexOf(action.tagId), 1)
-        return character.id === action.id ? Object.assign({}, character, { tags: tags }) : character
-      })
-
-    case ATTACH_BOOK_TO_CHARACTER:
-      return state.map((character) => {
-        let bookIds = cloneDeep(character.bookIds)
-        bookIds.push(action.bookId)
-        return character.id === action.id
-          ? Object.assign({}, character, { bookIds: bookIds })
-          : character
-      })
-
-    case REMOVE_BOOK_FROM_CHARACTER:
-      return state.map((character) => {
-        let bookIds = cloneDeep(character.bookIds)
-        bookIds.splice(bookIds.indexOf(action.bookId), 1)
-        return character.id === action.id
-          ? Object.assign({}, character, { bookIds: bookIds })
-          : character
-      })
-
-    case DELETE_NOTE:
-      return state.map((character) => {
-        let notes = cloneDeep(character.noteIds)
-        notes.splice(notes.indexOf(action.id), 1)
-        return Object.assign({}, character, { noteIds: notes })
-      })
-
-    case DELETE_CARD:
-      return state.map((character) => {
-        let cards = cloneDeep(character.cards)
-        cards.splice(cards.indexOf(action.id), 1)
-        return Object.assign({}, character, { cards: cards })
-      })
-
-    case DELETE_CHARACTER:
-      return state.filter((character) => character.id !== action.id)
-
-    case DELETE_IMAGE:
-      return state.map((ch) => {
-        if (action.id == ch.imageId) {
-          return {
-            ...ch,
-            imageId: null,
-          }
-        } else {
-          return ch
-        }
-      })
-
-    case RESET:
-    case FILE_LOADED:
-      return action.data.characters.map((character) => {
-        const normalizeRCEContent = repair('normalizeRCEContent')
-        return {
-          ...character,
-          notes: normalizeRCEContent(character.notes),
-          ...applyToCustomAttributes(
-            character,
-            normalizeRCEContent,
-            action.data.customAttributes.characters,
-            'paragraph'
-          ),
-        }
-      })
-
-    case NEW_FILE:
-      return newFileCharacters
-
-    case DELETE_CHARACTER_CATEGORY:
-      return state.map((character) => {
-        // In one case the ids are strings and the other they are numbers
-        // so just to be safe string them both
-        if (String(character.categoryId) !== String(action.category.id)) {
           return character
-        }
+        })
+      }
 
-        return {
-          ...character,
-          categoryId: null,
-        }
-      })
+      case ADD_TEMPLATE_TO_CHARACTER:
+        return state.map((character) => {
+          if (character.id === action.id) {
+            if (character.templates.some(({ id }) => id === action.templateData.id)) {
+              return character
+            }
+            const newCharacter = cloneDeep(character)
+            newCharacter.templates.push({
+              id: action.templateData.id,
+              version: action.templateData.version,
+              attributes: action.templateData.attributes,
+              value: '',
+            })
+            return newCharacter
+          } else {
+            return character
+          }
+        })
 
-    default:
-      return state
+      case EDIT_CHARACTER_ATTRIBUTE:
+        if (
+          action.oldAttribute.type != 'text' &&
+          action.oldAttribute.name == action.newAttribute.name
+        )
+          return state
+
+        return state.map((c) => {
+          let ch = cloneDeep(c)
+
+          if (action.oldAttribute.name != action.newAttribute.name) {
+            ch[action.newAttribute.name] = ch[action.oldAttribute.name]
+            delete ch[action.oldAttribute.name]
+          }
+
+          // reset value to blank string
+          // (if changing to something other than text type)
+          // see ../selectors/customAttributes.js for when this is allowed
+          if (action.oldAttribute.type == 'text') {
+            let desc = ch[action.newAttribute.name]
+            if (desc && desc.length && typeof desc !== 'string') {
+              desc = ''
+            }
+            ch[action.newAttribute.name] = desc
+          }
+          return ch
+        })
+
+      case ATTACH_CHARACTER_TO_CARD:
+        return state.map((character) => {
+          let cards = cloneDeep(character.cards)
+          cards.push(action.id)
+          return character.id === action.characterId
+            ? Object.assign({}, character, { cards: cards })
+            : character
+        })
+
+      case REMOVE_CHARACTER_FROM_CARD:
+        return state.map((character) => {
+          let cards = cloneDeep(character.cards)
+          cards.splice(cards.indexOf(action.id), 1)
+          return character.id === action.characterId
+            ? Object.assign({}, character, { cards: cards })
+            : character
+        })
+
+      case ATTACH_CHARACTER_TO_NOTE:
+        return state.map((character) => {
+          let notes = cloneDeep(character.noteIds)
+          notes.push(action.id)
+          return character.id === action.characterId
+            ? Object.assign({}, character, { noteIds: notes })
+            : character
+        })
+
+      case REMOVE_CHARACTER_FROM_NOTE:
+        return state.map((character) => {
+          let notes = cloneDeep(character.noteIds)
+          notes.splice(notes.indexOf(action.id), 1)
+          return character.id === action.characterId
+            ? Object.assign({}, character, { noteIds: notes })
+            : character
+        })
+
+      case ATTACH_TAG_TO_CHARACTER:
+        return state.map((character) => {
+          let tags = cloneDeep(character.tags)
+          tags.push(action.tagId)
+          return character.id === action.id
+            ? Object.assign({}, character, { tags: tags })
+            : character
+        })
+
+      case REMOVE_TAG_FROM_CHARACTER:
+        return state.map((character) => {
+          let tags = cloneDeep(character.tags)
+          tags.splice(tags.indexOf(action.tagId), 1)
+          return character.id === action.id
+            ? Object.assign({}, character, { tags: tags })
+            : character
+        })
+
+      case DELETE_TAG:
+        return state.map((character) => {
+          if (character.tags.includes(action.id)) {
+            let tags = cloneDeep(character.tags)
+            tags.splice(tags.indexOf(action.id), 1)
+            return Object.assign({}, character, { tags: tags })
+          } else {
+            return character
+          }
+        })
+
+      case ATTACH_BOOK_TO_CHARACTER:
+        return state.map((character) => {
+          let bookIds = cloneDeep(character.bookIds)
+          bookIds.push(action.bookId)
+          return character.id === action.id
+            ? Object.assign({}, character, { bookIds: bookIds })
+            : character
+        })
+
+      case REMOVE_BOOK_FROM_CHARACTER:
+        return state.map((character) => {
+          let bookIds = cloneDeep(character.bookIds)
+          bookIds.splice(bookIds.indexOf(action.bookId), 1)
+          return character.id === action.id
+            ? Object.assign({}, character, { bookIds: bookIds })
+            : character
+        })
+
+      case REMOVE_TEMPLATE_FROM_CHARACTER:
+        return state.map((character) => {
+          if (character.id !== action.id) return character
+          const newTemplates = character.templates.filter((t) => t.id != action.templateId)
+          return Object.assign({}, character, { templates: newTemplates })
+        })
+
+      case DELETE_NOTE:
+        return state.map((character) => {
+          let notes = cloneDeep(character.noteIds)
+          notes.splice(notes.indexOf(action.id), 1)
+          return Object.assign({}, character, { noteIds: notes })
+        })
+
+      case DELETE_CARD:
+        return state.map((character) => {
+          let cards = cloneDeep(character.cards)
+          cards.splice(cards.indexOf(action.id), 1)
+          return Object.assign({}, character, { cards: cards })
+        })
+
+      case DELETE_CHARACTER:
+        return state.filter((character) => character.id !== action.id)
+
+      case DELETE_IMAGE:
+        return state.map((ch) => {
+          if (action.id == ch.imageId) {
+            return {
+              ...ch,
+              imageId: null,
+            }
+          } else {
+            return ch
+          }
+        })
+
+      case RESET:
+      case FILE_LOADED:
+        return action.data.characters.map((character) => {
+          const normalizeRCEContent = repair('normalizeRCEContent')
+          return {
+            ...character,
+            ...applyToCustomAttributes(
+              character,
+              normalizeRCEContent,
+              action.data.customAttributes.characters,
+              'paragraph'
+            ),
+            notes: normalizeRCEContent(character.notes),
+          }
+        })
+
+      case NEW_FILE:
+        return newFileCharacters
+
+      case DELETE_CHARACTER_CATEGORY:
+        return state.map((character) => {
+          // In one case the ids are strings and the other they are numbers
+          // so just to be safe string them both
+          if (String(character.categoryId) !== String(action.category.id)) {
+            return character
+          }
+
+          return {
+            ...character,
+            categoryId: null,
+          }
+        })
+
+      case LOAD_CHARACTERS:
+        return action.characters
+
+      default:
+        return state
+    }
   }
-}
 
 export default characters

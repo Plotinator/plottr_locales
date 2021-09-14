@@ -3,6 +3,8 @@ import { DASHED, DOTTED, nextBorderStyle, NONE, SOLID } from '../store/borderSty
 import { hierarchyLevel } from '../store/initialState'
 import { t } from 'plottr_locales'
 
+import { getTextColor } from './colors'
+
 export const borderStyleToCss = (borderStyle) => {
   switch (borderStyle) {
     case NONE:
@@ -28,10 +30,12 @@ export const hierarchyToStyles = (
   { level, textSize, borderStyle, backgroundColor },
   timelineSize,
   hovering,
-  theme
+  theme,
+  isDarkMode,
+  featureFlags
 ) => ({
   ...{
-    color: nullIfNone(theme.textColor),
+    color: nullIfNone(getTextColor(theme.textColor, isDarkMode, featureFlags.BEAT_HIERARCHY)),
     lineHeight: `${textSize}px`,
     backgroundColor: nullIfNone(backgroundColor),
   },
@@ -54,6 +58,7 @@ export const hierarchyToStyles = (
 const LEVEL_NAMES = [t('Scene'), t('Chapter'), t('Act')]
 
 export const nextLevelName = (depth) => {
+  if (depth == 'default') return t('Chapter')
   return LEVEL_NAMES[depth] || `Level-${depth + 1}`
 }
 
