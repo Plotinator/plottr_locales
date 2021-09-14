@@ -10,7 +10,7 @@ import Leaf from './Leaf'
 import Element from './Element'
 import { createEditor } from './helpers'
 import { useRegisterEditor } from './editor-registry'
-import { withEditState } from './withEditState'
+import { useEditState } from './withEditState'
 
 const HOTKEYS = {
   'mod+b': 'bold',
@@ -76,7 +76,7 @@ const RichTextEditorConnector = (connector) => {
     }, [autoFocus, editorWrapperRef])
 
     // State management
-    const [value, currentSelection, key, onValueChanged, onKeyDown] = withEditState(
+    const [value, currentSelection, key, onValueChanged, onKeyDown] = useEditState(
       editor,
       id,
       fileId,

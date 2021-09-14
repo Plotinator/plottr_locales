@@ -203,7 +203,7 @@ export const editsConflict = (editsAfter, operationsToApply) => {
  *   documented it here because I think that this is where it's most
  *   useful to know about it.
  */
-export const withEditState = (
+export const useEditState = (
   editor,
   editorId,
   fileId,
