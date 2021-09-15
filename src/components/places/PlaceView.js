@@ -204,6 +204,7 @@ const PlaceViewConnector = (connector) => {
                 <FormGroup>
                   <ControlLabel>{i18n('Notes')}</ControlLabel>
                   <RichText
+                    id={`place-${place.id}-notes`}
                     description={place.notes}
                     onChange={this.handleNotesChanged}
                     selection={this.props.selection}

@@ -164,6 +164,9 @@ const EditAttributeConnector = (connector) => {
           <div>
             <Label />
             <RichText
+              id={`${
+                templateAttribute ? 'template-attribute' : 'custom-attribute'
+              }-${name}-${type}-${inputId}`}
               description={value || []}
               onChange={onChange}
               selection={selection}
