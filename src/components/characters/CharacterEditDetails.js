@@ -115,9 +115,10 @@ const CharacterEditDetailsConnector = (connector) => {
       })
     }
 
-    handleNotesChanged = (value) => {
+    handleNotesChanged = (value, selection) => {
       this.props.actions.editCharacter(this.props.character.id, {
-        notes: value,
+        ...(value ? { notes: value } : {}),
+        selection,
       })
     }
 
