@@ -116,10 +116,14 @@ const CharacterEditDetailsConnector = (connector) => {
     }
 
     handleNotesChanged = (value, selection) => {
-      this.props.actions.editCharacter(this.props.character.id, {
-        ...(value ? { notes: value } : {}),
-        selection,
-      })
+      this.props.actions.editCharacter(
+        this.props.character.id,
+        {
+          ...helpers.editors.attrIfPresent('notes', value),
+        },
+        this.props.editorPath,
+        selection
+      )
     }
 
     handleAttrChange = (attrName) => (desc, selection) => {
