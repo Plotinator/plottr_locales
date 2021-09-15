@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react'
-import { PropTypes } from 'prop-types'
+import React from 'react'
 import { t as i18n } from 'plottr_locales'
 
 const DarkOptionsSelect = (connector) => {
@@ -7,14 +6,8 @@ const DarkOptionsSelect = (connector) => {
     platform: { useSettingsInfo, setDarkMode },
   } = connector
 
-  const DarkOptionsSelect = ({ darkModeIsOn, setDarkModeIsOn }) => {
+  const DarkOptionsSelect = () => {
     const [settings, _, saveSetting] = useSettingsInfo()
-
-    useEffect(() => {
-      if (settings.user.dark !== darkModeIsOn) {
-        setDarkModeIsOn(settings.user.dark === 'dark')
-      }
-    }, [darkModeIsOn])
 
     const changeSetting = (ev) => {
       saveSetting('user.dark', ev.target.value)
@@ -30,28 +23,7 @@ const DarkOptionsSelect = (connector) => {
     )
   }
 
-  DarkOptionsSelect.propTypes = {
-    darkModeIsOn: PropTypes.bool,
-    setDarkModeIsOn: PropTypes.func.isRequired,
-  }
-
-  const {
-    pltr: { selectors, actions },
-    redux,
-  } = connector
-
-  if (redux) {
-    const { connect } = redux
-
-    return connect(
-      (state) => ({
-        darkModeIsOn: selectors.isDarkModeSelector(state.present),
-      }),
-      { setDarkModeIsOn: actions.ui.setDarkMode }
-    )(DarkOptionsSelect)
-  }
-
-  throw new Error('Could not connect DarkOptionsSelect')
+  return DarkOptionsSelect
 }
 
 export default DarkOptionsSelect
