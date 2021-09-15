@@ -22,6 +22,7 @@ import ClientIdMinter from './client-id-minter'
 import FileListListener from './file-list-listener'
 import Renamer from './renamer'
 import PasswordForm, { passwordSet } from './password-form'
+import SettingsConsistencyChecker from './settings-consistency-checker'
 
 const modalStyles = {
   overlay: {
@@ -50,6 +51,7 @@ const Root = () => {
         <PlottrModal isOpen={!passwordSet()} style={modalStyles}>
           <PasswordForm />
         </PlottrModal>
+        <SettingsConsistencyChecker />
         <Renamer />
         <FileListListener />
         <SessionObserver />
