@@ -181,9 +181,7 @@ const platform = {
     },
   },
   updateLanguage: (newLanguage) => {
-    // TODO: Not working:
-    // settings.set('locale', newLanguage)
-    // setupI18n(settings, {})
+    // Nop: This is handled adequately by OptionsHome.
   },
   updateBeatHierarchyFlag: (newValue) => {
     if (newValue) {
