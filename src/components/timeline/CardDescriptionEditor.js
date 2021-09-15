@@ -18,7 +18,6 @@ const CardDescriptionEditorConnector = (connector) => {
   } = connector
 
   const CardDescriptionEditor = ({
-    fileId,
     cardId,
     description,
     selection,
@@ -39,7 +38,6 @@ const CardDescriptionEditorConnector = (connector) => {
     return (
       <RichText
         id={`card.description-${cardId}`}
-        fileId={fileId}
         description={description}
         selection={selection}
         onChange={handleDescriptionChange}
@@ -56,7 +54,6 @@ const CardDescriptionEditorConnector = (connector) => {
     selection: PropTypes.object.isRequired,
     editCardAttributes: PropTypes.func.isRequired,
     darkMode: PropTypes.bool.isRequired,
-    fileId: PropTypes.string,
   }
 
   const {
@@ -75,7 +72,6 @@ const CardDescriptionEditorConnector = (connector) => {
           helpers.editors.cardDescriptionEditorPath(ownProps.cardId)
         ),
         darkMode: selectors.isDarkModeSelector(state.present),
-        fileId: selectors.selectedFileIdSelector(state.present),
       }),
       { editCardAttributes: actions.card.editCardAttributes }
     )(React.memo(CardDescriptionEditor, areEqual))

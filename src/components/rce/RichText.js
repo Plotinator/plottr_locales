@@ -23,7 +23,6 @@ const RichTextConnector = (connector) => {
       body = (
         <RichTextEditor
           id={props.id}
-          fileId={props.fileId}
           className={props.className}
           onChange={props.onChange}
           autoFocus={props.autofocus}
@@ -55,7 +54,6 @@ const RichTextConnector = (connector) => {
 
   RichText.propTypes = {
     id: PropTypes.string,
-    fileId: PropTypes.string,
     description: PropTypes.any,
     selection: PropTypes.object,
     onChange: PropTypes.func,
