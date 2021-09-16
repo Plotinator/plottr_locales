@@ -739,7 +739,11 @@ export const allTemplateUrlsForUser = (userId) => {
 
 export const listenToCustomTemplates = (userId, callback) => {
   const interval = setInterval(() => {
-    callback(allTemplateUrlsForUser(userId))
+    allTemplateUrlsForUser(userId)
+      .then((urls) =>
+        Promise.all(urls.map((url) => fetch(url).then((response) => response.json())))
+      )
+      .then(callback)
   }, 5000)
 
   return () => {
