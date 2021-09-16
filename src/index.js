@@ -655,6 +655,7 @@ export const saveBackup = (userId, file) => {
             storagePath: path,
             startOfSession: false,
             fileId,
+            fileName: file.project.selectedFile.fileName,
             lastModified: new Date(),
           })
         })
@@ -666,7 +667,9 @@ export const saveBackup = (userId, file) => {
         backupTime: startOfToday,
         fileId,
         storagePath: path,
+        fileName: file.project.selectedFile.fileName,
         startOfSession: true,
+        lastModified: new Date(),
       })
     })
   })
@@ -674,9 +677,13 @@ export const saveBackup = (userId, file) => {
 
 export const listenForBackups = (userId, onBackupsChanged) => {
   return database()
-    .collection('backup/${userId}/files')
-    .onSnapshot((documentRef) => {
-      onBackupsChanged(documentRef.data())
+    .collection(`backup/${userId}/files`)
+    .onSnapshot((documentsRef) => {
+      const documents = []
+      documentsRef.forEach((document) => {
+        documents.push(document.data())
+      })
+      onBackupsChanged(documents)
     })
 }
 
@@ -687,7 +694,7 @@ const formatDate = (date) => {
 const toBackupPath = (userId, fileId, date, startOfSession) => {
   return `storage://backups/${userId}/${fileId}/${formatDate(date)}${
     startOfSession ? '-(start-of-session)' : ''
-  }`
+  }.pltr`
 }
 
 const withoutStorageProtocal = (path) => {
@@ -779,6 +786,10 @@ export const saveImageToStorageFromURL = (userId, imageName, imageUrl) => {
   return imagetoBlob(imageUrl).then((response) => {
     return saveImageToStorageBlob(userId, imageName, response.blob())
   })
+}
+
+export const backupPublicURL = (storageProtocolURL) => {
+  return storage().ref().child(withoutStorageProtocal(storageProtocolURL)).getDownloadURL()
 }
 
 export const imagePublicURL = (storageProtocolURL) => {
