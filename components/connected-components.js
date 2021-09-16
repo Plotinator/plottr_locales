@@ -17,6 +17,7 @@ import {
   listenForChangesToEditor,
   deleteChangeSignal,
   deleteOldChanges,
+  backupPublicURL,
 } from 'plottr_firebase'
 import {
   getTemplateById,
@@ -285,7 +286,10 @@ const platform = {
     link.remove()
   },
   showItemInFolder: (fileName) => {
-    // Nop
+    if (isStorageURL(fileName)) {
+      backupPublicURL(fileName).then((url) => window.open(url, '_blank'))
+    }
+    console.error('Attempted to open file at: ', fileName)
   },
   tempFilesPath: 'TODO',
   mpq: {
