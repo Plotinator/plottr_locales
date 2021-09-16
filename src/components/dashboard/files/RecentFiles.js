@@ -118,6 +118,7 @@ const RecentFilesConnector = (connector) => {
                 <FileActions
                   missing={!!missing}
                   id={id}
+                  fileName={f.fileName}
                   filePath={f.path || f.id}
                   openFile={openFile}
                 />
