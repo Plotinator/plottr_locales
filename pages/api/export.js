@@ -45,30 +45,32 @@ export default (req, res) => {
             const nextBucket = result[0]
               ? Promise.resolve(bucket)
               : bucket.create().then((result) => result[0])
-            nextBucket.upload(
-              `/tmp/fileToExport.${extension}`,
-              {
-                destination: bucket.file(`/tmp/fileToExport.${extension}`),
-                resumable: false,
-              },
-              (err, storedFile) => {
-                if (err) {
-                  console.error('Error: ', err)
-                  reject(err)
-                  return
+            nextBucket.then((currentBucket) => {
+              currentBucket.upload(
+                `/tmp/fileToExport.${extension}`,
+                {
+                  destination: bucket.file(`/tmp/fileToExport.${extension}`),
+                  resumable: false,
+                },
+                (err, storedFile) => {
+                  if (err) {
+                    console.error('Error: ', err)
+                    reject(err)
+                    return
+                  }
+                  console.log(`Stored file on firestore at: tmp/${file.file.fileName}.${extension}`)
+                  console.log('file: ', storedFile)
+                  storedFile.makePublic().then((result) => {
+                    console.log('result of make public', result)
+                    const url = storedFile.publicUrl
+                    console.log('Redirecting to: ', url)
+                    res.status(302)
+                    res.setHeader('Location', url)
+                    resolve()
+                  })
                 }
-                console.log(`Stored file on firestore at: tmp/${file.file.fileName}.${extension}`)
-                console.log('file: ', storedFile)
-                storedFile.makePublic().then((result) => {
-                  console.log('result of make public', result)
-                  const url = storedFile.publicUrl
-                  console.log('Redirecting to: ', url)
-                  res.status(302)
-                  res.setHeader('Location', url)
-                  resolve()
-                })
-              }
-            )
+              )
+            })
           })
         }
       },
