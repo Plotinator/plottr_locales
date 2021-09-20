@@ -11,7 +11,7 @@ const Download = ({ withFullFileState }) => {
     <Button
       onClick={() => {
         withFullFileState((state) => {
-          fileDownload(JSON.stringify(state.present), state.present.file.fileName)
+          fileDownload(JSON.stringify(state.present), `${state.present.file.fileName}.pltr`)
         })
       }}
     >
