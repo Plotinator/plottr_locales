@@ -27,7 +27,7 @@ const HelpHomeConnector = (connector) => {
 
     const RenderWebView = () => {
       if (os === 'unknown') {
-        return <iframe src="https://docs.plottr.com" />
+        return <iframe src="https://docs.plottr.com" sandbox="allow-forms allow-scripts" />
       }
 
       return React.createElement('webview', {
