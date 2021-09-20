@@ -1,5 +1,6 @@
 const admin = require('firebase-admin')
 import askToExport from '../../lib/exporter/start_export'
+import AdmZip from 'adm-zip'
 
 if (!admin.apps.length) {
   if (process.env.FIREBASE_ENV === 'development') {
@@ -25,9 +26,10 @@ export default (req, res) => {
   const file = req.body.file
   const config = req.body.config
   const extension = config.type === 'scrivener' ? 'scrivener' : 'docx'
+  const savedFilePath = `/tmp/fileToExport.${extension}`
   return new Promise((resolve, reject) => {
     askToExport(
-      `/tmp/fileToExport.${extension}`,
+      savedFilePath,
       file,
       config.type,
       config,
@@ -36,7 +38,18 @@ export default (req, res) => {
           res.status(503)
           reject(res.json({ error }))
         } else {
-          console.log('Saved file at: ', `/tmp/fileToExport.${extension}`)
+          console.log('Saved file at: ', savedFilePath)
+          const uploadFilePath =
+            config.type === 'scrivener' ? `/tmp/fileToExport.zip` : `/tmp/fileToExport.${extension}`
+          if (config.type === 'scrivener') {
+            const zip = new AdmZip()
+            zip.addLocalFolder(savedFilePath)
+            zip.writeZip(uploadFilePath)
+          }
+          const destinationFilePath =
+            config.type === 'scrivener'
+              ? `tmp/${file.file.fileName}.zip`
+              : `tmp/${file.file.fileName}.${extension}`
           const bucket = storage.bucket(baseBucket)
           bucket.exists().then((result) => {
             const nextBucket = result[0]
@@ -44,9 +57,9 @@ export default (req, res) => {
               : bucket.create().then((result) => result[0])
             nextBucket.then((currentBucket) => {
               currentBucket.upload(
-                `/tmp/fileToExport.${extension}`,
+                savedFilePath,
                 {
-                  destination: bucket.file(`tmp/${file.file.fileName}.${extension}`),
+                  destination: bucket.file(destinationFilePath),
                   resumable: false,
                 },
                 (err, storedFile) => {
@@ -55,7 +68,7 @@ export default (req, res) => {
                     reject(err)
                     return
                   }
-                  console.log(`Stored file on firestore at: tmp/${file.file.fileName}.${extension}`)
+                  console.log(`Stored file on firestore at: ${destinationFilePath}`)
                   storedFile.makePublic().then((result) => {
                     const url = storedFile.publicUrl()
                     console.log('Redirecting to: ', url)
