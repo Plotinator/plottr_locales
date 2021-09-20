@@ -46,7 +46,7 @@ export default (req, res) => {
               currentBucket.upload(
                 `/tmp/fileToExport.${extension}`,
                 {
-                  destination: bucket.file(`tmp/fileToExport.${extension}`),
+                  destination: bucket.file(`tmp/${file.file.fileName}.${extension}`),
                   resumable: false,
                 },
                 (err, storedFile) => {
@@ -56,13 +56,12 @@ export default (req, res) => {
                     return
                   }
                   console.log(`Stored file on firestore at: tmp/${file.file.fileName}.${extension}`)
-                  console.log('file: ', storedFile)
                   storedFile.makePublic().then((result) => {
-                    console.log('result of make public', result)
                     const url = storedFile.publicUrl()
                     console.log('Redirecting to: ', url)
                     res.status(302)
                     res.setHeader('Location', url)
+                    res.send(`See: ${url}`)
                     resolve()
                   })
                 }
