@@ -1,5 +1,4 @@
 const admin = require('firebase-admin')
-import fs from 'fs'
 import askToExport from '../../lib/exporter/start_export'
 
 if (!admin.apps.length) {
@@ -18,9 +17,7 @@ if (!admin.apps.length) {
 }
 
 const baseBucket =
-  process.env.FIREBASE_ENV === 'production'
-    ? 'gs://plottr.appspot.com'
-    : 'gs://plottr-ci.appspot.com'
+  process.env.FIREBASE_ENV === 'production' ? 'plottr.appspot.com' : 'plottr-ci.appspot.com'
 
 const storage = admin.storage()
 
@@ -40,7 +37,7 @@ export default (req, res) => {
           reject(res.json({ error }))
         } else {
           console.log('Saved file at: ', `/tmp/fileToExport.${extension}`)
-          const bucket = storage.bucket('plottr-ci.appspot.com')
+          const bucket = storage.bucket(baseBucket)
           bucket.exists().then((result) => {
             const nextBucket = result[0]
               ? Promise.resolve(bucket)
