@@ -59,7 +59,7 @@ export default (req, res) => {
                   storedFile.makePublic().then((result) => {
                     const url = storedFile.publicUrl()
                     console.log('Redirecting to: ', url)
-                    res.status(302)
+                    res.status(200)
                     res.setHeader('Location', url)
                     res.send(`See: ${url}`)
                     resolve()
