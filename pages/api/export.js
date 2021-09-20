@@ -44,7 +44,7 @@ export default (req, res) => {
               : bucket.create().then((result) => result[0])
             nextBucket.then((currentBucket) => {
               currentBucket.upload(
-                `tmp/fileToExport.${extension}`,
+                `/tmp/fileToExport.${extension}`,
                 {
                   destination: bucket.file(`tmp/fileToExport.${extension}`),
                   resumable: false,
