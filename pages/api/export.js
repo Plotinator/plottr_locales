@@ -1,6 +1,7 @@
 const admin = require('firebase-admin')
 import askToExport from '../../lib/exporter/start_export'
 import AdmZip from 'adm-zip'
+import { v4 as uuidv4 } from 'uuid'
 
 if (!admin.apps.length) {
   if (process.env.FIREBASE_ENV === 'development') {
@@ -26,8 +27,9 @@ export default (req, res) => {
   const file = req.body.file
   const config = req.body.config
   const type = req.body.type
-  const extension = config.type === 'scrivener' ? 'scrivener' : 'docx'
-  const savedFilePath = `/tmp/fileToExport.${extension}`
+  const extension = type === 'scrivener' ? 'scrivener' : 'docx'
+  const baseFileName = `fileToExport-${uuidv4()}`
+  const savedFilePath = `/tmp/${baseFileName}.${extension}`
   return new Promise((resolve, reject) => {
     askToExport(
       savedFilePath,
@@ -41,7 +43,7 @@ export default (req, res) => {
         } else {
           console.log('Saved file at: ', savedFilePath)
           const uploadFilePath =
-            type === 'scrivener' ? `/tmp/fileToExport.zip` : `/tmp/fileToExport.${extension}`
+            type === 'scrivener' ? `/tmp/${baseFileName}.zip` : `/tmp/${baseFileName}.${extension}`
           if (type === 'scrivener') {
             const zip = new AdmZip()
             zip.addLocalFolder(savedFilePath)
