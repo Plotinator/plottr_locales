@@ -40,7 +40,7 @@ export default (req, res) => {
           reject(res.json({ error }))
         } else {
           console.log('Saved file at: ', `/tmp/fileToExport.${extension}`)
-          const bucket = storage.bucket(`${baseBucket}/tmp`)
+          const bucket = storage.bucket('tmp')
           bucket.exists().then((result) => {
             const nextBucket = result[0]
               ? Promise.resolve(bucket)
