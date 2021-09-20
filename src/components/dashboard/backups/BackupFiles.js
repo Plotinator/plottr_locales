@@ -37,14 +37,14 @@ const BackupFilesConnector = (connector) => {
       if (storageObject.startOfSession) {
         const nameSansStart = storageObject.fileName
         return (
-          <p>
+          <p title={nameSansStart}>
             <strong>{t('Session Start')}</strong>
             <br />
             <span>{nameSansStart}</span>
           </p>
         )
       } else {
-        return <p>{storageObject.fileName}</p>
+        return <p title={storageObject.fileName}>{storageObject.fileName}</p>
       }
     }
 
@@ -60,7 +60,9 @@ const BackupFilesConnector = (connector) => {
             onClick={() => openInFolder(filePath)}
           >
             <IoIosDocument />
-            <div>{isCloudBackup ? fileNameFromStorageObject(b) : fileNameFromPath(b)}</div>
+            <div className="dashboard__backups__item__title">
+              {isCloudBackup ? fileNameFromStorageObject(b) : fileNameFromPath(b)}
+            </div>
           </div>
         )
       }
