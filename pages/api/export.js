@@ -25,13 +25,14 @@ const storage = admin.storage()
 export default (req, res) => {
   const file = req.body.file
   const config = req.body.config
+  const type = req.body.type
   const extension = config.type === 'scrivener' ? 'scrivener' : 'docx'
   const savedFilePath = `/tmp/fileToExport.${extension}`
   return new Promise((resolve, reject) => {
     askToExport(
       savedFilePath,
       file,
-      config.type,
+      type,
       config,
       (error, filePath) => {
         if (error) {
@@ -40,14 +41,14 @@ export default (req, res) => {
         } else {
           console.log('Saved file at: ', savedFilePath)
           const uploadFilePath =
-            config.type === 'scrivener' ? `/tmp/fileToExport.zip` : `/tmp/fileToExport.${extension}`
-          if (config.type === 'scrivener') {
+            type === 'scrivener' ? `/tmp/fileToExport.zip` : `/tmp/fileToExport.${extension}`
+          if (type === 'scrivener') {
             const zip = new AdmZip()
             zip.addLocalFolder(savedFilePath)
             zip.writeZip(uploadFilePath)
           }
           const destinationFilePath =
-            config.type === 'scrivener'
+            type === 'scrivener'
               ? `tmp/${file.file.fileName}.zip`
               : `tmp/${file.file.fileName}.${extension}`
           const bucket = storage.bucket(baseBucket)
