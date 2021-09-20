@@ -7,10 +7,15 @@ import { listen, stopListening } from 'plottr_firebase'
 import { listenToCustomTemplates } from '../lib/templates'
 import { settings } from '../lib/settings'
 import { store } from '../lib/redux'
+import { closeDashboard } from '../lib/dashboard'
+
+const CURRENT_PROJECT_KEY = 'CURRENT_PROJECT'
 
 const Listener = ({
   userId,
   selectedFile,
+  selectFile,
+  fileList,
   setPermission,
   setFileLoaded,
   patchFile,
@@ -22,6 +27,21 @@ const Listener = ({
   unsetBeatHierarchy,
 }) => {
   const [unsubscribeFunctions, setUnsubscribeFunctions] = useState([])
+
+  useEffect(() => {
+    if (!selectedFile) {
+      const sessionFileId = window.sessionStorage.getItem(CURRENT_PROJECT_KEY)
+      if (sessionFileId && sessionFileId !== '') {
+        const foundInList = fileList.find(({ id }) => id === sessionFileId)
+        if (foundInList) {
+          selectFile(foundInList)
+          closeDashboard()
+        }
+      }
+    } else {
+      window.sessionStorage._setItem(CURRENT_PROJECT_KEY, selectedFile.id)
+    }
+  }, [selectedFile, fileList])
 
   useEffect(() => {
     if (selectedFile && selectedFile.none) {
@@ -75,6 +95,8 @@ Listener.propTypes = {
   userId: PropTypes.string,
   setPermission: PropTypes.func.isRequired,
   selectedFile: PropTypes.object,
+  fileList: PropTypes.array.isRequired,
+  selectFile: PropTypes.func.isRequired,
   setFileLoaded: PropTypes.func.isRequired,
   clientId: PropTypes.string,
   loadFile: PropTypes.func.isRequired,
@@ -87,6 +109,7 @@ Listener.propTypes = {
 export default connect(
   (state) => ({
     selectedFile: selectors.selectedFileSelector(state.present),
+    fileList: selectors.fileListSelector(state.present),
     userId: selectors.userIdSelector(state.present),
     clientId: selectors.clientIdSelector(state.present),
     darkMode: selectors.isDarkModeSelector(state.present),
@@ -99,5 +122,6 @@ export default connect(
     setFileLoaded: actions.project.setFileLoaded,
     setBeatHierarchy: actions.featureFlags.setBeatHierarchy,
     unsetBeatHierarchy: actions.featureFlags.unsetBeatHierarchy,
+    selectFile: actions.project.selectFile,
   }
 )(Listener)
