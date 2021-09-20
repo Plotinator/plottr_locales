@@ -47,9 +47,9 @@ export default (req, res) => {
               : bucket.create().then((result) => result[0])
             nextBucket.then((currentBucket) => {
               currentBucket.upload(
-                `/tmp/fileToExport.${extension}`,
+                `tmp/fileToExport.${extension}`,
                 {
-                  destination: bucket.file(`/tmp/fileToExport.${extension}`),
+                  destination: bucket.file(`tmp/fileToExport.${extension}`),
                   resumable: false,
                 },
                 (err, storedFile) => {
@@ -62,7 +62,7 @@ export default (req, res) => {
                   console.log('file: ', storedFile)
                   storedFile.makePublic().then((result) => {
                     console.log('result of make public', result)
-                    const url = storedFile.publicUrl
+                    const url = storedFile.publicUrl()
                     console.log('Redirecting to: ', url)
                     res.status(302)
                     res.setHeader('Location', url)
