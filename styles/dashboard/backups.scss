@@ -46,6 +46,11 @@
 
   p {
     text-align: center;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 100%;
+    display: inline-block;
   }
 
   &.icon {
@@ -66,6 +71,10 @@
     background-color: $blue-9;
     box-shadow: $blue-highlight-box-shadow;
   }
+}
+
+.dashboard__backups__item__title {
+  width: 100%;
 }
 
 .custom-file-input::-webkit-file-upload-button {
