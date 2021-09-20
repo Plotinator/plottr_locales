@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'react-proptypes'
+import { isEqual } from 'lodash'
 import {
   Form,
   FormGroup,
@@ -16,6 +17,7 @@ import cx from 'classnames'
 const EditSeriesConnector = (connector) => {
   const EditSeries = (props) => {
     const [editing, setEditing] = useState(false)
+    const [previousSeries, setPreviousSeries] = useState(props.series)
     const [details, setDetails] = useState({
       name: props.series.name,
       premise: props.series.premise,
@@ -24,15 +26,22 @@ const EditSeriesConnector = (connector) => {
     })
 
     useEffect(() => {
-      return () => {
-        if (editing) saveEdit()
+      if (!isEqual(props.series, previousSeries)) {
+        setPreviousSeries(props.series)
+        setDetails(props.series)
       }
-    }, [])
+    }, [props.series])
 
     const saveEdit = () => {
       props.actions.editSeries(details)
       setEditing(false)
     }
+
+    useEffect(() => {
+      return () => {
+        if (editing) saveEdit()
+      }
+    }, [])
 
     const checkForEdits = (e, which) => {
       const { series } = props
@@ -43,7 +52,7 @@ const EditSeriesConnector = (connector) => {
       if (series[which] != e.target.value) someEdited = true
 
       setEditing(someEdited)
-      setDetails({ [which]: e.target.value })
+      setDetails({ ...details, [which]: e.target.value })
     }
 
     const renderToolBar = () => {
