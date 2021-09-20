@@ -231,7 +231,7 @@ const platform = {
   isWindows: false,
   isMacOS: false,
   openExternal: (url) => {
-    window.location.href = url
+    window.open(url, '_blank')
   },
   createErrorReport,
   log: {
