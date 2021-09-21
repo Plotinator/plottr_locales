@@ -248,7 +248,7 @@ const platform = {
   dialog: {
     showErrorBox: (error) => {
       console.error(error)
-      alert(error)
+      if (typeof alert !== 'undefined') alert(error)
     },
   },
   showSaveDialogSync: () => {
