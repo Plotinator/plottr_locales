@@ -47,6 +47,7 @@ export default (req, res) => {
           const zip = new AdmZip()
           zip.addLocalFolder(savedFilePath)
           zip.writeZip(uploadFilePath)
+          console.log('Zipped to ', uploadFilePath)
         }
         const destinationFilePath =
           type === 'scrivener'
