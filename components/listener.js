@@ -8,8 +8,7 @@ import { listenToCustomTemplates } from '../lib/templates'
 import { settings } from '../lib/settings'
 import { store } from '../lib/redux'
 import { closeDashboard } from '../lib/dashboard'
-
-const CURRENT_PROJECT_KEY = 'CURRENT_PROJECT'
+import { setCurrentProject, currentProject } from '../lib/currentProject'
 
 const Listener = ({
   userId,
@@ -30,7 +29,7 @@ const Listener = ({
 
   useEffect(() => {
     if (!selectedFile) {
-      const sessionFileId = window.sessionStorage.getItem(CURRENT_PROJECT_KEY)
+      const sessionFileId = currentProject()
       if (sessionFileId && sessionFileId !== '') {
         const foundInList = fileList.find(({ id }) => id === sessionFileId)
         if (foundInList) {
@@ -39,7 +38,7 @@ const Listener = ({
         }
       }
     } else {
-      window.sessionStorage._setItem(CURRENT_PROJECT_KEY, selectedFile.id)
+      setCurrentProject(selectedFile.id)
     }
   }, [selectedFile, fileList])
 
