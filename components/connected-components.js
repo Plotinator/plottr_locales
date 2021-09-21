@@ -1,4 +1,5 @@
 import { connections } from 'plottr_components'
+import { ActionCreators } from 'redux-undo'
 import { history } from '../lib/history'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -65,6 +66,12 @@ const deleteFileOnFirestore = (fileId) => {
 }
 
 const platform = {
+  undo: () => {
+    store.dispatch(ActionCreators.undo())
+  },
+  redo: () => {
+    store.dispatch(ActionCreators.redo())
+  },
   appVersion: appVersion(),
   defaultBackupLocation: 'cloud',
   setDarkMode: (value) => {
