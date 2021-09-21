@@ -17,12 +17,13 @@ import { actions, selectors } from 'pltr/v2'
 import { basePath } from '../lib/basePath'
 import { useLicenseInfo } from '../lib/store_hooks'
 import { useTrialStatus } from '../lib/trialManager'
+import { currentProject } from '../lib/currentProject'
 
 const trialMode = true // TODO
 const isDev = process.env.NEXT_PUBLIC_NODE_ENV == 'development'
 
 function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
-  const [dashboardView, setDashboardView] = useState('files')
+  const [dashboardView, setDashboardView] = useState(currentProject() ? null : 'files')
   const trialInfo = useTrialStatus()
   const [_licenseInfo, licenseInfoSize] = useLicenseInfo()
   const firstTime = !licenseInfoSize && !trialInfo.started
