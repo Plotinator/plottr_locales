@@ -38,7 +38,7 @@ export default (req, res) => {
     (error, filePath) => {
       if (error) {
         res.status(503)
-        res.json({ error })
+        res.json({ error, message: error.message })
       } else {
         console.log('Saved file at: ', savedFilePath)
         const uploadFilePath =
@@ -68,7 +68,7 @@ export default (req, res) => {
                 if (err) {
                   console.error('Error: ', err)
                   res.status(503)
-                  res.json({ err })
+                  res.json({ err, message: err.message })
                   return
                 }
                 console.log(`Stored file on firestore at: ${destinationFilePath}`)
