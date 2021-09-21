@@ -50,8 +50,8 @@ export default (req, res) => {
         }
         const destinationFilePath =
           type === 'scrivener'
-            ? `tmp/${file.file.fileName}.zip`
-            : `tmp/${file.file.fileName}.${extension}`
+            ? `tmp/${uuidv4()}-${file.file.fileName}.zip`
+            : `tmp/${uuidv4()}-${file.file.fileName}.${extension}`
         const bucket = storage.bucket(baseBucket)
         bucket.exists().then((result) => {
           const nextBucket = result[0]
