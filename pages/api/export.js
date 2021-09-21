@@ -30,63 +30,61 @@ export default (req, res) => {
   const extension = type === 'scrivener' ? 'scrivener' : 'docx'
   const baseFileName = `fileToExport-${uuidv4()}`
   const savedFilePath = `/tmp/${baseFileName}.${extension}`
-  return new Promise((resolve, reject) => {
-    askToExport(
-      savedFilePath,
-      file,
-      type,
-      config,
-      (error, filePath) => {
-        if (error) {
-          res.status(503)
-          reject(res.json({ error }))
-        } else {
-          console.log('Saved file at: ', savedFilePath)
-          const uploadFilePath =
-            type === 'scrivener' ? `/tmp/${baseFileName}.zip` : `/tmp/${baseFileName}.${extension}`
-          if (type === 'scrivener') {
-            const zip = new AdmZip()
-            zip.addLocalFolder(savedFilePath)
-            zip.writeZip(uploadFilePath)
-          }
-          const destinationFilePath =
-            type === 'scrivener'
-              ? `tmp/${file.file.fileName}.zip`
-              : `tmp/${file.file.fileName}.${extension}`
-          const bucket = storage.bucket(baseBucket)
-          bucket.exists().then((result) => {
-            const nextBucket = result[0]
-              ? Promise.resolve(bucket)
-              : bucket.create().then((result) => result[0])
-            nextBucket.then((currentBucket) => {
-              currentBucket.upload(
-                savedFilePath,
-                {
-                  destination: bucket.file(destinationFilePath),
-                  resumable: false,
-                },
-                (err, storedFile) => {
-                  if (err) {
-                    console.error('Error: ', err)
-                    reject(err)
-                    return
-                  }
-                  console.log(`Stored file on firestore at: ${destinationFilePath}`)
-                  storedFile.makePublic().then((result) => {
-                    const url = storedFile.publicUrl()
-                    console.log('Redirecting to: ', url)
-                    res.status(200)
-                    res.setHeader('Location', url)
-                    res.send(`See: ${url}`)
-                    resolve()
-                  })
-                }
-              )
-            })
-          })
+  askToExport(
+    savedFilePath,
+    file,
+    type,
+    config,
+    (error, filePath) => {
+      if (error) {
+        res.status(503)
+        res.json({ error })
+      } else {
+        console.log('Saved file at: ', savedFilePath)
+        const uploadFilePath =
+          type === 'scrivener' ? `/tmp/${baseFileName}.zip` : `/tmp/${baseFileName}.${extension}`
+        if (type === 'scrivener') {
+          const zip = new AdmZip()
+          zip.addLocalFolder(savedFilePath)
+          zip.writeZip(uploadFilePath)
         }
-      },
-      false
-    )
-  })
+        const destinationFilePath =
+          type === 'scrivener'
+            ? `tmp/${file.file.fileName}.zip`
+            : `tmp/${file.file.fileName}.${extension}`
+        const bucket = storage.bucket(baseBucket)
+        bucket.exists().then((result) => {
+          const nextBucket = result[0]
+            ? Promise.resolve(bucket)
+            : bucket.create().then((result) => result[0])
+          nextBucket.then((currentBucket) => {
+            currentBucket.upload(
+              savedFilePath,
+              {
+                destination: bucket.file(destinationFilePath),
+                resumable: false,
+              },
+              (err, storedFile) => {
+                if (err) {
+                  console.error('Error: ', err)
+                  res.status(503)
+                  res.json({ err })
+                  return
+                }
+                console.log(`Stored file on firestore at: ${destinationFilePath}`)
+                storedFile.makePublic().then((result) => {
+                  const url = storedFile.publicUrl()
+                  console.log('Redirecting to: ', url)
+                  res.status(200)
+                  res.setHeader('Location', url)
+                  res.send(`See: ${url}`)
+                })
+              }
+            )
+          })
+        })
+      }
+    },
+    false
+  )
 }
