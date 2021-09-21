@@ -53,36 +53,29 @@ export default (req, res) => {
             ? `tmp/${uuidv4()}-${file.file.fileName}.zip`
             : `tmp/${uuidv4()}-${file.file.fileName}.${extension}`
         const bucket = storage.bucket(baseBucket)
-        bucket.exists().then((result) => {
-          const nextBucket = result[0]
-            ? Promise.resolve(bucket)
-            : bucket.create().then((result) => result[0])
-          nextBucket.then((currentBucket) => {
-            currentBucket.upload(
-              savedFilePath,
-              {
-                destination: bucket.file(destinationFilePath),
-                resumable: false,
-              },
-              (err, storedFile) => {
-                if (err) {
-                  console.error('Error: ', err)
-                  res.status(503)
-                  res.json({ err, message: err.message })
-                  return
-                }
-                console.log(`Stored file on firestore at: ${destinationFilePath}`)
-                storedFile.makePublic().then((result) => {
-                  const url = storedFile.publicUrl()
-                  console.log('Redirecting to: ', url)
-                  res.status(200)
-                  res.setHeader('Location', url)
-                  res.send(`See: ${url}`)
-                })
-              }
-            )
-          })
-        })
+        bucket.upload(
+          savedFilePath,
+          {
+            destination: bucket.file(destinationFilePath),
+            resumable: false,
+          },
+          (err, storedFile) => {
+            if (err) {
+              console.error('Error: ', err)
+              res.status(503)
+              res.json({ err, message: err.message })
+              return
+            }
+            console.log(`Stored file on firestore at: ${destinationFilePath}`)
+            storedFile.makePublic().then((result) => {
+              const url = storedFile.publicUrl()
+              console.log('Redirecting to: ', url)
+              res.status(200)
+              res.setHeader('Location', url)
+              res.send(`See: ${url}`)
+            })
+          }
+        )
       }
     },
     false
