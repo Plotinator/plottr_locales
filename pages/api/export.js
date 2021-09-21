@@ -41,8 +41,7 @@ export default (req, res) => {
         res.json({ error, message: error.message })
       } else {
         console.log('Saved file at: ', savedFilePath)
-        const uploadFilePath =
-          type === 'scrivener' ? `/tmp/${baseFileName}.zip` : `/tmp/${baseFileName}.${extension}`
+        const uploadFilePath = type === 'scrivener' ? `/tmp/${baseFileName}.zip` : savedFilePath
         if (type === 'scrivener') {
           const zip = new AdmZip()
           zip.addLocalFolder(savedFilePath)
@@ -55,7 +54,7 @@ export default (req, res) => {
             : `tmp/${uuidv4()}-${file.file.fileName}.${extension}`
         const bucket = storage.bucket(baseBucket)
         bucket.upload(
-          savedFilePath,
+          uploadFilePath,
           {
             destination: bucket.file(destinationFilePath),
             resumable: false,
