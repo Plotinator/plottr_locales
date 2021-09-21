@@ -32,6 +32,12 @@ const {
   card: { truncateTitle },
 } = helpers
 
+const modalStyles = {
+  content: {
+    borderRadius: 20,
+  },
+}
+
 const CardDialogConnector = (connector) => {
   const EditAttribute = UnconnectedEditAttribute(connector)
   const PlottrModal = UnconnectedPlottrModal(connector)
@@ -654,7 +660,7 @@ const CardDialogConnector = (connector) => {
     render() {
       const { cardId, ui } = this.props
       return (
-        <PlottrModal isOpen={true} onRequestClose={this.saveAndClose}>
+        <PlottrModal isOpen={true} onRequestClose={this.saveAndClose} style={modalStyles}>
           {this.renderDelete()}
           {this.renderRemoveTemplate()}
           {this.renderTemplatePicker()}
