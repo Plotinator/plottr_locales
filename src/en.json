@@ -1082,6 +1082,9 @@
   "Save as Template": {
     "message": "Save as Template"
   },
+  "Save as\nTemplate": {
+    "message": "Save as\nTemplate"
+  },
   "Save as": {
     "message": "Save as"
   },
@@ -1364,6 +1367,12 @@
   "Use Template": {
     "message": "Use Template"
   },
+  "Use Book\nTemplate": {
+    "message": "Use Book\nTemplate"
+  },
+  "Use Scene\nTemplate": {
+    "message": "Use Scene\nTemplate"
+  },
   "Use a different email": {
     "message": "Use a different email"
   },
@@ -1624,6 +1633,9 @@
   },
   "to activate this device.": {
     "message": "to activate this device."
+  },
+  "Use Template": {
+    "message": "Use\nTemplate"
   },
   "with an iOS mobile subscription!": {
     "message": "with an iOS mobile subscription!"
