@@ -21,6 +21,7 @@ const RECEIVED_OPERATIONS = 'RECEIVED_OPERATIONS'
 const CONTENT_EDITED = 'CONTENT_EDITED'
 const UPDATED_EDIT_TIME_STAMPS = 'UPDATED_EDIT_TIME_STAMPS'
 const UPDATED_FROM_INITIAL_VALUE = 'UPDATED_FROM_INITIAL_VALUE'
+const UNDONE = 'UNDONE'
 const KEY_PRESSED = 'KEY_PRESSED'
 const CONFLICT_DETECTED = 'CONFLICT_DETECTED'
 const RESET_FROM_INITIAL_VALUE = 'RESET_FROM_INITIAL_VALUE'
@@ -419,6 +420,10 @@ export const useEditState = (
   }
 
   const handleNewValueFromSlate = (newValue) => {
+    if (state.current === UNDONE) {
+      state.current = UPDATED_FROM_INITIAL_VALUE
+      return
+    }
     if (state.current !== RECEIVED_OPERATIONS) {
       recordHistoryOfEdits()
     }
@@ -429,10 +434,13 @@ export const useEditState = (
   const handleNewInitialValue = () => {
     const { value, selection } = valueAndSelection
     // undoId goes null when we undo.
-    if (!undoId || !value || !selection) {
+    if (!undoId) {
+      state.current = UNDONE
+    } else if (!value || !selection) {
       state.current = UPDATED_FROM_INITIAL_VALUE
-      setEditorState(useTextConverter(initialValue), initialSelection)
     }
+    setEditorState(useTextConverter(initialValue), initialSelection)
+    editor.selection = initialSelection
   }
 
   const handleOtherEditorChange = (latestEditsPerEditor) => {
