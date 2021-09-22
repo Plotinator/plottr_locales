@@ -300,6 +300,7 @@ export const useEditState = (
         } else {
           editor.apply(operation.operation)
         }
+        editor.operations = []
         if (latestEdits.current[operation.editorKey].read < operation.editNumber) {
           latestEdits.current[operation.editorKey].read = operation.editNumber
         }
