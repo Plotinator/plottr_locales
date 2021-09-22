@@ -243,6 +243,7 @@ export const useEditState = (
   const lastPublished = useRef(-1)
   const valueUpdateTimer = useRef(null)
   const deferredOperationsToApply = useRef([])
+  const deferredValuesToUpdate = useRef({ value: null, selection: null })
 
   // # State Updaters
 
@@ -382,8 +383,12 @@ export const useEditState = (
     if (valueUpdateTimer.current) {
       clearTimeout(valueUpdateTimer.current)
     }
+    deferredValuesToUpdate.current.value = value || deferredValuesToUpdate.current.value
+    deferredValuesToUpdate.current.selection = selection || deferredValuesToUpdate.current.selection
     valueUpdateTimer.current = setTimeout(() => {
-      onValueChanged(value, selection)
+      onValueChanged(deferredValuesToUpdate.current.value, deferredValuesToUpdate.current.selection)
+      deferredValuesToUpdate.current.value = null
+      deferredValuesToUpdate.current.selection = null
       valueUpdateTimer.current = null
     }, 500)
   }
