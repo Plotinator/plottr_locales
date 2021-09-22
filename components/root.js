@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Router, Switch, Route } from 'react-router-dom'
 import { Provider } from 'react-redux'
+import { ActionCreators } from 'redux-undo'
 import Head from 'next/head'
 
 import { PlottrModal } from 'connected-components'
@@ -45,7 +46,39 @@ const modalStyles = {
   },
 }
 
+const redo = () => {
+  store.dispatch(ActionCreators.redo())
+}
+
+const undo = () => {
+  store.dispatch(ActionCreators.undo())
+}
+
 const Root = () => {
+  useEffect(() => {
+    const listener = (event) => {
+      if (event.key === 'z' && (event.ctrlKey || event.metaKey)) {
+        event.preventDefault()
+        if (event.shiftKey) {
+          redo()
+        } else {
+          undo()
+        }
+        return
+      }
+      // On Linux, redo is CTRL+y
+      if (event.key === 'y' && event.ctrlKey) {
+        event.preventDefault()
+        redo()
+        return
+      }
+    }
+    document.addEventListener('keydown', listener)
+    return () => {
+      document.removeEventListener('keydown', listener)
+    }
+  }, [])
+
   return (
     <Provider store={store}>
       <Head>
