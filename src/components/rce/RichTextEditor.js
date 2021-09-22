@@ -133,7 +133,7 @@ const RichTextEditorConnector = (connector) => {
 
     useEffect(() => {
       return () => {
-        onValueChanged(null, {})
+        onValueChanged(null, null)
       }
     }, [])
 
