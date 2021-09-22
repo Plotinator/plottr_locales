@@ -6,11 +6,11 @@ import { permissionError } from '../actions/error'
 const externalSync = (patch, withData) => (store) => (next) => (action) => {
   const result = next(action)
 
-  const { present, past } = store.getState()
+  const { future, present, past } = store.getState()
   const fileId = present.file.id
   const clientId = present.client.clientId
   if (fileId) {
-    const previous = past[past.length - 1]
+    const previous = action.type === '@@redux-undo/UNDO' ? future[0] : past[past.length - 1]
     Object.keys(present).forEach((key) => {
       if (
         action.type === 'PERMISSION_ERROR' ||
