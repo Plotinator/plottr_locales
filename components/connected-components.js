@@ -238,7 +238,8 @@ const platform = {
   isWindows: false,
   isMacOS: false,
   openExternal: (url) => {
-    window.open(url, '_blank')
+    const withProtocol = url.match(/^[a-z]+:\/\//) ? url : `https://${url}`
+    window.open(withProtocol, '_blank')
   },
   createErrorReport,
   log: {
