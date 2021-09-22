@@ -396,7 +396,7 @@ export const useEditState = (
   const updateValueAndSelection = (newValue) => {
     const { value, selection } = valueAndSelection
     if (!isEqual(selection, editor.selection)) {
-      const nextSelection = { ...editor.selection }
+      const nextSelection = editor.selection === null ? null : { ...editor.selection }
       setEditorState(newValue, nextSelection)
       if (value !== newValue) {
         deboundecOnUpdateValue(newValue, nextSelection)
