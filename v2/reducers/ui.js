@@ -10,6 +10,7 @@ import {
   EDIT_PLACES_ATTRIBUTE,
   EXPAND_TIMELINE,
   FILE_LOADED,
+  LOAD_BEATS,
   LOAD_UI,
   NAVIGATE_TO_BOOK_TIMELINE,
   NEW_FILE,
@@ -47,6 +48,16 @@ const ui =
           currentTimeline: action.id,
           timelineScrollPosition: { x: 0, y: 0 },
         })
+
+      case LOAD_BEATS: {
+        if (!action.beats[state.currentTimeline]) {
+          return {
+            ...state,
+            currentTimeline: Object.keys(action.beats)[0],
+          }
+        }
+        return state
+      }
 
       case NAVIGATE_TO_BOOK_TIMELINE:
         return Object.assign({}, state, {
