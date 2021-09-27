@@ -118,7 +118,7 @@ const onSnapshot = (
 }
 
 const listenToFile = (store, userId, fileId, clientId) => {
-  const withIsCloud = (x) => ({ ...x, isCloudFile: true })
+  const withIsCloud = (x) => ({ ...x, isCloudFile: true, id: fileId })
   return database()
     .collection('file')
     .doc(fileId)
@@ -196,7 +196,7 @@ export const listen = (store, userId, fileId, clientId, fileVersion) => {
     listenToTags(store, userId, fileId, clientId),
     listenTohierarchyLevels(store, userId, fileId, clientId),
     listenToImages(store, userId, fileId, clientId),
-    listenToClient(store, userId, fileId, clientId)
+    listenToClient(store, userId, fileId, clientId),
   ]
   return unsubscribeFunctions
 }
@@ -246,7 +246,7 @@ const fetchBeats = (userId, fileId, clientId, version) => {
 }
 
 const fetchFile = (userId, fileId, clientId) => {
-  const withIsCloud = (x) => ({ ...x, isCloudFile: true })
+  const withIsCloud = (x) => ({ ...x, isCloudFile: true, id: fileId })
   const path = 'file'
   return database()
     .collection(path)
