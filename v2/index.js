@@ -93,7 +93,9 @@ import { emptyFile } from './store/newFileState'
 import * as newIds from './store/newIds'
 import * as borderStyle from './store/borderStyle'
 
-import externalSync from './middlewares/externalSync'
+import externalSync, {
+  externalSyncWithoutHistory
+} from './middlewares/externalSync'
 
 import { ARRAY_KEYS } from './middlewares/array-keys'
 
@@ -198,6 +200,7 @@ const slate = {
 
 const middlewares = {
   externalSync,
+  externalSyncWithoutHistory,
 }
 
 export {
