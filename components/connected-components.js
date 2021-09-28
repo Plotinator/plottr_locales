@@ -1,4 +1,5 @@
 import { connections } from 'plottr_components'
+import { ActionCreators } from 'redux-undo'
 import { history } from '../lib/history'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -65,6 +66,12 @@ const deleteFileOnFirestore = (fileId) => {
 }
 
 const platform = {
+  undo: () => {
+    store.dispatch(ActionCreators.undo())
+  },
+  redo: () => {
+    store.dispatch(ActionCreators.redo())
+  },
   appVersion: appVersion(),
   defaultBackupLocation: 'cloud',
   setDarkMode: (value) => {
@@ -231,7 +238,8 @@ const platform = {
   isWindows: false,
   isMacOS: false,
   openExternal: (url) => {
-    window.location.href = url
+    const withProtocol = url.match(/^[a-z]+:\/\//) ? url : `https://${url}`
+    window.open(withProtocol, '_blank')
   },
   createErrorReport,
   log: {
@@ -248,7 +256,7 @@ const platform = {
   dialog: {
     showErrorBox: (error) => {
       console.error(error)
-      alert(error)
+      if (typeof alert !== 'undefined') alert(error)
     },
   },
   showSaveDialogSync: () => {

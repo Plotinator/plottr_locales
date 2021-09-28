@@ -1,7 +1,9 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Router, Switch, Route } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { PropTypes } from 'prop-types'
+import { ActionCreators } from 'redux-undo'
+import Head from 'next/head'
 
 import { PlottrModal } from 'connected-components'
 import { history } from '../lib/history'
@@ -45,12 +47,69 @@ const modalStyles = {
   },
 }
 
+const redo = () => {
+  store.dispatch(ActionCreators.redo())
+}
+
+const undo = () => {
+  store.dispatch(ActionCreators.undo())
+}
+
 const Root = ({ projectId }) => {
-  if (projectId) {
-    // open the correct project
-  }
+  useEffect(() => {
+    const listener = (event) => {
+      if (event.key === 'z' && (event.ctrlKey || event.metaKey)) {
+        event.preventDefault()
+        if (event.shiftKey) {
+          redo()
+        } else {
+          undo()
+        }
+        return
+      }
+      // On Linux, redo is CTRL+y
+      if (event.key === 'y' && event.ctrlKey) {
+        event.preventDefault()
+        redo()
+        return
+      }
+    }
+    document.addEventListener('keydown', listener)
+    return () => {
+      document.removeEventListener('keydown', listener)
+    }
+  }, [])
+  useEffect(() => {
+    if (projectId) {
+      // open the correct project
+    }
+  }, [projectId])
+
   return (
     <Provider store={store}>
+      <Head>
+        <title>Plottr</title>
+        <meta name="description" content="Plottr" />
+        <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link rel="manifest" href="/site.webmanifest" />
+        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
+        <meta name="msapplication-TileColor" content="#da532c" />
+        <meta name="theme-color" content="#ffffff" />
+        <script>
+          {`var beamer_config = {
+            product_id: 'IgDazaTp8480',
+            selector: '#beamer-bell',
+            lazy: true,
+          }`}
+        </script>
+        <script
+          type="text/javascript"
+          async
+          src="https://app.getbeamer.com/js/beamer-embed.js"
+        ></script>
+      </Head>
       <React.StrictMode>
         <PlottrModal isOpen={!passwordSet()} style={modalStyles}>
           <PasswordForm />
