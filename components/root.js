@@ -1,6 +1,7 @@
 import React from 'react'
 import { Router, Switch, Route } from 'react-router-dom'
 import { Provider } from 'react-redux'
+import { PropTypes } from 'prop-types'
 
 import { PlottrModal } from 'connected-components'
 import { history } from '../lib/history'
@@ -44,7 +45,10 @@ const modalStyles = {
   },
 }
 
-const Root = () => {
+const Root = ({ projectId }) => {
+  if (projectId) {
+    // open the correct project
+  }
   return (
     <Provider store={store}>
       <React.StrictMode>
@@ -76,6 +80,10 @@ const Root = () => {
       </React.StrictMode>
     </Provider>
   )
+}
+
+Root.propTypes = {
+  projectId: PropTypes.string,
 }
 
 export default Root
