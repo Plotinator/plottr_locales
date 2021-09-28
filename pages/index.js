@@ -4,10 +4,10 @@ import { useRouter } from 'next/router'
 
 export default function Home() {
   const router = useRouter()
-  const { projectId } = router.query
+  const { pid } = router.query
 
-  // now use projectId to redirect
-  const loginURL = `/login${projectId ? '/' + projectId : ''}`
+  // now use pid to redirect
+  const loginURL = `/login${pid ? '?pid=' + pid : ''}`
 
   return (
     <div className="home">
