@@ -7,9 +7,9 @@ const Root = dynamic(() => import('../components/root'), {
 
 const Timeline = (props) => {
   const router = useRouter()
-  const { projectId } = router.query
+  const { pid } = router.query
 
-  return <Root {...props} projectId={projectId} />
+  return <Root {...props} projectId={pid} />
 }
 
 export default Timeline

@@ -11,14 +11,14 @@ import PasswordForm, { passwordSet } from '../components/password-form'
 export default function Login() {
   const [sessionChecked, setSessionChecked] = useState(false)
   const router = useRouter()
-  const { projectId } = router.query
+  const { pid } = router.query
 
   useEffect(() => {
     if (sessionChecked) return
     onSessionChange((user) => {
       setSessionChecked(true)
       if (user) {
-        const url = `/timeline${projectId ? '/' + projectId : ''}`
+        const url = `/timeline${pid ? '?pid=' + pid : ''}`
         window.location.href = url
       }
     })
