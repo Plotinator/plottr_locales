@@ -82,6 +82,7 @@ const Root = ({ projectId }) => {
   useEffect(() => {
     if (projectId) {
       // open the correct project
+      console.log('PROJECT ID', projectId)
     }
   }, [projectId])
 
