@@ -2,6 +2,9 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 
+// Routing:
+// https://nextjs.org/docs/routing/introduction
+// https://nextjs.org/docs/routing/dynamic-routes
 export default function Home() {
   const router = useRouter()
   const { pid } = router.query
