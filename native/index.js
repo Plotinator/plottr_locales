@@ -50,6 +50,43 @@ export const fetchFiles = (userId) => {
     })
 }
 
+export const listenToFiles = (userId, callback) => {
+  return database()
+    .collection(`authorisation/${userId}/granted`)
+    .onSnapshot(
+      (authorisationsRef) => {
+        const authorisedDocuments = []
+        authorisationsRef.forEach((authorisation) => {
+          const document = database()
+            .collection(`file`)
+            .doc(authorisation.id)
+            .get()
+            .then((file) => ({
+              id: file.id,
+              ...file.data(),
+              ...authorisation.data()
+            }))
+          authorisedDocuments.push(document)
+        })
+        Promise.all(authorisedDocuments)
+          .then((documents) => {
+            return documents.map((document) => {
+              return {
+                ...document,
+                cloudFile: true
+              }
+            })
+          })
+          .then((authorisedDocuments) => {
+            callback(authorisedDocuments)
+          })
+      },
+      (error) => {
+        console.error('Error listening to files', error)
+      }
+    )
+}
+
 const patchActions = (path) => {
   switch (path) {
     case 'beats':
