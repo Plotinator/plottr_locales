@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { actions } from 'pltr/v2'
 import { listenToFiles, onSessionChange } from 'plottr_firebase'
 
-const SessionObserver = ({ setUserId, setFileList }) => {
+const SessionObserver = ({ setUserId, setFileList, setEmailAddress }) => {
   useEffect(() => {
     let fileListener = null
     const sessionListener = onSessionChange((user) => {
@@ -13,6 +13,7 @@ const SessionObserver = ({ setUserId, setFileList }) => {
         window.location.href = '/login'
       } else {
         setUserId(user.uid)
+        setEmailAddress(user.email)
         fileListener = listenToFiles(user.uid, (files) => {
           const activeFiles = files.filter(({ deleted }) => !deleted)
           setFileList(activeFiles)
@@ -35,4 +36,5 @@ SessionObserver.propTypes = {
 export default connect(null, {
   setFileList: actions.project.setFileList,
   setUserId: actions.client.setUserId,
+  setEmailAddress: actions.client.setEmailAddress,
 })(SessionObserver)
