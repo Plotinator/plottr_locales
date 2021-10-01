@@ -307,6 +307,9 @@ const platform = {
       console.warn('TODO: implement MPQ!')
     },
   },
+  handleCustomerServiceCode: () => {
+    // TODO
+  },
   browserHistory: history,
   inBrowser: true,
   templatesDisabled: false,
