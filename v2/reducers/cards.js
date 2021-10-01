@@ -269,7 +269,10 @@ const cards =
           // see ../selectors/customAttributes.js for when this is allowed
           if (action.oldAttribute.type === 'text') {
             let description = newCard[action.newAttribute.name]
-            if (description && description.length && typeof description !== 'string') {
+            if (
+              !description ||
+              (description && description.length && typeof description !== 'string')
+            ) {
               description = ''
             }
             newCard[action.newAttribute.name] = description
@@ -374,13 +377,13 @@ const cards =
           const normalizeRCEContent = repair('normalizeRCEContent')
           return {
             ...card,
-            description: normalizeRCEContent(card.description),
             ...applyToCustomAttributes(
               card,
               normalizeRCEContent,
               action.data.customAttributes.scenes,
               'paragraph'
             ),
+            description: normalizeRCEContent(card.description),
           }
         })
 

@@ -18,6 +18,7 @@ import * as tourActions from './actions/tours'
 import * as errorActions from './actions/error'
 import * as permissionActions from './actions/permission'
 import * as projectActions from './actions/project'
+import * as clientActions from './actions/client'
 import * as editorActions from './actions/editors'
 
 import * as ActionTypes from './constants/ActionTypes'
@@ -57,6 +58,7 @@ import * as tourSelector from './selectors/tours'
 import * as errorSelectors from './selectors/error'
 import * as permissionSelectors from './selectors/permission'
 import * as projectSelectors from './selectors/project'
+import * as clientSelectors from './selectors/client'
 import * as actionSelectors from './selectors/actions'
 import * as editorsSelectors from './selectors/editors'
 
@@ -82,6 +84,7 @@ import featureFlagReducer from './reducers/featureFlags'
 import tourReducer from './reducers/tours'
 import errorReducer from './reducers/error'
 import permissionReducer from './reducers/permission'
+import clientReducer from './reducers/client'
 import editorsReducer from './reducers/editors'
 
 import * as initialState from './store/initialState'
@@ -89,6 +92,12 @@ import * as lineColors from './store/lineColors'
 import { emptyFile } from './store/newFileState'
 import * as newIds from './store/newIds'
 import * as borderStyle from './store/borderStyle'
+
+import externalSync, {
+  externalSyncWithoutHistory
+} from './middlewares/externalSync'
+
+import { ARRAY_KEYS } from './middlewares/array-keys'
 
 import * as tree from './reducers/tree'
 
@@ -117,6 +126,7 @@ const reducers = {
   tour: tourReducer,
   error: errorReducer,
   permission: permissionReducer,
+  client: clientReducer,
   editors: editorsReducer,
 }
 
@@ -139,6 +149,7 @@ const selectors = {
   ...errorSelectors,
   ...permissionSelectors,
   ...projectSelectors,
+  ...clientSelectors,
   ...actionSelectors,
   ...editorsSelectors,
 }
@@ -164,6 +175,7 @@ const actions = {
   error: errorActions,
   permission: permissionActions,
   project: projectActions,
+  client: clientActions,
   editors: editorActions,
 }
 
@@ -186,6 +198,11 @@ const slate = {
   plain: { serialize: serializeToPlain },
 }
 
+const middlewares = {
+  externalSync,
+  externalSyncWithoutHistory,
+}
+
 export {
   actions,
   ActionTypes,
@@ -206,4 +223,6 @@ export {
   tree,
   borderStyle,
   slate,
+  middlewares,
+  ARRAY_KEYS,
 }
