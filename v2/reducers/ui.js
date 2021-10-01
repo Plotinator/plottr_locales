@@ -176,7 +176,6 @@ const ui =
         return state
     }
   }
-}
 
 function timeline(state = defaultUI.timeline, action) {
   switch (action.type) {
