@@ -43,6 +43,7 @@ const EditAttributeConnector = (connector) => {
     removeAttribute,
     editAttribute,
     reorderAttribute,
+    editorPath,
   }) => {
     const [deleting, setDeleting] = useState(false)
     const [editing, setEditing] = useState(false)
@@ -164,9 +165,7 @@ const EditAttributeConnector = (connector) => {
           <div>
             <Label />
             <RichText
-              id={`${
-                templateAttribute ? 'template-attribute' : 'custom-attribute'
-              }-${name}-${type}-${inputId}`}
+              id={editorPath}
               description={value || []}
               onChange={onChange}
               selection={selection}

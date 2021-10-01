@@ -165,7 +165,7 @@ const CardViewConnector = (connector) => {
         <div className="outline__description__editing">
           <RichText
             autofocus
-            id={`card.description-${this.props.card.id}`}
+            id={this.editorPath}
             className="outline__description"
             onChange={this.handleDescriptionChange}
             description={description}
