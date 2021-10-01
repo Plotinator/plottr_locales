@@ -5,6 +5,7 @@ import { Button } from 'react-bootstrap'
 import cx from 'classnames'
 import { t as i18n } from 'plottr_locales'
 import isHotkey from 'is-hotkey'
+import { Transforms } from 'slate'
 import { Slate, Editable, ReactEditor } from 'slate-react'
 import UnconnectedToolBar from './ToolBar'
 import { toggleMark } from './MarkButton'
@@ -14,6 +15,8 @@ import { Spinner } from '../Spinner'
 import { createEditor } from './helpers'
 import { useRegisterEditor } from './editor-registry'
 import { useEditState } from './withEditState'
+
+import { checkDependencies } from '../checkDependencies'
 
 const HOTKEYS = {
   'mod+b': 'bold',
@@ -25,6 +28,7 @@ const RichTextEditorConnector = (connector) => {
   const {
     platform: {
       storage: { imagePublicURL, isStorageURL },
+      log,
       openExternal,
       publishRCEOperations,
       fetchRCEOperations,
@@ -37,6 +41,19 @@ const RichTextEditorConnector = (connector) => {
       listenForRCELock,
     },
   } = connector
+  checkDependencies({
+    imagePublicURL,
+    isStorageURL,
+    log,
+    openExternal,
+    publishRCEOperations,
+    fetchRCEOperations,
+    listenForChangesToEditor,
+    deleteChangeSignal,
+    deleteOldChanges,
+    undo,
+    redo,
+  })
 
   const ToolBar = UnconnectedToolBar(connector)
 
@@ -165,6 +182,29 @@ const RichTextEditorConnector = (connector) => {
       }
     }
 
+    const handleInput = (e) => {
+      e.stopPropagation()
+      try {
+        const domPoint = ReactEditor.toDOMPoint(editor, editor.selection.anchor)
+        // domPoint.nodeValue is the whole line, we just want the corrected word
+        const selectionBegin = editor.selection.anchor.offset
+        const substr = domPoint[0].nodeValue.substr(selectionBegin)
+        let endIndex = substr.search(/\W/) // first non-word character
+        if (endIndex == -1) {
+          // the word is the last on the line with no characters (space/period) after it
+          endIndex = undefined
+        }
+        const correctedWord = substr.substring(0, endIndex)
+        if (correctedWord) {
+          Transforms.delete(editor, { at: editor.selection })
+          Transforms.insertText(editor, correctedWord, { at: editor.selection })
+          Transforms.collapse(editor, { edge: 'anchor' })
+        }
+      } catch (error) {
+        log.warn(error)
+      }
+    }
+
     useEffect(() => {
       return () => {
         onValueChanged(null, null)
@@ -179,7 +219,7 @@ const RichTextEditorConnector = (connector) => {
       editorWrapperRef.firstChild.focus()
     }
 
-    if (!value) return null
+    if (value === null) return null
 
     if (!lock) {
       return <Spinner />
@@ -218,6 +258,7 @@ const RichTextEditorConnector = (connector) => {
               placeholder={i18n('Enter some text...')}
               onKeyDown={handleKeyDown}
               onKeyUp={handleKeyUp}
+              onInput={handleInput}
             />
           </div>
         </div>
@@ -244,6 +285,7 @@ const RichTextEditorConnector = (connector) => {
     redux,
     pltr: { selectors },
   } = connector
+  checkDependencies({ redux, selectors })
 
   if (redux) {
     const { connect } = redux

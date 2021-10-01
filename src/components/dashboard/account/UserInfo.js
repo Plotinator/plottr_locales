@@ -2,14 +2,14 @@ import React, { useState } from 'react'
 import PropTypes from 'react-proptypes'
 import { t } from 'plottr_locales'
 import { Button } from 'react-bootstrap'
-import UnconnectedDeleteConfirmModal from '../../dialogs/DeleteConfirmModal'
+import DeleteConfirmModal from '../../dialogs/DeleteConfirmModal'
+import { checkDependencies } from '../../checkDependencies'
 
 const UserInfoConnector = (connector) => {
-  const DeleteConfirmModal = UnconnectedDeleteConfirmModal(connector)
-
   const {
     platform: { machineIdSync },
   } = connector
+  checkDependencies({ machineIdSync })
 
   const deviceID = machineIdSync(true)
 
