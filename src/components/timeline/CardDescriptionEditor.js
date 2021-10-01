@@ -39,7 +39,7 @@ const CardDescriptionEditorConnector = (connector) => {
 
     return (
       <RichText
-        id={`card.description-${cardId}`}
+        id={editorPath}
         description={description}
         selection={selection}
         onChange={handleDescriptionChange}
