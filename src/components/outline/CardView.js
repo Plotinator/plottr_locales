@@ -10,6 +10,8 @@ import UnconnectedSelectList from '../SelectList'
 import cx from 'classnames'
 import { FaGripLinesVertical, FaCircle } from 'react-icons/fa'
 
+import { checkDependencies } from '../checkDependencies'
+
 const CardViewConnector = (connector) => {
   const RichText = UnconnectedRichText(connector)
   const Image = UnconnectedImage(connector)
@@ -18,6 +20,7 @@ const CardViewConnector = (connector) => {
   const {
     pltr: { helpers },
   } = connector
+  checkDependencies({ helpers })
 
   class CardView extends Component {
     constructor(props) {
@@ -31,6 +34,18 @@ const CardViewConnector = (connector) => {
 
       this.editorPath = helpers.editors.cardDescriptionEditorPath(props.card.id)
       this.titleInputRef = null
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+      const stateChanged = Object.keys(nextState).reduce((acc, key) => {
+        return acc || nextState[key] !== this.state[key]
+      }, false)
+      const propsChanged = Object.keys(nextProps).reduce((acc, key) => {
+        if (key === 'card' || key === 'selection') return acc
+        return acc || nextProps[key] !== this.props[key]
+      }, false)
+      const tagsChanged = this.props.card.tags !== nextProps.card.tags
+      return stateChanged || propsChanged || tagsChanged
     }
 
     componentWillUnmount() {
@@ -150,9 +165,10 @@ const CardViewConnector = (connector) => {
     renderDescription() {
       const { description } = this.props.card
       return (
-        <div className="outline__description__editing">
+        <div className="outline__description__editing" onKeyDown={this.handleEsc}>
           <RichText
             autofocus
+            id={this.editorPath}
             className="outline__description"
             onChange={this.handleDescriptionChange}
             description={description}
@@ -210,6 +226,12 @@ const CardViewConnector = (connector) => {
       if (!card.tags.length && !card.characters.length && !card.places.length) return null
 
       return <div className="divider" />
+    }
+
+    componentDidUpdate() {
+      if (this.props.isClickedOutside && this.state.editing) {
+        this.saveEdit()
+      }
     }
 
     render() {
@@ -298,12 +320,14 @@ const CardViewConnector = (connector) => {
     ui: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired,
     images: PropTypes.object,
+    isClickedOutside: PropTypes.bool,
   }
 
   const {
     redux,
     pltr: { selectors, actions },
   } = connector
+  checkDependencies({ redux, selectors, actions })
 
   if (redux) {
     const { connect, bindActionCreators } = redux

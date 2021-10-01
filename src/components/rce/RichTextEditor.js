@@ -1,16 +1,22 @@
-import React, { useCallback, useMemo, useState, useEffect, useRef } from 'react'
+import React, { useCallback, useMemo, useState, useEffect } from 'react'
 import PropTypes from 'react-proptypes'
 import { isEqual } from 'lodash'
+import { Button } from 'react-bootstrap'
 import cx from 'classnames'
 import { t as i18n } from 'plottr_locales'
 import isHotkey from 'is-hotkey'
+import { Transforms } from 'slate'
 import { Slate, Editable, ReactEditor } from 'slate-react'
 import UnconnectedToolBar from './ToolBar'
 import { toggleMark } from './MarkButton'
 import Leaf from './Leaf'
 import Element from './Element'
-import { useTextConverter, createEditor } from './helpers'
+import { Spinner } from '../Spinner'
+import { createEditor } from './helpers'
 import { useRegisterEditor } from './editor-registry'
+import { useEditState } from './withEditState'
+
+import { checkDependencies } from '../checkDependencies'
 
 const HOTKEYS = {
   'mod+b': 'bold',
@@ -20,12 +26,39 @@ const HOTKEYS = {
 
 const RichTextEditorConnector = (connector) => {
   const {
-    platform: { openExternal, undo, redo },
+    platform: {
+      storage: { imagePublicURL, isStorageURL },
+      log,
+      openExternal,
+      publishRCEOperations,
+      fetchRCEOperations,
+      listenForChangesToEditor,
+      deleteChangeSignal,
+      deleteOldChanges,
+      undo,
+      redo,
+      lockRCE,
+      listenForRCELock,
+    },
   } = connector
+  checkDependencies({
+    imagePublicURL,
+    isStorageURL,
+    log,
+    openExternal,
+    publishRCEOperations,
+    fetchRCEOperations,
+    listenForChangesToEditor,
+    deleteChangeSignal,
+    deleteOldChanges,
+    undo,
+    redo,
+  })
 
   const ToolBar = UnconnectedToolBar(connector)
 
   const RichTextEditor = ({
+    id,
     undoId,
     text,
     selection,
@@ -33,64 +66,83 @@ const RichTextEditorConnector = (connector) => {
     className,
     autoFocus,
     onChange,
+    fileId,
+    clientId,
+    isCloudFile,
+    emailAddress,
   }) => {
     const editor = useMemo(() => {
       return createEditor()
     }, [])
+    const registerEditor = useRegisterEditor(editor)
+
+    const [lock, setLock] = useState(isCloudFile ? null : true)
+    const [stealingLock, setStealingLock] = useState(false)
+
+    // Rendering helpers
     const renderLeaf = useCallback((props) => <Leaf {...props} />, [])
     const renderElement = useCallback(
-      (innerProps) => <Element {...innerProps} openExternal={openExternal} />,
+      (innerProps) => (
+        <Element
+          {...innerProps}
+          openExternal={openExternal}
+          imagePublicURL={imagePublicURL}
+          isStorageURL={isStorageURL}
+        />
+      ),
       [openExternal]
     )
-    const [value, setValue] = useState(null)
-    const [editorSelection, setEditorSelection] = useState({ ...editor.selection })
-    const [editorWrapperRef, setEditorWrapperRef] = useState(null)
-    const key = useRef(Math.random().toString(16))
+
+    const stealLock = useCallback(() => {
+      setStealingLock(true)
+      lockRCE(fileId, id, clientId, emailAddress)
+        .then(() => {
+          setStealingLock(false)
+        })
+        .catch((error) => {
+          console.error('Error stealing the lock for editor: ', id)
+          setStealingLock(false)
+        })
+    }, [fileId, id, clientId, emailAddress])
+
+    // Check for edit locks
     useEffect(() => {
-      // undoId goes null when we undo.
-      if (!undoId || !value || !editorSelection) {
-        setValue(useTextConverter(text)) // eslint-disable-line
-        if (selection && selection.anchor && selection.focus) {
-          editor.selection = selection
-          setEditorSelection(selection)
-        } else {
-          setEditorSelection({ ...editor.selection })
+      return listenForRCELock(fileId, id, clientId, (lockResult) => {
+        if (!isEqual(lockResult, lock)) {
+          setLock(lockResult)
+          if (!lockResult || !lockResult.clientId) {
+            stealLock()
+          }
         }
-      }
-    }, [text, undoId])
+      })
+    }, [setLock, fileId, lock, id, clientId, stealLock])
+
+    // Focus on first render
+    const [editorWrapperRef, setEditorWrapperRef] = useState(null)
     useEffect(() => {
       if (autoFocus && editorWrapperRef && editorWrapperRef.firstChild) {
         editorWrapperRef.firstChild.focus()
       }
     }, [autoFocus, editorWrapperRef])
 
-    const registerEditor = useRegisterEditor(editor)
-
-    if (!value) return null
-
-    const updateValue = (newVal) => {
-      setValue(newVal)
-
-      // Rules for changing are complicated because we need to support
-      // editors which don't use programatic undo and therefore don't
-      // track the current selection.
-      if (
-        selection &&
-        editor.selection &&
-        !isEqual(editorSelection, editor.selection) &&
-        editor.selection.anchor &&
-        editor.selection.focus
-      ) {
-        setEditorSelection({ ...editor.selection })
-        if (value !== newVal) {
-          onChange(newVal, { ...editor.selection })
-        } else {
-          onChange(null, { ...editor.selection })
-        }
-      } else if (value !== newVal) {
-        onChange(newVal)
-      }
-    }
+    // State management
+    const [value, currentSelection, key, onValueChanged, onKeyDown] = useEditState(
+      editor,
+      id,
+      fileId,
+      clientId,
+      onChange,
+      publishRCEOperations,
+      fetchRCEOperations,
+      listenForChangesToEditor,
+      deleteChangeSignal,
+      deleteOldChanges,
+      undo,
+      redo,
+      text,
+      selection,
+      undoId
+    )
 
     const handleKeyDown = (event) => {
       // If we don't have a selection, then the editor can't support
@@ -124,6 +176,7 @@ const RichTextEditorConnector = (connector) => {
           toggleMark(editor, mark)
         }
       }
+      onKeyDown(event)
     }
 
     const handleKeyUp = () => {
@@ -152,6 +205,35 @@ const RichTextEditorConnector = (connector) => {
       }
     }
 
+    const handleInput = (e) => {
+      e.stopPropagation()
+      try {
+        const domPoint = ReactEditor.toDOMPoint(editor, editor.selection.anchor)
+        // domPoint.nodeValue is the whole line, we just want the corrected word
+        const selectionBegin = editor.selection.anchor.offset
+        const substr = domPoint[0].nodeValue.substr(selectionBegin)
+        let endIndex = substr.search(/\W/) // first non-word character
+        if (endIndex == -1) {
+          // the word is the last on the line with no characters (space/period) after it
+          endIndex = undefined
+        }
+        const correctedWord = substr.substring(0, endIndex)
+        if (correctedWord) {
+          Transforms.delete(editor, { at: editor.selection })
+          Transforms.insertText(editor, correctedWord, { at: editor.selection })
+          Transforms.collapse(editor, { edge: 'anchor' })
+        }
+      } catch (error) {
+        log.warn(error)
+      }
+    }
+
+    useEffect(() => {
+      return () => {
+        onValueChanged(null, null)
+      }
+    }, [])
+
     const handleClickEditable = (event) => {
       if (!editorWrapperRef) return
       if (editorWrapperRef.firstChild.contains(event.target)) return
@@ -160,11 +242,28 @@ const RichTextEditorConnector = (connector) => {
       editorWrapperRef.firstChild.focus()
     }
 
+    if (value === null) return null
+
+    if (!lock) {
+      return <Spinner />
+    }
+
+    if (lock.clientId && lock.clientId !== clientId) {
+      return (
+        <>
+          <p>Editor is currently locked by {lock.emailAddress}.</p>
+          <Button disabled={stealingLock} onClick={stealLock}>
+            Steal lock
+          </Button>
+        </>
+      )
+    }
+
     const otherProps = {}
     return (
-      <Slate editor={editor} value={value} onChange={updateValue} key={key.current}>
+      <Slate editor={editor} value={value} onChange={onValueChanged} key={key.current}>
         <div className={cx('slate-editor__wrapper', className)}>
-          <ToolBar editor={editor} darkMode={darkMode} selection={editorSelection} />
+          <ToolBar editor={editor} darkMode={darkMode} selection={currentSelection} />
           <div
             // the firstChild will be the contentEditable dom node
             ref={(e) => {
@@ -182,6 +281,7 @@ const RichTextEditorConnector = (connector) => {
               placeholder={i18n('Enter some text...')}
               onKeyDown={handleKeyDown}
               onKeyUp={handleKeyUp}
+              onInput={handleInput}
             />
           </div>
         </div>
@@ -191,24 +291,34 @@ const RichTextEditorConnector = (connector) => {
 
   RichTextEditor.propTypes = {
     text: PropTypes.any,
+    id: PropTypes.string,
+    fileId: PropTypes.string,
     selection: PropTypes.object,
     onChange: PropTypes.func,
     autoFocus: PropTypes.bool,
     darkMode: PropTypes.bool,
     className: PropTypes.string,
     undoId: PropTypes.string,
+    clientId: PropTypes.string,
+    isCloudFile: PropTypes.bool,
+    emailAddress: PropTypes.string,
   }
 
   const {
     redux,
     pltr: { selectors },
   } = connector
+  checkDependencies({ redux, selectors })
 
   if (redux) {
     const { connect } = redux
 
     return connect((state) => ({
       undoId: selectors.undoIdSelector(state.present),
+      clientId: selectors.clientIdSelector(state.present),
+      fileId: selectors.selectedFileIdSelector(state.present),
+      isCloudFile: selectors.isCloudFileSelector(state.present),
+      emailAddress: selectors.emailAddressSelector(state.present),
     }))(RichTextEditor)
   }
 

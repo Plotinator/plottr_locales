@@ -3,22 +3,36 @@ import PropTypes from 'react-proptypes'
 import { t } from 'plottr_locales'
 import { Dropdown, MenuItem, Glyphicon } from 'react-bootstrap'
 import DeleteConfirmModal from '../../dialogs/DeleteConfirmModal'
+import { checkDependencies } from '../../checkDependencies'
 
 const FileActionsConnector = (connector) => {
   const {
     platform: {
       file: { deleteKnownFile, removeFromKnownFiles, isTempFile, basename, renameFile },
-      isMacOs,
+      isMacOS,
       showItemInFolder,
+      os,
     },
   } = connector
+  checkDependencies({
+    deleteKnownFile,
+    removeFromKnownFiles,
+    isTempFile,
+    basename,
+    renameFile,
+    isMacOS,
+    showItemInFolder,
+    os,
+  })
+
+  const osIsUnknown = os === 'unknown'
 
   let showInMessage = t('Show in File Explorer')
-  if (isMacOs) {
+  if (isMacOS) {
     showInMessage = t('Show in Finder')
   }
 
-  const FileActions = ({ missing, id, filePath, openFile }) => {
+  const FileActions = ({ missing, id, fileName, filePath, openFile }) => {
     const [deleting, setDeleting] = useState(false)
 
     const deleteFile = () => {
@@ -36,7 +50,11 @@ const FileActionsConnector = (connector) => {
       const name = basename(filePath)
 
       return (
-        <DeleteConfirmModal name={name} onDelete={deleteFile} onCancel={() => setDeleting(false)} />
+        <DeleteConfirmModal
+          name={fileName || name}
+          onDelete={deleteFile}
+          onCancel={() => setDeleting(false)}
+        />
       )
     }
 
@@ -60,7 +78,7 @@ const FileActionsConnector = (connector) => {
       }
     }
 
-    const isTemp = isTempFile(filePath)
+    const isTemp = filePath && isTempFile(filePath)
 
     return (
       <div className="dashboard__recent-files__file-actions">
@@ -71,10 +89,10 @@ const FileActionsConnector = (connector) => {
           </Dropdown.Toggle>
           <Dropdown.Menu>
             {missing ? null : <MenuItem eventKey="open">{t('Open')}</MenuItem>}
-            {missing ? null : <MenuItem eventKey="show">{showInMessage}</MenuItem>}
+            {osIsUnknown || missing ? null : <MenuItem eventKey="show">{showInMessage}</MenuItem>}
             {missing ? null : <MenuItem eventKey="rename">{t('Rename')}</MenuItem>}
             {missing ? null : <MenuItem eventKey="delete">{t('Delete')}</MenuItem>}
-            {(isTemp || missing) && (
+            {(isTemp || missing) && !osIsUnknown && (
               <MenuItem eventKey="remove">{t('Remove from this list')}</MenuItem>
             )}
           </Dropdown.Menu>
@@ -87,6 +105,7 @@ const FileActionsConnector = (connector) => {
     missing: PropTypes.bool,
     id: PropTypes.string,
     filePath: PropTypes.string,
+    fileName: PropTypes.string,
     openFile: PropTypes.func,
   }
 

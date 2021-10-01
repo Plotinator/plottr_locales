@@ -1,9 +1,17 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'react-proptypes'
 import { useSelected, useFocused } from 'slate-react'
 import cx from 'classnames'
 
-const Element = ({ attributes, children, element, openExternal }) => {
+const Element = ({ attributes, children, element, openExternal, isStorageURL, imagePublicURL }) => {
+  const [publicImageUrl, setPublicImageUrl] = useState(null)
+
+  useEffect(() => {
+    if (element.type === 'image-link' && element.storageUrl) {
+      imagePublicURL(element.storageUrl).then(setPublicImageUrl)
+    }
+  }, [isStorageURL, imagePublicURL, element.type])
+
   const selected = useSelected()
   const focused = useFocused()
   switch (element.type) {
@@ -36,7 +44,10 @@ const Element = ({ attributes, children, element, openExternal }) => {
           href={element.url}
           rel="noreferrer"
           target="_blank"
-          onClick={() => openExternal(element.url)}
+          onClick={(event) => {
+            event.preventDefault()
+            openExternal(element.url)
+          }}
         >
           {children}
         </a>
@@ -46,7 +57,7 @@ const Element = ({ attributes, children, element, openExternal }) => {
         <div {...attributes}>
           <div contentEditable={false}>
             <img
-              src={element.url}
+              src={publicImageUrl}
               className={cx('slate-editor__image-link', { selected: selected && focused })}
             />
           </div>
@@ -77,8 +88,11 @@ Element.propTypes = {
     type: PropTypes.string,
     url: PropTypes.string,
     data: PropTypes.string,
+    storageUrl: PropTypes.string,
   }),
   openExternal: PropTypes.func.isRequired,
+  isStorageURL: PropTypes.func.isRequired,
+  imagePublicURL: PropTypes.func.isRequired,
 }
 
 export default React.memo(Element)

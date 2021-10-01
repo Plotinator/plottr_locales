@@ -5,6 +5,23 @@ import DeleteConfirmModal from './dialogs/DeleteConfirmModal'
 import { FormControl, FormGroup, ControlLabel, Glyphicon, Button } from 'react-bootstrap'
 import cx from 'classnames'
 
+import { checkDependencies } from './checkDependencies'
+
+const areEqual = (prevProps, nextProps) => {
+  for (const key of Object.keys(prevProps)) {
+    if (
+      key === 'selection' ||
+      ('value' && nextProps.type === prevProps.type && nextProps.type === 'paragraph')
+    ) {
+      continue
+    }
+    if (prevProps[key] !== nextProps[key]) {
+      return false
+    }
+  }
+  return true
+}
+
 const EditAttributeConnector = (connector) => {
   const RichText = RichTextConnector(connector)
 
@@ -12,7 +29,10 @@ const EditAttributeConnector = (connector) => {
     platform: { undo, redo },
   } = connector
 
+  checkDependencies({ undo, redo })
+
   const EditAttribute = ({
+    entityType,
     templateAttribute,
     name,
     type,
@@ -28,6 +48,7 @@ const EditAttributeConnector = (connector) => {
     removeAttribute,
     editAttribute,
     reorderAttribute,
+    editorPath,
   }) => {
     const [deleting, setDeleting] = useState(false)
     const [editing, setEditing] = useState(false)
@@ -149,6 +170,7 @@ const EditAttributeConnector = (connector) => {
           <div>
             <Label />
             <RichText
+              id={editorPath}
               description={value || []}
               onChange={onChange}
               selection={selection}
@@ -199,6 +221,8 @@ const EditAttributeConnector = (connector) => {
     redux,
     pltr: { actions, selectors },
   } = connector
+
+  checkDependencies({ redux, actions, selectors })
 
   if (redux) {
     const { connect, bindActionCreators } = redux
@@ -255,7 +279,7 @@ const EditAttributeConnector = (connector) => {
         selection: selectors.selectionSelector(state.present, ownProps.editorPath),
       }),
       mapDispatchToProps
-    )(EditAttribute)
+    )(React.memo(EditAttribute, areEqual))
   }
 
   throw new Error('No connecter found for EditAttribute')

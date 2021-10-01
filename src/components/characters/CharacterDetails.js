@@ -5,6 +5,8 @@ import { t } from 'plottr_locales'
 import UnconnectedRichText from '../rce/RichText'
 import UnconnectedImage from '../images/Image'
 
+import { checkDependencies } from '../checkDependencies'
+
 const CharacterDetailsConnector = (connector) => {
   const RichText = UnconnectedRichText(connector)
   const Image = UnconnectedImage(connector)
@@ -15,6 +17,8 @@ const CharacterDetailsConnector = (connector) => {
     },
   } = connector
 
+  checkDependencies({ getTemplateById })
+
   class CharacterDetails extends Component {
     render() {
       const { character, ui, customAttributes, categories } = this.props
@@ -24,7 +28,11 @@ const CharacterDetailsConnector = (connector) => {
         if (type == 'paragraph') {
           desc = (
             <dd>
-              <RichText description={character[name]} darkMode={ui.darkMode} />
+              <RichText
+                id={`character.${character.id}.attribute.${name}`}
+                description={character[name]}
+                darkMode={ui.darkMode}
+              />
             </dd>
           )
         } else {
@@ -39,16 +47,17 @@ const CharacterDetailsConnector = (connector) => {
       })
       const templateNotes = character.templates.map((t) => {
         const templateData = getTemplateById(t.id)
+        const templateValues = character.templates.find((template) => t.id === template.id)
         const attrs = t.attributes.map((attr) => {
           let val
           if (attr.type == 'paragraph') {
             val = (
               <dd>
-                <RichText description={attr.value} darkMode={ui.darkMode} />
+                <RichText description={templateValues[attr.name]} darkMode={ui.darkMode} />
               </dd>
             )
           } else {
-            val = <dd>{attr.value}</dd>
+            val = <dd>{templateValues[attr.name]}</dd>
           }
           return (
             <dl key={attr.name} className="dl-horizontal">
@@ -58,8 +67,8 @@ const CharacterDetailsConnector = (connector) => {
           )
         })
         return (
-          <React.Fragment key={t.id}>
-            <p>{templateData.name}</p>
+          <React.Fragment key={template.id}>
+            <p>{templateData.name || template.name || t('Template')}</p>
             {attrs}
           </React.Fragment>
         )
@@ -85,7 +94,11 @@ const CharacterDetailsConnector = (connector) => {
                 <dl className="dl-horizontal">
                   <dt>{t('Notes')}</dt>
                   <dd>
-                    <RichText description={character.notes} darkMode={ui.darkMode} />
+                    <RichText
+                      id={`character.${character.id}.notes`}
+                      description={character.notes}
+                      darkMode={ui.darkMode}
+                    />
                   </dd>
                 </dl>
                 {customAttributes.length ? <p>{t('Attributes')}</p> : null}
@@ -119,6 +132,8 @@ const CharacterDetailsConnector = (connector) => {
     },
   } = connector
   const characterActions = connector.pltr.actions.character
+
+  checkDependencies({ redux, singleCharacterSelector, characterActions })
 
   if (redux) {
     const { connect, bindActionCreators } = redux

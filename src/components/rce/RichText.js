@@ -4,19 +4,34 @@ import UnconnectedRichTextEditor from './RichTextEditor'
 import RichTextViewer from './RichTextViewer'
 import UnconnectedRCEBoundary from './RCEBoundary'
 
+import { checkDependencies } from '../checkDependencies'
+
 const RichTextConnector = (connector) => {
   const RCEBoundary = UnconnectedRCEBoundary(connector)
   const RichTextEditor = UnconnectedRichTextEditor(connector)
 
   const {
-    platform: { openExternal, log, createErrorReport },
+    platform: {
+      storage: { imagePublicURL, isStorageURL },
+      openExternal,
+      log,
+      createErrorReport,
+    },
   } = connector
+  checkDependencies({
+    imagePublicURL,
+    isStorageURL,
+    openExternal,
+    log,
+    createErrorReport,
+  })
 
   const RichText = (props) => {
     let body = null
     if (props.editable) {
       body = (
         <RichTextEditor
+          id={props.id}
           className={props.className}
           onChange={props.onChange}
           autoFocus={props.autofocus}
@@ -26,12 +41,15 @@ const RichTextConnector = (connector) => {
         />
       )
     } else {
+      // TODO: support live watching(?)
       body = (
         <RichTextViewer
           text={props.description}
           className={props.className}
           openExternal={openExternal}
           log={log}
+          imagePublicURL={imagePublicURL}
+          isStorageURL={isStorageURL}
         />
       )
     }
@@ -44,6 +62,7 @@ const RichTextConnector = (connector) => {
   }
 
   RichText.propTypes = {
+    id: PropTypes.string,
     description: PropTypes.any,
     selection: PropTypes.object,
     onChange: PropTypes.func,
