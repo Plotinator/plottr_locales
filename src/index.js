@@ -570,6 +570,28 @@ export const catchupEditsSeen = (fileId, editorId, myEditorKey, otherEditorKey, 
     })
 }
 
+export const lockRCE = (fileId, editorId, clientId, emailAddress = '') => {
+  return database().doc(`rce/${fileId}/editors/${editorId}/locks/current`).set({
+    clientId,
+    emailAddress,
+  })
+}
+
+export const listenForRCELock = (fileId, editorId, clientId, cb) => {
+  return database()
+    .doc(`rce/${fileId}/editors/${editorId}/locks/current`)
+    .onSnapshot((documentRef) => {
+      const data = documentRef.data()
+      if (!data) {
+        console.log("Didn't find a lock for RCE with editorId", editorId)
+        cb({ clientId: null })
+        return
+      }
+      if (data.clientId === clientId) return
+      cb(data)
+    })
+}
+
 export const listenForChangesToEditor = (fileId, editorId, cb) => {
   database()
     .collection(`rce/${fileId}/editors/${editorId}/editTimestamps`)
