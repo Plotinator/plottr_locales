@@ -19,6 +19,8 @@ import {
   deleteChangeSignal,
   deleteOldChanges,
   backupPublicURL,
+  lockRCE,
+  listenForRCELock,
 } from 'plottr_firebase'
 import {
   getTemplateById,
@@ -315,6 +317,8 @@ const platform = {
   },
   rootElementSelectors: ['#__next'],
   publishRCEOperations,
+  lockRCE,
+  listenForRCELock,
   deleteChangeSignal,
   deleteOldChanges,
   fetchRCEOperations,
