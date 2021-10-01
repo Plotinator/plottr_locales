@@ -77,7 +77,7 @@ const ImagePickerConnector = (connector) => {
 
       if (files && files.length > 0) {
         for (const file of files) {
-          if (saveImageToStorageBlob) {
+          if (saveImageToStorageBlob && this.props.isCloudFile) {
             saveImageToStorageBlob(file, file.name).then((internalUrl) => {
               this.props.actions.addImage({ name: file.name, path: internalUrl })
               this.setState({ tabId: '1', justAddedImage: true })
@@ -399,12 +399,14 @@ const ImagePickerConnector = (connector) => {
     close: PropTypes.func,
     images: PropTypes.object,
     actions: PropTypes.object,
+    isCloudFile: PropTypes.bool,
   }
 
   const {
     redux,
     pltr: {
       actions: { image },
+      selectors,
     },
   } = connector
 
@@ -414,8 +416,9 @@ const ImagePickerConnector = (connector) => {
     return connect(
       (state) => {
         return {
-          images: state.present.images,
-          darkMode: state.present.ui.darkMode,
+          images: selectors.imagesSelector(state.present),
+          darkMode: selectors.isDarkModeSelector(state.present),
+          isCloudFile: selectors.isCloudFileSelector(state.present),
         }
       },
       (dispatch) => {
