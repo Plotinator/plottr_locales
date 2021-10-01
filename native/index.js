@@ -531,7 +531,6 @@ export const listenForRCELock = (fileId, editorId, clientId, cb) => {
         cb({ clientId: null })
         return
       }
-      if (data.clientId === clientId) return
       cb(data)
     })
 }
