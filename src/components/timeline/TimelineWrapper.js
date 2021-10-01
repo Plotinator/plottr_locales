@@ -24,6 +24,7 @@ import UnconnectedExportNavItem from '../export/ExportNavItem'
 import { FunSpinner } from '../Spinner'
 import UnconnectedSubNav from '../containers/SubNav'
 import { helpers } from 'pltr/v2'
+import { checkDependencies } from '../checkDependencies'
 
 const BREAKPOINT = 890
 
@@ -43,6 +44,7 @@ const TimelineWrapperConnector = (connector) => {
     platform: { mpq, exportDisabled, templatesDisabled },
   } = connector
   const saveAsTemplate = connector.platform.template.startSaveAsTemplate
+  checkDependencies({ mpq, exportDisabled, templatesDisabled, saveAsTemplate })
 
   class TimelineWrapper extends Component {
     constructor(props) {
@@ -264,7 +266,10 @@ const TimelineWrapperConnector = (connector) => {
     // //////////////
 
     startSaveAsTemplate = () => {
-      saveAsTemplate('plotlines')
+      const { allCards } = this.props
+      if (allCards.length) saveAsTemplate('plotlines')
+
+      return false
     }
 
     // ///////////////
@@ -286,7 +291,7 @@ const TimelineWrapperConnector = (connector) => {
     }
 
     renderSubNav() {
-      const { timelineBundle, actions, featureFlags } = this.props
+      const { timelineBundle, actions, featureFlags, allCards } = this.props
       const { isSmallerThanToolbar } = this.state
 
       let glyph = 'option-vertical'
@@ -326,7 +331,11 @@ const TimelineWrapperConnector = (connector) => {
             </Dropdown.Toggle>
             <Dropdown.Menu>
               <MenuItem
-                disabled={templatesDisabled || helpers.featureFlags.beatHierarchyIsOn(featureFlags)}
+                disabled={
+                  !allCards.length ||
+                  templatesDisabled ||
+                  helpers.featureFlags.beatHierarchyIsOn(featureFlags)
+                }
                 onSelect={this.startSaveAsTemplate}
               >
                 {t('Save as Template')}
@@ -487,6 +496,7 @@ const TimelineWrapperConnector = (connector) => {
   }
 
   TimelineWrapper.propTypes = {
+    allCards: PropTypes.array,
     bookId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
     timelineBundle: PropTypes.object.isRequired,
     featureFlags: PropTypes.object.isRequired,
@@ -499,6 +509,7 @@ const TimelineWrapperConnector = (connector) => {
     redux,
     pltr: { selectors, actions },
   } = connector
+  checkDependencies({ redux, selectors, actions })
 
   if (redux) {
     const { connect, bindActionCreators } = redux
@@ -506,6 +517,7 @@ const TimelineWrapperConnector = (connector) => {
     return connect(
       (state) => {
         return {
+          allCards: selectors.allCardsSelector(state.present),
           bookId: selectors.currentTimelineSelector(state.present),
           timelineBundle: selectors.timelineBundleSelector(state.present),
           featureFlags: selectors.featureFlags(state.present),
