@@ -11,7 +11,6 @@ import {
   EXPAND_TIMELINE,
   FILE_LOADED,
   LOAD_BEATS,
-  LOAD_UI,
   NAVIGATE_TO_BOOK_TIMELINE,
   NEW_FILE,
   OPEN_ATTRIBUTES_DIALOG,
@@ -177,6 +176,7 @@ const ui =
         return state
     }
   }
+}
 
 function timeline(state = defaultUI.timeline, action) {
   switch (action.type) {
