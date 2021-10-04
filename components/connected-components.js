@@ -41,7 +41,6 @@ import {
   useLicenseInfo,
   useSettingsInfo,
   useTemplatesInfo,
-  removeFileFromList,
 } from '../lib/store_hooks'
 import { useTrialStatus } from '../lib/trialManager'
 import { settings } from '../lib/settings'
@@ -62,9 +61,7 @@ const deleteFileOnFirestore = (fileId) => {
   const {
     client: { userId, clientId },
   } = state.present
-  deleteFile(fileId, userId, clientId).then(() => {
-    removeFileFromList(fileId)
-  })
+  deleteFile(fileId, userId, clientId)
 }
 
 const platform = {
