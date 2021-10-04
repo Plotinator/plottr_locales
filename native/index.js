@@ -7,6 +7,8 @@ import { DateTime, Duration } from 'luxon'
 
 import { actions, ARRAY_KEYS } from 'pltr/v2'
 
+database().settings({ ignoreUndefinedProperties: true })
+
 export const onSessionChange = (cb) => {
   return auth().onAuthStateChanged(cb)
 }
