@@ -58,6 +58,12 @@ can develop against local emulators of those services.  To do so, run
 the following commands:
 
 ```bash
+  firebase use plottr-ci
+```
+
+(Selects the current project to connect to.)
+
+```bash
   yarn start-emulators
 ```
 
