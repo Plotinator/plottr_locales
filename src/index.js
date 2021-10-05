@@ -4,7 +4,6 @@ import 'firebase/auth'
 import 'firebase/firestore'
 import 'firebase/storage'
 import axios from 'axios'
-import { v4 as uuidv4 } from 'uuid'
 import { DateTime, Duration } from 'luxon'
 
 import { actions, ARRAY_KEYS } from 'pltr/v2'
@@ -537,24 +536,39 @@ export const overwrite = (path, fileId, payload, clientId) => {
     })
 }
 
-export const shareDocument = (userId, fileId, emailAddress) => {
-  return database()
-    .collection('file')
-    .doc(fileId)
-    .get()
-    .then((documentRef) => {
-      const document = documentRef.data()
+export const shareDocument = (userId, fileId, emailAddress, permission) => {
+  return axios
+    .post(`${process.env.BASE_URL || ''}/api/share-document`, {
+      fileId,
+      emailAddress,
+      userId,
+      permission,
+    })
+    .then(() => {
       return database()
         .collection('file')
         .doc(fileId)
-        .set(
-          {
-            shareRecords: [...document.shareRecords, { emailAddress, permission: 'collaborator' }],
-          },
-          { merge: true }
-        )
-        .then(() => {
-          return pingAuth(userId, fileId)
+        .get()
+        .then((documentRef) => {
+          const document = documentRef.data()
+          const existingShareRecord = document.shareRecords.find(
+            (shareRecord) => shareRecord.emailAddress === emailAddress
+          )
+          if (existingShareRecord) {
+            return pingAuth(userId, fileId)
+          }
+          return database()
+            .collection('file')
+            .doc(fileId)
+            .set(
+              {
+                shareRecords: [...document.shareRecords, { emailAddress, permission }],
+              },
+              { merge: true }
+            )
+            .then(() => {
+              return pingAuth(userId, fileId)
+            })
         })
     })
 }
