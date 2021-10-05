@@ -29,7 +29,7 @@ const Listener = ({
   const [unsubscribeFunctions, setUnsubscribeFunctions] = useState([])
 
   useEffect(() => {
-    const sessionFileId = currentProject()
+    const sessionFileId = (selectedFile && selectedFile.id) || currentProject()
     if (sessionFileId && sessionFileId !== '') {
       const foundInList = fileList.find(({ id }) => id === sessionFileId)
       if (foundInList && !isEqual(foundInList, selectedFile)) {
