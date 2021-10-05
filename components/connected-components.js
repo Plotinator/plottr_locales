@@ -19,6 +19,8 @@ import {
   deleteChangeSignal,
   deleteOldChanges,
   backupPublicURL,
+  lockRCE,
+  listenForRCELock,
 } from 'plottr_firebase'
 import {
   getTemplateById,
@@ -39,7 +41,6 @@ import {
   useLicenseInfo,
   useSettingsInfo,
   useTemplatesInfo,
-  removeFileFromList,
 } from '../lib/store_hooks'
 import { useTrialStatus } from '../lib/trialManager'
 import { settings } from '../lib/settings'
@@ -60,9 +61,7 @@ const deleteFileOnFirestore = (fileId) => {
   const {
     client: { userId, clientId },
   } = state.present
-  deleteFile(fileId, userId, clientId).then(() => {
-    removeFileFromList(fileId)
-  })
+  deleteFile(fileId, userId, clientId)
 }
 
 const platform = {
@@ -305,6 +304,9 @@ const platform = {
       console.warn('TODO: implement MPQ!')
     },
   },
+  handleCustomerServiceCode: () => {
+    // TODO
+  },
   browserHistory: history,
   inBrowser: true,
   templatesDisabled: false,
@@ -315,6 +317,8 @@ const platform = {
   },
   rootElementSelectors: ['#__next'],
   publishRCEOperations,
+  lockRCE,
+  listenForRCELock,
   deleteChangeSignal,
   deleteOldChanges,
   fetchRCEOperations,
@@ -342,6 +346,7 @@ const platform = {
 const components = connections.pltr(platform)
 
 export const DeleteConfirmModal = components.DeleteConfirmModal
+export const ErrorModal = components.ErrorModal
 export const ColorPickerColor = components.ColorPickerColor
 export const ItemsManagerModal = components.ItemsManagerModal
 export const ListItem = components.ListItem

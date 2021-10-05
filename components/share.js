@@ -3,9 +3,8 @@ import { connect } from 'react-redux'
 import { PropTypes } from 'prop-types'
 import { FiShare } from 'react-icons/fi'
 import { Button, Form, FormGroup, Table } from 'react-bootstrap'
-import { GrFormEdit } from 'react-icons/gr'
 
-import { selectors } from 'pltr/v2'
+import { selectors, actions } from 'pltr/v2'
 import { PlottrModal } from 'connected-components'
 import { withEventTargetValue } from '../lib/withEventTargetValue'
 import { shareDocument } from 'plottr_firebase'
@@ -17,6 +16,7 @@ const modalStyles = {
     alignItems: 'center',
   },
   content: {
+    borderRadius: 20,
     width: '50%',
     position: 'relative',
     left: 'auto',
@@ -28,21 +28,25 @@ const modalStyles = {
   },
 }
 
-const Share = ({ selectedFile }) => {
+const Share = ({ userId, selectedFile, generalError }) => {
   const [sharing, setSharing] = useState(false)
   const [emailToShareWith, setEmailToShareWith] = useState('')
 
   const handleKeyDown = (event) => {
     if (event.which === 13) {
       event.preventDefault()
-      shareDocument(selectedFile.id, emailToShareWith)
+      shareDocument(userId, selectedFile.id, emailToShareWith, 'collaborator').catch((error) => {
+        generalError(error.response.data)
+      })
       setEmailToShareWith('')
     }
   }
 
   const handleShare = (event) => {
     event.preventDefault()
-    shareDocument(selectedFile.id, emailToShareWith)
+    shareDocument(userId, selectedFile.id, emailToShareWith, 'collaborator').catch((error) => {
+      generalError(error.response.data)
+    })
     setEmailToShareWith('')
   }
 
@@ -75,7 +79,6 @@ const Share = ({ selectedFile }) => {
             <tr>
               <th>Email address</th>
               <th>Permission</th>
-              <th>Edit</th>
             </tr>
           </thead>
           <tbody>
@@ -85,11 +88,6 @@ const Share = ({ selectedFile }) => {
                 <tr key={emailAddress}>
                   <td>{emailAddress}</td>
                   <td>{permission}</td>
-                  <td>
-                    <Button>
-                      <GrFormEdit />
-                    </Button>
-                  </td>
                 </tr>
               ))}
           </tbody>
@@ -107,9 +105,17 @@ const Share = ({ selectedFile }) => {
 }
 
 Share.propTypes = {
+  userId: PropTypes.string,
   selectedFile: PropTypes.object,
+  generalError: PropTypes.func.isrequired,
 }
 
-export default connect((state) => ({
-  selectedFile: selectors.selectedFileSelector(state.present),
-}))(Share)
+export default connect(
+  (state) => ({
+    userId: selectors.userIdSelector(state.present),
+    selectedFile: selectors.selectedFileSelector(state.present),
+  }),
+  {
+    generalError: actions.error.generalError,
+  }
+)(Share)

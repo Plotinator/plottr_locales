@@ -3,21 +3,27 @@ import { useEffect } from 'react'
 import { connect } from 'react-redux'
 
 import { actions } from 'pltr/v2'
-import { fetchFiles, onSessionChange } from 'plottr_firebase'
+import { listenToFiles, onSessionChange } from 'plottr_firebase'
 
-const SessionObserver = ({ setUserId, setFileList }) => {
+const SessionObserver = ({ setUserId, setFileList, setEmailAddress }) => {
   useEffect(() => {
-    onSessionChange((user) => {
+    let fileListener = null
+    const sessionListener = onSessionChange((user) => {
       if (!user) {
         window.location.href = '/login'
       } else {
         setUserId(user.uid)
-        fetchFiles(user.uid).then((files) => {
+        setEmailAddress(user.email)
+        fileListener = listenToFiles(user.uid, (files) => {
           const activeFiles = files.filter(({ deleted }) => !deleted)
           setFileList(activeFiles)
         })
       }
     })
+    return () => {
+      if (fileListener) fileListener()
+      sessionListener()
+    }
   }, [])
 
   return null
@@ -30,4 +36,5 @@ SessionObserver.propTypes = {
 export default connect(null, {
   setFileList: actions.project.setFileList,
   setUserId: actions.client.setUserId,
+  setEmailAddress: actions.client.setEmailAddress,
 })(SessionObserver)
