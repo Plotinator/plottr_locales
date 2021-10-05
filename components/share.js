@@ -28,21 +28,21 @@ const modalStyles = {
   },
 }
 
-const Share = ({ selectedFile }) => {
+const Share = ({ userId, selectedFile }) => {
   const [sharing, setSharing] = useState(false)
   const [emailToShareWith, setEmailToShareWith] = useState('')
 
   const handleKeyDown = (event) => {
     if (event.which === 13) {
       event.preventDefault()
-      shareDocument(selectedFile.id, emailToShareWith)
+      shareDocument(userId, selectedFile.id, emailToShareWith)
       setEmailToShareWith('')
     }
   }
 
   const handleShare = (event) => {
     event.preventDefault()
-    shareDocument(selectedFile.id, emailToShareWith)
+    shareDocument(userId, selectedFile.id, emailToShareWith)
     setEmailToShareWith('')
   }
 
@@ -107,9 +107,11 @@ const Share = ({ selectedFile }) => {
 }
 
 Share.propTypes = {
+  userId: PropTypes.string,
   selectedFile: PropTypes.object,
 }
 
 export default connect((state) => ({
+  userId: selectors.userIdSelector(state.present),
   selectedFile: selectors.selectedFileSelector(state.present),
 }))(Share)
