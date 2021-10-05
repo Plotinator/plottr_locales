@@ -23,4 +23,8 @@ export default (req, res) => {
     .collection(`authorisation/${userId}/granted`)
     .doc(fileId)
     .update({ timeStamp: new Date() })
+    .then((result) => {
+      res.status(200).send('')
+      return result
+    })
 }
