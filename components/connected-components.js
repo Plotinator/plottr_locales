@@ -346,6 +346,7 @@ const platform = {
 const components = connections.pltr(platform)
 
 export const DeleteConfirmModal = components.DeleteConfirmModal
+export const ErrorModal = components.ErrorModal
 export const ColorPickerColor = components.ColorPickerColor
 export const ItemsManagerModal = components.ItemsManagerModal
 export const ListItem = components.ListItem
