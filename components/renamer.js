@@ -1,15 +1,19 @@
 import { useState, useEffect } from 'react'
+import { PropTypes } from 'prop-types'
+import { connect } from 'react-redux'
 
+import { selectors } from 'pltr/v2'
 import { t } from 'plottr_locales'
 import { InputModal } from 'connected-components'
 import { editFileName } from 'plottr_firebase'
 
-const Renamer = () => {
+const Renamer = ({ userId }) => {
   const [visible, setVisible] = useState(false)
   const [fileId, setFileId] = useState(null)
 
   const renameFile = (newName) => {
-    editFileName(fileId, newName).then(() => {
+    if (!userId) return
+    editFileName(userId, fileId, newName).then(() => {
       const fetchEvent = new Event('fetch-file-list', { bubbles: true, cancelable: false })
       document.dispatchEvent(fetchEvent)
       const renameEvent = new Event('rename-file-to-new-name', { bubbles: true, cancelable: false })
@@ -48,6 +52,10 @@ const Renamer = () => {
   )
 }
 
-Renamer.propTypes = {}
+Renamer.propTypes = {
+  userId: PropTypes.string,
+}
 
-export default Renamer
+export default connect((state) => ({
+  userId: selectors.userIdSelector(state.present),
+}))(Renamer)

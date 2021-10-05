@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { PropTypes } from 'prop-types'
 import { connect } from 'react-redux'
+import { isEqual } from 'lodash'
 
 import { actions, selectors } from 'pltr/v2'
 import { listen, stopListening } from 'plottr_firebase'
@@ -28,17 +29,17 @@ const Listener = ({
   const [unsubscribeFunctions, setUnsubscribeFunctions] = useState([])
 
   useEffect(() => {
-    if (!selectedFile) {
-      const sessionFileId = currentProject()
-      if (sessionFileId && sessionFileId !== '') {
-        const foundInList = fileList.find(({ id }) => id === sessionFileId)
-        if (foundInList) {
-          selectFile(foundInList)
-          closeDashboard()
-        }
+    const sessionFileId = (selectedFile && selectedFile.id) || currentProject()
+    if (sessionFileId && sessionFileId !== '') {
+      const foundInList = fileList.find(({ id }) => id === sessionFileId)
+      if (foundInList && !isEqual(foundInList, selectedFile)) {
+        selectFile(foundInList)
+        closeDashboard()
       }
-    } else {
-      setCurrentProject(selectedFile.id)
+      const currentFile = foundInList || selectedFile
+      if (currentFile) {
+        setCurrentProject(currentFile.id)
+      }
     }
   }, [selectedFile, fileList])
 
