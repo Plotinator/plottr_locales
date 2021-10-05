@@ -4,6 +4,7 @@ import * as pltr from 'pltr/v2'
 import {
   OverlayTrigger,
   DeleteConfirmModal,
+  ErrorModal,
   ColorPickerColor,
   ItemsManagerModal as UnconnectedItemsManagerModal,
   ListItem,
@@ -199,6 +200,7 @@ export default (platform) => {
   return {
     OverlayTrigger,
     DeleteConfirmModal,
+    ErrorModal,
     ColorPickerColor,
     ItemsManagerModal: UnconnectedItemsManagerModal(connectorObject),
     ListItem,
