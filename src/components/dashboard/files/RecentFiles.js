@@ -142,6 +142,8 @@ const RecentFilesConnector = (connector) => {
                   fileName={f.fileName}
                   filePath={f.path || f.id}
                   openFile={openFile}
+                  permission={f.permission}
+                  isCloudFile={f.isCloudFile}
                 />
               </div>
             </Cell>
