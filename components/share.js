@@ -4,7 +4,7 @@ import { PropTypes } from 'prop-types'
 import { FiShare } from 'react-icons/fi'
 import { Button, Form, FormGroup, Table } from 'react-bootstrap'
 
-import { selectors } from 'pltr/v2'
+import { selectors, actions } from 'pltr/v2'
 import { PlottrModal } from 'connected-components'
 import { withEventTargetValue } from '../lib/withEventTargetValue'
 import { shareDocument } from 'plottr_firebase'
@@ -28,21 +28,25 @@ const modalStyles = {
   },
 }
 
-const Share = ({ userId, selectedFile }) => {
+const Share = ({ userId, selectedFile, generalError }) => {
   const [sharing, setSharing] = useState(false)
   const [emailToShareWith, setEmailToShareWith] = useState('')
 
   const handleKeyDown = (event) => {
     if (event.which === 13) {
       event.preventDefault()
-      shareDocument(userId, selectedFile.id, emailToShareWith, 'collaborator')
+      shareDocument(userId, selectedFile.id, emailToShareWith, 'collaborator').catch((error) => {
+        generalError(error.response.data)
+      })
       setEmailToShareWith('')
     }
   }
 
   const handleShare = (event) => {
     event.preventDefault()
-    shareDocument(userId, selectedFile.id, emailToShareWith, 'collaborator')
+    shareDocument(userId, selectedFile.id, emailToShareWith, 'collaborator').catch((error) => {
+      generalError(error.response.data)
+    })
     setEmailToShareWith('')
   }
 
@@ -103,9 +107,15 @@ const Share = ({ userId, selectedFile }) => {
 Share.propTypes = {
   userId: PropTypes.string,
   selectedFile: PropTypes.object,
+  generalError: PropTypes.func.isrequired,
 }
 
-export default connect((state) => ({
-  userId: selectors.userIdSelector(state.present),
-  selectedFile: selectors.selectedFileSelector(state.present),
-}))(Share)
+export default connect(
+  (state) => ({
+    userId: selectors.userIdSelector(state.present),
+    selectedFile: selectors.selectedFileSelector(state.present),
+  }),
+  {
+    generalError: actions.error.generalError,
+  }
+)(Share)

@@ -28,21 +28,31 @@ export default (req, res) => {
       if (documentRef.exists) {
         const data = documentRef.data()
         if (data.permission === 'owner') {
-          return auth.getUserByEmail(emailAddress).then((user) => {
-            return database
-              .doc(`authorisation/${user.uid}/granted/${fileId}`)
-              .set({ permission: permission })
-              .then((result) => {
-                res.status(200)
-                res.end()
-                return result
-              })
-          })
+          return auth
+            .getUserByEmail(emailAddress)
+            .then((user) => {
+              return database
+                .doc(`authorisation/${user.uid}/granted/${fileId}`)
+                .set({ permission })
+                .then((result) => {
+                  res.status(200)
+                  res.end()
+                  return result
+                })
+            })
+            .catch((error) => {
+              res.status(400)
+              res.send('No user found with that email address')
+              return Promise.resolve('No user found with that email address')
+            })
         }
       }
+      console.error(`User <${userId}> doesn't own document <${fileId}> and can't share it.`)
       res.status(400)
-      res.send(`User <${userId}> doesn't own document <${fileId}> and can't share it.`)
-      return Promise.reject(`User <${userId}> doesn't own document <${fileId}> and can't share it.`)
+      res.send(`We're having trouble sharing the document with that user.`)
+      return Promise.resolve(
+        `User <${userId}> doesn't own document <${fileId}> and can't share it.`
+      )
     })
     .catch((error) => {
       res.status(503)
