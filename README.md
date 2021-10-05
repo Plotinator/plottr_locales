@@ -58,7 +58,7 @@ can develop against local emulators of those services.  To do so, run
 the following commands:
 
 ```bash
-  firebase use plottr-ci
+   pushd lib/plottr_firebase; firebase use plottr-ci; popd
 ```
 
 (Selects the current project to connect to.)
