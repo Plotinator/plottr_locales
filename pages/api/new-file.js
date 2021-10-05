@@ -20,6 +20,17 @@ export default (req, res) => {
   const file = req.body.file
   const fileRecord = req.body.fileRecord
   const userId = req.query.userId
+  // TODO: verify a user token
+  // admin
+  //   .auth()
+  //   .verifyIdToken(idToken)
+  //   .then((decodedToken) => {
+  //     const uid = decodedToken.uid;
+  //     // ...
+  //   })
+  //   .catch((error) => {
+  //     // Handle error
+  //   })
   return database
     .collection('file')
     .add(fileRecord)
