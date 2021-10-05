@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { PropTypes } from 'prop-types'
 import { FiShare } from 'react-icons/fi'
 import { Button, Form, FormGroup, Table } from 'react-bootstrap'
-import { GrFormEdit } from 'react-icons/gr'
 
 import { selectors } from 'pltr/v2'
 import { PlottrModal } from 'connected-components'
@@ -17,6 +16,7 @@ const modalStyles = {
     alignItems: 'center',
   },
   content: {
+    borderRadius: 20,
     width: '50%',
     position: 'relative',
     left: 'auto',
@@ -75,7 +75,6 @@ const Share = ({ userId, selectedFile }) => {
             <tr>
               <th>Email address</th>
               <th>Permission</th>
-              <th>Edit</th>
             </tr>
           </thead>
           <tbody>
@@ -85,11 +84,6 @@ const Share = ({ userId, selectedFile }) => {
                 <tr key={emailAddress}>
                   <td>{emailAddress}</td>
                   <td>{permission}</td>
-                  <td>
-                    <Button>
-                      <GrFormEdit />
-                    </Button>
-                  </td>
                 </tr>
               ))}
           </tbody>
