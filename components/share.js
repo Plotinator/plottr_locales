@@ -35,14 +35,14 @@ const Share = ({ userId, selectedFile }) => {
   const handleKeyDown = (event) => {
     if (event.which === 13) {
       event.preventDefault()
-      shareDocument(userId, selectedFile.id, emailToShareWith)
+      shareDocument(userId, selectedFile.id, emailToShareWith, 'collaborator')
       setEmailToShareWith('')
     }
   }
 
   const handleShare = (event) => {
     event.preventDefault()
-    shareDocument(userId, selectedFile.id, emailToShareWith)
+    shareDocument(userId, selectedFile.id, emailToShareWith, 'collaborator')
     setEmailToShareWith('')
   }
 
