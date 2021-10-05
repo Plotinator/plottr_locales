@@ -37,7 +37,6 @@ if (!firebase.apps.length) {
 }
 
 const pingAuth = (userId, fileId) => {
-  // This needs to use the base URL.
   return axios.post(`${process.env.BASE_URL || ''}/api/ping-auth`, {
     userId,
     fileId,
@@ -538,17 +537,25 @@ export const overwrite = (path, fileId, payload, clientId) => {
     })
 }
 
-export const shareDocument = (fileId, emailAddress) => {
-  const invitationToken = uuidv4()
+export const shareDocument = (userId, fileId, emailAddress) => {
   return database()
     .collection('file')
     .doc(fileId)
-    .set(
-      { pending: [{ emailAddress, invitationToken, permission: 'collaborator' }] },
-      { merge: true }
-    )
-    .then(() => {
-      return invitationToken
+    .get()
+    .then((documentRef) => {
+      const document = documentRef.data()
+      return database()
+        .collection('file')
+        .doc(fileId)
+        .set(
+          {
+            shareRecords: [...document.shareRecords, { emailAddress, permission: 'collaborator' }],
+          },
+          { merge: true }
+        )
+        .then(() => {
+          return pingAuth(userId, fileId)
+        })
     })
 }
 
