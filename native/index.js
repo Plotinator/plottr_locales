@@ -4,10 +4,24 @@ import storage from '@react-native-firebase/storage'
 import semverGt from 'semver/functions/gt'
 import { v4 as uuidv4 } from 'uuid'
 import { DateTime, Duration } from 'luxon'
+import { BASE_API_URL } from '@env'
 
 import { actions, ARRAY_KEYS } from 'pltr/v2'
 
 database().settings({ ignoreUndefinedProperties: true })
+
+export const mintCookieToken = (user) => {
+  return user.getIdToken().then((idToken) => {
+    return fetch(`${BASE_API_URL || ''}/mint-token`, {
+      method: 'POST',
+      body: JSON.stringify({ idToken }),
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      }
+    })
+  })
+}
 
 export const onSessionChange = (cb) => {
   return auth().onAuthStateChanged(cb)
