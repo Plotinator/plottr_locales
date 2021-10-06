@@ -27,10 +27,11 @@ the hosts file with super user permissions:
 sude nano /etc/hosts
 ```
 
-Then add an alias for local host by adding the line: 
+Then add an alias for local host by adding the lines:
 
 ```
-127.0.0.1	plottr.local
+127.0.0.1	        plottr.local
+0:0:0:0:0:0:0:1     plottr.local
 ```
 
 My hosts file looks like this after I edited it:
@@ -42,10 +43,11 @@ My hosts file looks like this after I edited it:
 # localhost is used to configure the loopback interface
 # when the system is booting.  Do not change this entry.
 ##
-127.0.0.1	plottr.local
-127.0.0.1	localhost
-255.255.255.255	broadcasthost
-::1             localhost
+127.0.0.1	        plottr.local
+0:0:0:0:0:0:0:1     plottr.local
+127.0.0.1	        localhost
+255.255.255.255	    broadcasthost
+::1                 localhost
 ```
 
 Once you've made this modification, you'll be able to access Plottr
