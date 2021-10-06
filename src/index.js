@@ -472,8 +472,25 @@ export const logOut = () => {
   return auth().signOut()
 }
 
+export const mintCookieToken = (user) => {
+  return user.getIdToken().then((idToken) => {
+    return axios.post(`${process.env.BASE_URL || ''}/api/mint-token`, {
+      idToken,
+    })
+  })
+}
+
 export const onSessionChange = (cb) => {
-  return auth().onAuthStateChanged(cb)
+  return auth().onAuthStateChanged((user) => {
+    if (user) {
+      return mintCookieToken(user).then(() => {
+        cb(user)
+        return Promise.resolve(null)
+      })
+    }
+    cb(user)
+    return Promise.resolve(null)
+  })
 }
 
 let _firebaseui
