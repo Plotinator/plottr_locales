@@ -1,12 +1,10 @@
-import { verifyToken } from './verify-token'
-
 const admin = require('firebase-admin')
 
 if (!admin.apps.length) {
   if (process.env.FIREBASE_ENV === 'development') {
     const projectId = 'plottr-ci'
-    process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099'
     process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080'
+    process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099'
     admin.initializeApp({ projectId })
   } else if (process.env.FIREBASE_ENV === 'preview') {
     const serviceAccount = JSON.parse(process.env.FIREBASE_KEY)
@@ -17,20 +15,23 @@ if (!admin.apps.length) {
   }
 }
 
-const database = admin.firestore()
 const auth = admin.auth()
 
 export default (req, res) => {
-  const { fileId, userId } = req.body
+  const { idToken } = req.body
 
-  return verifyToken(auth, req).then(() => {
-    return database
-      .collection(`authorisation/${userId}/granted`)
-      .doc(fileId)
-      .update({ timeStamp: new Date() })
-      .then((result) => {
-        res.status(200).send('')
-        return result
-      })
-  })
+  const expiresIn = 60 * 60 * 24 * 5 * 1000
+
+  return auth.createSessionCookie(idToken, { expiresIn }).then(
+    (sessionCookie) => {
+      res.setHeader('Set-Cookie', `session=${sessionCookie}; Max-Age=${expiresIn}; HttpOnly`)
+      res.end(JSON.stringify({ status: 'success' }))
+      return Promise.resolve('success')
+    },
+    (error) => {
+      console.error('Error while minting token', error)
+      res.status(401).send('Unauthorized')
+      return Promise.resolve('failed')
+    }
+  )
 }
