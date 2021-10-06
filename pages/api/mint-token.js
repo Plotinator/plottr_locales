@@ -22,6 +22,9 @@ export default (req, res) => {
 
   const expiresIn = 60 * 60 * 24 * 5 * 1000
 
+  console.log('req', req)
+  console.log('idToken', idToken)
+
   return auth.createSessionCookie(idToken, { expiresIn }).then(
     (sessionCookie) => {
       res.setHeader('Set-Cookie', `session=${sessionCookie}; Max-Age=${expiresIn}; HttpOnly`)
