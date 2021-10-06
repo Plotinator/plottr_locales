@@ -21,7 +21,6 @@ const database = admin.firestore()
 const auth = admin.auth()
 
 export default (req, res) => {
-  console.error('Creating file.  Cookies are:', req.cookies)
   return verifyToken(auth, req).then(() => {
     const file = req.body.file
     const fileRecord = req.body.fileRecord
