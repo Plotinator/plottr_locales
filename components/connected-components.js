@@ -36,12 +36,7 @@ import { useExportConfigInfo } from '../lib/exportConfig'
 import export_config from '../lib/exporter/default_config'
 import { exportFile } from '../lib/export'
 import { store } from '../lib/redux'
-import {
-  useCustomTemplatesInfo,
-  useLicenseInfo,
-  useSettingsInfo,
-  useTemplatesInfo,
-} from '../lib/store_hooks'
+import { useCustomTemplatesInfo, useSettingsInfo, useTemplatesInfo } from '../lib/store_hooks'
 import { useTrialStatus } from '../lib/trialManager'
 import { settings } from '../lib/settings'
 import {
@@ -55,6 +50,7 @@ import {
 import { useBackupFolders } from '../lib/backups'
 import { createErrorReport } from '../lib/createErrorReport'
 import { closeDashboard } from '../lib/dashboard'
+import { useLicenseInfo } from '../lib/checkPro'
 
 const deleteFileOnFirestore = (fileId) => {
   const state = store.getState()

@@ -5,7 +5,6 @@ import { PropTypes } from 'prop-types'
 import { ActionCreators } from 'redux-undo'
 import Head from 'next/head'
 
-import { PlottrModal } from 'connected-components'
 import { history } from '../lib/history'
 import { store } from '../lib/redux'
 
@@ -24,28 +23,7 @@ import SessionObserver from './session-observer'
 import ClientIdMinter from './client-id-minter'
 import FileListListener from './file-list-listener'
 import Renamer from './renamer'
-import PasswordForm, { passwordSet } from './password-form'
 import SettingsConsistencyChecker from './settings-consistency-checker'
-
-const modalStyles = {
-  overlay: {
-    zIndex: 1000,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  content: {
-    padding: 0,
-    borderRadius: 0,
-    overflow: 'hidden',
-    width: '100%',
-    position: 'relative',
-    left: '0',
-    top: '0',
-    minHeight: '100vh',
-    maxHeight: '100vh',
-  },
-}
 
 const redo = () => {
   store.dispatch(ActionCreators.redo())
@@ -112,9 +90,6 @@ const Root = ({ projectId }) => {
         ></script>
       </Head>
       <React.StrictMode>
-        <PlottrModal isOpen={!passwordSet()} style={modalStyles}>
-          <PasswordForm />
-        </PlottrModal>
         <SettingsConsistencyChecker />
         <Renamer />
         <FileListListener />
