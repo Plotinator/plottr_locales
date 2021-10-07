@@ -503,9 +503,7 @@ export const firebaseUI = () => {
 
 export const startUI = (firebaseUI, queryString) => {
   firebaseUI.start(queryString, {
-    signInOptions: [
-      firebase.auth.EmailAuthProvider.PROVIDER_ID,
-    ],
+    signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID],
   })
 }
 
