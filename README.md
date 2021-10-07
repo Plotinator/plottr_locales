@@ -27,10 +27,11 @@ the hosts file with super user permissions:
 sude nano /etc/hosts
 ```
 
-Then add an alias for local host by adding the line: 
+Then add an alias for local host by adding the lines:
 
 ```
-127.0.0.1	plottr.local
+127.0.0.1	        plottr.local
+0:0:0:0:0:0:0:1     plottr.local
 ```
 
 My hosts file looks like this after I edited it:
@@ -42,10 +43,11 @@ My hosts file looks like this after I edited it:
 # localhost is used to configure the loopback interface
 # when the system is booting.  Do not change this entry.
 ##
-127.0.0.1	plottr.local
-127.0.0.1	localhost
-255.255.255.255	broadcasthost
-::1             localhost
+127.0.0.1	        plottr.local
+0:0:0:0:0:0:0:1     plottr.local
+127.0.0.1	        localhost
+255.255.255.255	    broadcasthost
+::1                 localhost
 ```
 
 Once you've made this modification, you'll be able to access Plottr
@@ -58,6 +60,12 @@ can develop against local emulators of those services.  To do so, run
 the following commands:
 
 ```bash
+   pushd lib/plottr_firebase; firebase use plottr-ci; popd
+```
+
+(Selects the current project to connect to.)
+
+```bash
   yarn start-emulators
 ```
 
@@ -68,6 +76,24 @@ create a test user:
 ```bash
   yarn seed-firestore
 ```
+
+# Magical Knowledge
+
+There are always things that one unearths when one arrives at a new
+project.  This is my attempt at making those things fewer and further
+between so as to avoid nasty surprises.
+
+Please add to this section whenever you discover something! :)
+
+## Keeping Track of the Current Project
+
+The App looks at the `CURRENT_PROJECT` parameter in `sessionStorage`
+to determine what project to load when we refresh.  Make sure that you
+update this parameter when implementing a new way to select or switch
+to a project.
+
+There are plans to incorporate a `pid` query param to force the app to
+load a particular project by id.
 
 # `Pltr` Library
 

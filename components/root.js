@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { Router, Switch, Route } from 'react-router-dom'
 import { Provider } from 'react-redux'
+import { PropTypes } from 'prop-types'
 import { ActionCreators } from 'redux-undo'
 import Head from 'next/head'
 
@@ -54,7 +55,7 @@ const undo = () => {
   store.dispatch(ActionCreators.undo())
 }
 
-const Root = () => {
+const Root = ({ projectId }) => {
   useEffect(() => {
     const listener = (event) => {
       if (event.key === 'z' && (event.ctrlKey || event.metaKey)) {
@@ -78,6 +79,12 @@ const Root = () => {
       document.removeEventListener('keydown', listener)
     }
   }, [])
+  useEffect(() => {
+    if (projectId) {
+      // open the correct project
+      console.log('PROJECT ID', projectId)
+    }
+  }, [projectId])
 
   return (
     <Provider store={store}>
@@ -133,6 +140,10 @@ const Root = () => {
       </React.StrictMode>
     </Provider>
   )
+}
+
+Root.propTypes = {
+  projectId: PropTypes.string,
 }
 
 export default Root
