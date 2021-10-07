@@ -503,8 +503,17 @@ export const firebaseUI = () => {
 
 export const startUI = (firebaseUI, queryString) => {
   firebaseUI.start(queryString, {
-    signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID],
+    signInOptions: [
+      {
+        provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
+        disableSignUp: { status: true },
+      },
+    ],
   })
+}
+
+export const currentUser = () => {
+  return firebase.auth().currentUser
 }
 
 // Useful for debugging because Firebase rejects keys with undefined
