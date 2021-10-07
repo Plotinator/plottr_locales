@@ -49,7 +49,7 @@ export default async (req, res) => {
     uids.filter(Boolean).map((obj) => {
       const claims = {
         ...obj.claims,
-        beta: true,
+        admin: true,
       }
       return admin
         .auth()
