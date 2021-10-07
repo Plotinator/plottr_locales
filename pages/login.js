@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import { PropTypes } from 'prop-types'
 import Head from 'next/head'
 import Image from 'next/image'
+import { useRouter } from 'next/router'
 
 import { FunSpinner } from 'connected-components'
 import { onSessionChange, firebaseUI, startUI } from 'plottr_firebase'
@@ -9,13 +10,16 @@ import PasswordForm, { passwordSet } from '../components/password-form'
 
 export default function Login() {
   const [sessionChecked, setSessionChecked] = useState(false)
+  const router = useRouter()
+  const { pid } = router.query
 
   useEffect(() => {
     if (sessionChecked) return
     onSessionChange((user) => {
       setSessionChecked(true)
       if (user) {
-        window.location.href = '/timeline'
+        const url = `/timeline${pid ? '?pid=' + pid : ''}`
+        window.location.href = url
       }
     })
   }, [])

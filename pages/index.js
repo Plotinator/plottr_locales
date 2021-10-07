@@ -1,7 +1,17 @@
 import Head from 'next/head'
 import Image from 'next/image'
+import { useRouter } from 'next/router'
 
+// Routing:
+// https://nextjs.org/docs/routing/introduction
+// https://nextjs.org/docs/routing/dynamic-routes
 export default function Home() {
+  const router = useRouter()
+  const { pid } = router.query
+
+  // now use pid to redirect
+  const loginURL = `/login${pid ? '?pid=' + pid : ''}`
+
   return (
     <div className="home">
       <Head>
@@ -22,7 +32,7 @@ export default function Home() {
           <h1>Welcome to Plottr</h1>
           <p>Click &quot;Get started&quot; to start Plottr in your browser.</p>
           <div className="home__controls">
-            <a className="home__button" href="/login">
+            <a className="home__button" href={loginURL}>
               Get started
             </a>
           </div>
