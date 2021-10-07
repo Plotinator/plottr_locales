@@ -15,8 +15,6 @@ import Download from './download'
 import Upload from './upload'
 import { actions, selectors } from 'pltr/v2'
 import { basePath } from '../lib/basePath'
-import { useLicenseInfo } from '../lib/store_hooks'
-import { useTrialStatus } from '../lib/trialManager'
 import { currentProject } from '../lib/currentProject'
 
 const trialMode = true // TODO
@@ -24,10 +22,6 @@ const isDev = process.env.NEXT_PUBLIC_NODE_ENV == 'development'
 
 function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
   const [dashboardView, setDashboardView] = useState(currentProject() ? null : 'files')
-  const trialInfo = useTrialStatus()
-  const [_licenseInfo, licenseInfoSize] = useLicenseInfo()
-  const firstTime = !licenseInfoSize && !trialInfo.started
-  const trialExpired = trialInfo.expired
 
   useEffect(() => {
     const path = basePath()
@@ -44,10 +38,6 @@ function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
       document.removeEventListener('close-dashboard', listener)
     }
   }, [])
-
-  useEffect(() => {
-    if (firstTime || trialExpired) setDashboardView('account')
-  }, [firstTime, trialExpired, dashboardView])
 
   useEffect(() => {
     onSessionChange((user) => {
@@ -98,7 +88,6 @@ function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
   }
 
   const resetDashboardView = () => {
-    if (firstTime || trialExpired) return
     setDashboardView(null)
   }
 

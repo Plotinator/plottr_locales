@@ -5,55 +5,71 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 
 import { FunSpinner } from 'connected-components'
-import { onSessionChange, firebaseUI, startUI } from 'plottr_firebase'
-import PasswordForm, { passwordSet } from '../components/password-form'
+import { onSessionChange, firebaseUI, startUI, currentUser } from 'plottr_firebase'
+import { userHasPro } from '../lib/checkPro'
 
 export default function Login() {
   const [sessionChecked, setSessionChecked] = useState(false)
   const router = useRouter()
   const { pid } = router.query
 
-  useEffect(() => {
+  useEffect(async () => {
     if (sessionChecked) return
-    onSessionChange((user) => {
+    onSessionChange(async (user) => {
+      console.log('session changed', user)
       setSessionChecked(true)
       if (user) {
+        console.log('session w/ user', router.query)
         const url = `/timeline${pid ? '?pid=' + pid : ''}`
-        window.location.href = url
+        console.log('url to redirect', url)
+        if (process.env.NEXT_PUBLIC_NODE_ENV === 'development') {
+          window.location.href = url
+        }
+        currentUser()
+          .getIdTokenResult()
+          .then(async (token) => {
+            console.log('token', token.claims)
+            if (token.claims.beta || token.claims.admin) {
+              window.location.href = url
+            } else {
+              // check for Plottr Pro
+              const hasPro = await userHasPro(user.email)
+              if (hasPro) {
+                window.location.href = url
+              } else {
+                // display something saying
+                // the user is not authorized for the beta
+                console.log('not authorized')
+              }
+            }
+          })
       }
     })
   }, [])
 
   const firebaseLoginComponentRef = useRef()
   useEffect(() => {
+    if (!sessionChecked) return
     if (firebaseLoginComponentRef.current) {
       const ui = firebaseUI()
       startUI(ui, '#firebase-login')
     }
-  }, [])
+  }, [sessionChecked])
 
   const renderMain = () => {
-    const passwordNotSet = !passwordSet()
+    if (!sessionChecked) return <FunSpinner />
 
     return (
       <>
-        {passwordNotSet ? <PasswordForm /> : null}
-        <div
-          className="login__left"
-          style={{ ...{ display: !sessionChecked || passwordNotSet ? 'none' : undefined } }}
-        >
+        <div className="login__left">
           <h1>Welcome to Plottr</h1>
           <div id="firebase-login" ref={firebaseLoginComponentRef}></div>
         </div>
-        <div
-          className="login__right"
-          style={{ ...{ display: !sessionChecked ? 'none' : undefined } }}
-        >
+        <div className="login__right">
           <div className="login__logo">
             <Image src="/logo_28_500.png" alt="Plottr Logo" width="358" height="500" />
           </div>
         </div>
-        {sessionChecked ? null : <FunSpinner />}
       </>
     )
   }
