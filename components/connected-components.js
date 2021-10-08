@@ -21,6 +21,7 @@ import {
   backupPublicURL,
   lockRCE,
   listenForRCELock,
+  logOut,
 } from 'plottr_firebase'
 import {
   getTemplateById,
@@ -336,6 +337,9 @@ const platform = {
     },
     isStorageURL,
     imagePublicURL,
+  },
+  firebase: {
+    logOut,
   },
 }
 

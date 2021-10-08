@@ -1,5 +1,6 @@
 import { connect } from 'react-redux'
 import { PropTypes } from 'prop-types'
+import { t } from 'plottr_locales'
 import { FiDownload } from 'react-icons/fi'
 import { Button } from 'react-bootstrap'
 import fileDownload from 'js-file-download'
@@ -14,6 +15,7 @@ const Download = ({ withFullFileState }) => {
           fileDownload(JSON.stringify(state.present), `${state.present.file.fileName}.pltr`)
         })
       }}
+      title={t('Download')}
     >
       <FiDownload />
     </Button>

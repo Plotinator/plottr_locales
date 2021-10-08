@@ -4,6 +4,7 @@ import { PropTypes } from 'prop-types'
 import { FiShare } from 'react-icons/fi'
 import { Button, Form, FormGroup, Table } from 'react-bootstrap'
 
+import { t } from 'plottr_locales'
 import { selectors, actions } from 'pltr/v2'
 import { PlottrModal } from 'connected-components'
 import { withEventTargetValue } from '../lib/withEventTargetValue'
@@ -97,6 +98,7 @@ const Share = ({ userId, selectedFile, generalError }) => {
         onClick={() => {
           setSharing(!sharing)
         }}
+        title={t('Share')}
       >
         <FiShare />
       </Button>

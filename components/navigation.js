@@ -7,7 +7,7 @@ import { t } from 'plottr_locales'
 import { Beamer, BookChooser } from 'connected-components'
 import cx from 'classnames'
 import { FaRegUser } from 'react-icons/fa'
-import { logOut, onSessionChange } from 'plottr_firebase'
+import { onSessionChange } from 'plottr_firebase'
 
 import DashboardModal from './dashboard-modal'
 import Share from './share'
@@ -16,9 +16,6 @@ import Upload from './upload'
 import { actions, selectors } from 'pltr/v2'
 import { basePath } from '../lib/basePath'
 import { currentProject } from '../lib/currentProject'
-
-const trialMode = true // TODO
-const isDev = process.env.NEXT_PUBLIC_NODE_ENV == 'development'
 
 function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
   const [dashboardView, setDashboardView] = useState(currentProject() ? null : 'files')
@@ -49,12 +46,6 @@ function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
     })
   }, [])
 
-  const renderTrialLinks = () => {
-    if (!trialMode || isDev) return null
-
-    return null
-  }
-
   const changeTo = (newLocation) => () => {
     changeCurrentView(newLocation)
   }
@@ -81,10 +72,6 @@ function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
 
   const selectHelp = () => {
     setDashboardView('help')
-  }
-
-  const selectLogout = () => {
-    logOut()
   }
 
   const resetDashboardView = () => {
@@ -145,12 +132,6 @@ function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
           </li>
         </Nav>
         <Beamer inNavigation />
-        <Navbar.Form pullRight style={{ marginRight: '15px' }}>
-          <Upload />
-          <Download />
-          <Share />
-        </Navbar.Form>
-        {renderTrialLinks()}
         <Nav pullRight className="project-nav__options">
           <NavItem>
             <Dropdown id="dashboard-dropdown-menu">
@@ -158,17 +139,20 @@ function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
                 <FaRegUser />
               </Dropdown.Toggle>
               <Dropdown.Menu>
-                <MenuItem onSelect={selectFiles}>{t('Files')}</MenuItem>
+                <MenuItem onSelect={selectFiles}>{t('Projects')}</MenuItem>
                 <MenuItem onSelect={selectOptions}>{t('Settings')}</MenuItem>
                 <MenuItem onSelect={selectAccount}>{t('Account')}</MenuItem>
                 <MenuItem onSelect={selectBackups}>{t('Backups')}</MenuItem>
-                <MenuItem onSelect={selectTemplates}>{t('Templates')}</MenuItem>
                 <MenuItem onSelect={selectHelp}>{t('Help')}</MenuItem>
-                <MenuItem onSelect={selectLogout}>{t('Logout')}</MenuItem>
               </Dropdown.Menu>
             </Dropdown>
           </NavItem>
         </Nav>
+        <Navbar.Form pullRight style={{ marginRight: '15px' }}>
+          <Upload />
+          <Download />
+          <Share />
+        </Navbar.Form>
       </Navbar>
     </>
   )
