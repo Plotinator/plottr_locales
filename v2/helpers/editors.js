@@ -37,6 +37,36 @@ export const editorPathforType = (entityType, entityId) => {
   }
 }
 
+export const editorPathforTypesAttribute = (entityType, entityId, attributeName) => {
+  switch (entityType) {
+    case 'card':
+      return cardCustomAttributeEditorPath(entityId, attributeName)
+    case 'note':
+      return noteCustomAttributeEditorPath(entityId, attributeName)
+    case 'character':
+      return characterCustomAttributeEditorPath(entityId, attributeName)
+    case 'place':
+      return placeCustomAttributeEditorPath(entityId, attributeName)
+    default:
+      return cardCustomAttributeEditorPath(entityId, attributeName)
+  }
+}
+
+export const editorPathforTypesTemplateAttribute = (entityType, entityId, templateId, attributeName) => {
+  switch (entityType) {
+    case 'card':
+      return cardTemplateAttributeEditorPath(entityId, templateId, attributeName)
+    case 'note':
+      return noteTemplateAttributeEditorPath(entityId, templateId, attributeName)
+    case 'character':
+      return characterTemplateAttributeEditorPath(entityId, templateId, attributeName)
+    case 'place':
+      return placeTemplateAttributeEditorPath(entityId, templateId, attributeName)
+    default:
+      return cardTemplateAttributeEditorPath(entityId, templateId, attributeName)
+  }
+}
+
 export const attrIfPresent = (attrName, value) =>
   value || value === ''
     ? {
