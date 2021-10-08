@@ -7,7 +7,11 @@ import { checkDependencies } from '../../checkDependencies'
 
 const UserInfoConnector = (connector) => {
   const {
-    platform: { machineIdSync, os },
+    platform: {
+      machineIdSync,
+      os,
+      firebase: { logOut },
+    },
   } = connector
   checkDependencies({ machineIdSync })
 
@@ -59,6 +63,13 @@ const UserInfoConnector = (connector) => {
             <p className="secondary-text">{t('Use this to remove your license on this device')}</p>
           </div>
         )}
+        {os == 'unknown' ? (
+          <div className="text-right">
+            <Button bsStyle="danger" bsSize="small" onClick={logOut}>
+              {t('Log Out')}
+            </Button>
+          </div>
+        ) : null}
       </div>
     )
   }
