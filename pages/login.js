@@ -6,7 +6,7 @@ import { useRouter } from 'next/router'
 
 import { FunSpinner } from 'connected-components'
 import { onSessionChange, firebaseUI, startUI, currentUser } from 'plottr_firebase'
-import { userHasPro } from '../lib/checkPro'
+import { setSubscriptionInfo, userHasPro } from '../lib/checkPro'
 
 export default function Login() {
   const [sessionChecked, setSessionChecked] = useState(false)
@@ -30,6 +30,7 @@ export default function Login() {
           .then(async (token) => {
             console.log('token', token.claims)
             if (token.claims.beta || token.claims.admin) {
+              setSubscriptionInfo({ ...token.claims, customer: { email: user.email } })
               window.location.href = url
             } else {
               // check for Plottr Pro
