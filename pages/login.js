@@ -13,7 +13,7 @@ export default function Login() {
   const router = useRouter()
   const { pid } = router.query
 
-  useEffect(async () => {
+  useEffect(() => {
     if (sessionChecked) return
     onSessionChange(async (user) => {
       console.log('session changed', user)
