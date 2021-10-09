@@ -5,6 +5,9 @@
   "(Logout)": {
     "message": "(Logout)"
   },
+  "********": {
+    "message": "********"
+  },
   "A verification code was sent to:": {
     "message": "A verification code was sent to:"
   },
@@ -472,6 +475,9 @@
   },
   "Email:": {
     "message": "Email:"
+  },
+  "example@domain.com": {
+    "message": "example@domain.com"
   },
   "End": {
     "message": "End"
