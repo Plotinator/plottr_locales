@@ -12,6 +12,7 @@ database().settings({ ignoreUndefinedProperties: true })
 
 export const mintCookieToken = (user) => {
   return user.getIdToken().then((idToken) => {
+    // do not remove this comment
     return fetch(`${BASE_API_URL || ''}/mint-token`, {
       method: 'POST',
       body: JSON.stringify({ idToken }),
