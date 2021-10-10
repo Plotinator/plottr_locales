@@ -587,6 +587,12 @@
   "Free Trial": {
     "message": "Free Trial"
   },
+  "From File": {
+    "message": "From File"
+  },
+  "From Template": {
+    "message": "From Template"
+  },
   "GET A LICENSE": {
     "message": "GET A LICENSE"
   },
@@ -691,6 +697,9 @@
   },
   "Keep your character sheets here": {
     "message": "Keep your character sheets here"
+  },
+  "Log Out": {
+    "message": "Log Out"
   },
   "LOGOUT": {
     "message": "LOGOUT"
@@ -802,6 +811,9 @@
   },
   "No Characters": {
     "message": "No Characters"
+  },
+  "No Documents Found": {
+    "message": "No Documents Found"
   },
   "No actions to undo": {
     "message": "No actions to undo"
@@ -1222,6 +1234,9 @@
   },
   "Source Link": {
     "message": "Source Link"
+  },
+  "Start": {
+    "message": "START"
   },
   "Start Mobile Subscription": {
     "message": "Start Mobile Subscription"
