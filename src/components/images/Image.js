@@ -16,32 +16,19 @@ const ImageConnector = (connector) => {
 
   const Image = ({ size, shape, image, responsive, className }) => {
     const [imageSrc, setImageSrc] = useState(null)
-    const [storageUrl, setStorageUrl] = useState(null)
 
     const isOnStorage = () => {
       return osIsUnknown && image?.path.startsWith('storage://')
     }
-
-    const currentStorageUrl = () => {
-      return isOnStorage() ? image?.path : image?.data
-    }
-
-    useEffect(() => {
-      if (storageUrl !== currentStorageUrl()) {
-        setImageSrc(null)
-      }
-    }, [setImageSrc, storageUrl, image])
 
     useEffect(() => {
       if (!image) return
 
       if (isOnStorage()) {
         resolveToPublicUrl(image.path).then((url) => {
-          setStorageUrl(currentStorageUrl())
           setImageSrc(url)
         })
       } else {
-        setStorageUrl(currentStorageUrl())
         setImageSrc(image.data)
       }
     }, [image, setImageSrc, imageSrc])
