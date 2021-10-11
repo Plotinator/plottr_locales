@@ -24,6 +24,7 @@ export default async (req, res) => {
   if (superNotSecretKey != 'magichorsewatermelon') return res.status(500).send('')
 
   let emailsWithoutUID = []
+  let resultingClaims = []
 
   // fetch uids from emails
   const uids = await Promise.all(
@@ -34,7 +35,7 @@ export default async (req, res) => {
         .then((userRecord) => {
           // See the UserRecord reference doc for the contents of userRecord.
           console.log('Success', userRecord.email, userRecord.uid, userRecord.customClaims)
-          return { uid: userRecord.uid, claims: userRecord.customClaims }
+          return { uid: userRecord.uid, claims: userRecord.customClaims, email: userRecord.email }
         })
         .catch((error) => {
           console.log('Error fetching user data:', em)
@@ -51,6 +52,7 @@ export default async (req, res) => {
         ...obj.claims,
         beta: true,
       }
+      resultingClaims.push({ email: obj.email, claims: claims })
       return admin
         .auth()
         .setCustomUserClaims(obj.uid, claims)
@@ -65,5 +67,5 @@ export default async (req, res) => {
     })
   )
 
-  return res.status(200).send(emailsWithoutUID)
+  return res.status(200).send({ results: resultingClaims, rejected: emailsWithoutUID })
 }
