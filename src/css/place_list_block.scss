@@ -213,6 +213,16 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+
+  .lock-icon__wrapper {
+    top: 75%;
+    left: 20%;
+    font-size: 12px;
+    padding: 12px;
+    svg {
+      font-size: 2rem;
+    }
+  }
 }
 
 .place-list__place__edit-image-wrapper {
