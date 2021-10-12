@@ -154,6 +154,12 @@
       width: 50%;
       padding-right: 3%;
       padding-left: 3%;
+
+      .lock-icon__wrapper {
+        position: absolute;
+        top: 66% !important;
+        left: 50%;
+      }
     }
   }
   .btn-toolbar {
