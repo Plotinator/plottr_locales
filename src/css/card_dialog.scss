@@ -130,6 +130,14 @@
   }
 }
 
+.card-dialog__custom-attributes__wrapper {
+  position: relative;
+  .lock-icon__wrapper {
+    position: absolute;
+    top: 55% !important;
+  }
+}
+
 .outline__description__editing  {
   position: relative;
 }
