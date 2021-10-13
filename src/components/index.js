@@ -12,6 +12,7 @@ import TemplatePicker from './templates/TemplatePicker'
 
 // Dialogs
 import DeleteConfirmModal from './dialogs/DeleteConfirmModal'
+import ErrorModal from './dialogs/ErrorModal'
 import CustomAttributeModal from './dialogs/CustomAttributeModal'
 import ItemsManagerModal, { ListItem } from './dialogs/ItemsManagerModal'
 import InputModal from './dialogs/InputModal'
@@ -103,6 +104,7 @@ import DashboardBody from './dashboard/navigation/DashboardBody'
 export {
   OverlayTrigger,
   DeleteConfirmModal,
+  ErrorModal,
   ColorPickerColor,
   ItemsManagerModal,
   ListItem,
