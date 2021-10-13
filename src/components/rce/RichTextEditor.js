@@ -239,7 +239,7 @@ const RichTextEditorConnector = (connector) => {
       <Slate editor={editor} value={value} onChange={onValueChanged} key={key.current}>
         {lock.clientId && lock.clientId !== clientId ? (
           <div className="lock-icon__wrapper" disabled={stealingLock} onClick={stealLock}>
-            <span>Steal lock</span>
+            <span>Take Control</span>
             <FaLock />
           </div>
         ) : null}
