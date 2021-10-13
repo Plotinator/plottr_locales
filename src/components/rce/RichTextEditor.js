@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo, useState, useEffect } from 'react'
 import PropTypes from 'react-proptypes'
 import { isEqual } from 'lodash'
-import { Button } from 'react-bootstrap'
 import cx from 'classnames'
 import { t as i18n } from 'plottr_locales'
 import isHotkey from 'is-hotkey'
@@ -17,6 +16,7 @@ import { useRegisterEditor } from './editor-registry'
 import { useEditState } from './withEditState'
 
 import { checkDependencies } from '../checkDependencies'
+import { FaLock } from 'react-icons/fa'
 
 const HOTKEYS = {
   'mod+b': 'bold',
@@ -71,6 +71,7 @@ const RichTextEditorConnector = (connector) => {
     isCloudFile,
     emailAddress,
   }) => {
+    // Editor instance
     const editor = useMemo(() => {
       return createEditor()
     }, [])
@@ -145,30 +146,6 @@ const RichTextEditorConnector = (connector) => {
     )
 
     const handleKeyDown = (event) => {
-      // If we don't have a selection, then the editor can't support
-      // programatic undo.  This isn't desirable because built-in undo
-      // leads to strange interactions when, e.g. the user undoes
-      // something, selections outside the RCE and then undoes again.
-      // (The result could be that text in the RCE is redone!)
-      //
-      // To ensure that the RCE has a selection, make sure that the on
-      // change handlers create actions that add `editorMetadata`.
-      // See the `editors` reducer for schema.
-      if (selection && event.key === 'z' && (event.ctrlKey || event.metaKey)) {
-        event.preventDefault()
-        if (event.shiftKey) {
-          redo()
-        } else {
-          undo()
-        }
-        return
-      }
-      // On Linux, redo is CTRL+y
-      if (selection && event.key === 'y' && event.ctrlKey) {
-        event.preventDefault()
-        redo()
-        return
-      }
       for (const hotkey in HOTKEYS) {
         if (isHotkey(hotkey, event)) {
           event.preventDefault()
@@ -248,20 +225,15 @@ const RichTextEditorConnector = (connector) => {
       return <Spinner />
     }
 
-    if (lock.clientId && lock.clientId !== clientId) {
-      return (
-        <>
-          <p>Editor is currently locked by {lock.emailAddress}.</p>
-          <Button disabled={stealingLock} onClick={stealLock}>
-            Steal lock
-          </Button>
-        </>
-      )
-    }
-
     const otherProps = {}
     return (
       <Slate editor={editor} value={value} onChange={onValueChanged} key={key.current}>
+        {lock.clientId && lock.clientId !== clientId ? (
+          <div className="lock-icon__wrapper" disabled={stealingLock} onClick={stealLock}>
+            <span>Steal lock</span>
+            <FaLock />
+          </div>
+        ) : null}
         <div className={cx('slate-editor__wrapper', className)}>
           <ToolBar editor={editor} darkMode={darkMode} selection={currentSelection} />
           <div
@@ -271,9 +243,13 @@ const RichTextEditorConnector = (connector) => {
               setEditorWrapperRef(e)
             }}
             onClick={handleClickEditable}
-            className={cx('slate-editor__editor', { darkmode: darkMode })}
+            className={cx('slate-editor__editor', {
+              darkmode: darkMode,
+              rceLocked: lock.clientId && lock.clientId !== clientId,
+            })}
           >
             <Editable
+              disabled={lock.clientId && lock.clientId !== clientId}
               spellCheck
               {...otherProps}
               renderLeaf={renderLeaf}
