@@ -3,7 +3,7 @@ import semverGt from 'semver/functions/gt'
 import 'firebase/auth'
 import 'firebase/firestore'
 import 'firebase/storage'
-import { v4 as uuidv4 } from 'uuid'
+import axios from 'axios'
 import { DateTime, Duration } from 'luxon'
 
 import { actions, ARRAY_KEYS } from 'pltr/v2'
@@ -35,10 +35,22 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig)
 }
 
-export const editFileName = (fileId, newName) => {
-  return database().doc(`file/${fileId}`).update({
-    fileName: newName,
+const pingAuth = (userId, fileId) => {
+  return axios.post(`${process.env.BASE_URL || ''}/api/ping-auth`, {
+    userId,
+    fileId,
   })
+}
+
+export const editFileName = (userId, fileId, newName) => {
+  return database()
+    .doc(`file/${fileId}`)
+    .update({
+      fileName: newName,
+    })
+    .then(() => {
+      pingAuth(userId, fileId)
+    })
 }
 
 let _database = null
@@ -366,27 +378,67 @@ export const deleteFile = (fileId, userId, clientId) => {
   const setDeletedhierarchyLevels = () => setDeleted('hierarchyLevels')
   const setDeletedimages = () => setDeleted('images')
 
-  return Promise.all([
-    setDeletedfile(),
-    setDeletedcards(),
-    setDeletedseries(),
-    setDeletedbooks(),
-    setDeletedcategories(),
-    setDeletedcharacters(),
-    setDeletedcustomAttributes(),
-    setDeletedlines(),
-    setDeletednotes(),
-    setDeletedplaces(),
-    setDeletedtags(),
-    setDeletedhierarchyLevels(),
-    setDeletedimages(),
-  ])
+  return setDeletedfile().then((deleteFileResult) =>
+    pingAuth(userId, fileId).then((pingAuthResult) =>
+      Promise.all([
+        setDeletedcards(),
+        setDeletedseries(),
+        setDeletedbooks(),
+        setDeletedcategories(),
+        setDeletedcharacters(),
+        setDeletedcustomAttributes(),
+        setDeletedlines(),
+        setDeletednotes(),
+        setDeletedplaces(),
+        setDeletedtags(),
+        setDeletedhierarchyLevels(),
+        setDeletedimages(),
+      ]).then((results) => [pingAuthResult, deleteFileResult, ...results])
+    )
+  )
 }
 
 export const stopListening = (unsubscribeFunctions) => {
   unsubscribeFunctions.forEach((fn) => {
     fn()
   })
+}
+
+export const listenToFiles = (userId, callback) => {
+  return database()
+    .collection(`authorisation/${userId}/granted`)
+    .onSnapshot(
+      (authorisationsRef) => {
+        const authorisedDocuments = []
+        authorisationsRef.forEach((authorisation) => {
+          const document = database()
+            .collection(`file`)
+            .doc(authorisation.id)
+            .get()
+            .then((file) => ({
+              id: file.id,
+              ...file.data(),
+              ...authorisation.data(),
+            }))
+          authorisedDocuments.push(document)
+        })
+        Promise.all(authorisedDocuments)
+          .then((documents) => {
+            return documents.map((document) => {
+              return {
+                ...document,
+                isCloudFile: true,
+              }
+            })
+          })
+          .then((authorisedDocuments) => {
+            callback(authorisedDocuments)
+          })
+      },
+      (error) => {
+        console.error('Error listening to files', error)
+      }
+    )
 }
 
 export const fetchFiles = (userId) => {
@@ -411,7 +463,7 @@ export const fetchFiles = (userId) => {
         return documents.map((document) => {
           return {
             ...document,
-            cloudFile: true,
+            isCloudFile: true,
           }
         })
       })
@@ -422,8 +474,25 @@ export const logOut = () => {
   return auth().signOut()
 }
 
+export const mintCookieToken = (user) => {
+  return user.getIdToken().then((idToken) => {
+    return axios.post(`${process.env.BASE_URL || ''}/api/mint-token`, {
+      idToken,
+    })
+  })
+}
+
 export const onSessionChange = (cb) => {
-  return auth().onAuthStateChanged(cb)
+  return auth().onAuthStateChanged((user) => {
+    if (user) {
+      return mintCookieToken(user).then(() => {
+        cb(user)
+        return Promise.resolve(null)
+      })
+    }
+    cb(user)
+    return Promise.resolve(null)
+  })
 }
 
 let _firebaseui
@@ -437,12 +506,19 @@ export const firebaseUI = () => {
 export const startUI = (firebaseUI, queryString) => {
   firebaseUI.start(queryString, {
     signInOptions: [
-      firebase.auth.EmailAuthProvider.PROVIDER_ID,
-      firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-      firebase.auth.FacebookAuthProvider.PROVIDER_ID,
-      firebase.auth.TwitterAuthProvider.PROVIDER_ID,
+      {
+        provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
+        disableSignUp: { status: true },
+      },
     ],
+    callbacks: {
+      signInSuccessWithAuthResult: () => false,
+    },
   })
+}
+
+export const currentUser = () => {
+  return firebase.auth().currentUser
 }
 
 // Useful for debugging because Firebase rejects keys with undefined
@@ -486,17 +562,40 @@ export const overwrite = (path, fileId, payload, clientId) => {
     })
 }
 
-export const shareDocument = (fileId, emailAddress) => {
-  const invitationToken = uuidv4()
-  return database()
-    .collection('file')
-    .doc(fileId)
-    .set(
-      { pending: [{ emailAddress, invitationToken, permission: 'collaborator' }] },
-      { merge: true }
-    )
+export const shareDocument = (userId, fileId, emailAddress, permission) => {
+  return axios
+    .post(`${process.env.BASE_URL || ''}/api/share-document`, {
+      fileId,
+      emailAddress,
+      userId,
+      permission,
+    })
     .then(() => {
-      return invitationToken
+      return database()
+        .collection('file')
+        .doc(fileId)
+        .get()
+        .then((documentRef) => {
+          const document = documentRef.data()
+          const existingShareRecord = document.shareRecords.find(
+            (shareRecord) => shareRecord.emailAddress === emailAddress
+          )
+          if (existingShareRecord) {
+            return pingAuth(userId, fileId)
+          }
+          return database()
+            .collection('file')
+            .doc(fileId)
+            .set(
+              {
+                shareRecords: [...document.shareRecords, { emailAddress, permission }],
+              },
+              { merge: true }
+            )
+            .then(() => {
+              return pingAuth(userId, fileId)
+            })
+        })
     })
 }
 
@@ -530,6 +629,31 @@ export const catchupEditsSeen = (fileId, editorId, myEditorKey, otherEditorKey, 
     .update({
       timeStamp: new Date(),
       [otherEditorKey]: since,
+    })
+}
+
+export const releaseRCELock = (fileId, editorId) => {
+  return database().doc(`rce/${fileId}/editors/${editorId}/locks/current`).delete()
+}
+
+export const lockRCE = (fileId, editorId, clientId, emailAddress = '') => {
+  return database().doc(`rce/${fileId}/editors/${editorId}/locks/current`).set({
+    clientId,
+    emailAddress,
+  })
+}
+
+export const listenForRCELock = (fileId, editorId, clientId, cb) => {
+  return database()
+    .doc(`rce/${fileId}/editors/${editorId}/locks/current`)
+    .onSnapshot((documentRef) => {
+      const data = documentRef.data()
+      if (!data) {
+        console.log("Didn't find a lock for RCE with editorId", editorId)
+        cb({ clientId: null })
+        return
+      }
+      cb(data)
     })
 }
 
@@ -655,6 +779,7 @@ export const saveBackup = (userId, file) => {
             storagePath: path,
             startOfSession: false,
             fileId,
+            fileName: file.project.selectedFile.fileName,
             lastModified: new Date(),
           })
         })
@@ -666,7 +791,9 @@ export const saveBackup = (userId, file) => {
         backupTime: startOfToday,
         fileId,
         storagePath: path,
+        fileName: file.project.selectedFile.fileName,
         startOfSession: true,
+        lastModified: new Date(),
       })
     })
   })
@@ -674,9 +801,13 @@ export const saveBackup = (userId, file) => {
 
 export const listenForBackups = (userId, onBackupsChanged) => {
   return database()
-    .collection('backup/${userId}/files')
-    .onSnapshot((documentRef) => {
-      onBackupsChanged(documentRef.data())
+    .collection(`backup/${userId}/files`)
+    .onSnapshot((documentsRef) => {
+      const documents = []
+      documentsRef.forEach((document) => {
+        documents.push(document.data())
+      })
+      onBackupsChanged(documents)
     })
 }
 
@@ -687,7 +818,7 @@ const formatDate = (date) => {
 const toBackupPath = (userId, fileId, date, startOfSession) => {
   return `storage://backups/${userId}/${fileId}/${formatDate(date)}${
     startOfSession ? '-(start-of-session)' : ''
-  }`
+  }.pltr`
 }
 
 const withoutStorageProtocal = (path) => {
@@ -721,36 +852,54 @@ export const saveCustomTemplate = (userId, template) => {
     .child(withoutStorageProtocal(filePath))
     .putString(JSON.stringify(template))
   return new Promise((resolve, reject) => {
-    return storageTask.then(() => {
-      resolve(filePath)
-    }, reject)
+    return storageTask
+      .then(() => {
+        resolve(filePath)
+      }, reject)
+      .then((result) => {
+        // Bumping the timestamp will guarantee that listeners fetch
+        // the latest versions.
+        return database()
+          .doc(`/templates/${userId}/userTemplates/${template.id}`)
+          .set({ id: template.id, path: filePath, timeStamp: new Date() })
+      })
   })
 }
 
-export const allTemplateUrlsForUser = (userId) => {
-  return storage()
-    .ref()
-    .child(`userTemplates/${userId}`)
-    .listAll()
-    .then((result) => {
-      return Promise.all(result.items.map((result) => result.getDownloadURL()))
-    })
+export const allTemplateUrlsForUser = (documents) => {
+  return Promise.all(
+    documents.map(({ path }) =>
+      storage().ref().child(withoutStorageProtocal(path)).getDownloadURL()
+    )
+  )
 }
 
 export const listenToCustomTemplates = (userId, callback) => {
-  const interval = setInterval(() => {
-    callback(allTemplateUrlsForUser(userId))
-  }, 5000)
-
-  return () => {
-    clearInterval(interval)
-  }
+  return database()
+    .collection(`/templates/${userId}/userTemplates`)
+    .onSnapshot((documentsRef) => {
+      const documents = []
+      documentsRef.forEach((document) => {
+        documents.push(document.data())
+      })
+      allTemplateUrlsForUser(documents)
+        .then((urls) =>
+          Promise.all(urls.map((url) => fetch(url).then((response) => response.json())))
+        )
+        .then(callback)
+    })
 }
 
 export const editCustomTemplate = saveCustomTemplate
 
 export const deleteCustomTemplate = (userId, templateId) => {
-  return storage().ref().child(`userTemplates/${templateId}`).delete()
+  return storage()
+    .ref()
+    .child(`userTemplates/${templateId}`)
+    .delete()
+    .then((result) => {
+      database().doc(`/templates/${userId}/userTemplates/${templateId}`).delete()
+    })
 }
 
 const toImagePath = (userId, imageName) => {
@@ -775,6 +924,10 @@ export const saveImageToStorageFromURL = (userId, imageName, imageUrl) => {
   return imagetoBlob(imageUrl).then((response) => {
     return saveImageToStorageBlob(userId, imageName, response.blob())
   })
+}
+
+export const backupPublicURL = (storageProtocolURL) => {
+  return storage().ref().child(withoutStorageProtocal(storageProtocolURL)).getDownloadURL()
 }
 
 export const imagePublicURL = (storageProtocolURL) => {
