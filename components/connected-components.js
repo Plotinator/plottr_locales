@@ -207,6 +207,7 @@ const platform = {
       // TODO
     },
     trial90days: [],
+    hasPro: true,
   },
   reloadMenu: () => {
     // NO-OP
