@@ -79,6 +79,7 @@ const RichTextEditorConnector = (connector) => {
     const registerEditor = useRegisterEditor(editor)
 
     const [lock, setLock] = useState(isCloudFile ? null : true)
+    const [focus, setFocus] = useState(null)
     const [stealingLock, setStealingLock] = useState(false)
 
     // Rendering helpers
@@ -108,20 +109,34 @@ const RichTextEditorConnector = (connector) => {
     }, [fileId, id, clientId, emailAddress])
 
     const relinquishLock = useCallback(() => {
-      if (releaseRCELock) releaseRCELock(fileId, id)
-    }, [fileId, id])
+      if (releaseRCELock && lock?.clientId === clientId) {
+        releaseRCELock(fileId, id)
+      }
+    }, [fileId, id, clientId, lock])
+
+    const handleOnBlur = () => {
+      setFocus(false)
+      relinquishLock()
+    }
+
+    const handleOnFocus = () => {
+      setFocus(true)
+      if (!lock || !lock.clientId) {
+        stealLock()
+      }
+    }
 
     // Check for edit locks
     useEffect(() => {
       return listenForRCELock(fileId, id, clientId, (lockResult) => {
         if (!isEqual(lockResult, lock)) {
           setLock(lockResult)
-          if (!lockResult || !lockResult.clientId) {
+          if ((focus || focus === null) && (!lockResult || !lockResult.clientId)) {
             stealLock()
           }
         }
       })
-    }, [setLock, fileId, lock, id, clientId, stealLock])
+    }, [setLock, fileId, lock, id, clientId, stealLock, focus])
 
     // Focus on first render
     const [editorWrapperRef, setEditorWrapperRef] = useState(null)
@@ -217,8 +232,12 @@ const RichTextEditorConnector = (connector) => {
     }, [])
 
     useEffect(() => {
-      if (releaseRCELock) releaseRCELock(fileId, id)
-    }, [])
+      return () => {
+        if (releaseRCELock && lock?.clientId === clientId) {
+          releaseRCELock(fileId, id)
+        }
+      }
+    }, [lock, fileId, id])
 
     const handleClickEditable = (event) => {
       if (!editorWrapperRef) return
@@ -267,7 +286,8 @@ const RichTextEditorConnector = (connector) => {
               onKeyDown={handleKeyDown}
               onKeyUp={handleKeyUp}
               onInput={handleInput}
-              onBlur={relinquishLock}
+              onBlur={handleOnBlur}
+              onFocus={handleOnFocus}
             />
           </div>
         </div>
