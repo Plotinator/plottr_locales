@@ -35,24 +35,6 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig)
 }
 
-const pingAuth = (userId, fileId) => {
-  return axios.post(`${process.env.BASE_URL || ''}/api/ping-auth`, {
-    userId,
-    fileId,
-  })
-}
-
-export const editFileName = (userId, fileId, newName) => {
-  return database()
-    .doc(`file/${fileId}`)
-    .update({
-      fileName: newName,
-    })
-    .then(() => {
-      pingAuth(userId, fileId)
-    })
-}
-
 let _database = null
 const database = () => {
   if (_database) return _database
@@ -96,6 +78,24 @@ const storage = () => {
     _storage = firebase.storage()
   }
   return _storage
+}
+
+const pingAuth = (userId, fileId) => {
+  return axios.post(`${process.env.BASE_URL || ''}/api/ping-auth`, {
+    userId,
+    fileId,
+  })
+}
+
+export const editFileName = (userId, fileId, newName) => {
+  return database()
+    .doc(`file/${fileId}`)
+    .update({
+      fileName: newName,
+    })
+    .then(() => {
+      pingAuth(userId, fileId)
+    })
 }
 
 const patchActions = (path) => {
