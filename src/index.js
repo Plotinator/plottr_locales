@@ -378,22 +378,24 @@ export const deleteFile = (fileId, userId, clientId) => {
   const setDeletedhierarchyLevels = () => setDeleted('hierarchyLevels')
   const setDeletedimages = () => setDeleted('images')
 
-  return Promise.all([
-    pingAuth(userId, fileId),
-    setDeletedfile(),
-    setDeletedcards(),
-    setDeletedseries(),
-    setDeletedbooks(),
-    setDeletedcategories(),
-    setDeletedcharacters(),
-    setDeletedcustomAttributes(),
-    setDeletedlines(),
-    setDeletednotes(),
-    setDeletedplaces(),
-    setDeletedtags(),
-    setDeletedhierarchyLevels(),
-    setDeletedimages(),
-  ])
+  return setDeletedfile().then((deleteFileResult) =>
+    pingAuth(userId, fileId).then((pingAuthResult) =>
+      Promise.all([
+        setDeletedcards(),
+        setDeletedseries(),
+        setDeletedbooks(),
+        setDeletedcategories(),
+        setDeletedcharacters(),
+        setDeletedcustomAttributes(),
+        setDeletedlines(),
+        setDeletednotes(),
+        setDeletedplaces(),
+        setDeletedtags(),
+        setDeletedhierarchyLevels(),
+        setDeletedimages(),
+      ]).then((results) => [pingAuthResult, deleteFileResult, ...results])
+    )
+  )
 }
 
 export const stopListening = (unsubscribeFunctions) => {
@@ -630,6 +632,10 @@ export const catchupEditsSeen = (fileId, editorId, myEditorKey, otherEditorKey, 
     })
 }
 
+export const releaseRCELock = (fileId, editorId) => {
+  return database().doc(`rce/${fileId}/editors/${editorId}/locks/current`).delete()
+}
+
 export const lockRCE = (fileId, editorId, clientId, emailAddress = '') => {
   return database().doc(`rce/${fileId}/editors/${editorId}/locks/current`).set({
     clientId,
@@ -846,40 +852,54 @@ export const saveCustomTemplate = (userId, template) => {
     .child(withoutStorageProtocal(filePath))
     .putString(JSON.stringify(template))
   return new Promise((resolve, reject) => {
-    return storageTask.then(() => {
-      resolve(filePath)
-    }, reject)
+    return storageTask
+      .then(() => {
+        resolve(filePath)
+      }, reject)
+      .then((result) => {
+        // Bumping the timestamp will guarantee that listeners fetch
+        // the latest versions.
+        return database()
+          .doc(`/templates/${userId}/userTemplates/${template.id}`)
+          .set({ id: template.id, path: filePath, timeStamp: new Date() })
+      })
   })
 }
 
-export const allTemplateUrlsForUser = (userId) => {
-  return storage()
-    .ref()
-    .child(`userTemplates/${userId}`)
-    .listAll()
-    .then((result) => {
-      return Promise.all(result.items.map((result) => result.getDownloadURL()))
-    })
+export const allTemplateUrlsForUser = (documents) => {
+  return Promise.all(
+    documents.map(({ path }) =>
+      storage().ref().child(withoutStorageProtocal(path)).getDownloadURL()
+    )
+  )
 }
 
 export const listenToCustomTemplates = (userId, callback) => {
-  const interval = setInterval(() => {
-    allTemplateUrlsForUser(userId)
-      .then((urls) =>
-        Promise.all(urls.map((url) => fetch(url).then((response) => response.json())))
-      )
-      .then(callback)
-  }, 5000)
-
-  return () => {
-    clearInterval(interval)
-  }
+  return database()
+    .collection(`/templates/${userId}/userTemplates`)
+    .onSnapshot((documentsRef) => {
+      const documents = []
+      documentsRef.forEach((document) => {
+        documents.push(document.data())
+      })
+      allTemplateUrlsForUser(documents)
+        .then((urls) =>
+          Promise.all(urls.map((url) => fetch(url).then((response) => response.json())))
+        )
+        .then(callback)
+    })
 }
 
 export const editCustomTemplate = saveCustomTemplate
 
 export const deleteCustomTemplate = (userId, templateId) => {
-  return storage().ref().child(`userTemplates/${templateId}`).delete()
+  return storage()
+    .ref()
+    .child(`userTemplates/${templateId}`)
+    .delete()
+    .then((result) => {
+      database().doc(`/templates/${userId}/userTemplates/${templateId}`).delete()
+    })
 }
 
 const toImagePath = (userId, imageName) => {
