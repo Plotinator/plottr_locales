@@ -25,6 +25,7 @@ export default (req, res) => {
   return auth.createSessionCookie(idToken, { expiresIn }).then(
     (sessionCookie) => {
       res.setHeader('Set-Cookie', `session=${sessionCookie}; Max-Age=${expiresIn}; HttpOnly`)
+      res.setHeader('Content-Type', 'application/json')
       res.end(JSON.stringify({ status: 'success' }))
       return Promise.resolve('success')
     },
