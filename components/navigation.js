@@ -37,6 +37,15 @@ function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
   }, [])
 
   useEffect(() => {
+    const listener = document.addEventListener('open-dashboard', (event) => {
+      setDashboardView(event.dashboardTab)
+    })
+    return () => {
+      document.removeEventListener('open-dashboard', listener)
+    }
+  }, [])
+
+  useEffect(() => {
     onSessionChange((user) => {
       if (!user) {
         // window.location.href = '/login'
