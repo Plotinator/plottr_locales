@@ -21,6 +21,7 @@ import {
   backupPublicURL,
   lockRCE,
   listenForRCELock,
+  releaseRCELock,
   logOut,
 } from 'plottr_firebase'
 import {
@@ -317,6 +318,7 @@ const platform = {
   publishRCEOperations,
   lockRCE,
   listenForRCELock,
+  releaseRCELock,
   deleteChangeSignal,
   deleteOldChanges,
   fetchRCEOperations,
