@@ -8,7 +8,7 @@ import { listen, stopListening } from 'plottr_firebase'
 import { listenToCustomTemplates } from '../lib/templates'
 import { settings } from '../lib/settings'
 import { store } from '../lib/redux'
-import { closeDashboard } from '../lib/dashboard'
+import { closeDashboard, openDashboard } from '../lib/dashboard'
 import { setCurrentProject, currentProject } from '../lib/currentProject'
 
 const Listener = ({
@@ -33,12 +33,20 @@ const Listener = ({
     if (sessionFileId && sessionFileId !== '') {
       const foundInList = fileList.find(({ id }) => id === sessionFileId)
       if (foundInList && !isEqual(foundInList, selectedFile)) {
-        selectFile(foundInList)
-        closeDashboard()
+        if (foundInList.deleted) {
+          selectFile(null)
+          openDashboard('files')
+        } else {
+          selectFile(foundInList)
+          closeDashboard()
+        }
+      } else if (!foundInList) {
+        selectFile(null)
+        openDashboard('files')
       }
       const currentFile = foundInList || selectedFile
       if (currentFile) {
-        setCurrentProject(currentFile.id)
+        setCurrentProject(currentFile?.id)
       }
     }
   }, [selectedFile, fileList])
