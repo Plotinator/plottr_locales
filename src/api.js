@@ -774,7 +774,7 @@ const api = (auth, database, storage, baseAPIDomain) => {
           // Bumping the timestamp will guarantee that listeners fetch
           // the latest versions.
           return database()
-            .doc(`/templates/${userId}/userTemplates/${template.id}`)
+            .doc(`templates/${userId}/userTemplates/${template.id}`)
             .set({ id: template.id, path: filePath, timeStamp: new Date() })
         })
     })
@@ -790,7 +790,7 @@ const api = (auth, database, storage, baseAPIDomain) => {
 
   const listenToCustomTemplates = (userId, callback) => {
     return database()
-      .collection(`/templates/${userId}/userTemplates`)
+      .collection(`templates/${userId}/userTemplates`)
       .onSnapshot((documentsRef) => {
         const documents = []
         documentsRef.forEach((document) => {
@@ -812,7 +812,7 @@ const api = (auth, database, storage, baseAPIDomain) => {
       .child(`userTemplates/${templateId}`)
       .delete()
       .then((result) => {
-        database().doc(`/templates/${userId}/userTemplates/${templateId}`).delete()
+        database().doc(`templates/${userId}/userTemplates/${templateId}`).delete()
       })
   }
 
