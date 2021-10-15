@@ -765,19 +765,14 @@ const api = (auth, database, storage, baseAPIDomain) => {
           .ref()
           .child(withoutStorageProtocal(filePath))
           .putString(JSON.stringify(template))
-    return new Promise((resolve, reject) => {
-      return storageTask
-        .then(() => {
-          resolve(filePath)
-        }, reject)
-        .then((result) => {
-          // Bumping the timestamp will guarantee that listeners fetch
-          // the latest versions.
-          return database()
-            .doc(`templates/${userId}/userTemplates/${template.id}`)
-            .set({ id: template.id, path: filePath, timeStamp: new Date() })
-        })
-    })
+    return storageTask
+      .then(() => {
+        // Bumping the timestamp will guarantee that listeners fetch
+        // the latest versions.
+        return database()
+          .doc(`templates/${userId}/userTemplates/${template.id}`)
+          .set({ id: template.id, path: filePath, timeStamp: new Date() })
+      })
   }
 
   const allTemplateUrlsForUser = (documents) => {
