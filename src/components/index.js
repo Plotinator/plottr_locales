@@ -12,6 +12,7 @@ import TemplatePicker from './templates/TemplatePicker'
 
 // Dialogs
 import DeleteConfirmModal from './dialogs/DeleteConfirmModal'
+import ErrorModal from './dialogs/ErrorModal'
 import CustomAttributeModal from './dialogs/CustomAttributeModal'
 import ItemsManagerModal, { ListItem } from './dialogs/ItemsManagerModal'
 import InputModal from './dialogs/InputModal'
@@ -100,9 +101,13 @@ import OverlayTrigger from './OverlayTrigger'
 // Dashboard
 import DashboardBody from './dashboard/navigation/DashboardBody'
 
+// Firebase
+import FirebaseLogin from './FirebaseLogin'
+
 export {
   OverlayTrigger,
   DeleteConfirmModal,
+  ErrorModal,
   ColorPickerColor,
   ItemsManagerModal,
   ListItem,
@@ -168,5 +173,6 @@ export {
   ProjectTemplateDetails,
   CharacterTemplateDetails,
   DashboardBody,
+  FirebaseLogin,
   connections,
 }

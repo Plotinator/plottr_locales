@@ -4,6 +4,7 @@ import * as pltr from 'pltr/v2'
 import {
   OverlayTrigger,
   DeleteConfirmModal,
+  ErrorModal,
   ColorPickerColor,
   ItemsManagerModal as UnconnectedItemsManagerModal,
   ListItem,
@@ -69,6 +70,7 @@ import {
   CharacterTemplateDetails,
   DashboardBody as UnconnectedDashboardBody,
   ActsHelpModal as UnconnectedActsHelpModal,
+  FirebaseLogin as UnconnectedFirebaseLogin,
 } from '../components'
 
 const connector = {
@@ -192,6 +194,12 @@ const connector = {
 //   templatesDisabled: bool,
 //   rootElementSelectors: [String],
 //   machineIdSync: () => IO String,
+//   firebase: {
+//     startUI,
+//     firebaseUI,
+//     onSessionChange,
+//     fetchFiles,
+//   },
 // }
 
 export default (platform) => {
@@ -199,6 +207,7 @@ export default (platform) => {
   return {
     OverlayTrigger,
     DeleteConfirmModal,
+    ErrorModal,
     ColorPickerColor,
     ItemsManagerModal: UnconnectedItemsManagerModal(connectorObject),
     ListItem,
@@ -264,5 +273,6 @@ export default (platform) => {
     CharacterTemplateDetails,
     DashboardBody: UnconnectedDashboardBody(connectorObject),
     ActsHelpModal: UnconnectedActsHelpModal(connectorObject),
+    FirebaseLogin: UnconnectedFirebaseLogin(connectorObject),
   }
 }

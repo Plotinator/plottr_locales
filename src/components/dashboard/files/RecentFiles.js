@@ -11,6 +11,8 @@ import UnconnectedFileActions from './FileActions'
 import RecentsHeader from './RecentsHeader'
 import { checkDependencies } from '../../checkDependencies'
 
+const isPlottrCloudFile = (filePath) => filePath && filePath.startsWith('plottr://')
+
 const renderPermission = (permission) => {
   switch (permission) {
     case 'collaborator':
@@ -38,8 +40,6 @@ const renderPermission = (permission) => {
       return null
   }
 }
-
-const isPlottrCloudFile = (filePath) => filePath && filePath.startsWith('plottr://')
 
 const RecentFilesConnector = (connector) => {
   const {
@@ -138,10 +138,12 @@ const RecentFilesConnector = (connector) => {
                 </div>
                 <FileActions
                   missing={!!missing}
-                  id={id}
+                  id={f.id || id}
                   fileName={f.fileName}
                   filePath={f.path || f.id}
                   openFile={openFile}
+                  permission={f.permission}
+                  isCloudFile={f.isCloudFile}
                 />
               </div>
             </Cell>
