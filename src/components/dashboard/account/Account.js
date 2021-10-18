@@ -9,6 +9,8 @@ import UnconnectedLicenseInfo from './LicenseInfo'
 import UnconnectedProInfo from './ProInfo'
 import UnconnectedTrialInfo from './TrialInfo'
 import { checkDependencies } from '../../checkDependencies'
+import BetaInfo from './BetaInfo'
+import { useEffect } from 'react'
 
 const AccountConnector = (connector) => {
   const {
@@ -83,6 +85,8 @@ const AccountConnector = (connector) => {
       if (isTrialExpired()) return <ExpiredView darkMode={darkMode} />
 
       const body = []
+      if (os == 'unknown') body.push(<BetaInfo key="beta" />)
+
       if (hasPro) body.push(<ProInfo key="pro" />)
 
       if (isLicense()) {
