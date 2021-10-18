@@ -9,9 +9,11 @@ import { actions, ARRAY_KEYS } from 'pltr/v2'
  * of the correspending firebase objects from either the firebase JS
  * api or the react-native-firebase api.
  */
-const api = (auth, database, storage, baseAPIDomain) => {
+const api = (auth, database, storage, baseAPIDomain, development) => {
+  const BASE_API_URL = development ? '' : `https://${baseAPIDomain || ''}`
+
   const pingAuth = (userId, fileId) => {
-    return axios.post(`https://${baseAPIDomain || ''}/api/ping-auth`, {
+    return axios.post(`${BASE_API_URL}/api/ping-auth`, {
       userId,
       fileId,
     })
@@ -399,7 +401,7 @@ const api = (auth, database, storage, baseAPIDomain) => {
   const mintCookieToken = (user) => {
     return user.getIdToken().then((idToken) => {
       // do not remove this comment
-      return fetch(`https://${baseAPIDomain || ''}/api/mint-token`, {
+      return fetch(`${BASE_API_URL}/api/mint-token`, {
         method: 'POST',
         body: JSON.stringify({ idToken }),
         headers: {
@@ -478,7 +480,7 @@ const api = (auth, database, storage, baseAPIDomain) => {
 
   const shareDocument = (userId, fileId, emailAddress, permission) => {
     return axios
-      .post(`https://${baseAPIDomain || ''}/api/share-document`, {
+      .post(`${BASE_API_URL}/api/share-document`, {
         fileId,
         emailAddress,
         userId,
