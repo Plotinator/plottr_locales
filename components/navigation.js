@@ -63,20 +63,8 @@ function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
     setDashboardView('account')
   }
 
-  const selectOptions = () => {
-    setDashboardView('options')
-  }
-
   const selectFiles = () => {
     setDashboardView('files')
-  }
-
-  const selectTemplates = () => {
-    setDashboardView('templates')
-  }
-
-  const selectBackups = () => {
-    setDashboardView('backups')
   }
 
   const selectHelp = () => {
@@ -149,9 +137,7 @@ function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
               </Dropdown.Toggle>
               <Dropdown.Menu>
                 <MenuItem onSelect={selectFiles}>{t('Projects')}</MenuItem>
-                <MenuItem onSelect={selectOptions}>{t('Settings')}</MenuItem>
                 <MenuItem onSelect={selectAccount}>{t('Account')}</MenuItem>
-                <MenuItem onSelect={selectBackups}>{t('Backups')}</MenuItem>
                 <MenuItem onSelect={selectHelp}>{t('Help')}</MenuItem>
               </Dropdown.Menu>
             </Dropdown>
