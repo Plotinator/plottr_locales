@@ -1,9 +1,11 @@
 import auth from '@react-native-firebase/auth'
 import database from '@react-native-firebase/firestore'
 import storage from '@react-native-firebase/storage'
-import { BASE_API_DOMAIN } from '@env'
+import Config from 'react-native-config'
 
 import api from '../src/api'
+
+const { BASE_API_DOMAIN } = Config
 
 database().settings({ ignoreUndefinedProperties: true })
 
