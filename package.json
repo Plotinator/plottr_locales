@@ -32,6 +32,7 @@
     "js-file-download": "^0.4.12",
     "jsrtf": "^0.0.3",
     "luxon": "^2.0.2",
+    "mixpanel-browser": "^2.41.0",
     "next": "10.2.0",
     "plottr_components": "link:./lib/plottr_components",
     "plottr_firebase": "link:./lib/plottr_firebase",
