@@ -53,6 +53,7 @@ import { useBackupFolders } from '../lib/backups'
 import { createErrorReport } from '../lib/createErrorReport'
 import { closeDashboard } from '../lib/dashboard'
 import { useProLicenseInfo, userHasPro } from '../lib/checkPro'
+import MPQ from '../lib/MPQ'
 
 const deleteFileOnFirestore = (fileId) => {
   const state = store.getState()
@@ -296,11 +297,7 @@ const platform = {
     console.error('Attempted to open file at: ', fileName)
   },
   tempFilesPath: 'TODO',
-  mpq: {
-    push: () => {
-      console.warn('TODO: implement MPQ!')
-    },
-  },
+  mpq: MPQ,
   handleCustomerServiceCode: () => {
     // TODO
   },

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Router, Switch, Route } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { PropTypes } from 'prop-types'
@@ -34,6 +34,21 @@ const undo = () => {
 }
 
 const Root = ({ projectId }) => {
+  const [fileName, setFileName] = useState('')
+
+  useEffect(() => {
+    return store.subscribe(() => {
+      const {
+        present: {
+          project: { selectedFile },
+        },
+      } = store.getState()
+      if (selectedFile?.fileName !== fileName) {
+        setFileName(selectedFile?.fileName)
+      }
+    })
+  }, [])
+
   useEffect(() => {
     const listener = (event) => {
       if (event.key === 'z' && (event.ctrlKey || event.metaKey)) {
@@ -67,7 +82,7 @@ const Root = ({ projectId }) => {
   return (
     <Provider store={store}>
       <Head>
-        <title>Plottr</title>
+        <title>Plottr{fileName ? ` | ${fileName}` : ''}</title>
         <meta name="description" content="Plottr" />
         <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
