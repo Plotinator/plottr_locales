@@ -1,16 +1,14 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'react-proptypes'
 import { Button } from 'react-bootstrap'
 import { t } from 'plottr_locales'
 
-import UnconnectedChoiceView from './ChoiceView'
+import BetaInfo from './BetaInfo'
 import UnconnectedExpiredView from './ExpiredView'
 import UnconnectedLicenseInfo from './LicenseInfo'
 import UnconnectedProInfo from './ProInfo'
 import UnconnectedTrialInfo from './TrialInfo'
 import { checkDependencies } from '../../checkDependencies'
-import BetaInfo from './BetaInfo'
-import { useEffect } from 'react'
 
 const AccountConnector = (connector) => {
   const {
@@ -23,14 +21,13 @@ const AccountConnector = (connector) => {
   } = connector
   checkDependencies({ useTrialStatus, licenseStore, useLicenseInfo, hasPro, openExternal, os, mpq })
 
-  const ChoiceView = UnconnectedChoiceView(connector)
   const TrialInfo = UnconnectedTrialInfo(connector)
   const ExpiredView = UnconnectedExpiredView(connector)
   const LicenseInfo = UnconnectedLicenseInfo(connector)
   const ProInfo = UnconnectedProInfo(connector)
 
   // many possible states:
-  // choices,
+  // choices (handled by AccountHome)
   //  - no trialInfo
   //  - no license
   //  - no pro
@@ -54,12 +51,21 @@ const AccountConnector = (connector) => {
   const Account = ({ darkMode, startProOnboarding }) => {
     const trialInfo = useTrialStatus()
     const [licenseInfo, licenseInfoSize] = useLicenseInfo()
-    const isFirstTime = () => !licenseInfoSize && !trialInfo.started && !hasPro
-    const isTrial = () => trialInfo.started && !trialInfo.expired && !licenseInfoSize && !hasPro
-    const isTrialExpired = () => trialInfo.expired && !licenseInfoSize && !hasPro
-    const isLicense = () => !!licenseInfoSize
+    const checkTrial = () =>
+      trialInfo.started && !trialInfo.expired && !licenseInfoSize && !hasPro()
+    const checkTrialExpired = () => trialInfo.expired && !licenseInfoSize && !hasPro()
+    const checkLicense = () => !!licenseInfoSize
+    const [isTrial, setIsTrial] = useState(checkTrial())
+    const [isTrialExpired, setIsTrialExpired] = useState(checkTrialExpired())
+    const [isLicense, setIsLicense] = useState(checkLicense())
 
-    const isWebOrPro = os == 'unknown' || hasPro
+    useEffect(() => {
+      setIsTrial(checkTrial())
+      setIsTrialExpired(checkTrialExpired())
+      setIsLicense(checkLicense())
+    }, [trialInfo, licenseInfo, licenseInfoSize])
+
+    const hideProButton = os == 'unknown' || hasPro() || isTrial
 
     const deleteLicense = () => {
       mpq.push('btn_remove_license_confirm')
@@ -80,16 +86,14 @@ const AccountConnector = (connector) => {
     })
 
     const AllAccountInfo = () => {
-      if (isFirstTime()) return <ChoiceView darkMode={darkMode} />
-      if (isTrial()) return <TrialInfo darkMode={darkMode} trialInfo={trialInfo} />
-      if (isTrialExpired()) return <ExpiredView darkMode={darkMode} />
+      if (isTrial) return <TrialInfo darkMode={darkMode} trialInfo={trialInfo} />
+      if (isTrialExpired) return <ExpiredView darkMode={darkMode} />
 
       const body = []
       if (os == 'unknown') body.push(<BetaInfo key="beta" />)
+      if (hasPro()) body.push(<ProInfo key="pro" />)
 
-      if (hasPro) body.push(<ProInfo key="pro" />)
-
-      if (isLicense()) {
+      if (isLicense) {
         body.push(
           <LicenseInfo key="license" licenseInfo={licenseInfo} deleteLicense={deleteLicense} />
         )
@@ -102,7 +106,7 @@ const AccountConnector = (connector) => {
       <div className="dashboard__account">
         <div className="dashboard__acount__top">
           <h1>{t('Account')}</h1>
-          {isWebOrPro ? null : (
+          {hideProButton ? null : (
             <div className="text-right">
               <Button onClick={startProOnboarding}>{t('Start Plottr Pro')} 🎉</Button>
               <p className="secondary-text">{proLink}</p>

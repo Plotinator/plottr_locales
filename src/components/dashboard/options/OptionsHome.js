@@ -51,10 +51,6 @@ const OptionsHomeConnector = (connector) => {
       }
     }
 
-    const onChangeNewFile = (ev) => {
-      saveSetting('user.newFiles', ev.target.value)
-    }
-
     const toggleBeatHierarchy = () => {
       const newValue = !settings.user.beatHierarchy
       saveSetting('user.beatHierarchy', newValue)
@@ -94,20 +90,6 @@ const OptionsHomeConnector = (connector) => {
                 />
               </div>
             </Tab>
-            {!osIsUnknown ? (
-              <Tab eventKey={2} title={t('Files')}>
-                <h1 className="secondary-text">{t('Coming Soon!')}</h1>
-                <div className="dashboard__options__item disabled">
-                  <h4>{t('Auto-Save')}</h4>
-                  <Switch
-                    disabled
-                    isOn={!!settings.user.autoSave || true}
-                    handleToggle={() => saveSetting('user.autoSave', !settings.user.autoSave)}
-                    labelText={t('By default, use auto-save for projects')}
-                  />
-                </div>{' '}
-              </Tab>
-            ) : null}
             <Tab eventKey={3} title={t('Backups')}>
               <div className="dashboard__options__item">
                 <h4>{t('Save Backups')}</h4>
@@ -119,16 +101,6 @@ const OptionsHomeConnector = (connector) => {
               </div>
               {!osIsUnknown ? (
                 <>
-                  <div className="dashboard__options__item">
-                    <h4>{t('Also save backups on this device')}</h4>
-                    <Switch
-                      isOn={!!settings.user.localBackups}
-                      handleToggle={() =>
-                        saveSetting('user.localBackups', !settings.user.localBackups)
-                      }
-                      labelText={t('Save backups to this device as well as in the cloud')}
-                    />
-                  </div>
                   <div className="dashboard__options__item">
                     <h4>{t('Backup Location')}</h4>
                     <HelpBlock className="dashboard__options-item-help">
@@ -149,6 +121,19 @@ const OptionsHomeConnector = (connector) => {
                   </div>
                   <div className="dashboard__options__item">
                     <BackupOptions />
+                  </div>
+                  <hr />
+                  <h1 className="secondary-text">{t('Coming Soon!')}</h1>
+                  <div className="dashboard__options__item disabled">
+                    <h4>{t('Also save backups on this device')}</h4>
+                    <Switch
+                      disabled
+                      isOn={!!settings.user.localBackups}
+                      handleToggle={() =>
+                        saveSetting('user.localBackups', !settings.user.localBackups)
+                      }
+                      labelText={t('Save backups to this device as well as in the cloud')}
+                    />
                   </div>
                 </>
               ) : null}

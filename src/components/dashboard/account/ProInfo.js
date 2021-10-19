@@ -45,7 +45,7 @@ const ProInfoConnector = (connector) => {
 
     return (
       <div className="dashboard__user-info">
-        <h2>{t('Subscription Information')}</h2>
+        <h2>{t('Pro Subscription')}</h2>
         <hr />
         <div className="dashboard__user-info__wrapper">
           <dl className="dl-horizontal">
