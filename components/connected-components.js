@@ -52,7 +52,7 @@ import {
 import { useBackupFolders } from '../lib/backups'
 import { createErrorReport } from '../lib/createErrorReport'
 import { closeDashboard } from '../lib/dashboard'
-import { useProLicenseInfo } from '../lib/checkPro'
+import { useProLicenseInfo, userHasPro } from '../lib/checkPro'
 
 const deleteFileOnFirestore = (fileId) => {
   const state = store.getState()
@@ -196,19 +196,17 @@ const platform = {
     }
   },
   license: {
-    useLicenseInfo: useProLicenseInfo,
-    checkForActiveLicense: () => {
-      // TODO
-    },
+    useLicenseInfo: () => [],
+    checkForActiveLicense: () => {},
     useTrialStatus,
-    licenseStore: () => {
-      // TODO
-    },
-    verifyLicense: () => {
-      // TODO
-    },
+    licenseStore: () => {},
+    verifyLicense: () => {},
     trial90days: [],
     hasPro: true,
+    checkForPro: async (email, callback) => {
+      const [hasPro, info] = await userHasPro(email)
+      callback(hasPro, info)
+    },
   },
   reloadMenu: () => {
     // NO-OP
