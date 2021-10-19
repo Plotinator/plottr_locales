@@ -202,7 +202,7 @@ const platform = {
     licenseStore: () => {},
     verifyLicense: () => {},
     trial90days: [],
-    hasPro: true,
+    hasPro: () => true,
     checkForPro: async (email, callback) => {
       const [hasPro, info] = await userHasPro(email)
       callback(hasPro, info)
