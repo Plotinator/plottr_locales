@@ -7,6 +7,8 @@ import { appVersion } from '../lib/version'
 import { newFile } from '../lib/files'
 import { closeDashboard } from '../lib/dashboard'
 
+const sansExtension = (fileName) => fileName.replace(/\..+$/, '')
+
 const Upload = ({
   userId,
   emailAddress,
@@ -52,7 +54,7 @@ const Upload = ({
           newFile(
             emailAddress,
             userId,
-            state.present.file.fileName,
+            sansExtension(fileList[0]?.name) || state.present.file.fileName,
             state,
             setFileList,
             selectFile
