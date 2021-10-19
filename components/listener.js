@@ -63,11 +63,6 @@ const Listener = ({
     setUnsubscribeFunctions(listen(store, userId, selectedFile.id, clientId, selectedFile.version))
     setPermission(selectedFile.permission)
     setFileLoaded()
-    if (settings.user.beatHierarchy && !actStructureIsOn) {
-      setBeatHierarchy()
-    } else if (!settings.user.beatHierarchy && actStructureIsOn) {
-      unsetBeatHierarchy()
-    }
 
     return () => {
       stopListening(unsubscribeFunctions)
@@ -75,6 +70,14 @@ const Listener = ({
       setPermission('viewer')
     }
   }, [selectedFile, userId, clientId])
+
+  useEffect(() => {
+    if (settings.user.beatHierarchy && !actStructureIsOn) {
+      setBeatHierarchy()
+    } else if (!settings.user.beatHierarchy && actStructureIsOn) {
+      unsetBeatHierarchy()
+    }
+  }, [actStructureIsOn, setBeatHierarchy, unsetBeatHierarchy])
 
   useEffect(() => {
     if (userId) {
