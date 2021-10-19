@@ -10,6 +10,7 @@ import { settings } from '../lib/settings'
 import { store } from '../lib/redux'
 import { closeDashboard, openDashboard } from '../lib/dashboard'
 import { setCurrentProject, currentProject } from '../lib/currentProject'
+import initMixpanel from 'lib/mixpanel'
 
 const Listener = ({
   userId,
@@ -63,11 +64,6 @@ const Listener = ({
     setUnsubscribeFunctions(listen(store, userId, selectedFile.id, clientId, selectedFile.version))
     setPermission(selectedFile.permission)
     setFileLoaded()
-    if (settings.user.beatHierarchy && !actStructureIsOn) {
-      setBeatHierarchy()
-    } else if (!settings.user.beatHierarchy && actStructureIsOn) {
-      unsetBeatHierarchy()
-    }
 
     return () => {
       stopListening(unsubscribeFunctions)
@@ -77,6 +73,14 @@ const Listener = ({
   }, [selectedFile, userId, clientId])
 
   useEffect(() => {
+    if (settings.user.beatHierarchy && !actStructureIsOn) {
+      setBeatHierarchy()
+    } else if (!settings.user.beatHierarchy && actStructureIsOn) {
+      unsetBeatHierarchy()
+    }
+  }, [actStructureIsOn, setBeatHierarchy, unsetBeatHierarchy])
+
+  useEffect(() => {
     if (userId) {
       const unsubscribe = listenToCustomTemplates(userId)
       return () => {
@@ -84,6 +88,12 @@ const Listener = ({
       }
     }
     return () => {}
+  }, [userId])
+
+  useEffect(() => {
+    if (userId) {
+      initMixpanel(userId)
+    }
   }, [userId])
 
   useEffect(() => {
