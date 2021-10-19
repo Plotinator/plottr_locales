@@ -30,12 +30,13 @@ export default function LoginPage() {
           .then(async (token) => {
             console.log('token', token.claims)
             if (token.claims.beta || token.claims.admin) {
-              setLicenseInfo({ ...token.claims, customer: { email: user.email } })
+              setLicenseInfo({ claims: token.claims, customer: { email: user.email } })
               window.location.href = url
             } else {
               // check for Plottr Pro
-              const hasPro = await userHasPro(user.email)
+              const [hasPro, info] = await userHasPro(user.email)
               if (hasPro) {
+                setLicenseInfo({ ...info, claims: token.claims })
                 window.location.href = url
               } else {
                 // display something saying
