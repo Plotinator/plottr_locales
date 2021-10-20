@@ -812,8 +812,12 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
       })
   }
 
+  const escapeImageName = (imageName) => {
+    return imageName.replace(/\//g, '__').replace(/:/g, '--')
+  }
+
   const toImagePath = (userId, imageName) => {
-    return `storage://images/${userId}/${imageName}`
+    return `storage://images/${userId}/${escapeImageName(imageName)}`
   }
 
   const imagetoBlob = (imageUrl) => {
