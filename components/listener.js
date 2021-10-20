@@ -10,7 +10,7 @@ import { settings } from '../lib/settings'
 import { store } from '../lib/redux'
 import { closeDashboard, openDashboard } from '../lib/dashboard'
 import { setCurrentProject, currentProject } from '../lib/currentProject'
-import initMixpanel from 'lib/mixpanel'
+import initMixpanel from '../lib/mixpanel'
 
 const Listener = ({
   userId,
