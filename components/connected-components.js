@@ -56,6 +56,7 @@ import { closeDashboard } from '../lib/dashboard'
 import { useProLicenseInfo, userHasPro } from '../lib/checkPro'
 import MPQ from '../lib/MPQ'
 import { resizeImage } from '../lib/resizeImage'
+import extractImages from '../lib/extractImages'
 
 const deleteFileOnFirestore = (fileId) => {
   const state = store.getState()
@@ -323,6 +324,7 @@ const platform = {
   machineIdSync: () => {
     return uuidv4()
   },
+  extractImages,
   storage: {
     saveImageToStorageBlob: (blob, name) => {
       const state = store.getState()
