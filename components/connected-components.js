@@ -267,7 +267,7 @@ const platform = {
   },
   rollbar: {
     rollbarAccessToken: process.env.NEXT_PUBLIC_ROLLBAR_ACCESS_TOKEN || '',
-    platform: 'TODO',
+    platform: 'web',
   },
   export: {
     askToExport: exportFile,
