@@ -42,6 +42,7 @@
     "react-bootstrap": "^0.32.4",
     "react-dom": "16.14.0",
     "react-icons": "^3.11.0",
+    "react-image-file-resizer": "^0.4.7",
     "react-proptypes": "^1.0.0",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",

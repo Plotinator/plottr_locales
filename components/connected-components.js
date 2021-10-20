@@ -10,6 +10,7 @@ import { actions } from 'pltr/v2'
 import { appVersion } from '../lib/version'
 import {
   saveImageToStorageBlob as saveImageToStorageBlobInFirebase,
+  saveImageToStorageFromURL as saveImageToStorageFromURLInFirebase,
   publishRCEOperations,
   fetchRCEOperations,
   deleteFile,
@@ -54,6 +55,7 @@ import { createErrorReport } from '../lib/createErrorReport'
 import { closeDashboard } from '../lib/dashboard'
 import { useProLicenseInfo, userHasPro } from '../lib/checkPro'
 import MPQ from '../lib/MPQ'
+import { resizeImage } from '../lib/resizeImage'
 
 const deleteFileOnFirestore = (fileId) => {
   const state = store.getState()
@@ -329,12 +331,20 @@ const platform = {
       } = state.present
       return saveImageToStorageBlobInFirebase(userId, name, blob)
     },
+    saveImageToStorageFromURL: (url, name) => {
+      const state = store.getState()
+      const {
+        client: { userId },
+      } = state.present
+      return saveImageToStorageFromURLInFirebase(userId, name, url)
+    },
     resolveToPublicUrl: (storageUrl) => {
       if (!storageUrl) return null
       return imagePublicURL(storageUrl)
     },
     isStorageURL,
     imagePublicURL,
+    resizeImage,
   },
   firebase: {
     logOut,
