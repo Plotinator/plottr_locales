@@ -832,7 +832,7 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
 
   const saveImageToStorageFromURL = (userId, imageName, imageUrl) => {
     return imagetoBlob(imageUrl).then((response) => {
-      return saveImageToStorageBlob(userId, imageName, response.blob())
+      return saveImageToStorageBlob(userId, imageName, response)
     })
   }
 
