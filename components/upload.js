@@ -6,6 +6,7 @@ import { actions, migrateIfNeeded, selectors } from 'pltr/v2'
 import { appVersion } from '../lib/version'
 import { newFile } from '../lib/files'
 import { closeDashboard } from '../lib/dashboard'
+import extractImages from '../lib/extractImages'
 
 const sansExtension = (fileName) => fileName.replace(/\..+$/, '')
 
@@ -49,19 +50,26 @@ const Upload = ({
           )
         }
         selectEmptyfile()
-        loadFile(data.file.fileName, true, data, data.file.version)
-        withFullFileState((state) =>
-          newFile(
-            emailAddress,
-            userId,
-            sansExtension(fileList[0]?.name) || state.present.file.fileName,
-            state,
-            setFileList,
-            selectFile
-          ).then(() => {
-            closeDashboard()
-          })
-        )
+        extractImages(data, userId).then((imagesExtracted) => {
+          loadFile(
+            imagesExtracted.file.fileName,
+            true,
+            imagesExtracted,
+            imagesExtracted.file.version
+          )
+          withFullFileState((state) =>
+            newFile(
+              emailAddress,
+              userId,
+              sansExtension(fileList[0]?.name) || state.present.file.fileName,
+              state,
+              setFileList,
+              selectFile
+            ).then(() => {
+              closeDashboard()
+            })
+          )
+        })
       })
     }
     fileReader.readAsText(fileList[0])
