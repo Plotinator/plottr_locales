@@ -11,8 +11,8 @@ const { BASE_API_URL } = Config
 
 database().settings({ ignoreUndefinedProperties: true })
 
-export const mintCookieToken = user => {
-  return user.getIdToken().then(idToken => {
+export const mintCookieToken = (user) => {
+  return user.getIdToken().then((idToken) => {
     // do not remove this comment
     return fetch(`${BASE_API_URL || ''}/mint-token`, {
       method: 'POST',
@@ -25,7 +25,7 @@ export const mintCookieToken = user => {
   })
 }
 
-export const onSessionChange = cb => {
+export const onSessionChange = (cb) => {
   return auth().onAuthStateChanged(cb)
 }
 
@@ -34,33 +34,31 @@ export const signInWithEmailAndPassword = (userName, password) => {
 }
 
 export const editFileName = (fileId, newName) => {
-  return database()
-    .doc(`file/${fileId}`)
-    .update({
-      fileName: newName
-    })
+  return database().doc(`file/${fileId}`).update({
+    fileName: newName
+  })
 }
 
-export const fetchFiles = userId => {
+export const fetchFiles = (userId) => {
   return database()
     .collection(`authorisation/${userId}/granted`)
     .get()
-    .then(authorisationsRef => {
+    .then((authorisationsRef) => {
       const authorisedDocuments = []
-      authorisationsRef.forEach(authorisation => {
+      authorisationsRef.forEach((authorisation) => {
         const document = database()
           .collection(`file`)
           .doc(authorisation.id)
           .get()
-          .then(file => ({
+          .then((file) => ({
             id: file.id,
             ...file.data(),
             ...authorisation.data()
           }))
         authorisedDocuments.push(document)
       })
-      return Promise.all(authorisedDocuments).then(documents => {
-        return documents.map(document => {
+      return Promise.all(authorisedDocuments).then((documents) => {
+        return documents.map((document) => {
           return {
             ...document,
             cloudFile: true
@@ -74,14 +72,14 @@ export const listenToFiles = (userId, callback) => {
   return database()
     .collection(`authorisation/${userId}/granted`)
     .onSnapshot(
-      authorisationsRef => {
+      (authorisationsRef) => {
         const authorisedDocuments = []
-        authorisationsRef.forEach(authorisation => {
+        authorisationsRef.forEach((authorisation) => {
           const document = database()
             .collection(`file`)
             .doc(authorisation.id)
             .get()
-            .then(file => ({
+            .then((file) => ({
               id: file.id,
               ...file.data(),
               ...authorisation.data()
@@ -89,25 +87,25 @@ export const listenToFiles = (userId, callback) => {
           authorisedDocuments.push(document)
         })
         Promise.all(authorisedDocuments)
-          .then(documents => {
-            return documents.map(document => {
+          .then((documents) => {
+            return documents.map((document) => {
               return {
                 ...document,
                 cloudFile: true
               }
             })
           })
-          .then(authorisedDocuments => {
+          .then((authorisedDocuments) => {
             callback(authorisedDocuments)
           })
       },
-      error => {
+      (error) => {
         console.error('Error listening to files', error)
       }
     )
 }
 
-const patchActions = path => {
+const patchActions = (path) => {
   switch (path) {
     case 'beats':
       return actions.beat
@@ -143,68 +141,61 @@ const patchActions = path => {
   return null
 }
 
-const onSnapshot = (
-  store,
-  fileId,
-  path,
-  withData,
-  patching,
-  clientId,
-  loadFunctionKey = 'load',
-  usingFromDocRef = () => ({})
-) => documentRef => {
-  const data = documentRef.data()
-  if (!data) {
-    console.warn(`No data in firestore at key ${path} for file: ${fileId}`)
-    return
-  }
-  if (data.clientId === clientId) return
-  const patchAction = patchActions(path)
-  if (!patchAction) {
-    console.error('No patch action for ', path)
-    return
-  }
-  delete data.fileId
-  delete data.clientId
-  store.dispatch(
-    patchActions(path)[loadFunctionKey](
-      patching,
-      withData({ ...usingFromDocRef(documentRef), ...data })
+const onSnapshot =
+  (
+    store,
+    fileId,
+    path,
+    withData,
+    patching,
+    clientId,
+    loadFunctionKey = 'load',
+    usingFromDocRef = () => ({})
+  ) =>
+  (documentRef) => {
+    const data = documentRef && documentRef.data()
+    if (!data) {
+      console.warn(`No data in firestore at key ${path} for file: ${fileId}`)
+      return
+    }
+    if (data.clientId === clientId) return
+    const patchAction = patchActions(path)
+    if (!patchAction) {
+      console.error('No patch action for ', path)
+      return
+    }
+    delete data.fileId
+    delete data.clientId
+    store.dispatch(
+      patchActions(path)[loadFunctionKey](
+        patching,
+        withData({ ...usingFromDocRef(documentRef), ...data })
+      )
     )
-  )
-}
+  }
 
 const listenToFile = (store, userId, fileId, clientId) => {
-  const withIsCloud = x => ({ ...x, isCloudFile: true, id: fileId })
+  const withIsCloud = (x) => ({ ...x, isCloudFile: true, id: fileId })
   return database()
     .collection('file')
     .doc(fileId)
     .onSnapshot(
-      onSnapshot(
-        store,
-        fileId,
-        'file',
-        withIsCloud,
-        true,
-        clientId,
-        'patchFile',
-        x => ({
-          id: x.id
-        })
-      )
+      onSnapshot(store, fileId, 'file', withIsCloud, true, clientId, 'patchFile', (x) => ({
+        id: x.id
+      }))
     )
 }
 
-const listenForObjectAtPath = path => (store, userId, fileId, clientId) => {
-  const identity = x => x
+const listenForObjectAtPath = (path) => (store, userId, fileId, clientId) => {
+  const identity = (x) => x
   return database()
     .collection(path)
     .doc(fileId)
     .onSnapshot(onSnapshot(store, fileId, path, identity, true, clientId))
 }
 
-const listenForArrayAtPath = path => (store, userId, fileId, clientId) => {
-  const values = x => Object.values(x)
+const listenForArrayAtPath = (path) => (store, userId, fileId, clientId) => {
+  const values = (x) => Object.values(x)
   return database()
     .collection(path)
     .doc(fileId)
@@ -213,8 +204,8 @@ const listenForArrayAtPath = path => (store, userId, fileId, clientId) => {
 
 const listenToBeats = (store, userId, fileId, clientId, version) => {
   const transform = semverGt(version, WHEN_BEATS_BECAME_AN_OBJECT)
-    ? x => x
-    : x => Object.values(x)
+    ? (x) => x
+    : (x) => Object.values(x)
   return database()
     .collection('beats')
     .doc(fileId)
@@ -258,8 +249,8 @@ export const listen = (store, userId, fileId, clientId, fileVersion) => {
   return unsubscribeFunctions
 }
 
-const onFetched = (fileId, path, withData, clientId) => documentRef => {
-  const data = documentRef.data()
+const onFetched = (fileId, path, withData, clientId) => (documentRef) => {
+  const data = documentRef && documentRef.data()
   if (!data) {
     console.warn(`No entry for ${path} on file ${fileId}`)
     return {}
@@ -271,8 +262,8 @@ const onFetched = (fileId, path, withData, clientId) => documentRef => {
   }
 }
 
-const fetchArrayAtPath = path => (userId, fileId, clientId) => {
-  const values = x => Object.values(x)
+const fetchArrayAtPath = (path) => (userId, fileId, clientId) => {
+  const values = (x) => Object.values(x)
   return database()
     .collection(path)
     .doc(fileId)
@@ -280,8 +271,8 @@ const fetchArrayAtPath = path => (userId, fileId, clientId) => {
     .then(onFetched(fileId, path, values, clientId))
 }
 
-const fetchObjectAtPath = path => (userId, fileId, clientId) => {
-  const identity = x => x
+const fetchObjectAtPath = (path) => (userId, fileId, clientId) => {
+  const identity = (x) => x
   return database()
     .collection(path)
     .doc(fileId)
@@ -293,8 +284,8 @@ const WHEN_BEATS_BECAME_AN_OBJECT = '2021.4.13'
 
 const fetchBeats = (userId, fileId, clientId, version) => {
   const transform = semverGt(version, WHEN_BEATS_BECAME_AN_OBJECT)
-    ? x => x
-    : x => Object.values(x)
+    ? (x) => x
+    : (x) => Object.values(x)
   return database()
     .collection('beats')
     .doc(fileId)
@@ -303,7 +294,7 @@ const fetchBeats = (userId, fileId, clientId, version) => {
 }
 
 const fetchFile = (userId, fileId, clientId) => {
-  const withIsCloud = x => ({ ...x, isCloudFile: true, id: fileId })
+  const withIsCloud = (x) => ({ ...x, isCloudFile: true, id: fileId })
   const path = 'file'
   return database()
     .collection(path)
@@ -336,29 +327,18 @@ export const withFileId = (fileId, file) => ({
   }
 })
 
-export const toFirestoreArray = array =>
-  array.reduce(
-    (acc, value, index) => Object.assign(acc, { [index]: value }),
-    {}
-  )
+export const toFirestoreArray = (array) =>
+  array.reduce((acc, value, index) => Object.assign(acc, { [index]: value }), {})
 
 export const overwriteAllKeys = (fileId, clientId, state) => {
   const results = []
-  Object.keys(state).forEach(key => {
-    if (
-      key === 'error' ||
-      key === 'permission' ||
-      key === 'ui' ||
-      key === 'project'
-    ) {
+  Object.keys(state).forEach((key) => {
+    if (key === 'error' || key === 'permission' || key === 'ui' || key === 'project') {
       return
     }
-    const payload =
-      ARRAY_KEYS.indexOf(key) !== -1
-        ? toFirestoreArray(state[key])
-        : state[key]
+    const payload = ARRAY_KEYS.indexOf(key) !== -1 ? toFirestoreArray(state[key]) : state[key]
     results.push(
-      overwrite(key, fileId, payload, clientId).catch(error => {
+      overwrite(key, fileId, payload, clientId).catch((error) => {
         console.error(`Error while force updating file ${fileId}`, error)
       })
     )
@@ -385,14 +365,14 @@ export const initialFetch = (userId, fileId, clientId, version) => {
     fetchhierarchyLevels(userId, fileId, clientId),
     fetchImages(userId, fileId, clientId),
     fetchClient(userId, fileId, clientId)
-  ]).then(results => {
+  ]).then((results) => {
     const json = Object.assign({}, ...results)
     return json
   })
 }
 
 export const deleteFile = (fileId, userId, clientId) => {
-  const setDeleted = path => patch(path, fileId, { deleted: true }, clientId)
+  const setDeleted = (path) => patch(path, fileId, { deleted: true }, clientId)
   const setDeletedfile = () => setDeleted('file')
   const setDeletedcards = () => setDeleted('cards')
   const setDeletedseries = () => setDeleted('series')
@@ -424,8 +404,8 @@ export const deleteFile = (fileId, userId, clientId) => {
   ])
 }
 
-export const stopListening = unsubscribeFunctions => {
-  unsubscribeFunctions.forEach(fn => {
+export const stopListening = (unsubscribeFunctions) => {
+  unsubscribeFunctions.forEach((fn) => {
     fn()
   })
 }
@@ -436,12 +416,12 @@ export const logOut = () => {
 
 // Useful for debugging because Firebase rejects keys with undefined
 // values.
-export const hasUndefinedValue = object => {
+export const hasUndefinedValue = (object) => {
   if (object === null) return false
 
   return (
     object === undefined ||
-    Object.values(object).some(value => {
+    Object.values(object).some((value) => {
       if (Array.isArray(value)) {
         return value.some(hasUndefinedValue)
       }
@@ -481,9 +461,9 @@ export const shareDocument = (fileId, emailAddress) => {
     .collection('file')
     .doc(fileId)
     .set(
-    {
-      pending: [{ emailAddress, invitationToken, permission: 'collaborator' }]
-    },
+      {
+        pending: [{ emailAddress, invitationToken, permission: 'collaborator' }]
+      },
       { merge: true }
     )
     .then(() => {
@@ -491,44 +471,31 @@ export const shareDocument = (fileId, emailAddress) => {
     })
 }
 
-export const publishRCEOperations = (
-  fileId,
-  editorId,
-  editorKey,
-  operations
-) => {
-  const modificationsRef = database().collection(
-    `rce/${fileId}/editors/${editorId}/changes`
-  )
+export const publishRCEOperations = (fileId, editorId, editorKey, operations) => {
+  const modificationsRef = database().collection(`rce/${fileId}/editors/${editorId}/changes`)
   const updateEditNumbersJob = operations.length
     ? database()
         .doc(`rce/${fileId}/editors/${editorId}/editTimestamps/${editorKey}`)
         .set(
-      {
-        timeStamp: new Date(),
-        editNumber: operations[operations.length - 1].editNumber,
-        editorKey
-      },
-      {
-        merge: true
-      }
+          {
+            timeStamp: new Date(),
+            editNumber: operations[operations.length - 1].editNumber,
+            editorKey
+          },
+          {
+            merge: true
+          }
         )
     : Promise.resolve([])
   return Promise.all([
     updateEditNumbersJob,
-    ...operations.map(operation => {
+    ...operations.map((operation) => {
       modificationsRef.add(operation)
     })
   ])
 }
 
-export const catchupEditsSeen = (
-  fileId,
-  editorId,
-  myEditorKey,
-  otherEditorKey,
-  since
-) => {
+export const catchupEditsSeen = (fileId, editorId, myEditorKey, otherEditorKey, since) => {
   database()
     .doc(`rce/${fileId}/editors/${editorId}/editTimestamps/${myEditorKey}`)
     .update({
@@ -538,19 +505,17 @@ export const catchupEditsSeen = (
 }
 
 export const lockRCE = (fileId, editorId, clientId, emailAddress = '') => {
-  return database()
-    .doc(`rce/${fileId}/editors/${editorId}/locks/current`)
-    .set({
-      clientId,
-      emailAddress
-    })
+  return database().doc(`rce/${fileId}/editors/${editorId}/locks/current`).set({
+    clientId,
+    emailAddress
+  })
 }
 
 export const listenForRCELock = (fileId, editorId, clientId, cb) => {
   return database()
     .doc(`rce/${fileId}/editors/${editorId}/locks/current`)
-    .onSnapshot(documentRef => {
-      const data = documentRef.data()
+    .onSnapshot((documentRef) => {
+      const data = documentRef && documentRef.data()
       if (!data) {
         console.log("Didn't find a lock for RCE with editorId", editorId)
         cb({ clientId: null })
@@ -563,35 +528,31 @@ export const listenForRCELock = (fileId, editorId, clientId, cb) => {
 export const listenForChangesToEditor = (fileId, editorId, cb) => {
   database()
     .collection(`rce/${fileId}/editors/${editorId}/editTimestamps`)
-    .onSnapshot(documentsRef => {
+    .onSnapshot((documentsRef) => {
       const documents = []
-      documentsRef.forEach(document => {
+      documentsRef.forEach((document) => {
         documents.push(document.data())
       })
       cb(documents)
     })
 }
 
-const deleteResults = documentsRef => {
+const deleteResults = (documentsRef) => {
   const deleteTasks = []
-  documentsRef.docs.forEach(document => {
+  documentsRef.docs.forEach((document) => {
     deleteTasks.push(document.ref.delete())
   })
   return Promise.all(deleteTasks)
 }
 
 export const deleteChangeSignal = (fileId, editorId, editorKey) => {
-  return database()
-    .doc(`rce/${fileId}/editors/${editorId}/editTimestamps/${editorKey}`)
-    .delete()
+  return database().doc(`rce/${fileId}/editors/${editorId}/editTimestamps/${editorKey}`).delete()
 }
 
 const ONE_MINUTE = 60 * 1000
 
 export const deleteOldChanges = (fileId, editorId) => {
-  const aMinuteAgo = DateTime.now()
-    .minus(Duration.fromMillis(ONE_MINUTE))
-    .toJSDate()
+  const aMinuteAgo = DateTime.now().minus(Duration.fromMillis(ONE_MINUTE)).toJSDate()
 
   return database()
     .collection(`rce/${fileId}/editors/${editorId}/changes`)
@@ -610,18 +571,18 @@ export const fetchRCEOperations = (fileId, editorId, since, editorKey, cb) => {
     .where('editNumber', '>', since)
     .orderBy('editNumber')
     .get()
-    .then(documentRef => {
+    .then((documentRef) => {
       const documents = []
-      documentRef.forEach(document => {
+      documentRef.forEach((document) => {
         documents.push(document.data())
       })
       if (documents.length) cb(documents)
     })
 }
 
-const getSingleDocument = documentRef => {
+const getSingleDocument = (documentRef) => {
   const documents = []
-  documentRef.forEach(document => {
+  documentRef.forEach((document) => {
     documents.push({ document: document.data(), documentRef: document })
   })
   if (documents.length) {
@@ -653,79 +614,65 @@ const currentBackup = (userId, file, startOfToday, fileId) => {
 const TEN_SECONDS_IN_MILISECONDS = 10000
 
 export const saveBackup = (userId, file) => {
-  const startOfToday = DateTime.now()
-    .startOf('day')
-    .toJSDate()
+  const startOfToday = DateTime.now().startOf('day').toJSDate()
   const lastModified = new Date()
   const fileId = file.project.selectedFile.id
 
-  return startOfSessionBackup(userId, file, startOfToday, fileId).then(
-    startOfSession => {
-      // Is there a backup for the start of today?
-      if (startOfSession) {
-        // Is there a non-start-of-session backup?
-        return currentBackup(userId, file, startOfToday, fileId).then(
-          result => {
-            if (result) {
-              // Update the current backup
-              const { document, documentRef } = result
-              const delta = lastModified - document.lastModified.toDate()
-              if (delta < TEN_SECONDS_IN_MILISECONDS) {
-                return Promise.resolve({ message: 'Not backed up', delta })
-              }
-              return backupToStorage(userId, file, startOfToday, false).then(
-                path => {
-                  return database()
-                    .doc(`backup/${userId}/files/${documentRef.id}`)
-                    .update({
-                      ...document,
-                      storagePath: path,
-                      lastModified: new Date()
-                    })
-                }
-              )
-            }
-            // Add a non-start-of-session backup.
-            return backupToStorage(userId, file, startOfToday, false).then(
-              path => {
-                return database()
-                  .collection(`backup/${userId}/files`)
-                  .add({
-                    backupTime: startOfToday,
-                    storagePath: path,
-                    startOfSession: false,
-                    fileId,
-                    lastModified: new Date()
-                  })
-              }
-            )
+  return startOfSessionBackup(userId, file, startOfToday, fileId).then((startOfSession) => {
+    // Is there a backup for the start of today?
+    if (startOfSession) {
+      // Is there a non-start-of-session backup?
+      return currentBackup(userId, file, startOfToday, fileId).then((result) => {
+        if (result) {
+          // Update the current backup
+          const { document, documentRef } = result
+          const delta = lastModified - document.lastModified.toDate()
+          if (delta < TEN_SECONDS_IN_MILISECONDS) {
+            return Promise.resolve({ message: 'Not backed up', delta })
           }
-        )
-      }
-      // Add a start-of-session backup
-      return backupToStorage(userId, file, startOfToday, true).then(path => {
-        return database()
-          .collection(`backup/${userId}/files`)
-          .add({
-            backupTime: startOfToday,
-            fileId,
-            storagePath: path,
-            startOfSession: true
+          return backupToStorage(userId, file, startOfToday, false).then((path) => {
+            return database()
+              .doc(`backup/${userId}/files/${documentRef.id}`)
+              .update({
+                ...document,
+                storagePath: path,
+                lastModified: new Date()
+              })
           })
+        }
+        // Add a non-start-of-session backup.
+        return backupToStorage(userId, file, startOfToday, false).then((path) => {
+          return database().collection(`backup/${userId}/files`).add({
+            backupTime: startOfToday,
+            storagePath: path,
+            startOfSession: false,
+            fileId,
+            lastModified: new Date()
+          })
+        })
       })
     }
-  )
+    // Add a start-of-session backup
+    return backupToStorage(userId, file, startOfToday, true).then((path) => {
+      return database().collection(`backup/${userId}/files`).add({
+        backupTime: startOfToday,
+        fileId,
+        storagePath: path,
+        startOfSession: true
+      })
+    })
+  })
 }
 
 export const listenForBackups = (userId, onBackupsChanged) => {
   return database()
     .collection('backup/${userId}/files')
-    .onSnapshot(documentRef => {
-      onBackupsChanged(documentRef.data())
+    .onSnapshot((documentRef) => {
+      onBackupsChanged(documentRef && documentRef.data())
     })
 }
 
-const formatDate = date => {
+const formatDate = (date) => {
   return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`
 }
 
@@ -735,7 +682,7 @@ const toBackupPath = (userId, fileId, date, startOfSession) => {
   }`
 }
 
-const withoutStorageProtocal = path => {
+const withoutStorageProtocal = (path) => {
   const split = path.split(/[a-zA-Z0-9]+:\/\//g)
   if (split.length > 1) return split[1]
   return split
@@ -772,13 +719,13 @@ export const saveCustomTemplate = (userId, template) => {
   })
 }
 
-export const allTemplateUrlsForUser = userId => {
+export const allTemplateUrlsForUser = (userId) => {
   return storage()
     .ref()
     .child(`userTemplates/${userId}`)
     .listAll()
-    .then(result => {
-      return Promise.all(result.items.map(result => result.getDownloadURL()))
+    .then((result) => {
+      return Promise.all(result.items.map((result) => result.getDownloadURL()))
     })
 }
 
@@ -795,26 +742,20 @@ export const listenToCustomTemplates = (userId, callback) => {
 export const editCustomTemplate = saveCustomTemplate
 
 export const deleteCustomTemplate = (userId, templateId) => {
-  return storage()
-    .ref()
-    .child(`userTemplates/${templateId}`)
-    .delete()
+  return storage().ref().child(`userTemplates/${templateId}`).delete()
 }
 
 const toImagePath = (userId, imageName) => {
   return `storage://images/${userId}/${imageName}`
 }
 
-const imagetoBlob = imageUrl => {
-  return fetch(imageUrl).then(response => response.blob())
+const imagetoBlob = (imageUrl) => {
+  return fetch(imageUrl).then((response) => response.blob())
 }
 
 export const saveImageToStorageBlob = (userId, imageName, imageBlob) => {
   const filePath = toImagePath(userId, imageName)
-  const storageTask = storage()
-    .ref()
-    .child(withoutStorageProtocal(filePath))
-    .put(imageBlob)
+  const storageTask = storage().ref().child(withoutStorageProtocal(filePath)).put(imageBlob)
   return new Promise((resolve, reject) => {
     return storageTask.then(() => {
       resolve(filePath)
@@ -823,18 +764,15 @@ export const saveImageToStorageBlob = (userId, imageName, imageBlob) => {
 }
 
 export const saveImageToStorageFromURL = (userId, imageName, imageUrl) => {
-  return imagetoBlob(imageUrl).then(response => {
+  return imagetoBlob(imageUrl).then((response) => {
     return saveImageToStorageBlob(userId, imageName, response.blob())
   })
 }
 
-export const imagePublicURL = storageProtocolURL => {
-  return storage()
-    .ref()
-    .child(withoutStorageProtocal(storageProtocolURL))
-    .getDownloadURL()
+export const imagePublicURL = (storageProtocolURL) => {
+  return storage().ref().child(withoutStorageProtocal(storageProtocolURL)).getDownloadURL()
 }
 
-export const isStorageURL = string => {
+export const isStorageURL = (string) => {
   return string.startsWith('storage://')
 }
