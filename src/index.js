@@ -18,7 +18,7 @@ const firebaseConfig =
         storageBucket: 'plottr.appspot.com',
         messagingSenderId: '414647050330',
         appId: '1:414647050330:web:6d0520f0d156e496deb863',
-        measurementId: 'G-V8KKTT2SWE',
+        measurementId: 'G-V8KKTT2SWE'
       }
     : {
         apiKey: process.env.FIREBASE_KEY || process.env.NEXT_PUBLIC_FIREBASE_KEY,
@@ -27,7 +27,7 @@ const firebaseConfig =
         storageBucket: 'plottr-ci.appspot.com',
         messagingSenderId: '733541501381',
         appId: '1:733541501381:web:66827ee4e4cbe58ac8e3ac',
-        measurementId: 'G-XHGVVN7KYL',
+        measurementId: 'G-XHGVVN7KYL'
       }
 
 // Initialize firebase instance (check whether one already exists)
@@ -37,7 +37,7 @@ if (!firebase.apps.length) {
 
 export const editFileName = (fileId, newName) => {
   return database().doc(`file/${fileId}`).update({
-    fileName: newName,
+    fileName: newName
   })
 }
 
@@ -134,7 +134,7 @@ const onSnapshot =
     usingFromDocRef = () => ({})
   ) =>
   (documentRef) => {
-    const data = documentRef.data()
+    const data = documentRef && documentRef.data()
     if (!data) {
       console.warn(`No data in firestore at key ${path} for file: ${fileId}`)
       return
@@ -162,7 +162,7 @@ const listenToFile = (store, userId, fileId, clientId) => {
     .doc(fileId)
     .onSnapshot(
       onSnapshot(store, fileId, 'file', withIsCloud, true, clientId, 'patchFile', (x) => ({
-        id: x.id,
+        id: x.id
       }))
     )
 }
@@ -225,13 +225,13 @@ export const listen = (store, userId, fileId, clientId, fileVersion) => {
     listenToTags(store, userId, fileId, clientId),
     listenTohierarchyLevels(store, userId, fileId, clientId),
     listenToImages(store, userId, fileId, clientId),
-    listenToClient(store, userId, fileId, clientId),
+    listenToClient(store, userId, fileId, clientId)
   ]
   return unsubscribeFunctions
 }
 
 const onFetched = (fileId, path, withData, clientId) => (documentRef) => {
-  const data = documentRef.data()
+  const data = documentRef && documentRef.data()
   if (!data) {
     console.warn(`No entry for ${path} on file ${fileId}`)
     return {}
@@ -239,7 +239,7 @@ const onFetched = (fileId, path, withData, clientId) => (documentRef) => {
   delete data.fileId
   delete data.clientId
   return {
-    [path]: withData(data),
+    [path]: withData(data)
   }
 }
 
@@ -304,8 +304,8 @@ export const withFileId = (fileId, file) => ({
   ...file,
   file: {
     ...file.file,
-    id: fileId,
-  },
+    id: fileId
+  }
 })
 
 export const toFirestoreArray = (array) =>
@@ -343,7 +343,7 @@ export const initialFetch = (userId, fileId, clientId, version) => {
     fetchTags(userId, fileId, clientId),
     fetchhierarchyLevels(userId, fileId, clientId),
     fetchImages(userId, fileId, clientId),
-    fetchClient(userId, fileId, clientId),
+    fetchClient(userId, fileId, clientId)
   ]).then((results) => {
     const json = Object.assign({}, ...results)
     return json
@@ -379,7 +379,7 @@ export const deleteFile = (fileId, userId, clientId) => {
     setDeletedplaces(),
     setDeletedtags(),
     setDeletedhierarchyLevels(),
-    setDeletedimages(),
+    setDeletedimages()
   ])
 }
 
@@ -403,7 +403,7 @@ export const fetchFiles = (userId) => {
           .then((file) => ({
             id: file.id,
             ...file.data(),
-            ...authorisation.data(),
+            ...authorisation.data()
           }))
         authorisedDocuments.push(document)
       })
@@ -411,7 +411,7 @@ export const fetchFiles = (userId) => {
         return documents.map((document) => {
           return {
             ...document,
-            cloudFile: true,
+            cloudFile: true
           }
         })
       })
@@ -440,8 +440,8 @@ export const startUI = (firebaseUI, queryString) => {
       firebase.auth.EmailAuthProvider.PROVIDER_ID,
       firebase.auth.GoogleAuthProvider.PROVIDER_ID,
       firebase.auth.FacebookAuthProvider.PROVIDER_ID,
-      firebase.auth.TwitterAuthProvider.PROVIDER_ID,
-    ],
+      firebase.auth.TwitterAuthProvider.PROVIDER_ID
+    ]
   })
 }
 
@@ -471,7 +471,7 @@ export const patch = (path, fileId, payload, clientId) => {
     .update({
       ...payload,
       clientId,
-      fileId,
+      fileId
     })
 }
 
@@ -482,7 +482,7 @@ export const overwrite = (path, fileId, payload, clientId) => {
     .set({
       ...payload,
       clientId,
-      fileId,
+      fileId
     })
 }
 
@@ -509,10 +509,10 @@ export const publishRCEOperations = (fileId, editorId, editorKey, operations) =>
           {
             timeStamp: new Date(),
             editNumber: operations[operations.length - 1].editNumber,
-            editorKey,
+            editorKey
           },
           {
-            merge: true,
+            merge: true
           }
         )
     : Promise.resolve([])
@@ -520,7 +520,7 @@ export const publishRCEOperations = (fileId, editorId, editorKey, operations) =>
     updateEditNumbersJob,
     ...operations.map((operation) => {
       modificationsRef.add(operation)
-    }),
+    })
   ])
 }
 
@@ -529,7 +529,7 @@ export const catchupEditsSeen = (fileId, editorId, myEditorKey, otherEditorKey, 
     .doc(`rce/${fileId}/editors/${editorId}/editTimestamps/${myEditorKey}`)
     .update({
       timeStamp: new Date(),
-      [otherEditorKey]: since,
+      [otherEditorKey]: since
     })
 }
 
@@ -644,7 +644,7 @@ export const saveBackup = (userId, file) => {
               .update({
                 ...document,
                 storagePath: path,
-                lastModified: new Date(),
+                lastModified: new Date()
               })
           })
         }
@@ -655,7 +655,7 @@ export const saveBackup = (userId, file) => {
             storagePath: path,
             startOfSession: false,
             fileId,
-            lastModified: new Date(),
+            lastModified: new Date()
           })
         })
       })
@@ -666,7 +666,7 @@ export const saveBackup = (userId, file) => {
         backupTime: startOfToday,
         fileId,
         storagePath: path,
-        startOfSession: true,
+        startOfSession: true
       })
     })
   })
@@ -676,7 +676,7 @@ export const listenForBackups = (userId, onBackupsChanged) => {
   return database()
     .collection('backup/${userId}/files')
     .onSnapshot((documentRef) => {
-      onBackupsChanged(documentRef.data())
+      onBackupsChanged(documentRef && documentRef.data())
     })
 }
 
