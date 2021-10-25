@@ -1,11 +1,10 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Router, Switch, Route } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { PropTypes } from 'prop-types'
 import { ActionCreators } from 'redux-undo'
 import Head from 'next/head'
 
-import { PlottrModal } from 'connected-components'
 import { history } from '../lib/history'
 import { store } from '../lib/redux'
 
@@ -24,28 +23,7 @@ import SessionObserver from './session-observer'
 import ClientIdMinter from './client-id-minter'
 import FileListListener from './file-list-listener'
 import Renamer from './renamer'
-import PasswordForm, { passwordSet } from './password-form'
 import SettingsConsistencyChecker from './settings-consistency-checker'
-
-const modalStyles = {
-  overlay: {
-    zIndex: 1000,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  content: {
-    padding: 0,
-    borderRadius: 0,
-    overflow: 'hidden',
-    width: '100%',
-    position: 'relative',
-    left: '0',
-    top: '0',
-    minHeight: '100vh',
-    maxHeight: '100vh',
-  },
-}
 
 const redo = () => {
   store.dispatch(ActionCreators.redo())
@@ -56,6 +34,21 @@ const undo = () => {
 }
 
 const Root = ({ projectId }) => {
+  const [fileName, setFileName] = useState('')
+
+  useEffect(() => {
+    return store.subscribe(() => {
+      const {
+        present: {
+          project: { selectedFile },
+        },
+      } = store.getState()
+      if (selectedFile?.fileName !== fileName) {
+        setFileName(selectedFile?.fileName)
+      }
+    })
+  }, [])
+
   useEffect(() => {
     const listener = (event) => {
       if (event.key === 'z' && (event.ctrlKey || event.metaKey)) {
@@ -89,7 +82,7 @@ const Root = ({ projectId }) => {
   return (
     <Provider store={store}>
       <Head>
-        <title>Plottr</title>
+        <title>Plottr{fileName ? ` | ${fileName}` : ''}</title>
         <meta name="description" content="Plottr" />
         <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
@@ -112,9 +105,6 @@ const Root = ({ projectId }) => {
         ></script>
       </Head>
       <React.StrictMode>
-        <PlottrModal isOpen={!passwordSet()} style={modalStyles}>
-          <PasswordForm />
-        </PlottrModal>
         <SettingsConsistencyChecker />
         <Renamer />
         <FileListListener />

@@ -249,6 +249,9 @@
       .card-dialog__custom-attributes-configuration-link {
         color: $darkmode-link-text;
       }
+      > .active {
+        position: relative !important;
+      }
     }
   }
 
@@ -270,5 +273,15 @@
   &.darkmode {
     background-color: $darkmode-darker-background;
     color: $darkmode-text;
+  }
+
+  .lock-icon__wrapper {
+    position: absolute;
+    top: 67%;
+    font-size: 12px;
+    padding: 20px;
+    svg {
+      font-size: 1.5rem;
+    }
   }
 }
