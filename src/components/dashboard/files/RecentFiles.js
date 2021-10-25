@@ -10,7 +10,7 @@ import MissingIndicator from './MissingIndicator'
 import UnconnectedFileActions from './FileActions'
 import RecentsHeader from './RecentsHeader'
 import { checkDependencies } from '../../checkDependencies'
-import { Spinner } from '../../Spinner'
+import { FunSpinner } from '../../Spinner'
 
 const isPlottrCloudFile = (filePath) => filePath && filePath.startsWith('plottr://')
 
@@ -66,9 +66,11 @@ const RecentFilesConnector = (connector) => {
     const [sortedIds, filesById] = useSortedKnownFiles(searchTerm, fileList)
     const [missingFiles, setMissing] = useState([])
     const [selectedFile, selectFile] = useState(null)
+    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
       let newMissing = [...missingFiles]
+      setLoading(true)
       sortedIds.forEach((id) => {
         const filePath = filesById[`${id}`].path
         if (!filePath) {
@@ -83,16 +85,19 @@ const RecentFilesConnector = (connector) => {
         }
       })
       setMissing(newMissing)
+      setLoading(false)
     }, [sortedIds, filesById])
 
-    const openFile = (filePath, id) => {
+    const openFile = async (filePath, id) => {
+      setLoading(true)
       if (missingFiles.includes(id)) return
-      openKnownFile(filePath, id)
+      await openKnownFile(filePath, id)
+      setLoading(false)
     }
 
     const renderRecents = () => {
       // TODO: if no files, show something different
-      if (!sortedIds.length) return null
+      if (!sortedIds.length) return <span>{t('No files found.')}</span>
 
       const fileWithPermissionsExists = Object.values(filesById).some(
         ({ permission }) => permission
@@ -103,7 +108,7 @@ const RecentFilesConnector = (connector) => {
         if (!f) return null
 
         const onFirebase = isPlottrCloudFile(f.path)
-        // TODO: where do web last save dates come from?  Backups perhaps?
+        // TODO: where do web last sav  e dates come from?  Backups perhaps?
         const lastOpen = (f.lastOpened && new Date(f.lastOpened)) || new Date()
         const fileBasename = (!onFirebase && f.path && basename(f.path)) || ''
         let formattedPath = ''
@@ -160,7 +165,7 @@ const RecentFilesConnector = (connector) => {
         )
       })
 
-      return (
+      return renderedFiles ? (
         <div className="dashboard__recent-files__table">
           <StickyTable leftStickyColumnCount={0}>
             <Row>
@@ -171,13 +176,15 @@ const RecentFilesConnector = (connector) => {
             {renderedFiles}
           </StickyTable>
         </div>
+      ) : (
+        <FunSpinner />
       )
     }
 
     return (
       <div className="dashboard__recent-files">
         <RecentsHeader setSearchTerm={setSearchTerm} />
-        {renderRecents() || <Spinner />}
+        {renderRecents() || <FunSpinner />}
       </div>
     )
   }
