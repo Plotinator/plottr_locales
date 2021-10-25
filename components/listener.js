@@ -8,8 +8,9 @@ import { listen, stopListening } from 'plottr_firebase'
 import { listenToCustomTemplates } from '../lib/templates'
 import { settings } from '../lib/settings'
 import { store } from '../lib/redux'
-import { closeDashboard } from '../lib/dashboard'
+import { closeDashboard, openDashboard } from '../lib/dashboard'
 import { setCurrentProject, currentProject } from '../lib/currentProject'
+import initMixpanel from '../lib/mixpanel'
 
 const Listener = ({
   userId,
@@ -33,12 +34,20 @@ const Listener = ({
     if (sessionFileId && sessionFileId !== '') {
       const foundInList = fileList.find(({ id }) => id === sessionFileId)
       if (foundInList && !isEqual(foundInList, selectedFile)) {
-        selectFile(foundInList)
-        closeDashboard()
+        if (foundInList.deleted) {
+          selectFile(null)
+          openDashboard('files')
+        } else {
+          selectFile(foundInList)
+          closeDashboard()
+        }
+      } else if (!foundInList) {
+        selectFile(null)
+        openDashboard('files')
       }
       const currentFile = foundInList || selectedFile
       if (currentFile) {
-        setCurrentProject(currentFile.id)
+        setCurrentProject(currentFile?.id)
       }
     }
   }, [selectedFile, fileList])
@@ -55,11 +64,6 @@ const Listener = ({
     setUnsubscribeFunctions(listen(store, userId, selectedFile.id, clientId, selectedFile.version))
     setPermission(selectedFile.permission)
     setFileLoaded()
-    if (settings.user.beatHierarchy && !actStructureIsOn) {
-      setBeatHierarchy()
-    } else if (!settings.user.beatHierarchy && actStructureIsOn) {
-      unsetBeatHierarchy()
-    }
 
     return () => {
       stopListening(unsubscribeFunctions)
@@ -69,6 +73,14 @@ const Listener = ({
   }, [selectedFile, userId, clientId])
 
   useEffect(() => {
+    if (settings.user.beatHierarchy && !actStructureIsOn) {
+      setBeatHierarchy()
+    } else if (!settings.user.beatHierarchy && actStructureIsOn) {
+      unsetBeatHierarchy()
+    }
+  }, [actStructureIsOn, setBeatHierarchy, unsetBeatHierarchy])
+
+  useEffect(() => {
     if (userId) {
       const unsubscribe = listenToCustomTemplates(userId)
       return () => {
@@ -76,6 +88,12 @@ const Listener = ({
       }
     }
     return () => {}
+  }, [userId])
+
+  useEffect(() => {
+    if (userId) {
+      initMixpanel(userId)
+    }
   }, [userId])
 
   useEffect(() => {

@@ -7,7 +7,7 @@ import { t } from 'plottr_locales'
 import { Beamer, BookChooser } from 'connected-components'
 import cx from 'classnames'
 import { FaRegUser } from 'react-icons/fa'
-import { logOut, onSessionChange } from 'plottr_firebase'
+import { onSessionChange } from 'plottr_firebase'
 
 import DashboardModal from './dashboard-modal'
 import Share from './share'
@@ -15,19 +15,10 @@ import Download from './download'
 import Upload from './upload'
 import { actions, selectors } from 'pltr/v2'
 import { basePath } from '../lib/basePath'
-import { useLicenseInfo } from '../lib/store_hooks'
-import { useTrialStatus } from '../lib/trialManager'
 import { currentProject } from '../lib/currentProject'
-
-const trialMode = true // TODO
-const isDev = process.env.NEXT_PUBLIC_NODE_ENV == 'development'
 
 function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
   const [dashboardView, setDashboardView] = useState(currentProject() ? null : 'files')
-  const trialInfo = useTrialStatus()
-  const [_licenseInfo, licenseInfoSize] = useLicenseInfo()
-  const firstTime = !licenseInfoSize && !trialInfo.started
-  const trialExpired = trialInfo.expired
 
   useEffect(() => {
     const path = basePath()
@@ -46,8 +37,13 @@ function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
   }, [])
 
   useEffect(() => {
-    if (firstTime || trialExpired) setDashboardView('account')
-  }, [firstTime, trialExpired, dashboardView])
+    const listener = document.addEventListener('open-dashboard', (event) => {
+      setDashboardView(event.dashboardTab)
+    })
+    return () => {
+      document.removeEventListener('open-dashboard', listener)
+    }
+  }, [])
 
   useEffect(() => {
     onSessionChange((user) => {
@@ -59,12 +55,6 @@ function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
     })
   }, [])
 
-  const renderTrialLinks = () => {
-    if (!trialMode || isDev) return null
-
-    return null
-  }
-
   const changeTo = (newLocation) => () => {
     changeCurrentView(newLocation)
   }
@@ -73,32 +63,15 @@ function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
     setDashboardView('account')
   }
 
-  const selectOptions = () => {
-    setDashboardView('options')
-  }
-
   const selectFiles = () => {
     setDashboardView('files')
-  }
-
-  const selectTemplates = () => {
-    setDashboardView('templates')
-  }
-
-  const selectBackups = () => {
-    setDashboardView('backups')
   }
 
   const selectHelp = () => {
     setDashboardView('help')
   }
 
-  const selectLogout = () => {
-    logOut()
-  }
-
   const resetDashboardView = () => {
-    if (firstTime || trialExpired) return
     setDashboardView(null)
   }
 
@@ -156,12 +129,6 @@ function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
           </li>
         </Nav>
         <Beamer inNavigation />
-        <Navbar.Form pullRight style={{ marginRight: '15px' }}>
-          <Upload />
-          <Download />
-          <Share />
-        </Navbar.Form>
-        {renderTrialLinks()}
         <Nav pullRight className="project-nav__options">
           <NavItem>
             <Dropdown id="dashboard-dropdown-menu">
@@ -169,17 +136,18 @@ function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
                 <FaRegUser />
               </Dropdown.Toggle>
               <Dropdown.Menu>
-                <MenuItem onSelect={selectFiles}>{t('Files')}</MenuItem>
-                <MenuItem onSelect={selectOptions}>{t('Settings')}</MenuItem>
+                <MenuItem onSelect={selectFiles}>{t('Projects')}</MenuItem>
                 <MenuItem onSelect={selectAccount}>{t('Account')}</MenuItem>
-                <MenuItem onSelect={selectBackups}>{t('Backups')}</MenuItem>
-                <MenuItem onSelect={selectTemplates}>{t('Templates')}</MenuItem>
                 <MenuItem onSelect={selectHelp}>{t('Help')}</MenuItem>
-                <MenuItem onSelect={selectLogout}>{t('Logout')}</MenuItem>
               </Dropdown.Menu>
             </Dropdown>
           </NavItem>
         </Nav>
+        <Navbar.Form pullRight style={{ marginRight: '15px' }}>
+          <Upload />
+          <Download />
+          <Share />
+        </Navbar.Form>
       </Navbar>
     </>
   )

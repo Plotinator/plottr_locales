@@ -1,10 +1,8 @@
 import React from 'react'
 import { PropTypes } from 'prop-types'
-import { PlottrModal } from 'connected-components'
+import { PlottrModal, DashboardBody } from 'connected-components'
 import cx from 'classnames'
 import { VscChromeClose } from 'react-icons/vsc'
-
-import { DashboardBody } from 'connected-components'
 
 const modalStyles = {
   overlay: {
