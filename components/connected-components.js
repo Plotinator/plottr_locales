@@ -10,6 +10,7 @@ import { actions } from 'pltr/v2'
 import { appVersion } from '../lib/version'
 import {
   saveImageToStorageBlob as saveImageToStorageBlobInFirebase,
+  saveImageToStorageFromURL as saveImageToStorageFromURLInFirebase,
   publishRCEOperations,
   fetchRCEOperations,
   deleteFile,
@@ -53,6 +54,9 @@ import { useBackupFolders } from '../lib/backups'
 import { createErrorReport } from '../lib/createErrorReport'
 import { closeDashboard } from '../lib/dashboard'
 import { useProLicenseInfo, userHasPro } from '../lib/checkPro'
+import MPQ from '../lib/MPQ'
+import { resizeImage } from '../lib/resizeImage'
+import extractImages from '../lib/extractImages'
 
 const deleteFileOnFirestore = (fileId) => {
   const state = store.getState()
@@ -202,7 +206,7 @@ const platform = {
     licenseStore: () => {},
     verifyLicense: () => {},
     trial90days: [],
-    hasPro: true,
+    hasPro: () => true,
     checkForPro: async (email, callback) => {
       const [hasPro, info] = await userHasPro(email)
       callback(hasPro, info)
@@ -266,7 +270,7 @@ const platform = {
   },
   rollbar: {
     rollbarAccessToken: process.env.NEXT_PUBLIC_ROLLBAR_ACCESS_TOKEN || '',
-    platform: 'TODO',
+    platform: 'web',
   },
   export: {
     askToExport: exportFile,
@@ -296,11 +300,7 @@ const platform = {
     console.error('Attempted to open file at: ', fileName)
   },
   tempFilesPath: 'TODO',
-  mpq: {
-    push: () => {
-      console.warn('TODO: implement MPQ!')
-    },
-  },
+  mpq: MPQ,
   handleCustomerServiceCode: () => {
     // TODO
   },
@@ -324,6 +324,7 @@ const platform = {
   machineIdSync: () => {
     return uuidv4()
   },
+  extractImages,
   storage: {
     saveImageToStorageBlob: (blob, name) => {
       const state = store.getState()
@@ -332,12 +333,20 @@ const platform = {
       } = state.present
       return saveImageToStorageBlobInFirebase(userId, name, blob)
     },
+    saveImageToStorageFromURL: (url, name) => {
+      const state = store.getState()
+      const {
+        client: { userId },
+      } = state.present
+      return saveImageToStorageFromURLInFirebase(userId, name, url)
+    },
     resolveToPublicUrl: (storageUrl) => {
       if (!storageUrl) return null
       return imagePublicURL(storageUrl)
     },
     isStorageURL,
     imagePublicURL,
+    resizeImage,
   },
   firebase: {
     logOut,

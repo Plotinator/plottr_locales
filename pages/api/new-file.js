@@ -1,5 +1,13 @@
 import { verifyToken } from './verify-token'
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb',
+    },
+  },
+}
+
 const admin = require('firebase-admin')
 
 if (!admin.apps.length) {
