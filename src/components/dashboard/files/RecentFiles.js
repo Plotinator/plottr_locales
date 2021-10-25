@@ -108,7 +108,7 @@ const RecentFilesConnector = (connector) => {
         if (!f) return null
 
         const onFirebase = isPlottrCloudFile(f.path)
-        // TODO: where do web last sav  e dates come from?  Backups perhaps?
+        // TODO: where do web last save dates come from?  Backups perhaps?
         const lastOpen = (f.lastOpened && new Date(f.lastOpened)) || new Date()
         const fileBasename = (!onFirebase && f.path && basename(f.path)) || ''
         let formattedPath = ''
