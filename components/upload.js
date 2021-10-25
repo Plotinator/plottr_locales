@@ -8,7 +8,7 @@ import { newFile } from '../lib/files'
 import { closeDashboard } from '../lib/dashboard'
 import extractImages from '../lib/extractImages'
 
-const sansExtension = (fileName) => fileName.replace(/\..+$/, '')
+const sansExtension = (fileName) => fileName.replace(/\.[^.]+$/, '')
 
 const Upload = ({
   userId,
