@@ -87,7 +87,7 @@ const UploadingConnector = (connector) => {
               `File was migrated.  Migration history: ${data.file.appliedMigrations}.  Initial version: ${data.file.initialVersion}`
             )
           }
-          return extractImages(data, settings.user.id)
+          extractImages(data, settings.user.id)
             .then((patchedData) =>
               uploadExisting(settings.user.email, settings.user.id, patchedData)
             )
