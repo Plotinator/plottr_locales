@@ -53,7 +53,7 @@ import {
 import { useBackupFolders } from '../lib/backups'
 import { createErrorReport } from '../lib/createErrorReport'
 import { closeDashboard } from '../lib/dashboard'
-import { useProLicenseInfo, userHasPro } from '../lib/checkPro'
+import { userHasPro } from '../lib/checkPro'
 import MPQ from '../lib/MPQ'
 import { resizeImage } from '../lib/resizeImage'
 import extractImages from '../lib/extractImages'
@@ -242,6 +242,7 @@ const platform = {
     window.open(withProtocol, '_blank')
   },
   createErrorReport,
+  createFullErrorReport: () => {},
   log: {
     info: () => {
       // TODO
