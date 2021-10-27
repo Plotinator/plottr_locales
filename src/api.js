@@ -13,7 +13,7 @@ const api = (auth, database, storage, baseAPIDomain) => {
   const pingAuth = (userId, fileId) => {
     return axios.post(`https://${baseAPIDomain || ''}/api/ping-auth`, {
       userId,
-      fileId,
+      fileId
     })
   }
 
@@ -21,7 +21,7 @@ const api = (auth, database, storage, baseAPIDomain) => {
     return database()
       .doc(`file/${fileId}`)
       .update({
-        fileName: newName,
+        fileName: newName
       })
       .then(() => {
         pingAuth(userId, fileId)
@@ -30,72 +30,72 @@ const api = (auth, database, storage, baseAPIDomain) => {
 
   const patchActions = (path) => {
     switch (path) {
-    case 'beats':
-      return actions.beat
-    case 'books':
-      return actions.book
-    case 'cards':
-      return actions.card
-    case 'series':
-      return actions.series
-    case 'categories':
-      return actions.category
-    case 'characters':
-      return actions.character
-    case 'customAttributes':
-      return actions.customAttribute
-    case 'featureFlags':
-      return actions.featureFlags
-    case 'lines':
-      return actions.line
-    case 'notes':
-      return actions.note
-    case 'places':
-      return actions.place
-    case 'tags':
-      return actions.tag
-    case 'hierarchyLevels':
-      return actions.hierarchyLevels
-    case 'images':
-      return actions.image
-    case 'file':
-      return actions.ui
+      case 'beats':
+        return actions.beat
+      case 'books':
+        return actions.book
+      case 'cards':
+        return actions.card
+      case 'series':
+        return actions.series
+      case 'categories':
+        return actions.category
+      case 'characters':
+        return actions.character
+      case 'customAttributes':
+        return actions.customAttribute
+      case 'featureFlags':
+        return actions.featureFlags
+      case 'lines':
+        return actions.line
+      case 'notes':
+        return actions.note
+      case 'places':
+        return actions.place
+      case 'tags':
+        return actions.tag
+      case 'hierarchyLevels':
+        return actions.hierarchyLevels
+      case 'images':
+        return actions.image
+      case 'file':
+        return actions.ui
     }
     return null
   }
 
   const onSnapshot =
-        (
-          store,
-          fileId,
-          path,
-          withData,
+    (
+      store,
+      fileId,
+      path,
+      withData,
+      patching,
+      clientId,
+      loadFunctionKey = 'load',
+      usingFromDocRef = () => ({})
+    ) =>
+    (documentRef) => {
+      const data = documentRef && documentRef.data()
+      if (!data) {
+        console.warn(`No data in firestore at key ${path} for file: ${fileId}`)
+        return
+      }
+      if (data.clientId === clientId) return
+      const patchAction = patchActions(path)
+      if (!patchAction) {
+        console.error('No patch action for ', path)
+        return
+      }
+      delete data.fileId
+      delete data.clientId
+      store.dispatch(
+        patchActions(path)[loadFunctionKey](
           patching,
-          clientId,
-          loadFunctionKey = 'load',
-          usingFromDocRef = () => ({})
-        ) =>
-        (documentRef) => {
-          const data = documentRef.data()
-          if (!data) {
-            console.warn(`No data in firestore at key ${path} for file: ${fileId}`)
-            return
-          }
-          if (data.clientId === clientId) return
-          const patchAction = patchActions(path)
-          if (!patchAction) {
-            console.error('No patch action for ', path)
-            return
-          }
-          delete data.fileId
-          delete data.clientId
-          store.dispatch(
-            patchActions(path)[loadFunctionKey](
-              patching,
-              withData({ ...usingFromDocRef(documentRef), ...data })
-            )
-          )
-        }
+          withData({ ...usingFromDocRef(documentRef), ...data })
+        )
+      )
+    }
 
   const listenToFile = (store, userId, fileId, clientId) => {
     const withIsCloud = (x) => ({ ...x, isCloudFile: true, id: fileId })
@@ -104,7 +104,7 @@ const api = (auth, database, storage, baseAPIDomain) => {
       .doc(fileId)
       .onSnapshot(
         onSnapshot(store, fileId, 'file', withIsCloud, true, clientId, 'patchFile', (x) => ({
-          id: x.id,
+          id: x.id
         }))
       )
   }
@@ -129,8 +129,8 @@ const api = (auth, database, storage, baseAPIDomain) => {
 
   const listenToBeats = (store, userId, fileId, clientId, version) => {
     const transform = semverGt(version, WHEN_BEATS_BECAME_AN_OBJECT)
-          ? (x) => x
-          : (x) => Object.values(x)
+      ? (x) => x
+      : (x) => Object.values(x)
     return database()
       .collection('beats')
       .doc(fileId)
@@ -169,13 +169,13 @@ const api = (auth, database, storage, baseAPIDomain) => {
       listenToTags(store, userId, fileId, clientId),
       listenTohierarchyLevels(store, userId, fileId, clientId),
       listenToImages(store, userId, fileId, clientId),
-      listenToClient(store, userId, fileId, clientId),
+      listenToClient(store, userId, fileId, clientId)
     ]
     return unsubscribeFunctions
   }
 
   const onFetched = (fileId, path, withData, clientId) => (documentRef) => {
-    const data = documentRef.data()
+    const data = documentRef && documentRef.data()
     if (!data) {
       console.warn(`No entry for ${path} on file ${fileId}`)
       return {}
@@ -183,7 +183,7 @@ const api = (auth, database, storage, baseAPIDomain) => {
     delete data.fileId
     delete data.clientId
     return {
-      [path]: withData(data),
+      [path]: withData(data)
     }
   }
 
@@ -207,8 +207,8 @@ const api = (auth, database, storage, baseAPIDomain) => {
 
   const fetchBeats = (userId, fileId, clientId, version) => {
     const transform = semverGt(version, WHEN_BEATS_BECAME_AN_OBJECT)
-          ? (x) => x
-          : (x) => Object.values(x)
+      ? (x) => x
+      : (x) => Object.values(x)
     return database()
       .collection('beats')
       .doc(fileId)
@@ -243,7 +243,7 @@ const api = (auth, database, storage, baseAPIDomain) => {
   const fetchClient = fetchObjectAtPath('client')
 
   const toFirestoreArray = (array) =>
-  array.reduce((acc, value, index) => Object.assign(acc, { [index]: value }), {})
+    array.reduce((acc, value, index) => Object.assign(acc, { [index]: value }), {})
 
   const overwriteAllKeys = (fileId, clientId, state) => {
     const results = []
@@ -277,7 +277,7 @@ const api = (auth, database, storage, baseAPIDomain) => {
       fetchTags(userId, fileId, clientId),
       fetchhierarchyLevels(userId, fileId, clientId),
       fetchImages(userId, fileId, clientId),
-      fetchClient(userId, fileId, clientId),
+      fetchClient(userId, fileId, clientId)
     ]).then((results) => {
       const json = Object.assign({}, ...results)
       return json
@@ -314,7 +314,7 @@ const api = (auth, database, storage, baseAPIDomain) => {
           setDeletedplaces(),
           setDeletedtags(),
           setDeletedhierarchyLevels(),
-          setDeletedimages(),
+          setDeletedimages()
         ]).then((results) => [pingAuthResult, deleteFileResult, ...results])
       )
     )
@@ -334,14 +334,14 @@ const api = (auth, database, storage, baseAPIDomain) => {
           const authorisedDocuments = []
           authorisationsRef.forEach((authorisation) => {
             const document = database()
-                  .collection(`file`)
-                  .doc(authorisation.id)
-                  .get()
-                  .then((file) => ({
-                    id: file.id,
-                    ...file.data(),
-                    ...authorisation.data(),
-                  }))
+              .collection(`file`)
+              .doc(authorisation.id)
+              .get()
+              .then((file) => ({
+                id: file.id,
+                ...file.data(),
+                ...authorisation.data()
+              }))
             authorisedDocuments.push(document)
           })
           Promise.all(authorisedDocuments)
@@ -349,7 +349,7 @@ const api = (auth, database, storage, baseAPIDomain) => {
               return documents.map((document) => {
                 return {
                   ...document,
-                  isCloudFile: true,
+                  isCloudFile: true
                 }
               })
             })
@@ -371,21 +371,21 @@ const api = (auth, database, storage, baseAPIDomain) => {
         const authorisedDocuments = []
         authorisationsRef.forEach((authorisation) => {
           const document = database()
-                .collection(`file`)
-                .doc(authorisation.id)
-                .get()
-                .then((file) => ({
-                  id: file.id,
-                  ...file.data(),
-                  ...authorisation.data(),
-                }))
+            .collection(`file`)
+            .doc(authorisation.id)
+            .get()
+            .then((file) => ({
+              id: file.id,
+              ...file.data(),
+              ...authorisation.data()
+            }))
           authorisedDocuments.push(document)
         })
         return Promise.all(authorisedDocuments).then((documents) => {
           return documents.map((document) => {
             return {
               ...document,
-              isCloudFile: true,
+              isCloudFile: true
             }
           })
         })
@@ -442,15 +442,15 @@ const api = (auth, database, storage, baseAPIDomain) => {
 
     return (
       object === undefined ||
-        Object.values(object).some((value) => {
-          if (Array.isArray(value)) {
-            return value.some(hasUndefinedValue)
-          }
-          if (typeof value === 'object') {
-            return hasUndefinedValue(value)
-          }
-          return value === undefined
-        })
+      Object.values(object).some((value) => {
+        if (Array.isArray(value)) {
+          return value.some(hasUndefinedValue)
+        }
+        if (typeof value === 'object') {
+          return hasUndefinedValue(value)
+        }
+        return value === undefined
+      })
     )
   }
 
@@ -461,7 +461,7 @@ const api = (auth, database, storage, baseAPIDomain) => {
       .update({
         ...payload,
         clientId,
-        fileId,
+        fileId
       })
   }
 
@@ -472,7 +472,7 @@ const api = (auth, database, storage, baseAPIDomain) => {
       .set({
         ...payload,
         clientId,
-        fileId,
+        fileId
       })
   }
 
@@ -482,7 +482,7 @@ const api = (auth, database, storage, baseAPIDomain) => {
         fileId,
         emailAddress,
         userId,
-        permission,
+        permission
       })
       .then(() => {
         return database()
@@ -490,7 +490,7 @@ const api = (auth, database, storage, baseAPIDomain) => {
           .doc(fileId)
           .get()
           .then((documentRef) => {
-            const document = documentRef.data()
+            const document = documentRef && documentRef.data()
             const existingShareRecord = document.shareRecords.find(
               (shareRecord) => shareRecord.emailAddress === emailAddress
             )
@@ -502,7 +502,7 @@ const api = (auth, database, storage, baseAPIDomain) => {
               .doc(fileId)
               .set(
                 {
-                  shareRecords: [...document.shareRecords, { emailAddress, permission }],
+                  shareRecords: [...document.shareRecords, { emailAddress, permission }]
                 },
                 { merge: true }
               )
@@ -516,24 +516,24 @@ const api = (auth, database, storage, baseAPIDomain) => {
   const publishRCEOperations = (fileId, editorId, editorKey, operations) => {
     const modificationsRef = database().collection(`rce/${fileId}/editors/${editorId}/changes`)
     const updateEditNumbersJob = operations.length
-          ? database()
+      ? database()
           .doc(`rce/${fileId}/editors/${editorId}/editTimestamps/${editorKey}`)
           .set(
             {
               timeStamp: new Date(),
               editNumber: operations[operations.length - 1].editNumber,
-              editorKey,
+              editorKey
             },
             {
-              merge: true,
+              merge: true
             }
           )
-          : Promise.resolve([])
+      : Promise.resolve([])
     return Promise.all([
       updateEditNumbersJob,
       ...operations.map((operation) => {
         modificationsRef.add(operation)
-      }),
+      })
     ])
   }
 
@@ -542,7 +542,7 @@ const api = (auth, database, storage, baseAPIDomain) => {
       .doc(`rce/${fileId}/editors/${editorId}/editTimestamps/${myEditorKey}`)
       .update({
         timeStamp: new Date(),
-        [otherEditorKey]: since,
+        [otherEditorKey]: since
       })
   }
 
@@ -553,7 +553,7 @@ const api = (auth, database, storage, baseAPIDomain) => {
   const lockRCE = (fileId, editorId, clientId, emailAddress = '') => {
     return database().doc(`rce/${fileId}/editors/${editorId}/locks/current`).set({
       clientId,
-      emailAddress,
+      emailAddress
     })
   }
 
@@ -561,7 +561,7 @@ const api = (auth, database, storage, baseAPIDomain) => {
     return database()
       .doc(`rce/${fileId}/editors/${editorId}/locks/current`)
       .onSnapshot((documentRef) => {
-        const data = documentRef.data()
+        const data = documentRef && documentRef.data()
         if (!data) {
           console.log("Didn't find a lock for RCE with editorId", editorId)
           cb({ clientId: null })
@@ -619,18 +619,22 @@ const api = (auth, database, storage, baseAPIDomain) => {
       .get()
       .then((documentRef) => {
         const documents = []
-        documentRef.forEach((document) => {
-          documents.push(document.data())
-        })
+        if (documentRef) {
+          documentRef.forEach((document) => {
+            documents.push(document.data())
+          })
+        }
         if (documents.length) cb(documents)
       })
   }
 
   const getSingleDocument = (documentRef) => {
     const documents = []
-    documentRef.forEach((document) => {
-      documents.push({ document: document.data(), documentRef: document })
-    })
+    if (documentRef) {
+      documentRef.forEach((document) => {
+        documents.push({ document: document.data(), documentRef: document })
+      })
+    }
     if (documents.length) {
       return documents[0]
     }
@@ -673,7 +677,7 @@ const api = (auth, database, storage, baseAPIDomain) => {
             // Update the current backup
             const { document, documentRef } = result
             const delta = lastModified - document.lastModified.toDate()
-            if (delta < TEN_SECONDS_IN_MILISECONDS) {
+            if (delta < TEN_SECONDS_IN_MILISECONDS || !documentRef) {
               return Promise.resolve({ message: 'Not backed up', delta })
             }
             return backupToStorage(userId, file, startOfToday, false).then((path) => {
@@ -682,7 +686,7 @@ const api = (auth, database, storage, baseAPIDomain) => {
                 .update({
                   ...document,
                   storagePath: path,
-                  lastModified: new Date(),
+                  lastModified: new Date()
                 })
             })
           }
@@ -694,7 +698,7 @@ const api = (auth, database, storage, baseAPIDomain) => {
               startOfSession: false,
               fileId,
               fileName: file.project.selectedFile.fileName,
-              lastModified: new Date(),
+              lastModified: new Date()
             })
           })
         })
@@ -707,7 +711,7 @@ const api = (auth, database, storage, baseAPIDomain) => {
           storagePath: path,
           fileName: file.project.selectedFile.fileName,
           startOfSession: true,
-          lastModified: new Date(),
+          lastModified: new Date()
         })
       })
     })
@@ -731,8 +735,8 @@ const api = (auth, database, storage, baseAPIDomain) => {
 
   const toBackupPath = (userId, fileId, date, startOfSession) => {
     return `storage://backups/${userId}/${fileId}/${formatDate(date)}${
-    startOfSession ? '-(start-of-session)' : ''
-  }.pltr`
+      startOfSession ? '-(start-of-session)' : ''
+    }.pltr`
   }
 
   const withoutStorageProtocal = (path) => {
@@ -745,9 +749,9 @@ const api = (auth, database, storage, baseAPIDomain) => {
     const fileId = file.project.selectedFile.id
     const filePath = toBackupPath(userId, fileId, date, startOfSession)
     const storageTask = storage()
-          .ref()
-          .child(withoutStorageProtocal(filePath))
-          .putString(JSON.stringify(file))
+      .ref()
+      .child(withoutStorageProtocal(filePath))
+      .putString(JSON.stringify(file))
     return new Promise((resolve, reject) =>
       storageTask.then(() => {
         resolve(filePath)
@@ -762,17 +766,16 @@ const api = (auth, database, storage, baseAPIDomain) => {
   const saveCustomTemplate = (userId, template) => {
     const filePath = toTemplatePath(userId, template.id)
     const storageTask = storage()
-          .ref()
-          .child(withoutStorageProtocal(filePath))
-          .putString(JSON.stringify(template))
-    return storageTask
-      .then(() => {
-        // Bumping the timestamp will guarantee that listeners fetch
-        // the latest versions.
-        return database()
-          .doc(`templates/${userId}/userTemplates/${template.id}`)
-          .set({ id: template.id, path: filePath, timeStamp: new Date() })
-      })
+      .ref()
+      .child(withoutStorageProtocal(filePath))
+      .putString(JSON.stringify(template))
+    return storageTask.then(() => {
+      // Bumping the timestamp will guarantee that listeners fetch
+      // the latest versions.
+      return database()
+        .doc(`templates/${userId}/userTemplates/${template.id}`)
+        .set({ id: template.id, path: filePath, timeStamp: new Date() })
+    })
   }
 
   const allTemplateUrlsForUser = (documents) => {
@@ -888,7 +891,6 @@ const api = (auth, database, storage, baseAPIDomain) => {
     imagePublicURL,
     isStorageURL
   }
-
 }
 
 export default api
