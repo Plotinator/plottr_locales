@@ -849,6 +849,9 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
   }
 
   const imagePublicURL = (storageProtocolURL, fileId, userId) => {
+    if (development) {
+      return storage().ref().child(withoutStorageProtocal(storageProtocolURL)).getDownloadURL()
+    }
     return axios
       .get(
         `${BASE_API_URL}/api/image-public-url?url=${storageProtocolURL}&fileId=${fileId}&userId=${userId}`
