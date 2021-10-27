@@ -15,7 +15,7 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
   const pingAuth = (userId, fileId) => {
     return axios.post(`${BASE_API_URL}/api/ping-auth`, {
       userId,
-      fileId,
+      fileId
     })
   }
 
@@ -23,7 +23,7 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
     return database()
       .doc(`file/${fileId}`)
       .update({
-        fileName: newName,
+        fileName: newName
       })
       .then(() => {
         pingAuth(userId, fileId)
@@ -78,7 +78,7 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
       usingFromDocRef = () => ({})
     ) =>
     (documentRef) => {
-      const data = documentRef.data()
+      const data = documentRef && documentRef.data()
       if (!data) {
         console.warn(`No data in firestore at key ${path} for file: ${fileId}`)
         return
@@ -106,7 +106,7 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
       .doc(fileId)
       .onSnapshot(
         onSnapshot(store, fileId, 'file', withIsCloud, true, clientId, 'patchFile', (x) => ({
-          id: x.id,
+          id: x.id
         }))
       )
   }
@@ -171,13 +171,13 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
       listenToTags(store, userId, fileId, clientId),
       listenTohierarchyLevels(store, userId, fileId, clientId),
       listenToImages(store, userId, fileId, clientId),
-      listenToClient(store, userId, fileId, clientId),
+      listenToClient(store, userId, fileId, clientId)
     ]
     return unsubscribeFunctions
   }
 
   const onFetched = (fileId, path, withData, clientId) => (documentRef) => {
-    const data = documentRef.data()
+    const data = documentRef && documentRef.data()
     if (!data) {
       console.warn(`No entry for ${path} on file ${fileId}`)
       return {}
@@ -185,7 +185,7 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
     delete data.fileId
     delete data.clientId
     return {
-      [path]: withData(data),
+      [path]: withData(data)
     }
   }
 
@@ -279,7 +279,7 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
       fetchTags(userId, fileId, clientId),
       fetchhierarchyLevels(userId, fileId, clientId),
       fetchImages(userId, fileId, clientId),
-      fetchClient(userId, fileId, clientId),
+      fetchClient(userId, fileId, clientId)
     ]).then((results) => {
       const json = Object.assign({}, ...results)
       return json
@@ -316,7 +316,7 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
           setDeletedplaces(),
           setDeletedtags(),
           setDeletedhierarchyLevels(),
-          setDeletedimages(),
+          setDeletedimages()
         ]).then((results) => [pingAuthResult, deleteFileResult, ...results])
       )
     )
@@ -351,7 +351,7 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
               return documents.map((document) => {
                 return {
                   ...document,
-                  isCloudFile: true,
+                  isCloudFile: true
                 }
               })
             })
@@ -387,7 +387,7 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
           return documents.map((document) => {
             return {
               ...document,
-              isCloudFile: true,
+              isCloudFile: true
             }
           })
         })
@@ -463,7 +463,7 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
       .update({
         ...payload,
         clientId,
-        fileId,
+        fileId
       })
   }
 
@@ -474,7 +474,7 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
       .set({
         ...payload,
         clientId,
-        fileId,
+        fileId
       })
   }
 
@@ -484,7 +484,7 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
         fileId,
         emailAddress,
         userId,
-        permission,
+        permission
       })
       .then(() => {
         return database()
@@ -492,7 +492,7 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
           .doc(fileId)
           .get()
           .then((documentRef) => {
-            const document = documentRef.data()
+            const document = documentRef && documentRef.data()
             const existingShareRecord = document.shareRecords.find(
               (shareRecord) => shareRecord.emailAddress === emailAddress
             )
@@ -504,7 +504,7 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
               .doc(fileId)
               .set(
                 {
-                  shareRecords: [...document.shareRecords, { emailAddress, permission }],
+                  shareRecords: [...document.shareRecords, { emailAddress, permission }]
                 },
                 { merge: true }
               )
@@ -524,10 +524,10 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
             {
               timeStamp: new Date(),
               editNumber: operations[operations.length - 1].editNumber,
-              editorKey,
+              editorKey
             },
             {
-              merge: true,
+              merge: true
             }
           )
       : Promise.resolve([])
@@ -535,7 +535,7 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
       updateEditNumbersJob,
       ...operations.map((operation) => {
         modificationsRef.add(operation)
-      }),
+      })
     ])
   }
 
@@ -544,7 +544,7 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
       .doc(`rce/${fileId}/editors/${editorId}/editTimestamps/${myEditorKey}`)
       .update({
         timeStamp: new Date(),
-        [otherEditorKey]: since,
+        [otherEditorKey]: since
       })
   }
 
@@ -555,7 +555,7 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
   const lockRCE = (fileId, editorId, clientId, emailAddress = '') => {
     return database().doc(`rce/${fileId}/editors/${editorId}/locks/current`).set({
       clientId,
-      emailAddress,
+      emailAddress
     })
   }
 
@@ -563,7 +563,7 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
     return database()
       .doc(`rce/${fileId}/editors/${editorId}/locks/current`)
       .onSnapshot((documentRef) => {
-        const data = documentRef.data()
+        const data = documentRef && documentRef.data()
         if (!data) {
           console.log("Didn't find a lock for RCE with editorId", editorId)
           cb({ clientId: null })
@@ -621,18 +621,22 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
       .get()
       .then((documentRef) => {
         const documents = []
-        documentRef.forEach((document) => {
-          documents.push(document.data())
-        })
+        if (documentRef) {
+          documentRef.forEach((document) => {
+            documents.push(document.data())
+          })
+        }
         if (documents.length) cb(documents)
       })
   }
 
   const getSingleDocument = (documentRef) => {
     const documents = []
-    documentRef.forEach((document) => {
-      documents.push({ document: document.data(), documentRef: document })
-    })
+    if (documentRef) {
+      documentRef.forEach((document) => {
+        documents.push({ document: document.data(), documentRef: document })
+      })
+    }
     if (documents.length) {
       return documents[0]
     }
@@ -675,7 +679,7 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
             // Update the current backup
             const { document, documentRef } = result
             const delta = lastModified - document.lastModified.toDate()
-            if (delta < TEN_SECONDS_IN_MILISECONDS) {
+            if (delta < TEN_SECONDS_IN_MILISECONDS || !documentRef) {
               return Promise.resolve({ message: 'Not backed up', delta })
             }
             return backupToStorage(userId, file, startOfToday, false).then((path) => {
@@ -684,7 +688,7 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
                 .update({
                   ...document,
                   storagePath: path,
-                  lastModified: new Date(),
+                  lastModified: new Date()
                 })
             })
           }
@@ -696,7 +700,7 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
               startOfSession: false,
               fileId,
               fileName: file.project.selectedFile.fileName,
-              lastModified: new Date(),
+              lastModified: new Date()
             })
           })
         })
@@ -709,7 +713,7 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
           storagePath: path,
           fileName: file.project.selectedFile.fileName,
           startOfSession: true,
-          lastModified: new Date(),
+          lastModified: new Date()
         })
       })
     })
