@@ -15,6 +15,7 @@ if (!admin.apps.length) {
     const projectId = 'plottr-ci'
     process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099'
     process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080'
+    process.env.FIREBASE_STORAGE_EMULATOR_HOST = 'localhost:9199'
     admin.initializeApp({ projectId })
   } else if (process.env.FIREBASE_ENV === 'preview') {
     const serviceAccount = JSON.parse(process.env.FIREBASE_KEY)
