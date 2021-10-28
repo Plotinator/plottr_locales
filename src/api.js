@@ -4,6 +4,10 @@ import { DateTime, Duration } from 'luxon'
 
 import { actions, ARRAY_KEYS } from 'pltr/v2'
 
+const defaultErrorHandler = (error) => {
+  console.error('Error communicating with Firebase.', error)
+}
+
 /**
  * auth, database and storage should be thunks that produce instances
  * of the correspending firebase objects from either the firebase JS
@@ -99,44 +103,45 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
       )
     }
 
-  const listenToFile = (store, userId, fileId, clientId) => {
+  const listenToFile = (store, userId, fileId, clientId, errorHandler) => {
     const withIsCloud = (x) => ({ ...x, isCloudFile: true, id: fileId })
     return database()
       .collection('file')
       .doc(fileId)
       .onSnapshot(
         onSnapshot(store, fileId, 'file', withIsCloud, true, clientId, 'patchFile', (x) => ({
-          id: x.id
-        }))
+          id: x.id,
+        })),
+        errorHandler
       )
   }
 
-  const listenForObjectAtPath = (path) => (store, userId, fileId, clientId) => {
+  const listenForObjectAtPath = (path) => (store, userId, fileId, clientId, errorHandler) => {
     const identity = (x) => x
     return database()
       .collection(path)
       .doc(fileId)
-      .onSnapshot(onSnapshot(store, fileId, path, identity, true, clientId))
+      .onSnapshot(onSnapshot(store, fileId, path, identity, true, clientId), errorHandler)
   }
 
-  const listenForArrayAtPath = (path) => (store, userId, fileId, clientId) => {
+  const listenForArrayAtPath = (path) => (store, userId, fileId, clientId, errorHandler) => {
     const values = (x) => Object.values(x)
     return database()
       .collection(path)
       .doc(fileId)
-      .onSnapshot(onSnapshot(store, fileId, path, values, true, clientId))
+      .onSnapshot(onSnapshot(store, fileId, path, values, true, clientId), errorHandler)
   }
 
   const WHEN_BEATS_BECAME_AN_OBJECT = '2021.4.13'
 
-  const listenToBeats = (store, userId, fileId, clientId, version) => {
+  const listenToBeats = (store, userId, fileId, clientId, version, errorHandler) => {
     const transform = semverGt(version, WHEN_BEATS_BECAME_AN_OBJECT)
       ? (x) => x
       : (x) => Object.values(x)
     return database()
       .collection('beats')
       .doc(fileId)
-      .onSnapshot(onSnapshot(store, fileId, 'beats', transform, true, clientId))
+      .onSnapshot(onSnapshot(store, fileId, 'beats', transform, true, clientId), errorHandler)
   }
 
   const listenToCards = listenForArrayAtPath('cards')
@@ -154,24 +159,33 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
   const listenToImages = listenForObjectAtPath('images')
   const listenToClient = listenForObjectAtPath('client')
 
-  const listen = (store, userId, fileId, clientId, fileVersion) => {
+  const listen = (
+    store,
+    userId,
+    fileId,
+    clientId,
+    fileVersion,
+    errorHandler = (error) => {
+      console.error('Error listening for changes.', error)
+    }
+  ) => {
     const unsubscribeFunctions = [
-      listenToFile(store, userId, fileId, clientId),
-      listenToBeats(store, userId, fileId, clientId, fileVersion),
-      listenToCards(store, userId, fileId, clientId),
-      listenToSeries(store, userId, fileId, clientId),
-      listenToBooks(store, userId, fileId, clientId),
-      listenToCategories(store, userId, fileId, clientId),
-      listenToCharacters(store, userId, fileId, clientId),
-      listenToCustomAttributes(store, userId, fileId, clientId),
-      listenToFeatureFlags(store, userId, fileId, clientId),
-      listenToLines(store, userId, fileId, clientId),
-      listenToNotes(store, userId, fileId, clientId),
-      listenToPlaces(store, userId, fileId, clientId),
-      listenToTags(store, userId, fileId, clientId),
-      listenTohierarchyLevels(store, userId, fileId, clientId),
-      listenToImages(store, userId, fileId, clientId),
-      listenToClient(store, userId, fileId, clientId)
+      listenToFile(store, userId, fileId, clientId, errorHandler),
+      listenToBeats(store, userId, fileId, clientId, fileVersion, errorHandler),
+      listenToCards(store, userId, fileId, clientId, errorHandler),
+      listenToSeries(store, userId, fileId, clientId, errorHandler),
+      listenToBooks(store, userId, fileId, clientId, errorHandler),
+      listenToCategories(store, userId, fileId, clientId, errorHandler),
+      listenToCharacters(store, userId, fileId, clientId, errorHandler),
+      listenToCustomAttributes(store, userId, fileId, clientId, errorHandler),
+      listenToFeatureFlags(store, userId, fileId, clientId, errorHandler),
+      listenToLines(store, userId, fileId, clientId, errorHandler),
+      listenToNotes(store, userId, fileId, clientId, errorHandler),
+      listenToPlaces(store, userId, fileId, clientId, errorHandler),
+      listenToTags(store, userId, fileId, clientId, errorHandler),
+      listenTohierarchyLevels(store, userId, fileId, clientId, errorHandler),
+      listenToImages(store, userId, fileId, clientId, errorHandler),
+      listenToClient(store, userId, fileId, clientId, errorHandler),
     ]
     return unsubscribeFunctions
   }
@@ -789,7 +803,7 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
     )
   }
 
-  const listenToCustomTemplates = (userId, callback) => {
+  const listenToCustomTemplates = (userId, callback, errorHandler = defaultErrorHandler) => {
     return database()
       .collection(`templates/${userId}/userTemplates`)
       .onSnapshot((documentsRef) => {
@@ -802,7 +816,8 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
             Promise.all(urls.map((url) => fetch(url).then((response) => response.json())))
           )
           .then(callback)
-      })
+          .catch(errorHandler)
+      }, errorHandler)
   }
 
   const editCustomTemplate = saveCustomTemplate
