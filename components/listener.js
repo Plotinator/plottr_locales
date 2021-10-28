@@ -26,6 +26,7 @@ const Listener = ({
   actStructureIsOn,
   setBeatHierarchy,
   unsetBeatHierarchy,
+  generalError,
 }) => {
   const [unsubscribeFunctions, setUnsubscribeFunctions] = useState([])
 
@@ -61,7 +62,12 @@ const Listener = ({
     if (!userId || !clientId || !selectedFile || !selectedFile.id) {
       return () => {}
     }
-    setUnsubscribeFunctions(listen(store, userId, selectedFile.id, clientId, selectedFile.version))
+    setUnsubscribeFunctions(
+      listen(store, userId, selectedFile.id, clientId, selectedFile.version, (error) => {
+        console.error('Error listening to file changes.', error)
+        generalError('There seems to be a problem with your network.')
+      })
+    )
     setPermission(selectedFile.permission)
     setFileLoaded()
 
@@ -141,5 +147,6 @@ export default connect(
     setBeatHierarchy: actions.featureFlags.setBeatHierarchy,
     unsetBeatHierarchy: actions.featureFlags.unsetBeatHierarchy,
     selectFile: actions.project.selectFile,
+    generalError: actions.error.generalError,
   }
 )(Listener)
