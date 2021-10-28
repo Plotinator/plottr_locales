@@ -103,7 +103,7 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
       )
     }
 
-  const listenToFile = (store, userId, fileId, clientId, errorHandler) => {
+  const listenToFile = (store, userId, fileId, clientId, errorHandler = defaultErrorHandler) => {
     const withIsCloud = (x) => ({ ...x, isCloudFile: true, id: fileId })
     return database()
       .collection('file')
@@ -116,25 +116,36 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
       )
   }
 
-  const listenForObjectAtPath = (path) => (store, userId, fileId, clientId, errorHandler) => {
-    const identity = (x) => x
-    return database()
-      .collection(path)
-      .doc(fileId)
-      .onSnapshot(onSnapshot(store, fileId, path, identity, true, clientId), errorHandler)
-  }
+  const listenForObjectAtPath =
+    (path) =>
+    (store, userId, fileId, clientId, errorHandler = defaultErrorHandler) => {
+      const identity = (x) => x
+      return database()
+        .collection(path)
+        .doc(fileId)
+        .onSnapshot(onSnapshot(store, fileId, path, identity, true, clientId), errorHandler)
+    }
 
-  const listenForArrayAtPath = (path) => (store, userId, fileId, clientId, errorHandler) => {
-    const values = (x) => Object.values(x)
-    return database()
-      .collection(path)
-      .doc(fileId)
-      .onSnapshot(onSnapshot(store, fileId, path, values, true, clientId), errorHandler)
-  }
+  const listenForArrayAtPath =
+    (path) =>
+    (store, userId, fileId, clientId, errorHandler = defaultErrorHandler) => {
+      const values = (x) => Object.values(x)
+      return database()
+        .collection(path)
+        .doc(fileId)
+        .onSnapshot(onSnapshot(store, fileId, path, values, true, clientId), errorHandler)
+    }
 
   const WHEN_BEATS_BECAME_AN_OBJECT = '2021.4.13'
 
-  const listenToBeats = (store, userId, fileId, clientId, version, errorHandler) => {
+  const listenToBeats = (
+    store,
+    userId,
+    fileId,
+    clientId,
+    version,
+    errorHandler = defaultErrorHandler
+  ) => {
     const transform = semverGt(version, WHEN_BEATS_BECAME_AN_OBJECT)
       ? (x) => x
       : (x) => Object.values(x)
@@ -165,9 +176,7 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
     fileId,
     clientId,
     fileVersion,
-    errorHandler = (error) => {
-      console.error('Error listening for changes.', error)
-    }
+    errorHandler = defaultErrorHandler
   ) => {
     const unsubscribeFunctions = [
       listenToFile(store, userId, fileId, clientId, errorHandler),
@@ -342,7 +351,7 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
     })
   }
 
-  const listenToFiles = (userId, callback, errorHandler) => {
+  const listenToFiles = (userId, callback, errorHandler = defaultErrorHandler) => {
     return database()
       .collection(`authorisation/${userId}/granted`)
       .onSnapshot(
@@ -427,7 +436,7 @@ const api = (auth, database, storage, baseAPIDomain, development) => {
     })
   }
 
-  const onSessionChange = (cb, errorHandler) => {
+  const onSessionChange = (cb, errorHandler = defaultErrorHandler) => {
     return auth().onAuthStateChanged((user) => {
       if (user) {
         return mintCookieToken(user).then(() => {
