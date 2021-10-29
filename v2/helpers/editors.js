@@ -1,26 +1,29 @@
-export const cardDescriptionEditorPath = (cardId) => `cards__${cardId}__description`
+const escapeSlashes = (str) => str.replace(/\//g, '--')
+
+export const cardDescriptionEditorPath = (cardId) => escapeSlashes(`cards__${cardId}__description`)
 export const cardCustomAttributeEditorPath = (cardId, attributeName) =>
-  `cards__${cardId}__customAttributes__${attributeName}`
+  escapeSlashes(`cards__${cardId}__customAttributes__${attributeName}`)
 export const cardTemplateAttributeEditorPath = (cardId, templateId, attributeName) =>
-  `cards__${cardId}__templates__${templateId}__${attributeName}`
+  escapeSlashes(`cards__${cardId}__templates__${templateId}__${attributeName}`)
 
-export const noteContentEditorPath = (noteId) => `notes__${noteId}__content`
+export const noteContentEditorPath = (noteId) => escapeSlashes(`notes__${noteId}__content`)
 export const noteCustomAttributeEditorPath = (noteId, attributeName) =>
-  `cards__${noteId}__customAttributes__${attributeName}`
+  escapeSlashes(`cards__${noteId}__customAttributes__${attributeName}`)
 export const noteTemplateAttributeEditorPath = (noteId, templateId, attributeName) =>
-  `cards__${noteId}__templates__${templateId}__${attributeName}`
+  escapeSlashes(`cards__${noteId}__templates__${templateId}__${attributeName}`)
 
-export const characterNotesEditorPath = (characterId) => `characters__${characterId}__notes`
+export const characterNotesEditorPath = (characterId) =>
+  escapeSlashes(`characters__${characterId}__notes`)
 export const characterCustomAttributeEditorPath = (characterId, attributeName) =>
-  `characters__${characterId}__customAttributes__${attributeName}`
+  escapeSlashes(`characters__${characterId}__customAttributes__${attributeName}`)
 export const characterTemplateAttributeEditorPath = (characterId, templateId, attributeName) =>
-  `characters__${characterId}__templates__${templateId}__${attributeName}`
+  escapeSlashes(`characters__${characterId}__templates__${templateId}__${attributeName}`)
 
-export const placeNotesEditorPath = (placeId) => `places__${placeId}__notes`
+export const placeNotesEditorPath = (placeId) => escapeSlashes(`places__${placeId}__notes`)
 export const placeCustomAttributeEditorPath = (placeId, attributeName) =>
-  `places__${placeId}__customAttributes__${attributeName}`
+  escapeSlashes(`places__${placeId}__customAttributes__${attributeName}`)
 export const placeTemplateAttributeEditorPath = (placeId, templateId, attributeName) =>
-  `places__${placeId}__templates__${templateId}__${attributeName}`
+  escapeSlashes(`places__${placeId}__templates__${templateId}__${attributeName}`)
 
 export const editorPathforType = (entityType, entityId) => {
   switch (entityType) {
