@@ -24,7 +24,7 @@ const UploadingConnector = (connector) => {
   } = connector
 
   const Uploading = ({ nextStep, projects, templates }) => {
-    const [settings] = useSettingsInfo()
+    const [settings] = useSettingsInfo(false)
     const [maxItems, setMaxItems] = useState(100)
     const [currentProgress, setCurrentProgress] = useState(0)
     const [currentObj, setCurrentObj] = useState(null)
