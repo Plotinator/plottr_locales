@@ -13,7 +13,7 @@ export const signInWithEmailAndPassword = (userName, password) => {
   return auth().signInWithEmailAndPassword(userName, password)
 }
 
-const wiredUp = api(auth, database, storage, BASE_API_DOMAIN)
+const wiredUp = api(auth, database, storage, BASE_API_DOMAIN, __DEV__)
 
 export const editFileName = wiredUp.editFileName
 export const listen = wiredUp.listen
