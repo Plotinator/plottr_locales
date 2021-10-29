@@ -61,6 +61,7 @@ import * as projectSelectors from './selectors/project'
 import * as clientSelectors from './selectors/client'
 import * as actionSelectors from './selectors/actions'
 import * as editorsSelectors from './selectors/editors'
+import * as imageSelectors from './selectors/images'
 
 import rootReducer from './reducers/root'
 import mainReducer from './reducers/main'
@@ -152,6 +153,7 @@ const selectors = {
   ...clientSelectors,
   ...actionSelectors,
   ...editorsSelectors,
+  ...imageSelectors,
 }
 
 const actions = {
