@@ -9,7 +9,7 @@ import cx from 'classnames'
 
 const RichTextViewer = ({ openExternal, imagePublicURL, isStorageURL, ...props }) => {
   const editor = useMemo(() => {
-    return withReact(createEditor())
+    return withReact(createEditor(props.log))
   }, [])
   const renderLeaf = useCallback((props) => <Leaf {...props} />, [])
   const renderElement = useCallback(
