@@ -26,11 +26,15 @@ const externalSync = (patch, withData) => (store) => (next) => (action) => {
         key === 'actions'
       )
         return
+      if (!present?.project?.selectedFile) return
       if (
         key === 'file' &&
         present.project.selectedFile &&
         present.project.selectedFile.permision !== 'owner'
       ) {
+        return
+      }
+      if (present.project.selectedFile.id !== present.file.id) {
         return
       }
       if (action.patching || action.type === 'FILE_LOADED') return
@@ -74,11 +78,15 @@ export const externalSyncWithoutHistory = (patch, withData) => (store) => (next)
         key === 'actions'
       )
         return
+      if (!present?.project?.selectedFile) return
       if (
         key === 'file' &&
         present.project.selectedFile &&
         present.project.selectedFile.permision !== 'owner'
       ) {
+        return
+      }
+      if (present.project.selectedFile.id !== present.file.id) {
         return
       }
       if (action.patching || action.type === 'FILE_LOADED') return
