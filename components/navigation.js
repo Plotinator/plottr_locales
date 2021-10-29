@@ -11,7 +11,6 @@ import { onSessionChange } from 'plottr_firebase'
 
 import DashboardModal from './dashboard-modal'
 import Share from './share'
-import Download from './download'
 import Upload from './upload'
 import { actions, selectors } from 'pltr/v2'
 import { basePath } from '../lib/basePath'
@@ -145,7 +144,6 @@ function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
         </Nav>
         <Navbar.Form pullRight style={{ marginRight: '15px' }}>
           <Upload />
-          <Download />
           <Share />
         </Navbar.Form>
       </Navbar>

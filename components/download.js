@@ -1,24 +1,35 @@
 import { connect } from 'react-redux'
 import { PropTypes } from 'prop-types'
 import { t } from 'plottr_locales'
-import { FiDownload } from 'react-icons/fi'
-import { Button } from 'react-bootstrap'
+import { VscCloudDownload } from 'react-icons/vsc'
+import { NavItem, Button } from 'react-bootstrap'
 import fileDownload from 'js-file-download'
 
 import { actions } from 'pltr/v2'
 
 const Download = ({ withFullFileState }) => {
+  const iconStyles = {
+    height: '1.5em',
+    width: '1.5em',
+    marginRight: '4px',
+    verticalAlign: 'bottom',
+  }
+
   return (
-    <Button
-      onClick={() => {
-        withFullFileState((state) => {
-          fileDownload(JSON.stringify(state.present), `${state.present.file.fileName}.pltr`)
-        })
-      }}
-      title={t('Download')}
-    >
-      <FiDownload />
-    </Button>
+    <NavItem>
+      <Button
+        bsSize="small"
+        onClick={() => {
+          withFullFileState((state) => {
+            fileDownload(JSON.stringify(state.present), `${state.present.file.fileName}.pltr`)
+          })
+        }}
+        title={t('Download')}
+      >
+        <VscCloudDownload style={iconStyles} />
+        {t('Download')}
+      </Button>
+    </NavItem>
   )
 }
 
