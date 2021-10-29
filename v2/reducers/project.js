@@ -3,6 +3,7 @@ import {
   SELECT_FILE,
   SELECT_EMPTY_FILE,
   SET_FILE_LOADED,
+  SHOW_LOADER,
   UNSET_FILE_LOADED,
 } from '../constants/ActionTypes'
 
@@ -11,6 +12,7 @@ const INITIAL_STATE = {
   selectedFile: null,
   userNameSearchResults: [],
   fileLoaded: false,
+  isLoading: false,
 }
 
 const NEW_FILE = { fileName: 'New file', none: true, id: -1 }
@@ -37,11 +39,17 @@ const projectReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         fileLoaded: true,
+        isLoading: false,
       }
     case UNSET_FILE_LOADED:
       return {
         ...state,
         fileLoaded: false,
+      }
+    case SHOW_LOADER:
+      return {
+        ...state,
+        isLoading: true,
       }
     default:
       return state
