@@ -22,7 +22,7 @@ const ImageConnector = (connector) => {
     }
 
     useEffect(() => {
-      if (!image) return
+      if (!image || imageSrc) return
 
       if (isOnStorage()) {
         resolveToPublicUrl(image.path).then((url) => {
