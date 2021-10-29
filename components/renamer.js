@@ -5,7 +5,9 @@ import { connect } from 'react-redux'
 import { selectors, actions } from 'pltr/v2'
 import { t } from 'plottr_locales'
 import { InputModal } from 'connected-components'
-import { editFileName } from 'plottr_firebase'
+import { editFileName } from 'wired-up-firebase'
+
+import { logger } from '../lib/logger'
 
 const Renamer = ({ userId, generalError }) => {
   const [visible, setVisible] = useState(false)
@@ -28,7 +30,7 @@ const Renamer = ({ userId, generalError }) => {
         setVisible(false)
       })
       .catch((error) => {
-        console.error(`Failed to rename file with id ${fileId} to ${newName}`, error)
+        logger.error(`Failed to rename file with id ${fileId} to ${newName}`, error)
         generalError('Failed to rename file.')
       })
   }

@@ -7,6 +7,7 @@ import { appVersion } from '../lib/version'
 import { newFile } from '../lib/files'
 import { closeDashboard } from '../lib/dashboard'
 import extractImages from '../lib/extractImages'
+import { logger } from '../lib/logger'
 
 const sansExtension = (fileName) => fileName.replace(/\.[^.]+$/, '')
 
@@ -38,39 +39,46 @@ const Upload = ({
     const fileReader = new FileReader()
     fileReader.onload = () => {
       const file = JSON.parse(fileReader.result)
-      migrateIfNeeded(appVersion(), file, file.file.fileName, null, (error, migrated, data) => {
-        if (error) {
-          console.error('Error migrating file: ', error)
-          return
-        }
-        console.log(`Loaded file ${file.file.fileName}.`)
-        if (migrated) {
-          console.log(
-            `File was migrated.  Migration history: ${data.file.appliedMigrations}.  Initial version: ${data.file.initialVersion}`
-          )
-        }
-        selectEmptyfile()
-        extractImages(data, userId).then((imagesExtracted) => {
-          loadFile(
-            imagesExtracted.file.fileName,
-            true,
-            imagesExtracted,
-            imagesExtracted.file.version
-          )
-          withFullFileState((state) =>
-            newFile(
-              emailAddress,
-              userId,
-              sansExtension(fileList[0]?.name) || state.present.file.fileName,
-              state,
-              setFileList,
-              selectFile
-            ).then(() => {
-              closeDashboard()
-            })
-          )
-        })
-      })
+      migrateIfNeeded(
+        appVersion(),
+        file,
+        file.file.fileName,
+        null,
+        (error, migrated, data) => {
+          if (error) {
+            logger.error('Error migrating file: ', error)
+            return
+          }
+          logger.info(`Loaded file ${file.file.fileName}.`)
+          if (migrated) {
+            logger.info(
+              `File was migrated.  Migration history: ${data.file.appliedMigrations}.  Initial version: ${data.file.initialVersion}`
+            )
+          }
+          selectEmptyfile()
+          extractImages(data, userId).then((imagesExtracted) => {
+            loadFile(
+              imagesExtracted.file.fileName,
+              true,
+              imagesExtracted,
+              imagesExtracted.file.version
+            )
+            withFullFileState((state) =>
+              newFile(
+                emailAddress,
+                userId,
+                sansExtension(fileList[0]?.name) || state.present.file.fileName,
+                state,
+                setFileList,
+                selectFile
+              ).then(() => {
+                closeDashboard()
+              })
+            )
+          })
+        },
+        logger
+      )
     }
     fileReader.readAsText(fileList[0])
   }
