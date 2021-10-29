@@ -2,7 +2,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as pltr from 'pltr/v2'
 import {
-  OverlayTrigger,
+  OverlayTrigger as UnconnectedOverlayTrigger,
   DeleteConfirmModal,
   ErrorModal,
   ColorPickerColor,
@@ -205,7 +205,7 @@ const connector = {
 export default (platform) => {
   var connectorObject = { ...connector, platform }
   return {
-    OverlayTrigger,
+    OverlayTrigger: UnconnectedOverlayTrigger(connectorObject),
     DeleteConfirmModal,
     ErrorModal,
     ColorPickerColor,
