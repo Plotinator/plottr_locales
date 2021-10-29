@@ -91,7 +91,15 @@ export const startUI = (firebaseUI, queryString) => {
   })
 }
 
-const wiredUp = api(auth, database, storage, process.env.NEXT_PUBLIC_API_BASE_DOMAIN)
+const wiredUp = api(
+  auth,
+  database,
+  storage,
+  process.env.NODE_ENV === 'development',
+  // For env vars to be read from Next config (on the web) we need to
+  // prefix them with 'NEXT_PUBLIC'
+  process.env.NEXT_PUBLIC_API_BASE_DOMAIN || process.env.API_BASE_DOMAIN
+)
 
 export const editFileName = wiredUp.editFileName
 export const listen = wiredUp.listen
