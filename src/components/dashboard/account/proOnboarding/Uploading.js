@@ -24,7 +24,7 @@ const UploadingConnector = (connector) => {
   } = connector
 
   const Uploading = ({ nextStep, projects, templates }) => {
-    const [settings] = useSettingsInfo()
+    const [settings] = useSettingsInfo(false)
     const [maxItems, setMaxItems] = useState(100)
     const [currentProgress, setCurrentProgress] = useState(0)
     const [currentObj, setCurrentObj] = useState(null)
@@ -87,7 +87,7 @@ const UploadingConnector = (connector) => {
               `File was migrated.  Migration history: ${data.file.appliedMigrations}.  Initial version: ${data.file.initialVersion}`
             )
           }
-          return extractImages(data, settings.user.id)
+          extractImages(data, settings.user.id)
             .then((patchedData) =>
               uploadExisting(settings.user.email, settings.user.id, patchedData)
             )
