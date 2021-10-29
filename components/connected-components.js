@@ -57,6 +57,7 @@ import { userHasPro } from '../lib/checkPro'
 import MPQ from '../lib/MPQ'
 import { resizeImage } from '../lib/resizeImage'
 import extractImages from '../lib/extractImages'
+import { useProLicenseInfo } from '../lib/checkPro'
 
 const deleteFileOnFirestore = (fileId) => {
   const state = store.getState()
@@ -326,6 +327,7 @@ const platform = {
     return uuidv4()
   },
   extractImages,
+  useProLicenseInfo,
   storage: {
     saveImageToStorageBlob: (blob, name) => {
       const state = store.getState()
