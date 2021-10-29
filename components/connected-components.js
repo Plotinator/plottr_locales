@@ -129,6 +129,7 @@ const platform = {
       const selectedFile = fileList.find((thatFile) => thatFile.id === fileId)
       if (!selectedFile) return
 
+      store.dispatch(actions.project.showLoader())
       openFile(userId, fileId, clientId, selectedFile.version, selectedFile.permission).then(() => {
         store.dispatch(actions.project.selectFile(selectedFile))
         closeDashboard()
