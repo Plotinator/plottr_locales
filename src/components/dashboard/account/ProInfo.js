@@ -3,16 +3,16 @@ import PropTypes from 'react-proptypes'
 import { t } from 'plottr_locales'
 import { Button } from 'react-bootstrap'
 import { checkDependencies } from '../../checkDependencies'
-import { checkForPro } from '../../../../../../src/common/licensing/check_pro'
 import { Spinner } from '../../Spinner'
 
 const ProInfoConnector = (connector) => {
   const {
     platform: {
       firebase: { logOut },
+      license: { checkForPro },
     },
   } = connector
-  checkDependencies({ logOut })
+  checkDependencies({ logOut, checkForPro })
 
   const ProInfo = ({ licenseInfo, emailAddress }) => {
     const [checking, setChecking] = useState(!licenseInfo)
@@ -45,7 +45,7 @@ const ProInfoConnector = (connector) => {
 
     return (
       <div className="dashboard__user-info">
-        <h2>{t('Plottr Pro Information')}</h2>
+        <h2>{t('Pro Subscription')}</h2>
         <hr />
         <div className="dashboard__user-info__wrapper">
           <dl className="dl-horizontal">
