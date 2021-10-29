@@ -13,10 +13,17 @@ const RCEBoundaryConnector = (connector) => {
   } = connector
   checkDependencies({ appVersion, log, user })
 
+  const selectionErrorMessages = [
+    'Cannot resolve a DOM point from Slate point',
+    'Cannot resolve a Slate point from DOM point',
+    'Cannot find a descendant at path',
+  ]
+
   class RCEBoundary extends Component {
     state = {
       hasError: false,
       viewError: false,
+      error: null,
       count: 0,
       rollbar: setupRollbar(
         'ErrorBoundary',
@@ -32,19 +39,29 @@ const RCEBoundaryConnector = (connector) => {
 
     static propTypes = {
       children: PropTypes.node,
+      resetChildren: PropTypes.func,
       createErrorReport: PropTypes.func.isRequired,
       openExternal: PropTypes.func.isRequired,
     }
 
     static getDerivedStateFromError(error) {
-      return { hasError: true, viewError: false }
+      return { error, viewError: false }
     }
 
     componentDidCatch(error, errorInfo) {
+      if (selectionErrorMessages.some((m) => error.message.includes(m))) {
+        return this.props.resetChildren()
+      }
       this.error = error
       this.errorInfo = errorInfo
-      log.error(error, errorInfo)
       this.state.rollbar.error(error, errorInfo)
+    }
+
+    componentDidUpdate() {
+      const { error } = this.state
+      if (error && selectionErrorMessages.some((m) => error.message.includes(m))) {
+        this.setState({ error: null, count: 0 })
+      }
     }
 
     createReport = () => {
@@ -56,7 +73,7 @@ const RCEBoundaryConnector = (connector) => {
     }
 
     render() {
-      if (this.state.hasError) {
+      if (this.state.error) {
         return (
           <div className="error-boundary rce">
             <div className="text-center">
@@ -68,7 +85,7 @@ const RCEBoundaryConnector = (connector) => {
             <div className="error-boundary__options">
               <Button
                 bsStyle="warning"
-                onClick={() => this.setState({ hasError: false, count: this.state.count + 1 })}
+                onClick={() => this.setState({ error: null, count: this.state.count + 1 })}
               >
                 {i18n('Try that again')}
               </Button>
