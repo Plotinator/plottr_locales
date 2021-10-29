@@ -3,6 +3,7 @@ import React from 'react'
 import { EditSeries, ErrorBoundary, BookList, SubNav } from 'connected-components'
 import { Nav, NavItem, Button } from 'react-bootstrap'
 import Download from './download'
+import Share from './share'
 
 export default function Project() {
   const SubNavigation = () => {
@@ -10,6 +11,7 @@ export default function Project() {
       <SubNav>
         <Nav bsStyle="pills">
           <Download />
+          <Share />
         </Nav>
       </SubNav>
     )

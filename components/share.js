@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { connect } from 'react-redux'
 import { PropTypes } from 'prop-types'
 import { IoIosShareAlt } from 'react-icons/io'
-import { Button, Form, FormGroup, ControlLabel, Table, FormControl } from 'react-bootstrap'
+import { NavItem, Button, Form, FormGroup, ControlLabel, Table, FormControl } from 'react-bootstrap'
 
 import { t } from 'plottr_locales'
 import { selectors, actions } from 'pltr/v2'
@@ -83,7 +83,7 @@ const Share = ({ userId, selectedFile, generalError }) => {
             </FormGroup>
           </Form>
           <div style={{ height: '16px', margin: '16px' }} />
-          <h4>{t('Current Permissions')}</h4>
+          <h4>{t('Permissions')}</h4>
           <Table striped bordered hover>
             <thead>
               <tr>
@@ -104,14 +104,11 @@ const Share = ({ userId, selectedFile, generalError }) => {
           </Table>
         </div>
       </PlottrModal>
-      <Button
-        onClick={() => {
-          setSharing(!sharing)
-        }}
-        title={t('Share')}
-      >
-        <IoIosShareAlt />
-      </Button>
+      <NavItem>
+        <Button onClick={() => setSharing(true)} title={t('Share')} bsSize="small">
+          <IoIosShareAlt />
+        </Button>
+      </NavItem>
     </>
   )
 }
