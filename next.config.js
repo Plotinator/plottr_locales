@@ -9,22 +9,6 @@ module.exports = {
       }
     }
 
-    config.module = {
-      ...config.module,
-      rules: [
-        ...config.module.rules,
-        {
-          test: /\.js$/,
-          loader: 'next-babel-loader',
-          include: path.resolve(__dirname, 'lib', 'pltr'),
-          exclude: /node_modules/,
-          query: {
-            cacheDirectory: true,
-          },
-        },
-      ],
-    }
-
     config.resolve = {
       ...config.resolve,
       alias: {
