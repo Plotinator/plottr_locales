@@ -10,7 +10,7 @@ import MissingIndicator from './MissingIndicator'
 import UnconnectedFileActions from './FileActions'
 import RecentsHeader from './RecentsHeader'
 import { checkDependencies } from '../../checkDependencies'
-import { FunSpinner } from '../../Spinner'
+import { FunSpinner, Spinner } from '../../Spinner'
 
 const isPlottrCloudFile = (filePath) => filePath && filePath.startsWith('plottr://')
 
@@ -61,16 +61,14 @@ const RecentFilesConnector = (connector) => {
 
   const FileActions = UnconnectedFileActions(connector)
 
-  const RecentFiles = ({ fileList }) => {
+  const RecentFiles = ({ fileList, isLoading }) => {
     const [searchTerm, setSearchTerm] = useState('')
     const [sortedIds, filesById] = useSortedKnownFiles(searchTerm, fileList)
     const [missingFiles, setMissing] = useState([])
     const [selectedFile, selectFile] = useState(null)
-    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
       let newMissing = [...missingFiles]
-      setLoading(true)
       sortedIds.forEach((id) => {
         const filePath = filesById[`${id}`].path
         if (!filePath) {
@@ -85,14 +83,14 @@ const RecentFilesConnector = (connector) => {
         }
       })
       setMissing(newMissing)
-      setLoading(false)
     }, [sortedIds, filesById])
 
-    const openFile = async (filePath, id) => {
-      setLoading(true)
-      if (missingFiles.includes(id)) return
-      await openKnownFile(filePath, id)
-      setLoading(false)
+    const openFile = (filePath, id) => {
+      return openKnownFile(filePath, id)
+    }
+
+    if (isLoading) {
+      return <FunSpinner />
     }
 
     const renderRecents = () => {
@@ -177,20 +175,21 @@ const RecentFilesConnector = (connector) => {
           </StickyTable>
         </div>
       ) : (
-        <FunSpinner />
+        <Spinner />
       )
     }
 
     return (
       <div className="dashboard__recent-files">
         <RecentsHeader setSearchTerm={setSearchTerm} />
-        {renderRecents() || <FunSpinner />}
+        {renderRecents() || <Spinner />}
       </div>
     )
   }
 
   RecentFiles.propTypes = {
     fileList: PropTypes.array.isRequired,
+    isLoading: PropTypes.bool,
   }
 
   const {
@@ -203,6 +202,7 @@ const RecentFilesConnector = (connector) => {
 
     return connect((state) => ({
       fileList: selectors.fileListSelector(state.present),
+      isLoading: selectors.loadingFileSelector(state.present),
     }))(RecentFiles)
   }
 
