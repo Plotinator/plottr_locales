@@ -6,25 +6,38 @@ import { actions } from 'pltr/v2'
 import { listenToFiles, onSessionChange } from 'plottr_firebase'
 import { useRouter } from 'next/router'
 
-const SessionObserver = ({ setUserId, setFileList, setEmailAddress }) => {
+const SessionObserver = ({ setUserId, setFileList, setEmailAddress, generalError }) => {
   const router = useRouter()
   const { pid } = router.query
 
   useEffect(() => {
     let fileListener = null
-    const sessionListener = onSessionChange((user) => {
-      if (!user) {
-        const url = `/login${pid ? '?pid=' + pid : ''}`
-        window.location.href = url
-      } else {
-        setUserId(user.uid)
-        setEmailAddress(user.email)
-        fileListener = listenToFiles(user.uid, (files) => {
-          const activeFiles = files.filter(({ deleted }) => !deleted)
-          setFileList(activeFiles)
-        })
+    const sessionListener = onSessionChange(
+      (user) => {
+        if (!user) {
+          const url = `/login${pid ? '?pid=' + pid : ''}`
+          window.location.href = url
+        } else {
+          setUserId(user.uid)
+          setEmailAddress(user.email)
+          fileListener = listenToFiles(
+            user.uid,
+            (files) => {
+              const activeFiles = files.filter(({ deleted }) => !deleted)
+              setFileList(activeFiles)
+            },
+            (error) => {
+              console.error('Error listening to files list.', error)
+              generalError('There seems to be a problem with your network.')
+            }
+          )
+        }
+      },
+      (error) => {
+        console.error('Error while trying to listen for session changes.', error)
+        generalError('There seems to be a problem with your network.')
       }
-    })
+    )
     return () => {
       if (fileListener) fileListener()
       sessionListener()
@@ -42,4 +55,5 @@ export default connect(null, {
   setFileList: actions.project.setFileList,
   setUserId: actions.client.setUserId,
   setEmailAddress: actions.client.setEmailAddress,
+  generalError: actions.error.generalError,
 })(SessionObserver)

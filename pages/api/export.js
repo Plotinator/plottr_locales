@@ -71,13 +71,30 @@ export default (req, res) => {
                 return
               }
               console.log(`Stored file on firestore at: ${destinationFilePath}`)
-              storedFile.makePublic().then((result) => {
-                const url = storedFile.publicUrl()
-                console.log('Redirecting to: ', url)
-                res.status(200)
-                res.setHeader('Location', url)
-                res.send(`See: ${url}`)
-              })
+              if (process.env.FIREBASE_ENV === 'development') {
+                storedFile.makePublic().then((result) => {
+                  const url = storedFile.publicUrl()
+                  console.log('Redirecting to: ', url)
+                  res.status(200)
+                  res.setHeader('Location', url)
+                  res.send(`See: ${url}`)
+                })
+              } else {
+                const expiryDate = new Date()
+                expiryDate.setDate(expiryDate.getDate() + 1)
+                const config = {
+                  action: 'read',
+                  expires: `${
+                    expiryDate.getMonth() + 1
+                  }-${expiryDate.getDate()}-${expiryDate.getFullYear()}`,
+                }
+                storedFile.getSignedUrl(config).then((url) => {
+                  console.log('Redirecting to: ', url)
+                  res.status(200)
+                  res.setHeader('Location', url)
+                  res.send(`See: ${url}`)
+                })
+              }
             }
           )
         }

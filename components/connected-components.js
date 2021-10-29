@@ -53,7 +53,7 @@ import {
 import { useBackupFolders } from '../lib/backups'
 import { createErrorReport } from '../lib/createErrorReport'
 import { closeDashboard } from '../lib/dashboard'
-import { useProLicenseInfo, userHasPro } from '../lib/checkPro'
+import { userHasPro } from '../lib/checkPro'
 import MPQ from '../lib/MPQ'
 import { resizeImage } from '../lib/resizeImage'
 import extractImages from '../lib/extractImages'
@@ -242,6 +242,7 @@ const platform = {
     window.open(withProtocol, '_blank')
   },
   createErrorReport,
+  createFullErrorReport: () => {},
   log: {
     info: () => {
       // TODO
@@ -342,7 +343,18 @@ const platform = {
     },
     resolveToPublicUrl: (storageUrl) => {
       if (!storageUrl) return null
-      return imagePublicURL(storageUrl)
+      const state = store.getState()
+      const {
+        client: { userId },
+        project: { selectedFile },
+      } = state.present
+      const fileId = selectedFile?.id
+      if (!fileId || !userId) {
+        return Promise.reject(
+          'No file or you are not logged in.  Either way we cannot fetch a picture.'
+        )
+      }
+      return imagePublicURL(storageUrl, fileId, userId)
     },
     isStorageURL,
     imagePublicURL,
