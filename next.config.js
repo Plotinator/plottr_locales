@@ -15,7 +15,7 @@ module.exports = {
         ...config.module.rules,
         {
           test: /\.js$/,
-          loader: 'babel-loader',
+          loader: 'next-babel-loader',
           include: path.resolve(__dirname, 'lib', 'pltr'),
           exclude: /node_modules/,
           query: {
