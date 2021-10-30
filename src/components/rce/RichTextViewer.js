@@ -34,7 +34,12 @@ const RichTextViewer = ({ openExternal, imagePublicURL, isStorageURL, ...props }
   return (
     <Slate editor={editor} value={value} key={key.current}>
       <div className={cx('slate-editor__wrapper', props.className, { readonly: true })}>
-        <div className={cx('slate-editor__editor', { readonly: true })}>
+        <div
+          className={cx('slate-editor__editor', {
+            readonly: true,
+            rceLocked: props.lock && props.lock.clientId && props.lock.clientId !== props.clientId,
+          })}
+        >
           <Editable readOnly renderLeaf={renderLeaf} renderElement={renderElement} />
         </div>
       </div>
@@ -49,6 +54,8 @@ RichTextViewer.propTypes = {
   log: PropTypes.object.isRequired,
   isStorageURL: PropTypes.func.isRequired,
   imagePublicURL: PropTypes.func.isRequired,
+  lock: PropTypes.object,
+  clientId: PropTypes.string,
 }
 
 export default RichTextViewer
