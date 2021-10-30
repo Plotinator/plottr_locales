@@ -1,9 +1,15 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import PropTypes from 'react-proptypes'
+import { FaLock } from 'react-icons/fa'
+import { isEqual } from 'lodash'
+
+import { t } from 'plottr_locales'
+import { selectors } from 'pltr/v2'
+
 import UnconnectedRichTextEditor from './RichTextEditor'
 import RichTextViewer from './RichTextViewer'
 import UnconnectedRCEBoundary from './RCEBoundary'
-
+import { Spinner } from '../Spinner'
 import { checkDependencies } from '../checkDependencies'
 
 const RichTextConnector = (connector) => {
@@ -16,6 +22,9 @@ const RichTextConnector = (connector) => {
       openExternal,
       log,
       createErrorReport,
+      lockRCE,
+      listenForRCELock,
+      releaseRCELock,
     },
   } = connector
   checkDependencies({
@@ -24,6 +33,9 @@ const RichTextConnector = (connector) => {
     openExternal,
     log,
     createErrorReport,
+    lockRCE,
+    listenForRCELock,
+    releaseRCELock,
   })
 
   const defaultSelection = {
@@ -41,12 +53,61 @@ const RichTextConnector = (connector) => {
     const reset = () => {
       setSelection(defaultSelection)
     }
+    const [lock, setLock] = useState(props.isCloudFile ? null : true)
+    const [stealingLock, setStealingLock] = useState(false)
+    const [focus, setFocus] = useState(null)
 
     let body = null
-    if (props.editable) {
+    const disabled = lock.clientId && lock.clientId !== props.clientId
+
+    const stealLock = useCallback(() => {
+      setStealingLock(true)
+      lockRCE(props.fileId, props.id, props.clientId, props.emailAddress)
+        .then(() => {
+          setStealingLock(false)
+        })
+        .catch((error) => {
+          console.error('Error stealing the lock for editor: ', props.id)
+          setStealingLock(false)
+        })
+    }, [props.fileId, props.id, props.clientId, props.emailAddress])
+
+    const relinquishLock = useCallback(() => {
+      if (releaseRCELock && lock?.clientId === props.clientId) {
+        releaseRCELock(props.fileId, props.id)
+      }
+    }, [props.fileId, props.id, props.clientId, lock])
+
+    const onFocus = () => {
+      setFocus(true)
+      if (!lock || !lock.clientId) {
+        stealLock()
+      }
+    }
+
+    const onBlur = () => {
+      setFocus(false)
+      relinquishLock()
+    }
+
+    // Check for edit locks
+    useEffect(() => {
+      return listenForRCELock(props.fileId, props.id, props.clientId, (lockResult) => {
+        if (!isEqual(lockResult, lock)) {
+          setLock(lockResult)
+          if ((focus || focus === null) && (!lockResult || !lockResult.clientId)) {
+            stealLock()
+          }
+        }
+      })
+    }, [setLock, props.fileId, lock, props.id, props.clientId, stealLock, focus])
+
+    if (props.editable && !disabled) {
       body = (
         <RichTextEditor
           id={props.id}
+          onBlur={onBlur}
+          onFocus={onFocus}
           className={props.className}
           onChange={props.onChange}
           autoFocus={props.autofocus}
@@ -58,15 +119,37 @@ const RichTextConnector = (connector) => {
     } else {
       // TODO: support live watching(?)
       body = (
-        <RichTextViewer
-          text={props.description}
-          className={props.className}
-          openExternal={openExternal}
-          log={log}
-          imagePublicURL={imagePublicURL}
-          isStorageURL={isStorageURL}
-        />
+        <>
+          {lock.clientId && lock.clientId !== props.clientId ? (
+            <div className="lock-icon__wrapper" disabled={stealingLock} onClick={stealLock}>
+              <span>{t('Take Control')}</span>
+              <FaLock />
+            </div>
+          ) : null}
+          <RichTextViewer
+            lock={lock}
+            clientId={props.clientId}
+            text={props.description}
+            className={props.className}
+            openExternal={openExternal}
+            log={log}
+            imagePublicURL={imagePublicURL}
+            isStorageURL={isStorageURL}
+          />
+        </>
       )
+    }
+
+    useEffect(() => {
+      return () => {
+        if (releaseRCELock && lock?.clientId === props.clientId) {
+          releaseRCELock(props.fileId, props.id)
+        }
+      }
+    }, [lock, props.fileId, props.id])
+
+    if (!lock) {
+      return <Spinner />
     }
 
     return (
@@ -82,6 +165,9 @@ const RichTextConnector = (connector) => {
 
   RichText.propTypes = {
     id: PropTypes.string,
+    clientId: PropTypes.string,
+    fileId: PropTypes.string,
+    emailAddress: PropTypes.string,
     description: PropTypes.any,
     selection: PropTypes.object,
     onChange: PropTypes.func,
@@ -91,9 +177,21 @@ const RichTextConnector = (connector) => {
     darkMode: PropTypes.bool.isRequired,
     isStorageURL: PropTypes.func.isRequired,
     imagePublicURL: PropTypes.func.isRequired,
+    isCloudFile: PropTypes.bool,
   }
 
-  return RichText
+  const { redux } = connector
+
+  if (redux) {
+    const { connect } = redux
+
+    return connect((state) => ({
+      clientId: selectors.clientIdSelector(state.present),
+      emailAddress: selectors.emailAddressSelector(state.present),
+    }))(RichText)
+  }
+
+  throw new Error("Couldn't connect RichText")
 }
 
 export default RichTextConnector
