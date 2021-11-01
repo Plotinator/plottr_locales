@@ -299,7 +299,11 @@ export const useEditState = (
           setEditorState(operation.operation.value, operation.operation.selection)
           editor.selection = operation.operation.selection
         } else {
-          editor.apply(operation.operation)
+          try {
+            editor.apply(operation.operation)
+          } catch (error) {
+            // do nothing?
+          }
         }
         editor.operations = []
         if (latestEdits.current[operation.editorKey].read < operation.editNumber) {
@@ -349,9 +353,16 @@ export const useEditState = (
     if (!deferredOperationsToApply.current.length) return
 
     deferredOperationsToApply.current.forEach((operation) => {
-      editor.apply(operation.operation)
-      if (latestEdits.current[operation.editorKey].read < operation.editNumber) {
-        latestEdits.current[operation.editorKey].read = operation.editNumber
+      try {
+        editor.apply(operation.operation)
+        if (
+          latestEdits.current[operation.editorKey] &&
+          latestEdits.current[operation.editorKey].read < operation.editNumber
+        ) {
+          latestEdits.current[operation.editorKey].read = operation.editNumber
+        }
+      } catch (error) {
+        // do nothing?
       }
     })
     deferredOperationsToApply.current = []

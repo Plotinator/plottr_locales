@@ -26,10 +26,10 @@ const EditAttributeConnector = (connector) => {
   const RichText = RichTextConnector(connector)
 
   const {
-    platform: { undo, redo },
+    platform: { undo, redo, log },
   } = connector
 
-  checkDependencies({ undo, redo })
+  checkDependencies({ undo, redo, log })
 
   const EditAttribute = ({
     entityType,
@@ -71,6 +71,10 @@ const EditAttributeConnector = (connector) => {
     }, [editing])
 
     const saveEdits = (newName) => {
+      if (!newName) {
+        setEditing(false)
+        return false
+      }
       editAttribute(index, { name, type }, { name: newName, type })
       setEditing(false)
     }
@@ -263,7 +267,7 @@ const EditAttributeConnector = (connector) => {
           }
 
         default:
-          console.warn(`${entityType} actions not implemented`)
+          log.warn(`${entityType} actions not implemented`)
           return {
             addAttribute: () => {},
             removeAttribute: () => {},
