@@ -8,7 +8,7 @@ import { t } from 'plottr_locales'
 import { selectors, actions } from 'pltr/v2'
 import { PlottrModal } from 'connected-components'
 import { withEventTargetValue } from '../lib/withEventTargetValue'
-import { shareDocument } from 'plottr_firebase'
+import { shareDocument } from 'wired-up-firebase'
 
 const modalStyles = {
   overlay: {
