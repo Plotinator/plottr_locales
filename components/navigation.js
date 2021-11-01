@@ -7,7 +7,7 @@ import { t } from 'plottr_locales'
 import { Beamer, BookChooser } from 'connected-components'
 import cx from 'classnames'
 import { FaRegUser } from 'react-icons/fa'
-import { onSessionChange } from 'plottr_firebase'
+import { onSessionChange } from 'wired-up-firebase'
 
 import DashboardModal from './dashboard-modal'
 import Share from './share'

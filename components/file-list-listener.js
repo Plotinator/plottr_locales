@@ -3,7 +3,9 @@ import { useEffect } from 'react'
 import { connect } from 'react-redux'
 
 import { actions, selectors } from 'pltr/v2'
-import { fetchFiles } from 'plottr_firebase'
+import { fetchFiles } from 'wired-up-firebase'
+
+import { logger } from '../lib/logger'
 
 const FileListListener = ({ fileList, userId, setFileList, generalError }) => {
   useEffect(() => {
@@ -15,7 +17,7 @@ const FileListListener = ({ fileList, userId, setFileList, generalError }) => {
           setFileList(files.filter(({ deleted }) => !deleted))
         })
         .catch((error) => {
-          console.error(`Failed to fetch file list for user with id: ${userId}`, error)
+          logger.error(`Failed to fetch file list for user with id: ${userId}`, error)
           generalError('We ran into a problem fetching your files.  Please try again.')
         })
     })

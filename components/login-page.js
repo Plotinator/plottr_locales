@@ -4,8 +4,9 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 
 import { FunSpinner } from 'connected-components'
-import { onSessionChange, firebaseUI, startUI, currentUser } from 'plottr_firebase'
+import { onSessionChange, firebaseUI, startUI, currentUser } from 'wired-up-firebase'
 import { useProLicenseInfo, userHasPro } from '../lib/checkPro'
+import { logger } from '../lib/logger'
 
 export default function LoginPage() {
   const [sessionChecked, setSessionChecked] = useState(false)
@@ -16,19 +17,19 @@ export default function LoginPage() {
   useEffect(() => {
     if (sessionChecked) return
     onSessionChange(async (user) => {
-      console.log('session changed', user)
+      logger.info('session changed', user)
       setSessionChecked(true)
       if (user) {
-        console.log('session w/ user', router.query)
+        logger.info('session w/ user', router.query)
         const url = `/timeline${pid ? '?pid=' + pid : ''}`
-        console.log('url to redirect', url)
+        logger.info('url to redirect', url)
         if (process.env.NEXT_PUBLIC_NODE_ENV === 'development') {
           window.location.href = url
         }
         currentUser()
           .getIdTokenResult()
           .then(async (token) => {
-            console.log('token', token.claims)
+            logger.info('token', token.claims)
             if (token.claims.beta || token.claims.admin) {
               setLicenseInfo({ claims: token.claims, customer: { email: user.email } })
               window.location.href = url
@@ -41,7 +42,7 @@ export default function LoginPage() {
               } else {
                 // display something saying
                 // the user is not authorized for the beta
-                console.log('not authorized')
+                logger.error('not authorized')
               }
             }
           })
