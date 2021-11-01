@@ -42,21 +42,16 @@ const RichTextConnector = (connector) => {
   }
 
   const RichText = (props) => {
-    const [selection, setSelection] = useState(props.selection)
-
-    useEffect(() => {
-      setSelection(props.selection)
-    }, [props.selection])
-
-    const reset = () => {
-      setSelection(defaultSelection)
-    }
     const [lock, setLock] = useState(props.isCloudFile ? null : true)
     const [stealingLock, setStealingLock] = useState(false)
     const [focus, setFocus] = useState(null)
 
     let body = null
-    const disabled = lock?.clientId !== props.clientId
+    const disabled = lock && lock.clientId && lock.clientId !== props.clientId
+
+    const reset = () => {
+      props.onChange(null, defaultSelection)
+    }
 
     const stealLock = useCallback(() => {
       setFocus(true)
@@ -94,7 +89,7 @@ const RichTextConnector = (connector) => {
       return listenForRCELock(props.fileId, props.id, props.clientId, (lockResult) => {
         if (!isEqual(lockResult, lock)) {
           setLock(lockResult)
-          if (lockResult?.clientId !== props.clientId) {
+          if (lockResult.clientId !== null && lockResult.clientId !== props.clientId) {
             setFocus(false)
           } else if ((focus || focus === null) && (!lockResult || !lockResult.clientId)) {
             stealLock()
@@ -111,7 +106,7 @@ const RichTextConnector = (connector) => {
       }
     }, [lock, props.fileId, props.id])
 
-    if (!lock) {
+    if (props.editable && !lock && !disabled) {
       return <Spinner />
     }
 
@@ -124,7 +119,7 @@ const RichTextConnector = (connector) => {
           className={props.className}
           onChange={props.onChange}
           autoFocus={props.autofocus}
-          selection={selection}
+          selection={props.selection}
           text={props.description}
           darkMode={props.darkMode}
         />
@@ -134,6 +129,7 @@ const RichTextConnector = (connector) => {
       body = (
         <RichTextViewer
           lock={lock}
+          disabled={!props.editable}
           stealingLock={stealingLock}
           stealLock={stealLock}
           clientId={props.clientId}

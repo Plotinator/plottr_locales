@@ -36,15 +36,11 @@ const RichTextViewer = ({
   )
   const value = useTextConverter(props.text, props.log)
   const key = useRef(Math.random().toString(16))
-
-  if (!value) return <span />
-  if (!value.length) return <span />
-  if (value.length == 1 && value[0].children.length === 1 && value[0].children[0].text == '')
-    return <span />
+  const isLocked = props.lock && props.lock.clientId && props.lock?.clientId !== props.clientId
 
   return (
     <Slate editor={editor} value={value} key={key.current}>
-      {props.lock?.clientId !== props.clientId ? (
+      {!props.disabled && isLocked ? (
         <div className="lock-icon__wrapper" disabled={stealingLock} onClick={stealLock}>
           <span>{t('Take Control')}</span>
           <FaLock />
@@ -54,7 +50,7 @@ const RichTextViewer = ({
         <div
           className={cx('slate-editor__editor', {
             readonly: true,
-            rceLocked: props.lock?.clientId !== props.clientId,
+            rceLocked: isLocked,
           })}
         >
           <Editable readOnly renderLeaf={renderLeaf} renderElement={renderElement} />
@@ -66,6 +62,7 @@ const RichTextViewer = ({
 
 RichTextViewer.propTypes = {
   text: PropTypes.any,
+  disabled: PropTypes.bool,
   className: PropTypes.string,
   openExternal: PropTypes.func.isRequired,
   log: PropTypes.object.isRequired,
