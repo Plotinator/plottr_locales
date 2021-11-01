@@ -26,6 +26,7 @@ import Renamer from './renamer'
 import SettingsConsistencyChecker from './settings-consistency-checker'
 import Upload from './upload'
 import { logger } from '../lib/logger'
+import FullPageSpinner from './spinner'
 
 const redo = () => {
   store.dispatch(ActionCreators.redo())
@@ -117,6 +118,7 @@ const Root = ({ projectId }) => {
         <Upload />
         <Router history={history}>
           <Navigation />
+          <FullPageSpinner />
           <Error />
           <main className="project-main tour-end">
             <Switch>
