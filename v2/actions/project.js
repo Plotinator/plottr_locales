@@ -34,6 +34,7 @@ export const unsetFileLoaded = () => ({
   type: UNSET_FILE_LOADED,
 })
 
-export const showLoader = () => ({
+export const showLoader = (isLoading) => ({
   type: SHOW_LOADER,
+  isLoading,
 })
