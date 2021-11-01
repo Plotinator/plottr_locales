@@ -24,6 +24,7 @@ import ClientIdMinter from './client-id-minter'
 import FileListListener from './file-list-listener'
 import Renamer from './renamer'
 import SettingsConsistencyChecker from './settings-consistency-checker'
+import Upload from './upload'
 import { logger } from '../lib/logger'
 
 const redo = () => {
@@ -113,6 +114,7 @@ const Root = ({ projectId }) => {
         <Listener />
         <ClientIdMinter />
         <SaveTemplate />
+        <Upload />
         <Router history={history}>
           <Navigation />
           <Error />
