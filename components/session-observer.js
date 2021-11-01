@@ -3,8 +3,10 @@ import { useEffect } from 'react'
 import { connect } from 'react-redux'
 
 import { actions } from 'pltr/v2'
-import { listenToFiles, onSessionChange } from 'plottr_firebase'
+import { listenToFiles, onSessionChange } from 'wired-up-firebase'
 import { useRouter } from 'next/router'
+
+import { logger } from '../lib/logger'
 
 const SessionObserver = ({ setUserId, setFileList, setEmailAddress, generalError }) => {
   const router = useRouter()
@@ -27,14 +29,14 @@ const SessionObserver = ({ setUserId, setFileList, setEmailAddress, generalError
               setFileList(activeFiles)
             },
             (error) => {
-              console.error('Error listening to files list.', error)
+              logger.error('Error listening to files list.', error)
               generalError('There seems to be a problem with your network.')
             }
           )
         }
       },
       (error) => {
-        console.error('Error while trying to listen for session changes.', error)
+        logger.error('Error while trying to listen for session changes.', error)
         generalError('There seems to be a problem with your network.')
       }
     )
