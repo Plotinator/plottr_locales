@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'react-proptypes'
 import UnconnectedRichTextEditor from './RichTextEditor'
 import RichTextViewer from './RichTextViewer'
@@ -26,7 +26,22 @@ const RichTextConnector = (connector) => {
     createErrorReport,
   })
 
+  const defaultSelection = {
+    anchor: { path: [0, 0], offset: 0 },
+    focus: { path: [0, 0], offset: 0 },
+  }
+
   const RichText = (props) => {
+    const [selection, setSelection] = useState(props.selection)
+
+    useEffect(() => {
+      setSelection(props.selection)
+    }, [props.selection])
+
+    const reset = () => {
+      setSelection(defaultSelection)
+    }
+
     let body = null
     if (props.editable) {
       body = (
@@ -35,7 +50,7 @@ const RichTextConnector = (connector) => {
           className={props.className}
           onChange={props.onChange}
           autoFocus={props.autofocus}
-          selection={props.selection}
+          selection={selection}
           text={props.description}
           darkMode={props.darkMode}
         />
@@ -55,7 +70,11 @@ const RichTextConnector = (connector) => {
     }
 
     return (
-      <RCEBoundary createErrorReport={createErrorReport} openExternal={openExternal}>
+      <RCEBoundary
+        createErrorReport={createErrorReport}
+        openExternal={openExternal}
+        resetChildren={reset}
+      >
         {body}
       </RCEBoundary>
     )
