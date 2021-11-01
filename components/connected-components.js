@@ -30,7 +30,6 @@ import {
   currentUser,
   fetchFiles,
   saveCustomTemplate,
-  uploadExisting,
 } from 'wired-up-firebase'
 import {
   getTemplateById,
@@ -56,6 +55,7 @@ import {
   useSortedKnownFiles,
   newFile,
   openFile,
+  uploadExisting,
 } from '../lib/files'
 import { useBackupFolders } from '../lib/backups'
 import { createErrorReport } from '../lib/createErrorReport'
@@ -76,6 +76,7 @@ const deleteFileOnFirestore = (fileId) => {
 }
 
 const platform = {
+  electron: null,
   undo: () => {
     store.dispatch(ActionCreators.undo())
   },

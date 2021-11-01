@@ -1,3 +1,7 @@
+# Fork
+Forked from https://github.com/ratehub/check-prop-types to change the
+dependency on `prop-types` to the new `react-proptypes`.
+
 # checkPropTypes
 
 [![Build Status](https://travis-ci.org/ratehub/check-prop-types.svg?branch=master)](https://travis-ci.org/ratehub/check-prop-types)
