@@ -1,6 +1,7 @@
 import semverGt from 'semver/functions/gt'
 import axios from 'axios'
 import { DateTime, Duration } from 'luxon'
+import { isEqual } from 'lodash'
 
 import { actions, ARRAY_KEYS } from 'pltr/v2'
 
@@ -578,14 +579,37 @@ const api = (auth, database, storage, baseAPIDomain, development, log) => {
       })
   }
 
-  const releaseRCELock = (fileId, editorId) => {
-    return database().doc(`rce/${fileId}/editors/${editorId}/locks/current`).delete()
+  const releaseRCELock = (fileId, editorId, expectedLock) => {
+    const lockReference = database().doc(`rce/${fileId}/editors/${editorId}/locks/current`)
+    return database().runTransaction((transactions) => {
+      return transactions.get(lockReference).then((lock) => {
+        if (!lock.exists) {
+          return 'Lock already deleted'
+        }
+        return lock.delete()
+      })
+    })
   }
 
-  const lockRCE = (fileId, editorId, clientId, emailAddress = '') => {
-    return database().doc(`rce/${fileId}/editors/${editorId}/locks/current`).set({
-      clientId,
-      emailAddress
+  const lockRCE = (fileId, editorId, clientId, expectedLock, emailAddress = '') => {
+    const lockReference = database().doc(`rce/${fileId}/editors/${editorId}/locks/current`)
+    return database().runTransaction((transactions) => {
+      transactions.get(lockReference).then((lock) => {
+        if (!lock.exists) {
+          return lock.set({
+            clientId,
+            emailAddress,
+          })
+        }
+        if (isEqual(lock.data(), expectedLock)) {
+          return lock.set({
+            clientId,
+            emailAddress,
+          })
+        }
+
+        return 'Lock modified by another client or request'
+      })
     })
   }
 
