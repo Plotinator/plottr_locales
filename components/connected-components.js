@@ -24,7 +24,13 @@ import {
   listenForRCELock,
   releaseRCELock,
   logOut,
-} from 'plottr_firebase'
+  startUI,
+  firebaseUI,
+  onSessionChange,
+  currentUser,
+  fetchFiles,
+  saveCustomTemplate,
+} from 'wired-up-firebase'
 import {
   getTemplateById,
   listTemplates,
@@ -49,6 +55,7 @@ import {
   useSortedKnownFiles,
   newFile,
   openFile,
+  uploadExisting,
 } from '../lib/files'
 import { useBackupFolders } from '../lib/backups'
 import { createErrorReport } from '../lib/createErrorReport'
@@ -57,6 +64,8 @@ import { userHasPro } from '../lib/checkPro'
 import MPQ from '../lib/MPQ'
 import { resizeImage } from '../lib/resizeImage'
 import extractImages from '../lib/extractImages'
+import { useProLicenseInfo } from '../lib/checkPro'
+import { logger } from '../lib/logger'
 
 const deleteFileOnFirestore = (fileId) => {
   const state = store.getState()
@@ -67,6 +76,7 @@ const deleteFileOnFirestore = (fileId) => {
 }
 
 const platform = {
+  electron: null,
   undo: () => {
     store.dispatch(ActionCreators.undo())
   },
@@ -245,19 +255,19 @@ const platform = {
   createErrorReport,
   createFullErrorReport: () => {},
   log: {
-    info: () => {
-      // TODO
+    info: (...args) => {
+      logger.info(...args)
     },
-    warn: () => {
-      // TODO
+    warn: (...args) => {
+      logger.warn(...args)
     },
-    error: () => {
-      // TODO
+    error: (...args) => {
+      logger.error(...args)
     },
   },
   dialog: {
     showErrorBox: (error) => {
-      console.error(error)
+      logger.error(error)
       if (typeof alert !== 'undefined') alert(error)
     },
   },
@@ -299,7 +309,7 @@ const platform = {
     if (isStorageURL(fileName)) {
       backupPublicURL(fileName).then((url) => window.open(url, '_blank'))
     }
-    console.error('Attempted to open file at: ', fileName)
+    logger.error('Attempted to open file at: ', fileName)
   },
   tempFilesPath: 'TODO',
   mpq: MPQ,
@@ -327,6 +337,7 @@ const platform = {
     return uuidv4()
   },
   extractImages,
+  useProLicenseInfo,
   storage: {
     saveImageToStorageBlob: (blob, name) => {
       const state = store.getState()
@@ -362,7 +373,14 @@ const platform = {
     resizeImage,
   },
   firebase: {
+    startUI,
+    firebaseUI,
+    onSessionChange,
+    currentUser,
+    fetchFiles,
     logOut,
+    saveCustomTemplate,
+    uploadExisting,
   },
 }
 
