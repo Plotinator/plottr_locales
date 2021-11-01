@@ -74,7 +74,7 @@ const RichTextEditorConnector = (connector) => {
   }) => {
     // Editor instance
     const editor = useMemo(() => {
-      return createEditor()
+      return createEditor(log)
     }, [])
     const registerEditor = useRegisterEditor(editor)
 
@@ -103,7 +103,7 @@ const RichTextEditorConnector = (connector) => {
           setStealingLock(false)
         })
         .catch((error) => {
-          console.error('Error stealing the lock for editor: ', id)
+          log.error('Error stealing the lock for editor: ', id)
           setStealingLock(false)
         })
     }, [fileId, id, clientId, emailAddress])
