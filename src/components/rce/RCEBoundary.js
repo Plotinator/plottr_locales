@@ -25,6 +25,7 @@ const RCEBoundaryConnector = (connector) => {
       viewError: false,
       error: null,
       count: 0,
+      autoResetCount: 0,
       rollbar: setupRollbar(
         'ErrorBoundary',
         appVersion,
@@ -58,10 +59,17 @@ const RCEBoundaryConnector = (connector) => {
     }
 
     componentDidUpdate() {
-      const { error } = this.state
+      const { error, autoResetCount } = this.state
+      if (autoResetCount > 0) return
+
+      // attempt an auto reset
       if (error && selectionErrorMessages.some((m) => error.message.includes(m))) {
-        this.setState({ error: null, count: 0 })
+        this.setState({ error: null, count: 0, autoResetCount: autoResetCount + 1 })
       }
+    }
+
+    tryAgain = () => {
+      this.setState({ error: null, count: this.state.count + 1, autoResetCount: 0 })
     }
 
     createReport = () => {
@@ -83,10 +91,7 @@ const RCEBoundaryConnector = (connector) => {
               </h4>
             </div>
             <div className="error-boundary__options">
-              <Button
-                bsStyle="warning"
-                onClick={() => this.setState({ error: null, count: this.state.count + 1 })}
-              >
+              <Button bsStyle="warning" onClick={this.tryAgain}>
                 {i18n('Try that again')}
               </Button>
               <Button onClick={() => this.setState({ viewError: !this.state.viewError })}>
