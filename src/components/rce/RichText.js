@@ -56,7 +56,7 @@ const RichTextConnector = (connector) => {
     const stealLock = useCallback(() => {
       setFocus(true)
       setStealingLock(true)
-      lockRCE(props.fileId, props.id, props.clientId, props.emailAddress)
+      lockRCE(props.fileId, props.id, props.clientId, lock, props.emailAddress)
         .then(() => {
           setStealingLock(false)
         })
@@ -64,11 +64,11 @@ const RichTextConnector = (connector) => {
           console.error('Error stealing the lock for editor: ', props.id)
           setStealingLock(false)
         })
-    }, [props.fileId, props.id, props.clientId, props.emailAddress])
+    }, [props.fileId, props.id, props.clientId, props.emailAddress, lock])
 
     const relinquishLock = useCallback(() => {
       if (releaseRCELock && lock?.clientId === props.clientId) {
-        releaseRCELock(props.fileId, props.id)
+        releaseRCELock(props.fileId, props.id, lock)
       }
     }, [props.fileId, props.id, props.clientId, lock])
 
