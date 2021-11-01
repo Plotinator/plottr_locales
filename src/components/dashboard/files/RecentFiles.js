@@ -20,21 +20,21 @@ const renderPermission = (permission) => {
       return (
         <div className="permissions">
           <AiOutlineTeam />
-          Collaborator
+          {t('Collaborator')}
         </div>
       )
     case 'viewer':
       return (
         <div className="permissions">
           <AiOutlineRead />
-          Viewer
+          {t('Viewer')}
         </div>
       )
     case 'owner':
       return (
         <div className="permissions">
           <GiQuillInk />
-          Owner
+          {t('Owner')}
         </div>
       )
     default:
