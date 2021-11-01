@@ -72,7 +72,7 @@ const RecentFilesConnector = (connector) => {
       sortedIds.forEach((id) => {
         const filePath = filesById[`${id}`].path
         if (!filePath) {
-          log.warn(`File with id: ${id}, doesn't have a "filePath"`)
+          log.warn(`File with id: ${filesById[id].id}, doesn't have a "filePath"`)
           return
         }
         if (isPlottrCloudFile(filePath)) {
