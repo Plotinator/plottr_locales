@@ -10,7 +10,7 @@ import MissingIndicator from './MissingIndicator'
 import UnconnectedFileActions from './FileActions'
 import RecentsHeader from './RecentsHeader'
 import { checkDependencies } from '../../checkDependencies'
-import { FunSpinner, Spinner } from '../../Spinner'
+import { Spinner } from '../../Spinner'
 
 const isPlottrCloudFile = (filePath) => (filePath && filePath.startsWith('plottr://')) || !filePath
 
@@ -61,7 +61,7 @@ const RecentFilesConnector = (connector) => {
 
   const FileActions = UnconnectedFileActions(connector)
 
-  const RecentFiles = ({ fileList, isLoading }) => {
+  const RecentFiles = ({ fileList }) => {
     const [searchTerm, setSearchTerm] = useState('')
     const [sortedIds, filesById] = useSortedKnownFiles(searchTerm, fileList)
     const [missingFiles, setMissing] = useState([])
@@ -87,10 +87,6 @@ const RecentFilesConnector = (connector) => {
 
     const openFile = (filePath, id) => {
       return openKnownFile(filePath, id)
-    }
-
-    if (isLoading) {
-      return <FunSpinner />
     }
 
     const renderRecents = () => {
@@ -204,7 +200,6 @@ const RecentFilesConnector = (connector) => {
 
   RecentFiles.propTypes = {
     fileList: PropTypes.array.isRequired,
-    isLoading: PropTypes.bool,
   }
 
   const {
@@ -217,7 +212,6 @@ const RecentFilesConnector = (connector) => {
 
     return connect((state) => ({
       fileList: selectors.fileListSelector(state.present),
-      isLoading: selectors.loadingFileSelector(state.present),
     }))(RecentFiles)
   }
 
