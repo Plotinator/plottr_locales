@@ -1,14 +1,14 @@
 import { useState } from 'react'
 import { connect } from 'react-redux'
 import { PropTypes } from 'prop-types'
-import { FiShare } from 'react-icons/fi'
-import { Button, Form, FormGroup, Table } from 'react-bootstrap'
+import { IoIosShareAlt } from 'react-icons/io'
+import { NavItem, Button, Form, FormGroup, ControlLabel, Table, FormControl } from 'react-bootstrap'
 
 import { t } from 'plottr_locales'
 import { selectors, actions } from 'pltr/v2'
 import { PlottrModal } from 'connected-components'
 import { withEventTargetValue } from '../lib/withEventTargetValue'
-import { shareDocument } from 'plottr_firebase'
+import { shareDocument } from 'wired-up-firebase'
 
 const modalStyles = {
   overlay: {
@@ -51,57 +51,64 @@ const Share = ({ userId, selectedFile, generalError }) => {
     setEmailToShareWith('')
   }
 
+  const closeDialog = () => setSharing(false)
+
   return (
     <>
-      <PlottrModal
-        isOpen={sharing}
-        onRequestClose={() => {
-          setSharing(false)
-        }}
-        style={modalStyles}
-      >
-        <h3>Share this file</h3>
-        <Form>
-          <FormGroup>
-            <h6>Email Address</h6>
-            <input
-              type="text"
-              value={emailToShareWith}
-              onChange={withEventTargetValue(setEmailToShareWith)}
-              onKeyDown={handleKeyDown}
-            />
-            <Button onClick={handleShare}>
-              <FiShare /> Share
-            </Button>
-          </FormGroup>
-        </Form>
-        <Table striped bordered condensed hover>
-          <thead>
-            <tr>
-              <th>Email address</th>
-              <th>Permission</th>
-            </tr>
-          </thead>
-          <tbody>
-            {selectedFile &&
-              selectedFile.shareRecords &&
-              selectedFile.shareRecords.map(({ emailAddress, permission }) => (
-                <tr key={emailAddress}>
-                  <td>{emailAddress}</td>
-                  <td>{permission}</td>
-                </tr>
-              ))}
-          </tbody>
-        </Table>
+      <PlottrModal isOpen={sharing} onRequestClose={closeDialog} style={modalStyles}>
+        <div className="acts-modal__wrapper">
+          <div className="acts-modal__header">
+            <div>
+              <h3>{t('Sharing')}</h3>
+              <Button onClick={closeDialog}>{t('Close')}</Button>
+            </div>
+            <hr />
+          </div>
+        </div>
+        <div className="acts-modal__body">
+          <h4>{t('Send Invite')}</h4>
+          <Form inline>
+            <FormGroup style={{ width: '100%' }}>
+              <ControlLabel>{t('Email Address')}</ControlLabel>{' '}
+              <FormControl
+                style={{ width: '55%' }}
+                type="text"
+                value={emailToShareWith}
+                onChange={withEventTargetValue(setEmailToShareWith)}
+                onKeyDown={handleKeyDown}
+              />{' '}
+              <Button onClick={handleShare} bsStyle="success">
+                <IoIosShareAlt /> {t('Share')}
+              </Button>
+            </FormGroup>
+          </Form>
+          <div style={{ height: '16px', margin: '16px' }} />
+          <h4>{t('Permissions')}</h4>
+          <Table striped bordered hover>
+            <thead>
+              <tr>
+                <th>{t('Email address')}</th>
+                <th>{t('Permission')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {selectedFile &&
+                selectedFile.shareRecords &&
+                selectedFile.shareRecords.map(({ emailAddress, permission }) => (
+                  <tr key={emailAddress}>
+                    <td>{emailAddress}</td>
+                    <td>{permission}</td>
+                  </tr>
+                ))}
+            </tbody>
+          </Table>
+        </div>
       </PlottrModal>
-      <Button
-        onClick={() => {
-          setSharing(!sharing)
-        }}
-        title={t('Share')}
-      >
-        <FiShare />
-      </Button>
+      <NavItem>
+        <Button onClick={() => setSharing(true)} title={t('Share')} bsSize="small">
+          <IoIosShareAlt />
+        </Button>
+      </NavItem>
     </>
   )
 }

@@ -9,7 +9,7 @@
     "grant-test-permissions": "yarn --cwd lib/plottr_firebase grant-test-permissions",
     "start-emulators": "yarn --cwd lib/plottr_firebase firebase emulators:start",
     "preinstall": "yarn --cwd lib/plottr_firebase install",
-    "postinstall": "npm --prefix lib/plottr_components install",
+    "postinstall": "npm --prefix lib/plottr_components install && yarn --cwd lib/plottr_check-prop-types",
     "dev": "npm-run-all --parallel dev:*",
     "dev:nextjs": "next dev",
     "dev:plottr_components": "npm --prefix lib/plottr_components run start",
@@ -24,6 +24,7 @@
     "validate": "npm-run-all format:check lint"
   },
   "dependencies": {
+    "@logtail/browser": "^0.1.10",
     "adm-zip": "^0.5.6",
     "classnames": "^2.3.1",
     "core-js": "^3.12.1",

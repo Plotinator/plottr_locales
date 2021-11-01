@@ -24,6 +24,8 @@ import ClientIdMinter from './client-id-minter'
 import FileListListener from './file-list-listener'
 import Renamer from './renamer'
 import SettingsConsistencyChecker from './settings-consistency-checker'
+import Upload from './upload'
+import { logger } from '../lib/logger'
 
 const redo = () => {
   store.dispatch(ActionCreators.redo())
@@ -75,7 +77,7 @@ const Root = ({ projectId }) => {
   useEffect(() => {
     if (projectId) {
       // open the correct project
-      console.log('PROJECT ID', projectId)
+      logger.info('PROJECT ID', projectId)
     }
   }, [projectId])
 
@@ -112,6 +114,7 @@ const Root = ({ projectId }) => {
         <Listener />
         <ClientIdMinter />
         <SaveTemplate />
+        <Upload />
         <Router history={history}>
           <Navigation />
           <Error />
