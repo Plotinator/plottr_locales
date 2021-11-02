@@ -103,6 +103,7 @@ const platform = {
         newEmptyFile(fileName, appVersion(), state.present),
         template || {}
       )
+      store.dispatch(actions.project.showLoader(true))
       newFile(
         emailAddress,
         userId,
@@ -111,9 +112,16 @@ const platform = {
         setFileList,
         selectFile,
         clientId
-      ).then(() => {
-        closeDashboard()
-      })
+      )
+        .then(() => {
+          store.dispatch(actions.project.showLoader(false))
+          closeDashboard()
+          logger.info('Created new file.')
+        })
+        .catch((error) => {
+          store.dispatch(actions.project.showLoader(false))
+          logger.error('Error creating new file.', error)
+        })
     },
     openExistingFile: messageOpenExistingFile,
     doesFileExist: () => {
