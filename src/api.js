@@ -584,9 +584,9 @@ const api = (auth, database, storage, baseAPIDomain, development, log) => {
     return database().runTransaction((transactions) => {
       return transactions.get(lockReference).then((lock) => {
         if (!lock.exists) {
-          return 'Lock already deleted'
+          return Promise.resolve('Lock already deleted')
         }
-        return lock.delete()
+        return transactions.delete(lockReference)
       })
     })
   }
@@ -594,21 +594,21 @@ const api = (auth, database, storage, baseAPIDomain, development, log) => {
   const lockRCE = (fileId, editorId, clientId, expectedLock, emailAddress = '') => {
     const lockReference = database().doc(`rce/${fileId}/editors/${editorId}/locks/current`)
     return database().runTransaction((transactions) => {
-      transactions.get(lockReference).then((lock) => {
+      return transactions.get(lockReference).then((lock) => {
         if (!lock.exists) {
-          return lock.set({
+          return lockReference.set({
             clientId,
             emailAddress,
           })
         }
         if (isEqual(lock.data(), expectedLock)) {
-          return lock.set({
+          return transactions.set(lockReference, {
             clientId,
             emailAddress,
           })
         }
 
-        return 'Lock modified by another client or request'
+        return Promise.resolve('Lock modified by another client or request')
       })
     })
   }
