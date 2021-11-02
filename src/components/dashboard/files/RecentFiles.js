@@ -86,13 +86,12 @@ const RecentFilesConnector = (connector) => {
     }, [sortedIds, filesById])
 
     const openFile = (filePath, id) => {
-      if (missingFiles.includes(id)) return
-      openKnownFile(filePath, id)
+      return openKnownFile(filePath, id)
     }
 
     const renderRecents = () => {
       // TODO: if no files, show something different
-      if (!sortedIds.length) return null
+      if (!sortedIds.length) return <span>{t('No files found.')}</span>
 
       const fileWithPermissionsExists = Object.values(filesById).some(
         ({ permission }) => permission
@@ -175,7 +174,7 @@ const RecentFilesConnector = (connector) => {
         )
       })
 
-      return (
+      return renderedFiles ? (
         <div className="dashboard__recent-files__table">
           <StickyTable leftStickyColumnCount={0}>
             <Row>
@@ -186,6 +185,8 @@ const RecentFilesConnector = (connector) => {
             {renderedFiles}
           </StickyTable>
         </div>
+      ) : (
+        <Spinner />
       )
     }
 
