@@ -17,6 +17,7 @@ const RCEBoundaryConnector = (connector) => {
     'Cannot resolve a DOM point from Slate point',
     'Cannot resolve a Slate point from DOM point',
     'Cannot find a descendant at path',
+    'Cannot get the start point in the node at path',
   ]
 
   class RCEBoundary extends Component {
@@ -51,6 +52,7 @@ const RCEBoundaryConnector = (connector) => {
 
     componentDidCatch(error, errorInfo) {
       if (selectionErrorMessages.some((m) => error.message.includes(m))) {
+        log.warn('Reseting selection on RCE after an error.', error, errorInfo)
         return this.props.resetChildren()
       }
       this.error = error
