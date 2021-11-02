@@ -61,7 +61,7 @@ const RichTextConnector = (connector) => {
           setStealingLock(false)
         })
         .catch((error) => {
-          console.error('Error stealing the lock for editor: ', props.id)
+          log.error(`Error stealing the lock for editor: ${props.id}`, error)
           setStealingLock(false)
         })
     }, [props.fileId, props.id, props.clientId, props.emailAddress, lock])
