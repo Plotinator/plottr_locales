@@ -36,10 +36,7 @@ const RichTextConnector = (connector) => {
     releaseRCELock,
   })
 
-  const defaultSelection = {
-    anchor: { path: [0, 0], offset: 0 },
-    focus: { path: [0, 0], offset: 0 },
-  }
+  const defaultSelection = null
 
   const RichText = (props) => {
     const [lock, setLock] = useState(props.isCloudFile ? null : true)
