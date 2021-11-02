@@ -14,6 +14,7 @@ module.exports = {
       alias: {
         ...config.resolve.alias,
         'connected-components': path.resolve('./components/connected-components.js'),
+        'wired-up-firebase': path.resolve('./lib/firebase.js'),
         // Avoid duplicate react in libs problem (see
         // https://medium.com/@penx/managing-dependencies-in-a-node-package-so-that-they-are-compatible-with-npm-link-61befa5aaca7)
         // If a better solution arose since this was written then feel

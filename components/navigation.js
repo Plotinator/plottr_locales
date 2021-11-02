@@ -7,12 +7,10 @@ import { t } from 'plottr_locales'
 import { Beamer, BookChooser } from 'connected-components'
 import cx from 'classnames'
 import { FaRegUser } from 'react-icons/fa'
-import { onSessionChange } from 'plottr_firebase'
+import { onSessionChange } from 'wired-up-firebase'
 
 import DashboardModal from './dashboard-modal'
 import Share from './share'
-import Download from './download'
-import Upload from './upload'
 import { actions, selectors } from 'pltr/v2'
 import { basePath } from '../lib/basePath'
 import { currentProject } from '../lib/currentProject'
@@ -132,7 +130,7 @@ function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
         <Nav pullRight className="project-nav__options">
           <NavItem>
             <Dropdown id="dashboard-dropdown-menu">
-              <Dropdown.Toggle noCaret bsSize="small" bsStyle="link">
+              <Dropdown.Toggle noCaret bsSize="small">
                 <FaRegUser />
               </Dropdown.Toggle>
               <Dropdown.Menu>
@@ -142,12 +140,8 @@ function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
               </Dropdown.Menu>
             </Dropdown>
           </NavItem>
-        </Nav>
-        <Navbar.Form pullRight style={{ marginRight: '15px' }}>
-          <Upload />
-          <Download />
           <Share />
-        </Navbar.Form>
+        </Nav>
       </Navbar>
     </>
   )

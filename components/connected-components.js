@@ -24,7 +24,13 @@ import {
   listenForRCELock,
   releaseRCELock,
   logOut,
-} from 'plottr_firebase'
+  startUI,
+  firebaseUI,
+  onSessionChange,
+  currentUser,
+  fetchFiles,
+  saveCustomTemplate,
+} from 'wired-up-firebase'
 import {
   getTemplateById,
   listTemplates,
@@ -49,24 +55,28 @@ import {
   useSortedKnownFiles,
   newFile,
   openFile,
+  uploadExisting,
 } from '../lib/files'
 import { useBackupFolders } from '../lib/backups'
 import { createErrorReport } from '../lib/createErrorReport'
 import { closeDashboard } from '../lib/dashboard'
-import { useProLicenseInfo, userHasPro } from '../lib/checkPro'
+import { userHasPro } from '../lib/checkPro'
 import MPQ from '../lib/MPQ'
 import { resizeImage } from '../lib/resizeImage'
 import extractImages from '../lib/extractImages'
+import { useProLicenseInfo } from '../lib/checkPro'
+import { logger } from '../lib/logger'
 
 const deleteFileOnFirestore = (fileId) => {
   const state = store.getState()
   const {
     client: { userId, clientId },
   } = state.present
-  deleteFile(fileId, userId, clientId)
+  return deleteFile(fileId, userId, clientId)
 }
 
 const platform = {
+  electron: null,
   undo: () => {
     store.dispatch(ActionCreators.undo())
   },
@@ -93,6 +103,7 @@ const platform = {
         newEmptyFile(fileName, appVersion(), state.present),
         template || {}
       )
+      store.dispatch(actions.project.showLoader(true))
       newFile(
         emailAddress,
         userId,
@@ -101,9 +112,16 @@ const platform = {
         setFileList,
         selectFile,
         clientId
-      ).then(() => {
-        closeDashboard()
-      })
+      )
+        .then(() => {
+          store.dispatch(actions.project.showLoader(false))
+          closeDashboard()
+          logger.info('Created new file.')
+        })
+        .catch((error) => {
+          store.dispatch(actions.project.showLoader(false))
+          logger.error('Error creating new file.', error)
+        })
     },
     openExistingFile: messageOpenExistingFile,
     doesFileExist: () => {
@@ -129,13 +147,32 @@ const platform = {
       const selectedFile = fileList.find((thatFile) => thatFile.id === fileId)
       if (!selectedFile) return
 
-      openFile(userId, fileId, clientId, selectedFile.version, selectedFile.permission).then(() => {
-        store.dispatch(actions.project.selectFile(selectedFile))
-        closeDashboard()
-      })
+      store.dispatch(actions.project.showLoader(true))
+      openFile(userId, fileId, clientId, selectedFile.version, selectedFile.permission)
+        .then(() => {
+          store.dispatch(actions.project.selectFile(selectedFile))
+          store.dispatch(actions.project.showLoader(false))
+          closeDashboard()
+          logger.info(`Opened file: ${fileId}`)
+        })
+        .catch((error) => {
+          store.dispatch(actions.project.showLoader(false))
+          store.dispatch(actions.error.generalError(error))
+          logger.error(`Error opening file: ${fileId}`, error)
+        })
     },
     deleteKnownFile: (position, fileId) => {
+      store.dispatch(actions.project.showLoader(true))
       deleteFileOnFirestore(fileId)
+        .then(() => {
+          store.dispatch(actions.project.showLoader(false))
+          logger.info(`Deleted file with id: ${fileId}`)
+        })
+        .catch((error) => {
+          store.dispatch(actions.project.showLoader(false))
+          store.dispatch(actions.error.generalError(error))
+          logger.error(`Error deleting file: ${fileId}`, error)
+        })
     },
     editKnownFilePath: (oldFilePath, newFilePath) => {
       // Nop: you can't change where a file is on the web.
@@ -242,20 +279,21 @@ const platform = {
     window.open(withProtocol, '_blank')
   },
   createErrorReport,
+  createFullErrorReport: () => {},
   log: {
-    info: () => {
-      // TODO
+    info: (...args) => {
+      logger.info(...args)
     },
-    warn: () => {
-      // TODO
+    warn: (...args) => {
+      logger.warn(...args)
     },
-    error: () => {
-      // TODO
+    error: (...args) => {
+      logger.error(...args)
     },
   },
   dialog: {
     showErrorBox: (error) => {
-      console.error(error)
+      logger.error(error)
       if (typeof alert !== 'undefined') alert(error)
     },
   },
@@ -297,7 +335,7 @@ const platform = {
     if (isStorageURL(fileName)) {
       backupPublicURL(fileName).then((url) => window.open(url, '_blank'))
     }
-    console.error('Attempted to open file at: ', fileName)
+    logger.error('Attempted to open file at: ', fileName)
   },
   tempFilesPath: 'TODO',
   mpq: MPQ,
@@ -325,6 +363,7 @@ const platform = {
     return uuidv4()
   },
   extractImages,
+  useProLicenseInfo,
   storage: {
     saveImageToStorageBlob: (blob, name) => {
       const state = store.getState()
@@ -342,14 +381,32 @@ const platform = {
     },
     resolveToPublicUrl: (storageUrl) => {
       if (!storageUrl) return null
-      return imagePublicURL(storageUrl)
+      const state = store.getState()
+      const {
+        client: { userId },
+        project: { selectedFile },
+      } = state.present
+      const fileId = selectedFile?.id
+      if (!fileId || !userId) {
+        return Promise.reject(
+          'No file or you are not logged in.  Either way we cannot fetch a picture.'
+        )
+      }
+      return imagePublicURL(storageUrl, fileId, userId)
     },
     isStorageURL,
     imagePublicURL,
     resizeImage,
   },
   firebase: {
+    startUI,
+    firebaseUI,
+    onSessionChange,
+    currentUser,
+    fetchFiles,
     logOut,
+    saveCustomTemplate,
+    uploadExisting,
   },
 }
 
@@ -369,6 +426,7 @@ export const ImagePicker = components.ImagePicker
 export const MiniColorPicker = components.MiniColorPicker
 export const Spinner = components.Spinner
 export const FunSpinner = components.FunSpinner
+export const FullPageSpinner = components.FullPageSpinner
 export const InputModal = components.InputModal
 export const ColorPicker = components.ColorPicker
 export const Switch = components.Switch

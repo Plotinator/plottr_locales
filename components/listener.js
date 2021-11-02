@@ -4,13 +4,14 @@ import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
 
 import { actions, selectors } from 'pltr/v2'
-import { listen, stopListening } from 'plottr_firebase'
+import { listen, stopListening } from 'wired-up-firebase'
 import { listenToCustomTemplates } from '../lib/templates'
 import { settings } from '../lib/settings'
 import { store } from '../lib/redux'
 import { closeDashboard, openDashboard } from '../lib/dashboard'
 import { setCurrentProject, currentProject } from '../lib/currentProject'
 import initMixpanel from '../lib/mixpanel'
+import { logger } from '../lib/logger'
 
 const Listener = ({
   userId,
@@ -26,6 +27,7 @@ const Listener = ({
   actStructureIsOn,
   setBeatHierarchy,
   unsetBeatHierarchy,
+  generalError,
 }) => {
   const [unsubscribeFunctions, setUnsubscribeFunctions] = useState([])
 
@@ -61,7 +63,12 @@ const Listener = ({
     if (!userId || !clientId || !selectedFile || !selectedFile.id) {
       return () => {}
     }
-    setUnsubscribeFunctions(listen(store, userId, selectedFile.id, clientId, selectedFile.version))
+    setUnsubscribeFunctions(
+      listen(store, userId, selectedFile.id, clientId, selectedFile.version, (error) => {
+        logger.error('Error listening to file changes.', error)
+        generalError('There seems to be a problem with your network.')
+      })
+    )
     setPermission(selectedFile.permission)
     setFileLoaded()
 
@@ -141,5 +148,6 @@ export default connect(
     setBeatHierarchy: actions.featureFlags.setBeatHierarchy,
     unsetBeatHierarchy: actions.featureFlags.unsetBeatHierarchy,
     selectFile: actions.project.selectFile,
+    generalError: actions.error.generalError,
   }
 )(Listener)
