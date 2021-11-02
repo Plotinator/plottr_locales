@@ -9,7 +9,7 @@ const switchErrorBody = (error) => {
     case 'permission-denied':
       return "You aren't allowed to do that!"
     default:
-      return error
+      return 'Something went wrong'
   }
 }
 
