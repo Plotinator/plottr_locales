@@ -309,11 +309,29 @@ const api = (auth, database, storage, baseAPIDomain, development, log) => {
       fetchTags(userId, fileId, clientId),
       fetchhierarchyLevels(userId, fileId, clientId),
       fetchImages(userId, fileId, clientId),
-      fetchClient(userId, fileId, clientId)
-    ]).then((results) => {
-      const json = Object.assign({}, ...results)
-      return json
-    })
+      fetchClient(userId, fileId, clientId),
+    ])
+      .then((results) => {
+        const newOpenDate = new Date()
+        return patch('file', fileId, { lastOpened: newOpenDate }, clientId).then(() => {
+          return {
+            results,
+            newOpenDate,
+          }
+        })
+      })
+      .then(({ results, newOpenDate }) => {
+        const json = Object.assign({}, ...results)
+        return pingAuth(userId, fileId).then(() => {
+          return {
+            ...json,
+            file: {
+              ...json.file,
+              lastOpened: newOpenDate,
+            },
+          }
+        })
+      })
   }
 
   const deleteFile = (fileId, userId, clientId) => {
