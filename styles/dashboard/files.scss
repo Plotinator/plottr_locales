@@ -99,7 +99,7 @@
     // float: right;
   }
 
-  svg {
+  svg:nth-child(2), span:nth-child(2) {
     margin: 15px;
   }
 }

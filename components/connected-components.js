@@ -139,8 +139,10 @@ const platform = {
       const selectedFile = fileList.find((thatFile) => thatFile.id === fileId)
       if (!selectedFile) return
 
+      store.dispatch(actions.project.showLoader(true))
       openFile(userId, fileId, clientId, selectedFile.version, selectedFile.permission).then(() => {
         store.dispatch(actions.project.selectFile(selectedFile))
+        store.dispatch(actions.project.showLoader(false))
         closeDashboard()
       })
     },
@@ -399,6 +401,7 @@ export const ImagePicker = components.ImagePicker
 export const MiniColorPicker = components.MiniColorPicker
 export const Spinner = components.Spinner
 export const FunSpinner = components.FunSpinner
+export const FullPageSpinner = components.FullPageSpinner
 export const InputModal = components.InputModal
 export const ColorPicker = components.ColorPicker
 export const Switch = components.Switch
