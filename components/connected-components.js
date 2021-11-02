@@ -72,7 +72,7 @@ const deleteFileOnFirestore = (fileId) => {
   const {
     client: { userId, clientId },
   } = state.present
-  deleteFile(fileId, userId, clientId)
+  return deleteFile(fileId, userId, clientId)
 }
 
 const platform = {
@@ -103,6 +103,7 @@ const platform = {
         newEmptyFile(fileName, appVersion(), state.present),
         template || {}
       )
+      store.dispatch(actions.project.showLoader(true))
       newFile(
         emailAddress,
         userId,
@@ -111,9 +112,16 @@ const platform = {
         setFileList,
         selectFile,
         clientId
-      ).then(() => {
-        closeDashboard()
-      })
+      )
+        .then(() => {
+          store.dispatch(actions.project.showLoader(false))
+          closeDashboard()
+          logger.info('Created new file.')
+        })
+        .catch((error) => {
+          store.dispatch(actions.project.showLoader(false))
+          logger.error('Error creating new file.', error)
+        })
     },
     openExistingFile: messageOpenExistingFile,
     doesFileExist: () => {
@@ -140,14 +148,31 @@ const platform = {
       if (!selectedFile) return
 
       store.dispatch(actions.project.showLoader(true))
-      openFile(userId, fileId, clientId, selectedFile.version, selectedFile.permission).then(() => {
-        store.dispatch(actions.project.selectFile(selectedFile))
-        store.dispatch(actions.project.showLoader(false))
-        closeDashboard()
-      })
+      openFile(userId, fileId, clientId, selectedFile.version, selectedFile.permission)
+        .then(() => {
+          store.dispatch(actions.project.selectFile(selectedFile))
+          store.dispatch(actions.project.showLoader(false))
+          closeDashboard()
+          logger.info(`Opened file: ${fileId}`)
+        })
+        .catch((error) => {
+          store.dispatch(actions.project.showLoader(false))
+          store.dispatch(actions.error.generalError(error))
+          logger.error(`Error opening file: ${fileId}`, error)
+        })
     },
     deleteKnownFile: (position, fileId) => {
+      store.dispatch(actions.project.showLoader(true))
       deleteFileOnFirestore(fileId)
+        .then(() => {
+          store.dispatch(actions.project.showLoader(false))
+          logger.info(`Deleted file with id: ${fileId}`)
+        })
+        .catch((error) => {
+          store.dispatch(actions.project.showLoader(false))
+          store.dispatch(actions.error.generalError(error))
+          logger.error(`Error deleting file: ${fileId}`, error)
+        })
     },
     editKnownFilePath: (oldFilePath, newFilePath) => {
       // Nop: you can't change where a file is on the web.
