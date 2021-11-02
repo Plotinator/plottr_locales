@@ -119,6 +119,7 @@ export const useEditState = (
   const handlingKeyDown = useRef(false)
   const valueUpdateTimer = useRef(null)
   const deferredValuesToUpdate = useRef({})
+  const justPasted = useRef(false)
 
   // # State Updaters
 
@@ -179,7 +180,12 @@ export const useEditState = (
     if (state.current === UNDONE) {
       state.current = UPDATED_FROM_INITIAL_VALUE
     }
-    updateValueAndSelection(newValue)
+    if (justPasted.current) {
+      justPasted.current = false
+      updateValueAndSelection(useTextConverter(newValue))
+    } else {
+      updateValueAndSelection(newValue)
+    }
     state.current = CONTENT_EDITED
   }
 
@@ -226,9 +232,6 @@ export const useEditState = (
   const onChange = (newValue) => {
     if (state.current === RESET_FROM_INITIAL_VALUE) return
 
-    if (fileId && editorId) {
-      deleteOldChanges(fileId, editorId)
-    }
     handleEvent(NEW_VALUE_FROM_SLATE, newValue)
   }
 
@@ -262,6 +265,13 @@ export const useEditState = (
     }
   }
 
+  // It's possible for invalid RCE data to result from pasting.
+  const onPaste = (event) => {
+    if (state.current === RESET_FROM_INITIAL_VALUE) return
+
+    justPasted.current = true
+  }
+
   // Handle user typing
   const onKeyDown = (event) => {
     if (state.current === RESET_FROM_INITIAL_VALUE) return
@@ -270,5 +280,5 @@ export const useEditState = (
     handleEvent(USER_KEY_DOWN, event)
   }
 
-  return [valueAndSelection.value, valueAndSelection.selection, key, onChange, onKeyDown]
+  return [valueAndSelection.value, valueAndSelection.selection, key, onChange, onKeyDown, onPaste]
 }

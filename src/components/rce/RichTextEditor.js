@@ -105,7 +105,7 @@ const RichTextEditorConnector = (connector) => {
     }, [autoFocus, editorWrapperRef])
 
     // State management
-    const [value, currentSelection, key, onValueChanged, onKeyDown] = useEditState(
+    const [value, currentSelection, key, onValueChanged, onKeyDown, onPaste] = useEditState(
       editor,
       id,
       fileId,
@@ -219,6 +219,7 @@ const RichTextEditorConnector = (connector) => {
               renderLeaf={renderLeaf}
               renderElement={renderElement}
               placeholder={t('Enter some text...')}
+              onPaste={onPaste}
               onKeyDown={handleKeyDown}
               onKeyUp={handleKeyUp}
               onInput={handleInput}
