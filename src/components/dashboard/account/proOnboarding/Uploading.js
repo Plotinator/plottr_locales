@@ -137,7 +137,7 @@ const UploadingConnector = (connector) => {
             now={currentProgress}
             max={maxItems}
             label={`${currentProgress}/${maxItems}`}
-            bsStyle="info"
+            bsStyle="success"
             striped
             active
           />
