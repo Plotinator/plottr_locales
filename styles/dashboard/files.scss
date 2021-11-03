@@ -183,6 +183,9 @@
         .permissions {
           display: flex;
           align-items: baseline;
+          svg {
+            margin-right: 8px;
+          }
         }
       }
 
