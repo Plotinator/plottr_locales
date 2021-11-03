@@ -91,6 +91,9 @@ export const startUI = (firebaseUI, queryString) => {
   })
 }
 
+const isElectron =
+  (navigator && navigator.userAgent && navigator.userAgent.toLowerCase()).indexOf(' electron/') > -1
+
 export const wireUpAPI = (logger) => {
   const wiredUp = api(
     auth,
@@ -100,7 +103,8 @@ export const wireUpAPI = (logger) => {
     // prefix them with 'NEXT_PUBLIC'
     process.env.NEXT_PUBLIC_API_BASE_DOMAIN || process.env.API_BASE_DOMAIN,
     process.env.NODE_ENV === 'development',
-    logger
+    logger,
+    isElectron
   )
 
   return {
