@@ -240,7 +240,7 @@ const platform = {
     useLicenseInfo: () => [],
     checkForActiveLicense: () => {},
     useTrialStatus,
-    licenseStore: () => {},
+    licenseStore: {},
     verifyLicense: () => {},
     trial90days: [],
     hasPro: () => true,
