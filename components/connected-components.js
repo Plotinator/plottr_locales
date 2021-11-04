@@ -66,6 +66,7 @@ import { resizeImage } from '../lib/resizeImage'
 import extractImages from '../lib/extractImages'
 import { useProLicenseInfo } from '../lib/checkPro'
 import { logger } from '../lib/logger'
+import { setCurrentProject } from '../lib/currentProject'
 
 const deleteFileOnFirestore = (fileId) => {
   const state = store.getState()
@@ -152,6 +153,7 @@ const platform = {
         .then(() => {
           store.dispatch(actions.project.selectFile(selectedFile))
           store.dispatch(actions.project.showLoader(false))
+          setCurrentProject(fileId)
           closeDashboard()
           logger.info(`Opened file: ${fileId}`)
         })
@@ -395,7 +397,6 @@ const platform = {
       return imagePublicURL(storageUrl, fileId, userId)
     },
     isStorageURL,
-    imagePublicURL,
     resizeImage,
   },
   firebase: {
