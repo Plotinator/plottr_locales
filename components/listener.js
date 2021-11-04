@@ -12,6 +12,15 @@ import { closeDashboard, openDashboard } from '../lib/dashboard'
 import { setCurrentProject, currentProject } from '../lib/currentProject'
 import initMixpanel from '../lib/mixpanel'
 import { logger } from '../lib/logger'
+import { openFile } from '../lib/files'
+
+const withoutTimestamp = (fileRecord) => {
+  return {
+    ...fileRecord,
+    lastOpened: undefined,
+    timeStamp: undefined,
+  }
+}
 
 const Listener = ({
   userId,
@@ -28,20 +37,39 @@ const Listener = ({
   setBeatHierarchy,
   unsetBeatHierarchy,
   generalError,
+  showLoader,
 }) => {
   const [unsubscribeFunctions, setUnsubscribeFunctions] = useState([])
 
   useEffect(() => {
     const sessionFileId = (selectedFile && selectedFile.id) || currentProject()
-    if (sessionFileId && sessionFileId !== '') {
+    if (
+      sessionFileId &&
+      sessionFileId !== '' &&
+      (!selectedFile || selectedFile.id !== sessionFileId)
+    ) {
       const foundInList = fileList.find(({ id }) => id === sessionFileId)
-      if (foundInList && !isEqual(foundInList, selectedFile)) {
+      showLoader(true)
+      if (foundInList && !isEqual(withoutTimestamp(foundInList), withoutTimestamp(selectedFile))) {
         if (foundInList.deleted) {
+          showLoader(false)
           selectFile(null)
           openDashboard('files')
         } else {
-          selectFile(foundInList)
-          closeDashboard()
+          logger.info(`Opening file after refresh: ${foundInList.id}`)
+          showLoader(true)
+          openFile(userId, foundInList.id, clientId, foundInList.version, foundInList.permission)
+            .then(() => {
+              logger.info(`Loaded file after refresh: ${foundInList.id}`)
+              showLoader(false)
+              selectFile(foundInList)
+              closeDashboard()
+            })
+            .catch((error) => {
+              logger.error(`Error loading file with id: ${foundInList.id}`)
+              showLoader(false)
+              generalError(error)
+            })
         }
       } else if (!foundInList) {
         selectFile(null)
@@ -149,5 +177,6 @@ export default connect(
     unsetBeatHierarchy: actions.featureFlags.unsetBeatHierarchy,
     selectFile: actions.project.selectFile,
     generalError: actions.error.generalError,
+    showLoader: actions.project.showLoader,
   }
 )(Listener)
