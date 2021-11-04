@@ -16,10 +16,10 @@ const ProStep1Connector = (connector) => {
       useSettingsInfo,
       license: { checkForPro },
       isDevelopment,
-      log,
+      firebase: { currentUser },
     },
   } = connector
-  checkDependencies({ useSettingsInfo, checkForPro, isDevelopment, log })
+  checkDependencies({ useSettingsInfo, checkForPro, isDevelopment })
 
   const FirebaseLogin = UnconnectedFirebaseLogin(connector)
 
@@ -41,14 +41,22 @@ const ProStep1Connector = (connector) => {
 
     const checkUser = (user) => {
       if (isDevelopment && userId) return
-      if (user.email && !checking) {
-        setChecking(true)
-        checkForPro(user.email, handleCheckPro(user.uid, user.email))
-      }
+
+      currentUser()
+        .getIdTokenResult()
+        .then((token) => {
+          if (token.claims.beta || token.claims.admin) {
+            handleCheckPro(user.uid, user.email)(true)
+          } else {
+            if (user.email && !checking) {
+              setChecking(true)
+              checkForPro(user.email, handleCheckPro(user.uid, user.email))
+            }
+          }
+        })
     }
 
     const handleCheckPro = (uid, email) => (hasPro) => {
-      log.info('checked pro')
       setChecking(false)
       if (hasPro) {
         saveSetting('user.id', uid)
