@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
 
 import { actions, selectors } from 'pltr/v2'
-import { listen, stopListening, initialFetch } from 'wired-up-firebase'
+import { listen, stopListening } from 'wired-up-firebase'
 import { listenToCustomTemplates } from '../lib/templates'
 import { settings } from '../lib/settings'
 import { store } from '../lib/redux'
@@ -12,6 +12,7 @@ import { closeDashboard, openDashboard } from '../lib/dashboard'
 import { setCurrentProject, currentProject } from '../lib/currentProject'
 import initMixpanel from '../lib/mixpanel'
 import { logger } from '../lib/logger'
+import { openFile } from '../lib/files'
 
 const withoutTimestamp = (fileRecord) => {
   return {
@@ -42,16 +43,22 @@ const Listener = ({
 
   useEffect(() => {
     const sessionFileId = (selectedFile && selectedFile.id) || currentProject()
-    if (sessionFileId && sessionFileId !== '') {
+    if (
+      sessionFileId &&
+      sessionFileId !== '' &&
+      (!selectedFile || selectedFile.id !== sessionFileId)
+    ) {
       const foundInList = fileList.find(({ id }) => id === sessionFileId)
+      showLoader(true)
       if (foundInList && !isEqual(withoutTimestamp(foundInList), withoutTimestamp(selectedFile))) {
         if (foundInList.deleted) {
+          showLoader(false)
           selectFile(null)
           openDashboard('files')
         } else {
           logger.info(`Opening file after refresh: ${foundInList.id}`)
           showLoader(true)
-          initialFetch(userId, foundInList.id, clientId, foundInList.version)
+          openFile(userId, foundInList.id, clientId, foundInList.version, foundInList.permission)
             .then(() => {
               logger.info(`Loaded file after refresh: ${foundInList.id}`)
               showLoader(false)
