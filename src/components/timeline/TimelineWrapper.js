@@ -14,7 +14,7 @@ import {
 import { StickyTable } from 'react-sticky-table'
 import { t } from 'plottr_locales'
 import cx from 'classnames'
-import OverlayTrigger from '../OverlayTrigger'
+import UnconnectedOverlayTrigger from '../OverlayTrigger'
 import UnconnectedTimelineTable from './TimelineTable'
 import UnconnectedActsConfigModal from '../dialogs/ActsConfigModal'
 import UnconnectedCustomAttributeModal from '../dialogs/CustomAttributeModal'
@@ -39,6 +39,7 @@ const TimelineWrapperConnector = (connector) => {
   const CustomAttrFilterList = UnconnectedCustomAttrFilterList(connector)
   const ExportNavItem = UnconnectedExportNavItem(connector)
   const SubNav = UnconnectedSubNav(connector)
+  const OverlayTrigger = UnconnectedOverlayTrigger(connector)
 
   const {
     platform: { mpq, exportDisabled, templatesDisabled },
@@ -442,14 +443,7 @@ const TimelineWrapperConnector = (connector) => {
               vertical: timelineBundle.orientation == 'vertical',
             })}
           >
-            {this.state.mounted ? (
-              <TimelineTable
-                tableRef={this.tableRef}
-                scrollTo={(position) => this.scrollTo(position)}
-              />
-            ) : (
-              <FunSpinner />
-            )}
+            {this.state.mounted ? <TimelineTable tableRef={this.tableRef} /> : <FunSpinner />}
           </StickyTable>
         )
       }

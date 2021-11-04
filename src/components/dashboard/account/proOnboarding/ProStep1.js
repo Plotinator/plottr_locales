@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'react-proptypes'
-import { t } from 'plottr_locales'
 import { Alert, Button } from 'react-bootstrap'
+
+import { t } from 'plottr_locales'
+
 import OnboardingStep from '../../../onboarding/OnboardingStep'
 import { StepBody, StepHeader } from '../../../onboarding/Step'
 import { Spinner } from '../../../Spinner'
 import UnconnectedFirebaseLogin from '../../../FirebaseLogin'
+import { checkDependencies } from '../../../checkDependencies'
 
 const ProStep1Connector = (connector) => {
   const {
@@ -13,8 +16,10 @@ const ProStep1Connector = (connector) => {
       useSettingsInfo,
       license: { checkForPro },
       isDevelopment,
+      firebase: { currentUser },
     },
   } = connector
+  checkDependencies({ useSettingsInfo, checkForPro, isDevelopment })
 
   const FirebaseLogin = UnconnectedFirebaseLogin(connector)
 
@@ -36,14 +41,22 @@ const ProStep1Connector = (connector) => {
 
     const checkUser = (user) => {
       if (isDevelopment && userId) return
-      if (user.email && !checking) {
-        setChecking(true)
-        checkForPro(user.email, handleCheckPro(user.uid, user.email))
-      }
+
+      currentUser()
+        .getIdTokenResult()
+        .then((token) => {
+          if (token.claims.beta || token.claims.admin) {
+            handleCheckPro(user.uid, user.email)(true)
+          } else {
+            if (user.email && !checking) {
+              setChecking(true)
+              checkForPro(user.email, handleCheckPro(user.uid, user.email))
+            }
+          }
+        })
     }
 
     const handleCheckPro = (uid, email) => (hasPro) => {
-      console.log('checked pro')
       setChecking(false)
       if (hasPro) {
         saveSetting('user.id', uid)

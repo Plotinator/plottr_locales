@@ -1,21 +1,24 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { PropTypes } from 'prop-types'
+
+import { checkDependencies } from './checkDependencies'
 
 const FirebaseLoginConnector = (connector) => {
   const {
     platform: {
+      log,
       useSettingsInfo,
       firebase: { startUI, firebaseUI, onSessionChange, fetchFiles },
       isDevelopment,
     },
   } = connector
+  checkDependencies({ log, useSettingsInfo, startUI, firebaseUI, onSessionChange, fetchFiles })
 
   const FirebaseLogin = ({ setUserId, setEmailAddress, setFileList, receiveUser }) => {
-    const [_settings, _size, saveSetting] = useSettingsInfo()
-    const [firebaseLoginComponentRef, setFirebaseLoginComponentRef] = useState(null)
+    const firebaseLoginComponentRef = useRef(null)
 
     useEffect(() => {
-      if (firebaseLoginComponentRef) {
+      if (firebaseLoginComponentRef?.current) {
         const ui = firebaseUI()
         startUI(ui, '#firebase_login_root')
       }
@@ -24,9 +27,7 @@ const FirebaseLoginConnector = (connector) => {
     useEffect(() => {
       const unregister = onSessionChange((user) => {
         if (user) {
-          if (isDevelopment) console.log(user)
-          saveSetting('user.id', user.uid)
-          saveSetting('user.email', user.email)
+          if (isDevelopment) log.info(user)
           setUserId(user.uid)
           setEmailAddress(user.email)
           if (receiveUser) receiveUser(user)
@@ -39,14 +40,7 @@ const FirebaseLoginConnector = (connector) => {
       return () => unregister()
     }, [])
 
-    return (
-      <div
-        ref={(ref) => {
-          setFirebaseLoginComponentRef(ref)
-        }}
-        id="firebase_login_root"
-      />
-    )
+    return <div ref={firebaseLoginComponentRef} id="firebase_login_root" />
   }
 
   FirebaseLogin.propTypes = {
