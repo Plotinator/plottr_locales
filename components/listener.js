@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
 
 import { actions, selectors } from 'pltr/v2'
-import { listen, stopListening } from 'wired-up-firebase'
+import { listen, stopListening, initialFetch } from 'wired-up-firebase'
 import { listenToCustomTemplates } from '../lib/templates'
 import { settings } from '../lib/settings'
 import { store } from '../lib/redux'
@@ -12,6 +12,14 @@ import { closeDashboard, openDashboard } from '../lib/dashboard'
 import { setCurrentProject, currentProject } from '../lib/currentProject'
 import initMixpanel from '../lib/mixpanel'
 import { logger } from '../lib/logger'
+
+const withoutTimestamp = (fileRecord) => {
+  return {
+    ...fileRecord,
+    lastOpened: undefined,
+    timeStamp: undefined,
+  }
+}
 
 const Listener = ({
   userId,
@@ -28,6 +36,7 @@ const Listener = ({
   setBeatHierarchy,
   unsetBeatHierarchy,
   generalError,
+  showLoader,
 }) => {
   const [unsubscribeFunctions, setUnsubscribeFunctions] = useState([])
 
@@ -35,13 +44,25 @@ const Listener = ({
     const sessionFileId = (selectedFile && selectedFile.id) || currentProject()
     if (sessionFileId && sessionFileId !== '') {
       const foundInList = fileList.find(({ id }) => id === sessionFileId)
-      if (foundInList && !isEqual(foundInList, selectedFile)) {
+      if (foundInList && !isEqual(withoutTimestamp(foundInList), withoutTimestamp(selectedFile))) {
         if (foundInList.deleted) {
           selectFile(null)
           openDashboard('files')
         } else {
-          selectFile(foundInList)
-          closeDashboard()
+          logger.info(`Opening file after refresh: ${foundInList.id}`)
+          showLoader(true)
+          initialFetch(userId, foundInList.id, clientId, foundInList.version)
+            .then(() => {
+              logger.info(`Loaded file after refresh: ${foundInList.id}`)
+              showLoader(false)
+              selectFile(foundInList)
+              closeDashboard()
+            })
+            .catch((error) => {
+              logger.error(`Error loading file with id: ${foundInList.id}`)
+              showLoader(false)
+              generalError(error)
+            })
         }
       } else if (!foundInList) {
         selectFile(null)
@@ -149,5 +170,6 @@ export default connect(
     unsetBeatHierarchy: actions.featureFlags.unsetBeatHierarchy,
     selectFile: actions.project.selectFile,
     generalError: actions.error.generalError,
+    showLoader: actions.project.showLoader,
   }
 )(Listener)
