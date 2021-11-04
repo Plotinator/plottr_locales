@@ -395,7 +395,6 @@ const platform = {
       return imagePublicURL(storageUrl, fileId, userId)
     },
     isStorageURL,
-    imagePublicURL,
     resizeImage,
   },
   firebase: {
