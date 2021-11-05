@@ -45,20 +45,38 @@ export default (req, res) => {
           })
           .then((permissionDocRef) => {
             const requests = [
-              database.collection('ui').doc(fileRef.id).set(file.ui),
-              database.collection('beats').doc(fileRef.id).set(file.beats),
+              database
+                .collection('ui')
+                .doc(fileRef.id)
+                .set({ ...file.ui }),
+              database
+                .collection('beats')
+                .doc(fileRef.id)
+                .set({ ...file.beats }),
               database
                 .collection('cards')
                 .doc(fileRef.id)
                 .set({ ...file.cards }),
-              database.collection('series').doc(fileRef.id).set(file.series),
-              database.collection('books').doc(fileRef.id).set(file.books),
-              database.collection('categories').doc(fileRef.id).set(file.categories),
+              database
+                .collection('series')
+                .doc(fileRef.id)
+                .set({ ...file.series }),
+              database
+                .collection('books')
+                .doc(fileRef.id)
+                .set({ ...file.books }),
+              database
+                .collection('categories')
+                .doc(fileRef.id)
+                .set({ ...file.categories }),
               database
                 .collection('characters')
                 .doc(fileRef.id)
                 .set({ ...file.characters }),
-              database.collection('customAttributes').doc(fileRef.id).set(file.customAttributes),
+              database
+                .collection('customAttributes')
+                .doc(fileRef.id)
+                .set({ ...file.customAttributes }),
               database
                 .collection('lines')
                 .doc(fileRef.id)
@@ -75,9 +93,18 @@ export default (req, res) => {
                 .collection('tags')
                 .doc(fileRef.id)
                 .set({ ...file.tags }),
-              database.collection('hierarchyLevels').doc(fileRef.id).set(file.hierarchyLevels),
-              database.collection('images').doc(fileRef.id).set(file.images),
-              database.collection('featureFlags').doc(fileRef.id).set(file.featureFlags),
+              database
+                .collection('hierarchyLevels')
+                .doc(fileRef.id)
+                .set({ ...file.hierarchyLevels }),
+              database
+                .collection('images')
+                .doc(fileRef.id)
+                .set({ ...file.images }),
+              database
+                .collection('featureFlags')
+                .doc(fileRef.id)
+                .set({ ...file.featureFlags }),
             ]
             return Promise.all(requests).then((results) => ({ fileId: fileRef.id }))
           })
