@@ -305,6 +305,9 @@
   "Content": {
     "message": "Content"
   },
+  "Congratulations": {
+    "message": "Congratulations"
+  },
   "Copy": {
     "message": "Copy"
   },
@@ -722,6 +725,9 @@
   "Let's verify your license.": {
     "message": "Let's verify your license."
   },
+  "Let's get you started": {
+    "message": "Let's get you started"
+  },
   "Levels of hierarchy": {
     "message": "Levels of hierarchy"
   },
@@ -835,6 +841,9 @@
   },
   "Not Receiving Updates": {
     "message": "Not Receiving Updates"
+  },
+  "NOT NOW": {
+    "message": "NOT NOW"
   },
   "Note Details": {
     "message": "Note Details"
@@ -1169,6 +1178,9 @@
   "See Less": {
     "message": "See Less"
   },
+  "See that was painless": {
+    "message": "See that was painless"
+  },
   "Select All": {
     "message": "Select All"
   },
@@ -1256,6 +1268,12 @@
   "Start Plottr Pro": {
     "message": "Start Plottr Pro"
   },
+  "START PLOTTING": {
+    "message": "START PLOTTING"
+  },
+  "Step {number}": {
+    "message": "Step {number}"
+  },
   "Story line": {
     "message": "Story line"
   },
@@ -1301,6 +1319,12 @@
   "Template Saved": {
     "message": "Template Saved"
   },
+  "Template": {
+    "message": "Template"
+  },
+  "Templates": {
+    "message": "Templates"
+  },
   "Terms of Service": {
     "message": "Terms of Service"
   },
@@ -1336,6 +1360,15 @@
   },
   "This will send you an email with a code": {
     "message": "This will send you an email with a code"
+  },
+  "This will be quick and painless.": {
+    "message": "This will be quick and painless."
+  },
+  "There are only ": {
+    "message": "There are only "
+  },
+  "{number} steps:": {
+    "message": "{number} steps:"
   },
   "Timeline is filtered": {
     "message": "Timeline is filtered"
@@ -1393,6 +1426,18 @@
   },
   "Upload Files": {
     "message": "Upload Files"
+  },
+  "Upload projects and templates": {
+    "message": "Upload projects and templates"
+  },
+  "Uploading projects and templates": {
+    "message": "Uploading projects and templates"
+  },
+  "UPLOADING...": {
+    "message": "UPLOADING..."
+  },
+  "Upload projects and templates to the cloud": {
+    "message": "Upload projects and templates to the cloud"
   },
   "Use Template": {
     "message": "Use Template"
