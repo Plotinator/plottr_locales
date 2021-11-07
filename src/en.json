@@ -1031,6 +1031,9 @@
   "Purchase Email": {
     "message": "Purchase Email"
   },
+  "Purchase Pro": {
+    "message": "Purchase Pro"
+  },
   "Purples": {
     "message": "Purples"
   },
@@ -1454,6 +1457,12 @@
   "Use this to remove your license on this device": {
     "message": "Use this to remove your license on this device"
   },
+  "Use License Code Login": {
+    "message": "Use License Code Login"
+  },
+  "Use Plottr Pro Login": {
+    "message": "Use Plottr Pro Login"
+  },
   "VERIFY CODE": {
     "message": "VERIFY CODE"
   },
@@ -1552,6 +1561,9 @@
   },
   "You may create a new project": {
     "message": "You may create a new project\nor select a project file to begin"
+  },
+  "You need to have an active Plottr Pro account to continue": {
+    "message": "You need to have an active Plottr Pro account to continue"
   },
   "Your email didn't verify. Try again or try another email.": {
     "message": "Your email didn't verify.\nTry again or try another email."
