@@ -1,4 +1,9 @@
-import { SET_USER_ID, SET_CLIENT_ID, SET_EMAIL_ADDRESS } from '../constants/ActionTypes'
+import {
+  SET_USER_ID,
+  SET_CLIENT_ID,
+  SET_EMAIL_ADDRESS,
+  SET_HAS_ONBOARDED,
+} from '../constants/ActionTypes'
 
 export const setUserId = (userId) => ({
   type: SET_USER_ID,
@@ -13,4 +18,9 @@ export const setClientId = (clientId) => ({
 export const setEmailAddress = (emailAddress) => ({
   type: SET_EMAIL_ADDRESS,
   emailAddress,
+})
+
+export const setHasOnboarded = (hasOnboarded) => ({
+  type: SET_HAS_ONBOARDED,
+  hasOnboarded,
 })

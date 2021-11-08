@@ -219,6 +219,7 @@ export const UNSET_FILE_LOADED = 'UNSET_FILE_LOADED'
 export const SET_USER_ID = 'SET_USER_ID'
 export const SET_CLIENT_ID = 'SET_CLIENT_ID'
 export const SET_EMAIL_ADDRESS = 'SET_EMAIL_ADDRESS'
+export const SET_HAS_ONBOARDED = 'SET_HAS_ONBOARDED'
 
 // action actions (for undo)
 export const RECORD_LAST_ACTION = 'RECORD_LAST_ACTION'
