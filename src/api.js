@@ -313,12 +313,20 @@ const api = (auth, database, storage, baseAPIDomain, development, log) => {
     ])
       .then((results) => {
         const newOpenDate = new Date()
-        return patch('file', fileId, { lastOpened: newOpenDate }, clientId).then(() => {
-          return {
-            results,
-            newOpenDate,
-          }
-        })
+        return patch('file', fileId, { lastOpened: newOpenDate }, clientId)
+          .then(() => {
+            return {
+              results,
+              newOpenDate,
+            }
+          })
+          .catch((error) => {
+            log.warn(`Error while updating last opened timestamp for file: ${fileId}`, error)
+            return {
+              results,
+              newOpenDate,
+            }
+          })
       })
       .then(({ results, newOpenDate }) => {
         const json = Object.assign({}, ...results)
