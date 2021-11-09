@@ -129,6 +129,7 @@ const platform = {
       // NOP.  We don't expect the API to reply with non-existant files.
       return true
     },
+    useSortedKnownFilesIgnoringLoggedIn: useSortedKnownFiles,
     useSortedKnownFiles,
     isTempFile: () => {
       // There's no such thing as a temp file with cloud storage
@@ -265,6 +266,7 @@ const platform = {
     saveTemplate: messageToSaveNewTemplate,
     useFilteredSortedTemplates,
     useCustomTemplatesInfo,
+    useLocalCustomTemplatesInfo: useCustomTemplatesInfo,
     useTemplatesInfo,
   },
   settings,
