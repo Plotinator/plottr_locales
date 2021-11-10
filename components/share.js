@@ -116,7 +116,7 @@ const Share = ({ userId, selectedFile, generalError }) => {
 Share.propTypes = {
   userId: PropTypes.string,
   selectedFile: PropTypes.object,
-  generalError: PropTypes.func.isrequired,
+  generalError: PropTypes.func.isRequired,
 }
 
 export default connect(
