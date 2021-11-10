@@ -648,7 +648,6 @@ const api = (auth, database, storage, baseAPIDomain, development, log) => {
       .onSnapshot((documentRef) => {
         const data = documentRef && documentRef.data()
         if (!data) {
-          log.info("Didn't find a lock for RCE with editorId", editorId)
           cb({ clientId: null })
           return
         }
