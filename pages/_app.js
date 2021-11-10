@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import { setupI18n } from 'plottr_locales'
 
 import { localeSettings } from '../lib/locale-settings'
-import { seedTemplates } from '../lib/templates'
 
 import '../styles/globals.scss'
 
@@ -11,6 +10,7 @@ setupI18n(localeSettings, {})
 
 const Plottr = ({ Component, pageProps }) => {
   useEffect(() => {
+    const { seedTemplates } = require('../lib/templates')
     seedTemplates()
   }, [])
 

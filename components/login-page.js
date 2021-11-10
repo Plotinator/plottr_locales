@@ -17,10 +17,10 @@ export default function LoginPage() {
   useEffect(() => {
     if (sessionChecked) return
     onSessionChange(async (user) => {
-      logger.info('session changed', user)
+      logger.info('Session changed')
       setSessionChecked(true)
       if (user) {
-        logger.info('session w/ user', router.query)
+        logger.info('Session w/ user', router.query)
         const url = `/timeline${pid ? '?pid=' + pid : ''}`
         logger.info('url to redirect', url)
         if (process.env.NEXT_PUBLIC_NODE_ENV === 'development') {
@@ -29,7 +29,7 @@ export default function LoginPage() {
         currentUser()
           .getIdTokenResult()
           .then(async (token) => {
-            logger.info('token', token.claims)
+            logger.info('Received token')
             if (token.claims.beta || token.claims.admin) {
               setLicenseInfo({ claims: token.claims, customer: { email: user.email } })
               window.location.href = url
