@@ -126,7 +126,7 @@ Upload.propTypes = {
   setFileList: PropTypes.func.isRequired,
   selectFile: PropTypes.func.isRequired,
   withFullFileState: PropTypes.func.isRequired,
-  showLoader: PropTypes.func.isrequired,
+  showLoader: PropTypes.func.isRequired,
 }
 
 export default connect(
