@@ -1,8 +1,13 @@
 const admin = require('firebase-admin')
-import askToExport from '../../lib/exporter/start_export'
 import AdmZip from 'adm-zip'
 import { v4 as uuidv4 } from 'uuid'
 import { verifyToken } from './verify-token'
+import { setupI18n } from 'plottr_locales'
+import { localeSettings } from '../../lib/locale-settings'
+
+setupI18n(localeSettings, {})
+
+import askToExport from '../../lib/exporter/start_export'
 
 if (!admin.apps.length) {
   if (process.env.FIREBASE_ENV === 'development') {
