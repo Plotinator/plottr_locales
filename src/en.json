@@ -1355,6 +1355,9 @@
   "There was an error while sharing your file. Try Again.": {
     "message": "There was an error while sharing your file. Try Again."
   },
+  "There was an error trying to sign you in. Ensure you password and email are correct.": {
+    "message": "There was an error trying to sign you in. Ensure you password and email are correct."
+  },
   "This is a plotline": {
     "message": "This is a plotline"
   },
