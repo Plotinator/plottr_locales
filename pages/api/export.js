@@ -81,6 +81,7 @@ export default (req, res) => {
                   const url = storedFile.publicUrl()
                   console.log('Redirecting to: ', url)
                   res.status(200)
+                  res.setHeader('Content-Type', 'text/html')
                   res.setHeader('Location', url)
                   res.send(`See: ${url}`)
                 })
@@ -96,6 +97,7 @@ export default (req, res) => {
                 storedFile.getSignedUrl(config).then((url) => {
                   console.log('Redirecting to: ', url)
                   res.status(200)
+                  res.setHeader('Content-Type', 'text/html')
                   res.setHeader('Location', url)
                   res.send(`See: ${url}`)
                 })
