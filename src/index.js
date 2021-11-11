@@ -91,6 +91,8 @@ export const startUI = (firebaseUI, queryString) => {
   })
 }
 
+database().settings({ ignoreUndefinedProperties: true })
+
 export const wireUpAPI = (logger) => {
   const wiredUp = api(
     auth,
