@@ -1010,6 +1010,12 @@
   "Plottr": {
     "message": "Plottr"
   },
+  "PLOTTR PRO": {
+    "message": "PLOTTR PRO"
+  },
+  "PLOTTR CLASSIC": {
+    "message": "PLOTTR CLASSIC"
+  },
   "Preferences": {
     "message": "Preferences"
   },
@@ -1397,6 +1403,9 @@
   "Try that again": {
     "message": "Try that again"
   },
+  "Try Plottr Pro today for a seamless cloud experience like you have never imagined.": {
+    "message": "Try Plottr Pro today for a seamless cloud experience like you have never imagined."
+  },
   "Tutorials": {
     "message": "Tutorials"
   },
@@ -1603,6 +1612,9 @@
   },
   "Your template has been saved and is ready to use": {
     "message": "Your template has been saved and is ready to use"
+  },
+  "Your next great plot begins with Plottr.": {
+    "message": "Your next great plot begins with Plottr."
   },
   "Zoom": {
     "message": "Zoom"
