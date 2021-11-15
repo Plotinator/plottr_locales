@@ -58,7 +58,7 @@ Error.getInitialProps = ({ req, res, err }) => {
       log.info('Reported error to Rollbar')
     })
   }
-  return { statusCode, error: err, message: err.message }
+  return { statusCode, error: err, message: err?.message }
 }
 
 export default Error
