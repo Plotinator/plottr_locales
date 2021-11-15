@@ -36,6 +36,7 @@ let _database = null
 const database = () => {
   if (_database) return _database
   _database = firebase.firestore()
+  _database.settings({ ignoreUndefinedProperties: true }, { merge: true })
   if (
     process.env.NEXT_PUBLIC_NODE_ENV === 'development' ||
     (typeof window !== 'undefined' && window && window.location.hostname === 'plottr.local')
@@ -90,8 +91,6 @@ export const startUI = (firebaseUI, queryString) => {
     },
   })
 }
-
-database().settings({ ignoreUndefinedProperties: true })
 
 export const wireUpAPI = (logger) => {
   const wiredUp = api(
