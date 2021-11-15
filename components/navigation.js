@@ -15,8 +15,22 @@ import { actions, selectors } from 'pltr/v2'
 import { basePath } from '../lib/basePath'
 import { currentProject } from '../lib/currentProject'
 
-function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
+function Navigation({
+  userId,
+  bookIds,
+  currentTimeline,
+  changeCurrentTimeline,
+  currentView,
+  changeCurrentView,
+  darkMode,
+}) {
   const [dashboardView, setDashboardView] = useState(currentProject() ? null : 'files')
+
+  useEffect(() => {
+    if (bookIds.indexOf(currentTimeline) === -1) {
+      changeCurrentTimeline(bookIds[0])
+    }
+  }, [bookIds, currentTimeline, changeCurrentTimeline])
 
   useEffect(() => {
     const path = basePath()
@@ -75,6 +89,17 @@ function Navigation({ userId, currentView, changeCurrentView, darkMode }) {
 
   const selectDashboardView = (view) => {
     setDashboardView(view)
+  }
+
+  if (bookIds && currentTimeline && bookIds.indexOf(currentTimeline) === -1) {
+    return (
+      <DashboardModal
+        activeView={'files'}
+        setActiveView={selectDashboardView}
+        closeDashboard={resetDashboardView}
+        darkMode={darkMode}
+      />
+    )
   }
 
   return (
@@ -152,10 +177,15 @@ Navigation.propTypes = {
   currentView: PropTypes.string.isRequired,
   changeCurrentView: PropTypes.func.isRequired,
   darkMode: PropTypes.bool.isRequired,
+  bookIds: PropTypes.array,
+  currentTimeline: PropTypes.number,
+  changeCurrentTimeline: PropTypes.func.isRequired,
 }
 
 function mapStateToProps(state) {
   return {
+    currentTimeline: selectors.currentTimelineSelector(state.present),
+    bookIds: selectors.allBookIdsSelector(state.present),
     currentView: state.present.ui.currentView,
     darkMode: state.present.ui.darkMode,
     userId: selectors.userIdSelector(state.present),
@@ -164,4 +194,5 @@ function mapStateToProps(state) {
 
 export default connect(mapStateToProps, {
   changeCurrentView: actions.ui.changeCurrentView,
+  changeCurrentTimeline: actions.ui.changeCurrentTimeline,
 })(Navigation)
