@@ -17,7 +17,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (sessionChecked) return
     onSessionChange(async (user) => {
-      logger.info('Session changed')
+      logger.info('Session changed', user)
       setSessionChecked(true)
       if (user) {
         logger.info('Session w/ user', router.query)
@@ -25,27 +25,28 @@ export default function LoginPage() {
         logger.info('url to redirect', url)
         if (process.env.NEXT_PUBLIC_NODE_ENV === 'development') {
           window.location.href = url
-        }
-        currentUser()
-          .getIdTokenResult()
-          .then(async (token) => {
-            logger.info('Received token')
-            if (token.claims.beta || token.claims.admin) {
-              setLicenseInfo({ claims: token.claims, customer: { email: user.email } })
-              window.location.href = url
-            } else {
-              // check for Plottr Pro
-              const [hasPro, info] = await userHasPro(user.email)
-              if (hasPro) {
-                setLicenseInfo({ ...info, claims: token.claims })
+        } else {
+          currentUser()
+            .getIdTokenResult()
+            .then(async (token) => {
+              logger.info('Received token')
+              if (token.claims.beta || token.claims.admin) {
+                setLicenseInfo({ claims: token.claims, customer: { email: user.email } })
                 window.location.href = url
               } else {
-                // display something saying
-                // the user is not authorized for the beta
-                logger.error('not authorized')
+                // check for Plottr Pro
+                const [hasPro, info] = await userHasPro(user.email)
+                if (hasPro) {
+                  setLicenseInfo({ ...info, claims: token.claims })
+                  window.location.href = url
+                } else {
+                  // display something saying
+                  // the user is not authorized for the beta
+                  logger.error('not authorized')
+                }
               }
-            }
-          })
+            })
+        }
       }
     })
   }, [])
