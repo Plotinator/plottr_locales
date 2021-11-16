@@ -10,8 +10,9 @@ import { actions, ARRAY_KEYS } from 'pltr/v2'
  * of the correspending firebase objects from either the firebase JS
  * api or the react-native-firebase api.
  */
-const api = (auth, database, storage, baseAPIDomain, development, log) => {
-  const BASE_API_URL = development || !baseAPIDomain ? '' : `https://${baseAPIDomain || ''}`
+const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop) => {
+  const BASE_API_URL =
+    (!isDesktop && development) || !baseAPIDomain ? '' : `https://${baseAPIDomain || ''}`
 
   const defaultErrorHandler = (error) => {
     log.error('Error communicating with Firebase.', error)
@@ -31,7 +32,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log) => {
         fileName: newName
       })
       .then(() => {
-        pingAuth(userId, fileId)
+        return pingAuth(userId, fileId)
       })
   }
 
@@ -313,20 +314,12 @@ const api = (auth, database, storage, baseAPIDomain, development, log) => {
     ])
       .then((results) => {
         const newOpenDate = new Date()
-        return patch('file', fileId, { lastOpened: newOpenDate }, clientId)
-          .then(() => {
-            return {
-              results,
-              newOpenDate,
-            }
-          })
-          .catch((error) => {
-            log.warn(`Error while updating last opened timestamp for file: ${fileId}`, error)
-            return {
-              results,
-              newOpenDate,
-            }
-          })
+        return patch('file', fileId, { lastOpened: newOpenDate }, clientId).then(() => {
+          return {
+            results,
+            newOpenDate,
+          }
+        })
       })
       .then(({ results, newOpenDate }) => {
         const json = Object.assign({}, ...results)
