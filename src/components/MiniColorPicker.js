@@ -17,7 +17,6 @@ export default function MiniColorPicker(props) {
   }, [props.el])
 
   useEffect(() => {
-    console.log('colorpicker props', props)
     document.addEventListener('mousedown', handleClickOutside)
 
     return () => document.removeEventListener('mousedown', handleClickOutside)
