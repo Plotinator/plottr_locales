@@ -39,7 +39,7 @@ const withoutStorageProtocal = (path) => {
 }
 
 export default (req, res) => {
-  return verifyToken(auth, req)
+  return verifyToken(auth, req, res)
     .then(() => {
       const storageURL = req.query.url
       const fileId = req.query.fileId

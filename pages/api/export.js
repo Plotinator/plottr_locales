@@ -32,7 +32,7 @@ const storage = admin.storage()
 const auth = admin.auth()
 
 export default (req, res) => {
-  return verifyToken(auth, req).then(() => {
+  return verifyToken(auth, req, res).then(() => {
     const file = req.body.file
     const config = req.body.config
     const type = req.body.type
