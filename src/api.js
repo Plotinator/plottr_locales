@@ -325,12 +325,20 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
     ])
       .then((results) => {
         const newOpenDate = new Date()
-        return patch('file', fileId, { lastOpened: newOpenDate }, clientId).then(() => {
-          return {
-            results,
-            newOpenDate,
-          }
-        })
+        return patch('file', fileId, { lastOpened: newOpenDate }, clientId)
+          .catch((error) => {
+            log.info(`Attempted to update file (${fileId}) timestamp and couldn't`, error)
+            return {
+              results,
+              newOpenDate,
+            }
+          })
+          .then(() => {
+            return {
+              results,
+              newOpenDate,
+            }
+          })
       })
       .then(({ results, newOpenDate }) => {
         const json = Object.assign({}, ...results)
