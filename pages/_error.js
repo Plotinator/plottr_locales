@@ -48,7 +48,7 @@ Error.getInitialProps = ({ req, res, err }) => {
   // Only require Rollbar and report error if we're on the server
   if (!process.browser) {
     const log = new Logtail(process.env.LOGTAIL_SOURCE_TOKEN)
-    log.info('Encountered an error on the server side.', err.message, err)
+    log.info('Encountered an error on the server side.', err?.message, err)
     const rollbar = new Rollbar(process.env.ROLLBAR_ACCESS_TOKEN)
     rollbar.error(err, req, (rollbarError) => {
       if (rollbarError) {
