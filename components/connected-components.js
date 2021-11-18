@@ -246,6 +246,7 @@ const platform = {
     licenseStore: {},
     verifyLicense: () => {},
     trial90days: [],
+    trial60days: [],
     hasPro: () => true,
     checkForPro: async (email, callback) => {
       const [hasPro, info] = await userHasPro(email)
