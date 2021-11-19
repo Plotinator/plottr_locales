@@ -53,9 +53,9 @@ const serialize = (nodes, doc) => {
 
     switch (n.type) {
       case 'bulleted-list':
-        return n.children.map((li) => {
+        return (n.children || []).map((li) => {
           return new Paragraph({
-            children: li.children.map(leaf),
+            children: (li.children || []).map(leaf),
             bullet: { level: 0 },
           })
         })
@@ -72,7 +72,7 @@ const serialize = (nodes, doc) => {
       case 'heading-two': {
         const headingLevel =
           n.type === 'heading-one' ? HeadingLevel.HEADING_4 : HeadingLevel.HEADING_5
-        return n.children.map((child) => {
+        return (n.children || []).map((child) => {
           if (child.text != null) {
             return new Paragraph({
               children: [leaf(child)],
@@ -82,7 +82,7 @@ const serialize = (nodes, doc) => {
 
           if (child.type === 'paragraph') {
             return new Paragraph({
-              children: child.children.map(leaf),
+              children: (child.children || []).map(leaf),
               heading: headingLevel,
             })
           }
@@ -92,9 +92,9 @@ const serialize = (nodes, doc) => {
         return children[0] // always an array with 1 TextRun
       case 'numbered-list':
         // make it a bullet list for now
-        return n.children.map((li) => {
+        return (n.children || []).map((li) => {
           return new Paragraph({
-            children: li.children.map(leaf),
+            children: (li.children || []).map(leaf),
             bullet: { level: 0 },
           })
         })
