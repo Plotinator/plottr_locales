@@ -47,7 +47,8 @@ export default (req, res) => {
       (error, filePath) => {
         if (error) {
           res.status(503)
-          res.json({ error, message: error.message })
+          console.error('Error while exporting: ', error)
+          res.json({ errorMessage: error.message })
         } else {
           console.log('Saved file at: ', savedFilePath)
           const uploadFilePath = type === 'scrivener' ? `/tmp/${baseFileName}.zip` : savedFilePath
