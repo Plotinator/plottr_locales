@@ -197,8 +197,8 @@ const TimelineWrapperConnector = (connector) => {
       mpq.push('btn_scroll_left')
       const current =
         this.props.timelineBundle?.orientation === 'vertical'
-          ? this.tableRef?.scrollTop
-          : this.tableRef?.scrollLeft
+          ? this.tableRef.scrollTop
+          : this.tableRef.scrollLeft
       this.scrollTo(current - this.scrollDistance())
     }
     scrollRight = () => {
