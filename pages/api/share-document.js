@@ -23,7 +23,7 @@ const auth = admin.auth()
 export default (req, res) => {
   const { fileId, emailAddress, permission, userId } = req.body
 
-  return verifyToken(auth, req).then(() => {
+  return verifyToken(auth, req, res).then(() => {
     return database
       .doc(`authorisation/${userId}/granted/${fileId}`)
       .get()
