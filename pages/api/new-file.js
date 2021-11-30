@@ -29,7 +29,7 @@ const database = admin.firestore()
 const auth = admin.auth()
 
 export default (req, res) => {
-  return verifyToken(auth, req).then(() => {
+  return verifyToken(auth, req, res).then(() => {
     const file = req.body.file
     const fileRecord = req.body.fileRecord
     const userId = req.query.userId
