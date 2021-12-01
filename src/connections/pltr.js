@@ -7,6 +7,7 @@ import {
   OverlayTrigger as UnconnectedOverlayTrigger,
   DeleteConfirmModal,
   ErrorModal,
+  MessageModal,
   ColorPickerColor,
   ItemsManagerModal as UnconnectedItemsManagerModal,
   ListItem,
@@ -118,6 +119,7 @@ const pltrTypeSpecs = {
     moveItemToTrash: PropTypes.func.isRequired,
     createFromSnowflake: PropTypes.func.isRequired,
     joinPath: PropTypes.func.isRequired,
+    listOfflineFiles: PropTypes.func.isRequired,
   }),
   update: PropTypes.shape({
     quitToInstall: PropTypes.func.isRequired,
@@ -239,6 +241,7 @@ export default (platform) => {
     OverlayTrigger: UnconnectedOverlayTrigger(connectorObject),
     DeleteConfirmModal,
     ErrorModal,
+    MessageModal,
     ColorPickerColor,
     ItemsManagerModal: UnconnectedItemsManagerModal(connectorObject),
     ListItem,
