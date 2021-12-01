@@ -26,7 +26,7 @@ export default (req, res) => {
     (sessionCookie) => {
       res.setHeader(
         'Set-Cookie',
-        `session=${sessionCookie}; Max-Age=${expiresIn}; SameSite=Strict; HttpOnly`
+        `session=${sessionCookie}; Max-Age=${expiresIn}; SameSite=Lax; HttpOnly`
       )
       res.setHeader('Content-Type', 'application/json')
       res.end(JSON.stringify({ status: 'success' }))
