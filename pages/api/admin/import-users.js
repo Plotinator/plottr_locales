@@ -24,6 +24,7 @@ export default async (req, res) => {
   if (superNotSecretKey != 'magic~horse!cantelope') return res.status(500).send('')
 
   let allFrbUsers = {}
+  let frbUsersCount = 0
   let usersThatFailed = []
   let usersToImport = []
   let numToImport = 0
@@ -52,6 +53,8 @@ export default async (req, res) => {
   try {
     // Start listing users from the beginning, 1000 at a time.
     await listAllUsers()
+
+    frbUsersCount = Object.keys(allFrbUsers).length
 
     // find WP users that don't have a Frb account
     usersToImport = users.reduce((acc, user) => {
@@ -87,9 +90,13 @@ export default async (req, res) => {
     return res.status(500).json({ failed: true, message: error.message })
   }
 
-  return res
-    .status(200)
-    .send({ attempted: numToImport, successCount, failureCount, failed: usersThatFailed })
+  return res.status(200).send({
+    attempted: numToImport,
+    frbUsersCount: frbUsersCount,
+    successCount,
+    failureCount,
+    failed: usersThatFailed,
+  })
 }
 
 function transformWordPressUsers(users) {
