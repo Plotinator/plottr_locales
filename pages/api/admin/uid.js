@@ -16,7 +16,7 @@ if (!admin.apps.length) {
 }
 
 // this is not going to be a permanent endpoint
-// so it's slightly insecure, but it's only going to live for a week
+// so it's slightly insecure, but it's only going to be live for a week
 export default async (req, res) => {
   const { email, superNotSecretKey } = req.body
 
