@@ -59,7 +59,7 @@ export default async (req, res) => {
     // find WP users that don't have a Frb account
     usersToImport = users.reduce((acc, user) => {
       // check if they have a Frb account already
-      if (!allFrbUsers[user.user_email]) {
+      if (!allFrbUsers[user.user_email.toLowerCase()]) {
         // no Frb account? add it to import
         acc.push(user)
       }
