@@ -18,6 +18,8 @@ if (!admin.apps.length) {
 // this is not going to be a permanent endpoint
 // i just need it for importing people who weren't imported properly
 // so it's slightly insecure, but it's only going to be live for a week
+// NOTES:
+// https://carluc.ci/cracking-wordpress-password-hash/
 export default async (req, res) => {
   const { users, superNotSecretKey } = req.body
 
