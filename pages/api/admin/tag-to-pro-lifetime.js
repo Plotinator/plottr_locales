@@ -16,15 +16,13 @@ if (!admin.apps.length) {
 }
 
 export default async (req, res) => {
-  const { contact } = req.body
   const { key } = req.query
-
-  console.log('body', req.body)
 
   if (key != 'A2eFc15') return res.status(500).send('')
 
-  console.log('contact', contact)
-  const { email, tags } = contact
+  console.log('body', req.body)
+  const email = req.body['contact[email]']
+  const tags = req.body['contact[tags]']
 
   // check that the contact has the right tag
   if (!tags.includes('Plottr: Customer - Pro - Lifetime')) {
