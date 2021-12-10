@@ -30,7 +30,7 @@ export default function LoginPage() {
             .getIdTokenResult()
             .then(async (token) => {
               logger.info('Received token')
-              if (token.claims.beta || token.claims.admin) {
+              if (token.claims.beta || token.claims.admin || token.claims.lifetime) {
                 setLicenseInfo({ claims: token.claims, customer: { email: user.email } })
                 window.location.href = url
               } else {
