@@ -199,6 +199,7 @@ const platform = {
       return `${path}/${backup}`
     },
     renameFile: messageRenameFile,
+    listOfflineFiles: () => [],
   },
   update: {
     quitToInstall: () => {
