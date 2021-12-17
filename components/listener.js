@@ -43,33 +43,36 @@ const Listener = ({
 
   useEffect(() => {
     const sessionFileId = (selectedFile && selectedFile.id) || currentProject()
-    if (
-      sessionFileId &&
-      sessionFileId !== '' &&
-      (!selectedFile || selectedFile.id !== sessionFileId)
-    ) {
+    if (sessionFileId && sessionFileId !== '') {
+      const isLoading = !selectedFile || selectedFile.id !== sessionFileId
       const foundInList = fileList.find(({ id }) => id === sessionFileId)
-      showLoader(true)
+      if (isLoading) showLoader(true)
       if (foundInList && !isEqual(withoutTimestamp(foundInList), withoutTimestamp(selectedFile))) {
         if (foundInList.deleted) {
-          showLoader(false)
+          if (isLoading) showLoader(false)
           selectFile(null)
           openDashboard('files')
         } else {
-          logger.info(`Opening file after refresh: ${foundInList.id}`)
-          showLoader(true)
-          openFile(userId, foundInList.id, clientId, foundInList.version, foundInList.permission)
-            .then(() => {
-              logger.info(`Loaded file after refresh: ${foundInList.id}`)
-              showLoader(false)
-              selectFile(foundInList)
-              closeDashboard()
-            })
-            .catch((error) => {
-              logger.error(`Error loading file with id: ${foundInList.id}`)
-              showLoader(false)
-              generalError(error)
-            })
+          if (isLoading) {
+            showLoader(true)
+            logger.info(`Opening file after refresh: ${foundInList.id}`)
+            openFile(userId, foundInList.id, clientId, foundInList.version, foundInList.permission)
+              .then(() => {
+                if (isLoading) {
+                  showLoader(false)
+                  logger.info(`Loaded file after refresh: ${foundInList.id}`)
+                }
+                selectFile(foundInList)
+                closeDashboard()
+              })
+              .catch((error) => {
+                logger.error(`Error loading file with id: ${foundInList.id}`)
+                if (isLoading) showLoader(false)
+                generalError(error)
+              })
+          } else {
+            selectFile(foundInList)
+          }
         }
       } else if (!foundInList) {
         selectFile(null)
