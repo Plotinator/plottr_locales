@@ -576,7 +576,8 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
           .get()
           .then((documentRef) => {
             const document = documentRef && documentRef.data()
-            const existingShareRecord = document.shareRecords.find(
+            const shareRecords = document.shareRecords || []
+            const existingShareRecord = shareRecords.find(
               (shareRecord) => shareRecord.emailAddress === emailAddress
             )
             if (existingShareRecord) {
@@ -587,7 +588,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
               .doc(fileId)
               .set(
                 {
-                  shareRecords: [...document.shareRecords, { emailAddress, permission }],
+                  shareRecords: [...shareRecords, { emailAddress, permission }],
                 },
                 { merge: true }
               )
@@ -597,9 +598,8 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
           })
       })
       .catch((error) => {
-        const status = error.response.status
-        log.error('Error sharing document', status, error.response)
-        if (status === 401) return mintCookieToken(currentUser())
+        log.error('Error sharing document', error.message, error.response?.status)
+        if (error.response?.status === 401) return mintCookieToken(currentUser())
         return Promise.reject(error)
       })
   }
