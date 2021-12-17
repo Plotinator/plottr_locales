@@ -37,7 +37,7 @@ const Share = ({ userId, selectedFile, generalError }) => {
     if (event.which === 13) {
       event.preventDefault()
       shareDocument(userId, selectedFile.id, emailToShareWith, 'collaborator').catch((error) => {
-        generalError(error.response.data)
+        generalError(error.message)
       })
       setEmailToShareWith('')
     }
@@ -46,7 +46,7 @@ const Share = ({ userId, selectedFile, generalError }) => {
   const handleShare = (event) => {
     event.preventDefault()
     shareDocument(userId, selectedFile.id, emailToShareWith, 'collaborator').catch((error) => {
-      generalError(error.response.data)
+      generalError(error.message)
     })
     setEmailToShareWith('')
   }
