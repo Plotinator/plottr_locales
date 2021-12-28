@@ -16,38 +16,25 @@ if (!admin.apps.length) {
 }
 
 export default async (req, res) => {
-  const { key } = req.query
+  const { email, updateData, superNotSecretKey } = req.body
 
-  if (key != 'A2eFc15') return res.status(500).send('')
+  if (superNotSecretKey != 'magic$poney^honeydew') return res.status(500).send('')
 
-  const email = req.body['contact[email]']
-  const tags = req.body['contact[tags]']
-
-  // check that the contact has the right tag
-  if (!tags.includes('Plottr: Customer - Pro - Lifetime')) {
-    return res.status(400).send({ where: 'checking tag', error: 'doesnt have right tag' })
-  }
-
-  // look up in Frb
   await admin
     .auth()
     .getUserByEmail(email)
     .then((userRecord) => {
-      // add "lifetime" claim
-      const claims = {
-        ...userRecord.customClaims,
-        lifetime: true,
-      }
+      // See the UserRecord reference doc for the contents of userRecord.
       return admin
         .auth()
-        .setCustomUserClaims(userRecord.uid, claims)
-        .then(() => {
-          console.log('Successfully added claims', email, userRecord.uid, claims)
-          return res.status(200).send({ success: true })
+        .updateUser(userRecord.uid, updateData)
+        .then((userRecord) => {
+          console.log('Successfully updated data', email, userRecord.email)
+          return res.status(200).send({ success: true, userRecord })
         })
         .catch((error) => {
-          console.log('Error adding claims', error)
-          return res.status(500).send({ where: 'adding claim', error: error })
+          console.log('Error updating user data:', email)
+          return res.status(500).send({ where: 'updating data', error: error })
         })
     })
     .catch((error) => {
