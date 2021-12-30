@@ -8,6 +8,8 @@ const switchErrorBody = (error) => {
   switch (error) {
     case 'permission-denied':
       return "You aren't allowed to do that!"
+    case 'could-not-open-file':
+      return 'There was a problem opening your file.  Please contact support.'
     default:
       return 'Something went wrong'
   }
