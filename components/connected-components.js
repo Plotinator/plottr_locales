@@ -160,8 +160,8 @@ const platform = {
         })
         .catch((error) => {
           store.dispatch(actions.project.showLoader(false))
-          store.dispatch(actions.error.generalError(error))
-          logger.error(`Error opening file: ${fileId}`, error)
+          store.dispatch(actions.error.generalError('could-not-open-file'))
+          logger.error(`Error opening file: ${fileId}`, error.message, error)
         })
     },
     deleteKnownFile: (position, fileId) => {
