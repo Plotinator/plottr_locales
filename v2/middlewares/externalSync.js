@@ -7,7 +7,13 @@ const externalSync = (patch, withData) => (store) => (next) => (action) => {
   const result = next(action)
 
   const { future, present, past } = store.getState()
-  if (!get(present, 'file.isCloudFile')) return result
+  if (
+    !get(present, 'file.isCloudFile') ||
+    get(present, 'project.isOffline') ||
+    get(present, 'project.resuming')
+  ) {
+    return result
+  }
 
   const fileId = present.file.id
   const clientId = present.client.clientId
@@ -27,11 +33,9 @@ const externalSync = (patch, withData) => (store) => (next) => (action) => {
       )
         return
       if (!get(present, 'project.selectedFile')) return
-      if (
-        key === 'file' &&
-        present.project.selectedFile &&
-        present.project.selectedFile.permision !== 'owner'
-      ) {
+      const userPermission = present.project.selectedFile && present.project.selectedFile.permission
+      if (userPermission !== 'owner' && userPermission !== 'collaborator') return
+      if (key === 'file' && userPermission !== 'owner') {
         return
       }
       if (present.project.selectedFile.id !== present.file.id) {

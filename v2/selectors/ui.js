@@ -1,7 +1,17 @@
 import { createSelector } from 'reselect'
 import { isSeries } from '../helpers/books'
+import { allBookIdsSelector } from './books'
 
-export const currentTimelineSelector = (state) => state.ui.currentTimeline
+export const currentTimelineSelector = (state) => {
+  const bookIds = allBookIdsSelector(state)
+  const currentTimeline = state.ui.currentTimeline
+  if (currentTimeline == 'series') return currentTimeline
+  if (bookIds.includes(currentTimeline)) {
+    return currentTimeline
+  } else {
+    return bookIds[0] || 1
+  }
+}
 export const timelineIsExpandedSelector = (state) => state.ui.timelineIsExpanded
 export const characterFilterSelector = (state) => state.ui.characterFilter
 export const characterSortSelector = (state) => state.ui.characterSort
