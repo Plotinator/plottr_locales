@@ -33,6 +33,7 @@ export default async (req, res) => {
       })
       .catch((error) => {
         console.log('Error fetching user data:', email)
+        console.error(error)
         return null
       })
   }
@@ -48,6 +49,7 @@ export default async (req, res) => {
 
     return res.status(200).send({ projects, files: fileObjs })
   } catch (error) {
+    console.error(error)
     return res.status(500).send({ error })
   }
 }
