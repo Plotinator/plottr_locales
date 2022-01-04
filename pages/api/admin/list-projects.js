@@ -67,7 +67,11 @@ export default async (req, res) => {
           .get()
           .then((doc) => {
             if (doc.exists) {
-              fileObjs.push(doc.data())
+              const data = {
+                ...doc.data(),
+                id: doc.id,
+              }
+              fileObjs.push(data)
             }
           })
           .catch((error) => {
