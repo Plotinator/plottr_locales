@@ -40,30 +40,34 @@ export default async (req, res) => {
 
   // now list projects
   try {
-    const projects = await database
+    const projects = []
+    await database
       .collection('authorisation')
       .doc(userUID)
       .collection('granted')
       .get()
       .then((querySnapshot) => {
-        return querySnapshot.map((doc) => {
-          return doc.id
+        querySnapshot.forEach((doc) => {
+          projects.push(doc.id)
         })
       })
       .catch((error) => {
         console.error('Error fetching projects', error)
         return []
       })
+
     console.log('projects', projects)
-    const fileObjs = await Promise.all(
+
+    const fileObjs = []
+    await Promise.all(
       projects.map((id) =>
         database
           .collection('file')
           .doc(id)
           .get()
           .then((querySnapshot) => {
-            return querySnapshot.map((doc) => {
-              return doc.data()
+            querySnapshot.forEach((doc) => {
+              fileObjs.push(doc.data())
             })
           })
           .catch((error) => {
