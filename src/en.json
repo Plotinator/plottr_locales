@@ -56,6 +56,9 @@
   "Add": {
     "message": "Add"
   },
+  "Advanced Export Options": {
+    "message": "Advanced Export Options"
+  },
   "After": {
     "message": "After"
   },
@@ -77,8 +80,8 @@
   "Are you sure you want to remove your license?": {
     "message": "Are you sure you want to remove your license?"
   },
-  "Are you sure?  (Removing levels may delete beat cards!)": {
-    "message": "Are you sure?  (Removing levels may delete beat cards!)"
+  "Are you sure?  (Removing levels may delete scene cards!)": {
+    "message": "Are you sure?  (Removing levels may delete scene cards!)"
   },
   "Attach Books": {
     "message": "Attach Books"
@@ -248,9 +251,6 @@
   "Choose an {platform} mobile subscription": {
     "message": "Choose an {platform} mobile subscription"
   },
-  "Choose Color": {
-    "message": "Choose Color"
-  },
   "Choose what categories you want to put your characters into": {
     "message": "Choose what categories you want to put your characters into"
   },
@@ -280,9 +280,6 @@
   },
   "Close": {
     "message": "Close"
-  },
-  "CODE": {
-    "message": "CODE"
   },
   "Collapse": {
     "message": "Collapse"
@@ -316,9 +313,6 @@
   },
   "Create From Template": {
     "message": "Create From Template"
-  },
-  "CREATE NEW PROJECT": {
-    "message": "CREATE NEW PROJECT"
   },
   "Create Report": {
     "message": "Create Report"
@@ -377,6 +371,12 @@
   "Delete Book {name}?": {
     "message": "Delete Book \"{name}\"?"
   },
+  "Number of Backups": {
+    "message": "Number of Backups"
+  },
+  "Never Delete Backups": {
+    "message": "Never Delete Backups"
+  },
   "Default Colors": {
     "message": "Default Colors"
   },
@@ -409,9 +409,6 @@
   },
   "Delete {title} Tag?": {
     "message": "Delete \"{title}\" Tag?"
-  },
-  "Delete": {
-    "message": "Delete"
   },
   "Demos": {
     "message": "Demos"
@@ -1667,26 +1664,11 @@
   "custom place attribute": {
     "message": "custom place attribute"
   },
-  "Description": {
-    "message": "Description"
-  },
   "hex code or name": {
     "message": "hex code or name"
   },
-  "Name": {
-    "message": "Name"
-  },
   "new card": {
     "message": "new card"
-  },
-  "New Character": {
-    "message": "New Character"
-  },
-  "New Note": {
-    "message": "New Note"
-  },
-  "New Place": {
-    "message": "New Place"
   },
   "new scene": {
     "message": "new scene"
@@ -1694,23 +1676,11 @@
   "new storyline": {
     "message": "new storyline"
   },
-  "New Tag": {
-    "message": "New Tag"
-  },
   "no more to add": {
     "message": "no more to add"
   },
-  "OK": {
-    "message": "OK"
-  },
   "or": {
     "message": "or"
-  },
-  "Paragraph": {
-    "message": "Paragraph"
-  },
-  "Place": {
-    "message": "Place"
   },
   "remove character {characterName} from card {cardName}": {
     "message": "remove character { characterName } from card { cardName }"
@@ -1729,9 +1699,6 @@
   },
   "remove tag {tagName} from note {noteName}": {
     "message": "remove tag { tagName } from note { noteName }"
-  },
-  "Story line": {
-    "message": "Story line"
   },
   "that best suits your style and needs.": {
     "message": "that best suits your style and needs."
@@ -1786,5 +1753,611 @@
   },
   "{wordCount,number} words": {
     "message": "{ wordCount, number } words"
+  },
+  "(If not, please contact me @ <a>support@plottr.com</a> or @StoryPlottr on Twitter)": {
+    "message": "(If not, please contact me @ <a>support@plottr.com</a> or @StoryPlottr on Twitter)"
+  },
+  "Add attributes": {
+    "message": "Add attributes"
+  },
+  "Attached to": {
+    "message": "Attached to"
+  },
+  "Bring All to Front": {
+    "message": "Bring All to Front"
+  },
+  "Buy the Full Version": {
+    "message": "Buy the Full Version"
+  },
+  "Card Title": {
+    "message": "Card Title"
+  },
+  "character": {
+    "message": "character"
+  },
+  "Choose color": {
+    "message": "Choose color"
+  },
+  "Choose what you want to track about your characters": {
+    "message": "Choose what you want to track about your characters"
+  },
+  "Choose what you want to track about your places": {
+    "message": "Choose what you want to track about your places"
+  },
+  "Click here to get the full version": {
+    "message": "Click here to get the full version"
+  },
+  "Contact": {
+    "message": "Contact"
+  },
+  "Crafted in the Mountains of Utah by": {
+    "message": "Crafted in the Mountains of Utah by"
+  },
+  "Create a new file": {
+    "message": "Create a new file"
+  },
+  "Creates a report to send me": {
+    "message": "Creates a report to send me"
+  },
+  "Creating your file didn't work. Let's try again.": {
+    "message": "Creating your file didn't work. Let's try again."
+  },
+  "Credits": {
+    "message": "Credits"
+  },
+  "Custom Attributes for Characters": {
+    "message": "Custom Attributes for Characters"
+  },
+  "Custom Attributes for Places": {
+    "message": "Custom Attributes for Places"
+  },
+  "Do you want to delete this card: { title }?": {
+    "message": "Do you want to delete this card: { title }?"
+  },
+  "Do you want to delete this character: { character }?": {
+    "message": "Do you want to delete this character: { character }?"
+  },
+  "Do you want to delete this note: { title }?": {
+    "message": "Do you want to delete this note: { title }?"
+  },
+  "Do you want to delete this place: { name }?": {
+    "message": "Do you want to delete this place: { name }?"
+  },
+  "Do you want to delete this scene: { title }?": {
+    "message": "Do you want to delete this scene: { title }?"
+  },
+  "Do you want to delete this story line: { title }?": {
+    "message": "Do you want to delete this story line: { title }?"
+  },
+  "Do you want to delete this tag: { title }?": {
+    "message": "Do you want to delete this tag: { title }?"
+  },
+  "Enter License": {
+    "message": "Enter License"
+  },
+  "Filter by story line": {
+    "message": "Filter by story line"
+  },
+  "Fit": {
+    "message": "Fit"
+  },
+  "Format with markdown!": {
+    "message": "Format with markdown!"
+  },
+  "Forums": {
+    "message": "Forums"
+  },
+  "Give feedback": {
+    "message": "Give feedback"
+  },
+  "If you keep seeing this problem, email me at support@plottr.com": {
+    "message": "If you keep seeing this problem, email me at support@plottr.com"
+  },
+  "It looks like you have Plottr on 5 computers already": {
+    "message": "It looks like you have Plottr on 5 computers already"
+  },
+  "It looks like you have an older file version. This could make things work funky or not at all. May Plottr update it for you?": {
+    "message": "It looks like you have an older file version. This could make things work funky or not at all. May Plottr update it for you?"
+  },
+  "It looks like your file was saved with a newer version of Plottr than you're using now. That could cause problems. Try updating Plottr and starting it again.": {
+    "message": "It looks like your file was saved with a newer version of Plottr than you're using now. That could cause problems. Try updating Plottr and starting it again."
+  },
+  "It will save a backup first which will be saved to the same folder as this file": {
+    "message": "It will save a backup first which will be saved to the same folder as this file"
+  },
+  "License verification failed": {
+    "message": "License verification failed"
+  },
+  "License verified! You're all set.": {
+    "message": "License verified! You're all set."
+  },
+  "Line": {
+    "message": "Line"
+  },
+  "Loading...": {
+    "message": "Loading..."
+  },
+  "Minimize": {
+    "message": "Minimize"
+  },
+  "My awesome story": {
+    "message": "My awesome story"
+  },
+  "Nope. Plottr tried again. But it didn't work. Plottr will ask you next time it opens, but you're verified. Enjoy": {
+    "message": "Nope. Plottr tried again. But it didn't work. Plottr will ask you next time it opens, but you're verified. Enjoy"
+  },
+  "Now let's get to the good stuff": {
+    "message": "Now let's get to the good stuff"
+  },
+  "Open the Tour": {
+    "message": "Open the Tour"
+  },
+  "Or feel free to contact me with any questions": {
+    "message": "Or feel free to contact me with any questions"
+  },
+  "place": {
+    "message": "place"
+  },
+  "Please upload the file named plottr_error_report.txt in your Documents folder": {
+    "message": "Please upload the file named plottr_error_report.txt in your Documents folder"
+  },
+  "Plottr couldn't save a backup. It hasn't touched your file yet, so don't worry. Try quitting Plottr and starting it again.": {
+    "message": "Plottr couldn't save a backup. It hasn't touched your file yet, so don't worry. Try quitting Plottr and starting it again."
+  },
+  "Plottr saved a backup just in case and now on with the show (To use the backup, remove '.backup' from the file name)": {
+    "message": "Plottr saved a backup just in case and now on with the show (To use the backup, remove '.backup' from the file name)"
+  },
+  "Plottr tried saving a backup just in case, but it didn't work. Try quitting Plottr and starting it again.": {
+    "message": "Plottr tried saving a backup just in case, but it didn't work. Try quitting Plottr and starting it again."
+  },
+  "Plottr updated your file without a problem. Don't forget to save your file.": {
+    "message": "Plottr updated your file without a problem. Don't forget to save your file."
+  },
+  "Plottr verified your license key successfully, but there was an error saving that. Let's try one more time": {
+    "message": "Plottr verified your license key successfully, but there was an error saving that. Let's try one more time"
+  },
+  "Problem saving backup": {
+    "message": "Problem saving backup"
+  },
+  "Report a problem": {
+    "message": "Report a problem"
+  },
+  "Request a feature": {
+    "message": "Request a feature"
+  },
+  "Reset": {
+    "message": "Reset"
+  },
+  "Save & Close": {
+    "message": "Save & Close"
+  },
+  "Scene 1": {
+    "message": "Scene 1"
+  },
+  "Scene {number}": {
+    "message": "Scene {number}"
+  },
+  "Scene {number} name": {
+    "message": "Scene {number} name"
+  },
+  "Story line name": {
+    "message": "Story line name"
+  },
+  "TRIAL Version": {
+    "message": "TRIAL Version"
+  },
+  "Try again by clicking in the menu: Plottr > Verify License...": {
+    "message": "Try again by clicking in the menu: Plottr > Verify License..."
+  },
+  "Update Plottr": {
+    "message": "Update Plottr"
+  },
+  "Upload the file Plottr just exported": {
+    "message": "Upload the file Plottr just exported"
+  },
+  "Use the code \"freetrial\" to get the secret discount": {
+    "message": "Use the code \"freetrial\" to get the secret discount"
+  },
+  "Verifying your license. Please wait...": {
+    "message": "Verifying your license. Please wait..."
+  },
+  "Where would you like to start your new file?": {
+    "message": "Where would you like to start your new file?"
+  },
+  "Would you like to open an existing file or start a new file?": {
+    "message": "Would you like to open an existing file or start a new file?"
+  },
+  "Would you like to save before exiting?": {
+    "message": "Would you like to save before exiting?"
+  },
+  "You should have received a license key from Gumroad.": {
+    "message": "You should have received a license key from Gumroad."
+  },
+  "Your free trial has expired!": {
+    "message": "Your free trial has expired!"
+  },
+  "a new card": {
+    "message": "a new card"
+  },
+  "description": {
+    "message": "description"
+  },
+  "learn how": {
+    "message": "learn how"
+  },
+  "name": {
+    "message": "name"
+  },
+  "New Card": {
+    "message": "New Card"
+  },
+  "new character": {
+    "message": "new character"
+  },
+  "new note": {
+    "message": "new note"
+  },
+  "new place": {
+    "message": "new place"
+  },
+  "new tag": {
+    "message": "new tag"
+  },
+  "no, just exit": {
+    "message": "no, just exit"
+  },
+  "no, open the file as-is": {
+    "message": "no, open the file as-is"
+  },
+  "ok": {
+    "message": "ok"
+  },
+  "story line": {
+    "message": "story line"
+  },
+  "tag name": {
+    "message": "tag name"
+  },
+  "title": {
+    "message": "title"
+  },
+  "yes, save!": {
+    "message": "yes, save!"
+  },
+  "yes, update the file": {
+    "message": "yes, update the file"
+  },
+  "{\n      count, plural,\n        one {1 carte}\n        other {# cartes}\n    }": {
+    "message": "{\n      count, plural,\n        one {1 carte}\n        other {# cartes}\n    }"
+  },
+  "{\n      count, plural,\n        one {1 note}\n        other {# notes}\n    }": {
+    "message": "{\n      count, plural,\n        one {1 note}\n        other {# notes}\n    }"
+  },
+  "{days} days remaining": {
+    "message": "{days} days remaining"
+  },
+  "Are you sure you want to delete {template}?": {
+    "message": "Are you sure you want to delete {template}?"
+  },
+  "Character Custom Attributes": {
+    "message": "Character Custom Attributes"
+  },
+  "Check for updates": {
+    "message": "Check for updates"
+  },
+  "Checking for updates": {
+    "message": "Checking for updates"
+  },
+  "Choose an image below or upload a new one": {
+    "message": "Choose an image below or upload a new one"
+  },
+  "Could not display license key. Try again": {
+    "message": "Could not display license key. Try again"
+  },
+  "Crafted in the Mountains of Utah": {
+    "message": "Crafted in the Mountains of Utah"
+  },
+  "Create an error report": {
+    "message": "Create an error report"
+  },
+  "Create unlimited story files": {
+    "message": "Create unlimited story files"
+  },
+  "Do you want to delete this book: { book }?": {
+    "message": "Do you want to delete this book: { book }?"
+  },
+  "Do you want to delete this chapter: { title }?": {
+    "message": "Do you want to delete this chapter: { title }?"
+  },
+  "Download Now": {
+    "message": "Download Now"
+  },
+  "Downloading ({percent}%)": {
+    "message": "Downloading ({percent}%)"
+  },
+  "Enter a customer service code": {
+    "message": "Enter a customer service code"
+  },
+  "Enter your code": {
+    "message": "Enter your code"
+  },
+  "Error": {
+    "message": "Error"
+  },
+  "Extending your trial didn't work. Let's try again.": {
+    "message": "Extending your trial didn't work. Let's try again."
+  },
+  "Facebook Support Group": {
+    "message": "Facebook Support Group"
+  },
+  "Here is your license key": {
+    "message": "Here is your license key"
+  },
+  "New File": {
+    "message": "New File"
+  },
+  "New from Template": {
+    "message": "New from Template"
+  },
+  "No updates available": {
+    "message": "No updates available"
+  },
+  "Open File": {
+    "message": "Open File"
+  },
+  "Plottr Trial": {
+    "message": "Plottr Trial"
+  },
+  "Plottr created a file named plottr_error_report.txt in your Documents folder": {
+    "message": "Plottr created a file named plottr_error_report.txt in your Documents folder"
+  },
+  "Quit and Install": {
+    "message": "Quit and Install"
+  },
+  "See the Changelog": {
+    "message": "See the Changelog"
+  },
+  "This is your Device ID": {
+    "message": "This is your Device ID"
+  },
+  "Try that again, but if it keeps happening, use the help menu to create an error report and report the problem.": {
+    "message": "Try that again, but if it keeps happening, use the help menu to create an error report and report the problem."
+  },
+  "Update Ready": {
+    "message": "Update Ready"
+  },
+  "Update available!": {
+    "message": "Update available!"
+  },
+  "Upload a new image": {
+    "message": "Upload a new image"
+  },
+  "View Device ID": {
+    "message": "View Device ID"
+  },
+  "View License Key": {
+    "message": "View License Key"
+  },
+  "View the Tour": {
+    "message": "View the Tour"
+  },
+  "paragraph": {
+    "message": "paragraph"
+  },
+  "selected": {
+    "message": "selected"
+  },
+  "{\n      count, plural,\n        one {1 card}\n        other {# cards}\n    }": {
+    "message": "{\n      count, plural,\n        one {1 card}\n        other {# cards}\n    }"
+  },
+  "(Series View)": {
+    "message": "(Series View)"
+  },
+  ".docx": {
+    "message": ".docx"
+  },
+  ".scriv": {
+    "message": ".scriv"
+  },
+  "Act": {
+    "message": "Act"
+  },
+  "Act Structure": {
+    "message": "Act Structure"
+  },
+  "Action": {
+    "message": "Action"
+  },
+  "Advanced...": {
+    "message": "Advanced..."
+  },
+  "Appearance: Dark/Light": {
+    "message": "Appearance: Dark/Light"
+  },
+  "Are you sure? Removing a level will delete the timeline cards directly under this level's heading cards (from all books across the project).": {
+    "message": "Are you sure? Removing a level will delete the timeline cards directly under this level's heading cards (from all books across the project)."
+  },
+  "Auto Number": {
+    "message": "Auto Number"
+  },
+  "Auto-Save": {
+    "message": "Auto-Save"
+  },
+  "Background Color": {
+    "message": "Background Color"
+  },
+  "Backup Options": {
+    "message": "Backup Options"
+  },
+  "Backups beyond this will be erased": {
+    "message": "Backups beyond this will be erased"
+  },
+  "Beats": {
+    "message": "Beats"
+  },
+  "Beta": {
+    "message": "Beta"
+  },
+  "Black (default)": {
+    "message": "Black (default)"
+  },
+  "Blue (default)": {
+    "message": "Blue (default)"
+  },
+  "Body": {
+    "message": "Body"
+  },
+  "Border Color": {
+    "message": "Border Color"
+  },
+  "Border Style": {
+    "message": "Border Style"
+  },
+  "Character Image": {
+    "message": "Character Image"
+  },
+  "Character Name": {
+    "message": "Character Name"
+  },
+  "Choose what categories you want to put your notes into": {
+    "message": "Choose what categories you want to put your notes into"
+  },
+  "Choose what categories you want to put your tags into": {
+    "message": "Choose what categories you want to put your tags into"
+  },
+  "Choose your backup location": {
+    "message": "Choose your backup location"
+  },
+  "Colors": {
+    "message": "Colors"
+  },
+  "Comedy": {
+    "message": "Comedy"
+  },
+  "Create New Project": {
+    "message": "Create New Project"
+  },
+  "DELETE": {
+    "message": "DELETE"
+  },
+  "Dark": {
+    "message": "Dark"
+  },
+  "Days of Backups": {
+    "message": "Days of Backups"
+  },
+  "Don't forget to make a backup of your files first.": {
+    "message": "Don't forget to make a backup of your files first."
+  },
+  "Edit {beatName}": {
+    "message": "Edit {beatName}"
+  },
+  "Edit {lineName}": {
+    "message": "Edit {lineName}"
+  },
+  "Export to:": {
+    "message": "Export to:"
+  },
+  "General": {
+    "message": "General"
+  },
+  "Get a License": {
+    "message": "Get a License"
+  },
+  "Give this file a new name": {
+    "message": "Give this file a new name"
+  },
+  "Green (default)": {
+    "message": "Green (default)"
+  },
+  "It looks like you've used all your license activations. Manage or upgrade here: <a>My Plottr Account</a>": {
+    "message": "It looks like you've used all your license activations. Manage or upgrade here: <a>My Plottr Account</a>"
+  },
+  "Levels": {
+    "message": "Levels"
+  },
+  "Light": {
+    "message": "Light"
+  },
+  "Mystery": {
+    "message": "Mystery"
+  },
+  "Note Categories": {
+    "message": "Note Categories"
+  },
+  "Note Title": {
+    "message": "Note Title"
+  },
+  "Orange (default)": {
+    "message": "Orange (default)"
+  },
+  "Organize your scene cards into Chapters and Acts": {
+    "message": "Organize your scene cards into Chapters and Acts"
+  },
+  "Place Name": {
+    "message": "Place Name"
+  },
+  "Put Description in:": {
+    "message": "Put Description in:"
+  },
+  "Red (default)": {
+    "message": "Red (default)"
+  },
+  "Romance": {
+    "message": "Romance"
+  },
+  "Save these settings across projects?": {
+    "message": "Save these settings across projects?"
+  },
+  "Screenplay": {
+    "message": "Screenplay"
+  },
+  "Structure": {
+    "message": "Structure"
+  },
+  "Synopsis": {
+    "message": "Synopsis"
+  },
+  "System": {
+    "message": "System"
+  },
+  "Tag Categories": {
+    "message": "Tag Categories"
+  },
+  "Tags / Characters / Places": {
+    "message": "Tags / Characters / Places"
+  },
+  "Templates": {
+    "message": "Templates"
+  },
+  "Text Color": {
+    "message": "Text Color"
+  },
+  "Text Size": {
+    "message": "Text Size"
+  },
+  "Title Page": {
+    "message": "Title Page"
+  },
+  "To give feedback on this feature, please visit:": {
+    "message": "To give feedback on this feature, please visit:"
+  },
+  "Use Templates": {
+    "message": "Use Templates"
+  },
+  "White (default)": {
+    "message": "White (default)"
+  },
+  "Yellow (default)": {
+    "message": "Yellow (default)"
+  },
+  "[Blank]": {
+    "message": "[Blank]"
+  },
+  "last edited": {
+    "message": "last edited"
+  },
+  "plottr.com/beta": {
+    "message": "plottr.com/beta"
   }
 }
