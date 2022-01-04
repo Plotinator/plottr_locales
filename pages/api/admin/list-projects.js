@@ -40,10 +40,16 @@ export default async (req, res) => {
 
   // now list projects
   try {
-    const projects = await database.collection('authorisation').doc(userUID).collection('granted')
+    const projects = await database
+      .collection('authorisation')
+      .doc(userUID)
+      .collection('granted')
+      .get()
     console.log('projects', projects)
     const fileObjs = await Promise.all(
-      Object.keys(projects).map((id) => database.collection('file').doc(id))
+      Object.keys(projects)
+        .map((id) => database.collection('file').doc(id))
+        .get()
     )
     console.log('fileObjs', fileObjs)
 
