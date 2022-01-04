@@ -65,13 +65,13 @@ export default async (req, res) => {
           .collection('file')
           .doc(id)
           .get()
-          .then((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
+          .then((doc) => {
+            if (doc.exists) {
               fileObjs.push(doc.data())
-            })
+            }
           })
           .catch((error) => {
-            console.error('Error fetching file objects', error)
+            console.error('Error fetching file objects for ID:', id, error)
             return []
           })
       )
