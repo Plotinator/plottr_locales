@@ -3,6 +3,7 @@ import {
   SET_CLIENT_ID,
   SET_EMAIL_ADDRESS,
   SET_HAS_ONBOARDED,
+  SET_HAS_PRO,
 } from '../constants/ActionTypes'
 
 export const setUserId = (userId) => ({
@@ -23,4 +24,9 @@ export const setEmailAddress = (emailAddress) => ({
 export const setHasOnboarded = (hasOnboarded) => ({
   type: SET_HAS_ONBOARDED,
   hasOnboarded,
+})
+
+export const setHasPro = (hasPro) => ({
+  type: SET_HAS_PRO,
+  hasPro,
 })

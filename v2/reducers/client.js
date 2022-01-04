@@ -3,6 +3,7 @@ import {
   SET_CLIENT_ID,
   SET_EMAIL_ADDRESS,
   SET_HAS_ONBOARDED,
+  SET_HAS_PRO,
 } from '../constants/ActionTypes'
 
 const INITIAL_STATE = {
@@ -10,6 +11,7 @@ const INITIAL_STATE = {
   clientId: null,
   emailAddress: null,
   hasOnboarded: null,
+  hasPro: null,
 }
 
 const clientReducer = (state = INITIAL_STATE, action) => {
@@ -35,6 +37,11 @@ const clientReducer = (state = INITIAL_STATE, action) => {
         hasOnboarded: action.hasOnboarded,
       }
     }
+    case SET_HAS_PRO:
+      return {
+        ...state,
+        hasPro: action.hasPro,
+      }
     default:
       return state
   }
