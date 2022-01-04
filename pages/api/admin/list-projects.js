@@ -45,11 +45,32 @@ export default async (req, res) => {
       .doc(userUID)
       .collection('granted')
       .get()
+      .then((querySnapshot) => {
+        return querySnapshot.map((doc) => {
+          return doc.id
+        })
+      })
+      .catch((error) => {
+        console.error('Error fetching projects', error)
+        return []
+      })
     console.log('projects', projects)
     const fileObjs = await Promise.all(
-      Object.keys(projects)
-        .map((id) => database.collection('file').doc(id))
-        .get()
+      projects.map((id) =>
+        database
+          .collection('file')
+          .doc(id)
+          .get()
+          .then((querySnapshot) => {
+            return querySnapshot.map((doc) => {
+              return doc.data()
+            })
+          })
+          .catch((error) => {
+            console.error('Error fetching file objects', error)
+            return []
+          })
+      )
     )
     console.log('fileObjs', fileObjs)
 
