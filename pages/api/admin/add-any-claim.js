@@ -31,11 +31,9 @@ export default async (req, res) => {
         .getUserByEmail(em)
         .then((userRecord) => {
           // See the UserRecord reference doc for the contents of userRecord.
-          console.log('Success', userRecord.email, userRecord.uid, userRecord.customClaims)
           return { uid: userRecord.uid, claims: userRecord.customClaims, email: userRecord.email }
         })
         .catch((error) => {
-          console.log('Error fetching user data:', em)
           emailsWithoutUID.push(em)
           return null
         })
