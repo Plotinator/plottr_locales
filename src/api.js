@@ -103,7 +103,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
       if (data.clientId === clientId) return
       const patchAction = patchActions(path)
       if (!patchAction) {
-        log.error('No patch action for ', path)
+        log.warn('No patch action for ', path)
         return
       }
       delete data.fileId
