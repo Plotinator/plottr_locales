@@ -6,6 +6,7 @@ import UnconnectedRichText from '../rce/RichText'
 import UnconnectedImage from '../images/Image'
 
 import { checkDependencies } from '../checkDependencies'
+import { cardCustomAttributeEditorPath } from '../../../../pltr/v2/helpers/editors'
 
 const CharacterDetailsConnector = (connector) => {
   const RichText = UnconnectedRichText(connector)
@@ -28,11 +29,7 @@ const CharacterDetailsConnector = (connector) => {
         if (type == 'paragraph') {
           desc = (
             <dd>
-              <RichText
-                id={`character.${character.id}.attribute.${name}`}
-                description={character[name]}
-                darkMode={ui.darkMode}
-              />
+              <RichText description={character[name]} darkMode={ui.darkMode} />
             </dd>
           )
         } else {
@@ -94,11 +91,7 @@ const CharacterDetailsConnector = (connector) => {
                 <dl className="dl-horizontal">
                   <dt>{t('Notes')}</dt>
                   <dd>
-                    <RichText
-                      id={`character.${character.id}.notes`}
-                      description={character.notes}
-                      darkMode={ui.darkMode}
-                    />
+                    <RichText description={character.notes} darkMode={ui.darkMode} />
                   </dd>
                 </dl>
                 {customAttributes.length ? <p>{t('Attributes')}</p> : null}
