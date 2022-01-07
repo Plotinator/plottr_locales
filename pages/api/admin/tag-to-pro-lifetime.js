@@ -22,6 +22,7 @@ export default async (req, res) => {
 
   const email = req.body['contact[email]']
   const tags = req.body['contact[tags]']
+  console.log('PRO-LIFETIME-HOOK', email, new Date().toString())
 
   // check that the contact has the right tag
   if (!tags.includes('Plottr: Customer - Pro - Lifetime')) {
