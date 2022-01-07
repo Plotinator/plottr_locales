@@ -16,6 +16,7 @@ if (!admin.apps.length) {
 }
 
 const database = admin.firestore()
+const auth = admin.auth()
 
 export default async (req, res) => {
   const { email, uid, admin } = req.body
@@ -25,8 +26,7 @@ export default async (req, res) => {
   let userUID = uid
 
   if (!uid) {
-    userUID = await admin
-      .auth()
+    userUID = await auth()
       .getUserByEmail(email)
       .then((userRecord) => {
         return userRecord.uid
