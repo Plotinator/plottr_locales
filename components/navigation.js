@@ -27,7 +27,7 @@ function Navigation({
   const [dashboardView, setDashboardView] = useState(currentProject() ? null : 'files')
 
   useEffect(() => {
-    if (bookIds.indexOf(currentTimeline) === -1) {
+    if (currentTimeline !== 'series' && bookIds.indexOf(currentTimeline) === -1) {
       changeCurrentTimeline(bookIds[0])
     }
   }, [bookIds, currentTimeline, changeCurrentTimeline])
@@ -91,7 +91,12 @@ function Navigation({
     setDashboardView(view)
   }
 
-  if (bookIds && currentTimeline && bookIds.indexOf(currentTimeline) === -1) {
+  if (
+    bookIds &&
+    currentTimeline &&
+    currentTimeline !== 'series' &&
+    bookIds.indexOf(currentTimeline) === -1
+  ) {
     return (
       <DashboardModal
         activeView={'files'}
