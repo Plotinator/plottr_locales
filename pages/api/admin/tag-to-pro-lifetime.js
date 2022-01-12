@@ -20,6 +20,8 @@ export default async (req, res) => {
 
   if (key != 'A2eFc15') return res.status(500).send('')
 
+  console.log(req.body)
+
   const email = req.body['contact[email]']
   const tags = req.body['contact[tags]']
 
