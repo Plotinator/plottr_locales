@@ -20,13 +20,14 @@ export default async (req, res) => {
 
   if (key != 'A2eFc15') return res.status(500).send('')
 
-  console.log(req.body)
+  console.log(req.body.email)
+  console.log(req.body.tag)
 
-  const email = req.body['contact[email]']
-  const tags = req.body['contact[tags]']
+  const email = req.body.email
+  const tag = req.body.tag
 
   // check that the contact has the right tag
-  if (!tags.includes('Plottr: Customer - Pro - Lifetime')) {
+  if (tag != 'Plottr: Customer - Pro - Lifetime') {
     return res.status(400).send({ where: 'checking tag', error: 'doesnt have right tag' })
   }
 
