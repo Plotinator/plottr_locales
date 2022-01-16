@@ -1577,6 +1577,9 @@
   "Your email didn't verify. Try again or try another email.": {
     "message": "Your email didn't verify.\nTry again or try another email."
   },
+  "You currently have no available licenses for this email.": {
+    "message": "You currently have no available licenses for this email."
+  },
   "Your selected license failed verification. Try another one.": {
     "message": "Your selected license failed verification. Try another one."
   },
@@ -1651,6 +1654,9 @@
   },
   "Character's Categories": {
     "message": "Character's Categories"
+  },
+  "Checking licenses for {email}": {
+    "message": "Checking licenses for {email}"
   },
   "custom character attribute": {
     "message": "custom character attribute"
