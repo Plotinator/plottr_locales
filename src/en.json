@@ -488,9 +488,6 @@
   "Ends After": {
     "message": "Ends After"
   },
-  "Enter Chapter's name or enter": {
-    "message": "Enter Chapter's name or enter \"auto\" \n(without quotes) for auto naming."
-  },
   "Enter Custom Attribute Title": {
     "message": "Enter Custom Attribute Title"
   },
@@ -1652,9 +1649,6 @@
   "but don't worry!": {
     "message": "but don''t worry!"
   },
-  "Character": {
-    "message": "Character"
-  },
   "Character's Categories": {
     "message": "Character's Categories"
   },
@@ -1705,9 +1699,6 @@
   },
   "to activate this device.": {
     "message": "to activate this device."
-  },
-  "Use Template": {
-    "message": "Use\nTemplate"
   },
   "with an iOS mobile subscription!": {
     "message": "with an iOS mobile subscription!"
@@ -2326,9 +2317,6 @@
   },
   "Tags / Characters / Places": {
     "message": "Tags / Characters / Places"
-  },
-  "Templates": {
-    "message": "Templates"
   },
   "Text Color": {
     "message": "Text Color"
