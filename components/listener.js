@@ -26,7 +26,7 @@ const Listener = ({
   userId,
   selectedFile,
   selectFile,
-  fileList,
+  knownFiles,
   setPermission,
   setFileLoaded,
   patchFile,
@@ -45,7 +45,7 @@ const Listener = ({
     const sessionFileId = (selectedFile && selectedFile.id) || currentProject()
     if (sessionFileId && sessionFileId !== '') {
       const isLoading = !selectedFile || selectedFile.id !== sessionFileId
-      const foundInList = fileList.find(({ id }) => id === sessionFileId)
+      const foundInList = knownFiles.find(({ id }) => id === sessionFileId)
       if (isLoading) showLoader(true)
       if (foundInList && !isEqual(withoutTimestamp(foundInList), withoutTimestamp(selectedFile))) {
         if (foundInList.deleted) {
@@ -83,7 +83,7 @@ const Listener = ({
         setCurrentProject(currentFile?.id)
       }
     }
-  }, [selectedFile, fileList])
+  }, [selectedFile, knownFiles])
 
   useEffect(() => {
     if (selectedFile && selectedFile.none) {
@@ -151,7 +151,7 @@ Listener.propTypes = {
   userId: PropTypes.string,
   setPermission: PropTypes.func.isRequired,
   selectedFile: PropTypes.object,
-  fileList: PropTypes.array.isRequired,
+  knownFiles: PropTypes.array.isRequired,
   selectFile: PropTypes.func.isRequired,
   setFileLoaded: PropTypes.func.isRequired,
   clientId: PropTypes.string,
@@ -165,7 +165,7 @@ Listener.propTypes = {
 export default connect(
   (state) => ({
     selectedFile: selectors.selectedFileSelector(state.present),
-    fileList: selectors.fileListSelector(state.present),
+    knownFiles: selectors.knownFilesSelector(state.present),
     userId: selectors.userIdSelector(state.present),
     clientId: selectors.clientIdSelector(state.present),
     darkMode: selectors.isDarkModeSelector(state.present),

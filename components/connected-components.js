@@ -39,32 +39,27 @@ import {
   messageToSaveNewTemplate,
   messageToEditTemplate,
   messageToDeleteTemplate,
-  useFilteredSortedTemplates,
 } from '../lib/templates'
-import { useExportConfigInfo } from '../lib/exportConfig'
 import export_config from '../lib/exporter/default_config'
 import { exportFile } from '../lib/export'
+import { saveAppSetting } from '../lib/appSettings'
+import { saveExportConfigSettings } from '../lib/exportSettings'
 import { store } from '../lib/redux'
-import { useCustomTemplatesInfo, useSettingsInfo, useTemplatesInfo } from '../lib/store_hooks'
-import { useTrialStatus } from '../lib/trialManager'
-import { settings } from '../lib/settings'
 import {
   messageOpenExistingFile,
   messageRenameFile,
   newEmptyFile,
-  useSortedKnownFiles,
   newFile,
   openFile,
   uploadExisting,
+  sortAndSearch,
 } from '../lib/files'
-import { useBackupFolders } from '../lib/backups'
 import { createErrorReport } from '../lib/createErrorReport'
 import { closeDashboard } from '../lib/dashboard'
 import { userHasPro } from '../lib/checkPro'
 import MPQ from '../lib/MPQ'
 import { resizeImage } from '../lib/resizeImage'
 import extractImages from '../lib/extractImages'
-import { useProLicenseInfo } from '../lib/checkPro'
 import { logger } from '../lib/logger'
 import { setCurrentProject } from '../lib/currentProject'
 
@@ -129,8 +124,7 @@ const platform = {
       // NOP.  We don't expect the API to reply with non-existant files.
       return true
     },
-    useSortedKnownFilesIgnoringLoggedIn: useSortedKnownFiles,
-    useSortedKnownFiles,
+    sortAndSearch,
     isTempFile: () => {
       // There's no such thing as a temp file with cloud storage
       return false
@@ -240,12 +234,15 @@ const platform = {
       store.dispatch(actions.featureFlags.unsetBeatHierarchy())
     }
   },
+  // A lot of the license wiring doesn't make sense for web.
   license: {
-    useLicenseInfo: () => [],
+    deleteLicense: () => {},
     checkForActiveLicense: () => {},
-    useTrialStatus,
-    licenseStore: {},
+    saveLicenseInfo: () => {},
     verifyLicense: () => {},
+    // There isn't a way to start/extend a trial on web yet.
+    startTrial: () => {},
+    extendTrial: () => {},
     trial90days: [],
     trial60days: [],
     hasPro: () => true,
@@ -266,13 +263,8 @@ const platform = {
     editTemplateDetails: messageToEditTemplate,
     startSaveAsTemplate,
     saveTemplate: messageToSaveNewTemplate,
-    useFilteredSortedTemplates,
-    useCustomTemplatesInfo,
-    useLocalCustomTemplatesInfo: useCustomTemplatesInfo,
-    useTemplatesInfo,
   },
-  settings,
-  useSettingsInfo,
+  settings: { saveAppSetting },
   user: {
     get: () => {},
   },
@@ -317,13 +309,10 @@ const platform = {
     platform: 'web',
   },
   export: {
+    saveExportConfigSettings,
     askToExport: exportFile,
     export_config,
   },
-  store: {
-    useExportConfigInfo,
-  },
-  useBackupFolders,
   moveFromTemp: (fullFileState) => {
     const data = new Blob([JSON.stringify(fullFileState, null, 2)], { type: 'text/json' })
     const link = document.createElement('a')
@@ -369,7 +358,6 @@ const platform = {
     return uuidv4()
   },
   extractImages,
-  useProLicenseInfo,
   storage: {
     saveImageToStorageBlob: (blob, name) => {
       const state = store.getState()
