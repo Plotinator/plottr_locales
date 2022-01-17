@@ -5,22 +5,19 @@ import { t } from 'plottr_locales'
 import UnconnectedVerifyView from './VerifyView'
 import UnconnectedVerifyPro from './VerifyPro'
 import AccountHeader from './AccountHeader'
-import { checkDependencies } from '../../checkDependencies'
 
 const ChoiceViewConnector = (connector) => {
   const {
     platform: {
-      license: { useTrialStatus },
       os,
+      license: { startTrial },
     },
   } = connector
-  checkDependencies({ useTrialStatus })
 
   const VerifyView = UnconnectedVerifyView(connector)
   const VerifyPro = UnconnectedVerifyPro(connector)
 
   const ChoiceView = ({ darkMode, goToAccount }) => {
-    const { startTrial } = useTrialStatus()
     const [view, setView] = useState('chooser')
 
     const goBack = () => setView('chooser')
@@ -29,13 +26,6 @@ const ChoiceViewConnector = (connector) => {
     const trialText = t.rich('Start the<br/>Free Trial', { br: () => <br /> })
     // eslint-disable-next-line react/display-name, react/prop-types
     const licenseText = t.rich('I have a<br/>License Key', { br: () => <br /> })
-
-    const proText = t.rich('I have Plottr Pro<br/><small>(Early Access Only)</small>', {
-      // eslint-disable-next-line react/display-name, react/prop-types
-      br: () => <br />,
-      // eslint-disable-next-line react/display-name, react/prop-types
-      small: ({ children }) => <small>{children}</small>,
-    })
 
     const renderBody = () => {
       switch (view) {
@@ -49,7 +39,7 @@ const ChoiceViewConnector = (connector) => {
                 <h2>{licenseText}</h2>
               </div>
               <div className="verify__choice" onClick={() => setView('pro')}>
-                <h2>{proText}</h2>
+                <h2>{t('I have Plottr Pro')}</h2>
               </div>
             </div>
           )
@@ -97,7 +87,20 @@ const ChoiceViewConnector = (connector) => {
     darkMode: PropTypes.bool,
   }
 
-  return ChoiceView
+  const {
+    redux,
+    pltr: { selectors },
+  } = connector
+
+  if (redux) {
+    const { connect } = redux
+
+    return connect((state) => ({
+      darkMode: selectors.isDarkModeSelector(state.present),
+    }))(ChoiceView)
+  }
+
+  throw new Error('Could not connect ChoiceView')
 }
 
 export default ChoiceViewConnector
