@@ -308,7 +308,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
             log.error(`Error while force updating file ${fileId} at key: ${key}`, error)
           })
           .then(() => ({
-            [key]: ARRAY_KEYS.indexOf(key) !== -1 ? toFirestoreArray(payload) : payload,
+            [key]: ARRAY_KEYS.indexOf(key) !== -1 ? Object.values(payload) : payload,
           }))
       )
     })
@@ -425,6 +425,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
                 id: file.id,
                 ...file.data(),
                 ...authorisation.data(),
+                path: `plottr://${file.id}`,
               }))
             authorisedDocuments.push(document)
           })
@@ -463,6 +464,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
               id: file.id,
               ...file.data(),
               ...authorisation.data(),
+              path: `plottr://${file.id}`,
             }))
           authorisedDocuments.push(document)
         })
