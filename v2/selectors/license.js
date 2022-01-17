@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect'
 
 import { hasProSelector } from './client'
-import { previouslyLoggedIntoProSelector } from './settings'
+import { shouldBeInProSelector } from './shouldBeInPro'
 
 export const trialInfoSelector = (state) => state.license.trialInfo
 export const trialEndSelector = createSelector(trialInfoSelector, ({ endsAt }) => endsAt)
@@ -119,9 +119,9 @@ export const isFirstTimeSelector = createSelector(
   hasLicenseSelector,
   trialStartedSelector,
   hasProSelector,
-  previouslyLoggedIntoProSelector,
-  (hasLicense, trialStarted, hasCurrentProLicense, loggedIntoProBefore) => {
-    return !hasLicense && !trialStarted && !hasCurrentProLicense && !loggedIntoProBefore
+  shouldBeInProSelector,
+  (hasLicense, trialStarted, hasCurrentProLicense, shouldBeInPro) => {
+    return !hasLicense && !trialStarted && !hasCurrentProLicense && !shouldBeInPro
   }
 )
 
