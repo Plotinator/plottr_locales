@@ -16,7 +16,7 @@ if (!admin.apps.length) {
 }
 
 const database = admin.firestore()
-const auth = admin.auth
+const auth = admin.auth()
 
 export default async (req, res) => {
   const { email, uid, admin } = req.body
@@ -56,8 +56,6 @@ export default async (req, res) => {
         return []
       })
 
-    console.log('projects', projects)
-
     const fileObjs = []
     await Promise.all(
       projects.map((id) =>
@@ -80,7 +78,6 @@ export default async (req, res) => {
           })
       )
     )
-    console.log('fileObjs', fileObjs)
 
     return res.status(200).send({ projects, files: fileObjs })
   } catch (error) {

@@ -20,11 +20,9 @@ export default async (req, res) => {
 
   if (key != 'A2eFc15') return res.status(500).send('')
 
-  console.log(req.body.email)
-  console.log(req.body.tag)
-
-  const email = req.body.email
-  const tag = req.body.tag
+  const email = req.body['contact[email]']
+  const tags = req.body['contact[tags]']
+  console.log('PRO-LIFETIME-HOOK', email, new Date().toString())
 
   // check that the contact has the right tag
   if (tag != 'Plottr: Customer - Pro - Lifetime') {
