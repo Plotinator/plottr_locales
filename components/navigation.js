@@ -23,8 +23,15 @@ function Navigation({
   currentView,
   changeCurrentView,
   darkMode,
+  selectedFile,
 }) {
   const [dashboardView, setDashboardView] = useState(currentProject() ? null : 'files')
+
+  useEffect(() => {
+    if (!selectedFile && dashboardView !== null) {
+      setDashboardView('files')
+    }
+  }, [selectedFile])
 
   useEffect(() => {
     if (currentTimeline !== 'series' && bookIds.indexOf(currentTimeline) === -1) {
@@ -84,7 +91,9 @@ function Navigation({
   }
 
   const resetDashboardView = () => {
-    setDashboardView(null)
+    if (selectedFile) {
+      setDashboardView(null)
+    }
   }
 
   const selectDashboardView = (view) => {
@@ -184,6 +193,7 @@ Navigation.propTypes = {
   darkMode: PropTypes.bool.isRequired,
   bookIds: PropTypes.array,
   currentTimeline: PropTypes.number,
+  selectedFile: PropTypes.object,
   changeCurrentTimeline: PropTypes.func.isRequired,
 }
 
@@ -194,6 +204,7 @@ function mapStateToProps(state) {
     currentView: state.present.ui.currentView,
     darkMode: state.present.ui.darkMode,
     userId: selectors.userIdSelector(state.present),
+    selectedFile: selectors.selectedFileSelector(state.present),
   }
 }
 

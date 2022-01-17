@@ -27,6 +27,7 @@ import SettingsConsistencyChecker from './settings-consistency-checker'
 import Upload from './upload'
 import { logger } from '../lib/logger'
 import FullPageSpinner from './spinner'
+import world from '../lib/world'
 
 const redo = () => {
   store.dispatch(ActionCreators.redo())
@@ -50,6 +51,10 @@ const Root = ({ projectId }) => {
         setFileName(selectedFile?.fileName)
       }
     })
+  }, [])
+
+  useEffect(() => {
+    return world.publishChangesToStore(store)
   }, [])
 
   useEffect(() => {

@@ -4,8 +4,7 @@ import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
 
 import { actions, selectors } from 'pltr/v2'
-import { listen, stopListening } from 'wired-up-firebase'
-import { listenToCustomTemplates } from '../lib/templates'
+import { listen, stopListening, listenToCustomTemplates } from 'wired-up-firebase'
 import { settings } from '../lib/settings'
 import { store } from '../lib/redux'
 import { closeDashboard, openDashboard } from '../lib/dashboard'
@@ -38,18 +37,33 @@ const Listener = ({
   unsetBeatHierarchy,
   generalError,
   showLoader,
+  setCustomTemplates,
+  startCheckingFileToLoad,
+  finishCheckingFileToLoad,
+  checkedFileToLoad,
+  startLoadingFile,
+  finishLoadingFile,
+  loadingFile,
 }) => {
   const [unsubscribeFunctions, setUnsubscribeFunctions] = useState([])
 
   useEffect(() => {
+    if (!checkedFileToLoad) startCheckingFileToLoad()
     const sessionFileId = (selectedFile && selectedFile.id) || currentProject()
-    if (sessionFileId && sessionFileId !== '') {
+    if (!checkedFileToLoad) finishCheckingFileToLoad()
+    if (!loadingFile && sessionFileId && sessionFileId !== '') {
       const isLoading = !selectedFile || selectedFile.id !== sessionFileId
       const foundInList = knownFiles.find(({ id }) => id === sessionFileId)
-      if (isLoading) showLoader(true)
       if (foundInList && !isEqual(withoutTimestamp(foundInList), withoutTimestamp(selectedFile))) {
+        if (isLoading) {
+          startLoadingFile()
+          showLoader(true)
+        }
         if (foundInList.deleted) {
-          if (isLoading) showLoader(false)
+          if (isLoading) {
+            showLoader(false)
+            finishLoadingFile()
+          }
           selectFile(null)
           openDashboard('files')
         } else {
@@ -60,6 +74,7 @@ const Listener = ({
               .then(() => {
                 if (isLoading) {
                   showLoader(false)
+                  finishLoadingFile()
                   logger.info(`Loaded file after refresh: ${foundInList.id}`)
                 }
                 selectFile(foundInList)
@@ -67,7 +82,10 @@ const Listener = ({
               })
               .catch((error) => {
                 logger.error(`Error loading file with id: ${foundInList.id}`)
-                if (isLoading) showLoader(false)
+                if (isLoading) {
+                  showLoader(false)
+                  finishLoadingFile()
+                }
                 generalError(error)
               })
           } else {
@@ -120,7 +138,9 @@ const Listener = ({
 
   useEffect(() => {
     if (userId) {
-      const unsubscribe = listenToCustomTemplates(userId)
+      const unsubscribe = listenToCustomTemplates(userId, (templates) => {
+        setCustomTemplates(templates)
+      })
       return () => {
         unsubscribe()
       }
@@ -158,8 +178,13 @@ Listener.propTypes = {
   loadFile: PropTypes.func.isRequired,
   darkMode: PropTypes.bool,
   actStructureIsOn: PropTypes.bool,
+  checkedFileToLoad: PropTypes.bool,
+  loadingFile: PropTypes.bool,
   setBeatHierarchy: PropTypes.func.isRequired,
   unsetBeatHierarchy: PropTypes.func.isRequired,
+  setCustomTemplates: PropTypes.func.isrequired,
+  startLoadingFile: PropTypes.func.isrequired,
+  finishLoadingFile: PropTypes.func.isrequired,
 }
 
 export default connect(
@@ -170,6 +195,8 @@ export default connect(
     clientId: selectors.clientIdSelector(state.present),
     darkMode: selectors.isDarkModeSelector(state.present),
     actStructureIsOn: selectors.beatHierarchyIsOn(state.present),
+    checkedFileToLoad: selectors.checkedFileToLoadSelector(state.present),
+    loadingFile: selectors.loadingFileSelector(state.present),
   }),
   {
     setPermission: actions.permission.setPermission,
@@ -181,5 +208,10 @@ export default connect(
     selectFile: actions.project.selectFile,
     generalError: actions.error.generalError,
     showLoader: actions.project.showLoader,
+    setCustomTemplates: actions.templates.setCustomTemplates,
+    startCheckingFileToLoad: actions.applicationState.startCheckingFileToLoad,
+    finishCheckingFileToLoad: actions.applicationState.finishCheckingFileToLoad,
+    finishLoadingFile: actions.applicationState.finishLoadingFile,
+    startLoadingFile: actions.applicationState.startLoadingFile,
   }
 )(Listener)
