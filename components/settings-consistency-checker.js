@@ -4,11 +4,7 @@ import { connect } from 'react-redux'
 
 import { actions, selectors } from 'pltr/v2'
 
-import { useSettingsInfo } from '../lib/store_hooks'
-
-export const SettingsConsistencyChecker = ({ darkModeIsOn, setDarkModeIsOn }) => {
-  const [settings] = useSettingsInfo()
-
+export const SettingsConsistencyChecker = ({ darkModeIsOn, setDarkModeIsOn, settings }) => {
   useEffect(() => {
     if (settings.user.dark !== darkModeIsOn) {
       setDarkModeIsOn(settings.user.dark === 'dark')
@@ -26,6 +22,7 @@ SettingsConsistencyChecker.propTypes = {
 export default connect(
   (state) => ({
     darkModeIsOn: selectors.isDarkModeSelector(state.present),
+    settings: selectors.appSettingsSelector(state.present),
   }),
   { setDarkModeIsOn: actions.ui.setDarkMode }
 )(SettingsConsistencyChecker)

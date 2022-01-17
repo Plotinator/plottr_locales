@@ -8,7 +8,7 @@ import { useRouter } from 'next/router'
 
 import { logger } from '../lib/logger'
 
-const SessionObserver = ({ setUserId, setFileList, setEmailAddress, generalError }) => {
+const SessionObserver = ({ setUserId, setKnownFiles, setEmailAddress, generalError }) => {
   const router = useRouter()
   const { pid } = router.query
 
@@ -26,7 +26,7 @@ const SessionObserver = ({ setUserId, setFileList, setEmailAddress, generalError
             user.uid,
             (files) => {
               const activeFiles = files.filter(({ deleted }) => !deleted)
-              setFileList(activeFiles)
+              setKnownFiles(activeFiles)
             },
             (error) => {
               logger.error('Error listening to files list.', error)
@@ -54,7 +54,7 @@ SessionObserver.propTypes = {
 }
 
 export default connect(null, {
-  setFileList: actions.project.setFileList,
+  setKnownFiles: actions.knownFiles.setKnownFiles,
   setUserId: actions.client.setUserId,
   setEmailAddress: actions.client.setEmailAddress,
   generalError: actions.error.generalError,
