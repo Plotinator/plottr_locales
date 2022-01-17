@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { AiOutlineTeam, AiOutlineRead } from 'react-icons/ai'
 import { GiQuillInk } from 'react-icons/gi'
-import { isEqual, sortBy } from 'lodash'
+import { FaSignal } from 'react-icons/fa'
+import { isEqual } from 'lodash'
 import { StickyTable, Row, Cell } from 'react-sticky-table'
 import cx from 'classnames'
 
@@ -47,26 +48,16 @@ const renderPermission = (permission) => {
   }
 }
 
-const sortAndSearch = (searchTerm, files) => {
-  if (!files || !files.length) return [[], {}]
+const markOffline = (files) => {
+  return files.map((file) => ({ ...file, offline: true }))
+}
 
-  const filesById = files.reduce((acc, next, index) => {
-    return {
-      ...acc,
-      [index]: next,
-    }
-  }, {})
-  const filteredFileIds = Object.keys(filesById).filter((id) => {
-    if (searchTerm && searchTerm.length > 1) {
-      const f = filesById[`${id}`]
-      return (f.fileName || f.path).toLowerCase().includes(searchTerm.toLowerCase())
-    } else {
-      return true
-    }
-  })
-  const sortedFileIds = sortBy(filteredFileIds, (id) => filesById[`${id}`].lastOpened).reverse()
-
-  return [sortedFileIds, filesById]
+const formatFileName = (fileName, fileBasename, onFirebase, offline) => {
+  return offline
+    ? decodeURI(fileBasename.replace('.pltr', ''))
+    : onFirebase
+    ? fileName
+    : fileBasename.replace('.pltr', '')
 }
 
 const RecentFilesConnector = (connector) => {
@@ -75,11 +66,11 @@ const RecentFilesConnector = (connector) => {
       file: {
         isTempFile,
         doesFileExist,
-        useSortedKnownFiles,
         pathSep,
         basename,
         openKnownFile,
         listOfflineFiles,
+        sortAndSearch,
       },
       log,
     },
@@ -87,7 +78,6 @@ const RecentFilesConnector = (connector) => {
   checkDependencies({
     isTempFile,
     doesFileExist,
-    useSortedKnownFiles,
     pathSep,
     basename,
     openKnownFile,
@@ -97,9 +87,9 @@ const RecentFilesConnector = (connector) => {
 
   const FileActions = UnconnectedFileActions(connector)
 
-  const RecentFiles = ({ fileList, isOffline, resuming }) => {
+  const RecentFiles = ({ fileList, isOffline, resuming, sortedKnownFiles, loadingFileList }) => {
     const [searchTerm, setSearchTerm] = useState('')
-    const [onlineSortedIds, onlineFilesById] = useSortedKnownFiles(searchTerm, fileList)
+    const [onlineSortedIds, onlineFilesById] = sortedKnownFiles
     const [sortedIds, setSortedIds] = useState(onlineSortedIds)
     const [filesById, setFilesById] = useState(onlineFilesById)
     const [missingFiles, setMissing] = useState([])
@@ -135,7 +125,10 @@ const RecentFilesConnector = (connector) => {
         }
       } else {
         listOfflineFiles().then((offlineFiles) => {
-          const [offlineSortedIds, offlineFilesById] = sortAndSearch(searchTerm, offlineFiles)
+          const [offlineSortedIds, offlineFilesById] = sortAndSearch(
+            searchTerm,
+            markOffline(offlineFiles)
+          )
           if (!isEqual(offlineSortedIds, sortedIds)) {
             setSortedIds(offlineSortedIds)
           }
@@ -152,6 +145,7 @@ const RecentFilesConnector = (connector) => {
 
     const renderRecents = () => {
       // TODO: if no files, show something different
+      if (loadingFileList) return <Spinner />
       if (!sortedIds.length) return <span>{t('No files found.')}</span>
 
       const fileWithPermissionsExists = Object.values(filesById).some(
@@ -160,15 +154,22 @@ const RecentFilesConnector = (connector) => {
 
       // cloud files' lastOpened date comes from version ... do we need something better?
       const makeLastOpen = (fileObj) => {
+        const todayIfInvalid = (date) => {
+          if (isNaN(date.getTime())) {
+            return new Date()
+          }
+          return date
+        }
+
         if (fileObj.lastOpened) {
-          return fileObj.lastOpened.toDate
-            ? fileObj.lastOpened.toDate()
-            : new Date(fileObj.lastOpened)
+          return todayIfInvalid(
+            fileObj.lastOpened.toDate ? fileObj.lastOpened.toDate() : new Date(fileObj.lastOpened)
+          )
         }
 
         try {
           const splits = fileObj.version.replace(/-.*$/, '').split('.')
-          return new Date(splits[0], parseInt(splits[1]) - 1, splits[2])
+          return todayIfInvalid(new Date(splits[0], parseInt(splits[1]) - 1, splits[2]))
         } catch (error) {
           // do nothing
         }
@@ -228,12 +229,18 @@ const RecentFilesConnector = (connector) => {
                 <div>
                   <div className="title">
                     {missing}
-                    {onFirebase ? f.fileName : fileBasename.replace('.pltr', '')}
+                    {f.offline ? (
+                      <>
+                        <FaSignal title="This is an offline backup of a Plottr cloud file" />{' '}
+                      </>
+                    ) : null}
+                    {formatFileName(f.fileName, fileBasename, onFirebase, f.offline)}
                   </div>
                   <div className="secondary-text">{formattedPath}</div>
                 </div>
                 <FileActions
                   missing={!!missing}
+                  offline={f.offline}
                   id={f.id || id}
                   fileName={f.fileName}
                   filePath={f.path || f.id}
@@ -259,7 +266,7 @@ const RecentFilesConnector = (connector) => {
         )
       })
 
-      return renderedFiles ? (
+      return !loadingFileList && renderedFiles ? (
         <div className="dashboard__recent-files__table">
           <StickyTable leftStickyColumnCount={0}>
             <Row>
@@ -287,6 +294,8 @@ const RecentFilesConnector = (connector) => {
     fileList: PropTypes.array.isRequired,
     isOffline: PropTypes.bool,
     resuming: PropTypes.bool,
+    sortedKnownFiles: PropTypes.array.isRequired,
+    loadingFileList: PropTypes.bool,
   }
 
   const {
@@ -298,9 +307,11 @@ const RecentFilesConnector = (connector) => {
     const { connect } = redux
 
     return connect((state) => ({
-      fileList: selectors.fileListSelector(state.present),
+      fileList: selectors.knownFilesSelector(state.present),
       isOffline: selectors.isOfflineSelector(state.present),
       resuming: selectors.isResumingSelector(state.present),
+      sortedKnownFiles: selectors.sortedKnownFilesSelector(state.present),
+      loadingFileList: selectors.fileListIsLoadingSelector(state.present),
     }))(RecentFiles)
   }
 
