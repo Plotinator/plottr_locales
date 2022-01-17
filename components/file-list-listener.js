@@ -41,7 +41,7 @@ export default connect(
     userId: selectors.userIdSelector(state.present),
   }),
   {
-    setKnownFiles: actions.project.setKnownFiles,
+    setKnownFiles: actions.knownFiles.setKnownFiles,
     generalError: actions.error.generalError,
   }
 )(FileListListener)

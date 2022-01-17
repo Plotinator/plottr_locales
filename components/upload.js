@@ -20,6 +20,8 @@ const Upload = ({
   selectFile,
   withFullFileState,
   showLoader,
+  startUploadingFileToCloud,
+  finishUploadingFileToCloud,
 }) => {
   const fileInputRef = useRef(null)
 
@@ -39,12 +41,14 @@ const Upload = ({
     if (fileList.length < 1) return
     const fileReader = new FileReader()
     fileReader.onload = () => {
+      startUploadingFileToCloud()
       showLoader(true)
       let file
       try {
         file = JSON.parse(fileReader.result)
       } catch (error) {
         showLoader(false)
+        finishUploadingFileToCloud()
         logger.error('Failed to parse file to upload', error)
         return
       }
@@ -57,6 +61,7 @@ const Upload = ({
         (error, migrated, data) => {
           if (error) {
             showLoader(false)
+            finishUploadingFileToCloud()
             logger.error('Error migrating file: ', error)
             return
           }
@@ -86,17 +91,20 @@ const Upload = ({
                 )
                   .then(() => {
                     logger.info('Successfully uploaded a new file.')
+                    finishUploadingFileToCloud()
                     showLoader(false)
                     closeDashboard()
                   })
                   .catch((error) => {
                     logger.error('Failed to upload the new file.', error)
+                    finishUploadingFileToCloud()
                     showLoader(false)
                   })
               )
             })
             .catch((error) => {
               logger.error('Failed to extract images in file being uploaded', error)
+              finishUploadingFileToCloud()
               showLoader(false)
             })
         },
@@ -127,6 +135,8 @@ Upload.propTypes = {
   selectFile: PropTypes.func.isRequired,
   withFullFileState: PropTypes.func.isRequired,
   showLoader: PropTypes.func.isRequired,
+  startUploadingFileToCloud: PropTypes.func.isRequired,
+  finishUploadingFileToCloud: PropTypes.func.isRequired,
 }
 
 export default connect(
@@ -141,5 +151,7 @@ export default connect(
     selectFile: actions.project.selectFile,
     withFullFileState: actions.project.withFullFileState,
     showLoader: actions.project.showLoader,
+    startUploadingFileToCloud: actions.applicationState.startUploadingFileToCloud,
+    finishUploadingFileToCloud: actions.applicationState.finishUploadingFileToCloud,
   }
 )(Upload)

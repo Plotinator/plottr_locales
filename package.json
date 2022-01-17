@@ -50,6 +50,7 @@
     "luxon": "^2.0.2",
     "mixpanel-browser": "^2.41.0",
     "next": "10.2.0",
+    "plottr_world": "link:./lib/plottr_world/",
     "plottr_components": "link:./lib/plottr_components",
     "plottr_firebase": "link:./lib/plottr_firebase",
     "plottr_locales": "link:./lib/plottr_locales",

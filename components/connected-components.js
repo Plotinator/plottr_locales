@@ -32,7 +32,6 @@ import {
   saveCustomTemplate,
 } from 'wired-up-firebase'
 import {
-  getTemplateById,
   listTemplates,
   listCustomTemplates,
   startSaveAsTemplate,
@@ -89,33 +88,33 @@ const platform = {
       const state = store.getState()
       const {
         client: { emailAddress, userId, clientId },
-        project: { fileList },
+        knownFiles,
       } = state.present
-      const untitledFileList = fileList.filter(({ fileName }) => fileName.match(/Untitled/g))
+      const untitledFileList = knownFiles.filter(({ fileName }) => fileName.match(/Untitled/g))
       const fileName = t('Untitled') + ` - ${untitledFileList.length}`
-      const setFileList = (...args) => store.dispatch(actions.project.setFileList(...args))
+      const setKnownFiles = (...args) => store.dispatch(actions.knownFiles.setKnownFiles(...args))
       const selectFile = (...args) => store.dispatch(actions.project.selectFile(...args))
       const newFileState = Object.assign(
         newEmptyFile(fileName, appVersion(), state.present),
         template || {}
       )
-      store.dispatch(actions.project.showLoader(true))
+      store.dispatch(actions.applicationState.startCreatingCloudFile())
       newFile(
         emailAddress,
         userId,
         fileName,
         { present: newFileState },
-        setFileList,
+        setKnownFiles,
         selectFile,
         clientId
       )
         .then(() => {
-          store.dispatch(actions.project.showLoader(false))
+          store.dispatch(actions.applicationState.finishCreatingCloudFile())
           closeDashboard()
           logger.info('Created new file.')
         })
         .catch((error) => {
-          store.dispatch(actions.project.showLoader(false))
+          store.dispatch(actions.applicationState.finishCreatingCloudFile())
           logger.error('Error creating new file.', error)
         })
     },
@@ -138,15 +137,17 @@ const platform = {
       const state = store.getState()
       const {
         client: { userId, clientId },
-        project: { fileList },
+        knownFiles,
       } = state.present
-      const selectedFile = fileList.find((thatFile) => thatFile.id === fileId)
+      const selectedFile = knownFiles.find((thatFile) => thatFile.id === fileId)
       if (!selectedFile) return
 
+      store.dispatch(actions.applicationState.startLoadingFile())
       store.dispatch(actions.project.showLoader(true))
       openFile(userId, fileId, clientId, selectedFile.version, selectedFile.permission)
         .then(() => {
           store.dispatch(actions.project.selectFile(selectedFile))
+          store.dispatch(actions.applicationState.finishLoadingFile())
           store.dispatch(actions.project.showLoader(false))
           setCurrentProject(fileId)
           closeDashboard()
@@ -154,18 +155,22 @@ const platform = {
         })
         .catch((error) => {
           store.dispatch(actions.project.showLoader(false))
+          store.dispatch(actions.applicationState.finishLoadingFile())
           store.dispatch(actions.error.generalError('could-not-open-file'))
           logger.error(`Error opening file: ${fileId}`, error.message, error)
         })
     },
     deleteKnownFile: (position, fileId) => {
       store.dispatch(actions.project.showLoader(true))
+      store.dispatch(actions.applicationState.startDeletingFile())
       deleteFileOnFirestore(fileId)
         .then(() => {
+          store.dispatch(actions.applicationState.finishDeletingFile())
           store.dispatch(actions.project.showLoader(false))
           logger.info(`Deleted file with id: ${fileId}`)
         })
         .catch((error) => {
+          store.dispatch(actions.applicationState.finishDeletingFile())
           store.dispatch(actions.project.showLoader(false))
           store.dispatch(actions.error.generalError(error))
           logger.error(`Error deleting file: ${fileId}`, error)
@@ -255,10 +260,6 @@ const platform = {
     // NO-OP
   },
   template: {
-    TemplateFetcher: {}, // TODO
-    listTemplates,
-    listCustomTemplates,
-    getTemplateById,
     deleteTemplate: messageToDeleteTemplate,
     editTemplateDetails: messageToEditTemplate,
     startSaveAsTemplate,
