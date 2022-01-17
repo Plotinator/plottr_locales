@@ -95,6 +95,8 @@ export const hasLicenseSelector = createSelector(
   }
 )
 
+export const proInfoSelector = (state) => state.license.proLicenseInfo
+
 // More complicated logic
 export const isInTrialModeSelector = createSelector(
   trialStartedSelector,
