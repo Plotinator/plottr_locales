@@ -36,8 +36,8 @@ const AccountHomeConnector = (connector) => {
     }, [view])
 
     useEffect(() => {
-      // if (!isOnboardingDone && hasPro()) startOnboarding()
-    }, [isOnboardingDone])
+      // if (!isOnboardingDone && hasCurrentProLicense) startOnboarding()
+    }, [isOnboardingDone, hasCurrentProLicense])
 
     const handleSelect = (selectedKey) => {
       if (viewIsLocked) return
