@@ -87,7 +87,14 @@ const RecentFilesConnector = (connector) => {
 
   const FileActions = UnconnectedFileActions(connector)
 
-  const RecentFiles = ({ fileList, isOffline, resuming, sortedKnownFiles, loadingFileList }) => {
+  const RecentFiles = ({
+    fileList,
+    isOffline,
+    resuming,
+    sortedKnownFiles,
+    loadingFileList,
+    isCloudFile,
+  }) => {
     const [searchTerm, setSearchTerm] = useState('')
     const [onlineSortedIds, onlineFilesById] = sortedKnownFiles
     const [sortedIds, setSortedIds] = useState(onlineSortedIds)
@@ -220,7 +227,7 @@ const RecentFilesConnector = (connector) => {
         return (
           <Row
             key={idx}
-            onDoubleClick={() => openFile(f.path || f.id, id)}
+            onDoubleClick={() => (isCloudFile ? openFile(f.id, id) : openFile(f.path, id))}
             onClick={() => selectFile(selected ? null : id)}
             className={cx({ selected: selected })}
           >
@@ -296,6 +303,7 @@ const RecentFilesConnector = (connector) => {
     resuming: PropTypes.bool,
     sortedKnownFiles: PropTypes.array.isRequired,
     loadingFileList: PropTypes.bool,
+    isCloudFile: PropTypes.bool,
   }
 
   const {
@@ -312,6 +320,7 @@ const RecentFilesConnector = (connector) => {
       resuming: selectors.isResumingSelector(state.present),
       sortedKnownFiles: selectors.sortedKnownFilesSelector(state.present),
       loadingFileList: selectors.fileListIsLoadingSelector(state.present),
+      isCloudFile: selectors.isCloudFileSelector(state.present),
     }))(RecentFiles)
   }
 

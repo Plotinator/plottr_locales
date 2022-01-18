@@ -35,10 +35,6 @@ const AccountHomeConnector = (connector) => {
       setLock(view == 'proOnboarding')
     }, [view])
 
-    useEffect(() => {
-      // if (!isOnboardingDone && hasCurrentProLicense) startOnboarding()
-    }, [isOnboardingDone, hasCurrentProLicense])
-
     const handleSelect = (selectedKey) => {
       if (viewIsLocked) return
       setView(selectedKey)
