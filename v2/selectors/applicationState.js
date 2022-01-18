@@ -5,7 +5,7 @@ import {
   isCloudFileSelector,
   loadingFileSelector as deprecatedLoadingFileSelector,
 } from './project'
-import { previouslyLoggedIntoProSelector } from './settings'
+import { shouldBeInProSelector } from './shouldBeInPro'
 
 export const applicationStateSelector = (state) => state.applicationState
 
@@ -120,10 +120,10 @@ export const checkingProSubscriptionSelector = createSelector(
 )
 
 export const needToCheckProSubscriptionSelector = createSelector(
-  previouslyLoggedIntoProSelector,
+  shouldBeInProSelector,
   checkedProSubscriptionSelector,
-  (previouslyLoggedIntoPro, checkedProSubscription) => {
-    return previouslyLoggedIntoPro && !checkedProSubscription
+  (shouldBeInPro, checkedProSubscription) => {
+    return shouldBeInPro && !checkedProSubscription
   }
 )
 
@@ -139,7 +139,7 @@ export const applicationIsBusyAndUninterruptableSelector = createSelector(
   sessionCheckedSelector,
   isLoggedInSelector,
   checkingSessionSelector,
-  previouslyLoggedIntoProSelector,
+  shouldBeInProSelector,
   checkedProSubscriptionSelector,
   checkedLicenseSelector,
   checkedTrialSelector,
@@ -157,7 +157,7 @@ export const applicationIsBusyAndUninterruptableSelector = createSelector(
     sessionChecked,
     isLoggedIn,
     checkingSession,
-    previouslyLoggedIntoPro,
+    shouldBeInPro,
     checkedProSubscription,
     checkedLicense,
     checkedTrial,
@@ -176,7 +176,7 @@ export const applicationIsBusyAndUninterruptableSelector = createSelector(
     !applicationSettingsAreLoaded ||
     !sessionChecked ||
     checkingSession ||
-    (isLoggedIn && previouslyLoggedIntoPro && !checkedProSubscription) ||
+    (isLoggedIn && shouldBeInPro && !checkedProSubscription) ||
     // TODO: Web doesn't have trials or licenses to load.
     !checkedLicense ||
     !checkedTrial
@@ -192,7 +192,7 @@ export const applicationIsBusyButFileCouldBeUnloadedSelector = createSelector(
   sessionCheckedSelector,
   isLoggedInSelector,
   checkingSessionSelector,
-  previouslyLoggedIntoProSelector,
+  shouldBeInProSelector,
   checkedProSubscriptionSelector,
   checkedLicenseSelector,
   checkedTrialSelector,
@@ -208,7 +208,7 @@ export const applicationIsBusyButFileCouldBeUnloadedSelector = createSelector(
     sessionChecked,
     isLoggedIn,
     checkingSession,
-    previouslyLoggedIntoPro,
+    shouldBeInPro,
     checkedProSubscription,
     checkedLicense,
     checkedTrial,
@@ -225,7 +225,7 @@ export const applicationIsBusyButFileCouldBeUnloadedSelector = createSelector(
     !applicationSettingsAreLoaded ||
     !sessionChecked ||
     checkingSession ||
-    (isLoggedIn && previouslyLoggedIntoPro && !checkedProSubscription) ||
+    (isLoggedIn && shouldBeInPro && !checkedProSubscription) ||
     // TODO: Web doesn't have trials or licenses to load.
     !checkedLicense ||
     !checkedTrial
@@ -233,11 +233,11 @@ export const applicationIsBusyButFileCouldBeUnloadedSelector = createSelector(
 
 export const userNeedsToLoginSelector = createSelector(
   applicationSettingsAreLoadedSelector,
-  previouslyLoggedIntoProSelector,
+  shouldBeInProSelector,
   sessionCheckedSelector,
   isLoggedInSelector,
-  (settingsAreLoaded, userLoggedIntoPro, sessionChecked, isLoggedIn) => {
-    return settingsAreLoaded && userLoggedIntoPro && sessionChecked && !isLoggedIn
+  (settingsAreLoaded, shouldBeInPro, sessionChecked, isLoggedIn) => {
+    return settingsAreLoaded && shouldBeInPro && sessionChecked && !isLoggedIn
   }
 )
 
