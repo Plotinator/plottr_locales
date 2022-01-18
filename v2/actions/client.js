@@ -3,6 +3,7 @@ import {
   SET_CLIENT_ID,
   SET_EMAIL_ADDRESS,
   SET_HAS_PRO,
+  SET_IS_ON_WEB,
 } from '../constants/ActionTypes'
 
 export const setUserId = (userId) => ({
@@ -23,4 +24,8 @@ export const setEmailAddress = (emailAddress) => ({
 export const setHasPro = (hasPro) => ({
   type: SET_HAS_PRO,
   hasPro,
+})
+
+export const setIsOnWeb = () => ({
+  type: SET_IS_ON_WEB,
 })
