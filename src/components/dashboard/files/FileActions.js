@@ -46,7 +46,11 @@ const FileActionsConnector = (connector) => {
 
     const deleteFile = () => {
       setDeleting(false)
-      deleteKnownFile(id, filePath)
+      if (isCloudFile) {
+        deleteKnownFile(id, id)
+      } else {
+        deleteKnownFile(id, filePath)
+      }
     }
 
     const _renameFile = () => {
