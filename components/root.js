@@ -1,32 +1,21 @@
 import React, { useEffect, useState } from 'react'
-import { Router, Switch, Route } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { PropTypes } from 'prop-types'
 import { ActionCreators } from 'redux-undo'
 import Head from 'next/head'
 
-import { history } from '../lib/history'
 import { store } from '../lib/redux'
 
-import Navigation from './navigation'
-import Project from './project'
-import Timeline from './timeline'
-import Outline from './outline'
-import Notes from './notes'
-import Characters from './characters'
-import Places from './places'
-import Tags from './tags'
 import Listener from './listener'
 import SaveTemplate from './save-template'
-import Error from './error'
 import SessionObserver from './session-observer'
 import ClientIdMinter from './client-id-minter'
 import FileListListener from './file-list-listener'
 import Renamer from './renamer'
 import SettingsConsistencyChecker from './settings-consistency-checker'
 import Upload from './upload'
+import Main from './Main'
 import { logger } from '../lib/logger'
-import FullPageSpinner from './spinner'
 import world from '../lib/world'
 
 const redo = () => {
@@ -121,22 +110,7 @@ const Root = ({ projectId }) => {
         <ClientIdMinter />
         <SaveTemplate />
         <Upload />
-        <Router history={history}>
-          <Navigation />
-          <FullPageSpinner />
-          <Error />
-          <main className="project-main tour-end">
-            <Switch>
-              <Route path="/project" component={Project} />
-              <Route path="/timeline" component={Timeline} />
-              <Route path="/outline" component={Outline} />
-              <Route path="/notes" component={Notes} />
-              <Route path="/characters" component={Characters} />
-              <Route path="/places" component={Places} />
-              <Route path="/tags" component={Tags} />
-            </Switch>
-          </main>
-        </Router>
+        <Main />
       </React.StrictMode>
     </Provider>
   )
