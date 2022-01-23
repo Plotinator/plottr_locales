@@ -1568,6 +1568,9 @@
   "You have unsaved changes": {
     "message": "You have unsaved changes.\nDo you want to save?"
   },
+  "You have no {type}s": {
+    "message": "You have no {type}s"
+  },
   "You may create a new project": {
     "message": "You may create a new project\nor select a project file to begin"
   },
@@ -1656,7 +1659,7 @@
     "message": "Character's Categories"
   },
   "Checking licenses for {email}": {
-    "message": "Checking licenses for {email}"
+    "message": "Checking licenses for\n{email}"
   },
   "custom character attribute": {
     "message": "custom character attribute"
@@ -2098,6 +2101,9 @@
   },
   "No updates available": {
     "message": "No updates available"
+  },
+  "No more {type}s": {
+    "message": "No more {type}s"
   },
   "Open File": {
     "message": "Open File"
