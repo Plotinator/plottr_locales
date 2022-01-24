@@ -24,9 +24,11 @@ export default (req, res) => {
 
   return auth.createSessionCookie(idToken, { expiresIn }).then(
     (sessionCookie) => {
+      const previewAndProdHeaders =
+        process.env.FIREBASE_ENV !== 'development' ? '' : 'SameSite=None; Secure;'
       res.setHeader(
         'Set-Cookie',
-        `session=${sessionCookie}; Max-Age=${expiresIn}; HttpOnly; SameSite=None; Secure;`
+        `session=${sessionCookie}; Max-Age=${expiresIn}; HttpOnly; ${previewAndProdHeaders}`
       )
       res.setHeader('Content-Type', 'application/json')
       res.end(JSON.stringify({ status: 'success' }))
