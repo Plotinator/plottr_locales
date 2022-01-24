@@ -81,7 +81,7 @@ const Main = ({
     return (
       <div id="temporary-inner">
         <div className="loading-splash">
-          <img src="../icons/logo_28_500.png" height="500" />
+          <img src="/logo_28_500.png" height="500" />
         </div>
       </div>
     )
