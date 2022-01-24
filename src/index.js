@@ -43,6 +43,10 @@ const database = () => {
   ) {
     try {
       _database.useEmulator('plottr.local', 8081)
+      _database.settings(
+        { ignoreUndefinedProperties: true, host: 'plottr.local:8081', ssl: true },
+        { merge: true }
+      )
     } catch (error) {
       console.error('Error initialising dev emulator (you can usually safely ignore this):', error)
     }
