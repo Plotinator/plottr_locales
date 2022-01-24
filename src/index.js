@@ -42,11 +42,7 @@ const database = () => {
     (typeof window !== 'undefined' && window && window.location.hostname === 'plottr.local')
   ) {
     try {
-      _database.useEmulator('plottr.local', 8081)
-      _database.settings(
-        { ignoreUndefinedProperties: true, host: 'plottr.local:8081', ssl: true },
-        { merge: true }
-      )
+      _database.useEmulator('plottr.local', 8080)
     } catch (error) {
       console.error('Error initialising dev emulator (you can usually safely ignore this):', error)
     }
@@ -63,7 +59,7 @@ const auth = () => {
     process.env.NEXT_PUBLIC_NODE_ENV === 'development' ||
     (typeof window !== 'undefined' && window && window.location.hostname === 'plottr.local')
   ) {
-    _auth.useEmulator('https://plottr.local:9100')
+    _auth.useEmulator('http://plottr.local:9099')
   }
   return _auth
 }
@@ -76,7 +72,7 @@ const storage = () => {
     (typeof window !== 'undefined' && window && window.location.hostname === 'plottr.local')
   ) {
     _storage = firebase.storage()
-    _storage.useEmulator('localhost', 9200)
+    _storage.useEmulator('localhost', 9199)
   } else {
     _storage = firebase.storage()
   }
