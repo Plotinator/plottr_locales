@@ -139,51 +139,78 @@ for SSL from what the emulator serves on):
 server {
    listen 8081 ssl;
    server_name plottr.local;
-   ssl_certificate  <path-to-root>/https_cert/plottr.local.pem;
-   ssl_certificate_key  <path-to-root>/https_cert/plottr.local-key.pem;
+   ssl_certificate  <project-root>/https_cert/plottr.local.pem;
+   ssl_certificate_key  <project-root>/https_cert/plottr.local-key.pem;
    ssl_prefer_server_ciphers on;
 
    location / {
         proxy_pass http://localhost:8080;
 
+        proxy_buffering           off;
+        proxy_cache               off;
+        chunked_transfer_encoding off;
+
+        add_header              'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+
         proxy_set_header        Host $host;
         proxy_set_header        X-Real-IP $remote_addr;
         proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header        X-Forwarded-Proto $scheme;
+        proxy_set_header        Connection '';
+
+        proxy_http_version 1.1;
    }
 }
 
 server {
    listen 9100 ssl;
    server_name plottr.local;
-   ssl_certificate  <path-to-root>/https_cert/plottr.local.pem;
-   ssl_certificate_key  <path-to-root>/https_cert/plottr.local-key.pem;
+   ssl_certificate  <project-root>/https_cert/plottr.local.pem;
+   ssl_certificate_key  <project-root>/https_cert/plottr.local-key.pem;
    ssl_prefer_server_ciphers on;
 
    location / {
         proxy_pass http://localhost:9099;
 
+        proxy_buffering           off;
+        proxy_cache               off;
+        chunked_transfer_encoding off;
+
+        add_header              'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+
         proxy_set_header        Host $host;
         proxy_set_header        X-Real-IP $remote_addr;
         proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header        X-Forwarded-Proto $scheme;
+        proxy_set_header        Connection '';
+
+        proxy_http_version 1.1;
    }
 }
 
 server {
    listen 9200 ssl;
    server_name plottr.local;
-   ssl_certificate  <path-to-root>/https_cert/plottr.local.pem;
-   ssl_certificate_key  <path-to-root>/https_cert/plottr.local-key.pem;
+   ssl_certificate  <project-root>/https_cert/plottr.local.pem;
+   ssl_certificate_key  <project-root>/https_cert/plottr.local-key.pem;
    ssl_prefer_server_ciphers on;
 
    location / {
         proxy_pass http://localhost:9199;
 
+        proxy_buffering           off;
+        proxy_cache               off;
+        chunked_transfer_encoding off;
+
+        add_header              'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+
         proxy_set_header        Host $host;
         proxy_set_header        X-Real-IP $remote_addr;
         proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header        X-Forwarded-Proto $scheme;
+        proxy_set_header        Connection '';
+
+        proxy_http_version 1.1;
    }
 }
 ```
