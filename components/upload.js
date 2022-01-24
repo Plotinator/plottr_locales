@@ -16,7 +16,7 @@ const Upload = ({
   emailAddress,
   loadFile,
   selectEmptyfile,
-  setFileList,
+  setKnownFiles,
   selectFile,
   withFullFileState,
   showLoader,
@@ -86,7 +86,7 @@ const Upload = ({
                   userId,
                   sansExtension(fileList[0]?.name) || state.present.file.fileName,
                   state,
-                  setFileList,
+                  setKnownFiles,
                   selectFile
                 )
                   .then(() => {
@@ -131,7 +131,7 @@ Upload.propTypes = {
   emailAddress: PropTypes.string,
   loadFile: PropTypes.func.isRequired,
   selectEmptyfile: PropTypes.func.isRequired,
-  setFileList: PropTypes.func.isRequired,
+  setKnownFiles: PropTypes.func.isRequired,
   selectFile: PropTypes.func.isRequired,
   withFullFileState: PropTypes.func.isRequired,
   showLoader: PropTypes.func.isRequired,
@@ -147,7 +147,7 @@ export default connect(
   {
     loadFile: actions.ui.loadFile,
     selectEmptyfile: actions.project.selectEmptyFile,
-    setFileList: actions.project.setFileList,
+    setKnownFiles: actions.knownFiles.setKnownFiles,
     selectFile: actions.project.selectFile,
     withFullFileState: actions.project.withFullFileState,
     showLoader: actions.project.showLoader,
