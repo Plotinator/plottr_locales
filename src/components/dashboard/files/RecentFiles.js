@@ -18,7 +18,8 @@ import prettydate from 'pretty-date'
 
 const oneDay = 1000 * 60 * 60 * 24
 
-const isPlottrCloudFile = (filePath) => (filePath && filePath.startsWith('plottr://')) || !filePath
+const isPlottrCloudFile = (file) =>
+  (file && (file.isCloudFile || (file.filePath && file.filePath.startsWith('plottr://')))) || !file
 
 const renderPermission = (permission) => {
   switch (permission) {
@@ -53,11 +54,7 @@ const markOffline = (files) => {
 }
 
 const formatFileName = (fileName, fileBasename, onFirebase, offline) => {
-  return offline
-    ? decodeURI(fileBasename.replace('.pltr', ''))
-    : onFirebase
-    ? fileName
-    : fileBasename.replace('.pltr', '')
+  return offline ? fileName : onFirebase ? fileName : fileBasename.replace('.pltr', '')
 }
 
 const RecentFilesConnector = (connector) => {
@@ -108,11 +105,12 @@ const RecentFilesConnector = (connector) => {
       sortedIds.forEach((id) => {
         if (!filesById[`${id}`]) return
 
-        const filePath = filesById[`${id}`].path
+        const file = filesById[`${id}`]
+        const filePath = file.path
         if (!filePath) {
           return
         }
-        if (isPlottrCloudFile(filePath)) {
+        if (isPlottrCloudFile(file)) {
           return
         }
         if (!doesFileExist(filePath)) {
@@ -152,14 +150,13 @@ const RecentFilesConnector = (connector) => {
 
     const renderRecents = () => {
       // TODO: if no files, show something different
-      if (loadingFileList) return <Spinner />
+      if (!isOffline && loadingFileList) return <Spinner />
       if (!sortedIds.length) return <span>{t('No files found.')}</span>
 
       const fileWithPermissionsExists = Object.values(filesById).some(
         ({ permission }) => permission
       )
 
-      // cloud files' lastOpened date comes from version ... do we need something better?
       const makeLastOpen = (fileObj) => {
         const todayIfInvalid = (date) => {
           if (isNaN(date.getTime())) {
@@ -206,7 +203,7 @@ const RecentFilesConnector = (connector) => {
         const f = filesById[`${id}`]
         if (!f) return null
 
-        const onFirebase = isPlottrCloudFile(f.path)
+        const onFirebase = isPlottrCloudFile(f)
         const lastOpen = makeLastOpen(f)
         const fileBasename = (!onFirebase && f.path && basename(f.path)) || ''
         let formattedPath = ''
@@ -273,7 +270,7 @@ const RecentFilesConnector = (connector) => {
         )
       })
 
-      return !loadingFileList && renderedFiles ? (
+      return (isOffline || !loadingFileList) && renderedFiles ? (
         <div className="dashboard__recent-files__table">
           <StickyTable leftStickyColumnCount={0}>
             <Row>
