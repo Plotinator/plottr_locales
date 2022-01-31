@@ -17,7 +17,6 @@ const CharacterDetailsConnector = (connector) => {
     templateAttributeValue,
     startEditing,
     character,
-    ui,
     customAttributes,
     categories,
   }) => {
@@ -30,7 +29,6 @@ const CharacterDetailsConnector = (connector) => {
             <RichText
               id={`character.${character.id}.attribute.${name}`}
               description={character[name]}
-              darkMode={ui.darkMode}
             />
           </dd>
         )
@@ -52,7 +50,7 @@ const CharacterDetailsConnector = (connector) => {
         if (attr.type == 'paragraph') {
           val = (
             <dd>
-              <RichText description={attributeValue} darkMode={ui.darkMode} />
+              <RichText description={attributeValue} />
             </dd>
           )
         } else {
@@ -93,7 +91,7 @@ const CharacterDetailsConnector = (connector) => {
               <dl className="dl-horizontal">
                 <dt>{t('Notes')}</dt>
                 <dd>
-                  <RichText description={character.notes} darkMode={ui.darkMode} />
+                  <RichText description={character.notes} />
                 </dd>
               </dl>
               {customAttributes.length ? <p>{t('Attributes')}</p> : null}
@@ -115,7 +113,6 @@ const CharacterDetailsConnector = (connector) => {
     categories: PropTypes.array.isRequired,
     actions: PropTypes.object.isRequired,
     customAttributes: PropTypes.array.isRequired,
-    ui: PropTypes.object.isRequired,
     startEditing: PropTypes.func.isRequired,
     getTemplateById: PropTypes.func.isRequired,
     templateAttributeValue: PropTypes.func.isRequired,
@@ -142,7 +139,6 @@ const CharacterDetailsConnector = (connector) => {
           character: selectors.singleCharacterSelector(state.present, ownProps.characterId),
           categories: state.present.categories.characters,
           customAttributes: state.present.customAttributes.characters,
-          ui: state.present.ui,
           getTemplateById: (templateId) =>
             selectors.templateByIdSelector(state.present, templateId),
           templateAttributeValue: (templateId, attributeName) => {
