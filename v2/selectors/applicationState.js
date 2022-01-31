@@ -3,9 +3,10 @@ import { hasProSelector, isLoggedInSelector } from './client'
 import { hasLicenseSelector, isInTrialModeSelector } from './license'
 import {
   isCloudFileSelector,
+  isOfflineSelector,
   loadingFileSelector as deprecatedLoadingFileSelector,
 } from './project'
-import { previouslyLoggedIntoProSelector } from './settings'
+import { shouldBeInProSelector } from './shouldBeInPro'
 
 export const applicationStateSelector = (state) => state.applicationState
 
@@ -120,124 +121,234 @@ export const checkingProSubscriptionSelector = createSelector(
 )
 
 export const needToCheckProSubscriptionSelector = createSelector(
-  previouslyLoggedIntoProSelector,
+  shouldBeInProSelector,
   checkedProSubscriptionSelector,
-  (previouslyLoggedIntoPro, checkedProSubscription) => {
-    return previouslyLoggedIntoPro && !checkedProSubscription
+  (shouldBeInPro, checkedProSubscription) => {
+    return shouldBeInPro && !checkedProSubscription
+  }
+)
+
+const busyLoadingFileOrNeedToLoadFileSelector = createSelector(
+  deprecatedLoadingFileSelector,
+  loadingFileSelector,
+  fileIsLoadedSelector,
+  (fileIsLoadingDeprecated, fileIsLoading, loadedAFileBefore) => {
+    return fileIsLoadingDeprecated || fileIsLoading || !loadedAFileBefore
+  }
+)
+
+const checkingWhatToLoadOrNeedToCheckWhatToLoadSelector = createSelector(
+  checkingFileToLoadSelector,
+  checkedFileToLoadSelector,
+  (checkingFileToLoad, checkedFileToLoad) => {
+    return checkingFileToLoad || !checkedFileToLoad
+  }
+)
+
+const manipulatingAFileSelector = createSelector(
+  isRenamingFileSelector,
+  creatingCloudFileSelector,
+  uploadingFileToCloudSelector,
+  deletingFileSelector,
+  (isRenamingFile, creatingCloudFile, uploadingFileToCloud, deletingFile) => {
+    return isRenamingFile || creatingCloudFile || uploadingFileToCloud || deletingFile
+  }
+)
+
+const checkingSessionOrNeedToCheckSessionSelector = createSelector(
+  sessionCheckedSelector,
+  checkingSessionSelector,
+  (sessionChecked, checkingSession) => {
+    return checkingSession || !sessionChecked
   }
 )
 
 export const applicationIsBusyAndUninterruptableSelector = createSelector(
-  deprecatedLoadingFileSelector,
-  isRenamingFileSelector,
-  creatingCloudFileSelector,
-  uploadingFileToCloudSelector,
-  loadingFileSelector,
-  fileIsLoadedSelector,
-  deletingFileSelector,
+  busyLoadingFileOrNeedToLoadFileSelector,
+  checkingWhatToLoadOrNeedToCheckWhatToLoadSelector,
+  manipulatingAFileSelector,
   applicationSettingsAreLoadedSelector,
-  sessionCheckedSelector,
+  checkingSessionOrNeedToCheckSessionSelector,
   isLoggedInSelector,
-  checkingSessionSelector,
-  previouslyLoggedIntoProSelector,
+  shouldBeInProSelector,
   checkedProSubscriptionSelector,
   checkedLicenseSelector,
   checkedTrialSelector,
-  checkingFileToLoadSelector,
-  checkedFileToLoadSelector,
   (
-    fileIsLoadingDeprecated,
-    renamingFile,
-    creatingCloudFile,
-    uplodingFileToCloud,
-    loadingFile,
-    fileLoaded,
-    deletingFile,
+    busyLoadingFileOrNeedToLoadFile,
+    checkingWhatToLoadOrNeedToCheckWhatToLoad,
+    manipulatingAFile,
     applicationSettingsAreLoaded,
-    sessionChecked,
+    checkingSessionOrNeedToCheckSession,
     isLoggedIn,
-    checkingSession,
-    previouslyLoggedIntoPro,
+    shouldBeInPro,
     checkedProSubscription,
     checkedLicense,
-    checkedTrial,
-    checkingFileToLoad,
-    checkedFileToLoad
-  ) =>
-    checkingFileToLoad ||
-    !checkedFileToLoad ||
-    fileIsLoadingDeprecated ||
-    loadingFile ||
-    !fileLoaded ||
-    renamingFile ||
-    creatingCloudFile ||
-    uplodingFileToCloud ||
-    deletingFile ||
-    !applicationSettingsAreLoaded ||
-    !sessionChecked ||
-    checkingSession ||
-    (isLoggedIn && previouslyLoggedIntoPro && !checkedProSubscription) ||
-    // TODO: Web doesn't have trials or licenses to load.
-    !checkedLicense ||
-    !checkedTrial
+    checkedTrial
+  ) => {
+    return (
+      busyLoadingFileOrNeedToLoadFile ||
+      checkingWhatToLoadOrNeedToCheckWhatToLoad ||
+      manipulatingAFile ||
+      !applicationSettingsAreLoaded ||
+      checkingSessionOrNeedToCheckSession ||
+      (isLoggedIn && shouldBeInPro && !checkedProSubscription) ||
+      // TODO: Web doesn't have trials or licenses to load.
+      !checkedLicense ||
+      !checkedTrial
+    )
+  }
+)
+
+export const isInOfflineModeSelector = createSelector(
+  isOfflineSelector,
+  shouldBeInProSelector,
+  (isOffline, shouldBeInPro) => {
+    return isOffline && shouldBeInPro
+  }
 )
 
 export const applicationIsBusyButFileCouldBeUnloadedSelector = createSelector(
-  isRenamingFileSelector,
-  creatingCloudFileSelector,
-  uploadingFileToCloudSelector,
+  checkingWhatToLoadOrNeedToCheckWhatToLoadSelector,
   loadingFileSelector,
-  deletingFileSelector,
+  manipulatingAFileSelector,
   applicationSettingsAreLoadedSelector,
-  sessionCheckedSelector,
+  isInOfflineModeSelector,
+  checkingSessionOrNeedToCheckSessionSelector,
   isLoggedInSelector,
-  checkingSessionSelector,
-  previouslyLoggedIntoProSelector,
+  shouldBeInProSelector,
   checkedProSubscriptionSelector,
   checkedLicenseSelector,
   checkedTrialSelector,
-  checkingFileToLoadSelector,
-  checkedFileToLoadSelector,
   (
-    renamingFile,
-    creatingCloudFile,
-    uplodingFileToCloud,
+    checkingWhatToLoadOrNeedToCheckWhatToLoad,
     loadingFile,
-    deletingFile,
+    manipulatingAFile,
     applicationSettingsAreLoaded,
-    sessionChecked,
+    isInOfflineMode,
+    checkingSessionOrNeedToCheckSession,
     isLoggedIn,
-    checkingSession,
-    previouslyLoggedIntoPro,
+    shouldBeInPro,
     checkedProSubscription,
     checkedLicense,
-    checkedTrial,
-    checkingFileToLoad,
-    checkedFileToLoad
-  ) =>
-    !checkedFileToLoad ||
-    checkingFileToLoad ||
-    loadingFile ||
-    renamingFile ||
-    creatingCloudFile ||
-    uplodingFileToCloud ||
-    deletingFile ||
-    !applicationSettingsAreLoaded ||
-    !sessionChecked ||
-    checkingSession ||
-    (isLoggedIn && previouslyLoggedIntoPro && !checkedProSubscription) ||
-    // TODO: Web doesn't have trials or licenses to load.
-    !checkedLicense ||
-    !checkedTrial
+    checkedTrial
+  ) => {
+    return (
+      checkingWhatToLoadOrNeedToCheckWhatToLoad ||
+      loadingFile ||
+      manipulatingAFile ||
+      !applicationSettingsAreLoaded ||
+      (!isInOfflineMode && checkingSessionOrNeedToCheckSession) ||
+      (isLoggedIn && shouldBeInPro && !checkedProSubscription) ||
+      // TODO: Web doesn't have trials or licenses to load.
+      !checkedLicense ||
+      !checkedTrial
+    )
+  }
+)
+
+export const loadingStateSelector = createSelector(
+  checkingWhatToLoadOrNeedToCheckWhatToLoadSelector,
+  loadingFileSelector,
+  manipulatingAFileSelector,
+  applicationSettingsAreLoadedSelector,
+  checkingSessionOrNeedToCheckSessionSelector,
+  isLoggedInSelector,
+  shouldBeInProSelector,
+  checkedProSubscriptionSelector,
+  checkingLicenseSelector,
+  checkingTrialSelector,
+  (
+    checkingWhatToLoadOrNeedToCheckWhatToLoad,
+    loadingFile,
+    manipulatingAFile,
+    applicationSettingsAreLoaded,
+    checkingSessionOrNeedToCheckSession,
+    isLoggedIn,
+    shouldBeInPro,
+    checkedProSubscription,
+    checkingLicense,
+    checkingTrial
+  ) => {
+    if (checkingWhatToLoadOrNeedToCheckWhatToLoad) {
+      return 'Locating document...'
+    }
+    if (loadingFile) {
+      return 'Placing document on table...'
+    }
+    if (manipulatingAFile) {
+      return 'Spilling ink on desk...'
+    }
+    if (!applicationSettingsAreLoaded) {
+      return 'Loading settings...'
+    }
+    if (checkingSessionOrNeedToCheckSession) {
+      return 'Security checkpoint...'
+    }
+    if (
+      (isLoggedIn && shouldBeInPro && !checkedProSubscription) ||
+      checkingLicense ||
+      checkingTrial
+    ) {
+      return 'Checking your ticket...'
+    }
+    return 'Done!'
+  }
+)
+
+export const loadingProgressSelector = createSelector(
+  checkingWhatToLoadOrNeedToCheckWhatToLoadSelector,
+  loadingFileSelector,
+  manipulatingAFileSelector,
+  applicationSettingsAreLoadedSelector,
+  checkingSessionOrNeedToCheckSessionSelector,
+  isLoggedInSelector,
+  shouldBeInProSelector,
+  checkedProSubscriptionSelector,
+  checkedLicenseSelector,
+  checkedTrialSelector,
+  (
+    checkingWhatToLoadOrNeedToCheckWhatToLoad,
+    loadingFile,
+    manipulatingAFile,
+    applicationSettingsAreLoaded,
+    checkingSessionOrNeedToCheckSession,
+    isLoggedIn,
+    shouldBeInPro,
+    checkedProSubscription,
+    checkedLicense,
+    checkedTrial
+  ) => {
+    let progress = 0
+    if (!checkingWhatToLoadOrNeedToCheckWhatToLoad) {
+      progress++
+    }
+    if (!applicationSettingsAreLoaded) {
+      progress++
+    }
+    if (!checkingSessionOrNeedToCheckSession) {
+      progress++
+    }
+    if (!(isLoggedIn && shouldBeInPro && !checkedProSubscription)) {
+      progress++
+    }
+    if (checkedLicense) {
+      progress++
+    }
+    if (checkedTrial) {
+      progress++
+    }
+    return 100.0 * (progress / 6.0)
+  }
 )
 
 export const userNeedsToLoginSelector = createSelector(
   applicationSettingsAreLoadedSelector,
-  previouslyLoggedIntoProSelector,
+  shouldBeInProSelector,
   sessionCheckedSelector,
   isLoggedInSelector,
-  (settingsAreLoaded, userLoggedIntoPro, sessionChecked, isLoggedIn) => {
-    return settingsAreLoaded && userLoggedIntoPro && sessionChecked && !isLoggedIn
+  (settingsAreLoaded, shouldBeInPro, sessionChecked, isLoggedIn) => {
+    return settingsAreLoaded && shouldBeInPro && sessionChecked && !isLoggedIn
   }
 )
 
@@ -246,6 +357,7 @@ export const isInSomeValidLicenseStateSelector = createSelector(
   sessionCheckedSelector,
   userNeedsToLoginSelector,
 
+  isInOfflineModeSelector,
   needToCheckProSubscriptionSelector,
   hasProSelector,
   hasLicenseSelector,
@@ -255,6 +367,7 @@ export const isInSomeValidLicenseStateSelector = createSelector(
     sessionChecked,
     needsToLogin,
 
+    isInOfflineMode,
     needToCheckProSubscription,
     hasPro,
     hasLicense,
@@ -262,10 +375,11 @@ export const isInSomeValidLicenseStateSelector = createSelector(
   ) => {
     return (
       applicationSettingsAreLoaded &&
-      sessionChecked &&
-      !needsToLogin &&
-      !needToCheckProSubscription &&
-      (hasPro || hasLicense || isInTrialMode)
+      (isInOfflineMode ||
+        (sessionChecked &&
+          !needsToLogin &&
+          !needToCheckProSubscription &&
+          (hasPro || hasLicense || isInTrialMode)))
     )
   }
 )

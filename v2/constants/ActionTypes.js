@@ -9,7 +9,6 @@ export const CHANGE_CURRENT_VIEW = 'CHANGE_CURRENT_VIEW'
 export const CHANGE_ORIENTATION = 'CHANGE_ORIENTATION'
 export const CHANGE_CURRENT_TIMELINE = 'CHANGE_CURRENT_TIMELINE'
 export const RESET = 'RESET'
-export const SET_DARK_MODE = 'SET_DARK_MODE'
 export const SET_CHARACTER_SORT = 'SET_CHARACTER_SORT'
 export const SET_PLACE_SORT = 'SET_PLACE_SORT'
 export const SET_NOTE_SORT = 'SET_NOTE_SORT'
@@ -254,10 +253,17 @@ export const SET_USER_ID = 'SET_USER_ID'
 export const SET_CLIENT_ID = 'SET_CLIENT_ID'
 export const SET_EMAIL_ADDRESS = 'SET_EMAIL_ADDRESS'
 export const SET_HAS_PRO = 'SET_HAS_PRO'
+export const SET_IS_ON_WEB = 'SET_IS_ON_WEB'
 // IMPORTANT: Please keep this up to date(!).  Impacts our ability to
 // track actual changes to the content of a file as apposed to system
 // data.
-export const CLIENT_ACTIONS = [SET_USER_ID, SET_CLIENT_ID, SET_EMAIL_ADDRESS, SET_HAS_PRO]
+export const CLIENT_ACTIONS = [
+  SET_USER_ID,
+  SET_CLIENT_ID,
+  SET_EMAIL_ADDRESS,
+  SET_HAS_PRO,
+  SET_IS_ON_WEB,
+]
 
 // action actions (for undo)
 export const RECORD_LAST_ACTION = 'RECORD_LAST_ACTION'

@@ -3,6 +3,7 @@ import {
   SET_CLIENT_ID,
   SET_EMAIL_ADDRESS,
   SET_HAS_PRO,
+  SET_IS_ON_WEB,
 } from '../constants/ActionTypes'
 
 const INITIAL_STATE = {
@@ -10,6 +11,7 @@ const INITIAL_STATE = {
   clientId: null,
   emailAddress: null,
   hasPro: null,
+  isOnWeb: null,
 }
 
 const clientReducer = (state = INITIAL_STATE, action) => {
@@ -34,6 +36,12 @@ const clientReducer = (state = INITIAL_STATE, action) => {
         ...state,
         hasPro: action.hasPro,
       }
+    case SET_IS_ON_WEB: {
+      return {
+        ...state,
+        isOnWeb: true,
+      }
+    }
     default:
       return state
   }
