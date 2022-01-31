@@ -1,8 +1,7 @@
 import { isEqual, get } from 'lodash'
-import { ARRAY_KEYS } from './array-keys'
-import { SYSTEM_REDUCER_KEYS } from '../reducers/systemReducers'
 
 import { permissionError } from '../actions/error'
+import { SYSTEM_REDUCER_KEYS } from '../reducers/systemReducers'
 
 const externalSync = (patch, withData) => (store) => (next) => (action) => {
   const result = next(action)
@@ -34,6 +33,7 @@ const externalSync = (patch, withData) => (store) => (next) => (action) => {
         key === 'actions'
       )
         return
+      if (SYSTEM_REDUCER_KEYS.indexOf(key) >= 0) return
       if (!get(present, 'project.selectedFile')) return
       const userPermission = present.project.selectedFile && present.project.selectedFile.permission
       if (userPermission !== 'owner' && userPermission !== 'collaborator') return
@@ -84,6 +84,7 @@ export const externalSyncWithoutHistory = (patch, withData) => (store) => (next)
         key === 'actions'
       )
         return
+      if (SYSTEM_REDUCER_KEYS.indexOf(key) >= 0) return
       if (!get(present, 'project.selectedFile')) return
       if (
         key === 'file' &&
