@@ -12,7 +12,6 @@ import SessionObserver from './session-observer'
 import ClientIdMinter from './client-id-minter'
 import FileListListener from './file-list-listener'
 import Renamer from './renamer'
-import SettingsConsistencyChecker from './settings-consistency-checker'
 import Upload from './upload'
 import Main from './Main'
 import { logger } from '../lib/logger'
@@ -102,7 +101,6 @@ const Root = ({ projectId }) => {
         ></script>
       </Head>
       <React.StrictMode>
-        <SettingsConsistencyChecker />
         <Renamer />
         <FileListListener />
         <SessionObserver />

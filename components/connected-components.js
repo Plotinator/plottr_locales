@@ -32,8 +32,6 @@ import {
   saveCustomTemplate,
 } from 'wired-up-firebase'
 import {
-  listTemplates,
-  listCustomTemplates,
   startSaveAsTemplate,
   messageToSaveNewTemplate,
   messageToEditTemplate,
@@ -269,10 +267,10 @@ const platform = {
   user: {
     get: () => {},
   },
-  os: 'unknown',
+  os: () => 'unknown',
   isDevelopment: process.env.NEXT_PUBLIC_NODE_ENV === 'development',
-  isWindows: false,
-  isMacOS: false,
+  isWindows: () => false,
+  isMacOS: () => false,
   openExternal: (url) => {
     const withProtocol = url.match(/^[a-z]+:\/\//) ? url : `https://${url}`
     window.open(withProtocol, '_blank')
@@ -471,3 +469,4 @@ export const FileLocation = components.FileLocation
 export const BookChooser = components.BookChooser
 export const TimelineWrapper = components.TimelineWrapper
 export const DashboardBody = components.DashboardBody
+export const DashboardNav = components.DashboardNav
