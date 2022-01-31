@@ -18,7 +18,8 @@ import prettydate from 'pretty-date'
 
 const oneDay = 1000 * 60 * 60 * 24
 
-const isPlottrCloudFile = (filePath) => (filePath && filePath.startsWith('plottr://')) || !filePath
+const isPlottrCloudFile = (file) =>
+  (file && (file.isCloudFile || (file.filePath && file.filePath.startsWith('plottr://')))) || !file
 
 const renderPermission = (permission) => {
   switch (permission) {
@@ -53,11 +54,7 @@ const markOffline = (files) => {
 }
 
 const formatFileName = (fileName, fileBasename, onFirebase, offline) => {
-  return offline
-    ? decodeURI(fileBasename.replace('.pltr', ''))
-    : onFirebase
-    ? fileName
-    : fileBasename.replace('.pltr', '')
+  return offline ? fileName : onFirebase ? fileName : fileBasename.replace('.pltr', '')
 }
 
 const RecentFilesConnector = (connector) => {
@@ -87,7 +84,14 @@ const RecentFilesConnector = (connector) => {
 
   const FileActions = UnconnectedFileActions(connector)
 
-  const RecentFiles = ({ fileList, isOffline, resuming, sortedKnownFiles, loadingFileList }) => {
+  const RecentFiles = ({
+    fileList,
+    isOffline,
+    resuming,
+    sortedKnownFiles,
+    loadingFileList,
+    isCloudFile,
+  }) => {
     const [searchTerm, setSearchTerm] = useState('')
     const [onlineSortedIds, onlineFilesById] = sortedKnownFiles
     const [sortedIds, setSortedIds] = useState(onlineSortedIds)
@@ -101,11 +105,12 @@ const RecentFilesConnector = (connector) => {
       sortedIds.forEach((id) => {
         if (!filesById[`${id}`]) return
 
-        const filePath = filesById[`${id}`].path
+        const file = filesById[`${id}`]
+        const filePath = file.path
         if (!filePath) {
           return
         }
-        if (isPlottrCloudFile(filePath)) {
+        if (isPlottrCloudFile(file)) {
           return
         }
         if (!doesFileExist(filePath)) {
@@ -145,14 +150,13 @@ const RecentFilesConnector = (connector) => {
 
     const renderRecents = () => {
       // TODO: if no files, show something different
-      if (loadingFileList) return <Spinner />
+      if (!isOffline && loadingFileList) return <Spinner />
       if (!sortedIds.length) return <span>{t('No files found.')}</span>
 
       const fileWithPermissionsExists = Object.values(filesById).some(
         ({ permission }) => permission
       )
 
-      // cloud files' lastOpened date comes from version ... do we need something better?
       const makeLastOpen = (fileObj) => {
         const todayIfInvalid = (date) => {
           if (isNaN(date.getTime())) {
@@ -199,7 +203,7 @@ const RecentFilesConnector = (connector) => {
         const f = filesById[`${id}`]
         if (!f) return null
 
-        const onFirebase = isPlottrCloudFile(f.path)
+        const onFirebase = isPlottrCloudFile(f)
         const lastOpen = makeLastOpen(f)
         const fileBasename = (!onFirebase && f.path && basename(f.path)) || ''
         let formattedPath = ''
@@ -220,7 +224,7 @@ const RecentFilesConnector = (connector) => {
         return (
           <Row
             key={idx}
-            onDoubleClick={() => openFile(f.path || f.id, id)}
+            onDoubleClick={() => (isCloudFile ? openFile(f.id, id) : openFile(f.path, id))}
             onClick={() => selectFile(selected ? null : id)}
             className={cx({ selected: selected })}
           >
@@ -266,7 +270,7 @@ const RecentFilesConnector = (connector) => {
         )
       })
 
-      return !loadingFileList && renderedFiles ? (
+      return (isOffline || !loadingFileList) && renderedFiles ? (
         <div className="dashboard__recent-files__table">
           <StickyTable leftStickyColumnCount={0}>
             <Row>
@@ -296,6 +300,7 @@ const RecentFilesConnector = (connector) => {
     resuming: PropTypes.bool,
     sortedKnownFiles: PropTypes.array.isRequired,
     loadingFileList: PropTypes.bool,
+    isCloudFile: PropTypes.bool,
   }
 
   const {
@@ -312,6 +317,7 @@ const RecentFilesConnector = (connector) => {
       resuming: selectors.isResumingSelector(state.present),
       sortedKnownFiles: selectors.sortedKnownFilesSelector(state.present),
       loadingFileList: selectors.fileListIsLoadingSelector(state.present),
+      isCloudFile: selectors.isCloudFileSelector(state.present),
     }))(RecentFiles)
   }
 

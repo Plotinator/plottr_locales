@@ -26,7 +26,7 @@ const AccountHomeConnector = (connector) => {
 
   const viewsToHideNav = ['proOnboarding', 'choice']
 
-  const AccountHome = ({ darkMode, settings, isFirstTime }) => {
+  const AccountHome = ({ settings, isFirstTime }) => {
     const [view, setView] = useState(isFirstTime ? 'choice' : 'account')
     const [viewIsLocked, setLock] = useState(false)
     const isOnboardingDone = settings.isOnboardingDone
@@ -34,10 +34,6 @@ const AccountHomeConnector = (connector) => {
     useEffect(() => {
       setLock(view == 'proOnboarding')
     }, [view])
-
-    useEffect(() => {
-      // if (!isOnboardingDone && hasCurrentProLicense) startOnboarding()
-    }, [isOnboardingDone, hasCurrentProLicense])
 
     const handleSelect = (selectedKey) => {
       if (viewIsLocked) return
@@ -55,19 +51,13 @@ const AccountHomeConnector = (connector) => {
     let body
     switch (view) {
       case 'choice':
-        body = <ChoiceView darkMode={darkMode} goToAccount={() => setView('account')} />
+        body = <ChoiceView goToAccount={() => setView('account')} />
         break
       case 'proOnboarding':
         body = <ProOnboarding cancel={cancelOnboarding} />
         break
       case 'account':
-        body = <Account darkMode={darkMode} startProOnboarding={startOnboarding} />
-        break
-      case 'settings':
-        body = <OptionsHome />
-        break
-      case 'backups':
-        body = <BackupsHome />
+        body = <Account startProOnboarding={startOnboarding} />
         break
       case 'about':
         body = <About />
@@ -81,12 +71,6 @@ const AccountHomeConnector = (connector) => {
           <Nav bsStyle="pills" activeKey={view} onSelect={handleSelect}>
             <NavItem eventKey="account" disabled={viewIsLocked}>
               {t('Account')}
-            </NavItem>
-            <NavItem eventKey="settings" disabled={viewIsLocked}>
-              {t('Settings')}
-            </NavItem>
-            <NavItem eventKey="backups" disabled={viewIsLocked}>
-              {t('Backups')}
             </NavItem>
             <NavItem eventKey="about" disabled={viewIsLocked}>
               {t('About')}
@@ -105,7 +89,6 @@ const AccountHomeConnector = (connector) => {
   }
 
   AccountHome.propTypes = {
-    darkMode: PropTypes.bool,
     settings: PropTypes.object.isRequired,
     isFirstTime: PropTypes.bool,
   }
