@@ -78,16 +78,8 @@ function Navigation({
     changeCurrentView(newLocation)
   }
 
-  const selectAccount = () => {
-    setDashboardView('account')
-  }
-
   const selectFiles = () => {
     setDashboardView('files')
-  }
-
-  const selectHelp = () => {
-    setDashboardView('help')
   }
 
   const resetDashboardView = () => {
@@ -167,19 +159,9 @@ function Navigation({
         </Nav>
         <Beamer inNavigation />
         <Nav pullRight className="project-nav__options">
-          <NavItem>
-            <Dropdown id="dashboard-dropdown-menu">
-              <Dropdown.Toggle noCaret bsSize="small">
-                <FaRegUser />
-              </Dropdown.Toggle>
-              <Dropdown.Menu>
-                <MenuItem onSelect={selectFiles}>{t('Projects')}</MenuItem>
-                <MenuItem onSelect={selectAccount}>{t('Account')}</MenuItem>
-                <MenuItem onSelect={selectHelp}>{t('Help')}</MenuItem>
-              </Dropdown.Menu>
-            </Dropdown>
+          <NavItem onClick={selectFiles}>
+            <FaRegUser />
           </NavItem>
-          <Share />
         </Nav>
       </Navbar>
     </>
