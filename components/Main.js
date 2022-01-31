@@ -25,6 +25,8 @@ const Main = ({
   isInTrialModeWithExpiredTrial,
   showDashboard,
   cantShowFile,
+  loadingState,
+  loadingProgress,
 }) => {
   const [dashboardClosed, setDashboardClosed] = useState(false)
   const [firstTimeBooting, setFirstTimeBooting] = useState(busyBooting)
@@ -82,6 +84,13 @@ const Main = ({
       <div id="temporary-inner">
         <div className="loading-splash">
           <img src="/logo_28_500.png" height="500" />
+          <h3>{loadingState}</h3>
+          <div className="loading-splash__progress">
+            <div
+              className="loading-splash__progress__bar"
+              style={{ width: `${loadingProgress}%` }}
+            />
+          </div>
         </div>
       </div>
     )
@@ -118,6 +127,8 @@ Main.propTypes = {
   isInTrialModeWithExpiredTrial: PropTypes.bool,
   showDashboard: PropTypes.bool,
   cantShowFile: PropTypes.bool,
+  loadingState: PropTypes.string.isRequired,
+  loadingProgress: PropTypes.number.isRequired,
 }
 
 export default connect((state) => ({
@@ -127,4 +138,6 @@ export default connect((state) => ({
   isInTrialModeWithExpiredTrial: selectors.isInTrialModeWithExpiredTrialSelector(state.present),
   showDashboard: selectors.showDashboardOnBootSelector(state.present),
   cantShowFile: selectors.cantShowFileSelector(state.present),
+  loadingState: selectors.loadingStateSelector(state.present),
+  loadingProgress: selectors.loadingProgressSelector(state.present),
 }))(Main)
