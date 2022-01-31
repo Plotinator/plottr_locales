@@ -264,3 +264,31 @@ input[type='file'] {
     width: 12px !important;
   }
 }
+
+#temporary-inner {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#temporary-inner img {
+  margin-top: 16px;
+}
+
+.loading-splash {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.loading-splash__progress {
+  width: 40vw;
+}
+
+.loading-splash__progress__bar {
+  position: relative;
+  height: 3px;
+  background: $orange;
+  transition: width 0.4s;
+}
