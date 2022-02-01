@@ -7,4 +7,3 @@ const Root = dynamic(() => import('../components/root'), {
 const Outline = (props) => <Root {...props} />
 
 export default Outline
-
