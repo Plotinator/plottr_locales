@@ -162,6 +162,7 @@ function Navigation({
           <NavItem onClick={selectFiles}>
             <FaRegUser />
           </NavItem>
+          <Share />
         </Nav>
       </Navbar>
     </>
