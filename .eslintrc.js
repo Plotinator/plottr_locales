@@ -24,6 +24,7 @@ module.exports = {
     },
   },
   ignorePatterns: [
+    '/.next/**',
     '/node_modules/**',
     '/build/**',
     '**/*.json',
