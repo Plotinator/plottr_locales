@@ -183,8 +183,8 @@ function mapStateToProps(state) {
   return {
     currentTimeline: selectors.currentTimelineSelector(state.present),
     bookIds: selectors.allBookIdsSelector(state.present),
-    currentView: state.present.ui.currentView,
-    darkMode: state.present.ui.darkMode,
+    currentView: selectors.currentViewSelector(state.present),
+    darkMode: selectors.isDarkModeSelector(state.present),
     userId: selectors.userIdSelector(state.present),
     selectedFile: selectors.selectedFileSelector(state.present),
   }
