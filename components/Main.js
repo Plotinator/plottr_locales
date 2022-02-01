@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { Router, Switch, Route } from 'react-router-dom'
 
 import { selectors } from 'pltr/v2'
+import { FullPageSpinner as Spinner } from 'connected-components'
 
 import Navigation from './navigation'
 import Project from './project'
@@ -19,6 +20,7 @@ import Dashboard from './Dashboard'
 import { history } from '../lib/history'
 
 const Main = ({
+  loadingFile,
   busyBooting,
   needsToLogin,
   isFirstTime,
@@ -96,6 +98,10 @@ const Main = ({
     )
   }
 
+  if (loadingFile) {
+    return <Spinner />
+  }
+
   if (cantShowFile || (showDashboard && !dashboardClosed)) {
     return <Dashboard closeDashboard={closeDashboard} />
   }
@@ -121,6 +127,7 @@ const Main = ({
 }
 
 Main.propTypes = {
+  loadingFile: PropTypes.bool,
   busyBooting: PropTypes.bool,
   needsToLogin: PropTypes.bool,
   isFirstTime: PropTypes.bool,
@@ -132,6 +139,7 @@ Main.propTypes = {
 }
 
 export default connect((state) => ({
+  loadingFile: selectors.loadingFileSelector(state.present),
   busyBooting: selectors.applicationIsBusyButFileCouldBeUnloadedSelector(state.present),
   needsToLogin: selectors.userNeedsToLoginSelector(state.present),
   isFirstTime: selectors.isFirstTimeSelector(state.present),
