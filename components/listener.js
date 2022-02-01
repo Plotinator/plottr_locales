@@ -32,7 +32,6 @@ const Listener = ({
   clientId,
   loadFile,
   darkMode,
-  actStructureIsOn,
   setBeatHierarchy,
   unsetBeatHierarchy,
   generalError,
@@ -129,12 +128,12 @@ const Listener = ({
   }, [selectedFile, userId, clientId])
 
   useEffect(() => {
-    if (settings.user.beatHierarchy && !actStructureIsOn) {
+    if (settings.user.beatHierarchy) {
       setBeatHierarchy()
-    } else if (!settings.user.beatHierarchy && actStructureIsOn) {
+    } else if (!settings.user.beatHierarchy) {
       unsetBeatHierarchy()
     }
-  }, [actStructureIsOn, setBeatHierarchy, unsetBeatHierarchy])
+  }, [setBeatHierarchy, unsetBeatHierarchy])
 
   useEffect(() => {
     if (userId) {
@@ -177,7 +176,6 @@ Listener.propTypes = {
   clientId: PropTypes.string,
   loadFile: PropTypes.func.isRequired,
   darkMode: PropTypes.bool,
-  actStructureIsOn: PropTypes.bool,
   checkedFileToLoad: PropTypes.bool,
   loadingFile: PropTypes.bool,
   setBeatHierarchy: PropTypes.func.isRequired,
@@ -194,7 +192,6 @@ export default connect(
     userId: selectors.userIdSelector(state.present),
     clientId: selectors.clientIdSelector(state.present),
     darkMode: selectors.isDarkModeSelector(state.present),
-    actStructureIsOn: selectors.beatHierarchyIsOn(state.present),
     checkedFileToLoad: selectors.checkedFileToLoadSelector(state.present),
     loadingFile: selectors.loadingFileSelector(state.present),
   }),
