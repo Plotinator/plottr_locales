@@ -7,4 +7,3 @@ const Root = dynamic(() => import('../components/root'), {
 const Characters = (props) => <Root {...props} />
 
 export default Characters
-

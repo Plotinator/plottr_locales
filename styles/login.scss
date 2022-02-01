@@ -6,7 +6,7 @@ $font-size: 20px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: hsl(60, 3%, 94%) url("/mountain_background.jpg");
+  background: hsl(60, 3%, 94%) url('/mountain_background.jpg');
   background-size: cover;
   background-blend-mode: overlay;
   height: 100vh;
@@ -63,11 +63,13 @@ $font-size: 20px;
   cursor: not-allowed;
 }
 
-.login__button:hover, .login__button:focus {
+.login__button:hover,
+.login__button:focus {
   color: white;
 }
 
-.login__logo {}
+.login__logo {
+}
 
 .login__switch-form-type-button {
   color: $orange;
@@ -87,7 +89,7 @@ $font-size: 20px;
   align-items: flex-start;
 }
 
-@import "firebase-ui-auth.css";
+@import 'firebase-ui-auth.css';
 
 #firebase-login {
   margin-top: 20px;

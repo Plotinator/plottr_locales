@@ -7,4 +7,3 @@ const Root = dynamic(() => import('../components/root'), {
 const Project = (props) => <Root {...props} />
 
 export default Project
-
