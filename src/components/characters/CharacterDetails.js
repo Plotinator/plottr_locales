@@ -6,7 +6,6 @@ import UnconnectedRichText from '../rce/RichText'
 import UnconnectedImage from '../images/Image'
 
 import { checkDependencies } from '../checkDependencies'
-import { cardCustomAttributeEditorPath } from '../../../../pltr/v2/helpers/editors'
 
 const CharacterDetailsConnector = (connector) => {
   const RichText = UnconnectedRichText(connector)
