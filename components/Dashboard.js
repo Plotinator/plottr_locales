@@ -36,6 +36,8 @@ Dashboard.propTypes = {
   closeDashboard: PropTypes.func.isRequired,
 }
 
-export default connect((state) => ({
-  darkMode: selectors.isDarkModeSelector(state.present),
-}))(Dashboard)
+export default React.memo(
+  connect((state) => ({
+    darkMode: selectors.isDarkModeSelector(state.present),
+  }))(Dashboard)
+)

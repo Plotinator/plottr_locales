@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { PropTypes } from 'prop-types'
 import { connect } from 'react-redux'
 import { Router, Switch, Route } from 'react-router-dom'
 
-import { selectors } from 'pltr/v2'
+import { selectors, actions } from 'pltr/v2'
 import { FullPageSpinner as Spinner } from 'connected-components'
 
 import Navigation from './navigation'
@@ -29,13 +29,23 @@ const Main = ({
   cantShowFile,
   loadingState,
   loadingProgress,
+  currentAppStateIsDashboard,
+  setCurrentAppStateToDashboard,
+  setCurrentAppStateToApplication,
 }) => {
   const [dashboardClosed, setDashboardClosed] = useState(false)
   const [firstTimeBooting, setFirstTimeBooting] = useState(busyBooting)
 
-  const closeDashboard = () => {
+  useEffect(() => {
+    if (showDashboard && !dashboardClosed) {
+      setCurrentAppStateToDashboard()
+    }
+  }, [dashboardClosed, setCurrentAppStateToDashboard, showDashboard])
+
+  const closeDashboard = useCallback(() => {
     setDashboardClosed(true)
-  }
+    setCurrentAppStateToApplication()
+  }, [])
 
   // A latch so that we only show initial loading splash once.
   useEffect(() => {
@@ -54,9 +64,10 @@ const Main = ({
       !needsToLogin &&
       !isFirstTime &&
       !isInTrialModeWithExpiredTrial &&
-      !(cantShowFile || (showDashboard && !dashboardClosed))
+      !(cantShowFile || ((currentAppStateIsDashboard || showDashboard) && !dashboardClosed))
     ) {
       closeDashboard()
+      setCurrentAppStateToDashboard()
     }
   }, [
     firstTimeBooting,
@@ -102,7 +113,7 @@ const Main = ({
     return <Spinner />
   }
 
-  if (cantShowFile || (showDashboard && !dashboardClosed)) {
+  if (cantShowFile || ((currentAppStateIsDashboard || showDashboard) && !dashboardClosed)) {
     return <Dashboard closeDashboard={closeDashboard} />
   }
 
@@ -136,16 +147,26 @@ Main.propTypes = {
   cantShowFile: PropTypes.bool,
   loadingState: PropTypes.string.isRequired,
   loadingProgress: PropTypes.number.isRequired,
+  currentAppStateIsDashboard: PropTypes.string.isRequired,
+  setCurrentAppStateToDashboard: PropTypes.func.isRequired,
+  setCurrentAppStateToApplication: PropTypes.func.isRequired,
 }
 
-export default connect((state) => ({
-  loadingFile: selectors.loadingFileSelector(state.present),
-  busyBooting: selectors.applicationIsBusyButFileCouldBeUnloadedSelector(state.present),
-  needsToLogin: selectors.userNeedsToLoginSelector(state.present),
-  isFirstTime: selectors.isFirstTimeSelector(state.present),
-  isInTrialModeWithExpiredTrial: selectors.isInTrialModeWithExpiredTrialSelector(state.present),
-  showDashboard: selectors.showDashboardOnBootSelector(state.present),
-  cantShowFile: selectors.cantShowFileSelector(state.present),
-  loadingState: selectors.loadingStateSelector(state.present),
-  loadingProgress: selectors.loadingProgressSelector(state.present),
-}))(Main)
+export default connect(
+  (state) => ({
+    loadingFile: selectors.loadingFileSelector(state.present),
+    busyBooting: selectors.applicationIsBusyButFileCouldBeUnloadedSelector(state.present),
+    needsToLogin: selectors.userNeedsToLoginSelector(state.present),
+    isFirstTime: selectors.isFirstTimeSelector(state.present),
+    isInTrialModeWithExpiredTrial: selectors.isInTrialModeWithExpiredTrialSelector(state.present),
+    showDashboard: selectors.showDashboardOnBootSelector(state.present),
+    cantShowFile: selectors.cantShowFileSelector(state.present),
+    loadingState: selectors.loadingStateSelector(state.present),
+    loadingProgress: selectors.loadingProgressSelector(state.present),
+    currentAppStateIsDashboard: selectors.currentAppStateIsDashboardSelector(state.present),
+  }),
+  {
+    setCurrentAppStateToDashboard: actions.client.setCurrentAppStateToDashboard,
+    setCurrentAppStateToApplication: actions.client.setCurrentAppStateToApplication,
+  }
+)(Main)
