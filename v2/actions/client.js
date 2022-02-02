@@ -4,6 +4,7 @@ import {
   SET_EMAIL_ADDRESS,
   SET_HAS_PRO,
   SET_IS_ON_WEB,
+  SET_CURRENT_APP_STATE,
 } from '../constants/ActionTypes'
 
 export const setUserId = (userId) => ({
@@ -29,3 +30,11 @@ export const setHasPro = (hasPro) => ({
 export const setIsOnWeb = () => ({
   type: SET_IS_ON_WEB,
 })
+
+export function setCurrentAppStateToDashboard() {
+  return { type: SET_CURRENT_APP_STATE, appState: 'dashboard' }
+}
+
+export function setCurrentAppStateToApplication() {
+  return { type: SET_CURRENT_APP_STATE, appState: 'app' }
+}
