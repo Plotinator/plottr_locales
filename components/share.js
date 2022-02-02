@@ -104,11 +104,14 @@ const Share = ({ userId, selectedFile, generalError }) => {
           </Table>
         </div>
       </PlottrModal>
-      <NavItem>
-        <Button onClick={() => setSharing(true)} title={t('Share')} bsSize="small">
-          <IoIosShareAlt />
-        </Button>
-      </NavItem>
+      <Button
+        className="project-nav__share-button"
+        onClick={() => setSharing(true)}
+        title={t('Share')}
+        bsSize="small"
+      >
+        <IoIosShareAlt />
+      </Button>
     </>
   )
 }
