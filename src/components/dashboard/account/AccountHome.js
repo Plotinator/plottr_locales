@@ -1,9 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'react-proptypes'
-import { Nav, NavItem } from 'react-bootstrap'
-import { t } from 'plottr_locales'
 
-import UnconnectedAbout from './About'
 import UnconnectedAccount from './Account'
 import UnconnectedProOnboarding from './proOnboarding/index'
 import UnconnectedChoiceView from './ChoiceView'
@@ -15,25 +12,12 @@ const AccountHomeConnector = (connector) => {
   } = connector
   checkDependencies({ mpq })
 
-  const About = UnconnectedAbout(connector)
   const Account = UnconnectedAccount(connector)
   const ProOnboarding = UnconnectedProOnboarding(connector)
   const ChoiceView = UnconnectedChoiceView(connector)
 
-  const viewsToHideNav = ['proOnboarding', 'choice']
-
-  const AccountHome = ({ settings, isFirstTime }) => {
+  const AccountHome = ({ isFirstTime }) => {
     const [view, setView] = useState(isFirstTime ? 'choice' : 'account')
-    const [viewIsLocked, setLock] = useState(false)
-
-    useEffect(() => {
-      setLock(view == 'proOnboarding')
-    }, [view])
-
-    const handleSelect = (selectedKey) => {
-      if (viewIsLocked) return
-      setView(selectedKey)
-    }
 
     const startOnboarding = () => {
       setView('proOnboarding')
@@ -54,33 +38,9 @@ const AccountHomeConnector = (connector) => {
       case 'account':
         body = <Account startProOnboarding={startOnboarding} />
         break
-      case 'about':
-        body = <About />
-        break
     }
 
-    const AccountNav = () => {
-      if (viewsToHideNav.includes(view)) return null
-      return (
-        <div className="dashboard__account__nav-tabs">
-          <Nav bsStyle="pills" activeKey={view} onSelect={handleSelect}>
-            <NavItem eventKey="account" disabled={viewIsLocked}>
-              {t('Account')}
-            </NavItem>
-            <NavItem eventKey="about" disabled={viewIsLocked}>
-              {t('About')}
-            </NavItem>
-          </Nav>
-        </div>
-      )
-    }
-
-    return (
-      <div className="dashboard__account">
-        <AccountNav />
-        {body}
-      </div>
-    )
+    return <div className="dashboard__account">{body}</div>
   }
 
   AccountHome.propTypes = {
