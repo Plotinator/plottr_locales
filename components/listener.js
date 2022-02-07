@@ -5,7 +5,6 @@ import { isEqual } from 'lodash'
 
 import { actions, selectors } from 'pltr/v2'
 import { listen, stopListening, listenToCustomTemplates } from 'wired-up-firebase'
-import { settings } from '../lib/settings'
 import { store } from '../lib/redux'
 import { closeDashboard, openDashboard } from '../lib/dashboard'
 import { setCurrentProject, currentProject } from '../lib/currentProject'
@@ -43,6 +42,7 @@ const Listener = ({
   startLoadingFile,
   finishLoadingFile,
   loadingFile,
+  settings,
 }) => {
   const [unsubscribeFunctions, setUnsubscribeFunctions] = useState([])
 
@@ -178,6 +178,7 @@ Listener.propTypes = {
   darkMode: PropTypes.bool,
   checkedFileToLoad: PropTypes.bool,
   loadingFile: PropTypes.bool,
+  settings: PropTypes.object.isRequired,
   setBeatHierarchy: PropTypes.func.isRequired,
   unsetBeatHierarchy: PropTypes.func.isRequired,
   setCustomTemplates: PropTypes.func.isrequired,
@@ -194,6 +195,7 @@ export default connect(
     darkMode: selectors.isDarkModeSelector(state.present),
     checkedFileToLoad: selectors.checkedFileToLoadSelector(state.present),
     loadingFile: selectors.loadingFileSelector(state.present),
+    settings: selectors.appSettingsSelector(state.present),
   }),
   {
     setPermission: actions.permission.setPermission,
