@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'react-proptypes'
 import { t, setupI18n } from 'plottr_locales'
 import { HelpBlock, Button, Tabs, Tab } from 'react-bootstrap'
@@ -37,6 +37,10 @@ const OptionsHomeConnector = (connector) => {
 
   const OptionsHome = ({ hasCurrentProLicense, settings }) => {
     const [activeTab, setActiveTab] = useState(1)
+
+    useEffect(() => {
+      setupI18n(settings, { electron })
+    }, [settings.locale])
 
     const osIsUnknown = os() === 'unknown'
 
@@ -97,8 +101,7 @@ const OptionsHomeConnector = (connector) => {
                 <LanguagePicker
                   onSelectLanguage={(newLanguage) => {
                     saveAppSetting('locale', newLanguage)
-                    setupI18n(settings, { electron })
-                    updateLanguage(newLanguage)
+                    updateLanguage(settings.locale)
                   }}
                 />
               </div>
