@@ -827,6 +827,9 @@
 	"Open Existing File": {
 		"message": "Vorhandene Datei öffnen"
 	},
+	"Open Existing File": {
+		"message": "Vorhandene Datei öffnen"
+	},
 	"Open a Plottr Document": {
 		"message": "Plottr-Dokument öffnen"
 	},
