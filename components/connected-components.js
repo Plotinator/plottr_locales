@@ -228,7 +228,7 @@ const platform = {
     },
   },
   updateLanguage: (newLanguage) => {
-    // Nop: This is handled adequately by OptionsHome.
+    window.location.reload()
   },
   updateBeatHierarchyFlag: (newValue) => {
     if (newValue) {
