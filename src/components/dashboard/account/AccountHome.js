@@ -16,14 +16,18 @@ const AccountHomeConnector = (connector) => {
   const ProOnboarding = UnconnectedProOnboarding(connector)
   const ChoiceView = UnconnectedChoiceView(connector)
 
-  const AccountHome = ({ isFirstTime }) => {
-    const [view, setView] = useState(isFirstTime ? 'choice' : 'account')
+  const AccountHome = ({ isFirstTime, isOnboarding, startProOnboarding, finishProOnboarding }) => {
+    const [view, setView] = useState(
+      isOnboarding ? 'proOnboarding' : isFirstTime ? 'choice' : 'account'
+    )
 
     const startOnboarding = () => {
+      startProOnboarding()
       setView('proOnboarding')
     }
 
     const cancelOnboarding = () => {
+      finishProOnboarding()
       setView('account')
     }
 
@@ -44,23 +48,28 @@ const AccountHomeConnector = (connector) => {
   }
 
   AccountHome.propTypes = {
-    settings: PropTypes.object.isRequired,
     isFirstTime: PropTypes.bool,
+    isOnboarding: PropTypes.bool,
+    startProOnboarding: PropTypes.func.isRequired,
+    finishProOnboarding: PropTypes.func.isRequired,
   }
 
   const {
     redux,
-    pltr: { selectors },
+    pltr: { selectors, actions },
   } = connector
 
   if (redux) {
     const { connect } = redux
     return connect(
       (state) => ({
-        settings: selectors.appSettingsSelector(state.present),
         isFirstTime: selectors.isFirstTimeSelector(state.present),
+        isOnboarding: selectors.isOnboardingToProSelector(state.present),
       }),
-      {}
+      {
+        startProOnboarding: actions.applicationState.startProOnboarding,
+        finishProOnboarding: actions.applicationState.finishProOnboarding,
+      }
     )(AccountHome)
   }
 
