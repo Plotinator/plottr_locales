@@ -7,11 +7,15 @@ import { VscChromeClose } from 'react-icons/vsc'
 import { selectors } from 'pltr/v2'
 import { DashboardBody, DashboardNav } from 'connected-components'
 
-const Dashboard = ({ darkMode, closeDashboard }) => {
+const Dashboard = ({ darkMode, closeDashboard, ignoreSignalsToClose }) => {
   const [activeView, setActiveView] = useState('files')
 
   useEffect(() => {
-    const closeListener = document.addEventListener('close-dashboard', closeDashboard)
+    const closeListener = document.addEventListener('close-dashboard', () => {
+      if (!ignoreSignalsToClose) {
+        closeDashboard()
+      }
+    })
     return () => {
       document.removeEventListener('close-dashboard', closeListener)
     }
@@ -33,6 +37,7 @@ const Dashboard = ({ darkMode, closeDashboard }) => {
 
 Dashboard.propTypes = {
   darkMode: PropTypes.bool,
+  ignoreSignalsToClose: PropTypes.bool,
   closeDashboard: PropTypes.func.isRequired,
 }
 

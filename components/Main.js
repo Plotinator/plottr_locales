@@ -114,7 +114,12 @@ const Main = ({
   }
 
   if (cantShowFile || ((currentAppStateIsDashboard || showDashboard) && !dashboardClosed)) {
-    return <Dashboard closeDashboard={closeDashboard} />
+    return (
+      <Dashboard
+        closeDashboard={closeDashboard}
+        ignoreSignalsToClose={showDashboard && !dashboardClosed}
+      />
+    )
   }
 
   return (
