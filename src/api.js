@@ -3,7 +3,7 @@ import axios from 'axios'
 import { DateTime, Duration } from 'luxon'
 import { isEqual } from 'lodash'
 
-import { actions, ARRAY_KEYS } from 'pltr/v2'
+import { actions, selectors, ARRAY_KEYS } from 'pltr/v2'
 
 /**
  * auth, database and storage should be thunks that produce instances
@@ -784,7 +784,8 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
   const saveBackup = (userId, file) => {
     const startOfToday = DateTime.now().startOf('day').toJSDate()
     const lastModified = new Date()
-    const fileId = file.project.selectedFile.id
+    const fileId = selectors.fileIdSelector(file)
+    const fileName = selectors.fileNameSelector(file)
 
     return startOfSessionBackup(userId, file, startOfToday, fileId).then((startOfSession) => {
       // Is there a backup for the start of today?
@@ -803,6 +804,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
                 .doc(`backup/${userId}/files/${documentRef.id}`)
                 .update({
                   ...document,
+                  fileName,
                   storagePath: path,
                   lastModified: new Date(),
                 })
@@ -815,7 +817,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
               storagePath: path,
               startOfSession: false,
               fileId,
-              fileName: file.project.selectedFile.fileName,
+              fileName,
               lastModified: new Date(),
             })
           })
@@ -827,7 +829,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
           backupTime: startOfToday,
           fileId,
           storagePath: path,
-          fileName: file.project.selectedFile.fileName,
+          fileName,
           startOfSession: true,
           lastModified: new Date(),
         })
@@ -864,7 +866,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
   }
 
   const backupToStorage = (userId, file, date, startOfSession) => {
-    const fileId = file.project.selectedFile.id
+    const fileId = selectors.fileIdSelector(file)
     const filePath = toBackupPath(userId, fileId, date, startOfSession)
     const storageTask = storage()
       .ref()
