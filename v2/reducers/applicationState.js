@@ -21,6 +21,11 @@ import {
   FINISH_DELETING_FILE,
   START_CHECKING_FILE_TO_LOAD,
   FINISH_CHECKING_FILE_TO_LOAD,
+  ADVANCE_PRO_ONBOARDING,
+  START_ONBOARDING,
+  FINISH_ONBOARDING,
+  START_SAVING_FILE_AS,
+  FINISH_SAVING_FILE_AS,
 } from '../constants/ActionTypes'
 
 const INITIAL_STATE = {
@@ -37,6 +42,7 @@ const INITIAL_STATE = {
     fileLoaded: false,
     renamingFile: false,
     deletingFile: false,
+    savingFileAs: false,
   },
   session: {
     loggingIn: false,
@@ -56,6 +62,10 @@ const INITIAL_STATE = {
     settingsLoaded: false,
     loadingExportConfig: false,
     exportConfigLoaded: false,
+  },
+  proOnboarding: {
+    isOnboarding: false,
+    onboardingStep: null,
   },
 }
 
@@ -288,6 +298,24 @@ const applicationStateReducer = (state = INITIAL_STATE, action) => {
         },
       }
     }
+    case START_SAVING_FILE_AS: {
+      return {
+        ...state,
+        file: {
+          ...state.file,
+          savingFileAs: true,
+        },
+      }
+    }
+    case FINISH_SAVING_FILE_AS: {
+      return {
+        ...state,
+        file: {
+          ...state.file,
+          savingFileAs: false,
+        },
+      }
+    }
     case START_LOGGING_IN: {
       return {
         ...state,
@@ -354,6 +382,50 @@ const applicationStateReducer = (state = INITIAL_STATE, action) => {
         ...state,
         settings: {
           ...finishLoadingSettingsType(state.settings, action.settingsType),
+        },
+      }
+    }
+    case ADVANCE_PRO_ONBOARDING: {
+      if (!state.proOnboarding.isOnboarding) {
+        return state
+      }
+      const onboardingStep = state.proOnboarding.onboardingStep
+        ? state.proOnboarding.onboardingStep
+        : 0
+      return {
+        ...state,
+        proOnboarding: {
+          ...state.proOnboarding,
+          onboardingStep: onboardingStep + 1,
+        },
+      }
+    }
+    case START_ONBOARDING: {
+      if (state.proOnboarding.isOnboarding) {
+        return state
+      }
+      return {
+        ...state,
+        proOnboarding: {
+          ...state.proOnboarding,
+          isOnboarding: true,
+        },
+        license: {
+          ...state.license,
+          checkingProSubscription: false,
+          proSubscriptionChecked: false,
+        },
+      }
+    }
+    case FINISH_ONBOARDING: {
+      if (!state.proOnboarding.isOnboarding) {
+        return state
+      }
+      return {
+        ...state,
+        proOnboarding: {
+          ...state.proOnboarding,
+          isOnboarding: false,
         },
       }
     }

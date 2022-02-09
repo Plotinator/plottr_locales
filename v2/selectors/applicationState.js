@@ -4,9 +4,12 @@ import { hasLicenseSelector, isInTrialModeSelector } from './license'
 import {
   isCloudFileSelector,
   isOfflineSelector,
+  isResumingSelector,
   loadingFileSelector as deprecatedLoadingFileSelector,
 } from './project'
 import { shouldBeInProSelector } from './shouldBeInPro'
+
+export { shouldBeInProSelector }
 
 export const applicationStateSelector = (state) => state.applicationState
 
@@ -77,6 +80,10 @@ export const deletingFileSelector = createSelector(
   fileStateSelector,
   ({ deletingFile }) => deletingFile
 )
+export const savingFileAsSelector = createSelector(
+  fileStateSelector,
+  ({ savingFileAs }) => savingFileAs
+)
 
 export const sessionStateSelector = createSelector(
   applicationStateSelector,
@@ -120,6 +127,19 @@ export const checkingProSubscriptionSelector = createSelector(
   ({ checkingProSubscription }) => checkingProSubscription
 )
 
+export const proOnboardingStateSelector = createSelector(
+  applicationStateSelector,
+  ({ proOnboarding }) => proOnboarding
+)
+export const currentProOnboardingStepSelector = createSelector(
+  proOnboardingStateSelector,
+  ({ onboardingStep }) => onboardingStep
+)
+export const isOnboardingToProSelector = createSelector(
+  proOnboardingStateSelector,
+  ({ isOnboarding }) => isOnboarding
+)
+
 export const needToCheckProSubscriptionSelector = createSelector(
   shouldBeInProSelector,
   checkedProSubscriptionSelector,
@@ -145,21 +165,33 @@ const checkingWhatToLoadOrNeedToCheckWhatToLoadSelector = createSelector(
   }
 )
 
-const manipulatingAFileSelector = createSelector(
+export const manipulatingAFileSelector = createSelector(
   isRenamingFileSelector,
   creatingCloudFileSelector,
   uploadingFileToCloudSelector,
   deletingFileSelector,
-  (isRenamingFile, creatingCloudFile, uploadingFileToCloud, deletingFile) => {
-    return isRenamingFile || creatingCloudFile || uploadingFileToCloud || deletingFile
+  savingFileAsSelector,
+  (isRenamingFile, creatingCloudFile, uploadingFileToCloud, deletingFile, savingFileAs) => {
+    return (
+      isRenamingFile || creatingCloudFile || uploadingFileToCloud || deletingFile || savingFileAs
+    )
+  }
+)
+
+export const isInOfflineModeSelector = createSelector(
+  isOfflineSelector,
+  shouldBeInProSelector,
+  (isOffline, shouldBeInPro) => {
+    return isOffline && shouldBeInPro
   }
 )
 
 const checkingSessionOrNeedToCheckSessionSelector = createSelector(
   sessionCheckedSelector,
   checkingSessionSelector,
-  (sessionChecked, checkingSession) => {
-    return checkingSession || !sessionChecked
+  isInOfflineModeSelector,
+  (sessionChecked, checkingSession, isInOfflineMode) => {
+    return !isInOfflineMode && (checkingSession || !sessionChecked)
   }
 )
 
@@ -197,14 +229,6 @@ export const applicationIsBusyAndUninterruptableSelector = createSelector(
       !checkedLicense ||
       !checkedTrial
     )
-  }
-)
-
-export const isInOfflineModeSelector = createSelector(
-  isOfflineSelector,
-  shouldBeInProSelector,
-  (isOffline, shouldBeInPro) => {
-    return isOffline && shouldBeInPro
   }
 )
 
@@ -388,7 +412,8 @@ export const cantShowFileSelector = createSelector(
   fileIsLoadedSelector,
   hasProSelector,
   isCloudFileSelector,
-  (fileLoaded, hasActiveProSubscription, selectedFileIsACloudFile) => {
-    return !fileLoaded || !!hasActiveProSubscription !== !!selectedFileIsACloudFile
+  isResumingSelector,
+  (fileLoaded, hasActiveProSubscription, selectedFileIsACloudFile, isResuming) => {
+    return !isResuming && (!fileLoaded || !!hasActiveProSubscription !== !!selectedFileIsACloudFile)
   }
 )
