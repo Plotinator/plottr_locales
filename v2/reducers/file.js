@@ -24,11 +24,13 @@ const file =
         !stateWithoutTimeStamp.timeStamp ||
         (SYSTEM_REDUCER_ACTION_TYPES.indexOf(action.type) === -1 &&
           !stateWithoutTimeStamp.isResuming))
-    const state = stateWithoutTimeStamp && {
-      ...stateWithoutTimeStamp,
-      timeStamp: shouldUpdateTimestamp ? new Date() : stateWithoutTimeStamp.timeStamp,
-      versionStamp: shouldUpdateTimestamp ? uuidv4() : stateWithoutTimeStamp.versionStamp,
-    }
+    const state =
+      (stateWithoutTimeStamp && {
+        ...stateWithoutTimeStamp,
+        timeStamp: shouldUpdateTimestamp ? new Date() : stateWithoutTimeStamp.timeStamp,
+        versionStamp: shouldUpdateTimestamp ? uuidv4() : stateWithoutTimeStamp.versionStamp,
+      }) ||
+      defaultFile
     switch (action.type) {
       case FILE_LOADED:
         return {
