@@ -19,14 +19,18 @@ const file =
   (dataRepairers) =>
   (stateWithoutTimeStamp = defaultFile, action) => {
     const shouldUpdateTimestamp =
-      !stateWithoutTimeStamp.versionStamp ||
-      !stateWithoutTimeStamp.timeStamp ||
-      (SYSTEM_REDUCER_ACTION_TYPES.indexOf(action.type) === -1 && !stateWithoutTimeStamp.isResuming)
-    const state = {
-      ...stateWithoutTimeStamp,
-      timeStamp: shouldUpdateTimestamp ? new Date() : stateWithoutTimeStamp.timeStamp,
-      versionStamp: shouldUpdateTimestamp ? uuidv4() : stateWithoutTimeStamp.versionStamp,
-    }
+      stateWithoutTimeStamp &&
+      (!stateWithoutTimeStamp.versionStamp ||
+        !stateWithoutTimeStamp.timeStamp ||
+        (SYSTEM_REDUCER_ACTION_TYPES.indexOf(action.type) === -1 &&
+          !stateWithoutTimeStamp.isResuming))
+    const state =
+      (stateWithoutTimeStamp && {
+        ...stateWithoutTimeStamp,
+        timeStamp: shouldUpdateTimestamp ? new Date() : stateWithoutTimeStamp.timeStamp,
+        versionStamp: shouldUpdateTimestamp ? uuidv4() : stateWithoutTimeStamp.versionStamp,
+      }) ||
+      defaultFile
     switch (action.type) {
       case FILE_LOADED:
         return {
