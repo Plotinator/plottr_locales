@@ -14,23 +14,22 @@ import {
 } from '../constants/ActionTypes'
 import { file as defaultFile } from '../store/initialState'
 import { SYSTEM_REDUCER_ACTION_TYPES } from './systemReducers'
+import LoadActions from '../constants/loadActions'
 
 const file =
   (dataRepairers) =>
   (stateWithoutTimeStamp = defaultFile, action) => {
-    const shouldUpdateTimestamp =
-      stateWithoutTimeStamp &&
-      (!stateWithoutTimeStamp.versionStamp ||
-        !stateWithoutTimeStamp.timeStamp ||
-        (SYSTEM_REDUCER_ACTION_TYPES.indexOf(action.type) === -1 &&
-          !stateWithoutTimeStamp.isResuming))
-    const state =
-      (stateWithoutTimeStamp && {
-        ...stateWithoutTimeStamp,
-        timeStamp: shouldUpdateTimestamp ? new Date() : stateWithoutTimeStamp.timeStamp,
-        versionStamp: shouldUpdateTimestamp ? uuidv4() : stateWithoutTimeStamp.versionStamp,
-      }) ||
-      defaultFile
+    const shouldNotUpdateTimestamp =
+      action.type.startsWith('@') ||
+      action.type === 'FILE_LOADED' ||
+      LoadActions.indexOf(action.type) !== -1 ||
+      SYSTEM_REDUCER_ACTION_TYPES.indexOf(action.type) !== -1 ||
+      stateWithoutTimeStamp.isResuming
+    const state = {
+      ...stateWithoutTimeStamp,
+      timeStamp: shouldNotUpdateTimestamp ? stateWithoutTimeStamp.timeStamp : new Date(),
+      versionStamp: shouldNotUpdateTimestamp ? stateWithoutTimeStamp.versionStamp : uuidv4(),
+    }
     switch (action.type) {
       case FILE_LOADED:
         return {
