@@ -35,7 +35,7 @@ const OptionsHomeConnector = (connector) => {
   const DarkOptionsSelect = UnconnectedDarkOptionsSelect(connector)
   const BackupOptions = UnconnectedBackupOptions(connector)
 
-  const OptionsHome = ({ hasCurrentProLicense, settings }) => {
+  const OptionsHome = ({ hasCurrentProLicense, settings, shouldBeInPro }) => {
     const [activeTab, setActiveTab] = useState(1)
 
     useEffect(() => {
@@ -58,6 +58,11 @@ const OptionsHomeConnector = (connector) => {
       const newValue = !settings.user.beatHierarchy
       saveAppSetting('user.beatHierarchy', newValue)
       updateBeatHierarchyFlag(newValue)
+    }
+
+    const toggleEnableOfflineMode = () => {
+      const newValue = !settings.user.enableOfflineMode
+      saveAppSetting('user.enableOfflineMode', newValue)
     }
 
     // show if:
@@ -188,6 +193,24 @@ const OptionsHomeConnector = (connector) => {
                   </Button>
                 </p>
               </div>
+              {!osIsUnknown && shouldBeInPro ? (
+                <div className="dashboard__options__item">
+                  <h4>{t('Offline Mode')}</h4>
+                  <Switch
+                    isOn={!!settings.user.enableOfflineMode}
+                    handleToggle={toggleEnableOfflineMode}
+                    labelText={t('Continue working when your connection goes down.')}
+                  />
+                  <br />
+                  <p>
+                    {t('To give feedback on this feature, please visit:')}
+                    <br />
+                    <Button bsStyle="link" onClick={() => openExternal('https://plottr.com/beta/')}>
+                      {t('plottr.com/beta')}
+                    </Button>
+                  </p>
+                </div>
+              ) : null}
             </Tab>
           </Tabs>
         </div>
@@ -198,6 +221,7 @@ const OptionsHomeConnector = (connector) => {
   OptionsHome.propTypes = {
     hasCurrentProLicense: PropTypes.bool,
     settings: PropTypes.object.isRequired,
+    shouldBeInPro: PropTypes.bool,
   }
 
   const {
@@ -212,6 +236,7 @@ const OptionsHomeConnector = (connector) => {
       return {
         hasCurrentProLicense: selectors.hasProSelector(state.present),
         settings: selectors.appSettingsSelector(state.present),
+        shouldBeInPro: selectors.shouldBeInProSelector(state.present),
       }
     })(OptionsHome)
   }
