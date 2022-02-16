@@ -133,7 +133,14 @@ const CardCellConnector = (connector) => {
         // dropped in from a different beat
         newOrder = currentIds
         if (Array.isArray(id) || id.length > 1) {
-          newOrder = id.concat(currentIds)
+          if (positionWithinLine) {
+            newOrder = currentIds
+              .slice(0, positionWithinLine)
+              .concat(id)
+              .concat(currentIds.slice(positionWithinLine))
+          } else {
+            newOrder = id.concat(currentIds)
+          }
         } else {
           newOrder.splice(positionWithinLine, 0, id)
         }
