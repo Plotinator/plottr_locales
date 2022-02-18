@@ -56,6 +56,15 @@ function Navigation({
   }, [])
 
   useEffect(() => {
+    const listener = document.addEventListener('force-close-dashboard', () => {
+      setDashboardView(null)
+    })
+    return () => {
+      document.removeEventListener('force-close-dashboard', listener)
+    }
+  }, [])
+
+  useEffect(() => {
     const listener = document.addEventListener('open-dashboard', (event) => {
       setDashboardView(event.dashboardTab)
     })
