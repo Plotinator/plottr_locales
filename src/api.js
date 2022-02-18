@@ -3,8 +3,7 @@ import axios from 'axios'
 import { DateTime, Duration } from 'luxon'
 import { isEqual } from 'lodash'
 
-import { actions, selectors, ARRAY_KEYS } from 'pltr/v2'
-import { SYSTEM_REDUCER_KEYS } from '../../pltr/v2/reducers/systemReducers'
+import { SYSTEM_REDUCER_KEYS, actions, selectors, ARRAY_KEYS } from 'pltr/v2'
 
 /**
  * auth, database and storage should be thunks that produce instances
