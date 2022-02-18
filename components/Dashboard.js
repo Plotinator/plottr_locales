@@ -19,7 +19,16 @@ const Dashboard = ({ darkMode, closeDashboard, ignoreSignalsToClose }) => {
     return () => {
       document.removeEventListener('close-dashboard', closeListener)
     }
-  }, [])
+  }, [ignoreSignalsToClose, closeDashboard])
+
+  useEffect(() => {
+    const closeListener = document.addEventListener('force-close-dashboard', () => {
+      closeDashboard()
+    })
+    return () => {
+      document.removeEventListener('force-close-dashboard', closeListener)
+    }
+  }, [closeDashboard])
 
   return (
     <div id="dashboard__react__root">

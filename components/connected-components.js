@@ -52,7 +52,7 @@ import {
   sortAndSearch,
 } from '../lib/files'
 import { createErrorReport } from '../lib/createErrorReport'
-import { closeDashboard } from '../lib/dashboard'
+import { closeDashboard, forceCloseDashboard } from '../lib/dashboard'
 import { userHasPro } from '../lib/checkPro'
 import MPQ from '../lib/MPQ'
 import { resizeImage } from '../lib/resizeImage'
@@ -148,7 +148,7 @@ const platform = {
           store.dispatch(actions.applicationState.finishLoadingFile())
           store.dispatch(actions.project.showLoader(false))
           setCurrentProject(fileId)
-          closeDashboard()
+          forceCloseDashboard()
           logger.info(`Opened file: ${fileId}`)
         })
         .catch((error) => {
