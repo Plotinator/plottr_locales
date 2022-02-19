@@ -26,6 +26,7 @@ import {
   FINISH_ONBOARDING,
   START_SAVING_FILE_AS,
   FINISH_SAVING_FILE_AS,
+  START_ONBOARDING_FROM_ROOT,
 } from '../constants/ActionTypes'
 
 const INITIAL_STATE = {
@@ -65,6 +66,7 @@ const INITIAL_STATE = {
   },
   proOnboarding: {
     isOnboarding: false,
+    isOnboardingFromRoot: false,
     onboardingStep: null,
   },
 }
@@ -386,7 +388,7 @@ const applicationStateReducer = (state = INITIAL_STATE, action) => {
       }
     }
     case ADVANCE_PRO_ONBOARDING: {
-      if (!state.proOnboarding.isOnboarding) {
+      if (!state.proOnboarding.isOnboarding && !state.proOnboarding.isOnboardingFromRoot) {
         return state
       }
       const onboardingStep = state.proOnboarding.onboardingStep
@@ -401,7 +403,7 @@ const applicationStateReducer = (state = INITIAL_STATE, action) => {
       }
     }
     case START_ONBOARDING: {
-      if (state.proOnboarding.isOnboarding) {
+      if (state.proOnboarding.isOnboarding || state.proOnboarding.isOnboardingFromRoot) {
         return state
       }
       return {
@@ -409,6 +411,7 @@ const applicationStateReducer = (state = INITIAL_STATE, action) => {
         proOnboarding: {
           ...state.proOnboarding,
           isOnboarding: true,
+          onboardingStep: 0,
         },
         license: {
           ...state.license,
@@ -417,8 +420,29 @@ const applicationStateReducer = (state = INITIAL_STATE, action) => {
         },
       }
     }
+    case START_ONBOARDING_FROM_ROOT: {
+      if (state.proOnboarding.isOnboardingFromRoot || state.proOnboarding.isOnboardingFromRoot) {
+        return state
+      }
+      return {
+        ...state,
+        proOnboarding: {
+          ...state.proOnboarding,
+          isOnboardingFromRoot: true,
+          onboardingStep: 0,
+        },
+        license: {
+          ...state.license,
+          checkingProSubscription: false,
+          proSubscriptionChecked: false,
+        },
+      }
+    }
+    default: {
+      return state
+    }
     case FINISH_ONBOARDING: {
-      if (!state.proOnboarding.isOnboarding) {
+      if (!state.proOnboarding.isOnboarding && !state.proOnboarding.isOnboardingFromRoot) {
         return state
       }
       return {
@@ -426,11 +450,9 @@ const applicationStateReducer = (state = INITIAL_STATE, action) => {
         proOnboarding: {
           ...state.proOnboarding,
           isOnboarding: false,
+          isOnboardingFromRoot: false,
         },
       }
-    }
-    default: {
-      return state
     }
   }
 }

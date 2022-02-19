@@ -1,6 +1,11 @@
 import { createSelector } from 'reselect'
 import { hasProSelector, isLoggedInSelector } from './client'
-import { hasLicenseSelector, isInTrialModeSelector } from './license'
+import {
+  hasLicenseSelector,
+  isFirstTimeSelector,
+  isInTrialModeSelector,
+  isInTrialModeWithExpiredTrialSelector,
+} from './license'
 import {
   isCloudFileSelector,
   isOfflineSelector,
@@ -140,6 +145,10 @@ export const isOnboardingToProSelector = createSelector(
   proOnboardingStateSelector,
   ({ isOnboarding }) => isOnboarding
 )
+export const isOnboardingToProFromRootSelector = createSelector(
+  proOnboardingStateSelector,
+  ({ isOnboardingFromRoot }) => isOnboardingFromRoot
+)
 
 export const needToCheckProSubscriptionSelector = createSelector(
   shouldBeInProSelector,
@@ -235,6 +244,8 @@ export const applicationIsBusyAndUninterruptableSelector = createSelector(
 )
 
 export const applicationIsBusyButFileCouldBeUnloadedSelector = createSelector(
+  isFirstTimeSelector,
+  isInTrialModeWithExpiredTrialSelector,
   checkingWhatToLoadOrNeedToCheckWhatToLoadSelector,
   loadingFileSelector,
   manipulatingAFileSelector,
@@ -247,6 +258,8 @@ export const applicationIsBusyButFileCouldBeUnloadedSelector = createSelector(
   checkedLicenseSelector,
   checkedTrialSelector,
   (
+    firstTime,
+    isInTrialModeWithExpiredTrial,
     checkingWhatToLoadOrNeedToCheckWhatToLoad,
     loadingFile,
     manipulatingAFile,
@@ -260,7 +273,10 @@ export const applicationIsBusyButFileCouldBeUnloadedSelector = createSelector(
     checkedTrial
   ) => {
     return (
-      checkingWhatToLoadOrNeedToCheckWhatToLoad ||
+      // We only check what to load when we're in a valid license
+      // state.  So we need to account for there being no license or
+      // there being an expired trial.
+      (!firstTime && !isInTrialModeWithExpiredTrial && checkingWhatToLoadOrNeedToCheckWhatToLoad) ||
       loadingFile ||
       manipulatingAFile ||
       !applicationSettingsAreLoaded ||
