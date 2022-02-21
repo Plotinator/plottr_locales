@@ -1,5 +1,7 @@
 import { PropTypes } from 'prop-types'
 
+import ListFiles from './list-files'
+
 const AdminPageMain = ({ section }) => {
   const sectionBody = (() => {
     switch (section) {
@@ -12,12 +14,7 @@ const AdminPageMain = ({ section }) => {
         )
       }
       case 'list-files': {
-        return (
-          <>
-            <h1>List Files</h1>
-            <p>Search for a user&apos;s files</p>
-          </>
-        )
+        return <ListFiles />
       }
       default: {
         return <h1>Unknown section</h1>
