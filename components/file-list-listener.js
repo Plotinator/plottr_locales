@@ -7,14 +7,14 @@ import { fetchFiles } from 'wired-up-firebase'
 
 import { logger } from '../lib/logger'
 
-const FileListListener = ({ fileList, userId, setFileList, generalError }) => {
+const FileListListener = ({ fileList, userId, setKnownFiles, generalError }) => {
   useEffect(() => {
     if (!fileList || fileList.length === 0 || !userId) return () => {}
 
     const fetchListener = document.addEventListener('fetch-file-list', (event) => {
       fetchFiles(userId)
         .then((files) => {
-          setFileList(files.filter(({ deleted }) => !deleted))
+          setKnownFiles(files.filter(({ deleted }) => !deleted))
         })
         .catch((error) => {
           logger.error(`Failed to fetch file list for user with id: ${userId}`, error)
@@ -24,7 +24,7 @@ const FileListListener = ({ fileList, userId, setFileList, generalError }) => {
     return () => {
       document.removeEventListener('fetch-file-list', fetchListener)
     }
-  }, [fileList, userId, setFileList])
+  }, [fileList, userId, setKnownFiles])
 
   return null
 }
@@ -32,16 +32,16 @@ const FileListListener = ({ fileList, userId, setFileList, generalError }) => {
 FileListListener.propTypes = {
   fileList: PropTypes.array.isRequired,
   userId: PropTypes.string,
-  setFileList: PropTypes.func.isRequired,
+  setKnownFiles: PropTypes.func.isRequired,
 }
 
 export default connect(
   (state) => ({
-    fileList: selectors.fileListSelector(state.present),
+    fileList: selectors.knownFilesSelector(state.present),
     userId: selectors.userIdSelector(state.present),
   }),
   {
-    setFileList: actions.project.setFileList,
+    setKnownFiles: actions.knownFiles.setKnownFiles,
     generalError: actions.error.generalError,
   }
 )(FileListListener)

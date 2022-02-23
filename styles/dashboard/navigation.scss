@@ -1,5 +1,5 @@
-@import "../colors";
-@import "../vars";
+@import '../colors';
+@import '../vars';
 
 #dashboard__react__root {
   nav {
@@ -27,7 +27,7 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  transition: all .1s ease-in;
+  transition: all 0.1s ease-in;
 
   &:hover {
     background-color: $gray-7;

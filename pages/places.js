@@ -7,4 +7,3 @@ const Root = dynamic(() => import('../components/root'), {
 const Places = (props) => <Root {...props} />
 
 export default Places
-

@@ -1,5 +1,5 @@
-@import "../colors";
-@import "../vars";
+@import '../colors';
+@import '../vars';
 
 .dashboard__help {
   height: 100%;
@@ -19,7 +19,8 @@
     border-top: 1px solid $neutral-gray-7;
   }
 
-  iframe, webview {
+  iframe,
+  webview {
     height: calc(100% - 49px);
     width: 100%;
     border: 1px solid $neutral-gray-7;

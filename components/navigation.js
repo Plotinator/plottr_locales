@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import PropTypes from 'react-proptypes'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { Navbar, Nav, NavItem, Dropdown, MenuItem } from 'react-bootstrap'
+import { Navbar, Nav, NavItem } from 'react-bootstrap'
 import { t } from 'plottr_locales'
 import { Beamer, BookChooser } from 'connected-components'
 import cx from 'classnames'
@@ -23,8 +23,15 @@ function Navigation({
   currentView,
   changeCurrentView,
   darkMode,
+  selectedFile,
 }) {
   const [dashboardView, setDashboardView] = useState(currentProject() ? null : 'files')
+
+  useEffect(() => {
+    if (!selectedFile && dashboardView !== null) {
+      setDashboardView('files')
+    }
+  }, [selectedFile])
 
   useEffect(() => {
     if (currentTimeline !== 'series' && bookIds.indexOf(currentTimeline) === -1) {
@@ -45,6 +52,15 @@ function Navigation({
     })
     return () => {
       document.removeEventListener('close-dashboard', listener)
+    }
+  }, [])
+
+  useEffect(() => {
+    const listener = document.addEventListener('force-close-dashboard', () => {
+      setDashboardView(null)
+    })
+    return () => {
+      document.removeEventListener('force-close-dashboard', listener)
     }
   }, [])
 
@@ -71,20 +87,14 @@ function Navigation({
     changeCurrentView(newLocation)
   }
 
-  const selectAccount = () => {
-    setDashboardView('account')
-  }
-
   const selectFiles = () => {
     setDashboardView('files')
   }
 
-  const selectHelp = () => {
-    setDashboardView('help')
-  }
-
   const resetDashboardView = () => {
-    setDashboardView(null)
+    if (selectedFile) {
+      setDashboardView(null)
+    }
   }
 
   const selectDashboardView = (view) => {
@@ -158,17 +168,8 @@ function Navigation({
         </Nav>
         <Beamer inNavigation />
         <Nav pullRight className="project-nav__options">
-          <NavItem>
-            <Dropdown id="dashboard-dropdown-menu">
-              <Dropdown.Toggle noCaret bsSize="small">
-                <FaRegUser />
-              </Dropdown.Toggle>
-              <Dropdown.Menu>
-                <MenuItem onSelect={selectFiles}>{t('Projects')}</MenuItem>
-                <MenuItem onSelect={selectAccount}>{t('Account')}</MenuItem>
-                <MenuItem onSelect={selectHelp}>{t('Help')}</MenuItem>
-              </Dropdown.Menu>
-            </Dropdown>
+          <NavItem onClick={selectFiles}>
+            <FaRegUser />
           </NavItem>
           <Share />
         </Nav>
@@ -184,6 +185,7 @@ Navigation.propTypes = {
   darkMode: PropTypes.bool.isRequired,
   bookIds: PropTypes.array,
   currentTimeline: PropTypes.number,
+  selectedFile: PropTypes.object,
   changeCurrentTimeline: PropTypes.func.isRequired,
 }
 
@@ -191,9 +193,10 @@ function mapStateToProps(state) {
   return {
     currentTimeline: selectors.currentTimelineSelector(state.present),
     bookIds: selectors.allBookIdsSelector(state.present),
-    currentView: state.present.ui.currentView,
-    darkMode: state.present.ui.darkMode,
+    currentView: selectors.currentViewSelector(state.present),
+    darkMode: selectors.isDarkModeSelector(state.present),
     userId: selectors.userIdSelector(state.present),
+    selectedFile: selectors.selectedFileSelector(state.present),
   }
 }
 

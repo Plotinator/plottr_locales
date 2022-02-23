@@ -1,5 +1,5 @@
-@import "../colors";
-@import "../vars";
+@import '../colors';
+@import '../vars';
 
 .dashboard__backups {
   height: 100%;
@@ -36,7 +36,7 @@
   justify-content: space-evenly;
   cursor: pointer;
   border-radius: 4px;
-  transition: all .1s ease-in;
+  transition: all 0.1s ease-in;
   position: relative;
 
   .badge {
@@ -81,8 +81,8 @@
   visibility: hidden;
 }
 .custom-file-input {
-  margin-top:10px;
-  width:93px;
+  margin-top: 10px;
+  width: 93px;
   height: 32px;
 }
 .custom-file-input::before {
@@ -99,7 +99,7 @@
   text-shadow: 1px 1px #fff;
   font-weight: 700;
   font-size: 10pt;
-  color:black;
+  color: black;
 }
 .custom-file-input:hover::before {
   border-color: black;

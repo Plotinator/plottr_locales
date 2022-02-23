@@ -7,4 +7,3 @@ const Root = dynamic(() => import('../components/root'), {
 const Tags = (props) => <Root {...props} />
 
 export default Tags
-

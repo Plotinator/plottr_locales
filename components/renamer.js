@@ -9,27 +9,21 @@ import { editFileName } from 'wired-up-firebase'
 
 import { logger } from '../lib/logger'
 
-const Renamer = ({ userId, generalError }) => {
+const Renamer = ({ userId, generalError, startRenamingFile, finishRenamingFile }) => {
   const [visible, setVisible] = useState(false)
   const [fileId, setFileId] = useState(null)
 
   const renameFile = (newName) => {
     if (!userId) return
+    startRenamingFile()
     editFileName(userId, fileId, newName)
       .then(() => {
-        const fetchEvent = new Event('fetch-file-list', { bubbles: true, cancelable: false })
-        document.dispatchEvent(fetchEvent)
-        const renameEvent = new Event('rename-file-to-new-name', {
-          bubbles: true,
-          cancelable: false,
-        })
-        renameEvent.fileId = fileId
-        renameEvent.newName = newName
-        document.dispatchEvent(renameEvent)
+        finishRenamingFile()
         setFileId(null)
         setVisible(false)
       })
       .catch((error) => {
+        finishRenamingFile()
         logger.error(`Failed to rename file with id ${fileId} to ${newName}`, error)
         generalError('Failed to rename file.')
       })
@@ -65,11 +59,17 @@ const Renamer = ({ userId, generalError }) => {
 Renamer.propTypes = {
   userId: PropTypes.string,
   generalError: PropTypes.func.isRequired,
+  startRenamingFile: PropTypes.func.isRequired,
+  finishRenamingFile: PropTypes.func.isRequired,
 }
 
 export default connect(
   (state) => ({
     userId: selectors.userIdSelector(state.present),
   }),
-  { generalError: actions.error.generalError }
+  {
+    generalError: actions.error.generalError,
+    startRenamingFile: actions.applicationState.startRenamingFile,
+    finishRenamingFile: actions.applicationState.finishRenamingFile,
+  }
 )(Renamer)
