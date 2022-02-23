@@ -16,7 +16,7 @@ if (!admin.apps.length) {
 }
 
 const database = admin.firestore()
-const auth = admin.auth()
+const auth = admin.auth
 
 export default async (req, res) => {
   const { email, uid, admin } = req.body
