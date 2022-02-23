@@ -9,7 +9,6 @@ $text-color: $gray-0;
 @import 'home';
 @import 'login';
 
-@import '../lib/plottr_components/dist/components/components-tailwind.css';
 @import '../lib/plottr_components/dist/components/components.css';
 
 @import 'dashboard/dashboard';
@@ -263,4 +262,32 @@ input[type='file'] {
     height: 12px !important;
     width: 12px !important;
   }
+}
+
+#temporary-inner {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#temporary-inner img {
+  margin-top: 16px;
+}
+
+.loading-splash {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.loading-splash__progress {
+  width: 40vw;
+}
+
+.loading-splash__progress__bar {
+  position: relative;
+  height: 3px;
+  background: $orange;
+  transition: width 0.4s;
 }

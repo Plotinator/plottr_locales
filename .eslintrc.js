@@ -24,6 +24,8 @@ module.exports = {
     },
   },
   ignorePatterns: [
+    '/.next/**',
+    'lib/plottr_check-prop-types/**',
     '/node_modules/**',
     '/build/**',
     '**/*.json',

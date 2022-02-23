@@ -20,8 +20,11 @@ export default async (req, res) => {
 
   if (key != 'A2eFc15') return res.status(500).send('')
 
-  const email = req.body.email
-  const tag = req.body.tag
+  const { email, tag } = req.body
+
+  if (!email) {
+    return res.status(400).send({ where: 'email', error: 'no email' })
+  }
 
   // check that the contact has the right tag
   if (tag != 'Plottr: Customer - Pro - Lifetime') {

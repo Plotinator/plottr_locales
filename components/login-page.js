@@ -5,12 +5,11 @@ import { useRouter } from 'next/router'
 
 import { FunSpinner } from 'connected-components'
 import { onSessionChange, firebaseUI, startUI, currentUser } from 'wired-up-firebase'
-import { useProLicenseInfo, userHasPro } from '../lib/checkPro'
+import { userHasPro } from '../lib/checkPro'
 import { logger } from '../lib/logger'
 
 export default function LoginPage() {
   const [sessionChecked, setSessionChecked] = useState(false)
-  const [_licenseInfo, _size, _setAtKey, setLicenseInfo] = useProLicenseInfo()
   const router = useRouter()
   const { pid } = router.query
 
@@ -31,13 +30,11 @@ export default function LoginPage() {
             .then(async (token) => {
               logger.info('Received token')
               if (token.claims.beta || token.claims.admin || token.claims.lifetime) {
-                setLicenseInfo({ claims: token.claims, customer: { email: user.email } })
                 window.location.href = url
               } else {
                 // check for Plottr Pro
-                const [hasPro, info] = await userHasPro(user.email)
+                const [hasPro] = await userHasPro(user.email)
                 if (hasPro) {
-                  setLicenseInfo({ ...info, claims: token.claims })
                   window.location.href = url
                 } else {
                   // display something saying

@@ -32,39 +32,31 @@ import {
   saveCustomTemplate,
 } from 'wired-up-firebase'
 import {
-  getTemplateById,
-  listTemplates,
-  listCustomTemplates,
   startSaveAsTemplate,
   messageToSaveNewTemplate,
   messageToEditTemplate,
   messageToDeleteTemplate,
-  useFilteredSortedTemplates,
 } from '../lib/templates'
-import { useExportConfigInfo } from '../lib/exportConfig'
 import export_config from '../lib/exporter/default_config'
 import { exportFile } from '../lib/export'
+import { saveAppSetting } from '../lib/appSettings'
+import { saveExportConfigSettings } from '../lib/exportSettings'
 import { store } from '../lib/redux'
-import { useCustomTemplatesInfo, useSettingsInfo, useTemplatesInfo } from '../lib/store_hooks'
-import { useTrialStatus } from '../lib/trialManager'
-import { settings } from '../lib/settings'
 import {
   messageOpenExistingFile,
   messageRenameFile,
   newEmptyFile,
-  useSortedKnownFiles,
   newFile,
   openFile,
   uploadExisting,
+  sortAndSearch,
 } from '../lib/files'
-import { useBackupFolders } from '../lib/backups'
 import { createErrorReport } from '../lib/createErrorReport'
-import { closeDashboard } from '../lib/dashboard'
+import { closeDashboard, forceCloseDashboard } from '../lib/dashboard'
 import { userHasPro } from '../lib/checkPro'
 import MPQ from '../lib/MPQ'
 import { resizeImage } from '../lib/resizeImage'
 import extractImages from '../lib/extractImages'
-import { useProLicenseInfo } from '../lib/checkPro'
 import { logger } from '../lib/logger'
 import { setCurrentProject } from '../lib/currentProject'
 
@@ -94,33 +86,33 @@ const platform = {
       const state = store.getState()
       const {
         client: { emailAddress, userId, clientId },
-        project: { fileList },
+        knownFiles,
       } = state.present
-      const untitledFileList = fileList.filter(({ fileName }) => fileName.match(/Untitled/g))
+      const untitledFileList = knownFiles.filter(({ fileName }) => fileName.match(/Untitled/g))
       const fileName = t('Untitled') + ` - ${untitledFileList.length}`
-      const setFileList = (...args) => store.dispatch(actions.project.setFileList(...args))
+      const setKnownFiles = (...args) => store.dispatch(actions.knownFiles.setKnownFiles(...args))
       const selectFile = (...args) => store.dispatch(actions.project.selectFile(...args))
       const newFileState = Object.assign(
         newEmptyFile(fileName, appVersion(), state.present),
         template || {}
       )
-      store.dispatch(actions.project.showLoader(true))
+      store.dispatch(actions.applicationState.startCreatingCloudFile())
       newFile(
         emailAddress,
         userId,
         fileName,
         { present: newFileState },
-        setFileList,
+        setKnownFiles,
         selectFile,
         clientId
       )
         .then(() => {
-          store.dispatch(actions.project.showLoader(false))
+          store.dispatch(actions.applicationState.finishCreatingCloudFile())
           closeDashboard()
           logger.info('Created new file.')
         })
         .catch((error) => {
-          store.dispatch(actions.project.showLoader(false))
+          store.dispatch(actions.applicationState.finishCreatingCloudFile())
           logger.error('Error creating new file.', error)
         })
     },
@@ -129,8 +121,7 @@ const platform = {
       // NOP.  We don't expect the API to reply with non-existant files.
       return true
     },
-    useSortedKnownFilesIgnoringLoggedIn: useSortedKnownFiles,
-    useSortedKnownFiles,
+    sortAndSearch,
     isTempFile: () => {
       // There's no such thing as a temp file with cloud storage
       return false
@@ -144,34 +135,40 @@ const platform = {
       const state = store.getState()
       const {
         client: { userId, clientId },
-        project: { fileList },
+        knownFiles,
       } = state.present
-      const selectedFile = fileList.find((thatFile) => thatFile.id === fileId)
+      const selectedFile = knownFiles.find((thatFile) => thatFile.id === fileId)
       if (!selectedFile) return
 
+      store.dispatch(actions.applicationState.startLoadingFile())
       store.dispatch(actions.project.showLoader(true))
       openFile(userId, fileId, clientId, selectedFile.version, selectedFile.permission)
         .then(() => {
           store.dispatch(actions.project.selectFile(selectedFile))
+          store.dispatch(actions.applicationState.finishLoadingFile())
           store.dispatch(actions.project.showLoader(false))
           setCurrentProject(fileId)
-          closeDashboard()
+          forceCloseDashboard()
           logger.info(`Opened file: ${fileId}`)
         })
         .catch((error) => {
           store.dispatch(actions.project.showLoader(false))
+          store.dispatch(actions.applicationState.finishLoadingFile())
           store.dispatch(actions.error.generalError('could-not-open-file'))
           logger.error(`Error opening file: ${fileId}`, error.message, error)
         })
     },
     deleteKnownFile: (position, fileId) => {
       store.dispatch(actions.project.showLoader(true))
+      store.dispatch(actions.applicationState.startDeletingFile())
       deleteFileOnFirestore(fileId)
         .then(() => {
+          store.dispatch(actions.applicationState.finishDeletingFile())
           store.dispatch(actions.project.showLoader(false))
           logger.info(`Deleted file with id: ${fileId}`)
         })
         .catch((error) => {
+          store.dispatch(actions.applicationState.finishDeletingFile())
           store.dispatch(actions.project.showLoader(false))
           store.dispatch(actions.error.generalError(error))
           logger.error(`Error deleting file: ${fileId}`, error)
@@ -231,7 +228,7 @@ const platform = {
     },
   },
   updateLanguage: (newLanguage) => {
-    // Nop: This is handled adequately by OptionsHome.
+    window.location.reload()
   },
   updateBeatHierarchyFlag: (newValue) => {
     if (newValue) {
@@ -240,12 +237,15 @@ const platform = {
       store.dispatch(actions.featureFlags.unsetBeatHierarchy())
     }
   },
+  // A lot of the license wiring doesn't make sense for web.
   license: {
-    useLicenseInfo: () => [],
+    deleteLicense: () => {},
     checkForActiveLicense: () => {},
-    useTrialStatus,
-    licenseStore: {},
+    saveLicenseInfo: () => {},
     verifyLicense: () => {},
+    // There isn't a way to start/extend a trial on web yet.
+    startTrial: () => {},
+    extendTrial: () => {},
     trial90days: [],
     trial60days: [],
     hasPro: () => true,
@@ -258,28 +258,19 @@ const platform = {
     // NO-OP
   },
   template: {
-    TemplateFetcher: {}, // TODO
-    listTemplates,
-    listCustomTemplates,
-    getTemplateById,
     deleteTemplate: messageToDeleteTemplate,
     editTemplateDetails: messageToEditTemplate,
     startSaveAsTemplate,
     saveTemplate: messageToSaveNewTemplate,
-    useFilteredSortedTemplates,
-    useCustomTemplatesInfo,
-    useLocalCustomTemplatesInfo: useCustomTemplatesInfo,
-    useTemplatesInfo,
   },
-  settings,
-  useSettingsInfo,
+  settings: { saveAppSetting },
   user: {
     get: () => {},
   },
-  os: 'unknown',
+  os: () => 'unknown',
   isDevelopment: process.env.NEXT_PUBLIC_NODE_ENV === 'development',
-  isWindows: false,
-  isMacOS: false,
+  isWindows: () => false,
+  isMacOS: () => false,
   openExternal: (url) => {
     const withProtocol = url.match(/^[a-z]+:\/\//) ? url : `https://${url}`
     window.open(withProtocol, '_blank')
@@ -317,13 +308,10 @@ const platform = {
     platform: 'web',
   },
   export: {
+    saveExportConfigSettings,
     askToExport: exportFile,
     export_config,
   },
-  store: {
-    useExportConfigInfo,
-  },
-  useBackupFolders,
   moveFromTemp: (fullFileState) => {
     const data = new Blob([JSON.stringify(fullFileState, null, 2)], { type: 'text/json' })
     const link = document.createElement('a')
@@ -369,7 +357,6 @@ const platform = {
     return uuidv4()
   },
   extractImages,
-  useProLicenseInfo,
   storage: {
     saveImageToStorageBlob: (blob, name) => {
       const state = store.getState()
@@ -482,3 +469,4 @@ export const FileLocation = components.FileLocation
 export const BookChooser = components.BookChooser
 export const TimelineWrapper = components.TimelineWrapper
 export const DashboardBody = components.DashboardBody
+export const DashboardNav = components.DashboardNav

@@ -120,15 +120,6 @@ function transformWordPressUsers(users) {
   return firebaseUsers
 }
 
-function randomString(length) {
-  const chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-  let result = ''
-  for (let i = length; i > 0; --i) {
-    result += chars[Math.round(Math.random() * (chars.length - 1))]
-  }
-  return result
-}
-
 const phpassBase64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 function base64Translate(input) {
   const res = [0]
