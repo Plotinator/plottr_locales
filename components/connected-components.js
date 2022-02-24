@@ -11,20 +11,14 @@ import { appVersion } from '../lib/version'
 import {
   saveImageToStorageBlob as saveImageToStorageBlobInFirebase,
   saveImageToStorageFromURL as saveImageToStorageFromURLInFirebase,
-  publishRCEOperations,
-  fetchRCEOperations,
   deleteFile,
   imagePublicURL,
   isStorageURL,
-  listenForChangesToEditor,
-  deleteChangeSignal,
-  deleteOldChanges,
   backupPublicURL,
   lockRCE,
   listenForRCELock,
   releaseRCELock,
   logOut,
-  startUI,
   firebaseUI,
   onSessionChange,
   currentUser,
@@ -345,14 +339,9 @@ const platform = {
     bindActionCreators,
   },
   rootElementSelectors: ['#__next'],
-  publishRCEOperations,
   lockRCE,
   listenForRCELock,
   releaseRCELock,
-  deleteChangeSignal,
-  deleteOldChanges,
-  fetchRCEOperations,
-  listenForChangesToEditor,
   machineIdSync: () => {
     return uuidv4()
   },
@@ -391,7 +380,6 @@ const platform = {
     resizeImage,
   },
   firebase: {
-    startUI,
     firebaseUI,
     onSessionChange,
     currentUser,
@@ -399,6 +387,9 @@ const platform = {
     logOut,
     saveCustomTemplate,
     uploadExisting,
+  },
+  login: {
+    loginPopupURL: '/login-popup',
   },
 }
 

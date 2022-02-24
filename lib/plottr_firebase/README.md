@@ -228,32 +228,6 @@ Produce a `Promise` which, when resolved, contains the unique token
 that should be emailed to the user for them to accept the invitation
 when logging in.
 
-### Publish RCE Operations
-
-`publishRCEOperations(fileId: String, editorId: String, operations: SlateOperation[]): Promise<Any[]>`
-
-Publish an array of RCE `operations` made in file with id `fileId` to
-the editor editing specific RCE content in a Plottr file that can be
-uniquely identified across all open instances of Plottr editing the
-file by `editorId`.
-
-An example `editorId` is the string: `'cards__1__description'` which
-might uniquely identify the description editor for the card that has
-id 1 in the file with id `fileId`.
-
-Produce a `Promise` which, when resolved, indicates that the
-operations were published.
-
-### Fetch RCE Operations
-
-`fetchRCEOperations(fileId: String, editorId: String, since: Date, cb: (SlateOperation[] => Void)): Void`
-
-Poll Firebase for editor operations corresponding to the file with id
-`fileId` made to the editor that can be uniquely identified across all
-open instances of Plottr editing the file by `editorId` after the
-`Date` `since`. Call `cb` with an array of operations that meet those
-criteria.
-
 ### Save Custom Template
 
 `saveCustomTemplate(userId: String, template: Template): Promise<Any>`
@@ -351,12 +325,6 @@ Instruct Firebase to mount the authentication interface corresponding
 to `firebaseUI` to the DOM node corresponding to `queryString`.
 
 ## Utilities
-
-### Stop Listening
-
-`stopListening(unsubscribeFunctions: Function[]): Void`
-
-Call each of the given `unsubscribeFunctions`.
 
 ### With File Id
 
