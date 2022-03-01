@@ -88,7 +88,7 @@ const RichTextEditorConnector = (connector) => {
           cacheImage={cacheImage}
         />
       ),
-      [openExternal]
+      [openExternal, resolveToPublicUrl, imageCache, cacheImage]
     )
 
     const handleOnBlur = () => {
