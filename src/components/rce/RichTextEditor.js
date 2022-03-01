@@ -268,7 +268,24 @@ const RichTextEditorConnector = (connector) => {
         imageCache: selectors.imageCacheSelector(state.present),
       }),
       { cacheImage: actions.imageCache.cacheImage }
-    )(RichTextEditor)
+    )(
+      React.memo(RichTextEditor, (prevProps, nextProps) => {
+        return (
+          prevProps.id === nextProps.id &&
+          prevProps.undoId === nextProps.undoId &&
+          prevProps.darkMode === nextProps.darkMode &&
+          prevProps.className === nextProps.className &&
+          prevProps.autoFocus === nextProps.autoFocus &&
+          prevProps.onChange === nextProps.onChange &&
+          prevProps.fileId === nextProps.fileId &&
+          prevProps.clientId === nextProps.clientId &&
+          prevProps.onBlur === nextProps.onBlur &&
+          prevProps.onFocus === nextProps.onFocus &&
+          prevProps.imageCache === nextProps.imageCache &&
+          prevProps.cacheImage === nextProps.cacheImage
+        )
+      })
+    )
   }
 
   throw new Error('Could not connect RichTextEditor')
