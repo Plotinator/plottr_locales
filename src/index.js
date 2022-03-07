@@ -84,8 +84,17 @@ const storage = () => {
   return _storage
 }
 
-export const startUI = (firebaseUI, queryString) => {
-  firebaseUI.start(queryString, {
+let _firebaseui
+const firebaseUI = () => {
+  if (_firebaseui) return _firebaseui
+  const firebaseui = require('firebaseui')
+  _firebaseui = new firebaseui.auth.AuthUI(auth())
+  return _firebaseui
+}
+
+export const startUI = (queryString) => {
+  const ui = firebaseUI()
+  ui.start(queryString, {
     signInOptions: [
       {
         provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
@@ -116,33 +125,38 @@ export const wireUpAPI = (logger) => {
 
   return {
     editFileName: wiredUp.editFileName,
-    listen: wiredUp.listen,
-    withFileId: wiredUp.withFileId,
+    listenToFile: wiredUp.listenToFile,
+    listenToBeats: wiredUp.listenToBeats,
+    listenToCards: wiredUp.listenToCards,
+    listenToSeries: wiredUp.listenToSeries,
+    listenToBooks: wiredUp.listenToBooks,
+    listenToCategories: wiredUp.listenToCategories,
+    listenToCharacters: wiredUp.listenToCharacters,
+    listenToCustomAttributes: wiredUp.listenToCustomAttributes,
+    listenToFeatureFlags: wiredUp.listenToFeatureFlags,
+    listenToLines: wiredUp.listenToLines,
+    listenToNotes: wiredUp.listenToNotes,
+    listenToPlaces: wiredUp.listenToPlaces,
+    listenToTags: wiredUp.listenToTags,
+    listenToHierarchyLevels: wiredUp.listenToHierarchyLevels,
+    listenToImages: wiredUp.listenToImages,
     toFirestoreArray: wiredUp.toFirestoreArray,
     overwriteAllKeys: wiredUp.overwriteAllKeys,
     initialFetch: wiredUp.initialFetch,
     deleteFile: wiredUp.deleteFile,
-    stopListening: wiredUp.stopListening,
     listenToFiles: wiredUp.listenToFiles,
     fetchFiles: wiredUp.fetchFiles,
     logOut: wiredUp.logOut,
     mintCookieToken: wiredUp.mintCookieToken,
     onSessionChange: wiredUp.onSessionChange,
-    firebaseUI: wiredUp.firebaseUI,
     currentUser: wiredUp.currentUser,
     hasUndefinedValue: wiredUp.hasUndefinedValue,
     patch: wiredUp.patch,
     overwrite: wiredUp.overwrite,
     shareDocument: wiredUp.shareDocument,
-    publishRCEOperations: wiredUp.publishRCEOperations,
-    catchupEditsSeen: wiredUp.catchupEditsSeen,
     releaseRCELock: wiredUp.releaseRCELock,
     lockRCE: wiredUp.lockRCE,
     listenForRCELock: wiredUp.listenForRCELock,
-    listenForChangesToEditor: wiredUp.listenForChangesToEditor,
-    deleteChangeSignal: wiredUp.deleteChangeSignal,
-    deleteOldChanges: wiredUp.deleteOldChanges,
-    fetchRCEOperations: wiredUp.fetchRCEOperations,
     saveBackup: wiredUp.saveBackup,
     listenForBackups: wiredUp.listenForBackups,
     saveCustomTemplate: wiredUp.saveCustomTemplate,
@@ -155,5 +169,6 @@ export const wireUpAPI = (logger) => {
     backupPublicURL: wiredUp.backupPublicURL,
     imagePublicURL: wiredUp.imagePublicURL,
     isStorageURL: wiredUp.isStorageURL,
+    loginWithEmailAndPassword: wiredUp.loginWithEmailAndPassword,
   }
 }
