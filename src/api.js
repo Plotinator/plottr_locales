@@ -271,7 +271,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
   const overwriteAllKeys = (fileId, clientId, state) => {
     const requests = []
     Object.keys(state).forEach((key) => {
-      if (SYSTEM_REDUCER_KEYS.indexOf(key) !== -1) {
+      if (SYSTEM_REDUCER_KEYS.indexOf(key) >= 0) {
         return
       }
       const payload = ARRAY_KEYS.indexOf(key) !== -1 ? toFirestoreArray(state[key]) : state[key]
