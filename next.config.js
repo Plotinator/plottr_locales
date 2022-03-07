@@ -2,13 +2,6 @@ const path = require('path')
 
 module.exports = {
   webpack: (config, { isServer }) => {
-    // Fixes npm packages that depend on `fs` module
-    if (!isServer) {
-      config.node = {
-        fs: 'empty',
-      }
-    }
-
     config.resolve = {
       ...config.resolve,
       alias: {
@@ -20,12 +13,14 @@ module.exports = {
         // If a better solution arose since this was written then feel
         // free to replace this! :)
         react: path.resolve('./node_modules/react'),
-        docx: path.resolve('./node_modules/docx'),
         redux: path.resolve('./node_modules/redux'),
         'react-redux': path.resolve('./node_modules/react-redux'),
         'react-dom': path.resolve('./node_modules/react-dom'),
+        automerge: path.resolve('./node_modules/automerge'),
       },
     }
+
+    config.optimization.splitChunks = false
 
     return config
   },

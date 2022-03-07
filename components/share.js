@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { connect } from 'react-redux'
 import { PropTypes } from 'prop-types'
 import { IoIosShareAlt } from 'react-icons/io'
-import { NavItem, Button, Form, FormGroup, ControlLabel, Table, FormControl } from 'react-bootstrap'
+import { Button, Form, FormGroup, ControlLabel, Table, FormControl } from 'react-bootstrap'
 
 import { t } from 'plottr_locales'
 import { selectors, actions } from 'pltr/v2'
