@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
 
 import { actions, selectors } from 'pltr/v2'
-import { listen, stopListening, listenToCustomTemplates } from 'wired-up-firebase'
+import { listen, listenToCustomTemplates } from 'wired-up-firebase'
 import { store } from '../lib/redux'
 import { closeDashboard, openDashboard } from '../lib/dashboard'
 import { setCurrentProject, currentProject } from '../lib/currentProject'
@@ -19,6 +19,8 @@ const withoutTimestamp = (fileRecord) => {
     timeStamp: undefined,
   }
 }
+
+const nop = () => {}
 
 const Listener = ({
   userId,
@@ -44,7 +46,7 @@ const Listener = ({
   loadingFile,
   settings,
 }) => {
-  const [unsubscribeFunctions, setUnsubscribeFunctions] = useState([])
+  const [unsubscribe, setUnsubscribe] = useState(nop)
 
   useEffect(() => {
     if (!checkedFileToLoad) startCheckingFileToLoad()
@@ -111,7 +113,7 @@ const Listener = ({
     if (!userId || !clientId || !selectedFile || !selectedFile.id) {
       return () => {}
     }
-    setUnsubscribeFunctions(
+    setUnsubscribe(
       listen(store, userId, selectedFile.id, clientId, selectedFile.version, (error) => {
         logger.error('Error listening to file changes.', error)
         generalError('There seems to be a problem with your network.')
@@ -121,8 +123,7 @@ const Listener = ({
     setFileLoaded()
 
     return () => {
-      stopListening(unsubscribeFunctions)
-      setUnsubscribeFunctions([])
+      if (unsubscribe) unsubscribe()
       setPermission('viewer')
     }
   }, [selectedFile, userId, clientId])

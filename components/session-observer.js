@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 import { connect } from 'react-redux'
 
 import { actions, selectors } from 'pltr/v2'
-import { listenToFiles, onSessionChange, logOut, currentUser } from 'wired-up-firebase'
+import { listenToFiles, onSessionChange, logOut, getIdTokenResult } from 'wired-up-firebase'
 import { useRouter } from 'next/router'
 
 import { licenseServerAPIs } from '../lib/api'
@@ -83,37 +83,35 @@ const SessionObserver = ({
   useEffect(() => {
     if (checkedSession && isLoggedIn && !hasPro) {
       startLoadingALicenseType('proSubscription')
-      currentUser()
-        ?.getIdTokenResult()
-        .then((token) => {
-          if (token.claims.beta || token.claims.admin || token.claims.lifetime) {
-            handleCheckPro(
-              userId,
-              emailAddress,
-              token.claims.lifeTime || token.claims.admin,
-              token.claims.admin
-            )(true, { expiration: 'lifetime', admin: true })
-          } else {
-            if (emailAddress) {
-              licenseServerAPIs
-                .checkForPro(
+      getIdTokenResult().then((token) => {
+        if (token.claims.beta || token.claims.admin || token.claims.lifetime) {
+          handleCheckPro(
+            userId,
+            emailAddress,
+            token.claims.lifeTime || token.claims.admin,
+            token.claims.admin
+          )(true, { expiration: 'lifetime', admin: true })
+        } else {
+          if (emailAddress) {
+            licenseServerAPIs
+              .checkForPro(
+                emailAddress,
+                handleCheckPro(
+                  userId,
                   emailAddress,
-                  handleCheckPro(
-                    userId,
-                    emailAddress,
-                    token.claims.lifeTime || token.claims.admin,
-                    token.claims.admin
-                  )
+                  token.claims.lifeTime || token.claims.admin,
+                  token.claims.admin
                 )
-                .catch((error) => {
-                  // TODO: maybe retry?
-                  logger.error('Failed to check for pro', error)
-                  finishLoadingALicenseType('proSubscription')
-                  logOut()
-                })
-            }
+              )
+              .catch((error) => {
+                // TODO: maybe retry?
+                logger.error('Failed to check for pro', error)
+                finishLoadingALicenseType('proSubscription')
+                logOut()
+              })
           }
-        })
+        }
+      })
     }
   }, [isLoggedIn, checkedSession, userId, emailAddress, hasPro])
 
