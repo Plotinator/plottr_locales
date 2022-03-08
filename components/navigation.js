@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import PropTypes from 'react-proptypes'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { Navbar, Nav, NavItem } from 'react-bootstrap'
+import { Navbar, Nav, NavItem, Button } from 'react-bootstrap'
 import { t } from 'plottr_locales'
 import { Beamer, BookChooser } from 'connected-components'
 import cx from 'classnames'
@@ -167,12 +167,12 @@ function Navigation({
           </li>
         </Nav>
         <Beamer inNavigation />
-        <Nav pullRight className="project-nav__options">
-          <NavItem onClick={selectFiles}>
-            <FaRegUser />
-          </NavItem>
+        <Navbar.Form pullRight className="project-nav__options">
+          <Button onClick={selectFiles}>
+            <FaRegUser /> {t('Dashboard')}
+          </Button>
           <Share />
-        </Nav>
+        </Navbar.Form>
       </Navbar>
     </>
   )
