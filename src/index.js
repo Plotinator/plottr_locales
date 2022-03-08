@@ -37,10 +37,7 @@ const database = () => {
   if (_database) return _database
   _database = firebase.firestore()
   _database.settings({ ignoreUndefinedProperties: true }, { merge: true })
-  if (
-    process.env.NEXT_PUBLIC_NODE_ENV === 'development' ||
-    (typeof window !== 'undefined' && window && window.location.hostname === 'plottr.local')
-  ) {
+  if (process.env.NEXT_PUBLIC_NODE_ENV === 'development') {
     try {
       _database.useEmulator('plottr.local', 8081)
       _database.settings(
@@ -59,10 +56,7 @@ const auth = () => {
   if (_auth) return _auth
   _auth = firebase.auth()
   _auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-  if (
-    process.env.NEXT_PUBLIC_NODE_ENV === 'development' ||
-    (typeof window !== 'undefined' && window && window.location.hostname === 'plottr.local')
-  ) {
+  if (process.env.NEXT_PUBLIC_NODE_ENV === 'development') {
     _auth.useEmulator('https://plottr.local:9100')
   }
   return _auth
@@ -71,10 +65,7 @@ const auth = () => {
 let _storage = null
 const storage = () => {
   if (_storage) return _storage
-  if (
-    process.env.NEXT_PUBLIC_NODE_ENV === 'development' ||
-    (typeof window !== 'undefined' && window && window.location.hostname === 'plottr.local')
-  ) {
+  if (process.env.NEXT_PUBLIC_NODE_ENV === 'development') {
     _storage = firebase.storage()
     _storage.useEmulator('localhost', 9200)
     _storage._delegate.host = 'https://plottr.local:9200'
