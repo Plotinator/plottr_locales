@@ -109,7 +109,7 @@ export const wireUpAPI = (logger) => {
     // For env vars to be read from Next config (on the web) we need to
     // prefix them with 'NEXT_PUBLIC'
     process.env.NEXT_PUBLIC_API_BASE_DOMAIN || process.env.API_BASE_DOMAIN,
-    process.env.NODE_ENV === 'development',
+    process.env.NEXT_PUBLIC_NODE_ENV === 'development',
     logger,
     isElectron
   )
