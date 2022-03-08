@@ -19,7 +19,6 @@ import {
   listenForRCELock,
   releaseRCELock,
   logOut,
-  firebaseUI,
   onSessionChange,
   currentUser,
   fetchFiles,
@@ -380,7 +379,6 @@ const platform = {
     resizeImage,
   },
   firebase: {
-    firebaseUI,
     onSessionChange,
     currentUser,
     fetchFiles,
