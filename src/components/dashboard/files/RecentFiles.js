@@ -105,6 +105,7 @@ const RecentFilesConnector = (connector) => {
     loadingFileList,
     shouldBeInPro,
     offlineModeEnabled,
+    isOnWeb,
   }) => {
     const [searchTerm, setSearchTerm] = useState('')
     const [onlineSortedIds, onlineFilesById] = sortedKnownFiles
@@ -244,7 +245,7 @@ const RecentFilesConnector = (connector) => {
         return (
           <Row
             key={idx}
-            onDoubleClick={() => openFile(f.isCloudFile ? f.id : f.path, id)}
+            onDoubleClick={() => openFile(isOnWeb ? f.id : f.path, id)}
             onClick={() => selectFile(selected ? null : id)}
             className={cx({ selected: selected })}
           >
@@ -322,6 +323,7 @@ const RecentFilesConnector = (connector) => {
     loadingFileList: PropTypes.bool,
     shouldBeInPro: PropTypes.bool,
     offlineModeEnabled: PropTypes.bool,
+    isOnWeb: PropTypes.bool,
   }
 
   const {
@@ -340,6 +342,7 @@ const RecentFilesConnector = (connector) => {
       loadingFileList: selectors.fileListIsLoadingSelector(state.present),
       shouldBeInPro: selectors.shouldBeInProSelector(state.present),
       offlineModeEnabled: selectors.offlineModeEnabledSelector(state.present),
+      isOnWeb: selectors.isOnWebSelector(state.present),
     }))(RecentFiles)
   }
 
