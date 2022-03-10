@@ -135,6 +135,8 @@ the demo site is what's enabled by default) and configure it to
 forward from https to http, like so (take note of the different port
 for SSL from what the emulator serves on):
 
+(on mac w/ homebrew, the config file is here: /usr/local/etc/nginx/nginx.conf)
+
 ```
 server {
    listen 8081 ssl;
@@ -221,6 +223,11 @@ This is also different per platform.  On Windows it might be a
 service.  On older Linux distributions you can call it's init script:
 
 `#/etc/rc.d/rc.nginx start`
+
+on mac, w/ homebrew do this to start it in the background:
+`brew services start nginx` and `brew services stop nginx` to stop it
+or start in your terminal:
+`sudo nginx` and `sudo nginx -s stop` to stop
 
 ### Troubleshooting
 

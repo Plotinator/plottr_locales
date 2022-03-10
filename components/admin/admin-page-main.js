@@ -1,6 +1,6 @@
 import { PropTypes } from 'prop-types'
 
-import ListFiles from './list-files'
+import ListFiles from '../list-files'
 
 const AdminPageMain = ({ section }) => {
   const sectionBody = (() => {

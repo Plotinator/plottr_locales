@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic'
 
-const AdminPage = dynamic(() => import('../components/admin-page'), {
+const AdminPage = dynamic(() => import('../../components/admin/admin-page'), {
   ssr: false,
 })
 
