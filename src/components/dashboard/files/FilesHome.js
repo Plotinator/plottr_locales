@@ -204,7 +204,7 @@ const FilesHomeConnector = (connector) => {
 
     return connect(
       (state) => ({
-        isOnWeb: selectors.isOnWebSelector(state.present)
+        isOnWeb: selectors.isOnWebSelector(state.present),
       }),
       (dispatch) => {
         return {
