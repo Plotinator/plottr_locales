@@ -8,7 +8,7 @@ import AdminPageMain from './admin-page-main'
 import AdminPageNav from './admin-page-nav'
 
 const AdminPage = () => {
-  const [section, setSection] = useState('')
+  const [section, setSection] = useState('user')
 
   useEffect(() => {
     let fileListener = null

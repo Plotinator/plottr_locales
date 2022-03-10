@@ -7,6 +7,9 @@ const AdminPageNav = ({ section, setSection }) => {
     <div className="admin-page-nav">
       <h3>Plottr Admin</h3>
       <Nav bsStyle="pills" stacked activeKey={1} onSelect={setSection}>
+        <NavItem eventKey="user" title="List Files">
+          User Info
+        </NavItem>
         <NavItem eventKey="fixes" title="Fixes">
           Fixes
         </NavItem>
