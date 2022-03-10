@@ -183,7 +183,10 @@ const platform = {
     },
     moveItemToTrash: deleteFileOnFirestore,
     createFromSnowflake: (importedPath) => {
-      // TODO
+      // NOP
+    },
+    createFromScrivener: (importedPath) => {
+      // NOP
     },
     joinPath: (path, backup) => {
       return `${path}/${backup}`
