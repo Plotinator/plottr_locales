@@ -105,10 +105,10 @@ const Share = ({ userId, selectedFile, generalError }) => {
         </div>
       </PlottrModal>
       <Button
+        bsSize="small"
         className="project-nav__share-button"
         onClick={() => setSharing(true)}
         title={t('Share')}
-        bsSize="small"
       >
         <IoIosShareAlt />
       </Button>
