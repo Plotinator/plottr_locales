@@ -75,14 +75,14 @@ const platform = {
     store.dispatch(actions.ui.setDarkMode(value === 'dark'))
   },
   file: {
-    createNew: (template) => {
+    createNew: (template, newFileName) => {
       const state = store.getState()
       const {
         client: { emailAddress, userId, clientId },
         knownFiles,
       } = state.present
       const untitledFileList = knownFiles.filter(({ fileName }) => fileName.match(/Untitled/g))
-      const fileName = t('Untitled') + ` - ${untitledFileList.length}`
+      const fileName = newFileName || t('Untitled') + ` - ${untitledFileList.length}`
       const setKnownFiles = (...args) => store.dispatch(actions.knownFiles.setKnownFiles(...args))
       const selectFile = (...args) => store.dispatch(actions.project.selectFile(...args))
       const newFileState = Object.assign(
