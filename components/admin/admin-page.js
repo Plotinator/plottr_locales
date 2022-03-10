@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { onSessionChange, currentUser, logOut } from 'wired-up-firebase'
 
-import { logger } from '../lib/logger'
+import { logger } from '../../lib/logger'
 import AdminPageLayout from './admin-page-layout'
 import AdminPageMain from './admin-page-main'
 import AdminPageNav from './admin-page-nav'
@@ -14,7 +14,7 @@ const AdminPage = () => {
     let fileListener = null
     const sessionListener = onSessionChange(
       (user) => {
-        const url = `/admin-login`
+        const url = `admin/admin-login`
         if (!user) {
           window.location.href = url
         } else {
