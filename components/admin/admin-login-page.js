@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 
 import { FunSpinner } from 'connected-components'
 import { onSessionChange, firebaseUI, startUI, currentUser, logOut } from 'wired-up-firebase'
-import { logger } from '../lib/logger'
+import { logger } from '../../lib/logger'
 
 export default function AdminLoginPage() {
   const [sessionChecked, setSessionChecked] = useState(false)

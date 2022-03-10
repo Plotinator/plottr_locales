@@ -1,7 +1,11 @@
 import { useState } from 'react'
 import { FormGroup, ControlLabel, FormControl, HelpBlock, Table, Label } from 'react-bootstrap'
 
-import { listFiles } from '../lib/admin/list-files'
+// import { listFiles } from '../lib/admin/list-files'
+// just for now:
+const listFiles = () => {
+  return new Promise().resolve([])
+}
 
 const withEventTargetValue = (f) => (event) => {
   return f(event.target.value)
