@@ -166,12 +166,12 @@ function Navigation({
             </Link>
           </li>
         </Nav>
-        <Beamer inNavigation />
         <Navbar.Form pullRight className="project-nav__options">
-          <Button onClick={selectFiles}>
+          <Share />
+          <Button className="project-nav__dashboard-button" onClick={selectFiles}>
             <FaRegUser /> {t('Dashboard')}
           </Button>
-          <Share />
+          <Beamer inNavigation />
         </Navbar.Form>
       </Navbar>
     </>

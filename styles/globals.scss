@@ -105,7 +105,18 @@ svg {
   }
 
   .project-nav__share-button {
-    margin-left: 17px;
+    svg {
+      margin: 0px !important;
+    }
+  }
+
+  .project-nav__dashboard-button {
+    margin-left: 15px;
+  }
+
+  .project-nav__beamer-button {
+    margin-right: 18px;
+    margin-left: 15px;
   }
 }
 
