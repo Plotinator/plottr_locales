@@ -1,9 +1,22 @@
 import { useState } from 'react'
 import { FormGroup, ControlLabel, FormControl, HelpBlock, Label } from 'react-bootstrap'
-import { getFrbUser } from '../../lib/admin/user-functions'
 
 const withEventTargetValue = (f) => (event) => {
   return f(event.target.value)
+}
+
+const dummyUser = {
+  uid: 'asdfjkl12347890',
+  email: 'example@example.com',
+  emailVerified: false,
+  disabled: false,
+  metadata: {
+    lastSignInTime: 'Sun, 27 Feb 2022 18:28:22 GMT',
+    creationTime: 'Sun, 27 Feb 2022 18:28:22 GMT',
+  },
+  customClaims: {
+    admin: true,
+  },
 }
 
 const UserInfoPage = () => {
@@ -11,13 +24,8 @@ const UserInfoPage = () => {
   const [userId, setUserId] = useState(null)
   const [userRecord, setUserRecord] = useState(null)
 
-  const fetchUser = async () => {
-    const [error, user] = await getFrbUser(userId)
-    if (user) {
-      setUserRecord(user)
-    } else {
-      setError(error)
-    }
+  const fetchUser = () => {
+    setUserRecord(dummyUser)
   }
 
   const renderUserRecord = () => {
