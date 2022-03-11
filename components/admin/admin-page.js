@@ -19,7 +19,6 @@ const AdminPage = () => {
         } else {
           getIdTokenResult().then((token) => {
             logger.info('Received token')
-            console.log('received token', token.claims)
             if (!token.claims.admin) {
               alert('You dont have the admin claim.')
               logOut().then(() => {

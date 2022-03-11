@@ -19,8 +19,6 @@ if (!admin.apps.length) {
 
 const auth = admin.auth()
 
-// this is not going to be a permanent endpoint
-// so it's slightly insecure, but it's only going to be live for a week
 export default async (req, res) => {
   return verifyAdminToken(auth, req, res).then(async () => {
     const { email } = req.body
