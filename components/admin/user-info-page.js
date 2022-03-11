@@ -27,14 +27,15 @@ const UserInfoPage = () => {
 
   const fetchUser = () => {
     axios
-      .post('/api/admin/uid', { email: 'example@example.com' })
+      .post('/api/admin/uid', { email: userId })
       .then((response) => {
         console.log(response)
+        setUserRecord(response.data)
       })
       .catch((error) => {
         console.log(error)
       })
-    setUserRecord(dummyUser)
+    // setUserRecord(dummyUser)
   }
 
   const renderUserRecord = () => {
@@ -43,6 +44,7 @@ const UserInfoPage = () => {
     const stringData = JSON.stringify(userRecord, null, 2)
 
     const claims = Object.entries(userRecord.customClaims).map(([key, value]) => {
+      console.log(key, value)
       return (
         <>
           <dt>{key}</dt>
