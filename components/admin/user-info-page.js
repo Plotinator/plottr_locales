@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FormGroup, ControlLabel, FormControl, HelpBlock, Label } from 'react-bootstrap'
+import { FormGroup, ControlLabel, FormControl, HelpBlock, Label, Button } from 'react-bootstrap'
 import axios from 'axios'
 
 const withEventTargetValue = (f) => (event) => {
@@ -80,7 +80,7 @@ const UserInfoPage = () => {
     <div className="user-info">
       <h1>User Info</h1>
       <p>Search for a user</p>
-      <form>
+      <div>
         <FormGroup controlId="formBasicText">
           <ControlLabel>User Email</ControlLabel>
           <FormControl
@@ -92,8 +92,8 @@ const UserInfoPage = () => {
           <FormControl.Feedback />
           <HelpBlock>Enter user email</HelpBlock>
         </FormGroup>
-        <FormControl type="submit" onSubmit={fetchUser} />
-      </form>
+        <Button onClick={fetchUser}>Go!</Button>
+      </div>
       <p />
       {renderUserRecord()}
       {error ? <Label>{error.message}</Label> : null}
