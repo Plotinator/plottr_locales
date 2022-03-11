@@ -50,7 +50,7 @@ export default function AdminLoginPage() {
     return (
       <>
         <div className="login__left">
-          <h1>Welcome to Plottr</h1>
+          <h1>Plottr Admin Portal</h1>
           <div id="firebase-login" ref={firebaseLoginComponentRef}></div>
         </div>
         <div className="login__right">

@@ -20,6 +20,9 @@ if (!admin.apps.length) {
 export default async (req, res) => {
   const { email, superNotSecretKey } = req.body
 
+  console.log('cookies')
+  console.log(req.cookies)
+
   if (superNotSecretKey != 'magichorsewatermelon') return res.status(500).send('')
 
   const record = await admin

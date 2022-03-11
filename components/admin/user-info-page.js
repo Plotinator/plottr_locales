@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { FormGroup, ControlLabel, FormControl, HelpBlock, Label } from 'react-bootstrap'
+import axios from 'axios'
 
 const withEventTargetValue = (f) => (event) => {
   return f(event.target.value)
@@ -25,6 +26,14 @@ const UserInfoPage = () => {
   const [userRecord, setUserRecord] = useState(null)
 
   const fetchUser = () => {
+    axios
+      .post('/api/admin/uid', { email: 'example@example.com' })
+      .then((response) => {
+        console.log(response)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
     setUserRecord(dummyUser)
   }
 
@@ -71,7 +80,7 @@ const UserInfoPage = () => {
     <div className="user-info">
       <h1>User Info</h1>
       <p>Search for a user</p>
-      <form onSubmit={fetchUser}>
+      <form>
         <FormGroup controlId="formBasicText">
           <ControlLabel>User Email</ControlLabel>
           <FormControl
