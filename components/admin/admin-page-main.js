@@ -1,17 +1,17 @@
 import { PropTypes } from 'prop-types'
-import { ErrorBoundary } from 'connected-components'
 
 import ListFiles from '../list-files'
 import UserInfoPage from './user-info-page'
+import { AdminErrorBoundary } from './admin-error-boundary'
 
 const AdminPageMain = ({ section }) => {
   const sectionBody = (() => {
     switch (section) {
       case 'user': {
         return (
-          <ErrorBoundary>
+          <AdminErrorBoundary>
             <UserInfoPage />
-          </ErrorBoundary>
+          </AdminErrorBoundary>
         )
       }
       case 'fixes': {
