@@ -10,7 +10,6 @@ export const verifyToken = (auth, req, res) => {
 
 export const verifyAdminToken = (auth, req, res) => {
   const sessionCookie = req.cookies.session || ''
-  console.log('sessionCookie', sessionCookie)
   return auth
     .verifySessionCookie(sessionCookie, true)
     .then((customClaims) => {
