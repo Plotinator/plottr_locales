@@ -14,7 +14,7 @@ const AdminPage = () => {
     let fileListener = null
     const sessionListener = onSessionChange(
       (user) => {
-        const url = `admin/admin-login`
+        const url = `/admin/admin-login`
         if (!user) {
           window.location.href = url
         } else {

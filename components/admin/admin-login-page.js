@@ -4,7 +4,8 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 
 import { FunSpinner } from 'connected-components'
-import { onSessionChange, firebaseUI, startUI, currentUser, logOut } from 'wired-up-firebase'
+import { onSessionChange, getIdTokenResult, logOut } from 'wired-up-firebase'
+import { startUI } from 'plottr_firebase'
 import { logger } from '../../lib/logger'
 
 export default function AdminLoginPage() {
@@ -20,19 +21,17 @@ export default function AdminLoginPage() {
         logger.info('Session w/ user', router.query)
         const url = `/admin`
         logger.info('url to redirect', url)
-        currentUser()
-          .getIdTokenResult(true)
-          .then((token) => {
-            logger.info('Received token')
-            if (token.claims.admin) {
-              window.location.href = url
-            } else {
-              logOut().then(() => {
-                alert('You dont have the admin claim.')
-                window.location.reload()
-              })
-            }
-          })
+        getIdTokenResult().then((token) => {
+          logger.info('Received token')
+          if (token.claims.admin) {
+            window.location.href = url
+          } else {
+            logOut().then(() => {
+              alert('You dont have the admin claim.')
+              window.location.reload()
+            })
+          }
+        })
       }
     })
   }, [])
@@ -41,8 +40,7 @@ export default function AdminLoginPage() {
   useEffect(() => {
     if (!sessionChecked) return
     if (firebaseLoginComponentRef.current) {
-      const ui = firebaseUI()
-      startUI(ui, '#firebase-login')
+      startUI('#firebase-login')
     }
   }, [sessionChecked])
 
