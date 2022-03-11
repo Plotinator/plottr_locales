@@ -1,3 +1,5 @@
+import { verifyAdminToken } from '../verify-token'
+
 const admin = require('firebase-admin')
 
 if (!admin.apps.length) {
@@ -15,27 +17,25 @@ if (!admin.apps.length) {
   }
 }
 
+const auth = admin.auth()
+
 // this is not going to be a permanent endpoint
 // so it's slightly insecure, but it's only going to be live for a week
 export default async (req, res) => {
-  const { email, superNotSecretKey } = req.body
+  return verifyAdminToken(auth, req, res).then(async () => {
+    const { email } = req.body
 
-  console.log('cookies')
-  console.log(req.cookies)
+    const record = await auth
+      .getUserByEmail(email)
+      .then((userRecord) => {
+        // See the UserRecord reference doc for the contents of userRecord.
+        return userRecord
+      })
+      .catch((error) => {
+        console.log('Error fetching user data:', email)
+        return null
+      })
 
-  if (superNotSecretKey != 'magichorsewatermelon') return res.status(500).send('')
-
-  const record = await admin
-    .auth()
-    .getUserByEmail(email)
-    .then((userRecord) => {
-      // See the UserRecord reference doc for the contents of userRecord.
-      return userRecord
-    })
-    .catch((error) => {
-      console.log('Error fetching user data:', email)
-      return null
-    })
-
-  return res.status(200).send({ user: record })
+    return res.status(200).send({ user: record })
+  })
 }
