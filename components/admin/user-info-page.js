@@ -30,12 +30,11 @@ const UserInfoPage = () => {
       .post('/api/admin/uid', { email: userId })
       .then((response) => {
         console.log(response)
-        setUserRecord(response.data)
+        setUserRecord(response?.data?.user)
       })
       .catch((error) => {
         console.log(error)
       })
-    // setUserRecord(dummyUser)
   }
 
   const renderUserRecord = () => {
