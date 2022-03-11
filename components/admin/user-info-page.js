@@ -6,20 +6,6 @@ const withEventTargetValue = (f) => (event) => {
   return f(event.target.value)
 }
 
-const dummyUser = {
-  uid: 'asdfjkl12347890',
-  email: 'example@example.com',
-  emailVerified: false,
-  disabled: false,
-  metadata: {
-    lastSignInTime: 'Sun, 27 Feb 2022 18:28:22 GMT',
-    creationTime: 'Sun, 27 Feb 2022 18:28:22 GMT',
-  },
-  customClaims: {
-    admin: true,
-  },
-}
-
 const UserInfoPage = () => {
   const [error, setError] = useState([])
   const [userId, setUserId] = useState(null)
@@ -29,11 +15,11 @@ const UserInfoPage = () => {
     axios
       .post('/api/admin/uid', { email: userId })
       .then((response) => {
-        console.log(response)
         setUserRecord(response?.data?.user)
       })
       .catch((error) => {
         console.log(error)
+        setError(error)
       })
   }
 
@@ -43,11 +29,10 @@ const UserInfoPage = () => {
     const stringData = JSON.stringify(userRecord, null, 2)
 
     const claims = Object.entries(userRecord.customClaims).map(([key, value]) => {
-      console.log(key, value)
       return (
         <>
           <dt>{key}</dt>
-          <dd>{value}</dd>
+          <dd>{String(value)}</dd>
         </>
       )
     })
@@ -61,13 +46,13 @@ const UserInfoPage = () => {
           <dt>Email</dt>
           <dd>{userRecord.email}</dd>
           <dt>Disabled</dt>
-          <dd>{userRecord.disabled}</dd>
+          <dd>{String(userRecord.disabled)}</dd>
           <dt>Last Sign In</dt>
           <dd>{userRecord.metadata.lastSignInTime}</dd>
           <dt>Created</dt>
           <dd>{userRecord.metadata.creationTime}</dd>
           <dt>Email Verified</dt>
-          <dd>{userRecord.emailVerified}</dd>
+          <dd>{String(userRecord.emailVerified)}</dd>
         </dl>
         <h3>Custom Claims</h3>
         <dl>{claims}</dl>
@@ -90,8 +75,6 @@ const UserInfoPage = () => {
             placeholder="Enter email"
             onChange={withEventTargetValue(setUserId)}
           />
-          <FormControl.Feedback />
-          <HelpBlock>Enter user email</HelpBlock>
         </FormGroup>
         <Button onClick={fetchUser}>Go!</Button>
       </div>
@@ -99,7 +82,11 @@ const UserInfoPage = () => {
       {renderUserRecord()}
       {error ? <Label>{error.message}</Label> : null}
       <style jsx>{`
-        .user-info {
+        .user-info dl dd {
+          margin-left: 40px;
+        }
+        .user-info dl dt {
+          font-weigth: bold;
         }
       `}</style>
     </div>
