@@ -19,7 +19,6 @@ export class AdminErrorBoundary extends Component {
     this.error = error
     this.errorInfo = errorInfo
     console.error(error, errorInfo)
-    this.state.rollbar.error(error, errorInfo)
   }
 
   render() {

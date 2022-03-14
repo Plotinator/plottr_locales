@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FormGroup, ControlLabel, FormControl, Table, Label, Button } from 'react-bootstrap'
+import { FormGroup, ControlLabel, FormControl, Label, Button } from 'react-bootstrap'
 import axios from 'axios'
 import UserRecord from './UserRecord'
 
@@ -7,14 +7,15 @@ const withEventTargetValue = (f) => (event) => {
   return f(event.target.value)
 }
 
-const UserInfoPage = () => {
+const CreateUser = () => {
   const [error, setError] = useState([])
   const [userId, setUserId] = useState(null)
+  const [password, setPassword] = useState(null)
   const [userRecord, setUserRecord] = useState(null)
 
-  const fetchUser = () => {
+  const createUser = () => {
     axios
-      .post('/api/admin/uid', { email: userId })
+      .post('/api/admin/create-user', { email: userId, password })
       .then((response) => {
         if (response?.data?.user) {
           setUserRecord(response?.data?.user)
@@ -36,8 +37,7 @@ const UserInfoPage = () => {
 
   return (
     <div className="user-info">
-      <h1>User Info</h1>
-      <p>Search for a user</p>
+      <h1>Create a new Firebase User</h1>
       <div>
         <FormGroup controlId="formBasicText">
           <ControlLabel>User Email</ControlLabel>
@@ -48,7 +48,16 @@ const UserInfoPage = () => {
             onChange={withEventTargetValue(setUserId)}
           />
         </FormGroup>
-        <Button onClick={fetchUser}>Go!</Button>
+        <FormGroup controlId="formPasswordText">
+          <ControlLabel>User Password</ControlLabel>
+          <FormControl
+            type="text"
+            value={password}
+            placeholder="Enter password"
+            onChange={withEventTargetValue(setPassword)}
+          />
+        </FormGroup>
+        <Button onClick={createUser}>Create!</Button>
       </div>
       <p />
       {renderUserRecord()}
@@ -57,4 +66,4 @@ const UserInfoPage = () => {
   )
 }
 
-export default UserInfoPage
+export default CreateUser

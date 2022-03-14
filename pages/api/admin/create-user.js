@@ -3,19 +3,20 @@ import { verifyAdminToken } from '../verify-token'
 
 export default async (req, res) => {
   return verifyAdminToken(auth, req, res).then(async () => {
-    const { email } = req.body
+    const { email, pw } = req.body
 
-    const record = await auth
-      .getUserByEmail(email)
+    const newRecord = await auth
+      .createUser({ email: email, password: pw })
       .then((userRecord) => {
         // See the UserRecord reference doc for the contents of userRecord.
         return userRecord
       })
       .catch((error) => {
-        console.log('Error fetching user data:', email)
+        console.log('Error creating user:', email)
+        console.error(error)
         return null
       })
 
-    return res.status(200).send({ user: record })
+    return res.status(200).send({ user: newRecord })
   })
 }

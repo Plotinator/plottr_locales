@@ -3,6 +3,7 @@ import { PropTypes } from 'prop-types'
 import ListFiles from '../list-files'
 import UserInfoPage from './user-info-page'
 import { AdminErrorBoundary } from './admin-error-boundary'
+import CreateUser from './create-user'
 
 const AdminPageMain = ({ section }) => {
   const sectionBody = (() => {
@@ -11,6 +12,13 @@ const AdminPageMain = ({ section }) => {
         return (
           <AdminErrorBoundary>
             <UserInfoPage />
+          </AdminErrorBoundary>
+        )
+      }
+      case 'create': {
+        return (
+          <AdminErrorBoundary>
+            <CreateUser />
           </AdminErrorBoundary>
         )
       }
