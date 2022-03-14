@@ -390,7 +390,10 @@ const platform = {
     uploadExisting,
   },
   login: {
-    loginPopupURL: '/login-popup',
+    launchLoginPopup: () => {
+      logger.warn('Calling nop action: launchLoginPopup')
+      // NOP.  On web we launch it at a different URL and then redirect.
+    },
   },
 }
 
