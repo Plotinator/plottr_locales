@@ -6,7 +6,7 @@ const AdminPageNav = ({ section, setSection }) => {
   return (
     <div className="admin-page-nav">
       <h3>Plottr Admin</h3>
-      <Nav bsStyle="pills" stacked activeKey={1} onSelect={setSection}>
+      <Nav bsStyle="pills" stacked activeKey={section} onSelect={setSection}>
         <NavItem eventKey="user" title="List Files">
           User Info
         </NavItem>
@@ -15,6 +15,9 @@ const AdminPageNav = ({ section, setSection }) => {
         </NavItem>
         <NavItem eventKey="list-files" title="List Files">
           List Files
+        </NavItem>
+        <NavItem eventKey="create" title="Create a new Firebase user">
+          Create User
         </NavItem>
       </Nav>
       <style jsx>{`
