@@ -7,6 +7,14 @@ import { localeSettings } from '../../lib/locale-settings'
 
 setupI18n(localeSettings, {})
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb',
+    },
+  },
+}
+
 import askToExport from '../../lib/exporter/start_export'
 
 if (!admin.apps.length) {
