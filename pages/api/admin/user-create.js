@@ -1,5 +1,7 @@
-import auth from '../../../lib/admin/auth'
+import admin from '../../../lib/admin/frbAdmin'
 import { verifyAdminToken } from '../verify-token'
+
+const auth = admin.auth()
 
 export default async (req, res) => {
   return verifyAdminToken(auth, req, res).then(async () => {
