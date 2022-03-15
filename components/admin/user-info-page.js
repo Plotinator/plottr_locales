@@ -8,7 +8,7 @@ const withEventTargetValue = (f) => (event) => {
 }
 
 const UserInfoPage = () => {
-  const [error, setError] = useState([])
+  const [error, setError] = useState(null)
   const [userEmail, setUserEmail] = useState('')
   const [userRecord, setUserRecord] = useState(null)
   const [isUpdateMode, setUpdateMode] = useState(false)
@@ -21,6 +21,7 @@ const UserInfoPage = () => {
       .then((response) => {
         if (response?.data?.user) {
           setUserRecord(response?.data?.user)
+          setError(null)
         } else {
           setError({ message: 'Returned null' })
         }

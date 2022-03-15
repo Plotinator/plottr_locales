@@ -1,5 +1,7 @@
-import auth from '../../../lib/admin/auth'
+import admin from '../../../lib/admin/frbAdmin'
 import { verifyAdminToken } from '../verify-token'
+
+const auth = admin.auth()
 
 // this endpoint shouldn't be needed much
 // it's used to import people who weren't created properly from WP

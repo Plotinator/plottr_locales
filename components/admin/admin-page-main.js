@@ -1,6 +1,6 @@
 import { PropTypes } from 'prop-types'
 
-import ListFiles from '../list-files'
+import ListProjects from './list-projects'
 import UserInfoPage from './user-info-page'
 import { AdminErrorBoundary } from './admin-error-boundary'
 import CreateUser from './create-user'
@@ -9,29 +9,13 @@ const AdminPageMain = ({ section }) => {
   const sectionBody = (() => {
     switch (section) {
       case 'user': {
-        return (
-          <AdminErrorBoundary>
-            <UserInfoPage />
-          </AdminErrorBoundary>
-        )
+        return <UserInfoPage />
       }
       case 'create': {
-        return (
-          <AdminErrorBoundary>
-            <CreateUser />
-          </AdminErrorBoundary>
-        )
+        return <CreateUser />
       }
-      case 'fixes': {
-        return (
-          <>
-            <h1>Fixes</h1>
-            <p>Some fixes... TBD.</p>
-          </>
-        )
-      }
-      case 'list-files': {
-        return <ListFiles />
+      case 'projects': {
+        return <ListProjects />
       }
       default: {
         return <h1>Unknown section</h1>
@@ -41,7 +25,9 @@ const AdminPageMain = ({ section }) => {
 
   return (
     <div className="admin-page-main">
-      {sectionBody}
+      <AdminErrorBoundary>
+        {sectionBody}
+      </AdminErrorBoundary>
       <style jsx>{`
         .admin-page-main {
           grid-area: main;
