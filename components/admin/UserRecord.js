@@ -4,7 +4,13 @@ import { PropTypes } from 'prop-types'
 const UserRecord = ({ user }) => {
   const stringData = JSON.stringify(user, null, 2)
 
-  let claims = <Label bsStyle="primary">None</Label>
+  let claims = (
+    <tr>
+      <td>
+        <Label bsStyle="primary">None</Label>
+      </td>
+    </tr>
+  )
 
   if (user.customClaims) {
     claims = Object.entries(user.customClaims).map(([key, value], idx) => {

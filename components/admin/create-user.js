@@ -15,7 +15,7 @@ const CreateUser = () => {
 
   const createUser = () => {
     axios
-      .post('/api/admin/create-user', { email: userId, password })
+      .post('/api/admin/user-create', { email: userId, password })
       .then((response) => {
         if (response?.data?.user) {
           setUserRecord(response?.data?.user)
