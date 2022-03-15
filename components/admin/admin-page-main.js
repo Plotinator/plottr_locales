@@ -25,9 +25,7 @@ const AdminPageMain = ({ section }) => {
 
   return (
     <div className="admin-page-main">
-      <AdminErrorBoundary>
-        {sectionBody}
-      </AdminErrorBoundary>
+      <AdminErrorBoundary>{sectionBody}</AdminErrorBoundary>
       <style jsx>{`
         .admin-page-main {
           grid-area: main;

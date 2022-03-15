@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { FormGroup, ControlLabel, FormControl, Table, Label, Button } from 'react-bootstrap'
+import { FormGroup, ControlLabel, FormControl, Label, Button } from 'react-bootstrap'
 import axios from 'axios'
-import UserRecord from './UserRecord'
+// import UserRecord from './UserRecord'
 import ProjectList from './ProjectList'
 
 const withEventTargetValue = (f) => (event) => {
@@ -10,7 +10,7 @@ const withEventTargetValue = (f) => (event) => {
 
 const ListProjects = () => {
   const [files, setFiles] = useState([])
-  const [userRecord, setUserRecord] = useState(null)
+  // const [userRecord, setUserRecord] = useState(null)
   const [error, setError] = useState([])
   const [userEmail, setUserEmail] = useState(null)
 
