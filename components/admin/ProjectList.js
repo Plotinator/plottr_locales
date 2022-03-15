@@ -2,9 +2,8 @@ import { Table, Label, Button } from 'react-bootstrap'
 import { PropTypes } from 'prop-types'
 
 const ProjectList = ({ files }) => {
-
   const renderTime = (frbTimeStamp) => {
-    const realDate = new Date( frbTimeStamp._seconds * 1000 )
+    const realDate = new Date(frbTimeStamp._seconds * 1000)
     return realDate.toLocaleString()
   }
 
@@ -31,7 +30,7 @@ const ProjectList = ({ files }) => {
             <td>{permission}</td>
             <td>{version}</td>
             <td>
-              <Button style={{marginRight: '8px'}}>Share to Support@</Button>
+              <Button style={{ marginRight: '8px' }}>Share to Support@</Button>
               {deleted ? <Button bsStyle="warning">Undelete</Button> : null}
             </td>
           </tr>
