@@ -22,19 +22,16 @@ export default (req, res) => {
             .doc(`file/${fileId}`)
             .update({ shareRecords: newRecords })
             .then((result) => {
-              res.status(200)
-              res.send('Success')
+              res.status(200).send('Success')
               return result
             })
             .catch((error) => {
-              res.status(500)
-              res.send('Error deleting share record')
+              res.status(500).send('Error deleting share record')
               return Promise.resolve('Error deleting share record')
             })
         })
         .catch((error) => {
-          res.status(500)
-          res.send('Error deleting authorisation doc')
+          res.status(500).send('Error deleting authorisation doc')
           return Promise.resolve('Error deleting authorisation doc')
         })
     } else {
@@ -51,19 +48,16 @@ export default (req, res) => {
             .doc(`file/${fileId}`)
             .update({ shareRecords: newRecords })
             .then((result) => {
-              res.status(200)
-              res.send('Success')
+              res.status(200).send('Success')
               return result
             })
             .catch((error) => {
-              res.status(500)
-              res.send('Error creating share record')
+              res.status(500).send('Error creating share record')
               return Promise.resolve('Error creating share record')
             })
         })
         .catch((error) => {
-          res.status(500)
-          res.send('Error creating authorisation doc')
+          res.status(500).send('Error creating authorisation doc')
           return Promise.resolve('Error creating authorisation doc')
         })
     }
