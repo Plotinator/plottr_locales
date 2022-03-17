@@ -4,6 +4,20 @@ import axios from 'axios'
 import { SUPPORT_EMAIL } from '../../lib/admin/constants'
 
 const ProjectList = ({ files, supportUserProjects, refetch, supportID }) => {
+  const unDelete = (fileId) => {
+    axios
+      .post('/api/admin/project-undelete', { fileId })
+      .then((response) => {
+        console.log(response)
+        refetch()
+      })
+      .catch((error) => {
+        console.log(error)
+        console.log(error.response.data)
+        refetch()
+      })
+  }
+
   const shareWithSupport = (fileId, currentShareRecords) => {
     axios
       .post('/api/admin/project-share-support', { fileId, currentShareRecords, supportID })
@@ -94,7 +108,11 @@ const ProjectList = ({ files, supportUserProjects, refetch, supportID }) => {
                     Share to Support User
                   </Button>
                 )}
-                {deleted ? <Button bsStyle="warning">Undelete</Button> : null}
+                {deleted ? (
+                  <Button bsStyle="warning" onClick={() => unDelete(fileId)}>
+                    Undelete
+                  </Button>
+                ) : null}
               </td>
             </tr>
           )
