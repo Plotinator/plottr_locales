@@ -1,27 +1,9 @@
-import { Label, Table } from 'react-bootstrap'
+import { Table } from 'react-bootstrap'
 import { PropTypes } from 'prop-types'
+import CustomClaims from './CustomClaims'
 
-const UserRecord = ({ user }) => {
+const UserRecord = ({ user, refetch }) => {
   const stringData = JSON.stringify(user, null, 2)
-
-  let claims = (
-    <tr>
-      <td>
-        <Label bsStyle="primary">None</Label>
-      </td>
-    </tr>
-  )
-
-  if (user.customClaims) {
-    claims = Object.entries(user.customClaims).map(([key, value], idx) => {
-      return (
-        <tr key={idx}>
-          <th>{key}</th>
-          <td>{String(value)}</td>
-        </tr>
-      )
-    })
-  }
 
   return (
     <div>
@@ -54,10 +36,7 @@ const UserRecord = ({ user }) => {
           </tr>
         </tbody>
       </Table>
-      <h3>Custom Claims</h3>
-      <Table striped bordered hover>
-        <tbody>{claims}</tbody>
-      </Table>
+      <CustomClaims claims={user.customClaims} userID={user.uid} refetch={refetch} />
       <h3>String</h3>
       <pre>{stringData}</pre>
       <style jsx>{`
@@ -72,6 +51,7 @@ const UserRecord = ({ user }) => {
 
 UserRecord.propTypes = {
   user: PropTypes.object,
+  refetch: PropTypes.func,
 }
 
 export default UserRecord

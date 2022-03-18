@@ -96,6 +96,7 @@ const ProjectList = ({ files, supportUserProjects, refetch, supportID }) => {
                   <Button
                     style={{ marginRight: '8px' }}
                     bsStyle="warning"
+                    bsSize="xs"
                     onClick={() => unShareWithSupport(fileId, shareRecords)}
                   >
                     Un-Share with Support User
@@ -103,13 +104,14 @@ const ProjectList = ({ files, supportUserProjects, refetch, supportID }) => {
                 ) : (
                   <Button
                     style={{ marginRight: '8px' }}
+                    bsSize="xs"
                     onClick={() => shareWithSupport(fileId, shareRecords)}
                   >
                     Share to Support User
                   </Button>
                 )}
                 {deleted ? (
-                  <Button bsStyle="warning" onClick={() => unDelete(fileId)}>
+                  <Button bsStyle="warning" bsSize="xs" onClick={() => unDelete(fileId)}>
                     Undelete
                   </Button>
                 ) : null}

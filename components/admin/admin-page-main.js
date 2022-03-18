@@ -4,6 +4,7 @@ import ListProjects from './list-projects'
 import UserInfoPage from './user-info-page'
 import { AdminErrorBoundary } from './admin-error-boundary'
 import CreateUser from './create-user'
+import DocumentViewer from './document-viewer'
 
 const AdminPageMain = ({ section }) => {
   const sectionBody = (() => {
@@ -16,6 +17,9 @@ const AdminPageMain = ({ section }) => {
       }
       case 'projects': {
         return <ListProjects />
+      }
+      case 'documents': {
+        return <DocumentViewer />
       }
       default: {
         return <h1>Unknown section</h1>
