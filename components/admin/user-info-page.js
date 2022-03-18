@@ -96,7 +96,7 @@ const UserInfoPage = () => {
   const renderUserRecord = () => {
     if (!userRecord) return null
 
-    return <UserRecord user={userRecord} />
+    return <UserRecord user={userRecord} refetch={fetchUser} />
   }
 
   return (

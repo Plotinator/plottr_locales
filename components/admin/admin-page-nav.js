@@ -13,6 +13,9 @@ const AdminPageNav = ({ section, setSection }) => {
         <NavItem eventKey="projects" title="Projects">
           Projects
         </NavItem>
+        <NavItem eventKey="documents" title="Projects">
+          Documents
+        </NavItem>
         <NavItem eventKey="create" title="Create a new Firebase user">
           Create User
         </NavItem>

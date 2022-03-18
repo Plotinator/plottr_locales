@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { FormGroup, ControlLabel, FormControl, Label, Button } from 'react-bootstrap'
 import axios from 'axios'
-// import UserRecord from './UserRecord'
 import ProjectList from './ProjectList'
 import { AdminErrorBoundary } from './admin-error-boundary'
 
@@ -13,7 +12,6 @@ const withEventTargetValue = (f) => (event) => {
 
 const ListProjects = () => {
   const [files, setFiles] = useState([])
-  // const [userRecord, setUserRecord] = useState(null)
   const [error, setError] = useState([])
   const [userEmail, setUserEmail] = useState('')
   const [supportUserData, setSupportUserData] = useState(null)
@@ -57,25 +55,12 @@ const ListProjects = () => {
         } else {
           setError({ message: 'Returned null' })
         }
-        // if (response?.data?.user) {
-        //   setUserRecord(response?.data?.user)
-        // }
       })
       .catch((error) => {
         console.log(error)
         console.log(error.response.data)
         setError(error)
       })
-  }
-
-  const renderUserRecord = () => {
-    return null
-    // if (!userRecord) return null
-
-    // return <div>
-    //   <h1>User Data:</h1>
-    //   <UserRecord user={userRecord} />
-    // </div>
   }
 
   return (
@@ -108,7 +93,6 @@ const ListProjects = () => {
       ) : (
         <Label>{error.message}</Label>
       )}
-      {renderUserRecord()}
       <style jsx>{`
         .list-files {
         }
