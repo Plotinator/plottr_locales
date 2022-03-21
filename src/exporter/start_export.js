@@ -25,10 +25,17 @@ export default function askToExport(
         case 'word':
         default:
           WordExporter(fullState, fileName, options, notifyUser)
-          break
+            .then((filePath) => {
+              cb(null, filePath)
+            })
+            .catch((error) => {
+              logger.error('error', error)
+            })
+          return
       }
       cb(null, true)
     } catch (error) {
+      logger.error('Failed to export', error)
       cb(error, false)
     }
   } else {
