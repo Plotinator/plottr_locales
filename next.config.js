@@ -17,6 +17,10 @@ module.exports = {
         'react-redux': path.resolve('./node_modules/react-redux'),
         'react-dom': path.resolve('./node_modules/react-dom'),
         automerge: path.resolve('./node_modules/automerge'),
+        plottr_import_export: path.resolve('./lib/plottr_import_export/src/index.js'),
+        plottr_import_export_config: path.resolve(
+          './lib/plottr_import_export/src/exporter/default_config'
+        ),
       },
     }
 
