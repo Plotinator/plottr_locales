@@ -53,6 +53,7 @@
     "next": "11",
     "plottr_components": "link:./lib/plottr_components",
     "plottr_firebase": "link:./lib/plottr_firebase",
+    "plottr_import_export": "file:./lib/plottr_import_export",
     "plottr_locales": "link:./lib/plottr_locales",
     "plottr_world": "link:./lib/plottr_world/",
     "pltr": "link:./lib/pltr",
