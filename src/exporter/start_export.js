@@ -1,34 +1,30 @@
-import { getCurrentWindow, dialog } from '@electron/remote'
-import { t } from 'plottr_locales'
-import MPQ from '../common/utils/MPQ'
 import ScrivenerExporter from './scrivener/v2/exporter'
 import WordExporter from './word/exporter'
 
-const win = getCurrentWindow()
-
-export default function askToExport(defaultPath, fullState, type, options, isWindows, cb) {
-  let label = t('Where would you like to save the export?')
-  let filters = []
-  switch (type) {
-    case 'word':
-      filters = [{ name: t('MS Word'), extensions: ['docx'] }]
-      break
-    case 'scrivener':
-      filters = [{ name: t('Scrivener Project'), extensions: ['scriv'] }]
-      break
-  }
-  const fileName = dialog.showSaveDialogSync(win, { title: label, filters, defaultPath })
+export default function askToExport(
+  defaultPath,
+  fullState,
+  type,
+  options,
+  isWindows,
+  notifyUser,
+  logger,
+  saveDialog,
+  mpq,
+  cb
+) {
+  const fileName = saveDialog ? saveDialog(defaultPath, type) : defaultPath
   if (fileName) {
-    MPQ.push('Export', { export_type: type, options: options })
+    mpq.push('Export', { export_type: type, options: options })
 
     try {
       switch (type) {
         case 'scrivener':
-          ScrivenerExporter(fullState, fileName, options, isWindows)
+          ScrivenerExporter(fullState, fileName, options, isWindows, notifyUser, logger)
           break
         case 'word':
         default:
-          WordExporter(fullState, fileName, options)
+          WordExporter(fullState, fileName, options, notifyUser)
           break
       }
       cb(null, true)
