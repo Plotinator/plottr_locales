@@ -30,7 +30,7 @@ import {
   messageToEditTemplate,
   messageToDeleteTemplate,
 } from '../lib/templates'
-import export_config from '../lib/exporter/default_config'
+import exportConfig from 'plottr_import_export/src/exporter/default_config'
 import { exportFile } from '../lib/export'
 import { saveAppSetting } from '../lib/appSettings'
 import { saveExportConfigSettings } from '../lib/exportSettings'
@@ -306,7 +306,7 @@ const platform = {
   export: {
     saveExportConfigSettings,
     askToExport: exportFile,
-    export_config,
+    export_config: exportConfig,
   },
   moveFromTemp: (fullFileState) => {
     const data = new Blob([JSON.stringify(fullFileState, null, 2)], { type: 'text/json' })
