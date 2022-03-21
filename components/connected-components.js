@@ -52,6 +52,7 @@ import { resizeImage } from '../lib/resizeImage'
 import extractImages from '../lib/extractImages'
 import { logger } from '../lib/logger'
 import { setCurrentProject } from '../lib/currentProject'
+import { notifyUser } from '../lib/notifyUser'
 
 const deleteFileOnFirestore = (fileId) => {
   const state = store.getState()
@@ -307,6 +308,10 @@ const platform = {
     saveExportConfigSettings,
     askToExport: exportFile,
     export_config: exportConfig,
+    notifyUser,
+    exportSaveDialog: () => {
+      // NOP
+    },
   },
   moveFromTemp: (fullFileState) => {
     const data = new Blob([JSON.stringify(fullFileState, null, 2)], { type: 'text/json' })
