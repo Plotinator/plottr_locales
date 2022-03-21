@@ -1,9 +1,23 @@
 const admin = require('firebase-admin')
 import AdmZip from 'adm-zip'
 import { v4 as uuidv4 } from 'uuid'
-import { verifyToken } from './verify-token'
+
 import { setupI18n } from 'plottr_locales'
+import { askToExport } from 'plottr_import_export'
+
+import { verifyToken } from './verify-token'
 import { localeSettings } from '../../lib/locale-settings'
+import { logger } from '../../lib/logger'
+
+class DummyMixpanelQueue {
+  projectEventStats(event, basicAttrs = {}, state) {}
+
+  push(event, attrs = {}) {}
+
+  flush() {}
+}
+
+const MPQ = new DummyMixpanelQueue()
 
 setupI18n(localeSettings, {})
 
@@ -14,8 +28,6 @@ export const config = {
     },
   },
 }
-
-import askToExport from '../../lib/exporter/start_export'
 
 if (!admin.apps.length) {
   if (process.env.FIREBASE_ENV === 'development') {
@@ -39,6 +51,9 @@ const baseBucket =
 const storage = admin.storage()
 const auth = admin.auth()
 
+const nopNotifier = () => {}
+const nopSaveDialog = () => {}
+
 export default (req, res) => {
   return verifyToken(auth, req, res).then(() => {
     const file = req.body.file
@@ -52,6 +67,11 @@ export default (req, res) => {
       file,
       type,
       config,
+      false, // isWindows
+      nopNotifier,
+      logger,
+      nopSaveDialog,
+      MPQ,
       (error, filePath) => {
         if (error) {
           res.status(503)

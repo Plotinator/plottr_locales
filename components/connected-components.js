@@ -30,7 +30,7 @@ import {
   messageToEditTemplate,
   messageToDeleteTemplate,
 } from '../lib/templates'
-import exportConfig from 'plottr_import_export/src/exporter/default_config'
+import exportConfig from 'plottr_import_export_config'
 import { exportFile } from '../lib/export'
 import { saveAppSetting } from '../lib/appSettings'
 import { saveExportConfigSettings } from '../lib/exportSettings'
@@ -288,7 +288,7 @@ const platform = {
   dialog: {
     showErrorBox: (error) => {
       logger.error(error)
-      if (typeof alert !== 'undefined') alert(error)
+      if (typeof alert !== 'undefined' && error.message) alert(error.message)
     },
   },
   showSaveDialogSync: () => {
