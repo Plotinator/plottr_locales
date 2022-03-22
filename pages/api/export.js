@@ -1,4 +1,5 @@
 const admin = require('firebase-admin')
+import fs from 'fs'
 import AdmZip from 'adm-zip'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -80,6 +81,7 @@ export default (req, res) => {
             res.json({ errorMessage: error.message })
           } else {
             console.log('Saved file at: ', savedFilePath)
+            console.log('TMP dir contents: ', fs.readdirSync('/tmp/'))
             const uploadFilePath = type === 'scrivener' ? `/tmp/${baseFileName}.zip` : savedFilePath
             if (type === 'scrivener') {
               const zip = new AdmZip()
