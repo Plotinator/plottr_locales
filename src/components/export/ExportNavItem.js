@@ -47,8 +47,8 @@ const ExportNavItemConnector = (connector) => {
       const defaultPath =
         bookId == 'series' ? seriesName + ' ' + t('(Series View)') : books[`${bookId}`].title
 
-      withFullFileState((file) => {
-        const withoutSystemKeys = removeSystemKeys(file)
+      withFullFileState((state) => {
+        const withoutSystemKeys = removeSystemKeys(state.present)
         askToExport(
           defaultPath,
           withoutSystemKeys,
