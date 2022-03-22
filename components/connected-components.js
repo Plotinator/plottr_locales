@@ -30,7 +30,7 @@ import {
   messageToEditTemplate,
   messageToDeleteTemplate,
 } from '../lib/templates'
-import export_config from '../lib/exporter/default_config'
+import exportConfig from 'plottr_import_export_config'
 import { exportFile } from '../lib/export'
 import { saveAppSetting } from '../lib/appSettings'
 import { saveExportConfigSettings } from '../lib/exportSettings'
@@ -52,6 +52,7 @@ import { resizeImage } from '../lib/resizeImage'
 import extractImages from '../lib/extractImages'
 import { logger } from '../lib/logger'
 import { setCurrentProject } from '../lib/currentProject'
+import { notifyUser } from '../lib/notifyUser'
 
 const deleteFileOnFirestore = (fileId) => {
   const state = store.getState()
@@ -287,7 +288,7 @@ const platform = {
   dialog: {
     showErrorBox: (error) => {
       logger.error(error)
-      if (typeof alert !== 'undefined') alert(error)
+      if (typeof alert !== 'undefined' && error.message) alert(error.message)
     },
   },
   showSaveDialogSync: () => {
@@ -306,7 +307,11 @@ const platform = {
   export: {
     saveExportConfigSettings,
     askToExport: exportFile,
-    export_config,
+    export_config: exportConfig,
+    notifyUser,
+    exportSaveDialog: () => {
+      // NOP
+    },
   },
   moveFromTemp: (fullFileState) => {
     const data = new Blob([JSON.stringify(fullFileState, null, 2)], { type: 'text/json' })
