@@ -80,6 +80,8 @@ export default (req, res) => {
             console.error('Error while exporting: ', error)
             res.json({ errorMessage: error.message })
           } else {
+            console.log('Error object', error)
+            console.log('File path', filePath)
             console.log('Saved file at: ', savedFilePath)
             console.log('TMP dir contents: ', fs.readdirSync('/tmp/'))
             const uploadFilePath = type === 'scrivener' ? `/tmp/${baseFileName}.zip` : savedFilePath
