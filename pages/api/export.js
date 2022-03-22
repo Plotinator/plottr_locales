@@ -53,7 +53,6 @@ const storage = admin.storage()
 const auth = admin.auth()
 
 const nopNotifier = () => {}
-const nopSaveDialog = () => {}
 
 export default (req, res) => {
   return verifyToken(auth, req, res).then(() => {
@@ -72,7 +71,7 @@ export default (req, res) => {
         false, // isWindows
         nopNotifier,
         logger,
-        nopSaveDialog,
+        null,
         MPQ,
         (error, filePath) => {
           if (error) {
