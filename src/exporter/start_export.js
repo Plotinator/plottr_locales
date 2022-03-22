@@ -40,6 +40,6 @@ export default function askToExport(
       cb(error, false)
     }
   } else {
-    cb(null, false)
+    cb(new Error('No file name'), false)
   }
 }
