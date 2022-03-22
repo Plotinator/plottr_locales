@@ -19,19 +19,43 @@ export default function askToExport(
 
     try {
       switch (type) {
-        case 'scrivener':
-          ScrivenerExporter(fullState, fileName, options, isWindows, notifyUser, logger)
+        case 'scrivener': {
+          const errorMessage = ScrivenerExporter(
+            fullState,
+            fileName,
+            options,
+            isWindows,
+            notifyUser,
+            logger
+          )
+          if (!errorMessage) {
+            cb(null, true)
+          } else {
+            cb(new Error(errorMessage), false)
+          }
           break
+        }
         case 'word':
         default:
           WordExporter(fullState, fileName, options, notifyUser)
-          break
+            .then((filePath) => {
+              cb(null, filePath)
+            })
+            .catch((error) => {
+              logger.error('error', error)
+              cb(error, false)
+            })
+          return
       }
-      cb(null, true)
     } catch (error) {
+      logger.error('Failed to export', error)
       cb(error, false)
     }
   } else {
-    cb(null, false)
+    if (saveDialog) {
+      cb(null, false)
+    } else {
+      cb(new Error('No file name'), false)
+    }
   }
 }

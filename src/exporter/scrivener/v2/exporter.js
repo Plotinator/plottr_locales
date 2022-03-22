@@ -23,16 +23,17 @@ export default function Exporter(state, exportPath, options, isWindows, notifyUs
     let documentContents = createScrivx(state, realPath, options)
 
     // create the rtf documents for each scene card
-    createRTFDocuments(documentContents, realPath, options, isWindows)
+    createRTFDocuments(documentContents, realPath, options, isWindows, log)
   } catch (error) {
     log.error(error)
     // move anything we've made to the trash
     remove(realPath)
     // don't go any further
-    return false
+    return error.message || 'Something went wrong'
   }
 
   notifyUser(realPath, 'scrivener')
+  return true
 }
 
 function createProjectStructure(exportPath) {
@@ -90,7 +91,7 @@ function createScrivx(state, basePath, options) {
   return documentContents
 }
 
-function createRTFDocuments(documentContents, basePath, isWindows) {
+function createRTFDocuments(documentContents, basePath, isWindows, log) {
   const realBasePath = path.join(basePath, 'Files', 'Docs')
 
   Object.keys(documentContents).forEach((docID) => {
@@ -98,20 +99,20 @@ function createRTFDocuments(documentContents, basePath, isWindows) {
     // document is {docTitle: '', description: []}
     const documents = documentContents[docID]
     if (documents.notes) {
-      createRTF(docID, documents.notes, realBasePath, true)
+      createRTF(docID, documents.notes, realBasePath, true, log)
     }
 
     if (documents.body) {
-      createRTF(docID, documents.body, realBasePath, false)
+      createRTF(docID, documents.body, realBasePath, false, log)
     }
 
     if (documents.synopsis) {
-      createSynopsis(docID, documents.synopsis, realBasePath, isWindows)
+      createSynopsis(docID, documents.synopsis, realBasePath, isWindows, log)
     }
   })
 }
 
-function createRTF(docID, document, realBasePath, isNotes) {
+function createRTF(docID, document, realBasePath, isNotes, log) {
   let doc = new rtf()
   let data = null
   if (document.docTitle) {
@@ -132,7 +133,7 @@ function createRTF(docID, document, realBasePath, isNotes) {
   }
 }
 
-function createSynopsis(docID, document, realBasePath, isWindows) {
+function createSynopsis(docID, document, realBasePath, isWindows, log) {
   try {
     const data = serializePlain(document.description, isWindows)
     const fileName = `${docID}_synopsis.txt`
