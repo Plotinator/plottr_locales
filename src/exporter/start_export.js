@@ -19,10 +19,22 @@ export default function askToExport(
 
     try {
       switch (type) {
-        case 'scrivener':
-          ScrivenerExporter(fullState, fileName, options, isWindows, notifyUser, logger)
-          cb(null, true)
+        case 'scrivener': {
+          const errorMessage = ScrivenerExporter(
+            fullState,
+            fileName,
+            options,
+            isWindows,
+            notifyUser,
+            logger
+          )
+          if (!errorMessage) {
+            cb(null, true)
+          } else {
+            cb(new Error(errorMessage), false)
+          }
           break
+        }
         case 'word':
         default:
           WordExporter(fullState, fileName, options, notifyUser)
@@ -40,6 +52,10 @@ export default function askToExport(
       cb(error, false)
     }
   } else {
-    cb(new Error('No file name'), false)
+    if (saveDialog) {
+      cb(null, false)
+    } else {
+      cb(new Error('No file name'), false)
+    }
   }
 }
