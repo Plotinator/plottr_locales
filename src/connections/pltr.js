@@ -195,6 +195,7 @@ const pltrTypeSpecs = {
     export_config: PropTypes.object.isRequired,
     saveExportConfigSettings: PropTypes.func.isRequired,
     notifyUser: PropTypes.func.isRequired,
+    exportSaveDialog: PropTypes.func.isRequired,
   }),
   moveFromTemp: PropTypes.func.isRequired,
   showItemInFolder: PropTypes.func.isRequired,
