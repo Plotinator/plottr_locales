@@ -31,6 +31,7 @@ export default function askToExport(
             })
             .catch((error) => {
               logger.error('error', error)
+              cb(error, false)
             })
           return
       }
