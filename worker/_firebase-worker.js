@@ -116,7 +116,8 @@ self.onmessage = (event) => {
           messageId,
         })
       } catch (error) {
-        logger.error('Error posting message back', error)
+        console.error('Error posting message back', error)
+        logger.error('Error posting message back', error.message)
         try {
           self.postMessage({
             type: errorTypeToReplyType(type),
@@ -127,11 +128,17 @@ self.onmessage = (event) => {
             messageId,
           })
         } catch (secondError) {
-          logger.error(
+          console.error(
             'Error telling the main process about an error.  Second error: ',
             secondError,
             '.  First error (the error we tried to tell the main process): ',
             error
+          )
+          logger.error(
+            'Error telling the main process about an error.  Second error: ',
+            secondError.message,
+            '.  First error (the error we tried to tell the main process): ',
+            error.message
           )
         }
       }
@@ -148,7 +155,8 @@ self.onmessage = (event) => {
           payload: {},
         })
       } catch (error) {
-        logger.error('Error logging error to main process: ', error)
+        console.error('Error logging error to main process: ', error)
+        logger.error('Error logging error to main process: ', error.message)
       }
       return
     }
@@ -169,7 +177,8 @@ self.onmessage = (event) => {
             },
           })
         } catch (error) {
-          logger.error('Error logging error to main process: ', error)
+          console.error('Error logging error to main process: ', error)
+          logger.error('Error logging error to main process: ', error.message)
         }
       }
       const unsubscribeToFile = listenToFile(userId, fileId, clientId, replyWithReduxAction)
@@ -278,7 +287,8 @@ self.onmessage = (event) => {
             payload: result,
           })
         } catch (error) {
-          logger.error('Error replying to LISTEN_TO_FILES: ', error)
+          console.error('Error replying to LISTEN_TO_FILES: ', error)
+          logger.error('Error replying to LISTEN_TO_FILES: ', error.message)
         }
       })
       unsubscribeFunctions.set(messageId, unsubscribe)
@@ -311,7 +321,8 @@ self.onmessage = (event) => {
             },
           })
         } catch (error) {
-          logger.error('Error replying to ON_SESSION_CHANGE: ', error)
+          console.error('Error replying to ON_SESSION_CHANGE: ', error)
+          logger.error('Error replying to ON_SESSION_CHANGE: ', error.message)
         }
       })
       unsubscribeFunctions.set(messageId, unsubscribe)
@@ -329,7 +340,8 @@ self.onmessage = (event) => {
           },
         })
       } catch (error) {
-        logger.error('Error replying to CURRENT_USER: ', error)
+        console.error('Error replying to CURRENT_USER: ', error)
+        logger.error('Error replying to CURRENT_USER: ', error.message)
       }
       return
     }
@@ -426,7 +438,8 @@ self.onmessage = (event) => {
             },
           })
         } catch (error) {
-          logger.error('Error replying to GET_ID_TOKEN_RESULT: ', error)
+          console.error('Error replying to GET_ID_TOKEN_RESULT: ', error)
+          logger.error('Error replying to GET_ID_TOKEN_RESULT: ', error.message)
         }
       }
       return
@@ -440,7 +453,8 @@ self.onmessage = (event) => {
           payload: isStorageURL(string),
         })
       } catch (error) {
-        logger.error('Error replying to IS_STORAGE_URL: ', error)
+        console.error('Error replying to IS_STORAGE_URL: ', error)
+        logger.error('Error replying to IS_STORAGE_URL: ', error.message)
       }
       return
     }
@@ -454,7 +468,8 @@ self.onmessage = (event) => {
             payload: result,
           })
         } catch (error) {
-          logger.error('Error replying to LISTEN_FOR_RCE_LOCK: ', error)
+          console.error('Error replying to LISTEN_FOR_RCE_LOCK: ', error)
+          logger.error('Error replying to LISTEN_FOR_RCE_LOCK: ', error.message)
         }
       })
       unsubscribeFunctions.set(messageId, unsubscribe)
@@ -470,7 +485,8 @@ self.onmessage = (event) => {
             payload: result,
           })
         } catch (error) {
-          logger.error('Error replying to LISTEN_FOR_BACKUPS: ', error)
+          console.error('Error replying to LISTEN_FOR_BACKUPS: ', error)
+          logger.error('Error replying to LISTEN_FOR_BACKUPS: ', error.message)
         }
       })
       unsubscribeFunctions.set(messageId, unsubscribe)
@@ -486,7 +502,8 @@ self.onmessage = (event) => {
             payload: result,
           })
         } catch (error) {
-          logger.error('Error replying to LISTEN_TO_CUSTOM_TEMPLATES: ', error)
+          console.error('Error replying to LISTEN_TO_CUSTOM_TEMPLATES: ', error)
+          logger.error('Error replying to LISTEN_TO_CUSTOM_TEMPLATES: ', error.message)
         }
       })
       unsubscribeFunctions.set(messageId, unsubscribe)
