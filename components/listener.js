@@ -46,8 +46,6 @@ const Listener = ({
   loadingFile,
   settings,
 }) => {
-  const [unsubscribe, setUnsubscribe] = useState(nop)
-
   useEffect(() => {
     if (!checkedFileToLoad) startCheckingFileToLoad()
     const sessionFileId = (selectedFile && selectedFile.id) || currentProject()
@@ -113,11 +111,16 @@ const Listener = ({
     if (!userId || !clientId || !selectedFile || !selectedFile.id) {
       return () => {}
     }
-    setUnsubscribe(
-      listen(store, userId, selectedFile.id, clientId, selectedFile.version, (error) => {
+    const unsubscribe = listen(
+      store,
+      userId,
+      selectedFile.id,
+      clientId,
+      selectedFile.version,
+      (error) => {
         logger.error('Error listening to file changes.', error)
         generalError('There seems to be a problem with your network.')
-      })
+      }
     )
     setPermission(selectedFile.permission)
     setFileLoaded()
