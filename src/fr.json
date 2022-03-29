@@ -2188,5 +2188,14 @@
   },
   "plottr.com/beta": {
     "message": "plottr.com/beta"
+  },
+  "Import": {
+    "message": "Importer"
+  },
+  "Enter title": {
+    "message": "Entrez le titre"
+  },
+  "Duplicate": {
+    "message": "Dupliquer"
   }
 }
