@@ -1,6 +1,7 @@
 const path = require('path')
 
 module.exports = {
+  productionBrowserSourceMaps: true,
   webpack: (config, { isServer }) => {
     config.resolve = {
       ...config.resolve,
