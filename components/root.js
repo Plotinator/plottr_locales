@@ -16,9 +16,11 @@ import Upload from './upload'
 import Main from './Main'
 import { logger } from '../lib/logger'
 import world from '../lib/world'
-import { instrumentLongRunningTasks } from '../lib/longRunning'
 
-instrumentLongRunningTasks()
+// import { instrumentLongRunningTasks } from '../lib/longRunning'
+
+// This is much too slow to use in practice.
+// instrumentLongRunningTasks()
 
 const redo = () => {
   store.dispatch(ActionCreators.redo())
