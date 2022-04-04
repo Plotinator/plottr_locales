@@ -182,6 +182,10 @@ const platform = {
       // Nop: no such thing as reading synchronously from the file
       // system when we're using cloud storage.
     },
+    rmRF: () => {
+      // Nop: no such thing as deleting a folder recursively on the
+      // web.
+    },
     moveItemToTrash: deleteFileOnFirestore,
     createFromSnowflake: (importedPath) => {
       // NOP
