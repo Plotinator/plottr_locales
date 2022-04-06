@@ -1,13 +1,34 @@
 const admin = require('firebase-admin')
+import fs from 'fs'
 import AdmZip from 'adm-zip'
 import { v4 as uuidv4 } from 'uuid'
-import { verifyToken } from './verify-token'
+
 import { setupI18n } from 'plottr_locales'
+import { askToExport } from 'plottr_import_export'
+
+import { verifyToken } from './verify-token'
 import { localeSettings } from '../../lib/locale-settings'
+import { logger } from '../../lib/logger'
+
+class DummyMixpanelQueue {
+  projectEventStats(event, basicAttrs = {}, state) {}
+
+  push(event, attrs = {}) {}
+
+  flush() {}
+}
+
+const MPQ = new DummyMixpanelQueue()
 
 setupI18n(localeSettings, {})
 
-import askToExport from '../../lib/exporter/start_export'
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb',
+    },
+  },
+}
 
 if (!admin.apps.length) {
   if (process.env.FIREBASE_ENV === 'development') {
@@ -31,6 +52,8 @@ const baseBucket =
 const storage = admin.storage()
 const auth = admin.auth()
 
+const nopNotifier = () => {}
+
 export default (req, res) => {
   return verifyToken(auth, req, res).then(() => {
     const file = req.body.file
@@ -39,75 +62,87 @@ export default (req, res) => {
     const extension = type === 'scrivener' ? 'scrivener' : 'docx'
     const baseFileName = `fileToExport-${uuidv4()}`
     const savedFilePath = `/tmp/${baseFileName}.${extension}`
-    askToExport(
-      savedFilePath,
-      file,
-      type,
-      config,
-      (error, filePath) => {
-        if (error) {
-          res.status(503)
-          console.error('Error while exporting: ', error)
-          res.json({ errorMessage: error.message })
-        } else {
-          console.log('Saved file at: ', savedFilePath)
-          const uploadFilePath = type === 'scrivener' ? `/tmp/${baseFileName}.zip` : savedFilePath
-          if (type === 'scrivener') {
-            const zip = new AdmZip()
-            zip.addLocalFolder(savedFilePath)
-            zip.writeZip(uploadFilePath)
-            console.log('Zipped to ', uploadFilePath)
-          }
-          const destinationFilePath =
-            type === 'scrivener'
-              ? `tmp/${uuidv4()}-${file.file.fileName}.zip`
-              : `tmp/${uuidv4()}-${file.file.fileName}.${extension}`
-          const bucket = storage.bucket(baseBucket)
-          bucket.upload(
-            uploadFilePath,
-            {
-              destination: bucket.file(destinationFilePath),
-              resumable: false,
-            },
-            (err, storedFile) => {
-              if (err) {
-                console.error('Error: ', err)
-                res.status(503)
-                res.json({ err, message: err.message })
-                return
-              }
-              console.log(`Stored file on firestore at: ${destinationFilePath}`)
-              if (process.env.FIREBASE_ENV === 'development') {
-                storedFile.makePublic().then((result) => {
-                  const url = storedFile.publicUrl()
-                  console.log('Redirecting to: ', url)
-                  res.status(200)
-                  res.setHeader('Content-Type', 'text/html')
-                  res.setHeader('Location', url)
-                  res.send(`See: ${url}`)
-                })
-              } else {
-                const expiryDate = new Date()
-                expiryDate.setDate(expiryDate.getDate() + 1)
-                const config = {
-                  action: 'read',
-                  expires: `${
-                    expiryDate.getMonth() + 1
-                  }-${expiryDate.getDate()}-${expiryDate.getFullYear()}`,
-                }
-                storedFile.getSignedUrl(config).then((url) => {
-                  console.log('Redirecting to: ', url)
-                  res.status(200)
-                  res.setHeader('Content-Type', 'text/html')
-                  res.setHeader('Location', url)
-                  res.send(`See: ${url}`)
-                })
-              }
+    try {
+      askToExport(
+        savedFilePath,
+        file,
+        type,
+        config,
+        false, // isWindows
+        nopNotifier,
+        logger,
+        null,
+        MPQ,
+        (error, filePath) => {
+          if (error) {
+            res.status(503)
+            console.error('Error while exporting: ', error)
+            res.json({ errorMessage: error.message })
+          } else {
+            console.log('Error object', error)
+            console.log('File path', filePath)
+            console.log('Saved file at: ', savedFilePath)
+            console.log('TMP dir contents: ', fs.readdirSync('/tmp/'))
+            const uploadFilePath = type === 'scrivener' ? `/tmp/${baseFileName}.zip` : savedFilePath
+            if (type === 'scrivener') {
+              const zip = new AdmZip()
+              zip.addLocalFolder(savedFilePath)
+              zip.writeZip(uploadFilePath)
+              console.log('Zipped to ', uploadFilePath)
             }
-          )
-        }
-      },
-      false
-    )
+            const destinationFilePath =
+              type === 'scrivener'
+                ? `tmp/${uuidv4()}-${file.file.fileName}.zip`
+                : `tmp/${uuidv4()}-${file.file.fileName}.${extension}`
+            const bucket = storage.bucket(baseBucket)
+            bucket.upload(
+              uploadFilePath,
+              {
+                destination: bucket.file(destinationFilePath),
+                resumable: false,
+              },
+              (err, storedFile) => {
+                if (err) {
+                  console.error('Error: ', err)
+                  res.status(503)
+                  res.json({ err, message: err.message })
+                  return
+                }
+                console.log(`Stored file on firestore at: ${destinationFilePath}`)
+                if (process.env.FIREBASE_ENV === 'development') {
+                  storedFile.makePublic().then((result) => {
+                    const url = storedFile.publicUrl()
+                    console.log('Redirecting to: ', url)
+                    res.status(200)
+                    res.setHeader('Content-Type', 'text/html')
+                    res.setHeader('Location', url)
+                    res.send(`See: ${url}`)
+                  })
+                } else {
+                  const expiryDate = new Date()
+                  expiryDate.setDate(expiryDate.getDate() + 1)
+                  const config = {
+                    action: 'read',
+                    expires: `${
+                      expiryDate.getMonth() + 1
+                    }-${expiryDate.getDate()}-${expiryDate.getFullYear()}`,
+                  }
+                  storedFile.getSignedUrl(config).then((url) => {
+                    console.log('Redirecting to: ', url)
+                    res.status(200)
+                    res.setHeader('Content-Type', 'text/html')
+                    res.setHeader('Location', url)
+                    res.send(`See: ${url}`)
+                  })
+                }
+              }
+            )
+          }
+        },
+        false
+      )
+    } catch (error) {
+      console.error(`Error exporting to ${type}.  `, error.message, error)
+    }
   })
 }

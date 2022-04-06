@@ -4,7 +4,8 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 
 import { FunSpinner } from 'connected-components'
-import { onSessionChange, firebaseUI, startUI, currentUser } from 'wired-up-firebase'
+import { onSessionChange, getIdTokenResult } from 'wired-up-firebase'
+import { startUI } from 'plottr_firebase'
 import { userHasPro } from '../lib/checkPro'
 import { logger } from '../lib/logger'
 
@@ -25,24 +26,22 @@ export default function LoginPage() {
         if (process.env.NEXT_PUBLIC_NODE_ENV === 'development') {
           window.location.href = url
         } else {
-          currentUser()
-            .getIdTokenResult()
-            .then(async (token) => {
-              logger.info('Received token')
-              if (token.claims.beta || token.claims.admin || token.claims.lifetime) {
+          getIdTokenResult().then(async (token) => {
+            logger.info('Received token')
+            if (token.claims.beta || token.claims.admin || token.claims.lifetime) {
+              window.location.href = url
+            } else {
+              // check for Plottr Pro
+              const [hasPro] = await userHasPro(user.email)
+              if (hasPro) {
                 window.location.href = url
               } else {
-                // check for Plottr Pro
-                const [hasPro] = await userHasPro(user.email)
-                if (hasPro) {
-                  window.location.href = url
-                } else {
-                  // display something saying
-                  // the user is not authorized for the beta
-                  logger.error('not authorized')
-                }
+                // display something saying
+                // the user is not authorized for the beta
+                logger.error('not authorized')
               }
-            })
+            }
+          })
         }
       }
     })
@@ -52,8 +51,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (!sessionChecked) return
     if (firebaseLoginComponentRef.current) {
-      const ui = firebaseUI()
-      startUI(ui, '#firebase-login')
+      startUI('#firebase-login')
     }
   }, [sessionChecked])
 

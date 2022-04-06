@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { PropTypes } from 'prop-types'
 import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
 
 import { actions, selectors } from 'pltr/v2'
-import { listen, stopListening, listenToCustomTemplates } from 'wired-up-firebase'
+import { listen, listenToCustomTemplates } from 'wired-up-firebase'
 import { store } from '../lib/redux'
 import { closeDashboard, openDashboard } from '../lib/dashboard'
 import { setCurrentProject, currentProject } from '../lib/currentProject'
@@ -44,8 +44,6 @@ const Listener = ({
   loadingFile,
   settings,
 }) => {
-  const [unsubscribeFunctions, setUnsubscribeFunctions] = useState([])
-
   useEffect(() => {
     if (!checkedFileToLoad) startCheckingFileToLoad()
     const sessionFileId = (selectedFile && selectedFile.id) || currentProject()
@@ -111,18 +109,22 @@ const Listener = ({
     if (!userId || !clientId || !selectedFile || !selectedFile.id) {
       return () => {}
     }
-    setUnsubscribeFunctions(
-      listen(store, userId, selectedFile.id, clientId, selectedFile.version, (error) => {
+    const unsubscribe = listen(
+      store,
+      userId,
+      selectedFile.id,
+      clientId,
+      selectedFile.version,
+      (error) => {
         logger.error('Error listening to file changes.', error)
         generalError('There seems to be a problem with your network.')
-      })
+      }
     )
     setPermission(selectedFile.permission)
     setFileLoaded()
 
     return () => {
-      stopListening(unsubscribeFunctions)
-      setUnsubscribeFunctions([])
+      if (unsubscribe) unsubscribe()
       setPermission('viewer')
     }
   }, [selectedFile, userId, clientId])
@@ -133,7 +135,7 @@ const Listener = ({
     } else if (!settings.user.beatHierarchy) {
       unsetBeatHierarchy()
     }
-  }, [setBeatHierarchy, unsetBeatHierarchy])
+  }, [settings, setBeatHierarchy, unsetBeatHierarchy])
 
   useEffect(() => {
     if (userId) {

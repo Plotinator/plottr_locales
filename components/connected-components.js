@@ -11,21 +11,14 @@ import { appVersion } from '../lib/version'
 import {
   saveImageToStorageBlob as saveImageToStorageBlobInFirebase,
   saveImageToStorageFromURL as saveImageToStorageFromURLInFirebase,
-  publishRCEOperations,
-  fetchRCEOperations,
   deleteFile,
   imagePublicURL,
   isStorageURL,
-  listenForChangesToEditor,
-  deleteChangeSignal,
-  deleteOldChanges,
   backupPublicURL,
   lockRCE,
   listenForRCELock,
   releaseRCELock,
   logOut,
-  startUI,
-  firebaseUI,
   onSessionChange,
   currentUser,
   fetchFiles,
@@ -37,7 +30,7 @@ import {
   messageToEditTemplate,
   messageToDeleteTemplate,
 } from '../lib/templates'
-import export_config from '../lib/exporter/default_config'
+import exportConfig from 'plottr_import_export_config'
 import { exportFile } from '../lib/export'
 import { saveAppSetting } from '../lib/appSettings'
 import { saveExportConfigSettings } from '../lib/exportSettings'
@@ -59,6 +52,7 @@ import { resizeImage } from '../lib/resizeImage'
 import extractImages from '../lib/extractImages'
 import { logger } from '../lib/logger'
 import { setCurrentProject } from '../lib/currentProject'
+import { notifyUser } from '../lib/notifyUser'
 
 const deleteFileOnFirestore = (fileId) => {
   const state = store.getState()
@@ -82,14 +76,14 @@ const platform = {
     store.dispatch(actions.ui.setDarkMode(value === 'dark'))
   },
   file: {
-    createNew: (template) => {
+    createNew: (template, newFileName) => {
       const state = store.getState()
       const {
         client: { emailAddress, userId, clientId },
         knownFiles,
       } = state.present
       const untitledFileList = knownFiles.filter(({ fileName }) => fileName.match(/Untitled/g))
-      const fileName = t('Untitled') + ` - ${untitledFileList.length}`
+      const fileName = newFileName || t('Untitled') + ` - ${untitledFileList.length}`
       const setKnownFiles = (...args) => store.dispatch(actions.knownFiles.setKnownFiles(...args))
       const selectFile = (...args) => store.dispatch(actions.project.selectFile(...args))
       const newFileState = Object.assign(
@@ -188,9 +182,16 @@ const platform = {
       // Nop: no such thing as reading synchronously from the file
       // system when we're using cloud storage.
     },
+    rmRF: () => {
+      // Nop: no such thing as deleting a folder recursively on the
+      // web.
+    },
     moveItemToTrash: deleteFileOnFirestore,
     createFromSnowflake: (importedPath) => {
-      // TODO
+      // NOP
+    },
+    createFromScrivener: (importedPath) => {
+      // NOP
     },
     joinPath: (path, backup) => {
       return `${path}/${backup}`
@@ -291,7 +292,7 @@ const platform = {
   dialog: {
     showErrorBox: (error) => {
       logger.error(error)
-      if (typeof alert !== 'undefined') alert(error)
+      if (typeof alert !== 'undefined' && error.message) alert(error.message)
     },
   },
   showSaveDialogSync: () => {
@@ -310,7 +311,11 @@ const platform = {
   export: {
     saveExportConfigSettings,
     askToExport: exportFile,
-    export_config,
+    export_config: exportConfig,
+    notifyUser,
+    exportSaveDialog: () => {
+      // NOP
+    },
   },
   moveFromTemp: (fullFileState) => {
     const data = new Blob([JSON.stringify(fullFileState, null, 2)], { type: 'text/json' })
@@ -345,14 +350,9 @@ const platform = {
     bindActionCreators,
   },
   rootElementSelectors: ['#__next'],
-  publishRCEOperations,
   lockRCE,
   listenForRCELock,
   releaseRCELock,
-  deleteChangeSignal,
-  deleteOldChanges,
-  fetchRCEOperations,
-  listenForChangesToEditor,
   machineIdSync: () => {
     return uuidv4()
   },
@@ -391,14 +391,18 @@ const platform = {
     resizeImage,
   },
   firebase: {
-    startUI,
-    firebaseUI,
     onSessionChange,
     currentUser,
     fetchFiles,
     logOut,
     saveCustomTemplate,
     uploadExisting,
+  },
+  login: {
+    launchLoginPopup: () => {
+      logger.warn('Calling nop action: launchLoginPopup')
+      // NOP.  On web we launch it at a different URL and then redirect.
+    },
   },
 }
 

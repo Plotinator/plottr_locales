@@ -93,6 +93,31 @@ svg {
       }
     }
   }
+
+  .project-nav__options {
+    padding-right: 0;
+    button {
+      font-size: 15px;
+      svg {
+        margin-right: 4px;
+      }
+    }
+  }
+
+  .project-nav__share-button {
+    svg {
+      margin: 0px !important;
+    }
+  }
+
+  .project-nav__dashboard-button {
+    margin-left: 15px;
+  }
+
+  .project-nav__beamer-button {
+    margin-right: 18px;
+    margin-left: 15px;
+  }
 }
 
 body {
