@@ -4,45 +4,34 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 
 import { FunSpinner } from 'connected-components'
-import { onSessionChange, getIdTokenResult } from 'wired-up-firebase'
+import { onSessionChange, getIdTokenResult, logOut } from 'wired-up-firebase'
 import { startUI } from 'plottr_firebase'
-import { userHasPro } from '../lib/checkPro'
-import { logger } from '../lib/logger'
+import { logger } from '../../lib/logger'
 
-export default function LoginPage() {
+export default function AdminLoginPage() {
   const [sessionChecked, setSessionChecked] = useState(false)
   const router = useRouter()
-  const { pid } = router.query
 
   useEffect(() => {
     if (sessionChecked) return
-    onSessionChange(async (user) => {
+    onSessionChange((user) => {
       logger.info('Session changed', user)
       setSessionChecked(true)
       if (user) {
         logger.info('Session w/ user', router.query)
-        const url = `/timeline${pid ? '?pid=' + pid : ''}`
+        const url = `/admin`
         logger.info('url to redirect', url)
-        if (process.env.NEXT_PUBLIC_NODE_ENV === 'development') {
-          window.location.href = url
-        } else {
-          getIdTokenResult().then(async (token) => {
-            logger.info('Received token')
-            if (token.claims.beta || token.claims.admin || token.claims.lifetime) {
-              window.location.href = url
-            } else {
-              // check for Plottr Pro
-              const [hasPro] = await userHasPro(user.email)
-              if (hasPro) {
-                window.location.href = url
-              } else {
-                // display something saying
-                // the user is not authorized for the beta
-                logger.error('not authorized')
-              }
-            }
-          })
-        }
+        getIdTokenResult().then((token) => {
+          logger.info('Received token')
+          if (token.claims.admin) {
+            window.location.href = url
+          } else {
+            logOut().then(() => {
+              alert('You dont have the admin claim.')
+              window.location.reload()
+            })
+          }
+        })
       }
     })
   }, [])
@@ -61,7 +50,7 @@ export default function LoginPage() {
     return (
       <>
         <div className="login__left">
-          <h1>Welcome to Plottr</h1>
+          <h1>Plottr Admin Portal</h1>
           <div id="firebase-login" ref={firebaseLoginComponentRef}></div>
         </div>
         <div className="login__right">
@@ -76,6 +65,6 @@ export default function LoginPage() {
   return <main className="login__main">{renderMain()}</main>
 }
 
-LoginPage.propTypes = {
+AdminLoginPage.propTypes = {
   email: PropTypes.string,
 }

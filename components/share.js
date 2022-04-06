@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { connect } from 'react-redux'
 import { PropTypes } from 'prop-types'
 import { IoIosShareAlt } from 'react-icons/io'
-import { NavItem, Button, Form, FormGroup, ControlLabel, Table, FormControl } from 'react-bootstrap'
+import { Button, Form, FormGroup, ControlLabel, Table, FormControl } from 'react-bootstrap'
 
 import { t } from 'plottr_locales'
 import { selectors, actions } from 'pltr/v2'
@@ -105,10 +105,10 @@ const Share = ({ userId, selectedFile, generalError }) => {
         </div>
       </PlottrModal>
       <Button
+        bsSize="small"
         className="project-nav__share-button"
         onClick={() => setSharing(true)}
         title={t('Share')}
-        bsSize="small"
       >
         <IoIosShareAlt />
       </Button>
