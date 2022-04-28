@@ -227,7 +227,7 @@ const TimelineTableConnector = (connector) => {
           const lastBeat = beats[idx - 1]
           return [
             <Row key={`beatId-${beat.id}`}>
-              {isLarge || idx === 0 ? (
+              {isLarge || isMedium || idx === 0 ? (
                 <BeatInsertCell
                   isFirst={idx === 0}
                   isInBeatList={true}
@@ -306,7 +306,7 @@ const TimelineTableConnector = (connector) => {
     getToastMessage = (cardAction, newBookId) => {
       if (cardAction == 'move' && newBookId) {
         const { books, actions } = this.props
-        const bookTitle = this.bookTitle(books[newBookId])
+        const bookTitle = newBookId === 'series' ? t('Series') : this.bookTitle(books[newBookId])
 
         // if card is moved to another book, create the book link
         return (
@@ -429,7 +429,12 @@ const TimelineTableConnector = (connector) => {
               vertical: orientation == 'vertical',
             })}
           >
-            <table className="table-header-rotated">
+            <table
+              className="table-header-rotated"
+              ref={(ref) => {
+                this.props.setTableRef(ref)
+              }}
+            >
               <TopRow />
               <tbody>{this.renderRows()}</tbody>
               {toast.visible ? this.renderToastMessage() : null}
@@ -470,6 +475,7 @@ const TimelineTableConnector = (connector) => {
     toast: PropTypes.object,
     notificationActions: PropTypes.object,
     beatPositions: PropTypes.object.isRequired,
+    setTableRef: PropTypes.func,
   }
 
   const {
