@@ -20,39 +20,6 @@ const {
   lists: { reorderList },
 } = helpers
 
-const CELL_SIZES = {
-  small: {
-    vertical: {
-      start: 0,
-      length: 0,
-    },
-    horizontal: {
-      start: 0,
-      length: 0,
-    },
-  },
-  medium: {
-    vertical: {
-      start: 40,
-      length: 108.69,
-    },
-    horizontal: {
-      start: 27,
-      length: 90,
-    },
-  },
-  large: {
-    vertical: {
-      start: 40,
-      length: 108.69,
-    },
-    horizontal: {
-      start: 27,
-      length: 202,
-    },
-  },
-}
-
 const TimelineTableConnector = (connector) => {
   const CardCell = UnconnectedCardCell(connector)
   const BlankCard = UnconnectedBlankCard(connector)
@@ -69,24 +36,43 @@ const TimelineTableConnector = (connector) => {
     }
 
     setLength = () => {
-      const { tableRef, orientation, isMedium, isSmall } = this.props
+      const { tableRef, orientation, isSmall, isMedium } = this.props
       if (isSmall) return
 
       if (!tableRef) return
-      const size = isSmall ? 'small' : isMedium ? 'medium' : 'large'
-      const { start, length } = CELL_SIZES[size][orientation]
-      let newLength = this.props.beats.length * length + start
+      let newLength = 0
+      if (orientation === 'horizontal') {
+        newLength = Array.from(tableRef.querySelector('.sticky-table-row').children)
+          .slice(1, -1) // The first table cell is note above the line
+          .reduce((acc, nextNode) => {
+            return acc + nextNode.clientWidth
+          }, 0)
+      } else {
+        newLength = Array.from(tableRef.querySelectorAll('.sticky-table-row'))
+          .slice(2, isMedium ? undefined : -1) // The first table cell is note above the line
+          .reduce((acc, nextNode) => {
+            return acc + nextNode.clientHeight
+          }, 0)
+      }
       if (this.state.tableLength != newLength) {
         this.setState({ tableLength: newLength })
       }
     }
 
     componentDidMount() {
-      this.setLength()
+      // We need to wait a minute to make sure that the DOM size
+      // calculations are done.
+      setTimeout(() => {
+        this.setLength()
+      }, 50)
     }
 
     componentDidUpdate() {
-      this.setLength()
+      // We need to wait a minute to make sure that the DOM size
+      // calculations are done.
+      setTimeout(() => {
+        this.setLength()
+      }, 50)
 
       const { visible } = this.props.toast
 
@@ -241,7 +227,7 @@ const TimelineTableConnector = (connector) => {
           const lastBeat = beats[idx - 1]
           return [
             <Row key={`beatId-${beat.id}`}>
-              {isLarge || idx === 0 ? (
+              {isLarge || isMedium || idx === 0 ? (
                 <BeatInsertCell
                   isFirst={idx === 0}
                   isInBeatList={true}
@@ -320,7 +306,7 @@ const TimelineTableConnector = (connector) => {
     getToastMessage = (cardAction, newBookId) => {
       if (cardAction == 'move' && newBookId) {
         const { books, actions } = this.props
-        const bookTitle = this.bookTitle(books[newBookId])
+        const bookTitle = newBookId === 'series' ? t('Series') : this.bookTitle(books[newBookId])
 
         // if card is moved to another book, create the book link
         return (
@@ -349,6 +335,18 @@ const TimelineTableConnector = (connector) => {
           <button className="close" onClick={() => this.handleCloseToast()}>
             <span aria-hidden="true">&times;</span>
           </button>
+        </div>
+      )
+    }
+
+    renderMessage = () => {
+      const { message } = this.props
+      return (
+        <div
+          className={cx('update-notifier scene-card-update-toast alert alert-info')}
+          role="alert"
+        >
+          {message}
         </div>
       )
     }
@@ -433,7 +431,7 @@ const TimelineTableConnector = (connector) => {
     }
 
     render() {
-      const { darkMode, orientation, isSmall, toast } = this.props
+      const { darkMode, orientation, isSmall, toast, message } = this.props
 
       if (isSmall) {
         return (
@@ -443,7 +441,12 @@ const TimelineTableConnector = (connector) => {
               vertical: orientation == 'vertical',
             })}
           >
-            <table className="table-header-rotated">
+            <table
+              className="table-header-rotated"
+              ref={(ref) => {
+                this.props.setTableRef(ref)
+              }}
+            >
               <TopRow />
               <tbody>{this.renderRows()}</tbody>
               {toast.visible ? this.renderToastMessage() : null}
@@ -454,6 +457,7 @@ const TimelineTableConnector = (connector) => {
         return [
           <TopRow key="top-row" />,
           toast.visible ? this.renderToastMessage() : null,
+          message ? this.renderMessage() : null,
           this.renderRows(),
         ]
       }
@@ -484,6 +488,8 @@ const TimelineTableConnector = (connector) => {
     toast: PropTypes.object,
     notificationActions: PropTypes.object,
     beatPositions: PropTypes.object.isRequired,
+    setTableRef: PropTypes.func,
+    message: PropTypes.string,
   }
 
   const {
@@ -515,6 +521,7 @@ const TimelineTableConnector = (connector) => {
           isLarge: selectors.isLargeSelector(state.present),
           toast: selectors.toastNotificationSelector(state.present),
           beatPositions: selectors.visibleBeatPositions(state.present),
+          message: selectors.messageSelector(state.present),
         }
       },
       (dispatch) => {

@@ -377,10 +377,10 @@ const CardDialogConnector = (connector) => {
     }
 
     const renderBooks = (onSelect = changeBook) => {
-      return books.allIds.map((id) => {
+      return ['series', ...books.allIds].map((id) => {
         return (
           <MenuItem key={id} onSelect={() => onSelect(id)}>
-            {books[id].title || t('Untitled')}
+            {id === 'series' ? t('Series') : books[id].title || t('Untitled')}
           </MenuItem>
         )
       })
@@ -406,6 +406,7 @@ const CardDialogConnector = (connector) => {
       const title = cardMetaData.title
       return (
         <FormControl
+          placeholder={t('Enter title')}
           style={{ fontSize: '24px', textAlign: 'center', marginBottom: '6px' }}
           onKeyPress={handleEnter}
           type="text"
