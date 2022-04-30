@@ -770,9 +770,6 @@
   "Text Color": {
     "message": "رنگ متن"
   },
-  "Chapter": {
-    "message": "فصل"
-  },
   "Main Plot": {
     "message": "طرح اصلي"
   },
@@ -1808,12 +1805,6 @@
   "Minimize": {
     "message": "کوچک‌سازی"
   },
-  "Zoom": {
-    "message": "بزرگنمایی"
-  },
-  "Close": {
-    "message": "بستن"
-  },
   "My awesome story": {
     "message": "داستان عالی من"
   },
@@ -2086,5 +2077,11 @@
   },
   "Import": {
     "message": "وارد کردن"
+  },
+  "Enter title": {
+    "message": "عنوان را وارد کنید"
+  },
+  "Duplicate": {
+    "message": "کپی کردن"
   }
 }
