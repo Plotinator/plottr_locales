@@ -137,7 +137,7 @@ const Listener = ({
     } else if (!settings.user.beatHierarchy) {
       unsetBeatHierarchy()
     }
-  }, [setBeatHierarchy, unsetBeatHierarchy])
+  }, [settings, setBeatHierarchy, unsetBeatHierarchy])
 
   useEffect(() => {
     if (userId) {

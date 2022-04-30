@@ -62,6 +62,8 @@ const deleteFileOnFirestore = (fileId) => {
   return deleteFile(fileId, userId, clientId)
 }
 
+const NOP = () => {}
+
 const platform = {
   electron: null,
   undo: () => {
@@ -168,61 +170,34 @@ const platform = {
           logger.error(`Error deleting file: ${fileId}`, error)
         })
     },
-    editKnownFilePath: (oldFilePath, newFilePath) => {
-      // Nop: you can't change where a file is on the web.
-    },
-    removeFromKnownFiles: (id) => {
-      // TODO: not sure what the best thing to do is if all we have is
-      // a position id.
-    },
-    saveFile: (filePath, file) => {
-      // Nop: files are saved as we go.
-    },
-    readFileSync: () => {
-      // Nop: no such thing as reading synchronously from the file
-      // system when we're using cloud storage.
-    },
+    // You can't change where a file is on the web.
+    editKnownFilePath: NOP,
+    removeFromKnownFiles: NOP,
+    // Files are saved as we go.
+    saveFile: NOP,
+    // no such thing as reading synchronously from the file system
+    // when we're using cloud storage.
+    readFileSync: NOP,
     moveItemToTrash: deleteFileOnFirestore,
-    createFromSnowflake: (importedPath) => {
-      // NOP
-    },
-    createFromScrivener: (importedPath) => {
-      // NOP
-    },
+    createFromSnowflake: NOP,
+    createFromScrivener: NOP,
     joinPath: (path, backup) => {
       return `${path}/${backup}`
     },
     renameFile: messageRenameFile,
     listOfflineFiles: () => [],
+    rmRF: NOP,
   },
   update: {
-    quitToInstall: () => {
-      // Nop
-    },
-    downloadUpdate: () => {
-      // Nop
-    },
-    checkForUpdates: () => {
-      // Nop
-    },
-    onUpdateError: (cb) => {
-      // Nop
-    },
-    onUpdaterUpdateAvailable: (cb) => {
-      // Nop
-    },
-    onUpdaterUpdateNotAvailable: (cb) => {
-      // Nop
-    },
-    onUpdaterDownloadProgress: (cb) => {
-      // Nop
-    },
-    onUpdatorUpdateDownloaded: (cb) => {
-      // Nop
-    },
-    deregisterUpdateListeners: () => {
-      // Nop
-    },
+    quitToInstall: NOP,
+    downloadUpdate: NOP,
+    checkForUpdates: NOP,
+    onUpdateError: NOP,
+    onUpdaterUpdateAvailable: NOP,
+    onUpdaterUpdateNotAvailable: NOP,
+    onUpdaterDownloadProgress: NOP,
+    onUpdatorUpdateDownloaded: NOP,
+    deregisterUpdateListeners: NOP,
   },
   updateLanguage: (newLanguage) => {
     window.location.reload()
@@ -309,9 +284,7 @@ const platform = {
     askToExport: exportFile,
     export_config: exportConfig,
     notifyUser,
-    exportSaveDialog: () => {
-      // NOP
-    },
+    exportSaveDialog: NOP,
   },
   moveFromTemp: (fullFileState) => {
     const data = new Blob([JSON.stringify(fullFileState, null, 2)], { type: 'text/json' })
@@ -396,7 +369,7 @@ const platform = {
   },
   login: {
     launchLoginPopup: () => {
-      logger.warn('Calling nop action: launchLoginPopup')
+      logger.warn('Calling NOP action: launchLoginPopup')
       // NOP.  On web we launch it at a different URL and then redirect.
     },
   },
