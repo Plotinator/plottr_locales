@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { FormGroup, ControlLabel, FormControl, Label, Button } from 'react-bootstrap'
 import axios from 'axios'
-import ProjectList from './ProjectList'
 import { AdminErrorBoundary } from './admin-error-boundary'
 
 const withEventTargetValue = (f) => (event) => {
