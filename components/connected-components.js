@@ -178,7 +178,6 @@ const platform = {
     // no such thing as reading synchronously from the file system
     // when we're using cloud storage.
     readFileSync: NOP,
-    rmRF: NOP,
     moveItemToTrash: deleteFileOnFirestore,
     createFromSnowflake: NOP,
     createFromScrivener: NOP,
