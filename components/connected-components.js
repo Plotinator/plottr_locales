@@ -1,12 +1,13 @@
 import { connections } from 'plottr_components'
 import { ActionCreators } from 'redux-undo'
-import { history } from '../lib/history'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { v4 as uuidv4 } from 'uuid'
 
 import { t } from 'plottr_locales'
-import { actions } from 'pltr/v2'
+import { actions, selectors } from 'pltr/v2'
+import { history } from '../lib/history'
+
 import { appVersion } from '../lib/version'
 import {
   saveImageToStorageBlob as saveImageToStorageBlobInFirebase,
@@ -84,14 +85,21 @@ const platform = {
         client: { emailAddress, userId, clientId },
         knownFiles,
       } = state.present
+      const actStructureEnabled = selectors.actStructureEnabled(state.present)
       const untitledFileList = knownFiles.filter(({ fileName }) => fileName.match(/Untitled/g))
       const fileName = newFileName || t('Untitled') + ` - ${untitledFileList.length}`
       const setKnownFiles = (...args) => store.dispatch(actions.knownFiles.setKnownFiles(...args))
       const selectFile = (...args) => store.dispatch(actions.project.selectFile(...args))
-      const newFileState = Object.assign(
-        newEmptyFile(fileName, appVersion(), state.present),
-        template || {}
-      )
+      const newFileStateWithoutFeatureFlags = {
+        ...newEmptyFile(fileName, appVersion(), state.present),
+        ...(template || {}),
+      }
+      const newFileState = {
+        ...newFileStateWithoutFeatureFlags,
+        featureFlags: {
+          BEAT_HIERARCHY: actStructureEnabled,
+        },
+      }
       store.dispatch(actions.applicationState.startCreatingCloudFile())
       newFile(
         emailAddress,
