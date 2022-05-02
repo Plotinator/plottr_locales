@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { PropTypes } from 'prop-types'
 import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
@@ -19,8 +19,6 @@ const withoutTimestamp = (fileRecord) => {
     timeStamp: undefined,
   }
 }
-
-const nop = () => {}
 
 const Listener = ({
   userId,
