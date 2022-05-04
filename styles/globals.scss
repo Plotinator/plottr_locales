@@ -53,7 +53,7 @@ svg {
     border-radius: 0;
     margin-bottom: 0;
     z-index: 1000;
-    overflow: hidden;
+    overflow: visible;
     .container-fluid {
       padding: 0;
 
@@ -74,6 +74,10 @@ svg {
           float: none;
         }
       }
+    }
+
+    &.navOverflowHidden {
+      overflow: hidden;
     }
 
     .navbar-save-controls {
