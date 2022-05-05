@@ -33,6 +33,7 @@ export default function Exporter(data, fileName, options, notifyUser) {
 
     console.log('About to notify user...')
     notifyUser(filePath, 'word')
+    console.log('Notified user...')
 
     return filePath
   })
