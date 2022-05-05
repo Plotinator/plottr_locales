@@ -68,6 +68,58 @@ const ProjectList = ({ files, supportUserProjects, refetch, supportID }) => {
     return realDate.toLocaleString()
   }
 
+  const sortableTime = (fileObj) => {
+    const frbTimeStamp = fileObj.timeStamp
+    if (!frbTimeStamp) return 0
+
+    const realDate = new Date(frbTimeStamp._seconds * 1000)
+    return realDate.getTime()
+  }
+
+  const renderFiles = () => {
+    const sortedFiles = files.sort((a, b) => sortableTime(a) > sortableTime(b))
+
+    return sortedFiles.map(
+      ({ fileId, deleted, fileName, permission, version, timeStamp, shareRecords }) => {
+        return (
+          <tr key={fileId}>
+            <td>{deleted ? <Label bsStyle="danger">DELETED</Label> : ''}</td>
+            <td>{fileName}</td>
+            <td>{renderTime(timeStamp)}</td>
+            <td>{fileId}</td>
+            <td>{permission}</td>
+            <td>{version}</td>
+            <td>
+              {isSharedWithSupport(fileId, shareRecords) ? (
+                <Button
+                  style={{ marginRight: '8px' }}
+                  bsStyle="warning"
+                  bsSize="xs"
+                  onClick={() => unShareWithSupport(fileId, shareRecords)}
+                >
+                  Un-Share with Support User
+                </Button>
+              ) : (
+                <Button
+                  style={{ marginRight: '8px' }}
+                  bsSize="xs"
+                  onClick={() => shareWithSupport(fileId, shareRecords)}
+                >
+                  Share to Support User
+                </Button>
+              )}
+              {deleted ? (
+                <Button bsStyle="warning" bsSize="xs" onClick={() => unDelete(fileId)}>
+                  Undelete
+                </Button>
+              ) : null}
+            </td>
+          </tr>
+        )
+      }
+    )
+  }
+
   return (
     <Table striped bordered hover>
       <thead>
@@ -81,45 +133,7 @@ const ProjectList = ({ files, supportUserProjects, refetch, supportID }) => {
           <th>Actions</th>
         </tr>
       </thead>
-      <tbody>
-        {files.map(
-          ({ fileId, deleted, fileName, permission, version, timeStamp, shareRecords }) => (
-            <tr key={fileId}>
-              <td>{deleted ? <Label bsStyle="danger">DELETED</Label> : ''}</td>
-              <td>{fileName}</td>
-              <td>{renderTime(timeStamp)}</td>
-              <td>{fileId}</td>
-              <td>{permission}</td>
-              <td>{version}</td>
-              <td>
-                {isSharedWithSupport(fileId, shareRecords) ? (
-                  <Button
-                    style={{ marginRight: '8px' }}
-                    bsStyle="warning"
-                    bsSize="xs"
-                    onClick={() => unShareWithSupport(fileId, shareRecords)}
-                  >
-                    Un-Share with Support User
-                  </Button>
-                ) : (
-                  <Button
-                    style={{ marginRight: '8px' }}
-                    bsSize="xs"
-                    onClick={() => shareWithSupport(fileId, shareRecords)}
-                  >
-                    Share to Support User
-                  </Button>
-                )}
-                {deleted ? (
-                  <Button bsStyle="warning" bsSize="xs" onClick={() => unDelete(fileId)}>
-                    Undelete
-                  </Button>
-                ) : null}
-              </td>
-            </tr>
-          )
-        )}
-      </tbody>
+      <tbody>{renderFiles()}</tbody>
     </Table>
   )
 }
