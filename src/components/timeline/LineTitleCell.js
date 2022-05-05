@@ -47,6 +47,7 @@ const LineTitleCellConnector = (connector) => {
     notifications,
     books,
     zIndex,
+    actStructureEnabled,
   }) => {
     const [hovering, setHovering] = useState(false)
     const [editing, setEditing] = useState(line.title === '')
@@ -126,12 +127,10 @@ const LineTitleCellConnector = (connector) => {
       e.dataTransfer.effectAllowed = 'move'
       e.dataTransfer.setData('text/json', JSON.stringify(line))
       setDragging(true)
-      notifications.showMessage(t("Hold shift to duplicate the timeline you've picked up"))
     }
 
     const handleDragEnd = () => {
       setDragging(false)
-      notifications.dismissMessage()
     }
 
     const handleDragEnter = (e) => {
@@ -307,24 +306,26 @@ const LineTitleCellConnector = (connector) => {
                   {allIcon} {t('All')}
                 </Button>
                 <Button
-                  title={t('Duplicate plot line')}
+                  title={t('Duplicate plotline')}
                   block
                   bsSize="small"
                   onClick={duplicateThisPlotline}
                 >
                   <FiCopy />
                 </Button>
-                <Button
-                  title={t('Move plot line to another book')}
-                  block
-                  bsSize="small"
-                  onClick={toggleMovingLine}
-                >
-                  <FaBook />
-                </Button>
+                {actStructureEnabled ? null : (
+                  <Button
+                    title={t('Move plotline')}
+                    block
+                    bsSize="small"
+                    onClick={toggleMovingLine}
+                  >
+                    <FaBook />
+                  </Button>
+                )}
               </>
             )}
-            <Button title={t('Delete plot line')} block bsSize="small" onClick={handleDelete}>
+            <Button title={t('Delete plotline')} block bsSize="small" onClick={handleDelete}>
               <Glyphicon glyph="trash" />
             </Button>
           </div>
@@ -356,22 +357,20 @@ const LineTitleCellConnector = (connector) => {
                     {allIcon} {t('All')}
                   </Button>
                   <Button
-                    title={t('Duplicate plot line')}
+                    title={t('Duplicate plotline')}
                     bsSize="small"
                     onClick={duplicateThisPlotline}
                   >
                     <FiCopy />
                   </Button>
-                  <Button
-                    title={t('Move plot line to another book')}
-                    bsSize="small"
-                    onClick={toggleMovingLine}
-                  >
-                    <FaBook />
-                  </Button>
+                  {actStructureEnabled ? null : (
+                    <Button title={t('Move plotline')} bsSize="small" onClick={toggleMovingLine}>
+                      <FaBook />
+                    </Button>
+                  )}
                 </>
               )}
-              <Button title={t('Delete plot line')} bsSize="small" onClick={handleDelete}>
+              <Button title={t('Delete plotline')} bsSize="small" onClick={handleDelete}>
                 <Glyphicon glyph="trash" />
               </Button>
             </ButtonGroup>
@@ -382,6 +381,7 @@ const LineTitleCellConnector = (connector) => {
 
     const moveToBook = (targetBookId) => {
       actions.moveLine(line.id, targetBookId)
+      notifications.showToastNotification(true, null, targetBookId, 'move')
     }
 
     const renderBookOptions = () => {
@@ -537,6 +537,7 @@ const LineTitleCellConnector = (connector) => {
     notifications: PropTypes.object.isRequired,
     books: PropTypes.object.isRequired,
     zIndex: PropTypes.number,
+    actStructureEnabled: PropTypes.bool,
   }
 
   const {
@@ -571,6 +572,7 @@ const LineTitleCellConnector = (connector) => {
           isLarge: isLargeSelector(state.present),
           lineIsExpanded: lineIsExpandedSelector(state.present)[ownProps.line.id],
           books: allBooksSelector(state.present),
+          actStructureEnabled: selectors.beatHierarchyIsOn(state.present),
         }
       },
       (dispatch, ownProps) => {
