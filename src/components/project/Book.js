@@ -46,7 +46,7 @@ const BookConnector = (connector) => {
 
     cancelDelete = (e) => {
       e.stopPropagation()
-      this.setState({ deleting: false, hovering: false })
+      this.setState({ deleting: false })
     }
 
     handleDelete = (e) => {

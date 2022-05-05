@@ -24,7 +24,6 @@ const AddLineRowConnector = (connector) => {
     isSmall,
     isMedium,
     howManyCells,
-    zIndex,
   }) => {
     const [hovering, setHovering] = useState(false)
     const [showTemplatePicker, setShowTemplatePicker] = useState(false)
@@ -128,7 +127,7 @@ const AddLineRowConnector = (connector) => {
       )
     } else {
       return (
-        <Row style={{ zIndex, position: zIndex ? 'relative' : null }}>
+        <Row>
           <Cell onMouseEnter={() => setHovering(true)} onMouseLeave={() => setHovering(false)}>
             {renderInsertButton()}
             {renderTemplatePicker()}
@@ -149,7 +148,6 @@ const AddLineRowConnector = (connector) => {
     lines: PropTypes.array,
     cards: PropTypes.array,
     actions: PropTypes.object,
-    zIndex: PropTypes.number,
   }
 
   const {

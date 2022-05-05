@@ -7,8 +7,6 @@ import {
   FormControl,
   FormGroup,
   ControlLabel,
-  DropdownButton,
-  MenuItem,
 } from 'react-bootstrap'
 import { Cell } from 'react-sticky-table'
 import UnconnectedColorPicker from '../ColorPicker'
@@ -16,7 +14,7 @@ import DeleteConfirmModal from '../dialogs/DeleteConfirmModal'
 import InputModal from '../dialogs/InputModal'
 import { t } from 'plottr_locales'
 import cx from 'classnames'
-import { FaBook, FaExpandAlt, FaCompressAlt } from 'react-icons/fa'
+import { FaExpandAlt, FaCompressAlt } from 'react-icons/fa'
 import { FiCopy } from 'react-icons/fi'
 import Floater from 'react-floater'
 import { helpers } from 'pltr/v2'
@@ -45,8 +43,6 @@ const LineTitleCellConnector = (connector) => {
     actions,
     uiActions,
     notifications,
-    books,
-    zIndex,
   }) => {
     const [hovering, setHovering] = useState(false)
     const [editing, setEditing] = useState(line.title === '')
@@ -55,21 +51,9 @@ const LineTitleCellConnector = (connector) => {
     const [dropDepth, setDropDepth] = useState(0)
     const [showColorPicker, setShowColorPicker] = useState(false)
     const [deleting, setDeleting] = useState(false)
-    const [movingLine, setMovingLine] = useState(false)
 
     const hoverTimeout = useRef(null)
     const titleInputRef = useRef()
-    const bookChoiceDropDown = useRef()
-
-    useEffect(() => {
-      if (movingLine && bookChoiceDropDown.current) {
-        const dropDownId = bookChoiceDropDown.current.props.id
-        const dropDown = document.querySelector(`#${dropDownId}`)
-        if (dropDown) {
-          dropDown.focus()
-        }
-      }
-    }, [movingLine])
 
     useEffect(() => {
       window.SCROLLWITHKEYS = false
@@ -100,7 +84,6 @@ const LineTitleCellConnector = (connector) => {
     const finalizeEdit = (newVal) => {
       var id = line.id
       actions.editLineTitle(id, newVal)
-      setMovingLine(false)
       setEditing(false)
       setHovering(false)
     }
@@ -111,14 +94,11 @@ const LineTitleCellConnector = (connector) => {
       }
     }
 
-    const handleBlur = (event) => {
-      if (titleInputRef.current && titleInputRef.current.value !== '') {
+    const handleBlur = () => {
+      if (titleInputRef.current.value !== '') {
         editTitle()
         setEditing(false)
         setHovering(false)
-      }
-      if (!event.relatedTarget || !event.relatedTarget.attributes.role.value === 'menuitem') {
-        setMovingLine(false)
       }
     }
 
@@ -168,10 +148,7 @@ const LineTitleCellConnector = (connector) => {
     }
 
     const handleEsc = (event) => {
-      if (event.which === 27) {
-        setEditing(false)
-        setMovingLine(false)
-      }
+      if (event.which === 27) setEditing(false)
     }
 
     const changeColor = (newColor) => {
@@ -186,9 +163,7 @@ const LineTitleCellConnector = (connector) => {
     }
 
     const startEditing = () => {
-      if (!movingLine) {
-        setEditing(true)
-      }
+      setEditing(true)
     }
 
     const startHovering = () => {
@@ -220,10 +195,6 @@ const LineTitleCellConnector = (connector) => {
       actions.duplicateLine(line.id, line.position + 1)
     }
 
-    const toggleMovingLine = () => {
-      setMovingLine(!movingLine)
-    }
-
     const renderEditInput = () => {
       if (!editing) return null
 
@@ -236,7 +207,6 @@ const LineTitleCellConnector = (connector) => {
           title={t('Edit {lineName}', { lineName: line.title || t('New Plotline') })}
           cancel={() => {
             setEditing(false)
-            setMovingLine(false)
             setHovering(false)
           }}
         />
@@ -299,9 +269,6 @@ const LineTitleCellConnector = (connector) => {
                 <Button block bsSize="small" onClick={duplicateThisPlotline}>
                   <FiCopy />
                 </Button>
-                <Button block bsSize="small" onClick={toggleMovingLine}>
-                  <FaBook />
-                </Button>
               </>
             )}
             <Button block bsSize="small" onClick={handleDelete}>
@@ -330,9 +297,6 @@ const LineTitleCellConnector = (connector) => {
                   <Button bsSize="small" onClick={duplicateThisPlotline}>
                     <FiCopy />
                   </Button>
-                  <Button bsSize="small" onClick={toggleMovingLine}>
-                    <FaBook />
-                  </Button>
                 </>
               )}
               <Button bsSize="small" onClick={handleDelete}>
@@ -344,38 +308,7 @@ const LineTitleCellConnector = (connector) => {
       }
     }
 
-    const moveToBook = (targetBookId) => {
-      actions.moveLine(line.id, targetBookId)
-    }
-
-    const renderBookOptions = () => {
-      const title = isMedium ? t('Book') : t('Change book')
-      return (
-        <DropdownButton
-          open
-          ref={bookChoiceDropDown}
-          id={`line-book-${line.id}`}
-          bsSize="small"
-          title={title}
-          onBlur={handleBlur}
-        >
-          {Object.values(books).map((book) => {
-            if (Array.isArray(book)) return null
-
-            return (
-              <MenuItem key={book.id} eventKey={book.id} onClick={() => moveToBook(book.id)}>
-                {book.title}
-              </MenuItem>
-            )
-          })}
-        </DropdownButton>
-      )
-    }
-
     const renderTitle = () => {
-      if (movingLine) {
-        return renderBookOptions()
-      }
       if (!editing) return truncateTitle(t(line.title), 50)
       return (
         <FormGroup>
@@ -447,10 +380,8 @@ const LineTitleCellConnector = (connector) => {
 
     let placement = 'bottom'
     if (orientation == 'vertical') placement = 'right'
-    // Note the z-index.  This is needed to have titles stack their
-    // controls onto titles to their right.
     return (
-      <Cell style={{ zIndex, position: zIndex ? 'relative' : null }}>
+      <Cell>
         <div
           className={wrapperKlass}
           onMouseEnter={startHovering}
@@ -460,7 +391,7 @@ const LineTitleCellConnector = (connector) => {
           {renderDelete()}
           <Floater
             component={renderHoverOptions}
-            open={hovering && !movingLine}
+            open={hovering}
             placement={placement}
             hideArrow
             offset={0}
@@ -499,8 +430,6 @@ const LineTitleCellConnector = (connector) => {
     actions: PropTypes.object.isRequired,
     uiActions: PropTypes.object.isRequired,
     notifications: PropTypes.object.isRequired,
-    books: PropTypes.object.isRequired,
-    zIndex: PropTypes.number,
   }
 
   const {
@@ -513,13 +442,7 @@ const LineTitleCellConnector = (connector) => {
   const uiActions = actions.ui
   const notifications = actions.notifications
 
-  const {
-    lineIsExpandedSelector,
-    isLargeSelector,
-    isMediumSelector,
-    isSmallSelector,
-    allBooksSelector,
-  } = selectors
+  const { lineIsExpandedSelector, isLargeSelector, isMediumSelector, isSmallSelector } = selectors
 
   if (redux) {
     const { connect, bindActionCreators } = redux
@@ -534,7 +457,6 @@ const LineTitleCellConnector = (connector) => {
           isMedium: isMediumSelector(state.present),
           isLarge: isLargeSelector(state.present),
           lineIsExpanded: lineIsExpandedSelector(state.present)[ownProps.line.id],
-          books: allBooksSelector(state.present),
         }
       },
       (dispatch, ownProps) => {
