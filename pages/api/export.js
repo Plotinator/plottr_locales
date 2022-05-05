@@ -54,6 +54,10 @@ const auth = admin.auth()
 
 const nopNotifier = () => {}
 
+const nopRM = () => {
+  return Promise.resolve(true)
+}
+
 export default (req, res) => {
   console.log('Starting export...')
   return verifyToken(auth, req, res)
@@ -76,6 +80,7 @@ export default (req, res) => {
           logger,
           null,
           MPQ,
+          nopRM,
           (error, filePath) => {
             if (error) {
               res.status(503)
