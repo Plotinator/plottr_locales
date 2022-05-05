@@ -80,13 +80,13 @@ const ProjectList = ({ files, supportUserProjects, refetch, supportID }) => {
     const sortedFiles = files.sort((a, b) => sortableTime(a) > sortableTime(b))
 
     return sortedFiles.map(
-      ({ fileId, deleted, fileName, permission, version, timeStamp, shareRecords }) => {
+      ({ fileId, id, deleted, fileName, permission, version, timeStamp, shareRecords }) => {
         return (
           <tr key={fileId}>
             <td>{deleted ? <Label bsStyle="danger">DELETED</Label> : ''}</td>
             <td>{fileName}</td>
             <td>{renderTime(timeStamp)}</td>
-            <td>{fileId}</td>
+            <td>{fileId ?? id}</td>
             <td>{permission}</td>
             <td>{version}</td>
             <td>
