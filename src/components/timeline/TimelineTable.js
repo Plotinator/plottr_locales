@@ -138,7 +138,7 @@ const TimelineTableConnector = (connector) => {
 
       const beatMapKeys = Object.keys(beatMapping)
       let howManyCells = 0
-      const renderedLines = lines.map((line, index) => {
+      const renderedLines = lines.map((line) => {
         const lineTitle = (
           <LineTitleCell
             line={line}
@@ -157,10 +157,8 @@ const TimelineTableConnector = (connector) => {
             </tr>
           )
         } else {
-          // Note the z-index.  It's needed to stack controls from the
-          // top row onto the next row.
           return (
-            <Row key={`lineId-${line.id}`} style={{ zIndex: 100 - index, position: 'relative' }}>
+            <Row key={`lineId-${line.id}`}>
               {lineTitle}
               {cards}
             </Row>
@@ -169,12 +167,7 @@ const TimelineTableConnector = (connector) => {
       })
       return [
         ...renderedLines,
-        <AddLineRow
-          key="insert-line"
-          bookId={currentTimeline}
-          howManyCells={howManyCells}
-          zIndex={100 - renderedLines.length}
-        />,
+        <AddLineRow key="insert-line" bookId={currentTimeline} howManyCells={howManyCells} />,
       ]
     }
 

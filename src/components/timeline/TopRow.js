@@ -185,13 +185,12 @@ const TopRowConnector = (connector) => {
 
     renderLines() {
       const { lines, currentTimeline, orientation, isSmall, isMedium, isLarge } = this.props
-      const renderedLines = lines.map((line, index) => (
+      const renderedLines = lines.map((line) => (
         <LineTitleCell
           key={`line-${line.id}`}
           line={line}
           handleReorder={this.handleReorderLines}
           bookId={currentTimeline}
-          zIndex={100 - index}
         />
       ))
       const insertLineDiv = (

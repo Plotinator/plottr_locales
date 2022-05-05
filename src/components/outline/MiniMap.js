@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import PropTypes from 'react-proptypes'
+import { keyBy } from 'lodash'
 import { Nav, NavItem } from 'react-bootstrap'
 import cx from 'classnames'
 import MiniBeatConnector from './MiniBeat'
@@ -25,7 +26,6 @@ const MiniMapConnector = (connector) => {
     actions,
     beatActions,
     active,
-    linesById,
   }) => {
     const [mouseOver, setMouseOver] = useState(false)
     const [firstRender, setFirstRender] = useState(true)
@@ -95,6 +95,7 @@ const MiniMapConnector = (connector) => {
 
     const renderBeats = () => {
       if (!beats.length) return null
+      const linesById = keyBy(lines, 'id')
       let beatsWithCards = allCards.map((card) => card.beatId)
       return beats.map((beat, idx) => {
         if (firstRender && idx > 20) return null
@@ -158,7 +159,6 @@ const MiniMapConnector = (connector) => {
     actions: PropTypes.object.isRequired,
     beatActions: PropTypes.object.isRequired,
     handleActive: PropTypes.func,
-    linesById: PropTypes.array.isRequired,
   }
 
   const {
@@ -186,7 +186,6 @@ const MiniMapConnector = (connector) => {
           currentTimeline: selectors.currentTimelineSelector(state.present),
           darkMode: selectors.isDarkModeSelector(state.present),
           positionOffset: selectors.positionOffsetSelector(state.present),
-          linesById: selectors.linesById(state.present),
         }
       },
       (dispatch) => {
