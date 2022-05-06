@@ -26,7 +26,6 @@ function Navigation({
   selectedFile,
 }) {
   const [dashboardView, setDashboardView] = useState(currentProject() ? null : 'files')
-  const [isNavOverflow, setIsNavOverflow] = useState(true)
 
   useEffect(() => {
     if (!selectedFile && dashboardView !== null) {
@@ -102,8 +101,14 @@ function Navigation({
     setDashboardView(view)
   }
 
-  const setNavOverflow = (isDropdownOpen) => {
-    setIsNavOverflow(isDropdownOpen)
+  const setNavOverflow = () => {
+    const projectNav = document.querySelector('.project-nav')
+    const isDropdownOpen = document.querySelector('.project-nav .dropdown.open')
+    if (isDropdownOpen) {
+      projectNav.classList.add('navOverflowHidden')
+    } else {
+      projectNav.classList.remove('navOverflowHidden')
+    }
   }
 
   if (
@@ -132,13 +137,9 @@ function Navigation({
           darkMode={darkMode}
         />
       ) : null}
-      <Navbar
-        className={cx('project-nav', { navOverflowHidden: isNavOverflow })}
-        fluid
-        inverse={darkMode}
-      >
+      <Navbar className="project-nav navOverflowHidden" fluid inverse={darkMode}>
         <Nav bsStyle="pills">
-          <BookChooser setNavOverflow={setNavOverflow} isNavOverflow={isNavOverflow} />
+          <BookChooser setNavOverflow={setNavOverflow} />
           <li role="presentation" className={cx({ active: currentView === 'project' })}>
             <Link role="button" to="/project" onClick={changeTo('project')}>
               {t('Project')}
