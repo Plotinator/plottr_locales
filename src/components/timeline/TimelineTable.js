@@ -42,17 +42,23 @@ const TimelineTableConnector = (connector) => {
       if (!tableRef) return
       let newLength = 0
       if (orientation === 'horizontal') {
-        newLength = Array.from(tableRef.querySelector('.sticky-table-row').children)
-          .slice(1, -1) // The first table cell is note above the line
-          .reduce((acc, nextNode) => {
-            return acc + nextNode.clientWidth
-          }, 0)
+        const row = tableRef.querySelector('.sticky-table-row')
+        if (row) {
+          newLength = Array.from(row.children)
+            .slice(1, -1) // The first table cell is note above the line
+            .reduce((acc, nextNode) => {
+              return acc + nextNode.clientWidth
+            }, 0)
+        }
       } else {
-        newLength = Array.from(tableRef.querySelectorAll('.sticky-table-row'))
-          .slice(2, isMedium ? undefined : -1) // The first table cell is note above the line
-          .reduce((acc, nextNode) => {
-            return acc + nextNode.clientHeight
-          }, 0)
+        const row = tableRef.querySelectorAll('.sticky-table-row')
+        if (row) {
+          newLength = Array.from(row)
+            .slice(2, isMedium ? undefined : -1) // The first table cell is note above the line
+            .reduce((acc, nextNode) => {
+              return acc + nextNode.clientHeight
+            }, 0)
+        }
       }
       if (this.state.tableLength != newLength) {
         this.setState({ tableLength: newLength })
@@ -310,15 +316,16 @@ const TimelineTableConnector = (connector) => {
       this.props.notificationActions.showToastNotification(false)
     }
 
-    getToastMessage = (cardAction, newBookId) => {
-      if (cardAction == 'move' && newBookId) {
+    getToastMessage = (cardAction, newBookId, lineAction) => {
+      if ((cardAction === 'move' || lineAction === 'move') && newBookId) {
         const { books, actions } = this.props
         const bookTitle = newBookId === 'series' ? t('Series') : this.bookTitle(books[newBookId])
+        const entityType = cardAction ? 'Scene card' : 'Plotline'
 
         // if card is moved to another book, create the book link
         return (
           <div className="toast-message-with-anchor">
-            {t('Woohoo! Scene card moved to')}
+            {t(`Woohoo! ${entityType} moved to`)}
             <a href="#" onClick={() => actions.changeCurrentTimeline(newBookId)}>
               {` ${bookTitle}`}
             </a>
@@ -338,7 +345,7 @@ const TimelineTableConnector = (connector) => {
           )}
           role="alert"
         >
-          {this.getToastMessage(toast.cardAction, toast.newBookId)}
+          {this.getToastMessage(toast.cardAction, toast.newBookId, toast.lineAction)}
           <button className="close" onClick={() => this.handleCloseToast()}>
             <span aria-hidden="true">&times;</span>
           </button>
