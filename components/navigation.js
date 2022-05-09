@@ -101,16 +101,6 @@ function Navigation({
     setDashboardView(view)
   }
 
-  const setNavOverflow = () => {
-    const projectNav = document.querySelector('.project-nav')
-    const isDropdownOpen = document.querySelector('.project-nav .dropdown.open')
-    if (isDropdownOpen) {
-      projectNav.classList.add('navOverflowHidden')
-    } else {
-      projectNav.classList.remove('navOverflowHidden')
-    }
-  }
-
   if (
     bookIds &&
     currentTimeline &&
@@ -137,9 +127,9 @@ function Navigation({
           darkMode={darkMode}
         />
       ) : null}
-      <Navbar className="project-nav navOverflowHidden" fluid inverse={darkMode}>
+      <Navbar className="project-nav" fluid inverse={darkMode}>
         <Nav bsStyle="pills">
-          <BookChooser setNavOverflow={setNavOverflow} />
+          <BookChooser />
           <li role="presentation" className={cx({ active: currentView === 'project' })}>
             <Link role="button" to="/project" onClick={changeTo('project')}>
               {t('Project')}
