@@ -57,6 +57,7 @@ const CardViewConnector = (connector) => {
       var newTitle = this.titleInputRef.value || card.title
       actions.editCard(card.id, newTitle, card.description, card.templates, {})
       this.setState({ editing: false })
+      this.props.onEditCardChange(false)
     }
 
     handleEnter = (event) => {
@@ -73,6 +74,7 @@ const CardViewConnector = (connector) => {
 
     handleDragStart = (e) => {
       this.setState({ dragging: true, editing: false })
+      this.props.onEditCardChange(false)
       const { card, index } = this.props
       const lineId = card.lineId
       e.dataTransfer.effectAllowed = 'move'
@@ -84,7 +86,10 @@ const CardViewConnector = (connector) => {
     }
 
     editOnClick = () => {
-      if (!this.state.editing) this.setState({ editing: true })
+      if (!this.state.editing) {
+        this.setState({ editing: true })
+        this.props.onEditCardChange(true)
+      }
     }
 
     handleDragEnter = (e) => {
@@ -320,6 +325,7 @@ const CardViewConnector = (connector) => {
     actions: PropTypes.object.isRequired,
     images: PropTypes.object,
     isClickedOutside: PropTypes.bool,
+    onEditCardChange: PropTypes.func,
   }
 
   const {

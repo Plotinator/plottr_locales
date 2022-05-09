@@ -20,6 +20,12 @@ const BeatViewConnector = (connector) => {
   const CardView = UnconnectedCardView(connector)
 
   class BeatView extends Component {
+    constructor(props) {
+      super(props)
+
+      this.childIsBeingEdited = false
+    }
+
     state = { sortedCards: [], inDropZone: false, dropDepth: 0, clickedOutside: false }
     beatRef = createRef()
     titleRef = createRef()
@@ -97,6 +103,10 @@ const BeatViewConnector = (connector) => {
       }
     }
 
+    onEditCardChange = (editing) => {
+      this.childIsBeingEdited = editing
+    }
+
     renderManualSort() {
       const { cards, beat } = this.props
       if (cards.length === 0 || cards[0].isEmpty || cards.length === 1) return null
@@ -117,6 +127,7 @@ const BeatViewConnector = (connector) => {
           index={idx}
           reorder={this.reorderCards}
           isClickedOutside={this.state.clickedOutside}
+          onEditCardChange={this.onEditCardChange}
         />
       ))
     }
@@ -181,6 +192,9 @@ const BeatViewConnector = (connector) => {
       // communicate that it's being edited to the redux store and
       // then, when we hit this point we can decide whether or not to
       // save the card on its behalf.
+
+      // Only handle the event if our child is being edited
+      if (!this.childIsBeingEdited) return
 
       // We can't close the editor if we were picking an image, and
       // that's a different component.
