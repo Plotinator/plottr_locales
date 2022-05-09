@@ -11,16 +11,18 @@ import {
   MenuItem,
 } from 'react-bootstrap'
 import { Cell } from 'react-sticky-table'
-import UnconnectedColorPicker from '../ColorPicker'
-import DeleteConfirmModal from '../dialogs/DeleteConfirmModal'
-import InputModal from '../dialogs/InputModal'
-import { t } from 'plottr_locales'
+import { sort } from 'lodash'
 import cx from 'classnames'
 import { FaBook, FaExpandAlt, FaCompressAlt } from 'react-icons/fa'
 import { FiCopy } from 'react-icons/fi'
 import Floater from 'react-floater'
-import { helpers } from 'pltr/v2'
 
+import { helpers } from 'pltr/v2'
+import { t } from 'plottr_locales'
+
+import UnconnectedColorPicker from '../ColorPicker'
+import DeleteConfirmModal from '../dialogs/DeleteConfirmModal'
+import InputModal from '../dialogs/InputModal'
 import { checkDependencies } from '../checkDependencies'
 
 const {
@@ -47,6 +49,7 @@ const LineTitleCellConnector = (connector) => {
     notifications,
     books,
     zIndex,
+    actStructureEnabled,
   }) => {
     const [hovering, setHovering] = useState(false)
     const [editing, setEditing] = useState(line.title === '')
@@ -126,12 +129,10 @@ const LineTitleCellConnector = (connector) => {
       e.dataTransfer.effectAllowed = 'move'
       e.dataTransfer.setData('text/json', JSON.stringify(line))
       setDragging(true)
-      notifications.showMessage(t("Hold shift to duplicate the timeline you've picked up"))
     }
 
     const handleDragEnd = () => {
       setDragging(false)
-      notifications.dismissMessage()
     }
 
     const handleDragEnter = (e) => {
@@ -221,7 +222,12 @@ const LineTitleCellConnector = (connector) => {
     }
 
     const toggleMovingLine = () => {
-      setMovingLine(!movingLine)
+      const thereIsAnotherBook = books.allIds.some((id) => {
+        return bookId !== id
+      })
+      if (thereIsAnotherBook) {
+        setMovingLine(!movingLine)
+      }
     }
 
     const renderEditInput = () => {
@@ -307,24 +313,26 @@ const LineTitleCellConnector = (connector) => {
                   {allIcon} {t('All')}
                 </Button>
                 <Button
-                  title={t('Duplicate plot line')}
+                  title={t('Duplicate plotline')}
                   block
                   bsSize="small"
                   onClick={duplicateThisPlotline}
                 >
                   <FiCopy />
                 </Button>
-                <Button
-                  title={t('Move plot line to another book')}
-                  block
-                  bsSize="small"
-                  onClick={toggleMovingLine}
-                >
-                  <FaBook />
-                </Button>
+                {actStructureEnabled ? null : (
+                  <Button
+                    title={t('Move plotline')}
+                    block
+                    bsSize="small"
+                    onClick={toggleMovingLine}
+                  >
+                    <FaBook />
+                  </Button>
+                )}
               </>
             )}
-            <Button title={t('Delete plot line')} block bsSize="small" onClick={handleDelete}>
+            <Button title={t('Delete plotline')} block bsSize="small" onClick={handleDelete}>
               <Glyphicon glyph="trash" />
             </Button>
           </div>
@@ -356,22 +364,20 @@ const LineTitleCellConnector = (connector) => {
                     {allIcon} {t('All')}
                   </Button>
                   <Button
-                    title={t('Duplicate plot line')}
+                    title={t('Duplicate plotline')}
                     bsSize="small"
                     onClick={duplicateThisPlotline}
                   >
                     <FiCopy />
                   </Button>
-                  <Button
-                    title={t('Move plot line to another book')}
-                    bsSize="small"
-                    onClick={toggleMovingLine}
-                  >
-                    <FaBook />
-                  </Button>
+                  {actStructureEnabled ? null : (
+                    <Button title={t('Move plotline')} bsSize="small" onClick={toggleMovingLine}>
+                      <FaBook />
+                    </Button>
+                  )}
                 </>
               )}
-              <Button title={t('Delete plot line')} bsSize="small" onClick={handleDelete}>
+              <Button title={t('Delete plotline')} bsSize="small" onClick={handleDelete}>
                 <Glyphicon glyph="trash" />
               </Button>
             </ButtonGroup>
@@ -382,6 +388,7 @@ const LineTitleCellConnector = (connector) => {
 
     const moveToBook = (targetBookId) => {
       actions.moveLine(line.id, targetBookId)
+      notifications.showToastNotification(true, null, targetBookId, 'move')
     }
 
     const renderBookOptions = () => {
@@ -395,12 +402,14 @@ const LineTitleCellConnector = (connector) => {
           title={title}
           onBlur={handleBlur}
         >
-          {Object.values(books).map((book) => {
+          {books.allIds.sort().map((id, index) => {
+            const book = books[id]
             if (Array.isArray(book)) return null
+            if (bookId === book.id) return null
 
             return (
               <MenuItem key={book.id} eventKey={book.id} onClick={() => moveToBook(book.id)}>
-                {book.title}
+                {book.title || t('Untitled')}
               </MenuItem>
             )
           })}
@@ -537,6 +546,7 @@ const LineTitleCellConnector = (connector) => {
     notifications: PropTypes.object.isRequired,
     books: PropTypes.object.isRequired,
     zIndex: PropTypes.number,
+    actStructureEnabled: PropTypes.bool,
   }
 
   const {
@@ -571,6 +581,7 @@ const LineTitleCellConnector = (connector) => {
           isLarge: isLargeSelector(state.present),
           lineIsExpanded: lineIsExpandedSelector(state.present)[ownProps.line.id],
           books: allBooksSelector(state.present),
+          actStructureEnabled: selectors.beatHierarchyIsOn(state.present),
         }
       },
       (dispatch, ownProps) => {
