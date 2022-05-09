@@ -57,16 +57,7 @@ const OutlineViewConnector = (connector) => {
 
     useEffect(() => {
       setTimeout(() => setFirstRender(false), 500)
-    }, [])
-
-    useEffect(() => {
-      setFirstRender(true)
-      setTimeout(() => setFirstRender(false), 500)
     }, [currentTimeline])
-
-    const fixMe = () => {
-      log.warn('OutlineView waypoint needs fixing')
-    }
 
     const filterItem = (id) => {
       actions.setOutlineFilter(id)
@@ -100,6 +91,19 @@ const OutlineViewConnector = (connector) => {
         return renderFilterItem(i)
       })
       return <ul className="filter-list__list">{items}</ul>
+    }
+
+    const insertSpace = (event) => {
+      const currentValue = event.target.value
+      const start = event.target.selectionStart
+      const end = event.target.selectionEnd
+      if (event.key === ' ') {
+        actions.setOutlineSearchTerm(
+          currentValue.slice(0, start) + ' ' + currentValue.slice(end + 1)
+        )
+      }
+      event.preventDefault()
+      event.stopPropagation()
     }
 
     const renderSubNav = () => {
@@ -139,6 +143,7 @@ const OutlineViewConnector = (connector) => {
             <NavItem>
               <FormControl
                 onChange={withEventTargetValue(actions.setOutlineSearchTerm)}
+                onKeyUp={insertSpace}
                 value={outlineSearchTerm}
                 type="text"
                 placeholder="Search"
@@ -170,12 +175,7 @@ const OutlineViewConnector = (connector) => {
             : []
           return (
             <ErrorBoundary key={beat.id}>
-              <BeatView
-                beat={beat}
-                cards={beatCards}
-                waypoint={fixMe}
-                activeFilter={!!outlineFilter}
-              />
+              <BeatView beat={beat} cards={beatCards} activeFilter={!!outlineFilter} />
             </ErrorBoundary>
           )
         })
