@@ -1,4 +1,4 @@
-import React, { Component, createRef } from 'react'
+import React, { Component } from 'react'
 import PropTypes from 'react-proptypes'
 import { Glyphicon } from 'react-bootstrap'
 import { Waypoint } from 'react-waypoint'
@@ -22,13 +22,9 @@ const BeatViewConnector = (connector) => {
   class BeatView extends Component {
     constructor(props) {
       super(props)
-
-      this.childIsBeingEdited = false
     }
 
-    state = { sortedCards: [], inDropZone: false, dropDepth: 0, clickedOutside: false }
-    beatRef = createRef()
-    titleRef = createRef()
+    state = { sortedCards: [], inDropZone: false, dropDepth: 0 }
 
     static getDerivedStateFromProps(nextProps, nextState) {
       const { beat, cards, lines } = nextProps
@@ -121,14 +117,7 @@ const BeatViewConnector = (connector) => {
 
     renderCards() {
       return this.state.sortedCards.map((c, idx) => (
-        <CardView
-          key={c.id}
-          card={c}
-          index={idx}
-          reorder={this.reorderCards}
-          isClickedOutside={this.state.clickedOutside}
-          onEditCardChange={this.onEditCardChange}
-        />
+        <CardView key={c.id} card={c} index={idx} reorder={this.reorderCards} />
       ))
     }
 
@@ -175,41 +164,6 @@ const BeatViewConnector = (connector) => {
           <FaCircle />
         </div>
       )
-    }
-
-    componentDidMount() {
-      document.addEventListener('click', this.handleClickOutside, true)
-    }
-
-    componentWillUnmount() {
-      document.removeEventListener('click', this.handleClickOutside, true)
-    }
-
-    handleClickOutside = (e) => {
-      // FIXME: this event causes a cascade of events that's *very*
-      // expensive.  The purpose is to save the card that we're
-      // editing.  It might be better to have that component
-      // communicate that it's being edited to the redux store and
-      // then, when we hit this point we can decide whether or not to
-      // save the card on its behalf.
-
-      // Only handle the event if our child is being edited
-      if (!this.childIsBeingEdited) return
-
-      // We can't close the editor if we were picking an image, and
-      // that's a different component.
-      const imagePickerModal = document.querySelector('.image-picker__wrapper')
-      if (imagePickerModal) return
-
-      if (this.titleRef.current && this.titleRef.current.contains(e.target)) {
-        this.setState({ clickedOutside: true }, () => {
-          this.setState({ clickedOutside: false })
-        })
-      } else if (this.beatRef.current && !this.beatRef.current.contains(e.target)) {
-        this.setState({ clickedOutside: true }, () => {
-          this.setState({ clickedOutside: false })
-        })
-      }
     }
 
     render() {
