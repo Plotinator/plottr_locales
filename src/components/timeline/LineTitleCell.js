@@ -69,7 +69,9 @@ const LineTitleCellConnector = (connector) => {
         const wrapperDiv = titleCellRef.current
         if (wrapperDiv) {
           wrapperDiv.style.zIndex = zIndex
-          wrapperDiv.style.position = 'relative'
+          if (orientation !== 'vertical') {
+            wrapperDiv.style.position = 'relative'
+          }
         }
       }
     }, [zIndex])
