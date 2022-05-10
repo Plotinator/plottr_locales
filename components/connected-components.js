@@ -100,6 +100,10 @@ const platform = {
           BEAT_HIERARCHY: actStructureEnabled,
         },
       }
+      if (newFileState.books[1]) {
+        newFileState.books[1].title = fileName
+        newFileState.series.name = fileName
+      }
       store.dispatch(actions.applicationState.startCreatingCloudFile())
       newFile(
         emailAddress,
