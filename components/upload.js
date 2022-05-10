@@ -121,6 +121,7 @@ const Upload = ({
         onChange={onChangeSelection}
         style={{ display: 'none' }}
         type="file"
+        accept=".pltr"
       />
     </>
   )
