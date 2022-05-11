@@ -20,6 +20,7 @@ import Dashboard from './Dashboard'
 import { history } from '../lib/history'
 
 const Main = ({
+  creatingFile,
   loadingFile,
   busyBooting,
   needsToLogin,
@@ -109,7 +110,7 @@ const Main = ({
     )
   }
 
-  if (loadingFile) {
+  if (loadingFile || creatingFile) {
     return <Spinner />
   }
 
@@ -143,6 +144,7 @@ const Main = ({
 }
 
 Main.propTypes = {
+  creatingFile: PropTypes.bool,
   loadingFile: PropTypes.bool,
   busyBooting: PropTypes.bool,
   needsToLogin: PropTypes.bool,
@@ -159,6 +161,7 @@ Main.propTypes = {
 
 export default connect(
   (state) => ({
+    creatingFile: selectors.creatingCloudFileSelector(state.present),
     loadingFile: selectors.loadingFileSelector(state.present),
     busyBooting: selectors.applicationIsBusyButFileCouldBeUnloadedSelector(state.present),
     needsToLogin: selectors.userNeedsToLoginSelector(state.present),
