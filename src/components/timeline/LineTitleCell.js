@@ -11,7 +11,6 @@ import {
   MenuItem,
 } from 'react-bootstrap'
 import { Cell } from 'react-sticky-table'
-import { sort } from 'lodash'
 import cx from 'classnames'
 import { FaBook, FaExpandAlt, FaCompressAlt } from 'react-icons/fa'
 import { FiCopy } from 'react-icons/fi'
@@ -63,6 +62,19 @@ const LineTitleCellConnector = (connector) => {
     const hoverTimeout = useRef(null)
     const titleInputRef = useRef()
     const bookChoiceDropDown = useRef()
+    const titleCellRef = useRef()
+
+    useEffect(() => {
+      if (titleCellRef.current && zIndex) {
+        const wrapperDiv = titleCellRef.current
+        if (wrapperDiv) {
+          wrapperDiv.style.zIndex = zIndex
+          if (orientation !== 'vertical') {
+            wrapperDiv.style.position = 'relative'
+          }
+        }
+      }
+    }, [zIndex])
 
     useEffect(() => {
       if (movingLine && bookChoiceDropDown.current) {
@@ -120,7 +132,7 @@ const LineTitleCellConnector = (connector) => {
         setEditing(false)
         setHovering(false)
       }
-      if (!event.relatedTarget || !event.relatedTarget.attributes.role.value === 'menuitem') {
+      if (!event.relatedTarget || !event.relatedTarget.attributes?.role?.value === 'menuitem') {
         setMovingLine(false)
       }
     }
@@ -222,9 +234,11 @@ const LineTitleCellConnector = (connector) => {
     }
 
     const toggleMovingLine = () => {
-      const thereIsAnotherBook = books.allIds.some((id) => {
-        return bookId !== id
-      })
+      const thereIsAnotherBook =
+        bookId !== 'series' ||
+        books.allIds.some((id) => {
+          return bookId !== id
+        })
       if (thereIsAnotherBook) {
         setMovingLine(!movingLine)
       }
@@ -402,8 +416,8 @@ const LineTitleCellConnector = (connector) => {
           title={title}
           onBlur={handleBlur}
         >
-          {books.allIds.sort().map((id, index) => {
-            const book = books[id]
+          {[...books.allIds, 'series'].sort().map((id, index) => {
+            const book = id === 'series' ? { id: 'series', title: t('Series') } : books[id]
             if (Array.isArray(book)) return null
             if (bookId === book.id) return null
 
@@ -495,7 +509,7 @@ const LineTitleCellConnector = (connector) => {
     // Note the z-index.  This is needed to have titles stack their
     // controls onto titles to their right.
     return (
-      <Cell style={{ zIndex, position: zIndex ? 'relative' : null }}>
+      <Cell ref={titleCellRef}>
         <div
           className={wrapperKlass}
           onMouseEnter={startHovering}
