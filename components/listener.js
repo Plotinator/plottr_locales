@@ -43,10 +43,22 @@ const Listener = ({
   finishLoadingFile,
   loadingFile,
   settings,
+  showDashboardOnBoot,
+  settingsHaveLoaded,
 }) => {
   useEffect(() => {
+    if (!settingsHaveLoaded) return
     if (!checkedFileToLoad) startCheckingFileToLoad()
-    const sessionFileId = (selectedFile && selectedFile.id) || currentProject()
+    const sessionFileId =
+      (selectedFile && selectedFile.id) ||
+      currentProject() ||
+      (!showDashboardOnBoot &&
+        knownFiles.reduce((mostRecent, nextFile) => {
+          if (nextFile.timeStamp.seconds > mostRecent.timeStamp.seconds) {
+            return nextFile
+          }
+          return mostRecent
+        }, knownFiles[0])?.fileId)
     if (!checkedFileToLoad) finishCheckingFileToLoad()
     if (!loadingFile && sessionFileId && sessionFileId !== '') {
       const isLoading = !selectedFile || selectedFile.id !== sessionFileId
@@ -98,7 +110,7 @@ const Listener = ({
         setCurrentProject(currentFile?.id)
       }
     }
-  }, [selectedFile, knownFiles])
+  }, [selectedFile, knownFiles, showDashboardOnBoot, settingsHaveLoaded])
 
   useEffect(() => {
     if (selectedFile && selectedFile.none) {
@@ -186,6 +198,8 @@ Listener.propTypes = {
   setCustomTemplates: PropTypes.func.isrequired,
   startLoadingFile: PropTypes.func.isrequired,
   finishLoadingFile: PropTypes.func.isrequired,
+  showDashboardOnBoot: PropTypes.bool,
+  settingsHaveLoaded: PropTypes.bool,
 }
 
 export default connect(
@@ -198,6 +212,8 @@ export default connect(
     checkedFileToLoad: selectors.checkedFileToLoadSelector(state.present),
     loadingFile: selectors.loadingFileSelector(state.present),
     settings: selectors.appSettingsSelector(state.present),
+    showDashboardOnBoot: selectors.showDashboardOnBootSelector(state.present),
+    settingsHaveLoaded: selectors.applicationSettingsAreLoadedSelector(state.present),
   }),
   {
     setPermission: actions.permission.setPermission,
