@@ -132,7 +132,7 @@ const LineTitleCellConnector = (connector) => {
         setEditing(false)
         setHovering(false)
       }
-      if (!event.relatedTarget || !event.relatedTarget.attributes.role.value === 'menuitem') {
+      if (!event.relatedTarget || !event.relatedTarget.attributes?.role?.value === 'menuitem') {
         setMovingLine(false)
       }
     }
