@@ -234,9 +234,11 @@ const LineTitleCellConnector = (connector) => {
     }
 
     const toggleMovingLine = () => {
-      const thereIsAnotherBook = books.allIds.some((id) => {
-        return bookId !== id
-      })
+      const thereIsAnotherBook =
+        bookId !== 'series' ||
+        books.allIds.some((id) => {
+          return bookId !== id
+        })
       if (thereIsAnotherBook) {
         setMovingLine(!movingLine)
       }
