@@ -22,7 +22,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
     return axios
       .post(`${BASE_API_URL}/api/ping-auth`, {
         userId,
-        fileId,
+        fileId
       })
       .catch((error) => {
         const status = error && error.response && error.response.status
@@ -40,7 +40,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
     return database()
       .doc(`file/${fileId}`)
       .update({
-        fileName: newName,
+        fileName: newName
       })
       .then(() => {
         return pingAuth(userId, fileId)
@@ -123,7 +123,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
       .doc(fileId)
       .onSnapshot(
         onSnapshot(store, fileId, 'file', withIsCloud, true, clientId, 'patchFile', (x) => ({
-          id: x.id,
+          id: x.id
         })),
         errorHandler
       )
@@ -207,7 +207,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
       listenToTags(store, userId, fileId, clientId, errorHandler),
       listenTohierarchyLevels(store, userId, fileId, clientId, errorHandler),
       listenToImages(store, userId, fileId, clientId, errorHandler),
-      listenToClient(store, userId, fileId, clientId, errorHandler),
+      listenToClient(store, userId, fileId, clientId, errorHandler)
     ]
     return unsubscribeFunctions
   }
@@ -221,7 +221,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
     delete data.fileId
     delete data.clientId
     return {
-      [path]: withData(data),
+      [path]: withData(data)
     }
   }
 
@@ -308,7 +308,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
             log.error(`Error while force updating file ${fileId} at key: ${key}`, error)
           })
           .then(() => ({
-            [key]: ARRAY_KEYS.indexOf(key) !== -1 ? Object.values(payload) : payload,
+            [key]: ARRAY_KEYS.indexOf(key) !== -1 ? Object.values(payload) : payload
           }))
       )
     })
@@ -335,7 +335,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
       fetchTags(userId, fileId, clientId),
       fetchhierarchyLevels(userId, fileId, clientId),
       fetchImages(userId, fileId, clientId),
-      fetchClient(userId, fileId, clientId),
+      fetchClient(userId, fileId, clientId)
     ])
       .then((results) => {
         const newOpenDate = new Date()
@@ -344,13 +344,13 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
             log.info(`Attempted to update file (${fileId}) timestamp and couldn't`, error)
             return {
               results,
-              newOpenDate,
+              newOpenDate
             }
           })
           .then(() => {
             return {
               results,
-              newOpenDate,
+              newOpenDate
             }
           })
       })
@@ -361,8 +361,8 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
             ...json,
             file: {
               ...json.file,
-              lastOpened: newOpenDate,
-            },
+              lastOpened: newOpenDate
+            }
           }
         })
       })
@@ -398,7 +398,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
           setDeletedplaces(),
           setDeletedtags(),
           setDeletedhierarchyLevels(),
-          setDeletedimages(),
+          setDeletedimages()
         ]).then((results) => [pingAuthResult, deleteFileResult, ...results])
       )
     )
@@ -424,7 +424,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
               .then((file) => ({
                 id: file.id,
                 ...file.data(),
-                ...authorisation.data(),
+                ...authorisation.data()
               }))
             authorisedDocuments.push(document)
           })
@@ -433,7 +433,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
               return documents.map((document) => {
                 return {
                   ...document,
-                  isCloudFile: true,
+                  isCloudFile: true
                 }
               })
             })
@@ -462,7 +462,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
             .then((file) => ({
               id: file.id,
               ...file.data(),
-              ...authorisation.data(),
+              ...authorisation.data()
             }))
           authorisedDocuments.push(document)
         })
@@ -470,7 +470,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
           return documents.map((document) => {
             return {
               ...document,
-              isCloudFile: true,
+              isCloudFile: true
             }
           })
         })
@@ -489,8 +489,8 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
         body: JSON.stringify({ idToken }),
         headers: {
           Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
+          'Content-Type': 'application/json'
+        }
       })
     })
   }
@@ -546,7 +546,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
       .update({
         ...payload,
         clientId,
-        fileId,
+        fileId
       })
   }
 
@@ -557,7 +557,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
       .set({
         ...payload,
         clientId,
-        fileId,
+        fileId
       })
   }
 
@@ -567,7 +567,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
         fileId,
         emailAddress,
         userId,
-        permission,
+        permission
       })
       .then(() => {
         return database()
@@ -587,7 +587,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
               .doc(fileId)
               .set(
                 {
-                  shareRecords: [...document.shareRecords, { emailAddress, permission }],
+                  shareRecords: [...document.shareRecords, { emailAddress, permission }]
                 },
                 { merge: true }
               )
@@ -613,10 +613,10 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
             {
               timeStamp: new Date(),
               editNumber: operations[operations.length - 1].editNumber,
-              editorKey,
+              editorKey
             },
             {
-              merge: true,
+              merge: true
             }
           )
       : Promise.resolve([])
@@ -624,7 +624,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
       updateEditNumbersJob,
       ...operations.map((operation) => {
         modificationsRef.add(operation)
-      }),
+      })
     ])
   }
 
@@ -633,7 +633,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
       .doc(`rce/${fileId}/editors/${editorId}/editTimestamps/${myEditorKey}`)
       .update({
         timeStamp: new Date(),
-        [otherEditorKey]: since,
+        [otherEditorKey]: since
       })
   }
 
@@ -659,13 +659,13 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
         if (!lock.exists) {
           return lockReference.set({
             clientId,
-            emailAddress,
+            emailAddress
           })
         }
         if (isEqual(lock.data(), expectedLock)) {
           return transactions.set(lockReference, {
             clientId,
-            emailAddress,
+            emailAddress
           })
         }
 
@@ -802,7 +802,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
                 .update({
                   ...document,
                   storagePath: path,
-                  lastModified: new Date(),
+                  lastModified: new Date()
                 })
             })
           }
@@ -814,7 +814,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
               startOfSession: false,
               fileId,
               fileName: file.project.selectedFile.fileName,
-              lastModified: new Date(),
+              lastModified: new Date()
             })
           })
         })
@@ -827,7 +827,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
           storagePath: path,
           fileName: file.project.selectedFile.fileName,
           startOfSession: true,
-          lastModified: new Date(),
+          lastModified: new Date()
         })
       })
     })
@@ -964,8 +964,10 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
   }
 
   const imagePublicURL = (storageProtocolURL, fileId, userId) => {
+    const fallbackURL = () =>
+      storage().ref().child(withoutStorageProtocal(storageProtocolURL)).getDownloadURL()
     if (development) {
-      return storage().ref().child(withoutStorageProtocal(storageProtocolURL)).getDownloadURL()
+      return fallbackURL()
     }
     return axios
       .get(
@@ -975,10 +977,10 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
         return response.data.publicURL
       })
       .catch((error) => {
-        const status = error.response.status
+        const status = error?.response?.status
         log.error('Error sharing document', status, error.response)
         if (status === 401) return mintCookieToken(currentUser())
-        return Promise.reject(error)
+        return Promise.resolve(fallbackURL())
       })
   }
 
@@ -1025,7 +1027,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
     saveImageToStorageFromURL,
     backupPublicURL,
     imagePublicURL,
-    isStorageURL,
+    isStorageURL
   }
 }
 
