@@ -54,7 +54,13 @@ const Listener = ({
       currentProject() ||
       (!showDashboardOnBoot &&
         knownFiles.reduce((mostRecent, nextFile) => {
-          if (nextFile.timeStamp.seconds > mostRecent.timeStamp.seconds) {
+          if (
+            nextFile.timeStamp &&
+            nextFile.timeStamp.seconds &&
+            (!mostRecent.timeStamp ||
+              !mostRecent.timeStamp.seconds ||
+              nextFile.timeStamp.seconds > mostRecent.timeStamp.seconds)
+          ) {
             return nextFile
           }
           return mostRecent
