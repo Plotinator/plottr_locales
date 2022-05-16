@@ -17,11 +17,13 @@ const convertFromNanosAndSeconds = (nanosAndSecondsObject) => {
 }
 
 function getDateValue(fileObj) {
-  if (fileObj.lastOpened) {
+  const lastOpenedIsString = typeof fileObj.lastOpened === 'string'
+
+  if (!lastOpenedIsString && fileObj.lastOpened) {
     return convertFromNanosAndSeconds(fileObj.lastOpened) || new Date()
   }
 
-  if (typeof fileObj.lastOpened === 'string') {
+  if (lastOpenedIsString) {
     return new Date(fileObj.lastOpened)
   }
 
