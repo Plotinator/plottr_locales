@@ -21,6 +21,10 @@ function getDateValue(fileObj) {
     return convertFromNanosAndSeconds(fileObj.lastOpened) || new Date()
   }
 
+  if (typeof fileObj.lastOpened === 'string') {
+    return new Date(fileObj.lastOpened)
+  }
+
   try {
     const splits = fileObj.version.replace(/-.*$/, '').split('.')
     return new Date(splits[0], parseInt(splits[1]) - 1, splits[2])
