@@ -1,8 +1,10 @@
 import React, { useRef } from 'react'
 import { Button, FormControl, FormGroup } from 'react-bootstrap'
+import PropTypes from 'react-proptypes'
 import { t } from 'plottr_locales'
 
 import { checkDependencies } from '../../checkDependencies'
+import { createWebReport } from './create-report'
 
 const HelpHomeConnector = (connector) => {
   const {
@@ -10,7 +12,7 @@ const HelpHomeConnector = (connector) => {
   } = connector
   checkDependencies({ os, mpq, openExternal, createFullErrorReport, handleCustomerServiceCode })
 
-  const HelpHome = (props) => {
+  const HelpHome = ({ isOnWeb, state }) => {
     const serviceCodeRef = useRef(null)
 
     const submitCode = () => {
@@ -37,6 +39,14 @@ const HelpHomeConnector = (connector) => {
         src: 'https://docs.plottr.com',
         allowpopups: 'true',
       })
+    }
+
+    const handleCreateErrorReport = () => {
+      if (isOnWeb) {
+        createWebReport(state)
+      } else {
+        return createFullErrorReport()
+      }
     }
 
     return (
@@ -83,7 +93,7 @@ const HelpHomeConnector = (connector) => {
           <h1>{t('Actions')}</h1>
           <div className="dashboard__help__item actions">
             <Button onClick={l('plottr.com/support')}>{t('Report a Problem')}</Button>
-            <Button onClick={createFullErrorReport}>{t('Create an Error Report')}</Button>
+            <Button onClick={handleCreateErrorReport}>{t('Create an Error Report')}</Button>
             <div>
               <FormGroup controlId="customerServiceCode">
                 <FormControl
@@ -105,7 +115,29 @@ const HelpHomeConnector = (connector) => {
     )
   }
 
-  return HelpHome
+  HelpHome.propTypes = {
+    isOnWeb: PropTypes.bool,
+    state: PropTypes.object,
+  }
+
+  const {
+    redux,
+    pltr: { selectors },
+  } = connector
+  checkDependencies({ redux })
+
+  if (redux) {
+    const { connect } = redux
+
+    return connect((state) => {
+      return {
+        state: state.present,
+        isOnWeb: selectors.isOnWebSelector(state.present),
+      }
+    })(HelpHome)
+  }
+
+  throw new Error('Could not connect HelpHome')
 }
 
 export default HelpHomeConnector
