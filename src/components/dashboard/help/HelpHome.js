@@ -4,7 +4,7 @@ import PropTypes from 'react-proptypes'
 import { t } from 'plottr_locales'
 
 import { checkDependencies } from '../../checkDependencies'
-import { createWebReport } from './create-report'
+import { createWebReport } from '../../createReport'
 
 const HelpHomeConnector = (connector) => {
   const {
@@ -43,7 +43,7 @@ const HelpHomeConnector = (connector) => {
 
     const handleCreateErrorReport = () => {
       if (isOnWeb) {
-        createWebReport(state)
+        return createWebReport(state)
       } else {
         return createFullErrorReport()
       }
