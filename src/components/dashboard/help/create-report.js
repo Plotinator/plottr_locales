@@ -39,13 +39,13 @@ Session start: ${sessionTimeStamp}
 ----------------------------------
 CLIENT INFO
 ----------------------------------
-\n${clientArr.length ? clientArr.join('\n') : ''}
+\n${clientArr && clientArr.length ? clientArr.join('\n') : ''}
 \n
 ----------------------------------
 FILE INFO
 ----------------------------------
 \n${
-    selectedFile.length
+    selectedFile && selectedFile.length
       ? selectedFile.filter((i) => !i.startsWith('{') && !i.endsWith('}')).join('\n')
       : ''
   }
