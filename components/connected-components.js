@@ -261,9 +261,7 @@ const platform = {
     window.open(withProtocol, '_blank')
   },
   createErrorReport,
-  createFullErrorReport: (fullState) => {
-    createWebReport(fullState)
-  },
+  createFullErrorReport: (fullState) => createWebReport(fullState),
   log: {
     info: (...args) => {
       logger.info(...args)
