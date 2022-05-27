@@ -1,20 +1,25 @@
 import { upperFirst, camelCase, keys } from 'lodash'
 import { DateTime } from 'luxon'
+import { applicationStateSelector } from 'pltr/v2/selectors/applicationState'
+import { allBeatsSelector } from 'pltr/v2/selectors/beats'
+import { allBookIdsSelector } from 'pltr/v2/selectors/books'
+import { hierarchyLevelCount } from 'pltr/v2/selectors/hierarchy'
 
 export function createWebReport(state) {
-  const client = state.client
-  const applicationState = state.applicationState
   const locale = state.settings.appSettings.locale
   const stateStartTime = state.actions.startTimestamp
   const file = state.project.selectedFile
-  const totalBooks = state.books.allIds.length
   const totalCards = state.cards.length
   const totalLines = state.lines.length
   const totalCharacters = state.characters.length
   const totalNotes = state.notes.length
   const totalTags = state.tags.length
   const totalPlaces = state.places.length
-  const hierarchyLevels = keys(state.hierarchyLevels).length
+  const client = state.client
+  const totalBooks = allBookIdsSelector(state).length
+  const applicationState = applicationStateSelector(state)
+  const allBeats = allBeatsSelector(state)
+  const hierarchyLevel = hierarchyLevelCount(state)
 
   const clientArr = getStateValue(client)
   const selectedFile = getStateValue(file)
@@ -26,7 +31,7 @@ export function createWebReport(state) {
     .setLocale(locale)
     .toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS)
 
-  const totalBeats = Object.values(state.beats).reduce((acc, curr) => {
+  const totalBeats = Object.values(allBeats).reduce((acc, curr) => {
     if (curr.index && keys(curr.index) && keys(curr.index).length) {
       return acc + keys(curr.index).length
     }
@@ -54,7 +59,7 @@ FILE INFO
 AGGREGATIONS
 ----------------------------------
 \n
-Hierarchy Level: ${hierarchyLevels}
+Hierarchy Level: ${hierarchyLevel}
 Books: ${totalBooks}
 Beats: ${totalBeats}
 Plotlines: ${totalLines}
@@ -70,14 +75,13 @@ GENERIC INFO
 \n
 ${applicationStateObj}
 `
-
-  return downloadReport(report)
+  return download('plottr-user-report.txt', report)
 }
 
-const downloadReport = (report) => {
+const download = (fileName, report) => {
   const data = new Blob([report], { type: 'text/plain' })
   const link = document.createElement('a')
-  link.download = 'plottr-user-report.txt'
+  link.download = fileName
   link.href = window.URL.createObjectURL(data)
   link.dataset.downloadurl = `text/plain:${link.download}:${link.href}`
   link.dispatchEvent(new MouseEvent('click'), {
