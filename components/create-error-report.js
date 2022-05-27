@@ -1,4 +1,4 @@
-import { upperFirst, camelCase, keys } from 'lodash'
+import { keys, startCase } from 'lodash'
 import { DateTime } from 'luxon'
 import { applicationStateSelector } from 'pltr/v2/selectors/applicationState'
 import { allBeatsSelector } from 'pltr/v2/selectors/beats'
@@ -78,29 +78,18 @@ ${applicationStateObj}
   return download('plottr-user-report.txt', report)
 }
 
-const download = (fileName, report) => {
-  const data = new Blob([report], { type: 'text/plain' })
-  const link = document.createElement('a')
-  link.download = fileName
-  link.href = window.URL.createObjectURL(data)
-  link.dataset.downloadurl = `text/plain:${link.download}:${link.href}`
-  link.dispatchEvent(new MouseEvent('click'), {
-    view: window,
-    bubbles: true,
-    cancelable: true,
-  })
-  link.remove()
+function download(fileName, report) {
+  const element = document.createElement('a')
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(report))
+  element.setAttribute('download', fileName)
+  element.style.display = 'none'
+  document.body.appendChild(element)
+  element.click()
+  document.body.removeChild(element)
 }
 
-const camelSnakeCaseToCapitalizedWords = (string) => {
-  const f = (str) =>
-    camelCase(str).replace(/(?<=[a-z\d])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])(?=[_])/g, ' ')
-  const words = f(string)
-  return upperFirst(words)
-}
-
-const extractObjectValues = (root, obj) => {
-  const key = camelSnakeCaseToCapitalizedWords(obj)
+function extractObjectValues(root, obj) {
+  const key = startCase(obj)
   if (isAnObject(root[obj])) {
     const stateObj = getStateValue(root[obj])
 
@@ -109,11 +98,11 @@ const extractObjectValues = (root, obj) => {
   return `${key}: ${root[obj] || 'false'}`
 }
 
-const isAnObject = (obj) => {
+function isAnObject(obj) {
   return obj && typeof obj === 'object' && obj.constructor === Object
 }
 
-const getStateValue = (obj) => {
+function getStateValue(obj) {
   if (isAnObject(obj)) {
     return Object.keys(obj).map((i) => {
       if (isAnObject(i)) {
