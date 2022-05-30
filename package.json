@@ -29,6 +29,7 @@
     "dev:nextjs": "node server.js",
     "dev:plottr_components": "npm --prefix lib/plottr_components run start",
     "build": "npm-run-all build:*",
+    "build:tree-changes-hook": "npm --prefix=lib/tree-changes/packages/tree-changes-hook run build",
     "build:plottr_components": "npm --prefix lib/plottr_components run compile",
     "build:next": "next build",
     "test": "jest '(lib.*)|(pages.*)'",
