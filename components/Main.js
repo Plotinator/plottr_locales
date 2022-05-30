@@ -33,6 +33,7 @@ const Main = ({
   currentAppStateIsDashboard,
   setCurrentAppStateToDashboard,
   setCurrentAppStateToApplication,
+  clickOnDom,
 }) => {
   const [dashboardClosed, setDashboardClosed] = useState(false)
   const [firstTimeBooting, setFirstTimeBooting] = useState(busyBooting)
@@ -128,7 +129,12 @@ const Main = ({
       <Navigation />
       <FullPageSpinner />
       <Error />
-      <main className="project-main tour-end">
+      <main
+        onClick={(event) => {
+          clickOnDom(event.clientX, event.clientY)
+        }}
+        className="project-main tour-end"
+      >
         <Switch>
           <Route path="/project" component={Project} />
           <Route path="/timeline" component={Timeline} />
@@ -157,6 +163,7 @@ Main.propTypes = {
   currentAppStateIsDashboard: PropTypes.string.isRequired,
   setCurrentAppStateToDashboard: PropTypes.func.isRequired,
   setCurrentAppStateToApplication: PropTypes.func.isRequired,
+  clickOnDom: PropTypes.func.isRequired,
 }
 
 export default connect(
@@ -176,5 +183,6 @@ export default connect(
   {
     setCurrentAppStateToDashboard: actions.client.setCurrentAppStateToDashboard,
     setCurrentAppStateToApplication: actions.client.setCurrentAppStateToApplication,
+    clickOnDom: actions.domEvents.clickOnDom,
   }
 )(Main)
