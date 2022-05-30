@@ -22,7 +22,7 @@
     "grant-collab-permissions": "yarn --cwd lib/plottr_firebase grant-collab-permissions",
     "grant-test-permissions": "yarn --cwd lib/plottr_firebase grant-test-permissions",
     "start-emulators": "yarn --cwd lib/plottr_firebase firebase emulators:start",
-    "preinstall": "yarn --cwd lib/plottr_firebase install && git submodule update --init --recursive",
+    "preinstall": "yarn --cwd lib/plottr_firebase install",
     "postinstall": "npm --prefix=lib/tree-changes/packages/tree-changes-hook i && npm --prefix lib/plottr_components install && yarn --cwd lib/plottr_check-prop-types",
     "dev": "npm-run-all --parallel dev:*",
     "dev:tree-changes-hook": "npm --prefix=lib/tree-changes/packages/tree-changes-hook run build",
