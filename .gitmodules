@@ -1,3 +1,0 @@
-[submodule "lib/tree-changes"]
-	path = lib/tree-changes
-	url = git@github.com:Plotinator/tree-changes.git
