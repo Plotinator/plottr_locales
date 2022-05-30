@@ -31,6 +31,7 @@ module.exports = {
     '**/*.json',
     '**/*.xml',
     'lib/plottr_components/dist/**',
+    'lib/tree-changes',
   ],
   rules: {
     'no-unused-vars': [
