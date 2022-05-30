@@ -23,8 +23,9 @@
     "grant-test-permissions": "yarn --cwd lib/plottr_firebase grant-test-permissions",
     "start-emulators": "yarn --cwd lib/plottr_firebase firebase emulators:start",
     "preinstall": "yarn --cwd lib/plottr_firebase install",
-    "postinstall": "npm --prefix lib/plottr_components install && yarn --cwd lib/plottr_check-prop-types",
+    "postinstall": "npm --prefix=lib/tree-changes/packages/tree-changes-hook i && npm --prefix lib/plottr_components install && yarn --cwd lib/plottr_check-prop-types",
     "dev": "npm-run-all --parallel dev:*",
+    "dev:tree-changes-hook": "npm --prefix=lib/tree-changes/packages/tree-changes-hook run build",
     "dev:nextjs": "node server.js",
     "dev:plottr_components": "npm --prefix lib/plottr_components run start",
     "build": "npm-run-all build:*",
@@ -70,7 +71,8 @@
     "regenerator-runtime": "^0.13.7",
     "rimraf": "^3.0.2",
     "rollbar": "^2.24.0",
-    "semver": "^7.3.5"
+    "semver": "^7.3.5",
+    "tree-changes-hook": "file:./lib/tree-changes/packages/tree-changes-hook"
   },
   "devDependencies": {
     "@babel/core": "^7.14.3",
