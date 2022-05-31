@@ -70,6 +70,7 @@
     "redux-thunk": "^2.3.0",
     "redux-undo": "^1.0.1",
     "regenerator-runtime": "^0.13.7",
+    "requestidlecallback-polyfill": "^1.0.2",
     "rimraf": "^3.0.2",
     "rollbar": "^2.24.0",
     "semver": "^7.3.5",
