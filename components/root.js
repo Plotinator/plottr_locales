@@ -3,6 +3,7 @@ import { Provider } from 'react-redux'
 import { PropTypes } from 'prop-types'
 import { ActionCreators } from 'redux-undo'
 import Head from 'next/head'
+import 'requestidlecallback-polyfill'
 
 import { store } from '../lib/redux'
 

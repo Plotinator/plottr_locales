@@ -8735,8 +8735,8 @@ platform@1.3.6:
     docx "^5.5.0"
     jsrtf "0.0.3"
     lodash "^4.17.19"
-    plottr_locales "file:../../.cache/yarn/v6/npm-plottr-import-export-0.0.1-e3bcd7b1-6c64-49b9-9abd-6b4df1042a8b-1653921056370/node_modules/plottr_locales"
-    pltr "file:../../.cache/yarn/v6/npm-plottr-import-export-0.0.1-e3bcd7b1-6c64-49b9-9abd-6b4df1042a8b-1653921056370/node_modules/pltr"
+    plottr_locales "file:../../.cache/yarn/v6/npm-plottr-import-export-0.0.1-05c64405-c92d-4dd0-93b7-b74c9ff700f6-1653993527171/node_modules/plottr_locales"
+    pltr "file:../../.cache/yarn/v6/npm-plottr-import-export-0.0.1-05c64405-c92d-4dd0-93b7-b74c9ff700f6-1653993527171/node_modules/pltr"
     xml-js "^1.6.11"
 
 "plottr_locales@file:lib/plottr_locales":
@@ -9609,6 +9609,11 @@ request@^2.87.0, request@^2.88.2:
     tough-cookie "~2.5.0"
     tunnel-agent "^0.6.0"
     uuid "^3.3.2"
+
+requestidlecallback-polyfill@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/requestidlecallback-polyfill/-/requestidlecallback-polyfill-1.0.2.tgz#02eefae286ff86ef04232087dba19f005308b18e"
+  integrity sha512-zzkRzvMe7UdV0M7AIU70vl2fh4rFnNYDL8U0ISwWiOX/5MowBV1ESYCWSQP/KsgJNUOC/AS6X3DApOmxoyE6MA==
 
 require-directory@^2.1.1:
   version "2.1.1"
