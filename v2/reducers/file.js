@@ -1,4 +1,3 @@
-import 'react-native-get-random-values'
 import { v4 as uuidv4 } from 'uuid'
 
 import {
@@ -10,7 +9,7 @@ import {
   LOAD_FILE,
   SET_OFFLINE,
   SET_RESUMING,
-  RECORD_LAST_ACTION,
+  RECORD_LAST_ACTION
 } from '../constants/ActionTypes'
 import { file as defaultFile } from '../store/initialState'
 import { SYSTEM_REDUCER_ACTION_TYPES } from './systemReducers'
@@ -25,7 +24,7 @@ const file =
     const state = {
       ...stateWithoutTimeStamp,
       timeStamp: shouldUpdateTimestamp ? new Date() : stateWithoutTimeStamp.timeStamp,
-      versionStamp: shouldUpdateTimestamp ? uuidv4() : stateWithoutTimeStamp.versionStamp,
+      versionStamp: shouldUpdateTimestamp ? uuidv4() : stateWithoutTimeStamp.versionStamp
     }
     switch (action.type) {
       case FILE_LOADED:
@@ -37,7 +36,7 @@ const file =
           id: action.data.file.id || null,
           appliedMigrations: action.data.file.appliedMigrations || [],
           initialVersion: action.data.file.initialVersion || action.version,
-          isCloudFile: action.data.file.isCloudFile || false,
+          isCloudFile: action.data.file.isCloudFile || false
         }
 
       case FILE_SAVED:
@@ -65,19 +64,19 @@ const file =
             ...stateWithoutTimeStamp,
             resuming: false,
             originalVersionStamp: stateWithoutTimeStamp.versionStamp,
-            originalTimeStamp: stateWithoutTimeStamp.timeStamp,
+            originalTimeStamp: stateWithoutTimeStamp.timeStamp
           }
         } else {
           return {
             ...state,
-            resuming: true,
+            resuming: true
           }
         }
 
       case SET_RESUMING:
         return {
           ...stateWithoutTimeStamp,
-          resuming: action.resuming,
+          resuming: action.resuming
         }
 
       default:
