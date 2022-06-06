@@ -119,12 +119,11 @@ const SelectListConnector = (connector) => {
         <label className="select-list__details-label">
           {label}:
           <Floater
-            rootClose
             open={visible}
             onClose={() => {
               setVisible(false)
             }}
-            placement="right-start"
+            placement="right"
             component={renderUnSelected}
           >
             <Button
