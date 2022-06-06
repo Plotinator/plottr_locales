@@ -130,32 +130,6 @@ const RichTextEditorConnector = (connector) => {
       onKeyDown(event)
     }
 
-    const handleKeyUp = () => {
-      // scroll to the cursor
-      if (editor.selection == null) return
-      try {
-        const domPoint = ReactEditor.toDOMPoint(editor, editor.selection.focus)
-        const node = domPoint[0]
-        let isElem = false
-        let parent = node.parentElement
-        // find the closest parent that is a slate element
-        while (!isElem) {
-          if (parent == null) {
-            isElem = true
-            return
-          }
-          if (parent.dataset.slateNode == 'element') {
-            isElem = true
-          } else {
-            parent = parent.parentElement
-          }
-        }
-        parent.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-      } catch (e) {
-        // Do nothing if there is an error.
-      }
-    }
-
     const handleInput = (e) => {
       e.stopPropagation()
       try {
@@ -217,7 +191,6 @@ const RichTextEditorConnector = (connector) => {
               placeholder={t('Enter some text...')}
               onPaste={onPaste}
               onKeyDown={handleKeyDown}
-              onKeyUp={handleKeyUp}
               onInput={handleInput}
               onBlur={handleOnBlur}
               onFocus={handleOnFocus}
@@ -265,6 +238,7 @@ const RichTextEditorConnector = (connector) => {
       }),
       { cacheImage: actions.imageCache.cacheImage }
     )(
+      // eslint-disable-next-line react/display-name
       React.memo(RichTextEditor, (prevProps, nextProps) => {
         return (
           prevProps.id === nextProps.id &&
