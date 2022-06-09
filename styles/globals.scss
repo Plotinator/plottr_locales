@@ -1,6 +1,6 @@
 @import 'colors';
 @import 'vars';
-@import 'bootstrap_configuration';
+@import '../lib/plottr_components/src/css/components.scss';
 
 $text-color: $gray-0;
 
@@ -8,8 +8,6 @@ $text-color: $gray-0;
 @import 'error_boundary';
 @import 'home';
 @import 'login';
-
-@import '../lib/plottr_components/dist/components/components.css';
 
 @import 'dashboard/dashboard';
 
