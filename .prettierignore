@@ -3,6 +3,7 @@ lib/plottr_components/src/css/bootstrap/**/*
 lib/plottr_check-prop-types/**/*
 lib/plottr_locales/lib/babel-plugin-extract-format-message/**/*
 lib/plottr_locales/lib/format-message-cli/**/*
+lib/tree-changes/**/*
 styles/bootstrap/**/*
 **/*.md
 .next/

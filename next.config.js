@@ -7,6 +7,9 @@ module.exports = {
       ...config.resolve,
       alias: {
         ...config.resolve.alias,
+        // The upstream tree-changes-hook explores all props and some
+        // are circular.
+        'tree-changes-hook': path.resolve('./lib/tree-changes/packages/tree-changes-hook'),
         docx: path.resolve('./node_modules/docx'),
         'connected-components': path.resolve('./components/connected-components.js'),
         'wired-up-firebase': path.resolve('./lib/firebase.js'),
