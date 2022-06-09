@@ -54,6 +54,7 @@ import extractImages from '../lib/extractImages'
 import { logger } from '../lib/logger'
 import { setCurrentProject } from '../lib/currentProject'
 import { notifyUser } from '../lib/notifyUser'
+import { createWebReport } from './create-error-report'
 
 const deleteFileOnFirestore = (fileId) => {
   const state = store.getState()
@@ -260,7 +261,7 @@ const platform = {
     window.open(withProtocol, '_blank')
   },
   createErrorReport,
-  createFullErrorReport: () => {},
+  createFullErrorReport: (fullState) => createWebReport(fullState),
   log: {
     info: (...args) => {
       logger.info(...args)
