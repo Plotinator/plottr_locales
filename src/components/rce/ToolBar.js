@@ -44,7 +44,7 @@ const UnconnectedToolBar = (connector) => {
   const underlineIcon = <FaUnderline />
   const strikeThroughIcon = <FaStrikethrough />
 
-  const ToolBar = ({ editor, darkMode, selection }) => {
+  const ToolBar = ({ editor, darkMode }) => {
     const [showColorPicker, toggleColorPicker] = useState(false)
     const [fonts, setFonts] = useState(null)
     const [recentFonts, setRecentFonts] = useState(null)
@@ -82,39 +82,16 @@ const UnconnectedToolBar = (connector) => {
               logger={log}
             />
             <FontSizeChooser editor={editor} />
-            <MarkButton
-              selection={selection}
-              mark="bold"
-              icon={boldIcon}
-              editor={editor}
-              logger={log}
-            />
-            <MarkButton
-              selection={selection}
-              mark="italic"
-              icon={italicIcon}
-              editor={editor}
-              logger={log}
-            />
-            <MarkButton
-              selection={selection}
-              mark="underline"
-              icon={underlineIcon}
-              editor={editor}
-              logger={log}
-            />
-            <MarkButton
-              selection={selection}
-              mark="strike"
-              icon={strikeThroughIcon}
-              editor={editor}
-              logger={log}
-            />
+            <MarkButton mark="bold" icon={boldIcon} editor={editor} logger={log} />
+            <MarkButton mark="italic" icon={italicIcon} editor={editor} logger={log} />
+            <MarkButton mark="underline" icon={underlineIcon} editor={editor} logger={log} />
+            <MarkButton mark="strike" icon={strikeThroughIcon} editor={editor} logger={log} />
             <Floater
               component={miniColorPickerOverlay}
               open={showColorPicker}
               placement="bottom"
               hideArrow
+              rootClose
               onClose={closeColorPicker}
             >
               <ColorButton
@@ -138,7 +115,6 @@ const UnconnectedToolBar = (connector) => {
 
   ToolBar.propTypes = {
     editor: PropTypes.object.isRequired,
-    selection: PropTypes.object,
     darkMode: PropTypes.bool,
   }
 
