@@ -1,7 +1,8 @@
-import scrivxJSON from './fixtures/scrivener-example3-jsonified.json'
+import example3ScrivxJSON from './fixtures/scrivener-example3-jsonified.json'
 import { cloneDeep, keys, upperFirst, values } from 'lodash'
 import { emptyFile, initialState, tree } from 'pltr/v2'
 import {
+  categorizePlot,
   concatenateValues,
   createCustomAttributes,
   createNewBeat,
@@ -21,6 +22,7 @@ import {
   getRTFContents,
   getSection,
   getVer_2_7_matchName,
+  isAPlotline,
   isATag,
   isNotExcludedAttribute,
   keepRTFNonSectionItems,
@@ -194,7 +196,7 @@ currentState.beats = {
 currentState.lines = []
 
 function isAnObject(val) {
-  if (val && typeof val === 'object') {
+  if (val && val instanceof Object) {
     return true
   } else {
     return false
@@ -285,11 +287,11 @@ expect.extend({
   },
 })
 
-const manuscript = scrivxJSON['ScrivenerProject']['Binder']['BinderItem'].find(
+const manuscript = example3ScrivxJSON['ScrivenerProject']['Binder']['BinderItem'].find(
   (n) => n['_attributes']['Type'] == 'DraftFolder' || n['Title']['_text'] == 'Manuscript'
 )
 
-const sectionsJSON = scrivxJSON['ScrivenerProject']['Binder']['BinderItem'].filter(
+const sectionsJSON = example3ScrivxJSON['ScrivenerProject']['Binder']['BinderItem'].filter(
   (n) => n['_attributes']['Type'] != 'DraftFolder' && n['_attributes']['Type'] != 'TrashFolder'
 )
 
@@ -297,9 +299,20 @@ const characters = getSection(sectionsJSON, 'Characters').filter((i) => i)
 const notes = getSection(sectionsJSON, 'Notes').filter((i) => i)
 const places = getSection(sectionsJSON, 'Places').filter((i) => i)
 
-const charactersBinderItem = Array.isArray(characters[0]['Children']['BinderItem'])
-  ? characters[0]['Children']['BinderItem']
-  : [characters[0]['Children']['BinderItem']]
+const charactersBinderItem =
+  characters &&
+  characters[0] &&
+  characters[0]['Children'] &&
+  characters[0]['Children']['BinderItem'] &&
+  Array.isArray(characters[0]['Children']['BinderItem'])
+    ? characters[0]['Children']['BinderItem']
+    : characters &&
+      characters[0] &&
+      characters[0]['Children'] &&
+      characters[0]['Children']['BinderItem'] &&
+      !Array.isArray(characters[0]['Children']['BinderItem'])
+    ? [characters[0]['Children']['BinderItem']]
+    : []
 
 // const notesBinderItem = Array.isArray(notes[0]['Children']['BinderItem'])
 //   ? notes[0]['Children']['BinderItem']
@@ -756,6 +769,8 @@ describe('ScrivenerImporter', () => {
   })
 
   describe('getManuscriptSectionItems', () => {
+    const SECTION_ITEMS_WITH_PLOTLINE = ['characters', 'notes', 'places', 'tags', 'plotline']
+
     const files = getMatchedRelevantFiles(relevantFiles, UUID)
     let fileContents = { txtContent: createSlateParagraph(''), rtfContents: [] }
     const mappedFiles = mapMatchedFiles(currentState, files, fileContents, bookId)
@@ -777,7 +792,7 @@ describe('ScrivenerImporter', () => {
     it('should have an object key name that belongs included in "SECTION_ITEMS"', () => {
       sectionItemsFromManuscript.forEach((section) => {
         const sectionItemKey = keys(section)[0]
-        expect(SECTION_ITEMS).toContain(sectionItemKey)
+        expect(SECTION_ITEMS_WITH_PLOTLINE).toContain(sectionItemKey)
       })
     })
   })
@@ -1039,6 +1054,45 @@ describe('ScrivenerImporter', () => {
         expect(attrKeys[1]).toBe('type')
         expect(attrib.name).toBeDefined()
         expect(attrib.type).toBeDefined()
+      })
+    })
+  })
+
+  describe('categorizePlot', () => {
+    const sectionItemsWithPlotline = [
+      'Character',
+      'Characters',
+      'Place',
+      'Places',
+      'Tag',
+      'Tags',
+      'Plotline',
+    ]
+    it('should return `Plot` if the string contains plot but is not `Plotline`', () => {
+      expect(categorizePlot('Subplot')).toBe('Plot')
+      expect(categorizePlot('Mainplot')).toBe('Plot')
+      expect(categorizePlot('Sub-plot')).toBe('Plot')
+      expect(categorizePlot('Main plot')).toBe('Plot')
+      expect(categorizePlot('Plotline')).toBe('Plotline')
+
+      sectionItemsWithPlotline.forEach((item) => {
+        expect(categorizePlot(item)).toBe(item)
+      })
+    })
+  })
+
+  describe('isAPlot', () => {
+    const sectionItems = ['Character', 'Characters', 'Place', 'Places', 'Tag', 'Tags']
+
+    it('should return true if string contains "plot"', () => {
+      expect(isAPlotline('Subplot')).toBeTruthy()
+      expect(isAPlotline('Mainplot')).toBeTruthy()
+      expect(isAPlotline('Sub-plot')).toBeTruthy()
+      expect(isAPlotline('Main plot')).toBeTruthy()
+      expect(isAPlotline('Plotline')).toBeTruthy()
+
+      sectionItems.forEach((item) => {
+        expect(isAPlotline(item)).toBeFalsy()
       })
     })
   })
