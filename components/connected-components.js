@@ -77,7 +77,7 @@ const platform = {
   appVersion: appVersion(),
   defaultBackupLocation: 'cloud',
   setDarkMode: (value) => {
-    store.dispatch(actions.ui.setDarkMode(value === 'dark'))
+    store.dispatch(actions.settings.setDarkMode(value === 'dark'))
   },
   file: {
     createNew: (template, newFileName) => {
