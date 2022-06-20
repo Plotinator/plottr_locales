@@ -117,6 +117,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
     }
 
   const listenToFile = (store, userId, fileId, clientId, errorHandler = defaultErrorHandler) => {
+  
     const withIsCloud = (x) => ({ ...x, isCloudFile: true, id: fileId })
     return database()
       .collection('file')
@@ -125,7 +126,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
         onSnapshot(store, fileId, 'file', withIsCloud, true, clientId, 'patchFile', (x) => ({
           id: x.id
         })),
-        errorHandler
+        
       )
   }
 
@@ -136,7 +137,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
       return database()
         .collection(path)
         .doc(fileId)
-        .onSnapshot(onSnapshot(store, fileId, path, identity, true, clientId), errorHandler)
+        .onSnapshot(onSnapshot(store, fileId, path, identity, true, clientId))
     }
 
   const listenForArrayAtPath =
@@ -146,7 +147,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
       return database()
         .collection(path)
         .doc(fileId)
-        .onSnapshot(onSnapshot(store, fileId, path, values, true, clientId), errorHandler)
+        .onSnapshot(onSnapshot(store, fileId, path, values, true, clientId))
     }
 
   const WHEN_BEATS_BECAME_AN_OBJECT = '2021.4.13'
@@ -159,13 +160,14 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
     version,
     errorHandler = defaultErrorHandler
   ) => {
+
     const transform = semverGt(version, WHEN_BEATS_BECAME_AN_OBJECT)
       ? (x) => x
       : (x) => Object.values(x)
     return database()
       .collection('beats')
       .doc(fileId)
-      .onSnapshot(onSnapshot(store, fileId, 'beats', transform, true, clientId), errorHandler)
+      .onSnapshot(onSnapshot(store, fileId, 'beats', transform, true, clientId))
   }
 
   const listenToCards = listenForArrayAtPath('cards')
@@ -443,7 +445,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
         },
         (error) => {
           log.error('Error listening to files', error)
-          errorHandler(error)
+        //  errorHandler(error)
         }
       )
   }
@@ -505,7 +507,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
       }
       cb(user)
       return Promise.resolve(null)
-    }, errorHandler)
+    }, )
   }
 
   let _firebaseui
