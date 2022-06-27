@@ -61,9 +61,10 @@ const withNormalizer = (editor) => {
 
     // Don't allow a collection of list items to not have a parent of a list type
     if (Element.isElement(node) && !LIST_TYPES.includes(node.type)) {
-      let allChildrenAreListTypes = true
+      let allChildrenAreListTypes =
+        node.children && node.children.length && node.children.length > 0
       for (const [child] of Node.children(editor, path)) {
-        allChildrenAreListTypes &= Element.isElement(child) && child.type == 'list-item'
+        allChildrenAreListTypes &= Element.isElement(child) && child.type === 'list-item'
       }
       if (allChildrenAreListTypes) {
         Transforms.setNodes(editor, { type: 'bulleted-list' }, { at: path })
@@ -72,17 +73,30 @@ const withNormalizer = (editor) => {
 
     // Don't allow root-level collections of nodes to all be list items.
     if (Array.isArray(path) && path.length === 0 && node.children && node.children.length > 0) {
-      let allChildrenAreListTypes = true
+      let allChildrenAreListTypes = node.children.length !== 0
+      let allChildrenAreEmpty = node.children.length !== 0
       for (const child of node.children) {
-        allChildrenAreListTypes &= Element.isElement(child) && child.type == 'list-item'
+        allChildrenAreListTypes &= Element.isElement(child) && child.type === 'list-item'
+        allChildrenAreEmpty &=
+          Element.isElement(child) &&
+          Array.isArray(child.children) &&
+          child.children.every((subChild) => {
+            return subChild.text === ''
+          })
       }
       if (allChildrenAreListTypes) {
-        node.children = [
-          {
-            type: 'bulleted-list',
-            children: node.children,
-          },
-        ]
+        if (allChildrenAreEmpty) {
+          node.children.forEach((child, index) => {
+            Transforms.setNodes(editor, { type: 'paragraph' }, { at: [...path, index] })
+          })
+        } else {
+          node.children = [
+            {
+              type: 'bulleted-list',
+              children: node.children,
+            },
+          ]
+        }
       }
     }
 
