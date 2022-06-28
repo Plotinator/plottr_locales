@@ -24,6 +24,7 @@ function Navigation({
   changeCurrentView,
   darkMode,
   selectedFile,
+  clickOnDom,
 }) {
   const [dashboardView, setDashboardView] = useState(currentProject() ? null : 'files')
 
@@ -127,7 +128,14 @@ function Navigation({
           darkMode={darkMode}
         />
       ) : null}
-      <Navbar className="project-nav" fluid inverse={darkMode}>
+      <Navbar
+        onClick={(event) => {
+          clickOnDom(event.clientX, event.clientY)
+        }}
+        className="project-nav"
+        fluid
+        inverse={darkMode}
+      >
         <Nav bsStyle="pills">
           <BookChooser />
           <li role="presentation" className={cx({ active: currentView === 'project' })}>
@@ -187,6 +195,7 @@ Navigation.propTypes = {
   currentTimeline: PropTypes.number,
   selectedFile: PropTypes.object,
   changeCurrentTimeline: PropTypes.func.isRequired,
+  clickOnDom: PropTypes.func.isRequired,
 }
 
 function mapStateToProps(state) {
@@ -203,4 +212,5 @@ function mapStateToProps(state) {
 export default connect(mapStateToProps, {
   changeCurrentView: actions.ui.changeCurrentView,
   changeCurrentTimeline: actions.ui.changeCurrentTimeline,
+  clickOnDom: actions.domEvents.clickOnDom,
 })(Navigation)
