@@ -12,6 +12,9 @@ import UnconnectedLanguagePicker from '../../LanguagePicker'
 import UnconnectedDarkOptionsSelect from './DarkOptionsSelect'
 import UnconnectedBackupOptions from './BackupOptions'
 import { checkDependencies } from '../../checkDependencies'
+import { DefaultFontDropdown } from './DefaultFontDropdown'
+import { addRecent, getFonts, getRecent } from '../../rce/fonts'
+import { DefaultFontSizeDropdown } from './DefaultFontSizeDropdown'
 
 const OptionsHomeConnector = (connector) => {
   const {
@@ -23,6 +26,9 @@ const OptionsHomeConnector = (connector) => {
       updateLanguage,
       updateBeatHierarchyFlag,
       os,
+      log,
+      setFontStyle,
+      setFontSize,
       settings: { saveAppSetting },
     },
   } = connector
@@ -34,6 +40,8 @@ const OptionsHomeConnector = (connector) => {
     updateBeatHierarchyFlag,
     os,
     saveAppSetting,
+    setFontStyle,
+    setFontSize,
   })
 
   const LanguagePicker = UnconnectedLanguagePicker(connector)
@@ -42,6 +50,9 @@ const OptionsHomeConnector = (connector) => {
 
   const OptionsHome = ({ hasCurrentProLicense, settings, shouldBeInPro }) => {
     const [activeTab, setActiveTab] = useState(1)
+    const [fonts, setFonts] = useState(null)
+    const [recentFonts, setRecentFonts] = useState(settings.user.font ? [settings.user.font] : null)
+    const defaultFontSize = settings.user.fontSize
 
     useEffect(() => {
       setupI18n(settings, { electron })
@@ -52,6 +63,11 @@ const OptionsHomeConnector = (connector) => {
         setActiveTab(x)
       }
     }
+
+    useEffect(() => {
+      if (!fonts) setFonts(getFonts(os()))
+      if (!recentFonts) setRecentFonts(getRecent())
+    }, [])
 
     const osIsUnknown = os() === 'unknown'
 
@@ -90,12 +106,29 @@ const OptionsHomeConnector = (connector) => {
     const dashboardFirstIsOn =
       settings.user.openDashboardFirst === undefined ? true : settings.user.openDashboardFirst
 
+    const spellCheckFirstIsOn =
+      settings.user.useSpellcheck === undefined ? true : settings.user.useSpellcheck
+
     const handleSelectLanguage = useCallback(
       (newLanguage) => {
         saveAppSetting('locale', newLanguage)
         updateLanguage(newLanguage)
       },
       [saveAppSetting, updateLanguage]
+    )
+
+    const handleSelectFont = useCallback(
+      (newFont) => {
+        setFontStyle(newFont)
+      },
+      [saveAppSetting, setFontStyle]
+    )
+
+    const handleSelectFontSize = useCallback(
+      (newSize) => {
+        setFontSize(newSize)
+      },
+      [saveAppSetting, setFontSize]
     )
 
     return (
@@ -123,6 +156,17 @@ const OptionsHomeConnector = (connector) => {
               <div className="dashboard__options__item">
                 <h4>{t('Language')}</h4>
                 <LanguagePicker onSelectLanguage={handleSelectLanguage} />
+              </div>
+              <div className="dashboard__options__item">
+                <h4>{t('Spell Check')}</h4>
+                <Switch
+                  isOn={spellCheckFirstIsOn}
+                  handleToggle={() =>
+                    saveAppSetting('user.useSpellcheck', !settings.user.useSpellcheck)
+                  }
+                  labelText={t('Use spellcheck')}
+                />
+                <p>{t('Requires you to restart plottr')}</p>
               </div>
             </Tab>
             <Tab eventKey={2} title={t('Dashboard')}>
@@ -236,6 +280,26 @@ const OptionsHomeConnector = (connector) => {
                   </p>
                 </div>
               ) : null}
+            </Tab>
+            <Tab eventKey={5} title={t('Appearance')}>
+              <div className="dashboard__options__item">
+                <h4>{t('Default Font')}</h4>
+                <DefaultFontDropdown
+                  fonts={fonts || []}
+                  recentFonts={recentFonts || []}
+                  addRecent={addRecent}
+                  onChange={handleSelectFont}
+                />
+                <br />
+                <p>
+                  <br />
+                  <h4>{t('Default Font Size')}</h4>
+                  <DefaultFontSizeDropdown
+                    defaultFontSize={defaultFontSize}
+                    onChange={handleSelectFontSize}
+                  />
+                </p>
+              </div>
             </Tab>
           </Tabs>
         </div>
