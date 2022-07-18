@@ -123,6 +123,8 @@ const pltrTypeSpecs = {
   appVersion: PropTypes.string.isRequired,
   defaultBackupLocation: PropTypes.string.isRequired,
   setDarkMode: PropTypes.func.isRequired,
+  setFontStyle: PropTypes.func.isRequired,
+  setFontSize: PropTypes.func.isRequired,
   file: PropTypes.shape({
     sortAndSearch: PropTypes.func.isRequired,
     createNew: PropTypes.func.isRequired,
@@ -236,6 +238,7 @@ const pltrTypeSpecs = {
     resolveToPublicUrl: PropTypes.func.isRequired,
     saveImageToStorageBlob: PropTypes.func.isRequired,
     saveImageToStorageFromURL: PropTypes.func.isRequired,
+    downloadStorageImage: PropTypes.func.isRequired,
   }),
 }
 
