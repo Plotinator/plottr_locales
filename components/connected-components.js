@@ -51,6 +51,7 @@ import { userHasPro } from '../lib/checkPro'
 import MPQ from '../lib/MPQ'
 import { resizeImage } from '../lib/resizeImage'
 import extractImages from '../lib/extractImages'
+import { downloadStorageImage } from '../lib/downloadStorageImage'
 import { logger } from '../lib/logger'
 import { setCurrentProject } from '../lib/currentProject'
 import { notifyUser } from '../lib/notifyUser'
@@ -78,6 +79,12 @@ const platform = {
   defaultBackupLocation: 'cloud',
   setDarkMode: (value) => {
     store.dispatch(actions.settings.setDarkMode(value === 'dark'))
+  },
+  setFontStyle: (value) => {
+    store.dispatch(actions.settings.setFontSettings({ font: value }))
+  },
+  setFontSize: (value) => {
+    store.dispatch(actions.settings.setFontSettings({ fontSize: value }))
   },
   file: {
     createNew: (template, newFileName) => {
@@ -371,6 +378,7 @@ const platform = {
     },
     isStorageURL,
     resizeImage,
+    downloadStorageImage,
   },
   firebase: {
     onSessionChange,
