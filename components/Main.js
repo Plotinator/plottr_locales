@@ -34,6 +34,7 @@ const Main = ({
   setCurrentAppStateToDashboard,
   setCurrentAppStateToApplication,
   clickOnDom,
+  settings,
 }) => {
   const [dashboardClosed, setDashboardClosed] = useState(false)
   const [firstTimeBooting, setFirstTimeBooting] = useState(busyBooting)
@@ -55,6 +56,18 @@ const Main = ({
       setFirstTimeBooting(false)
     }
   }, [busyBooting])
+
+  useEffect(() => {
+    if (settings.user.font) {
+      window.document.documentElement.style.setProperty('--default-rce-font', settings.user.font)
+    }
+    if (settings.user.fontSize) {
+      window.document.documentElement.style.setProperty(
+        '--default-rce-font-size',
+        String(settings.user.fontSize) + 'px'
+      )
+    }
+  }, [settings.user])
 
   // If we opened a file then don't show the dashboard all of a sudden
   // when the user changes the always show dashboard setting.
@@ -164,6 +177,7 @@ Main.propTypes = {
   setCurrentAppStateToDashboard: PropTypes.func.isRequired,
   setCurrentAppStateToApplication: PropTypes.func.isRequired,
   clickOnDom: PropTypes.func.isRequired,
+  settings: PropTypes.object,
 }
 
 export default connect(
@@ -179,6 +193,7 @@ export default connect(
     loadingState: selectors.loadingStateSelector(state.present),
     loadingProgress: selectors.loadingProgressSelector(state.present),
     currentAppStateIsDashboard: selectors.currentAppStateIsDashboardSelector(state.present),
+    settings: selectors.appSettingsSelector(state.present),
   }),
   {
     setCurrentAppStateToDashboard: actions.client.setCurrentAppStateToDashboard,
