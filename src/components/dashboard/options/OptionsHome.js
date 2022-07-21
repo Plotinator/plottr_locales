@@ -26,7 +26,6 @@ const OptionsHomeConnector = (connector) => {
       updateLanguage,
       updateBeatHierarchyFlag,
       os,
-      log,
       setFontStyle,
       setFontSize,
       settings: { saveAppSetting },
@@ -48,7 +47,7 @@ const OptionsHomeConnector = (connector) => {
   const DarkOptionsSelect = UnconnectedDarkOptionsSelect(connector)
   const BackupOptions = UnconnectedBackupOptions(connector)
 
-  const OptionsHome = ({ hasCurrentProLicense, settings, shouldBeInPro, isOnWeb }) => {
+  const OptionsHome = ({ hasCurrentProLicense, settings, shouldBeInPro }) => {
     const [activeTab, setActiveTab] = useState(1)
     const [fonts, setFonts] = useState(null)
     const [recentFonts, setRecentFonts] = useState(settings.user.font ? [settings.user.font] : null)
@@ -281,28 +280,26 @@ const OptionsHomeConnector = (connector) => {
                 </div>
               ) : null}
             </Tab>
-            {!isOnWeb ? (
-              <Tab eventKey={5} title={t('Appearance')}>
-                <div className="dashboard__options__item">
-                  <h4>{t('Default Font')}</h4>
-                  <DefaultFontDropdown
-                    fonts={fonts || []}
-                    recentFonts={recentFonts || []}
-                    addRecent={addRecent}
-                    onChange={handleSelectFont}
-                  />
+            <Tab eventKey={5} title={t('Appearance')}>
+              <div className="dashboard__options__item">
+                <h4>{t('Default Font')}</h4>
+                <DefaultFontDropdown
+                  fonts={fonts || []}
+                  recentFonts={recentFonts || []}
+                  addRecent={addRecent}
+                  onChange={handleSelectFont}
+                />
+                <br />
+                <p>
                   <br />
-                  <p>
-                    <br />
-                    <h4>{t('Default Font Size')}</h4>
-                    <DefaultFontSizeDropdown
-                      defaultFontSize={defaultFontSize}
-                      onChange={handleSelectFontSize}
-                    />
-                  </p>
-                </div>
-              </Tab>
-            ) : null}
+                  <h4>{t('Default Font Size')}</h4>
+                  <DefaultFontSizeDropdown
+                    defaultFontSize={defaultFontSize}
+                    onChange={handleSelectFontSize}
+                  />
+                </p>
+              </div>
+            </Tab>
           </Tabs>
         </div>
       </div>
@@ -313,7 +310,6 @@ const OptionsHomeConnector = (connector) => {
     hasCurrentProLicense: PropTypes.bool,
     settings: PropTypes.object.isRequired,
     shouldBeInPro: PropTypes.bool,
-    isOnWeb: PropTypes.bool,
   }
 
   const {
@@ -329,7 +325,6 @@ const OptionsHomeConnector = (connector) => {
         hasCurrentProLicense: selectors.hasProSelector(state.present),
         settings: selectors.appSettingsSelector(state.present),
         shouldBeInPro: selectors.shouldBeInProSelector(state.present),
-        isOnWeb: selectors.isOnWebSelector(state.present),
       }
     })(OptionsHome)
   }
