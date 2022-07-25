@@ -4,11 +4,22 @@ import { t } from 'plottr_locales'
 import { IoIosDocument } from 'react-icons/io'
 import { checkDependencies } from '../../checkDependencies'
 
+const safelyDecodeURI = (str) => {
+  try {
+    return decodeURI(str)
+  } catch (error) {
+    return str
+  }
+}
+
 const truncateTitle = (title) => {
+  if (!title) {
+    return t('Untitled')
+  }
   if (title.length > 80) {
     return `${title.slice(0, 80)}...`
   }
-  return decodeURI(title)
+  return safelyDecodeURI(title)
 }
 
 const BackupFilesConnector = (connector) => {
@@ -79,7 +90,7 @@ const BackupFilesConnector = (connector) => {
       return acc
     }, [])
 
-    if (renderedFiles.length) {
+    if (renderedFiles && renderedFiles.length) {
       return renderedFiles
     }
     return <p>{t('No Matches')}</p>
