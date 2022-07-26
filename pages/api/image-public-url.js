@@ -38,6 +38,29 @@ const withoutStorageProtocal = (path) => {
   return split
 }
 
+export const imagePublicURL = (storageURL, fileId, userId) => {
+  const bucket = storage.bucket(baseBucket)
+
+  return database
+    .doc(`authorisation/${userId}/granted/${fileId}`)
+    .get()
+    .then((file) => {
+      const permission = file?.data()?.permission
+      if (permission === 'owner' || permission === 'collaborator' || permission === 'viewer') {
+        const expiryDate = new Date()
+        expiryDate.setDate(expiryDate.getDate() + 1)
+        const config = {
+          action: 'read',
+          expires: `${
+            expiryDate.getMonth() + 1
+          }-${expiryDate.getDate()}-${expiryDate.getFullYear()}`,
+        }
+        return bucket.file(withoutStorageProtocal(storageURL)).getSignedUrl(config)
+      }
+      throw new Error(`Permission denied when accessing: ${storageURL}`)
+    })
+}
+
 export default (req, res) => {
   return verifyToken(auth, req, res)
     .then(() => {

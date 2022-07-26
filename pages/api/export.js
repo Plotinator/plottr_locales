@@ -9,7 +9,7 @@ import { askToExport } from 'plottr_import_export'
 import { verifyToken } from './verify-token'
 import { localeSettings } from '../../lib/locale-settings'
 import { logger } from '../../lib/logger'
-import { downloadStorageImage } from '../../lib/downloadStorageImage'
+import { imagePublicURL } from './image-public-url'
 
 class DummyMixpanelQueue {
   projectEventStats(event, basicAttrs = {}, state) {}
@@ -57,6 +57,14 @@ const nopNotifier = () => {}
 
 const nopRM = () => {
   return Promise.resolve(true)
+}
+
+const downloadStorageImage = (storageURL, fileId, userId) => {
+  return imagePublicURL(storageURL, fileId, userId).then((url) => {
+    return fetch(url).then((response) => {
+      return response.blob()
+    })
+  })
 }
 
 export default (req, res) => {
