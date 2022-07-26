@@ -76,7 +76,9 @@ const platform = {
     store.dispatch(ActionCreators.redo())
   },
   appVersion: appVersion(),
-  defaultBackupLocation: 'cloud',
+  defaultBackupLocation: () => {
+    return Promise.resolve('cloud')
+  },
   setDarkMode: (value) => {
     store.dispatch(actions.settings.setDarkMode(value === 'dark'))
   },
@@ -138,10 +140,6 @@ const platform = {
       return true
     },
     sortAndSearch,
-    isTempFile: () => {
-      // There's no such thing as a temp file with cloud storage
-      return false
-    },
     pathSep: 'todo',
     basename: (filePath) => {
       // There's no such thing as a 'basename' in cloud storage
@@ -237,7 +235,6 @@ const platform = {
     verifyLicense: () => {},
     // There isn't a way to start/extend a trial on web yet.
     startTrial: () => {},
-    extendTrial: () => {},
     trial90days: [],
     trial60days: [],
     hasPro: () => true,
@@ -256,9 +253,6 @@ const platform = {
     saveTemplate: messageToSaveNewTemplate,
   },
   settings: { saveAppSetting },
-  user: {
-    get: () => {},
-  },
   os: () => 'unknown',
   isDevelopment: process.env.NEXT_PUBLIC_NODE_ENV === 'development',
   isWindows: () => false,
@@ -325,7 +319,6 @@ const platform = {
     }
     logger.error('Attempted to open file at: ', fileName)
   },
-  tempFilesPath: 'TODO',
   mpq: MPQ,
   handleCustomerServiceCode: () => {
     // TODO
