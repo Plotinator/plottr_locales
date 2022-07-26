@@ -9,6 +9,7 @@ import { askToExport } from 'plottr_import_export'
 import { verifyToken } from './verify-token'
 import { localeSettings } from '../../lib/locale-settings'
 import { logger } from '../../lib/logger'
+import { downloadStorageImage } from '../../lib/downloadStorageImage'
 
 class DummyMixpanelQueue {
   projectEventStats(event, basicAttrs = {}, state) {}
@@ -66,6 +67,7 @@ export default (req, res) => {
       const file = req.body.file
       const config = req.body.config
       const type = req.body.type
+      const userId = req.query.userId
       const extension = type === 'scrivener' ? 'scrivener' : 'docx'
       const baseFileName = `fileToExport-${uuidv4()}`
       const savedFilePath = `/tmp/${baseFileName}.${extension}`
@@ -81,6 +83,8 @@ export default (req, res) => {
           null,
           MPQ,
           nopRM,
+          userId,
+          downloadStorageImage,
           (error, filePath) => {
             if (error) {
               res.status(503)
