@@ -1,5 +1,20 @@
 @import 'vars';
 
+.timeline-tabbed-view-body {
+  display: flex;
+}
+
+.nav-with-cross {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  svg {
+    cursor: pointer;
+  }
+}
+
 #timelineview__root {
   width: 100vw;
 
