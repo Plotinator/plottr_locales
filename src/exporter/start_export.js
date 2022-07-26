@@ -12,6 +12,8 @@ export default function askToExport(
   saveDialog,
   mpq,
   rm,
+  userId,
+  downloadStorageImage,
   cb
 ) {
   const fileName = saveDialog ? saveDialog(defaultPath, type) : defaultPath
@@ -35,7 +37,7 @@ export default function askToExport(
         case 'word':
         default:
           console.log('About to export to word...')
-          WordExporter(fullState, fileName, options, notifyUser)
+          WordExporter(fullState, fileName, options, notifyUser, userId, downloadStorageImage)
             .then((filePath) => {
               cb(null, filePath)
             })
