@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react'
 import PropTypes from 'react-proptypes'
 import UnconnectedAccountHome from '../account/AccountHome'
 import UnconnectedFilesHome from '../files/FilesHome'
-import UnconnectedUpdateNotifier from '../UpdateNotifier'
 import UnconnectedTemplatesHome from '../templates/TemplatesHome'
 import UnconnectedBackupsHome from '../backups/BackupsHome'
 import UnconnectedOptionsHome from '../options/OptionsHome'
 import UnconnectedHelpHome from '../help/HelpHome'
 import UnconnectedDashboardErrorBoundary from '../../containers/DashboardErrorBoundary'
-import UnconnectedErrorBoundary from '../../containers/ErrorBoundary'
 import { checkDependencies } from '../../checkDependencies'
+import UnconnectedUpdateNotifier from '../UpdateNotifier'
+import UnconnectedErrorBoundary from '../../containers/ErrorBoundary'
 
 const DashboardBodyConnector = (connector) => {
   const {
@@ -30,18 +30,20 @@ const DashboardBodyConnector = (connector) => {
   const ErrorBoundary = UnconnectedErrorBoundary(connector)
   const AccountHome = UnconnectedAccountHome(connector)
   const FilesHome = UnconnectedFilesHome(connector)
-  const UpdateNotifier = UnconnectedUpdateNotifier(connector)
   const TemplatesHome = UnconnectedTemplatesHome(connector)
   const BackupsHome = UnconnectedBackupsHome(connector)
   const OptionsHome = UnconnectedOptionsHome(connector)
   const HelpHome = UnconnectedHelpHome(connector)
+  const UpdateNotifier = UnconnectedUpdateNotifier(connector)
 
-  function Body({ children }) {
+  function Body({ children, isModal }) {
     return (
       <div className="dashboard__body">
-        <ErrorBoundary>
-          <UpdateNotifier />
-        </ErrorBoundary>
+        {isModal ? null : (
+          <ErrorBoundary>
+            <UpdateNotifier inDashboard />
+          </ErrorBoundary>
+        )}
         <DashboardErrorBoundary>{children}</DashboardErrorBoundary>
       </div>
     )
@@ -49,9 +51,11 @@ const DashboardBodyConnector = (connector) => {
 
   Body.propTypes = {
     children: PropTypes.node,
+    isModal: PropTypes.bool,
   }
 
   const DashboardBody = ({
+    isModal,
     hasCurrentProLicense,
     currentView,
     children,
@@ -59,6 +63,8 @@ const DashboardBodyConnector = (connector) => {
     expired,
     hasLicense,
     licenseInfo,
+    trialMode,
+    canGetUpdates,
   }) => {
     const [showAccount, setShowAccount] = useState(false)
 
@@ -71,10 +77,12 @@ const DashboardBodyConnector = (connector) => {
       reloadMenu()
       // update settings.trialMode
       if (hasLicense) {
-        saveAppSetting('trialMode', false)
+        if (trialMode) {
+          saveAppSetting('trialMode', false)
+        }
       } else {
-        saveAppSetting('trialMode', true)
-        saveAppSetting('canGetUpdates', true)
+        if (!trialMode) saveAppSetting('trialMode', true)
+        if (!canGetUpdates) saveAppSetting('canGetUpdates', true)
       }
 
       // no license and trial hasn't started (first time using the app)
@@ -105,13 +113,13 @@ const DashboardBodyConnector = (connector) => {
       switch (currentView) {
         case 'help':
           return (
-            <Body>
+            <Body isModal={isModal}>
               <HelpHome />
             </Body>
           )
         default:
           return (
-            <Body>
+            <Body isModal={isModal}>
               <AccountHome />
             </Body>
           )
@@ -148,11 +156,14 @@ const DashboardBodyConnector = (connector) => {
   DashboardBody.propTypes = {
     currentView: PropTypes.string,
     children: PropTypes.node,
+    isModal: PropTypes.bool,
     hasCurrentProLicense: PropTypes.bool,
     started: PropTypes.bool,
     expired: PropTypes.bool,
     hasLicense: PropTypes.bool,
     licenseInfo: PropTypes.object,
+    trialMode: PropTypes.bool,
+    canGetUpdates: PropTypes.bool,
   }
 
   const {
@@ -169,6 +180,8 @@ const DashboardBodyConnector = (connector) => {
         expired: selectors.trialExpiredSelector(state.present),
         hasLicense: selectors.hasLicenseSelector(state.present),
         licenseInfo: selectors.licenseInfoSelector(state.present),
+        trialMode: selectors.trialModeSelector(state.present),
+        canGetUpdates: selectors.canGetUpdatesSelector(state.present),
       }),
       {}
     )(DashboardBody)
