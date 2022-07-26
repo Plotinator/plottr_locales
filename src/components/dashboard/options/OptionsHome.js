@@ -52,6 +52,11 @@ const OptionsHomeConnector = (connector) => {
     const [fonts, setFonts] = useState(null)
     const [recentFonts, setRecentFonts] = useState(settings.user.font ? [settings.user.font] : null)
     const defaultFontSize = settings.user.fontSize
+    const [defaultBackupPath, setDefaultBackupPath] = useState('')
+
+    useEffect(() => {
+      defaultBackupLocation().then(setDefaultBackupPath)
+    }, [])
 
     useEffect(() => {
       setupI18n(settings, { electron })
@@ -98,15 +103,17 @@ const OptionsHomeConnector = (connector) => {
       return (!osIsUnknown && !hasCurrentProLicense) || (!osIsUnknown && settings.user.localBackups)
     }
 
-    const dashboardFirstText = settings.user.openDashboardFirst
+    const dashboardAtFirstIsOn =
+      settings.user.openDashboardFirst === undefined ? true : settings.user.openDashboardFirst
+
+    const dashboardFirstText = dashboardAtFirstIsOn
       ? t("When Plottr opens, the first thing you'll see is the dashboard")
       : t('Plottr opens your most recent project at start')
 
-    const dashboardFirstIsOn =
-      settings.user.openDashboardFirst === undefined ? true : settings.user.openDashboardFirst
-
-    const spellCheckFirstIsOn =
+    const spellCheckAtFirstIsOn =
       settings.user.useSpellcheck === undefined ? true : settings.user.useSpellcheck
+
+    const spellCheckText = spellCheckAtFirstIsOn ? t('Enabled') : t('Disabled')
 
     const handleSelectLanguage = useCallback(
       (newLanguage) => {
@@ -159,11 +166,15 @@ const OptionsHomeConnector = (connector) => {
               <div className="dashboard__options__item">
                 <h4>{t('Spell Check')}</h4>
                 <Switch
-                  isOn={spellCheckFirstIsOn}
-                  handleToggle={() =>
-                    saveAppSetting('user.useSpellcheck', !settings.user.useSpellcheck)
-                  }
-                  labelText={t('Use spellcheck')}
+                  isOn={spellCheckAtFirstIsOn}
+                  handleToggle={() => {
+                    const newVal =
+                      settings.user.useSpellcheck === undefined
+                        ? false
+                        : !settings.user.useSpellcheck
+                    saveAppSetting('user.useSpellcheck', newVal)
+                  }}
+                  labelText={spellCheckText}
                 />
                 <p>{t('Requires you to restart plottr')}</p>
               </div>
@@ -172,10 +183,13 @@ const OptionsHomeConnector = (connector) => {
               <div className="dashboard__options__item">
                 <h4>{t('Always Open Dashboard First')}</h4>
                 <Switch
-                  isOn={dashboardFirstIsOn}
-                  handleToggle={(event) => {
-                    event.stopPropagation()
-                    saveAppSetting('user.openDashboardFirst', !settings.user.openDashboardFirst)
+                  isOn={dashboardAtFirstIsOn}
+                  handleToggle={() => {
+                    const newVal =
+                      settings.user.openDashboardFirst === undefined
+                        ? false
+                        : !settings.user.openDashboardFirst
+                    saveAppSetting('user.openDashboardFirst', newVal)
                   }}
                   labelText={dashboardFirstText}
                 />
@@ -224,7 +238,7 @@ const OptionsHomeConnector = (connector) => {
                       <Button onClick={onChangeBackupLocation}>{t('Choose...')}</Button>
                       {'  '}
                       {!settings.user.backupLocation || settings.user.backupLocation === 'default'
-                        ? defaultBackupLocation
+                        ? defaultBackupPath
                         : settings.user.backupLocation}
                     </p>
                     {settings.user.backupLocation !== 'default' ? (
