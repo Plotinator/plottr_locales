@@ -5,9 +5,11 @@ import { VscCloudDownload } from 'react-icons/vsc'
 import { NavItem, Button } from 'react-bootstrap'
 import fileDownload from 'js-file-download'
 
-import { actions } from 'pltr/v2'
+import exportToSelfContainedPlottrFile from '../lib/plottr_import_export/src/exporter/plottr'
+import { actions, selectors } from 'pltr/v2'
+import { downloadStorageImage } from '../lib/downloadStorageImage'
 
-const Download = ({ withFullFileState }) => {
+const Download = ({ withFullFileState, userId }) => {
   const iconStyles = {
     height: '1.5em',
     width: '1.5em',
@@ -21,7 +23,11 @@ const Download = ({ withFullFileState }) => {
         bsSize="small"
         onClick={() => {
           withFullFileState((state) => {
-            fileDownload(JSON.stringify(state.present), `${state.present.file.fileName}.pltr`)
+            exportToSelfContainedPlottrFile(state.present, userId, downloadStorageImage).then(
+              (file) => {
+                fileDownload(JSON.stringify(file), `${state.present.file.fileName}.pltr`)
+              }
+            )
           })
         }}
         title={t('Download')}
@@ -35,6 +41,14 @@ const Download = ({ withFullFileState }) => {
 
 Download.propTypes = {
   withFullFileState: PropTypes.func.isRequired,
+  userId: PropTypes.string.isRequired,
 }
 
-export default connect(null, { withFullFileState: actions.project.withFullFileState })(Download)
+export default connect(
+  (state) => {
+    return {
+      userId: selectors.userIdSelector(state.present),
+    }
+  },
+  { withFullFileState: actions.project.withFullFileState }
+)(Download)
