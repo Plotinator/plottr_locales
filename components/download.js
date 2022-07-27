@@ -7,7 +7,7 @@ import fileDownload from 'js-file-download'
 
 import exportToSelfContainedPlottrFile from '../lib/plottr_import_export/src/exporter/plottr'
 import { actions, selectors } from 'pltr/v2'
-import { downloadStorageImage } from 'lib/downloadStorageImage'
+import { downloadStorageImage } from '../lib/downloadStorageImage'
 
 const Download = ({ withFullFileState, userId }) => {
   const iconStyles = {
