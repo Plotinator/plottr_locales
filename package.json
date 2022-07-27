@@ -23,7 +23,7 @@
     "grant-test-permissions": "yarn --cwd lib/plottr_firebase grant-test-permissions",
     "start-emulators": "yarn --cwd lib/plottr_firebase firebase emulators:start",
     "preinstall": "yarn --cwd lib/plottr_firebase install",
-    "postinstall": "npm --prefix lib/plottr_components ci && npm --prefix lib/plottr_import_export ci && yarn --cwd lib/plottr_check-prop-types",
+    "postinstall": "npm --prefix lib/plottr_components ci && npm --prefix lib/plottr_import_export ci && yarn --cwd lib/plottr_check-prop-types && npm --prefix=lib/pltr ci",
     "dev": "npm-run-all --parallel dev:*",
     "dev:nextjs": "node server.js",
     "dev:plottr_components": "npm --prefix lib/plottr_components run start",
