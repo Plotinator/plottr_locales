@@ -3,7 +3,6 @@ import {
   SET_USER_SETTINGS,
   SET_APP_SETTINGS,
   SET_DARK_MODE,
-  SET_FONT_SETTINGS,
 } from '../constants/ActionTypes'
 
 const INITIAL_STATE = {
@@ -132,6 +131,8 @@ const INITIAL_STATE = {
       beatHierarchy: false,
       enableOfflineMode: false,
       useSpellcheck: true,
+      font: 'Forum',
+      fontSize: 20,
     },
   },
   userSettings: {
@@ -158,15 +159,6 @@ const settingsReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         appSettings: action.appSettings,
-      }
-    }
-    case SET_FONT_SETTINGS: {
-      return {
-        ...state,
-        appSettings: {
-          ...state.appSettings,
-          user: { ...state.appSettings.user, ...action.fontSettings },
-        },
       }
     }
     case SET_DARK_MODE: {
