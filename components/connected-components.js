@@ -252,7 +252,14 @@ const platform = {
     startSaveAsTemplate,
     saveTemplate: messageToSaveNewTemplate,
   },
-  settings: { saveAppSetting },
+  settings: {
+    // Desktop writes to the FS for app settings, and web might store
+    // them on a server in the future.
+    saveAppSetting: (key, value) => {
+      saveAppSetting(key, value)
+      return Promise.resolve(true)
+    },
+  },
   os: () => 'unknown',
   isDevelopment: process.env.NEXT_PUBLIC_NODE_ENV === 'development',
   isWindows: () => false,
