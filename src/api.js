@@ -479,6 +479,16 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
           },
         })
       })
+      .then((response) => {
+        if (response.ok) {
+          return response
+        }
+        return response.text().then((body) => {
+          return Promise.reject(
+            new Error(`HTTP failure while minting a cookie: ${response.status}.  Body: ${body}`)
+          )
+        })
+      })
   }
 
   const onSessionChange = (cb, errorHandler = defaultErrorHandler) => {
@@ -847,7 +857,23 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
           })
           allTemplateUrlsForUser(documents)
             .then((urls) =>
-              Promise.all(urls.map((url) => fetch(url).then((response) => response.json())))
+              Promise.all(
+                urls.map((url) => {
+                  return fetch(url).then((response) => {
+                    if (response.ok) {
+                      return response.json()
+                    }
+
+                    return response.text().then((body) => {
+                      return Promise.reject(
+                        new Error(
+                          `HTTP request for custom template failed: ${response.status}.  Body: ${body}`
+                        )
+                      )
+                    })
+                  })
+                })
+              )
             )
             .then(callback)
             .catch(errorHandler)
@@ -877,7 +903,15 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
   }
 
   const imagetoBlob = (imageUrl) => {
-    return fetch(imageUrl).then((response) => response.blob())
+    return fetch(imageUrl).then((response) => {
+      if (response.ok) {
+        return response.blob()
+      }
+
+      return response.text().then((body) => {
+        return Promise.reject(new Error(`HTTP error reading image to blob: ${response.status}`))
+      })
+    })
   }
 
   const saveImageToStorageBlob = (userId, imageName, imageBlob) => {
