@@ -141,7 +141,7 @@ const ui =
         return Object.assign({}, state, { outlineFilter: filter })
 
       case FILE_LOADED:
-        return action.data.ui
+        return action.data.ui || newFileUI
 
       case NEW_FILE:
         return newFileUI
