@@ -134,19 +134,19 @@ const FileActionsConnector = (connector) => {
               </Button>
             </>
           )}
-          <Dropdown id={`file-action-${id}`} onSelect={doTheThing}>
-            <Dropdown.Toggle noCaret>
-              <Glyphicon glyph="option-horizontal" />
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              {isCloudFile || osIsUnknown || missing ? null : (
-                <MenuItem eventKey="show">{showInMessage}</MenuItem>
-              )}
-              {osIsUnknown ? null : (
+          {osIsUnknown ? null : (
+            <Dropdown id={`file-action-${id}`} onSelect={doTheThing}>
+              <Dropdown.Toggle noCaret>
+                <Glyphicon glyph="option-horizontal" />
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                {isCloudFile || missing ? null : (
+                  <MenuItem eventKey="show">{showInMessage}</MenuItem>
+                )}
                 <MenuItem eventKey="remove">{t('Remove from this list')}</MenuItem>
-              )}
-            </Dropdown.Menu>
-          </Dropdown>
+              </Dropdown.Menu>
+            </Dropdown>
+          )}
         </ButtonGroup>
       </div>
     )
