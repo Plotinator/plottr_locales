@@ -1,6 +1,6 @@
-import auth from '@react-native-firebase/auth'
-import database from '@react-native-firebase/firestore'
-import storage from '@react-native-firebase/storage'
+import legacyAPIAuth from '@react-native-firebase/auth'
+import legacyAPIDatabase from '@react-native-firebase/firestore'
+import legacyAPIStorage from '@react-native-firebase/storage'
 import Config from 'react-native-config'
 
 import api from '../src/api'
@@ -9,42 +9,214 @@ const { BASE_API_DOMAIN } = Config
 
 database().settings({ ignoreUndefinedProperties: true }, { merge: true })
 
-export const signInWithEmailAndPassword = (userName, password) => {
-  return auth().signInWithEmailAndPassword(userName, password)
+const auth = () => {
+  return {
+    instance: legacyAPIAuth(),
+    onAuthStateChanged: (nextOrObserver, error, completed) => {
+      return auth().onAuthStateChanged(nextOrObserver, error, completed)
+    },
+    signOut: () => {
+      return auth().signOut()
+    },
+    currentUser: () => {
+      return auth().currentUser
+    },
+    signInWithEmailAndPassword: (email, password) => {
+      return auth().signInWithEmailAndPassword(email, password)
+    }
+  }
+}
+
+const translate = (rootClause) => {
+  const translateIter = (ref, ...clauses) => {
+    if (clauses.length === 0) {
+      return ref
+    }
+
+    const clause = clauses[0]
+    switch (clause.type) {
+      case 'query': {
+        return translateIter(ref, clause.clauses)
+      }
+      case 'collection': {
+        return translateIter(
+          database().collection(clause.collectionPath),
+          clauses.slice(1)
+        )
+      }
+      case 'where': {
+        return translateIter(
+          ref.where(...clause.clauses),
+          clauses.slice(1)
+        )
+      }
+    }
+    throw new Error(`Unrecognised clause type in Firebase translation layer.  Clause is: ${JSON.stringify(clause)}`)
+  }
+
+  return translateIter(null, [rootClause])
+}
+
+const database = () => {
+  return {
+    instance: legacyAPIDatabase(),
+    query: (...clauses) => {
+      return {
+        type: 'query',
+        clauses,
+      }
+    },
+    collection: (collectionPath) => {
+      return {
+        type: 'collection',
+        collectionPath,
+      }
+    },
+    doc: (path) => {
+      return database().doc(path)
+    },
+    updateDoc: (ref, data) => {
+      return ref.update(data);
+    },
+    where: (...clauses) => {
+      return {
+        type: 'where',
+        clauses,
+      }
+    },
+    onSnapshot: (ref, handleSnapshot) => {
+      return ref.onSnapshot(handleSnapshot)
+    },
+    getDoc: (ref) => {
+      return ref.get()
+    },
+    getDocs: (clause) => {
+      return translate(clause)
+    },
+    setDoc: (ref, data, options) => {
+      return ref.set(data, options)
+    },
+    runTransaction: (transaction) => {
+      return database().runTransaction(transaction)
+    },
+    addDoc: (ref, document) => {
+      return ref.add(document)
+    },
+  }
+}
+
+const storage = () => {
+  return {
+    instance: legacyAPIStorage(),
+    ref: (path) => {
+      return storage().ref().child(path)
+    },
+    uploadString: (objectRef, s) => {
+      return objectRef.putString(s)
+    },
+    getDownloadURL: (path) => {
+      return storage().ref().child(path).getDownloadURL()
+    },
+    deleteObject: (path) => {
+      return storage().ref().child(path).delete()
+    },
+    uploadBytes: (objectRef, bytes) => {
+      return objectRef.put(bytes)
+    },
+  }
 }
 
 export const wireUpAPI = (logger) => {
+  // Pretend to be desktop because we never run emulators locally.
   const wiredUp = api(auth, database, storage, BASE_API_DOMAIN, __DEV__, logger, true)
+
+  const listen = (withResponse, userId, fileId, clientId, fileVersion) => {
+    const unsubscribeToFile = wiredUp.listenToFile(userId, fileId, clientId, withResponse)
+    const unsubscribeToBeats = wiredUp.listenToBeats(
+      userId,
+      fileId,
+      clientId,
+      fileVersion,
+      withResponse
+    )
+    const unsubscribeToCards = wiredUp.listenToCards(userId, fileId, clientId, withResponse)
+    const unsubscribeToSeries = wiredUp.listenToSeries(userId, fileId, clientId, withResponse)
+    const unsubscribeToBooks = wiredUp.listenToBooks(userId, fileId, clientId, withResponse)
+    const unsubscribeToCategories = wiredUp.listenToCategories(
+      userId,
+      fileId,
+      clientId,
+      withResponse
+    )
+    const unsubscribeToCharacters = wiredUp.listenToCharacters(
+      userId,
+      fileId,
+      clientId,
+      withResponse
+    )
+    const unsubscribeToAttributes = wiredUp.listenToCustomAttributes(
+      userId,
+      fileId,
+      clientId,
+      withResponse
+    )
+    const unsubscribeToFlags = wiredUp.listenToFeatureFlags(
+      userId,
+      fileId,
+      clientId,
+      withResponse
+    )
+    const unsubscribeToLines = wiredUp.listenToLines(userId, fileId, clientId, withResponse)
+    const unsubscribeToNotes = wiredUp.listenToNotes(userId, fileId, clientId, withResponse)
+    const unsubscribeToPlaces = wiredUp.listenToPlaces(userId, fileId, clientId, withResponse)
+    const unsubscribeToTags = wiredUp.listenToTags(userId, fileId, clientId, withResponse)
+    const unsubscribeToLevels = wiredUp.listenToHierarchyLevels(
+      userId,
+      fileId,
+      clientId,
+      withResponse
+    )
+    const unsubscribeToImages = wiredUp.listenToImages(userId, fileId, clientId, withResponse)
+    const unsubscribe = () => {
+      unsubscribeToFile()
+      unsubscribeToBeats()
+      unsubscribeToCards()
+      unsubscribeToSeries()
+      unsubscribeToBooks()
+      unsubscribeToCategories()
+      unsubscribeToCharacters()
+      unsubscribeToAttributes()
+      unsubscribeToFlags()
+      unsubscribeToLines()
+      unsubscribeToNotes()
+      unsubscribeToPlaces()
+      unsubscribeToTags()
+      unsubscribeToLevels()
+      unsubscribeToImages()
+    }
+    return unsubscribe
+  }
 
   return {
     editFileName: wiredUp.editFileName,
-    listen: wiredUp.listen,
-    withFileId: wiredUp.withFileId,
+    listen,
     toFirestoreArray: wiredUp.toFirestoreArray,
     overwriteAllKeys: wiredUp.overwriteAllKeys,
     initialFetch: wiredUp.initialFetch,
     deleteFile: wiredUp.deleteFile,
-    stopListening: wiredUp.stopListening,
     listenToFiles: wiredUp.listenToFiles,
     fetchFiles: wiredUp.fetchFiles,
     logOut: wiredUp.logOut,
     mintCookieToken: wiredUp.mintCookieToken,
     onSessionChange: wiredUp.onSessionChange,
-    firebaseUI: wiredUp.firebaseUI,
     currentUser: wiredUp.currentUser,
     hasUndefinedValue: wiredUp.hasUndefinedValue,
     patch: wiredUp.patch,
     overwrite: wiredUp.overwrite,
     shareDocument: wiredUp.shareDocument,
-    publishRCEOperations: wiredUp.publishRCEOperations,
-    catchupEditsSeen: wiredUp.catchupEditsSeen,
     releaseRCELock: wiredUp.releaseRCELock,
     lockRCE: wiredUp.lockRCE,
     listenForRCELock: wiredUp.listenForRCELock,
-    listenForChangesToEditor: wiredUp.listenForChangesToEditor,
-    deleteChangeSignal: wiredUp.deleteChangeSignal,
-    deleteOldChanges: wiredUp.deleteOldChanges,
-    fetchRCEOperations: wiredUp.fetchRCEOperations,
     saveBackup: wiredUp.saveBackup,
     listenForBackups: wiredUp.listenForBackups,
     saveCustomTemplate: wiredUp.saveCustomTemplate,
@@ -56,6 +228,7 @@ export const wireUpAPI = (logger) => {
     saveImageToStorageFromURL: wiredUp.saveImageToStorageFromURL,
     backupPublicURL: wiredUp.backupPublicURL,
     imagePublicURL: wiredUp.imagePublicURL,
-    isStorageURL: wiredUp.isStorageURL
+    isStorageURL: wiredUp.isStorageURL,
+    loginWithEmailAndPassword: wiredUp.loginWithEmailAndPassword,
   }
 }
