@@ -124,3 +124,24 @@ export const timelineBundleSelector = createSelector(
     isLarge,
   })
 )
+
+const uiSelector = (state) => state.ui
+
+export const attributeTabsSelector = createSelector(uiSelector, ({ attributeTabs }) => {
+  return attributeTabs || {}
+})
+export const characterAttributeTabSelector = createSelector(
+  attributeTabsSelector,
+  ({ characters }) => {
+    return characters || 'all'
+  }
+)
+export const characterTabSelector = createSelector(uiSelector, ({ characterTab }) => {
+  return characterTab || {}
+})
+export const selectedCharacterSelector = createSelector(
+  characterTabSelector,
+  ({ selectedCharacter }) => {
+    return selectedCharacter || null
+  }
+)
