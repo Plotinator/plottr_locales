@@ -1,7 +1,38 @@
-import firebase from 'firebase/app'
-import 'firebase/auth'
-import 'firebase/firestore'
-import 'firebase/storage'
+import { initializeApp } from 'firebase/app'
+import {
+  getAuth,
+  connectAuthEmulator,
+  setPersistence,
+  onAuthStateChanged,
+  indexedDBLocalPersistence,
+  EmailAuthProvider,
+  signOut,
+  signInWithEmailAndPassword,
+} from 'firebase/auth'
+import {
+  initializeFirestore,
+  connectFirestoreEmulator,
+  query,
+  collection,
+  where,
+  doc,
+  updateDoc,
+  onSnapshot,
+  getDoc,
+  getDocs,
+  setDoc,
+  runTransaction,
+  addDoc,
+} from 'firebase/firestore'
+import {
+  getStorage,
+  connectStorageEmulator,
+  ref,
+  uploadString,
+  getDownloadURL,
+  deleteObject,
+  uploadBytes,
+} from 'firebase/storage'
 
 import api from './api'
 
@@ -28,61 +59,131 @@ const firebaseConfig =
       }
 
 // Initialize firebase instance (check whether one already exists)
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig)
+let firebaseApp = null
+if (!firebaseApp) {
+  firebaseApp = initializeApp(firebaseConfig)
 }
 
 let _database = null
 const database = () => {
-  if (_database) return _database
-  _database = firebase.firestore()
-  _database.settings({ ignoreUndefinedProperties: true }, { merge: true })
-  if (
-    process.env.NEXT_PUBLIC_NODE_ENV === 'development' ||
-    (typeof window !== 'undefined' && window && window.location.hostname === 'plottr.local')
-  ) {
-    try {
-      _database.useEmulator('plottr.local', 8080)
-    } catch (error) {
-      console.error('Error initialising dev emulator (you can usually safely ignore this):', error)
+  if (!firebaseApp) return null
+  if (!_database) {
+    if (process.env.NEXT_PUBLIC_NODE_ENV === 'development') {
+      try {
+        console.log(
+          'Using database local emulator for environment: ',
+          process.env.NEXT_PUBLIC_NODE_ENV
+        )
+        _database = initializeFirestore(firebaseApp, {
+          ignoreUndefinedProperties: true,
+          host: 'plottr.local:8081',
+          ssl: true,
+        })
+        connectFirestoreEmulator(_database, 'plottr.local', 8081)
+      } catch (error) {
+        console.error(
+          'Error initialising dev emulator (you can usually safely ignore this):',
+          error
+        )
+      }
+    } else {
+      _database = initializeFirestore(firebaseApp, { ignoreUndefinedProperties: true })
     }
   }
-  return _database
+  return {
+    instance: _database,
+    query,
+    collection: (collectionName) => {
+      return collection(_database, collectionName)
+    },
+    doc: (path) => {
+      return doc(_database, path)
+    },
+    updateDoc,
+    where,
+    onSnapshot,
+    getDoc,
+    getDocs,
+    setDoc,
+    runTransaction: (transaction) => {
+      return runTransaction(_database, transaction)
+    },
+    addDoc,
+  }
 }
 
 let _auth = null
 const auth = () => {
-  if (_auth) return _auth
-  _auth = firebase.auth()
-  if (
-    process.env.NEXT_PUBLIC_NODE_ENV === 'development' ||
-    (typeof window !== 'undefined' && window && window.location.hostname === 'plottr.local')
-  ) {
-    _auth.useEmulator('http://plottr.local:9099')
+  if (!firebaseApp) return null
+  if (!_auth) {
+    if (process.env.NEXT_PUBLIC_NODE_ENV === 'development') {
+      console.log('Using auth local emulator for environment: ', process.env.NEXT_PUBLIC_NODE_ENV)
+      _auth = getAuth(firebaseApp)
+      connectAuthEmulator(_auth, 'https://plottr.local:9100')
+      setPersistence(_auth, indexedDBLocalPersistence)
+    } else {
+      _auth = getAuth(firebaseApp)
+      setPersistence(_auth, indexedDBLocalPersistence)
+    }
   }
-  return _auth
+  return {
+    instance: _auth,
+    onAuthStateChanged: (nextOrObserver, error, completed) => {
+      return onAuthStateChanged(_auth, nextOrObserver, error, completed)
+    },
+    signOut: () => {
+      return signOut(_auth)
+    },
+    currentUser: () => {
+      return _auth.currentUser
+    },
+    signInWithEmailAndPassword: (email, password) => {
+      return signInWithEmailAndPassword(_auth, email, password)
+    },
+  }
 }
 
 let _storage = null
 const storage = () => {
-  if (_storage) return _storage
-  if (
-    process.env.NEXT_PUBLIC_NODE_ENV === 'development' ||
-    (typeof window !== 'undefined' && window && window.location.hostname === 'plottr.local')
-  ) {
-    _storage = firebase.storage()
-    _storage.useEmulator('localhost', 9199)
-  } else {
-    _storage = firebase.storage()
+  if (!firebaseApp) return null
+  if (!_storage) {
+    if (process.env.NEXT_PUBLIC_NODE_ENV === 'development') {
+      console.log(
+        'Using storage local emulator for environment: ',
+        process.env.NEXT_PUBLIC_NODE_ENV
+      )
+      _storage = getStorage(firebaseApp)
+      connectStorageEmulator(_storage, 'localhost', 9200)
+      _storage._delegate.host = 'https://plottr.local:9200'
+    } else {
+      _storage = getStorage(firebaseApp)
+    }
   }
-  return _storage
+  return {
+    ref: (path) => {
+      return ref(_storage, path)
+    },
+    uploadString,
+    getDownloadURL,
+    deleteObject,
+    uploadBytes,
+  }
 }
 
-export const startUI = (firebaseUI, queryString) => {
-  firebaseUI.start(queryString, {
+let _firebaseui
+const firebaseUI = () => {
+  if (_firebaseui) return _firebaseui
+  const firebaseui = require('firebaseui')
+  _firebaseui = new firebaseui.auth.AuthUI(auth().instance)
+  return _firebaseui
+}
+
+export const startUI = (queryString) => {
+  const ui = firebaseUI()
+  ui.start(queryString, {
     signInOptions: [
       {
-        provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
+        provider: EmailAuthProvider.PROVIDER_ID,
         disableSignUp: { status: true },
       },
     ],
@@ -103,40 +204,45 @@ export const wireUpAPI = (logger) => {
     // For env vars to be read from Next config (on the web) we need to
     // prefix them with 'NEXT_PUBLIC'
     process.env.NEXT_PUBLIC_API_BASE_DOMAIN || process.env.API_BASE_DOMAIN,
-    process.env.NODE_ENV === 'development',
+    process.env.NEXT_PUBLIC_NODE_ENV === 'development',
     logger,
     isElectron
   )
 
   return {
     editFileName: wiredUp.editFileName,
-    listen: wiredUp.listen,
-    withFileId: wiredUp.withFileId,
+    listenToFile: wiredUp.listenToFile,
+    listenToBeats: wiredUp.listenToBeats,
+    listenToCards: wiredUp.listenToCards,
+    listenToSeries: wiredUp.listenToSeries,
+    listenToBooks: wiredUp.listenToBooks,
+    listenToCategories: wiredUp.listenToCategories,
+    listenToCharacters: wiredUp.listenToCharacters,
+    listenToCustomAttributes: wiredUp.listenToCustomAttributes,
+    listenToFeatureFlags: wiredUp.listenToFeatureFlags,
+    listenToLines: wiredUp.listenToLines,
+    listenToNotes: wiredUp.listenToNotes,
+    listenToPlaces: wiredUp.listenToPlaces,
+    listenToTags: wiredUp.listenToTags,
+    listenToHierarchyLevels: wiredUp.listenToHierarchyLevels,
+    listenToImages: wiredUp.listenToImages,
     toFirestoreArray: wiredUp.toFirestoreArray,
     overwriteAllKeys: wiredUp.overwriteAllKeys,
     initialFetch: wiredUp.initialFetch,
     deleteFile: wiredUp.deleteFile,
-    stopListening: wiredUp.stopListening,
     listenToFiles: wiredUp.listenToFiles,
     fetchFiles: wiredUp.fetchFiles,
     logOut: wiredUp.logOut,
     mintCookieToken: wiredUp.mintCookieToken,
     onSessionChange: wiredUp.onSessionChange,
-    firebaseUI: wiredUp.firebaseUI,
     currentUser: wiredUp.currentUser,
     hasUndefinedValue: wiredUp.hasUndefinedValue,
     patch: wiredUp.patch,
     overwrite: wiredUp.overwrite,
     shareDocument: wiredUp.shareDocument,
-    publishRCEOperations: wiredUp.publishRCEOperations,
-    catchupEditsSeen: wiredUp.catchupEditsSeen,
     releaseRCELock: wiredUp.releaseRCELock,
     lockRCE: wiredUp.lockRCE,
     listenForRCELock: wiredUp.listenForRCELock,
-    listenForChangesToEditor: wiredUp.listenForChangesToEditor,
-    deleteChangeSignal: wiredUp.deleteChangeSignal,
-    deleteOldChanges: wiredUp.deleteOldChanges,
-    fetchRCEOperations: wiredUp.fetchRCEOperations,
     saveBackup: wiredUp.saveBackup,
     listenForBackups: wiredUp.listenForBackups,
     saveCustomTemplate: wiredUp.saveCustomTemplate,
@@ -149,5 +255,6 @@ export const wireUpAPI = (logger) => {
     backupPublicURL: wiredUp.backupPublicURL,
     imagePublicURL: wiredUp.imagePublicURL,
     isStorageURL: wiredUp.isStorageURL,
+    loginWithEmailAndPassword: wiredUp.loginWithEmailAndPassword,
   }
 }
