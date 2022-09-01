@@ -7,22 +7,22 @@ import api from '../src/api'
 
 const { BASE_API_DOMAIN } = Config
 
-database().settings({ ignoreUndefinedProperties: true }, { merge: true })
+legacyAPIDatabase().settings({ ignoreUndefinedProperties: true }, { merge: true })
 
 const auth = () => {
   return {
     instance: legacyAPIAuth(),
     onAuthStateChanged: (nextOrObserver, error, completed) => {
-      return auth().onAuthStateChanged(nextOrObserver, error, completed)
+      return legacyAPIAuth().onAuthStateChanged(nextOrObserver, error, completed)
     },
     signOut: () => {
-      return auth().signOut()
+      return legacyAPIAuth().signOut()
     },
     currentUser: () => {
-      return auth().currentUser
+      return legacyAPIAuth().currentUser
     },
     signInWithEmailAndPassword: (email, password) => {
-      return auth().signInWithEmailAndPassword(email, password)
+      return legacyAPIAuth().signInWithEmailAndPassword(email, password)
     }
   }
 }
@@ -40,7 +40,7 @@ const translate = (rootClause) => {
       }
       case 'collection': {
         return translateIter(
-          database().collection(clause.collectionPath),
+          legacyAPIDatabase().collection(clause.collectionPath),
           clauses.slice(1)
         )
       }
@@ -73,7 +73,7 @@ const database = () => {
       }
     },
     doc: (path) => {
-      return database().doc(path)
+      return legacyAPIDatabase().doc(path)
     },
     updateDoc: (ref, data) => {
       return ref.update(data);
@@ -97,7 +97,7 @@ const database = () => {
       return ref.set(data, options)
     },
     runTransaction: (transaction) => {
-      return database().runTransaction(transaction)
+      return legacyAPIDatabase().runTransaction(transaction)
     },
     addDoc: (ref, document) => {
       return ref.add(document)
@@ -109,16 +109,16 @@ const storage = () => {
   return {
     instance: legacyAPIStorage(),
     ref: (path) => {
-      return storage().ref().child(path)
+      return legacyAPIStorage().ref().child(path)
     },
     uploadString: (objectRef, s) => {
       return objectRef.putString(s)
     },
     getDownloadURL: (path) => {
-      return storage().ref().child(path).getDownloadURL()
+      return legacyAPIStorage().ref().child(path).getDownloadURL()
     },
     deleteObject: (path) => {
-      return storage().ref().child(path).delete()
+      return legacyAPIStorage().ref().child(path).delete()
     },
     uploadBytes: (objectRef, bytes) => {
       return objectRef.put(bytes)
