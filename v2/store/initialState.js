@@ -80,7 +80,15 @@ export const ui = {
     outline: null,
     timeline: null,
   },
+  attributeTabs: {
+    characters: null,
+  },
+  characterTab: {
+    selectedCharacter: null,
+  },
 }
+
+export const attributes = []
 
 export const notifications = {
   message: null,

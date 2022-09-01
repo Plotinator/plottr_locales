@@ -42,6 +42,8 @@ import {
   SET_ACTIVE_TIMELINE_TAB,
   SET_TIMELINE_VIEW,
   DELETE_BEAT,
+  SELECT_CHARACTER_ATTRIBUTE_BOOK_TAB,
+  SELECT_CHARACTER,
 } from '../constants/ActionTypes'
 import { ui as defaultUI } from '../store/initialState'
 import { newFileUI } from '../store/newFileState'
@@ -333,6 +335,26 @@ const ui =
           timeline: {
             ...state.timeline,
             actTab: action.actTab || state.timeline.actTab,
+          },
+        }
+      }
+
+      case SELECT_CHARACTER_ATTRIBUTE_BOOK_TAB: {
+        return {
+          ...state,
+          attributeTabs: {
+            ...state.attributeTabs,
+            characters: action.bookId,
+          },
+        }
+      }
+
+      case SELECT_CHARACTER: {
+        return {
+          ...state,
+          characterTab: {
+            ...state.characterTab,
+            selectedCharacter: action.id,
           },
         }
       }
