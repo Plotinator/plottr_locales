@@ -38,12 +38,6 @@ const translate = (rootClause) => {
       case 'query': {
         return translateIter(ref, clause.clauses)
       }
-      case 'collection': {
-        return translateIter(
-          legacyAPIDatabase().collection(clause.collectionPath),
-          clauses.slice(1)
-        )
-      }
       case 'where': {
         return translateIter(
           ref.where(...clause.clauses),
@@ -51,7 +45,9 @@ const translate = (rootClause) => {
         )
       }
     }
-    throw new Error(`Unrecognised clause type in Firebase translation layer.  Clause is: ${JSON.stringify(clause)}`)
+    // Doesn't need to be translated.  (Most likely created by
+    // `collection`.)
+    return clause
   }
 
   return translateIter(null, [rootClause])
@@ -67,10 +63,7 @@ const database = () => {
       }
     },
     collection: (collectionPath) => {
-      return {
-        type: 'collection',
-        collectionPath,
-      }
+      return legacyAPIDatabase().collection(collectionPath)
     },
     doc: (path) => {
       return legacyAPIDatabase().doc(path)
@@ -91,7 +84,10 @@ const database = () => {
       return ref.get()
     },
     getDocs: (clause) => {
-      return translate(clause)
+      if (clause.type === 'query') {
+        return translate(clause).get()
+      }
+      return clause.get()
     },
     setDoc: (ref, data, options) => {
       return ref.set(data, options)
@@ -114,8 +110,8 @@ const storage = () => {
     uploadString: (objectRef, s) => {
       return objectRef.putString(s)
     },
-    getDownloadURL: (path) => {
-      return legacyAPIStorage().ref().child(path).getDownloadURL()
+    getDownloadURL: (ref) => {
+      return ref.getDownloadURL()
     },
     deleteObject: (path) => {
       return legacyAPIStorage().ref().child(path).delete()
