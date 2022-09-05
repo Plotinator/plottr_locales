@@ -5,6 +5,31 @@ import { isEqual } from 'lodash'
 
 import { actions, selectors, ARRAY_KEYS, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
 
+const sequencePromiseThunks = (log, batchSize = 10) => (thunks) => {
+  return new Promise((resolve, reject) => {
+    const iter = (results, remainingThunks) => {
+      if (remainingThunks.length === 0) {
+        resolve(results)
+        return
+      }
+
+      const nextThunks = remainingThunks.slice(0, 10)
+      Promise.all(
+        nextThunks.map((f) => {
+          return f()
+        }))
+        .then((newResults) => {
+          iter([...newResults, ...results], remainingThunks.slice(1))
+        })
+        .catch((error) => {
+          log.error('Failed to execute a sequenced promise', error.message, error)
+        })
+    }
+
+    iter([], thunks)
+  })
+}
+
 /**
  * auth, database and storage should be thunks that produce instances
  * of the correspending firebase objects from either the firebase JS
@@ -14,8 +39,10 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
   const BASE_API_URL =
     (!isDesktop && development) || !baseAPIDomain ? '' : `https://${baseAPIDomain || ''}`
 
+  const sequence = sequencePromiseThunks(log)
+
   const defaultErrorHandler = (error) => {
-    log.error('Error communicating with Firebase.', error)
+    log.error('Error communicating with Firebase.', error.message, error)
   }
 
   const pingAuth = (userId, fileId) => {
@@ -379,15 +406,20 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
       next: (authorisationsRef) => {
         const authorisedDocuments = []
         authorisationsRef.forEach((authorisation) => {
-          const document = getDoc(doc(`file/${authorisation.id}`)).then((file) => ({
-            id: file.id,
-            ...file.data(),
-            ...authorisation.data(),
-            path: `plottr://${file.id}`,
-          }))
-          authorisedDocuments.push(document)
+          const data = authorisation.data()
+          if (data.deleted) return
+
+          authorisedDocuments.push(() => {
+            console.log(`Getting authorised document, file/${authorisation.id}`)
+            return getDoc(doc(`file/${authorisation.id}`)).then((file) => ({
+              id: file.id,
+              ...file.data(),
+              ...data,
+              path: `plottr://${file.id}`,
+            }))
+          })
         })
-        Promise.all(authorisedDocuments)
+        sequence(authorisedDocuments)
           .then((documents) => {
             return documents.map((document) => {
               return {
@@ -402,12 +434,13 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
           .catch((error) => {
             log.error(
               `Fetching the documents we're authorised to read for ${userId}`,
-              error.message
+              error.message,
+              error
             )
           })
       },
       error: (error) => {
-        log.error('Error listening to files', error)
+        log.error('Error listening to files', error.message, error)
         errorHandler(error)
       },
     })
@@ -419,15 +452,20 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
     return getDocs(collection(`authorisation/${userId}/granted`)).then((authorisationsRef) => {
       const authorisedDocuments = []
       authorisationsRef.forEach((authorisation) => {
-        const document = getDoc(doc(`file/${authorisation.id}`)).then((file) => ({
-          id: file.id,
-          ...file.data(),
-          ...authorisation.data(),
-          path: `plottr://${file.id}`,
-        }))
-        authorisedDocuments.push(document)
+        const data = authorisation.data()
+        if (data.deleted) return
+
+        authorisedDocuments.push(() => {
+          console.log(`Getting authorised document, file/${authorisation.id}`)
+          return getDoc(doc(`file/${authorisation.id}`)).then((file) => ({
+            id: file.id,
+            ...file.data(),
+            ...authorisation.data(),
+            path: `plottr://${file.id}`,
+          }))
+        })
       })
-      return Promise.all(authorisedDocuments).then((documents) => {
+      return sequence(authorisedDocuments).then((documents) => {
         return documents.map((document) => {
           return {
             ...document,
@@ -787,9 +825,9 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
 
   const allTemplateUrlsForUser = (documents) => {
     const { ref, getDownloadURL } = storage()
-    return Promise.all(
+    return sequence(
       documents.map(({ path }) => {
-        return getDownloadURL(ref(withoutStorageProtocal(path)))
+        return () => getDownloadURL(ref(withoutStorageProtocal(path)))
       })
     )
   }

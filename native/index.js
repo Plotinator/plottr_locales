@@ -190,9 +190,17 @@ export const wireUpAPI = (logger) => {
       unsubscribeToLevels()
       unsubscribeToImages()
     }
-    return unsubscribe
+    return Promise.resolve(unsubscribe)
   }
 
+  const returningPromise = (f) => (...args) => {
+    return Promise.resolve(f(...args))
+  }
+
+  // Contract for mobile: everything must return a promise except for:
+  //  - `toFirestoreArray`,
+  //  - `hasUndefinedValue`, &
+  //  - `isStorageURL`.
   return {
     editFileName: wiredUp.editFileName,
     listen,
@@ -205,7 +213,7 @@ export const wireUpAPI = (logger) => {
     logOut: wiredUp.logOut,
     mintCookieToken: wiredUp.mintCookieToken,
     onSessionChange: wiredUp.onSessionChange,
-    currentUser: wiredUp.currentUser,
+    currentUser: returningPromise(wiredUp.currentUser),
     hasUndefinedValue: wiredUp.hasUndefinedValue,
     patch: wiredUp.patch,
     overwrite: wiredUp.overwrite,
@@ -225,6 +233,15 @@ export const wireUpAPI = (logger) => {
     backupPublicURL: wiredUp.backupPublicURL,
     imagePublicURL: wiredUp.imagePublicURL,
     isStorageURL: wiredUp.isStorageURL,
-    loginWithEmailAndPassword: wiredUp.loginWithEmailAndPassword,
+    loginWithEmailAndPassword: (email, password) => {
+      console.log('-----> Logging in...')
+      return wiredUp.loginWithEmailAndPassword(email, password).then((result) => {
+        console.log('-----> Minting cookie...')
+        return wiredUp.mintCookieToken().then(() => {
+          console.log('-----> Minted cookie...')
+          return result
+        })
+      })
+    },
   }
 }
