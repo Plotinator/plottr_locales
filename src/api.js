@@ -5,7 +5,7 @@ import { isEqual } from 'lodash'
 
 import { actions, selectors, ARRAY_KEYS, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
 
-const sequencePromiseThunks = (log, batchSize = 10) => (thunks) => {
+const sequencePromiseThunks = (log, onPartialResult, batchSize = 10) => (thunks) => {
   return new Promise((resolve, reject) => {
     const iter = (results, remainingThunks) => {
       if (remainingThunks.length === 0) {
@@ -19,7 +19,9 @@ const sequencePromiseThunks = (log, batchSize = 10) => (thunks) => {
           return f()
         }))
         .then((newResults) => {
-          iter([...newResults, ...results], remainingThunks.slice(1))
+          const currentResults = [...newResults, ...results]
+          onPartialResult(currentResults)
+          iter(currentResults, remainingThunks.slice(1))
         })
         .catch((error) => {
           log.error('Failed to execute a sequenced promise', error.message, error)
@@ -400,7 +402,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
     )
   }
 
-  const listenToFiles = (userId, callback, errorHandler = defaultErrorHandler) => {
+  const listenToFiles = (userId, onPartialResult, callback, errorHandler = defaultErrorHandler) => {
     const { getDoc, doc, collection, onSnapshot } = database()
     return onSnapshot(collection(`authorisation/${userId}/granted`), {
       next: (authorisationsRef) => {
@@ -419,7 +421,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
             }))
           })
         })
-        sequence(authorisedDocuments)
+        sequence(authorisedDocuments, onPartialResult)
           .then((documents) => {
             return documents.map((document) => {
               return {
