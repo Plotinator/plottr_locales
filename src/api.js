@@ -5,7 +5,9 @@ import { isEqual } from 'lodash'
 
 import { actions, selectors, ARRAY_KEYS, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
 
-const sequencePromiseThunks = (log, onPartialResult, batchSize = 10) => (thunks) => {
+const doNothingWithPartialResult = () => {}
+
+const sequencePromiseThunks = (log, batchSize = 10) => (thunks, onPartialResult = doNothingWithPartialResult) => {
   return new Promise((resolve, reject) => {
     const iter = (results, remainingThunks) => {
       if (remainingThunks.length === 0) {
@@ -827,6 +829,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
 
   const allTemplateUrlsForUser = (documents) => {
     const { ref, getDownloadURL } = storage()
+    const doNothingWithPartialResult = () => {}
     return sequence(
       documents.map(({ path }) => {
         return () => getDownloadURL(ref(withoutStorageProtocal(path)))
