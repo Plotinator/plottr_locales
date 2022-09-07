@@ -412,7 +412,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
       )
   }
 
-  const listenToFiles = (userId, onPartialResult, callback, errorHandler = defaultErrorHandler) => {
+  const listenToFiles = (userId, callback, errorHandler = defaultErrorHandler) => {
     const { getDoc, doc, collection, onSnapshot } = database()
     return onSnapshot(collection(`authorisation/${userId}/granted`), {
       next: (authorisationsRef) => {
@@ -421,35 +421,14 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
           const data = authorisation.data()
           if (data.deleted) return
 
-          authorisedDocuments.push(() => {
-            console.log(`Getting authorised document, file/${authorisation.id}`)
-            return getDoc(doc(`file/${authorisation.id}`)).then((file) => ({
-              id: file.id,
-              ...file.data(),
-              ...data,
-              path: `plottr://${file.id}`,
-            }))
+          authorisedDocuments.push({
+            id: authorisation.id,
+            ...data,
+            fileURL: `plottr://${authorisation.id}`,
+            isCloudFile: true,
           })
         })
-        sequence(authorisedDocuments, onPartialResult)
-          .then((documents) => {
-            return documents.map((document) => {
-              return {
-                ...document,
-                isCloudFile: true,
-              }
-            })
-          })
-          .then((authorisedDocuments) => {
-            callback(authorisedDocuments)
-          })
-          .catch((error) => {
-            log.error(
-              `Fetching the documents we're authorised to read for ${userId}`,
-              error.message,
-              error
-            )
-          })
+        callback(authorisedDocuments)
       },
       error: (error) => {
         log.error('Error listening to files', error.message, error)
@@ -463,28 +442,18 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
 
     return getDocs(collection(`authorisation/${userId}/granted`)).then((authorisationsRef) => {
       const authorisedDocuments = []
-      authorisationsRef.forEach((authorisation) => {
-        const data = authorisation.data()
-        if (data.deleted) return
+        authorisationsRef.forEach((authorisation) => {
+          const data = authorisation.data()
+          if (data.deleted) return
 
-        authorisedDocuments.push(() => {
-          console.log(`Getting authorised document, file/${authorisation.id}`)
-          return getDoc(doc(`file/${authorisation.id}`)).then((file) => ({
-            id: file.id,
-            ...file.data(),
-            ...authorisation.data(),
-            path: `plottr://${file.id}`,
-          }))
-        })
-      })
-      return sequence(authorisedDocuments).then((documents) => {
-        return documents.map((document) => {
-          return {
-            ...document,
+          authorisedDocuments.push({
+            id: authorisation.id,
+            ...data,
+            fileURL: `plottr://${authorisation.id}`,
             isCloudFile: true,
-          }
+          })
         })
-      })
+        return authorisedDocuments
     })
   }
 
