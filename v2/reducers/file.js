@@ -24,7 +24,7 @@ const file =
       action.type === 'FILE_LOADED' ||
       LoadActions.indexOf(action.type) !== -1 ||
       SYSTEM_REDUCER_ACTION_TYPES.indexOf(action.type) !== -1 ||
-      stateWithoutTimeStamp.isResuming
+      stateWithoutTimeStamp?.isResuming
     const state = stateWithoutTimeStamp && {
       ...stateWithoutTimeStamp,
       timeStamp: shouldNotUpdateTimestamp ? stateWithoutTimeStamp.timeStamp : new Date(),
