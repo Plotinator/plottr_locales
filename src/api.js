@@ -316,25 +316,28 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
     })
   }
 
-  const initialFetch = (userId, fileId, clientId, version) => {
-    return Promise.all([
-      fetchFile(userId, fileId, clientId),
-      fetchChapters(userId, fileId, clientId),
-      fetchBeats(userId, fileId, clientId, version),
-      fetchCards(userId, fileId, clientId),
-      fetchSeries(userId, fileId, clientId),
-      fetchBooks(userId, fileId, clientId),
-      fetchCategories(userId, fileId, clientId),
-      fetchCharacters(userId, fileId, clientId),
-      fetchCustomAttributes(userId, fileId, clientId),
-      fetchEditors(userId, fileId, clientId),
-      fetchLines(userId, fileId, clientId),
-      fetchNotes(userId, fileId, clientId),
-      fetchPlaces(userId, fileId, clientId),
-      fetchTags(userId, fileId, clientId),
-      fetchhierarchyLevels(userId, fileId, clientId),
-      fetchImages(userId, fileId, clientId),
-    ])
+  const initialFetch = (userId, fileId, clientId) => {
+    return fetchFile(userId, fileId, clientId).then((file) => {
+      return Promise.all([
+        fetchChapters(userId, fileId, clientId),
+        fetchBeats(userId, fileId, clientId, file.file.version),
+        fetchCards(userId, fileId, clientId),
+        fetchSeries(userId, fileId, clientId),
+        fetchBooks(userId, fileId, clientId),
+        fetchCategories(userId, fileId, clientId),
+        fetchCharacters(userId, fileId, clientId),
+        fetchCustomAttributes(userId, fileId, clientId),
+        fetchEditors(userId, fileId, clientId),
+        fetchLines(userId, fileId, clientId),
+        fetchNotes(userId, fileId, clientId),
+        fetchPlaces(userId, fileId, clientId),
+        fetchTags(userId, fileId, clientId),
+        fetchhierarchyLevels(userId, fileId, clientId),
+        fetchImages(userId, fileId, clientId),
+      ]).then((results) => {
+        return [file, ...results]
+      })
+    })
       .then((results) => {
         const newOpenDate = new Date()
         return patch('file', fileId, { lastOpened: newOpenDate }, clientId)
