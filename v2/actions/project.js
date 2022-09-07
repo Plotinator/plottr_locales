@@ -12,16 +12,13 @@ import {
   SET_OVERWRITING_CLOUD_WITH_BACKUP,
   SET_SHOW_RESUME_MESSAGE_DIALOG,
   SET_BACKING_UP_OFFLINE_FILE,
+  START_CREATING_NEW_PROJECT,
+  FINISH_CREATING_NEW_PROJECT,
 } from '../constants/ActionTypes'
 
 export const withFullFileState = (cb) => (dispatch, getState) => {
   cb(getState())
 }
-
-export const setFileList = (fileList) => ({
-  type: SET_FILE_LIST,
-  fileList,
-})
 
 export const selectFile = (selectedFile) => ({
   type: SELECT_FILE,
@@ -73,4 +70,14 @@ export const setShowResumeMessageDialog = (showResumeMessageDialog) => ({
 export const setBackingUpOfflineFile = (backingUpOfflineFile) => ({
   type: SET_BACKING_UP_OFFLINE_FILE,
   backingUpOfflineFile,
+})
+
+export const startCreatingNewProject = (template, defaultName) => ({
+  type: START_CREATING_NEW_PROJECT,
+  template,
+  defaultName,
+})
+
+export const finishCreatingNewProject = () => ({
+  type: FINISH_CREATING_NEW_PROJECT,
 })

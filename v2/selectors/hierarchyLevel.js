@@ -4,6 +4,7 @@ import { repeat } from 'lodash'
 import { depth } from '../reducers/tree'
 import { beatIdSelector, beatsByBookSelector } from './beats'
 import { sortedHierarchyLevels } from './hierarchy'
+import { timelineViewIsTabbedSelector } from './ui'
 
 export const hierarchyLevelSelector = createSelector(
   beatsByBookSelector,
@@ -34,6 +35,21 @@ export const hierarchyLevelNameSelector = createSelector(
   }
 )
 
+export const beatInsertControlHierarchyLevelNameSelector = createSelector(
+  beatsByBookSelector,
+  beatIdSelector,
+  sortedHierarchyLevels,
+  timelineViewIsTabbedSelector,
+  (beats, beatId, hierarchyLevels, timelineViewIsTabbed) => {
+    if (timelineViewIsTabbed && (!beatId || depth(beats, beatId) === 0)) {
+      return (hierarchyLevels[1] || hierarchyLevels[0]).name
+    }
+
+    return (hierarchyLevels[depth(beats, beatId)] || hierarchyLevels[hierarchyLevels.length - 1])
+      .name
+  }
+)
+
 export const hierarchyChildLevelNameSelector = createSelector(
   beatsByBookSelector,
   beatIdSelector,
@@ -46,7 +62,7 @@ export const hierarchyChildLevelNameSelector = createSelector(
       return level.name
     } else {
       return `${repeat('Sub-', newDepth - hierarchyLevels.length + 1)}${
-        hierarchyLevels[hierarchyLevels.length - 1].name
+        (hierarchyLevels[hierarchyLevels.length - 1] || { name: '' }).name
       }`
     }
   }

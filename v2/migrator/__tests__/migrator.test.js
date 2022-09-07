@@ -8,6 +8,8 @@ const dummyLog = {
   error: () => {},
 }
 
+const nopBackupFunction = null
+
 describe('migrator', () => {
   describe('given a v2021.2.8 file', () => {
     describe('without an `initialVersion` or `appliedMigrations`', () => {
@@ -17,7 +19,7 @@ describe('migrator', () => {
           'test',
           '2021.2.8',
           '2021.6.9',
-          null,
+          nopBackupFunction,
           dummyLog
         )
         const data = await new Promise((resolve) =>
@@ -33,7 +35,7 @@ describe('migrator', () => {
           'test',
           '2021.2.8',
           '2021.6.9',
-          null,
+          nopBackupFunction,
           dummyLog
         )
         const data = await new Promise((resolve) =>
@@ -41,7 +43,7 @@ describe('migrator', () => {
             resolve(result)
           })
         )
-        expect(data.file.appliedMigrations).toEqual(['m2021_4_13', 'm2021_6_9', 'm2021_8_1'])
+        expect(data.file.appliedMigrations).toEqual(['m2021_4_13', 'm2021_6_9'])
       })
     })
     describe('with an `initialVersion` of 2021.8.1', () => {
@@ -58,7 +60,7 @@ describe('migrator', () => {
           'test',
           '2021.2.8',
           '2021.6.9',
-          null,
+          nopBackupFunction,
           dummyLog
         )
         const data = await new Promise((resolve) =>
@@ -83,7 +85,7 @@ describe('migrator', () => {
           'test',
           '2021.2.8',
           '2021.6.9',
-          null,
+          nopBackupFunction,
           dummyLog
         )
         const data = await new Promise((resolve) =>
@@ -91,7 +93,7 @@ describe('migrator', () => {
             resolve(result)
           })
         )
-        expect(data.file.appliedMigrations).toEqual(['m2021_6_9', 'm2021_8_1'])
+        expect(data.file.appliedMigrations).toEqual(['m2021_6_9'])
       })
     })
     describe('with an `initialVersion` of 2021.2.8', () => {
@@ -109,7 +111,7 @@ describe('migrator', () => {
             'test',
             '2021.2.8',
             '2021.6.9',
-            null,
+            nopBackupFunction,
             dummyLog
           )
           let success = false

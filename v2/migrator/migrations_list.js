@@ -1,5 +1,8 @@
 import { greaterBySemver } from './greaterBySemver'
 
+// NOTE: to indicate that a migration has breaking changes, use a *
+// e.g. '*m2022_9_21'
+
 const list = [
   'm0_6',
   'm0_7',
@@ -24,6 +27,8 @@ const list = [
   'm2021_4_13',
   'm2021_6_9',
   'm2021_8_1',
+  'm2022_5_17',
+  'm2022_5_17_1',
 ]
 
 export default list.sort((thisVersion, thatVersion) =>
