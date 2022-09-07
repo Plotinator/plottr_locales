@@ -367,6 +367,12 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
   }
 
   const deleteFile = (fileId, userId, clientId) => {
+    const { doc, updateDoc } = database()
+    const setDeletedAuthorisation = () => {
+      return updateDoc(doc(`authorisation/${userId}/granted/${fileId}`), {
+        deleted: true
+      })
+    }
     const setDeleted = (path) => patch(path, fileId, { deleted: true }, clientId)
     const setDeletedfile = () => setDeleted('file')
     const setDeletedCards = () => setDeleted('cards')
@@ -383,25 +389,27 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
     const setDeletedHierarchyLevels = () => setDeleted('hierarchyLevels')
     const setDeletedImages = () => setDeleted('images')
 
-    return setDeletedfile().then((deleteFileResult) =>
-      pingAuth(userId, fileId).then((pingAuthResult) =>
-        Promise.all([
-          setDeletedCards(),
-          setDeletedSeries(),
-          setDeletedBooks(),
-          setDeletedCategories(),
-          setDeletedCharacters(),
-          setDeletedCustomAttributes(),
-          setDeletedLines(),
-          setDeletedBeats(),
-          setDeletedNotes(),
-          setDeletedPlaces(),
-          setDeletedTags(),
-          setDeletedHierarchyLevels(),
-          setDeletedImages(),
-        ]).then((results) => [pingAuthResult, deleteFileResult, ...results])
+    return setDeletedAuthorisation()
+      .then(setDeletedfile)
+      .then((deleteFileResult) =>
+        pingAuth(userId, fileId).then((pingAuthResult) =>
+          Promise.all([
+            setDeletedCards(),
+            setDeletedSeries(),
+            setDeletedBooks(),
+            setDeletedCategories(),
+            setDeletedCharacters(),
+            setDeletedCustomAttributes(),
+            setDeletedLines(),
+            setDeletedBeats(),
+            setDeletedNotes(),
+            setDeletedPlaces(),
+            setDeletedTags(),
+            setDeletedHierarchyLevels(),
+            setDeletedImages(),
+          ]).then((results) => [pingAuthResult, deleteFileResult, ...results])
+        )
       )
-    )
   }
 
   const listenToFiles = (userId, onPartialResult, callback, errorHandler = defaultErrorHandler) => {
