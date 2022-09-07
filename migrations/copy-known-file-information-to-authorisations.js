@@ -84,7 +84,7 @@ const markDeletedAuthorisedDocumentsAsDeleted = (userId) => {
             })
             if (correspondingFile) {
               const payload = {
-                lastOpened: correspondingFile.lastOpened || null,
+                lastOpened: correspondingFile.lastOpened || correspondingFile.timeStamp || null,
                 fileURL: `plottr://${correspondingFile.id}`,
                 fileName: correspondingFile.fileName || 'Untitled'
               }
