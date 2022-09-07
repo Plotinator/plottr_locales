@@ -91,8 +91,8 @@ const markDeletedAuthorisedDocumentsAsDeleted = (userId) => {
             })
             if (fileIsDeleted) {
               console.log(`Marking: authorisation/${userId}/granted/${fileId}`)
-              // return database.doc(`authorisation/${userId}/granted/${fileId}`)
-              //   .update({ deleted: true })
+              return database.doc(`authorisation/${userId}/granted/${fileId}`)
+                .update({ deleted: true })
             } else {
               console.log(`File isn't deleted: authorisation/${userId}/granted/${fileId}`)
             }
