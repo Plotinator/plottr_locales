@@ -16,7 +16,13 @@ const convertFromNanosAndSeconds = (nanosAndSecondsObject) => {
   )
 }
 
+const VERY_OLD_DATE = new Date(0)
+
 function getDateValue(fileObj) {
+  if (!fileObj.lastOpened) {
+    return VERY_OLD_DATE
+  }
+
   // At some point, we stored a timestamp in this field.  Now it's a
   // `seconds`, and `nanoseconds` object.
   const lastOpenedIsString = typeof fileObj.lastOpened === 'string'
