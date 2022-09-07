@@ -141,3 +141,38 @@ export const isTempFileSelector = createSelector(
     return file && file.isTempFile
   }
 )
+
+export const sortedProKnownFilesByIdSelector = createSelector(
+  cloudFileListSelector,
+  searchTermSelector,
+  (files, searchTerm) => {
+    const filteredFileIds = files
+      .filter((f) => {
+        if (searchTerm && searchTerm.length > 1) {
+          return (f.fileName || f.path).toLowerCase().includes(searchTerm.toLowerCase())
+        } else {
+          return true
+        }
+      })
+      .map(({ id }) => {
+        return id
+      })
+    const sortedIds = sortBy(filteredFileIds, (id) =>
+      getDateValue(files.find((file) => file.id === id))
+    ).reverse()
+    const filesById = files.reduce((acc, nextFile) => {
+      return {
+        ...acc,
+        [nextFile.id]: nextFile,
+      }
+    }, {})
+    return [sortedIds, filesById]
+  }
+)
+
+export const sortedFlatProKnownFilesByIdSelector = createSelector(
+  sortedProKnownFilesByIdSelector,
+  (proFiles) => {
+    return proFiles[0].map((id) => proFiles[1][id])
+  }
+)
