@@ -5,7 +5,6 @@ import {
   NAVIGATE_TO_BOOK_TIMELINE,
   FILE_SAVED,
   NEW_FILE,
-  SET_DARK_MODE,
   CHANGE_CURRENT_TIMELINE,
   CLEAR_TEMPLATE_FROM_TIMELINE,
   SET_CHARACTER_SORT,
@@ -27,6 +26,16 @@ import {
   SET_NOTES_FILTER,
   LOAD_UI,
   LOAD_FILE,
+  SET_NOTES_SEARCH_TERM,
+  SET_CHARACTERS_SEARCH_TERM,
+  SET_PLACES_SEARCH_TERM,
+  SET_TAGS_SEARCH_TERM,
+  SET_OUTLINE_SEARCH_TERM,
+  SET_TIMELINE_SEARCH_TERM,
+  SET_ACTIVE_TIMELINE_TAB,
+  SET_TIMELINE_VIEW,
+  SELECT_CHARACTER_ATTRIBUTE_BOOK_TAB,
+  SELECT_CHARACTER,
 } from '../constants/ActionTypes'
 
 export function changeCurrentView(view) {
@@ -47,10 +56,6 @@ export function newFile(fileName) {
 
 export function fileSaved() {
   return { type: FILE_SAVED, dirty: false }
-}
-
-export function setDarkMode(on) {
-  return { type: SET_DARK_MODE, on }
 }
 
 export function setCharacterSort(attr, direction) {
@@ -133,6 +138,46 @@ export function closeAttributesDialog() {
   return { type: CLOSE_ATTRIBUTES_DIALOG }
 }
 
+export function setNotesSearchTerm(searchTerm) {
+  return { type: SET_NOTES_SEARCH_TERM, searchTerm }
+}
+
+export function setCharactersSearchTerm(searchTerm) {
+  return { type: SET_CHARACTERS_SEARCH_TERM, searchTerm }
+}
+
+export function setPlacesSearchTerm(searchTerm) {
+  return { type: SET_PLACES_SEARCH_TERM, searchTerm }
+}
+
+export function setTagsSearchTerm(searchTerm) {
+  return { type: SET_TAGS_SEARCH_TERM, searchTerm }
+}
+
+export function setOutlineSearchTerm(searchTerm) {
+  return { type: SET_OUTLINE_SEARCH_TERM, searchTerm }
+}
+
+export function setTimelineSearchTerm(searchTerm) {
+  return { type: SET_TIMELINE_SEARCH_TERM, searchTerm }
+}
+
 export function patchFile(patching, file) {
   return { type: LOAD_FILE, patching, file }
+}
+
+export function setTimelineActiveTab(activeTab) {
+  return { type: SET_ACTIVE_TIMELINE_TAB, activeTab }
+}
+
+export function setTimelineView(timelineView) {
+  return { type: SET_TIMELINE_VIEW, timelineView }
+}
+
+export function selectCharacterAttributeBookTab(bookId) {
+  return { type: SELECT_CHARACTER_ATTRIBUTE_BOOK_TAB, bookId }
+}
+
+export function selectCharacter(id) {
+  return { type: SELECT_CHARACTER, id }
 }

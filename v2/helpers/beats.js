@@ -79,19 +79,28 @@ export function isSeries({ bookId }) {
   return isSeriesString(bookId)
 }
 
+export const nextIdForBook = (beatTree) => {
+  return tree.nextId('id')(beatTree)
+}
+
 export const nextId = (beats) =>
   Object.values(beats)
+    .filter((value) => typeof value === 'object')
     .flatMap((book) => tree.nextId('id')(book))
     .reduce((maxId, id) => Math.max(id - 1, maxId), 0) + 1
+
+export function nextPositionInTree(beatTree, parent) {
+  return (
+    tree
+      .children(beatTree, parent || null)
+      .reduce((maxPosition, item) => Math.max(item.position, maxPosition), -1) + 1
+  )
+}
 
 export function nextPositionInBook(items, bookId, parent) {
   if (!items[bookId]) return 0
 
-  return (
-    tree
-      .children(items[bookId], parent || null)
-      .reduce((maxPosition, item) => Math.max(item.position, maxPosition), -1) + 1
-  )
+  return nextPositionInTree(items[bookId], parent)
 }
 
 export function positionReset(items) {
@@ -216,6 +225,10 @@ export const adjustHierarchyLevels =
     }
     return newTree
   }
+
+export const rootParentId = (beatTree, beatId) => {
+  return tree.rootParentId(beatTree, beatId)
+}
 
 export const beatIds = (beatTree) => {
   return tree.reduce('id')(beatTree, (acc, { id }) => [...acc, id], [])

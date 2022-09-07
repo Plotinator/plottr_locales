@@ -4,6 +4,8 @@ import {
   SET_EMAIL_ADDRESS,
   SET_HAS_ONBOARDED,
   SET_HAS_PRO,
+  SET_IS_ON_WEB,
+  SET_CURRENT_APP_STATE,
 } from '../constants/ActionTypes'
 
 const INITIAL_STATE = {
@@ -12,6 +14,8 @@ const INITIAL_STATE = {
   emailAddress: null,
   hasOnboarded: null,
   hasPro: null,
+  isOnWeb: null,
+  currentAppState: null,
 }
 
 const clientReducer = (state = INITIAL_STATE, action) => {
@@ -42,6 +46,18 @@ const clientReducer = (state = INITIAL_STATE, action) => {
         ...state,
         hasPro: action.hasPro,
       }
+    case SET_IS_ON_WEB: {
+      return {
+        ...state,
+        isOnWeb: true,
+      }
+    }
+    case SET_CURRENT_APP_STATE: {
+      return {
+        ...state,
+        currentAppState: action.appState,
+      }
+    }
     default:
       return state
   }

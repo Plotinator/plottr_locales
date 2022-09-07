@@ -54,7 +54,7 @@ export const ui = {
   currentTimeline: 1, // bookId or 'series'
   timelineIsExpanded: true,
   orientation: 'horizontal',
-  darkMode: false,
+  darkMode: false, // <- Deprecated, but keep here for a while for backwards compatibility.
   characterSort: 'name~asc',
   characterFilter: null,
   placeSort: 'name~asc',
@@ -69,6 +69,33 @@ export const ui = {
   },
   timeline: {
     size: 'large',
+    view: 'default',
+    actTab: 0,
+  },
+  searchTerms: {
+    notes: null,
+    characters: null,
+    places: null,
+    tags: null,
+    outline: null,
+    timeline: null,
+  },
+  attributeTabs: {
+    characters: null,
+  },
+  characterTab: {
+    selectedCharacter: null,
+  },
+}
+
+export const attributes = []
+
+export const notifications = {
+  message: null,
+  toast: {
+    cardAction: null,
+    newBookId: null,
+    visible: false,
   },
 }
 

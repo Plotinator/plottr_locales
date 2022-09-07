@@ -1,7 +1,13 @@
 import { createSelector } from 'reselect'
-import { currentTimelineSelector, noteFilterSelector, noteSortSelector } from './ui'
+import {
+  currentTimelineSelector,
+  noteFilterSelector,
+  noteSortSelector,
+  notesSearchTermSelector,
+} from './ui'
 import { isSeries } from '../helpers/books'
 import { sortBy, groupBy } from 'lodash'
+import { outOfOrderSearch } from '../helpers/outOfOrderSearch'
 
 export const allNotesSelector = (state) => state.notes
 const noteCustomAttributesSelector = (state) => state.customAttributes.notes
@@ -103,6 +109,43 @@ export const visibleSortedNotesByCategorySelector = createSelector(
     }
 
     return sortEachCategory(visible, sort)
+  }
+)
+
+const stringifiedNotesByIdSelector = createSelector(allNotesSelector, (notes) => {
+  return notes.reduce((acc, note) => {
+    return {
+      ...acc,
+      [note.id]: JSON.stringify(note).toLowerCase(),
+    }
+  }, {})
+})
+
+export const visibleSortedSearchedNotesByCategorySelector = createSelector(
+  visibleSortedNotesByCategorySelector,
+  notesSearchTermSelector,
+  stringifiedNotesByIdSelector,
+  (noteCategories, searchTerm, stringifiedNotes) => {
+    if (!searchTerm) return noteCategories
+
+    const lowSearchTerms = searchTerm
+      .toLowerCase()
+      .split(' ')
+      .filter((x) => x)
+    return Object.entries(noteCategories).reduce((acc, nextCategory) => {
+      const [key, notes] = nextCategory
+      const newNotes = notes.filter(({ id }) => {
+        return outOfOrderSearch(lowSearchTerms, stringifiedNotes[id])
+      })
+      if (newNotes.length > 0) {
+        return {
+          ...acc,
+          [key]: newNotes,
+        }
+      } else {
+        return acc
+      }
+    }, {})
   }
 )
 

@@ -1,4 +1,4 @@
-import { sortBy } from 'lodash'
+import { sortBy, keyBy } from 'lodash'
 import { createSelector } from 'reselect'
 import { currentTimelineSelector, timelineIsExpandedSelector } from './ui'
 import { cardMapSelector } from './cards'
@@ -11,6 +11,20 @@ export const allSeriesLinesSelector = (state) => state.lines.filter(isSeries)
 export const allLinesSelector = (state) => state.lines
 
 export const nextLineIdSelector = createSelector(allLinesSelector, (lines) => nextId(lines))
+
+export const bookIdSelector = (state, bookId) => bookId
+
+export const linesForBookSelector = createSelector(
+  allLinesSelector,
+  bookIdSelector,
+  (lines, bookId) => {
+    return lines.filter((l) => l && l.bookId == bookId)
+  }
+)
+
+export const firstLineForBookSelector = createSelector(linesForBookSelector, (lines) => {
+  return sortBy(lines, 'position')[0]
+})
 
 export const linesByBookSelector = createSelector(
   allLinesSelector,
@@ -62,3 +76,7 @@ export const lineMaxCardsSelector = createSelector(
     }, {})
   }
 )
+
+export const linesById = createSelector(sortedLinesByBookSelector, (lines) => {
+  return keyBy(lines, 'id')
+})

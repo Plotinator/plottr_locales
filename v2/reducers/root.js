@@ -6,13 +6,35 @@ import {
   RESET_TIMELINE,
   ADD_BOOK_FROM_TEMPLATE,
   ADD_LINES_FROM_TEMPLATE,
+  MOVE_CARD_TO_BOOK,
+  DUPLICATE_LINE,
+  MOVE_LINE,
+  ADD_BEAT,
+  INSERT_BEAT,
+  DELETE_BEAT,
+  CREATE_CHARACTER_ATTRIBUTE,
+  EDIT_CHARACTER_ATTRIBUTE_VALUE,
+  EDIT_CHARACTER_ATTRIBUTE_METADATA,
+  DELETE_CHARACTER_ATTRIBUTE,
+  REORDER_CHARACTER_ATTRIBUTE_METADATA,
 } from '../constants/ActionTypes'
-import { isSeriesSelector } from '../selectors/ui'
+import { characterAttributeTabSelector, isSeriesSelector } from '../selectors/ui'
 import { reduce, beatsByPosition, nextId as nextBeatId } from '../helpers/beats'
 import { nextId, objectId } from '../store/newIds'
 import * as tree from './tree'
 import { beat as defaultBeat } from '../store/initialState'
 import { cloneDeep } from 'lodash'
+import { firstLineForBookSelector } from '../selectors/lines'
+import { timelineViewIsTabbedSelector } from '../selectors/ui'
+import {
+  sortedBeatsForAnotherBookSelector,
+  firstVisibleBeatForBookSelector,
+  timelineTabBeatIdsSelector,
+  timelineActiveTabSelector,
+} from '../selectors/beats'
+import { addBeat } from '../actions/beats'
+import { setTimelineView } from '../actions/ui'
+import { characterAttributesForBookSelector } from '../selectors/attributes'
 
 /**
  * `dataRepairers` is an object which contains various repairs to be
@@ -32,6 +54,49 @@ const root = (dataRepairers) => (state, action) => {
   const isSeries = action.type.includes('@@') ? false : isSeriesSelector(state)
   const mainReducer = unrepairedMainReducer(dataRepairers)
   switch (action.type) {
+    // Actions for new attributes need the current book.
+    case REORDER_CHARACTER_ATTRIBUTE_METADATA:
+    case DELETE_CHARACTER_ATTRIBUTE:
+    case EDIT_CHARACTER_ATTRIBUTE_METADATA:
+    case EDIT_CHARACTER_ATTRIBUTE_VALUE:
+    case CREATE_CHARACTER_ATTRIBUTE: {
+      const bookId = characterAttributeTabSelector(state)
+      const characterAttributes = characterAttributesForBookSelector(state)
+      const nextAttributeId = nextId(characterAttributes)
+      const newAction = {
+        ...action,
+        bookId,
+        nextAttributeId,
+      }
+      return mainReducer(state, newAction)
+    }
+    case DELETE_BEAT: {
+      const topLevelbeatIds = timelineTabBeatIdsSelector(state)
+      const position = topLevelbeatIds.indexOf(action.id)
+      if (position !== -1) {
+        if (topLevelbeatIds.length > 1) {
+          if (position === 0) {
+            return mainReducer(state, { ...action, actTab: topLevelbeatIds[1] })
+          } else {
+            return mainReducer(state, { ...action, actTab: topLevelbeatIds[position - 1] })
+          }
+        } else {
+          const withDefaultView = mainReducer(state, setTimelineView('default'))
+          return mainReducer(withDefaultView, { ...action, actTab: topLevelbeatIds[position - 1] })
+        }
+      }
+      return mainReducer(state, action)
+    }
+
+    case INSERT_BEAT: {
+      const timelineViewIsTabbed = timelineViewIsTabbedSelector(state)
+      if (timelineViewIsTabbed) {
+        const activeParentId = timelineActiveTabSelector(state)
+        return mainReducer(state, { ...action, parentId: activeParentId })
+      }
+      return mainReducer(state, action)
+    }
+
     case ADD_BOOK:
       return mainReducer(state, { ...action, newBookId: objectId(state.books.allIds) })
 
@@ -46,6 +111,29 @@ const root = (dataRepairers) => (state, action) => {
         nextBeatId: nextBeatId(state.beats),
         nextCardId: nextId(state.cards),
       })
+
+    case MOVE_CARD_TO_BOOK: {
+      const destinationLineId = firstLineForBookSelector(state, action.bookId).id
+      const destinationBeatId = firstVisibleBeatForBookSelector(state, action.bookId).id
+
+      const newAction = {
+        ...action,
+        destinationLineId,
+        destinationBeatId,
+      }
+
+      return mainReducer(state, newAction)
+    }
+
+    case DUPLICATE_LINE: {
+      const newLineId = nextId(state.lines)
+      const newAction = {
+        ...action,
+        newLineId,
+      }
+
+      return mainReducer(state, newAction)
+    }
 
     case ADD_LINES_FROM_TEMPLATE: {
       // cards from the template need to know the new ids of lines (and sometimes beats) from the template
@@ -155,6 +243,82 @@ const root = (dataRepairers) => (state, action) => {
         lineIds: lineIdsToReset,
       }
       return mainReducer(state, newResetAction)
+    }
+
+    case MOVE_LINE: {
+      const sourceLine = state.lines.find(({ id }) => {
+        return id === action.id
+      })
+
+      if (!sourceLine || sourceLine.bookId === action.destinationBookId) {
+        return state
+      }
+
+      const sourceCards = state.cards.filter(({ lineId }) => {
+        return lineId === action.id
+      })
+      const beatsForLine = sourceCards.map(({ beatId }) => {
+        return beatId
+      })
+
+      const positionOfBeat = (beatId, beatIds) => {
+        return beatIds.indexOf(beatId)
+      }
+
+      const beatsInSourceBook = sortedBeatsForAnotherBookSelector(state, sourceLine.bookId)
+      const beatIdsInSourceBook = beatsInSourceBook.map(({ id }) => id)
+      const cardToPositionMapping = sourceCards.reduce((acc, nextCard) => {
+        return {
+          ...acc,
+          [nextCard.id]: positionOfBeat(nextCard.beatId, beatIdsInSourceBook),
+        }
+      }, {})
+      const beatsInDestinationBook = sortedBeatsForAnotherBookSelector(
+        state,
+        action.destinationBookId
+      )
+      const requiredNumberOfBeats = beatsForLine.reduce((furthestPosition, nextBeat) => {
+        const positionOfCardsBeat = beatIdsInSourceBook.indexOf(nextBeat) + 1
+        return Math.max(positionOfCardsBeat, furthestPosition)
+      }, 0)
+      const numberOfBeatsAtDestination = beatsInDestinationBook.length
+
+      if (numberOfBeatsAtDestination < requiredNumberOfBeats) {
+        let stateWithEnoughBeats = state
+        for (let i = 0; i < requiredNumberOfBeats - numberOfBeatsAtDestination; ++i) {
+          stateWithEnoughBeats = mainReducer(
+            stateWithEnoughBeats,
+            addBeat(action.destinationBookId, null)
+          )
+        }
+        const beatsInDestinationBook = sortedBeatsForAnotherBookSelector(
+          stateWithEnoughBeats,
+          action.destinationBookId
+        )
+        const beatIdsInDestinationBook = beatsInDestinationBook.map(({ id }) => id)
+        const cardToBeatIdMapping = sourceCards.reduce((acc, nextCard) => {
+          return {
+            ...acc,
+            [nextCard.id]: beatIdsInDestinationBook[cardToPositionMapping[nextCard.id]],
+          }
+        }, {})
+        return mainReducer(stateWithEnoughBeats, {
+          ...action,
+          cardToBeatIdMapping,
+        })
+      }
+
+      const beatIdsInDestinationBook = beatsInDestinationBook.map(({ id }) => id)
+      const cardToBeatIdMapping = sourceCards.reduce((acc, nextCard) => {
+        return {
+          ...acc,
+          [nextCard.id]: beatIdsInDestinationBook[cardToPositionMapping[nextCard.id]],
+        }
+      }, {})
+      return mainReducer(state, {
+        ...action,
+        cardToBeatIdMapping,
+      })
     }
 
     default:

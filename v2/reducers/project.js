@@ -11,10 +11,11 @@ import {
   SET_OVERWRITING_CLOUD_WITH_BACKUP,
   SET_SHOW_RESUME_MESSAGE_DIALOG,
   SET_BACKING_UP_OFFLINE_FILE,
+  START_CREATING_NEW_PROJECT,
+  FINISH_CREATING_NEW_PROJECT,
 } from '../constants/ActionTypes'
 
 const INITIAL_STATE = {
-  fileList: [],
   selectedFile: null,
   userNameSearchResults: [],
   fileLoaded: false,
@@ -31,11 +32,6 @@ const NEW_FILE = { fileName: 'New file', none: true, id: -1 }
 
 const projectReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case SET_FILE_LIST:
-      return {
-        ...state,
-        fileList: action.fileList,
-      }
     case SELECT_FILE:
       return {
         ...state,
@@ -91,6 +87,20 @@ const projectReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         backingUpOfflineFile: action.backingUpOfflineFile,
+      }
+    case START_CREATING_NEW_PROJECT:
+      return {
+        ...state,
+        projectNamingModalIsVisible: true,
+        template: action.template,
+        defaultName: action.defaultName,
+      }
+    case FINISH_CREATING_NEW_PROJECT:
+      return {
+        ...state,
+        projectNamingModalIsVisible: false,
+        template: null,
+        defaultName: null,
       }
     default:
       return state

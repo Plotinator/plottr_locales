@@ -20,7 +20,6 @@ import {
   REMOVE_PLACES_ATTRIBUTE,
   SET_CHARACTER_FILTER,
   SET_CHARACTER_SORT,
-  SET_DARK_MODE,
   SET_NOTE_FILTER,
   SET_NOTE_SORT,
   SET_OUTLINE_FILTER,
@@ -28,6 +27,23 @@ import {
   SET_PLACE_SORT,
   SET_TIMELINE_FILTER,
   SET_TIMELINE_SIZE,
+  SET_NOTES_SEARCH_TERM,
+  SET_TAGS_SEARCH_TERM,
+  SET_PLACES_SEARCH_TERM,
+  SET_CHARACTERS_SEARCH_TERM,
+  SET_OUTLINE_SEARCH_TERM,
+  SET_TIMELINE_SEARCH_TERM,
+  ADD_NOTE,
+  ADD_CHARACTER,
+  ADD_PLACE,
+  ADD_TAG,
+  ADD_CARD,
+  ADD_CREATED_TAG,
+  SET_ACTIVE_TIMELINE_TAB,
+  SET_TIMELINE_VIEW,
+  DELETE_BEAT,
+  SELECT_CHARACTER_ATTRIBUTE_BOOK_TAB,
+  SELECT_CHARACTER,
 } from '../constants/ActionTypes'
 import { ui as defaultUI } from '../store/initialState'
 import { newFileUI } from '../store/newFileState'
@@ -71,9 +87,6 @@ const ui =
 
       case COLLAPSE_TIMELINE:
         return Object.assign({}, state, { timelineIsExpanded: false })
-
-      case SET_DARK_MODE:
-        return Object.assign({}, state, { darkMode: action.on })
 
       case SET_CHARACTER_SORT:
         return Object.assign({}, state, { characterSort: `${action.attr}~${action.direction}` })
@@ -129,16 +142,27 @@ const ui =
       case SET_TIMELINE_FILTER:
         return Object.assign({}, state, { timelineFilter: action.filter })
 
-      case SET_OUTLINE_FILTER:
-        if (!action.filter || !Object.values(action.filter)) filter = null
-        else if (typeof action.filter === 'object') filter = action.filter
-        else if (Array.isArray(state.outlineFilter) && state.outlineFilter.includes(action.filter))
+      case SET_OUTLINE_FILTER: {
+        if (!action.filter || !Object.values(action.filter)) {
+          filter = null
+        } else if (typeof action.filter === 'object') {
+          filter = action.filter
+        } else if (
+          Array.isArray(state.outlineFilter) &&
+          state.outlineFilter.includes(action.filter)
+        ) {
           filter = state.outlineFilter.filter((item) => item !== action.filter)
-        else if (!Array.isArray(state.outlineFilter)) filter = [action.filter]
-        else if (Array.isArray(state.outlineFilter))
+          if (filter.length === 0) {
+            filter = null
+          }
+        } else if (!Array.isArray(state.outlineFilter)) {
+          filter = [action.filter]
+        } else if (Array.isArray(state.outlineFilter)) {
           filter = [...state.outlineFilter, action.filter]
+        }
 
         return Object.assign({}, state, { outlineFilter: filter })
+      }
 
       case FILE_LOADED:
         return action.data.ui || newFileUI
@@ -172,6 +196,168 @@ const ui =
           ...state,
           timeline: timeline(state.timeline, action),
         }
+
+      case SET_NOTES_SEARCH_TERM: {
+        return {
+          ...state,
+          searchTerms: {
+            ...state.searchTerms,
+            notes: action.searchTerm,
+          },
+        }
+      }
+
+      case ADD_NOTE: {
+        return {
+          ...state,
+          searchTerms: {
+            ...state.searchTerms,
+            notes: null,
+          },
+        }
+      }
+
+      case SET_CHARACTERS_SEARCH_TERM: {
+        return {
+          ...state,
+          searchTerms: {
+            ...state.searchTerms,
+            characters: action.searchTerm,
+          },
+        }
+      }
+
+      case ADD_CHARACTER: {
+        return {
+          ...state,
+          searchTerms: {
+            ...state.searchTerms,
+            characters: null,
+          },
+        }
+      }
+
+      case SET_PLACES_SEARCH_TERM: {
+        return {
+          ...state,
+          searchTerms: {
+            ...state.searchTerms,
+            places: action.searchTerm,
+          },
+        }
+      }
+
+      case ADD_PLACE: {
+        return {
+          ...state,
+          searchTerms: {
+            ...state.searchTerms,
+            places: null,
+          },
+        }
+      }
+
+      case SET_TAGS_SEARCH_TERM: {
+        return {
+          ...state,
+          searchTerms: {
+            ...state.searchTerms,
+            tags: action.searchTerm,
+          },
+        }
+      }
+
+      case ADD_CREATED_TAG:
+      case ADD_TAG: {
+        return {
+          ...state,
+          searchTerms: {
+            ...state.searchTerms,
+            tags: null,
+          },
+        }
+      }
+
+      case SET_OUTLINE_SEARCH_TERM: {
+        return {
+          ...state,
+          searchTerms: {
+            ...state.searchTerms,
+            outline: action.searchTerm,
+          },
+        }
+      }
+
+      case SET_TIMELINE_SEARCH_TERM: {
+        return {
+          ...state,
+          searchTerms: {
+            ...state.searchTerms,
+            timeline: action.searchTerm,
+          },
+        }
+      }
+
+      case ADD_CARD: {
+        return {
+          ...state,
+          searchTerms: {
+            ...state.searchTerms,
+            outline: null,
+            timeline: null,
+          },
+        }
+      }
+
+      case SET_ACTIVE_TIMELINE_TAB: {
+        return {
+          ...state,
+          timeline: {
+            ...state.timeline,
+            actTab: action.activeTab,
+          },
+        }
+      }
+
+      case SET_TIMELINE_VIEW: {
+        return {
+          ...state,
+          timeline: {
+            ...state.timeline,
+            view: action.timelineView,
+          },
+        }
+      }
+
+      case DELETE_BEAT: {
+        return {
+          ...state,
+          timeline: {
+            ...state.timeline,
+            actTab: action.actTab || state.timeline.actTab,
+          },
+        }
+      }
+
+      case SELECT_CHARACTER_ATTRIBUTE_BOOK_TAB: {
+        return {
+          ...state,
+          attributeTabs: {
+            ...state.attributeTabs,
+            characters: action.bookId,
+          },
+        }
+      }
+
+      case SELECT_CHARACTER: {
+        return {
+          ...state,
+          characterTab: {
+            ...state.characterTab,
+            selectedCharacter: action.id,
+          },
+        }
+      }
 
       default:
         return state
