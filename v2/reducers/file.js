@@ -40,7 +40,7 @@ const file =
           id: action.data.file.id || null,
           appliedMigrations: action.data.file.appliedMigrations || [],
           initialVersion: action.data.file.initialVersion || action.version,
-          isCloudFile: action.data.file.isCloudFile || false
+          isCloudFile: action.data.file.isCloudFile || false,
         }
 
       case FILE_SAVED:
@@ -68,19 +68,19 @@ const file =
             ...stateWithoutTimeStamp,
             resuming: false,
             originalVersionStamp: stateWithoutTimeStamp.versionStamp,
-            originalTimeStamp: stateWithoutTimeStamp.timeStamp
+            originalTimeStamp: stateWithoutTimeStamp.timeStamp,
           }
         } else {
           return {
             ...state,
-            resuming: true
+            resuming: true,
           }
         }
 
       case SET_RESUMING:
         return {
           ...stateWithoutTimeStamp,
-          resuming: action.resuming
+          resuming: action.resuming,
         }
 
       case SELECT_FILE: {
