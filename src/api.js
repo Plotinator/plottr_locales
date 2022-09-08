@@ -823,7 +823,6 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
 
   const allTemplateUrlsForUser = (documents) => {
     const { ref, getDownloadURL } = storage()
-    const doNothingWithPartialResult = () => {}
     return sequence(
       documents.map(({ path }) => {
         return () => getDownloadURL(ref(withoutStorageProtocal(path)))
