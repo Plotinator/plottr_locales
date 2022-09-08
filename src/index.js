@@ -79,7 +79,6 @@ const database = () => {
           host: 'plottr.local:8081',
           ssl: true,
         })
-        connectFirestoreEmulator(_database, 'plottr.local', 8081)
       } catch (error) {
         console.error(
           'Error initialising dev emulator (you can usually safely ignore this):',
@@ -154,7 +153,8 @@ const storage = () => {
       )
       _storage = getStorage(firebaseApp)
       connectStorageEmulator(_storage, 'localhost', 9200)
-      _storage._delegate.host = 'https://plottr.local:9200'
+      // This doesn't work on the new version :/
+      // _storage._delegate.host = 'https://plottr.local:9200'
     } else {
       _storage = getStorage(firebaseApp)
     }
