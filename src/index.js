@@ -194,7 +194,9 @@ export const startUI = (queryString) => {
 }
 
 const isElectron =
-  ((navigator && navigator.userAgent && navigator.userAgent.toLowerCase()) || '').indexOf(' electron/') > -1
+  ((navigator && navigator.userAgent && navigator.userAgent.toLowerCase()) || '').indexOf(
+    ' electron/'
+  ) > -1
 
 export const wireUpAPI = (logger) => {
   const wiredUp = api(
