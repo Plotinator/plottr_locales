@@ -11,7 +11,6 @@ import {
 } from 'firebase/auth'
 import {
   initializeFirestore,
-  connectFirestoreEmulator,
   query,
   collection,
   where,
