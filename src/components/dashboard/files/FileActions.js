@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import PropTypes from 'react-proptypes'
-import { IoOpenOutline } from 'react-icons/io5'
 
 import { t } from 'plottr_locales'
 
@@ -122,7 +121,7 @@ const FileActionsConnector = (connector) => {
           {missing ? null : (
             <>
               <Button bsSize="small" onClick={handleOpen} title={t('Open')}>
-                <IoOpenOutline />
+                <Glyphicon glyph="open" />
               </Button>
               <Button bsSize="small" onClick={_renameFile} title={t('Rename')}>
                 <Glyphicon glyph="edit" />
