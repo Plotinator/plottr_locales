@@ -420,7 +420,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
   }
 
   const listenToFiles = (userId, callback, errorHandler = defaultErrorHandler) => {
-    const { getDoc, doc, collection, onSnapshot } = database()
+    const { collection, onSnapshot } = database()
     return onSnapshot(collection(`authorisation/${userId}/granted`), {
       next: (authorisationsRef) => {
         const authorisedDocuments = []
@@ -445,7 +445,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
   }
 
   const fetchFiles = (userId) => {
-    const { collection, getDocs, getDoc, doc } = database()
+    const { collection, getDocs } = database()
 
     return getDocs(collection(`authorisation/${userId}/granted`)).then((authorisationsRef) => {
       const authorisedDocuments = []
