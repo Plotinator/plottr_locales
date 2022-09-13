@@ -28,7 +28,7 @@ const auth = () => {
 }
 
 const translate = (rootClause) => {
-  const translateIter = (ref, ...clauses) => {
+  const translateIter = (ref, clauses) => {
     if (clauses.length === 0) {
       return ref
     }
@@ -47,7 +47,7 @@ const translate = (rootClause) => {
     }
     // Doesn't need to be translated.  (Most likely created by
     // `collection`.)
-    return clause
+    return translateIter(clause, clauses.slice(1))
   }
 
   return translateIter(null, [rootClause])
