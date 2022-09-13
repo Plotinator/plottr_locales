@@ -234,11 +234,8 @@ export const wireUpAPI = (logger) => {
     imagePublicURL: wiredUp.imagePublicURL,
     isStorageURL: wiredUp.isStorageURL,
     loginWithEmailAndPassword: (email, password) => {
-      console.log('-----> Logging in...')
       return wiredUp.loginWithEmailAndPassword(email, password).then((result) => {
-        console.log('-----> Minting cookie...')
         return wiredUp.mintCookieToken().then(() => {
-          console.log('-----> Minted cookie...')
           return result
         })
       })
