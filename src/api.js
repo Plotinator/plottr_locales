@@ -74,12 +74,33 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
       })
   }
 
-  const editFileName = (userId, fileId, newName) => {
+  const updateAuthFileName = (fileId, newName) => {
+    return axios
+      .post(`${BASE_API_URL}/api/update-auth-name`, {
+        fileId,
+        newName,
+      })
+      .then((response) => ({
+        fileId,
+      }))
+      .catch((error) => {
+        const status = error && error.response && error.response.status
+        log.error(
+          'Error pinging auth (to signal that the file list was updated)',
+          status,
+          error.response
+        )
+        if (status === 401) return mintCookieToken(currentUser())
+        return Promise.reject(error)
+      })
+  }
+
+  const editFileName = (fileId, newName) => {
     const { doc, updateDoc } = database()
     return updateDoc(doc(`file/${fileId}`), {
       fileName: newName,
     }).then(() => {
-      return pingAuth(userId, fileId)
+      return updateAuthFileName(fileId, newName)
     })
   }
 
@@ -374,10 +395,9 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
   }
 
   const deleteFile = (fileId, userId, clientId) => {
-    const { doc, updateDoc } = database()
     const setDeletedAuthorisation = () => {
-      return updateDoc(doc(`authorisation/${userId}/granted/${fileId}`), {
-        deleted: true,
+      return axios.post(`${BASE_API_URL}/api/delete-auth`, {
+        fileId,
       })
     }
     const setDeleted = (path) => patch(path, fileId, { deleted: true }, clientId)
@@ -944,6 +964,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
 
   return {
     editFileName,
+    updateAuthFileName,
     listenToFile,
     listenToBeats,
     listenToCards,

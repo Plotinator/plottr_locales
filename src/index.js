@@ -212,6 +212,7 @@ export const wireUpAPI = (logger) => {
 
   return {
     editFileName: wiredUp.editFileName,
+    updateAuthFileName: wiredUp.updateAuthFileName,
     listenToFile: wiredUp.listenToFile,
     listenToBeats: wiredUp.listenToBeats,
     listenToCards: wiredUp.listenToCards,
