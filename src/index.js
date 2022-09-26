@@ -153,7 +153,7 @@ const storage = () => {
       _storage = getStorage(firebaseApp)
       connectStorageEmulator(_storage, 'localhost', 9200)
       // This doesn't work on the new version :/
-      // _storage._delegate.host = 'https://plottr.local:9200'
+      _storage._protocol = 'https'
     } else {
       _storage = getStorage(firebaseApp)
     }
