@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
 import PropTypes from 'react-proptypes'
+import { IoOpenOutline } from 'react-icons/io5'
 
 import { t } from 'plottr_locales'
+import { helpers } from 'pltr/v2'
 
 import Glyphicon from '../../Glyphicon'
 import MenuItem from '../../MenuItem'
@@ -34,13 +36,14 @@ const FileActionsConnector = (connector) => {
     missing,
     id,
     fileName,
-    filePath,
+    fileURL,
     openFile,
     permission,
     isCloudFile,
     offline,
     isOnWeb,
     isTemp,
+    isInOfflineMode,
   }) => {
     const [deleting, setDeleting] = useState(false)
 
@@ -53,25 +56,17 @@ const FileActionsConnector = (connector) => {
 
     const deleteFile = () => {
       setDeleting(false)
-      if (isCloudFile) {
-        deleteKnownFile(id, id)
-      } else {
-        deleteKnownFile(id, filePath)
-      }
+      deleteKnownFile(fileURL)
     }
 
     const _renameFile = () => {
-      if (isOnWeb) {
-        renameFile(id)
-      } else {
-        renameFile(filePath)
-      }
+      renameFile(fileURL)
     }
 
     const renderDeleteFile = () => {
       if (!deleting) return null
 
-      const name = basename(filePath)
+      const name = basename(helpers.file.withoutProtocol(fileURL))
 
       return (
         <DeleteConfirmModal
@@ -82,31 +77,23 @@ const FileActionsConnector = (connector) => {
       )
     }
     const handleOpen = () => {
-      if (isOnWeb) {
-        openFile(id, id)
-      } else {
-        openFile(filePath, id)
-      }
+      openFile(fileURL)
     }
 
     const doTheThing = (eventKey) => {
       switch (eventKey) {
         case 'open': {
-          if (isOnWeb) {
-            openFile(id, id)
-          } else {
-            openFile(filePath, id)
-          }
+          openFile(fileURL)
           break
         }
         case 'show':
-          showItemInFolder(filePath)
+          showItemInFolder(fileURL)
           break
         case 'rename':
           _renameFile()
           break
         case 'remove':
-          removeFromKnownFiles(id)
+          removeFromKnownFiles(fileURL)
           break
         case 'delete':
           setDeleting(true)
@@ -123,24 +110,36 @@ const FileActionsConnector = (connector) => {
               <Button bsSize="small" onClick={handleOpen} title={t('Open')}>
                 <Glyphicon glyph="open" />
               </Button>
-              <Button bsSize="small" onClick={_renameFile} title={t('Rename')}>
+              <Button
+                bsSize="small"
+                onClick={_renameFile}
+                title={t('Rename')}
+                disabled={isInOfflineMode}
+              >
                 <Glyphicon glyph="edit" />
               </Button>
-              <Button bsSize="small" onClick={() => setDeleting(true)} title={t('Delete')}>
+              <Button
+                bsSize="small"
+                onClick={() => setDeleting(true)}
+                title={t('Delete')}
+                disabled={isInOfflineMode}
+              >
                 <Glyphicon glyph="trash" />
               </Button>
             </>
           )}
-          {osIsUnknown ? null : (
+          {isInOfflineMode || isCloudFile || osIsUnknown ? null : (
             <Dropdown id={`file-action-${id}`} onSelect={doTheThing}>
               <Dropdown.Toggle noCaret>
                 <Glyphicon glyph="option-horizontal" />
               </Dropdown.Toggle>
               <Dropdown.Menu>
-                {isCloudFile || missing ? null : (
+                {isCloudFile || osIsUnknown || missing ? null : (
                   <MenuItem eventKey="show">{showInMessage}</MenuItem>
                 )}
-                <MenuItem eventKey="remove">{t('Remove from this list')}</MenuItem>
+                {isCloudFile || osIsUnknown ? null : (
+                  <MenuItem eventKey="remove">{t('Remove from this list')}</MenuItem>
+                )}
               </Dropdown.Menu>
             </Dropdown>
           )}
@@ -152,7 +151,7 @@ const FileActionsConnector = (connector) => {
   FileActions.propTypes = {
     missing: PropTypes.bool,
     id: PropTypes.string,
-    filePath: PropTypes.string,
+    fileURL: PropTypes.string,
     fileName: PropTypes.string,
     openFile: PropTypes.func,
     permission: PropTypes.string,
@@ -160,6 +159,7 @@ const FileActionsConnector = (connector) => {
     offline: PropTypes.bool,
     isOnWeb: PropTypes.bool,
     isTemp: PropTypes.bool,
+    isInOfflineMode: PropTypes.bool,
   }
 
   const {
@@ -170,9 +170,10 @@ const FileActionsConnector = (connector) => {
   if (redux) {
     const { connect } = redux
 
-    return connect((state, { filePath }) => ({
+    return connect((state, { fileURL }) => ({
       isOnWeb: selectors.isOnWebSelector(state.present),
-      isTemp: selectors.isTempFileSelector(state.present, filePath),
+      isTemp: selectors.isTempFileSelector(state.present, fileURL),
+      isInOfflineMode: selectors.isInOfflineModeSelector(state.present),
     }))(FileActions)
   }
 
