@@ -198,6 +198,7 @@ export const wireUpAPI = (logger) => {
   //  - `isStorageURL`.
   return {
     editFileName: wiredUp.editFileName,
+    updateAuthFileName: wiredUp.updateAuthFileName,
     listen,
     toFirestoreArray: wiredUp.toFirestoreArray,
     overwriteAllKeys: wiredUp.overwriteAllKeys,
