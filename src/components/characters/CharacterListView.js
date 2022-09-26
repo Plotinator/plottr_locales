@@ -421,11 +421,7 @@ const CharacterListViewConnector = (connector) => {
                       return null
                     }
                     const title = (book.title && truncateTitle(book.title, 40)) || t('Untitled')
-                    return (
-                      <Tab key={index} eventKey={book.id} title={title}>
-                        {title}
-                      </Tab>
-                    )
+                    return <Tab key={index} eventKey={book.id} title={title}></Tab>
                   })}
                 </Tabs>
               </div>
@@ -447,7 +443,7 @@ const CharacterListViewConnector = (connector) => {
     characterSort: PropTypes.string,
     darkMode: PropTypes.bool,
     charactersSearchTerm: PropTypes.string,
-    books: PropTypes.array.isRequired,
+    books: PropTypes.object.isRequired,
     selectedCharacteId: PropTypes.number,
     attributeTabId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     actions: PropTypes.object.isRequired,
