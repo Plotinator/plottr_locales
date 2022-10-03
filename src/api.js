@@ -4,6 +4,7 @@ import { DateTime } from 'luxon'
 import { isEqual } from 'lodash'
 
 import { actions, selectors, ARRAY_KEYS, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
+import { logger } from 'lib/logger'
 
 const doNothingWithPartialResult = () => {}
 
@@ -903,30 +904,25 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
     return `storage://images/${userId}/${escapeImageName(imageName)}`
   }
 
-  const imagetoBlob = (imageUrl) => {
-    return fetch(imageUrl).then((response) => {
-      if (response.ok) {
-        return response.blob()
-      }
-
-      return response.text().then((body) => {
-        return Promise.reject(new Error(`HTTP error reading image to blob: ${response.status}`))
-      })
-    })
-  }
-
-  const saveImageToStorageBlob = (userId, imageName, imageBlob) => {
+  const saveImageToStorageBlob = (userId, imageName, imageUrl) => {
     const filePath = toImagePath(userId, imageName)
-    const { uploadBytes, ref } = storage()
-    return uploadBytes(ref(withoutStorageProtocal(filePath)), imageBlob).then(() => {
-      return filePath
-    })
+    return axios
+      .post(`${BASE_API_URL}/api/upload-image`, {
+        userId,
+        imageUrl,
+        storageURL: filePath,
+      })
+      .then((response) => {
+        return response.data.storageURL
+      })
+      .catch((error) => {
+        logger.error(`Failed to upload image for user ${userId} to ${filePath}`, error)
+        return Promise.reject(error)
+      })
   }
 
   const saveImageToStorageFromURL = (userId, imageName, imageUrl) => {
-    return imagetoBlob(imageUrl).then((response) => {
-      return saveImageToStorageBlob(userId, imageName, response)
-    })
+    return saveImageToStorageBlob(userId, imageName, imageUrl)
   }
 
   const backupPublicURL = (storageProtocolURL) => {
