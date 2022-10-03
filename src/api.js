@@ -4,7 +4,6 @@ import { DateTime } from 'luxon'
 import { isEqual } from 'lodash'
 
 import { actions, selectors, ARRAY_KEYS, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
-import { logger } from 'lib/logger'
 
 const doNothingWithPartialResult = () => {}
 
@@ -916,7 +915,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
         return response.data.storageURL
       })
       .catch((error) => {
-        logger.error(`Failed to upload image for user ${userId} to ${filePath}`, error)
+        log.error(`Failed to upload image for user ${userId} to ${filePath}`, error)
         return Promise.reject(error)
       })
   }
