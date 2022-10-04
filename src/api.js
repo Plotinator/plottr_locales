@@ -814,10 +814,19 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
   const backupToStorage = (userId, file, date, startOfSession) => {
     const fileId = selectors.fileIdSelector(file)
     const filePath = toBackupPath(userId, fileId, date, startOfSession)
-    const { ref, uploadString } = storage()
-    return uploadString(ref(withoutStorageProtocal(filePath)), JSON.stringify(file)).then(() => {
-      return filePath
-    })
+    return axios
+      .post(`${BASE_API_URL}/api/backup-file-to-storage`, {
+        userId,
+        fileText: JSON.stringify(file),
+        storageURL: filePath,
+      })
+      .then((response) => {
+        return response.data.storageURL
+      })
+      .catch((error) => {
+        log.error(`Failed to upload backup file for user ${userId} to ${filePath}`, error)
+        return Promise.reject(error)
+      })
   }
 
   const toTemplatePath = (userId, templateId) => {
