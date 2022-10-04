@@ -811,22 +811,26 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
     return split
   }
 
-  const backupToStorage = (userId, file, date, startOfSession) => {
-    const fileId = selectors.fileIdSelector(file)
-    const filePath = toBackupPath(userId, fileId, date, startOfSession)
+  const saveFileToStorage = (userId, storageURL, fileText) => {
     return axios
       .post(`${BASE_API_URL}/api/save-file-to-storage`, {
         userId,
-        fileText: JSON.stringify(file),
-        storageURL: filePath,
+        fileText,
+        storageURL,
       })
       .then((response) => {
         return response.data.storageURL
       })
       .catch((error) => {
-        log.error(`Failed to upload backup file for user ${userId} to ${filePath}`, error)
+        log.error(`Failed to upload file for user ${userId} to ${storageURL}`, error)
         return Promise.reject(error)
       })
+  }
+
+  const backupToStorage = (userId, file, date, startOfSession) => {
+    const fileId = selectors.fileIdSelector(file)
+    const storageURL = toBackupPath(userId, fileId, date, startOfSession)
+    return saveFileToStorage(userId, storageURL, JSON.stringify(file))
   }
 
   const toTemplatePath = (userId, templateId) => {
@@ -834,20 +838,17 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
   }
 
   const saveCustomTemplate = (userId, template) => {
-    const filePath = toTemplatePath(userId, template.id)
-    const { ref, uploadString } = storage()
-    return uploadString(ref(withoutStorageProtocal(filePath)), JSON.stringify(template)).then(
-      () => {
-        // Bumping the timestamp will guarantee that listeners fetch
-        // the latest versions.
-        const { doc, setDoc } = database()
-        return setDoc(doc(`templates/${userId}/userTemplates/${template.id}`), {
-          id: template.id,
-          path: filePath,
-          timeStamp: new Date(),
-        })
-      }
-    )
+    const storageURL = toTemplatePath(userId, template.id)
+    return saveFileToStorage(userId, storageURL, JSON.stringify(template)).then(() => {
+      // Bumping the timestamp will guarantee that listeners fetch
+      // the latest versions.
+      const { doc, setDoc } = database()
+      return setDoc(doc(`templates/${userId}/userTemplates/${template.id}`), {
+        id: template.id,
+        path: storageURL,
+        timeStamp: new Date(),
+      })
+    })
   }
 
   const allTemplateUrlsForUser = (documents) => {
