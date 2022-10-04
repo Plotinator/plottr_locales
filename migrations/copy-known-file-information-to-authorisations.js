@@ -1,4 +1,3 @@
-const fs = require('fs')
 const admin = require('firebase-admin')
 const readline = require('node:readline')
 const { stdin, stdout } = require('node:process')
@@ -63,7 +62,7 @@ const allFiles = (userId) => {
               return document.data()
             }
             return {
-              exists: false
+              exists: false,
             }
           })
       })
