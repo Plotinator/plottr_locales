@@ -905,11 +905,22 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
   const editCustomTemplate = saveCustomTemplate
 
   const deleteCustomTemplate = (userId, templateId) => {
-    const { deleteObject, ref } = storage()
-    return deleteObject(ref(`userTemplates/${userId}/${templateId}`)).then((result) => {
-      const { doc, deleteDoc } = database()
-      return deleteDoc(doc(`templates/${userId}/userTemplates/${templateId}`))
-    })
+    const storageURL = `userTemplates/${userId}/${templateId}`
+    return axios
+      .post(`${BASE_API_URL}/api/delete-custom-template?url=${storageURL}`)
+      .then((response) => {
+        return response.data.publicURL
+      })
+      .catch((error) => {
+        const status = error && error.response && error.response.status
+        log.error('Error getting template public url', status, error && error.response, error)
+        if (status === 401) return mintCookieToken(currentUser())
+        return Promise.reject(error)
+      })
+      .then((result) => {
+        const { doc, deleteDoc } = database()
+        return deleteDoc(doc(`templates/${userId}/userTemplates/${templateId}`))
+      })
   }
 
   const escapeImageName = (imageName) => {
