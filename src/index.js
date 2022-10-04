@@ -22,6 +22,7 @@ import {
   setDoc,
   runTransaction,
   addDoc,
+  deleteDoc,
 } from 'firebase/firestore'
 import {
   getStorage,
@@ -107,6 +108,7 @@ const database = () => {
       return runTransaction(_database, transaction)
     },
     addDoc,
+    deleteDoc,
   }
 }
 
