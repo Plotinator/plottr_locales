@@ -3,7 +3,7 @@ import axios from 'axios'
 import { DateTime } from 'luxon'
 import { isEqual } from 'lodash'
 
-import { helpers, actions, selectors, ARRAY_KEYS, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
+import { removeSystemKeys, actions, selectors, ARRAY_KEYS, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
 
 const doNothingWithPartialResult = () => {}
 
@@ -718,11 +718,12 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
 
   const TEN_SECONDS_IN_MILISECONDS = 10000
 
-  const saveBackup = (userId, file) => {
+  const saveBackup = (userId, fullFile) => {
     const startOfToday = DateTime.now().startOf('day').toJSDate()
     const lastModified = new Date()
-    const fileId = selectors.fileIdSelector(file)
-    const fileName = selectors.fileNameSelector(file)
+    const fileId = selectors.fileIdSelector(fullFile)
+    const fileName = selectors.fileNameSelector(fullFile)
+    const file = removeSystemKeys(fullFile)
 
     return startOfSessionBackup(userId, file, startOfToday, fileId)
       .then((startOfSession) => {
@@ -953,8 +954,17 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
   }
 
   const backupPublicURL = (storageProtocolURL) => {
-    const { ref, getDownloadURL } = storage()
-    return getDownloadURL(ref(helpers.file.withoutProtocol(storageProtocolURL)))
+    return axios
+      .get(`${BASE_API_URL}/api/backup-public-url?url=${storageProtocolURL}`)
+      .then((response) => {
+        return response.data.publicURL
+      })
+      .catch((error) => {
+        const status = error && error.response && error.response.status
+        log.error('Error getting file public url', status, error && error.response, error)
+        if (status === 401) return mintCookieToken(currentUser())
+        return Promise.reject(error)
+      })
   }
 
   const filePublicURL = (storageProtocolURL, fileId, userId) => {
