@@ -3,7 +3,7 @@ import axios from 'axios'
 import { DateTime } from 'luxon'
 import { isEqual } from 'lodash'
 
-import { actions, selectors, ARRAY_KEYS, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
+import { helpers, actions, selectors, ARRAY_KEYS, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
 
 const doNothingWithPartialResult = () => {}
 
@@ -805,12 +805,6 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
     }.pltr`
   }
 
-  const withoutStorageProtocal = (path) => {
-    const split = path.split(/[a-zA-Z0-9]+:\/\//g)
-    if (split.length > 1) return split[1]
-    return split
-  }
-
   const saveFileToStorage = (userId, storageURL, fileText) => {
     return axios
       .post(`${BASE_API_URL}/api/save-file-to-storage`, {
@@ -851,11 +845,24 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
     })
   }
 
+  const templatePublicURL = (storageURL) => {
+    return axios
+      .get(`${BASE_API_URL}/api/template-public-url?url=${storageURL}`)
+      .then((response) => {
+        return response.data.publicURL
+      })
+      .catch((error) => {
+        const status = error && error.response && error.response.status
+        log.error('Error getting template public url', status, error && error.response, error)
+        if (status === 401) return mintCookieToken(currentUser())
+        return Promise.reject(error)
+      })
+  }
+
   const allTemplateUrlsForUser = (documents) => {
-    const { ref, getDownloadURL } = storage()
     return sequence(
       documents.map(({ path }) => {
-        return () => getDownloadURL(ref(withoutStorageProtocal(path)))
+        return () => templatePublicURL(path)
       })
     )
   }
@@ -936,14 +943,10 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
 
   const backupPublicURL = (storageProtocolURL) => {
     const { ref, getDownloadURL } = storage()
-    return getDownloadURL(ref(withoutStorageProtocal(storageProtocolURL)))
+    return getDownloadURL(ref(helpers.file.withoutProtocol(storageProtocolURL)))
   }
 
-  const imagePublicURL = (storageProtocolURL, fileId, userId) => {
-    if (development) {
-      const { ref, getDownloadURL } = storage()
-      return getDownloadURL(ref(withoutStorageProtocal(storageProtocolURL)))
-    }
+  const filePublicURL = (storageProtocolURL, fileId, userId) => {
     return axios
       .get(
         `${BASE_API_URL}/api/file-public-url?url=${storageProtocolURL}&fileId=${fileId}&userId=${userId}`
@@ -953,10 +956,14 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
       })
       .catch((error) => {
         const status = error && error.response && error.response.status
-        log.error('Error getting image public url', status, error && error.response, error)
+        log.error('Error getting file public url', status, error && error.response, error)
         if (status === 401) return mintCookieToken(currentUser())
         return Promise.reject(error)
       })
+  }
+
+  const imagePublicURL = (storageProtocolURL, fileId, userId) => {
+    return filePublicURL(storageProtocolURL, fileId, userId)
   }
 
   const isStorageURL = (string) => {
