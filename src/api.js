@@ -815,7 +815,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
     const fileId = selectors.fileIdSelector(file)
     const filePath = toBackupPath(userId, fileId, date, startOfSession)
     return axios
-      .post(`${BASE_API_URL}/api/backup-file-to-storage`, {
+      .post(`${BASE_API_URL}/api/save-file-to-storage`, {
         userId,
         fileText: JSON.stringify(file),
         storageURL: filePath,
