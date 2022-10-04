@@ -127,13 +127,18 @@ export const timelineBundleSelector = createSelector(
 
 const uiSelector = (state) => state.ui
 
+const showBookTabsSelector = createSelector(allBookIdsSelector, (bookIds) => {
+  return bookIds.length > 1
+})
+
 export const attributeTabsSelector = createSelector(uiSelector, ({ attributeTabs }) => {
   return attributeTabs || {}
 })
-export const characterAttributeTabSelector = createSelector(
+export const selectedCharacterAttributeTabSelector = createSelector(
   attributeTabsSelector,
-  ({ characters }) => {
-    return characters || 'all'
+  showBookTabsSelector,
+  ({ characters }, showTabs) => {
+    return showTabs ? characters || 'all' : 'all'
   }
 )
 export const characterTabSelector = createSelector(uiSelector, ({ characterTab }) => {
