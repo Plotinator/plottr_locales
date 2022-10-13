@@ -28,7 +28,7 @@ const attributesReducer =
           ...state,
           characters: [
             ...characterAttributeState,
-            { ...action.attribute, id: action.nextAttributeId, bookId: 'all' },
+            { ...action.attribute, id: action.nextAttributeId },
           ],
         }
       }
@@ -68,11 +68,17 @@ const attributesReducer =
       }
 
       case REORDER_CHARACTER_ATTRIBUTE_METADATA: {
-        const { toIndex, attribute } = action
+        const { toIndex, attributeId } = action
 
         const characterAttributeState = state.characters || EMPTY_ATTRIBUTE_STATE
-        const copy = characterAttributeState.slice().filter(({ id }) => id !== attribute.id)
-        copy.splice(toIndex, 0, attribute)
+        const existingAttribute = characterAttributeState.find((existingAttribute) => {
+          return existingAttribute.id === attributeId
+        })
+        if (!existingAttribute) {
+          return state
+        }
+        const copy = characterAttributeState.slice().filter(({ id }) => id !== attributeId)
+        copy.splice(toIndex, 0, existingAttribute)
 
         return {
           ...state,
@@ -96,7 +102,6 @@ const attributesReducer =
               name: 'tags',
               type: 'base-attribute',
               id: action.attributeId,
-              bookId: action.currentBookId,
             },
           ],
         }
@@ -118,7 +123,6 @@ const attributesReducer =
               name: 'shortDescription',
               type: 'base-attribute',
               id: action.attributeId,
-              bookId: action.currentBookId,
             },
           ],
         }
@@ -140,7 +144,6 @@ const attributesReducer =
               name: 'description',
               type: 'base-attribute',
               id: action.attributeId,
-              bookId: action.currentBookId,
             },
           ],
         }
@@ -162,7 +165,6 @@ const attributesReducer =
               name: 'category',
               type: 'base-attribute',
               id: action.attributeId,
-              bookId: action.currentBookId,
             },
           ],
         }
