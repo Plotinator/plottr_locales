@@ -22,6 +22,7 @@ import {
   EDIT_CHARACTER_SHORT_DESCRIPTION,
   EDIT_CHARACTER_DESCRIPTION,
   EDIT_CHARACTER_CATEGORY,
+  DELETE_CHARACTER_CATEGORY,
 } from '../constants/ActionTypes'
 import { selectedCharacterAttributeTabSelector, isSeriesSelector } from '../selectors/ui'
 import { reduce, beatsByPosition, nextId as nextBeatId } from '../helpers/beats'
@@ -43,15 +44,17 @@ import {
   characterAttributesForBookSelector,
   characterAttributsForBookByIdSelector,
 } from '../selectors/attributes'
+import { DELETE_TAG } from '../../v1/constants/ActionTypes'
 
 const addCharacterAttributeDataForModifyingBaseAttribute = (baseAttributeName, state, action) => {
   const currentBookId = selectedCharacterAttributeTabSelector(state)
   const characterAttributes = characterAttributesForBookSelector(state)
   const nextAttributeId = nextId(characterAttributes)
   const availableAttributes = characterAttributsForBookByIdSelector(state)
-  const existingBookAttribute = Object.values(availableAttributes).find((attribute) => {
+  const isThisTypeOfBaseAttribute = (attribute) => {
     return attribute.type === 'base-attribute' && attribute.name === baseAttributeName
-  })
+  }
+  const existingBookAttribute = Object.values(availableAttributes).find(isThisTypeOfBaseAttribute)
   const attributeId = existingBookAttribute?.id || nextAttributeId
   return {
     ...action,
@@ -95,7 +98,8 @@ const root = (dataRepairers) => (state, action) => {
   switch (action.type) {
     // We might need to mint the books attribute when attaching a book
     // to a character.
-    case EDIT_CHARACTER_CATEGORY: {
+    case EDIT_CHARACTER_CATEGORY:
+    case DELETE_CHARACTER_CATEGORY: {
       const newAction = addCharacterAttributeDataForModifyingBaseAttribute(
         'category',
         state,
@@ -119,7 +123,8 @@ const root = (dataRepairers) => (state, action) => {
       )
       return mainReducer(state, newAction)
     }
-    case ATTACH_TAG_TO_CHARACTER: {
+    case ATTACH_TAG_TO_CHARACTER:
+    case DELETE_TAG: {
       const newAction = addCharacterAttributeDataForModifyingBaseAttribute('tags', state, action)
       return mainReducer(state, newAction)
     }
@@ -258,7 +263,10 @@ const root = (dataRepairers) => (state, action) => {
 
     case DELETE_BOOK: {
       const linesToDelete = state.lines.filter((l) => l.bookId == action.id).map((l) => l.id)
-      const newAction = Object.assign({}, action, { linesToDelete: linesToDelete })
+      const newAction = {
+        ...action,
+        linesToDelete: linesToDelete,
+      }
       if (state.ui.currentTimeline == action.id) {
         const nextBookId = state.books.allIds.find((id) => id != action.id)
         let newState = { ...state }
