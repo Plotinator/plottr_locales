@@ -13,6 +13,7 @@ import {
   attributesSelector,
   characterAttributesForCurrentBookSelector,
   characterAttributsForBookByIdSelector,
+  overriddenBookIdSelector,
 } from './attributes'
 import { allBookIdsSelector } from './books'
 import { showBookTabs } from './attributeTabs'
@@ -44,13 +45,12 @@ export const singleCharacterSelector = createSelector(
 )
 
 const displayedSingleCharacter = (character, bookId, currentBookAttributeDescirptorsById) => {
-  const currentBookAttributes = (character.attributes || []).filter((attribute) => {
-    return currentBookAttributeDescirptorsById[attribute.id]?.bookId === bookId
-  })
+  const currentBookAttributes = character.attributes || []
 
   const tags =
     currentBookAttributes.find((attribute) => {
       return (
+        attribute.bookId === bookId &&
         currentBookAttributeDescirptorsById[attribute.id].type === 'base-attribute' &&
         currentBookAttributeDescirptorsById[attribute.id].name === 'tags'
       )
@@ -61,6 +61,7 @@ const displayedSingleCharacter = (character, bookId, currentBookAttributeDescirp
   const description =
     currentBookAttributes.find((attribute) => {
       return (
+        attribute.bookId === bookId &&
         currentBookAttributeDescirptorsById[attribute.id].type === 'base-attribute' &&
         currentBookAttributeDescirptorsById[attribute.id].name === 'shortDescription'
       )
@@ -71,6 +72,7 @@ const displayedSingleCharacter = (character, bookId, currentBookAttributeDescirp
   const notes =
     currentBookAttributes.find((attribute) => {
       return (
+        attribute.bookId === bookId &&
         currentBookAttributeDescirptorsById[attribute.id].type === 'base-attribute' &&
         currentBookAttributeDescirptorsById[attribute.id].name === 'description'
       )
@@ -81,6 +83,7 @@ const displayedSingleCharacter = (character, bookId, currentBookAttributeDescirp
   const categoryId =
     currentBookAttributes.find((attribute) => {
       return (
+        attribute.bookId === bookId &&
         currentBookAttributeDescirptorsById[attribute.id].type === 'base-attribute' &&
         currentBookAttributeDescirptorsById[attribute.id].name === 'category'
       )
@@ -110,14 +113,35 @@ export const charactersByCategorySelector = createSelector(allCharactersSelector
   groupBy(characters, 'categoryId')
 )
 
-const allDisplayedCharactersSelector = createSelector(
+export const allDisplayedCharactersSelector = createSelector(
   allCharactersSelector,
   characterAttributeTabSelector,
   characterAttributsForBookByIdSelector,
-  (characters, bookId, currentBookAttributeDescirptorsById) => {
+  overriddenBookIdSelector,
+  (characters, bookId, currentBookAttributeDescirptorsById, overridenBookId) => {
     return characters.map((character) =>
-      displayedSingleCharacter(character, bookId, currentBookAttributeDescirptorsById)
+      displayedSingleCharacter(
+        character,
+        overridenBookId || bookId,
+        currentBookAttributeDescirptorsById
+      )
     )
+  }
+)
+
+export const allDisplayedCharactersForCurrentBookSelector = createSelector(
+  allDisplayedCharactersSelector,
+  characterAttributeTabSelector,
+  overriddenBookIdSelector,
+  (characters, selectedBookId, overriddenBookId) => {
+    const bookId = overriddenBookId || selectedBookId || 'series'
+    if (bookId === 'all' || bookId === 'series') {
+      return characters
+    }
+
+    return characters.filter((character) => {
+      return character.bookIds.indexOf(bookId) > -1
+    })
   }
 )
 
@@ -186,12 +210,11 @@ export const visibleSortedCharactersByCategorySelector = createSelector(
             // It could be a new attribute
             const characterAttributes = ch.attributes || []
             const attributeFound = characterAttributes.find((attribute) => {
-              const attributeBookId = allAttributes.find((bookAttribute) => {
-                return attribute.id === bookAttribute.id
-              })?.bookId
-              return attribute?.id?.toString() === attr && attributeBookId === bookId
+              return attribute?.id?.toString() === attr && attribute.bookId === bookId
             })
-            const definesAttribute = attributeFound?.value === val
+            const definesAttribute =
+              attributeFound?.value === val ||
+              (attributeFound && attributeFound.value === undefined && val === '')
             if (definesAttribute) {
               return true
             }
@@ -296,33 +319,24 @@ export const charactersSortedInBookSelector = createSelector(
 
 const characterCustomAttributes = (state) => state.customAttributes.characters
 
-const combinedAttributesForCharacter = (character, attributes, customAttributes, bookId) => {
+const combinedAttributesForCharacter = (
+  character,
+  attributes,
+  customAttributes,
+  selectedBookId,
+  overridenBookId
+) => {
   const characterBookAttributes = character.attributes || []
   const allAttributes = attributes.characters || []
+  const bookId = overridenBookId || selectedBookId
   const newAttributes = allAttributes
     .filter((bookAttribute) => {
-      return (
-        (bookAttribute.bookId === bookId || bookAttribute.bookId === 'all') &&
-        bookAttribute.type !== 'base-attribute'
-      )
+      return bookAttribute.type !== 'base-attribute'
     })
     .map((bookAttribute) => {
-      const valueForASeriesAttribute = characterBookAttributes.find((attributeValue) => {
+      const value = characterBookAttributes.find((attributeValue) => {
         return attributeValue.id === bookAttribute.id && attributeValue.bookId === bookId
       })
-      if (valueForASeriesAttribute) {
-        return {
-          value: '',
-          ...bookAttribute,
-          ...valueForASeriesAttribute,
-        }
-      }
-      const value =
-        bookAttribute.bookId === bookId
-          ? characterBookAttributes.find((attributeValue) => {
-              return attributeValue.id === bookAttribute.id
-            })
-          : {}
       return {
         value: '',
         ...bookAttribute,
@@ -346,6 +360,7 @@ export const characterAttributesSelector = createSelector(
   attributesSelector,
   characterCustomAttributes,
   characterAttributeTabSelector,
+  overriddenBookIdSelector,
   combinedAttributesForCharacter
 )
 
