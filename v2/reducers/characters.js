@@ -136,6 +136,7 @@ const characters =
             name: action.name,
             description: action.description,
             notes: action.notes,
+            ...(action.currentBookId !== 'all' ? { bookIds: [action.currentBookId] } : {}),
           },
         ]
 
@@ -177,7 +178,7 @@ const characters =
           if (character.id === action.id) {
             return {
               ...character,
-              image: action.image,
+              imageId: action.imageId,
             }
           }
 
