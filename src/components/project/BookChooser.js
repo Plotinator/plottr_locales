@@ -13,13 +13,13 @@ const {
   card: { truncateTitle },
 } = helpers
 
-const DISABLED_VIEWS = ['tags']
+const DISABLED_VIEWS = ['tags', 'notes', 'characters', 'places']
 
 const BookChooserConnector = (connector) => {
   class BookChooser extends Component {
     handleChange(id) {
       this.props.actions.changeCurrentTimeline(id)
-      if (this.props.currentView == 'story') {
+      if (this.props.currentView == 'project') {
         this.props.actions.changeCurrentView('timeline')
       }
     }
