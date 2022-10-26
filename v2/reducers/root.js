@@ -17,8 +17,15 @@ import {
   EDIT_CHARACTER_ATTRIBUTE_METADATA,
   DELETE_CHARACTER_ATTRIBUTE,
   REORDER_CHARACTER_ATTRIBUTE_METADATA,
+  ATTACH_TAG_TO_CHARACTER,
+  REMOVE_TAG_FROM_CHARACTER,
+  EDIT_CHARACTER_SHORT_DESCRIPTION,
+  EDIT_CHARACTER_DESCRIPTION,
+  EDIT_CHARACTER_CATEGORY,
+  DELETE_CHARACTER_CATEGORY,
+  ADD_CHARACTER,
 } from '../constants/ActionTypes'
-import { characterAttributeTabSelector, isSeriesSelector } from '../selectors/ui'
+import { selectedCharacterAttributeTabSelector, isSeriesSelector } from '../selectors/ui'
 import { reduce, beatsByPosition, nextId as nextBeatId } from '../helpers/beats'
 import { nextId, objectId } from '../store/newIds'
 import * as tree from './tree'
@@ -34,7 +41,30 @@ import {
 } from '../selectors/beats'
 import { addBeat } from '../actions/beats'
 import { setTimelineView } from '../actions/ui'
-import { characterAttributesForBookSelector } from '../selectors/attributes'
+import {
+  characterAttributesForBookSelector,
+  characterAttributsForBookByIdSelector,
+} from '../selectors/attributes'
+import { ATTACH_CHARACTER_TO_CARD, DELETE_TAG } from '../../v1/constants/ActionTypes'
+import { currentTimelineSelector } from '../selectors/books'
+import { allCharactersSelector, singleCharacterSelector } from '../selectors/characters'
+
+const addCharacterAttributeDataForModifyingBaseAttribute = (baseAttributeName, state, action) => {
+  const currentBookId = selectedCharacterAttributeTabSelector(state)
+  const characterAttributes = characterAttributesForBookSelector(state)
+  const nextAttributeId = nextId(characterAttributes)
+  const availableAttributes = characterAttributsForBookByIdSelector(state)
+  const isThisTypeOfBaseAttribute = (attribute) => {
+    return attribute.type === 'base-attribute' && attribute.name === baseAttributeName
+  }
+  const existingBookAttribute = Object.values(availableAttributes).find(isThisTypeOfBaseAttribute)
+  const attributeId = existingBookAttribute?.id || nextAttributeId
+  return {
+    ...action,
+    currentBookId,
+    attributeId,
+  }
+}
 
 /**
  * `dataRepairers` is an object which contains various repairs to be
@@ -54,13 +84,60 @@ const root = (dataRepairers) => (state, action) => {
   const isSeries = action.type.includes('@@') ? false : isSeriesSelector(state)
   const mainReducer = unrepairedMainReducer(dataRepairers)
   switch (action.type) {
+    case ATTACH_CHARACTER_TO_CARD: {
+      const currentTimeline = currentTimelineSelector(state)
+      return mainReducer(state, {
+        ...action,
+        currentTimeline,
+      })
+    }
+    case ADD_CHARACTER: {
+      const currentBookId = selectedCharacterAttributeTabSelector(state)
+      return mainReducer(state, {
+        ...action,
+        currentBookId,
+      })
+    }
+    // We might need to mint the books attribute when attaching a book
+    // to a character.
+    case EDIT_CHARACTER_CATEGORY:
+    case DELETE_CHARACTER_CATEGORY: {
+      const newAction = addCharacterAttributeDataForModifyingBaseAttribute(
+        'category',
+        state,
+        action
+      )
+      return mainReducer(state, newAction)
+    }
+    case EDIT_CHARACTER_DESCRIPTION: {
+      const newAction = addCharacterAttributeDataForModifyingBaseAttribute(
+        'description',
+        state,
+        action
+      )
+      return mainReducer(state, newAction)
+    }
+    case EDIT_CHARACTER_SHORT_DESCRIPTION: {
+      const newAction = addCharacterAttributeDataForModifyingBaseAttribute(
+        'shortDescription',
+        state,
+        action
+      )
+      return mainReducer(state, newAction)
+    }
+    case ATTACH_TAG_TO_CHARACTER:
+    case REMOVE_TAG_FROM_CHARACTER:
+    case DELETE_TAG: {
+      const newAction = addCharacterAttributeDataForModifyingBaseAttribute('tags', state, action)
+      return mainReducer(state, newAction)
+    }
     // Actions for new attributes need the current book.
     case REORDER_CHARACTER_ATTRIBUTE_METADATA:
     case DELETE_CHARACTER_ATTRIBUTE:
     case EDIT_CHARACTER_ATTRIBUTE_METADATA:
     case EDIT_CHARACTER_ATTRIBUTE_VALUE:
     case CREATE_CHARACTER_ATTRIBUTE: {
-      const bookId = characterAttributeTabSelector(state)
+      const bookId = selectedCharacterAttributeTabSelector(state)
       const characterAttributes = characterAttributesForBookSelector(state)
       const nextAttributeId = nextId(characterAttributes)
       const newAction = {
@@ -183,7 +260,10 @@ const root = (dataRepairers) => (state, action) => {
 
     case DELETE_BOOK: {
       const linesToDelete = state.lines.filter((l) => l.bookId == action.id).map((l) => l.id)
-      const newAction = Object.assign({}, action, { linesToDelete: linesToDelete })
+      const newAction = {
+        ...action,
+        linesToDelete: linesToDelete,
+      }
       if (state.ui.currentTimeline == action.id) {
         const nextBookId = state.books.allIds.find((id) => id != action.id)
         let newState = { ...state }
