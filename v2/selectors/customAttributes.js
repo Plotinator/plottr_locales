@@ -65,6 +65,10 @@ function hasNoValue(item, id) {
 
 const noEntityHasAttributeBound = (entities, attrs) => {
   return attrs.reduce((acc, attr) => {
+    if (attr.type === 'base-attribute') {
+      return acc
+    }
+
     if (attr.type == 'text') {
       acc.push(attr.name)
       return acc
@@ -140,4 +144,18 @@ export const placeCustomAttributesRestrictedValues = createSelector(
 export const noteCustomAttributesRestrictedValues = createSelector(
   noteCustomAttributesSelector,
   (attrs) => placeKeys.concat(attrs.map((a) => a.name))
+)
+
+const attributeNameSelector = (_state, attributeName) => {
+  return attributeName
+}
+
+export const legacyCustomCharacterAttributeByName = createSelector(
+  characterCustomAttributesSelector,
+  attributeNameSelector,
+  (customAttributes, name) => {
+    return customAttributes.find((attribute) => {
+      return attribute.name === name
+    })
+  }
 )

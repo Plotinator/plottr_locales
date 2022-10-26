@@ -1,9 +1,15 @@
 import { FILE_LOADED } from '../../v1/constants/ActionTypes'
 import {
+  ATTACH_BOOK_TO_CHARACTER,
+  ATTACH_TAG_TO_CHARACTER,
   CREATE_CHARACTER_ATTRIBUTE,
   DELETE_CHARACTER_ATTRIBUTE,
   EDIT_CHARACTER_ATTRIBUTE_METADATA,
   REORDER_CHARACTER_ATTRIBUTE_METADATA,
+  EDIT_CHARACTER_SHORT_DESCRIPTION,
+  EDIT_CHARACTER_DESCRIPTION,
+  EDIT_CHARACTER_CATEGORY,
+  REMOVE_TAG_FROM_CHARACTER,
 } from '../constants/ActionTypes'
 
 const EMPTY_ATTRIBUTE_STATE = []
@@ -23,7 +29,7 @@ const attributesReducer =
           ...state,
           characters: [
             ...characterAttributeState,
-            { ...action.attribute, id: action.nextAttributeId, bookId: action.bookId },
+            { ...action.attribute, id: action.nextAttributeId },
           ],
         }
       }
@@ -63,11 +69,17 @@ const attributesReducer =
       }
 
       case REORDER_CHARACTER_ATTRIBUTE_METADATA: {
-        const { toIndex, attribute } = action
+        const { toIndex, attributeId } = action
 
         const characterAttributeState = state.characters || EMPTY_ATTRIBUTE_STATE
-        const copy = characterAttributeState.slice().filter(({ id }) => id !== attribute.id)
-        copy.splice(toIndex, 0, attribute)
+        const existingAttribute = characterAttributeState.find((existingAttribute) => {
+          return existingAttribute.id === attributeId
+        })
+        if (!existingAttribute) {
+          return state
+        }
+        const copy = characterAttributeState.slice().filter(({ id }) => id !== attributeId)
+        copy.splice(toIndex, 0, existingAttribute)
 
         return {
           ...state,
@@ -75,8 +87,93 @@ const attributesReducer =
         }
       }
 
+      case REMOVE_TAG_FROM_CHARACTER:
+      case ATTACH_TAG_TO_CHARACTER: {
+        const attributeExists = state.characters.some((attribute) => {
+          return attribute.id === action.attributeId
+        })
+        if (attributeExists) {
+          return state
+        }
+
+        return {
+          ...state,
+          characters: [
+            ...state.characters,
+            {
+              name: 'tags',
+              type: 'base-attribute',
+              id: action.attributeId,
+            },
+          ],
+        }
+      }
+
+      case EDIT_CHARACTER_SHORT_DESCRIPTION: {
+        const attributeExists = state.characters.some((attribute) => {
+          return attribute.id === action.attributeId
+        })
+        if (attributeExists) {
+          return state
+        }
+
+        return {
+          ...state,
+          characters: [
+            ...state.characters,
+            {
+              name: 'shortDescription',
+              type: 'base-attribute',
+              id: action.attributeId,
+            },
+          ],
+        }
+      }
+
+      case EDIT_CHARACTER_DESCRIPTION: {
+        const attributeExists = state.characters.some((attribute) => {
+          return attribute.id === action.attributeId
+        })
+        if (attributeExists) {
+          return state
+        }
+
+        return {
+          ...state,
+          characters: [
+            ...state.characters,
+            {
+              name: 'description',
+              type: 'base-attribute',
+              id: action.attributeId,
+            },
+          ],
+        }
+      }
+
+      case EDIT_CHARACTER_CATEGORY: {
+        const attributeExists = state.characters.some((attribute) => {
+          return attribute.id === action.attributeId
+        })
+        if (attributeExists) {
+          return state
+        }
+
+        return {
+          ...state,
+          characters: [
+            ...state.characters,
+            {
+              name: 'category',
+              type: 'base-attribute',
+              id: action.attributeId,
+            },
+          ],
+        }
+      }
+
       case FILE_LOADED: {
-        return action.data.attributes || {}
+        return action.data.attributes || INITIAL_STATE
       }
 
       default: {

@@ -1,12 +1,12 @@
+import { omit } from 'lodash'
+
 import {
-  ADD_CHARACTER_ATTRIBUTE,
   ADD_PLACES_ATTRIBUTE,
   CHANGE_CURRENT_TIMELINE,
   CHANGE_CURRENT_VIEW,
   CHANGE_ORIENTATION,
   CLOSE_ATTRIBUTES_DIALOG,
   COLLAPSE_TIMELINE,
-  EDIT_CHARACTER_ATTRIBUTE,
   EDIT_PLACES_ATTRIBUTE,
   EXPAND_TIMELINE,
   FILE_LOADED,
@@ -16,7 +16,6 @@ import {
   NEW_FILE,
   OPEN_ATTRIBUTES_DIALOG,
   RECORD_SCROLL_POSITION,
-  REMOVE_CHARACTER_ATTRIBUTE,
   REMOVE_PLACES_ATTRIBUTE,
   SET_CHARACTER_FILTER,
   SET_CHARACTER_SORT,
@@ -44,6 +43,8 @@ import {
   DELETE_BEAT,
   SELECT_CHARACTER_ATTRIBUTE_BOOK_TAB,
   SELECT_CHARACTER,
+  DELETE_CHARACTER_ATTRIBUTE,
+  DELETE_BOOK,
 } from '../constants/ActionTypes'
 import { ui as defaultUI } from '../store/initialState'
 import { newFileUI } from '../store/newFileState'
@@ -103,32 +104,17 @@ const ui =
       case SET_CHARACTER_FILTER:
         return Object.assign({}, state, { characterFilter: action.filter })
 
-      case ADD_CHARACTER_ATTRIBUTE:
-        filter = { ...state.characterFilter }
-        if (action.attribute.type == 'paragraph') return state
-        filter[action.attribute.name] = []
-        return Object.assign({}, state, { characterFilter: filter })
       case ADD_PLACES_ATTRIBUTE:
         filter = { ...state.placeFilter }
         if (action.attribute.type == 'paragraph') return state
         filter[action.attribute.name] = []
         return Object.assign({}, state, { placeFilter: filter })
 
-      case REMOVE_CHARACTER_ATTRIBUTE:
-        filter = { ...state.characterFilter }
-        delete filter[action.attribute]
-        return Object.assign({}, state, { characterFilter: filter })
       case REMOVE_PLACES_ATTRIBUTE:
         filter = { ...state.placeFilter }
         delete filter[action.attribute]
         return Object.assign({}, state, { placeFilter: filter })
 
-      case EDIT_CHARACTER_ATTRIBUTE:
-        filter = { ...state.characterFilter }
-        delete filter[action.oldAttribute.name]
-        if (action.newAttribute.type == 'paragraph') return state
-        filter[action.newAttribute.name] = []
-        return Object.assign({}, state, { characterFilter: filter })
       case EDIT_PLACES_ATTRIBUTE:
         filter = { ...state.placeFilter }
         delete filter[action.oldAttribute.name]
@@ -342,10 +328,37 @@ const ui =
       case SELECT_CHARACTER_ATTRIBUTE_BOOK_TAB: {
         return {
           ...state,
+          characterFilter: {},
           attributeTabs: {
             ...state.attributeTabs,
             characters: action.bookId,
           },
+        }
+      }
+
+      case DELETE_BOOK: {
+        const selectedBook = state.attributeTabs?.characters
+
+        return {
+          ...state,
+          characterFilter: selectedBook === action.id ? {} : state.characterFilter,
+          attributeTabs: {
+            ...state.attributeTabs,
+            characters: selectedBook === action.id ? 'all' : selectedBook,
+          },
+        }
+      }
+
+      case DELETE_CHARACTER_ATTRIBUTE: {
+        if (!state.characterFilter || !state.characterFilter[action.id.toString()]) {
+          return state
+        }
+
+        const currentFilter = state.characterFilter
+
+        return {
+          ...state,
+          characterFilter: omit(currentFilter, action.id.toString()),
         }
       }
 
