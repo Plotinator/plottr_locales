@@ -510,6 +510,54 @@ const characters =
         })
       }
 
+      case EDIT_CHARACTER_ATTRIBUTE_METADATA: {
+        const nextState = state.map((character) => {
+          if (!Array.isArray(character.attributes)) {
+            return character
+          }
+
+          const attributes = character.attributes
+          return {
+            ...character,
+            attributes: attributes.map((attribute) => {
+              if (attribute.id === action.id) {
+                const newValue =
+                  typeof attribute.value === 'undefined'
+                    ? attribute.value
+                    : action.attributeType === 'text' && typeof attribute.value !== 'string'
+                    ? firstParagraphText(attribute.value)
+                    : attribute.value
+                return {
+                  ...attribute,
+                  value: newValue,
+                }
+              }
+
+              return attribute
+            }),
+          }
+        })
+
+        if (!action.id) {
+          const { oldName, name } = action
+          return nextState.map((character) => {
+            if (character[oldName]) {
+              return omit(
+                {
+                  ...character,
+                  [name]: character[oldName],
+                },
+                oldName
+              )
+            }
+
+            return character
+          })
+        }
+
+        return nextState
+      }
+
       case EDIT_CHARACTER_CATEGORY:
       case EDIT_CHARACTER_DESCRIPTION:
       case EDIT_CHARACTER_SHORT_DESCRIPTION:
@@ -557,35 +605,6 @@ const characters =
           }
 
           return character
-        })
-      }
-
-      case EDIT_CHARACTER_ATTRIBUTE_METADATA: {
-        return state.map((character) => {
-          if (!Array.isArray(character.attributes)) {
-            return character
-          }
-
-          const attributes = character.attributes
-          return {
-            ...character,
-            attributes: attributes.map((attribute) => {
-              if (attribute.id === action.id) {
-                const newValue =
-                  typeof attribute.value === 'undefined'
-                    ? attribute.value
-                    : action.attributeType === 'text' && typeof attribute.value !== 'string'
-                    ? firstParagraphText(attribute.value)
-                    : attribute.value
-                return {
-                  ...attribute,
-                  value: newValue,
-                }
-              }
-
-              return attribute
-            }),
-          }
         })
       }
 
