@@ -2,6 +2,7 @@ import { wireUpAPI } from 'plottr_firebase'
 
 import {
   EDIT_FILE_NAME,
+  UPDATE_AUTH_FILE_NAME,
   LISTEN,
   WITH_FILE_ID,
   TO_FIRESTORE_ARRAY,
@@ -54,6 +55,7 @@ import { logger } from './worker-logger'
 const wiredUp = wireUpAPI(logger)
 
 const editFileName = wiredUp.editFileName
+const updateAuthFileName = wiredUp.updateAuthFileName
 const listenToFile = wiredUp.listenToFile
 const listenToBeats = wiredUp.listenToBeats
 const listenToCards = wiredUp.listenToCards
@@ -69,6 +71,7 @@ const listenToPlaces = wiredUp.listenToPlaces
 const listenToTags = wiredUp.listenToTags
 const listenToHierarchyLevels = wiredUp.listenToHierarchyLevels
 const listenToImages = wiredUp.listenToImages
+const listenToAttributes = wiredUp.listenToAttributes
 const overwriteAllKeys = wiredUp.overwriteAllKeys
 const initialFetch = wiredUp.initialFetch
 const deleteFile = wiredUp.deleteFile
@@ -202,8 +205,18 @@ self.onmessage = (event) => {
       return
     }
     case EDIT_FILE_NAME: {
-      const { userId, fileId, newName } = messagePayload
-      editFileName(userId, fileId, newName)
+      const { fileId, newName } = messagePayload
+      editFileName(fileId, newName)
+        .then(replyToPromise(type))
+        .catch((error) => {
+          logger.error(`Failed to rename file with id ${fileId} to ${newName}`, error.message)
+          replyToPromiseWithError(type, error.message)
+        })
+      return
+    }
+    case UPDATE_AUTH_FILE_NAME: {
+      const { fileId, newName } = messagePayload
+      updateAuthFileName(fileId, newName)
         .then(replyToPromise(type))
         .catch((error) => {
           logger.error(`Failed to rename file with id ${fileId} to ${newName}`, error.message)
@@ -250,7 +263,7 @@ self.onmessage = (event) => {
         clientId,
         replyWithReduxAction
       )
-      const unsubscribeToAttributes = listenToCustomAttributes(
+      const unsubscribeToCustomAttributes = listenToCustomAttributes(
         userId,
         fileId,
         clientId,
@@ -273,6 +286,12 @@ self.onmessage = (event) => {
         replyWithReduxAction
       )
       const unsubscribeToImages = listenToImages(userId, fileId, clientId, replyWithReduxAction)
+      const unsubscribeToAttributes = listenToAttributes(
+        userId,
+        fileId,
+        clientId,
+        replyWithReduxAction
+      )
       const unsubscribe = () => {
         unsubscribeToFile()
         unsubscribeToBeats()
@@ -281,7 +300,7 @@ self.onmessage = (event) => {
         unsubscribeToBooks()
         unsubscribeToCategories()
         unsubscribeToCharacters()
-        unsubscribeToAttributes()
+        unsubscribeToCustomAttributes()
         unsubscribeToFlags()
         unsubscribeToLines()
         unsubscribeToNotes()
@@ -289,6 +308,7 @@ self.onmessage = (event) => {
         unsubscribeToTags()
         unsubscribeToLevels()
         unsubscribeToImages()
+        unsubscribeToAttributes()
       }
       unsubscribeFunctions.set(messageId, unsubscribe)
       return

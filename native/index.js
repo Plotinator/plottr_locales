@@ -23,12 +23,12 @@ const auth = () => {
     },
     signInWithEmailAndPassword: (email, password) => {
       return legacyAPIAuth().signInWithEmailAndPassword(email, password)
-    }
+    },
   }
 }
 
 const translate = (rootClause) => {
-  const translateIter = (ref, clauses) => {
+  const translateIter = (ref, ...clauses) => {
     if (clauses.length === 0) {
       return ref
     }
@@ -39,15 +39,12 @@ const translate = (rootClause) => {
         return translateIter(ref, clause.clauses)
       }
       case 'where': {
-        return translateIter(
-          ref.where(...clause.clauses),
-          clauses.slice(1)
-        )
+        return translateIter(ref.where(...clause.clauses), clauses.slice(1))
       }
     }
     // Doesn't need to be translated.  (Most likely created by
     // `collection`.)
-    return translateIter(clause, clauses.slice(1))
+    return clause
   }
 
   return translateIter(null, [rootClause])
@@ -69,7 +66,7 @@ const database = () => {
       return legacyAPIDatabase().doc(path)
     },
     updateDoc: (ref, data) => {
-      return ref.update(data);
+      return ref.update(data)
     },
     where: (...clauses) => {
       return {
@@ -124,6 +121,7 @@ const storage = () => {
 
 export const wireUpAPI = (logger) => {
   // Pretend to be desktop because we never run emulators locally.
+  // eslint-disable-next-line
   const wiredUp = api(auth, database, storage, BASE_API_DOMAIN, __DEV__, logger, true)
 
   const listen = (withResponse, userId, fileId, clientId, fileVersion) => {
@@ -150,18 +148,13 @@ export const wireUpAPI = (logger) => {
       clientId,
       withResponse
     )
-    const unsubscribeToAttributes = wiredUp.listenToCustomAttributes(
+    const unsubscribeToCustomAttributes = wiredUp.listenToCustomAttributes(
       userId,
       fileId,
       clientId,
       withResponse
     )
-    const unsubscribeToFlags = wiredUp.listenToFeatureFlags(
-      userId,
-      fileId,
-      clientId,
-      withResponse
-    )
+    const unsubscribeToFlags = wiredUp.listenToFeatureFlags(userId, fileId, clientId, withResponse)
     const unsubscribeToLines = wiredUp.listenToLines(userId, fileId, clientId, withResponse)
     const unsubscribeToNotes = wiredUp.listenToNotes(userId, fileId, clientId, withResponse)
     const unsubscribeToPlaces = wiredUp.listenToPlaces(userId, fileId, clientId, withResponse)
@@ -172,7 +165,8 @@ export const wireUpAPI = (logger) => {
       clientId,
       withResponse
     )
-    const unsubscribeToImages = wiredUp.listenToImages(userId, fileId, clientId, withResponse)
+      const unsubscribeToImages = wiredUp.listenToImages(userId, fileId, clientId, withResponse)
+      const unsubscribeToAttributes = wiredUp.listenToAttributes(userId, fileId, clientId, withResponse)
     const unsubscribe = () => {
       unsubscribeToFile()
       unsubscribeToBeats()
@@ -181,7 +175,7 @@ export const wireUpAPI = (logger) => {
       unsubscribeToBooks()
       unsubscribeToCategories()
       unsubscribeToCharacters()
-      unsubscribeToAttributes()
+      unsubscribeToCustomAttributes()
       unsubscribeToFlags()
       unsubscribeToLines()
       unsubscribeToNotes()
@@ -193,9 +187,11 @@ export const wireUpAPI = (logger) => {
     return Promise.resolve(unsubscribe)
   }
 
-  const returningPromise = (f) => (...args) => {
-    return Promise.resolve(f(...args))
-  }
+  const returningPromise =
+    (f) =>
+    (...args) => {
+      return Promise.resolve(f(...args))
+    }
 
   // Contract for mobile: everything must return a promise except for:
   //  - `toFirestoreArray`,
@@ -203,6 +199,7 @@ export const wireUpAPI = (logger) => {
   //  - `isStorageURL`.
   return {
     editFileName: wiredUp.editFileName,
+    updateAuthFileName: wiredUp.updateAuthFileName,
     listen,
     toFirestoreArray: wiredUp.toFirestoreArray,
     overwriteAllKeys: wiredUp.overwriteAllKeys,
