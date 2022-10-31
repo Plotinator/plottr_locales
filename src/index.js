@@ -11,7 +11,6 @@ import {
 } from 'firebase/auth'
 import {
   initializeFirestore,
-  connectFirestoreEmulator,
   query,
   collection,
   where,
@@ -23,6 +22,7 @@ import {
   setDoc,
   runTransaction,
   addDoc,
+  deleteDoc,
 } from 'firebase/firestore'
 import {
   getStorage,
@@ -79,7 +79,6 @@ const database = () => {
           host: 'plottr.local:8081',
           ssl: true,
         })
-        connectFirestoreEmulator(_database, 'plottr.local', 8081)
       } catch (error) {
         console.error(
           'Error initialising dev emulator (you can usually safely ignore this):',
@@ -109,6 +108,7 @@ const database = () => {
       return runTransaction(_database, transaction)
     },
     addDoc,
+    deleteDoc,
   }
 }
 
@@ -154,7 +154,8 @@ const storage = () => {
       )
       _storage = getStorage(firebaseApp)
       connectStorageEmulator(_storage, 'localhost', 9200)
-      _storage._delegate.host = 'https://plottr.local:9200'
+      // This doesn't work on the new version :/
+      _storage._protocol = 'https'
     } else {
       _storage = getStorage(firebaseApp)
     }
@@ -194,23 +195,29 @@ export const startUI = (queryString) => {
 }
 
 const isElectron =
-  ((navigator && navigator.userAgent && navigator.userAgent.toLowerCase()) || '').indexOf(' electron/') > -1
+  ((navigator && navigator.userAgent && navigator.userAgent.toLowerCase()) || '').indexOf(
+    ' electron/'
+  ) > -1
 
 export const wireUpAPI = (logger) => {
+  const isDevelopment = (process.env.NEXT_PUBLIC_NODE_ENV || process.env.NODE_ENV) === 'development'
   const wiredUp = api(
     auth,
     database,
     storage,
     // For env vars to be read from Next config (on the web) we need to
     // prefix them with 'NEXT_PUBLIC'
-    process.env.NEXT_PUBLIC_API_BASE_DOMAIN || process.env.API_BASE_DOMAIN,
-    process.env.NEXT_PUBLIC_NODE_ENV === 'development',
+    process.env.NEXT_PUBLIC_API_BASE_DOMAIN ||
+      process.env.API_BASE_DOMAIN ||
+      (isDevelopment && 'plottr-web-alpha.vercel.app'),
+    isDevelopment,
     logger,
     isElectron
   )
 
   return {
     editFileName: wiredUp.editFileName,
+    updateAuthFileName: wiredUp.updateAuthFileName,
     listenToFile: wiredUp.listenToFile,
     listenToBeats: wiredUp.listenToBeats,
     listenToCards: wiredUp.listenToCards,
@@ -226,6 +233,7 @@ export const wireUpAPI = (logger) => {
     listenToTags: wiredUp.listenToTags,
     listenToHierarchyLevels: wiredUp.listenToHierarchyLevels,
     listenToImages: wiredUp.listenToImages,
+    listenToAttributes: wiredUp.listenToAttributes,
     toFirestoreArray: wiredUp.toFirestoreArray,
     overwriteAllKeys: wiredUp.overwriteAllKeys,
     initialFetch: wiredUp.initialFetch,
