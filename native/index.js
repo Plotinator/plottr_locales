@@ -28,7 +28,7 @@ const auth = () => {
 }
 
 const translate = (rootClause) => {
-  const translateIter = (ref, ...clauses) => {
+  const translateIter = (ref, clauses) => {
     if (clauses.length === 0) {
       return ref
     }
