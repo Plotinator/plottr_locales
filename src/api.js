@@ -133,6 +133,8 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
         return actions.image
       case 'file':
         return actions.ui
+      case 'attributes':
+        return actions.attributes
     }
     return null
   }
