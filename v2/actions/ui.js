@@ -37,7 +37,7 @@ import {
   SELECT_CHARACTER_ATTRIBUTE_BOOK_TAB,
   SELECT_CHARACTER,
 } from '../constants/ActionTypes'
-import { fileURLSelector } from '../selectors/knownFiles'
+import { fileURLSelector } from '../selectors/project'
 
 export function changeCurrentView(view) {
   return { type: CHANGE_CURRENT_VIEW, view }
