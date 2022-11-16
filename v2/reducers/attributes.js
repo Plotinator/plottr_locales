@@ -5,10 +5,11 @@ import {
   CREATE_CHARACTER_ATTRIBUTE,
   DELETE_CHARACTER_ATTRIBUTE,
   EDIT_CHARACTER_ATTRIBUTE_METADATA,
-  REORDER_CHARACTER_ATTRIBUTE_METADATA,
   EDIT_CHARACTER_SHORT_DESCRIPTION,
   EDIT_CHARACTER_DESCRIPTION,
   EDIT_CHARACTER_CATEGORY,
+  REMOVE_TAG_FROM_CHARACTER,
+  LOAD_ATTRIBUTES,
 } from '../constants/ActionTypes'
 
 const EMPTY_ATTRIBUTE_STATE = []
@@ -67,25 +68,7 @@ const attributesReducer =
         }
       }
 
-      case REORDER_CHARACTER_ATTRIBUTE_METADATA: {
-        const { toIndex, attributeId } = action
-
-        const characterAttributeState = state.characters || EMPTY_ATTRIBUTE_STATE
-        const existingAttribute = characterAttributeState.find((existingAttribute) => {
-          return existingAttribute.id === attributeId
-        })
-        if (!existingAttribute) {
-          return state
-        }
-        const copy = characterAttributeState.slice().filter(({ id }) => id !== attributeId)
-        copy.splice(toIndex, 0, existingAttribute)
-
-        return {
-          ...state,
-          characters: copy,
-        }
-      }
-
+      case REMOVE_TAG_FROM_CHARACTER:
       case ATTACH_TAG_TO_CHARACTER: {
         const attributeExists = state.characters.some((attribute) => {
           return attribute.id === action.attributeId
@@ -172,6 +155,10 @@ const attributesReducer =
 
       case FILE_LOADED: {
         return action.data.attributes || INITIAL_STATE
+      }
+
+      case LOAD_ATTRIBUTES: {
+        return action.attributes
       }
 
       default: {

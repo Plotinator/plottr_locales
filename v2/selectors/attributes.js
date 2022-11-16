@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect'
-import { groupBy, mapValues } from 'lodash'
+import { differenceWith, groupBy, isEqual, mapValues } from 'lodash'
 
-import { selectedCharacterAttributeTabSelector } from './ui'
+import { selectedCharacterAttributeTabSelector, characterCustomAttributeOrderSelector } from './ui'
 
 export const attributesSelector = (state) => state.attributes || []
 
@@ -18,6 +18,15 @@ export const allCharacterAttributesSelector = createSelector(attributesSelector,
   return (attributes && attributes.characters) || []
 })
 
+export const allNonBaseCharacterAttributesSelector = createSelector(
+  attributesSelector,
+  (attributes) => {
+    return ((attributes && attributes.characters) || []).filter((attribute) => {
+      return attribute.type !== 'base-attribute'
+    })
+  }
+)
+
 export const overriddenBookIdSelector = (_state, _characterId, bookId) => bookId
 
 export const characterAttributsForBookByIdSelector = createSelector(
@@ -31,11 +40,24 @@ export const characterAttributesForCurrentBookSelector = createSelector(
   attributesSelector,
   legacyCharacterCustomAttributesSelector,
   selectedCharacterAttributeTabSelector,
-  (attributes, legacyAttributes, bookId) => {
+  characterCustomAttributeOrderSelector,
+  (attributes, legacyAttributes, bookId, order) => {
     const bookAttributes = (attributes && attributes.characters) || []
     const newAttributes = bookAttributes.filter((attribute) => {
       return attribute.type !== 'base-attribute'
     })
-    return [...newAttributes, ...legacyAttributes]
+    const ordered = order.map((entry) => {
+      if (entry.type === 'attributes') {
+        return newAttributes.find(({ id }) => {
+          return id === entry.id
+        })
+      } else {
+        return legacyAttributes.find(({ name }) => {
+          return name === entry.name
+        })
+      }
+    })
+    const missing = differenceWith([...newAttributes, ...legacyAttributes], ordered, isEqual)
+    return [...ordered, ...missing]
   }
 )

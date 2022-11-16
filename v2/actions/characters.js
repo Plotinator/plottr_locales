@@ -19,13 +19,19 @@ import {
   EDIT_CHARACTER_CATEGORY,
   EDIT_CHARACTER_NAME,
   EDIT_CHARACTER_IMAGE,
+  DELETE_CHARACTER_LEGACY_CUSTOM_ATTRIBUTE,
 } from '../constants/ActionTypes'
 import { editorMetadataIfPresent } from '../helpers/editors'
-import { characterAttributesForCurrentBookSelector } from '../selectors/attributes'
+import {
+  characterAttributesForBookSelector,
+  characterAttributesForCurrentBookSelector,
+} from '../selectors/attributes'
 import { character } from '../store/initialState'
 import { selectedCharacterAttributeTabSelector } from '../selectors/ui'
 import { allBookIdsSelector } from '../selectors/books'
 import { escapeBraces } from './customAttributes'
+import { nextId } from '../store/newIds'
+import { legacyCustomCharacterAttributeByName } from '../selectors/customAttributes'
 
 export function addCharacter(name) {
   return {
@@ -64,7 +70,9 @@ export function editCharacterImage(id, imageId) {
 
 export const editCharacterTemplateAttribute =
   (id, templateId, name, value, editorPath, selection) => (dispatch, getState) => {
-    const state = getState().present
+    // NOTE: Mobile doesn't use history middleware
+    const fullState = getState()
+    const state = fullState.present ? fullState.present : fullState
     const bookId = selectedCharacterAttributeTabSelector(state)
 
     dispatch({
@@ -91,9 +99,12 @@ export function addTag(id, tagId) {
 }
 
 export const addBook = (id, bookId) => (dispatch, getState) => {
-  const bookIds = allBookIdsSelector(getState().present)
+  // NOTE: Mobile doesn't use history middleware
+  const fullState = getState()
+  const state = fullState.present ? fullState.present : fullState
+  const bookIds = allBookIdsSelector(state)
 
-  if (bookIds.indexOf(bookId) > -1) {
+  if (bookId === 'series' || bookIds.indexOf(bookId) > -1) {
     dispatch({ type: ATTACH_BOOK_TO_CHARACTER, id, bookId })
   }
   // TODO: error message?
@@ -119,19 +130,22 @@ export function duplicateCharacter(id) {
   return { type: DUPLICATE_CHARACTER, id }
 }
 
-export function createCharacterAttribute(type, name) {
+export function createCharacterAttribute(type, name, fromLegacyAttribute) {
   return {
     type: CREATE_CHARACTER_ATTRIBUTE,
     attribute: {
       type,
       name: escapeBraces(name),
     },
+    fromLegacyAttribute,
   }
 }
 
 export const editCharacterAttributeValue =
   (characterId, attributeId, value) => (dispatch, getState) => {
-    const state = getState().present
+    // NOTE: Mobile doesn't use history middleware
+    const fullState = getState()
+    const state = fullState.present ? fullState.present : fullState
     const characterAttributesForBook = characterAttributesForCurrentBookSelector(state)
     const selectedBook = selectedCharacterAttributeTabSelector(state)
     const newAttribute = characterAttributesForBook.find((attribute) => {
@@ -159,6 +173,22 @@ export const editCharacterAttributeValue =
       })
       return
     }
+
+    const legacyCustomAttribute = legacyCustomCharacterAttributeByName(state, attributeId)
+    if (legacyCustomAttribute) {
+      const characterAttributes = characterAttributesForBookSelector(state)
+      const nextAttributeId = nextId(characterAttributes)
+      dispatch(
+        createCharacterAttribute(legacyCustomAttribute.type, legacyCustomAttribute.name, true)
+      )
+      dispatch({
+        type: DELETE_CHARACTER_LEGACY_CUSTOM_ATTRIBUTE,
+        attributeName: attributeId,
+      })
+      editCharacterAttributeValue(characterId, nextAttributeId, value)(dispatch, getState)
+    }
+
+    // TODO: handle error state.  There was no legacy attribute.
   }
 
 export const editShortDescription = (characterId, shortDescription) => {

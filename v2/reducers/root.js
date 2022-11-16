@@ -65,21 +65,6 @@ const addCharacterAttributeDataForModifyingBaseAttribute = (baseAttributeName, s
   }
 }
 
-const addCharacterAttributeDataForRemovingBaseAttribute = (baseAttributeName, state, action) => {
-  const currentBookId = selectedCharacterAttributeTabSelector(state)
-  const availableAttributes = characterAttributsForBookByIdSelector(state)
-  const existingBookAttribute = Object.values(availableAttributes).find((attribute) => {
-    return attribute.type === 'base-attribute' && attribute.name === baseAttributeName
-  })
-  const attributeId = existingBookAttribute?.id
-
-  return {
-    ...action,
-    currentBookId,
-    attributeId,
-  }
-}
-
 /**
  * `dataRepairers` is an object which contains various repairs to be
  * made to the data that's loaded from files.  We have it here because
@@ -140,14 +125,9 @@ const root = (dataRepairers) => (state, action) => {
       return mainReducer(state, newAction)
     }
     case ATTACH_TAG_TO_CHARACTER:
+    case REMOVE_TAG_FROM_CHARACTER:
     case DELETE_TAG: {
       const newAction = addCharacterAttributeDataForModifyingBaseAttribute('tags', state, action)
-      return mainReducer(state, newAction)
-    }
-    // We need to know what the current book is and the associated
-    // attribute when we remove a book association from a character.
-    case REMOVE_TAG_FROM_CHARACTER: {
-      const newAction = addCharacterAttributeDataForRemovingBaseAttribute('tags', state, action)
       return mainReducer(state, newAction)
     }
     // Actions for new attributes need the current book.
