@@ -1,4 +1,4 @@
-import { cloneDeep, uniq } from 'lodash'
+import { cloneDeep, omit, uniq } from 'lodash'
 import {
   ADD_CHARACTER,
   ADD_CHARACTER_WITH_TEMPLATE,
@@ -34,6 +34,7 @@ import {
   DELETE_BOOK,
   EDIT_CHARACTER_NAME,
   EDIT_CHARACTER_IMAGE,
+  DELETE_CHARACTER_LEGACY_CUSTOM_ATTRIBUTE,
 } from '../constants/ActionTypes'
 import { character as defaultCharacter } from '../store/initialState'
 import { newFileCharacters } from '../store/newFileState'
@@ -80,7 +81,11 @@ const attachBaseAttribute = (attributeName, value, action, state) => {
             })
           : [
               ...newAttributes,
-              { id: attributeId, bookId: action.bookId || action.currentBookId, value: [value] },
+              {
+                id: attributeId,
+                bookId: action.bookId || action.currentBookId,
+                value: [value, ...character[attributeName]],
+              },
             ]
         : newAttributes
 
@@ -93,33 +98,64 @@ const attachBaseAttribute = (attributeName, value, action, state) => {
   })
 }
 
-const removeBaseAttribute = (attributeName, value, action, state) => {
+const removeTag = (attributeName, value, action, state) => {
   return state.map((character) => {
-    if (!Array.isArray(character.attributes)) {
-      return character
+    if (character.id === action.id) {
+      const attributeId = action.attributeId
+      const newAttributes = character.attributes || []
+      const hasAttribute = newAttributes.some((attribute) => {
+        return (
+          attribute.id === attributeId &&
+          attribute.bookId === (action.bookId || action.currentBookId)
+        )
+      })
+      const attributes = attributeId
+        ? hasAttribute
+          ? newAttributes.map((attribute) => {
+              if (
+                attribute.id === attributeId &&
+                attribute.bookId === (action.bookId || action.currentBookId)
+              ) {
+                return {
+                  ...attribute,
+                  value: attribute.value.filter((x) => x !== value),
+                }
+              }
+              return attribute
+            })
+          : [
+              ...newAttributes,
+              {
+                id: attributeId,
+                bookId: action.bookId || action.currentBookId,
+                value: character[attributeName].filter((x) => x !== value),
+              },
+            ]
+        : newAttributes
+
+      return {
+        ...character,
+        attributes,
+      }
     }
 
-    return character.id === action.id
-      ? {
-          ...character,
-          attributes: character.attributes.map((attribute) => {
-            if (
-              attribute.id === action.attributeId &&
-              attribute.bookId === (action.bookId || action.currentBookId)
-            ) {
-              return {
-                ...attribute,
-                value: attribute.value.filter((id) => {
-                  return id !== value
-                }),
-              }
-            }
-            return attribute
-          }),
-        }
-      : character
+    return character
   })
 }
+
+const DISALLOWED_NAMES = [
+  'notes',
+  'categoryId',
+  'id',
+  'name',
+  'color',
+  'cards',
+  'noteIds',
+  'templates',
+  'tags',
+  'imageId',
+  'bookIds',
+]
 
 const characters =
   (dataRepairers) =>
@@ -291,7 +327,7 @@ const characters =
       }
 
       case REMOVE_TAG_FROM_CHARACTER: {
-        return removeBaseAttribute('tags', action.tagId, action, state)
+        return removeTag('tags', action.tagId, action, state)
       }
 
       case DELETE_TAG: {
@@ -474,18 +510,72 @@ const characters =
         return state.map((character) => {
           const attributes = character.attributes || []
 
+          const oldValue =
+            DISALLOWED_NAMES.indexOf(action.attribute.name) === -1
+              ? character[action.attribute.name]
+              : undefined
+          const value = action.attribute.value || oldValue
+
           return {
             ...character,
             attributes: [
               ...attributes,
               {
-                value: action.attribute.value,
+                value,
                 id: action.nextAttributeId,
                 bookId: action.bookId || action.currentBookId,
               },
             ],
           }
         })
+      }
+
+      case EDIT_CHARACTER_ATTRIBUTE_METADATA: {
+        const nextState = state.map((character) => {
+          if (!Array.isArray(character.attributes)) {
+            return character
+          }
+
+          const attributes = character.attributes
+          return {
+            ...character,
+            attributes: attributes.map((attribute) => {
+              if (attribute.id === action.id) {
+                const newValue =
+                  typeof attribute.value === 'undefined'
+                    ? attribute.value
+                    : action.attributeType === 'text' && typeof attribute.value !== 'string'
+                    ? firstParagraphText(attribute.value)
+                    : attribute.value
+                return {
+                  ...attribute,
+                  value: newValue,
+                }
+              }
+
+              return attribute
+            }),
+          }
+        })
+
+        if (!action.id) {
+          const { oldName, name } = action
+          return nextState.map((character) => {
+            if (character[oldName]) {
+              return omit(
+                {
+                  ...character,
+                  [name]: character[oldName],
+                },
+                oldName
+              )
+            }
+
+            return character
+          })
+        }
+
+        return nextState
       }
 
       case EDIT_CHARACTER_CATEGORY:
@@ -538,35 +628,6 @@ const characters =
         })
       }
 
-      case EDIT_CHARACTER_ATTRIBUTE_METADATA: {
-        return state.map((character) => {
-          if (!Array.isArray(character.attributes)) {
-            return character
-          }
-
-          const attributes = character.attributes
-          return {
-            ...character,
-            attributes: attributes.map((attribute) => {
-              if (attribute.id === action.id) {
-                const newValue =
-                  typeof attribute.value === 'undefined'
-                    ? attribute.value
-                    : action.attributeType === 'text' && typeof attribute.value !== 'string'
-                    ? firstParagraphText(attribute.value)
-                    : attribute.value
-                return {
-                  ...attribute,
-                  value: newValue,
-                }
-              }
-
-              return attribute
-            }),
-          }
-        })
-      }
-
       case DELETE_CHARACTER_ATTRIBUTE: {
         return state.map((character) => {
           if (!Array.isArray(character.attributes)) {
@@ -580,6 +641,17 @@ const characters =
               return attribute.id !== action.id
             }),
           }
+        })
+      }
+
+      case DELETE_CHARACTER_LEGACY_CUSTOM_ATTRIBUTE: {
+        const { attributeName } = action
+
+        return state.map((character) => {
+          if (typeof character[attributeName] !== 'undefined') {
+            return omit(character, attributeName)
+          }
+          return character
         })
       }
 

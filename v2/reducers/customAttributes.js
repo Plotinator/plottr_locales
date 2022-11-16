@@ -18,6 +18,8 @@ import {
   REORDER_CARDS_ATTRIBUTE,
   REORDER_NOTES_ATTRIBUTE,
   LOAD_CUSTOM_ATTRIBUTES,
+  DELETE_CHARACTER_LEGACY_CUSTOM_ATTRIBUTE,
+  EDIT_CHARACTER_ATTRIBUTE_METADATA,
 } from '../constants/ActionTypes'
 import { combineReducers } from 'redux'
 import { newFileCustomAttributes } from '../store/newFileState'
@@ -38,6 +40,31 @@ function characters(state = [], action) {
 
       copy.splice(toIndex, 0, attribute)
       return copy
+    }
+
+    case EDIT_CHARACTER_ATTRIBUTE_METADATA: {
+      const { id, name, attributeType, oldName } = action
+      if (id || !oldName) {
+        return state
+      }
+
+      return state.map((attribute) => {
+        if (attribute.name === oldName) {
+          return {
+            ...attribute,
+            name,
+            type: attributeType,
+          }
+        }
+        return attribute
+      })
+    }
+
+    case DELETE_CHARACTER_LEGACY_CUSTOM_ATTRIBUTE: {
+      const { attributeName } = action
+      return state.filter((attribute) => {
+        return attribute.name !== attributeName
+      })
     }
 
     case LOAD_CUSTOM_ATTRIBUTES:

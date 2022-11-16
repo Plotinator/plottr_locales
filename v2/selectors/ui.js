@@ -148,6 +148,15 @@ export const characterTabSelector = createSelector(uiSelector, ({ characterTab }
 export const selectedCharacterSelector = createSelector(
   characterTabSelector,
   ({ selectedCharacter }) => {
-    return selectedCharacter || null
+    if (selectedCharacter || selectedCharacter === 0) {
+      return selectedCharacter
+    }
+
+    return null
   }
+)
+const customAttributeOrderSelector = (state) => state.ui.customAttributeOrder || []
+export const characterCustomAttributeOrderSelector = createSelector(
+  customAttributeOrderSelector,
+  ({ characters }) => characters || []
 )
