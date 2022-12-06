@@ -40,7 +40,9 @@
       "templates": [],
       "imageId": "7"
     },
-    "allIds": [1]
+    "allIds": [
+      1
+    ]
   },
   "characters": [
     {
@@ -57,7 +59,16 @@
         }
       ],
       "color": null,
-      "cards": [1, 2, 6, 7, 3, 4, 5, 11],
+      "cards": [
+        1,
+        2,
+        6,
+        7,
+        3,
+        4,
+        5,
+        11
+      ],
       "noteIds": [],
       "templates": [],
       "tags": [],
@@ -80,7 +91,11 @@
         }
       ],
       "color": null,
-      "cards": [3, 4, 11],
+      "cards": [
+        3,
+        4,
+        11
+      ],
       "noteIds": [],
       "templates": [],
       "tags": [],
@@ -103,7 +118,11 @@
         }
       ],
       "color": null,
-      "cards": [3, 4, 11],
+      "cards": [
+        3,
+        4,
+        11
+      ],
       "noteIds": [],
       "templates": [],
       "tags": [],
@@ -126,7 +145,11 @@
         }
       ],
       "color": null,
-      "cards": [3, 4, 11],
+      "cards": [
+        3,
+        4,
+        11
+      ],
       "noteIds": [],
       "templates": [],
       "tags": [],
@@ -199,9 +222,19 @@
           ]
         }
       ],
-      "tags": [7, 1],
-      "characters": [2, 1, 4, 3],
-      "places": [2],
+      "tags": [
+        7,
+        1
+      ],
+      "characters": [
+        2,
+        1,
+        4,
+        3
+      ],
+      "places": [
+        2
+      ],
       "templates": [],
       "imageId": null
     },
@@ -224,7 +257,10 @@
           ]
         }
       ],
-      "tags": [6, 1],
+      "tags": [
+        6,
+        1
+      ],
       "characters": [],
       "places": [],
       "templates": [],
@@ -249,7 +285,10 @@
           ]
         }
       ],
-      "tags": [8, 1],
+      "tags": [
+        8,
+        1
+      ],
       "characters": [],
       "places": [],
       "templates": [],
@@ -305,9 +344,14 @@
           ]
         }
       ],
-      "tags": [3, 7],
+      "tags": [
+        3,
+        7
+      ],
       "characters": [],
-      "places": [2],
+      "places": [
+        2
+      ],
       "templates": [],
       "imageId": null,
       "positionWithinLine": 0,
@@ -363,9 +407,16 @@
           ]
         }
       ],
-      "tags": [3, 6],
-      "characters": [1],
-      "places": [2],
+      "tags": [
+        3,
+        6
+      ],
+      "characters": [
+        1
+      ],
+      "places": [
+        2
+      ],
       "templates": [],
       "imageId": null,
       "positionWithinLine": 0,
@@ -406,8 +457,13 @@
           ]
         }
       ],
-      "tags": [3, 8],
-      "characters": [1],
+      "tags": [
+        3,
+        8
+      ],
+      "characters": [
+        1
+      ],
       "places": [],
       "templates": [],
       "imageId": null,
@@ -432,9 +488,17 @@
           ]
         }
       ],
-      "tags": [1, 4],
-      "characters": [1],
-      "places": [2, 1],
+      "tags": [
+        1,
+        4
+      ],
+      "characters": [
+        1
+      ],
+      "places": [
+        2,
+        1
+      ],
       "templates": [],
       "imageId": null,
       "positionWithinLine": 0,
@@ -458,9 +522,18 @@
           ]
         }
       ],
-      "tags": [1],
-      "characters": [1, 2, 4, 3],
-      "places": [2],
+      "tags": [
+        1
+      ],
+      "characters": [
+        1,
+        2,
+        4,
+        3
+      ],
+      "places": [
+        2
+      ],
       "templates": [],
       "imageId": null,
       "positionWithinLine": 0,
@@ -484,9 +557,18 @@
           ]
         }
       ],
-      "tags": [1],
-      "characters": [1, 4, 3, 2],
-      "places": [2],
+      "tags": [
+        1
+      ],
+      "characters": [
+        1,
+        4,
+        3,
+        2
+      ],
+      "places": [
+        2
+      ],
       "templates": [],
       "imageId": null,
       "positionWithinLine": 0,
@@ -510,9 +592,16 @@
           ]
         }
       ],
-      "tags": [3, 8],
-      "characters": [1],
-      "places": [2],
+      "tags": [
+        3,
+        8
+      ],
+      "characters": [
+        1
+      ],
+      "places": [
+        2
+      ],
       "templates": [],
       "imageId": null,
       "positionWithinLine": 0,
@@ -536,9 +625,16 @@
           ]
         }
       ],
-      "tags": [2, 5],
-      "characters": [1],
-      "places": [1],
+      "tags": [
+        2,
+        5
+      ],
+      "characters": [
+        1
+      ],
+      "places": [
+        1
+      ],
       "templates": [],
       "imageId": null,
       "positionWithinLine": 0,
@@ -607,7 +703,10 @@
         }
       ],
       "color": null,
-      "cards": [1, 5],
+      "cards": [
+        1,
+        5
+      ],
       "noteIds": [],
       "templates": [],
       "tags": [],
@@ -628,7 +727,15 @@
         }
       ],
       "color": null,
-      "cards": [7, 2, 8, 3, 4, 5, 11],
+      "cards": [
+        7,
+        2,
+        8,
+        3,
+        4,
+        5,
+        11
+      ],
       "noteIds": [],
       "templates": [],
       "tags": [],
@@ -729,7 +836,9 @@
           ]
         }
       ],
-      "tags": [4],
+      "tags": [
+        4
+      ],
       "characters": [],
       "places": [],
       "lastEdited": 1597213167350,
@@ -763,7 +872,9 @@
           ]
         }
       ],
-      "tags": [2],
+      "tags": [
+        2
+      ],
       "characters": [],
       "places": [],
       "lastEdited": 1597183091866,
@@ -804,7 +915,9 @@
           ]
         }
       ],
-      "tags": [1],
+      "tags": [
+        1
+      ],
       "characters": [],
       "places": [],
       "lastEdited": 1597186957639,
@@ -838,7 +951,9 @@
           ]
         }
       ],
-      "tags": [3],
+      "tags": [
+        3
+      ],
       "characters": [],
       "places": [],
       "lastEdited": 1597186607532,
@@ -880,7 +995,9 @@
           ]
         }
       ],
-      "tags": [5],
+      "tags": [
+        5
+      ],
       "characters": [],
       "places": [],
       "lastEdited": 1597183102925,
