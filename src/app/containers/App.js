@@ -17,6 +17,7 @@ import {
   ActsHelpModal,
   UpdateNotifier,
   NewProjectInputModal,
+  SearchModal,
 } from 'connected-components'
 import { hasPreviousAction } from '../../common/utils/error_reporter'
 import { store } from '../store'
@@ -39,6 +40,8 @@ const App = ({
   clickOnDom,
   applicationIsBusyAndCannotBeQuit,
   showErrorBox,
+  searchDialogIsOpen,
+  openSearch,
 }) => {
   const [showTemplateCreate, setShowTemplateCreate] = useState(false)
   const [type, setType] = useState(null)
@@ -98,6 +101,18 @@ const App = ({
       unsubscribeFromTurnOnActsHelp()
     }
   }, [])
+
+  useEffect(() => {
+    const searchListener = (event) => {
+      if (!searchDialogIsOpen && event.key === 'f' && (event.ctrlKey || event.metaKey)) {
+        openSearch()
+      }
+    }
+    document.addEventListener('keydown', searchListener)
+    return () => {
+      document.removeEventListener('keydown', searchListener)
+    }
+  }, [searchDialogIsOpen, openSearch])
 
   const askToSave = (event) => {
     console.log(
@@ -234,6 +249,7 @@ const App = ({
       </main>
       <React.StrictMode>
         <Spinner />
+        {searchDialogIsOpen ? <SearchModal /> : null}
         {renderTemplateCreate()}
         {renderAskToSave()}
         {renderAdvanceExportModal()}
@@ -251,6 +267,7 @@ App.propTypes = {
   isResuming: PropTypes.bool,
   userNeedsToLogin: PropTypes.bool,
   sessionChecked: PropTypes.bool,
+  searchDialogIsOpen: PropTypes.bool,
   clickOnDom: PropTypes.func,
   applicationIsBusyAndCannotBeQuit: PropTypes.bool,
   showErrorBox: PropTypes.func.isRequired,
@@ -267,7 +284,11 @@ function mapStateToProps(state) {
     applicationIsBusyAndCannotBeQuit: selectors.busyWithWorkThatPreventsQuittingSelector(
       state.present
     ),
+    searchDialogIsOpen: selectors.searchDialogIsOpenSelector(state.present),
   }
 }
 
-export default connect(mapStateToProps, { clickOnDom: actions.domEvents.clickOnDom })(App)
+export default connect(mapStateToProps, {
+  clickOnDom: actions.domEvents.clickOnDom,
+  openSearch: actions.ui.openSearch,
+})(App)

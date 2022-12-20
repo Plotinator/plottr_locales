@@ -3,7 +3,6 @@ import { render } from 'react-dom'
 import { Provider } from 'react-redux'
 
 import { selectors } from 'pltr/v2'
-import { SearchModal } from 'connected-components'
 
 import { saveBackup as saveBackupOnFirebase } from 'wired-up-firebase'
 
@@ -90,7 +89,6 @@ export const renderFile = (root, whenClientIsReady) => {
         <Listener showErrorBox={showErrorBox} />
         <Renamer />
         <SaveAs />
-        <SearchModal />
         <Error showErrorBox={showErrorBox} />
         <Resume
           backupOfflineBackupForResume={backupOfflineBackupForResume}
