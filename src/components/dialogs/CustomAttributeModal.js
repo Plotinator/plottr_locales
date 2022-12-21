@@ -41,7 +41,7 @@ const CustomAttributeModalConnector = (connector) => {
             item={attr}
             index={index}
             canChangeType={customAttributesThatCanChange.includes(attr.name)}
-            deleteItem={({ name }) => removeAttribute(name)}
+            deleteItem={({ name, id }) => removeAttribute(name, id)}
             updateItem={(newAttr) => editAttribute(index, attr, newAttr)}
             reorderItem={reorderAttribute}
           />
@@ -97,21 +97,50 @@ const CustomAttributeModalConnector = (connector) => {
             break
         }
 
+        const attributesSelector = (() => {
+          switch (type) {
+            case 'characters': {
+              return (state) => {
+                return selectors.characterAttributesForCurrentBookSelector(state)
+              }
+            }
+            default: {
+              return (state) => state.customAttributes[type] || []
+            }
+          }
+        })()
+
         return {
-          customAttributes: state.present.customAttributes[type] || [],
+          customAttributes: attributesSelector(state.present),
           customAttributesThatCanChange: canChangeFn(state.present),
         }
       },
       (dispatch, { type }) => {
         const customAttributeActions = bindActionCreators(actions.customAttribute, dispatch)
+        const characterActions = bindActionCreators(actions.character, dispatch)
+        const attributesActions = bindActionCreators(actions.attributes, dispatch)
 
         switch (type) {
           case 'characters':
             return {
-              addAttribute: customAttributeActions.addCharacterAttr,
-              removeAttribute: customAttributeActions.removeCharacterAttr,
-              editAttribute: customAttributeActions.editCharacterAttr,
-              reorderAttribute: customAttributeActions.reorderCharacterAttribute,
+              addAttribute: (attribute) =>
+                characterActions.createCharacterAttribute(attribute.type, attribute.name),
+              // Other attributes are still keyed by name :/
+              removeAttribute: (name, id) => {
+                attributesActions.deleteCharacterAttribute(id, name)
+              },
+              // An adaptor because the old interface for editing
+              // attributes is super-janky.
+              editAttribute: (index, oldAttribute, newAttribute) => {
+                attributesActions.editCharacterAttributeMetadata(
+                  oldAttribute.id,
+                  newAttribute.name,
+                  newAttribute.type,
+                  oldAttribute.name
+                )
+              },
+              reorderAttribute: (attribute, toIndex) =>
+                attributesActions.reorderCharacterAttribute(attribute.id, toIndex, attribute.name),
             }
 
           case 'places':

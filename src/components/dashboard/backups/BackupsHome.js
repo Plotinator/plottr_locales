@@ -30,10 +30,18 @@ const BackupsHomeConnector = (connector) => {
       setSearchTerm('')
     }, [selectedFolder])
 
-    const body = selectedFolder ? (
-      <BackupFiles folder={selectedFolder} searchTerm={searchTerm} />
-    ) : (
-      <Folders selectFolder={selectFolder} folders={folders} searchTerm={searchTerm} />
+    // NOTE: It's important to render the dashboard body wrapper here
+    // to make sure that scrolling resets when changing folders etc.
+    const Body = () => (
+      <div className="dashboard__backups__wrapper">
+        <DashboardErrorBoundary>
+          {selectedFolder ? (
+            <BackupFiles folder={selectedFolder} searchTerm={searchTerm} />
+          ) : (
+            <Folders selectFolder={selectFolder} folders={folders} searchTerm={searchTerm} />
+          )}
+        </DashboardErrorBoundary>
+      </div>
     )
 
     let breadcrumb = null
@@ -56,12 +64,14 @@ const BackupsHomeConnector = (connector) => {
     // <FormControl type='search' placeholder={t('Search')} className='dashboard__search' />
     return (
       <div className="dashboard__backups">
-        <h1>{t('Your Backups')}</h1>
+        <h1>{t('Backups')}</h1>
         <Grid fluid>
           <Row>
             <Col xs={4} sm={6} md={8} lg={9}>
               {breadcrumb}
             </Col>
+          </Row>
+          <Row>
             <Col xs={8} sm={6} md={4} lg={3}>
               <FormControl
                 type="search"
@@ -73,9 +83,7 @@ const BackupsHomeConnector = (connector) => {
             </Col>
           </Row>
         </Grid>
-        <div className="dashboard__backups__wrapper">
-          <DashboardErrorBoundary>{body}</DashboardErrorBoundary>
-        </div>
+        <Body />
       </div>
     )
   }

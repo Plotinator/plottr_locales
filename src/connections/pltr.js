@@ -126,7 +126,6 @@ const pltrTypeSpecs = {
   defaultBackupLocation: PropTypes.func.isRequired,
   setDarkMode: PropTypes.func.isRequired,
   file: PropTypes.shape({
-    sortAndSearch: PropTypes.func.isRequired,
     createNew: PropTypes.func.isRequired,
     openExistingFile: PropTypes.func.isRequired,
     doesFileExist: PropTypes.func.isRequired,
@@ -209,6 +208,7 @@ const pltrTypeSpecs = {
     exportSaveDialog: PropTypes.func.isRequired,
   }),
   moveFromTemp: PropTypes.func.isRequired,
+  duplicateFile: PropTypes.func.isRequired,
   showItemInFolder: PropTypes.func.isRequired,
   mpq: PropTypes.object.isRequired,
   rootElementSelectors: PropTypes.array.isRequired,

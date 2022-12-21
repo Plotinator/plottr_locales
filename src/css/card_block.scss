@@ -18,6 +18,10 @@
         color: $gray-8;
       }
     }
+
+    .card__title {
+      word-break: break-word;
+    }
   }
   .card__add-card {
     font-size: 12px;
@@ -27,8 +31,8 @@
   }
   &:hover {
     .card__add-card {
-        color: $blue-5;
-      }
+      color: $blue-5;
+    }
   }
 
   &.vertical {
@@ -56,6 +60,14 @@
 
   cursor: pointer;
 
+  .card__cell__overview__drag-anchor {
+    width: 150px;
+    margin-left: 12.5px;
+    margin-right: 12.5px;
+    &.medium-timeline {
+      width: 80px;
+    }
+  }
   span:first-child {
     text-align: left;
   }
@@ -85,7 +97,6 @@
     .card__add-card {
       display: block;
       z-index: 10;
-
     }
     &:hover .card__add-card {
       .glyphicon {
@@ -93,6 +104,8 @@
         padding: 2px 2px 2.5px 3px;
         border: 1px solid $blue-7;
         border-radius: 3px;
+        margin-left: 12px;
+        margin-right: -19px;
       }
     }
     .card__behind {
