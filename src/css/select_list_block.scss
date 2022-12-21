@@ -16,7 +16,17 @@
     }
   }
   li:hover {
-    background-color: $body-background-color;
+    &:not(.select-list__line) {
+      background-color: $body-background-color;
+    }
+  }
+  .select-list__line {
+    cursor: default;
+    hr {
+      border-top: 1px solid darken(hsl(210deg, 36%, 96%), 3%);
+      padding: 0;
+      margin: 0 -14px 0 -24px;
+    }
   }
   &.series-select {
     li {
@@ -106,6 +116,7 @@
     visibility: hidden;
     margin-left: 4px;
     cursor: pointer;
+    align-self: center;
   }
 
   &:hover {
@@ -145,6 +156,11 @@
     .glyphicon-remove {
       visibility: visible;
     }
+  }
+
+  .label.label-info {
+    white-space: inherit;
+    word-break: break-word;
   }
 }
 

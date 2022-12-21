@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'react-proptypes'
 
-import { t as i18n } from 'plottr_locales'
+import { t } from 'plottr_locales'
 import { actions, helpers } from 'pltr/v2'
 
 import NavDropdown from '../NavDropdown'
@@ -10,15 +10,16 @@ import { checkDependencies } from '../checkDependencies'
 
 const {
   books: { isSeries },
+  card: { truncateTitle },
 } = helpers
 
-const DISABLED_VIEWS = ['notes', 'characters', 'places', 'tags']
+const DISABLED_VIEWS = ['tags', 'notes', 'characters', 'places']
 
 const BookChooserConnector = (connector) => {
   class BookChooser extends Component {
     handleChange(id) {
       this.props.actions.changeCurrentTimeline(id)
-      if (this.props.currentView == 'story') {
+      if (this.props.currentView == 'project') {
         this.props.actions.changeCurrentView('timeline')
       }
     }
@@ -28,7 +29,11 @@ const BookChooserConnector = (connector) => {
     }
 
     bookTitle = (book) => {
-      return book.title || i18n('Untitled')
+      return book.title ? (
+        <span title={book.title}>{truncateTitle(book.title, 40)}</span>
+      ) : (
+        t('Untitled')
+      )
     }
 
     renderBookList() {
@@ -46,7 +51,7 @@ const BookChooserConnector = (connector) => {
     render() {
       const { currentTimeline, books, series } = this.props
       const seriesText =
-        series.name == '' ? i18n('Series View') : `${series.name} (${i18n('Series View')})`
+        series.name == '' ? t('Series View') : `${series.name} (${t('Series View')})`
       let title = seriesText
       const currentBook = books[currentTimeline] || books[books.allIds[0]]
       if (!isSeries(currentTimeline)) title = this.bookTitle(currentBook)

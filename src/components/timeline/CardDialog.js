@@ -59,6 +59,7 @@ const CardDialogConnector = (connector) => {
     places,
     tags,
     characters,
+    characterBookCategories,
     actions,
     uiActions,
     customAttributes,
@@ -252,6 +253,9 @@ const CardDialogConnector = (connector) => {
         openTemplatePicker()
       } else if (typeof key === 'number') {
         setActiveTab(key)
+        if (key === 2 && !customAttributes.length) {
+          uiActions.openAttributesDialog()
+        }
       }
     }
 
@@ -289,6 +293,7 @@ const CardDialogConnector = (connector) => {
           isOpen={showTemplatePicker}
           close={closeTemplatePicker}
           onChooseTemplate={handleChooseTemplate}
+          templatesAlreadySelected={cardMetaData.templates}
         />
       )
     }
@@ -307,6 +312,7 @@ const CardDialogConnector = (connector) => {
               onSave={saveEdit}
               onSaveAndClose={saveAndClose}
               name={attr.name}
+              id={attr.id}
               type={attr.type}
             />
           </React.Fragment>
@@ -340,6 +346,7 @@ const CardDialogConnector = (connector) => {
                 onSave={saveEdit}
                 onSaveAndClose={saveAndClose}
                 name={attr.name}
+                id={attr.id}
                 type={attr.type}
                 description={attr.description}
                 link={attr.link}
@@ -405,12 +412,22 @@ const CardDialogConnector = (connector) => {
         const destinationLine = destinationLineId(id)
         const destinationBeat = destinationBeatId(id)
         const noDestination = !destinationLine || !destinationBeat
+        const bookTitle = books[id]?.title || t('Untitled')
 
         return (
-          <MenuItem key={id} onSelect={() => onSelect(id)} disabled={noDestination}>
+          <MenuItem
+            title={
+              noDestination
+                ? t("Can't move card to empty book")
+                : t('Move card to { bookTitle }', { bookTitle })
+            }
+            key={id}
+            onSelect={() => onSelect(id)}
+            disabled={noDestination}
+          >
             <div className="card-dialog__book-selector">
               {noDestination && <IoIosWarning />}
-              {id === 'series' ? t('Series') : books[id].title || t('Untitled')}
+              {id === 'series' ? t('Series') : bookTitle}
             </div>
           </MenuItem>
         )
@@ -459,14 +476,14 @@ const CardDialogConnector = (connector) => {
         <div className="card-dialog__dropdown-wrapper" style={{ marginBottom: '5px' }}>
           <label className="card-dialog__details-label" htmlFor="select-book">
             {t('Book')}:
-            <DropdownButton
-              id="select-book"
-              className="card-dialog__select-line"
-              title={currentTimelineBookTitle()}
-            >
-              {renderBooks(moveCard)}
-            </DropdownButton>
           </label>
+          <DropdownButton
+            id="select-book"
+            className="card-dialog__select-line"
+            title={currentTimelineBookTitle()}
+          >
+            {renderBooks(moveCard)}
+          </DropdownButton>
         </div>
       )
     }
@@ -499,32 +516,33 @@ const CardDialogConnector = (connector) => {
           <div className="card-dialog__dropdown-wrapper">
             <label className="card-dialog__details-label" htmlFor={lineDropdownID}>
               {t('Plotline')}:
-              <DropdownButton
-                id={lineDropdownID}
-                className="card-dialog__select-line"
-                title={truncateTitle(getCurrentLine().title, 35)}
-              >
-                {renderLineItems()}
-              </DropdownButton>
             </label>
+            <DropdownButton
+              id={lineDropdownID}
+              className="card-dialog__select-line"
+              title={truncateTitle(getCurrentLine().title, 35)}
+            >
+              {renderLineItems()}
+            </DropdownButton>
           </div>
           <div className="card-dialog__dropdown-wrapper">
             <label className="card-dialog__details-label" htmlFor={beatDropdownID}>
               {labelText}:
-              <DropdownButton
-                id={beatDropdownID}
-                className="card-dialog__select-card"
-                title={DropDownTitle}
-              >
-                {renderBeatItems()}
-              </DropdownButton>
             </label>
+            <DropdownButton
+              id={beatDropdownID}
+              className="card-dialog__select-card"
+              title={DropDownTitle}
+            >
+              {renderBeatItems()}
+            </DropdownButton>
           </div>
           <SelectList
             parentId={cardId}
             type={'Characters'}
             selectedItems={cardMetaData.characters}
             allItems={characters}
+            categories={characterBookCategories}
             add={actions.addCharacter}
             remove={actions.removeCharacter}
           />
@@ -560,7 +578,7 @@ const CardDialogConnector = (connector) => {
                 style={{ margin: '2px', marginRight: '12px' }}
                 buttonStyle={{
                   border: `1px solid ${borderColor}`,
-                  backgroundColor: cardMetaData.color && borderColor,
+                  backgroundColor: cardMetaData.color,
                 }}
               />
             </Floater>
@@ -642,6 +660,7 @@ const CardDialogConnector = (connector) => {
     customAttributes: PropTypes.array.isRequired,
     uiActions: PropTypes.object.isRequired,
     notificationActions: PropTypes.object.isRequired,
+    characterBookCategories: PropTypes.array.isRequired,
     currentTimeline: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     destinationLineId: PropTypes.func,
     destinationBeatId: PropTypes.func,
@@ -667,6 +686,7 @@ const CardDialogConnector = (connector) => {
           lines: selectors.sortedLinesByBookSelector(state.present),
           tags: selectors.sortedTagsSelector(state.present),
           characters: selectors.charactersSortedAtoZSelector(state.present),
+          characterBookCategories: selectors.characterBookCategoriesSelector(state.present),
           places: selectors.placesSortedAtoZSelector(state.present),
           customAttributes: state.present.customAttributes.scenes,
           darkMode: selectors.isDarkModeSelector(state.present),

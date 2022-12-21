@@ -46,7 +46,7 @@ const CharacterEditDetailsConnector = (connector) => {
     character,
     actions,
     editorPath,
-    customAttributes,
+    attributes,
     getTemplateById,
     darkMode,
     templateAttributeValue,
@@ -114,22 +114,11 @@ const CharacterEditDetailsConnector = (connector) => {
     }
 
     const handleNotesChanged = (value, selection) => {
-      actions.editCharacter(
-        character.id,
-        helpers.editors.attrIfPresent('notes', value),
-        editorPath,
-        selection
-      )
+      actions.editDescription(character.id, value)
     }
 
-    const handleAttrChange = (attrName) => (desc, selection) => {
-      const editorPath = helpers.editors.characterCustomAttributeEditorPath(character.id, attrName)
-      actions.editCharacter(
-        character.id,
-        helpers.editors.attrIfPresent(attrName, desc),
-        editorPath,
-        selection
-      )
+    const handleAttrChange = (attrId) => (value) => {
+      actions.editCharacterAttributeValue(character.id, attrId, value)
     }
 
     const handleTemplateAttrChange = (id, name) => (desc, selection) => {
@@ -139,27 +128,23 @@ const CharacterEditDetailsConnector = (connector) => {
         name
       )
 
-      if (!desc && desc !== '') {
-        actions.editCharacter(character.id, {}, editorPath, selection)
-        return
-      }
       actions.editCharacterTemplateAttribute(character.id, id, name, desc, editorPath, selection)
     }
 
     const changeCategory = (val) => {
-      actions.editCharacter(character.id, { categoryId: val })
+      actions.editCategory(character.id, val)
     }
 
     const changeImage = (newImageId) => {
-      actions.editCharacter(character.id, { imageId: newImageId })
+      actions.editCharacterImage(character.id, newImageId)
     }
 
     const changeName = (newName) => {
-      actions.editCharacter(character.id, { name: newName })
+      actions.editCharacterName(character.id, newName)
     }
 
     const changeShortDescription = (newShortDescription) => {
-      actions.editCharacter(character.id, { description: newShortDescription })
+      actions.editShortDescription(character.id, newShortDescription)
     }
 
     const selectTab = (key) => {
@@ -183,7 +168,8 @@ const CharacterEditDetailsConnector = (connector) => {
           isOpen={showTemplatePicker}
           close={() => setShowTemplatePicker(false)}
           onChooseTemplate={handleChooseTemplate}
-          canMakeCharacterTemplates={!!customAttributes.length}
+          canMakeCharacterTemplates={!!attributes.length}
+          templatesAlreadySelected={character.templates}
         />
       )
     }
@@ -235,22 +221,26 @@ const CharacterEditDetailsConnector = (connector) => {
     }
 
     const renderEditingCustomAttributes = () => {
-      return customAttributes.map((attr, index) => {
+      return attributes.map((attr, index) => {
         const editorPath = helpers.editors.characterCustomAttributeEditorPath(
           character.id,
           attr.name
         )
+        // Don't use the attr.key || attr.name alone for key here
+        // because legacy attribute names can overlap with new
+        // attribute ids.
         return (
-          <React.Fragment key={attr.name}>
+          <React.Fragment key={`${index}-${attr.id || attr.name}`}>
             <EditAttribute
               index={index}
               entity={character}
               entityType="character"
-              value={character[attr.name]}
+              value={attr.value}
               editorPath={editorPath}
-              onChange={handleAttrChange(attr.name)}
+              onChange={handleAttrChange(attr.id || attr.name)}
               onSave={finishEditing}
               name={attr.name}
+              id={attr.id}
               type={attr.type}
             />
           </React.Fragment>
@@ -280,6 +270,7 @@ const CharacterEditDetailsConnector = (connector) => {
                 onChange={handleTemplateAttrChange(template.id, attr.name)}
                 onSave={finishEditing}
                 name={attr.name}
+                id={attr.id}
                 type={attr.type}
                 description={attr.description}
                 link={attr.link}
@@ -354,7 +345,7 @@ const CharacterEditDetailsConnector = (connector) => {
                   onChange={withEventTargetValue(changeShortDescription)}
                   onKeyDown={handleEsc}
                   onKeyPress={handleEnter}
-                  defaultValue={character.description}
+                  value={character.description}
                 />
               </FormGroup>
             </div>
@@ -409,7 +400,7 @@ const CharacterEditDetailsConnector = (connector) => {
             </Button>
             <Button onClick={handleDelete}>
               <Glyphicon glyph="trash" />
-              {t('Delete')}
+              {' ' + t('Delete')}
             </Button>
           </ButtonToolbar>
         </div>
@@ -422,7 +413,7 @@ const CharacterEditDetailsConnector = (connector) => {
     openAttributes: PropTypes.func,
     character: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired,
-    customAttributes: PropTypes.array.isRequired,
+    attributes: PropTypes.array.isRequired,
     darkMode: PropTypes.bool,
     finishEditing: PropTypes.func.isRequired,
     selection: PropTypes.object,
@@ -446,8 +437,11 @@ const CharacterEditDetailsConnector = (connector) => {
       (state, ownProps) => {
         const editorPath = helpers.editors.characterNotesEditorPath(ownProps.characterId)
         return {
-          character: selectors.singleCharacterSelector(state.present, ownProps.characterId),
-          customAttributes: state.present.customAttributes.characters,
+          character: selectors.displayedSingleCharacterSelector(
+            state.present,
+            ownProps.characterId
+          ),
+          attributes: selectors.characterAttributesSelector(state.present, ownProps.characterId),
           selection: selectors.selectionSelector(state.present, editorPath),
           editorPath,
           darkMode: selectors.isDarkModeSelector(state.present),

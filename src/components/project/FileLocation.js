@@ -9,11 +9,11 @@ import { checkDependencies } from '../checkDependencies'
 
 const FileLocationConnector = (connector) => {
   const {
-    platform: { moveFromTemp, showItemInFolder, isMacOS, os },
+    platform: { moveFromTemp, showItemInFolder, isMacOS, os, duplicateFile },
   } = connector
   checkDependencies({ moveFromTemp, showItemInFolder, isMacOS, os })
 
-  const FileLocation = ({ file, state, hasCurrentProLicense, isTemp }) => {
+  const FileLocation = ({ fileURL, state, hasCurrentProLicense, isTemp }) => {
     let showInMessage = t('Show in File Explorer')
     if (isMacOS()) {
       showInMessage = t('Show in Finder')
@@ -27,9 +27,14 @@ const FileLocationConnector = (connector) => {
     if (hasCurrentProLicense) return null
 
     let button = (
-      <Button bsSize="small" onClick={() => showItemInFolder(file.fileName)}>
-        {showInMessage}
-      </Button>
+      <div className="file-actions-wrapper">
+        <Button bsSize="small" onClick={() => showItemInFolder(fileURL)}>
+          {showInMessage}
+        </Button>
+        <Button bsSize="small" onClick={() => duplicateFile(fileURL)}>
+          {t('Duplicate')}
+        </Button>
+      </div>
     )
     if (isTemp) {
       button = (
@@ -49,7 +54,7 @@ const FileLocationConnector = (connector) => {
   }
 
   FileLocation.propTypes = {
-    file: PropTypes.object.isRequired,
+    fileURL: PropTypes.string.isRequired,
     state: PropTypes.object.isRequired,
     hasCurrentProLicense: PropTypes.bool,
     isTemp: PropTypes.bool,
@@ -66,10 +71,16 @@ const FileLocationConnector = (connector) => {
 
     return connect((state) => {
       return {
-        file: state.present.file,
+        fileURL: selectors.fileURLSelector(state.present),
         state: state.present,
         hasCurrentProLicense: selectors.hasProSelector(state.present),
-        isTemp: selectors.isTempFileSelector(state.present, state.present.file.fileName),
+        // NOTE: In other places we call this selector with a given
+        // prop for the fileURL selector.  That's why fileURL isn't
+        // *inside* isTempFileSelector.
+        isTemp: selectors.isTempFileSelector(
+          state.present,
+          selectors.fileURLSelector(state.present)
+        ),
       }
     })(FileLocation)
   }

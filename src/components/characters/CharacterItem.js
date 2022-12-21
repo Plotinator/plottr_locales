@@ -24,14 +24,6 @@ const CharacterItemConnector = (connector) => {
       this.ref = React.createRef()
     }
 
-    componentDidMount() {
-      this.scrollIntoView()
-    }
-
-    componentDidUpdate() {
-      this.scrollIntoView()
-    }
-
     scrollIntoView = () => {
       if (this.props.selected) {
         const node = this.ref.current
@@ -111,7 +103,7 @@ const CharacterItemConnector = (connector) => {
     }
 
     render() {
-      const { character } = this.props
+      const { character, selected } = this.props
       let img = null
       if (character.imageId) {
         img = (
@@ -122,7 +114,11 @@ const CharacterItemConnector = (connector) => {
       }
 
       return (
-        <div className="list-group-item" ref={this.ref} onClick={this.selectCharacter}>
+        <div
+          className={cx('list-group-item', { selected })}
+          ref={this.ref}
+          onClick={this.selectCharacter}
+        >
           <div className="character-list__item-inner">
             {img}
             <div>
@@ -150,6 +146,7 @@ const CharacterItemConnector = (connector) => {
 
     static propTypes = {
       character: PropTypes.object.isRequired,
+      characterId: PropTypes.number.isRequired,
       selected: PropTypes.bool.isRequired,
       select: PropTypes.func.isRequired,
       startEdit: PropTypes.func.isRequired,
@@ -160,7 +157,7 @@ const CharacterItemConnector = (connector) => {
 
   const {
     redux,
-    pltr: { actions },
+    pltr: { actions, selectors },
   } = connector
 
   checkDependencies({ redux, actions })
@@ -168,11 +165,21 @@ const CharacterItemConnector = (connector) => {
   if (redux) {
     const { connect, bindActionCreators } = redux
 
-    return connect(null, (dispatch) => {
-      return {
-        actions: bindActionCreators(actions.character, dispatch),
+    return connect(
+      (state, ownProps) => {
+        return {
+          character: selectors.displayedSingleCharacterSelector(
+            state.present,
+            ownProps.characterId
+          ),
+        }
+      },
+      (dispatch) => {
+        return {
+          actions: bindActionCreators(actions.character, dispatch),
+        }
       }
-    })(CharacterItem)
+    )(CharacterItem)
   }
 
   throw new Error('Cannot connect CharacterItem')

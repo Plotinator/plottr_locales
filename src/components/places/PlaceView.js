@@ -163,7 +163,7 @@ const PlaceViewConnector = (connector) => {
     const renderEditingCustomAttributes = () => {
       return customAttributes.map((attr, index) => {
         const editorPath = helpers.editors.placeCustomAttributeEditorPath(place.id, attr.name)
-        const { name, type } = attr
+        const { name, id, type } = attr
         return (
           <React.Fragment key={`custom-attribute-${index}-${name}`}>
             <EditAttribute
@@ -174,6 +174,7 @@ const PlaceViewConnector = (connector) => {
               onChange={(desc, selection) => handleAttrDescriptionChange(name, desc, selection)}
               onSave={saveEdit}
               name={name}
+              id={id}
               type={type}
             />
           </React.Fragment>
@@ -233,7 +234,7 @@ const PlaceViewConnector = (connector) => {
             </div>
             <ButtonToolbar className="card-dialog__button-bar">
               <Button bsStyle="success" onClick={saveEdit}>
-                {t('Save')}
+                {t('Close')}
               </Button>
               <Button className="card-dialog__duplicate" onClick={handleDuplicate}>
                 <FiCopy />
@@ -241,7 +242,7 @@ const PlaceViewConnector = (connector) => {
               </Button>
               <Button onClick={handleDelete}>
                 <Glyphicon glyph="trash" />
-                {t('Delete')}
+                {' ' + t('Delete')}
               </Button>
             </ButtonToolbar>
           </div>
