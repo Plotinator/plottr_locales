@@ -183,6 +183,7 @@ export const wireUpAPI = (logger) => {
       unsubscribeToTags()
       unsubscribeToLevels()
       unsubscribeToImages()
+      unsubscribeToAttributes()
     }
     return Promise.resolve(unsubscribe)
   }
