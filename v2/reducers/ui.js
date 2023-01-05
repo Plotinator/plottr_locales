@@ -1,4 +1,4 @@
-import { omit } from 'lodash'
+import { omit, isEmpty } from 'lodash'
 
 import {
   ADD_PLACES_ATTRIBUTE,
@@ -51,6 +51,13 @@ import {
   EDIT_CHARACTER_ATTRIBUTE_METADATA,
   SET_CARD_DIALOG_OPEN,
   SET_CARD_DIALOG_CLOSE,
+  DELETE_CARD,
+  CHANGE_BEAT,
+  CHANGE_LINE,
+  OPEN_NEW_BOOK_DIALOG,
+  OPEN_EDIT_BOOK_DIALOG,
+  CLOSE_BOOK_DIALOG,
+  MOVE_CARD_TO_BOOK,
 } from '../constants/ActionTypes'
 import { ui as defaultUI } from '../store/initialState'
 import { newFileUI } from '../store/newFileState'
@@ -222,7 +229,7 @@ const updateUI = (state, action) => {
     }
 
     case FILE_LOADED: {
-      const initialState = action.data.ui || newFileUI
+      const initialState = (!isEmpty(action.data.ui) && action.data.ui) || newFileUI
       return addCustomAttributeOrdering(initialState, action.data)
     }
 
@@ -553,6 +560,24 @@ const updateUI = (state, action) => {
       }
     }
 
+    case CHANGE_BEAT:
+      return {
+        ...state,
+        cardDialog: {
+          ...state.cardDialog,
+          beatId: action.beatId,
+        },
+      }
+
+    case CHANGE_LINE:
+      return {
+        ...state,
+        cardDialog: {
+          ...state.cardDialog,
+          lineId: action.lineId,
+        },
+      }
+
     case SET_CARD_DIALOG_OPEN: {
       return {
         ...state,
@@ -565,6 +590,8 @@ const updateUI = (state, action) => {
       }
     }
 
+    case MOVE_CARD_TO_BOOK:
+    case DELETE_CARD:
     case SET_CARD_DIALOG_CLOSE: {
       return {
         ...state,
@@ -572,6 +599,35 @@ const updateUI = (state, action) => {
           cardId: null,
           lineId: null,
           beatId: null,
+          isOpen: false,
+        },
+      }
+    }
+
+    case OPEN_EDIT_BOOK_DIALOG:
+      return {
+        ...state,
+        bookDialog: {
+          bookId: action.bookId,
+          isOpen: true,
+        },
+      }
+
+    case OPEN_NEW_BOOK_DIALOG: {
+      return {
+        ...state,
+        bookDialog: {
+          bookId: null,
+          isOpen: true,
+        },
+      }
+    }
+
+    case CLOSE_BOOK_DIALOG: {
+      return {
+        ...state,
+        bookDialog: {
+          bookId: null,
           isOpen: false,
         },
       }
