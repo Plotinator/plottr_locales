@@ -2,7 +2,7 @@
 
 $title_height: 70px;
 $cell_width: 175px;
-$medium_width: 80px;
+$medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
 
 .beat__cell {
   width: $cell_width;
@@ -132,6 +132,10 @@ $medium_width: 80px;
   }
   &.disabled {
     cursor: not-allowed;
+  }
+
+  span:first-child {
+    word-break: break-word;
   }
 }
 
@@ -346,6 +350,9 @@ $medium_width: 80px;
         padding: 6px 2px;
       }
     }
+  }
+  span:first-child {
+    word-break: break-word;
   }
 }
 
