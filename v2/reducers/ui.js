@@ -1,4 +1,4 @@
-import { omit } from 'lodash'
+import { omit, isEmpty } from 'lodash'
 
 import {
   ADD_PLACES_ATTRIBUTE,
@@ -15,7 +15,7 @@ import {
   NAVIGATE_TO_BOOK_TIMELINE,
   NEW_FILE,
   OPEN_ATTRIBUTES_DIALOG,
-  RECORD_SCROLL_POSITION,
+  RECORD_TIMELINE_SCROLL_POSITION,
   REMOVE_PLACES_ATTRIBUTE,
   SET_CHARACTER_FILTER,
   SET_CHARACTER_SORT,
@@ -57,6 +57,8 @@ import {
   OPEN_NEW_BOOK_DIALOG,
   OPEN_EDIT_BOOK_DIALOG,
   CLOSE_BOOK_DIALOG,
+  MOVE_CARD_TO_BOOK,
+  RECORD_OUTLINE_SCROLL_POSITION,
 } from '../constants/ActionTypes'
 import { ui as defaultUI } from '../store/initialState'
 import { newFileUI } from '../store/newFileState'
@@ -228,7 +230,7 @@ const updateUI = (state, action) => {
     }
 
     case FILE_LOADED: {
-      const initialState = action.data.ui || newFileUI
+      const initialState = (!isEmpty(action.data.ui) && action.data.ui) || newFileUI
       return addCustomAttributeOrdering(initialState, action.data)
     }
 
@@ -356,13 +358,19 @@ const updateUI = (state, action) => {
     case NEW_FILE:
       return newFileUI
 
-    case RECORD_SCROLL_POSITION:
+    case RECORD_TIMELINE_SCROLL_POSITION:
       return {
         ...state,
         timelineScrollPosition: {
           x: action.x,
           y: action.y,
         },
+      }
+
+    case RECORD_OUTLINE_SCROLL_POSITION:
+      return {
+        ...state,
+        outlineScrollPosition: action.position,
       }
 
     case OPEN_ATTRIBUTES_DIALOG:
@@ -589,6 +597,7 @@ const updateUI = (state, action) => {
       }
     }
 
+    case MOVE_CARD_TO_BOOK:
     case DELETE_CARD:
     case SET_CARD_DIALOG_CLOSE: {
       return {
