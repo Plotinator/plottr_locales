@@ -1,4 +1,4 @@
-import { omit } from 'lodash'
+import { omit, isEmpty } from 'lodash'
 
 import {
   ADD_PLACES_ATTRIBUTE,
@@ -57,6 +57,7 @@ import {
   OPEN_NEW_BOOK_DIALOG,
   OPEN_EDIT_BOOK_DIALOG,
   CLOSE_BOOK_DIALOG,
+  MOVE_CARD_TO_BOOK,
 } from '../constants/ActionTypes'
 import { ui as defaultUI } from '../store/initialState'
 import { newFileUI } from '../store/newFileState'
@@ -228,7 +229,7 @@ const updateUI = (state, action) => {
     }
 
     case FILE_LOADED: {
-      const initialState = action.data.ui || newFileUI
+      const initialState = (!isEmpty(action.data.ui) && action.data.ui) || newFileUI
       return addCustomAttributeOrdering(initialState, action.data)
     }
 
@@ -589,6 +590,7 @@ const updateUI = (state, action) => {
       }
     }
 
+    case MOVE_CARD_TO_BOOK:
     case DELETE_CARD:
     case SET_CARD_DIALOG_CLOSE: {
       return {
