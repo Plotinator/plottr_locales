@@ -323,6 +323,7 @@ const CharacterListViewConnector = (connector) => {
           selected={ch.id == selectedCharacteId}
           startEdit={editSelected}
           stopEdit={stopEditing}
+          editing={editingSelected}
           select={() => uiActions.selectCharacter(ch.id)}
         />
       ))
@@ -408,7 +409,7 @@ const CharacterListViewConnector = (connector) => {
         {renderCreateInput()}
         <Grid fluid className="tab-body">
           <Row>
-            <Col sm={3}>
+            <Col sm={3} onDoubleClick={stopEditing}>
               <h1 className={cx('secondary-text', { darkmode: darkMode })}>
                 {t('Characters')}{' '}
                 <Button onClick={handleCreateNewCharacter}>
@@ -498,7 +499,7 @@ const CharacterListViewConnector = (connector) => {
           characterSort: selectors.characterSortSelector(state.present),
           darkMode: selectors.isDarkModeSelector(state.present),
           charactersSearchTerm: selectors.charactersSearchTermSelector(state.present),
-          books: selectors.allBooksSelector(state.present),
+          books: selectors.allBooksWithCharactersInThemSelector(state.present),
           attributeTabId: selectors.characterAttributeTabSelector(state.present),
           selectedCharacteId: selectors.selectedCharacterSelector(state.present),
           showTabs: selectors.showBookTabsSelector(state.present),

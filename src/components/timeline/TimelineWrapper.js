@@ -3,6 +3,7 @@ import PropTypes from 'react-proptypes'
 import { StickyTable } from 'react-sticky-table'
 import cx from 'classnames'
 import { VscSymbolStructure } from 'react-icons/vsc'
+import { CgArrowLongRight, CgArrowLongDown } from 'react-icons/cg'
 
 import { t } from 'plottr_locales'
 import { helpers } from 'pltr/v2'
@@ -295,7 +296,7 @@ const TimelineWrapperConnector = (connector) => {
       }
       if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
       scrollTimeoutRef.current = setTimeout(() => {
-        actions.recordScrollPosition(position)
+        actions.recordTimelineScrollPosition(position)
       }, 500)
     }
 
@@ -371,11 +372,11 @@ const TimelineWrapperConnector = (connector) => {
     }
 
     const renderSubNav = () => {
-      let glyph = 'option-vertical'
+      let glyph = <CgArrowLongDown style={{ marginBottom: -2, marginRight: -2 }} />
       let scrollDirectionFirst = 'menu-left'
       let scrollDirectionSecond = 'menu-right'
       if (timelineBundle.orientation === 'vertical') {
-        glyph = 'option-horizontal'
+        glyph = <CgArrowLongRight style={{ marginBottom: -2 }} />
         scrollDirectionFirst = 'menu-up'
         scrollDirectionSecond = 'menu-down'
       }
@@ -438,6 +439,7 @@ const TimelineWrapperConnector = (connector) => {
           <Nav bsStyle="pills">
             <NavItem>
               <Floater
+                positionLeftMost
                 open={filterIsOpen}
                 placement="bottom"
                 component={renderPopover}
@@ -458,17 +460,17 @@ const TimelineWrapperConnector = (connector) => {
               {filterDeclaration}
             </NavItem>
             <NavItem>
+              <Button bsSize="small" onClick={openCustomAttributesDialog}>
+                <Glyphicon glyph="list" /> {t('Attributes')}
+              </Button>
+            </NavItem>
+            <NavItem>
               <Button
                 bsSize="small"
                 onClick={flipOrientation}
                 disabled={timelineViewIsStacked && !timelineBundle.isSmall}
               >
-                <Glyphicon glyph={glyph} /> {t('Flip')}
-              </Button>
-            </NavItem>
-            <NavItem>
-              <Button bsSize="small" onClick={openCustomAttributesDialog}>
-                <Glyphicon glyph="list" /> {t('Attributes')}
+                {glyph} {t('Flip')}
               </Button>
             </NavItem>
             <NavItem>
