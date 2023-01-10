@@ -104,7 +104,7 @@ const FileActionsConnector = (connector) => {
           {missing ? null : (
             <>
               <Button bsSize="small" onClick={handleOpen} title={t('Open')}>
-                <Glyphicon glyph="open" />
+                <IoOpenOutline />
               </Button>
               <Button
                 bsSize="small"
