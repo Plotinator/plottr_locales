@@ -296,7 +296,7 @@ const TimelineWrapperConnector = (connector) => {
       }
       if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
       scrollTimeoutRef.current = setTimeout(() => {
-        actions.recordScrollPosition(position)
+        actions.recordTimelineScrollPosition(position)
       }, 500)
     }
 
@@ -439,6 +439,7 @@ const TimelineWrapperConnector = (connector) => {
           <Nav bsStyle="pills">
             <NavItem>
               <Floater
+                positionLeftMost
                 open={filterIsOpen}
                 placement="bottom"
                 component={renderPopover}
