@@ -1,7 +1,10 @@
-import { clone, sortBy } from 'lodash'
+import { clone, sortBy, difference } from 'lodash'
 import semverGt from 'semver/functions/gt'
+import semverLte from 'semver/functions/lte'
 
+import migrationsList from './migrations_list'
 import { nextColor, nextDarkColor } from '../store/lineColors'
+import { toSemver } from './toSemver'
 
 // The 2021-07-07 version was problematic because it was created by
 // broken templates.  In that version of the templates we had no
@@ -124,10 +127,34 @@ export const handleObjectTitlesOnCards = (file) => {
   }
 }
 
-const applyAllFixes = (file) =>
-  [handle2021_07_07, handleMissingTemplatesFieldOnCards, handleObjectTitlesOnCards].reduce(
-    (acc, f) => f(acc),
-    file
+export const insertBreakingVersionsPriorToBreakingVersionChange = (file) => {
+  const breakingMigrations = migrationsList.filter((mig) => mig.includes('*'))
+  const appliedMigrations = file.file.appliedMigrations || []
+  const missingBreakingMigrations = difference(breakingMigrations, appliedMigrations).filter(
+    (missingVersion) => {
+      return semverLte(toSemver(missingVersion), toSemver(file.file.version))
+    }
   )
+
+  if (missingBreakingMigrations.length > 0) {
+    return {
+      ...file,
+      file: {
+        ...file.file,
+        appliedMigrations: [...appliedMigrations, ...missingBreakingMigrations],
+      },
+    }
+  }
+
+  return file
+}
+
+const applyAllFixes = (file) =>
+  [
+    handle2021_07_07,
+    handleMissingTemplatesFieldOnCards,
+    handleObjectTitlesOnCards,
+    insertBreakingVersionsPriorToBreakingVersionChange,
+  ].reduce((acc, f) => f(acc), file)
 
 export default applyAllFixes
