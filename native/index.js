@@ -119,12 +119,12 @@ const storage = () => {
   }
 }
 
-export const wireUpAPI = (logger) => {
+export const wireUpAPI = (logger, actions, selectors) => {
   // Pretend to be desktop because we never run emulators locally.
   // eslint-disable-next-line
   const wiredUp = api(auth, database, storage, BASE_API_DOMAIN, __DEV__, logger, true)
 
-  const listen = (withResponse, userId, fileId, clientId, fileVersion) => {
+  const listen = (actions, selectors, withResponse, userId, fileId, clientId, fileVersion) => {
     const unsubscribeToUI = wiredUp.listenToUI(userId, fileId, clientId, withResponse)
     const unsubscribeToFile = wiredUp.listenToFile(userId, fileId, clientId, withResponse)
     const unsubscribeToBeats = wiredUp.listenToBeats(
