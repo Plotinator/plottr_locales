@@ -103,6 +103,8 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
 
   const patchActions = (path) => {
     switch (path) {
+      case 'ui':
+        return actions.ui
       case 'beats':
         return actions.beat
       case 'books':
@@ -239,6 +241,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
     )
   }
 
+  const listenToUI = listenForObjectAtPath('ui')
   const listenToCards = listenForArrayAtPath('cards')
   const listenToSeries = listenForObjectAtPath('series')
   const listenToBooks = listenForObjectAtPath('books')
@@ -299,6 +302,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
     })
   }
 
+  const fetchUI = fetchObjectAtPath('ui')
   const fetchChapters = fetchArrayAtPath('chapters')
   const fetchCards = fetchArrayAtPath('cards')
   const fetchSeries = fetchObjectAtPath('series')
@@ -345,6 +349,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
     return fetchFile(userId, fileId, clientId)
       .then((file) => {
         return Promise.all([
+          fetchUI(userId, fileId, clientId),
           fetchChapters(userId, fileId, clientId),
           fetchBeats(userId, fileId, clientId, file.file.version),
           fetchCards(userId, fileId, clientId),
@@ -1011,6 +1016,7 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
     updateAuthFileName,
     listenToFile,
     listenToBeats,
+    listenToUI,
     listenToCards,
     listenToSeries,
     listenToBooks,
