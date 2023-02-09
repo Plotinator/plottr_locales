@@ -102,7 +102,7 @@ const CardConnector = (connector) => {
 
       const hoverTimeout = setTimeout(() => {
         this.setState({ hovering: true })
-      }, 1000)
+      }, 500)
       this.setState({ hoverTimeout })
     }
 
@@ -118,7 +118,10 @@ const CardConnector = (connector) => {
 
     renderPopover = () => {
       return (
-        <Popover id={`card-popover-${this.props.card.id}`} title={this.props.card.title}>
+        <Popover
+          id={`card-popover-${this.props.card.id}`}
+          title={truncateTitle(this.props.card.title, 150)}
+        >
           <div className="card__popover-wrapper">
             <RichText
               description={this.props.cardDescription}
