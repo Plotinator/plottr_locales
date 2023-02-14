@@ -204,7 +204,25 @@ const OptionsHomeConnector = (connector) => {
                 </div>
               </div>
             </Tab>
-            <Tab eventKey={2} title={t('Dashboard')}>
+            {!osIsUnknown ? (
+              <Tab eventKey={2} title={t('Files')}>
+                <div className="dashboard__options__item">
+                  <h4>{t('Default Folder')}</h4>
+                  <Switch
+                    isOn={!!settings.user.defaultFolder}
+                    handleToggle={() =>
+                      saveAppSetting('user.defaultFolder', !settings.user.defaultFolder)
+                    }
+                    labelText={
+                      settings.user.defaultFolder
+                        ? t('All your project files will be saved to the folder you choose')
+                        : t('Do not save new project files to a default folder')
+                    }
+                  />
+                </div>
+              </Tab>
+            ) : null}
+            <Tab eventKey={3} title={t('Dashboard')}>
               <div className="dashboard__options__item">
                 <h4>{t('Always Open Dashboard First')}</h4>
                 <Switch
@@ -231,7 +249,7 @@ const OptionsHomeConnector = (connector) => {
                 />
               </div>
             </Tab>
-            <Tab eventKey={3} title={t('Backups')}>
+            <Tab eventKey={4} title={t('Backups')}>
               <div className="dashboard__options__item">
                 <h4>{t('Save Backups')}</h4>
                 <Switch
@@ -279,7 +297,7 @@ const OptionsHomeConnector = (connector) => {
               ) : null}
             </Tab>
             {!osIsUnknown && shouldBeInPro ? (
-              <Tab eventKey={4} title={t('Beta')}>
+              <Tab eventKey={5} title={t('Beta')}>
                 <div className="dashboard__options__item">
                   <h4>{t('Offline Mode')}</h4>
                   <Switch
