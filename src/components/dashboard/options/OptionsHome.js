@@ -25,6 +25,7 @@ const OptionsHomeConnector = (connector) => {
       hostLocale,
       openExternal,
       showItemInFolder,
+      userDocumentsPath,
       defaultBackupLocation,
       showOpenDialog,
       updateLanguage,
@@ -36,6 +37,8 @@ const OptionsHomeConnector = (connector) => {
   checkDependencies({
     hostLocale,
     openExternal,
+    showItemInFolder,
+    userDocumentsPath,
     defaultBackupLocation,
     showOpenDialog,
     updateLanguage,
@@ -84,6 +87,19 @@ const OptionsHomeConnector = (connector) => {
           let folderPath = files[0]
           saveAppSetting('user.backupLocation', folderPath)
         }
+      })
+    }
+
+    const onChangeDefaultFolderLocation = () => {
+      const title = t('Choose your default folder location')
+      const properties = ['openDirectory', 'createDirectory']
+      userDocumentsPath().then((docPath) => {
+        showOpenDialog(title, [], properties, docPath).then((files) => {
+          if (files && files.length) {
+            let folderPath = files[0]
+            saveAppSetting('user.defaultFolderLocation', folderPath)
+          }
+        })
       })
     }
 
@@ -223,11 +239,29 @@ const OptionsHomeConnector = (connector) => {
                     }
                     labelText={
                       settings.user.defaultFolder
-                        ? t('All your project files will be saved to the folder you choose')
+                        ? t('All your project files will be saved to the folder you choose below')
                         : t('Do not save new project files to a default folder')
                     }
                   />
                 </div>
+                {settings.user.defaultFolder ? (
+                  <div className="dashboard__options__item">
+                    <h4>{t('Default Folder Location')}</h4>
+                    <HelpBlock className="dashboard__options-item-help">
+                      {t('The folder where all your project files get saved')}
+                    </HelpBlock>
+                    <p>
+                      <Button onClick={onChangeDefaultFolderLocation}>{t('Choose...')}</Button>
+                      {'  '}
+                      <Button
+                        bsStyle="link"
+                        onClick={() => showItemInFolder(settings.user.defaultFolderLocation)}
+                      >
+                        {settings.user.defaultFolderLocation}
+                      </Button>
+                    </p>
+                  </div>
+                ) : null}
               </Tab>
             ) : null}
             <Tab eventKey={3} title={t('Dashboard')}>
