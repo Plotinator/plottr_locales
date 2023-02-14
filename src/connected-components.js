@@ -90,6 +90,7 @@ const {
   showErrorBox,
   askToExport,
   userDesktopPath,
+  userDocumentsPath,
 } = makeMainProcessClient()
 
 export const rmRF = (path, ...args) => {
@@ -412,6 +413,7 @@ const platform = {
   log: logger,
   showOpenDialog,
   showErrorBox,
+  userDocumentsPath,
   node: {
     env: isDevelopment() ? 'development' : 'production',
   },

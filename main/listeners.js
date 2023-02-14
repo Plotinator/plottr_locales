@@ -622,12 +622,13 @@ export const listenOnIPCMain = (
     }
   })
 
-  ipcMain.on('show-open-dialog', (event, replyChannel, title, filters, properties) => {
+  ipcMain.on('show-open-dialog', (event, replyChannel, title, filters, properties, defaultPath) => {
     dialog
       .showOpenDialog(event.sender.getOwnerBrowserWindow(), {
         title,
         filters,
         properties,
+        defaultPath,
       })
       .then((files) => {
         event.sender.send(replyChannel, files.filePaths)

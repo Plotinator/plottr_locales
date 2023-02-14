@@ -95,8 +95,8 @@ const _makeMainProcessClient = () => {
     return ask('user-logs-path')
   }
 
-  const showOpenDialog = (title, filters, properties) => {
-    return ask('show-open-dialog', title, filters, properties)
+  const showOpenDialog = (title, filters, properties, defaultPath) => {
+    return ask('show-open-dialog', title, filters, properties, defaultPath)
   }
 
   const openExternal = (url) => {
