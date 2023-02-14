@@ -17,12 +17,14 @@ import { addRecent, getFonts, getRecent } from '../../rce/fonts'
 import { FontSettingDropdown } from './FontSettingDropdown'
 import { FontSizeSettingDropdown } from './FontSizeSettingDropdown'
 import RichTextSettingsViewer from './RichTextSettingsViewer'
+import Alert from '../../Alert'
 
 const OptionsHomeConnector = (connector) => {
   const {
     platform: {
       hostLocale,
       openExternal,
+      showItemInFolder,
       defaultBackupLocation,
       showOpenDialog,
       updateLanguage,
@@ -95,6 +97,12 @@ const OptionsHomeConnector = (connector) => {
     // - not Pro, unless Pro & localBackups
     const showBackupLocation = () => {
       return (!osIsUnknown && !hasCurrentProLicense) || (!osIsUnknown && settings.user.localBackups)
+    }
+
+    const backupFolderPath = () => {
+      return !settings.user.backupLocation || settings.user.backupLocation === 'default'
+        ? defaultBackupPath
+        : settings.user.backupLocation
     }
 
     const dashboardAtFirstIsOn =
@@ -273,6 +281,9 @@ const OptionsHomeConnector = (connector) => {
               {showBackupLocation() ? (
                 <>
                   <div className="dashboard__options__item">
+                    <BackupOptions />
+                  </div>
+                  <div className="dashboard__options__item">
                     <h4>{t('Backup Location')}</h4>
                     <HelpBlock className="dashboard__options-item-help">
                       {t('Folder where backups are stored')}
@@ -280,18 +291,18 @@ const OptionsHomeConnector = (connector) => {
                     <p>
                       <Button onClick={onChangeBackupLocation}>{t('Choose...')}</Button>
                       {'  '}
-                      {!settings.user.backupLocation || settings.user.backupLocation === 'default'
-                        ? defaultBackupPath
-                        : settings.user.backupLocation}
+                      <Button bsStyle="link" onClick={() => showItemInFolder(backupFolderPath())}>
+                        {backupFolderPath()}
+                      </Button>
                     </p>
+                    <Alert bsStyle="danger" style={{ maxWidth: 'max-content' }}>
+                      {t('Backups are read-only and can only be copied, not edited')}
+                    </Alert>
                     {settings.user.backupLocation !== 'default' ? (
                       <Button onClick={() => saveAppSetting('user.backupLocation', 'default')}>
                         {t('Restore Default')}
                       </Button>
                     ) : null}
-                  </div>
-                  <div className="dashboard__options__item">
-                    <BackupOptions />
                   </div>
                 </>
               ) : null}
