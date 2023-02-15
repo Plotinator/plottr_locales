@@ -45,7 +45,6 @@ const makeFileModule = () => {
 
   function saveToDefaultLocation(json, name) {
     return whenClientIsReady(({ saveToDefaultLocation }) => {
-      console.log('about to save', saveToDefaultLocation, name)
       return saveToDefaultLocation(json, name)
     })
   }
