@@ -65,6 +65,7 @@ const {
   hostLocale,
   openExternal,
   showOpenDialog,
+  showSaveDialog,
   machineId,
   openKnownFile,
   pleaseSetDarkModeSetting,
@@ -412,6 +413,7 @@ const platform = {
   handleCustomerServiceCode,
   log: logger,
   showOpenDialog,
+  showSaveDialog,
   showErrorBox,
   userDocumentsPath,
   node: {

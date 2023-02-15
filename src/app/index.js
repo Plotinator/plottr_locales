@@ -60,7 +60,6 @@ const {
   onSave,
   onSaveAs,
   pleaseOpenWindow,
-  removeFromTempFilesIfTemp,
   editKnownFilePath,
   pleaseTellDashboardToReloadRecents,
   onUndo,
@@ -90,6 +89,8 @@ const {
   onCreateFileShortcut,
   showItemInFolder,
   userDesktopPath,
+  userDocumentsPath,
+  createNewFile,
   askToExport,
 } = makeMainProcessClient()
 
@@ -338,23 +339,6 @@ tellMeWhatOSImOn()
                           newFileURL
                         )
                       )
-                      // remove from tmp store
-                      removeFromTempFilesIfTemp(oldFileURL)
-                        .then(() => {
-                          // update in known files
-                          return editKnownFilePath(oldFileURL, newFileURL)
-                        })
-                        .then(() => {
-                          // change the window's title
-                          setRepresentedFileName(newFilePath)
-                        })
-                        .then(() => {
-                          setFileURL(newFileURL)
-                        })
-                        .then(() => {
-                          // send event to dashboard
-                          pleaseTellDashboardToReloadRecents()
-                        })
                     })
                   })
                 }
@@ -463,7 +447,22 @@ tellMeWhatOSImOn()
         window.addEventListener('focus', reloadMenu)
 
         onNewProject(() => {
-          store.dispatch(actions.project.startCreatingNewProject())
+          fileSystemAPIs.currentAppSettings().then((settings) => {
+            if (settings.user.defaultFolder && settings.user.defaultFolderLocation) {
+              store.dispatch(actions.project.startCreatingNewProject())
+            } else {
+              userDocumentsPath().then((docPath) => {
+                const title = t('Choose where to save this file on your computer')
+                const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
+                showSaveDialog(filters, title, docPath).then((fileName) => {
+                  if (fileName) {
+                    const newFilePath = ensureEndsInPltr(fileName)
+                    createNewFile(null, newFilePath)
+                  }
+                })
+              })
+            }
+          })
         })
 
         onCreateFileShortcut((sourceFile, destinationURL) => {
