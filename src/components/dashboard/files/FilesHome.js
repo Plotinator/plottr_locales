@@ -145,6 +145,7 @@ const FilesHomeConnector = (connector) => {
         if (template.constructor.name == 'Object') {
           mpq.push('btn_create_with_template', { template_name: template.name })
           projectActions.startCreatingNewProject(template)
+          setView('recent')
         } else {
           projectActions.startCreatingNewProject()
         }
@@ -153,6 +154,7 @@ const FilesHomeConnector = (connector) => {
           if (newFilePath) {
             let templateObj = template.constructor.name == 'Object' ? template : null
             createNew(templateObj, newFilePath)
+            setView('recent')
           }
         })
       }
@@ -167,7 +169,8 @@ const FilesHomeConnector = (connector) => {
             modal={false}
             types={['custom', 'project', 'plotlines']}
             onChooseTemplate={handleCreateNewProject}
-            showCancelButton={false}
+            showCancelButton
+            close={() => setView('recent')}
             confirmButtonText={t('Create New Project')}
           />
         )
