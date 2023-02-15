@@ -17,6 +17,8 @@ const FilesHomeConnector = (connector) => {
       log,
       showErrorBox,
       showOpenDialog,
+      showSaveDialog,
+      userDocumentsPath,
       mpq,
     },
   } = connector
@@ -27,6 +29,8 @@ const FilesHomeConnector = (connector) => {
     log,
     showErrorBox,
     showOpenDialog,
+    showSaveDialog,
+    userDocumentsPath,
     mpq,
   })
 
@@ -69,7 +73,28 @@ const FilesHomeConnector = (connector) => {
     })
   }
 
-  const FilesHome = ({ errorActions, importActions, isOnWeb, projectActions, isInOfflineMode }) => {
+  function savePlottrProjectDialog() {
+    const title = t('Choose where to save this file on your computer')
+    const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
+    return userDocumentsPath().then((docPath) => {
+      return showSaveDialog(filters, title, docPath).then((fileName) => {
+        if (fileName) {
+          const filePath = fileName.endsWith('.pltr') ? fileName : `${fileName}.pltr`
+          return filePath
+        }
+        return Promise.resolve()
+      })
+    })
+  }
+
+  const FilesHome = ({
+    errorActions,
+    importActions,
+    isOnWeb,
+    projectActions,
+    isInOfflineMode,
+    settings,
+  }) => {
     const [view, setView] = useState('recent')
 
     const createFromSnowflakeImport = () => {
@@ -116,11 +141,20 @@ const FilesHomeConnector = (connector) => {
     const handleCreateNewProject = (template) => {
       if (isInOfflineMode) return
 
-      if (template.constructor.name == 'Object') {
-        mpq.push('btn_create_with_template', { template_name: template.name })
-        projectActions.startCreatingNewProject(template)
+      if (settings.user.defaultFolder && settings.user.defaultFolderLocation) {
+        if (template.constructor.name == 'Object') {
+          mpq.push('btn_create_with_template', { template_name: template.name })
+          projectActions.startCreatingNewProject(template)
+        } else {
+          projectActions.startCreatingNewProject()
+        }
       } else {
-        projectActions.startCreatingNewProject()
+        savePlottrProjectDialog().then((newFilePath) => {
+          if (newFilePath) {
+            let templateObj = template.constructor.name == 'Object' ? template : null
+            createNew(templateObj, newFilePath)
+          }
+        })
       }
     }
 
@@ -173,6 +207,7 @@ const FilesHomeConnector = (connector) => {
     projectActions: PropTypes.object,
     isOnWeb: PropTypes.bool,
     isInOfflineMode: PropTypes.bool,
+    settings: PropTypes.object.isRequired,
   }
 
   const {
@@ -193,6 +228,7 @@ const FilesHomeConnector = (connector) => {
       (state) => ({
         isOnWeb: selectors.isOnWebSelector(state.present),
         isInOfflineMode: selectors.isInOfflineModeSelector(state.present),
+        settings: selectors.appSettingsSelector(state.present),
       }),
       (dispatch) => {
         return {
