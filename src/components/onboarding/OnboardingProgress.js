@@ -18,7 +18,7 @@ export default function OnboardingProgress({ currentStep, totalSteps }) {
 
   return (
     <div className="onboarding__progress">
-      <ProgressBar now={currentStep} max={totalSteps} />
+      <ProgressBar now={currentStep / 2} max={totalSteps} />
       <StepTitles />
     </div>
   )

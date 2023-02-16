@@ -92,6 +92,7 @@ import {
   ProOnboarding as UnconnectedProOnboarding,
   UpdateNotifier as UnconnectedUpdateNotifier,
   NewProjectInputModal as UnconnectedNewProjectInputModal,
+  SettingsWizard as UnconnectedSettingsWizard,
 } from '../components'
 
 const connector = {
@@ -334,5 +335,6 @@ export default (platform) => {
     ProOnboarding: UnconnectedProOnboarding(connectorObject),
     UpdateNotifier: UnconnectedUpdateNotifier(connectorObject),
     NewProjectInputModal: UnconnectedNewProjectInputModal(connectorObject),
+    SettingsWizard: UnconnectedSettingsWizard(connectorObject),
   }
 }

@@ -26,7 +26,7 @@ const ExpiredViewConnector = (connector) => {
 
     const renderChoices = () => {
       // eslint-disable-next-line react/display-name, react/prop-types
-      const licenseText = t.rich('I have a<br/>License Key', { br: () => <br /> })
+      const licenseText = t.rich('I have a<br/>License Key', { br: () => <br key="unique" /> })
 
       return (
         <>
