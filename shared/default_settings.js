@@ -9,6 +9,7 @@ module.exports = {
   gracePeriodEnd: 0,
   canEdit: true,
   canExport: true,
+  finishedSettingsWizard: false,
   user: {
     autoDownloadUpdate: true,
     autoSave: true,

@@ -1,0 +1,40 @@
+@import "../colors";
+@import "../vars";
+
+.settings-wizard__wrapper {
+  height: 100vh;
+  display: grid;
+  grid-template-areas: 'header' 'body';
+  grid-template-rows: auto 1fr;
+
+  .onboarding__wrapper {
+    display: grid;
+    grid-template-areas: 'progress' 'step';
+    grid-template-rows: auto 1fr;
+    height: 61vh;
+
+    .onboarding__progress {
+      grid-area: progress;
+    }
+
+    .onboarding__step {
+      grid-area: step;
+      height: 90%;
+      width: 80vw;
+      margin: 0 auto;
+      margin-top: 16px;
+      background-color: $gray-8;
+      border-radius: 16px;
+    }
+  }
+}
+
+.settings-wizard__header {
+  grid-area: header;
+  padding: 16px 0;
+  text-align: center;
+}
+
+.settings-wizard__body {
+  grid-area: body;
+}
