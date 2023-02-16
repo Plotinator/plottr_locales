@@ -141,6 +141,19 @@ export const checkingProSubscriptionSelector = createSelector(
   ({ checkingProSubscription }) => checkingProSubscription
 )
 
+export const settingsWizardStateSelector = createSelector(
+  applicationStateSelector,
+  ({ settingsWizard }) => settingsWizard
+)
+export const currentSettingsWizardStepSelector = createSelector(
+  settingsWizardStateSelector,
+  ({ wizardStep }) => wizardStep
+)
+export const isInSettingsWizardSelector = createSelector(
+  settingsWizardStateSelector,
+  ({ isInSettingsWizard }) => isInSettingsWizard
+)
+
 export const proOnboardingStateSelector = createSelector(
   applicationStateSelector,
   ({ proOnboarding }) => proOnboarding
