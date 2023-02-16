@@ -41,6 +41,10 @@ import {
   BUSY_WITH_WORK_THAT_PREVENTS_QUITTING,
   DONE_WITH_WORK_THAT_PREVENTS_QUITTING,
   CLEAR_ERROR_LOADING_FILE,
+  START_SETTINGS_WIZARD,
+  ADVANCE_SETTINGS_WIZARD,
+  FINISH_SETTINGS_WIZARD,
+  SET_APP_SETTINGS,
 } from '../constants/ActionTypes'
 
 const INITIAL_STATE = {
@@ -84,6 +88,10 @@ const INITIAL_STATE = {
     isOnboarding: false,
     isOnboardingFromRoot: false,
     onboardingStep: null,
+  },
+  settingsWizard: {
+    isInSettingsWizard: false,
+    wizardStep: null,
   },
   update: {
     requestedCheck: false,
@@ -457,6 +465,53 @@ function applicationStateReducer(state = INITIAL_STATE, action) {
         ...state,
         settings: {
           ...finishLoadingSettingsType(state.settings, action.settingsType),
+        },
+      }
+    }
+    case SET_APP_SETTINGS: {
+      const isInSettingsWizard = action.appSettings.finishedSettingsWizard ? false : true
+      return {
+        ...state,
+        settingsWizard: {
+          isInSettingsWizard,
+          wizardStep: isInSettingsWizard ? 1 : null,
+        },
+      }
+    }
+    case ADVANCE_SETTINGS_WIZARD: {
+      if (!state.settingsWizard.isInSettingsWizard) {
+        return state
+      }
+      const wizardStep = state.settingsWizard.wizardStep ? state.settingsWizard.wizardStep : 1
+      return {
+        ...state,
+        settingsWizard: {
+          ...state.settingsWizard,
+          wizardStep: wizardStep + 1,
+        },
+      }
+    }
+    case START_SETTINGS_WIZARD: {
+      if (state.settingsWizard.isInSettingsWizard) {
+        return state
+      }
+      return {
+        ...state,
+        settingsWizard: {
+          isInSettingsWizard: true,
+          wizardStep: 1,
+        },
+      }
+    }
+    case FINISH_SETTINGS_WIZARD: {
+      if (!state.settingsWizard.isInSettingsWizard) {
+        return state
+      }
+      return {
+        ...state,
+        settingsWizard: {
+          ...state.settingsWizard,
+          isInSettingsWizard: false,
         },
       }
     }

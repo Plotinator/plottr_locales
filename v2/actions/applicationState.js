@@ -40,6 +40,9 @@ import {
   BUSY_WITH_WORK_THAT_PREVENTS_QUITTING,
   DONE_WITH_WORK_THAT_PREVENTS_QUITTING,
   CLEAR_ERROR_LOADING_FILE,
+  ADVANCE_SETTINGS_WIZARD,
+  START_SETTINGS_WIZARD,
+  FINISH_SETTINGS_WIZARD,
 } from '../constants/ActionTypes'
 
 // Project states
@@ -133,6 +136,17 @@ export const startLoadingASettingsType = (settingsType) => ({
 export const finishLoadingASettingsType = (settingsType) => ({
   type: FINISH_LOADING_A_SETTINGS_TYPE,
   settingsType,
+})
+
+// Settings Wizard
+export const advanceSettingsWizard = () => ({
+  type: ADVANCE_SETTINGS_WIZARD,
+})
+export const startSettingsWizard = () => ({
+  type: START_SETTINGS_WIZARD,
+})
+export const finishSettingsWizard = () => ({
+  type: FINISH_SETTINGS_WIZARD,
 })
 
 // Pro Onboarding
