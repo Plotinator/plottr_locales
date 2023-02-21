@@ -106,6 +106,13 @@ function buildFileMenu(fileURL, getTrialInfo) {
           type: 'separator',
         },
         {
+          label: t('Open Image Gallery'),
+          visible: !!fileURL,
+          click: (event, focusedWindow) => {
+            focusedWindow.webContents.send('image-picker-file-from-menu')
+          },
+        },
+        {
           label: t('Export'),
           visible: !!fileURL,
           enabled:
