@@ -35,7 +35,6 @@ import {
   timelineViewIsTabbedSelector,
   currentTimelineSelector,
   firstLineForBookSelector,
-  sortedBeatsForAnotherBookSelector,
   firstVisibleBeatForBookSelector,
   timelineTabBeatIdsSelector,
   timelineActiveTabSelector,
@@ -51,7 +50,6 @@ import { nextId, objectId } from '../store/newIds'
 import * as tree from './tree'
 import { beat as defaultBeat } from '../store/initialState'
 import { cloneDeep } from 'lodash'
-import { addBeat } from '../actions/beats'
 import { setTimelineView } from '../actions/ui'
 import { deleteLine } from '../actions/lines'
 import { applyTemplate, moveLineActions } from '../helpers/templates'
