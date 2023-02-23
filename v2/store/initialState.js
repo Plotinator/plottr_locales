@@ -72,6 +72,9 @@ export const uiState = {
     size: 'large',
     view: 'default',
     actTab: 0,
+    beatToDelete: null,
+    contextMenuBeat: null,
+    editingBeatId: null,
   },
   searchTerms: {
     notes: null,
@@ -102,6 +105,12 @@ export const uiState = {
     bookId: null,
   },
   outlineScrollPosition: 0,
+  templateModal: {
+    expanded: false,
+  },
+  actConfigModal: {
+    open: false,
+  },
 }
 
 export const ui = {
@@ -280,9 +289,7 @@ export const hierarchyLevel = {
   },
 }
 
-export const featureFlags = {
-  BEAT_HIERARCHY: false,
-}
+export const featureFlags = {}
 
 export const tour = {
   showTour: false,
