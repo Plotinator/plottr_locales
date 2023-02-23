@@ -22,6 +22,7 @@ import Button from '../Button'
 import UnconnectedColorPicker from '../ColorPicker'
 import DeleteConfirmModal from '../dialogs/DeleteConfirmModal'
 import InputModal from '../dialogs/InputModal'
+import ToolTip from '../ToolTip'
 import { checkDependencies } from '../checkDependencies'
 
 const {
@@ -49,7 +50,8 @@ const LineTitleCellConnector = (connector) => {
     notifications,
     books,
     zIndex,
-    actStructureEnabled,
+    allHierarchyLevels,
+    currentTimeline,
     togglePinPlotline,
   }) => {
     const [hovering, setHovering] = useState(false)
@@ -348,16 +350,9 @@ const LineTitleCellConnector = (connector) => {
                 >
                   <FiCopy />
                 </Button>
-                {actStructureEnabled ? null : (
-                  <Button
-                    title={t('Move plotline')}
-                    block
-                    bsSize="small"
-                    onClick={toggleMovingLine}
-                  >
-                    <FaBook />
-                  </Button>
-                )}
+                <Button title={t('Move plotline')} block bsSize="small" onClick={toggleMovingLine}>
+                  <FaBook />
+                </Button>
               </>
             )}
             <Button title={t('Delete plotline')} block bsSize="small" onClick={handleDelete}>
@@ -405,11 +400,9 @@ const LineTitleCellConnector = (connector) => {
                   >
                     <FiCopy />
                   </Button>
-                  {actStructureEnabled ? null : (
-                    <Button title={t('Move plotline')} bsSize="small" onClick={toggleMovingLine}>
-                      <FaBook />
-                    </Button>
-                  )}
+                  <Button title={t('Move plotline')} bsSize="small" onClick={toggleMovingLine}>
+                    <FaBook />
+                  </Button>
                 </>
               )}
               <Button title={t('Delete plotline')} bsSize="small" onClick={handleDelete}>
@@ -441,6 +434,26 @@ const LineTitleCellConnector = (connector) => {
             const book = id === 'series' ? { id: 'series', title: t('Series') } : books[id]
             if (Array.isArray(book)) return null
             if (bookId === book.id) return null
+
+            const mismatchInLevelCount =
+              Object.values(allHierarchyLevels[book.id]).length !==
+              Object.values(allHierarchyLevels[currentTimeline]).length
+
+            if (mismatchInLevelCount) {
+              return (
+                <ToolTip
+                  id={`move-book-${book.id}-tooltip`}
+                  placement="right"
+                  text={t(
+                    'You can only move plotlines to books with the same number of structure levels'
+                  )}
+                >
+                  <MenuItem className="disabled" key={book.id} eventKey={book.id}>
+                    {book.title || t('Untitled')}
+                  </MenuItem>
+                </ToolTip>
+              )
+            }
 
             return (
               <MenuItem key={book.id} eventKey={book.id} onClick={() => moveToBook(book.id)}>
@@ -599,7 +612,8 @@ const LineTitleCellConnector = (connector) => {
     notifications: PropTypes.object.isRequired,
     books: PropTypes.object.isRequired,
     zIndex: PropTypes.number,
-    actStructureEnabled: PropTypes.bool,
+    currentTimeline: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    allHierarchyLevels: PropTypes.object.isRequired,
     togglePinPlotline: PropTypes.func,
   }
 
@@ -635,7 +649,8 @@ const LineTitleCellConnector = (connector) => {
           isLarge: isLargeSelector(state.present),
           lineIsExpanded: lineIsExpandedSelector(state.present)[ownProps.line.id],
           books: allBooksSelector(state.present),
-          actStructureEnabled: selectors.beatHierarchyIsOn(state.present),
+          currentTimeline: selectors.currentTimelineSelector(state.present),
+          allHierarchyLevels: selectors.allHierarchyLevelsSelector(state.present),
         }
       },
       (dispatch, ownProps) => {
