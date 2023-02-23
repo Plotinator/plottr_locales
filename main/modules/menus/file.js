@@ -74,7 +74,7 @@ function buildFileMenu(fileURL, getTrialInfo) {
             if (isPro) {
               focusedWindow.webContents.send('save-as--pro', fileURL)
             } else {
-              focusedWindow.webContents.send('save-as')
+              focusedWindow.webContents.send('save-as', fileURL)
             }
           },
         },
