@@ -59,10 +59,17 @@ import {
   CLOSE_BOOK_DIALOG,
   MOVE_CARD_TO_BOOK,
   RECORD_OUTLINE_SCROLL_POSITION,
+  TOGGLE_ADVANCED_SAVE_TEMPLATE_PANEL,
+  SET_FOCUSSED_TIMELINE_TAB_BEAT,
+  SET_TIMELINE_TAB_BEAT_TO_DELETE,
+  SET_ACT_CONFIG_MODAL_OPEN,
+  SET_EDITING_BEAT_ID,
+  PIN_PLOTLINE,
+  UNPIN_PLOTLINE,
 } from '../constants/ActionTypes'
 import { ui as defaultUI } from '../store/initialState'
 import { newFileUI } from '../store/newFileState'
-import { characterAttributesForCurrentBookSelector } from '../selectors/attributes'
+import { characterAttributesForCurrentBookSelector } from '../selectors'
 
 const removeCustomAttributeFilter = (state, action) => {
   if (!state.characterFilter || !state.characterFilter[(action.id || action.name).toString()]) {
@@ -636,6 +643,96 @@ const updateUI = (state, action) => {
         bookDialog: {
           bookId: null,
           isOpen: false,
+        },
+      }
+    }
+
+    case TOGGLE_ADVANCED_SAVE_TEMPLATE_PANEL: {
+      return {
+        ...state,
+        templateModal: {
+          ...(state.templateModal || {}),
+          expanded: !state.templateModal?.expanded,
+        },
+      }
+    }
+
+    case SET_FOCUSSED_TIMELINE_TAB_BEAT: {
+      return {
+        ...state,
+        timeline: {
+          ...state.timeline,
+          contextMenuBeat: action.beatId,
+        },
+      }
+    }
+
+    case SET_TIMELINE_TAB_BEAT_TO_DELETE: {
+      return {
+        ...state,
+        timeline: {
+          ...state.timeline,
+          beatToDelete: action.beatId,
+        },
+      }
+    }
+
+    case SET_ACT_CONFIG_MODAL_OPEN: {
+      return {
+        ...state,
+        actConfigModal: {
+          ...state.actConfigModal,
+          open: action.open,
+        },
+      }
+    }
+
+    case SET_EDITING_BEAT_ID: {
+      return {
+        ...state,
+        timeline: {
+          ...state.timeline,
+          editingBeatId: action.id,
+        },
+      }
+    }
+
+    case PIN_PLOTLINE: {
+      const currentPinnedPlotlines =
+        !state.timeline?.pinnedPlotlines ||
+        !state.timeline?.pinnedPlotlines[action.bookId] ||
+        isNaN(state.timeline?.pinnedPlotlines[action.bookId])
+          ? 0
+          : parseInt(state.timeline?.pinnedPlotlines[action.bookId])
+
+      return {
+        ...state,
+        timeline: {
+          ...state.timeline,
+          pinnedPlotlines: {
+            ...(state.timeline?.pinnedPlotlines || {}),
+            [action.bookId]: Math.max(1, currentPinnedPlotlines + 1),
+          },
+        },
+      }
+    }
+
+    case UNPIN_PLOTLINE: {
+      const currentPinnedPlotlines =
+        !state.timeline?.pinnedPlotlines ||
+        !state.timeline?.pinnedPlotlines[action.bookId] ||
+        isNaN(state.timeline?.pinnedPlotlines[action.bookId])
+          ? 0
+          : parseInt(state.timeline?.pinnedPlotlines[action.bookId])
+
+      return {
+        ...state,
+        timeline: {
+          ...state.timeline,
+          pinnedPlotlines: {
+            ...(state.timeline?.pinnedPlotlines || {}),
+            [action.bookId]: Math.max(0, currentPinnedPlotlines - 1),
+          },
         },
       }
     }
