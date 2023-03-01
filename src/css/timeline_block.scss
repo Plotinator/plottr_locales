@@ -92,7 +92,11 @@
     z-index: 8 !important;
   }
 
-  .sticky-table-cell.card-pinned:has(.card__body-wrapper, .card__behind) {
+  .sticky-table-cell.card-pinned:has(.card__body-wrapper, .card__behind, .creating) {
+    z-index: 10 !important;
+  }
+
+  .sticky-table-cell:has(.card__cell.card-pinned .creating) {
     z-index: 10 !important;
   }
 
@@ -410,7 +414,7 @@
   }
 }
 
-#timelineview__root .isPinned .sticky-table-cell:not(:first-child):not(:nth-child(2)):not(:has(.card__body-wrapper, .card__cell__overview-cell)) {
+#timelineview__root .isPinned .sticky-table-cell:not(:first-child):not(:nth-child(2)):not(:has(.card__body-wrapper, .card__cell__overview-cell, .creating)) {
   z-index: 3;
   &:hover {
     z-index: 5;
