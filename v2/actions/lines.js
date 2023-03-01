@@ -161,7 +161,7 @@ const pinDuplicatedPlotline = (id, position) => (dispatch, getState) => {
   const duplicatedLine = lines.find(
     (l) => l.title == selectedLine.title && l?.isPinned && selectedLine?.isPinned
   )
-  if (duplicatedLine?.isPinned) {
+  if (duplicatedLine) {
     const reorderedLines = reorderList(pinnedPlotlines, duplicatedLine.position, lines)
     const totalPinnedPlotlines = Math.max(1, pinnedPlotlines + 1)
     return dispatch({
