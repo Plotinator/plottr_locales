@@ -256,9 +256,9 @@ const BlankCardConnector = (connector) => {
     }
 
     renderCreateNew() {
-      const { color, isMedium } = this.props
+      const { color, isMedium, isPinned } = this.props
       const cardStyle = { borderColor: color }
-      const bodyKlass = cx('card__body creating', { 'medium-timeline': isMedium })
+      const bodyKlass = cx('card__body creating', { 'medium-timeline': isMedium, isPinned })
       return (
         <div className={bodyKlass} style={cardStyle}>
           <FormGroup>
@@ -281,7 +281,7 @@ const BlankCardConnector = (connector) => {
 
     render() {
       window.SCROLLWITHKEYS = !this.state.creating
-      const { orientation, verticalInsertion, isSmall, isMedium } = this.props
+      const { orientation, verticalInsertion, isSmall, isMedium, isPinned } = this.props
 
       let body = null
       if (this.state.creating) {
@@ -300,7 +300,11 @@ const BlankCardConnector = (connector) => {
           ) : (
             <Cell>
               <div
-                className={cx('card__cell', { vertical, 'medium-timeline': isMedium })}
+                className={cx('card__cell', {
+                  vertical,
+                  'medium-timeline': isMedium,
+                  'card-pinned': isPinned,
+                })}
                 onDragEnter={this.handleDragEnter}
                 onDragOver={this.handleDragOver}
                 onDragLeave={this.handleDragLeave}

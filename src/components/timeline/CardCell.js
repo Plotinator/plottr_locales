@@ -253,8 +253,16 @@ const CardCellConnector = (connector) => {
     }
 
     renderBody() {
-      const { cards, orientation, isVisible, color, lineIsExpanded, beatIsExpanded, isMedium } =
-        this.props
+      const {
+        cards,
+        orientation,
+        isVisible,
+        color,
+        lineIsExpanded,
+        beatIsExpanded,
+        isMedium,
+        isPinned,
+      } = this.props
       const numOfCards = cards.length
       const vertical = orientation == 'vertical'
 
@@ -263,6 +271,7 @@ const CardCellConnector = (connector) => {
           multiple: numOfCards > 1,
           vertical: vertical,
           'medium-timeline': isMedium,
+          'card-pinned': isPinned,
         })
         return <div className={cellKlass}>{this.renderCards(true)}</div>
       } else {
