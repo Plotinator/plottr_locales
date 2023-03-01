@@ -124,16 +124,30 @@ const lines =
 
       case PIN_PLOTLINE: {
         const bookLines = action.lines.map((l) =>
-          l.id === action.lineId ? Object.assign({}, l, { isPinned: true }) : l
+          l.id === action.lineId && l.bookId === action.bookId
+            ? Object.assign({}, l, { isPinned: true })
+            : l
         )
-        return [...state.filter((l) => l && l.bookId != actionBookId), ...positionReset(bookLines)]
+        return [
+          ...state.filter((l) => l && l.bookId != actionBookId),
+          ...positionReset(
+            sortBy(bookLines, [(item) => (item?.isPinned === true ? 'isPinned' : 'position')])
+          ),
+        ]
       }
 
       case UNPIN_PLOTLINE: {
         const bookLines = action.lines.map((l) =>
-          l.id === action.lineId ? Object.assign({}, l, { isPinned: false }) : l
+          l.id === action.lineId && l.bookId === action.bookId
+            ? Object.assign({}, l, { isPinned: false })
+            : l
         )
-        return [...state.filter((l) => l && l.bookId != actionBookId), ...positionReset(bookLines)]
+        return [
+          ...state.filter((l) => l && l.bookId != actionBookId),
+          ...positionReset(
+            sortBy(bookLines, [(item) => (item?.isPinned === true ? 'isPinned' : 'position')])
+          ),
+        ]
       }
 
       case REORDER_LINES:
