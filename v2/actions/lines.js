@@ -17,9 +17,11 @@ import {
 } from '../constants/ActionTypes'
 import { reorderList } from '../helpers/lists'
 import {
+  allLinesSelector,
   currentTimelineSelector,
   pinnedPlotlinesSelector,
   sortedLinesByBookSelector,
+  timelineSelector,
 } from '../selectors'
 
 // N.B. if one does not supply a book ID, then it is assumed that the
@@ -191,6 +193,47 @@ export function load(patching, lines) {
   return { type: LOAD_LINES, patching, lines }
 }
 
-export function moveLine(id, destinationBookId) {
-  return { type: MOVE_LINE, id, destinationBookId }
+const pinMovedLine = (id, destinationBookId, position) => (dispatch, getState) => {
+  const fullState = getState()
+  const state = fullState.present ? fullState.present : fullState
+  const lines = allLinesSelector(state)
+  const destinationBookLines = lines.filter((l) => l.bookId === destinationBookId)
+  const timeline = timelineSelector(state)
+  const destinationBookPinnedPlotlines = timeline.pinnedPlotlines[destinationBookId]
+  const reorderedLines = reorderList(
+    destinationBookPinnedPlotlines - 1,
+    position,
+    destinationBookLines
+  )
+  return dispatch({
+    type: PIN_PLOTLINE,
+    lineId: id,
+    lines: reorderedLines,
+    bookId: destinationBookId,
+    totalPinnedPlotlines: Math.max(1, destinationBookPinnedPlotlines + 1),
+  })
+}
+
+export const moveLine = (id, destinationBookId) => (dispatch, getState) => {
+  const fullState = getState()
+  const state = fullState.present ? fullState.present : fullState
+  const lines = sortedLinesByBookSelector(state)
+  const bookId = currentTimelineSelector(state)
+  const selectedLine = lines.find((l) => l.id === id)
+  const timeline = timelineSelector(state)
+  const currentBookPinnedPlotlines = timeline.pinnedPlotlines[bookId]
+
+  if (selectedLine?.isPinned) {
+    const reorderedLines = reorderList(currentBookPinnedPlotlines - 1, selectedLine.position, lines)
+    dispatch({
+      type: UNPIN_PLOTLINE,
+      lineId: selectedLine.id,
+      lines: reorderedLines,
+      bookId,
+      totalPinnedPlotlines: Math.max(0, currentBookPinnedPlotlines - 1),
+    })
+    dispatch({ type: MOVE_LINE, id, destinationBookId })
+    return pinMovedLine(id, destinationBookId, selectedLine.position)(dispatch, getState)
+  }
+  return dispatch({ type: MOVE_LINE, id, destinationBookId })
 }
