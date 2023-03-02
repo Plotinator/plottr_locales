@@ -1,0 +1,38 @@
+.restructure-modal__wrapper {
+  height: 100%;
+  display: grid;
+  grid-template-areas: 'header' 'body' 'footer';
+  grid-template-rows: auto 1fr auto;
+}
+
+.restructure-modal__header {
+  grid-area: header;
+  div {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  h3 {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+  hr {
+    margin-top: 8px;
+  }
+}
+
+.restructure-modal__body {
+  grid-area: body;
+  height: 100%;
+}
+
+.restructure-modal__footer {
+  grid-area: footer;
+  & > div {
+    display: flex;
+    justify-content: space-between;
+  }
+  hr {
+    margin-top: 0;
+  }
+}
