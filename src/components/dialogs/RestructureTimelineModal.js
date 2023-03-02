@@ -128,7 +128,12 @@ const RestructureTimelineModalConnector = (connector) => {
   const PlottrModal = UnconnectedPlottrModal(connector)
   const BeatRow = UnconnectedBeatRow(connector)
 
-  const RestructureTimelineModal = ({ closeDialog, beats, beatHierarchyLevels }) => {
+  const RestructureTimelineModal = ({
+    closeDialog,
+    beats,
+    beatHierarchyLevels,
+    restructureTimeline,
+  }) => {
     const [stagedBeats, setStagedBeats] = useState(beats)
     const [stagedHierarchyLevels, setStagedHierarchyLevels] = useState(beatHierarchyLevels)
     const [beatDraggedId, setBeatDraggedId] = useState(null)
@@ -180,6 +185,11 @@ const RestructureTimelineModalConnector = (connector) => {
       setBeatDraggedId(null)
     }
 
+    const restructureAndCloseDialog = () => {
+      restructureTimeline(stagedBeats, stagedHierarchyLevels)
+      closeDialog()
+    }
+
     return (
       <PlottrModal isOpen={true} onRequestClose={closeDialog} style={modalStyles}>
         <div className="restructure-modal__wrapper">
@@ -215,7 +225,7 @@ const RestructureTimelineModalConnector = (connector) => {
           </div>
           <div className="restructure-modal__footer">
             <hr />
-            <Button bsStyle="success" onClick={closeDialog}>
+            <Button bsStyle="success" onClick={restructureAndCloseDialog}>
               {t('Restructure')}
             </Button>
           </div>
@@ -226,6 +236,7 @@ const RestructureTimelineModalConnector = (connector) => {
 
   RestructureTimelineModal.propTypes = {
     closeDialog: PropTypes.func.isRequired,
+    restructureTimeline: PropTypes.func.isRequired,
     beats: PropTypes.array.isRequired,
     beatHierarchyLevels: PropTypes.array.isRequired,
   }
@@ -240,18 +251,14 @@ const RestructureTimelineModalConnector = (connector) => {
     const { connect } = redux
     return connect(
       (state) => {
-        const beats = selectors.visibleSortedBeatsForTimelineByBookSelector(state.present)
-        const beatHierarchyLevels = beats.map((beat) => {
-          return selectors.hierarchyLevelSelector(state.present, beat.id)
-        })
         return {
-          beatHierarchyLevels,
-          sortedHierarchyLevels: selectors.sortedHierarchyLevels(state.present),
-          beats,
+          beatHierarchyLevels: selectors.sortedBeatsHierachyLevels(state.present),
+          beats: selectors.visibleSortedBeatsForTimelineByBookSelector(state.present),
         }
       },
       {
         closeDialog: actions.ui.closeRestructureTimelineModal,
+        restructureTimeline: actions.beat.restructureTimeline,
       }
     )(RestructureTimelineModal)
   }
