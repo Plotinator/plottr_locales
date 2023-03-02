@@ -24,6 +24,9 @@
 .restructure-modal__body {
   grid-area: body;
   height: 100%;
+  table {
+    width: 100%;
+  }
 }
 
 .restructure-modal__footer {
