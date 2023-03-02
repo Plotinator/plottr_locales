@@ -26,6 +26,9 @@
   height: 100%;
   table {
     width: 100%;
+    tr {
+      user-select: none;
+    }
   }
 }
 
