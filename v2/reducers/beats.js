@@ -68,11 +68,17 @@ const beats =
     const actionBookId = associateWithBroadestScope(action.bookId || action.newBookId)
 
     switch (action.type) {
-      case ADD_BOOK:
       case ADD_BEAT: {
         // If we don't get a parent id then make this a root node
         const title = action.title || defaultBeat.title
         const parentId = action.parentId || null
+        const position = nextPositionInBook(state, actionBookId, parentId)
+        return addNodeToState(state, actionBookId, position, title, parentId)
+      }
+
+      case ADD_BOOK: {
+        const title = 'auto'
+        const parentId = null
         const position = nextPositionInBook(state, actionBookId, parentId)
         return addNodeToState(state, actionBookId, position, title, parentId)
       }
