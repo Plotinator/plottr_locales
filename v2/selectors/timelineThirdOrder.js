@@ -44,6 +44,7 @@ import {
   timelineViewIsStackedSelector,
   timelineViewIsTabbedSelector,
   uiSelector,
+  hierarchyLevelSelector,
 } from './secondOrder'
 
 const selectedOrientationSelector = createSelector(uiSelector, ({ orientation }) => {
@@ -474,6 +475,17 @@ export const timelineSparceBeatMap = createSelector(
       acc[index] = beat.id
       return acc
     }, {})
+  }
+)
+
+const fullStateSelector = (state) => state
+export const sortedBeatsHierachyLevels = createSelector(
+  visibleSortedBeatsForTimelineByBookSelector,
+  fullStateSelector,
+  (beats, state) => {
+    return beats.map((beat) => {
+      return hierarchyLevelSelector(state, beat.id)
+    })
   }
 )
 
