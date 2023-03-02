@@ -23,11 +23,16 @@
 
 .restructure-modal__body {
   grid-area: body;
-  height: 100%;
+  height: 50vh;
+  overflow-y: auto;
   table {
     width: 100%;
+    height: 100%;
     tr {
       user-select: none;
+      &.dragging-over {
+        outline: 1px dashed black;
+      }
     }
   }
 }
@@ -40,5 +45,22 @@
   }
   hr {
     margin-top: 0;
+  }
+}
+
+.restructure-modal__select-line {
+  margin-left: 5px !important;
+  @include user-text;
+  button {
+    text-transform: capitalize;
+  }
+}
+
+.restructure-modal__hierarchy-level-selector {
+  display: flex;
+  align-items: center;
+  svg {
+    margin-right: 5px;
+    color: $yellow-5;
   }
 }
