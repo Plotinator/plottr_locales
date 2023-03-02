@@ -355,14 +355,9 @@ const LineTitleCellConnector = (connector) => {
                 >
                   {allIcon} {t('All')}
                 </Button>
-                  <Button
-                    title={t('Move plotline')}
-                    block
-                    bsSize="small"
-                    onClick={toggleMovingLine}
-                  >
-                    <FaBook />
-                  </Button>
+                <Button title={t('Move plotline')} block bsSize="small" onClick={toggleMovingLine}>
+                  <FaBook />
+                </Button>
               </>
             )}
           </div>
@@ -412,9 +407,9 @@ const LineTitleCellConnector = (connector) => {
                   >
                     {allIcon} {t('All')}
                   </Button>
-                    <Button title={t('Move plotline')} bsSize="small" onClick={toggleMovingLine}>
-                      <FaBook />
-                    </Button>
+                  <Button title={t('Move plotline')} bsSize="small" onClick={toggleMovingLine}>
+                    <FaBook />
+                  </Button>
                 </>
               )}
             </ButtonGroup>
