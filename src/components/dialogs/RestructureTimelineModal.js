@@ -3,6 +3,7 @@ import { PropTypes } from 'prop-types'
 
 import { t } from 'plottr_locales'
 
+import Button from '../Button'
 import UnconnectedPlottrModal from '../PlottrModal'
 import { checkDependencies } from '../checkDependencies'
 
@@ -68,21 +69,33 @@ const RestructureTimelineModalConnector = (connector) => {
 
     return (
       <PlottrModal isOpen={true} onRequestClose={closeDialog} style={modalStyles}>
-        <table>
-          <thead>
-            <tr>
-              <th>{t('Name')}</th>
-              <th>{t('Structure Type')}</th>
-            </tr>
-          </thead>
-          {stagedBeats.map(({ id }) => {
-            return (
-              <React.Fragment key={id}>
-                <BeatRow id={id} />
-              </React.Fragment>
-            )
-          })}
-        </table>
+        <div className="restructure-modal__wrapper">
+          <div className="restructure-modal__header">
+            <div>
+              <h3>{t('Restructure Timeline')}</h3>
+              <Button onClick={closeDialog}>{t('Close')}</Button>
+            </div>
+            <hr />
+          </div>
+          <div className="restructure-modal__body">
+            <table>
+              <thead>
+                <tr>
+                  <th>{t('Name')}</th>
+                  <th>{t('Structure Type')}</th>
+                </tr>
+              </thead>
+              {stagedBeats.map(({ id }) => {
+                return (
+                  <React.Fragment key={id}>
+                    <BeatRow id={id} />
+                  </React.Fragment>
+                )
+              })}
+            </table>
+          </div>
+          <div className="restructure-modal__footer"></div>
+        </div>
       </PlottrModal>
     )
   }
