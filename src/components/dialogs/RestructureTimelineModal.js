@@ -119,7 +119,7 @@ const RestructureTimelineModalConnector = (connector) => {
         beats: selectors.visibleSortedBeatsForTimelineByBookSelector(state.present),
       }),
       {
-        closeDialog: actions.ui.closeRestructureModal,
+        closeDialog: actions.ui.closeRestructureTimelineModal,
       }
     )(RestructureTimelineModal)
   }
