@@ -21,6 +21,14 @@ const {
 } = helpers
 
 export default function exportOutline(state, namesMapping, options) {
+  return [{ children: interpret(exportOutlineDirectives(state, namesMapping, options)) }]
+}
+
+function interpret(directives) {
+  return directives
+}
+
+export function exportOutlineDirectives(state, namesMapping, options) {
   // get current book id and select only those beats/lines/cards
   const beats = sortedBeatsByBookSelector(state)
   const lines = sortedLinesByBookSelector(state)
@@ -42,7 +50,7 @@ export default function exportOutline(state, namesMapping, options) {
     )
   }
 
-  if (!beats.length) return { children: children }
+  if (!beats.length) return children
 
   const getFilteredCards = (cards) => {
     if (outlineExportFilter) {
@@ -88,12 +96,8 @@ export default function exportOutline(state, namesMapping, options) {
     return paragraphs
   })
 
-  return [{ children: [...children, ...beatParagraphs] }]
+  return [...children, ...beatParagraphs]
 }
-
-// export function exportOutlineDirectives(state, namesMapping, options) {
-  
-// }
 
 function card(card, linesById, namesMapping, customAttrs, options) {
   let paragraphs = [new Paragraph({ text: '' })]
