@@ -678,3 +678,12 @@ function cardIsVisible(card, filter, filterIsEmpty) {
     })
   })
 }
+
+export const parentIsHigherLevelAndViewIsStackedSelector = createSelector(
+  timelineViewIsStackedSelector,
+  hierarchyLevelSelector,
+  sortedHierarchyLevels,
+  (timelineIsStackedView, hierarchyLevel, sortedLevels) => {
+    return timelineIsStackedView && hierarchyLevel.level !== sortedLevels.length - 1
+  }
+)
