@@ -313,6 +313,10 @@ const TimelineTableConnector = (connector) => {
       this.props.notificationActions.showToastNotification(false)
     }
 
+    handleCloseMessage = () => {
+      this.props.notificationActions.dismissMessage()
+    }
+
     getToastMessage = (cardAction, newBookId, lineAction) => {
       if ((cardAction === 'move' || lineAction === 'move') && newBookId) {
         const { books, actions } = this.props
@@ -358,6 +362,9 @@ const TimelineTableConnector = (connector) => {
           role="alert"
         >
           {message}
+          <button className="close" onClick={() => this.handleCloseMessage()}>
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
       )
     }
