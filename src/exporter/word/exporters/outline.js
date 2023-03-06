@@ -14,6 +14,7 @@ const {
   sortedBeatsByBookSelector,
   makeBeatTitleSelector,
   cardsCustomAttributesSelector,
+  hierarchyLevelSelector,
 } = selectors
 const {
   card: { sortCardsInBeat, cardMapping },
@@ -55,11 +56,20 @@ export default function exportOutline(state, namesMapping, options) {
 
   const beatParagraphs = (beats || []).flatMap((beat) => {
     const uniqueBeatTitleSelector = makeBeatTitleSelector(state)
+    const hierarchyLevel = hierarchyLevelSelector(state, beat.id)
     const title = uniqueBeatTitleSelector(state, beat.id)
     let paragraphs = [new Paragraph({ text: '' })]
 
+    const level = hierarchyLevel.level
+    const heading =
+      level === 0
+        ? HeadingLevel.HEADING_2
+        : level === 1
+        ? HeadingLevel.HEADING_3
+        : HeadingLevel.HEADING_4
+
     if (!options.outline.sceneCards) {
-      paragraphs.push(new Paragraph({ text: title, heading: HeadingLevel.HEADING_2 }))
+      paragraphs.push(new Paragraph({ text: title, heading }))
     } else {
       const cards = beatCardMapping[beat.id]
       const customAttrs = cardsCustomAttributesSelector(state)
@@ -67,7 +77,7 @@ export default function exportOutline(state, namesMapping, options) {
 
       const filteredCards = getFilteredCards(sortedCards)
 
-      paragraphs.push(new Paragraph({ text: title, heading: HeadingLevel.HEADING_2 }))
+      paragraphs.push(new Paragraph({ text: title, heading }))
 
       const cardParagraphs = (filteredCards || []).flatMap((c) => {
         return card(c, linesById, namesMapping, customAttrs, options)
@@ -80,6 +90,10 @@ export default function exportOutline(state, namesMapping, options) {
 
   return [{ children: [...children, ...beatParagraphs] }]
 }
+
+// export function exportOutlineDirectives(state, namesMapping, options) {
+  
+// }
 
 function card(card, linesById, namesMapping, customAttrs, options) {
   let paragraphs = [new Paragraph({ text: '' })]
