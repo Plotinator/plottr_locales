@@ -13,7 +13,6 @@ import FormGroup from '../FormGroup'
 import FormControl from '../FormControl'
 import { checkDependencies } from '../checkDependencies'
 import UnconnectedTemplatePicker from '../templates/TemplatePicker'
-import ToolTip from '../ToolTip'
 
 const { lightBackground } = lineColors
 
@@ -70,30 +69,36 @@ const BlankCardConnector = (connector) => {
       e.stopPropagation()
       this.setState({ inDropZone: false, dropDepth: 0 })
 
-      if (this.props.disableDrop) {
-        this.props.notificationActions.showMessage(
-          i18n('Please add levels of structure above to drop scene cards here.')
-        )
-        return
-      }
-
       const json = e.dataTransfer.getData('text/json')
       const droppedData = JSON.parse(json)
 
-      const { beatId, lineId } = this.props
+      const { beatId, lineId, addMissingBeats } = this.props
       if (droppedData.cardIds) {
-        this.props.actions.reorderCardsWithinLine(beatId, lineId, [...droppedData.cardIds])
+        this.props.actions.reorderCardsWithinLine(
+          beatId,
+          lineId,
+          [...droppedData.cardIds],
+          addMissingBeats
+        )
       } else if (droppedData.cardId) {
-        this.props.actions.reorderCardsWithinLine(beatId, lineId, [droppedData.cardId])
+        this.props.actions.reorderCardsWithinLine(
+          beatId,
+          lineId,
+          [droppedData.cardId],
+          addMissingBeats
+        )
       }
 
       return
     }
 
     saveCreate = () => {
+      const { addMissingBeats } = this.props
+
       const newCard = this.buildCard(this.titleInputRef.value)
       this.props.actions.addCard(
-        Object.assign(newCard, this.state.templates ? { templates: this.state.templates } : {})
+        Object.assign(newCard, this.state.templates ? { templates: this.state.templates } : {}),
+        addMissingBeats
       )
       this.setState({
         creating: false,
@@ -103,8 +108,10 @@ const BlankCardConnector = (connector) => {
     }
 
     createFromSmall = () => {
+      const { addMissingBeats } = this.props
+
       const newCard = this.buildCard('')
-      this.props.actions.addCard(newCard)
+      this.props.actions.addCard(newCard, addMissingBeats)
     }
 
     handleFinishCreate = (event) => {
@@ -185,16 +192,8 @@ const BlankCardConnector = (connector) => {
     }
 
     renderBlank() {
-      const {
-        color,
-        verticalInsertion,
-        orientation,
-        isSmall,
-        isMedium,
-        readOnly,
-        isPinned,
-        disableDrop,
-      } = this.props
+      const { color, verticalInsertion, orientation, isSmall, isMedium, readOnly, isPinned } =
+        this.props
       const { templateHover, defaultHover, inDropZone } = this.state
       if (isSmall) {
         const smallStyle = { borderColor: color }
@@ -224,60 +223,6 @@ const BlankCardConnector = (connector) => {
         disabled: readOnly,
         'vertical-blank-card__body': verticalInsertion,
       })
-
-      if (disableDrop) {
-        if (inDropZone) {
-          return (
-            <div
-              className={cx(bodyKlass, {
-                hover: inDropZone,
-                'drop-disabled': disableDrop,
-                'medium-timeline': isMedium,
-                'card-pinned': isPinned,
-              })}
-              style={{
-                border: 'none',
-                color: 'none',
-              }}
-            >
-              <div
-                className="non-template"
-                onClick={this.startCreating}
-                onMouseEnter={this.onAddWithDefaultHover}
-                onMouseLeave={this.onAddWithDefaultLeave}
-                style={addWithDefaultStyle}
-              >
-                <Glyphicon glyph="ban-circle" />
-              </div>
-            </div>
-          )
-        } else {
-          return (
-            <ToolTip
-              placement="right"
-              text={i18n('Please add structure levels above this cell to use it.')}
-            >
-              <div
-                className={cx(bodyKlass, {
-                  'create-disabled': disableDrop,
-                  'medium-timeline': isMedium,
-                  'card-pinned': isPinned,
-                })}
-                style={blankCardStyle}
-              >
-                <div
-                  className="non-template"
-                  onMouseEnter={this.onAddWithDefaultHover}
-                  onMouseLeave={this.onAddWithDefaultLeave}
-                  style={addWithDefaultStyle}
-                >
-                  <Glyphicon glyph="ban-circle" />
-                </div>
-              </div>
-            </ToolTip>
-          )
-        }
-      }
 
       return (
         <div
@@ -413,7 +358,7 @@ const BlankCardConnector = (connector) => {
     actions: PropTypes.object,
     notificationActions: PropTypes.object,
     readOnly: PropTypes.bool,
-    disableDrop: PropTypes.bool,
+    addMissingBeats: PropTypes.bool,
     isPinned: PropTypes.bool,
   }
 
@@ -441,7 +386,7 @@ const BlankCardConnector = (connector) => {
           isSmall: selectors.isSmallSelector(state.present),
           isMedium: selectors.isMediumSelector(state.present),
           readOnly: !selectors.canWriteSelector(state.present),
-          disableDrop: selectors.parentIsHigherLevelAndViewIsStackedSelector(
+          addMissingBeats: selectors.parentIsHigherLevelAndViewIsStackedSelector(
             state.present,
             ownProps.beatId
           ),
