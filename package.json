@@ -1,6 +1,6 @@
 {
   "name": "plottr",
-  "version": "2023.3.3",
+  "version": "2023.3.29-alpha.13",
   "description": "A visual story-planning tool",
   "repository": "https://github.com/cameronsutter/plottr_electron.git",
   "homepage": "plottr.com",
@@ -121,6 +121,7 @@
     "eslint-config-prettier": "^7.1.0",
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-react": "^7.22.0",
+    "fast-check": "^3.7.0",
     "file-loader": "^6.2.0",
     "flip": "^1.0.0",
     "format-message-cli": "^6.2.1",
@@ -151,6 +152,7 @@
     "pltr": "file:./lib/pltr",
     "prettier": "^2.2.1",
     "pretty-date": "^0.2.0",
+    "rc-tooltip": "^6.0.1",
     "react": "^16.8.6",
     "react-beautiful-dnd": "^13.0.0",
     "react-dom": "^16.8.6",
@@ -245,18 +247,17 @@
     "afterSign": "build/notarize.js",
     "mac": {
       "category": "public.app-category.productivity",
-      "target": "default",
-      "hardenedRuntime": true,
-      "gatekeeperAssess": false,
-      "entitlements": "build/entitlements.mac.plist",
-      "entitlementsInherit": "build/entitlements.mac.plist",
-      "darkModeSupport": true,
       "target": [
         {
           "target": "dmg",
           "arch": "universal"
         }
-      ]
+      ],
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "darkModeSupport": true
     },
     "dmg": {
       "backgroundColor": "#ebf2f9",
