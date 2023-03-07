@@ -9,6 +9,7 @@ import {
   COLLAPSE_BEAT,
   LOAD_BEATS,
   APPEND_TOP_LEVEL_BEAT,
+  RESTRUCTURE_TIMELINE,
 } from '../constants/ActionTypes'
 import { beat } from '../store/initialState'
 
@@ -46,6 +47,10 @@ export function collapseBeat(id, bookId) {
 
 export function appendTopLevelBeat(bookId) {
   return { type: APPEND_TOP_LEVEL_BEAT, bookId }
+}
+
+export function restructureTimeline(flatBeats, beatHierarchyLevels) {
+  return { type: RESTRUCTURE_TIMELINE, flatBeats, beatHierarchyLevels }
 }
 
 export function load(patching, beats) {
