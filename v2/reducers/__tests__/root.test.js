@@ -362,7 +362,7 @@ describe('ADD_CARD', () => {
           it('should add the missing chapter', () => {
             expect(newChapters.length).toBe(1)
             expect(tree.nodeParent(newBeats, newChapters[0].id)).toEqual(
-              tree.findNode(oldBeats, 35)
+              tree.findNode(oldBeats, 35).id
             )
           })
           const newChapter = newChapters[0]
@@ -370,7 +370,7 @@ describe('ADD_CARD', () => {
           it('should add the missing scene', () => {
             expect(newScenes.length).toBe(1)
             expect(tree.nodeParent(newBeats, newScenes[0].id)).toEqual(
-              tree.findNode(newBeats, newChapter.id)
+              tree.findNode(newBeats, newChapter.id).id
             )
           })
           it('should add one new card', () => {
@@ -417,7 +417,9 @@ describe('ADD_CARD', () => {
           const newCards = difference(newState.cards, multi_tier_zelda.cards)
           it('should add the missing scene', () => {
             expect(newScenes.length).toBe(1)
-            expect(tree.nodeParent(newBeats, newScenes[0].id)).toEqual(tree.findNode(newBeats, 34))
+            expect(tree.nodeParent(newBeats, newScenes[0].id)).toEqual(
+              tree.findNode(newBeats, 34).id
+            )
           })
           it('should add one new card', () => {
             expect(newCards.length).toEqual(1)
