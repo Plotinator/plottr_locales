@@ -1659,23 +1659,25 @@ describe('exportOutlineDirectives', () => {
     it('should export headings at the correct levels', () => {
       const names = namesMapping(multi_tier_file)
       const result = exportOutlineDirectives(multi_tier_file, names, default_export_config.word)
-      expect(result).toEqual(expect.arrayContaining([
-        { type: 'paragraph', text: 'Outline', heading: 'Heading1', alignment: 'center' },
-        { type: 'paragraph', text: 'Act 1', heading: 'Heading2' },
-        { type: 'paragraph', text: 'Intro (Main Plot)', heading: 'Heading3' },
-        { type: 'paragraph', text: 'Chapter 1', heading: 'Heading3' },
-        { type: 'paragraph', text: 'First memories (Main Plot)', heading: 'Heading3' },
-        { type: 'paragraph', text: 'Leaving the plateau (Memories)', heading: 'Heading3' },
-        { type: 'paragraph', text: 'Scene 1', heading: 'Heading4' },
-        { type: 'paragraph', text: 'shadows (Memories)', heading: 'Heading3' },
-        { type: 'paragraph', text: 'Act 2', heading: 'Heading2' },
-        { type: 'paragraph', text: "Zora's Domain (Main Plot)", heading: 'Heading3' },
-        { type: 'paragraph', text: 'Chapter 2', heading: 'Heading3' },
-        { type: 'paragraph', text: 'Preparation (Main Plot)', heading: 'Heading3' },
-        { type: 'paragraph', text: 'Prince Sidon (Memories)', heading: 'Heading3' },
-        { type: 'paragraph', text: 'Scene 2', heading: 'Heading4' },
-        { type: 'paragraph', text: 'Vah Ruta (Main Plot)', heading: 'Heading3' },
-      ]))
+      expect(result).toEqual(
+        expect.arrayContaining([
+          { type: 'paragraph', text: 'Outline', heading: 'Heading1', alignment: 'center' },
+          { type: 'paragraph', text: 'Act 1', heading: 'Heading2' },
+          { type: 'paragraph', text: 'Intro (Main Plot)', heading: 'Heading3' },
+          { type: 'paragraph', text: 'Chapter 1', heading: 'Heading3' },
+          { type: 'paragraph', text: 'First memories (Main Plot)', heading: 'Heading3' },
+          { type: 'paragraph', text: 'Leaving the plateau (Memories)', heading: 'Heading3' },
+          { type: 'paragraph', text: 'Scene 1', heading: 'Heading4' },
+          { type: 'paragraph', text: 'shadows (Memories)', heading: 'Heading3' },
+          { type: 'paragraph', text: 'Act 2', heading: 'Heading2' },
+          { type: 'paragraph', text: "Zora's Domain (Main Plot)", heading: 'Heading3' },
+          { type: 'paragraph', text: 'Chapter 2', heading: 'Heading3' },
+          { type: 'paragraph', text: 'Preparation (Main Plot)', heading: 'Heading3' },
+          { type: 'paragraph', text: 'Prince Sidon (Memories)', heading: 'Heading3' },
+          { type: 'paragraph', text: 'Scene 2', heading: 'Heading4' },
+          { type: 'paragraph', text: 'Vah Ruta (Main Plot)', heading: 'Heading3' },
+        ])
+      )
     })
   })
 })
