@@ -3,7 +3,7 @@
     "fileName": "/Users/colinfarris/Documents/GitHub/plottr_electron/Zelda.pltr",
     "loaded": true,
     "dirty": true,
-    "version": "2023.1.10-alpha.2",
+    "version": "2023.3.29-alpha.12",
     "id": null,
     "appliedMigrations": [
       "m2021_4_13",
@@ -11,11 +11,12 @@
       "m2021_8_1",
       "m2022_5_17_1",
       "m2022_5_17",
-      "*m2023_1_7"
+      "*m2023_1_7",
+      "*m2023_3_5"
     ],
     "initialVersion": "2021.2.24",
     "isCloudFile": false,
-    "versionStamp": "5756f509-c352-4654-a340-e318d6f422e9"
+    "versionStamp": "6e6de032-0671-41d4-85b0-374db1244c63"
   },
   "ui": {
     "currentView": "timeline",
@@ -36,8 +37,9 @@
     },
     "timeline": {
       "size": "large",
-      "view": "stacked",
-      "actTab": 35
+      "view": "default",
+      "actTab": 39,
+      "contextMenuBeat": null
     },
     "attributesDialogIsOpen": false,
     "outlineFilter": null,
@@ -59,10 +61,10 @@
       "characters": []
     },
     "cardDialog": {
+      "isOpen": false,
       "cardId": null,
       "lineId": null,
-      "beatId": null,
-      "isOpen": false
+      "beatId": null
     },
     "collaborators": {},
     "bookDialog": {
@@ -72,11 +74,15 @@
     "outlineScrollPosition": 0,
     "templateModal": {
       "expanded": false
+    },
+    "actConfigModal": {
+      "open": false
+    },
+    "resturctureTimelineModal": {
+      "open": false
     }
   },
-  "featureFlags": {
-    "BEAT_HIERARCHY": true
-  },
+  "featureFlags": {},
   "series": {
     "name": "The Legend of Zelda",
     "premise": "",
@@ -145,10 +151,32 @@
       "timelineTemplates": [],
       "imageId": "5"
     },
-    "allIds": [8, 1, 5, 9, 6, 7]
+    "allIds": [
+      8,
+      1,
+      5,
+      9,
+      6,
+      7
+    ]
   },
   "beats": {
     "1": {
+      "children": {
+        "2": [],
+        "16": [],
+        "17": [],
+        "null": [
+          17,
+          16,
+          2
+        ]
+      },
+      "heap": {
+        "2": null,
+        "16": null,
+        "17": null
+      },
       "index": {
         "2": {
           "id": 2,
@@ -180,47 +208,19 @@
           "time": 0,
           "title": "auto",
           "expanded": true
-        },
-        "34": {
-          "id": 34,
-          "bookId": "1",
-          "position": 0,
-          "title": "auto",
-          "time": 0,
-          "templates": [],
-          "autoOutlineSort": true,
-          "fromTemplateId": null,
-          "expanded": true
-        },
-        "35": {
-          "id": 35,
-          "bookId": "1",
-          "position": 0,
-          "title": "auto",
-          "time": 0,
-          "templates": [],
-          "autoOutlineSort": true,
-          "fromTemplateId": null,
-          "expanded": true
         }
-      },
-      "heap": {
-        "2": 34,
-        "16": 34,
-        "17": 34,
-        "34": 35,
-        "35": null
-      },
-      "children": {
-        "2": [],
-        "16": [],
-        "17": [],
-        "34": [17, 16, 2],
-        "35": [34],
-        "null": [35]
       }
     },
     "5": {
+      "children": {
+        "18": [],
+        "null": [
+          18
+        ]
+      },
+      "heap": {
+        "18": null
+      },
       "index": {
         "18": {
           "autoOutlineSort": true,
@@ -231,43 +231,19 @@
           "time": 0,
           "title": "auto",
           "expanded": true
-        },
-        "34": {
-          "id": 34,
-          "bookId": "5",
-          "position": 0,
-          "title": "auto",
-          "time": 0,
-          "templates": [],
-          "autoOutlineSort": true,
-          "fromTemplateId": null,
-          "expanded": true
-        },
-        "35": {
-          "id": 35,
-          "bookId": "5",
-          "position": 0,
-          "title": "auto",
-          "time": 0,
-          "templates": [],
-          "autoOutlineSort": true,
-          "fromTemplateId": null,
-          "expanded": true
         }
-      },
-      "heap": {
-        "18": 34,
-        "34": 35,
-        "35": null
-      },
-      "children": {
-        "18": [],
-        "34": [18],
-        "35": [34],
-        "null": [35]
       }
     },
     "6": {
+      "children": {
+        "19": [],
+        "null": [
+          19
+        ]
+      },
+      "heap": {
+        "19": null
+      },
       "index": {
         "19": {
           "autoOutlineSort": true,
@@ -278,168 +254,52 @@
           "time": 0,
           "title": "auto",
           "expanded": true
-        },
-        "34": {
-          "id": 34,
-          "bookId": "6",
-          "position": 0,
-          "title": "auto",
-          "time": 0,
-          "templates": [],
-          "autoOutlineSort": true,
-          "fromTemplateId": null,
-          "expanded": true
-        },
-        "35": {
-          "id": 35,
-          "bookId": "6",
-          "position": 0,
-          "title": "auto",
-          "time": 0,
-          "templates": [],
-          "autoOutlineSort": true,
-          "fromTemplateId": null,
-          "expanded": true
         }
-      },
-      "heap": {
-        "19": 34,
-        "34": 35,
-        "35": null
-      },
-      "children": {
-        "19": [],
-        "34": [19],
-        "35": [34],
-        "null": [35]
       }
     },
     "7": {
       "children": {
-        "20": [],
-        "26": [],
         "27": [],
-        "28": [],
-        "29": [],
-        "30": [],
-        "31": [],
-        "32": [],
-        "34": [28, 27, 26, 20],
-        "35": [34, 36, 49],
-        "36": [32, 31, 30, 29],
-        "37": [46],
-        "41": [44],
-        "44": [45],
-        "45": [],
-        "46": [47],
-        "47": [],
-        "49": [],
-        "null": [35, 37, 41]
+        "34": [
+          27
+        ],
+        "35": [
+          34
+        ],
+        "39": [
+          40
+        ],
+        "40": [
+          41
+        ],
+        "41": [],
+        "null": [
+          35,
+          39
+        ]
       },
       "heap": {
-        "20": 34,
-        "26": 34,
         "27": 34,
-        "28": 34,
-        "29": 36,
-        "30": 36,
-        "31": 36,
-        "32": 36,
         "34": 35,
         "35": null,
-        "36": 35,
-        "37": null,
-        "41": null,
-        "44": 41,
-        "45": 44,
-        "46": 37,
-        "47": 46,
-        "49": 35
+        "39": null,
+        "40": 39,
+        "41": 40
       },
       "index": {
-        "20": {
-          "autoOutlineSort": true,
-          "bookId": 7,
-          "fromTemplateId": null,
-          "id": 20,
-          "position": 0,
-          "time": 0,
-          "title": "auto",
-          "expanded": true
-        },
-        "26": {
-          "autoOutlineSort": true,
-          "bookId": 7,
-          "fromTemplateId": null,
-          "id": 26,
-          "position": 1,
-          "time": 0,
-          "title": "auto",
-          "expanded": true
-        },
         "27": {
           "autoOutlineSort": true,
           "bookId": 7,
           "fromTemplateId": null,
           "id": 27,
-          "position": 2,
-          "time": 0,
-          "title": "auto",
-          "expanded": true
-        },
-        "28": {
-          "autoOutlineSort": true,
-          "bookId": 7,
-          "fromTemplateId": null,
-          "id": 28,
-          "position": 3,
-          "time": 0,
-          "title": "auto",
-          "expanded": true
-        },
-        "29": {
-          "autoOutlineSort": true,
-          "bookId": 7,
-          "fromTemplateId": null,
-          "id": 29,
           "position": 0,
-          "time": 0,
-          "title": "auto",
-          "expanded": true
-        },
-        "30": {
-          "autoOutlineSort": true,
-          "bookId": 7,
-          "fromTemplateId": null,
-          "id": 30,
-          "position": 1,
-          "time": 0,
-          "title": "auto",
-          "expanded": true
-        },
-        "31": {
-          "autoOutlineSort": true,
-          "bookId": 7,
-          "fromTemplateId": null,
-          "id": 31,
-          "position": 2,
-          "time": 0,
-          "title": "auto",
-          "expanded": true
-        },
-        "32": {
-          "autoOutlineSort": true,
-          "bookId": 7,
-          "fromTemplateId": null,
-          "id": 32,
-          "position": 3,
           "time": 0,
           "title": "auto",
           "expanded": true
         },
         "34": {
           "id": 34,
-          "bookId": "7",
+          "bookId": 7,
           "position": 0,
           "title": "auto",
           "time": 0,
@@ -450,7 +310,7 @@
         },
         "35": {
           "id": 35,
-          "bookId": "7",
+          "bookId": 7,
           "position": 0,
           "title": "auto",
           "time": 0,
@@ -459,22 +319,22 @@
           "fromTemplateId": null,
           "expanded": true
         },
-        "36": {
+        "39": {
           "autoOutlineSort": true,
           "bookId": 7,
           "fromTemplateId": null,
-          "id": 36,
+          "id": 39,
           "position": 1,
           "time": 0,
           "title": "auto",
           "expanded": true
         },
-        "37": {
+        "40": {
           "autoOutlineSort": true,
           "bookId": 7,
           "fromTemplateId": null,
-          "id": 37,
-          "position": 1,
+          "id": 40,
+          "position": 0,
           "time": 0,
           "title": "auto",
           "expanded": true
@@ -484,63 +344,32 @@
           "bookId": 7,
           "fromTemplateId": null,
           "id": 41,
-          "position": 2,
-          "time": 0,
-          "title": "auto",
-          "expanded": true
-        },
-        "44": {
-          "autoOutlineSort": true,
-          "bookId": 7,
-          "fromTemplateId": null,
-          "id": 44,
           "position": 0,
           "time": 0,
           "title": "auto",
           "expanded": true
-        },
-        "45": {
-          "autoOutlineSort": true,
-          "bookId": 7,
-          "fromTemplateId": null,
-          "id": 45,
-          "position": 0,
-          "time": 0,
-          "title": "auto",
-          "expanded": true
-        },
-        "46": {
-          "autoOutlineSort": true,
-          "bookId": 7,
-          "fromTemplateId": null,
-          "id": 46,
-          "position": 0,
-          "time": 0,
-          "title": "auto",
-          "expanded": true
-        },
-        "47": {
-          "autoOutlineSort": true,
-          "bookId": 7,
-          "fromTemplateId": null,
-          "id": 47,
-          "position": 0,
-          "time": 0,
-          "title": "auto",
-          "expanded": true
-        },
-        "49": {
-          "autoOutlineSort": true,
-          "bookId": 7,
-          "fromTemplateId": null,
-          "id": 49,
-          "position": 2,
-          "time": 0,
-          "title": "auto"
         }
       }
     },
     "8": {
+      "children": {
+        "21": [],
+        "22": [],
+        "23": [],
+        "24": [],
+        "null": [
+          24,
+          23,
+          22,
+          21
+        ]
+      },
+      "heap": {
+        "21": null,
+        "22": null,
+        "23": null,
+        "24": null
+      },
       "index": {
         "21": {
           "autoOutlineSort": true,
@@ -581,49 +410,19 @@
           "time": 0,
           "title": "auto",
           "expanded": true
-        },
-        "34": {
-          "id": 34,
-          "bookId": "8",
-          "position": 0,
-          "title": "auto",
-          "time": 0,
-          "templates": [],
-          "autoOutlineSort": true,
-          "fromTemplateId": null,
-          "expanded": true
-        },
-        "35": {
-          "id": 35,
-          "bookId": "8",
-          "position": 0,
-          "title": "auto",
-          "time": 0,
-          "templates": [],
-          "autoOutlineSort": true,
-          "fromTemplateId": null,
-          "expanded": true
         }
-      },
-      "heap": {
-        "21": 34,
-        "22": 34,
-        "23": 34,
-        "24": 34,
-        "34": 35,
-        "35": null
-      },
-      "children": {
-        "21": [],
-        "22": [],
-        "23": [],
-        "24": [],
-        "34": [24, 23, 22, 21],
-        "35": [34],
-        "null": [35]
       }
     },
     "9": {
+      "children": {
+        "25": [],
+        "null": [
+          25
+        ]
+      },
+      "heap": {
+        "25": null
+      },
       "index": {
         "25": {
           "autoOutlineSort": true,
@@ -634,43 +433,19 @@
           "time": 0,
           "title": "auto",
           "expanded": true
-        },
-        "34": {
-          "id": 34,
-          "bookId": "9",
-          "position": 0,
-          "title": "auto",
-          "time": 0,
-          "templates": [],
-          "autoOutlineSort": true,
-          "fromTemplateId": null,
-          "expanded": true
-        },
-        "35": {
-          "id": 35,
-          "bookId": "9",
-          "position": 0,
-          "title": "auto",
-          "time": 0,
-          "templates": [],
-          "autoOutlineSort": true,
-          "fromTemplateId": null,
-          "expanded": true
         }
-      },
-      "heap": {
-        "25": 34,
-        "34": 35,
-        "35": null
-      },
-      "children": {
-        "25": [],
-        "34": [25],
-        "35": [34],
-        "null": [35]
       }
     },
     "series": {
+      "children": {
+        "1": [],
+        "null": [
+          1
+        ]
+      },
+      "heap": {
+        "1": null
+      },
       "index": {
         "1": {
           "id": 1,
@@ -682,136 +457,25 @@
           "autoOutlineSort": true,
           "fromTemplateId": null,
           "expanded": true
-        },
-        "34": {
-          "id": 34,
-          "bookId": "series",
-          "position": 0,
-          "title": "auto",
-          "time": 0,
-          "templates": [],
-          "autoOutlineSort": true,
-          "fromTemplateId": null,
-          "expanded": true
-        },
-        "35": {
-          "id": 35,
-          "bookId": "series",
-          "position": 0,
-          "title": "auto",
-          "time": 0,
-          "templates": [],
-          "autoOutlineSort": true,
-          "fromTemplateId": null,
-          "expanded": true
         }
-      },
-      "heap": {
-        "1": 34,
-        "34": 35,
-        "35": null
-      },
-      "children": {
-        "1": [],
-        "34": [1],
-        "35": [34],
-        "null": [35]
       }
     }
   },
   "cards": [
     {
-      "id": 39,
-      "lineId": 16,
-      "beatId": 34,
-      "bookId": null,
-      "positionWithinLine": 0,
-      "positionInBeat": 0,
-      "title": "Chapter card 2",
-      "description": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "text": ""
-            }
-          ]
-        }
-      ],
-      "tags": [],
-      "characters": [],
-      "places": [],
-      "templates": [],
-      "imageId": null,
-      "fromTemplateId": null,
-      "color": null
-    },
-    {
-      "id": 38,
-      "lineId": 13,
-      "beatId": 34,
-      "bookId": null,
-      "positionWithinLine": 0,
-      "positionInBeat": 0,
-      "title": "Chapter 1 card",
-      "description": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "text": "These chapter cards wont be visible in the stacked view."
-            }
-          ]
-        }
-      ],
-      "tags": [],
-      "characters": [],
-      "places": [],
-      "templates": [],
-      "imageId": null,
-      "fromTemplateId": null,
-      "color": null
-    },
-    {
-      "id": 37,
-      "lineId": 16,
-      "beatId": 35,
-      "bookId": null,
-      "positionWithinLine": 0,
-      "positionInBeat": 0,
-      "title": "Act Card 2",
-      "description": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "text": ""
-            }
-          ]
-        }
-      ],
-      "tags": [],
-      "characters": [],
-      "places": [],
-      "templates": [],
-      "imageId": null,
-      "fromTemplateId": null,
-      "color": null
-    },
-    {
       "id": 36,
-      "lineId": 13,
-      "beatId": 35,
+      "lineId": 16,
+      "beatId": 37,
       "bookId": null,
       "positionWithinLine": 0,
       "positionInBeat": 0,
-      "title": "Act card 1",
+      "title": "tnaehou",
       "description": [
         {
           "type": "paragraph",
           "children": [
             {
-              "text": "I added these two \"Act\" cards because they'll dissapear in the other views."
+              "text": ""
             }
           ]
         }
@@ -826,8 +490,8 @@
     },
     {
       "id": 35,
-      "lineId": 16,
-      "beatId": 32,
+      "lineId": 13,
+      "beatId": 41,
       "bookId": null,
       "positionWithinLine": 0,
       "positionInBeat": 0,
@@ -853,7 +517,7 @@
     {
       "id": 34,
       "lineId": 13,
-      "beatId": 32,
+      "beatId": 37,
       "bookId": null,
       "positionWithinLine": 0,
       "positionInBeat": 0,
@@ -878,8 +542,8 @@
     },
     {
       "id": 33,
-      "lineId": 16,
-      "beatId": 31,
+      "lineId": 13,
+      "beatId": 39,
       "bookId": null,
       "positionWithinLine": 0,
       "positionInBeat": 0,
@@ -904,116 +568,12 @@
     },
     {
       "id": 32,
-      "lineId": 13,
-      "beatId": 31,
+      "lineId": 16,
+      "beatId": 40,
       "bookId": null,
       "positionWithinLine": 0,
       "positionInBeat": 0,
       "title": "Prince Sidon",
-      "description": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "text": ""
-            }
-          ]
-        }
-      ],
-      "tags": [],
-      "characters": [],
-      "places": [],
-      "templates": [],
-      "imageId": null,
-      "fromTemplateId": null,
-      "color": null
-    },
-    {
-      "id": 31,
-      "lineId": 13,
-      "beatId": 30,
-      "bookId": null,
-      "positionWithinLine": 0,
-      "positionInBeat": 0,
-      "title": "Making the climb",
-      "description": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "text": ""
-            }
-          ]
-        }
-      ],
-      "tags": [],
-      "characters": [],
-      "places": [],
-      "templates": [],
-      "imageId": null,
-      "fromTemplateId": null,
-      "color": null
-    },
-    {
-      "id": 30,
-      "lineId": 16,
-      "beatId": 29,
-      "bookId": null,
-      "positionWithinLine": 0,
-      "positionInBeat": 0,
-      "title": "Princess Ruto",
-      "description": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "text": ""
-            }
-          ]
-        }
-      ],
-      "tags": [],
-      "characters": [],
-      "places": [],
-      "templates": [],
-      "imageId": null,
-      "fromTemplateId": null,
-      "color": null
-    },
-    {
-      "id": 29,
-      "lineId": 13,
-      "beatId": 29,
-      "bookId": null,
-      "positionWithinLine": 0,
-      "positionInBeat": 0,
-      "title": "Zora's Domain",
-      "description": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "text": ""
-            }
-          ]
-        }
-      ],
-      "tags": [],
-      "characters": [],
-      "places": [],
-      "templates": [],
-      "imageId": null,
-      "fromTemplateId": null,
-      "color": null
-    },
-    {
-      "id": 28,
-      "lineId": 13,
-      "beatId": 28,
-      "bookId": null,
-      "positionWithinLine": 0,
-      "positionInBeat": 0,
-      "title": "Where to start",
       "description": [
         {
           "type": "paragraph",
@@ -1060,8 +620,8 @@
     },
     {
       "id": 26,
-      "lineId": 13,
-      "beatId": 27,
+      "lineId": 16,
+      "beatId": 34,
       "bookId": null,
       "positionWithinLine": 0,
       "positionInBeat": 0,
@@ -1087,7 +647,7 @@
     {
       "id": 25,
       "lineId": 13,
-      "beatId": 26,
+      "beatId": 40,
       "bookId": null,
       "positionWithinLine": 0,
       "positionInBeat": 0,
@@ -1112,8 +672,8 @@
     },
     {
       "id": 24,
-      "lineId": 16,
-      "beatId": 20,
+      "lineId": 13,
+      "beatId": 34,
       "bookId": null,
       "positionWithinLine": 0,
       "positionInBeat": 0,
@@ -1139,7 +699,7 @@
     {
       "id": 23,
       "lineId": 13,
-      "beatId": 20,
+      "beatId": 35,
       "bookId": null,
       "positionWithinLine": 0,
       "positionInBeat": 0,
@@ -1768,7 +1328,14 @@
       "tags": [],
       "categoryId": "1",
       "imageId": null,
-      "bookIds": [1, 5, 8, 6, 7, 9]
+      "bookIds": [
+        1,
+        5,
+        8,
+        6,
+        7,
+        9
+      ]
     },
     {
       "id": 2,
@@ -1791,7 +1358,13 @@
       "tags": [],
       "categoryId": "2",
       "imageId": null,
-      "bookIds": [8, 1, 5, 6, 7]
+      "bookIds": [
+        8,
+        1,
+        5,
+        6,
+        7
+      ]
     },
     {
       "id": 3,
@@ -1814,7 +1387,13 @@
       "tags": [],
       "categoryId": null,
       "imageId": null,
-      "bookIds": [8, 1, 5, 6, 7]
+      "bookIds": [
+        8,
+        1,
+        5,
+        6,
+        7
+      ]
     }
   ],
   "customAttributes": {
@@ -1988,158 +1567,10 @@
     }
   ],
   "hierarchyLevels": {
-    "series": {
-      "0": {
-        "name": "Act",
-        "level": 0,
-        "autoNumber": true,
-        "textSize": 24,
-        "borderStyle": "SOLID",
-        "backgroundColor": "none",
-        "textColor": "#e5554f",
-        "borderColor": "#e5554f",
-        "dark": {
-          "textColor": "#ffb8b5",
-          "borderColor": "#ffb8b5"
-        },
-        "light": {
-          "textColor": "#e5554f",
-          "borderColor": "#e5554f"
-        }
-      },
-      "1": {
-        "name": "Chapter",
-        "level": 1,
-        "autoNumber": true,
-        "textSize": 24,
-        "borderStyle": "DASHED",
-        "backgroundColor": "none",
-        "textColor": "#78be20",
-        "borderColor": "#78be20",
-        "dark": {
-          "textColor": "#baed79",
-          "borderColor": "#baed79"
-        },
-        "light": {
-          "textColor": "#78be20",
-          "borderColor": "#78be20"
-        }
-      },
-      "2": {
-        "name": "Chapter",
-        "level": 2,
-        "autoNumber": true,
-        "textSize": 24,
-        "borderStyle": "NONE",
-        "backgroundColor": "none",
-        "textColor": "#0b1117",
-        "borderColor": "#6cace4",
-        "dark": {
-          "borderColor": "#c9e6ff",
-          "textColor": "#c9e6ff"
-        },
-        "light": {
-          "borderColor": "#6cace4",
-          "textColor": "#0b1117"
-        }
-      }
-    },
     "1": {
       "0": {
-        "name": "Act",
+        "name": "Chapter",
         "level": 0,
-        "autoNumber": true,
-        "textSize": 24,
-        "borderStyle": "SOLID",
-        "backgroundColor": "none",
-        "textColor": "#e5554f",
-        "borderColor": "#e5554f",
-        "dark": {
-          "textColor": "#ffb8b5",
-          "borderColor": "#ffb8b5"
-        },
-        "light": {
-          "textColor": "#e5554f",
-          "borderColor": "#e5554f"
-        }
-      },
-      "1": {
-        "name": "Chapter",
-        "level": 1,
-        "autoNumber": true,
-        "textSize": 24,
-        "borderStyle": "DASHED",
-        "backgroundColor": "none",
-        "textColor": "#78be20",
-        "borderColor": "#78be20",
-        "dark": {
-          "textColor": "#baed79",
-          "borderColor": "#baed79"
-        },
-        "light": {
-          "textColor": "#78be20",
-          "borderColor": "#78be20"
-        }
-      },
-      "2": {
-        "name": "Chapter",
-        "level": 2,
-        "autoNumber": true,
-        "textSize": 24,
-        "borderStyle": "NONE",
-        "backgroundColor": "none",
-        "textColor": "#0b1117",
-        "borderColor": "#6cace4",
-        "dark": {
-          "borderColor": "#c9e6ff",
-          "textColor": "#c9e6ff"
-        },
-        "light": {
-          "borderColor": "#6cace4",
-          "textColor": "#0b1117"
-        }
-      }
-    },
-    "8": {
-      "0": {
-        "name": "Act",
-        "level": 0,
-        "autoNumber": true,
-        "textSize": 24,
-        "borderStyle": "SOLID",
-        "backgroundColor": "none",
-        "textColor": "#e5554f",
-        "borderColor": "#e5554f",
-        "dark": {
-          "textColor": "#ffb8b5",
-          "borderColor": "#ffb8b5"
-        },
-        "light": {
-          "textColor": "#e5554f",
-          "borderColor": "#e5554f"
-        }
-      },
-      "1": {
-        "name": "Chapter",
-        "level": 1,
-        "autoNumber": true,
-        "textSize": 24,
-        "borderStyle": "DASHED",
-        "backgroundColor": "none",
-        "textColor": "#78be20",
-        "borderColor": "#78be20",
-        "dark": {
-          "textColor": "#baed79",
-          "borderColor": "#baed79"
-        },
-        "light": {
-          "textColor": "#78be20",
-          "borderColor": "#78be20"
-        }
-      },
-      "2": {
-        "name": "Chapter",
-        "level": 2,
         "autoNumber": true,
         "textSize": 24,
         "borderStyle": "NONE",
@@ -2158,100 +1589,8 @@
     },
     "5": {
       "0": {
-        "name": "Act",
+        "name": "Chapter",
         "level": 0,
-        "autoNumber": true,
-        "textSize": 24,
-        "borderStyle": "SOLID",
-        "backgroundColor": "none",
-        "textColor": "#e5554f",
-        "borderColor": "#e5554f",
-        "dark": {
-          "textColor": "#ffb8b5",
-          "borderColor": "#ffb8b5"
-        },
-        "light": {
-          "textColor": "#e5554f",
-          "borderColor": "#e5554f"
-        }
-      },
-      "1": {
-        "name": "Chapter",
-        "level": 1,
-        "autoNumber": true,
-        "textSize": 24,
-        "borderStyle": "DASHED",
-        "backgroundColor": "none",
-        "textColor": "#78be20",
-        "borderColor": "#78be20",
-        "dark": {
-          "textColor": "#baed79",
-          "borderColor": "#baed79"
-        },
-        "light": {
-          "textColor": "#78be20",
-          "borderColor": "#78be20"
-        }
-      },
-      "2": {
-        "name": "Chapter",
-        "level": 2,
-        "autoNumber": true,
-        "textSize": 24,
-        "borderStyle": "NONE",
-        "backgroundColor": "none",
-        "textColor": "#0b1117",
-        "borderColor": "#6cace4",
-        "dark": {
-          "borderColor": "#c9e6ff",
-          "textColor": "#c9e6ff"
-        },
-        "light": {
-          "borderColor": "#6cace4",
-          "textColor": "#0b1117"
-        }
-      }
-    },
-    "9": {
-      "0": {
-        "name": "Act",
-        "level": 0,
-        "autoNumber": true,
-        "textSize": 24,
-        "borderStyle": "SOLID",
-        "backgroundColor": "none",
-        "textColor": "#e5554f",
-        "borderColor": "#e5554f",
-        "dark": {
-          "textColor": "#ffb8b5",
-          "borderColor": "#ffb8b5"
-        },
-        "light": {
-          "textColor": "#e5554f",
-          "borderColor": "#e5554f"
-        }
-      },
-      "1": {
-        "name": "Chapter",
-        "level": 1,
-        "autoNumber": true,
-        "textSize": 24,
-        "borderStyle": "DASHED",
-        "backgroundColor": "none",
-        "textColor": "#78be20",
-        "borderColor": "#78be20",
-        "dark": {
-          "textColor": "#baed79",
-          "borderColor": "#baed79"
-        },
-        "light": {
-          "textColor": "#78be20",
-          "borderColor": "#78be20"
-        }
-      },
-      "2": {
-        "name": "Chapter",
-        "level": 2,
         "autoNumber": true,
         "textSize": 24,
         "borderStyle": "NONE",
@@ -2270,44 +1609,8 @@
     },
     "6": {
       "0": {
-        "name": "Act",
+        "name": "Chapter",
         "level": 0,
-        "autoNumber": true,
-        "textSize": 24,
-        "borderStyle": "SOLID",
-        "backgroundColor": "none",
-        "textColor": "#e5554f",
-        "borderColor": "#e5554f",
-        "dark": {
-          "textColor": "#ffb8b5",
-          "borderColor": "#ffb8b5"
-        },
-        "light": {
-          "textColor": "#e5554f",
-          "borderColor": "#e5554f"
-        }
-      },
-      "1": {
-        "name": "Chapter",
-        "level": 1,
-        "autoNumber": true,
-        "textSize": 24,
-        "borderStyle": "DASHED",
-        "backgroundColor": "none",
-        "textColor": "#78be20",
-        "borderColor": "#78be20",
-        "dark": {
-          "textColor": "#baed79",
-          "borderColor": "#baed79"
-        },
-        "light": {
-          "textColor": "#78be20",
-          "borderColor": "#78be20"
-        }
-      },
-      "2": {
-        "name": "Chapter",
-        "level": 2,
         "autoNumber": true,
         "textSize": 24,
         "borderStyle": "NONE",
@@ -2362,8 +1665,68 @@
         }
       },
       "2": {
-        "name": "Chapter",
+        "name": "Scene",
         "level": 2,
+        "autoNumber": true,
+        "textSize": 24,
+        "borderStyle": "NONE",
+        "backgroundColor": "none",
+        "textColor": "#0b1117",
+        "borderColor": "#6cace4",
+        "dark": {
+          "borderColor": "#c9e6ff",
+          "textColor": "#c9e6ff"
+        },
+        "light": {
+          "borderColor": "#6cace4",
+          "textColor": "#0b1117"
+        }
+      }
+    },
+    "8": {
+      "0": {
+        "name": "Chapter",
+        "level": 0,
+        "autoNumber": true,
+        "textSize": 24,
+        "borderStyle": "NONE",
+        "backgroundColor": "none",
+        "textColor": "#0b1117",
+        "borderColor": "#6cace4",
+        "dark": {
+          "borderColor": "#c9e6ff",
+          "textColor": "#c9e6ff"
+        },
+        "light": {
+          "borderColor": "#6cace4",
+          "textColor": "#0b1117"
+        }
+      }
+    },
+    "9": {
+      "0": {
+        "name": "Chapter",
+        "level": 0,
+        "autoNumber": true,
+        "textSize": 24,
+        "borderStyle": "NONE",
+        "backgroundColor": "none",
+        "textColor": "#0b1117",
+        "borderColor": "#6cace4",
+        "dark": {
+          "borderColor": "#c9e6ff",
+          "textColor": "#c9e6ff"
+        },
+        "light": {
+          "borderColor": "#6cace4",
+          "textColor": "#0b1117"
+        }
+      }
+    },
+    "series": {
+      "0": {
+        "name": "Chapter",
+        "level": 0,
         "autoNumber": true,
         "textSize": 24,
         "borderStyle": "NONE",
