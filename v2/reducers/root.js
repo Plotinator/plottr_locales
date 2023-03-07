@@ -28,6 +28,10 @@ import {
   SET_HIERARCHY_LEVELS,
   ATTACH_CHARACTER_TO_CARD,
   DELETE_TAG,
+  RESTRUCTURE_TIMELINE,
+  UNSAFE_SET_BEATS,
+  ADD_CARD,
+  REORDER_CARDS_WITHIN_LINE,
 } from '../constants/ActionTypes'
 import {
   selectedCharacterAttributeTabSelector,
@@ -49,9 +53,10 @@ import { reduce, beatsByPosition, nextId as nextBeatId } from '../helpers/beats'
 import { nextId, objectId } from '../store/newIds'
 import * as tree from './tree'
 import { beat as defaultBeat } from '../store/initialState'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, zip, range } from 'lodash'
 import { setTimelineView } from '../actions/ui'
 import { deleteLine } from '../actions/lines'
+import { addBeat } from '../actions/beats'
 import { applyTemplate, moveLineActions } from '../helpers/templates'
 
 const addCharacterAttributeDataForModifyingBaseAttribute = (baseAttributeName, state, action) => {
@@ -349,12 +354,18 @@ const root = (dataRepairers) => (state, action) => {
         return line.id === action.id
       })
       // No such line or book
-      if (!line || typeof state.books[action.destinationBookId] === 'undefined') {
+      if (
+        !line ||
+        (action.destinationBookId !== 'series' &&
+          typeof state.books[action.destinationBookId] === 'undefined')
+      ) {
         return state
       }
 
       const sourceBookId = line.bookId
-      if (typeof state.books[line.bookId] === 'undefined') {
+
+      const book = action.destinationBookId === 'series' ? state.series : state.books[line.bookId]
+      if (typeof book === 'undefined') {
         return state
       }
 
@@ -386,10 +397,91 @@ const root = (dataRepairers) => (state, action) => {
       return mainReducer(withNewLine, deleteLine(action.id))
     }
 
+    case RESTRUCTURE_TIMELINE: {
+      const { flatBeats, beatHierarchyLevels } = action
+      const bookId = currentTimelineSelector(state)
+
+      let newBeatId = nextBeatId(state.beats)
+      let newBeatTree = tree.newTree('id')
+      let lastHierarchyLevel = null
+      let lastBeatId = null
+      for (const [beat, level] of zip(flatBeats, beatHierarchyLevels)) {
+        // Add the missing higher level beats
+        const startLevel =
+          lastHierarchyLevel === null
+            ? 0
+            : level.level - lastHierarchyLevel.level > 1
+            ? lastHierarchyLevel.level + 1
+            : level.level
+        for (let i = startLevel; i < level.level; ++i) {
+          const parentId = i === 0 ? null : lastBeatId
+          const node = {
+            autoOutlineSort: true,
+            bookId: bookId,
+            fromTemplateId: null,
+            id: newBeatId,
+            position: tree.nextPosition(newBeatTree, parentId),
+            time: 0,
+            title: 'auto',
+            expanded: true,
+          }
+          newBeatTree = tree.addNode('id')(newBeatTree, parentId, node)
+          lastBeatId = newBeatId
+          newBeatId++
+        }
+        // Add the next beat
+        const parentId =
+          startLevel === 0 && startLevel === level.level
+            ? null
+            : lastHierarchyLevel && lastHierarchyLevel.level - level.level === 1 // Assumes a depth of three at most.  Would have to keep chasing parents to the same level otherwise.
+            ? tree.nodeParent(newBeatTree, tree.nodeParent(newBeatTree, lastBeatId))
+            : (lastHierarchyLevel && level.level === lastHierarchyLevel.level) ||
+              (lastHierarchyLevel === null && level.level === startLevel)
+            ? tree.nodeParent(newBeatTree, lastBeatId)
+            : lastBeatId
+
+        const position = tree.nextPosition(newBeatTree, parentId)
+        newBeatTree = tree.addNode('id')(newBeatTree, parentId, {
+          ...beat,
+          position,
+        })
+        lastBeatId = beat.id
+        lastHierarchyLevel = level
+      }
+
+      return mainReducer(state, { type: UNSAFE_SET_BEATS, bookId, beats: newBeatTree })
+    }
+
     case SET_HIERARCHY_LEVELS: {
       return mainReducer(state, {
         ...action,
         existingHierarchyLevelCount: hierarchyLevelCount(state),
+      })
+    }
+
+    case ADD_CARD:
+    case REORDER_CARDS_WITHIN_LINE: {
+      const bookId = currentTimelineSelector(state)
+      const beats = state.beats[bookId]
+      const beatId = action.beatId || action.card.beatId
+      const depthOfBeat = tree.depth(beats, beatId)
+      const maxDepth = tree.maxDepth('id')(beats)
+      const newBeatId = nextBeatId(state.beats)
+      const [newState, finalBeatId, _nextBeatId] =
+        action.addMissingBeats && depthOfBeat !== maxDepth
+          ? range(maxDepth, depthOfBeat).reduce(
+              (acc, _iteration) => {
+                const [currentState, beatId, newBeatId] = acc
+                const newState = mainReducer(currentState, addBeat(bookId, beatId))
+                return [newState, newBeatId, newBeatId + 1]
+              },
+              [state, beatId, newBeatId]
+            )
+          : [state, beatId, newBeatId]
+      return mainReducer(newState, {
+        ...action,
+        ...(action.beatId ? { beatId: finalBeatId } : {}),
+        ...(action.card ? { card: { ...action.card, beatId: finalBeatId } } : {}),
       })
     }
 

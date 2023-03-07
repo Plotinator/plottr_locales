@@ -4,7 +4,6 @@ import { createSelector } from 'reselect'
 import { outOfOrderSearch } from '../helpers/outOfOrderSearch'
 import { reduce, depth, findNode, nodeParent, children, forEach } from '../reducers/tree'
 import {
-  maxDepth,
   beatsByPosition,
   rootParentId,
   beatTitle,
@@ -45,6 +44,7 @@ import {
   timelineViewIsStackedSelector,
   timelineViewIsTabbedSelector,
   uiSelector,
+  hierarchyLevelSelector,
 } from './secondOrder'
 
 const selectedOrientationSelector = createSelector(uiSelector, ({ orientation }) => {
@@ -478,6 +478,17 @@ export const timelineSparceBeatMap = createSelector(
   }
 )
 
+const fullStateSelector = (state) => state
+export const sortedBeatsHierachyLevels = createSelector(
+  visibleSortedBeatsForTimelineByBookSelector,
+  fullStateSelector,
+  (beats, state) => {
+    return beats.map((beat) => {
+      return hierarchyLevelSelector(state, beat.id)
+    })
+  }
+)
+
 export const leavesPerBeatSelector = createSelector(beatsByBookSelector, (beats) => {
   const index = new Map()
   const leavesForBeat = (id) => {
@@ -667,3 +678,12 @@ function cardIsVisible(card, filter, filterIsEmpty) {
     })
   })
 }
+
+export const parentIsHigherLevelAndViewIsStackedSelector = createSelector(
+  timelineViewIsStackedSelector,
+  hierarchyLevelSelector,
+  sortedHierarchyLevels,
+  (timelineIsStackedView, hierarchyLevel, sortedLevels) => {
+    return timelineIsStackedView && hierarchyLevel.level !== sortedLevels.length - 1
+  }
+)
