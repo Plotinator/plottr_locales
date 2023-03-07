@@ -53,9 +53,10 @@ import { reduce, beatsByPosition, nextId as nextBeatId } from '../helpers/beats'
 import { nextId, objectId } from '../store/newIds'
 import * as tree from './tree'
 import { beat as defaultBeat } from '../store/initialState'
-import { cloneDeep, zip } from 'lodash'
+import { cloneDeep, zip, range } from 'lodash'
 import { setTimelineView } from '../actions/ui'
 import { deleteLine } from '../actions/lines'
+import { addBeat } from '../actions/beats'
 import { applyTemplate, moveLineActions } from '../helpers/templates'
 
 const addCharacterAttributeDataForModifyingBaseAttribute = (baseAttributeName, state, action) => {
@@ -460,8 +461,28 @@ const root = (dataRepairers) => (state, action) => {
 
     case ADD_CARD:
     case REORDER_CARDS_WITHIN_LINE: {
-      
-      return mainReducer(state, action)
+      const bookId = currentTimelineSelector(state)
+      const beats = state.beats[bookId]
+      const beatId = action.beatId || action.card.beatId
+      const depthOfBeat = tree.depth(beats, beatId)
+      const maxDepth = tree.maxDepth('id')(beats)
+      const newBeatId = nextBeatId(state.beats)
+      const [newState, finalBeatId, _nextBeatId] =
+        action.addMissingBeats && depthOfBeat !== maxDepth
+          ? range(maxDepth, depthOfBeat).reduce(
+              (acc, _iteration) => {
+                const [currentState, beatId, newBeatId] = acc
+                const newState = mainReducer(currentState, addBeat(bookId, beatId))
+                return [newState, newBeatId, newBeatId + 1]
+              },
+              [state, beatId, newBeatId]
+            )
+          : [state, beatId, newBeatId]
+      return mainReducer(newState, {
+        ...action,
+        ...(action.beatId ? { beatId: finalBeatId } : {}),
+        ...(action.card ? { card: { ...action.card, beatId: finalBeatId } } : {}),
+      })
     }
 
     default:
