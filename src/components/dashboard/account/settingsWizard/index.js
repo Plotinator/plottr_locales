@@ -5,25 +5,35 @@ import OnboardingFlow from '../../../onboarding/OnboardingFlow'
 import OnboardingProgress from '../../../onboarding/OnboardingProgress'
 import AccountHeader from '../AccountHeader'
 import UnconnectedSettingsWizardStep1 from './SettingsWizardStep1'
-// import UnconnectedProStep2 from './ProStep2'
-// import UnconnectedProStep3 from './ProStep3'
+import UnconnectedSettingsWizardStep2 from './SettingsWizardStep2'
+import UnconnectedSettingsWizardStep3 from './SettingsWizardStep3'
+import UnconnectedErrorBoundary from '../../../containers/ErrorBoundary'
 
-const steps = 3
+const steps = 4
 
 const SettingsWizardConnector = (connector) => {
+  const ErrorBoundary = UnconnectedErrorBoundary(connector)
   const SettingsWizardStep1 = UnconnectedSettingsWizardStep1(connector)
-  // const ProStep2 = UnconnectedProStep2(connector)
-  // const ProStep3 = UnconnectedProStep3(connector)
+  const SettingsWizardStep2 = UnconnectedSettingsWizardStep2(connector)
+  const SettingsWizardStep3 = UnconnectedSettingsWizardStep3(connector)
 
-  const SettingsWizard = ({ step, advanceSettingsWizard }) => {
+  const SettingsWizard = ({ step, advanceSettingsWizard, regressSettingsWizard }) => {
     const CurrentStep = () => {
       switch (step) {
         case 1:
           return <SettingsWizardStep1 nextStep={advanceSettingsWizard} />
         case 2:
-          return <SettingsWizardStep1 nextStep={advanceSettingsWizard} />
+          return (
+            <SettingsWizardStep2 nextStep={advanceSettingsWizard} goBack={regressSettingsWizard} />
+          )
         case 3:
-          return <SettingsWizardStep1 nextStep={advanceSettingsWizard} />
+          return (
+            <SettingsWizardStep3 nextStep={advanceSettingsWizard} goBack={regressSettingsWizard} />
+          )
+        case 4:
+          return (
+            <SettingsWizardStep1 nextStep={advanceSettingsWizard} goBack={regressSettingsWizard} />
+          )
         default:
           return <SettingsWizardStep1 nextStep={advanceSettingsWizard} />
       }
@@ -38,7 +48,9 @@ const SettingsWizardConnector = (connector) => {
         <div className="settings-wizard__body">
           <OnboardingFlow>
             <OnboardingProgress currentStep={step} totalSteps={steps} />
-            <CurrentStep />
+            <ErrorBoundary>
+              <CurrentStep />
+            </ErrorBoundary>
           </OnboardingFlow>
         </div>
       </div>
@@ -48,6 +60,7 @@ const SettingsWizardConnector = (connector) => {
   SettingsWizard.propTypes = {
     step: PropTypes.number,
     advanceSettingsWizard: PropTypes.func.isRequired,
+    regressSettingsWizard: PropTypes.func.isRequired,
   }
 
   const {
@@ -66,6 +79,7 @@ const SettingsWizardConnector = (connector) => {
       },
       {
         advanceSettingsWizard: actions.applicationState.advanceSettingsWizard,
+        regressSettingsWizard: actions.applicationState.regressSettingsWizard,
       }
     )(SettingsWizard)
   }

@@ -7,10 +7,12 @@ import ProStep0 from './ProStep0'
 import UnconnectedProStep1 from './ProStep1'
 import UnconnectedProStep2 from './ProStep2'
 import UnconnectedProStep3 from './ProStep3'
+import UnconnectedErrorBoundary from '../../../containers/ErrorBoundary'
 
 const steps = 3
 
 const ProOnboardingConnector = (connector) => {
+  const ErrorBoundary = UnconnectedErrorBoundary(connector)
   const ProStep1 = UnconnectedProStep1(connector)
   const ProStep2 = UnconnectedProStep2(connector)
   const ProStep3 = UnconnectedProStep3(connector)
@@ -33,7 +35,9 @@ const ProOnboardingConnector = (connector) => {
       <OnboardingFlow>
         <h1>{t('Welcome to Plottr Pro')}</h1>
         <OnboardingProgress currentStep={step} totalSteps={steps} />
-        <CurrentStep />
+        <ErrorBoundary>
+          <CurrentStep />
+        </ErrorBoundary>
       </OnboardingFlow>
     )
   }
