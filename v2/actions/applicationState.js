@@ -41,6 +41,7 @@ import {
   DONE_WITH_WORK_THAT_PREVENTS_QUITTING,
   CLEAR_ERROR_LOADING_FILE,
   ADVANCE_SETTINGS_WIZARD,
+  REGRESS_SETTINGS_WIZARD,
   START_SETTINGS_WIZARD,
   FINISH_SETTINGS_WIZARD,
 } from '../constants/ActionTypes'
@@ -141,6 +142,9 @@ export const finishLoadingASettingsType = (settingsType) => ({
 // Settings Wizard
 export const advanceSettingsWizard = () => ({
   type: ADVANCE_SETTINGS_WIZARD,
+})
+export const regressSettingsWizard = () => ({
+  type: REGRESS_SETTINGS_WIZARD,
 })
 export const startSettingsWizard = () => ({
   type: START_SETTINGS_WIZARD,

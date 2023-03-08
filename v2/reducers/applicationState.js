@@ -43,6 +43,7 @@ import {
   CLEAR_ERROR_LOADING_FILE,
   START_SETTINGS_WIZARD,
   ADVANCE_SETTINGS_WIZARD,
+  REGRESS_SETTINGS_WIZARD,
   FINISH_SETTINGS_WIZARD,
   SET_APP_SETTINGS,
 } from '../constants/ActionTypes'
@@ -470,11 +471,12 @@ function applicationStateReducer(state = INITIAL_STATE, action) {
     }
     case SET_APP_SETTINGS: {
       const isInSettingsWizard = action.appSettings.finishedSettingsWizard ? false : true
+      const wizardStep = state.settingsWizard.wizardStep ? state.settingsWizard.wizardStep : 1
       return {
         ...state,
         settingsWizard: {
           isInSettingsWizard,
-          wizardStep: isInSettingsWizard ? 1 : null,
+          wizardStep: wizardStep,
         },
       }
     }
@@ -488,6 +490,20 @@ function applicationStateReducer(state = INITIAL_STATE, action) {
         settingsWizard: {
           ...state.settingsWizard,
           wizardStep: wizardStep + 1,
+        },
+      }
+    }
+    case REGRESS_SETTINGS_WIZARD: {
+      if (!state.settingsWizard.isInSettingsWizard) {
+        return state
+      }
+      const wizardStep = state.settingsWizard.wizardStep ? state.settingsWizard.wizardStep : 1
+      const nextStep = wizardStep - 1
+      return {
+        ...state,
+        settingsWizard: {
+          ...state.settingsWizard,
+          wizardStep: nextStep < 1 ? 1 : nextStep,
         },
       }
     }
