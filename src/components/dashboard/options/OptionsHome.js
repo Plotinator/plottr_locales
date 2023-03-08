@@ -43,6 +43,7 @@ const OptionsHomeConnector = (connector) => {
     showOpenDialog,
     updateLanguage,
     os,
+    log,
     saveAppSetting,
   })
 
