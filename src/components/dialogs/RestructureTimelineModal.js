@@ -261,7 +261,7 @@ const RestructureTimelineModalConnector = (connector) => {
       (state) => {
         return {
           beatHierarchyLevels: selectors.sortedBeatsHierachyLevels(state.present),
-          beats: selectors.visibleSortedBeatsForTimelineByBookSelector(state.present),
+          beats: selectors.sortedBeatsByBookSelector(state.present),
         }
       },
       {
