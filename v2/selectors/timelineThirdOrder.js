@@ -480,7 +480,7 @@ export const timelineSparceBeatMap = createSelector(
 
 const fullStateSelector = (state) => state
 export const sortedBeatsHierachyLevels = createSelector(
-  visibleSortedBeatsForTimelineByBookSelector,
+  sortedBeatsByBookSelector,
   fullStateSelector,
   (beats, state) => {
     return beats.map((beat) => {
