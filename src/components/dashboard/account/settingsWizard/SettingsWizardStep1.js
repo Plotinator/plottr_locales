@@ -3,18 +3,18 @@ import PropTypes from 'react-proptypes'
 
 import { t, setupI18n } from 'plottr_locales'
 
-import OnboardingStep from '../../../onboarding/OnboardingStep'
 import { StepBody, StepFooter, StepHeader } from '../../../onboarding/Step'
 import OnboardingButtonBar from '../../../onboarding/OnboardingButtonBar'
+import OnboardingStep from '../../../onboarding/OnboardingStep'
+import ButtonGroup from '../../../ButtonGroup'
 import Button from '../../../Button'
 import UnconnectedDarkOptionsSelect from '../../options/DarkOptionsSelect'
 import UnconnectedLanguagePicker from '../../../LanguagePicker'
-import { checkDependencies } from '../../../checkDependencies'
-import ButtonGroup from '../../../ButtonGroup'
-import { FontSettingDropdown } from '../../options/FontSettingDropdown'
-import RichTextSettingsViewer from '../../options/RichTextSettingsViewer'
-import { addRecent, getFonts, getRecent } from '../../../rce/fonts'
 import { FontSizeSettingDropdown } from '../../options/FontSizeSettingDropdown'
+import RichTextSettingsViewer from '../../options/RichTextSettingsViewer'
+import { FontSettingDropdown } from '../../options/FontSettingDropdown'
+import { addRecent, getFonts, getRecent } from '../../../rce/fonts'
+import { checkDependencies } from '../../../checkDependencies'
 
 const SettingsWizardStep1Connector = (connector) => {
   const {
@@ -65,11 +65,6 @@ const SettingsWizardStep1Connector = (connector) => {
       addRecent('Forum')
       saveAppSetting('user.fontSize', 20)
     }, [saveAppSetting])
-
-    const handleNextStep = () => {
-      // if the user hasn't changed anything, do we need to do anything to save settings?
-      return nextStep()
-    }
 
     // TODO: pull the default values from the right place (default_settings)
     const rceFontIsDefault = settings.user.font === undefined || settings.user.font === 'Forum'
@@ -132,7 +127,7 @@ const SettingsWizardStep1Connector = (connector) => {
         </StepBody>
         <StepFooter>
           <OnboardingButtonBar>
-            <Button bsSize="large" bsStyle="success" onClick={handleNextStep}>
+            <Button bsSize="large" bsStyle="success" onClick={nextStep}>
               {t('Next')}
             </Button>
           </OnboardingButtonBar>
@@ -147,16 +142,21 @@ const SettingsWizardStep1Connector = (connector) => {
   }
 
   const {
-    pltr: { selectors },
+    pltr: { selectors, actions },
     redux,
   } = connector
 
   if (redux) {
     const { connect } = redux
 
-    return connect((state) => ({
-      settings: selectors.appSettingsSelector(state.present),
-    }))(SettingsWizardStep1)
+    return connect(
+      (state) => ({
+        settings: selectors.appSettingsSelector(state.present),
+      }),
+      {
+        nextStep: actions.applicationState.advanceSettingsWizard,
+      }
+    )(SettingsWizardStep1)
   }
 
   throw new Error('Could not connect SettingsWizardStep1')

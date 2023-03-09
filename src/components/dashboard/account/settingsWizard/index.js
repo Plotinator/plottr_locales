@@ -4,10 +4,11 @@ import { t } from 'plottr_locales'
 import OnboardingFlow from '../../../onboarding/OnboardingFlow'
 import OnboardingProgress from '../../../onboarding/OnboardingProgress'
 import AccountHeader from '../AccountHeader'
+import UnconnectedErrorBoundary from '../../../containers/ErrorBoundary'
 import UnconnectedSettingsWizardStep1 from './SettingsWizardStep1'
 import UnconnectedSettingsWizardStep2 from './SettingsWizardStep2'
 import UnconnectedSettingsWizardStep3 from './SettingsWizardStep3'
-import UnconnectedErrorBoundary from '../../../containers/ErrorBoundary'
+import UnconnectedSettingsWizardStep4 from './SettingsWizardStep4'
 
 const steps = 4
 
@@ -16,26 +17,21 @@ const SettingsWizardConnector = (connector) => {
   const SettingsWizardStep1 = UnconnectedSettingsWizardStep1(connector)
   const SettingsWizardStep2 = UnconnectedSettingsWizardStep2(connector)
   const SettingsWizardStep3 = UnconnectedSettingsWizardStep3(connector)
+  const SettingsWizardStep4 = UnconnectedSettingsWizardStep4(connector)
 
-  const SettingsWizard = ({ step, advanceSettingsWizard, regressSettingsWizard }) => {
+  const SettingsWizard = ({ step }) => {
     const CurrentStep = () => {
       switch (step) {
         case 1:
-          return <SettingsWizardStep1 nextStep={advanceSettingsWizard} />
+          return <SettingsWizardStep1 />
         case 2:
-          return (
-            <SettingsWizardStep2 nextStep={advanceSettingsWizard} goBack={regressSettingsWizard} />
-          )
+          return <SettingsWizardStep2 />
         case 3:
-          return (
-            <SettingsWizardStep3 nextStep={advanceSettingsWizard} goBack={regressSettingsWizard} />
-          )
+          return <SettingsWizardStep3 />
         case 4:
-          return (
-            <SettingsWizardStep1 nextStep={advanceSettingsWizard} goBack={regressSettingsWizard} />
-          )
+          return <SettingsWizardStep4 />
         default:
-          return <SettingsWizardStep1 nextStep={advanceSettingsWizard} />
+          return <SettingsWizardStep1 />
       }
     }
 
@@ -59,29 +55,21 @@ const SettingsWizardConnector = (connector) => {
 
   SettingsWizard.propTypes = {
     step: PropTypes.number,
-    advanceSettingsWizard: PropTypes.func.isRequired,
-    regressSettingsWizard: PropTypes.func.isRequired,
   }
 
   const {
     redux,
-    pltr: { selectors, actions },
+    pltr: { selectors },
   } = connector
 
   if (redux) {
     const { connect } = redux
 
-    return connect(
-      (state) => {
-        return {
-          step: selectors.currentSettingsWizardStepSelector(state.present),
-        }
-      },
-      {
-        advanceSettingsWizard: actions.applicationState.advanceSettingsWizard,
-        regressSettingsWizard: actions.applicationState.regressSettingsWizard,
+    return connect((state) => {
+      return {
+        step: selectors.currentSettingsWizardStepSelector(state.present),
       }
-    )(SettingsWizard)
+    })(SettingsWizard)
   }
 
   throw new Error('Could not connect SettingsWizard')
