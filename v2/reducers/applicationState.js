@@ -528,6 +528,7 @@ function applicationStateReducer(state = INITIAL_STATE, action) {
         settingsWizard: {
           ...state.settingsWizard,
           isInSettingsWizard: false,
+          wizardStep: 1,
         },
       }
     }
