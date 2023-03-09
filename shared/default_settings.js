@@ -26,5 +26,6 @@ module.exports = {
     useSpellcheck: true,
     font: 'Forum',
     fontSize: 20,
+    defaultFolder: true,
   },
 }

@@ -25,6 +25,10 @@
       margin-top: 16px;
       background-color: $gray-8;
       border-radius: 16px;
+
+      .step__body .onboarding__settings .dashboard__options__item .form-group {
+        margin-left: 0;
+      }
     }
   }
 }
