@@ -3,99 +3,27 @@ import PropTypes from 'react-proptypes'
 
 import { t } from 'plottr_locales'
 
-import OnboardingStep from '../../../onboarding/OnboardingStep'
 import { StepBody, StepFooter, StepHeader } from '../../../onboarding/Step'
 import OnboardingButtonBar from '../../../onboarding/OnboardingButtonBar'
+import OnboardingStep from '../../../onboarding/OnboardingStep'
 import Button from '../../../Button'
-import Switch from '../../../Switch'
-import HelpBlock from '../../../HelpBlock'
-import { checkDependencies } from '../../../checkDependencies'
+import UnconnectedBackupSettings from '../../options/BackupSettings'
 
 const SettingsWizardStep3Connector = (connector) => {
-  const {
-    platform: {
-      settings: { saveAppSetting },
-      file: { joinPath },
-      showOpenDialog,
-      showItemInFolder,
-      userDocumentsPath,
-    },
-  } = connector
-  checkDependencies({
-    saveAppSetting,
-    showOpenDialog,
-    showItemInFolder,
-    userDocumentsPath,
-    joinPath,
-  })
+  const BackupSettings = UnconnectedBackupSettings(connector)
 
-  const SettingsWizardStep3 = ({ nextStep, goBack, settings }) => {
-    const [defPath, setDefPath] = useState('')
-
-    useEffect(() => {
-      userDocumentsPath().then((docPath) => {
-        joinPath(docPath, 'Plottr').then((filePath) => setDefPath(filePath))
-      })
-    }, [])
-
-    const onChangeDefaultFolderLocation = () => {
-      const title = t('Choose your default folder location')
-      const properties = ['openDirectory', 'createDirectory']
-      showOpenDialog(title, [], properties, folderPath()).then((files) => {
-        if (files && files.length) {
-          let folderPath = files[0]
-          saveAppSetting('user.defaultFolderLocation', folderPath)
-        }
-      })
-    }
-
-    const folderPath = () => {
-      return settings.user.defaultFolderLocation || defPath
-    }
-
-    const handleNextStep = () => {
-      if (settings.user.defaultFolder && !settings.user.defaultFolderLocation) {
-        saveAppSetting('user.defaultFolderLocation', folderPath())
-      }
-      // saveAppSetting('finishedSettingsWizard', true)
-      return nextStep()
-    }
-
+  const SettingsWizardStep3 = ({ nextStep, goBack }) => {
     return (
       <OnboardingStep>
         <StepHeader>
           <div style={{ textAlign: 'left', marginLeft: '8%' }}>
-            <h3>{t('Files')}</h3>
-            <h6>{t('Choose how to save your files')}</h6>
+            <h3>{t('Backups')}</h3>
+            <h6>{t('Choose how to backup your work')}</h6>
           </div>
         </StepHeader>
         <StepBody>
           <div className="onboarding__settings">
-            <div className="dashboard__options__item">
-              <h4>{t('Default Folder')}</h4>
-              <Switch
-                isOn={!!settings.user.defaultFolder}
-                handleToggle={() =>
-                  saveAppSetting('user.defaultFolder', !settings.user.defaultFolder)
-                }
-                labelText={t('All your files will be automatically saved to the folder you choose')}
-              />
-            </div>
-            {settings.user.defaultFolder ? (
-              <div className="dashboard__options__item">
-                <h4>{t('Default Folder Location')}</h4>
-                <HelpBlock className="dashboard__options-item-help">
-                  {t('Folder where all your projects get created')}
-                </HelpBlock>
-                <p>
-                  <Button onClick={onChangeDefaultFolderLocation}>{t('Choose...')}</Button>
-                  {'  '}
-                  <Button bsStyle="link" onClick={() => showItemInFolder(folderPath())}>
-                    {folderPath()}
-                  </Button>
-                </p>
-              </div>
-            ) : null}
+            <BackupSettings />
           </div>
         </StepBody>
         <StepFooter>
@@ -103,7 +31,7 @@ const SettingsWizardStep3Connector = (connector) => {
             <Button bsSize="large" onClick={goBack}>
               {t('Back')}
             </Button>
-            <Button bsSize="large" bsStyle="success" onClick={handleNextStep}>
+            <Button bsSize="large" bsStyle="success" onClick={nextStep}>
               {t('Next')}
             </Button>
           </OnboardingButtonBar>
@@ -113,22 +41,27 @@ const SettingsWizardStep3Connector = (connector) => {
   }
 
   SettingsWizardStep3.propTypes = {
-    nextStep: PropTypes.func,
-    goBack: PropTypes.func,
-    settings: PropTypes.object.isRequired,
+    nextStep: PropTypes.func.isRequired,
+    goBack: PropTypes.func.isRequired,
   }
 
   const {
-    pltr: { selectors },
+    pltr: { selectors, actions },
     redux,
   } = connector
 
   if (redux) {
     const { connect } = redux
 
-    return connect((state) => ({
-      settings: selectors.appSettingsSelector(state.present),
-    }))(SettingsWizardStep3)
+    return connect(
+      (state) => ({
+        settings: selectors.appSettingsSelector(state.present),
+      }),
+      {
+        nextStep: actions.applicationState.advanceSettingsWizard,
+        goBack: actions.applicationState.regressSettingsWizard,
+      }
+    )(SettingsWizardStep3)
   }
 
   throw new Error('Could not connect SettingsWizardStep3')

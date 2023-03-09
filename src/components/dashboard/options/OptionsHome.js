@@ -3,7 +3,6 @@ import PropTypes from 'react-proptypes'
 
 import { t, setupI18n } from 'plottr_locales'
 
-import HelpBlock from '../../HelpBlock'
 import Tab from '../../Tab'
 import Tabs from '../../Tabs'
 import Button from '../../Button'
@@ -11,23 +10,19 @@ import Switch from '../../Switch'
 import ButtonGroup from '../../ButtonGroup'
 import UnconnectedLanguagePicker from '../../LanguagePicker'
 import UnconnectedDarkOptionsSelect from './DarkOptionsSelect'
-import UnconnectedBackupOptions from './BackupOptions'
+import UnconnectedBackupSettings from './BackupSettings'
+import UnconnectedFileSettings from './FileSettings'
 import { checkDependencies } from '../../checkDependencies'
 import { addRecent, getFonts, getRecent } from '../../rce/fonts'
 import { FontSettingDropdown } from './FontSettingDropdown'
 import { FontSizeSettingDropdown } from './FontSizeSettingDropdown'
 import RichTextSettingsViewer from './RichTextSettingsViewer'
-import Alert from '../../Alert'
 
 const OptionsHomeConnector = (connector) => {
   const {
     platform: {
       hostLocale,
       openExternal,
-      showItemInFolder,
-      userDocumentsPath,
-      defaultBackupLocation,
-      showOpenDialog,
       updateLanguage,
       os,
       log,
@@ -37,10 +32,6 @@ const OptionsHomeConnector = (connector) => {
   checkDependencies({
     hostLocale,
     openExternal,
-    showItemInFolder,
-    userDocumentsPath,
-    defaultBackupLocation,
-    showOpenDialog,
     updateLanguage,
     os,
     log,
@@ -49,17 +40,13 @@ const OptionsHomeConnector = (connector) => {
 
   const LanguagePicker = UnconnectedLanguagePicker(connector)
   const DarkOptionsSelect = UnconnectedDarkOptionsSelect(connector)
-  const BackupOptions = UnconnectedBackupOptions(connector)
+  const BackupSettings = UnconnectedBackupSettings(connector)
+  const FileSettings = UnconnectedFileSettings(connector)
 
-  const OptionsHome = ({ hasCurrentProLicense, settings, shouldBeInPro }) => {
+  const OptionsHome = ({ settings, shouldBeInPro }) => {
     const [activeTab, setActiveTab] = useState(1)
     const [fonts, setFonts] = useState(null)
     const [recentFonts, setRecentFonts] = useState(settings.user.font ? [settings.user.font] : null)
-    const [defaultBackupPath, setDefaultBackupPath] = useState('')
-
-    useEffect(() => {
-      defaultBackupLocation().then(setDefaultBackupPath)
-    }, [])
 
     useEffect(() => {
       hostLocale().then((locale) => {
@@ -80,46 +67,9 @@ const OptionsHomeConnector = (connector) => {
 
     const osIsUnknown = os() === 'unknown'
 
-    const onChangeBackupLocation = () => {
-      const title = t('Choose your backup location')
-      const properties = ['openDirectory', 'createDirectory']
-      showOpenDialog(title, [], properties).then((files) => {
-        if (files && files.length) {
-          let folderPath = files[0]
-          saveAppSetting('user.backupLocation', folderPath)
-        }
-      })
-    }
-
-    const onChangeDefaultFolderLocation = () => {
-      const title = t('Choose your default folder location')
-      const properties = ['openDirectory', 'createDirectory']
-      userDocumentsPath().then((docPath) => {
-        showOpenDialog(title, [], properties, docPath).then((files) => {
-          if (files && files.length) {
-            let folderPath = files[0]
-            saveAppSetting('user.defaultFolderLocation', folderPath)
-          }
-        })
-      })
-    }
-
     const toggleEnableOfflineMode = () => {
       const newValue = !settings.user.enableOfflineMode
       saveAppSetting('user.enableOfflineMode', newValue)
-    }
-
-    // show if:
-    // - not web
-    // - not Pro, unless Pro & localBackups
-    const showBackupLocation = () => {
-      return (!osIsUnknown && !hasCurrentProLicense) || (!osIsUnknown && settings.user.localBackups)
-    }
-
-    const backupFolderPath = () => {
-      return !settings.user.backupLocation || settings.user.backupLocation === 'default'
-        ? defaultBackupPath
-        : settings.user.backupLocation
     }
 
     const dashboardAtFirstIsOn =
@@ -231,38 +181,7 @@ const OptionsHomeConnector = (connector) => {
             </Tab>
             {!osIsUnknown ? (
               <Tab eventKey={2} title={t('Files')}>
-                <div className="dashboard__options__item">
-                  <h4>{t('Default Folder')}</h4>
-                  <Switch
-                    isOn={!!settings.user.defaultFolder}
-                    handleToggle={() =>
-                      saveAppSetting('user.defaultFolder', !settings.user.defaultFolder)
-                    }
-                    labelText={
-                      settings.user.defaultFolder
-                        ? t('All your project files will be saved to the folder you choose below')
-                        : t('Do not save new project files to a default folder')
-                    }
-                  />
-                </div>
-                {settings.user.defaultFolder ? (
-                  <div className="dashboard__options__item">
-                    <h4>{t('Default Folder Location')}</h4>
-                    <HelpBlock className="dashboard__options-item-help">
-                      {t('The folder where all your project files get saved')}
-                    </HelpBlock>
-                    <p>
-                      <Button onClick={onChangeDefaultFolderLocation}>{t('Choose...')}</Button>
-                      {'  '}
-                      <Button
-                        bsStyle="link"
-                        onClick={() => showItemInFolder(settings.user.defaultFolderLocation)}
-                      >
-                        {settings.user.defaultFolderLocation}
-                      </Button>
-                    </p>
-                  </div>
-                ) : null}
+                <FileSettings />
               </Tab>
             ) : null}
             <Tab eventKey={3} title={t('Dashboard')}>
@@ -293,54 +212,7 @@ const OptionsHomeConnector = (connector) => {
               </div>
             </Tab>
             <Tab eventKey={4} title={t('Backups')}>
-              <div className="dashboard__options__item">
-                <h4>{t('Save Backups')}</h4>
-                <Switch
-                  isOn={!!settings.backup}
-                  handleToggle={() => saveAppSetting('backup', !settings.backup)}
-                  labelText={t('Automatically save daily backups')}
-                />
-              </div>
-              {!osIsUnknown && hasCurrentProLicense ? (
-                <div className="dashboard__options__item">
-                  <h4>{t('Also save backups on this device')}</h4>
-                  <Switch
-                    isOn={!!settings.user.localBackups}
-                    handleToggle={() =>
-                      saveAppSetting('user.localBackups', !settings.user.localBackups)
-                    }
-                    labelText={t('Save backups to this device as well as in the cloud')}
-                  />
-                </div>
-              ) : null}
-              {showBackupLocation() ? (
-                <>
-                  <div className="dashboard__options__item">
-                    <BackupOptions />
-                  </div>
-                  <div className="dashboard__options__item">
-                    <h4>{t('Backup Location')}</h4>
-                    <HelpBlock className="dashboard__options-item-help">
-                      {t('Folder where backups are stored')}
-                    </HelpBlock>
-                    <p>
-                      <Button onClick={onChangeBackupLocation}>{t('Choose...')}</Button>
-                      {'  '}
-                      <Button bsStyle="link" onClick={() => showItemInFolder(backupFolderPath())}>
-                        {backupFolderPath()}
-                      </Button>
-                    </p>
-                    <Alert bsStyle="danger" style={{ maxWidth: 'max-content' }}>
-                      {t('Backups are read-only and can only be copied, not edited')}
-                    </Alert>
-                    {settings.user.backupLocation !== 'default' ? (
-                      <Button onClick={() => saveAppSetting('user.backupLocation', 'default')}>
-                        {t('Restore Default')}
-                      </Button>
-                    ) : null}
-                  </div>
-                </>
-              ) : null}
+              <BackupSettings />
             </Tab>
             {!osIsUnknown && shouldBeInPro ? (
               <Tab eventKey={5} title={t('Beta')}>
@@ -369,7 +241,6 @@ const OptionsHomeConnector = (connector) => {
   }
 
   OptionsHome.propTypes = {
-    hasCurrentProLicense: PropTypes.bool,
     settings: PropTypes.object.isRequired,
     shouldBeInPro: PropTypes.bool,
   }
@@ -384,7 +255,6 @@ const OptionsHomeConnector = (connector) => {
 
     return connect((state) => {
       return {
-        hasCurrentProLicense: selectors.hasProSelector(state.present),
         settings: selectors.appSettingsSelector(state.present),
         shouldBeInPro: selectors.shouldBeInProSelector(state.present),
       }
