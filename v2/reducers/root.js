@@ -403,6 +403,8 @@ const root = (dataRepairers) => (state, action) => {
     case RESTRUCTURE_TIMELINE: {
       const { flatBeats, beatHierarchyLevels } = action
       const bookId = currentTimelineSelector(state)
+      const timelineViewIsStacked = timelineViewIsStackedSelector(state)
+      const maxDepth = tree.maxDepth('id')(state.beats[bookId])
 
       let newBeatId = nextBeatId(state.beats)
       let newBeatTree = tree.newTree('id')
@@ -416,7 +418,8 @@ const root = (dataRepairers) => (state, action) => {
             : level.level - lastHierarchyLevel.level > 1
             ? lastHierarchyLevel.level + 1
             : level.level
-        for (let i = startLevel; i < level.level; ++i) {
+        const depthToGoTo = timelineViewIsStacked ? maxDepth + 1 : level.level
+        for (let i = startLevel; i < depthToGoTo; ++i) {
           const parentId = i === 0 ? null : lastBeatId
           const node = {
             autoOutlineSort: true,
