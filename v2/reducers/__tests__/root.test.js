@@ -18,6 +18,7 @@ import {
   sortedBeatsForAnotherBookSelector,
   visibleSortedBeatsForTimelineByBookSelector,
   sortedBeatsHierachyLevels,
+  sortedHierarchyLevels,
 } from '../../selectors'
 
 const rootReducer = rootReducerWithoutRepairers({
@@ -321,13 +322,72 @@ describe('rootReducer', () => {
                 if (previousLevel < level.level) {
                   expect(level.level - previousLevel).toBe(1)
                 } else if (previousLevel >= level.level) {
-                  expect(level.level).toBeGreaterThanOrEqual(0)
+                  expect(level.level).toBe(0)
                 }
                 previousLevel = level.level
               }
 
               // Property 2.
               const newBeatIds = newBeatArray.map((beat) => {
+                return beat.id
+              })
+              const finalIds = finalBeatArray.map((beat) => {
+                return beat.id
+              })
+              const finalBeatIds = difference(finalIds, difference(finalIds, newBeatIds))
+              expect(newBeatIds).toEqual(finalBeatIds)
+            }
+          )
+        )
+      })
+    })
+    describe('given arbitrary re-assignment of beat depths', () => {
+      it('should produce valid beat trees', () => {
+        const beatArray = visibleSortedBeatsForTimelineByBookSelector(multi_tier_zelda)
+        const hierarchyLevels = sortedHierarchyLevels(multi_tier_zelda)
+
+        fc.assert(
+          fc.property(
+            fc.int32Array({
+              min: 0,
+              max: 2,
+              minLength: beatArray.length,
+              maxLength: beatArray.length,
+            }),
+            (newHeights) => {
+              // Two properties:
+              //
+              //  1. It should never skip a level going lower.
+              //
+              //  2. It should contain all of the original beats in
+              //     the new order.
+              //
+              //  3. No higher level beat should be without children
+              const newBeatHierarchyLevels = newHeights.map((height) => {
+                return hierarchyLevels[height]
+              })
+
+              // Exercise the root reducer
+              const newState = rootReducer(
+                multi_tier_zelda,
+                restructureTimeline(beatArray, newBeatHierarchyLevels)
+              )
+              const finalBeatHierarchyLevels = sortedBeatsHierachyLevels(newState)
+              const finalBeatArray = visibleSortedBeatsForTimelineByBookSelector(newState)
+
+              // Property 1 & 3.
+              let previousLevel = 0
+              for (const level of finalBeatHierarchyLevels) {
+                if (previousLevel < level.level) {
+                  expect(level.level - previousLevel).toBe(1)
+                } else if (previousLevel >= level.level) {
+                  expect(level.level).toBe(0)
+                }
+                previousLevel = level.level
+              }
+
+              // Property 2.
+              const newBeatIds = beatArray.map((beat) => {
                 return beat.id
               })
               const finalIds = finalBeatArray.map((beat) => {
