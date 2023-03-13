@@ -48,6 +48,7 @@ import {
   userIdSelector,
   shouldBeInProSelector,
   hierarchyLevelCount,
+  timelineViewIsStackedSelector,
 } from '../selectors'
 import { reduce, beatsByPosition, nextId as nextBeatId } from '../helpers/beats'
 import { nextId, objectId } from '../store/newIds'
@@ -196,7 +197,9 @@ const root = (dataRepairers) => (state, action) => {
         const activeParentId = timelineActiveTabSelector(state)
         return mainReducer(state, { ...action, parentId: activeParentId })
       }
-      return mainReducer(state, action)
+
+      const timelineViewIsStacked = timelineViewIsStackedSelector(state)
+      return mainReducer(state, { ...action, timelineViewIsStacked })
     }
 
     case ADD_BOOK:
