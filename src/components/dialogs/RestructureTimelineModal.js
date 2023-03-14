@@ -194,7 +194,12 @@ const RestructureTimelineModalConnector = (connector) => {
     }
 
     const restructureAndCloseDialog = () => {
-      restructureTimeline(stagedBeats, stagedHierarchyLevels)
+      restructureTimeline(
+        stagedBeats,
+        stagedHierarchyLevels.map((hierarchyLevel) => {
+          return hierarchyLevel.level
+        })
+      )
       closeDialog()
     }
 
