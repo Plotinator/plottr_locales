@@ -256,6 +256,9 @@ describe('rootReducer', () => {
   })
   describe('RESTRUCTURE_TIMELINE', () => {
     const withoutPosition = (x) => omit(x, 'position')
+    const withoutCardDetailsWeDontCareAbout = (x) => {
+      return omit(x, 'beatId')
+    }
     describe('given the timeline view is not stacked', () => {
       describe('given the empty list of beats and hierarchies', () => {
         it('should produce the empty tree', () => {
@@ -592,6 +595,92 @@ describe('rootReducer', () => {
           )
         })
       })
+      describe('given a re-assignment of beats all to act', () => {
+        it('should ensure that the cards are all transfered down to scenes per act', () => {
+          const beatArray = sortedBeatsByBookSelector(stacked_multi_tier_zelda)
+          const sceneBeats = beatArray
+            .filter((beat) => {
+              return tree.depth(stacked_multi_tier_zelda.beats['7'], beat.id) === 2
+            })
+            .map((beat) => {
+              return beat.id
+            })
+          const allCards = allCardsSelector(stacked_multi_tier_zelda)
+          const sceneBeatCards = allCards.filter((card) => {
+            return sceneBeats.indexOf(card.beatId) !== -1
+          })
+          const hierarchyLevels = sortedHierarchyLevels(stacked_multi_tier_zelda)
+          const newHeights = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+          // Two properties:
+          //
+          //  1. It should never skip a level going lower.
+          //
+          //  2. It should contain all of the original beats in
+          //     the new order.
+          //
+          //  3. No higher level beat should be without children
+          //
+          //  4. It shouldn't make the tree deeper.
+          //
+          //  5. All cards on scenes should remain on scenes.
+          const newBeatHierarchyLevels = newHeights.map((height) => {
+            return hierarchyLevels[height].level
+          })
+
+          // Exercise the root reducer
+          const newState = rootReducer(
+            stacked_multi_tier_zelda,
+            restructureTimeline(beatArray, newBeatHierarchyLevels)
+          )
+          const finalBeatArray = sortedBeatsByBookSelector(newState)
+          const finalBeatHierarchyLevels = finalBeatArray.map((beat) => {
+            return tree.depth(newState.beats['7'], beat.id)
+          })
+          const finalSceneBeats = finalBeatArray
+            .filter((beat) => {
+              return tree.depth(newState.beats['7'], beat.id) === 2
+            })
+            .map((beat) => {
+              return beat.id
+            })
+          const finalAllCards = allCardsSelector(newState)
+          const finalSceneBeatCards = finalAllCards.filter((card) => {
+            return finalSceneBeats.indexOf(card.beatId) !== -1
+          })
+
+          // Property 5.
+          expect(finalSceneBeatCards.map(withoutCardDetailsWeDontCareAbout)).toEqual(
+            expect.arrayContaining(sceneBeatCards.map(withoutCardDetailsWeDontCareAbout))
+          )
+
+          // Property 1 & 3.
+          let previousLevel = 0
+          for (const [level, index] of zip(
+            finalBeatHierarchyLevels,
+            range(finalBeatHierarchyLevels.length)
+          )) {
+            if (previousLevel < level) {
+              expect(level - previousLevel).toBe(1)
+            } else if (previousLevel === level && index !== 0) {
+              expect(level).toBe(2)
+            }
+            // Property 4
+            expect(level).toBeGreaterThanOrEqual(0)
+            expect(level).toBeLessThanOrEqual(2)
+            previousLevel = level
+          }
+
+          // Property 2.
+          const newBeatIds = beatArray.map((beat) => {
+            return beat.id
+          })
+          const finalIds = finalBeatArray.map((beat) => {
+            return beat.id
+          })
+          const finalBeatIds = difference(finalIds, difference(finalIds, newBeatIds))
+          expect(newBeatIds).toEqual(finalBeatIds)
+        })
+      })
       describe('given arbitrary re-assignment of beat depths', () => {
         it('should produce valid beat trees', () => {
           const beatArray = sortedBeatsByBookSelector(stacked_multi_tier_zelda)
@@ -630,7 +719,7 @@ describe('rootReducer', () => {
                 //
                 //  5. All cards on scenes should remain on scenes.
                 const newBeatHierarchyLevels = newHeights.map((height) => {
-                  return hierarchyLevels[height]
+                  return hierarchyLevels[height].level
                 })
 
                 // Exercise the root reducer
@@ -642,7 +731,7 @@ describe('rootReducer', () => {
                 const finalBeatHierarchyLevels = finalBeatArray.map((beat) => {
                   return tree.depth(newState.beats['7'], beat.id)
                 })
-                const finalSceneBeats = beatArray
+                const finalSceneBeats = finalBeatArray
                   .filter((beat) => {
                     return tree.depth(newState.beats['7'], beat.id) === 2
                   })
@@ -655,7 +744,9 @@ describe('rootReducer', () => {
                 })
 
                 // Property 5.
-                expect(finalSceneBeatCards).toEqual(expect.arrayContaining(sceneBeatCards))
+                expect(finalSceneBeatCards.map(withoutCardDetailsWeDontCareAbout)).toEqual(
+                  expect.arrayContaining(sceneBeatCards.map(withoutCardDetailsWeDontCareAbout))
+                )
 
                 // Property 1 & 3.
                 let previousLevel = 0
