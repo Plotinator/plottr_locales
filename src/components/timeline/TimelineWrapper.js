@@ -296,7 +296,9 @@ const TimelineWrapperConnector = (connector) => {
       // mpq.push('btn_scroll_end')
       const element = timelineBundle.isSmall ? tableRef.current.parentElement : tableRef.current
       const target =
-        timelineBundle.orientation === 'vertical' ? element.scrollHeight : element.scrollWidth
+        timelineBundle.orientation === 'vertical'
+          ? element.scrollHeight - window.innerHeight
+          : element.scrollWidth - window.innerWidth
 
       if (tableRef.current) scrollTo(target)
     }
