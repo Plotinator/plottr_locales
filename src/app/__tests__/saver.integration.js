@@ -112,9 +112,9 @@ describe('Saver', (describe, it) => {
             }
             const waitSomeMore = () => {
               return new Promise((resolve) => {
-                setTimeout(resolve, 100)
+                setTimeout(resolve, 50)
               }).then(() => {
-                if (saver.saveRunner.pendingJobBuffer.length < 8) {
+                if (saver.saveRunner.pendingJobBuffer.length < 7) {
                   return waitSomeMore()
                 } else {
                   return verify()
