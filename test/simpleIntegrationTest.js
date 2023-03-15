@@ -42,3 +42,10 @@ export const assertGreaterThan = (a, b) => {
   }
   return true
 }
+
+export const assertLessThan = (a, b) => {
+  if (a >= b) {
+    throw new Error(`Expected ${JSON.stringify(a)} to be less than ${JSON.stringify(b)}`)
+  }
+  return true
+}
