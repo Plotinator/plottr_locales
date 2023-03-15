@@ -24,8 +24,8 @@ import {
 } from '../constants/ActionTypes'
 import { editorMetadataIfPresent } from '../helpers/editors'
 
-export function addCard(card) {
-  return { type: ADD_CARD, card }
+export function addCard(card, addMissingBeats) {
+  return { type: ADD_CARD, card, addMissingBeats }
 }
 
 export function addNewCardInBeat(newCard, reorderIds) {
@@ -76,8 +76,8 @@ export function changeBook(id, bookId) {
   return { type: CHANGE_BOOK, id, bookId }
 }
 
-export function reorderCardsWithinLine(beatId, lineId, ids) {
-  return { type: REORDER_CARDS_WITHIN_LINE, beatId, lineId, ids }
+export function reorderCardsWithinLine(beatId, lineId, ids, addMissingBeats) {
+  return { type: REORDER_CARDS_WITHIN_LINE, beatId, lineId, ids, addMissingBeats }
 }
 
 export function reorderCardsInBeat(

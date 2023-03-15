@@ -1,3 +1,5 @@
+import { clone, range } from 'lodash'
+
 import {
   ADD_LINES_FROM_TEMPLATE,
   ADD_BEAT,
@@ -20,6 +22,7 @@ import {
   ADD_BOOK_FROM_TEMPLATE,
   ADD_BOOK,
   APPEND_TOP_LEVEL_BEAT,
+  UNSAFE_SET_BEATS,
 } from '../constants/ActionTypes'
 import { beat as defaultBeat } from '../store/initialState'
 import { newFileBeats } from '../store/newFileState'
@@ -27,7 +30,6 @@ import { positionReset, nextPositionInBook, moveNextToSibling } from '../helpers
 import { associateWithBroadestScope } from '../helpers/lines'
 import * as tree from './tree'
 import { nextId, adjustHierarchyLevels } from '../helpers/beats'
-import { clone } from 'lodash'
 
 // bookId is:
 // Union of:
@@ -68,11 +70,17 @@ const beats =
     const actionBookId = associateWithBroadestScope(action.bookId || action.newBookId)
 
     switch (action.type) {
-      case ADD_BOOK:
       case ADD_BEAT: {
         // If we don't get a parent id then make this a root node
         const title = action.title || defaultBeat.title
         const parentId = action.parentId || null
+        const position = nextPositionInBook(state, actionBookId, parentId)
+        return addNodeToState(state, actionBookId, position, title, parentId)
+      }
+
+      case ADD_BOOK: {
+        const title = 'auto'
+        const parentId = null
         const position = nextPositionInBook(state, actionBookId, parentId)
         return addNodeToState(state, actionBookId, position, title, parentId)
       }
@@ -184,20 +192,48 @@ const beats =
         // If we don't get a parent id then make this a root node
         const parentId = tree.nodeParent(state[actionBookId], action.peerBeatId) || null
         const position = tree.findNode(state[actionBookId], action.peerBeatId).position + 0.5 // new same-level cards now appear BEFORE so user can see they have been added
+        const firstBeatId = nextId(state)
         const node = {
           autoOutlineSort: true,
           bookId: actionBookId,
           fromTemplateId: null,
-          id: nextId(state),
+          id: firstBeatId,
           // Will be reset by `moveNextToSibling'
           position,
           time: 0,
           title: 'auto',
         }
-        const newState = add(state[actionBookId], parentId, node)
-        return {
-          ...state,
-          [actionBookId]: positionReset(newState),
+        const newState = positionReset(add(state[actionBookId], parentId, node))
+        if (action.timelineViewIsStacked) {
+          const depthOfPeer = tree.depth(newState, action.peerBeatId)
+          const depthOfTree = tree.maxDepth('id')(newState)
+          const [_finalBeatId, finalState] = range(depthOfTree - depthOfPeer).reduce(
+            (acc, next) => {
+              const [lastBeatId, currentState] = acc
+              const node = {
+                autoOutlineSort: true,
+                bookId: actionBookId,
+                fromTemplateId: null,
+                id: lastBeatId + 1,
+                // Will be reset by `moveNextToSibling'
+                position,
+                time: 0,
+                title: 'auto',
+              }
+              const nextState = positionReset(add(currentState, lastBeatId, node))
+              return [lastBeatId + 1, nextState]
+            },
+            [firstBeatId, newState]
+          )
+          return {
+            ...state,
+            [actionBookId]: finalState,
+          }
+        } else {
+          return {
+            ...state,
+            [actionBookId]: newState,
+          }
         }
       }
 
@@ -287,6 +323,14 @@ const beats =
         const parentId = null
         const position = nextPositionInBook(state, actionBookId)
         return addNodeToState(state, actionBookId, position, title, parentId)
+      }
+
+      case UNSAFE_SET_BEATS: {
+        const actionBookId = associateWithBroadestScope(action.bookId || action.newBookId)
+        return {
+          ...state,
+          [actionBookId]: action.beats,
+        }
       }
 
       case NEW_FILE:
