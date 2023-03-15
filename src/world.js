@@ -146,7 +146,7 @@ const theWorld = (socketClient) => {
 
   const currentBackups = () => {
     return fileSystemAPIs.currentBackups().then((fileSystemBackups) => {
-      return mergeBackups(fileSystemBackups, firebaseAPIs.currentBackups())
+      return mergeBackups(firebaseAPIs.currentBackups(), fileSystemBackups)
     })
   }
 
