@@ -18,6 +18,12 @@
     // right: 15px;
     width: 300px;
   }
+}
+
+.dashboard__backups__header-div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
   h1 {
     font-size: 20pt;
@@ -33,6 +39,22 @@
   height: calc(100% - 49px);
   overflow: auto;
   padding-bottom: 100px;
+
+  table.table {
+    thead {
+      position: sticky;
+      top: 0;
+      background-color: $gray-8;
+    }
+
+    th {
+      min-width: 150px;
+      max-width: 300px;
+    }
+    td {
+      max-width: 300px;
+    }
+  }
 }
 
 .dashboard__backups__item {
