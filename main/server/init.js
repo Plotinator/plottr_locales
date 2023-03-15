@@ -4,7 +4,7 @@ import { join } from 'path'
 const START_PORT = 8000
 const MAX_ATTEMPTS = 10
 
-export const startServer = (log, broadcastPortChange, userDataPath, onFatalError) => {
+export const startServer = (log, broadcastPortChange, userDataPath, onFatalError, appVersion) => {
   let attempts = 0
 
   function attemptAStart(resolve, reject) {
@@ -18,11 +18,14 @@ export const startServer = (log, broadcastPortChange, userDataPath, onFatalError
     const randomPort = START_PORT + Math.floor(1000 * Math.random())
     log.info(`Starting socket server on port: ${randomPort}`)
 
+    const isBetaOrAlphaArgument = appVersion.match(/\d{4}\.\d\d?.\d\d?-(alpha|beta)\.\d+/)
+      ? 'isBetaOrAlpha'
+      : ''
     const serverScriptPath =
       process.env.NODE_ENV === 'test'
         ? join(__dirname, '..', '..', 'bin', 'socketServer.bundle.js')
         : join(__dirname, 'socketServer.bundle.js')
-    const server = fork(serverScriptPath, [randomPort, userDataPath])
+    const server = fork(serverScriptPath, [randomPort, userDataPath, isBetaOrAlphaArgument])
     let weInstructedServerToDie = false
     server.on('close', (code) => {
       if (weInstructedServerToDie) {
