@@ -74,7 +74,7 @@ describe('Saver', (describe, it) => {
   describe('save', (describe, it) => {
     describe('given a dummy getState function', (describe, it) => {
       describe('and a 50ms interval', (describe, it) => {
-        describe('and a save job that takes 1s', (describe, it) => {
+        describe('and a save job that takes 10s', (describe, it) => {
           it('should drop the oldest half of save jobs when we hit 10', () => {
             let stateCounter = 1
             const getState = () => {
@@ -88,7 +88,7 @@ describe('Saver', (describe, it) => {
                 setTimeout(() => {
                   saveCalls.push(args)
                   resolve()
-                }, 1000)
+                }, 10000)
               })
             }
             const backupFile = () => {
