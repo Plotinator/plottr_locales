@@ -236,6 +236,18 @@
       font-size: 12px;
     }
   }
+  &.drop-disabled {
+    background: none;
+    .non-template {
+      .glyphicon {
+        background-color: $body-background-color;
+        font-size: 50px;
+      }
+    }
+  }
+  &.create-disabled {
+    cursor: not-allowed;
+  }
 }
 
 .blank-card__body.disabled {
@@ -333,3 +345,4 @@
     }
   }
 }
+
