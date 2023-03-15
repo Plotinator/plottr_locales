@@ -44,6 +44,7 @@ import UnconnectedCardDialog from './CardDialog'
 import UnconnectedTimelineTabs from './TimelineTabs'
 import DropdownButton from '../DropdownButton'
 import ToolTip from '../ToolTip'
+import UnconnectedRestructureTimelineModal from '../dialogs/RestructureTimelineModal'
 
 const BREAKPOINT = 890
 
@@ -61,6 +62,7 @@ const TimelineWrapperConnector = (connector) => {
   const SubNav = UnconnectedSubNav(connector)
   const CardDialog = UnconnectedCardDialog(connector)
   const TimelineTabs = UnconnectedTimelineTabs(connector)
+  const RestructureTimelineModal = UnconnectedRestructureTimelineModal(connector)
 
   const {
     platform: {
@@ -97,6 +99,7 @@ const TimelineWrapperConnector = (connector) => {
     actConfigIsOpen,
     stickyHeaderCount,
     stickyLeftColumnCount,
+    restructureModalOpen,
   }) => {
     const [mounted, setMounted] = useState(false)
     const [clearing, setClearing] = useState(false)
@@ -397,6 +400,9 @@ const TimelineWrapperConnector = (connector) => {
             </Dropdown.Toggle>
             <Dropdown.Menu>
               <MenuItem onSelect={startSaveAsTemplate}>{t('Save as Template')}</MenuItem>
+              <MenuItem onSelect={actions.openRestructureTimelineModal}>
+                {t('Restructure Timeline')}
+              </MenuItem>
               <MenuItem divider />
               <MenuItem onSelect={() => setClearing(true)}>{t('Clear Timeline')}</MenuItem>
             </Dropdown.Menu>
@@ -651,6 +657,14 @@ const TimelineWrapperConnector = (connector) => {
       return <ActsConfigModal isDarkMode={timelineBundle.darkMode} closeDialog={closeBeatConfig} />
     }
 
+    const renderRestructureModal = () => {
+      if (!restructureModalOpen) {
+        return null
+      }
+
+      return <RestructureTimelineModal />
+    }
+
     return (
       <div
         id="timelineview__container"
@@ -659,6 +673,7 @@ const TimelineWrapperConnector = (connector) => {
         {renderSubNav()}
         {renderCustomAttributes()}
         {renderBeatConfig()}
+        {renderRestructureModal()}
         {renderDelete()}
         {renderCardDialog()}
         <div
@@ -695,6 +710,7 @@ const TimelineWrapperConnector = (connector) => {
     actConfigIsOpen: PropTypes.bool,
     stickyHeaderCount: PropTypes.number,
     stickyLeftColumnCount: PropTypes.number,
+    restructureModalOpen: PropTypes.bool,
   }
 
   const {
@@ -727,6 +743,7 @@ const TimelineWrapperConnector = (connector) => {
           actConfigIsOpen: selectors.actConfigModalIsOpenSelector(state.present),
           stickyHeaderCount: selectors.stickyHeaderCountSelector(state.present),
           stickyLeftColumnCount: selectors.stickyLeftColumnCountSelector(state.present),
+          restructureModalOpen: selectors.restructureModalOpenSelector(state.present),
         }
       },
       (dispatch) => {
