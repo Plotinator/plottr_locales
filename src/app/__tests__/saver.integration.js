@@ -1,5 +1,10 @@
 import { isEqual } from 'lodash'
-import { assertEqual, assertGreaterThan, describe } from '../../../test/simpleIntegrationTest'
+import {
+  assertEqual,
+  assertLessThan,
+  assertGreaterThan,
+  describe,
+} from '../../../test/simpleIntegrationTest'
 
 import Saver, { DUMMY_ROLLBAR, DUMMY_SHOW_ERROR_BOX, DUMMY_SHOW_MESSAGE_BOX } from '../saver'
 
@@ -68,6 +73,49 @@ function expectToMatchArrayLoosely(received, expected, allowedMissing = 1, allow
 describe('Saver', (describe, it) => {
   describe('save', (describe, it) => {
     describe('given a dummy getState function', (describe, it) => {
+      describe('and a 50ms interval', (describe, it) => {
+        describe('and a save job that takes 1s', (describe, it) => {
+          it('should drop the oldest half of save jobs when we hit 10', () => {
+            let stateCounter = 1
+            const getState = () => {
+              return {
+                stateCounter: stateCounter++,
+              }
+            }
+            const saveCalls = []
+            const saveFile = (...args) => {
+              return new Promise((resolve) => {
+                setTimeout(() => {
+                  saveCalls.push(args)
+                  resolve()
+                }, 1000)
+              })
+            }
+            const backupFile = () => {
+              return Promise.resolve()
+            }
+            const saver = new Saver(getState, saveFile, backupFile, CONSOLE_LOGGER, 50)
+            new Promise((resolve) => {
+              setTimeout(resolve, 500)
+            })
+              .then(() => {
+                expectToMatchArrayLoosely(saveCalls, [], 0, 0)
+                assertGreaterThan(saver.saveRunner.pendingJobBuffer.length, 5)
+                assertLessThan(saver.saveRunner.pendingJobBuffer.length, 9)
+                return new Promise((resolve) => {
+                  setTimeout(resolve, 600)
+                })
+              })
+              .then(() => {
+                expectToMatchArrayLoosely(saveCalls, [], 0, 0)
+                assertLessThan(saver.saveRunner.pendingJobBuffer.length, 10)
+              })
+              .then(() => {
+                saver.cancelAllRemainingRequests()
+              })
+          })
+        })
+      })
       describe('and a 100ms interval', (describe, it) => {
         it('should attempt to save the same thing 10 times in one second', () => {
           let stateCounter = 1
