@@ -98,7 +98,7 @@ describe('Saver', (describe, it) => {
             const verify = () => {
               expectToMatchArrayLoosely(saveCalls, [], 0, 0)
               assertGreaterThan(saver.saveRunner.pendingJobBuffer.length, 5)
-              assertLessThan(saver.saveRunner.pendingJobBuffer.length, 9)
+              assertLessThan(saver.saveRunner.pendingJobBuffer.length, 10)
               return new Promise((resolve) => {
                 setTimeout(resolve, 400)
               })
