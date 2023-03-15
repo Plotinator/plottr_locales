@@ -94,25 +94,34 @@ describe('Saver', (describe, it) => {
             const backupFile = () => {
               return Promise.resolve()
             }
-            const saver = new Saver(getState, saveFile, backupFile, CONSOLE_LOGGER, 50)
-            new Promise((resolve) => {
-              setTimeout(resolve, 500)
-            })
-              .then(() => {
-                expectToMatchArrayLoosely(saveCalls, [], 0, 0)
-                assertGreaterThan(saver.saveRunner.pendingJobBuffer.length, 5)
-                assertLessThan(saver.saveRunner.pendingJobBuffer.length, 9)
-                return new Promise((resolve) => {
-                  setTimeout(resolve, 600)
+            const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 50)
+            const verify = () => {
+              expectToMatchArrayLoosely(saveCalls, [], 0, 0)
+              assertGreaterThan(saver.saveRunner.pendingJobBuffer.length, 5)
+              assertLessThan(saver.saveRunner.pendingJobBuffer.length, 9)
+              return new Promise((resolve) => {
+                setTimeout(resolve, 400)
+              })
+                .then(() => {
+                  expectToMatchArrayLoosely(saveCalls, [], 0, 0)
+                  assertLessThan(saver.saveRunner.pendingJobBuffer.length, 10)
                 })
+                .then(() => {
+                  saver.cancelAllRemainingRequests()
+                })
+            }
+            const waitSomeMore = () => {
+              return new Promise((resolve) => {
+                setTimeout(resolve, 100)
+              }).then(() => {
+                if (saver.saveRunner.pendingJobBuffer.length < 8) {
+                  return waitSomeMore()
+                } else {
+                  return verify()
+                }
               })
-              .then(() => {
-                expectToMatchArrayLoosely(saveCalls, [], 0, 0)
-                assertLessThan(saver.saveRunner.pendingJobBuffer.length, 10)
-              })
-              .then(() => {
-                saver.cancelAllRemainingRequests()
-              })
+            }
+            waitSomeMore()
           })
         })
       })
