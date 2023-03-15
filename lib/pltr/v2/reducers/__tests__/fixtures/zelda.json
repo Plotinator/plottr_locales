@@ -465,16 +465,29 @@
     "series": {
       "children": {
         "1": [],
-        "null": [1]
+        "40": [],
+        "null": [1, 40]
       },
       "heap": {
-        "1": null
+        "1": null,
+        "40": null
       },
       "index": {
         "1": {
           "id": 1,
           "bookId": "series",
           "position": 0,
+          "title": "auto",
+          "time": 0,
+          "templates": [],
+          "autoOutlineSort": true,
+          "fromTemplateId": null,
+          "expanded": true
+        },
+        "40": {
+          "id": 40,
+          "bookId": "series",
+          "position": 1,
           "title": "auto",
           "time": 0,
           "templates": [],
