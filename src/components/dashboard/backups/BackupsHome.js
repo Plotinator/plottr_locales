@@ -48,7 +48,6 @@ const BackupsHomeConnector = (connector) => {
 
   BackupsHome.propTypes = {
     userId: PropTypes.string,
-    computeFolders: PropTypes.func.isRequired,
   }
 
   return BackupsHome
