@@ -1,4 +1,4 @@
-import { uniq, uniqBy } from 'lodash'
+import { uniq } from 'lodash'
 
 import { emptyFile, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
 
@@ -99,7 +99,11 @@ export const checkForBrokenCharacterAttributesRelationships =
       const characterAttributes = character.attributes || []
       return characterAttributes.some((attribute, index) => {
         return characterAttributes.some((otherAttribute, otherIndex) => {
-          return index !== otherIndex && attribute.id === otherAttribute.id
+          return (
+            index !== otherIndex &&
+            attribute.id === otherAttribute.id &&
+            attribute.bookId === otherAttribute.bookId
+          )
         })
       })
     })
