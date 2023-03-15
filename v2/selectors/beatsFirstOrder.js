@@ -30,7 +30,8 @@ export const visibleBeatsByPositionForTimeline = (
   timelineViewIsTabbed,
   activeTab,
   timelineViewIsStacked,
-  timelineViewIsSmall
+  timelineViewIsSmall,
+  hierarchyLevelCount
 ) => {
   const activeParentId = activeTab
   return visibleBeatsForTopLevelParentByPosition(
@@ -38,7 +39,8 @@ export const visibleBeatsByPositionForTimeline = (
     timelineViewIsTabbed,
     activeParentId,
     timelineViewIsStacked,
-    timelineViewIsSmall
+    timelineViewIsSmall,
+    hierarchyLevelCount
   )
 }
 
@@ -47,9 +49,10 @@ export const visibleBeatsForTopLevelParentByPosition = (
   timelineViewIsTabbed,
   topLevelParentId,
   timelineViewIsStacked,
-  timelineViewIsSmall
+  timelineViewIsSmall,
+  hierarchyLevelCount
 ) => {
-  const maximumDepth = maxDepth(beats)
+  const maximumDepth = hierarchyLevelCount - 1
 
   return beatsByPosition(({ id, expanded }) => {
     return expanded || timelineViewIsTabbed || timelineViewIsStacked
