@@ -100,7 +100,7 @@ describe('Saver', (describe, it) => {
               assertGreaterThan(saver.saveRunner.pendingJobBuffer.length, 5)
               assertLessThan(saver.saveRunner.pendingJobBuffer.length, 10)
               return new Promise((resolve) => {
-                setTimeout(resolve, 700)
+                setTimeout(resolve, 800)
               })
                 .then(() => {
                   expectToMatchArrayLoosely(saveCalls, [], 0, 0)
