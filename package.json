@@ -200,7 +200,7 @@
   "build": {
     "electronVersion": "22.0.1",
     "appId": "com.plottr.app",
-    "artifactName": "${productName}-${os}-installer-latest.${ext}",
+    "artifactName": "${productName}-${os}-${arch}-installer-latest.${ext}",
     "npmRebuild": false,
     "publish": [
       "github"
@@ -258,8 +258,8 @@
       "category": "public.app-category.productivity",
       "target": [
         {
-          "target": "dmg",
-          "arch": "universal"
+          "target": "default",
+          "arch": ["x64", "arm64"]
         }
       ],
       "hardenedRuntime": true,
