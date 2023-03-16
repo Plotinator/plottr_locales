@@ -253,54 +253,33 @@ tellMeWhatOSImOn()
           }
         })
 
-        const saveAsHandler = ({ fileUrl }) => {
-          const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
+        const saveAsHandler = () => {
+          const { present } = store.getState()
+          const isInOfflineMode = selectors.isInOfflineModeSelector(present)
+          if (isInOfflineMode) {
+            logger.info('Tried to save-as a file, but it is offline')
+            return
+          }
 
-          if (fileUrl) {
-            showSaveDialog(filters, t('Where would you like to save this copy?'), fileUrl).then(
-              (fileName) => {
+          whenClientIsReady(({ basename }) => {
+            return basename(present.file.fileName, '.pltr').then((defaultPath) => {
+              const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
+              showSaveDialog(
+                filters,
+                t('Where would you like to save this copy?'),
+                defaultPath
+              ).then((fileName) => {
                 if (fileName) {
                   const newFilePath = fileName.includes('.pltr') ? fileName : `${fileName}.pltr`
                   const newFileURL = helpers.file.filePathToFileURL(newFilePath)
-                  return whenClientIsReady(({ readFile }) => {
-                    return readFile(helpers.file.withoutProtocol(fileUrl), 'utf-8').then(
-                      (rawFile) => {
-                        const contents = JSON.parse(rawFile)
-                        return saveFile(newFileURL, contents).then(() => {
-                          store.dispatch(actions.applicationState.finishRenamingFile())
-                        })
-                      }
-                    )
+                  saveFile(newFileURL, present).then(() => {
+                    pleaseOpenWindow(newFileURL, true)
+                    store.dispatch(actions.ui.fileSaved())
                   })
                 }
-              }
-            )
-          } else {
-            whenClientIsReady(({ basename }) => {
-              const { present } = store.getState()
-              const isInOfflineMode = selectors.isInOfflineModeSelector(present)
-              if (isInOfflineMode) {
-                logger.info('Tried to save-as a file, but it is offline')
-                return
-              }
-              return basename(present.file.fileName, '.pltr').then((defaultPath) => {
-                showSaveDialog(
-                  filters,
-                  t('Where would you like to save this copy?'),
-                  defaultPath
-                ).then((fileName) => {
-                  if (fileName) {
-                    const newFilePath = fileName.includes('.pltr') ? fileName : `${fileName}.pltr`
-                    const newFileURL = helpers.file.filePathToFileURL(newFilePath)
-                    saveFile(newFileURL, present).then(() => {
-                      pleaseOpenWindow(newFileURL, true)
-                      store.dispatch(actions.ui.fileSaved())
-                    })
-                  }
-                })
               })
             })
-          }
+          })
         }
 
         const ensureEndsInPltr = (filePath) => {
