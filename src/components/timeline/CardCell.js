@@ -13,6 +13,7 @@ import UnconnectedCardAdd from './CardAdd'
 import UnconnectedErrorBoundary from '../containers/ErrorBoundary'
 
 import { checkDependencies } from '../checkDependencies'
+import VisualLine from './VisualLine'
 
 const {
   lists: { reorderList, moveToAbove },
@@ -342,7 +343,7 @@ const CardCellConnector = (connector) => {
     }
 
     render() {
-      const { cards, isSmall, isMedium, isPinned } = this.props
+      const { cards, isSmall, isMedium, isPinned, color, orientation } = this.props
 
       if (!cards.length) {
         if (isSmall) return <td></td>
@@ -356,6 +357,7 @@ const CardCellConnector = (connector) => {
       } else {
         return (
           <Cell className={cx({ 'medium-timeline': isMedium, 'card-pinned': isPinned })}>
+            <VisualLine color={color} isMedium={isMedium} orientation={orientation} />
             {this.renderBody()}
           </Cell>
         )
