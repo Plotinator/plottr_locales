@@ -92,6 +92,7 @@ const {
   askToExport,
   userDesktopPath,
   userDocumentsPath,
+  pleaseOpenWindow,
 } = makeMainProcessClient()
 
 export const rmRF = (path, ...args) => {
@@ -416,6 +417,7 @@ const platform = {
   showSaveDialog,
   showErrorBox,
   userDocumentsPath,
+  pleaseOpenWindow,
   node: {
     env: isDevelopment() ? 'development' : 'production',
   },
