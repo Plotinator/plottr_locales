@@ -76,7 +76,7 @@ class PressureControlledTaskQueue {
     this.logger.info(jobId, `Starting ${name} job`)
 
     if (this.pendingJobBuffer.length >= this.maxJobs) {
-      if (this.queueFullCounter === 5) {
+      if (this.queueFullCounter >= 5) {
         this.logger.warn('Queue was full too many times.  Removing half the jobs from the queue.')
         this.pendingJobBuffer = this.pendingJobBuffer.slice(this.pendingJobBuffer.length / 2)
         this.queueFullCounter = 0
