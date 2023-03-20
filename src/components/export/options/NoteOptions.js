@@ -70,6 +70,19 @@ export default function NoteOptions({ type, options, updateOptions }) {
         {type == 'word' ? (
           <li>
             <CheckOption
+              checked={options.category}
+              onChange={updateOptions}
+              category="notes"
+              attr="category"
+              disabled={!options.export}
+            >
+              <span>{t('Category')}</span>
+            </CheckOption>
+          </li>
+        ) : null}
+        {type == 'word' ? (
+          <li>
+            <CheckOption
               checked={options.customAttributes}
               onChange={updateOptions}
               category="notes"

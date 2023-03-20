@@ -65,6 +65,19 @@ export default function PlaceOptions({ type, options, updateOptions }) {
             <span>{t('Notes')}</span>
           </CheckOption>
         </li>
+        {type == 'word' ? (
+          <li>
+            <CheckOption
+              checked={options.category}
+              onChange={updateOptions}
+              category="places"
+              attr="category"
+              disabled={!options.export}
+            >
+              <span>{t('Category')}</span>
+            </CheckOption>
+          </li>
+        ) : null}
         <li>
           <CheckOption
             checked={options.customAttributes}
