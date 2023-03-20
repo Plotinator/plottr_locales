@@ -43,6 +43,7 @@ export default function VisualLine({
   orientation,
   isMedium,
   tableLength = !isMedium || orientation == 'vertical' ? 250 : 100,
+  isPinned,
 }) {
   const [margins, setMargins] = useState(getMargins(orientation, isMedium))
   const [currentLength, setCurrentLength] = useState(0)
@@ -58,7 +59,7 @@ export default function VisualLine({
     if (tableLength && tableLength > 0) {
       if (!animationStarted) {
         setMaxLength(tableLength - margins)
-        setAnimationStarted(true)
+        if (!isPinned) setAnimationStarted(true)
       }
     }
   }, [tableLength, margins, maxLength, setAnimationStarted, animationStarted])
@@ -107,4 +108,5 @@ VisualLine.propTypes = {
   orientation: PropTypes.string,
   tableLength: PropTypes.number,
   isMedium: PropTypes.bool,
+  isPinned: PropTypes.bool,
 }
