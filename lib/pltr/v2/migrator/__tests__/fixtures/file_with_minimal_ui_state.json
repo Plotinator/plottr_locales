@@ -26,6 +26,9 @@
     "characterSort": "name~asc",
     "characterFilter": null,
     "placeSort": "name~asc",
+    "resturctureTimelineModal": {
+      "open": false
+    },
     "placeFilter": null,
     "noteSort": "title~asc",
     "noteFilter": null,
