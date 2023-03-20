@@ -95,16 +95,31 @@ describe('Saver', (describe, it) => {
               return Promise.resolve()
             }
             const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 50)
+            const waitForEnoughReAttempts = () => {
+              return new Promise((resolve) => {
+                setTimeout(resolve, 50)
+              }).then(() => {
+                if (saver.saveRunner.queueFullCounter < 5) {
+                  return waitForEnoughReAttempts()
+                } else {
+                  return true
+                }
+              })
+            }
             const verify = () => {
               expectToMatchArrayLoosely(saveCalls, [], 0, 0)
               assertGreaterThan(saver.saveRunner.pendingJobBuffer.length, 5)
               assertLessThan(saver.saveRunner.pendingJobBuffer.length, 10)
-              return new Promise((resolve) => {
-                setTimeout(resolve, 600)
-              })
+              return waitForEnoughReAttempts()
+                .then(() => {
+                  return new Promise((resolve) => {
+                    setTimeout(resolve, 200)
+                  })
+                })
                 .then(() => {
                   expectToMatchArrayLoosely(saveCalls, [], 0, 0)
                   assertLessThan(saver.saveRunner.pendingJobBuffer.length, 10)
+                  assertLessThan(saver.saveRunner.queueFullCounter, 5)
                 })
                 .then(() => {
                   saver.cancelAllRemainingRequests()
