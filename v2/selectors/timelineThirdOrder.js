@@ -298,60 +298,68 @@ export const secondTierBeatsInAtLeastTwoTierArrangementSelector = createSelector
     if (hierarchyLevels.length < 2) {
       return []
     }
-    return sortedBeats
-      .filter((beat) => {
-        const currentDepth = depth(beats, beat.id)
-        return (
-          (hierarchyLevels.length === 3 && currentDepth === 1) ||
-          (hierarchyLevels.length === 2 && currentDepth === 0)
-        )
+    const beatsAtSecondTier = sortedBeats.filter((beat) => {
+      const currentDepth = depth(beats, beat.id)
+      return (
+        (hierarchyLevels.length === 3 && currentDepth === 1) ||
+        (hierarchyLevels.length === 2 && currentDepth === 0)
+      )
+    })
+    return beatsAtSecondTier.flatMap((beat, index) => {
+      const currentDepth = depth(beats, beat.id)
+      // Beat must be at the right level.
+      if (currentDepth === 0) {
+        return [beat]
+      }
+      const beatParent = nodeParent(beats, beat.id)
+      const indexOfParentInParents = topTierBeats.findIndex(({ id }) => {
+        return id === beatParent
       })
-      .flatMap((beat) => {
-        const currentDepth = depth(beats, beat.id)
-        // Beat must be at the right level.
-        if (currentDepth === 0) {
-          return [beat]
+      // There must be a parent beat for this beat, that's not in position zero
+      if (indexOfParentInParents > 0) {
+        // How many palceholders do we add?
+        //  - Count the number of beats at the parent level of the current
+        //    beat that have no children.
+        let closestIndexBackwardOfParentWithNoChildren
+        for (
+          closestIndexBackwardOfParentWithNoChildren = indexOfParentInParents - 1;
+          closestIndexBackwardOfParentWithNoChildren > 0;
+          closestIndexBackwardOfParentWithNoChildren--
+        ) {
+          const priorParent = topTierBeats[closestIndexBackwardOfParentWithNoChildren]
+          const childrenOfPriorParent = children(beats, priorParent.id)
+          // This is the closest beat back that has children
+          if (childrenOfPriorParent.length > 0) {
+            break
+          }
         }
-        const beatParent = nodeParent(beats, beat.id)
-        const indexOfParentInParents = topTierBeats.findIndex(({ id }) => {
-          return id === beatParent
-        })
-        // There must be a parent beat for this beat, that's not in position zero
-        if (indexOfParentInParents > 0) {
-          // How many palceholders do we add?
-          //  - Count the number of beats at the parent level of the current
-          //    beat that have no children.
-          let furthestIndexBackwardOfParentWithNoChildren
-          for (
-            furthestIndexBackwardOfParentWithNoChildren = indexOfParentInParents - 1;
-            furthestIndexBackwardOfParentWithNoChildren > 0;
-            furthestIndexBackwardOfParentWithNoChildren--
-          ) {
-            const priorParent = topTierBeats[furthestIndexBackwardOfParentWithNoChildren]
-            const childrenOfPriorParent = children(beats, priorParent.id)
-            // This is the furthest beat back that has children
-            if (childrenOfPriorParent.length > 0) {
-              break
-            }
-          }
-          // If there was a beat with no children, then it was one
-          // beat along.
-          furthestIndexBackwardOfParentWithNoChildren++
-          if (furthestIndexBackwardOfParentWithNoChildren < indexOfParentInParents) {
-            // Insert placeholders for all of the missing beats
-            return [
-              ...times(indexOfParentInParents - furthestIndexBackwardOfParentWithNoChildren, () => {
-                return {
-                  type: 'insert-placeholder',
-                }
-              }),
-              beat,
-            ]
-          }
-          return [beat]
+        // If there was a beat with no children, then it was one
+        // beat along.
+        //
+        // *But* only add placeholders for the first beat in the
+        // next chapter that detects missing beats in the previous
+        // chapter.
+        const priorBeat = beatsAtSecondTier[index - 1]
+        const priorBeatParent = priorBeat && nodeParent(beats, priorBeat.id)
+        closestIndexBackwardOfParentWithNoChildren++
+        if (
+          closestIndexBackwardOfParentWithNoChildren < indexOfParentInParents &&
+          priorBeatParent !== beatParent
+        ) {
+          // Insert placeholders for all of the missing beats
+          return [
+            ...times(indexOfParentInParents - closestIndexBackwardOfParentWithNoChildren, () => {
+              return {
+                type: 'insert-placeholder',
+              }
+            }),
+            beat,
+          ]
         }
         return [beat]
-      })
+      }
+      return [beat]
+    })
   }
 )
 
@@ -453,6 +461,7 @@ export const visibleSortedBeatsForTimelineByBookSelector = createSelector(
   timelineActiveTabSelector,
   timelineViewIsStackedSelector,
   isSmallSelector,
+  hierarchyLevelCount,
   visibleBeatsByPositionForTimeline
 )
 
@@ -462,7 +471,8 @@ export const timelineSparceBeatMap = createSelector(
   timelineActiveTabSelector,
   timelineViewIsStackedSelector,
   isSmallSelector,
-  (beats, timelineViewIsTabbed, activeTab, timelineViewIsStacked, isSmall) => {
+  hierarchyLevelCount,
+  (beats, timelineViewIsTabbed, activeTab, timelineViewIsStacked, isSmall, levelCount) => {
     const activeParentId = activeTab
 
     return visibleBeatsForTopLevelParentByPosition(
@@ -470,7 +480,8 @@ export const timelineSparceBeatMap = createSelector(
       timelineViewIsTabbed,
       activeParentId,
       timelineViewIsStacked,
-      isSmall
+      isSmall,
+      levelCount
     ).reduce((acc, beat, index) => {
       acc[index] = beat.id
       return acc
@@ -480,7 +491,7 @@ export const timelineSparceBeatMap = createSelector(
 
 const fullStateSelector = (state) => state
 export const sortedBeatsHierachyLevels = createSelector(
-  visibleSortedBeatsForTimelineByBookSelector,
+  sortedBeatsByBookSelector,
   fullStateSelector,
   (beats, state) => {
     return beats.map((beat) => {

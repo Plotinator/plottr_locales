@@ -48,6 +48,9 @@ import {
   userIdSelector,
   shouldBeInProSelector,
   hierarchyLevelCount,
+  timelineViewIsStackedSelector,
+  allCardsSelector,
+  sortedBeatsByBookSelector,
 } from '../selectors'
 import { reduce, beatsByPosition, nextId as nextBeatId } from '../helpers/beats'
 import { nextId, objectId } from '../store/newIds'
@@ -57,6 +60,7 @@ import { cloneDeep, zip, range } from 'lodash'
 import { setTimelineView } from '../actions/ui'
 import { deleteLine } from '../actions/lines'
 import { addBeat } from '../actions/beats'
+import { reorderCardsWithinLine } from '../actions/cards'
 import { applyTemplate, moveLineActions } from '../helpers/templates'
 
 const addCharacterAttributeDataForModifyingBaseAttribute = (baseAttributeName, state, action) => {
@@ -196,7 +200,9 @@ const root = (dataRepairers) => (state, action) => {
         const activeParentId = timelineActiveTabSelector(state)
         return mainReducer(state, { ...action, parentId: activeParentId })
       }
-      return mainReducer(state, action)
+
+      const timelineViewIsStacked = timelineViewIsStackedSelector(state)
+      return mainReducer(state, { ...action, timelineViewIsStacked })
     }
 
     case ADD_BOOK:
@@ -364,7 +370,7 @@ const root = (dataRepairers) => (state, action) => {
 
       const sourceBookId = line.bookId
 
-      const book = action.destinationBookId === 'series' ? state.series : state.books[line.bookId]
+      const book = line.bookId === 'series' ? state.series : state.books[line.bookId]
       if (typeof book === 'undefined') {
         return state
       }
@@ -400,20 +406,26 @@ const root = (dataRepairers) => (state, action) => {
     case RESTRUCTURE_TIMELINE: {
       const { flatBeats, beatHierarchyLevels } = action
       const bookId = currentTimelineSelector(state)
+      const timelineViewIsStacked = timelineViewIsStackedSelector(state)
+      const maxDepth = tree.maxDepth('id')(state.beats[bookId])
 
       let newBeatId = nextBeatId(state.beats)
       let newBeatTree = tree.newTree('id')
       let lastHierarchyLevel = null
       let lastBeatId = null
-      for (const [beat, level] of zip(flatBeats, beatHierarchyLevels)) {
+      for (const [beat, level, index] of zip(
+        flatBeats,
+        beatHierarchyLevels,
+        range(flatBeats.length)
+      )) {
         // Add the missing higher level beats
         const startLevel =
           lastHierarchyLevel === null
             ? 0
-            : level.level - lastHierarchyLevel.level > 1
-            ? lastHierarchyLevel.level + 1
-            : level.level
-        for (let i = startLevel; i < level.level; ++i) {
+            : level - lastHierarchyLevel > 1
+            ? lastHierarchyLevel + 1
+            : level
+        for (let i = startLevel; i < level; ++i) {
           const parentId = i === 0 ? null : lastBeatId
           const node = {
             autoOutlineSort: true,
@@ -431,13 +443,12 @@ const root = (dataRepairers) => (state, action) => {
         }
         // Add the next beat
         const parentId =
-          startLevel === 0 && startLevel === level.level
+          startLevel === 0 && startLevel === level
             ? null
-            : lastHierarchyLevel && lastHierarchyLevel.level - level.level === 1 // Assumes a depth of three at most.  Would have to keep chasing parents to the same level otherwise.
-            ? tree.nodeParent(newBeatTree, tree.nodeParent(newBeatTree, lastBeatId))
-            : (lastHierarchyLevel && level.level === lastHierarchyLevel.level) ||
-              (lastHierarchyLevel === null && level.level === startLevel)
+            : level === lastHierarchyLevel
             ? tree.nodeParent(newBeatTree, lastBeatId)
+            : level < lastHierarchyLevel && level === 1
+            ? tree.nodeParent(newBeatTree, tree.nodeParent(newBeatTree, lastBeatId))
             : lastBeatId
 
         const position = tree.nextPosition(newBeatTree, parentId)
@@ -446,10 +457,71 @@ const root = (dataRepairers) => (state, action) => {
           position,
         })
         lastBeatId = beat.id
-        lastHierarchyLevel = level
+        lastHierarchyLevel = tree.depth(newBeatTree, lastBeatId)
+
+        if (timelineViewIsStacked) {
+          const nextBeat = flatBeats[index + 1]
+          const nextLevel = beatHierarchyLevels[index + 1]
+          const finalLevel = tree.depth(newBeatTree, lastBeatId)
+          if (finalLevel !== maxDepth && (!nextBeat || nextLevel <= finalLevel)) {
+            for (let i = finalLevel + 1; i <= maxDepth; ++i) {
+              const parentId = lastBeatId
+              const node = {
+                autoOutlineSort: true,
+                bookId: bookId,
+                fromTemplateId: null,
+                id: newBeatId,
+                position: tree.nextPosition(newBeatTree, parentId),
+                time: 0,
+                title: 'auto',
+                expanded: true,
+              }
+              newBeatTree = tree.addNode('id')(newBeatTree, parentId, node)
+              lastBeatId = newBeatId
+              newBeatId++
+            }
+            lastHierarchyLevel = finalLevel
+          }
+        }
       }
 
-      return mainReducer(state, { type: UNSAFE_SET_BEATS, bookId, beats: newBeatTree })
+      let finalState = state
+      if (timelineViewIsStacked) {
+        const allCards = allCardsSelector(state)
+        const allBeats = sortedBeatsByBookSelector(state)
+        const sceneBeatsThatMovedUp = allBeats
+          .filter((beat, index) => {
+            const isSceneBeat = tree.depth(state.beats[bookId], beat.id) === maxDepth
+            const endedHigherThanScene = beatHierarchyLevels[index] < maxDepth
+            return isSceneBeat && endedHigherThanScene
+          })
+          .map((beat) => {
+            return beat.id
+          })
+        const allCardsThatMovedUp = allCards.filter((card) => {
+          return sceneBeatsThatMovedUp.indexOf(card.beatId) !== -1
+        })
+        const allfinalBeats = beatsByPosition(() => true)(newBeatTree)
+        for (const nextCardThatMoved of allCardsThatMovedUp) {
+          const indexOfBeatThatMovedUp = allfinalBeats.findIndex((beat) => {
+            return beat.id === nextCardThatMoved.beatId
+          })
+          let beatsFirstSceneChild = indexOfBeatThatMovedUp
+          while (tree.depth(newBeatTree, allfinalBeats[beatsFirstSceneChild].id) !== maxDepth) {
+            ++beatsFirstSceneChild
+          }
+          finalState = mainReducer(
+            finalState,
+            reorderCardsWithinLine(
+              allfinalBeats[beatsFirstSceneChild].id,
+              nextCardThatMoved.lineId,
+              [nextCardThatMoved.id]
+            )
+          )
+        }
+      }
+
+      return mainReducer(finalState, { type: UNSAFE_SET_BEATS, bookId, beats: newBeatTree })
     }
 
     case SET_HIERARCHY_LEVELS: {
