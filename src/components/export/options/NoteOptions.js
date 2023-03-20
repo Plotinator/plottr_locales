@@ -67,6 +67,19 @@ export default function NoteOptions({ type, options, updateOptions }) {
             <span>{t('Content')}</span>
           </CheckOption>
         </li>
+        {type == 'word' ? (
+          <li>
+            <CheckOption
+              checked={options.customAttributes}
+              onChange={updateOptions}
+              category="notes"
+              attr="customAttributes"
+              disabled={!options.export}
+            >
+              <span>{t('Custom Attributes')}</span>
+            </CheckOption>
+          </li>
+        ) : null}
       </ul>
     </div>
   )
