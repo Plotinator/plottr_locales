@@ -437,6 +437,7 @@ const platform = {
     const event = isLoggedIntoPro
       ? new Event('save-as--pro', { fileUrl })
       : new Event('save-as', { fileUrl })
+    event.fileUrl = fileUrl
     document.dispatchEvent(event)
   },
   showItemInFolder: (fileURL) => {
