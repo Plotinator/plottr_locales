@@ -1,4 +1,11 @@
-import { helpers, SYSTEM_REDUCER_KEYS, actions, migrateIfNeeded, emptyFile } from 'pltr/v2'
+import {
+  helpers,
+  SYSTEM_REDUCER_KEYS,
+  actions,
+  migrateIfNeeded,
+  Migrator,
+  emptyFile,
+} from 'pltr/v2'
 import { t } from 'plottr_locales'
 import {
   currentUser,
@@ -104,20 +111,26 @@ export function removeSystemKeys(jsonData) {
 
 const migrate = (originalFile, fileId) => (overwrittenFile) => {
   const json = overwrittenFile || originalFile
+  const fileURL = helpers.file.fileIdToPlottrCloudFileURL(fileId)
   return getVersion().then((version) => {
     return new Promise((resolve, reject) => {
       if (json.file.permission !== 'owner') {
-        machineId().then((clientId) => {
-          loadFileIntoRedux(json, fileId)
-          store.dispatch(actions.client.setClientId(clientId))
-          resolve(json)
-        })
+        const migrator = new Migrator(json, fileURL, json.file.version, version, () => {}, logger)
+        if (migrator.plottrBehindFile()) {
+          reject(new Error('Need to update Plottr'))
+        } else {
+          machineId().then((clientId) => {
+            loadFileIntoRedux(json, fileId)
+            store.dispatch(actions.client.setClientId(clientId))
+            resolve(json)
+          })
+        }
         return
       } else {
         migrateIfNeeded(
           version,
           json,
-          helpers.file.fileIdToPlottrCloudFileURL(fileId),
+          fileURL,
           null,
           (error, migrated, data) => {
             if (error) {
