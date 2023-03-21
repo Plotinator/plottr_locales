@@ -106,40 +106,51 @@ const migrate = (originalFile, fileId) => (overwrittenFile) => {
   const json = overwrittenFile || originalFile
   return getVersion().then((version) => {
     return new Promise((resolve, reject) => {
-      migrateIfNeeded(
-        version,
-        json,
-        helpers.file.fileIdToPlottrCloudFileURL(fileId),
-        null,
-        (error, migrated, data) => {
-          if (error) {
-            rollbar.error(error)
-            if (error === 'Plottr behind file') {
-              return reject(new Error('Need to update Plottr'))
+      if (json.file.permission !== 'owner') {
+        machineId().then((clientId) => {
+          loadFileIntoRedux(json, fileId)
+          store.dispatch(actions.client.setClientId(clientId))
+          resolve(json)
+        })
+        return
+      } else {
+        migrateIfNeeded(
+          version,
+          json,
+          helpers.file.fileIdToPlottrCloudFileURL(fileId),
+          null,
+          (error, migrated, data) => {
+            if (error) {
+              rollbar.error(error)
+              if (error === 'Plottr behind file') {
+                reject(new Error('Need to update Plottr'))
+                return
+              }
+              reject(error)
+              return
             }
-            return reject(error)
-          }
-          machineId().then((clientId) => {
-            if (migrated) {
-              logger.info(
-                `File was migrated.  Migration history: ${data.file.appliedMigrations}.  Initial version: ${data.file.initialVersion}`
-              )
-              overwriteAllKeys(fileId, clientId, removeSystemKeys(data))
-                .then((results) => {
-                  loadFileIntoRedux(data, fileId)
-                  store.dispatch(actions.client.setClientId(clientId))
-                  return results
-                })
-                .then(resolve, reject)
-            } else {
-              loadFileIntoRedux(data, fileId)
-              store.dispatch(actions.client.setClientId(clientId))
-              resolve(data)
-            }
-          })
-        },
-        logger
-      )
+            machineId().then((clientId) => {
+              if (migrated) {
+                logger.info(
+                  `File was migrated.  Migration history: ${data.file.appliedMigrations}.  Initial version: ${data.file.initialVersion}`
+                )
+                overwriteAllKeys(fileId, clientId, removeSystemKeys(data))
+                  .then((results) => {
+                    loadFileIntoRedux(data, fileId)
+                    store.dispatch(actions.client.setClientId(clientId))
+                    return results
+                  })
+                  .then(resolve, reject)
+              } else {
+                loadFileIntoRedux(data, fileId)
+                store.dispatch(actions.client.setClientId(clientId))
+                resolve(data)
+              }
+            })
+          },
+          logger
+        )
+      }
     })
   })
 }
