@@ -54,6 +54,7 @@ import * as templatesHelpers from './helpers/templates'
 import * as template from './template'
 
 import migrateIfNeeded from './migrator/migration_manager'
+import Migrator from './migrator/migrator.js'
 
 import * as selectors from './selectors'
 
@@ -216,6 +217,7 @@ export {
   colors,
   featureFlags,
   migrateIfNeeded,
+  Migrator,
   rootReducer,
   mainReducer,
   SYSTEM_REDUCER_KEYS,
