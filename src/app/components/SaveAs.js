@@ -61,9 +61,14 @@ const SaveAs = ({
               return fileId
             })
             .then((fileId) => {
-              pleaseOpenWindow(helpers.file.fileIdToPlottrCloudFileURL(fileId), true).then(() => {
-                window.close()
-              })
+              pleaseOpenWindow(helpers.file.fileIdToPlottrCloudFileURL(fileId), true)
+                .then(() => {
+                  window.close()
+                })
+                .catch((error) => {
+                  logger.error(`Error opening the ${fileId} as ${newName}`, error)
+                  finishSavingFileAs()
+                })
             })
             .catch((error) => {
               logger.error(`Error saving file with id ${fileId} as ${newName}`, error)
@@ -83,9 +88,10 @@ const SaveAs = ({
       saveFileAs.current = true
     })
     const saveAsPro = document.addEventListener('save-as--pro', (event) => {
+      const fileId = helpers.file.withoutProtocol(event.fileUrl)
       if (isOfflineMode) return
       setVisible(true)
-      setFileId(event.fileUrl)
+      setFileId(fileId)
       saveFileAs.current = true
     })
     return () => {
