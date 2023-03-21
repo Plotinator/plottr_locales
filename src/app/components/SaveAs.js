@@ -6,12 +6,13 @@ import { connect } from 'react-redux'
 import { selectors, actions, helpers } from 'pltr/v2'
 import { t } from 'plottr_locales'
 import { InputModal } from 'connected-components'
+import { initialFetch } from 'wired-up-firebase'
 import { uploadToFirebase } from '../../upload-to-firebase'
 
 import logger from '../../../shared/logger'
 import { makeMainProcessClient } from '../mainProcessClient'
 
-const { openKnownFile, pleaseOpenWindow, onSaveAsOnPro } = makeMainProcessClient()
+const { openKnownFile, pleaseOpenWindow, onSaveAsOnPro, getVersion } = makeMainProcessClient()
 
 export const openFile = (fileURL, unknown) => {
   return openKnownFile(fileURL, unknown)
@@ -39,33 +40,37 @@ const SaveAs = ({
     startSavingFileAs()
 
     withFullState((fullState) => {
-      return uploadToFirebase(emailAddress, userId, fullState.present, newName)
-        .then((response) => {
-          const fileId = response.data.fileId
-          if (!fileId) {
-            const message = 'Uploaded file for saveAs but we did not receive a fileId back'
-            logger.error(message)
-            return Promise.reject(new Error(message))
-          }
-          return fileId
+      return getVersion().then((version) => {
+        return initialFetch(userId, fileId, clientId, version).then((fileState) => {
+          return uploadToFirebase(emailAddress, userId, fullState.present, newName)
+            .then((response) => {
+              const fileId = response.data.fileId
+              if (!fileId) {
+                const message = 'Uploaded file for saveAs but we did not receive a fileId back'
+                logger.error(message)
+                return Promise.reject(new Error(message))
+              }
+              return fileId
+            })
+            .then((fileId) => {
+              logger.info(`Saved file with id ${fileId} as ${newName}`)
+              setFileId(null)
+              setVisible(false)
+              finishSavingFileAs()
+              saveFileAs.current = false
+              return fileId
+            })
+            .then((fileId) => {
+              pleaseOpenWindow(helpers.file.fileIdToPlottrCloudFileURL(fileId), true).then(() => {
+                window.close()
+              })
+            })
+            .catch((error) => {
+              logger.error(`Error saving file with id ${fileId} as ${newName}`, error)
+              finishSavingFileAs()
+            })
         })
-        .then((fileId) => {
-          logger.info(`Saved file with id ${fileId} as ${newName}`)
-          setFileId(null)
-          setVisible(false)
-          finishSavingFileAs()
-          saveFileAs.current = false
-          return fileId
-        })
-        .then((fileId) => {
-          pleaseOpenWindow(helpers.file.fileIdToPlottrCloudFileURL(fileId), true).then(() => {
-            window.close()
-          })
-        })
-        .catch((error) => {
-          logger.error(`Error saving file with id ${fileId} as ${newName}`, error)
-          finishSavingFileAs()
-        })
+      })
     })
   }
 
@@ -77,8 +82,15 @@ const SaveAs = ({
       setFileId(fileId)
       saveFileAs.current = true
     })
+    const saveAsPro = document.addEventListener('save-as--pro', (event) => {
+      if (isOfflineMode) return
+      setVisible(true)
+      setFileId(event.fileUrl)
+      saveFileAs.current = true
+    })
     return () => {
       unsubscribe()
+      document.removeEventListener('save-as--pro', saveAsPro)
     }
   }, [isOfflineMode])
 
