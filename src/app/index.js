@@ -13,7 +13,14 @@ import { setupI18n, t } from 'plottr_locales'
 
 import { store } from 'store'
 
-import { helpers, actions, selectors, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
+import {
+  helpers,
+  actions,
+  selectors,
+  migrateIfNeeded,
+  addMissingKeys,
+  SYSTEM_REDUCER_KEYS,
+} from 'pltr/v2'
 
 import { rtfToHTML } from 'pltr/v2/slate_serializers/to_html'
 import { convertHTMLNodeList } from 'pltr/v2/slate_serializers/from_html'
@@ -59,7 +66,7 @@ const {
   onExportFileFromMenu,
   onSave,
   onSaveAs,
-  pleaseOpenWindow,
+  addToKnownFilesAndOpen,
   removeFromTempFilesIfTemp,
   editKnownFilePath,
   pleaseTellDashboardToReloadRecents,
@@ -91,6 +98,7 @@ const {
   showItemInFolder,
   userDesktopPath,
   askToExport,
+  getVersion,
 } = makeMainProcessClient()
 
 const connectToSocketServer = (port) => {
@@ -253,33 +261,80 @@ tellMeWhatOSImOn()
           }
         })
 
-        const saveAsHandler = () => {
-          const { present } = store.getState()
-          const isInOfflineMode = selectors.isInOfflineModeSelector(present)
-          if (isInOfflineMode) {
-            logger.info('Tried to save-as a file, but it is offline')
-            return
-          }
+        const saveAsHandler = ({ fileUrl }) => {
+          const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
 
-          whenClientIsReady(({ basename }) => {
-            return basename(present.file.fileName, '.pltr').then((defaultPath) => {
-              const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
-              showSaveDialog(
-                filters,
-                t('Where would you like to save this copy?'),
-                defaultPath
-              ).then((fileName) => {
+          if (fileUrl) {
+            showSaveDialog(filters, t('Where would you like to save this copy?'), fileUrl).then(
+              (fileName) => {
                 if (fileName) {
                   const newFilePath = fileName.includes('.pltr') ? fileName : `${fileName}.pltr`
                   const newFileURL = helpers.file.filePathToFileURL(newFilePath)
-                  saveFile(newFileURL, present).then(() => {
-                    pleaseOpenWindow(newFileURL, true)
-                    store.dispatch(actions.ui.fileSaved())
+                  getVersion().then((version) => {
+                    whenClientIsReady(({ readFile }) => {
+                      return readFile(helpers.file.withoutProtocol(fileUrl), 'utf-8').then(
+                        (rawFile) => {
+                          const contents = JSON.parse(rawFile)
+                          return new Promise((resolve, reject) => {
+                            migrateIfNeeded(
+                              version,
+                              contents,
+                              fileUrl,
+                              null,
+                              (err, didMigrate, migratedState) => {
+                                if (err) {
+                                  rollbar.error(err)
+                                  logger.error(err)
+                                  if (err === 'Plottr behind file') {
+                                    showErrorBox(t('Error'), t('Please update Plottr'))
+                                    reject(new Error('Need to update Plottr'))
+                                  } else {
+                                    reject(err)
+                                  }
+                                } else {
+                                  saveFile(newFileURL, addMissingKeys(migratedState))
+                                    .then(() => {
+                                      store.dispatch(actions.applicationState.finishRenamingFile())
+                                      return addToKnownFilesAndOpen(newFileURL, true)
+                                    })
+                                    .then(resolve)
+                                    .catch(reject)
+                                }
+                              }
+                            )
+                          })
+                        }
+                      )
+                    })
                   })
                 }
+              }
+            )
+          } else {
+            whenClientIsReady(({ basename }) => {
+              const { present } = store.getState()
+              const isInOfflineMode = selectors.isInOfflineModeSelector(present)
+              if (isInOfflineMode) {
+                logger.info('Tried to save-as a file, but it is offline')
+                return Promise.resolve()
+              }
+              return basename(present.file.fileName, '.pltr').then((defaultPath) => {
+                showSaveDialog(
+                  filters,
+                  t('Where would you like to save this copy?'),
+                  defaultPath
+                ).then((fileName) => {
+                  if (fileName) {
+                    const newFilePath = fileName.includes('.pltr') ? fileName : `${fileName}.pltr`
+                    const newFileURL = helpers.file.filePathToFileURL(newFilePath)
+                    saveFile(newFileURL, present).then(() => {
+                      addToKnownFilesAndOpen(newFileURL, true)
+                    })
+                  }
+                })
               })
             })
-          })
+          }
         }
 
         const ensureEndsInPltr = (filePath) => {
