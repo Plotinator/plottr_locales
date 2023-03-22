@@ -955,7 +955,9 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
   const filePublicURL = (storageProtocolURL, fileId, userId) => {
     return axios
       .get(
-        `${BASE_API_URL}/api/file-public-url?url=${storageProtocolURL}&fileId=${fileId}&userId=${userId}`
+        `${BASE_API_URL}/api/file-public-url?url=${encodeURIComponent(
+          storageProtocolURL
+        )}&fileId=${fileId}&userId=${userId}`
       )
       .then((response) => {
         return response.data.publicURL
