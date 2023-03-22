@@ -124,7 +124,7 @@ export const wireUpAPI = (logger, actions, selectors) => {
   // eslint-disable-next-line
   const wiredUp = api(actions, selectors, auth, database, storage, BASE_API_DOMAIN, __DEV__, logger, true)
 
-  const listen = (actions, selectors, withResponse, userId, fileId, clientId, fileVersion) => {
+  const listen = (withResponse, userId, fileId, clientId, fileVersion) => {
     const unsubscribeToUI = wiredUp.listenToUI(userId, fileId, clientId, withResponse)
     const unsubscribeToFile = wiredUp.listenToFile(userId, fileId, clientId, withResponse)
     const unsubscribeToBeats = wiredUp.listenToBeats(
