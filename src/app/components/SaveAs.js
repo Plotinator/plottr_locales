@@ -7,8 +7,8 @@ import { selectors, actions, helpers } from 'pltr/v2'
 import { t } from 'plottr_locales'
 import { InputModal } from 'connected-components'
 import { initialFetch } from 'wired-up-firebase'
-import { uploadToFirebase } from '../../upload-to-firebase'
 
+import { uploadToFirebase } from '../../upload-to-firebase'
 import logger from '../../../shared/logger'
 import { makeMainProcessClient } from '../mainProcessClient'
 
@@ -26,7 +26,6 @@ const SaveAs = ({
   isOfflineMode,
   startSavingFileAs,
   finishSavingFileAs,
-  withFullState,
 }) => {
   const [visible, setVisible] = useState(false)
   const [fileId, setFileId] = useState(null)
@@ -34,15 +33,15 @@ const SaveAs = ({
 
   const renameFile = (newName) => {
     // This component is for renaming cloud files only.
-    if (!userId) {
+    if (!userId || !fileId || !emailAddress || !newName) {
       return
     }
-    startSavingFileAs()
 
-    withFullState((fullState) => {
-      return getVersion().then((version) => {
+    startSavingFileAs()
+    getVersion()
+      .then((version) => {
         return initialFetch(userId, fileId, clientId, version).then((fileState) => {
-          return uploadToFirebase(emailAddress, userId, fullState.present, newName)
+          return uploadToFirebase(emailAddress, userId, fileState, newName)
             .then((response) => {
               const fileId = response.data.fileId
               if (!fileId) {
@@ -61,14 +60,12 @@ const SaveAs = ({
               return fileId
             })
             .then((fileId) => {
-              pleaseOpenWindow(helpers.file.fileIdToPlottrCloudFileURL(fileId), true)
-                .then(() => {
-                  window.close()
-                })
-                .catch((error) => {
+              pleaseOpenWindow(helpers.file.fileIdToPlottrCloudFileURL(fileId), true).catch(
+                (error) => {
                   logger.error(`Error opening the ${fileId} as ${newName}`, error)
                   finishSavingFileAs()
-                })
+                }
+              )
             })
             .catch((error) => {
               logger.error(`Error saving file with id ${fileId} as ${newName}`, error)
@@ -76,7 +73,11 @@ const SaveAs = ({
             })
         })
       })
-    })
+      .finally(() => {
+        setFileId(null)
+        setVisible(false)
+        saveFileAs.current = false
+      })
   }
 
   useEffect(() => {
@@ -125,11 +126,11 @@ SaveAs.propTypes = {
   isOfflineMode: PropTypes.bool,
   startSavingFileAs: PropTypes.func.isRequired,
   finishSavingFileAs: PropTypes.func.isRequired,
-  withFullState: PropTypes.func.isRequired,
 }
 
 export default connect(
   (state) => ({
+    emailAddress: selectors.emailAddressSelector(state.present),
     userId: selectors.userIdSelector(state.present),
     clientId: selectors.clientIdSelector(state.present),
     fileList: selectors.knownFilesSelector(state.present),
@@ -138,6 +139,5 @@ export default connect(
   {
     startSavingFileAs: actions.applicationState.startSavingFileAs,
     finishSavingFileAs: actions.applicationState.finishSavingFileAs,
-    withFullState: actions.project.withFullFileState,
   }
 )(SaveAs)
