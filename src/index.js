@@ -12,7 +12,6 @@ const locales = {
   it: require('./it.json'),
   pt: require('./pt.json'),
   ru: require('./ru.json'),
-  el: require('./el.json'),
   ar: require('./ar.json'),
   flipped: require('./flipped.json'),
 }
