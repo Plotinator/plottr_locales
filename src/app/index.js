@@ -329,7 +329,6 @@ tellMeWhatOSImOn()
                     const newFileURL = helpers.file.filePathToFileURL(newFilePath)
                     saveFile(newFileURL, present).then(() => {
                       addToKnownFilesAndOpen(newFileURL, true)
-                      store.dispatch(actions.ui.fileSaved())
                     })
                   }
                 })
