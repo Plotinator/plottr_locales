@@ -245,13 +245,13 @@ const BeatTitleCellConnector = (connector) => {
           break
         case 2:
           warningMessage = t('Are you sure you want to delete all scene cards in "{beatTitle}".', {
-            title: beatTitle,
+            beatTitle,
           })
           break
         case 3:
           warningMessage = t(
             'Are you sure you want to delete all chapters and their scene cards in "{beatTitle}".',
-            { title: beatTitle }
+            { beatTitle }
           )
           break
       }
