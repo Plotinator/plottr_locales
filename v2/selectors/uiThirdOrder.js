@@ -48,3 +48,10 @@ export const outlineScrollPositionSelector = createSelector(
   uiSelector,
   ({ outlineScrollPosition }) => outlineScrollPosition
 )
+
+export const restructureModalOpenSelector = createSelector(
+  uiSelector,
+  ({ resturctureTimelineModal }) => {
+    return !!resturctureTimelineModal?.open
+  }
+)
