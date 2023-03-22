@@ -255,10 +255,8 @@ export const stickyLeftColumnCountSelector = createSelector(
   hierarchyLevelCount,
   selectedOrientationSelector,
   (pinnedPlotlines, timelineViewIsStacked, hierarchyLevelCount, selectedOrientation) => {
-    if (selectedOrientation == 'horizontal') {
+    if (selectedOrientation == 'horizontal' || timelineViewIsStacked) {
       return 1
-    } else if (timelineViewIsStacked) {
-      return hierarchyLevelCount + pinnedPlotlines + 1
     } else if (pinnedPlotlines) {
       return pinnedPlotlines + 1
     } else {
