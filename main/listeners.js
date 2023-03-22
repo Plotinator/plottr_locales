@@ -650,7 +650,7 @@ export const listenOnIPCMain = (
 
   ipcMain.on('open-path', (event, replyChannel, path) => {
     shell
-      .open(path)
+      .openPath(path)
       .then(() => {
         event.sender.send(replyChannel, path)
       })
