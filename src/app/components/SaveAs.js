@@ -81,11 +81,11 @@ const SaveAs = ({
   }
 
   useEffect(() => {
-    const unsubscribe = onSaveAsOnPro((fileId) => {
+    const unsubscribe = onSaveAsOnPro((fileUrl) => {
       if (isOfflineMode) return
 
       setVisible(true)
-      setFileId(fileId)
+      setFileId(helpers.file.withoutProtocol(fileUrl))
       saveFileAs.current = true
     })
     const saveAsPro = document.addEventListener('save-as--pro', (event) => {
