@@ -12,6 +12,8 @@ const locales = {
   it: require('./it.json'),
   pt: require('./pt.json'),
   ru: require('./ru.json'),
+  el: require('./el.json'),
+  ar: require('./ar.json'),
   flipped: require('./flipped.json'),
 }
 
@@ -27,6 +29,7 @@ const localeNames = {
   pt: 'português',
   fa: 'فارسی',
   ru: 'русский язык',
+  ar: 'العربية',
 }
 
 // The purpose of the flipped locale is to easily see if there are any strings
