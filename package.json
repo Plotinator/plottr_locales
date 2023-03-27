@@ -15,7 +15,6 @@
   "scripts": {
     "spit-out-version": "node build/spit-out-version.js",
     "start": "cross-env NODE_ENV=dev electron --inspect=5858 --enable-test-utilities .",
-    "postinstall": "cd node_modules/sharp && cross-env npm_config_arch=x64 npm install && cross-env npm_config_arch=arm64 npm install",
     "compile": "npm --prefix lib/plottr_components run compile && cross-env NODE_ENV=dev node_modules/.bin/webpack",
     "watch": "npm-run-all --parallel watch:*",
     "watch:plottr": "echo 'do you have fsevents?' && cross-env NODE_ENV=dev node_modules/.bin/webpack",
@@ -24,7 +23,8 @@
     "maps": "cross-env NODE_ENV=production MAPS=true node_modules/.bin/webpack",
     "pack": "npm --prefix lib/plottr_components ci && npm --prefix lib/plottr_components run compile && cross-env NODE_ENV=production node_modules/.bin/webpack",
     "pack:windows": "npm --prefix lib/plottr_components ci && npm --prefix lib/plottr_components run compile && cross-env NODE_ENV=production node_modules\\.bin\\webpack",
-    "dist": "npm run spit-out-version && node build/initEnv.js && npm run pack && electron-builder -ml --x64 --arm64 --publish always",
+    "install-sharp": "cd node_modules/sharp && cross-env npm_config_arch=x64 npm install && cross-env npm_config_arch=arm64 npm install",
+    "dist": "npm run install-sharp && npm run spit-out-version && node build/initEnv.js && npm run pack && electron-builder -ml --x64 --arm64 --publish always",
     "dist:linux": "npm run spit-out-version && node build/initEnv.js && npm run pack && electron-builder -l",
     "dist:windows": "npm run spit-out-version && node build/initEnv.js && npm run pack:windows && electron-builder -w --publish always",
     "dist:all": "npm run pack && electron-builder -mw",
