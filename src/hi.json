@@ -1,4 +1,4 @@
-﻿{
+{
   "(If not, please email support@plottr.com)": {
     "message": "(यदि नहीं, कृपया support@plottr.com पर ईमेल करें)"
   },
@@ -1586,8 +1586,8 @@
   "You should have received an email with a code": {
     "message": "आपको एक कोड के साथ एक ईमेल प्राप्त हुआ होगा"
   },
-  "You'll have 30 days": {
-    "message": "आपके पास 30 दिन है"
+  "You'll have 14 days": {
+    "message": "आपके पास 14 दिन है"
   },
   "You're on the latest version": {
     "message": "आप नवीनतम वर्ज़न पर हैं"

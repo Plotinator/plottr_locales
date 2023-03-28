@@ -1427,8 +1427,8 @@
   "You should have received an email with a code": {
     "message": "Вы должны были получить письмо с кодом"
   },
-  "You'll have 30 days": {
-    "message": "У вас будет 30 дней"
+  "You'll have 14 days": {
+    "message": "У вас будет 14 дней"
   },
   "You're on the latest version": {
     "message": "У вас установлена последняя версия"

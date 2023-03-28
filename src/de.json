@@ -806,9 +806,6 @@
   "OK": {
     "message": "OK"
   },
-  "ÜBERSCHREIBEN": {
-    "message": "OVERWRITE"
-  },
   "Once You Plot, the Fun Don't Stop": {
     "message": "Once You Plot, the Fun Don’t Stop"
   },
@@ -1430,8 +1427,8 @@
   "You should have received an email with a code": {
     "message": "Sie sollten eine E-Mail mit einem Code erhalten haben"
   },
-  "You'll have 30 days": {
-    "message": "Sie haben 30 Tage Zeit"
+  "You'll have 14 days": {
+    "message": "Sie haben 14 Tage Zeit"
   },
   "You're on the latest version": {
     "message": "Sie sind auf der neuesten Version"
@@ -1580,9 +1577,6 @@
   "{wordCount,number} words": {
     "message": "{wordCount, number} Wörter"
   },
-  "(If not, please contact me @ <a>support@plottr.com</a> or @StoryPlottr on Twitter)": {
-    "message": "(Falls nicht, kontaktieren Sie mich bitte @ <a>support@plottr.com</a> oder @StoryPlottr auf Twitter)"
-  },
   "Add attributes": {
     "message": "Attribute hinzufügen"
   },
@@ -1615,9 +1609,6 @@
   },
   "Contact": {
     "message": "Kontakt"
-  },
-  "Crafted in the Mountains of Utah by": {
-    "message": "Gefertigt in den Bergen von Utah von"
   },
   "Create a new file": {
     "message": "Neue Datei erstellen"
