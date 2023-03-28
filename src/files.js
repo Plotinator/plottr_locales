@@ -47,7 +47,7 @@ export const newFile = (
   const fileName = newFileName(fileList, name)
   return getVersion().then((version) => {
     const newFile = newEmptyFile(fileName, version, fullState.present)
-    const file = Object.assign({}, newFile, template.templateData || {})
+    const file = Object.assign({}, newFile, template?.templateData || {})
     if (!file.beats.series) {
       file.beats.series = newFile.beats.series
     }
