@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
-import { isEqual } from 'lodash'
 
 import { t } from 'plottr_locales'
 import { Row, Cell } from 'react-sticky-table'
@@ -37,7 +36,6 @@ const TimelineTableConnector = (connector) => {
 
       this.state = {
         tableLength: 0,
-        mouseXY: { x: null, y: null },
       }
 
       this.lastMoveTimeout = null
@@ -89,35 +87,6 @@ const TimelineTableConnector = (connector) => {
       setTimeout(() => {
         this.setLength()
       }, 50)
-
-      const { timelineViewIsStacked } = this.props
-
-      if (timelineViewIsStacked) {
-        if (this.mouseMoveListener) {
-          document.removeEventListener('mousemove', this.mouseMoveListener)
-        }
-        if (this.lastMoveTimeout) {
-          clearTimeout(this.lastMoveTimeout)
-        }
-
-        this.lastMoveTimeout = null
-        this.mouseMoveListener = document.addEventListener('mousemove', (event) => {
-          if (this.lastMoveTimeout) {
-            clearTimeout(this.lastMoveTimeout)
-          }
-          this.lastMoveTimeout = setTimeout(() => {
-            const newMouseXY = {
-              x: event.pageX,
-              y: event.pageY,
-            }
-            if (!isEqual(newMouseXY, this.state.mouseXY)) {
-              this.setState({
-                mouseXY: newMouseXY,
-              })
-            }
-          }, 10)
-        })
-      }
 
       const { visible } = this.props.toast
 
@@ -344,6 +313,10 @@ const TimelineTableConnector = (connector) => {
       this.props.notificationActions.showToastNotification(false)
     }
 
+    handleCloseMessage = () => {
+      this.props.notificationActions.dismissMessage()
+    }
+
     getToastMessage = (cardAction, newBookId, lineAction) => {
       if ((cardAction === 'move' || lineAction === 'move') && newBookId) {
         const { books, actions } = this.props
@@ -389,6 +362,9 @@ const TimelineTableConnector = (connector) => {
           role="alert"
         >
           {message}
+          <button className="close" onClick={() => this.handleCloseMessage()}>
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
       )
     }
