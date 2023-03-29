@@ -150,6 +150,10 @@ const _makeMainProcessClient = () => {
     return subscribeTo('advanced-export-file-from-menu', cb)
   }
 
+  const onOpenImagePickerFromMenu = (cb) => {
+    return subscribeTo('image-picker-file-from-menu', cb)
+  }
+
   const onTurnOnActsHelp = (cb) => {
     return subscribeTo('turn-on-acts-help', cb)
   }
@@ -503,6 +507,7 @@ const _makeMainProcessClient = () => {
     restartSocketServer,
     isRestarting,
     onCreateFileShortcut,
+    onOpenImagePickerFromMenu,
   }
 }
 
