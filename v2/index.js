@@ -49,6 +49,7 @@ import * as editorHelpers from './helpers/editors'
 import * as timeHelpers from './helpers/time'
 import * as dateHelpers from './helpers/date'
 import * as fileHelpers from './helpers/file'
+import * as templatesHelpers from './helpers/templates'
 
 import * as template from './template'
 
@@ -96,7 +97,7 @@ import testingAndDiagnosisReducer from './reducers/testingAndDiagnosis'
 
 import * as initialState from './store/initialState'
 import * as lineColors from './store/lineColors'
-import { emptyFile } from './store/newFileState'
+import { emptyFile, addMissingKeys } from './store/newFileState'
 import * as newIds from './store/newIds'
 import * as borderStyle from './store/borderStyle'
 
@@ -194,6 +195,7 @@ const helpers = {
   time: timeHelpers,
   date: dateHelpers,
   file: fileHelpers,
+  template: templatesHelpers,
 }
 
 const slate = {
@@ -224,6 +226,7 @@ export {
   initialState,
   lineColors,
   emptyFile,
+  addMissingKeys,
   newIds,
   template,
   tree,

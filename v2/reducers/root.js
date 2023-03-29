@@ -24,6 +24,14 @@ import {
   EDIT_CHARACTER_CATEGORY,
   DELETE_CHARACTER_CATEGORY,
   ADD_CHARACTER,
+  APPLY_TIMELINE_TEMPLATE,
+  SET_HIERARCHY_LEVELS,
+  ATTACH_CHARACTER_TO_CARD,
+  DELETE_TAG,
+  RESTRUCTURE_TIMELINE,
+  UNSAFE_SET_BEATS,
+  ADD_CARD,
+  REORDER_CARDS_WITHIN_LINE,
 } from '../constants/ActionTypes'
 import {
   selectedCharacterAttributeTabSelector,
@@ -31,7 +39,6 @@ import {
   timelineViewIsTabbedSelector,
   currentTimelineSelector,
   firstLineForBookSelector,
-  sortedBeatsForAnotherBookSelector,
   firstVisibleBeatForBookSelector,
   timelineTabBeatIdsSelector,
   timelineActiveTabSelector,
@@ -40,15 +47,21 @@ import {
   permissionSelector,
   userIdSelector,
   shouldBeInProSelector,
+  hierarchyLevelCount,
+  timelineViewIsStackedSelector,
+  allCardsSelector,
+  sortedBeatsByBookSelector,
 } from '../selectors'
 import { reduce, beatsByPosition, nextId as nextBeatId } from '../helpers/beats'
 import { nextId, objectId } from '../store/newIds'
 import * as tree from './tree'
 import { beat as defaultBeat } from '../store/initialState'
-import { cloneDeep } from 'lodash'
-import { addBeat } from '../actions/beats'
+import { cloneDeep, zip, range } from 'lodash'
 import { setTimelineView } from '../actions/ui'
-import { ATTACH_CHARACTER_TO_CARD, DELETE_TAG } from '../../v1/constants/ActionTypes'
+import { deleteLine } from '../actions/lines'
+import { addBeat } from '../actions/beats'
+import { reorderCardsWithinLine } from '../actions/cards'
+import { applyTemplate, moveLineActions } from '../helpers/templates'
 
 const addCharacterAttributeDataForModifyingBaseAttribute = (baseAttributeName, state, action) => {
   const currentBookId = selectedCharacterAttributeTabSelector(state)
@@ -96,6 +109,10 @@ const root = (dataRepairers) => (state, action) => {
   const isSeries = action.type.includes('@@') ? false : isSeriesSelector(state)
   const mainReducer = addPermission(unrepairedMainReducer(dataRepairers))
   switch (action.type) {
+    case APPLY_TIMELINE_TEMPLATE: {
+      return applyTemplate(state, action.bookId, action.template, action.selectedIndex)
+    }
+
     case ATTACH_CHARACTER_TO_CARD: {
       const currentTimeline = currentTimelineSelector(state)
       return mainReducer(state, {
@@ -183,7 +200,9 @@ const root = (dataRepairers) => (state, action) => {
         const activeParentId = timelineActiveTabSelector(state)
         return mainReducer(state, { ...action, parentId: activeParentId })
       }
-      return mainReducer(state, action)
+
+      const timelineViewIsStacked = timelineViewIsStackedSelector(state)
+      return mainReducer(state, { ...action, timelineViewIsStacked })
     }
 
     case ADD_BOOK:
@@ -260,13 +279,12 @@ const root = (dataRepairers) => (state, action) => {
 
       return mainReducer(state, {
         ...action,
-        bookId: bookId,
+        bookId,
         nextLineId: nextId(state.lines),
-        nextBeatId: ++nextIdForBeats,
         nextCardId: nextId(state.cards),
-        createdNewBeats: createdNewBeats,
+        createdNewBeats,
         newTree: beatTree,
-        cardToBeatIdMap: cardToBeatIdMap,
+        cardToBeatIdMap,
       })
     }
 
@@ -338,78 +356,204 @@ const root = (dataRepairers) => (state, action) => {
     }
 
     case MOVE_LINE: {
-      const sourceLine = state.lines.find(({ id }) => {
-        return id === action.id
+      const line = state.lines.find((line) => {
+        return line.id === action.id
       })
-
-      if (!sourceLine || sourceLine.bookId === action.destinationBookId) {
+      // No such line or book
+      if (
+        !line ||
+        (action.destinationBookId !== 'series' &&
+          typeof state.books[action.destinationBookId] === 'undefined')
+      ) {
         return state
       }
 
-      const sourceCards = state.cards.filter(({ lineId }) => {
-        return lineId === action.id
-      })
-      const beatsForLine = sourceCards.map(({ beatId }) => {
-        return beatId
-      })
+      const sourceBookId = line.bookId
 
-      const positionOfBeat = (beatId, beatIds) => {
-        return beatIds.indexOf(beatId)
+      const book = line.bookId === 'series' ? state.series : state.books[line.bookId]
+      if (typeof book === 'undefined') {
+        return state
       }
 
-      const beatsInSourceBook = sortedBeatsForAnotherBookSelector(state, sourceLine.bookId)
-      const beatIdsInSourceBook = beatsInSourceBook.map(({ id }) => id)
-      const cardToPositionMapping = sourceCards.reduce((acc, nextCard) => {
-        return {
-          ...acc,
-          [nextCard.id]: positionOfBeat(nextCard.beatId, beatIdsInSourceBook),
-        }
-      }, {})
-      const beatsInDestinationBook = sortedBeatsForAnotherBookSelector(
+      if (sourceBookId === action.destinationBookId) {
+        return state
+      }
+
+      const sourceLevelsOfHierarchy = Object.values(state.hierarchyLevels[sourceBookId]).length
+      const destinationLevelsOfHierarchy = Object.values(
+        state.hierarchyLevels[action.destinationBookId]
+      ).length
+      // We don't move lines between books with different levels of hierarchy.
+      if (sourceLevelsOfHierarchy !== destinationLevelsOfHierarchy) {
+        return state
+      }
+
+      const createLineBeatsAndCardsActions = moveLineActions(
         state,
+        action.id,
         action.destinationBookId
       )
-      const requiredNumberOfBeats = beatsForLine.reduce((furthestPosition, nextBeat) => {
-        const positionOfCardsBeat = beatIdsInSourceBook.indexOf(nextBeat) + 1
-        return Math.max(positionOfCardsBeat, furthestPosition)
-      }, 0)
-      const numberOfBeatsAtDestination = beatsInDestinationBook.length
 
-      if (numberOfBeatsAtDestination < requiredNumberOfBeats) {
-        let stateWithEnoughBeats = state
-        for (let i = 0; i < requiredNumberOfBeats - numberOfBeatsAtDestination; ++i) {
-          stateWithEnoughBeats = mainReducer(
-            stateWithEnoughBeats,
-            addBeat(action.destinationBookId, null)
-          )
-        }
-        const beatsInDestinationBook = sortedBeatsForAnotherBookSelector(
-          stateWithEnoughBeats,
-          action.destinationBookId
-        )
-        const beatIdsInDestinationBook = beatsInDestinationBook.map(({ id }) => id)
-        const cardToBeatIdMapping = sourceCards.reduce((acc, nextCard) => {
-          return {
-            ...acc,
-            [nextCard.id]: beatIdsInDestinationBook[cardToPositionMapping[nextCard.id]],
+      // Add the new line
+      const withNewLine = createLineBeatsAndCardsActions.reduce((accState, nextAction) => {
+        return mainReducer(accState, nextAction)
+      }, state)
+
+      // Remove the old line & cards
+      return mainReducer(withNewLine, deleteLine(action.id))
+    }
+
+    case RESTRUCTURE_TIMELINE: {
+      const { flatBeats, beatHierarchyLevels } = action
+      const bookId = currentTimelineSelector(state)
+      const timelineViewIsStacked = timelineViewIsStackedSelector(state)
+      const maxDepth = tree.maxDepth('id')(state.beats[bookId])
+
+      let newBeatId = nextBeatId(state.beats)
+      let newBeatTree = tree.newTree('id')
+      let lastHierarchyLevel = null
+      let lastBeatId = null
+      for (const [beat, level, index] of zip(
+        flatBeats,
+        beatHierarchyLevels,
+        range(flatBeats.length)
+      )) {
+        // Add the missing higher level beats
+        const startLevel =
+          lastHierarchyLevel === null
+            ? 0
+            : level - lastHierarchyLevel > 1
+            ? lastHierarchyLevel + 1
+            : level
+        for (let i = startLevel; i < level; ++i) {
+          const parentId = i === 0 ? null : lastBeatId
+          const node = {
+            autoOutlineSort: true,
+            bookId: bookId,
+            fromTemplateId: null,
+            id: newBeatId,
+            position: tree.nextPosition(newBeatTree, parentId),
+            time: 0,
+            title: 'auto',
+            expanded: true,
           }
-        }, {})
-        return mainReducer(stateWithEnoughBeats, {
-          ...action,
-          cardToBeatIdMapping,
+          newBeatTree = tree.addNode('id')(newBeatTree, parentId, node)
+          lastBeatId = newBeatId
+          newBeatId++
+        }
+        // Add the next beat
+        const parentId =
+          startLevel === 0 && startLevel === level
+            ? null
+            : level === lastHierarchyLevel
+            ? tree.nodeParent(newBeatTree, lastBeatId)
+            : level < lastHierarchyLevel && level === 1
+            ? tree.nodeParent(newBeatTree, tree.nodeParent(newBeatTree, lastBeatId))
+            : lastBeatId
+
+        const position = tree.nextPosition(newBeatTree, parentId)
+        newBeatTree = tree.addNode('id')(newBeatTree, parentId, {
+          ...beat,
+          position,
         })
+        lastBeatId = beat.id
+        lastHierarchyLevel = tree.depth(newBeatTree, lastBeatId)
+
+        if (timelineViewIsStacked) {
+          const nextBeat = flatBeats[index + 1]
+          const nextLevel = beatHierarchyLevels[index + 1]
+          const finalLevel = tree.depth(newBeatTree, lastBeatId)
+          if (finalLevel !== maxDepth && (!nextBeat || nextLevel <= finalLevel)) {
+            for (let i = finalLevel + 1; i <= maxDepth; ++i) {
+              const parentId = lastBeatId
+              const node = {
+                autoOutlineSort: true,
+                bookId: bookId,
+                fromTemplateId: null,
+                id: newBeatId,
+                position: tree.nextPosition(newBeatTree, parentId),
+                time: 0,
+                title: 'auto',
+                expanded: true,
+              }
+              newBeatTree = tree.addNode('id')(newBeatTree, parentId, node)
+              lastBeatId = newBeatId
+              newBeatId++
+            }
+            lastHierarchyLevel = finalLevel
+          }
+        }
       }
 
-      const beatIdsInDestinationBook = beatsInDestinationBook.map(({ id }) => id)
-      const cardToBeatIdMapping = sourceCards.reduce((acc, nextCard) => {
-        return {
-          ...acc,
-          [nextCard.id]: beatIdsInDestinationBook[cardToPositionMapping[nextCard.id]],
+      let finalState = state
+      if (timelineViewIsStacked) {
+        const allCards = allCardsSelector(state)
+        const allBeats = sortedBeatsByBookSelector(state)
+        const sceneBeatsThatMovedUp = allBeats
+          .filter((beat, index) => {
+            const isSceneBeat = tree.depth(state.beats[bookId], beat.id) === maxDepth
+            const endedHigherThanScene = beatHierarchyLevels[index] < maxDepth
+            return isSceneBeat && endedHigherThanScene
+          })
+          .map((beat) => {
+            return beat.id
+          })
+        const allCardsThatMovedUp = allCards.filter((card) => {
+          return sceneBeatsThatMovedUp.indexOf(card.beatId) !== -1
+        })
+        const allfinalBeats = beatsByPosition(() => true)(newBeatTree)
+        for (const nextCardThatMoved of allCardsThatMovedUp) {
+          const indexOfBeatThatMovedUp = allfinalBeats.findIndex((beat) => {
+            return beat.id === nextCardThatMoved.beatId
+          })
+          let beatsFirstSceneChild = indexOfBeatThatMovedUp
+          while (tree.depth(newBeatTree, allfinalBeats[beatsFirstSceneChild].id) !== maxDepth) {
+            ++beatsFirstSceneChild
+          }
+          finalState = mainReducer(
+            finalState,
+            reorderCardsWithinLine(
+              allfinalBeats[beatsFirstSceneChild].id,
+              nextCardThatMoved.lineId,
+              [nextCardThatMoved.id]
+            )
+          )
         }
-      }, {})
+      }
+
+      return mainReducer(finalState, { type: UNSAFE_SET_BEATS, bookId, beats: newBeatTree })
+    }
+
+    case SET_HIERARCHY_LEVELS: {
       return mainReducer(state, {
         ...action,
-        cardToBeatIdMapping,
+        existingHierarchyLevelCount: hierarchyLevelCount(state),
+      })
+    }
+
+    case ADD_CARD:
+    case REORDER_CARDS_WITHIN_LINE: {
+      const bookId = currentTimelineSelector(state)
+      const beats = state.beats[bookId]
+      const beatId = action.beatId || action.card.beatId
+      const depthOfBeat = tree.depth(beats, beatId)
+      const maxDepth = tree.maxDepth('id')(beats)
+      const newBeatId = nextBeatId(state.beats)
+      const [newState, finalBeatId, _nextBeatId] =
+        action.addMissingBeats && depthOfBeat !== maxDepth
+          ? range(maxDepth, depthOfBeat).reduce(
+              (acc, _iteration) => {
+                const [currentState, beatId, newBeatId] = acc
+                const newState = mainReducer(currentState, addBeat(bookId, beatId))
+                return [newState, newBeatId, newBeatId + 1]
+              },
+              [state, beatId, newBeatId]
+            )
+          : [state, beatId, newBeatId]
+      return mainReducer(newState, {
+        ...action,
+        ...(action.beatId ? { beatId: finalBeatId } : {}),
+        ...(action.card ? { card: { ...action.card, beatId: finalBeatId } } : {}),
       })
     }
 
