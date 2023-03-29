@@ -31,9 +31,6 @@ const {
 } = helpers
 
 const LineTitleCellConnector = (connector) => {
-  const {
-    platform: { isDevelopment },
-  } = connector
   const ColorPicker = UnconnectedColorPicker(connector)
   const Floater = UnconnectedPlottrFloater(connector)
 
