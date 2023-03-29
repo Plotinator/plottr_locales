@@ -37,6 +37,7 @@ const BlankCardConnector = (connector) => {
       }
 
       this.titleInputRef = null
+      this.ref = React.createRef()
     }
 
     componentDidUpdate(_, prevState) {
@@ -299,6 +300,8 @@ const BlankCardConnector = (connector) => {
     render() {
       window.SCROLLWITHKEYS = !this.state.creating
       const { orientation, verticalInsertion, isSmall, isMedium, isPinned, color } = this.props
+      const tableLength =
+        this.ref.current?.clientWidth || (!isMedium || orientation == 'vertical' ? 250 : 150)
 
       let body = null
       if (this.state.creating) {
@@ -315,13 +318,14 @@ const BlankCardConnector = (connector) => {
           {verticalInsertion ? (
             body
           ) : (
-            <Cell>
+            <Cell ref={this.ref}>
               {!isPinned ? (
                 <VisualLine
                   isPinned={isPinned}
                   color={color}
                   orientation={orientation}
                   isMedium={isMedium}
+                  tableLength={tableLength}
                 />
               ) : null}
               <div

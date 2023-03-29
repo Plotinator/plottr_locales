@@ -38,13 +38,7 @@ const getMargins = (orientation, isMedium) => {
 
 const nop = () => {}
 
-export default function VisualLine({
-  color,
-  orientation,
-  isMedium,
-  tableLength = !isMedium || orientation == 'vertical' ? 250 : 100,
-  isPinned,
-}) {
+export default function VisualLine({ color, orientation, isMedium, tableLength, isPinned }) {
   const [margins, setMargins] = useState(getMargins(orientation, isMedium))
   const [currentLength, setCurrentLength] = useState(0)
   const [maxLength, setMaxLength] = useState(0)
