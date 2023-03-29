@@ -1,5 +1,10 @@
 import { isEqual } from 'lodash'
-import { assertEqual, assertGreaterThan, describe } from '../../../test/simpleIntegrationTest'
+import {
+  assertEqual,
+  assertLessThan,
+  assertGreaterThan,
+  describe,
+} from '../../../test/simpleIntegrationTest'
 
 import Saver, { DUMMY_ROLLBAR, DUMMY_SHOW_ERROR_BOX, DUMMY_SHOW_MESSAGE_BOX } from '../saver'
 
@@ -68,6 +73,73 @@ function expectToMatchArrayLoosely(received, expected, allowedMissing = 1, allow
 describe('Saver', (describe, it) => {
   describe('save', (describe, it) => {
     describe('given a dummy getState function', (describe, it) => {
+      describe('and a 50ms interval', (describe, it) => {
+        describe('and a save job that takes 10s', (describe, it) => {
+          it('should drop the oldest half of save jobs when we hit 10', () => {
+            let stateCounter = 1
+            const getState = () => {
+              return {
+                stateCounter: stateCounter++,
+              }
+            }
+            const saveCalls = []
+            const saveFile = (...args) => {
+              return new Promise((resolve) => {
+                setTimeout(() => {
+                  saveCalls.push(args)
+                  resolve()
+                }, 10000)
+              })
+            }
+            const backupFile = () => {
+              return Promise.resolve()
+            }
+            const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 50)
+            const waitForEnoughReAttempts = () => {
+              return new Promise((resolve) => {
+                setTimeout(resolve, 50)
+              }).then(() => {
+                if (saver.saveRunner.queueFullCounter < 5) {
+                  return waitForEnoughReAttempts()
+                } else {
+                  return true
+                }
+              })
+            }
+            const verify = () => {
+              expectToMatchArrayLoosely(saveCalls, [], 0, 0)
+              assertGreaterThan(saver.saveRunner.pendingJobBuffer.length, 5)
+              assertLessThan(saver.saveRunner.pendingJobBuffer.length, 10)
+              return waitForEnoughReAttempts()
+                .then(() => {
+                  return new Promise((resolve) => {
+                    setTimeout(resolve, 200)
+                  })
+                })
+                .then(() => {
+                  expectToMatchArrayLoosely(saveCalls, [], 0, 0)
+                  assertLessThan(saver.saveRunner.pendingJobBuffer.length, 10)
+                  assertLessThan(saver.saveRunner.queueFullCounter, 5)
+                })
+                .then(() => {
+                  saver.cancelAllRemainingRequests()
+                })
+            }
+            const waitSomeMore = () => {
+              return new Promise((resolve) => {
+                setTimeout(resolve, 50)
+              }).then(() => {
+                if (saver.saveRunner.pendingJobBuffer.length < 7) {
+                  return waitSomeMore()
+                } else {
+                  return verify()
+                }
+              })
+            }
+            waitSomeMore()
+          })
+        })
+      })
       describe('and a 100ms interval', (describe, it) => {
         it('should attempt to save the same thing 10 times in one second', () => {
           let stateCounter = 1

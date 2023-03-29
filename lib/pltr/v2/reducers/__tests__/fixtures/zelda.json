@@ -465,16 +465,29 @@
     "series": {
       "children": {
         "1": [],
-        "null": [1]
+        "40": [],
+        "null": [1, 40]
       },
       "heap": {
-        "1": null
+        "1": null,
+        "40": null
       },
       "index": {
         "1": {
           "id": 1,
           "bookId": "series",
           "position": 0,
+          "title": "auto",
+          "time": 0,
+          "templates": [],
+          "autoOutlineSort": true,
+          "fromTemplateId": null,
+          "expanded": true
+        },
+        "40": {
+          "id": 40,
+          "bookId": "series",
+          "position": 1,
           "title": "auto",
           "time": 0,
           "templates": [],
@@ -1647,22 +1660,144 @@
     }
   ],
   "hierarchyLevels": {
-    "0": {
-      "name": "Chapter",
-      "level": 0,
-      "autoNumber": true,
-      "textSize": 24,
-      "borderStyle": "NONE",
-      "backgroundColor": "none",
-      "textColor": "#0b1117",
-      "borderColor": "#6cace4",
-      "dark": {
-        "borderColor": "#c9e6ff",
-        "textColor": "#c9e6ff"
-      },
-      "light": {
+    "series": {
+      "0": {
+        "name": "Chapter",
+        "level": 0,
+        "autoNumber": true,
+        "textSize": 24,
+        "borderStyle": "NONE",
+        "backgroundColor": "none",
+        "textColor": "#0b1117",
         "borderColor": "#6cace4",
-        "textColor": "#0b1117"
+        "dark": {
+          "borderColor": "#c9e6ff",
+          "textColor": "#c9e6ff"
+        },
+        "light": {
+          "borderColor": "#6cace4",
+          "textColor": "#0b1117"
+        }
+      }
+    },
+    "1": {
+      "0": {
+        "name": "Chapter",
+        "level": 0,
+        "autoNumber": true,
+        "textSize": 24,
+        "borderStyle": "NONE",
+        "backgroundColor": "none",
+        "textColor": "#0b1117",
+        "borderColor": "#6cace4",
+        "dark": {
+          "borderColor": "#c9e6ff",
+          "textColor": "#c9e6ff"
+        },
+        "light": {
+          "borderColor": "#6cace4",
+          "textColor": "#0b1117"
+        }
+      }
+    },
+    "5": {
+      "0": {
+        "name": "Chapter",
+        "level": 0,
+        "autoNumber": true,
+        "textSize": 24,
+        "borderStyle": "NONE",
+        "backgroundColor": "none",
+        "textColor": "#0b1117",
+        "borderColor": "#6cace4",
+        "dark": {
+          "borderColor": "#c9e6ff",
+          "textColor": "#c9e6ff"
+        },
+        "light": {
+          "borderColor": "#6cace4",
+          "textColor": "#0b1117"
+        }
+      }
+    },
+    "8": {
+      "0": {
+        "name": "Chapter",
+        "level": 0,
+        "autoNumber": true,
+        "textSize": 24,
+        "borderStyle": "NONE",
+        "backgroundColor": "none",
+        "textColor": "#0b1117",
+        "borderColor": "#6cace4",
+        "dark": {
+          "borderColor": "#c9e6ff",
+          "textColor": "#c9e6ff"
+        },
+        "light": {
+          "borderColor": "#6cace4",
+          "textColor": "#0b1117"
+        }
+      }
+    },
+    "6": {
+      "0": {
+        "name": "Chapter",
+        "level": 0,
+        "autoNumber": true,
+        "textSize": 24,
+        "borderStyle": "NONE",
+        "backgroundColor": "none",
+        "textColor": "#0b1117",
+        "borderColor": "#6cace4",
+        "dark": {
+          "borderColor": "#c9e6ff",
+          "textColor": "#c9e6ff"
+        },
+        "light": {
+          "borderColor": "#6cace4",
+          "textColor": "#0b1117"
+        }
+      }
+    },
+    "7": {
+      "0": {
+        "name": "Chapter",
+        "level": 0,
+        "autoNumber": true,
+        "textSize": 24,
+        "borderStyle": "NONE",
+        "backgroundColor": "none",
+        "textColor": "#0b1117",
+        "borderColor": "#6cace4",
+        "dark": {
+          "borderColor": "#c9e6ff",
+          "textColor": "#c9e6ff"
+        },
+        "light": {
+          "borderColor": "#6cace4",
+          "textColor": "#0b1117"
+        }
+      }
+    },
+    "9": {
+      "0": {
+        "name": "Chapter",
+        "level": 0,
+        "autoNumber": true,
+        "textSize": 24,
+        "borderStyle": "NONE",
+        "backgroundColor": "none",
+        "textColor": "#0b1117",
+        "borderColor": "#6cace4",
+        "dark": {
+          "borderColor": "#c9e6ff",
+          "textColor": "#c9e6ff"
+        },
+        "light": {
+          "borderColor": "#6cace4",
+          "textColor": "#0b1117"
+        }
       }
     }
   },

@@ -29,6 +29,7 @@ class PressureControlledTaskQueue {
   jobInterval = 10000
   onJobSuccess = () => {}
   onJobFailure = (_error) => {}
+  queueFullCounter = 0
 
   constructor(
     name,
@@ -75,8 +76,15 @@ class PressureControlledTaskQueue {
     this.logger.info(jobId, `Starting ${name} job`)
 
     if (this.pendingJobBuffer.length >= this.maxJobs) {
+      if (this.queueFullCounter >= 5) {
+        this.logger.warn('Queue was full too many times.  Removing half the jobs from the queue.')
+        this.pendingJobBuffer = this.pendingJobBuffer.slice(this.pendingJobBuffer.length / 2)
+        this.queueFullCounter = 0
+        return
+      }
       const error = new Error(`Too many concurrent ${name} jobs; dropping request to ${name}`)
       this.logger.error(jobId, `Too many concurrent ${name}s`, error)
+      ++this.queueFullCounter
       return
     }
 

@@ -1,6 +1,6 @@
 {
   "name": "plottr",
-  "version": "2023.3.3",
+  "version": "2023.3.29",
   "description": "A visual story-planning tool",
   "repository": "https://github.com/cameronsutter/plottr_electron.git",
   "homepage": "plottr.com",
@@ -15,7 +15,6 @@
   "scripts": {
     "spit-out-version": "node build/spit-out-version.js",
     "start": "cross-env NODE_ENV=dev electron --inspect=5858 --enable-test-utilities .",
-    "postinstall": "",
     "compile": "npm --prefix lib/plottr_components run compile && cross-env NODE_ENV=dev node_modules/.bin/webpack",
     "watch": "npm-run-all --parallel watch:*",
     "watch:plottr": "echo 'do you have fsevents?' && cross-env NODE_ENV=dev node_modules/.bin/webpack",
@@ -24,7 +23,8 @@
     "maps": "cross-env NODE_ENV=production MAPS=true node_modules/.bin/webpack",
     "pack": "npm --prefix lib/plottr_components ci && npm --prefix lib/plottr_components run compile && cross-env NODE_ENV=production node_modules/.bin/webpack",
     "pack:windows": "npm --prefix lib/plottr_components ci && npm --prefix lib/plottr_components run compile && cross-env NODE_ENV=production node_modules\\.bin\\webpack",
-    "dist": "npm run spit-out-version && node build/initEnv.js && npm run pack && electron-builder -ml --publish always",
+    "install-sharp": "cd node_modules/sharp && cross-env npm_config_arch=x64 npm_config_platform=darwin npm install && cross-env npm_config_arch=x64 npm_config_platform=linux npm install && cross-env npm_config_arch=arm64 npm_config_platform=darwin npm install && cross-env npm_config_arch=arm64 npm_config_platform=linux npm install",
+    "dist": "npm run install-sharp && npm run spit-out-version && node build/initEnv.js && npm run pack && electron-builder -ml --x64 --arm64 --publish always",
     "dist:linux": "npm run spit-out-version && node build/initEnv.js && npm run pack && electron-builder -l",
     "dist:windows": "npm run spit-out-version && node build/initEnv.js && npm run pack:windows && electron-builder -w --publish always",
     "dist:all": "npm run pack && electron-builder -mw",
@@ -33,7 +33,7 @@
     "test": "jest --runInBand \"(src.*)|(lib.*)|(main.*)\" && npm run integration-test",
     "integration-test": "babel-node main/server/__tests__/StatusManager.integration.js && babel-node src/app/__tests__/saver.integration.js && cross-env NODE_ENV=production node_modules/.bin/webpack --config=socket-server-only.config.js && cross-env NODE_ENV=test babel-node main/server/__tests__/server.integration.js",
     "test:watch": "jest \"(src.*)|(lib.*)|(main.*)\" --watch",
-    "test:debug": "node --inspect node_modules/.bin/jest --runInBand lib/pltr/v2/reducers/__tests__/ui.test.js",
+    "test:debug": "node --inspect node_modules/.bin/jest --runInBand lib/pltr/v2/helpers/__tests__/templates.test.js",
     "test:integration": "jest test/integration",
     "lint-file": "eslint",
     "lint": "eslint .",
@@ -91,7 +91,7 @@
     "babel-loader": "^8.2.3",
     "babel-plugin-lodash": "^3.3.4",
     "babel-plugin-macros": "^3.1.0",
-    "babel-plugin-module-resolver": "^4.0.0",
+    "babel-plugin-module-resolver": "^5.0.0",
     "buffer": "^6.0.3",
     "bufferutil": "^4.0.7",
     "changelog": "^1.4.2",
@@ -121,7 +121,8 @@
     "eslint-config-prettier": "^7.1.0",
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-react": "^7.22.0",
-    "file-loader": "^0.8.5",
+    "fast-check": "^3.7.0",
+    "file-loader": "^6.2.0",
     "flip": "^1.0.0",
     "format-message-cli": "^6.2.1",
     "hash-test-vectors": "^1.3.2",
@@ -151,10 +152,11 @@
     "pltr": "file:./lib/pltr",
     "prettier": "^2.2.1",
     "pretty-date": "^0.2.0",
+    "rc-tooltip": "^6.0.1",
     "react": "^16.8.6",
     "react-beautiful-dnd": "^13.0.0",
     "react-dom": "^16.8.6",
-    "react-icons": "^4.4.0",
+    "react-icons": "^4.7.1",
     "react-image-file-resizer": "^0.4.8",
     "react-is": "^16.13.1",
     "react-json-view": "^1.21.3",
@@ -198,10 +200,19 @@
   "build": {
     "electronVersion": "22.0.1",
     "appId": "com.plottr.app",
-    "artifactName": "${productName}-${os}-installer-latest.${ext}",
+    "artifactName": "${productName}-${os}-${arch}-installer-latest.${ext}",
     "npmRebuild": false,
     "publish": [
       "github"
+    ],
+    "extraResources": [
+      {
+        "from": "node_modules/sharp",
+        "to": "node_modules",
+        "filter": [
+          "**/*"
+        ]
+      }
     ],
     "files": [
       "**/*",
@@ -245,7 +256,12 @@
     "afterSign": "build/notarize.js",
     "mac": {
       "category": "public.app-category.productivity",
-      "target": "default",
+      "target": [
+        {
+          "target": "default",
+          "arch": ["x64", "arm64"]
+        }
+      ],
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
       "entitlements": "build/entitlements.mac.plist",
