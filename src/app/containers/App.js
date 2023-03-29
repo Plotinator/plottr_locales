@@ -17,6 +17,7 @@ import {
   ActsHelpModal,
   UpdateNotifier,
   NewProjectInputModal,
+  ImagePicker,
 } from 'connected-components'
 import { hasPreviousAction } from '../../common/utils/error_reporter'
 import { store } from '../store'
@@ -31,6 +32,7 @@ const {
   onReload,
   onWantsToClose,
   pleaseReloadMenu,
+  onOpenImagePickerFromMenu,
 } = makeMainProcessClient()
 
 const App = ({
@@ -49,6 +51,7 @@ const App = ({
   const [type, setType] = useState(null)
   const [showAskToSave, setShowAskToSave] = useState(false)
   const [showExportDialog, setShowExportDialog] = useState(false)
+  const [showImagePicker, setShowImagePicker] = useState(false)
   const [showActsGuideHelp, setShowActsGuideHelp] = useState(false)
 
   // FIXME: the close logic is broken and overly complicated.  I only
@@ -97,6 +100,9 @@ const App = ({
     const unsubscribeFromAdvancedExportFromMenu = onAdvancedExportFileFromMenu(() => {
       setShowExportDialog(true)
     })
+    const unsubscribeFromImagePickerMenu = onOpenImagePickerFromMenu(() => {
+      setShowImagePicker(true)
+    })
     const unsubscribeFromTurnOnActsHelp = onTurnOnActsHelp(() => {
       setShowActsGuideHelp(true)
     })
@@ -104,6 +110,7 @@ const App = ({
     return () => {
       document.removeEventListener('save-as-template-start', saveAsTemplateListener)
       unsubscribeFromAdvancedExportFromMenu()
+      unsubscribeFromImagePickerMenu()
       unsubscribeFromTurnOnActsHelp()
     }
   }, [])
@@ -216,6 +223,11 @@ const App = ({
     return <ExportDialog close={() => setShowExportDialog(false)} />
   }
 
+  const renderImagePickerModal = () => {
+    if (!showImagePicker) return null
+    return <ImagePicker fromMenu close={() => setShowImagePicker(false)} />
+  }
+
   const renderActStructureHelpModal = () => {
     if (!showActsGuideHelp) return null
     return <ActsHelpModal close={() => setShowActsGuideHelp(false)} />
@@ -247,6 +259,7 @@ const App = ({
         {renderAskToSave()}
         {renderAdvanceExportModal()}
         {renderActStructureHelpModal()}
+        {renderImagePickerModal()}
       </React.StrictMode>
     </ErrorBoundary>
   )

@@ -82,7 +82,6 @@ const {
   onUpdaterDownloadProgress,
   onUpdaterUpdateDownloaded,
   pleaseUpdateLanguage,
-  updateBeatHierarchy,
   pleaseReloadMenu,
   showItemInFolder,
   downloadFileAndShow,
@@ -362,9 +361,6 @@ const platform = {
   updateLanguage: (newLanguage) => {
     return pleaseUpdateLanguage(newLanguage)
   },
-  updateBeatHierarchyFlag: (newValue) => {
-    return updateBeatHierarchy(newValue)
-  },
   license: {
     checkForActiveLicense: licenseServerAPIs.checkForActiveLicense,
     verifyLicense: licenseServerAPIs.verifyLicense,
@@ -434,11 +430,14 @@ const platform = {
     const event = new Event('move-from-temp')
     document.dispatchEvent(event)
   },
-  duplicateFile: () => {
+  duplicateFile: (fileUrl) => {
     const state = store.getState().present
     const isLoggedIntoPro = selectors.hasProSelector(state)
 
-    const event = isLoggedIntoPro ? new Event('save-as--pro') : new Event('save-as')
+    const event = isLoggedIntoPro
+      ? new Event('save-as--pro', { fileUrl })
+      : new Event('save-as', { fileUrl })
+    event.fileUrl = fileUrl
     document.dispatchEvent(event)
   },
   showItemInFolder: (fileURL) => {
@@ -600,3 +599,4 @@ export const ExpiredView = components.ExpiredView
 export const ProOnboarding = components.ProOnboarding
 export const UpdateNotifier = components.UpdateNotifier
 export const NewProjectInputModal = components.NewProjectInputModal
+export const RestructureTimelineModal = components.RestructureTimelineModal
