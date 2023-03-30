@@ -55,7 +55,7 @@ export default class InputModal extends Component {
                 />
                 <div className="input-modal__controls">
                   <div className="input-modal__controls__control">
-                    <Button data-testid={testIds.ok} bsStyle="primary" onClick={this.handleOK}>
+                    <Button data-testid={testIds.ok} bsStyle="success" onClick={this.handleOK}>
                       {okText}
                     </Button>
                   </div>

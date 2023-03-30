@@ -39,7 +39,6 @@ const SettingsWizardConnector = (connector) => {
       <div className="settings-wizard__wrapper">
         <div className="settings-wizard__header">
           <AccountHeader />
-          <h1>{t('Onboarding')}</h1>
         </div>
         <div className="settings-wizard__body">
           <OnboardingFlow>
