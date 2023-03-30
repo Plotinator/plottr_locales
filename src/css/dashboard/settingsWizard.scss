@@ -11,7 +11,6 @@
     display: grid;
     grid-template-areas: 'progress' 'step';
     grid-template-rows: auto 1fr;
-    height: 61vh;
 
     .onboarding__progress {
       grid-area: progress;
@@ -19,12 +18,20 @@
 
     .onboarding__step {
       grid-area: step;
-      height: 90%;
+      max-height: 95%;
       width: 80vw;
       margin: 0 auto;
       margin-top: 16px;
       background-color: $gray-8;
       border-radius: 16px;
+
+      .step__header {
+        padding-bottom: 0;
+      }
+
+      .step__body {
+        padding-top: 0;
+      }
 
       .step__body .onboarding__settings .dashboard__options__item .form-group {
         margin-left: 0;
