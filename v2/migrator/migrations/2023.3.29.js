@@ -5,7 +5,7 @@ import { hierarchyLevel } from '../../store/initialState'
 function migrate(data) {
   if (
     (data.file && data.file.version === '2023.3.29') ||
-    typeof data.hierarchyLevels.series !== 'undefined'
+    typeof data.hierarchyLevels?.series !== 'undefined'
   ) {
     return data
   }
