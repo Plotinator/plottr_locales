@@ -301,7 +301,7 @@ const BlankCardConnector = (connector) => {
       window.SCROLLWITHKEYS = !this.state.creating
       const { orientation, verticalInsertion, isSmall, isMedium, isPinned, color } = this.props
       const tableLength =
-        this.ref.current?.clientWidth || (!isMedium || orientation == 'vertical' ? 250 : 150)
+        this.ref.current?.clientWidth + 50 || (!isMedium || orientation == 'vertical' ? 250 : 150)
 
       let body = null
       if (this.state.creating) {
