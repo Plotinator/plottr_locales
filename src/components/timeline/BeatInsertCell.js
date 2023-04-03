@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import PropTypes from 'react-proptypes'
 import { Cell } from 'react-sticky-table'
 import cx from 'classnames'
@@ -39,6 +39,7 @@ const BeatInsertCellConnector = (connector) => {
     } = props
 
     const [hovering, setHovering] = useState(false)
+    const ref = useRef(null)
 
     const insert = () => {
       if (readOnly) return
@@ -119,6 +120,7 @@ const BeatInsertCellConnector = (connector) => {
         level.name == hierarchyLevelName ? true : null
       )
       const isHigherLevel = hierarchyLevels.length - actualHierarchyLevel.level > 1
+      const tableLength = ref.current?.clientWidth + 50 || 50
 
       return (
         <div
@@ -126,7 +128,17 @@ const BeatInsertCellConnector = (connector) => {
           className={orientedClass()}
           onClick={insert}
           style={orientation == 'vertical' ? (isHigherLevel ? null : { marginTop: '10px' }) : null}
+          ref={ref}
         >
+          {!isPinned ? (
+            <VisualLine
+              isPinned={isPinned}
+              color={color}
+              orientation={orientation}
+              isMedium={isMedium}
+              tableLength={tableLength}
+            />
+          ) : null}
           <div className={wrapperClass()}>
             <Button bsSize="xs" block>
               <Glyphicon glyph="plus" />
