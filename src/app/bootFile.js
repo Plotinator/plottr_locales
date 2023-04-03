@@ -1,4 +1,11 @@
-import { helpers, SYSTEM_REDUCER_KEYS, actions, migrateIfNeeded, emptyFile } from 'pltr/v2'
+import {
+  helpers,
+  SYSTEM_REDUCER_KEYS,
+  actions,
+  migrateIfNeeded,
+  Migrator,
+  emptyFile,
+} from 'pltr/v2'
 import { t } from 'plottr_locales'
 import {
   currentUser,
@@ -104,42 +111,59 @@ export function removeSystemKeys(jsonData) {
 
 const migrate = (originalFile, fileId) => (overwrittenFile) => {
   const json = overwrittenFile || originalFile
+  const fileURL = helpers.file.fileIdToPlottrCloudFileURL(fileId)
   return getVersion().then((version) => {
     return new Promise((resolve, reject) => {
-      migrateIfNeeded(
-        version,
-        json,
-        helpers.file.fileIdToPlottrCloudFileURL(fileId),
-        null,
-        (error, migrated, data) => {
-          if (error) {
-            rollbar.error(error)
-            if (error === 'Plottr behind file') {
-              return reject(new Error('Need to update Plottr'))
-            }
-            return reject(error)
-          }
+      if (json.file.permission !== 'owner') {
+        const migrator = new Migrator(json, fileURL, json.file.version, version, () => {}, logger)
+        if (migrator.plottrBehindFile()) {
+          reject(new Error('Need to update Plottr'))
+        } else {
           machineId().then((clientId) => {
-            if (migrated) {
-              logger.info(
-                `File was migrated.  Migration history: ${data.file.appliedMigrations}.  Initial version: ${data.file.initialVersion}`
-              )
-              overwriteAllKeys(fileId, clientId, removeSystemKeys(data))
-                .then((results) => {
-                  loadFileIntoRedux(data, fileId)
-                  store.dispatch(actions.client.setClientId(clientId))
-                  return results
-                })
-                .then(resolve, reject)
-            } else {
-              loadFileIntoRedux(data, fileId)
-              store.dispatch(actions.client.setClientId(clientId))
-              resolve(data)
-            }
+            loadFileIntoRedux(json, fileId)
+            store.dispatch(actions.client.setClientId(clientId))
+            resolve(json)
           })
-        },
-        logger
-      )
+        }
+        return
+      } else {
+        migrateIfNeeded(
+          version,
+          json,
+          fileURL,
+          null,
+          (error, migrated, data) => {
+            if (error) {
+              rollbar.error(error)
+              if (error === 'Plottr behind file') {
+                reject(new Error('Need to update Plottr'))
+                return
+              }
+              reject(error)
+              return
+            }
+            machineId().then((clientId) => {
+              if (migrated) {
+                logger.info(
+                  `File was migrated.  Migration history: ${data.file.appliedMigrations}.  Initial version: ${data.file.initialVersion}`
+                )
+                overwriteAllKeys(fileId, clientId, removeSystemKeys(data))
+                  .then((results) => {
+                    loadFileIntoRedux(data, fileId)
+                    store.dispatch(actions.client.setClientId(clientId))
+                    return results
+                  })
+                  .then(resolve, reject)
+              } else {
+                loadFileIntoRedux(data, fileId)
+                store.dispatch(actions.client.setClientId(clientId))
+                resolve(data)
+              }
+            })
+          },
+          logger
+        )
+      }
     })
   })
 }
