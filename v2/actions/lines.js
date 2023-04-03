@@ -17,11 +17,9 @@ import {
 } from '../constants/ActionTypes'
 import { reorderList } from '../helpers/lists'
 import {
-  allLinesSelector,
   currentTimelineSelector,
   pinnedPlotlinesSelector,
   sortedLinesByBookSelector,
-  timelineSelector,
 } from '../selectors'
 
 // N.B. if one does not supply a book ID, then it is assumed that the
