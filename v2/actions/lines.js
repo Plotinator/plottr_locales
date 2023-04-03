@@ -122,26 +122,8 @@ export const togglePinPlotline = (line) => (dispatch, getState) => {
   return false
 }
 
-export const deleteLine = (id) => (dispatch, getState) => {
-  const fullState = getState()
-  const state = fullState.present ? fullState.present : fullState
-  const pinnedPlotlines = pinnedPlotlinesSelector(state)
-  const lines = sortedLinesByBookSelector(state)
-  const bookId = currentTimelineSelector(state)
-
-  const selectedLine = lines.find((l) => l.id === id)
-  if (selectedLine?.isPinned) {
-    const reorderedLines = reorderList(pinnedPlotlines - 1, selectedLine?.position, lines)
-    const totalPinnedPlotlines = Math.max(0, pinnedPlotlines - 1)
-    dispatch({
-      type: UNPIN_PLOTLINE,
-      lineId: selectedLine.id,
-      lines: reorderedLines,
-      bookId,
-      totalPinnedPlotlines,
-    })
-  }
-  return dispatch({ type: DELETE_LINE, id, bookId })
+export const deleteLine = (id, bookId, isPinned) => {
+  return { type: DELETE_LINE, id, bookId, isPinned }
 }
 
 export function expandLine(id) {
@@ -193,47 +175,16 @@ export function load(patching, lines) {
   return { type: LOAD_LINES, patching, lines }
 }
 
-const pinMovedLine = (id, destinationBookId, position) => (dispatch, getState) => {
-  const fullState = getState()
-  const state = fullState.present ? fullState.present : fullState
-  const lines = allLinesSelector(state)
-  const destinationBookLines = lines.filter((l) => l.bookId === destinationBookId)
-  const timeline = timelineSelector(state)
-  const destinationBookPinnedPlotlines = timeline.pinnedPlotlines[destinationBookId]
-  const reorderedLines = reorderList(
-    destinationBookPinnedPlotlines + 1,
-    position,
-    destinationBookLines
-  )
-  return dispatch({
+export const pinMovedLine = (id, destinationBookId, reorderedLines, totalPinnedPlotlines) => {
+  return {
     type: PIN_PLOTLINE,
     lineId: id,
     lines: reorderedLines,
     bookId: destinationBookId,
-    totalPinnedPlotlines: Math.max(1, destinationBookPinnedPlotlines + 1),
-  })
+    totalPinnedPlotlines,
+  }
 }
 
-export const moveLine = (id, destinationBookId) => (dispatch, getState) => {
-  const fullState = getState()
-  const state = fullState.present ? fullState.present : fullState
-  const lines = sortedLinesByBookSelector(state)
-  const bookId = currentTimelineSelector(state)
-  const selectedLine = lines.find((l) => l.id === id)
-  const timeline = timelineSelector(state)
-  const currentBookPinnedPlotlines = timeline.pinnedPlotlines[bookId]
-
-  if (selectedLine?.isPinned) {
-    const reorderedLines = reorderList(currentBookPinnedPlotlines - 1, selectedLine.position, lines)
-    dispatch({
-      type: UNPIN_PLOTLINE,
-      lineId: selectedLine.id,
-      lines: reorderedLines,
-      bookId,
-      totalPinnedPlotlines: Math.max(0, currentBookPinnedPlotlines - 1),
-    })
-    dispatch({ type: MOVE_LINE, id, destinationBookId, bookId })
-    return pinMovedLine(id, destinationBookId, selectedLine.position)(dispatch, getState)
-  }
-  return dispatch({ type: MOVE_LINE, id, destinationBookId, bookId })
+export const moveLine = (id, destinationBookId) => {
+  return { type: MOVE_LINE, id, destinationBookId }
 }
