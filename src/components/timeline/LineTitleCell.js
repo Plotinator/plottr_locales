@@ -31,8 +31,13 @@ const {
 } = helpers
 
 const LineTitleCellConnector = (connector) => {
+  const {
+    platform: { isDevelopment },
+  } = connector
   const ColorPicker = UnconnectedColorPicker(connector)
   const Floater = UnconnectedPlottrFloater(connector)
+
+  checkDependencies({ isDevelopment })
 
   const LineTitleCell = ({
     line,
@@ -316,13 +321,28 @@ const LineTitleCellConnector = (connector) => {
             <Button title={t('Change color')} block bsSize="small" onClick={openColorPicker}>
               <Glyphicon glyph="tint" />
             </Button>
-            <Button
-              title={line?.isPinned ? t('Unpin Plotline') : t('Pin this Plotline')}
-              block
-              bsSize="small"
-              onClick={handlePinPlotLine}
-            >
-              {line?.isPinned ? <TbPinnedOff /> : <BsPinFill />}
+            {isDevelopment ? (
+              <Button
+                title={line?.isPinned ? t('Unpin Plotline') : t('Pin this Plotline')}
+                block
+                bsSize="small"
+                onClick={handlePinPlotLine}
+              >
+                {line?.isPinned ? <TbPinnedOff /> : <BsPinFill />}
+              </Button>
+            ) : null}
+            {isSmall ? null : (
+              <Button
+                title={t('Duplicate plotline')}
+                block
+                bsSize="small"
+                onClick={duplicateThisPlotline}
+              >
+                <FiCopy />
+              </Button>
+            )}
+            <Button title={t('Delete plotline')} block bsSize="small" onClick={handleDelete}>
+              <Glyphicon glyph="trash" />
             </Button>
             {isSmall ? null : (
               <>
@@ -342,22 +362,11 @@ const LineTitleCellConnector = (connector) => {
                 >
                   {allIcon} {t('All')}
                 </Button>
-                <Button
-                  title={t('Duplicate plotline')}
-                  block
-                  bsSize="small"
-                  onClick={duplicateThisPlotline}
-                >
-                  <FiCopy />
-                </Button>
                 <Button title={t('Move plotline')} block bsSize="small" onClick={toggleMovingLine}>
                   <FaBook />
                 </Button>
               </>
             )}
-            <Button title={t('Delete plotline')} block bsSize="small" onClick={handleDelete}>
-              <Glyphicon glyph="trash" />
-            </Button>
           </div>
         )
       } else {
@@ -370,12 +379,26 @@ const LineTitleCellConnector = (connector) => {
               <Button title={t('Change color')} bsSize="small" onClick={openColorPicker}>
                 <Glyphicon glyph="tint" />
               </Button>
-              <Button
-                title={line?.isPinned ? t('Unpin Plotline') : t('Pin this Plotline')}
-                bsSize="small"
-                onClick={handlePinPlotLine}
-              >
-                {line?.isPinned ? <TbPinnedOff /> : <BsPinFill />}
+              {isDevelopment ? (
+                <Button
+                  title={line?.isPinned ? t('Unpin Plotline') : t('Pin this Plotline')}
+                  bsSize="small"
+                  onClick={handlePinPlotLine}
+                >
+                  {line?.isPinned ? <TbPinnedOff /> : <BsPinFill />}
+                </Button>
+              ) : null}
+              {isSmall ? null : (
+                <Button
+                  title={t('Duplicate plotline')}
+                  bsSize="small"
+                  onClick={duplicateThisPlotline}
+                >
+                  <FiCopy />
+                </Button>
+              )}
+              <Button title={t('Delete plotline')} bsSize="small" onClick={handleDelete}>
+                <Glyphicon glyph="trash" />
               </Button>
               {isSmall ? null : (
                 <>
@@ -393,21 +416,11 @@ const LineTitleCellConnector = (connector) => {
                   >
                     {allIcon} {t('All')}
                   </Button>
-                  <Button
-                    title={t('Duplicate plotline')}
-                    bsSize="small"
-                    onClick={duplicateThisPlotline}
-                  >
-                    <FiCopy />
-                  </Button>
                   <Button title={t('Move plotline')} bsSize="small" onClick={toggleMovingLine}>
                     <FaBook />
                   </Button>
                 </>
               )}
-              <Button title={t('Delete plotline')} bsSize="small" onClick={handleDelete}>
-                <Glyphicon glyph="trash" />
-              </Button>
             </ButtonGroup>
           </div>
         )

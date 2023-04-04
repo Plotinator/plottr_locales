@@ -32,6 +32,7 @@ import ActsConfigModal from './dialogs/ActsConfigModal'
 import AskToSaveModal from './dialogs/AskToSaveModal'
 import ActsHelpModal from './dialogs/ActsHelpModal'
 import NewProjectInputModal from './dialogs/NewProjectInputModal'
+import RestructureTimelineModal from './dialogs/RestructureTimelineModal'
 
 // Containers
 import ErrorBoundary from './containers/ErrorBoundary'
@@ -215,5 +216,6 @@ export {
   UpdateNotifier,
   NewProjectInputModal,
   SettingsWizard,
+  RestructureTimelineModal,
   connections,
 }
