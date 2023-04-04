@@ -54,6 +54,7 @@ import * as templatesHelpers from './helpers/templates'
 import * as template from './template'
 
 import migrateIfNeeded from './migrator/migration_manager'
+import Migrator from './migrator/migrator.js'
 
 import * as selectors from './selectors'
 
@@ -97,7 +98,7 @@ import testingAndDiagnosisReducer from './reducers/testingAndDiagnosis'
 
 import * as initialState from './store/initialState'
 import * as lineColors from './store/lineColors'
-import { emptyFile } from './store/newFileState'
+import { emptyFile, addMissingKeys } from './store/newFileState'
 import * as newIds from './store/newIds'
 import * as borderStyle from './store/borderStyle'
 
@@ -216,6 +217,7 @@ export {
   colors,
   featureFlags,
   migrateIfNeeded,
+  Migrator,
   rootReducer,
   mainReducer,
   SYSTEM_REDUCER_KEYS,
@@ -226,6 +228,7 @@ export {
   initialState,
   lineColors,
   emptyFile,
+  addMissingKeys,
   newIds,
   template,
   tree,

@@ -1,3 +1,5 @@
+import { difference } from 'lodash'
+
 import { t as i18n } from 'plottr_locales'
 import {
   series,
@@ -65,7 +67,7 @@ export const newFileCategories = Object.assign({}, categories, {
 })
 
 // Book 1 has one level by default
-export const newFileHierarchies = { 1: { 0: hierarchyLevel } }
+export const newFileHierarchies = { 1: { 0: hierarchyLevel }, series: { 0: hierarchyLevel } }
 
 export function emptyFile(name, version) {
   const books = {
@@ -97,4 +99,21 @@ export function emptyFile(name, version) {
     featureFlags,
     attributes,
   }
+}
+
+export const addMissingKeys = (file) => {
+  const newFile = emptyFile('Dummy', '2023.3.29')
+  const keys = difference(Object.keys(newFile), Object.keys(file))
+  const askingForKeyWeCannotProvide = keys.some((key) => {
+    return ['featureFlags', 'attributes'].indexOf(key) === -1
+  })
+  if (askingForKeyWeCannotProvide) {
+    return file
+  }
+  return keys.reduce((acc, nextKey) => {
+    return {
+      ...acc,
+      [nextKey]: newFile[nextKey],
+    }
+  }, file)
 }
