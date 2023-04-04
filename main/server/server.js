@@ -102,10 +102,11 @@ const parseArgs = () => {
   return {
     port: process.argv[2],
     userDataPath: process.argv[3],
+    isBetaOrAlpha: process.argv[4] === 'isBetaOrAlpha',
   }
 }
 
-const { rm } = fs.promises
+const { rm, mkdir, lstat } = fs.promises
 
 const startupTasks = (userDataPath, stores, logInfo) => {
   return wireupTemplateFetcher(userDataPath)(stores, logInfo).then((templateFetcher) => {
@@ -119,7 +120,7 @@ const startupTasks = (userDataPath, stores, logInfo) => {
 
 const ONE_GIGABYTE = 1073741824
 
-const setupListeners = (port, userDataPath) => {
+const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
   process.send(`Starting server on port: ${port}`)
   const webSocketServer = new WebSocketServer({ host: 'localhost', port, maxPayload: ONE_GIGABYTE })
   const unsubscribeFunctions = new Map()
@@ -133,13 +134,26 @@ const setupListeners = (port, userDataPath) => {
     error: logInfo,
   }
 
-  const stores = makeStores(userDataPath, basicLogger)
+  const stores = makeStores(userDataPath, basicLogger, isBetaOrAlpha)
   const settings = makeSettingsModule(stores)
 
   const makeFileModule = wireupFileModule(userDataPath)
   const makeBackupModule = wireupBackupModule(userDataPath)
   const makeFileSystemModule = wireupFileSystemModule(userDataPath)
   const makeTemplateFetcher = wireupTemplateFetcher(userDataPath)
+
+  const ensureUserDataFolderExists = () => {
+    return lstat(userDataPath).catch((error) => {
+      if (error.code === 'ENOENT') {
+        return mkdir(userDataPath, { recursive: true }).then(() => {
+          return new Promise((resolve) => {
+            setTimeout(resolve, 1000)
+          })
+        })
+      }
+      return Promise.resolve()
+    })
+  }
 
   const testModules = () => {
     const backupModule = makeBackupModule(settings, basicLogger)
@@ -1034,17 +1048,19 @@ const setupListeners = (port, userDataPath) => {
     })
   })
 
-  testModules().then(() => {
-    startupTasks(userDataPath, stores, logInfo).then(() => {
-      process.send('ready')
+  ensureUserDataFolderExists()
+    .then(testModules)
+    .then(() => {
+      startupTasks(userDataPath, stores, logInfo).then(() => {
+        process.send('ready')
+      })
     })
-  })
 }
 
 const startServer = () => {
-  const { port, userDataPath } = parseArgs()
+  const { port, userDataPath, isBetaOrAlpha } = parseArgs()
   process.send(`args: ${process.argv}`)
-  setupListeners(port, userDataPath)
+  setupListeners(port, userDataPath, isBetaOrAlpha)
 }
 
 startServer()

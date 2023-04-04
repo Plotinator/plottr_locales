@@ -75,8 +75,8 @@ const makeMPQ = (sender) => {
   }
 }
 
-function saveDialog(windowId, filters, title, defaultPath) {
-  return dialog.showSaveDialog(windowId, {
+function saveDialog(window, filters, title, defaultPath) {
+  return dialog.showSaveDialog(window, {
     filters,
     title,
     defaultPath,
@@ -85,8 +85,8 @@ function saveDialog(windowId, filters, title, defaultPath) {
 }
 
 const makeSaveDialog = (sender) => {
-  return (filters, title, defaultPath) => {
-    return saveDialog(sender.getOwnerBrowserWindow().id, filters, title, defaultPath).then(
+  return (defaultPath) => {
+    return saveDialog(sender.getOwnerBrowserWindow(), null, 'Export as', defaultPath).then(
       (result) => {
         return result.filePath
       }
@@ -635,7 +635,7 @@ export const listenOnIPCMain = (
 
   ipcMain.on('open-path', (event, replyChannel, path) => {
     shell
-      .open(path)
+      .openPath(path)
       .then(() => {
         event.sender.send(replyChannel, path)
       })

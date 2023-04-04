@@ -74,7 +74,19 @@ function buildFileMenu(fileURL, getTrialInfo) {
             if (isPro) {
               focusedWindow.webContents.send('save-as--pro', fileURL)
             } else {
-              focusedWindow.webContents.send('save-as')
+              focusedWindow.webContents.send('save-as', fileURL)
+            }
+          },
+        },
+        {
+          label: t('Duplicate File'),
+          accelerator: 'CmdOrCtrl+Shift+S',
+          visible: !!fileURL,
+          click: function (event, focusedWindow) {
+            if (isPro) {
+              focusedWindow.webContents.send('save-as--pro', fileURL)
+            } else {
+              focusedWindow.webContents.send('save-as', fileURL)
             }
           },
         },
@@ -104,6 +116,13 @@ function buildFileMenu(fileURL, getTrialInfo) {
         },
         {
           type: 'separator',
+        },
+        {
+          label: t('Open Image Gallery'),
+          visible: !!fileURL,
+          click: (event, focusedWindow) => {
+            focusedWindow.webContents.send('image-picker-file-from-menu')
+          },
         },
         {
           label: t('Export'),
