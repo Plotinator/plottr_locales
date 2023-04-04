@@ -93,6 +93,7 @@ import {
   UpdateNotifier as UnconnectedUpdateNotifier,
   NewProjectInputModal as UnconnectedNewProjectInputModal,
   SettingsWizard as UnconnectedSettingsWizard,
+  RestructureTimelineModal as UnconnectedRestructureTimelineModal,
 } from '../components'
 
 const connector = {
@@ -336,5 +337,6 @@ export default (platform) => {
     UpdateNotifier: UnconnectedUpdateNotifier(connectorObject),
     NewProjectInputModal: UnconnectedNewProjectInputModal(connectorObject),
     SettingsWizard: UnconnectedSettingsWizard(connectorObject),
+    RestructureTimelineModal: UnconnectedRestructureTimelineModal(connectorObject),
   }
 }

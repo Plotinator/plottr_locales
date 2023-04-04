@@ -237,10 +237,8 @@ const TemplatePickerConnector = (connector) => {
                 // Let the ErrorBoundary handle the error
                 throw new Error(error)
               }
-              const useableTemplate = Object.assign({}, selectedTemplate, {
-                templateData: template,
-              })
-              onChooseTemplate(useableTemplate)
+              const fullTemplate = { ...selectedTemplate, templateData: template }
+              onChooseTemplate(fullTemplate)
             },
             log
           )
