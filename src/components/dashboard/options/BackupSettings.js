@@ -57,6 +57,11 @@ const BackupSettingsConnector = (connector) => {
       return (!osIsUnknown && !hasCurrentProLicense) || (!osIsUnknown && settings.user.localBackups)
     }
 
+    const displayPath = (pathStr) => {
+      pathStr = pathStr[0] == '/' ? `${pathStr.substring(1)}` : pathStr
+      return pathStr.replace(/\\/g, ' » ').replace(/\//g, ' » ')
+    }
+
     const backupFolderPath = () => {
       return !settings.user.backupLocation || settings.user.backupLocation === 'default'
         ? defaultBackupPath
@@ -97,7 +102,7 @@ const BackupSettingsConnector = (connector) => {
                 <Button onClick={onChangeBackupLocation}>{t('Choose...')}</Button>
                 {'  '}
                 <Button bsStyle="link" onClick={() => showItemInFolder(backupFolderPath())}>
-                  {backupFolderPath()}
+                  {displayPath(backupFolderPath())}
                 </Button>
               </p>
               <Alert bsStyle="danger" style={{ maxWidth: 'max-content' }}>
