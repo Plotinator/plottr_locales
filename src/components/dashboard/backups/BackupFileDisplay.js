@@ -1,10 +1,9 @@
 import React, { useState } from 'react'
 import PropTypes from 'react-proptypes'
-import prettydate from 'pretty-date'
 import cx from 'classnames'
 
 import { t } from 'plottr_locales'
-import { helpers } from 'pltr/v2'
+import { helpers, migrateIfNeeded, addMissingKeys } from 'pltr/v2'
 
 import { checkDependencies } from '../../checkDependencies'
 import Button from '../../Button'
@@ -17,8 +16,9 @@ const BackupFileDisplayConnector = (connector) => {
       file: { joinPath, saveFile, doesFileExist, readFile },
       log,
       userDocumentsPath,
-      pleaseOpenWindow,
+      addToKnownFilesAndOpen,
       showSaveDialog,
+      appVersion,
     },
   } = connector
   checkDependencies({
@@ -30,8 +30,9 @@ const BackupFileDisplayConnector = (connector) => {
     readFile,
     log,
     userDocumentsPath,
-    pleaseOpenWindow,
+    addToKnownFilesAndOpen,
     showSaveDialog,
+    appVersion,
   })
 
   const BackupFileDisplay = ({ folder, groupName, file, folderDate, settings }) => {
@@ -84,6 +85,21 @@ const BackupFileDisplayConnector = (connector) => {
       })
     }
 
+    const migrateSaveAndOpen = (json, oldUrl, newFileURL) => {
+      return appVersion().then((version) => {
+        migrateIfNeeded(version, json, oldUrl, null, (err, _didMigrate, migratedState) => {
+          if (err) {
+            log.error(err)
+          } else {
+            console.log('addMissingKeys(migratedState)', addMissingKeys(migratedState))
+            saveFile(newFileURL, addMissingKeys(migratedState)).then(() => {
+              addToKnownFilesAndOpen(newFileURL, true)
+            })
+          }
+        })
+      })
+    }
+
     const saveAndOpenCopy = (oldPath, oldFileName, newFileName) => {
       joinPath(oldPath, oldFileName).then((oldFullPath) => {
         readFile(oldFullPath).then((fileText) => {
@@ -91,25 +107,22 @@ const BackupFileDisplayConnector = (connector) => {
           if (settings.user.defaultFolder && settings.user.defaultFolderLocation) {
             joinPath(settings.user.defaultFolderLocation, newFileName).then((newFullPath) => {
               findPathThatDoesntExist(newFullPath).then((uniquePath) => {
-                // save file
                 const newFileURL = helpers.file.filePathToFileURL(uniquePath)
-                saveFile(newFileURL, fileJSON).then(() => {
-                  pleaseOpenWindow(newFileURL)
-                })
+                migrateSaveAndOpen(fileJSON, oldFullPath, newFileURL)
               })
             })
           } else {
             userDocumentsPath().then((docPath) => {
-              const title = t('Where would you like to save this copy?')
-              const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
-              showSaveDialog(filters, title, docPath).then((fileName) => {
-                if (fileName) {
-                  const newFilePath = ensureEndsInPltr(fileName)
-                  const newFileURL = helpers.file.filePathToFileURL(newFilePath)
-                  saveFile(newFileURL, fileJSON).then(() => {
-                    pleaseOpenWindow(newFileURL)
-                  })
-                }
+              joinPath(docPath, newFileName).then((newFullPath) => {
+                const title = t('Where would you like to save this copy?')
+                const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
+                showSaveDialog(filters, title, newFullPath).then((fileName) => {
+                  if (fileName) {
+                    const newFilePath = ensureEndsInPltr(fileName)
+                    const newFileURL = helpers.file.filePathToFileURL(newFilePath)
+                    migrateSaveAndOpen(fileJSON, oldFullPath, newFileURL)
+                  }
+                })
               })
             })
           }
@@ -147,6 +160,13 @@ const BackupFileDisplayConnector = (connector) => {
       }
     }
 
+    const byteSize = (n) => {
+      const k = n > 0 ? Math.floor(Math.log2(n) / 10) : 0
+      const rank = (k > 0 ? 'KMGT'[k - 1] : '') + 'b'
+      const count = (n / Math.pow(1000, k)).toFixed(1)
+      return `${count.toLocaleString()} ${rank}`
+    }
+
     const isCloudBackup = file.storagePath
     return (
       <div
@@ -174,7 +194,7 @@ const BackupFileDisplayConnector = (connector) => {
             <small>
               {t('Last Edited: {date, time, short}', { date: new Date(file.lastEdited ?? 0) })}
             </small>
-            <small>{t('{size} Bytes', { size: Number(file.size ?? 0).toLocaleString() })}</small>
+            <small>{byteSize(file.size ?? 0)}</small>
           </div>
         </div>
       </div>
