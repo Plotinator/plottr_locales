@@ -1,4 +1,4 @@
-import { omit, isEmpty } from 'lodash'
+import { omit, isEmpty, identity } from 'lodash'
 
 import {
   ADD_PLACES_ATTRIBUTE,
@@ -73,7 +73,7 @@ import {
 } from '../constants/ActionTypes'
 import { ui as defaultUI } from '../store/initialState'
 import { newFileUI } from '../store/newFileState'
-import { characterAttributesForCurrentBookSelector } from '../selectors'
+import selectors from '../selectors'
 
 const removeCustomAttributeFilter = (state, action) => {
   if (!state.characterFilter || !state.characterFilter[(action.id || action.name).toString()]) {
@@ -89,6 +89,8 @@ const removeCustomAttributeFilter = (state, action) => {
 }
 
 const addCustomAttributeOrdering = (state, fullState) => {
+  const { characterAttributesForCurrentBookSelector } = selectors(identity)
+
   const toAttributeOrderEntry = (attribute) => {
     if (attribute.id) {
       return {

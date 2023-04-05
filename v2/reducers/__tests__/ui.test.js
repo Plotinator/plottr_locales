@@ -1,4 +1,4 @@
-import { omit } from 'lodash'
+import { identity, omit } from 'lodash'
 
 import { configureStore } from './fixtures/testStore'
 import {
@@ -15,7 +15,13 @@ import { addCard, addCharacter as addCharacterToCard, moveCardToBook } from '../
 import { addCharacter, editCharacterAttributeValue } from '../../actions/characters'
 import { setAppSettings } from '../../actions/settings'
 import { setPermission } from '../../actions/permission'
-import {
+import selectors from '../../selectors'
+import { changeCurrentTimeline, setCardDialogOpen } from '../../actions/ui'
+import { addBook } from '../../actions/books'
+import { setUserId } from '../../actions/client'
+import { addLineWithTitle, reorderLines, togglePinPlotline } from '../../actions/lines'
+
+const {
   permissionSelector,
   currentTimelineSelector,
   isCardDialogVisibleSelector,
@@ -23,11 +29,7 @@ import {
   stickyLeftColumnCountSelector,
   sortedLinesByBookSelector,
   pinnedPlotlinesSelector,
-} from '../../selectors'
-import { changeCurrentTimeline, setCardDialogOpen } from '../../actions/ui'
-import { addBook } from '../../actions/books'
-import { setUserId } from '../../actions/client'
-import { addLineWithTitle, reorderLines, togglePinPlotline } from '../../actions/lines'
+} = selectors(identity)
 
 const EMPTY_FILE = emptyFile('Test file')
 const initialStore = () => {

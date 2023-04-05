@@ -28,15 +28,16 @@ const books =
   (state = initialState, action) => {
     switch (action.type) {
       case EDIT_BOOK:
+        // this allows us to edit new book with
+        // any predefined param values only within
+        // the scope of the new book schema
+        const editedBook = Object.assign(defaultBook, state[action.id])
+        Object.keys(defaultBook).forEach((key) => {
+          if (action[key] !== undefined) editedBook[key] = action[key]
+        })
         return {
           ...state,
-          [action.id]: {
-            ...state[action.id],
-            title: action.title,
-            premise: action.premise,
-            genre: action.genre,
-            theme: action.theme,
-          },
+          [action.id]: editedBook
         }
 
       case EDIT_BOOK_IMAGE:

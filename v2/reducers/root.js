@@ -1,3 +1,5 @@
+import { identity } from 'lodash'
+
 import unrepairedMainReducer from './main'
 import {
   ADD_BOOK,
@@ -33,7 +35,21 @@ import {
   ADD_CARD,
   REORDER_CARDS_WITHIN_LINE,
 } from '../constants/ActionTypes'
-import {
+import selectors from '../selectors'
+import { reduce, beatsByPosition, nextId as nextBeatId } from '../helpers/beats'
+import { nextId, objectId } from '../store/newIds'
+import * as tree from './tree'
+import { beat as defaultBeat } from '../store/initialState'
+import { cloneDeep, zip, range } from 'lodash'
+import { addBeat } from '../actions/beats'
+import { setTimelineView } from '../actions/ui'
+import { deleteLine } from '../actions/lines'
+import { reorderCardsWithinLine } from '../actions/cards'
+import { applyTemplate, moveLineActions } from '../helpers/templates'
+import { reorderList } from '../helpers/lines'
+import { pinMovedLine } from '../actions/lines'
+
+const {
   selectedCharacterAttributeTabSelector,
   isSeriesSelector,
   timelineViewIsTabbedSelector,
@@ -51,18 +67,7 @@ import {
   timelineViewIsStackedSelector,
   allCardsSelector,
   sortedBeatsByBookSelector,
-} from '../selectors'
-import { reduce, beatsByPosition, nextId as nextBeatId } from '../helpers/beats'
-import { nextId, objectId } from '../store/newIds'
-import * as tree from './tree'
-import { beat as defaultBeat } from '../store/initialState'
-import { cloneDeep, zip, range } from 'lodash'
-import { setTimelineView } from '../actions/ui'
-import { deleteLine, pinMovedLine } from '../actions/lines'
-import { addBeat } from '../actions/beats'
-import { reorderCardsWithinLine } from '../actions/cards'
-import { applyTemplate, moveLineActions } from '../helpers/templates'
-import { reorderList } from '../helpers/lists'
+} = selectors(identity)
 
 const addCharacterAttributeDataForModifyingBaseAttribute = (baseAttributeName, state, action) => {
   const currentBookId = selectedCharacterAttributeTabSelector(state)

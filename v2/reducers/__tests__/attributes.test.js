@@ -1,3 +1,5 @@
+import { identity } from 'lodash'
+
 import { configureStore } from './fixtures/testStore'
 import { goldilocks } from './fixtures'
 import { emptyFile } from '../../store/newFileState'
@@ -15,7 +17,9 @@ import {
   editCharacterAttributeValue,
   addBook as addBookToCharacter,
 } from '../../actions/characters'
-import { characterAttributesSelector, singleCharacterSelector } from '../../selectors'
+import selectors from '../../selectors'
+
+const { characterAttributesSelector, singleCharacterSelector } = selectors(identity)
 
 const EMPTY_FILE = emptyFile('Test file')
 const initialStore = () => {
@@ -57,9 +61,9 @@ describe('editCharacterAttributeMetadata', () => {
             'device://tmp/dummy-goldilocks.pltr'
           )
         )
-        const initialState = removeSystemKeys(store.getState().present)
+        const initialState = removeSystemKeys(store.getState())
         store.dispatch(editCharacterAttributeMetadata(null, 'new-name', 'paragraph', 'blarg'))
-        const resultState = removeSystemKeys(store.getState().present)
+        const resultState = removeSystemKeys(store.getState())
         expect(ignoringChangesWeDontCareAbout(initialState)).toEqual(
           ignoringChangesWeDontCareAbout(resultState)
         )

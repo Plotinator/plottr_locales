@@ -57,7 +57,7 @@ import migrateIfNeeded from './migrator/migration_manager'
 import Migrator from './migrator/migrator.js'
 import addHierarchiesIfMissing from './migrator/handleSpecialCases'
 
-import * as selectors from './selectors'
+import selectors from './selectors'
 
 import rootReducer from './reducers/root'
 import mainReducer from './reducers/main'
@@ -148,39 +148,69 @@ const reducers = {
   testingAndDiagnosis: testingAndDiagnosisReducer,
 }
 
-const actions = {
-  beat: beatActions,
-  book: bookActions,
-  card: cardActions,
-  category: categoryActions,
-  character: characterActions,
-  customAttribute: customAttributeActions,
-  image: imageActions,
-  line: lineActions,
-  note: noteActions,
-  place: placeActions,
-  series: seriesActions,
-  tag: tagActions,
-  ui: uiActions,
-  undo: undoActions,
-  hierarchyLevels: hierarchyActions,
-  featureFlags: featureFlagActions,
-  error: errorActions,
-  permission: permissionActions,
-  project: projectActions,
-  client: clientActions,
-  editors: editorActions,
-  license: licenseActions,
-  knownFiles: knownFilesActions,
-  templates: templatesActions,
-  settings: settingsActions,
-  backups: backupsActions,
-  applicationState: applicationStateActions,
-  imageCache: imageCacheActions,
-  notifications: notificationActions,
-  domEvents: domEventActions,
-  testingAndDiagnosis: testingAndDiagnosisActions,
-  attributes: attributeActions,
+const actions = (selectState) => {
+  const wiredActions = (actions) => {
+    return Object.entries(actions).reduce((actionGroupAcc, nextEntry) => {
+      const [actionName, actionFunction] = nextEntry
+      return {
+        ...actionGroupAcc,
+        [actionName]: (...actionArgs) => {
+          const applied = actionFunction(...actionArgs)
+          if (typeof applied === 'function') {
+            return (dispatch, getState) => {
+              const augmentedGetState = () => {
+                return selectState(getState())
+              }
+              return applied(dispatch, augmentedGetState)
+            }
+          } else {
+            return applied
+          }
+        }
+      }
+    }, {})
+  }
+
+  return Object.entries({
+    beat: beatActions,
+    book: bookActions,
+    card: cardActions,
+    category: categoryActions,
+    character: characterActions,
+    customAttribute: customAttributeActions,
+    image: imageActions,
+    line: lineActions,
+    note: noteActions,
+    place: placeActions,
+    series: seriesActions,
+    tag: tagActions,
+    ui: uiActions,
+    undo: undoActions,
+    hierarchyLevels: hierarchyActions,
+    featureFlags: featureFlagActions,
+    error: errorActions,
+    permission: permissionActions,
+    project: projectActions,
+    client: clientActions,
+    editors: editorActions,
+    license: licenseActions,
+    knownFiles: knownFilesActions,
+    templates: templatesActions,
+    settings: settingsActions,
+    backups: backupsActions,
+    applicationState: applicationStateActions,
+    imageCache: imageCacheActions,
+    notifications: notificationActions,
+    domEvents: domEventActions,
+    testingAndDiagnosis: testingAndDiagnosisActions,
+    attributes: attributeActions,
+  }).reduce((actionsAcc, nextEntry) => {
+    const [name, actionBundle] = nextEntry
+    return {
+      ...actionsAcc,
+      [name]: wiredActions(actionBundle)
+    }
+  }, {})
 }
 
 const helpers = {
