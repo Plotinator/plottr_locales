@@ -93,6 +93,7 @@ const {
   userDesktopPath,
   userDocumentsPath,
   pleaseOpenWindow,
+  addToKnownFilesAndOpen,
 } = makeMainProcessClient()
 
 export const rmRF = (path, ...args) => {
@@ -418,6 +419,7 @@ const platform = {
   showErrorBox,
   userDocumentsPath,
   pleaseOpenWindow,
+  addToKnownFilesAndOpen,
   node: {
     env: isDevelopment() ? 'development' : 'production',
   },
