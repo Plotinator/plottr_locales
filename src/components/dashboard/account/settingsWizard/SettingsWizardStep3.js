@@ -8,11 +8,25 @@ import OnboardingButtonBar from '../../../onboarding/OnboardingButtonBar'
 import OnboardingStep from '../../../onboarding/OnboardingStep'
 import Button from '../../../Button'
 import UnconnectedBackupSettings from '../../options/BackupSettings'
+import { checkDependencies } from '../../../checkDependencies'
 
 const SettingsWizardStep3Connector = (connector) => {
+  const {
+    platform: {
+      settings: { saveAppSetting },
+    },
+  } = connector
+  checkDependencies({
+    saveAppSetting,
+  })
+
   const BackupSettings = UnconnectedBackupSettings(connector)
 
-  const SettingsWizardStep3 = ({ nextStep, goBack }) => {
+  const SettingsWizardStep3 = ({ goBack }) => {
+    const handleFinish = () => {
+      saveAppSetting('finishedSettingsWizard', true)
+    }
+
     return (
       <OnboardingStep>
         <StepHeader>
@@ -31,8 +45,8 @@ const SettingsWizardStep3Connector = (connector) => {
             <Button bsSize="large" onClick={goBack}>
               {t('Back')}
             </Button>
-            <Button bsSize="large" bsStyle="success" onClick={nextStep}>
-              {t('Next')}
+            <Button bsSize="large" bsStyle="success" onClick={handleFinish}>
+              {t('Done')}
             </Button>
           </OnboardingButtonBar>
         </StepFooter>
@@ -41,27 +55,21 @@ const SettingsWizardStep3Connector = (connector) => {
   }
 
   SettingsWizardStep3.propTypes = {
-    nextStep: PropTypes.func.isRequired,
     goBack: PropTypes.func.isRequired,
   }
 
   const {
-    pltr: { selectors, actions },
+    pltr: { actions },
     redux,
   } = connector
 
   if (redux) {
     const { connect } = redux
 
-    return connect(
-      (state) => ({
-        settings: selectors.appSettingsSelector(state.present),
-      }),
-      {
-        nextStep: actions.applicationState.advanceSettingsWizard,
-        goBack: actions.applicationState.regressSettingsWizard,
-      }
-    )(SettingsWizardStep3)
+    return connect((_state) => ({}), {
+      nextStep: actions.applicationState.advanceSettingsWizard,
+      goBack: actions.applicationState.regressSettingsWizard,
+    })(SettingsWizardStep3)
   }
 
   throw new Error('Could not connect SettingsWizardStep3')
