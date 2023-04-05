@@ -1,3 +1,5 @@
+import { identity } from 'lodash'
+
 import {
   ADD_CHARACTER,
   ADD_CHARACTER_WITH_TEMPLATE,
@@ -22,13 +24,7 @@ import {
   DELETE_CHARACTER_LEGACY_CUSTOM_ATTRIBUTE,
 } from '../constants/ActionTypes'
 import { editorMetadataIfPresent } from '../helpers/editors'
-import {
-  characterAttributesForBookSelector,
-  characterAttributesForCurrentBookSelector,
-  selectedCharacterAttributeTabSelector,
-  allBookIdsSelector,
-  legacyCustomCharacterAttributeByName,
-} from '../selectors'
+import selectors from '../selectors'
 import { character } from '../store/initialState'
 import { escapeBraces } from './customAttributes'
 import { nextId } from '../store/newIds'
@@ -70,9 +66,8 @@ export function editCharacterImage(id, imageId) {
 
 export const editCharacterTemplateAttribute =
   (id, templateId, name, value, editorPath, selection) => (dispatch, getState) => {
-    // NOTE: Mobile doesn't use history middleware
-    const fullState = getState()
-    const state = fullState.present ? fullState.present : fullState
+    const { selectedCharacterAttributeTabSelector } = selectors(identity)
+    const state = getState()
     const bookId = selectedCharacterAttributeTabSelector(state)
 
     dispatch({
@@ -99,9 +94,8 @@ export function addTag(id, tagId) {
 }
 
 export const addBook = (id, bookId) => (dispatch, getState) => {
-  // NOTE: Mobile doesn't use history middleware
-  const fullState = getState()
-  const state = fullState.present ? fullState.present : fullState
+  const { allBookIdsSelector } = selectors(identity)
+  const state = getState()
   const bookIds = allBookIdsSelector(state)
 
   if (bookId === 'series' || bookIds.indexOf(bookId) > -1) {
@@ -143,9 +137,17 @@ export function createCharacterAttribute(type, name, fromLegacyAttribute) {
 
 export const editCharacterAttributeValue =
   (characterId, attributeId, value) => (dispatch, getState) => {
-    // NOTE: Mobile doesn't use history middleware
-    const fullState = getState()
-    const state = fullState.present ? fullState.present : fullState
+    if (!attributeId) {
+      return
+    }
+
+    const {
+      characterAttributesForCurrentBookSelector,
+      selectedCharacterAttributeTabSelector,
+      legacyCustomCharacterAttributeByName,
+      characterAttributesForBookSelector,
+    } = selectors(identity)
+    const state = getState()
     const characterAttributesForBook = characterAttributesForCurrentBookSelector(state)
     const selectedBook = selectedCharacterAttributeTabSelector(state)
     const newAttribute = characterAttributesForBook.find((attribute) => {
