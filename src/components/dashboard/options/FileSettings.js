@@ -42,6 +42,11 @@ const FileSettingsConnector = (connector) => {
       }
     }, [settings, defaultPath])
 
+    const displayPath = (pathStr) => {
+      pathStr = pathStr[0] == '/' ? `${pathStr.substring(1)}` : pathStr
+      return pathStr.replace(/\\/g, ' » ').replace(/\//g, ' » ')
+    }
+
     const onChangeDefaultFolderLocation = () => {
       const title = t('Choose your default folder location')
       const properties = ['openDirectory', 'createDirectory']
@@ -73,8 +78,8 @@ const FileSettingsConnector = (connector) => {
             }}
             labelText={
               settings.user.defaultFolder
-                ? t('All your project files will be saved to the folder you choose below')
-                : t('Do not save new project files to a default folder')
+                ? t('Your project files will be saved to the folder chosen below')
+                : t('Your project files will be saved to a folder chosen manually')
             }
           />
         </div>
@@ -88,7 +93,7 @@ const FileSettingsConnector = (connector) => {
               <Button onClick={onChangeDefaultFolderLocation}>{t('Choose...')}</Button>
               {'  '}
               <Button bsStyle="link" onClick={() => showItemInFolder(folderPath())}>
-                {folderPath()}
+                {displayPath(folderPath())}
               </Button>
             </p>
           </div>

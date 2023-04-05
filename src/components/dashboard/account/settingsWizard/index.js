@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'react-proptypes'
-import { t } from 'plottr_locales'
 import OnboardingFlow from '../../../onboarding/OnboardingFlow'
 import OnboardingProgress from '../../../onboarding/OnboardingProgress'
 import AccountHeader from '../AccountHeader'
@@ -8,16 +7,14 @@ import UnconnectedErrorBoundary from '../../../containers/ErrorBoundary'
 import UnconnectedSettingsWizardStep1 from './SettingsWizardStep1'
 import UnconnectedSettingsWizardStep2 from './SettingsWizardStep2'
 import UnconnectedSettingsWizardStep3 from './SettingsWizardStep3'
-import UnconnectedSettingsWizardStep4 from './SettingsWizardStep4'
 
-const steps = 4
+const steps = 3
 
 const SettingsWizardConnector = (connector) => {
   const ErrorBoundary = UnconnectedErrorBoundary(connector)
   const SettingsWizardStep1 = UnconnectedSettingsWizardStep1(connector)
   const SettingsWizardStep2 = UnconnectedSettingsWizardStep2(connector)
   const SettingsWizardStep3 = UnconnectedSettingsWizardStep3(connector)
-  const SettingsWizardStep4 = UnconnectedSettingsWizardStep4(connector)
 
   const SettingsWizard = ({ step }) => {
     const CurrentStep = () => {
@@ -28,8 +25,6 @@ const SettingsWizardConnector = (connector) => {
           return <SettingsWizardStep2 />
         case 3:
           return <SettingsWizardStep3 />
-        case 4:
-          return <SettingsWizardStep4 />
         default:
           return <SettingsWizardStep1 />
       }
