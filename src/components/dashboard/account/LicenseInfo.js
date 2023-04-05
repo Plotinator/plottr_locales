@@ -90,7 +90,7 @@ const LicenseInfoConnector = (connector) => {
   }
 
   LicenseInfo.propTypes = {
-    expires: PropTypes.number,
+    expires: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     itemName: PropTypes.string,
     customerEmail: PropTypes.string,
     licenseKey: PropTypes.string,
