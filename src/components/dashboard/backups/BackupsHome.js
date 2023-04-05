@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { PropTypes } from 'prop-types'
 
 import { t } from 'plottr_locales'
@@ -10,6 +10,7 @@ import Col from '../../Col'
 import Row from '../../Row'
 import UnconnectedDashboardErrorBoundary from '../../containers/DashboardErrorBoundary'
 import UnconnectedBackupsTable from './BackupsTable'
+import { Spinner } from '../../Spinner'
 
 const BackupsHomeConnector = (connector) => {
   const BackupsTable = UnconnectedBackupsTable(connector)
@@ -17,14 +18,27 @@ const BackupsHomeConnector = (connector) => {
 
   const BackupsHome = () => {
     const [searchTerm, setSearchTerm] = useState('')
+    const [showWarning, setShowWarning] = useState(true)
+    const [showTable, setShowTable] = useState(false)
+
+    useEffect(() => {
+      setTimeout(() => setShowTable(true), 300)
+    }, [])
 
     return (
       <div className="dashboard__backups">
         <div className="dashboard__backups__header-div">
           <h1>{t('Backups')}</h1>
-          <Alert bsStyle="danger" style={{ maxWidth: 'max-content' }}>
-            {t('Backups are read-only and can only be copied, not edited')}
-          </Alert>
+          {showWarning ? (
+            <Alert
+              bsStyle="danger"
+              style={{ maxWidth: 'max-content' }}
+              onDismiss={() => setShowWarning(false)}
+              closeLabel="X"
+            >
+              {t('Backups are read-only and can only be copied, not edited')}
+            </Alert>
+          ) : null}
         </div>
         <Grid fluid>
           <Row>
@@ -40,7 +54,7 @@ const BackupsHomeConnector = (connector) => {
           </Row>
         </Grid>
         <DashboardErrorBoundary>
-          <BackupsTable searchTerm={searchTerm} />
+          {showTable ? <BackupsTable searchTerm={searchTerm} /> : <Spinner />}
         </DashboardErrorBoundary>
       </div>
     )
