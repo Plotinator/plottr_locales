@@ -79,7 +79,7 @@ function buildFileMenu(fileURL, getTrialInfo) {
           },
         },
         {
-          label: t('Duplicate File'),
+          label: t('Duplicate File') + '...',
           accelerator: 'CmdOrCtrl+Shift+S',
           visible: !!fileURL,
           click: function (event, focusedWindow) {
