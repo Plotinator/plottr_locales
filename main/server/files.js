@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
+import { lock } from 'proper-lockfile'
 
 import { checkFileIntegrity, SYSTEM_REDUCER_KEYS, helpers } from 'pltr/v2'
 
@@ -24,6 +25,7 @@ function removeSystemKeys(jsonData) {
 const fileModule = (userDataPath) => {
   const OFFLINE_FILE_FILES_PATH = path.join(userDataPath, 'offline')
   const TEMP_FILES_PATH = path.join(userDataPath, 'tmp')
+  const LOCK_FILES_PATH = path.join(userDataPath, 'locks')
 
   function offlineFileURL(fileURL) {
     if (!helpers.file.urlPointsToPlottrCloud(fileURL)) {
@@ -57,11 +59,43 @@ const fileModule = (userDataPath) => {
   return (backupModule, settingsModule, logger) => {
     const { backupBasePath } = backupModule
 
+    const withLockedFile = (filePath, f) => {
+      return ensureLockFilePathExists().then(() => {
+        return lock(filePath, {
+          lockfilePath: `${LOCK_FILES_PATH}/${basename(filePath)}.lock`,
+        })
+          .catch((error) => {
+            logger.error('Failed to lock the file for', filePath, error.message, error.stack)
+            return Promise.reject(new Error('Failed to lock'))
+          })
+          .then((release) => {
+            const result = f()
+            if (typeof result.then === 'function') {
+              return result
+                .then(() => {
+                  return release()
+                })
+                .catch((error) => {
+                  logger.error('Failed to lock the file for', filePath, error.message, error.stack)
+                  return Promise.reject(new Error('Failed to release lock'))
+                })
+            } else {
+              return release().catch((error) => {
+                logger.error('Failed to lock the file for', filePath, error.message, error.stack)
+                return Promise.reject(new Error('Failed to release lock'))
+              })
+            }
+          })
+      })
+    }
+
     const writeAndWaitForFlush = (filePath, data) => {
-      return open(filePath, 'w+').then((fileHandle) => {
-        return writeFile(fileHandle, data).then(() => {
-          return fileHandle.sync().then(() => {
-            return fileHandle.close()
+      return withLockedFile(filePath, () => {
+        return open(filePath, 'w+').then((fileHandle) => {
+          return writeFile(fileHandle, data).then(() => {
+            return fileHandle.sync().then(() => {
+              return fileHandle.close()
+            })
           })
         })
       })
@@ -167,6 +201,22 @@ const fileModule = (userDataPath) => {
             return unlink(filePath)
           })
         )
+      })
+    }
+
+    function ensureLockFilePathExists() {
+      return lstat(LOCK_FILES_PATH).catch((error) => {
+        if (error.code === 'ENOENT') {
+          return mkdir(LOCK_FILES_PATH, { recursive: true }).then(() => {
+            // Wait a little for the OS when we first make the lock
+            // file folder.
+            return new Promise((resolve) => {
+              setTimeout(resolve, 1000)
+            })
+          })
+        } else {
+          return Promise.reject(error)
+        }
       })
     }
 
