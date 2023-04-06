@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { PropTypes } from 'prop-types'
 import { connect } from 'react-redux'
 
-import { selectors, actions } from 'pltr/v2'
+import { selectors, actions } from 'wired-up-pltr'
 import { t } from 'plottr_locales'
 import { InputModal } from 'connected-components'
 import { editFileName as editFileNameOnFirebase } from 'wired-up-firebase'
@@ -88,10 +88,10 @@ Renamer.propTypes = {
 
 export default connect(
   (state) => ({
-    userId: selectors.userIdSelector(state.present),
-    isCloudFile: selectors.isCloudFileSelector(state.present),
-    fileList: selectors.knownFilesSelector(state.present),
-    isOffline: selectors.isOfflineSelector(state.present),
+    userId: selectors.userIdSelector(state),
+    isCloudFile: selectors.isCloudFileSelector(state),
+    fileList: selectors.knownFilesSelector(state),
+    isOffline: selectors.isOfflineSelector(state),
   }),
   {
     showLoader: actions.project.showLoader,

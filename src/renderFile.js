@@ -2,8 +2,7 @@ import React from 'react'
 import { render } from 'react-dom'
 import { Provider } from 'react-redux'
 
-import { selectors } from 'pltr/v2'
-
+import { selectors } from 'wired-up-pltr'
 import { saveBackup as saveBackupOnFirebase } from 'wired-up-firebase'
 
 import Main from 'containers/Main'
@@ -45,7 +44,7 @@ export const renderFile = (root, whenClientIsReady) => {
   }
 
   const saveBackup = (filePath, file) => {
-    const state = store.getState().present
+    const state = store.getState()
     const onCloud = selectors.isCloudFileSelector(state)
     const userId = selectors.userIdSelector(state)
     const localBackupsEnabled = selectors.localBackupsEnabledSelector(state)

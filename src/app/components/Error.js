@@ -3,7 +3,7 @@ import { PropTypes } from 'prop-types'
 import { connect } from 'react-redux'
 
 import { t } from 'plottr_locales'
-import { selectors, actions } from 'pltr/v2'
+import { selectors, actions } from 'wired-up-pltr'
 
 const Error = ({ errorMessage, clearError, showErrorBox }) => {
   useEffect(() => {
@@ -24,7 +24,7 @@ Error.propTypes = {
 
 export default connect(
   (state) => ({
-    errorMessage: selectors.errorMessageSelector(state.present),
+    errorMessage: selectors.errorMessageSelector(state),
   }),
   {
     clearError: actions.error.clearError,

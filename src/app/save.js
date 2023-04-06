@@ -1,15 +1,17 @@
 import { difference } from 'lodash'
 
 import exportToSelfContainedPlottrFile from 'plottr_import_export/src/exporter/plottr'
-import { helpers, selectors, SYSTEM_REDUCER_KEYS, emptyFile } from 'pltr/v2'
+import { helpers, SYSTEM_REDUCER_KEYS, emptyFile } from 'pltr/v2'
+import { selectors } from 'wired-up-pltr'
 
 const emptyFileState = emptyFile('DummyFile', '2022.11.2')
 
 export const saveFile = (whenClientIsReady, logger, postSaveHook) => (state) => {
   return whenClientIsReady(({ saveFile, saveOfflineFile }) => {
     const hasAllKeys = selectors.hasAllKeysSelector(state)
+    const fileJSON = selectors.fullFileStateSelector(state)
     if (!hasAllKeys) {
-      const withoutSystemKeys = difference(Object.keys(state), SYSTEM_REDUCER_KEYS)
+      const withoutSystemKeys = difference(Object.keys(fileJSON), SYSTEM_REDUCER_KEYS)
       const missing = difference(Object.keys(emptyFileState), withoutSystemKeys)
       const message = `File is missing keys (${missing}).  Refusing to save.`
       logger.error('Missing keys', new Error(message))
@@ -23,7 +25,7 @@ export const saveFile = (whenClientIsReady, logger, postSaveHook) => (state) => 
 
     const shouldSaveOfflineFile = selectors.shouldSaveOfflineFileSelector(state)
     if (shouldSaveOfflineFile) {
-      return saveOfflineFile(state)
+      return saveOfflineFile(fileJSON)
     }
 
     const isCloudFile = selectors.isCloudFileSelector(state)
@@ -33,7 +35,7 @@ export const saveFile = (whenClientIsReady, logger, postSaveHook) => (state) => 
     }
 
     const fileURL = selectors.fileURLSelector(state)
-    return saveFile(fileURL, state)
+    return saveFile(fileURL, fileJSON)
   }).then(() => {
     if (postSaveHook) {
       postSaveHook()
@@ -48,6 +50,7 @@ export const backupFile =
     const isCloudFile = selectors.isCloudFileSelector(state)
     const backupEnabled = selectors.backupEnabledSelector(state)
     const userId = selectors.userIdSelector(state)
+    const fileJSON = selectors.fullFileStateSelector(state)
 
     if (!backupEnabled) return Promise.resolve()
 
@@ -59,7 +62,7 @@ export const backupFile =
         return whenClientIsReady(({ saveBackup, offlineFileBasePath }) => {
           const hasAllKeys = selectors.hasAllKeysSelector(state)
           if (!hasAllKeys) {
-            const withoutSystemKeys = difference(Object.keys(state), SYSTEM_REDUCER_KEYS)
+            const withoutSystemKeys = difference(Object.keys(fileJSON), SYSTEM_REDUCER_KEYS)
             const missing = difference(Object.keys(emptyFileState), withoutSystemKeys)
             const message = `File is missing keys (${missing}).  Refusing to save.`
             logger.error('Missing keys', new Error(message))
@@ -82,8 +85,8 @@ export const backupFile =
             }
 
             const stateToSave = isCloudFile
-              ? exportToSelfContainedPlottrFile(state, userId, downloadStorageImage)
-              : Promise.resolve(state)
+              ? exportToSelfContainedPlottrFile(fileJSON, userId, downloadStorageImage)
+              : Promise.resolve(fileJSON)
 
             return stateToSave.then((selfContainedFile) => {
               const filePath = isCloudFile

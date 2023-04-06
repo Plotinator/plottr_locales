@@ -91,6 +91,7 @@ const mainConfig = {
     modules: ['node_modules', 'main'],
     alias: {
       plottr_locales: path.resolve('./node_modules/plottr_locales'),
+      'wired-up-pltr': path.resolve(__dirname, 'src', 'wired-up-pltr.js'),
     },
   },
   target: 'electron-main',
@@ -201,6 +202,7 @@ const rendererConfig = {
       test: path.resolve(__dirname, 'test'),
       'connected-components': path.resolve(__dirname, 'src', 'connected-components.js'),
       'wired-up-firebase': path.resolve(__dirname, 'src', 'wired-up-firebase.js'),
+      'wired-up-pltr': path.resolve(__dirname, 'src', 'wired-up-pltr.js'),
       'world-api': path.resolve(__dirname, 'src', 'world.js'),
       plottr_components: path.resolve(__dirname, 'lib', 'plottr_components', 'dist', 'components'),
       // Avoid duplicate react in libs problem (see
@@ -301,6 +303,7 @@ const loginPopupConfig = {
       test: path.resolve(__dirname, 'test'),
       'connected-components': path.resolve(__dirname, 'src', 'connected-components.js'),
       'wired-up-firebase': path.resolve(__dirname, 'src', 'wired-up-firebase.js'),
+      'wired-up-pltr': path.resolve(__dirname, 'src', 'wired-up-pltr.js'),
       'world-api': path.resolve(__dirname, 'src', 'world.js'),
       plottr_components: path.resolve(__dirname, 'lib', 'plottr_components', 'dist', 'components'),
       // Avoid duplicate react in libs problem (see

@@ -2,7 +2,8 @@ import { useEffect } from 'react'
 import { PropTypes } from 'prop-types'
 import { connect } from 'react-redux'
 
-import { helpers, actions, selectors } from 'pltr/v2'
+import { helpers } from 'pltr/v2'
+import { actions, selectors } from 'wired-up-pltr'
 import { listen, fetchFiles, getIdTokenResult, logOut, updateAuthFileName } from 'wired-up-firebase'
 import { t } from 'plottr_locales'
 
@@ -57,7 +58,7 @@ const Listener = ({
       fileSystemAPIs.backupBasePath().then((backupPath) => {
         if (helpers.file.withoutProtocol(fileURL).startsWith(backupPath)) {
           withFullFileState((state) => {
-            saveAsTempFile(state.present).then((newFileURL) => {
+            saveAsTempFile(state).then((newFileURL) => {
               pleaseOpenWindow(newFileURL).then(() => {
                 window.close()
               })
@@ -214,24 +215,24 @@ Listener.propTypes = {
 
 export default connect(
   (state) => ({
-    hasPro: selectors.hasProSelector(state.present),
-    emailAddress: selectors.emailAddressSelector(state.present),
-    selectedFile: selectors.selectedFileSelector(state.present),
-    userId: selectors.userIdSelector(state.present),
-    clientId: selectors.clientIdSelector(state.present),
-    fileLoaded: selectors.fileLoadedSelector(state.present),
-    isOffline: selectors.isOfflineSelector(state.present),
-    fileURL: selectors.fileURLSelector(state.present),
-    fileName: selectors.fileNameSelector(state.present),
-    originalFileName: selectors.originalFileNameSelector(state.present),
-    cloudFileURL: selectors.cloudFilePathSelector(state.present),
-    resuming: selectors.isResumingSelector(state.present),
-    isCloudFile: selectors.isCloudFileSelector(state.present),
-    isLoggedIn: selectors.isLoggedInSelector(state.present),
-    checkedSession: selectors.sessionCheckedSelector(state.present),
-    offlineModeIsEnabled: selectors.offlineModeEnabledSelector(state.present),
-    checkingProSubscription: selectors.checkingProSubscriptionSelector(state.present),
-    knownFiles: selectors.knownFilesSelector(state.present),
+    hasPro: selectors.hasProSelector(state),
+    emailAddress: selectors.emailAddressSelector(state),
+    selectedFile: selectors.selectedFileSelector(state),
+    userId: selectors.userIdSelector(state),
+    clientId: selectors.clientIdSelector(state),
+    fileLoaded: selectors.fileLoadedSelector(state),
+    isOffline: selectors.isOfflineSelector(state),
+    fileURL: selectors.fileURLSelector(state),
+    fileName: selectors.fileNameSelector(state),
+    originalFileName: selectors.originalFileNameSelector(state),
+    cloudFileURL: selectors.cloudFilePathSelector(state),
+    resuming: selectors.isResumingSelector(state),
+    isCloudFile: selectors.isCloudFileSelector(state),
+    isLoggedIn: selectors.isLoggedInSelector(state),
+    checkedSession: selectors.sessionCheckedSelector(state),
+    offlineModeIsEnabled: selectors.offlineModeEnabledSelector(state),
+    checkingProSubscription: selectors.checkingProSubscriptionSelector(state),
+    knownFiles: selectors.knownFilesSelector(state),
   }),
   {
     setPermission: actions.permission.setPermission,

@@ -22,6 +22,4 @@ Expired.propTypes = {
   darkMode: PropTypes.bool,
 }
 
-export default connect((state) => ({ darkMode: selectors.isDarkModeSelector(state.present) }))(
-  Expired
-)
+export default connect((state) => ({ darkMode: selectors.isDarkModeSelector(state) }))(Expired)

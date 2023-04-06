@@ -1,6 +1,7 @@
 import { omit } from 'lodash'
 
-import { emptyFile, actions } from 'pltr/v2'
+import { emptyFile } from 'pltr/v2'
+import { actions } from 'wired-up-pltr'
 
 import { configureStore } from './fixtures/testStore'
 import { saveFile, backupFile } from '../save'

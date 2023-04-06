@@ -3,7 +3,7 @@ import { PropTypes } from 'prop-types'
 import { connect } from 'react-redux'
 import cx from 'classnames'
 
-import { selectors } from 'pltr/v2'
+import { selectors } from 'wired-up-pltr'
 import { DashboardBody, DashboardNav, FullPageSpinner as Spinner } from 'connected-components'
 
 import OfflineBanner from '../components/OfflineBanner'
@@ -48,7 +48,7 @@ Dashboard.propTypes = {
 
 export default React.memo(
   connect((state) => ({
-    darkMode: selectors.isDarkModeSelector(state.present),
-    busy: selectors.manipulatingAFileSelector(state.present),
+    darkMode: selectors.isDarkModeSelector(state),
+    busy: selectors.manipulatingAFileSelector(state),
   }))(Dashboard)
 )

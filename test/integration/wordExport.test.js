@@ -6,7 +6,8 @@ import undoable from 'redux-undo'
 
 import default_config from 'plottr_import_export/src/exporter/default_config'
 import { wordExporter } from 'plottr_import_export'
-import { helpers, actions, rootReducer } from 'pltr/v2'
+import { helpers, rootReducer } from 'pltr/v2'
+import { actions } from 'wired-up-pltr'
 
 import { readExample3, copyCurrent, exportedPath, prevExportedPath, EXAMPLE_3 } from './common'
 

@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import { selectors } from 'pltr/v2'
+import { selectors } from 'wired-up-pltr'
 
 const Busy = ({ applicationIsBusyAndCannotBeQuit }) => {
   // We've decided to disable this component until further notice.
@@ -14,8 +14,6 @@ Busy.propTypes = {
 
 export default connect((state) => {
   return {
-    applicationIsBusyAndCannotBeQuit: selectors.busyWithWorkThatPreventsQuittingSelector(
-      state.present
-    ),
+    applicationIsBusyAndCannotBeQuit: selectors.busyWithWorkThatPreventsQuittingSelector(state),
   }
 })(Busy)

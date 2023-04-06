@@ -1,6 +1,6 @@
 import { groupBy, flatten } from 'lodash'
 
-import { selectors } from 'pltr/v2'
+import { selectors } from 'wired-up-pltr'
 import { plottrWorldAPI } from 'plottr_world'
 
 import { makeFileSystemAPIs, firebaseAPIs } from './api'
@@ -8,10 +8,10 @@ import logger from '../shared/logger'
 
 // From: https://github.com/reduxjs/redux/issues/303#issuecomment-125184409
 function observeStore(store, select, onChange) {
-  let currentState = select(store.getState().present)
+  let currentState = select(store.getState())
 
   function handleChange() {
-    let nextState = select(store.getState().present)
+    let nextState = select(store.getState())
     if (nextState !== currentState) {
       currentState = nextState
       onChange(currentState)
@@ -24,7 +24,7 @@ function observeStore(store, select, onChange) {
 }
 
 const afterSettingsLoad = (store, fn) => {
-  const appSettingsLoaded = selectors.applicationSettingsAreLoadedSelector(store.getState().present)
+  const appSettingsLoaded = selectors.applicationSettingsAreLoadedSelector(store.getState())
   if (!appSettingsLoaded) {
     const unsubscribe = observeStore(
       store,
@@ -50,9 +50,7 @@ const combineCloudAndFileSystemSources =
     const unsubscribeFromFileSystemSourceResult = fileSystemSource((fileSystemResult) => {
       _currentFileSystemResult = fileSystemResult
       afterSettingsLoad(store, () => {
-        const previouslyLoggedIntoPro = selectors.previouslyLoggedIntoProSelector(
-          store.getState().present
-        )
+        const previouslyLoggedIntoPro = selectors.previouslyLoggedIntoProSelector(store.getState())
         if (_currentCloudResult) {
           cb(mergeSources(_currentFileSystemResult, _currentCloudResult))
         } else if (forceIncludeLocal || !previouslyLoggedIntoPro) {
@@ -64,9 +62,7 @@ const combineCloudAndFileSystemSources =
     const unsubscribeFromCloudSource = cloudSource((cloudResult) => {
       _currentCloudResult = cloudResult
       afterSettingsLoad(store, () => {
-        const previouslyLoggedIntoPro = selectors.previouslyLoggedIntoProSelector(
-          store.getState().present
-        )
+        const previouslyLoggedIntoPro = selectors.previouslyLoggedIntoProSelector(store.getState())
         if (_currentFileSystemResult) {
           cb(mergeSources(_currentFileSystemResult, _currentCloudResult))
         } else if (previouslyLoggedIntoPro) {
