@@ -110,8 +110,10 @@ const NoteDetailsConnector = (connector) => {
     return connect(
       (state, ownProps) => {
         return {
-          note: selectors.singleNoteSelector(state.present, ownProps.noteId),
+          note: selectors.singleNoteSelector(state, ownProps.noteId),
+          // TODO ADAPT PLTR: use a selector!!!
           categories: state.present.categories.notes,
+          // TODO ADAPT PLTR: use a selector!!!
           customAttributes: state.present.customAttributes.notes,
         }
       },

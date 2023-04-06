@@ -355,20 +355,23 @@ const NoteListViewConnector = (connector) => {
     return connect(
       (state) => {
         return {
+          // TODO ADAPT PLTR: use a selector!!!
           notes: state.present.notes,
+          // TODO ADAPT PLTR: use a selector!!!
           characters: state.present.characters,
+          // TODO ADAPT PLTR: use a selector!!!
           places: state.present.places,
+          // TODO ADAPT PLTR: use a selector!!!
           tags: state.present.tags,
-          darkMode: selectors.isDarkModeSelector(state.present),
-          categories: selectors.sortedNoteCategoriesSelector(state.present),
-          visibleNotesByCategory: selectors.visibleSortedSearchedNotesByCategorySelector(
-            state.present
-          ),
-          filterIsEmpty: selectors.noteFilterIsEmptySelector(state.present),
+          darkMode: selectors.isDarkModeSelector(state),
+          categories: selectors.sortedNoteCategoriesSelector(state),
+          visibleNotesByCategory: selectors.visibleSortedSearchedNotesByCategorySelector(state),
+          filterIsEmpty: selectors.noteFilterIsEmptySelector(state),
+          // TODO ADAPT PLTR: use a selector!!!
           customAttributes: state.present.customAttributes.characters,
-          noteSortSelector: selectors.noteSortSelector(state.present),
-          noteSort: selectors.noteSortSelector(state.present),
-          notesSearchTerm: selectors.notesSearchTermSelector(state.present),
+          noteSortSelector: selectors.noteSortSelector(state),
+          noteSort: selectors.noteSortSelector(state),
+          notesSearchTerm: selectors.notesSearchTermSelector(state),
         }
       },
       (dispatch) => {

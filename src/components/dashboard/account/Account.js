@@ -113,12 +113,10 @@ const AccountConnector = (connector) => {
     const { connect } = redux
     return connect(
       (state) => ({
-        hasCurrentProLicense: selectors.hasProSelector(state.present),
-        hasLicense: selectors.hasLicenseSelector(state.present),
-        isInTrialMode: selectors.isInTrialModeSelector(state.present),
-        isInTrialModeWithExpiredTrial: selectors.isInTrialModeWithExpiredTrialSelector(
-          state.present
-        ),
+        hasCurrentProLicense: selectors.hasProSelector(state),
+        hasLicense: selectors.hasLicenseSelector(state),
+        isInTrialMode: selectors.isInTrialModeSelector(state),
+        isInTrialModeWithExpiredTrial: selectors.isInTrialModeWithExpiredTrialSelector(state),
       }),
       {}
     )(Account)

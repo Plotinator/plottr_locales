@@ -60,6 +60,7 @@ const CategoryPickerConnector = (connector) => {
     const { connect } = redux
     return connect((state, ownProps) => {
       return {
+        // TODO ADAPT PLTR: use a selector!!!
         categories: state.present.categories[ownProps.type],
       }
     })(CategoryPicker)
