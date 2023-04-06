@@ -202,7 +202,7 @@ const CardCellConnector = (connector) => {
     }
 
     renderCards(arentHidden) {
-      const { beatId, lineId, beatPosition, linePosition, color, cards } = this.props
+      const { beatId, lineId, beatPosition, linePosition, color, cards, isPinned } = this.props
       const numOfCards = cards.length
       const idxOfCards = numOfCards - 1
 
@@ -243,6 +243,7 @@ const CardCellConnector = (connector) => {
                 dropPosition={cards.length}
                 beatId={beatId}
                 lineId={lineId}
+                isPinned={isPinned}
               />
             ) : null}
           </div>
@@ -336,6 +337,7 @@ const CardCellConnector = (connector) => {
               beatId={this.props.beatId}
               lineId={this.props.lineId}
               allowDrop
+              isPinned={isPinned}
             />
             {this.renderDropZone(true)}
           </div>
@@ -346,7 +348,7 @@ const CardCellConnector = (connector) => {
     render() {
       const { cards, isSmall, isMedium, isPinned, color, orientation } = this.props
       const tableLength =
-        this.ref.current?.clientWidth + 50 || (!isMedium || orientation == 'vertical' ? 250 : 150)
+        this.ref.current?.clientWidth + 70 || (!isMedium || orientation == 'vertical' ? 225 : 110)
 
       if (!cards.length) {
         if (isSmall) return <td></td>
@@ -363,9 +365,9 @@ const CardCellConnector = (connector) => {
             className={cx({ 'medium-timeline': isMedium, 'card-pinned': isPinned })}
             ref={this.ref}
           >
-            {!isPinned ? (
+            {isPinned ? (
               <VisualLine
-                isPinned={isPinned}
+                isPinned
                 color={color}
                 isMedium={isMedium}
                 orientation={orientation}
@@ -388,6 +390,7 @@ const CardCellConnector = (connector) => {
       if (this.props.cards != nextProps.cards) return true
       if (this.props.lineIsExpanded != nextProps.lineIsExpanded) return true
       if (this.props.isVisible != nextProps.isVisible) return true
+      if (this.props.isPinned != nextProps.isPinned) return true
 
       return false
     }

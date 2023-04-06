@@ -130,7 +130,7 @@ const BeatInsertCellConnector = (connector) => {
           style={orientation == 'vertical' ? (isHigherLevel ? null : { marginTop: '10px' }) : null}
           ref={ref}
         >
-          {!isPinned ? (
+          {isPinned ? (
             <VisualLine
               isPinned={isPinned}
               color={color}
@@ -149,8 +149,18 @@ const BeatInsertCellConnector = (connector) => {
     }
 
     const renderLastInsertBeat = () => {
+      const tableLength = ref.current?.clientWidth + 50 || 50
       return (
         <div title={lastTitleText()} className={lastOrientedClass()} onClick={insert}>
+          {isPinned ? (
+            <VisualLine
+              isPinned={isPinned}
+              color={color}
+              orientation={orientation}
+              isMedium={isMedium}
+              tableLength={tableLength}
+            />
+          ) : null}
           <div className={lastWrapperClass()}>
             <Glyphicon glyph="plus" />
           </div>
@@ -159,6 +169,8 @@ const BeatInsertCellConnector = (connector) => {
     }
 
     const renderInsertMissingChildBeat = () => {
+      const tableLength = ref.current?.clientWidth + 50 || 50
+
       return (
         <div
           title={childTitleText()}
@@ -168,6 +180,15 @@ const BeatInsertCellConnector = (connector) => {
           })}
           onClick={insert}
         >
+          {isPinned ? (
+            <VisualLine
+              isPinned={isPinned}
+              color={color}
+              orientation={orientation}
+              isMedium={isMedium}
+              tableLength={tableLength}
+            />
+          ) : null}
           <div
             className={cx('insert-missing-beat-wrapper insert-beat', {
               'medium-timeline': isMedium,

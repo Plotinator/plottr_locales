@@ -301,7 +301,7 @@ const BlankCardConnector = (connector) => {
       window.SCROLLWITHKEYS = !this.state.creating
       const { orientation, verticalInsertion, isSmall, isMedium, isPinned, color } = this.props
       const tableLength =
-        this.ref.current?.clientWidth + 50 || (!isMedium || orientation == 'vertical' ? 250 : 150)
+        this.ref.current?.clientWidth + 70 || (!isMedium || orientation == 'vertical' ? 225 : 110)
 
       let body = null
       if (this.state.creating) {
@@ -319,9 +319,9 @@ const BlankCardConnector = (connector) => {
             body
           ) : (
             <Cell ref={this.ref}>
-              {!isPinned ? (
+              {isPinned ? (
                 <VisualLine
-                  isPinned={isPinned}
+                  isPinned
                   color={color}
                   orientation={orientation}
                   isMedium={isMedium}
@@ -357,6 +357,7 @@ const BlankCardConnector = (connector) => {
       if (this.state.templateHover !== nextState.templateHover) return true
       if (this.state.defaultHover !== nextState.defaultHover) return true
       if (this.state.showTemplatePicker !== nextState.showTemplatePicker) return true
+      if (this.state.isPinned !== nextState.isPinned) return true
       return false
     }
   }
