@@ -199,9 +199,11 @@ const isElectron =
     ' electron/'
   ) > -1
 
-export const wireUpAPI = (logger) => {
+export const wireUpAPI = (logger, actions, selectors) => {
   const isDevelopment = (process.env.NEXT_PUBLIC_NODE_ENV || process.env.NODE_ENV) === 'development'
   const wiredUp = api(
+    actions,
+    selectors,
     auth,
     database,
     storage,

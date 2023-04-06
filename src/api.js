@@ -10,7 +10,17 @@ import { removeSystemKeys, ARRAY_KEYS, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
  * of the correspending firebase objects from either the firebase JS
  * api or the react-native-firebase api.
  */
-const api = (actions, selectors, auth, database, storage, baseAPIDomain, development, log, isDesktop) => {
+const api = (
+  actions,
+  selectors,
+  auth,
+  database,
+  storage,
+  baseAPIDomain,
+  development,
+  log,
+  isDesktop
+) => {
   const BASE_API_URL =
     (!isDesktop && development) || !baseAPIDomain ? '' : `https://${baseAPIDomain || ''}`
 

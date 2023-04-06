@@ -1,4 +1,5 @@
 import { wireUpAPI } from 'plottr_firebase'
+import { selectors, actions } from 'wired-up-pltr'
 
 import {
   EDIT_FILE_NAME,
@@ -52,7 +53,7 @@ import {
 } from './firebase-messages'
 import { logger } from './worker-logger'
 
-const wiredUp = wireUpAPI(logger)
+const wiredUp = wireUpAPI(logger, actions, selectors)
 
 const editFileName = wiredUp.editFileName
 const updateAuthFileName = wiredUp.updateAuthFileName
