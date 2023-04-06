@@ -48,28 +48,33 @@
         border: 1px solid $gray-8;
         border-radius: 4px;
         user-select: none;
+        position: relative;
         & > div {
           width: 100%;
         }
+        .dashboard__backups__item-actions {
+          position: absolute;
+          top: -8px;
+          right: -8px;
+          display: flex;
+          justify-content: flex-end;
+          .dashboard__backups__item-button {
+            margin-left: 4px;
+            visibility: hidden;
+            &.active {
+              visibility: visible;
+            }
+          }
+        }
       }
       .dashboard__backups__item-title {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+        margin-bottom: 4px;
       }
       .dashboard__backups__item-details {
         display: flex;
         justify-content: space-between;
         align-items: center;
         color: $gray-4;
-      }
-      .dashboard__backups__item-button {
-        // opacity: 0.1;
-        visibility: hidden;
-        &.active {
-          // opacity: 1;
-          visibility: visible;
-        }
       }
     }
   }
