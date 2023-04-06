@@ -62,5 +62,5 @@ DashboardModal.propTypes = {
 }
 
 export default connect((state) => ({
-  darkMode: selectors.isDarkModeSelector(state.present),
+  darkMode: selectors.isDarkModeSelector(state),
 }))(DashboardModal)

@@ -4,9 +4,11 @@ import { connect } from 'react-redux'
 import { Spinner } from 'connected-components'
 
 import { t } from 'plottr_locales'
-import { selectors, actions, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
+import { selectors, actions } from 'wired-up-pltr'
+import { SYSTEM_REDUCER_KEYS } from 'pltr/v2'
 import { MessageModal } from 'connected-components'
 import { initialFetch, overwriteAllKeys } from 'wired-up-firebase'
+
 import logger from '../../../shared/logger'
 import { uploadProject } from '../../common/utils/upload_project'
 import { resumeDirective } from '../../resume'
@@ -54,7 +56,7 @@ const Resume = ({
       const checkAndUploadBackup = () => {
         return new Promise((resolve, reject) => {
           withFullFileState((state) => {
-            const offlineFile = state.present
+            const offlineFile = state
             return backupOfflineBackupForResume(offlineFile)
               .then(() => {
                 return getVersion().then((version) => {
@@ -209,16 +211,16 @@ Resume.propTypes = {
 
 export default connect(
   (state) => ({
-    isResuming: selectors.isResumingSelector(state.present),
-    overwritingCloudWithBackup: selectors.isOverwritingCloudWithBackupSelector(state.present),
-    checkingOfflineDrift: selectors.isCheckingForOfflineDriftSelector(state.present),
-    showResumeMessageDialog: selectors.showResumeMessageDialogSelector(state.present),
-    backingUpOfflineFile: selectors.backingUpOfflineFileSelector(state.present),
-    userId: selectors.userIdSelector(state.present),
-    email: selectors.emailAddressSelector(state.present),
-    fileId: selectors.fileIdSelector(state.present),
-    clientId: selectors.clientIdSelector(state.present),
-    offlineModeEnabled: selectors.offlineModeEnabledSelector(state.present),
+    isResuming: selectors.isResumingSelector(state),
+    overwritingCloudWithBackup: selectors.isOverwritingCloudWithBackupSelector(state),
+    checkingOfflineDrift: selectors.isCheckingForOfflineDriftSelector(state),
+    showResumeMessageDialog: selectors.showResumeMessageDialogSelector(state),
+    backingUpOfflineFile: selectors.backingUpOfflineFileSelector(state),
+    userId: selectors.userIdSelector(state),
+    email: selectors.emailAddressSelector(state),
+    fileId: selectors.fileIdSelector(state),
+    clientId: selectors.clientIdSelector(state),
+    offlineModeEnabled: selectors.offlineModeEnabledSelector(state),
   }),
   {
     withFullFileState: actions.project.withFullFileState,

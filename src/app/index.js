@@ -13,14 +13,8 @@ import { setupI18n, t } from 'plottr_locales'
 
 import { store } from 'store'
 
-import {
-  helpers,
-  actions,
-  selectors,
-  migrateIfNeeded,
-  addMissingKeys,
-  SYSTEM_REDUCER_KEYS,
-} from 'pltr/v2'
+import { helpers, migrateIfNeeded, addMissingKeys, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
+import { actions, selectors } from 'wired-up-pltr'
 
 import { rtfToHTML } from 'pltr/v2/slate_serializers/to_html'
 import { convertHTMLNodeList } from 'pltr/v2/slate_serializers/from_html'
@@ -226,15 +220,12 @@ tellMeWhatOSImOn()
 
         onExportFileFromMenu(({ type }) => {
           const currentState = store.getState()
-          const {
-            ui,
-            series: { name },
-            books,
-          } = currentState.present
-          const bookId = ui.currentTimeline
+          const bookId = selectors.currentTimelineSelector(currentState)
+          const name = selectors.seriesNameSelector(currentState)
+          const books = selectors.allBooksSelector(currentState)
           const defaultPath =
             bookId == 'series' ? name + ' ' + t('(Series View)') : books[`${bookId}`].title
-          const userId = selectors.userIdSelector(currentState.present)
+          const userId = selectors.userIdSelector(currentState)
 
           askToExport(defaultPath, currentState.present, type, exportConfig[type], userId).catch(
             (error) => {
@@ -246,21 +237,21 @@ tellMeWhatOSImOn()
         })
 
         onSave(() => {
-          const { present } = store.getState()
-          const isOffline = selectors.isOfflineSelector(present)
-          const isOfflineModeEnabled = selectors.offlineModeEnabledSelector(present)
-          const isCloudFile = selectors.isCloudFileSelector(present)
+          const state = store.getState()
+          const isOffline = selectors.isOfflineSelector(state)
+          const isOfflineModeEnabled = selectors.offlineModeEnabledSelector(state)
+          const isCloudFile = selectors.isCloudFileSelector(state)
+          const fileState = selectors.fullFileStateSelector(state)
           if (isCloudFile && isOffline && isOfflineModeEnabled) {
-            saveOfflineFile(present)
-              .then(() => {
-                store.dispatch(actions.ui.fileSaved())
-              })
-              .catch((error) => {
-                logger.error('Failed to save offline file', error)
-                showErrorBox(t('Error'), t('There was a problem saving your file'))
-              })
+            saveOfflineFile(fileState).then(() => {
+              store.dispatch(actions.ui.fileSaved())
+            })
+            .catch((error) => {
+              logger.error('Failed to save offline file', error)
+            })
           } else if (!isCloudFile) {
-            saveFile(present.project.fileURL, present)
+            const fileURL = selectors.fileURLSelector(state)
+            saveFile(fileURL, fileState)
               .then(() => {
                 store.dispatch(actions.ui.fileSaved())
               })
@@ -322,13 +313,14 @@ tellMeWhatOSImOn()
             )
           } else {
             whenClientIsReady(({ basename }) => {
-              const { present } = store.getState()
-              const isInOfflineMode = selectors.isInOfflineModeSelector(present)
+              const state = store.getState()
+              const isInOfflineMode = selectors.isInOfflineModeSelector(state)
+              const fileName = selectors.fileNameSelector(state)
               if (isInOfflineMode) {
                 logger.info('Tried to save-as a file, but it is offline')
                 return Promise.resolve()
               }
-              return basename(present.file.fileName, '.pltr').then((defaultPath) => {
+              return basename(fileName, '.pltr').then((defaultPath) => {
                 showSaveDialog(
                   filters,
                   t('Where would you like to save this copy?'),
@@ -337,7 +329,7 @@ tellMeWhatOSImOn()
                   if (fileName) {
                     const newFilePath = fileName.includes('.pltr') ? fileName : `${fileName}.pltr`
                     const newFileURL = helpers.file.filePathToFileURL(newFilePath)
-                    saveFile(newFileURL, present).then(() => {
+                    saveFile(newFileURL, state).then(() => {
                       addToKnownFilesAndOpen(newFileURL, true)
                     })
                   }
@@ -357,14 +349,14 @@ tellMeWhatOSImOn()
         }
 
         const moveFromTempHandler = () => {
-          const { present } = store.getState()
-          const isCloudFile = selectors.isCloudFileSelector(present)
+          const state = store.getState()
+          const isCloudFile = selectors.isCloudFileSelector(state)
           if (isCloudFile) {
             return
           }
 
-          isTempFile(present).then((isTemp) => {
-            const oldFileURL = selectors.fileURLSelector(present)
+          isTempFile(state).then((isTemp) => {
+            const oldFileURL = selectors.fileURLSelector(state)
             if (!oldFileURL) {
               logger.error(
                 `Tried to move the current file from temp but we couldn't compute its URL.`
@@ -372,7 +364,7 @@ tellMeWhatOSImOn()
               return
             }
             if (!isTemp) {
-              saveFile(oldFileURL, present).then(() => {
+              saveFile(oldFileURL, state).then(() => {
                 store.dispatch(actions.ui.fileSaved())
               })
               return
@@ -384,7 +376,7 @@ tellMeWhatOSImOn()
                 if (newFilePath) {
                   // Point at the new file
                   const newFileURL = helpers.file.filePathToFileURL(newFilePath)
-                  const oldFileURL = selectors.fileURLSelector(present)
+                  const oldFileURL = selectors.fileURLSelector(state)
                   if (!newFilePath || !newFileURL) {
                     logger.error(
                       `Tried to move file at ${oldFileURL} to ${newFilePath} (path: ${newFilePath})`
@@ -399,8 +391,8 @@ tellMeWhatOSImOn()
                         actions.ui.loadFile(
                           newFileName,
                           false,
-                          removeSystemKeys(present),
-                          present.file.version,
+                          removeSystemKeys(state),
+                          state.file.version,
                           newFileURL
                         )
                       )
@@ -484,7 +476,7 @@ tellMeWhatOSImOn()
         onCloseDashboard(closeDashboard)
 
         onCreatePlottrCloudFile((json, fileName, isScrivenerFile) => {
-          const state = store.getState().present
+          const state = store.getState()
           const emailAddress = selectors.emailAddressSelector(state)
           const userId = selectors.userIdSelector(state)
           uploadToFirebase(emailAddress, userId, json, fileName)

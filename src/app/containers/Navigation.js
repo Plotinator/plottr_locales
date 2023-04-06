@@ -3,13 +3,12 @@ import PropTypes from 'react-proptypes'
 import { connect } from 'react-redux'
 import { FaRegUser, FaKey } from 'react-icons/fa'
 
+import { t } from 'plottr_locales'
+import { Navbar, NavItem, Nav, Beamer, BookChooser, Button } from 'connected-components'
+import { selectors, actions } from 'wired-up-pltr'
+
 import DashboardModal from './DashboardModal'
 import OfflineBanner from '../components/OfflineBanner'
-
-import { t } from 'plottr_locales'
-
-import { Navbar, NavItem, Nav, Beamer, BookChooser, Button } from 'connected-components'
-import { selectors, actions } from 'pltr/v2'
 import { makeMainProcessClient } from '../mainProcessClient'
 
 const { openBuyWindow } = makeMainProcessClient()
@@ -123,11 +122,11 @@ Navigation.propTypes = {
 
 function mapStateToProps(state) {
   return {
-    isInTrialMode: selectors.isInTrialModeSelector(state.present),
-    currentView: selectors.currentViewSelector(state.present),
-    darkMode: selectors.isDarkModeSelector(state.present),
-    appIsBusyWithWork: selectors.busyWithWorkThatPreventsQuittingSelector(state.present),
-    unsavedChanges: selectors.unsavedChangesSelector(state.present),
+    isInTrialMode: selectors.isInTrialModeSelector(state),
+    currentView: selectors.currentViewSelector(state),
+    darkMode: selectors.isDarkModeSelector(state),
+    appIsBusyWithWork: selectors.busyWithWorkThatPreventsQuittingSelector(state),
+    unsavedChanges: selectors.unsavedChangesSelector(state),
   }
 }
 
