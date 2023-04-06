@@ -152,6 +152,7 @@
     "pltr": "file:./lib/pltr",
     "prettier": "^2.2.1",
     "pretty-date": "^0.2.0",
+    "proper-lockfile": "^4.1.2",
     "rc-tooltip": "^6.0.1",
     "react": "^16.8.6",
     "react-beautiful-dnd": "^13.0.0",
@@ -259,7 +260,10 @@
       "target": [
         {
           "target": "default",
-          "arch": ["x64", "arm64"]
+          "arch": [
+            "x64",
+            "arm64"
+          ]
         }
       ],
       "hardenedRuntime": true,

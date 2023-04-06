@@ -6,7 +6,7 @@ import { removeSystemKeys } from 'pltr/v2'
 const DEFAULT_SAVE_INTERVAL_MS = 10000
 const DEFAULT_BACKUP_INTERVAL_MS = 60000
 
-const MAX_SAVE_JOBS = 10
+const MAX_SAVE_JOBS = 1
 
 class PressureControlledTaskQueue {
   name = 'UnamedPressureControlledTaskQueue'
@@ -78,8 +78,14 @@ class PressureControlledTaskQueue {
     if (this.pendingJobBuffer.length >= this.maxJobs) {
       if (this.queueFullCounter >= 5) {
         this.logger.warn('Queue was full too many times.  Removing half the jobs from the queue.')
-        this.pendingJobBuffer = this.pendingJobBuffer.slice(this.pendingJobBuffer.length / 2)
+        this.pendingJobBuffer = this.pendingJobBuffer.slice(
+          Math.ceil(this.pendingJobBuffer.length / 2)
+        )
         this.queueFullCounter = 0
+        this.showErrorBox(
+          t('Auto-saving failed'),
+          t("Saving your file didn't work. Check where it's stored.")
+        )
         return
       }
       const error = new Error(`Too many concurrent ${name} jobs; dropping request to ${name}`)
