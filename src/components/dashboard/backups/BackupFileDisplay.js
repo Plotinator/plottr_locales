@@ -174,21 +174,23 @@ const BackupFileDisplayConnector = (connector) => {
         onMouseEnter={() => setShowButtons(true)}
         onMouseLeave={() => setShowButtons(false)}
       >
+        <div className="dashboard__backups__item-actions">
+          <div className={cx('dashboard__backups__item-button', { active: showButtons })}>
+            <Button bsSize="xs" bsStyle="success" onClick={handleMakeCopy}>
+              {t('Open a Copy')}
+            </Button>
+          </div>
+          {isCloudBackup ? null : (
+            <div className={cx('dashboard__backups__item-button', { active: showButtons })}>
+              <Button bsSize="xs" bsStyle="primary" onClick={handleOpenInFolder}>
+                {t('View in Folder')}
+              </Button>
+            </div>
+          )}
+        </div>
         <div>
           <div className="dashboard__backups__item-title">
             {isCloudBackup ? fileNameFromStorageObject(file) : fileNameFromPath(file)}
-            <div className={cx('dashboard__backups__item-button', { active: showButtons })}>
-              <Button bsSize="xs" bsStyle="success" onClick={handleMakeCopy}>
-                {t('Open a Copy')}
-              </Button>
-            </div>
-            {isCloudBackup ? null : (
-              <div className={cx('dashboard__backups__item-button', { active: showButtons })}>
-                <Button bsSize="xs" bsStyle="primary" onClick={handleOpenInFolder}>
-                  {t('View in Folder')}
-                </Button>
-              </div>
-            )}
           </div>
           <div className="dashboard__backups__item-details">
             <small>
