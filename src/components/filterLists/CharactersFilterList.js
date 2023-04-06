@@ -43,7 +43,7 @@ const CharacterFilterListConnector = (connector) => {
 
     return connect((state) => {
       return {
-        characters: charactersFilterItemsSelector(state.present),
+        characters: charactersFilterItemsSelector(state),
       }
     })(CharacterFilterList)
   }

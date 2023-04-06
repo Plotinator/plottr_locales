@@ -67,6 +67,7 @@ const NoteCategoriesModalConnector = (connector) => {
     return connect(
       (state) => {
         return {
+          // TODO ADAPT PLTR: use a selector!!!
           categories: state.present.categories.notes,
           startSaveAsTemplate,
         }

@@ -146,6 +146,7 @@ const EditSeriesConnector = (connector) => {
     return connect(
       (state) => {
         return {
+          // TODO ADAPT PLTR: use a selector!!!
           series: state.present.series,
         }
       },

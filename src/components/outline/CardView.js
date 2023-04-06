@@ -368,17 +368,18 @@ const CardViewConnector = (connector) => {
 
     return connect(
       (state, ownProps) => {
+        // TODO ADAPT PLTR: use a selector!!!
         let line = state.present.lines.find((l) => l.id == ownProps.card.lineId)
         return {
           line: line,
           selection: selectors.selectionSelector(
-            state.present,
+            state,
             helpers.editors.cardDescriptionEditorPath(ownProps.card.id)
           ),
-          characters: selectors.charactersSortedAtoZSelector(state.present),
-          places: selectors.placesSortedAtoZSelector(state.present),
-          tags: selectors.sortedTagsSelector(state.present),
-          darkMode: selectors.isDarkModeSelector(state.present),
+          characters: selectors.charactersSortedAtoZSelector(state),
+          places: selectors.placesSortedAtoZSelector(state),
+          tags: selectors.sortedTagsSelector(state),
+          darkMode: selectors.isDarkModeSelector(state),
         }
       },
       (dispatch) => {

@@ -352,13 +352,14 @@ const CardConnector = (connector) => {
     return connect(
       (state, ownProps) => {
         return {
-          cardDescription: selectors.cardDescriptionByIdSelector(state.present, ownProps.card.id),
+          cardDescription: selectors.cardDescriptionByIdSelector(state, ownProps.card.id),
+          // TODO ADAPT PLTR: use a selector!!!
           tags: state.present.tags,
-          timelineSize: selectors.timelineSizeSelector(state.present),
-          orientation: selectors.orientationSelector(state.present),
-          isVisible: selectors.visibleCardsSelector(state.present)[ownProps.card.id],
-          isSmall: selectors.isSmallSelector(state.present),
-          isMedium: selectors.isMediumSelector(state.present),
+          timelineSize: selectors.timelineSizeSelector(state),
+          orientation: selectors.orientationSelector(state),
+          isVisible: selectors.visibleCardsSelector(state)[ownProps.card.id],
+          isSmall: selectors.isSmallSelector(state),
+          isMedium: selectors.isMediumSelector(state),
         }
       },
       (dispatch) => {

@@ -691,25 +691,26 @@ const CardDialogConnector = (connector) => {
     return connect(
       (state, ownProps) => {
         return {
-          cardMetaData: selectors.cardMetaDataSelector(state.present, ownProps.cardId),
-          beats: selectors.visibleSortedBeatsByBookIgnoringCollapsedSelector(state.present),
-          lines: selectors.sortedLinesByBookSelector(state.present),
-          tags: selectors.sortedTagsSelector(state.present),
-          characters: selectors.charactersSortedAtoZSelector(state.present),
-          characterBookCategories: selectors.characterBookCategoriesSelector(state.present),
-          places: selectors.placesSortedAtoZSelector(state.present),
+          cardMetaData: selectors.cardMetaDataSelector(state, ownProps.cardId),
+          beats: selectors.visibleSortedBeatsByBookIgnoringCollapsedSelector(state),
+          lines: selectors.sortedLinesByBookSelector(state),
+          tags: selectors.sortedTagsSelector(state),
+          characters: selectors.charactersSortedAtoZSelector(state),
+          characterBookCategories: selectors.characterBookCategoriesSelector(state),
+          places: selectors.placesSortedAtoZSelector(state),
+          // TODO ADAPT PLTR: use a selector!!!
           customAttributes: state.present.customAttributes.scenes,
-          darkMode: selectors.isDarkModeSelector(state.present),
+          darkMode: selectors.isDarkModeSelector(state),
+          // TODO ADAPT PLTR: use a selector!!!
           books: state.present.books,
-          isSeries: selectors.isSeriesSelector(state.present),
-          currentTimeline: selectors.currentTimelineSelector(state.present),
-          getTemplateById: selectors.templateByIdFnSelector(state.present),
+          isSeries: selectors.isSeriesSelector(state),
+          currentTimeline: selectors.currentTimelineSelector(state),
+          getTemplateById: selectors.templateByIdFnSelector(state),
           // FIXME: these function change each re-render we should
           // instead create a selector that produces the function.
-          destinationLineId: (bookId) => selectors.firstLineForBookSelector(state.present, bookId),
-          destinationBeatId: (bookId) =>
-            selectors.firstVisibleBeatForBookSelector(state.present, bookId),
-          click: selectors.lastClickSelector(state.present),
+          destinationLineId: (bookId) => selectors.firstLineForBookSelector(state, bookId),
+          destinationBeatId: (bookId) => selectors.firstVisibleBeatForBookSelector(state, bookId),
+          click: selectors.lastClickSelector(state),
         }
       },
       (dispatch) => {

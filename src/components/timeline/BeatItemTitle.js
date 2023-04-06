@@ -38,11 +38,11 @@ const BeatItemTitleConnector = (connector) => {
     const { connect } = redux
 
     return connect((state, ownProps) => ({
-      isSeries: selectors.isSeriesSelector(state.present),
-      positionOffset: selectors.positionOffsetSelector(state.present),
-      beatIndex: selectors.beatIndexSelector(state.present, ownProps.beat.id),
-      beatTree: selectors.beatsByBookSelector(state.present),
-      hierarchyLevels: selectors.sortedHierarchyLevels(state.present),
+      isSeries: selectors.isSeriesSelector(state),
+      positionOffset: selectors.positionOffsetSelector(state),
+      beatIndex: selectors.beatIndexSelector(state, ownProps.beat.id),
+      beatTree: selectors.beatsByBookSelector(state),
+      hierarchyLevels: selectors.sortedHierarchyLevels(state),
     }))(BeatItemTitle)
   }
 

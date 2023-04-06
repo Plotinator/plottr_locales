@@ -293,14 +293,14 @@ const RecentFilesConnector = (connector) => {
     const { connect } = redux
 
     return connect((state) => ({
-      isInOfflineMode: selectors.isInOfflineModeSelector(state.present),
-      resuming: selectors.isResumingSelector(state.present),
-      sortedKnownFiles: selectors.flatSortedKnownFilesSelector(state.present),
-      loadingFileList: selectors.fileListIsLoadingSelector(state.present),
-      shouldBeInPro: selectors.shouldBeInProSelector(state.present),
-      offlineModeEnabled: selectors.offlineModeEnabledSelector(state.present),
-      isOnWeb: selectors.isOnWebSelector(state.present),
-      hasCurrentProLicense: selectors.hasProSelector(state.present),
+      isInOfflineMode: selectors.isInOfflineModeSelector(state),
+      resuming: selectors.isResumingSelector(state),
+      sortedKnownFiles: selectors.flatSortedKnownFilesSelector(state),
+      loadingFileList: selectors.fileListIsLoadingSelector(state),
+      shouldBeInPro: selectors.shouldBeInProSelector(state),
+      offlineModeEnabled: selectors.offlineModeEnabledSelector(state),
+      isOnWeb: selectors.isOnWebSelector(state),
+      hasCurrentProLicense: selectors.hasProSelector(state),
     }))(RecentFiles)
   }
 

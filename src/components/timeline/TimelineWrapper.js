@@ -85,12 +85,10 @@ const TimelineWrapperConnector = (connector) => {
     isOnWeb,
     timelineSearchTerm,
     timelineView,
-    timelineTabs,
     activeTab,
     timelineViewIsStacked,
     timelineViewIsTabbed,
     hierarchyLevels,
-    topLevelBeatName,
     beatActions,
     isCardDialogVisible,
     cardDialogBeatId,
@@ -197,7 +195,7 @@ const TimelineWrapperConnector = (connector) => {
         projectActions.withFullFileState((state) => {
           // FIXME: this is dated, but we don't need it so much so I
           // left it untouched when doing the knownFiles refactor.
-          saveFile(helpers.file.filePathToFileURL(state.present.file.fileName), state.present)
+          saveFile(helpers.file.filePathToFileURL(state.file.fileName), state)
         })
       }
     }
@@ -698,11 +696,9 @@ const TimelineWrapperConnector = (connector) => {
     isOnWeb: PropTypes.bool,
     timelineSearchTerm: PropTypes.string,
     timelineView: PropTypes.string.isRequired,
-    timelineTabs: PropTypes.array.isRequired,
     timelineViewIsStacked: PropTypes.bool,
     timelineViewIsTabbed: PropTypes.bool,
     hierarchyLevels: PropTypes.array.isRequired,
-    topLevelBeatName: PropTypes.string.isRequired,
     beatActions: PropTypes.object.isRequired,
     cardDialogCardId: PropTypes.number,
     cardDialogLineId: PropTypes.number,
@@ -727,25 +723,25 @@ const TimelineWrapperConnector = (connector) => {
     return connect(
       (state) => {
         return {
-          cardsExistOnTimeline: selectors.cardsExistOnTimelineSelector(state.present),
-          bookId: selectors.currentTimelineSelector(state.present),
-          timelineBundle: selectors.timelineBundleSelector(state.present),
-          testingAndDiagnosisEnabled: selectors.testingAndDiagnosisEnabledSelector(state.present),
-          isOnWeb: selectors.isOnWebSelector(state.present),
-          timelineSearchTerm: selectors.timelineSearchTermSelector(state.present),
-          timelineView: selectors.timelineViewSelector(state.present),
-          timelineViewIsStacked: selectors.timelineViewIsStackedSelector(state.present),
-          timelineViewIsTabbed: selectors.timelineViewIsTabbedSelector(state.present),
-          hierarchyLevels: selectors.sortedHierarchyLevels(state.present),
-          cardDialogCardId: selectors.cardDialogCardIdSelector(state.present),
-          cardDialogLineId: selectors.cardDialogLineIdSelector(state.present),
-          cardDialogBeatId: selectors.cardDialogBeatIdSelector(state.present),
-          isCardDialogVisible: selectors.isCardDialogVisibleSelector(state.present),
-          activeTab: selectors.timelineActiveTabSelector(state.present),
-          actConfigIsOpen: selectors.actConfigModalIsOpenSelector(state.present),
-          stickyHeaderCount: selectors.stickyHeaderCountSelector(state.present),
-          stickyLeftColumnCount: selectors.stickyLeftColumnCountSelector(state.present),
-          restructureModalOpen: selectors.restructureModalOpenSelector(state.present),
+          cardsExistOnTimeline: selectors.cardsExistOnTimelineSelector(state),
+          bookId: selectors.currentTimelineSelector(state),
+          timelineBundle: selectors.timelineBundleSelector(state),
+          testingAndDiagnosisEnabled: selectors.testingAndDiagnosisEnabledSelector(state),
+          isOnWeb: selectors.isOnWebSelector(state),
+          timelineSearchTerm: selectors.timelineSearchTermSelector(state),
+          timelineView: selectors.timelineViewSelector(state),
+          timelineViewIsStacked: selectors.timelineViewIsStackedSelector(state),
+          timelineViewIsTabbed: selectors.timelineViewIsTabbedSelector(state),
+          hierarchyLevels: selectors.sortedHierarchyLevels(state),
+          cardDialogCardId: selectors.cardDialogCardIdSelector(state),
+          cardDialogLineId: selectors.cardDialogLineIdSelector(state),
+          cardDialogBeatId: selectors.cardDialogBeatIdSelector(state),
+          isCardDialogVisible: selectors.isCardDialogVisibleSelector(state),
+          activeTab: selectors.timelineActiveTabSelector(state),
+          actConfigIsOpen: selectors.actConfigModalIsOpenSelector(state),
+          stickyHeaderCount: selectors.stickyHeaderCountSelector(state),
+          stickyLeftColumnCount: selectors.stickyLeftColumnCountSelector(state),
+          restructureModalOpen: selectors.restructureModalOpenSelector(state),
         }
       },
       (dispatch) => {

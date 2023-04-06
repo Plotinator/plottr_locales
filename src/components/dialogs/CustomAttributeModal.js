@@ -73,6 +73,7 @@ const CustomAttributeModalConnector = (connector) => {
 
     return connect(
       (state, { type }) => {
+        // TODO ADAPT PLTR: use a selector!!!
         const customAttributes = state.present.customAttributes[type]
 
         let canChangeFn
@@ -111,8 +112,8 @@ const CustomAttributeModalConnector = (connector) => {
         })()
 
         return {
-          customAttributes: attributesSelector(state.present),
-          customAttributesThatCanChange: canChangeFn(state.present),
+          customAttributes: attributesSelector(state),
+          customAttributesThatCanChange: canChangeFn(state),
         }
       },
       (dispatch, { type }) => {

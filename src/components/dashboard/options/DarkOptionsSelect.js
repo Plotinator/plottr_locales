@@ -60,7 +60,7 @@ const DarkOptionsSelect = (connector) => {
   if (redux) {
     const { connect } = redux
     return connect((state) => ({
-      settings: selectors.appSettingsSelector(state.present),
+      settings: selectors.appSettingsSelector(state),
     }))(DarkOptionsSelect)
   }
 
