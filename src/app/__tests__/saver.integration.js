@@ -94,7 +94,7 @@ describe('Saver', (describe, it) => {
             const backupFile = () => {
               return Promise.resolve()
             }
-            const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 50)
+            const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 10, 50)
             const waitForEnoughReAttempts = () => {
               return new Promise((resolve) => {
                 setTimeout(resolve, 50)
@@ -156,7 +156,7 @@ describe('Saver', (describe, it) => {
           const backupFile = () => {
             return Promise.resolve()
           }
-          const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 100)
+          const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 10, 100)
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
           }).then(() => {
@@ -244,7 +244,7 @@ describe('Saver', (describe, it) => {
             const backupFile = () => {
               return Promise.resolve()
             }
-            const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 100)
+            const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 10, 100)
             new Promise((resolve) => {
               setTimeout(resolve, 1100)
             }).then(() => {
@@ -324,6 +324,7 @@ describe('Saver', (describe, it) => {
               saveFile,
               backupFile,
               NOP_LOGGER,
+              10,
               100,
               10000,
               DUMMY_ROLLBAR,
@@ -423,6 +424,7 @@ describe('Saver', (describe, it) => {
                 saveFile,
                 backupFile,
                 NOP_LOGGER,
+                10,
                 100,
                 10000,
                 DUMMY_ROLLBAR,
@@ -504,7 +506,7 @@ describe('Saver', (describe, it) => {
           const backupFile = () => {
             return Promise.resolve()
           }
-          const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 500)
+          const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 10, 500)
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
           }).then(() => {
@@ -548,7 +550,7 @@ describe('Saver', (describe, it) => {
           const backupFile = () => {
             return Promise.resolve()
           }
-          const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 100)
+          const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 10, 100)
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
           }).then(() => {
@@ -632,7 +634,7 @@ describe('Saver', (describe, it) => {
               const backupFile = () => {
                 return Promise.resolve()
               }
-              const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 100)
+              const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 10, 100)
               new Promise((resolve) => {
                 setTimeout(resolve, 1050)
               }).then(() => {
@@ -689,7 +691,7 @@ describe('Saver', (describe, it) => {
               const backupFile = () => {
                 return Promise.resolve()
               }
-              const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 100)
+              const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 10, 100)
               new Promise((resolve) => {
                 setTimeout(resolve, 1050)
               }).then(() => {
@@ -752,7 +754,7 @@ describe('Saver', (describe, it) => {
           const backupFile = () => {
             return Promise.resolve()
           }
-          const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 500)
+          const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 10, 500)
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
           }).then(() => {
@@ -816,6 +818,7 @@ describe('Saver', (describe, it) => {
             saveFile,
             backupFile,
             countingLogger,
+            10,
             100,
             10000,
             DUMMY_ROLLBAR,
@@ -873,7 +876,7 @@ describe('Saver', (describe, it) => {
             backupCalls.push(args)
             return Promise.resolve()
           }
-          const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 100000, 100)
+          const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 10, 100000, 100)
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
           }).then(() => {
@@ -961,7 +964,7 @@ describe('Saver', (describe, it) => {
             const saveFile = () => {
               return Promise.resolve()
             }
-            const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 10000, 100)
+            const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 10, 10000, 100)
             new Promise((resolve) => {
               setTimeout(resolve, 1100)
             }).then(() => {
@@ -1042,7 +1045,7 @@ describe('Saver', (describe, it) => {
                 loggedErrors++
               },
             }
-            const saver = new Saver(getState, saveFile, backupFile, countingLogger, 10000, 100)
+            const saver = new Saver(getState, saveFile, backupFile, countingLogger, 10, 10000, 100)
             assertGreaterThan(loggedInfos, 0)
             assertEqual(loggedWarnings, 0)
             assertEqual(loggedErrors, 0)
@@ -1147,6 +1150,7 @@ describe('Saver', (describe, it) => {
                 saveFile,
                 backupFile,
                 countingLogger,
+                10,
                 10000,
                 100,
                 DUMMY_ROLLBAR,
@@ -1233,7 +1237,7 @@ describe('Saver', (describe, it) => {
             backupCalls.push(args)
             return Promise.resolve()
           }
-          const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 10000, 500)
+          const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 10, 10000, 500)
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
           }).then(() => {
@@ -1277,7 +1281,7 @@ describe('Saver', (describe, it) => {
             backupCalls.push(args)
             return Promise.resolve()
           }
-          const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 10000, 100)
+          const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 10, 10000, 100)
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
           }).then(() => {
@@ -1361,7 +1365,7 @@ describe('Saver', (describe, it) => {
                   setTimeout(resolve, 200)
                 })
               }
-              const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 10000, 100)
+              const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 10, 10000, 100)
               new Promise((resolve) => {
                 setTimeout(resolve, 1050)
               }).then(() => {
@@ -1418,7 +1422,7 @@ describe('Saver', (describe, it) => {
                   setTimeout(resolve, 200)
                 })
               }
-              const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 10000, 100)
+              const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 10, 10000, 100)
               new Promise((resolve) => {
                 setTimeout(resolve, 1050)
               }).then(() => {
@@ -1481,7 +1485,7 @@ describe('Saver', (describe, it) => {
             backupCalls.push(args)
             return Promise.resolve()
           }
-          const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 10000, 500)
+          const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 10, 10000, 500)
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
           }).then(() => {

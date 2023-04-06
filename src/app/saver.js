@@ -30,6 +30,7 @@ class PressureControlledTaskQueue {
   onJobSuccess = () => {}
   onJobFailure = (_error) => {}
   queueFullCounter = 0
+  showErrorBox = () => {}
 
   constructor(
     name,
@@ -38,7 +39,8 @@ class PressureControlledTaskQueue {
     maxJobs,
     jobInterval = 10000,
     onJobSuccess = () => {},
-    onJobFailure = (_error) => {}
+    onJobFailure = (_error) => {},
+    showErrorBox = () => {}
   ) {
     this.name = name
     this.createNextJob = createNextJob
@@ -47,6 +49,7 @@ class PressureControlledTaskQueue {
     this.jobInterval = jobInterval
     this.onJobSuccess = onJobSuccess
     this.onJobFailure = onJobFailure
+    this.showErrorBox = showErrorBox
   }
 
   executePendingJob = () => {
@@ -210,6 +213,7 @@ class Saver {
     saveFile,
     backupFile,
     logger,
+    maxSaveJobs = MAX_SAVE_JOBS,
     saveIntervalMS = DEFAULT_SAVE_INTERVAL_MS,
     backupIntervalMS = DEFAULT_BACKUP_INTERVAL_MS,
     rollbar = DUMMY_ROLLBAR,
@@ -250,7 +254,7 @@ class Saver {
         }
       },
       logger,
-      MAX_SAVE_JOBS,
+      maxSaveJobs,
       saveIntervalMS,
       (result) => {
         // This might happen if we're not saving this time.
@@ -268,7 +272,8 @@ class Saver {
             this.lastAutoSaveFailed = true
           }
         })
-      }
+      },
+      this.showErrorBox
     )
     this.saveRunner.start()
 
@@ -303,7 +308,8 @@ class Saver {
       },
       (error) => {
         this.onSaveBackupError(error)
-      }
+      },
+      this.showErrorBox
     )
     this.backupRunner.start()
   }
