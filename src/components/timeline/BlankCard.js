@@ -321,7 +321,6 @@ const BlankCardConnector = (connector) => {
             <Cell ref={this.ref}>
               {isPinned ? (
                 <VisualLine
-                  isPinned
                   color={color}
                   orientation={orientation}
                   isMedium={isMedium}
@@ -357,7 +356,6 @@ const BlankCardConnector = (connector) => {
       if (this.state.templateHover !== nextState.templateHover) return true
       if (this.state.defaultHover !== nextState.defaultHover) return true
       if (this.state.showTemplatePicker !== nextState.showTemplatePicker) return true
-      if (this.state.isPinned !== nextState.isPinned) return true
       return false
     }
   }
