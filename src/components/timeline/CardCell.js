@@ -348,7 +348,13 @@ const CardCellConnector = (connector) => {
     render() {
       const { cards, isSmall, isMedium, isPinned, color, orientation } = this.props
       const tableLength =
-        this.ref.current?.clientWidth + 70 || (!isMedium || orientation == 'vertical' ? 225 : 110)
+        orientation == 'horizontal' && !isMedium
+          ? this.ref.current?.clientWidth + 50 || 225
+          : orientation == 'horizontal' && isMedium
+          ? this.ref.current?.clientWidth + 50 || 110
+          : this.ref.current?.clientHeight && orientation == 'vertical'
+          ? this.ref.current?.clientHeight + 50
+          : 225
 
       if (!cards.length) {
         if (isSmall) return <td></td>
@@ -389,6 +395,7 @@ const CardCellConnector = (connector) => {
       if (this.props.cards != nextProps.cards) return true
       if (this.props.lineIsExpanded != nextProps.lineIsExpanded) return true
       if (this.props.isVisible != nextProps.isVisible) return true
+      if (this.props.isPinned != nextProps.isPinned) return true
 
       return false
     }
