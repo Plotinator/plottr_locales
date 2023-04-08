@@ -351,10 +351,10 @@ const CardCellConnector = (connector) => {
         orientation == 'horizontal' && !isMedium
           ? this.ref.current?.clientWidth + 50 || 225
           : orientation == 'horizontal' && isMedium
-          ? this.ref.current?.clientWidth + 50 || 110
-          : this.ref.current?.clientHeight && orientation == 'vertical'
+          ? this.ref.current?.clientWidth + 25 || 95
+          : this.ref.current?.clientHeight && orientation == 'vertical' && isMedium
           ? this.ref.current?.clientHeight + 50
-          : 225
+          : this.ref.current?.clientHeight + 50 || 225
 
       if (!cards.length) {
         if (isSmall) return <td></td>
