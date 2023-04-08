@@ -72,6 +72,10 @@
       }
     }
 
+    .sticky-table-cell:has(.vertical-blank-card__body) {
+      z-index: 10;
+    }
+
     .sticky-table-row:first-child {
       .sticky-table-cell:after {
         content: '';
