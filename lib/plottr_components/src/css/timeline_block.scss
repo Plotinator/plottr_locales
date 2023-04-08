@@ -72,7 +72,7 @@
       }
     }
 
-    .sticky-table-cell:has(.vertical-blank-card__body) {
+    .sticky-table-cell:has(.vertical-blank-card__body.card-pinned) {
       z-index: 10;
     }
 
