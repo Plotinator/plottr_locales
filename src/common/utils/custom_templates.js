@@ -1,7 +1,8 @@
 import { cloneDeep } from 'lodash'
 
 import { t } from 'plottr_locales'
-import { tree, helpers, selectors } from 'pltr/v2'
+import { tree, helpers } from 'pltr/v2'
+import { selectors } from 'wired-up-pltr'
 
 import { saveCustomTemplate } from './templates_from_firestore'
 import { whenClientIsReady } from '../../../shared/socket-client/index'
@@ -20,14 +21,12 @@ export function addNewCustomTemplate(pltrData, { type, data }) {
   }
 
   templatePromise.then((template) => {
-    const {
-      client: { userId },
-    } = pltrData
+    const userId = selectors.userIdSelector(pltrData)
     if (userId) {
       saveCustomTemplate(userId, template)
     } else {
       whenClientIsReady(({ setCustomTemplate }) => {
-        setCustomTemplate(template.id, template)
+        return setCustomTemplate(template.id, template)
       })
     }
 

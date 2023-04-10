@@ -215,7 +215,7 @@ tellMeWhatOSImOn()
         document.addEventListener('save-custom-template', (event) => {
           const currentState = store.getState()
           const options = event.payload
-          addNewCustomTemplate(currentState.present, options)
+          addNewCustomTemplate(currentState, options)
         })
 
         onExportFileFromMenu(({ type }) => {
