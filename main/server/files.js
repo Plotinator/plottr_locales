@@ -60,33 +60,47 @@ const fileModule = (userDataPath) => {
     const { backupBasePath } = backupModule
 
     const withLockedFile = (filePath, f) => {
-      return ensureLockFilePathExists().then(() => {
-        return lock(filePath, {
-          lockfilePath: `${LOCK_FILES_PATH}/${basename(filePath)}.lock`,
+      return lstat(filePath)
+        .catch((error) => {
+          if (error.code === 'ENOENT') {
+            return f()
+          } else {
+            return Promise.reject(error)
+          }
         })
-          .catch((error) => {
-            logger.error('Failed to lock the file for', filePath, error.message, error.stack)
-            return Promise.reject(new Error('Failed to lock'))
+        .then(ensureLockFilePathExists)
+        .then(() => {
+          return lock(filePath, {
+            lockfilePath: `${LOCK_FILES_PATH}/${basename(filePath)}.lock`,
           })
-          .then((release) => {
-            const result = f()
-            if (typeof result.then === 'function') {
-              return result
-                .then(() => {
-                  return release()
-                })
-                .catch((error) => {
+            .catch((error) => {
+              logger.error('Failed to lock the file for', filePath, error.message, error.stack)
+              return Promise.reject(new Error('Failed to lock'))
+            })
+            .then((release) => {
+              const result = f()
+              if (typeof result.then === 'function') {
+                return result
+                  .then(() => {
+                    return release()
+                  })
+                  .catch((error) => {
+                    logger.error(
+                      'Failed to lock the file for',
+                      filePath,
+                      error.message,
+                      error.stack
+                    )
+                    return Promise.reject(new Error('Failed to release lock'))
+                  })
+              } else {
+                return release().catch((error) => {
                   logger.error('Failed to lock the file for', filePath, error.message, error.stack)
                   return Promise.reject(new Error('Failed to release lock'))
                 })
-            } else {
-              return release().catch((error) => {
-                logger.error('Failed to lock the file for', filePath, error.message, error.stack)
-                return Promise.reject(new Error('Failed to release lock'))
-              })
-            }
-          })
-      })
+              }
+            })
+        })
     }
 
     const writeAndWaitForFlush = (filePath, data) => {
