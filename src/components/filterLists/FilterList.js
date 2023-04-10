@@ -142,6 +142,7 @@ const FilterListConnector = (connector) => {
           charactersFilterItemsSelector,
           placesFilterItemsSelector,
           tagsFilterItemsSelector,
+          allBooksSelector,
         },
       },
     } = connector
@@ -149,6 +150,7 @@ const FilterListConnector = (connector) => {
       charactersFilterItemsSelector,
       placesFilterItemsSelector,
       tagsFilterItemsSelector,
+      allBooksSelector,
     })
 
     return connect((state) => {
@@ -156,8 +158,7 @@ const FilterListConnector = (connector) => {
         characters: charactersFilterItemsSelector(state),
         places: placesFilterItemsSelector(state),
         tags: tagsFilterItemsSelector(state),
-        // TODO ADAPT PLTR: use a selector!!!
-        books: state.present.books,
+        books: allBooksSelector(state),
       }
     })(FilterList)
   }

@@ -546,12 +546,10 @@ const TimelineTableConnector = (connector) => {
       (state, { activeTab }) => {
         return {
           beats: selectors.visibleSortedBeatsForTimelineByBookSelector(state),
-          // TODO ADAPT PLTR: use a selector!!!
-          books: state.present.books,
+          books: selectors.allBooksSelector(state),
           beatHasChildrenMap: selectors.beatHasChildrenSelector(state),
           beatMapping: selectors.timelineSparceBeatMap(state, activeTab),
-          // TODO ADAPT PLTR: use a selector!!!
-          nextBeatId: nextId(state.present.beats),
+          nextBeatId: selectors.nextBeatIdSelector(state),
           lines: selectors.sortedLinesByBookSelector(state),
           cardMap: selectors.searchedCardMetaDataMapSelector(state),
           darkMode: selectors.isDarkModeSelector(state),

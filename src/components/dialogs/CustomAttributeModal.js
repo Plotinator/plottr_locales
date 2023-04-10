@@ -73,9 +73,6 @@ const CustomAttributeModalConnector = (connector) => {
 
     return connect(
       (state, { type }) => {
-        // TODO ADAPT PLTR: use a selector!!!
-        const customAttributes = state.present.customAttributes[type]
-
         let canChangeFn
         switch (type) {
           case 'characters':
@@ -92,8 +89,7 @@ const CustomAttributeModalConnector = (connector) => {
             break
           default:
             canChangeFn = () => {
-              log.warn(`${type}CustomAttributesThatCanChangeSelector not implemented`)
-              return customAttributes.map(({ name }) => name)
+              throw new Error(`Unsupported attribute type: ${type}`)
             }
             break
         }
@@ -105,8 +101,17 @@ const CustomAttributeModalConnector = (connector) => {
                 return selectors.characterAttributesForCurrentBookSelector(state)
               }
             }
+            case 'notes': {
+              return (state) => selectors.noteCustomAttributesSelector(state)
+            }
+            case 'places': {
+              return (state) => selectors.placeCustomAttributesSelector(state)
+            }
+            case 'scenes': {
+              return (state) => selectors.cardsCustomAttributesSelector(state)
+            }
             default: {
-              return (state) => state.customAttributes[type] || []
+              throw new Error('Invalid type for custom attribute modal: ' + type)
             }
           }
         })()

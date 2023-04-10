@@ -358,12 +358,9 @@ const PlaceViewConnector = (connector) => {
       (state, ownProps) => {
         const editorPath = helpers.editors.placeNotesEditorPath(ownProps.place.id)
         return {
-          // TODO ADAPT PLTR: use a selector!!!
-          customAttributes: state.present.customAttributes.places,
-          // TODO ADAPT PLTR: use a selector!!!
-          cards: state.present.cards,
-          // TODO ADAPT PLTR: use a selector!!!
-          notes: state.present.notes,
+          customAttributes: selectors.placeCustomAttributesSelector(state),
+          cards: selectors.allCardsSelector(state),
+          notes: selectors.singleNoteSelector(state),
           darkMode: selectors.isDarkModeSelector(state),
           editorPath,
           selection: selectors.selectionSelector(state, editorPath),

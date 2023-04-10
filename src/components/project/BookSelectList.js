@@ -144,10 +144,8 @@ const BookSelectListConnector = (connector) => {
 
     return connect((state) => {
       return {
-        // TODO ADAPT PLTR: use a selector!!!
-        books: state.present.books,
-        // TODO ADAPT PLTR: use a selector!!!
-        series: state.present.series,
+        books: selectors.allBooksSelector(state),
+        series: selectors.seriesSelector(state),
         click: selectors.lastClickSelector(state),
       }
     })(BookSelectList)

@@ -79,6 +79,7 @@ const TemplatePickerConnector = (connector) => {
       log,
       template: { deleteTemplate, editTemplateDetails },
     },
+    pltr: { selectors },
   } = connector
   checkDependencies({
     log,
@@ -212,11 +213,11 @@ const TemplatePickerConnector = (connector) => {
               }
               withFullState((file) => {
                 const fullTemplate = { ...selectedTemplate, templateData: template }
-                const defaultHierarchyLevelIndex = helpers.template.levelToApplyTo(
+                const defaultHierarchyLevelIndex = helpers.template.levelToApplyTo(selectors)(
                   file,
                   fullTemplate
                 )
-                if (helpers.template.levelsDiffer(file, template)) {
+                if (helpers.template.levelsDiffer(selectors)(file, template)) {
                   setStagedPlotlineTemplate({
                     template: fullTemplate,
                     level: defaultHierarchyLevelIndex,
@@ -589,7 +590,7 @@ const TemplatePickerConnector = (connector) => {
   }
 
   const {
-    pltr: { selectors, actions },
+    pltr: { actions },
     redux,
   } = connector
 

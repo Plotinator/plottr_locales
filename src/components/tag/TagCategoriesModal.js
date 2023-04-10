@@ -52,17 +52,16 @@ const TagCategoriesModalConnector = (connector) => {
 
   const {
     redux,
-    pltr: { actions },
+    pltr: { actions, selectors },
   } = connector
-  checkDependencies({ redux, actions })
+  checkDependencies({ redux, actions, selectors })
 
   if (redux) {
     const { connect, bindActionCreators } = redux
     return connect(
       (state) => {
         return {
-          // TODO ADAPT PLTR: use a selector!!!
-          categories: state.present.categories.tags,
+          categories: selectors.tagCategoriesSelector(state),
         }
       },
       (dispatch) => {

@@ -358,13 +358,11 @@ const PlaceListViewConnector = (connector) => {
     return connect(
       (state) => {
         return {
-          // TODO ADAPT PLTR: use a selector!!!
-          places: state.present.places,
+          places: selectors.allPlacesSelector(state),
           visiblePlacesByCategory: selectors.visibleSortedSearchedPlacesByCategorySelector(state),
           categories: selectors.sortedPlaceCategoriesSelector(state),
           filterIsEmpty: selectors.placeFilterIsEmptySelector(state),
-          // TODO ADAPT PLTR: use a selector!!!
-          customAttributes: state.present.customAttributes.places,
+          customAttributes: selectors.placeCustomAttributesSelector(state),
           customAttributesThatCanChange:
             selectors.placeCustomAttributesThatCanChangeSelector(state),
           restrictedValues: selectors.placeCustomAttributesRestrictedValues(state),

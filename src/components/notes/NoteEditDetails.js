@@ -244,8 +244,7 @@ const NoteEditDetailsConnector = (connector) => {
         const editorPath = helpers.editors.noteContentEditorPath(ownProps.noteId)
         return {
           note: selectors.singleNoteSelector(state, ownProps.noteId),
-          // TODO ADAPT PLTR: use a selector!!!
-          customAttributes: state.present.customAttributes.notes,
+          customAttributes: selectors.noteCustomAttributesSelector(state),
           editorPath,
           selection: selectors.selectionSelector(state, editorPath),
           darkMode: selectors.isDarkModeSelector(state),

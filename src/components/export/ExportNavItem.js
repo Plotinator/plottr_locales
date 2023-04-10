@@ -152,10 +152,8 @@ const ExportNavItemConnector = (connector) => {
     return connect(
       (state) => ({
         currentTimeline: selectors.currentTimelineSelector(state),
-        // TODO ADAPT PLTR: use a selector!!!
-        seriesName: state.present.series.name,
-        // TODO ADAPT PLTR: use a selector!!!
-        books: state.present.books,
+        seriesName: selectors.seriesNameSelector(state),
+        books: selectors.allBooksSelector(state),
         userId: selectors.userIdSelector(state),
       }),
       {

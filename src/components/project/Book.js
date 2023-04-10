@@ -229,8 +229,7 @@ const BookConnector = (connector) => {
       (state, ownProps) => {
         return {
           darkMode: selectors.isDarkModeSelector(state),
-          // TODO ADAPT PLTR: use a selector!!!
-          book: state.present.books[ownProps.bookId],
+          book: selectors.bookByIdSelector(state),
           books: selectors.allBooksSelector(state),
           canDelete: selectors.canDeleteBookSelector(state),
         }

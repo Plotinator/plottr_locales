@@ -353,8 +353,7 @@ const CardConnector = (connector) => {
       (state, ownProps) => {
         return {
           cardDescription: selectors.cardDescriptionByIdSelector(state, ownProps.card.id),
-          // TODO ADAPT PLTR: use a selector!!!
-          tags: state.present.tags,
+          tags: selectors.allTagsSelector(state),
           timelineSize: selectors.timelineSizeSelector(state),
           orientation: selectors.orientationSelector(state),
           isVisible: selectors.visibleCardsSelector(state)[ownProps.card.id],

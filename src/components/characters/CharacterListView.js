@@ -489,11 +489,9 @@ const CharacterListViewConnector = (connector) => {
           visibleCharactersByCategory:
             selectors.visibleSortedSearchedCharactersByCategorySelector(state),
           filterIsEmpty: selectors.characterFilterIsEmptySelector(state),
-          // TODO ADAPT PLTR: use a selector!!!
-          characters: state.present.characters,
+          characters: selectors.allCharactersSelector(state),
           categories: selectors.sortedCharacterCategoriesSelector(state),
-          // TODO ADAPT PLTR: use a selector!!!
-          customAttributes: state.present.customAttributes.characters,
+          customAttributes: selectors.characterCustomAttributesSelector(state),
           customAttributesThatCanChange:
             selectors.characterCustomAttributesThatCanChangeSelector(state),
           characterSort: selectors.characterSortSelector(state),

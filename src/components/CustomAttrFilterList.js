@@ -255,12 +255,10 @@ const CustomAttrFilterListConnector = (connector) => {
     const mapStateToProps = (state, { type }) => {
       return {
         tags: selectors.sortedTagsSelector(state),
-        // TODO ADAPT PLTR: use a selector!!!
-        books: state.present.books,
+        books: selectors.allBooksSelector(state),
         customAttributes: selectors.customAttributesFilter(state),
         customAttributeValues: chooseAttributeValuesPerType(state, type),
-        // TODO ADAPT PLTR: use a selector!!!
-        items: type === 'outline' ? state.present.cards : state.present[type],
+        items: selectors.filterItemsSelector(state),
         filteredItems: selectors.filterItemsSelector(state),
         showCharacters: type === 'cards' || type === 'notes',
         showPlaces: type === 'cards' || type === 'notes',

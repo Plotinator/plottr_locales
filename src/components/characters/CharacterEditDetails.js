@@ -444,11 +444,13 @@ const CharacterEditDetailsConnector = (connector) => {
           darkMode: selectors.isDarkModeSelector(state),
           getTemplateById: (templateId) => selectors.templateByIdSelector(state, templateId),
           templateAttributeValue: (templateId, attributeName) => {
-            return selectors.characterTemplateAttributeValueSelector(
-              ownProps.characterId,
-              templateId,
-              attributeName
-            )
+            return (state) =>
+              selectors.characterTemplateAttributeValueSelector(
+                state,
+                ownProps.characterId,
+                templateId,
+                attributeName
+              )
           },
           charactersSearchTerm: selectors.charactersSearchTermSelector(state),
         }

@@ -134,16 +134,16 @@ const CharacterDetailsConnector = (connector) => {
       (state, ownProps) => {
         return {
           character: selectors.displayedSingleCharacterSelector(state, ownProps.characterId),
-          // TODO ADAPT PLTR: use a selector!!!
-          categories: state.present.categories.characters,
+          categories: selectors.characterCategoriesSelector(state),
           customAttributes: selectors.characterAttributesSelector(state, ownProps.characterId),
           getTemplateById: (templateId) => selectors.templateByIdSelector(state, templateId),
           templateAttributeValue: (templateId, attributeName) => {
             return selectors.characterTemplateAttributeValueSelector(
+              state,
               ownProps.characterId,
               templateId,
               attributeName
-            )(state)
+            )
           },
         }
       },

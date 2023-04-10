@@ -167,8 +167,7 @@ const AddLineRowConnector = (connector) => {
           isMedium: selectors.isMediumSelector(state),
           beats: selectors.sortedBeatsByBookSelector(state),
           lines: selectors.linesByBookSelector(state),
-          // TODO ADAPT PLTR: use a selector!!!
-          cards: state.present.cards,
+          cards: selectors.allCardsSelector(state),
         }
       },
       (dispatch) => {
