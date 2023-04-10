@@ -9,13 +9,14 @@ import { t } from 'plottr_locales'
 import { addToKnownFiles, addToKnown } from './known_files'
 import { importFromSnowflake, importFromScrivener } from 'plottr_import_export'
 
-import { helpers, emptyFile, tree, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
+import { helpers, emptyFile, tree, SYSTEM_REDUCER_KEYS, specialCaseFixes } from 'pltr/v2'
 import { openProjectWindow } from './windows/projects'
 import { broadcastToAllWindows } from './broadcast'
 import { OFFLINE_FILE_FILES_PATH, isOfflineFile } from './offlineFilePath'
 import { whenClientIsReady } from '../../shared/socket-client'
 
 const { writeFile } = fs.promises
+const { addSeriesHierarchyIfMissing } = specialCaseFixes
 
 const makeFileModule = () => {
   const TMP_PATH = 'tmp'
@@ -55,21 +56,6 @@ const makeFileModule = () => {
     return whenClientIsReady(({ saveToTempFile }) => {
       return saveToTempFile(json, name)
     })
-  }
-
-  function addSeriesHierarchyIfMissing(file) {
-    if (typeof file.hierarchyLevels.series === 'undefined') {
-      const newFile = emptyFile('', '')
-      return {
-        ...file,
-        hierarchyLevels: {
-          ...file.hierarchyLevels,
-          series: newFile.hierarchyLevels.series,
-        },
-      }
-    } else {
-      return file
-    }
   }
 
   function newFileFromTemplate(template, name) {
