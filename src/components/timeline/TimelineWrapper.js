@@ -613,6 +613,8 @@ const TimelineWrapperConnector = (connector) => {
                     darkmode: timelineBundle.darkMode,
                     vertical: timelineBundle.orientation == 'vertical',
                   })}
+                  stickyHeaderCount={stickyHeaderCount}
+                  leftStickyColumnCount={stickyLeftColumnCount}
                 >
                   {mounted ? (
                     <TimelineTable activeTab={activeTab} tableRef={tableRef.current} />
