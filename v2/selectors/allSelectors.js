@@ -29,6 +29,7 @@ import * as settingsFirstOrder from './settingsFirstOrder'
 import * as tagsFirstOrder from './tagsFirstOrder'
 import * as templatesFirstOrder from './templatesFirstOrder'
 import * as testingAndDiagnosisFirstOrder from './testingAndDiagnosisFirstOrder'
+import * as filterFirstOrder from './filterFirstOrder'
 import * as secondOrder from './secondOrder'
 import * as applicationStateThirdOrder from './applicationStateThirdOrder'
 import * as charactersThirdOrder from './charactersThirdOrder'
@@ -74,6 +75,7 @@ const allSelectors = {
   ...tagsFirstOrder,
   ...templatesFirstOrder,
   ...testingAndDiagnosisFirstOrder,
+  ...filterFirstOrder,
   ...secondOrder,
   ...applicationStateThirdOrder,
   ...charactersThirdOrder,

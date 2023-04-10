@@ -6,8 +6,6 @@ import { addBeat } from '../actions/beats'
 import root from '../reducers/root'
 import { addLinesFromTemplate, addLineWithTitle, deleteLine, pinMovedLine } from '../actions/lines'
 import { nextId } from './nextBeatId'
-import { hierarchyLevelCount } from '../selectors'
-import { currentTimelineSelector } from '../selectors'
 import { nextId as nextLineId } from '../store/newIds'
 import { reorderList } from './lists'
 
@@ -384,12 +382,14 @@ export const moveLineActions = (file, sourceLineId, destinationBookId) => {
   }
 }
 
-export const levelsDiffer = (destinationFile, templateData) => {
+export const levelsDiffer = (selectors) => (destinationFile, templateData) => {
+  const { hierarchyLevelCount } = selectors
   const hierarchyLevels = hierarchyLevelCount(destinationFile)
   return maxDepthIncludingRoot(templateData.beats['1']) < hierarchyLevels
 }
 
-export const levelToApplyTo = (destinationFile, template) => {
+export const levelToApplyTo = (selectors) => (destinationFile, template) => {
+  const { currentTimelineSelector } = selectors
   const currentTimeline = currentTimelineSelector(destinationFile)
   const [startDepth] = computeMergeStart(
     destinationFile.beats[currentTimeline],

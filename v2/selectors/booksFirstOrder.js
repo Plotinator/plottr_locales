@@ -9,6 +9,17 @@ export const allBookIdsSelector = (state) => state.books.allIds
 export const allBooksSelector = (state) => state.books
 export const allBooksAsArraySelector = (state) => [...Object.values(omit(state.books, 'allIds'))]
 
+const bookIdSelector = (_state, bookId) => {
+  return bookId
+}
+export const bookByIdSelector = createSelector(
+  allBooksSelector,
+  bookIdSelector,
+  (books, bookIdSelector) => {
+    return books[bookIdSelector]
+  }
+)
+
 export const canDeleteBookSelector = createSelector(
   allBookIdsSelector,
   (bookIds) => bookIds.length > 1
