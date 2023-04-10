@@ -84,8 +84,7 @@ const ImageConnector = (connector) => {
     return connect(
       (state, ownProps) => {
         return {
-          // TODO ADAPT PLTR: use a selector!!!
-          image: state.present.images[ownProps.imageId],
+          image: selectors.imageByIdSelector(state, ownProps.imageId),
           imageCache: selectors.imageCacheSelector(state),
         }
       },

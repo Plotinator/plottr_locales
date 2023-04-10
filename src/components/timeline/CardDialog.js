@@ -698,19 +698,14 @@ const CardDialogConnector = (connector) => {
           characters: selectors.charactersSortedAtoZSelector(state),
           characterBookCategories: selectors.characterBookCategoriesSelector(state),
           places: selectors.placesSortedAtoZSelector(state),
-          // TODO ADAPT PLTR: use a selector!!!
-          customAttributes: state.present.customAttributes.scenes,
+          customAttributes: selectors.cardsCustomAttributesSelector(state),
           darkMode: selectors.isDarkModeSelector(state),
-          // TODO ADAPT PLTR: use a selector!!!
-          books: state.present.books,
+          books: selectors.allBooksSelector(state),
           isSeries: selectors.isSeriesSelector(state),
           currentTimeline: selectors.currentTimelineSelector(state),
           getTemplateById: selectors.templateByIdFnSelector(state),
-          // FIXME: these function change each re-render we should
-          // instead create a selector that produces the function.
-          destinationLineId: (bookId) => selectors.firstLineForBookSelector(state, bookId),
-          destinationBeatId: (bookId) => selectors.firstVisibleBeatForBookSelector(state, bookId),
-          click: selectors.lastClickSelector(state),
+          destinationLineId: selectors.firstLineForBookThunkSelector(state),
+          destinationBeatId: selectors.firstVisibleBeatForBookThunkSelector(state),
         }
       },
       (dispatch) => {

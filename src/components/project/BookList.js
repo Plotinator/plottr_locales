@@ -210,12 +210,9 @@ const BookListConnector = (connector) => {
     return connect(
       (state) => {
         return {
-          // TODO ADAPT PLTR: use a selector!!!
-          books: state.present.books,
-          // TODO ADAPT PLTR: use a selector!!!
-          lines: state.present.lines,
-          // TODO ADAPT PLTR: use a selector!!!
-          cards: state.present.cards,
+          books: selectors.allBooksSelector(state),
+          lines: selectors.allLinesSelector(state),
+          cards: selectors.allCardsSelector(state),
           isBookDialogVisible: selectors.isBookDialogVisibleSelector(state),
         }
       },

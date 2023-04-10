@@ -377,6 +377,7 @@ const TopRowConnector = (connector) => {
     leavesPerBeatSelector,
     timelineViewIsTabbedSelector,
     timelineActiveTabSelector,
+    nextBeatIdSelector,
   } = selectors
 
   if (redux) {
@@ -384,9 +385,6 @@ const TopRowConnector = (connector) => {
 
     return connect(
       (state) => {
-        // TODO ADAPT PLTR: use a selector!!!
-        const nextBeatId = nextId(state.present.beats)
-
         return {
           currentTimeline: currentTimelineSelector(state),
           orientation: orientationSelector(state),
@@ -396,7 +394,7 @@ const TopRowConnector = (connector) => {
           isLarge: isLargeSelector(state),
           beats: visibleSortedBeatsForTimelineByBookSelector(state),
           booksBeats: beatsByBookSelector(state),
-          nextBeatId: nextBeatId,
+          nextBeatId: nextBeatIdSelector(state),
           lines: sortedLinesByBookSelector(state),
           timelineViewIsStacked: timelineViewIsStackedSelector(state),
           topTierBeats: topTierBeatsInThreeTierArrangementSelector(state),

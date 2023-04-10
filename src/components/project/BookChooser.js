@@ -97,10 +97,8 @@ const BookChooserConnector = (connector) => {
         return {
           currentTimeline: selectors.currentTimelineSelector(state),
           currentView: selectors.currentViewSelector(state),
-          // TODO ADAPT PLTR: use a selector!!!
-          books: state.present.books,
-          // TODO ADAPT PLTR: use a selector!!!
-          series: state.present.series,
+          books: selectors.allBooksSelector(state),
+          series: selectors.seriesSelector(state),
         }
       },
       (dispatch) => {
