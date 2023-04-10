@@ -11,6 +11,17 @@ export const noteCategoriesSelector = (state) => state.categories.notes
 export const tagCategoriesSelector = (state) => state.categories.tags
 export const placeCategoriesSelector = (state) => state.categories.places
 
+const typeSelector = (_state, type) => {
+  return type
+}
+export const categoryByTypeSelector = createSelector(
+  allCategoriesSelector,
+  typeSelector,
+  (categories, categoryType) => {
+    return categories[categoryType]
+  }
+)
+
 export const sortedCharacterCategoriesSelector = createSelector(
   characterCategoriesSelector,
   (categories) => sortBy(categories, 'position')

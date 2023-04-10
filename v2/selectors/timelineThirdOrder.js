@@ -271,6 +271,17 @@ export const lineMaxCardsSelector = createSelector(
   }
 )
 
+export const firstVisibleBeatForBookThunkSelector = createSelector(
+  allBeatsSelector,
+  timelineViewIsTabbedSelector,
+  (beats, timelineIsTabbed) => {
+    return (bookId) => {
+      const firstVisibleBeat = visibleBeatsByPosition(beats[bookId], timelineIsTabbed)[0]
+      return firstVisibleBeat
+    }
+  }
+)
+
 const bookIdSelector = (state, bookId) => bookId
 export const firstVisibleBeatForBookSelector = createSelector(
   allBeatsSelector,

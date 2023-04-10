@@ -23,6 +23,22 @@ export const linesForBookSelector = createSelector(
   }
 )
 
-export const firstLineForBookSelector = createSelector(linesForBookSelector, (lines) => {
+export const firstLineForBookThunkSelector = createSelector(linesForBookSelector, (lines) => {
+  return (bookId) => {
+    const linesInBook = lines.filter((l) => l && l.bookId == bookId)
+    return sortBy(linesInBook, 'position')[0]
+  }
+})
+
+export const firstLineForBookSelector = createSelector(allLinesSelector, (lines) => {
   return sortBy(lines, 'position')[0]
 })
+
+const cardLineIdSelector = (_state, id) => id
+export const cardsLineSelector = createSelector(
+  allLinesSelector,
+  cardLineIdSelector,
+  (lines, id) => {
+    return lines.find((l) => l.id == id)
+  }
+)
