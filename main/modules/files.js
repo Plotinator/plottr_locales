@@ -57,18 +57,33 @@ const makeFileModule = () => {
     })
   }
 
+  function addSeriesHierarchyIfMissing(file) {
+    if (typeof file.hierarchyLevels.series === 'undefined') {
+      const newFile = emptyFile('', '')
+      return {
+        ...file,
+        hierarchyLevels: {
+          ...file.hierarchyLevels,
+          series: newFile.hierarchyLevels.series,
+        },
+      }
+    } else {
+      return file
+    }
+  }
+
   function newFileFromTemplate(template, name) {
     if (!name) {
-      return template.templateData
+      return addSeriesHierarchyIfMissing(template.templateData)
     }
 
-    return {
+    return addSeriesHierarchyIfMissing({
       ...template.templateData,
       series: {
         ...template.templateData.series,
         name,
       },
-    }
+    })
   }
 
   async function createNew(template, name) {
