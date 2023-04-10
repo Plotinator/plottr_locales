@@ -397,7 +397,9 @@ const root = (dataRepairers) => (state, action) => {
       }, state)
 
       if (line.isPinned) {
-        const destinationBookLines = withNewLine.lines.filter((l) => l.bookId === action.destinationBookId)
+        const destinationBookLines = withNewLine.lines.filter(
+          (l) => l.bookId === action.destinationBookId
+        )
         const destinationBookPinnedPlotlines = Number(
           withNewLine.ui?.timeline?.pinnedPlotlines[action.destinationBookId] || 0
         )
@@ -408,12 +410,10 @@ const root = (dataRepairers) => (state, action) => {
           destinationBookLines
         )
 
-        const withLinePinned = mainReducer(withNewLine, pinMovedLine(
-          newLineId,
-          action.destinationBookId,
-          reorderedLines,
-          totalPinnedPlotlines
-        ))
+        const withLinePinned = mainReducer(
+          withNewLine,
+          pinMovedLine(newLineId, action.destinationBookId, reorderedLines, totalPinnedPlotlines)
+        )
         return mainReducer(withLinePinned, deleteLine(action.id))
       }
 
