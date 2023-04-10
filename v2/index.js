@@ -54,6 +54,7 @@ import * as templatesHelpers from './helpers/templates'
 import * as template from './template'
 
 import migrateIfNeeded from './migrator/migration_manager'
+import addSeriesHierarchyIfMissing from './migrator/handleSpecialCases'
 
 import * as selectors from './selectors'
 
@@ -208,6 +209,10 @@ const middlewares = {
   externalSyncWithoutHistory,
 }
 
+const specialCaseFixes = {
+  addSeriesHierarchyIfMissing,
+}
+
 export {
   actions,
   ActionTypes,
@@ -235,4 +240,5 @@ export {
   middlewares,
   ARRAY_KEYS,
   checkFileIntegrity,
+  specialCaseFixes,
 }
