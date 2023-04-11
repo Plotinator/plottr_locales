@@ -180,15 +180,22 @@ export const insertBreakingVersionsPriorToBreakingVersionChange = (file) => {
   return file
 }
 
-export const addSeriesHierarchyIfMissing = (file) => {
+export const addHierarchiesIfMissing = (file) => {
   if (
-    typeof file.hierarchyLevels?.series === 'undefined' &&
+    (typeof file.hierarchyLevels?.series === 'undefined' ||
+      file.books.allIds.some((id) => typeof file.hierarchyLevels[id] === 'undefined')) &&
     semverGte(file.file.version, '2023.3.29')
   ) {
     const newFile = emptyFile('', '')
     return {
       ...file,
       hierarchyLevels: {
+        ...file.books.allIds.reduce((acc, next) => {
+          return {
+            ...acc,
+            [next]: newFile.hierarchyLevels['1'],
+          }
+        }, {}),
         ...file.hierarchyLevels,
         series: newFile.hierarchyLevels.series,
       },
@@ -205,7 +212,7 @@ const applyAllFixes = (file) =>
     handleObjectTitlesOnCards,
     handleMissingUIState,
     insertBreakingVersionsPriorToBreakingVersionChange,
-    addSeriesHierarchyIfMissing,
+    addHierarchiesIfMissing,
   ].reduce((acc, f) => f(acc), file)
 
 export default applyAllFixes
