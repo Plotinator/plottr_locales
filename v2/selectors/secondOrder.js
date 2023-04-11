@@ -27,8 +27,10 @@ export const shouldBeInProSelector = createSelector(
   }
 )
 
-const rootUiSelector = (state) => state.ui
-
+export const rootUiSelector = (state) => state.ui
+export const uiCollaboratorsSelector = createSelector(rootUiSelector, (rootUi) => {
+  return rootUi.collaborators
+})
 export const uiSelector = createSelector(
   shouldBeInProSelector,
   userIdSelector,
@@ -340,6 +342,14 @@ export const hierarchyLevelSelector = createSelector(
   sortedHierarchyLevels,
   (beats, beatId, hierarchyLevels) => {
     return hierarchyLevels[depth(beats, beatId)] || hierarchyLevels[hierarchyLevels.length - 1]
+  }
+)
+const bookIdSelector = (_state, id) => id
+export const hierarchyLevelsForAnotherBookSelector = createSelector(
+  allHierarchyLevelsSelector,
+  bookIdSelector,
+  (hierarchies, bookId) => {
+    return hierarchies[bookId]
   }
 )
 

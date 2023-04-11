@@ -1,32 +1,9 @@
-import { identity } from 'lodash'
-
-import { configureStore } from './fixtures/testStore'
+import { configureStore, pltrAdaptor } from './fixtures/testStore'
 import { hamlet, file_with_legacy_character_tags, goldilocks } from './fixtures'
 import { emptyFile } from '../../store/newFileState'
-import { loadFile, selectCharacterAttributeBookTab } from '../../actions/ui'
-import {
-  addCharacter,
-  addTemplateToCharacter,
-  createCharacterAttribute,
-  editCharacterTemplateAttribute,
-  addBook as addBookToCharacter,
-  addTag as addTagToCharacter,
-  removeTag as removeTagFromCharacter,
-  removeBook as removeBookFromCharacter,
-  editCharacterAttributeValue,
-  editShortDescription,
-  editDescription,
-  editCategory,
-} from '../../actions/characters'
+import actions from '../../actions/characters'
 import { removeSystemKeys } from '../systemReducers'
 import selectors from '../../selectors'
-import { addBook } from '../../actions/books'
-import { addTag } from '../../actions/tags'
-import { deleteBook } from '../../actions/books'
-import { deleteCharacterCategory } from '../../actions/categories'
-import { deleteTag } from '../../actions/tags'
-import { deleteCharacterAttribute, editCharacterAttributeMetadata } from '../../actions/attributes'
-import { addCharacter as addCharacterToCard } from '../../actions/cards'
 
 const {
   characterAttributesSelector,
@@ -34,7 +11,32 @@ const {
   singleCharacterSelector,
   allCharacterAttributesSelector,
   characterCustomAttributesSelector,
-} = selectors(identity)
+  fullFileStateSelector,
+  attributesSelector,
+  allCharactersSelector,
+} = selectors(pltrAdaptor)
+
+const wiredUpActions = actions(pltrAdaptor)
+const { loadFile, selectCharacterAttributeBookTab } = actions.ui
+const { addBook, deleteBook } = actions.books
+const { addTag, deleteTag } = actions.tags
+const { deleteCharacterCategory } = actions.categories
+const { deleteCharacterAttribute, editCharacterAttributeMetadata } = actions.attributes
+const addCharacterToCard = actions.cards.addCharacter
+const {
+  addCharacter,
+  addTemplateToCharacter,
+  createCharacterAttribute,
+  editCharacterTemplateAttribute,
+  editCharacterAttributeValue,
+  editShortDescription,
+  editDescription,
+  editCategory,
+} = wiredUpActions.character
+const addBookToCharacter = wiredUpActions.characetr.addBook
+const addTagToCharacter = wiredUpActions.characetr.addTag
+const removeTagFromCharacter = wiredUpActions.characetr.removeTag
+const removeBookFromCharacter = wiredUpActions.characetr.removeBook
 
 const EMPTY_FILE = emptyFile('Test file')
 const initialStore = () => {
@@ -94,7 +96,7 @@ describe('editCharacterTemplateAttribute', () => {
   describe('given a store with no characters', () => {
     it('should leave the state unchanged', () => {
       const store = initialStore()
-      const initialState = removeSystemKeys(store.getState().present)
+      const initialState = removeSystemKeys(fullFileStateSelector(store.getState()))
       store.dispatch(
         editCharacterTemplateAttribute(
           1,
@@ -104,9 +106,9 @@ describe('editCharacterTemplateAttribute', () => {
           'characters/1/dummy-id/dummy-attribute'
         )
       )
-      const resultState = removeSystemKeys(store.getState().present)
-      expect(ignoringChangesWeDontCareAbout(initialState)).toEqual(
-        ignoringChangesWeDontCareAbout(resultState)
+      const resultState = removeSystemKeys(fullFileStateSelector(store.getState()))
+      expect(ignoringChangesWeDontCareAbout(fullFileStateSelector(initialState))).toEqual(
+        ignoringChangesWeDontCareAbout(fullFileStateSelector(resultState))
       )
     })
   })
@@ -115,7 +117,7 @@ describe('editCharacterTemplateAttribute', () => {
       it('should leave the state unchanged', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
-        const initialState = removeSystemKeys(store.getState().present)
+        const initialState = removeSystemKeys(fullFileStateSelector(store.getState()))
         store.dispatch(
           editCharacterTemplateAttribute(
             1,
@@ -125,9 +127,9 @@ describe('editCharacterTemplateAttribute', () => {
             'characters/1/dummy-id/dummy-attribute'
           )
         )
-        const resultState = removeSystemKeys(store.getState().present)
-        expect(ignoringChangesWeDontCareAbout(initialState)).toEqual(
-          ignoringChangesWeDontCareAbout(resultState)
+        const resultState = removeSystemKeys(fullFileStateSelector(store.getState()))
+        expect(ignoringChangesWeDontCareAbout(fullFileStateSelector(initialState))).toEqual(
+          ignoringChangesWeDontCareAbout(fullFileStateSelector(resultState))
         )
       })
     })
@@ -137,7 +139,7 @@ describe('editCharacterTemplateAttribute', () => {
           const store = initialStore()
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(addTemplateToCharacter(1, A_CHARACTER_TEMPLATE))
-          const initialState = removeSystemKeys(store.getState().present)
+          const initialState = store.getState()
           const initialTemplate = singleCharacterSelector(initialState, 1).templates[0]
           expect(initialTemplate).toEqual({
             attributes: [
@@ -168,7 +170,7 @@ describe('editCharacterTemplateAttribute', () => {
               'characters/1/dummy-id/dummy-attribute'
             )
           )
-          const resultState = removeSystemKeys(store.getState().present)
+          const resultState = store.getState()
           const resultTemplate = singleCharacterSelector(resultState, 1).templates[0]
           expect(resultTemplate).toEqual({
             attributes: [
@@ -204,7 +206,7 @@ describe('editCharacterTemplateAttribute', () => {
           const store = initialStore()
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(addTemplateToCharacter(1, A_CHARACTER_TEMPLATE))
-          const initialState = removeSystemKeys(store.getState().present)
+          const initialState = store.getState()
           const initialTemplate = singleCharacterSelector(initialState, 1).templates[0]
           expect(initialTemplate).toEqual({
             attributes: [
@@ -235,7 +237,7 @@ describe('editCharacterTemplateAttribute', () => {
               'characters/1/dummy-id/dummy-attribute'
             )
           )
-          const resultState = removeSystemKeys(store.getState().present)
+          const resultState = store.getState()
           const resultTemplate = singleCharacterSelector(resultState, 1).templates[0]
           expect(resultTemplate).toEqual(initialTemplate)
         })
@@ -246,7 +248,7 @@ describe('editCharacterTemplateAttribute', () => {
             const store = initialStore()
             store.dispatch(addCharacter('John Doe'))
             store.dispatch(addTemplateToCharacter(1, A_CHARACTER_TEMPLATE))
-            const initialState = removeSystemKeys(store.getState().present)
+            const initialState = store.getState()
             const initialTemplate = singleCharacterSelector(initialState, 1).templates[0]
             expect(initialTemplate).toEqual({
               attributes: [
@@ -277,7 +279,7 @@ describe('editCharacterTemplateAttribute', () => {
                 'characters/1/dummy-id/dummy-attribute'
               )
             )
-            const resultState = removeSystemKeys(store.getState().present)
+            const resultState = store.getState()
             const resultTemplate = singleCharacterSelector(resultState, 1).templates[0]
             expect(resultTemplate).toEqual({
               attributes: [
@@ -313,7 +315,7 @@ describe('editCharacterTemplateAttribute', () => {
             const store = initialStore()
             store.dispatch(addCharacter('John Doe'))
             store.dispatch(addTemplateToCharacter(1, A_CHARACTER_TEMPLATE))
-            const initialState = removeSystemKeys(store.getState().present)
+            const initialState = store.getState()
             const initialTemplate = singleCharacterSelector(initialState, 1).templates[0]
             expect(initialTemplate).toEqual({
               attributes: [
@@ -353,7 +355,7 @@ describe('editCharacterTemplateAttribute', () => {
                 'characters/1/dummy-id/dummy-attribute'
               )
             )
-            const resultState = removeSystemKeys(store.getState().present)
+            const resultState = store.getState()
             const resultTemplate = singleCharacterSelector(resultState, 1).templates[0]
             expect(resultTemplate).toEqual({
               attributes: [
@@ -391,7 +393,7 @@ describe('editCharacterTemplateAttribute', () => {
               store.dispatch(addCharacter('John Doe'))
               store.dispatch(addTemplateToCharacter(1, A_CHARACTER_TEMPLATE))
               store.dispatch(addBook())
-              const initialState = removeSystemKeys(store.getState().present)
+              const initialState = store.getState()
               const initialTemplate = singleCharacterSelector(initialState, 1).templates[0]
               expect(initialTemplate).toEqual({
                 attributes: [
@@ -432,7 +434,7 @@ describe('editCharacterTemplateAttribute', () => {
                   'characters/1/dummy-id/dummy-attribute'
                 )
               )
-              const resultState = removeSystemKeys(store.getState().present)
+              const resultState = store.getState()
               const resultTemplate = singleCharacterSelector(resultState, 1).templates[0]
               expect(resultTemplate).toEqual({
                 attributes: [
@@ -470,7 +472,7 @@ describe('editCharacterTemplateAttribute', () => {
               store.dispatch(addTemplateToCharacter(1, A_CHARACTER_TEMPLATE))
               store.dispatch(addBook())
               store.dispatch(addBookToCharacter(1, 1))
-              const initialState = removeSystemKeys(store.getState().present)
+              const initialState = store.getState()
               const initialTemplate = singleCharacterSelector(initialState, 1).templates[0]
               expect(initialTemplate).toEqual({
                 attributes: [
@@ -511,7 +513,7 @@ describe('editCharacterTemplateAttribute', () => {
                   'characters/1/dummy-id/dummy-attribute'
                 )
               )
-              const resultState = removeSystemKeys(store.getState().present)
+              const resultState = store.getState()
               const resultTemplate = singleCharacterSelector(resultState, 1).templates[0]
               expect(resultTemplate).toEqual({
                 attributes: [
@@ -558,7 +560,7 @@ describe('addTag', () => {
     it('should add a base attribute for tags to the attributes collection', () => {
       const store = initialStore()
       store.dispatch(addTagToCharacter(1, 1))
-      expect(ignoringChangesWeDontCareAbout(store.getState().present).attributes).toEqual({
+      expect(attributesSelector(store.getState())).toEqual({
         characters: [
           {
             id: 1,
@@ -575,7 +577,7 @@ describe('addTag', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(addTagToCharacter(1, 1))
-        expect(ignoringChangesWeDontCareAbout(store.getState().present).attributes).toEqual({
+        expect(attributesSelector(store.getState())).toEqual({
           characters: [
             {
               id: 1,
@@ -592,10 +594,10 @@ describe('addTag', () => {
           const store = initialStore()
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(addTag())
-          expect(singleCharacterSelector(store.getState().present, 1).attributes).toBeUndefined()
+          expect(singleCharacterSelector(store.getState(), 1).attributes).toBeUndefined()
           store.dispatch(selectCharacterAttributeBookTab('1'))
           store.dispatch(addTagToCharacter(1, 1))
-          const resultState = removeSystemKeys(store.getState().present)
+          const resultState = store.getState()
           expect(singleCharacterSelector(resultState, 1).attributes).toEqual([
             {
               bookId: 'all',
@@ -603,7 +605,7 @@ describe('addTag', () => {
               value: [1],
             },
           ])
-          expect(ignoringChangesWeDontCareAbout(resultState).attributes).toEqual({
+          expect(attributesSelector(resultState)).toEqual({
             characters: [
               {
                 id: 1,
@@ -619,10 +621,10 @@ describe('addTag', () => {
           const store = initialStore()
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(addTag())
-          expect(singleCharacterSelector(store.getState().present, 1).attributes).toBeUndefined()
+          expect(singleCharacterSelector(store.getState(), 1).attributes).toBeUndefined()
           store.dispatch(selectCharacterAttributeBookTab('all'))
           store.dispatch(addTagToCharacter(1, 1))
-          const resultState = removeSystemKeys(store.getState().present)
+          const resultState = store.getState()
           expect(singleCharacterSelector(resultState, 1).attributes).toEqual([
             {
               bookId: 'all',
@@ -630,7 +632,7 @@ describe('addTag', () => {
               value: [1],
             },
           ])
-          expect(ignoringChangesWeDontCareAbout(resultState).attributes).toEqual({
+          expect(attributesSelector(resultState)).toEqual({
             characters: [
               {
                 id: 1,
@@ -648,10 +650,10 @@ describe('addTag', () => {
           const store = initialStore()
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(addTag())
-          expect(singleCharacterSelector(store.getState().present, 1).attributes).toBeUndefined()
+          expect(singleCharacterSelector(store.getState(), 1).attributes).toBeUndefined()
           store.dispatch(selectCharacterAttributeBookTab('all'))
           store.dispatch(addTagToCharacter(1, 1))
-          const resultState = removeSystemKeys(store.getState().present)
+          const resultState = store.getState()
           expect(singleCharacterSelector(resultState, 1).attributes).toEqual([
             {
               bookId: 'all',
@@ -659,7 +661,7 @@ describe('addTag', () => {
               value: [1],
             },
           ])
-          expect(ignoringChangesWeDontCareAbout(resultState).attributes).toEqual({
+          expect(attributesSelector(resultState)).toEqual({
             characters: [
               {
                 id: 1,
@@ -676,12 +678,12 @@ describe('addTag', () => {
             const store = initialStore()
             store.dispatch(addCharacter('John Doe'))
             store.dispatch(addTag())
-            expect(singleCharacterSelector(store.getState().present, 1).attributes).toBeUndefined()
+            expect(singleCharacterSelector(store.getState(), 1).attributes).toBeUndefined()
             store.dispatch(addBook())
             store.dispatch(addBookToCharacter(1, 1))
             store.dispatch(selectCharacterAttributeBookTab('all'))
             store.dispatch(addTagToCharacter(1, 1))
-            const resultState = removeSystemKeys(store.getState().present)
+            const resultState = store.getState()
             expect(singleCharacterSelector(resultState, 1).attributes).toEqual([
               {
                 bookId: 'all',
@@ -689,7 +691,7 @@ describe('addTag', () => {
                 value: [1],
               },
             ])
-            expect(ignoringChangesWeDontCareAbout(resultState).attributes).toEqual({
+            expect(attributesSelector(resultState)).toEqual({
               characters: [
                 {
                   id: 1,
@@ -705,12 +707,12 @@ describe('addTag', () => {
             const store = initialStore()
             store.dispatch(addCharacter('John Doe'))
             store.dispatch(addTag())
-            expect(singleCharacterSelector(store.getState().present, 1).attributes).toBeUndefined()
+            expect(singleCharacterSelector(store.getState(), 1).attributes).toBeUndefined()
             store.dispatch(addBook())
             store.dispatch(addBookToCharacter(1, 1))
             store.dispatch(selectCharacterAttributeBookTab('1'))
             store.dispatch(addTagToCharacter(1, 1))
-            const resultState = removeSystemKeys(store.getState().present)
+            const resultState = store.getState()
             expect(singleCharacterSelector(resultState, 1).attributes).toEqual([
               {
                 bookId: '1',
@@ -718,7 +720,7 @@ describe('addTag', () => {
                 value: [1],
               },
             ])
-            expect(ignoringChangesWeDontCareAbout(resultState).attributes).toEqual({
+            expect(attributesSelector(resultState)).toEqual({
               characters: [
                 {
                   id: 1,
@@ -745,13 +747,10 @@ describe('addTag', () => {
             'device://tmp/dummy-url-test-file.pltr'
           )
         )
-        const character1TagsBefore = displayedSingleCharacterSelector(
-          store.getState().present,
-          1
-        ).tags
+        const character1TagsBefore = displayedSingleCharacterSelector(store.getState(), 1).tags
         expect(character1TagsBefore).toEqual([1, 2, 3, 4, 5, 7, 9, 10, 8])
         store.dispatch(addTagToCharacter(1, 11))
-        const character1TagsAfter = displayedSingleCharacterSelector(store.getState().present, 1)
+        const character1TagsAfter = displayedSingleCharacterSelector(store.getState(), 1)
           .attributes[0].value
         expect(character1TagsAfter).toEqual([11, 1, 2, 3, 4, 5, 7, 9, 10, 8])
       })
@@ -763,10 +762,10 @@ describe('addBook', () => {
   describe('given a state with no characters', () => {
     it('leave the state un changed', () => {
       const store = initialStore()
-      const initialState = store.getState().present
+      const initialState = store.getState()
       store.dispatch(addBookToCharacter(1, 1))
-      expect(ignoringChangesWeDontCareAbout(store.getState().present)).toEqual(
-        ignoringChangesWeDontCareAbout(initialState)
+      expect(ignoringChangesWeDontCareAbout(fullFileStateSelector(store.getState()))).toEqual(
+        ignoringChangesWeDontCareAbout(fullFileStateSelector(initialState))
       )
     })
   })
@@ -776,7 +775,7 @@ describe('addBook', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(addBookToCharacter(2, 1))
-        expect(singleCharacterSelector(store.getState().present, 1).bookIds).toEqual([])
+        expect(singleCharacterSelector(store.getState(), 1).bookIds).toEqual([])
       })
     })
     describe('and that characters id', () => {
@@ -784,16 +783,16 @@ describe('addBook', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(addBookToCharacter(1, 1))
-        expect(singleCharacterSelector(store.getState().present, 1).bookIds).toEqual([1])
+        expect(singleCharacterSelector(store.getState(), 1).bookIds).toEqual([1])
       })
       describe('and a book id that does not exist', () => {
         it('should leave the state unchanged', () => {
           const store = initialStore()
           store.dispatch(addCharacter('John Doe'))
-          const initialState = store.getState().present
+          const initialState = store.getState()
           store.dispatch(addBookToCharacter(1, 2))
-          expect(ignoringChangesWeDontCareAbout(store.getState().present)).toEqual(
-            ignoringChangesWeDontCareAbout(initialState)
+          expect(ignoringChangesWeDontCareAbout(fullFileStateSelector(store.getState()))).toEqual(
+            ignoringChangesWeDontCareAbout(fullFileStateSelector(initialState))
           )
         })
       })
@@ -802,7 +801,7 @@ describe('addBook', () => {
           const store = initialStore()
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(addBookToCharacter(1, 'series'))
-          expect(singleCharacterSelector(store.getState().present, 1).bookIds).toEqual(['series'])
+          expect(singleCharacterSelector(store.getState(), 1).bookIds).toEqual(['series'])
         })
       })
     })
@@ -814,7 +813,7 @@ describe('removeTag', () => {
     it('should add an empty base attribute for tags', () => {
       const store = initialStore()
       store.dispatch(removeTagFromCharacter(1, 1))
-      expect(allCharacterAttributesSelector(store.getState().present)).toEqual([
+      expect(allCharacterAttributesSelector(store.getState())).toEqual([
         {
           id: 1,
           name: 'tags',
@@ -829,7 +828,7 @@ describe('removeTag', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(removeTagFromCharacter(1, 1))
-        expect(allCharacterAttributesSelector(store.getState().present)).toEqual([
+        expect(allCharacterAttributesSelector(store.getState())).toEqual([
           {
             id: 1,
             name: 'tags',
@@ -845,7 +844,7 @@ describe('removeTag', () => {
           store.dispatch(addTag())
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(removeTagFromCharacter(1, 1))
-          expect(allCharacterAttributesSelector(store.getState().present)).toEqual([
+          expect(allCharacterAttributesSelector(store.getState())).toEqual([
             {
               id: 1,
               name: 'tags',
@@ -861,10 +860,10 @@ describe('removeTag', () => {
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(addTagToCharacter(1, 1))
           store.dispatch(removeTagFromCharacter(1, 1))
-          expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([
+          expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
             { id: 1, value: [], bookId: 'all' },
           ])
-          expect(store.getState().present.attributes).toEqual({
+          expect(attributesSelector(store.getState())).toEqual({
             characters: [{ id: 1, type: 'base-attribute', name: 'tags' }],
           })
         })
@@ -879,16 +878,16 @@ describe('removeTag', () => {
               store.dispatch(addBookToCharacter(1, 1))
               store.dispatch(selectCharacterAttributeBookTab('1'))
               store.dispatch(addTagToCharacter(1, 1))
-              expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([
+              expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
                 { id: 1, value: [1], bookId: 'all' },
                 { id: 1, value: [1], bookId: '1' },
               ])
               store.dispatch(removeTagFromCharacter(1, 1))
-              expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([
+              expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
                 { id: 1, value: [1], bookId: 'all' },
                 { id: 1, value: [], bookId: '1' },
               ])
-              expect(store.getState().present.attributes).toEqual({
+              expect(attributesSelector(store.getState())).toEqual({
                 characters: [{ id: 1, type: 'base-attribute', name: 'tags' }],
               })
             })
@@ -903,17 +902,17 @@ describe('removeTag', () => {
               store.dispatch(addBookToCharacter(1, 1))
               store.dispatch(selectCharacterAttributeBookTab('1'))
               store.dispatch(addTagToCharacter(1, 1))
-              expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([
+              expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
                 { id: 1, value: [1], bookId: 'all' },
                 { id: 1, value: [1], bookId: '1' },
               ])
               store.dispatch(selectCharacterAttributeBookTab('all'))
               store.dispatch(removeTagFromCharacter(1, 1))
-              expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([
+              expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
                 { id: 1, value: [], bookId: 'all' },
                 { id: 1, value: [1], bookId: '1' },
               ])
-              expect(store.getState().present.attributes).toEqual({
+              expect(attributesSelector(store.getState())).toEqual({
                 characters: [{ id: 1, type: 'base-attribute', name: 'tags' }],
               })
             })
@@ -935,13 +934,10 @@ describe('removeTag', () => {
             'device://tmp/dummy-url-test-file.pltr'
           )
         )
-        const character1TagsBefore = displayedSingleCharacterSelector(
-          store.getState().present,
-          1
-        ).tags
+        const character1TagsBefore = displayedSingleCharacterSelector(store.getState(), 1).tags
         expect(character1TagsBefore).toEqual([1, 2, 3, 4, 5, 7, 9, 10, 8])
         store.dispatch(removeTagFromCharacter(1, 10))
-        const attributesAfter = allCharacterAttributesSelector(store.getState().present)
+        const attributesAfter = allCharacterAttributesSelector(store.getState())
         expect(attributesAfter).toEqual([
           {
             id: 1,
@@ -949,7 +945,7 @@ describe('removeTag', () => {
             name: 'tags',
           },
         ])
-        const character1TagsAfter = displayedSingleCharacterSelector(store.getState().present, 1)
+        const character1TagsAfter = displayedSingleCharacterSelector(store.getState(), 1)
           .attributes[0].value
         expect(character1TagsAfter).toEqual([1, 2, 3, 4, 5, 7, 9, 8])
       })
@@ -961,10 +957,10 @@ describe('removeBook', () => {
   describe('given a state with no characters', () => {
     it('leave the state un changed', () => {
       const store = initialStore()
-      const initialState = store.getState().present
+      const initialState = store.getState()
       store.dispatch(removeBookFromCharacter(1, 1))
-      expect(ignoringChangesWeDontCareAbout(store.getState().present)).toEqual(
-        ignoringChangesWeDontCareAbout(initialState)
+      expect(ignoringChangesWeDontCareAbout(fullFileStateSelector(store.getState()))).toEqual(
+        ignoringChangesWeDontCareAbout(fullFileStateSelector(initialState))
       )
     })
   })
@@ -973,10 +969,10 @@ describe('removeBook', () => {
       it('should leave the state unchanged', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
-        const initialState = store.getState().present
+        const initialState = store.getState()
         store.dispatch(removeBookFromCharacter(1, 1))
-        expect(ignoringChangesWeDontCareAbout(store.getState().present)).toEqual(
-          ignoringChangesWeDontCareAbout(initialState)
+        expect(ignoringChangesWeDontCareAbout(fullFileStateSelector(store.getState()))).toEqual(
+          ignoringChangesWeDontCareAbout(fullFileStateSelector(initialState))
         )
       })
     })
@@ -987,7 +983,7 @@ describe('removeBook', () => {
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(addBookToCharacter(1, 1))
           store.dispatch(removeBookFromCharacter(1, 1))
-          expect(singleCharacterSelector(store.getState().present, 1).bookIds).toEqual([])
+          expect(singleCharacterSelector(store.getState(), 1).bookIds).toEqual([])
         })
       })
       describe('and a different book id', () => {
@@ -995,9 +991,9 @@ describe('removeBook', () => {
           const store = initialStore()
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(addBookToCharacter(1, 1))
-          expect(singleCharacterSelector(store.getState().present, 1).bookIds).toEqual([1])
+          expect(singleCharacterSelector(store.getState(), 1).bookIds).toEqual([1])
           store.dispatch(removeBookFromCharacter(1, 2))
-          expect(singleCharacterSelector(store.getState().present, 1).bookIds).toEqual([1])
+          expect(singleCharacterSelector(store.getState(), 1).bookIds).toEqual([1])
         })
       })
     })
@@ -1006,16 +1002,16 @@ describe('removeBook', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(addBookToCharacter(1, 1))
-        expect(singleCharacterSelector(store.getState().present, 1).bookIds).toEqual([1])
+        expect(singleCharacterSelector(store.getState(), 1).bookIds).toEqual([1])
       })
       describe('and a book id that does not exist', () => {
         it('should leave the state unchanged', () => {
           const store = initialStore()
           store.dispatch(addCharacter('John Doe'))
-          const initialState = store.getState().present
+          const initialState = store.getState()
           store.dispatch(addBookToCharacter(1, 2))
-          expect(ignoringChangesWeDontCareAbout(store.getState().present)).toEqual(
-            ignoringChangesWeDontCareAbout(initialState)
+          expect(ignoringChangesWeDontCareAbout(fullFileStateSelector(store.getState()))).toEqual(
+            ignoringChangesWeDontCareAbout(fullFileStateSelector(initialState))
           )
         })
       })
@@ -1027,11 +1023,9 @@ describe('createCharacterAttribute', () => {
   describe('given a state with no characters', () => {
     it('should not change the character state', () => {
       const store = initialStore()
-      const initialState = store.getState().present
+      const initialState = store.getState()
       store.dispatch(createCharacterAttribute('text', 'strength'))
-      expect(ignoringChangesWeDontCareAbout(store.getState().present).characters).toEqual(
-        ignoringChangesWeDontCareAbout(initialState).characters
-      )
+      expect(allCharactersSelector(store.getState())).toEqual(allCharactersSelector(initialState))
     })
   })
   describe('given a state with a character', () => {
@@ -1039,7 +1033,7 @@ describe('createCharacterAttribute', () => {
       const store = initialStore()
       store.dispatch(addCharacter('John Doe'))
       store.dispatch(createCharacterAttribute('text', 'strength'))
-      expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([
+      expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
         {
           id: 1,
           value: undefined,
@@ -1052,7 +1046,7 @@ describe('createCharacterAttribute', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(createCharacterAttribute('text', 'id'))
-        expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([
+        expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
           {
             id: 1,
             value: undefined,
@@ -1068,10 +1062,10 @@ describe('editCharacterAttributeValue', () => {
   describe('given a state with no characters', () => {
     it('should leave the state unchanged', () => {
       const store = initialStore()
-      const initialState = store.getState().present
+      const initialState = store.getState()
       store.dispatch(editCharacterAttributeValue(1, 1, 'New value'))
-      expect(ignoringChangesWeDontCareAbout(store.getState().present)).toEqual(
-        ignoringChangesWeDontCareAbout(initialState)
+      expect(ignoringChangesWeDontCareAbout(fullFileStateSelector(store.getState()))).toEqual(
+        ignoringChangesWeDontCareAbout(fullFileStateSelector(initialState))
       )
     })
   })
@@ -1080,10 +1074,10 @@ describe('editCharacterAttributeValue', () => {
       it('should leave the state unchanged', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
-        const initialState = store.getState().present
+        const initialState = store.getState()
         store.dispatch(editCharacterAttributeValue(1, 1, 'New value'))
-        expect(ignoringChangesWeDontCareAbout(store.getState().present)).toEqual(
-          ignoringChangesWeDontCareAbout(initialState)
+        expect(ignoringChangesWeDontCareAbout(fullFileStateSelector(store.getState()))).toEqual(
+          ignoringChangesWeDontCareAbout(fullFileStateSelector(initialState))
         )
       })
     })
@@ -1093,10 +1087,10 @@ describe('editCharacterAttributeValue', () => {
           const store = initialStore()
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(createCharacterAttribute('text', 'strength'))
-          const initialState = store.getState().present
+          const initialState = store.getState()
           store.dispatch(editCharacterAttributeValue(2, 1, 'New value'))
-          expect(ignoringChangesWeDontCareAbout(store.getState().present)).toEqual(
-            ignoringChangesWeDontCareAbout(initialState)
+          expect(ignoringChangesWeDontCareAbout(fullFileStateSelector(store.getState()))).toEqual(
+            ignoringChangesWeDontCareAbout(fullFileStateSelector(initialState))
           )
         })
       })
@@ -1108,10 +1102,10 @@ describe('editCharacterAttributeValue', () => {
             const store = initialStore()
             store.dispatch(addCharacter('John Doe'))
             store.dispatch(createCharacterAttribute('text', 'strength'))
-            const initialState = store.getState().present
+            const initialState = store.getState()
             store.dispatch(editCharacterAttributeValue(1, 2, 'New value'))
-            expect(ignoringChangesWeDontCareAbout(store.getState().present).characters).toEqual(
-              ignoringChangesWeDontCareAbout(initialState).characters
+            expect(allCharactersSelector(store.getState())).toEqual(
+              allCharactersSelector(initialState)
             )
           })
         })
@@ -1121,7 +1115,7 @@ describe('editCharacterAttributeValue', () => {
             store.dispatch(addCharacter('John Doe'))
             store.dispatch(createCharacterAttribute('text', 'strength'))
             store.dispatch(editCharacterAttributeValue(1, 1, 'New value'))
-            expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([
+            expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
               {
                 id: 1,
                 value: 'New value',
@@ -1140,7 +1134,7 @@ describe('editCharacterAttributeValue', () => {
         store.dispatch(
           loadFile('Hamlet', false, hamlet, hamlet.file.version, 'device:///tmp.dummy.pltr')
         )
-        const attributesBefore = characterAttributesSelector(store.getState().present, 1)
+        const attributesBefore = characterAttributesSelector(store.getState(), 1)
         expect(attributesBefore).toEqual([
           {
             name: 'Role',
@@ -1197,7 +1191,7 @@ describe('editCharacterAttributeValue', () => {
           },
         ])
         editCharacterAttributeValue(1, 'Attended Wittenberg', 'No')(store.dispatch, store.getState)
-        const attributesAfter = characterAttributesSelector(store.getState().present, 1)
+        const attributesAfter = characterAttributesSelector(store.getState(), 1)
         expect(attributesAfter).toEqual([
           {
             name: 'Role',
@@ -1264,12 +1258,10 @@ describe('editShortDescription', () => {
   describe('given a store with no characters', () => {
     it('should add an attribute but leave the character state unchanged', () => {
       const store = initialStore()
-      const initialState = store.getState().present
+      const initialState = store.getState()
       store.dispatch(editShortDescription(1, 'New value'))
-      expect(ignoringChangesWeDontCareAbout(store.getState().present).characters).toEqual(
-        ignoringChangesWeDontCareAbout(initialState).characters
-      )
-      expect(ignoringChangesWeDontCareAbout(store.getState().present).attributes).toEqual({
+      expect(allCharactersSelector(store.getState())).toEqual(allCharactersSelector(initialState))
+      expect(attributesSelector(store.getState())).toEqual({
         characters: [{ id: 1, name: 'shortDescription', type: 'base-attribute' }],
       })
     })
@@ -1279,12 +1271,10 @@ describe('editShortDescription', () => {
       it('should leave the character state unchanged and create an attribute for the description', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
-        const initialState = store.getState().present
+        const initialState = store.getState()
         store.dispatch(editShortDescription(2, 'New value'))
-        expect(ignoringChangesWeDontCareAbout(store.getState().present).characters).toEqual(
-          ignoringChangesWeDontCareAbout(initialState).characters
-        )
-        expect(ignoringChangesWeDontCareAbout(store.getState().present).attributes).toEqual({
+        expect(allCharactersSelector(store.getState())).toEqual(allCharactersSelector(initialState))
+        expect(attributesSelector(store.getState())).toEqual({
           characters: [{ id: 1, name: 'shortDescription', type: 'base-attribute' }],
         })
       })
@@ -1294,14 +1284,14 @@ describe('editShortDescription', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(editShortDescription(1, 'New value'))
-        expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([
+        expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
           {
             bookId: 'all',
             id: 1,
             value: 'New value',
           },
         ])
-        expect(ignoringChangesWeDontCareAbout(store.getState().present).attributes).toEqual({
+        expect(attributesSelector(store.getState())).toEqual({
           characters: [{ id: 1, name: 'shortDescription', type: 'base-attribute' }],
         })
       })
@@ -1312,14 +1302,14 @@ describe('editShortDescription', () => {
             store.dispatch(addCharacter('John Doe'))
             store.dispatch(editShortDescription(1, 'New value'))
             store.dispatch(addBook())
-            expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([
+            expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
               {
                 bookId: 'all',
                 id: 1,
                 value: 'New value',
               },
             ])
-            expect(ignoringChangesWeDontCareAbout(store.getState().present).attributes).toEqual({
+            expect(attributesSelector(store.getState())).toEqual({
               characters: [{ id: 1, name: 'shortDescription', type: 'base-attribute' }],
             })
           })
@@ -1333,14 +1323,14 @@ describe('editShortDescription', () => {
               store.dispatch(addBookToCharacter(1, 1))
               store.dispatch(selectCharacterAttributeBookTab('all'))
               store.dispatch(editShortDescription(1, 'New value'))
-              expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([
+              expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
                 {
                   bookId: 'all',
                   id: 1,
                   value: 'New value',
                 },
               ])
-              expect(ignoringChangesWeDontCareAbout(store.getState().present).attributes).toEqual({
+              expect(attributesSelector(store.getState())).toEqual({
                 characters: [{ id: 1, name: 'shortDescription', type: 'base-attribute' }],
               })
             })
@@ -1353,14 +1343,14 @@ describe('editShortDescription', () => {
               store.dispatch(addBookToCharacter(1, 1))
               store.dispatch(selectCharacterAttributeBookTab('1'))
               store.dispatch(editShortDescription(1, 'New value'))
-              expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([
+              expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
                 {
                   bookId: '1',
                   id: 1,
                   value: 'New value',
                 },
               ])
-              expect(ignoringChangesWeDontCareAbout(store.getState().present).attributes).toEqual({
+              expect(attributesSelector(store.getState())).toEqual({
                 characters: [{ id: 1, name: 'shortDescription', type: 'base-attribute' }],
               })
             })
@@ -1375,12 +1365,10 @@ describe('editDescription', () => {
   describe('given a store with no characters', () => {
     it('should add an attribute but leave the character state unchanged', () => {
       const store = initialStore()
-      const initialState = store.getState().present
+      const initialState = store.getState()
       store.dispatch(editDescription(1, 'New value'))
-      expect(ignoringChangesWeDontCareAbout(store.getState().present).characters).toEqual(
-        ignoringChangesWeDontCareAbout(initialState).characters
-      )
-      expect(ignoringChangesWeDontCareAbout(store.getState().present).attributes).toEqual({
+      expect(allCharactersSelector(store.getState())).toEqual(allCharactersSelector(initialState))
+      expect(attributesSelector(store.getState())).toEqual({
         characters: [{ id: 1, name: 'description', type: 'base-attribute' }],
       })
     })
@@ -1390,12 +1378,10 @@ describe('editDescription', () => {
       it('should leave the character state unchanged and create an attribute for the description', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
-        const initialState = store.getState().present
+        const initialState = store.getState()
         store.dispatch(editDescription(2, 'New value'))
-        expect(ignoringChangesWeDontCareAbout(store.getState().present).characters).toEqual(
-          ignoringChangesWeDontCareAbout(initialState).characters
-        )
-        expect(ignoringChangesWeDontCareAbout(store.getState().present).attributes).toEqual({
+        expect(allCharactersSelector(store.getState())).toEqual(allCharactersSelector(initialState))
+        expect(attributesSelector(store.getState())).toEqual({
           characters: [{ id: 1, name: 'description', type: 'base-attribute' }],
         })
       })
@@ -1405,14 +1391,14 @@ describe('editDescription', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(editDescription(1, 'New value'))
-        expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([
+        expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
           {
             bookId: 'all',
             id: 1,
             value: 'New value',
           },
         ])
-        expect(ignoringChangesWeDontCareAbout(store.getState().present).attributes).toEqual({
+        expect(attributesSelector(store.getState())).toEqual({
           characters: [{ id: 1, name: 'description', type: 'base-attribute' }],
         })
       })
@@ -1423,14 +1409,14 @@ describe('editDescription', () => {
             store.dispatch(addCharacter('John Doe'))
             store.dispatch(editDescription(1, 'New value'))
             store.dispatch(addBook())
-            expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([
+            expect(singleCharacterSelector(store.getState(), 1)).toEqual([
               {
                 bookId: 'all',
                 id: 1,
                 value: 'New value',
               },
             ])
-            expect(ignoringChangesWeDontCareAbout(store.getState().present).attributes).toEqual({
+            expect(attributesSelector(store.getState())).toEqual({
               characters: [{ id: 1, name: 'description', type: 'base-attribute' }],
             })
           })
@@ -1444,14 +1430,14 @@ describe('editDescription', () => {
               store.dispatch(addBookToCharacter(1, 1))
               store.dispatch(selectCharacterAttributeBookTab('all'))
               store.dispatch(editDescription(1, 'New value'))
-              expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([
+              expect(attributesSelector(store.getState(), 1)).toEqual([
                 {
                   bookId: 'all',
                   id: 1,
                   value: 'New value',
                 },
               ])
-              expect(ignoringChangesWeDontCareAbout(store.getState().present).attributes).toEqual({
+              expect(attributesSelector(store.getState())).toEqual({
                 characters: [{ id: 1, name: 'description', type: 'base-attribute' }],
               })
             })
@@ -1464,14 +1450,14 @@ describe('editDescription', () => {
               store.dispatch(addBookToCharacter(1, 1))
               store.dispatch(selectCharacterAttributeBookTab('1'))
               store.dispatch(editDescription(1, 'New value'))
-              expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([
+              expect(attributesSelector(store.getState(), 1)).toEqual([
                 {
                   bookId: '1',
                   id: 1,
                   value: 'New value',
                 },
               ])
-              expect(ignoringChangesWeDontCareAbout(store.getState().present).attributes).toEqual({
+              expect(attributesSelector(store.getState())).toEqual({
                 characters: [{ id: 1, name: 'description', type: 'base-attribute' }],
               })
             })
@@ -1486,12 +1472,10 @@ describe('editCategory', () => {
   describe('given a store with no characters', () => {
     it('should add an attribute but leave the character state unchanged', () => {
       const store = initialStore()
-      const initialState = store.getState().present
+      const initialState = store.getState()
       store.dispatch(editCategory(1, 'New value'))
-      expect(ignoringChangesWeDontCareAbout(store.getState().present).characters).toEqual(
-        ignoringChangesWeDontCareAbout(initialState).characters
-      )
-      expect(ignoringChangesWeDontCareAbout(store.getState().present).attributes).toEqual({
+      expect(allCharactersSelector(store.getState())).toEqual(allCharactersSelector(initialState))
+      expect(attributesSelector(store.getState())).toEqual({
         characters: [{ id: 1, name: 'category', type: 'base-attribute' }],
       })
     })
@@ -1501,12 +1485,10 @@ describe('editCategory', () => {
       it('should leave the character state unchanged and create an attribute for the description', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
-        const initialState = store.getState().present
+        const initialState = store.getState()
         store.dispatch(editCategory(2, 'New value'))
-        expect(ignoringChangesWeDontCareAbout(store.getState().present).characters).toEqual(
-          ignoringChangesWeDontCareAbout(initialState).characters
-        )
-        expect(ignoringChangesWeDontCareAbout(store.getState().present).attributes).toEqual({
+        expect(allCharactersSelector(store.getState())).toEqual(allCharactersSelector(initialState))
+        expect(attributesSelector(store.getState())).toEqual({
           characters: [{ id: 1, name: 'category', type: 'base-attribute' }],
         })
       })
@@ -1516,14 +1498,14 @@ describe('editCategory', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(editCategory(1, 'New value'))
-        expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([
+        expect(attributesSelector(store.getState(), 1)).toEqual([
           {
             bookId: 'all',
             id: 1,
             value: 'New value',
           },
         ])
-        expect(ignoringChangesWeDontCareAbout(store.getState().present).attributes).toEqual({
+        expect(attributesSelector(store.getState())).toEqual({
           characters: [{ id: 1, name: 'category', type: 'base-attribute' }],
         })
       })
@@ -1534,14 +1516,14 @@ describe('editCategory', () => {
             store.dispatch(addCharacter('John Doe'))
             store.dispatch(editCategory(1, 'New value'))
             store.dispatch(addBook())
-            expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([
+            expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
               {
                 bookId: 'all',
                 id: 1,
                 value: 'New value',
               },
             ])
-            expect(ignoringChangesWeDontCareAbout(store.getState().present).attributes).toEqual({
+            expect(attributesSelector(store.getState())).toEqual({
               characters: [{ id: 1, name: 'category', type: 'base-attribute' }],
             })
           })
@@ -1555,14 +1537,14 @@ describe('editCategory', () => {
               store.dispatch(addBookToCharacter(1, 1))
               store.dispatch(selectCharacterAttributeBookTab('all'))
               store.dispatch(editCategory(1, 'New value'))
-              expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([
+              expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
                 {
                   bookId: 'all',
                   id: 1,
                   value: 'New value',
                 },
               ])
-              expect(ignoringChangesWeDontCareAbout(store.getState().present).attributes).toEqual({
+              expect(attributesSelector(store.getState())).toEqual({
                 characters: [{ id: 1, name: 'category', type: 'base-attribute' }],
               })
             })
@@ -1575,14 +1557,14 @@ describe('editCategory', () => {
               store.dispatch(addBookToCharacter(1, 1))
               store.dispatch(selectCharacterAttributeBookTab('1'))
               store.dispatch(editCategory(1, 'New value'))
-              expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([
+              expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
                 {
                   bookId: '1',
                   id: 1,
                   value: 'New value',
                 },
               ])
-              expect(ignoringChangesWeDontCareAbout(store.getState().present).attributes).toEqual({
+              expect(attributesSelector(store.getState())).toEqual({
                 characters: [{ id: 1, name: 'category', type: 'base-attribute' }],
               })
             })
@@ -1600,10 +1582,10 @@ describe('deleteBook', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(addBook())
-        const initialState = store.getState().present
+        const initialState = store.getState()
         store.dispatch(deleteBook(1))
-        expect(ignoringChangesWeDontCareAbout(initialState).characters).toEqual(
-          ignoringChangesWeDontCareAbout(store.getState().present).characters
+        expect(allCharactersSelector(initialState)).toEqual(
+          allCharactersSelector(store.getState())
         )
       })
     })
@@ -1615,7 +1597,7 @@ describe('deleteBook', () => {
           store.dispatch(addBook())
           store.dispatch(addBookToCharacter(1, 1))
           store.dispatch(deleteBook(1))
-          expect(singleCharacterSelector(store.getState().present, 1).bookIds).toEqual([])
+          expect(singleCharacterSelector(store.getState(), 1).bookIds).toEqual([])
         })
       })
       describe('and a different book id', () => {
@@ -1626,7 +1608,7 @@ describe('deleteBook', () => {
           store.dispatch(addBook())
           store.dispatch(addBookToCharacter(1, 1))
           store.dispatch(deleteBook(2))
-          expect(singleCharacterSelector(store.getState().present, 1).bookIds).toEqual([1])
+          expect(singleCharacterSelector(store.getState(), 1).bookIds).toEqual([1])
         })
       })
     })
@@ -1637,9 +1619,9 @@ describe('deleteCharacterCategory', () => {
   describe('given a state with no characters', () => {
     it('should leave the character state unchanged', () => {
       const store = initialStore()
-      const initialState = store.getState().present
+      const initialState = store.getState()
       store.dispatch(deleteCharacterCategory(1))
-      expect(initialState.characters).toEqual(store.getState().present.characters)
+      expect(allCharactersSelector(initialState)).toEqual(allCharactersSelector(store.getState()))
     })
   })
   describe('given a state with a character', () => {
@@ -1647,9 +1629,9 @@ describe('deleteCharacterCategory', () => {
       it('should leave the state unchanged', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
-        const initialState = store.getState().present
+        const initialState = store.getState()
         store.dispatch(deleteCharacterCategory(1))
-        expect(initialState.characters).toEqual(store.getState().present.characters)
+        expect(allCharactersSelector(initialState)).toEqual(allCharactersSelector(store.getState()))
       })
     })
     describe('and the character has a category', () => {
@@ -1659,7 +1641,7 @@ describe('deleteCharacterCategory', () => {
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(editCategory(1, 1))
           store.dispatch(deleteCharacterCategory(1))
-          expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([
+          expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
             {
               bookId: 'all',
               id: 1,
@@ -1676,7 +1658,7 @@ describe('deleteCharacterCategory', () => {
             store.dispatch(addBookToCharacter(1, 1))
             store.dispatch(selectCharacterAttributeBookTab('2'))
             store.dispatch(deleteCharacterCategory(1))
-            expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([
+            expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
               {
                 bookId: 'all',
                 id: 1,
@@ -1692,7 +1674,7 @@ describe('deleteCharacterCategory', () => {
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(editCategory(1, 1))
           store.dispatch(deleteCharacterCategory(2))
-          expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([
+          expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
             {
               bookId: 'all',
               id: 1,
@@ -1709,9 +1691,9 @@ describe('deleteTag', () => {
   describe('given a state with no characters', () => {
     it('should leave the character state unchanged', () => {
       const store = initialStore()
-      const initialState = store.getState().present
+      const initialState = store.getState()
       store.dispatch(deleteTag(1))
-      expect(initialState.characters).toEqual(store.getState().present.characters)
+      expect(allCharactersSelector(initialState)).toEqual(allCharactersSelector(store.getState()))
     })
   })
   describe('given a state with a character', () => {
@@ -1719,9 +1701,9 @@ describe('deleteTag', () => {
       it('should leave the state unchanged', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
-        const initialState = store.getState().present
+        const initialState = store.getState()
         store.dispatch(deleteTag(1))
-        expect(initialState.characters).toEqual(store.getState().present.characters)
+        expect(allCharactersSelector(initialState)).toEqual(allCharactersSelector(store.getState()))
       })
     })
     describe('and the character has a tag', () => {
@@ -1732,7 +1714,7 @@ describe('deleteTag', () => {
           store.dispatch(addTag())
           store.dispatch(addTagToCharacter(1, 1))
           store.dispatch(deleteTag(1))
-          expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([
+          expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
             {
               bookId: 'all',
               id: 1,
@@ -1750,7 +1732,7 @@ describe('deleteTag', () => {
             store.dispatch(addBookToCharacter(1, 1))
             store.dispatch(selectCharacterAttributeBookTab('2'))
             store.dispatch(deleteTag(1))
-            expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([
+            expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
               {
                 bookId: 'all',
                 id: 1,
@@ -1768,7 +1750,7 @@ describe('deleteTag', () => {
           store.dispatch(addTag())
           store.dispatch(addTagToCharacter(1, 1))
           store.dispatch(deleteTag(2))
-          expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([
+          expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
             {
               bookId: 'all',
               id: 1,
@@ -1785,9 +1767,9 @@ describe('deleteCharacterAttribute', () => {
   describe('given a state with no characters', () => {
     it('should leave the character state unchanged', () => {
       const store = initialStore()
-      const initialState = store.getState().present
+      const initialState = store.getState()
       store.dispatch(deleteCharacterAttribute(1))
-      expect(initialState.characters).toEqual(store.getState().present.characters)
+      expect(allCharactersSelector(initialState)).toEqual(allCharactersSelector(store.getState()))
     })
   })
   describe('given a state with a character', () => {
@@ -1795,9 +1777,9 @@ describe('deleteCharacterAttribute', () => {
       it('should leave the character state unchanged', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
-        const initialState = store.getState().present
+        const initialState = store.getState()
         store.dispatch(deleteCharacterAttribute(1))
-        expect(initialState.characters).toEqual(store.getState().present.characters)
+        expect(allCharactersSelector(initialState)).toEqual(allCharactersSelector(store.getState()))
       })
     })
     describe('and a custom attribute', () => {
@@ -1807,7 +1789,7 @@ describe('deleteCharacterAttribute', () => {
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(createCharacterAttribute('text', 'strength'))
           store.dispatch(deleteCharacterAttribute(1))
-          expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([])
+          expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([])
         })
         describe('and a different book is selected', () => {
           it('should still remove the attribute for that custom attribute entirely', () => {
@@ -1817,7 +1799,7 @@ describe('deleteCharacterAttribute', () => {
             store.dispatch(createCharacterAttribute('text', 'strength'))
             store.dispatch(selectCharacterAttributeBookTab('2'))
             store.dispatch(deleteCharacterAttribute(1))
-            expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([])
+            expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([])
           })
         })
       })
@@ -1827,7 +1809,7 @@ describe('deleteCharacterAttribute', () => {
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(createCharacterAttribute('text', 'strength'))
           store.dispatch(deleteCharacterAttribute(2))
-          expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([
+          expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
             {
               bookId: 'all',
               id: 1,
@@ -1844,10 +1826,10 @@ describe('addCharacter (to card)', () => {
   describe('given a state with no characters', () => {
     it('should leave the character state unchanged', () => {
       const store = initialStore()
-      const initialState = store.getState().present
+      const initialState = store.getState()
       store.dispatch(addCharacterToCard(1, 2))
-      const resultState = store.getState().present
-      expect(initialState.characters).toEqual(resultState.characters)
+      const resultState = store.getState()
+      expect(allCharactersSelector(initialState)).toEqual(allCharactersSelector(resultState))
     })
   })
   describe('given a state with a character', () => {
@@ -1855,10 +1837,10 @@ describe('addCharacter (to card)', () => {
       it('should leave the character state unchanged', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
-        const initialState = store.getState().present
+        const initialState = store.getState()
         store.dispatch(addCharacterToCard(1, 2))
-        const resultState = store.getState().present
-        expect(initialState.characters).toEqual(resultState.characters)
+        const resultState = store.getState()
+        expect(allCharactersSelector(initialState)).toEqual(allCharactersSelector(resultState))
       })
     })
     describe('and that character id', () => {
@@ -1866,7 +1848,7 @@ describe('addCharacter (to card)', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(addCharacterToCard(1, 1))
-        const resultState = store.getState().present
+        const resultState = store.getState()
         expect(singleCharacterSelector(resultState, 1).bookIds).toEqual([1])
       })
       describe('and the character already has that book', () => {
@@ -1875,7 +1857,7 @@ describe('addCharacter (to card)', () => {
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(addCharacterToCard(1, 1))
           store.dispatch(addCharacterToCard(1, 1))
-          const resultState = store.getState().present
+          const resultState = store.getState()
           expect(singleCharacterSelector(resultState, 1).bookIds).toEqual([1])
         })
       })
@@ -1897,17 +1879,17 @@ describe('editAttributeMetadata', () => {
             'device:///tmp.dummy.pltr'
           )
         )
-        const otherCharacterBefore = singleCharacterSelector(store.getState().present, 2)
+        const otherCharacterBefore = singleCharacterSelector(store.getState(), 2)
         expect(otherCharacterBefore.Species).toEqual('Bear')
         store.dispatch(editCharacterAttributeMetadata(null, 'NewName', 'text', 'Species'))
-        const legacyAttributes = characterCustomAttributesSelector(store.getState().present)
+        const legacyAttributes = characterCustomAttributesSelector(store.getState())
         expect(legacyAttributes).toEqual([
           {
             type: 'text',
             name: 'NewName',
           },
         ])
-        const otherCharacterAfter = singleCharacterSelector(store.getState().present, 2)
+        const otherCharacterAfter = singleCharacterSelector(store.getState(), 2)
         expect(otherCharacterAfter.Species).toBeUndefined()
         expect(otherCharacterAfter.NewName).toEqual('Bear')
       })
@@ -1935,7 +1917,7 @@ describe('editAttributeMetadata', () => {
                   },
                 ])
               )
-              expect(singleCharacterSelector(store.getState().present, 1).attributes).toEqual([
+              expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
                 {
                   bookId: 'all',
                   id: 1,
@@ -1960,7 +1942,7 @@ describe('editAttributeMetadata', () => {
                 ])
               )
               store.dispatch(editCharacterAttributeMetadata(1, 'strength', 'text', 'strength'))
-              const johnDoe = singleCharacterSelector(store.getState().present, 1)
+              const johnDoe = singleCharacterSelector(store.getState(), 1)
               expect(johnDoe.attributes).toEqual([
                 {
                   bookId: 'all',
