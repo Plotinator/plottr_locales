@@ -4,6 +4,7 @@
 
 import { get } from 'lodash'
 
+export const fileSelector = ({ file }) => file
 export const fileNameSelector = (state) => get(state, 'file.fileName')
 export const originalFileNameSelector = (state) => get(state, 'file.originalFileName')
 export const cloudFilePathSelector = (state) => {

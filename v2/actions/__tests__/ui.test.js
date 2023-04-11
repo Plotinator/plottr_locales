@@ -294,7 +294,7 @@ describe('bookDialog', () => {
     describe('and openNewBookDialog is dispatched', () => {
       const nextBookNumber = allBookIdsSelector(initialState).length + 1
       store.dispatch(openNewBookDialog())
-      const previousState = store.getState().present
+      const previousState = store.getState()
       const bookDialogBookId = bookDialogBookIdSelector(previousState)
       const bookNumber = bookNumberSelector(previousState)
       const isOpen = isBookDialogVisibleSelector(previousState)
@@ -314,7 +314,7 @@ describe('bookDialog', () => {
 
       describe('given addBook is dispatched with completely blank fields', () => {
         store.dispatch(addBook())
-        const presentState = store.getState().present
+        const presentState = store.getState()
         const allBooks = allBooksSelector(presentState)
         const totalBooks = allBookIdsSelector(presentState).length
 
@@ -345,7 +345,7 @@ describe('bookDialog', () => {
             exampleBookAttributes.theme
           )
         )
-        const presentState = store.getState().present
+        const presentState = store.getState()
         const allBooks = allBooksSelector(presentState)
         const totalBooks = allBookIdsSelector(presentState).length
 
@@ -371,9 +371,10 @@ describe('bookDialog', () => {
 
       describe('given closeBookDialog is dispatched', () => {
         store.dispatch(closeBookDialog())
-        const presentState = store.getState().present
+        const presentState = store.getState()
+        const bookDialog = bookDialogSelector(presentState)
         it('should be back to its initialState', () => {
-          expect(presentState.ui.bookDialog).toMatchObject(initialBookDialogState)
+          expect(bookDialog).toMatchObject(initialBookDialogState)
         })
       })
     })
@@ -381,7 +382,7 @@ describe('bookDialog', () => {
     describe('given openEditBookDialog is dispatched', () => {
       const bookId = 1
       store.dispatch(openEditBookDialog(bookId))
-      const previousState = store.getState().present
+      const previousState = store.getState()
       const currentBook = allBooksSelector(previousState)[bookId]
       const initialTotalNumberOfBooks = allBookIdsSelector(previousState).length
       const bookDialogBookId = bookDialogBookIdSelector(previousState)
@@ -411,7 +412,7 @@ describe('bookDialog', () => {
             exampleBookAttributes.theme
           )
         )
-        const presentState = store.getState().present
+        const presentState = store.getState()
         const allBooks = allBooksSelector(presentState)
         const totalBooks = allBookIdsSelector(presentState).length
 
@@ -437,9 +438,10 @@ describe('bookDialog', () => {
 
       describe('given closeBookDialog is dispatched', () => {
         store.dispatch(closeBookDialog())
-        const presentState = store.getState().present
+        const presentState = store.getState()
         it('should be back to its initialState', () => {
-          expect(presentState.ui.bookDialog).toMatchObject(initialBookDialogState)
+          const bookDialog = bookDialogSelector(presentState)
+          expect(bookDialog).toMatchObject(initialBookDialogState)
         })
       })
     })
