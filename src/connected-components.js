@@ -142,6 +142,7 @@ const platform = {
   file: {
     createNew: (template, name) => {
       const state = store.getState()
+      const file = selectors.fullFileStateSelector(state)
       const emailAddress = selectors.emailAddressSelector(state)
       const userId = selectors.userIdSelector(state)
       const clientId = selectors.clientIdSelector(state)
@@ -149,7 +150,7 @@ const platform = {
       if (userId) {
         store.dispatch(actions.project.showLoader(true))
         store.dispatch(actions.applicationState.startCreatingCloudFile())
-        newFile(emailAddress, userId, fileList, state, clientId, template, openFile, name)
+        newFile(emailAddress, userId, fileList, file, clientId, template, openFile, name)
           .then((fileId) => {
             logger.info('Created new file.', fileId)
             store.dispatch(actions.project.showLoader(false))
