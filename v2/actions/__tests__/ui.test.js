@@ -1,4 +1,4 @@
-import { mapValues, identity } from 'lodash'
+import { mapValues } from 'lodash'
 
 import { removeSystemKeys } from '../../reducers/systemReducers'
 import selectors from '../../selectors'
@@ -15,9 +15,10 @@ import {
   setCardDialogOpen,
   closeBookDialog,
 } from '../ui'
-import { configureStore } from './fixtures/testStore'
+import { configureStore, pltrAdaptor } from './fixtures/testStore'
 
 const {
+  fullFileStateSelector,
   allBookIdsSelector,
   allBooksSelector,
   bookDialogBookIdSelector,
@@ -27,7 +28,10 @@ const {
   cardDialogLineIdSelector,
   isBookDialogVisibleSelector,
   isCardDialogVisibleSelector,
-} = selectors(identity)
+  allCardsSelector,
+  cardDialogSelector,
+  bookDialogSelector,
+} = selectors(pltrAdaptor)
 
 const EMPTY_FILE = emptyFile('Test file')
 
@@ -81,7 +85,7 @@ function isAnObject(val) {
 
 describe('cardDialog', () => {
   const store = initialStore()
-  const initialState = removeSystemKeys(store.getState().present)
+  const initialState = removeSystemKeys(fullFileStateSelector(store.getState()))
   describe('given the initial state store', () => {
     const cardId = cardDialogCardIdSelector(initialState)
     const beatId = cardDialogBeatIdSelector(initialState)
@@ -108,7 +112,7 @@ describe('cardDialog', () => {
       const beatId = 1
       const lineId = 1
       store.dispatch(setCardDialogOpen(cardId, beatId, lineId))
-      const presentState = store.getState().present
+      const presentState = store.getState()
 
       const cardDialogCardId = cardDialogCardIdSelector(presentState)
       const cardDialogBeatId = cardDialogBeatIdSelector(presentState)
@@ -132,7 +136,7 @@ describe('cardDialog', () => {
           const beatId = 1
           const lineId = 1
           store.dispatch(setCardDialogOpen(cardId, beatId, lineId))
-          const presentState = store.getState().present
+          const presentState = store.getState()
 
           const cardDialogCardId = cardDialogCardIdSelector(presentState)
           const cardDialogBeatId = cardDialogBeatIdSelector(presentState)
@@ -158,7 +162,7 @@ describe('cardDialog', () => {
     })
 
     describe('given no another cardDialog action is dispatched', () => {
-      const presentState = store.getState().present
+      const presentState = store.getState()
 
       const cardId = cardDialogCardIdSelector(presentState)
       const beatId = cardDialogBeatIdSelector(presentState)
@@ -175,7 +179,7 @@ describe('cardDialog', () => {
 
     describe('given setCardDialogClose is dispatched', () => {
       store.dispatch(setCardDialogClose())
-      const presentState = store.getState().present
+      const presentState = store.getState()
 
       const cardId = cardDialogCardIdSelector(presentState)
       const beatId = cardDialogBeatIdSelector(presentState)
@@ -193,7 +197,8 @@ describe('cardDialog', () => {
       })
 
       it('should match the object from the initial state store', () => {
-        expect(presentState.ui.cardDialog).toMatchObject(initialCardDialogState)
+        const cardDialog = cardDialogSelector(presentState)
+        expect(cardDialog).toMatchObject(initialCardDialogState)
       })
     })
   })
@@ -210,19 +215,20 @@ describe('cardDialog', () => {
 
       describe('and given changeBeat is dispatched', () => {
         const newBeatId = 2
-        const previousState = store.getState().present
+        const previousState = store.getState()
         const cardId = cardDialogCardIdSelector(previousState)
         store.dispatch(changeBeat(cardId, newBeatId, currentBookId))
 
-        const presentState = store.getState().present
+        const presentState = store.getState()
 
         it('should change the beatId of the current card equal to the newBeatId', () => {
-          const changedCard = presentState.cards.find((card) => card.id == cardId)
+          const presentCards = allCardsSelector(presentState)
+          const changedCard = presentCards.find((card) => card.id == cardId)
           expect(changedCard.beatId).toEqual(newBeatId)
         })
 
         it('should also change the cardDialog beatId to be equal to the newBeatId', () => {
-          const cardDialogState = presentState.ui.cardDialog
+          const cardDialogState = cardDialogSelector(presentState)
           expect(cardDialogState.beatId).toEqual(newBeatId)
         })
       })
@@ -242,20 +248,21 @@ describe('cardDialog', () => {
 
       describe('and given changeLine is dispatched', () => {
         const newLineId = 2
-        const previousState = store.getState().present
+        const previousState = store.getState()
         const cardId = cardDialogCardIdSelector(previousState)
         store.dispatch(changeLine(cardId, newLineId, currentBookId))
 
-        const presentState = store.getState().present
+        const presentState = store.getState()
 
         it('should change the lineId of the current card equal to the newLineId', () => {
-          const changedCard = presentState.cards.find((card) => card.id == cardId)
+          const presentCards = allCardsSelector(presentState)
+          const changedCard = presentCards.find((card) => card.id == cardId)
           expect(changedCard.lineId).toEqual(newLineId)
         })
 
         it('should also change the cardDialog lineId to be equal to the newLineId', () => {
-          const cardDialogState = presentState.ui.cardDialog
-          expect(cardDialogState.lineId).toEqual(newLineId)
+          const cardDialog = cardDialogSelector(presentState)
+          expect(cardDialog.lineId).toEqual(newLineId)
         })
       })
     })
@@ -264,13 +271,14 @@ describe('cardDialog', () => {
 
 describe('bookDialog', () => {
   const store = initialStore()
-  const initialState = removeSystemKeys(store.getState().present)
+  const initialState = store.getState()
 
   describe('given the initial state store', () => {
     const bookId = bookDialogBookIdSelector(initialState)
     const isOpen = isBookDialogVisibleSelector(initialState)
     it('should produce initial state store', () => {
-      expect(initialState.ui.bookDialog).toMatchObject(initialBookDialogState)
+      const bookDialog = bookDialogSelector(initialState)
+      expect(bookDialog).toMatchObject(initialBookDialogState)
     })
 
     it('should have `null` as initial values for cardId lineId and beatId', () => {
