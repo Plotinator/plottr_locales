@@ -16,6 +16,10 @@ import file_2023_01_7_fix_applies from './2023_01_7_fix_applies.json'
 import file_2023_01_7_fix_does_not_apply from './2023_01_7_fix_does_not_apply.json'
 import file_2023_01_7_no_migrations_collection from './2023_01_07_no_migrations_collection.json'
 import file_2022_5_18 from './2022_5_18.json'
+import file_without_series_hierarchy_levels from './file_without_series_hierarchy_levels.json'
+import file_2023_3_29 from './file_2023_3_29.json'
+import file_without_hierarchy_levels from './file_without_hierarchy_levels.json'
+import file_with_series_hierarchy_levels_but_no_others from './file_with_series_hierarchy_levels_but_no_others.json'
 
 export {
   file_2021_07_20,
@@ -36,4 +40,8 @@ export {
   file_2023_01_7_fix_does_not_apply,
   file_2023_01_7_no_migrations_collection,
   file_2022_5_18,
+  file_without_series_hierarchy_levels,
+  file_2023_3_29,
+  file_without_hierarchy_levels,
+  file_with_series_hierarchy_levels_but_no_others,
 }

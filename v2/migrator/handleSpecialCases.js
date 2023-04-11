@@ -1,11 +1,13 @@
 import { clone, sortBy, difference } from 'lodash'
 import semverGt from 'semver/functions/gt'
+import semverGte from 'semver/functions/gte'
 import semverLte from 'semver/functions/lte'
 
 import { uiState } from '../store/initialState'
 
 import migrationsList from './migrations_list'
 import { nextColor, nextDarkColor } from '../store/lineColors'
+import { emptyFile } from '../store/newFileState'
 import { toSemver } from './toSemver'
 
 // The 2021-07-07 version was problematic because it was created by
@@ -178,6 +180,31 @@ export const insertBreakingVersionsPriorToBreakingVersionChange = (file) => {
   return file
 }
 
+export const addHierarchiesIfMissing = (file) => {
+  if (
+    (typeof file.hierarchyLevels?.series === 'undefined' ||
+      file.books.allIds.some((id) => typeof file.hierarchyLevels[id] === 'undefined')) &&
+    semverGte(file.file.version, '2023.3.29')
+  ) {
+    const newFile = emptyFile('', '')
+    return {
+      ...file,
+      hierarchyLevels: {
+        ...(file.books?.allIds || []).reduce((acc, next) => {
+          return {
+            ...acc,
+            [next]: newFile.hierarchyLevels['1'],
+          }
+        }, {}),
+        ...file.hierarchyLevels,
+        series: newFile.hierarchyLevels.series,
+      },
+    }
+  } else {
+    return file
+  }
+}
+
 const applyAllFixes = (file) =>
   [
     handle2021_07_07,
@@ -185,6 +212,7 @@ const applyAllFixes = (file) =>
     handleObjectTitlesOnCards,
     handleMissingUIState,
     insertBreakingVersionsPriorToBreakingVersionChange,
+    addHierarchiesIfMissing,
   ].reduce((acc, f) => f(acc), file)
 
 export default applyAllFixes
