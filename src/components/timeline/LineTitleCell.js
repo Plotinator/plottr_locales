@@ -34,6 +34,11 @@ const LineTitleCellConnector = (connector) => {
   const ColorPicker = UnconnectedColorPicker(connector)
   const Floater = UnconnectedPlottrFloater(connector)
 
+  const {
+    platform: { isDevelopment },
+  } = connector
+  checkDependencies({ isDevelopment })
+
   const LineTitleCell = ({
     line,
     bookId,
@@ -316,14 +321,16 @@ const LineTitleCellConnector = (connector) => {
             <Button title={t('Change color')} block bsSize="small" onClick={openColorPicker}>
               <Glyphicon glyph="tint" />
             </Button>
-            <Button
-              title={line?.isPinned ? t('Unpin Plotline') : t('Pin this Plotline')}
-              block
-              bsSize="small"
-              onClick={handlePinPlotLine}
-            >
-              {line?.isPinned ? <TbPinnedOff /> : <BsPinFill />}
-            </Button>
+            {isDevelopment ? (
+              <Button
+                title={line?.isPinned ? t('Unpin Plotline') : t('Pin this Plotline')}
+                block
+                bsSize="small"
+                onClick={handlePinPlotLine}
+              >
+                {line?.isPinned ? <TbPinnedOff /> : <BsPinFill />}
+              </Button>
+            ) : null}
             {isSmall ? null : (
               <Button
                 title={t('Duplicate plotline')}
@@ -372,13 +379,15 @@ const LineTitleCellConnector = (connector) => {
               <Button title={t('Change color')} bsSize="small" onClick={openColorPicker}>
                 <Glyphicon glyph="tint" />
               </Button>
-              <Button
-                title={line?.isPinned ? t('Unpin Plotline') : t('Pin this Plotline')}
-                bsSize="small"
-                onClick={handlePinPlotLine}
-              >
-                {line?.isPinned ? <TbPinnedOff /> : <BsPinFill />}
-              </Button>
+              {isDevelopment ? (
+                <Button
+                  title={line?.isPinned ? t('Unpin Plotline') : t('Pin this Plotline')}
+                  bsSize="small"
+                  onClick={handlePinPlotLine}
+                >
+                  {line?.isPinned ? <TbPinnedOff /> : <BsPinFill />}
+                </Button>
+              ) : null}
               {isSmall ? null : (
                 <Button
                   title={t('Duplicate plotline')}
