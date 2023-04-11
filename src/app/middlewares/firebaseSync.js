@@ -2,10 +2,10 @@ import { identity } from 'lodash'
 
 import { middlewares, ARRAY_KEYS } from 'pltr/v2'
 import { overwrite, toFirestoreArray } from 'wired-up-firebase'
+import { selectors } from 'wired-up-pltr'
 
 const firebaseSync = (store) => (next) => (action) => {
-  const file = store.getState().present && store.getState().present.file
-  const isCloudFile = file && file.isCloudFile
+  const isCloudFile = selectors.isCloudFileSelector(store.getState())
   if (isCloudFile) {
     return middlewares.externalSync(identity)(overwrite, (key, data) => {
       return ARRAY_KEYS.indexOf(key) !== -1 ? toFirestoreArray(data) : data

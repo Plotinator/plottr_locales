@@ -1,7 +1,7 @@
 import { omit } from 'lodash'
 
 import { emptyFile } from 'pltr/v2'
-import { actions } from 'wired-up-pltr'
+import { actions, selectors } from 'wired-up-pltr'
 
 import { configureStore } from './fixtures/testStore'
 import { saveFile, backupFile } from '../save'
@@ -18,7 +18,7 @@ const initialStore = () => {
   return store
 }
 const stateWithoutFileURL = () => {
-  return initialStore().getState().present
+  return selectors.fullFileStateSelector(initialStore().getState())
 }
 const stateForDeviceFile = () => {
   const store = initialStore()
@@ -31,7 +31,7 @@ const stateForDeviceFile = () => {
       'device://tmp/dummy-url-test-file.pltr'
     )
   )
-  return store.getState().present
+  return selectors.fullFileStateSelector(store.getState())
 }
 const stateForProFile = () => {
   const store = initialStore()
@@ -44,7 +44,7 @@ const stateForProFile = () => {
       'plottr://abcdefghowilovetowritethesetests'
     )
   )
-  return store.getState().present
+  return selectors.fullFileStateSelector(store.getState())
 }
 const stateForProFileWithOfflineModeEnabled = () => {
   const store = initialStore()
@@ -57,7 +57,7 @@ const stateForProFileWithOfflineModeEnabled = () => {
       'plottr://abcdefghowilovetowritethesetests'
     )
   )
-  const oldSettings = store.getState().present.settings.appSettings
+  const oldSettings = selectors.appSettingsSelector(store.getState())
   store.dispatch(
     actions.settings.setAppSettings({
       ...oldSettings,
@@ -67,7 +67,7 @@ const stateForProFileWithOfflineModeEnabled = () => {
       },
     })
   )
-  return store.getState().present
+  return selectors.fullFileStateSelector(store.getState())
 }
 const stateForProFileWithOfflineModeDisabled = () => {
   const store = initialStore()
@@ -80,7 +80,7 @@ const stateForProFileWithOfflineModeDisabled = () => {
       'plottr://abcdefghowilovetowritethesetests'
     )
   )
-  const oldSettings = store.getState().present.settings.appSettings
+  const oldSettings = selectors.appSettingsSelector(store.getState())
   store.dispatch(
     actions.settings.setAppSettings({
       ...oldSettings,
@@ -90,7 +90,7 @@ const stateForProFileWithOfflineModeDisabled = () => {
       },
     })
   )
-  return store.getState().present
+  return selectors.fullFileStateSelector(store.getState())
 }
 const resumingState = () => {
   const store = initialStore()
@@ -104,7 +104,7 @@ const resumingState = () => {
     )
   )
   store.dispatch(actions.project.setResuming(true))
-  return store.getState().present
+  return selectors.fullFileStateSelector(store.getState())
 }
 const offlineWithOfflineDisabledState = () => {
   const store = initialStore()
@@ -118,7 +118,7 @@ const offlineWithOfflineDisabledState = () => {
     )
   )
   store.dispatch(actions.project.setOffline(true))
-  const oldSettings = store.getState().present.settings.appSettings
+  const oldSettings = selectors.appSettingsSelector(store.getState())
   store.dispatch(
     actions.settings.setAppSettings({
       ...oldSettings,
@@ -128,7 +128,7 @@ const offlineWithOfflineDisabledState = () => {
       },
     })
   )
-  return store.getState().present
+  return selectors.fullFileStateSelector(store.getState())
 }
 const offlineLocalFileWithOfflineDisabledState = () => {
   const store = initialStore()
@@ -142,7 +142,7 @@ const offlineLocalFileWithOfflineDisabledState = () => {
     )
   )
   store.dispatch(actions.project.setOffline(true))
-  const oldSettings = store.getState().present.settings.appSettings
+  const oldSettings = selectors.appSettingsSelector(store.getState())
   store.dispatch(
     actions.settings.setAppSettings({
       ...oldSettings,
@@ -152,7 +152,7 @@ const offlineLocalFileWithOfflineDisabledState = () => {
       },
     })
   )
-  return store.getState().present
+  return selectors.fullFileStateSelector(store.getState())
 }
 const offlineLocalFileWithOfflineEnabledState = () => {
   const store = initialStore()
@@ -166,7 +166,7 @@ const offlineLocalFileWithOfflineEnabledState = () => {
     )
   )
   store.dispatch(actions.project.setOffline(true))
-  const oldSettings = store.getState().present.settings.appSettings
+  const oldSettings = selectors.appSettingsSelector(store.getState())
   store.dispatch(
     actions.settings.setAppSettings({
       ...oldSettings,
@@ -176,7 +176,7 @@ const offlineLocalFileWithOfflineEnabledState = () => {
       },
     })
   )
-  return store.getState().present
+  return selectors.fullFileStateSelector(store.getState())
 }
 const onlineWithOfflineDisabledAndLocalBackupDisabledState = () => {
   const store = initialStore()
@@ -190,7 +190,7 @@ const onlineWithOfflineDisabledAndLocalBackupDisabledState = () => {
     )
   )
   store.dispatch(actions.project.setOffline(false))
-  const oldSettings = store.getState().present.settings.appSettings
+  const oldSettings = selectors.appSettingsSelector(store.getState())
   store.dispatch(
     actions.settings.setAppSettings({
       ...oldSettings,
@@ -201,7 +201,7 @@ const onlineWithOfflineDisabledAndLocalBackupDisabledState = () => {
       },
     })
   )
-  return store.getState().present
+  return selectors.fullFileStateSelector(store.getState())
 }
 const onlineWithOfflineDisabledAndLocalBackupEnabledState = () => {
   const store = initialStore()
@@ -215,7 +215,7 @@ const onlineWithOfflineDisabledAndLocalBackupEnabledState = () => {
     )
   )
   store.dispatch(actions.project.setOffline(false))
-  const oldSettings = store.getState().present.settings.appSettings
+  const oldSettings = selectors.appSettingsSelector(store.getState())
   store.dispatch(
     actions.settings.setAppSettings({
       ...oldSettings,
@@ -226,7 +226,7 @@ const onlineWithOfflineDisabledAndLocalBackupEnabledState = () => {
       },
     })
   )
-  return store.getState().present
+  return selectors.fullFileStateSelector(store.getState())
 }
 const offlineWithOfflineEnabledState = () => {
   const store = initialStore()
@@ -240,7 +240,7 @@ const offlineWithOfflineEnabledState = () => {
     )
   )
   store.dispatch(actions.project.setOffline(true))
-  const oldSettings = store.getState().present.settings.appSettings
+  const oldSettings = selectors.appSettingsSelector(store.getState())
   store.dispatch(
     actions.settings.setAppSettings({
       ...oldSettings,
@@ -250,7 +250,7 @@ const offlineWithOfflineEnabledState = () => {
       },
     })
   )
-  return store.getState().present
+  return selectors.appSettingsSelector(store.getState())
 }
 const localFileWithBackupsDisabled = () => {
   const store = initialStore()
@@ -263,14 +263,14 @@ const localFileWithBackupsDisabled = () => {
       'device://abcdefghowilovetowritethesetests'
     )
   )
-  const oldSettings = store.getState().present.settings.appSettings
+  const oldSettings = selectors.appSettingsSelector(store.getState())
   store.dispatch(
     actions.settings.setAppSettings({
       ...oldSettings,
       backup: false,
     })
   )
-  return store.getState().present
+  return selectors.fullFileStateSelector(store.getState())
 }
 const localFileWithBackupsEnabled = () => {
   const store = initialStore()
@@ -283,14 +283,14 @@ const localFileWithBackupsEnabled = () => {
       'device://abcdefghowilovetowritethesetests'
     )
   )
-  const oldSettings = store.getState().present.settings.appSettings
+  const oldSettings = selectors.appSettingsSelector(store.getState())
   store.dispatch(
     actions.settings.setAppSettings({
       ...oldSettings,
       backup: true,
     })
   )
-  return store.getState().present
+  return selectors.fullFileStateSelector(store.getState())
 }
 const localFileWithBackupsEnabledThatPointsAtOfflineModeFile = () => {
   const store = initialStore()
@@ -303,14 +303,14 @@ const localFileWithBackupsEnabledThatPointsAtOfflineModeFile = () => {
       'device:///offline/a-file.pltr'
     )
   )
-  const oldSettings = store.getState().present.settings.appSettings
+  const oldSettings = selectors.appSettingsSelector(store.getState())
   store.dispatch(
     actions.settings.setAppSettings({
       ...oldSettings,
       backup: true,
     })
   )
-  return store.getState().present
+  return selectors.fullFileStateSelector(store.getState())
 }
 
 describe('saveFile', () => {

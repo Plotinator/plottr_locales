@@ -226,14 +226,13 @@ tellMeWhatOSImOn()
           const defaultPath =
             bookId == 'series' ? name + ' ' + t('(Series View)') : books[`${bookId}`].title
           const userId = selectors.userIdSelector(currentState)
+          const file = selectors.fullFileStateSelector(currentState)
 
-          askToExport(defaultPath, currentState.present, type, exportConfig[type], userId).catch(
-            (error) => {
-              logger.error(error)
-              showErrorBox(t('Error'), t('There was an error doing that. Try again'))
-              return
-            }
-          )
+          askToExport(defaultPath, file, type, exportConfig[type], userId).catch((error) => {
+            logger.error(error)
+            showErrorBox(t('Error'), t('There was an error doing that. Try again'))
+            return
+          })
         })
 
         onSave(() => {
