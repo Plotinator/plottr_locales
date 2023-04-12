@@ -349,12 +349,13 @@ tellMeWhatOSImOn()
 
         const moveFromTempHandler = () => {
           const state = store.getState()
+          const file = selectors.fullFileStateSelector(state)
           const isCloudFile = selectors.isCloudFileSelector(state)
           if (isCloudFile) {
             return
           }
 
-          isTempFile(state).then((isTemp) => {
+          isTempFile(file).then((isTemp) => {
             const oldFileURL = selectors.fileURLSelector(state)
             if (!oldFileURL) {
               logger.error(
@@ -363,7 +364,7 @@ tellMeWhatOSImOn()
               return
             }
             if (!isTemp) {
-              saveFile(oldFileURL, state).then(() => {
+              saveFile(oldFileURL, file).then(() => {
                 store.dispatch(actions.ui.fileSaved())
               })
               return
@@ -390,8 +391,8 @@ tellMeWhatOSImOn()
                         actions.ui.loadFile(
                           newFileName,
                           false,
-                          removeSystemKeys(state),
-                          state.file.version,
+                          removeSystemKeys(file),
+                          file.file.version,
                           newFileURL
                         )
                       )
