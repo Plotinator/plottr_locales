@@ -18,7 +18,7 @@ export default class InputModal extends Component {
   }
 
   handleOK = () => {
-    this.props.getValue(this.state.inputValue)
+    this.props.getValue(this.state.inputValue || this.props.defaultValue)
   }
 
   handleChange = (e) => {
