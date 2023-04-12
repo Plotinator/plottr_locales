@@ -1,6 +1,3 @@
-const filterTypeSelector = (_state, type) => {
-  return type
-}
 export const filterItemsSelector = (state, type) => {
   switch (type) {
     case 'outline':

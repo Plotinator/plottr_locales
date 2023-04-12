@@ -437,7 +437,7 @@ export const topLevelBeatNameSelector = createSelector(sortedHierarchyLevels, (l
   return levels[0].name
 })
 
-export const filterItemsSelector = createSelector(
+export const filteredItemsSelector = createSelector(
   currentViewSelector,
   timelineFilterSelector,
   characterFilterSelector,
