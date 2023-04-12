@@ -229,7 +229,7 @@ const BookConnector = (connector) => {
       (state, ownProps) => {
         return {
           darkMode: selectors.isDarkModeSelector(state),
-          book: selectors.bookByIdSelector(state),
+          book: selectors.bookByIdSelector(state, ownProps.bookId),
           books: selectors.allBooksSelector(state),
           canDelete: selectors.canDeleteBookSelector(state),
         }
