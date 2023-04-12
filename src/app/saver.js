@@ -5,143 +5,6 @@ import { removeSystemKeys } from 'pltr/v2'
 
 const DEFAULT_SAVE_INTERVAL_MS = 10000
 const DEFAULT_BACKUP_INTERVAL_MS = 60000
-
-const MAX_SAVE_JOBS = 1
-
-class PressureControlledTaskQueue {
-  name = 'UnamedPressureControlledTaskQueue'
-  jobId = 0
-  running = false
-  logger = {
-    info: (jobId, ...args) => this._logger.info(`[${this.name} job: ${jobId}]`, ...args),
-    warn: (jobId, ...args) => this._logger.warn(`[${this.name} job: ${jobId}]`, ...args),
-    error: (jobId, ...args) => this._logger.error(`[${this.name} job: ${jobId}]`, ...args),
-  }
-  _logger = {
-    info: (...args) => console.log(args),
-    warn: (...args) => console.warn(args),
-    error: (...args) => console.error(args),
-  }
-  createNextJob = () => () => Promise.resolve()
-  maxJobs = 5
-  pendingJobBuffer = []
-  jobTimer = null
-  jobInterval = 10000
-  onJobSuccess = () => {}
-  onJobFailure = (_error) => {}
-  queueFullCounter = 0
-  showErrorBox = () => {}
-
-  constructor(
-    name,
-    createNextJob,
-    logger,
-    maxJobs,
-    jobInterval = 10000,
-    onJobSuccess = () => {},
-    onJobFailure = (_error) => {},
-    showErrorBox = () => {}
-  ) {
-    this.name = name
-    this.createNextJob = createNextJob
-    this._logger = logger
-    this.maxJobs = maxJobs
-    this.jobInterval = jobInterval
-    this.onJobSuccess = onJobSuccess
-    this.onJobFailure = onJobFailure
-    this.showErrorBox = showErrorBox
-  }
-
-  executePendingJob = () => {
-    if (this.pendingJobBuffer.length === 0 || !this.running) {
-      return
-    }
-
-    const nextJob = this.pendingJobBuffer[0]
-    this.logger.info('Dequeueing a job...')
-    nextJob()
-      .then((result) => {
-        this.onJobSuccess(result)
-      })
-      .catch((error) => {
-        this.onJobFailure(error)
-      })
-      .finally(() => {
-        this.pendingJobBuffer = this.pendingJobBuffer.slice(1)
-        this.executePendingJob()
-      })
-  }
-
-  enqueueJob = () => {
-    const jobId = this.jobId++
-    const name = this.name
-    const jobThunk = this.createNextJob()
-    this.logger.info(jobId, `Starting ${name} job`)
-
-    if (this.pendingJobBuffer.length >= this.maxJobs) {
-      if (this.queueFullCounter >= 5) {
-        this.logger.warn('Queue was full too many times.  Removing half the jobs from the queue.')
-        this.pendingJobBuffer = this.pendingJobBuffer.slice(
-          Math.ceil(this.pendingJobBuffer.length / 2)
-        )
-        this.queueFullCounter = 0
-        this.showErrorBox(
-          t('Auto-saving failed'),
-          t("Saving your file didn't work. Check where it's stored.")
-        )
-        return
-      }
-      const error = new Error(`Too many concurrent ${name} jobs; dropping request to ${name}`)
-      this.logger.error(jobId, `Too many concurrent ${name}s`, error)
-      ++this.queueFullCounter
-      return
-    }
-
-    this.logger.info(jobId, `Accepted request to ${name} with current state.`)
-
-    if (this.pendingJobBuffer.length > 0) {
-      this.logger.info(jobId, `${name} busy.  Waiting for last ${name} job to finish first`)
-      this.pendingJobBuffer.push(jobThunk)
-      return
-    }
-
-    this.pendingJobBuffer.push(jobThunk)
-    this.executePendingJob()
-  }
-
-  stop = () => {
-    if (!this.running) {
-      this.logger.warn(`${this.name} is not running; cannot stop a stopped ${this.name}'`)
-      return
-    }
-
-    this.pendingJobBuffer = []
-    this.logger.warn(`Stopping ${this.name}`)
-    this.running = false
-    clearInterval(this.jobTimer)
-    this.jobTimer = null
-  }
-
-  start = () => {
-    if (this.running) {
-      this.logger.warn(`${this.name} is running; cannot start a running ${this.name}`)
-      return
-    }
-
-    this.logger.info(`Starting ${this.name}`)
-    this.running = true
-    this.jobTimer = setInterval(this.enqueueJob, this.jobInterval)
-  }
-
-  cancelAllRemainingRequests = () => {
-    this.logger.warn(
-      `Dropping all pending ${this.name} requests.  ${this.pendingJobBuffer.length} remain unprocessed`
-    )
-    this.pendingJobBuffer = []
-    this.stop()
-  }
-}
-
 export const DUMMY_ROLLBAR = {
   info: () => {},
   warn: () => {},
@@ -151,172 +14,153 @@ export const DUMMY_SHOW_MESSAGE_BOX = () => {}
 export const DUMMY_SHOW_ERROR_BOX = () => {}
 export const DUMMY_SERVER_IS_BUSY_RESTARTING = () => Promise.resolve(false)
 
-const IGNORE = 'IGNORE'
+const stateDidntChange = (oldState, newState) => {
+  const currentWithoutSystemKeys = removeSystemKeys(newState)
+  return Object.keys(currentWithoutSystemKeys).every((key) => {
+    if (key === 'file') {
+      return isEqual(currentWithoutSystemKeys[key], oldState[key])
+    }
 
-class Saver {
-  getState = () => ({})
-  saveFile = (file) => Promise.resolve()
-  backupFile = (file) => Promise.resolve()
-  logger = {
-    info: (...args) => console.log(args),
-    warn: (...args) => console.warn(args),
-    error: (...args) => console.error(args),
+    return currentWithoutSystemKeys[key] === oldState[key]
+  })
+}
+
+const Saver = (
+  getState,
+  saveFile,
+  backupFile,
+  saveIntervalMS,
+  backupIntervalMS,
+  logger,
+  rollbar,
+  showMessageBox,
+  showErrorBox,
+  serverIsBusyRestarting
+) => {
+  let saveInterval = null
+  let backupInterval = null
+  let lastSaveFailed = { current: false }
+  let lastBackupFailed = { current: false }
+  let lastStateBackedUp = { current: {} }
+  let lastStateSaved = { current: {} }
+
+  const startJob = (
+    name,
+    f,
+    intervalMS,
+    lastStateRef,
+    lastFailedRef,
+    onSuccessThisTime,
+    onFailed
+  ) => {
+    return setInterval(() => {
+      const state = getState()
+      if (!stateDidntChange(lastStateRef.current, state)) {
+        logger.info(`Starting ${name}...`)
+        f(state)
+          .then(() => {
+            lastStateRef.current = state
+            if (lastFailedRef.current) {
+              lastFailedRef.current = false
+              onSuccessThisTime()
+            }
+          })
+          .catch((error) => {
+            onFailed(error).then((shouldMarkAsFailed) => {
+              lastFailedRef.current = shouldMarkAsFailed
+            })
+          })
+      } else {
+        logger.info(`State didn't change.  Not going ahead with ${name}.`)
+      }
+    }, intervalMS)
   }
-  saveRunner = null
-  backupRunner = null
-  lastAutoSaveFailed = false
-  rollbar = null
-  showMessageBox = () => {}
-  showErrorBox = () => {}
-  lastStateSaved = {}
-  lastStateBackedUp = {}
-  onSaveBackupError = (error) => {
-    this.serverIsBusyRestarting().then((restarting) => {
+
+  const onSaveBackupError = (error) => {
+    return serverIsBusyRestarting().then((restarting) => {
       if (restarting) {
-        this.lastStateBackedUp = {}
-        this.logger.info(
+        lastStateBackedUp = {}
+        logger.info(
           "Failed to backup, but the server is restarting, so we're going to ignore this error"
         )
-        return
+        return !restarting
       }
-      this.logger.error('BACKUP failed', error)
-      this.rollbar.warn(error.message)
+      logger.error('BACKUP failed', error)
+      rollbar.warn(error.message)
+      return !restarting
     })
   }
-  onSaveBackupSuccess = () => {
-    this.logger.info('[file save backup]', 'success')
+
+  const onSaveBackupSuccess = () => {
+    logger.info('[file save backup]', 'success')
   }
-  onAutoSaveError = (error) => {
-    return this.serverIsBusyRestarting().then((restarting) => {
+
+  const onAutoSaveError = (error) => {
+    return serverIsBusyRestarting().then((restarting) => {
       if (restarting) {
-        this.lastStateSaved = {}
-        this.logger.info(
+        lastStateSaved = {}
+        logger.info(
           "Failed to save, but the server is restarting, so we're going to ignore this error"
         )
-        return restarting
+        return !restarting
       }
-      this.logger.warn('Failed to autosave', error)
-      this.rollbar.warn(error.message)
-      this.showErrorBox(
+      logger.warn('Failed to autosave', error)
+      rollbar.warn(error.message)
+      showErrorBox(
         t('Auto-saving failed'),
         t("Saving your file didn't work. Check where it's stored.")
       )
-      return restarting
+      return !restarting
     })
   }
-  onAutoSaveWorkedThisTime = () => {
-    this.showMessageBox(t('Auto-saving worked'), t('Saving worked this time 🎉'))
+
+  const onAutoSaveWorkedThisTime = () => {
+    showMessageBox(t('Auto-saving worked'), t('Saving worked this time 🎉'))
   }
 
-  constructor(
-    getState,
-    saveFile,
-    backupFile,
-    logger,
-    maxSaveJobs = MAX_SAVE_JOBS,
-    saveIntervalMS = DEFAULT_SAVE_INTERVAL_MS,
-    backupIntervalMS = DEFAULT_BACKUP_INTERVAL_MS,
-    rollbar = DUMMY_ROLLBAR,
-    showMessageBox = DUMMY_SHOW_MESSAGE_BOX,
-    showErrorBox = DUMMY_SHOW_ERROR_BOX,
-    serverIsBusyRestarting = DUMMY_SERVER_IS_BUSY_RESTARTING
-  ) {
-    this.getState = getState
-    this.logger = logger
-    this.saveFile = saveFile
-    this.backupFile = backupFile
-    this.rollbar = rollbar
-    this.showMessageBox = showMessageBox
-    this.showErrorBox = showErrorBox
-    this.serverIsBusyRestarting = serverIsBusyRestarting
-
-    this.saveRunner = new PressureControlledTaskQueue(
+  const start = () => {
+    logger.info('Starting auto-saver...')
+    saveInterval = startJob(
       'Save',
-      () => {
-        const currentState = this.getState()
-        const currentWithoutSystemKeys = removeSystemKeys(currentState)
-        const stateDidNotChange = Object.keys(currentWithoutSystemKeys).every((key) => {
-          if (key === 'file') {
-            return isEqual(currentWithoutSystemKeys[key], this.lastStateSaved[key])
-          }
-
-          return currentWithoutSystemKeys[key] === this.lastStateSaved[key]
-        })
-        if (stateDidNotChange) {
-          this.logger.info('State did not change.  Next save will not actually save')
-          return () => {
-            return Promise.resolve(IGNORE)
-          }
-        }
-        this.lastStateSaved = currentWithoutSystemKeys
-        return () => {
-          return this.saveFile(currentState)
-        }
-      },
-      logger,
-      maxSaveJobs,
+      saveFile,
       saveIntervalMS,
-      (result) => {
-        // This might happen if we're not saving this time.
-        if (result === IGNORE) {
-          return
-        }
-        if (this.lastAutoSaveFailed) {
-          this.lastAutoSaveFailed = false
-          this.onAutoSaveWorkedThisTime()
-        }
-      },
-      (error) => {
-        this.onAutoSaveError(error).then((shouldIgnore) => {
-          if (!shouldIgnore) {
-            this.lastAutoSaveFailed = true
-          }
-        })
-      },
-      this.showErrorBox
+      lastStateSaved,
+      lastSaveFailed,
+      onAutoSaveWorkedThisTime,
+      onAutoSaveError
     )
-    this.saveRunner.start()
 
-    this.backupRunner = new PressureControlledTaskQueue(
+    backupInterval = startJob(
       'Backup',
-      () => {
-        const currentState = this.getState()
-        const currentWithoutSystemKeys = removeSystemKeys(currentState)
-        const stateDidNotChange = Object.keys(currentWithoutSystemKeys).every((key) => {
-          if (key === 'file') {
-            return isEqual(currentWithoutSystemKeys[key], this.lastStateSaved[key])
-          }
-
-          return currentWithoutSystemKeys[key] === this.lastStateBackedUp[key]
-        })
-        if (stateDidNotChange) {
-          this.logger.info('State did not change.  Next backup will not actually backup')
-          return () => {
-            return Promise.resolve()
-          }
-        }
-        this.lastStateBackedUp = currentWithoutSystemKeys
-        return () => {
-          return this.backupFile(currentState)
-        }
-      },
-      logger,
-      MAX_SAVE_JOBS,
+      backupFile,
       backupIntervalMS,
-      () => {
-        this.onSaveBackupSuccess()
-      },
-      (error) => {
-        this.onSaveBackupError(error)
-      },
-      this.showErrorBox
+      lastStateBackedUp,
+      lastBackupFailed,
+      onSaveBackupSuccess,
+      onSaveBackupError
     )
-    this.backupRunner.start()
   }
 
-  cancelAllRemainingRequests = () => {
-    this.saveRunner.cancelAllRemainingRequests()
-    this.backupRunner.cancelAllRemainingRequests()
+  const stop = () => {
+    if (saveInterval) {
+      logger.info('Stopping the auto-saver per request.')
+      clearInterval(saveInterval)
+      saveInterval = null
+    }
+    if (backupInterval) {
+      logger.info('Stopping the auto-backup process per request.')
+      clearInterval(backupInterval)
+      backupInterval = null
+    }
+  }
+
+  start()
+
+  return {
+    start,
+    stop,
+    // Deprecated!
+    cancelAllRemainingRequests: stop,
   }
 }
 

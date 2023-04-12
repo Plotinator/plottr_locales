@@ -146,7 +146,6 @@ const migrate = (originalFile, fileId) => (overwrittenFile) => {
 
 const SAVE_INTERVAL_MS = 10000
 const BACKUP_INTERVAL_MS = 60000
-const MAX_SAVE_JOBS = 1
 let saver = null
 
 export function bootFile(
@@ -511,7 +510,7 @@ export function bootFile(
     const postBackupHook = () => {
       // NOP
     }
-    saver = new Saver(
+    saver = Saver(
       () => {
         return store.getState().present
       },
@@ -523,10 +522,9 @@ export function bootFile(
         logger,
         postBackupHook
       ),
-      logger,
-      MAX_SAVE_JOBS,
       SAVE_INTERVAL_MS,
       BACKUP_INTERVAL_MS,
+      logger,
       rollbar,
       (title, message) => {
         showMessageBox(title, message)
