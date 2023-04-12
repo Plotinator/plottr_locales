@@ -43,6 +43,7 @@ import * as templatesThirdOrder from './templatesThirdOrder'
 import * as timelineThirdOrder from './timelineThirdOrder'
 import * as uiThirdOrder from './uiThirdOrder'
 import * as categoriesThirdOrder from './categoriesThirdOrder'
+import * as booksThirdOrder from './booksThirdOrder'
 
 const allSelectors = {
   ...actionsFirstOrder,
@@ -90,6 +91,7 @@ const allSelectors = {
   ...timelineThirdOrder,
   ...uiThirdOrder,
   ...categoriesThirdOrder,
+  ...booksThirdOrder,
 }
 
 export default allSelectors
