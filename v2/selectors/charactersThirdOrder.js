@@ -5,18 +5,10 @@ import { outOfOrderSearch } from '../helpers/outOfOrderSearch'
 import { isSeries } from '../helpers/books'
 
 // Other selector dependencies
-import { showBookTabs } from './attributeTabsFirstOrder'
+import { showBookTabs } from '../helpers/characters'
 import { allBookIdsSelector, allBooksSelector } from './booksFirstOrder'
-import {
-  allCharactersSelector,
-  displayedSingleCharacter,
-  singleCharacterSelector,
-} from './charactersFirstOrder'
-import {
-  attributesSelector,
-  characterAttributsForBookByIdSelector,
-  overriddenBookIdSelector,
-} from './attributesFirstOrder'
+import { allCharactersSelector, singleCharacterSelector } from './charactersFirstOrder'
+import { attributesSelector, characterAttributsForBookByIdSelector } from './attributesFirstOrder'
 import { characterCustomAttributesSelector } from './customAttributesFirstOrder'
 import { sortEachCategory } from './sortEachCategory'
 import {
@@ -32,6 +24,63 @@ import { charactersSortedAtoZSelector } from './charactersFirstOrder'
 import { placesSortedAtoZSelector } from './placesFirstOrder'
 import { allNotesInBookSelector } from './notesThirdOrder'
 import { allCardsSelector } from './cardsFirstOrder'
+
+const displayedSingleCharacter = (character, bookId, currentBookAttributeDescirptorsById) => {
+  const currentBookAttributes = character.attributes || []
+
+  const tags =
+    currentBookAttributes.find((attribute) => {
+      return (
+        attribute.bookId === bookId &&
+        currentBookAttributeDescirptorsById[attribute.id].type === 'base-attribute' &&
+        currentBookAttributeDescirptorsById[attribute.id].name === 'tags'
+      )
+    })?.value ||
+    (bookId === 'all' && character.tags) ||
+    []
+
+  const description =
+    currentBookAttributes.find((attribute) => {
+      return (
+        attribute.bookId === bookId &&
+        currentBookAttributeDescirptorsById[attribute.id].type === 'base-attribute' &&
+        currentBookAttributeDescirptorsById[attribute.id].name === 'shortDescription'
+      )
+    })?.value ||
+    (bookId === 'all' && character.description) ||
+    ''
+
+  const notes =
+    currentBookAttributes.find((attribute) => {
+      return (
+        attribute.bookId === bookId &&
+        currentBookAttributeDescirptorsById[attribute.id].type === 'base-attribute' &&
+        currentBookAttributeDescirptorsById[attribute.id].name === 'description'
+      )
+    })?.value ||
+    (bookId === 'all' && character.notes) ||
+    ''
+
+  const category = currentBookAttributes.find((attribute) => {
+    return (
+      attribute.bookId === bookId &&
+      currentBookAttributeDescirptorsById[attribute.id].type === 'base-attribute' &&
+      currentBookAttributeDescirptorsById[attribute.id].name === 'category'
+    )
+  })
+  const categoryId =
+    typeof category?.value !== 'undefined'
+      ? category?.value
+      : (bookId === 'all' && character.categoryId) || null
+
+  return {
+    ...character,
+    tags,
+    description,
+    notes,
+    categoryId,
+  }
+}
 
 export const attributeTabsSelector = createSelector(uiSelector, ({ attributeTabs }) => {
   return attributeTabs || {}
@@ -59,6 +108,7 @@ export const characterAttributeTabSelector = createSelector(
   }
 )
 
+const overriddenBookIdSelector = (_state, _characterId, bookId) => bookId
 export const allDisplayedCharactersSelector = createSelector(
   allCharactersSelector,
   characterAttributeTabSelector,

@@ -15,13 +15,7 @@ import { createDeepEqualSelector } from './createDeepEqualSelector'
 // Other selector dependencies
 import { allLinesSelector } from './linesFirstOrder'
 import { allCardMetaDataSelector, allCardsSelector } from './cardsFirstOrder'
-import {
-  allBeatsSelector,
-  beatIdSelector,
-  visibleBeatsByPositionForTimeline,
-  visibleBeatsByPositionIgnoringCollapsed,
-  visibleBeatsForTopLevelParentByPosition,
-} from './beatsFirstOrder'
+import { allBeatsSelector } from './beatsFirstOrder'
 import { isDarkModeSelector } from './settingsFirstOrder'
 import {
   attributesDialogIsOpenSelector,
@@ -417,6 +411,7 @@ export const secondTierBeatsInAtLeastTwoTierArrangementSelector = createSelector
   }
 )
 
+const beatIdSelector = (state, beatId) => beatId
 export const makeBeatTitleSelector = () =>
   createSelector(
     beatIndexSelector,
@@ -481,6 +476,12 @@ export const timelineTabsSelector = createSelector(
   }
 )
 
+const visibleBeatsByPositionIgnoringCollapsed = (beats) =>
+  beatsByPosition(() => {
+    return true
+  })(beats).filter(({ id }) => {
+    return true
+  })
 export const visibleSortedBeatsByBookIgnoringCollapsedSelector = createSelector(
   beatsByBookSelector,
   visibleBeatsByPositionIgnoringCollapsed
@@ -532,6 +533,60 @@ export const timelineActiveTabSelector = createSelector(
     return tabBeatIds[0]
   }
 )
+
+const visibleBeatsForTopLevelParentByPosition = (
+  beats,
+  timelineViewIsTabbed,
+  topLevelParentId,
+  timelineViewIsStacked,
+  timelineViewIsSmall,
+  hierarchyLevelCount
+) => {
+  const maximumDepth = hierarchyLevelCount - 1
+
+  return beatsByPosition(({ id, expanded }) => {
+    return expanded || timelineViewIsTabbed || timelineViewIsStacked
+  })(beats)
+    .filter(({ id }) => {
+      const nodeChildren = children(beats, id)
+      const currentDepth = depth(beats, id)
+      const rootParentNodeId = rootParentId(beats, id)
+      return (
+        (timelineViewIsTabbed && rootParentNodeId === topLevelParentId && currentDepth !== 0) ||
+        (timelineViewIsStacked && (timelineViewIsSmall || nodeChildren.length === 0)) ||
+        (!timelineViewIsTabbed && !timelineViewIsStacked)
+      )
+    })
+    .map((beat) => {
+      const currentDepth = depth(beats, beat.id)
+      if (!timelineViewIsSmall && timelineViewIsStacked && currentDepth !== maximumDepth) {
+        return {
+          ...beat,
+          isInsertChildCell: true,
+        }
+      }
+      return beat
+    })
+}
+
+const visibleBeatsByPositionForTimeline = (
+  beats,
+  timelineViewIsTabbed,
+  activeTab,
+  timelineViewIsStacked,
+  timelineViewIsSmall,
+  hierarchyLevelCount
+) => {
+  const activeParentId = activeTab
+  return visibleBeatsForTopLevelParentByPosition(
+    beats,
+    timelineViewIsTabbed,
+    activeParentId,
+    timelineViewIsStacked,
+    timelineViewIsSmall,
+    hierarchyLevelCount
+  )
+}
 
 export const visibleSortedBeatsForTimelineByBookSelector = createSelector(
   beatsByBookSelector,

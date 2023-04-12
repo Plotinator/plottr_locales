@@ -7,10 +7,13 @@ import { createSelector } from 'reselect'
 
 import { nextId } from '../store/newIds'
 import { isSeries } from '../helpers/lines'
+import { fullFileStateSelector } from './fullFileFirstOrder'
 
-export const allSeriesLinesSelector = (state) => state.lines.filter(isSeries)
+export const allSeriesLinesSelector = createSelector(fullFileStateSelector, (state) =>
+  state.lines.filter(isSeries)
+)
 
-export const allLinesSelector = (state) => state.lines
+export const allLinesSelector = createSelector(fullFileStateSelector, (state) => state.lines)
 
 export const nextLineIdSelector = createSelector(allLinesSelector, (lines) => nextId(lines))
 

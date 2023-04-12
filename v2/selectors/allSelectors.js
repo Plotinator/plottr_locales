@@ -1,6 +1,6 @@
+import * as fullFileFirstOrder from './fullFileFirstOrder'
 import * as actionsFirstOrder from './actionsFirstOrder'
 import * as applicationStateFirstOrder from './applicationStateFirstOrder'
-import * as attributeTabsFirstOrder from './attributeTabsFirstOrder'
 import * as attributesFirstOrder from './attributesFirstOrder'
 import * as backupsFirstOrder from './backupsFirstOrder'
 import * as beatsFirstOrder from './beatsFirstOrder'
@@ -46,9 +46,9 @@ import * as categoriesThirdOrder from './categoriesThirdOrder'
 import * as booksThirdOrder from './booksThirdOrder'
 
 const allSelectors = {
+  ...fullFileFirstOrder,
   ...actionsFirstOrder,
   ...applicationStateFirstOrder,
-  ...attributeTabsFirstOrder,
   ...attributesFirstOrder,
   ...backupsFirstOrder,
   ...beatsFirstOrder,
