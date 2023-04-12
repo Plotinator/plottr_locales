@@ -22,8 +22,12 @@
 
 .dashboard__backups__header-div {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  align-items: baseline;
+
+  span.glyphicon {
+    margin-left: 16px;
+    font-size: larger;
+  }
 
   h1 {
     font-size: 20pt;
@@ -54,8 +58,8 @@
         }
         .dashboard__backups__item-actions {
           position: absolute;
-          top: -8px;
-          right: -8px;
+          top: 5px;
+          right: 8px;
           display: flex;
           justify-content: flex-end;
           .dashboard__backups__item-button {

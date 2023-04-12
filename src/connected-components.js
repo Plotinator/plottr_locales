@@ -438,14 +438,15 @@ const platform = {
     const event = new Event('move-from-temp')
     document.dispatchEvent(event)
   },
-  duplicateFile: (fileUrl) => {
+  duplicateFile: (fileUrl, suggestedNewName) => {
     const state = store.getState().present
     const isLoggedIntoPro = selectors.hasProSelector(state)
 
     const event = isLoggedIntoPro
-      ? new Event('save-as--pro', { fileUrl })
+      ? new Event('save-as--pro', { fileUrl, suggestedNewName })
       : new Event('save-as', { fileUrl })
     event.fileUrl = fileUrl
+    event.suggestedNewName = suggestedNewName
     document.dispatchEvent(event)
   },
   showItemInFolder: (fileURL) => {
