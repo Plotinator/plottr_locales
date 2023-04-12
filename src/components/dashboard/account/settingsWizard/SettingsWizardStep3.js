@@ -37,7 +37,7 @@ const SettingsWizardStep3Connector = (connector) => {
         </StepHeader>
         <StepBody>
           <div className="onboarding__settings">
-            <BackupSettings />
+            <BackupSettings newDefault />
           </div>
         </StepBody>
         <StepFooter>
