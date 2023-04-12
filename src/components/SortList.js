@@ -77,7 +77,7 @@ const SortListConnector = (connector) => {
           items = [t('name'), t('description'), ...customAttributes]
         } else {
           customAttributes = selectors.noteSortCAnamesSelector(state)
-          attr = selectors.placeSortSelector(state)
+          attr = selectors.noteSortSelector(state)
           items = [t('title'), t('last edited'), ...customAttributes]
         }
         return {
