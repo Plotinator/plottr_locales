@@ -12,18 +12,17 @@ const BackupFileDisplayConnector = (connector) => {
   const {
     platform: {
       mpq,
-      showItemInFolder,
       file: { joinPath, saveFile, doesFileExist, readFile },
       log,
       userDocumentsPath,
       addToKnownFilesAndOpen,
       showSaveDialog,
       appVersion,
+      duplicateFile,
     },
   } = connector
   checkDependencies({
     mpq,
-    showItemInFolder,
     joinPath,
     saveFile,
     doesFileExist,
@@ -33,33 +32,18 @@ const BackupFileDisplayConnector = (connector) => {
     addToKnownFilesAndOpen,
     showSaveDialog,
     appVersion,
+    duplicateFile,
   })
 
-  const BackupFileDisplay = ({ folder, groupName, file, folderDate, settings }) => {
-    const [showButtons, setShowButtons] = useState(false)
-
-    const openInFolder = (fileURL) => {
-      // mpq.push('btn_open_backup')
-      showItemInFolder(fileURL)
-    }
-
-    const handleOpenInFolder = () => {
-      const isCloudBackup = file.storagePath
-      const filePathPromise = isCloudBackup
-        ? Promise.resolve(file.storagePath)
-        : joinPath(folder.path, file.name)
-      filePathPromise.then((filePath) => {
-        const fileURL = helpers.file.isProtocolString(filePath)
-          ? filePath
-          : helpers.file.filePathToFileURL(filePath)
-        if (!fileURL) {
-          const message = `Couldn't create fileURL for backup with path: ${filePath}`
-          log.error(message)
-          return
-        }
-        openInFolder(fileURL)
-      })
-    }
+  const BackupFileDisplay = ({
+    folder,
+    groupName,
+    file,
+    folderDate,
+    settings,
+    hasCurrentProLicense,
+  }) => {
+    const [showActions, setShowActions] = useState(false)
 
     const ensureEndsInPltr = (filePath) => {
       if (!filePath) return null
@@ -101,6 +85,7 @@ const BackupFileDisplayConnector = (connector) => {
     }
 
     const saveAndOpenCopy = (oldPath, oldFileName, newFileName) => {
+      mpq.push('btn_open_backup')
       joinPath(oldPath, oldFileName).then((oldFullPath) => {
         readFile(oldFullPath).then((fileText) => {
           const fileJSON = JSON.parse(fileText)
@@ -132,12 +117,14 @@ const BackupFileDisplayConnector = (connector) => {
 
     const handleMakeCopy = () => {
       const isCloudBackup = file.storagePath
+      // make the name
+      const backupText = t('Backup')
+      const extension = isCloudBackup ? '' : '.pltr'
+      const newName = `${groupName} [${backupText} ${folderDate}]${extension}`
       if (isCloudBackup) {
-        // TODO
+        const fileUrl = helpers.file.fileIdToPlottrCloudFileURL(file.fileId)
+        duplicateFile(fileUrl, newName)
       } else {
-        // make the name
-        const backupText = t('Backup')
-        const newName = `${groupName} [${backupText} ${folderDate}].pltr`
         saveAndOpenCopy(folder.path, file.name, newName)
       }
     }
@@ -160,6 +147,30 @@ const BackupFileDisplayConnector = (connector) => {
       }
     }
 
+    const renderFileDetails = (file) => {
+      const isCloudBackup = file.storagePath
+      if (isCloudBackup) {
+        const date = helpers.time.convertFromNanosAndSeconds(file.lastModified)
+        return (
+          <div className="dashboard__backups__item-details">
+            <small>
+              {file.lastModified ? t('Last Edited: {date, time, short}', { date }) : ''}
+            </small>
+            <small className="accented-text">{t('Saved in the cloud')}</small>
+          </div>
+        )
+      } else {
+        return (
+          <div className="dashboard__backups__item-details">
+            <small>
+              {t('Last Edited: {date, time, short}', { date: new Date(file.lastEdited ?? 0) })}
+            </small>
+            <small>{byteSize(file.size ?? 0)}</small>
+          </div>
+        )
+      }
+    }
+
     const byteSize = (n) => {
       const k = n > 0 ? Math.floor(Math.log2(n) / 10) : 0
       const rank = (k > 0 ? 'KMGT'[k - 1] : '') + 'b'
@@ -171,33 +182,23 @@ const BackupFileDisplayConnector = (connector) => {
     return (
       <div
         className="dashboard__backups__item"
-        onMouseEnter={() => setShowButtons(true)}
-        onMouseLeave={() => setShowButtons(false)}
+        onMouseEnter={() => setShowActions(true)}
+        onMouseLeave={() => setShowActions(false)}
       >
-        <div className="dashboard__backups__item-actions">
-          <div className={cx('dashboard__backups__item-button', { active: showButtons })}>
-            <Button bsSize="xs" bsStyle="success" onClick={handleMakeCopy}>
-              {t('Open a Copy')}
-            </Button>
-          </div>
-          {isCloudBackup ? null : (
-            <div className={cx('dashboard__backups__item-button', { active: showButtons })}>
-              <Button bsSize="xs" bsStyle="primary" onClick={handleOpenInFolder}>
-                {t('View in Folder')}
+        {!hasCurrentProLicense || (hasCurrentProLicense && isCloudBackup) ? (
+          <div className="dashboard__backups__item-actions">
+            <div className={cx('dashboard__backups__item-button', { active: showActions })}>
+              <Button bsSize="xs" bsStyle="success" onClick={handleMakeCopy}>
+                {t('Open a Copy')}
               </Button>
             </div>
-          )}
-        </div>
+          </div>
+        ) : null}
         <div>
           <div className="dashboard__backups__item-title">
             {isCloudBackup ? fileNameFromStorageObject(file) : fileNameFromPath(file)}
           </div>
-          <div className="dashboard__backups__item-details">
-            <small>
-              {t('Last Edited: {date, time, short}', { date: new Date(file.lastEdited ?? 0) })}
-            </small>
-            <small>{byteSize(file.size ?? 0)}</small>
-          </div>
+          {renderFileDetails(file)}
         </div>
       </div>
     )
@@ -209,6 +210,7 @@ const BackupFileDisplayConnector = (connector) => {
     file: PropTypes.object.isRequired,
     folderDate: PropTypes.string,
     settings: PropTypes.object.isRequired,
+    hasCurrentProLicense: PropTypes.bool.isRequired,
   }
 
   const {
@@ -221,6 +223,7 @@ const BackupFileDisplayConnector = (connector) => {
 
     return connect((state) => ({
       settings: selectors.appSettingsSelector(state.present),
+      hasCurrentProLicense: selectors.hasProSelector(state.present),
     }))(BackupFileDisplay)
   }
 

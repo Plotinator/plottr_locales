@@ -46,7 +46,7 @@ const BackupsTableConnector = (connector) => {
 
     const groupableName = (fileObj) => {
       if (fileObj.storagePath) {
-        return fileObj.fileName
+        return fileObj.fileId
       } else {
         return fileObj.name.replace('(start-session)-', '').replace('.pltr', '')
       }
@@ -74,14 +74,17 @@ const BackupsTableConnector = (connector) => {
       // display each project as another column
       const groups = groupBy(folder.backups, groupableName)
       return Object.entries(groups).map(([groupName, files]) => {
+        // sometimes files[0].fileName will be undefined
+        const realGroupName =
+          files[0]?.storagePath && files[0]?.fileName ? files[0].fileName : groupName
         let row = null
-        if (groupName?.toLowerCase().includes(searchTerm.toLowerCase())) {
+        if (realGroupName?.toLowerCase().includes(searchTerm.toLowerCase())) {
           row = (
             <Row key={groupName} className="dashboard__backups__project-row">
               <Col xs={12} sm={6} md={3}>
-                <h6>{groupName}</h6>
+                <h6>{realGroupName}</h6>
               </Col>
-              {renderFiles(folder, groupName, files)}
+              {renderFiles(folder, realGroupName, files)}
             </Row>
           )
         }

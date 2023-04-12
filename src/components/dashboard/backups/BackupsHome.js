@@ -4,6 +4,8 @@ import { PropTypes } from 'prop-types'
 import { t } from 'plottr_locales'
 
 import FormControl from '../../FormControl'
+import Glyphicon from '../../Glyphicon'
+import ToolTip from '../../ToolTip'
 import Alert from '../../Alert'
 import Grid from '../../Grid'
 import Col from '../../Col'
@@ -18,7 +20,6 @@ const BackupsHomeConnector = (connector) => {
 
   const BackupsHome = () => {
     const [searchTerm, setSearchTerm] = useState('')
-    const [showWarning, setShowWarning] = useState(true)
     const [showTable, setShowTable] = useState(false)
 
     useEffect(() => {
@@ -29,16 +30,13 @@ const BackupsHomeConnector = (connector) => {
       <div className="dashboard__backups">
         <div className="dashboard__backups__header-div">
           <h1>{t('Backups')}</h1>
-          {showWarning ? (
-            <Alert
-              bsStyle="danger"
-              style={{ maxWidth: 'max-content' }}
-              onDismiss={() => setShowWarning(false)}
-              closeLabel="X"
-            >
-              {t('Backups are read-only and can only be copied, not edited')}
-            </Alert>
-          ) : null}
+          <ToolTip
+            id="backup-warning-tooltip"
+            placement="right"
+            text={t('Backups are read-only and can only be copied, not edited')}
+          >
+            <Glyphicon glyph="info-sign" />
+          </ToolTip>
         </div>
         <Grid fluid>
           <Row>
