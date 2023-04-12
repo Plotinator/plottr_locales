@@ -7,7 +7,7 @@ import { noEntityHasLegacyAttributeBound } from './noEntitiyHasValueBound'
 
 // Other selector dependencies
 import { allCardsSelector } from './cardsFirstOrder'
-import { allBeatsSelector, beatIdSelector } from './beatsFirstOrder'
+import { allBeatsSelector } from './beatsFirstOrder'
 import { previouslyLoggedIntoProSelector } from './settingsFirstOrder'
 import { isOnWebSelector, userIdSelector } from './clientFirstOrder'
 import { permissionSelector } from './permissionFirstOrder'
@@ -18,6 +18,7 @@ import {
   placeCustomAttributesSelector,
 } from './customAttributesFirstOrder'
 import { allNotesSelector } from './notesFirstOrder'
+import { fullFileStateSelector } from './fullFileFirstOrder'
 
 export const shouldBeInProSelector = createSelector(
   previouslyLoggedIntoProSelector,
@@ -27,7 +28,7 @@ export const shouldBeInProSelector = createSelector(
   }
 )
 
-export const rootUiSelector = (state) => state.ui
+export const rootUiSelector = createSelector(fullFileStateSelector, (state) => state.ui)
 export const uiCollaboratorsSelector = createSelector(rootUiSelector, (rootUi) => {
   return rootUi.collaborators
 })
@@ -193,7 +194,10 @@ export const pinnedPlotlinesSelector = createSelector(
   }
 )
 
-export const allHierarchyLevelsSelector = (state) => state.hierarchyLevels
+export const allHierarchyLevelsSelector = createSelector(
+  fullFileStateSelector,
+  (state) => state.hierarchyLevels
+)
 export const hierarchyLevelsSelector = createSelector(
   allHierarchyLevelsSelector,
   currentTimelineSelector,
@@ -336,6 +340,7 @@ export const sortedHierarchyLevels = createSelector(
     return sortedLevels
   }
 )
+const beatIdSelector = (state, beatId) => beatId
 export const hierarchyLevelSelector = createSelector(
   beatsByBookSelector,
   beatIdSelector,
