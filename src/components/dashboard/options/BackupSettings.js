@@ -17,7 +17,9 @@ const BackupSettingsConnector = (connector) => {
       defaultBackupLocation,
       showOpenDialog,
       os,
+      userDocumentsPath,
       settings: { saveAppSetting },
+      file: { joinPath },
     },
   } = connector
   checkDependencies({
@@ -26,16 +28,34 @@ const BackupSettingsConnector = (connector) => {
     showOpenDialog,
     os,
     saveAppSetting,
+    joinPath,
+    userDocumentsPath,
   })
 
   const BackupOptions = UnconnectedBackupOptions(connector)
 
-  const BackupSettings = ({ hasCurrentProLicense, settings }) => {
+  const BackupSettings = ({ hasCurrentProLicense, settings, newDefault }) => {
     const [defaultBackupPath, setDefaultBackupPath] = useState('')
 
     useEffect(() => {
-      defaultBackupLocation().then(setDefaultBackupPath)
+      // right now newDefault only gets set during the Settings Wizard (the first time a user uses Plottr)
+      // that makes it so current users have no change
+      // but new users have a friendlier backups folder by default
+      if (newDefault) {
+        userDocumentsPath().then((docPath) =>
+          joinPath(docPath, 'Plottr Backups').then(setDefaultBackupPath)
+        )
+      } else {
+        defaultBackupLocation().then(setDefaultBackupPath)
+      }
     }, [])
+
+    useEffect(() => {
+      // in the Settings Wizard (newDefault is true), the defaultBackupPath has resolved, and the backupLocation is still the default
+      if (newDefault && defaultBackupPath && settings.user.backupLocation === 'default') {
+        saveAppSetting('user.backupLocation', backupFolderPath())
+      }
+    }, [newDefault, settings, defaultBackupPath])
 
     const osIsUnknown = os() === 'unknown'
 
@@ -55,6 +75,13 @@ const BackupSettingsConnector = (connector) => {
     // - not Pro, unless Pro & localBackups
     const showBackupLocation = () => {
       return (!osIsUnknown && !hasCurrentProLicense) || (!osIsUnknown && settings.user.localBackups)
+    }
+
+    const showRestoreButton = () => {
+      return (
+        (newDefault && settings.user.backupLocation !== defaultBackupPath) ||
+        (!newDefault && settings.user.backupLocation !== 'default')
+      )
     }
 
     const displayPath = (pathStr) => {
@@ -105,14 +132,14 @@ const BackupSettingsConnector = (connector) => {
                   {displayPath(backupFolderPath())}
                 </Button>
               </p>
-              <Alert bsStyle="danger" style={{ maxWidth: 'max-content' }}>
-                {t('Backups are read-only and can only be copied, not edited')}
-              </Alert>
-              {settings.user.backupLocation !== 'default' ? (
+              {showRestoreButton() ? (
                 <Button onClick={() => saveAppSetting('user.backupLocation', 'default')}>
                   {t('Restore Default')}
                 </Button>
               ) : null}
+              <Alert bsStyle="danger" style={{ maxWidth: 'max-content', marginTop: '16px' }}>
+                {t('Backups are read-only and can only be copied, not edited')}
+              </Alert>
             </div>
           </>
         ) : null}
@@ -124,6 +151,7 @@ const BackupSettingsConnector = (connector) => {
     hasCurrentProLicense: PropTypes.bool,
     settings: PropTypes.object.isRequired,
     shouldBeInPro: PropTypes.bool,
+    newDefault: PropTypes.bool,
   }
 
   const {

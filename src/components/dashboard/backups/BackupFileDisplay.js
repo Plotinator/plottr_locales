@@ -210,7 +210,7 @@ const BackupFileDisplayConnector = (connector) => {
     file: PropTypes.object.isRequired,
     folderDate: PropTypes.string,
     settings: PropTypes.object.isRequired,
-    hasCurrentProLicense: PropTypes.bool.isRequired,
+    hasCurrentProLicense: PropTypes.bool,
   }
 
   const {
