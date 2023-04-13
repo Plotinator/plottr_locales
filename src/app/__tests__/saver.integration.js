@@ -814,7 +814,65 @@ describe('Saver', (describe, it) => {
         })
       })
     })
-    describe('a state that doesnt change', (describe, it) => {
+    describe('given a state that doesnt change', (describe, it) => {
+      it('should only save once', () => {
+        const THE_STATE = {
+          a: 'haha',
+        }
+        const getState = () => {
+          return THE_STATE
+        }
+        const backupFile = (...args) => {
+          return Promise.resolve()
+        }
+        const saveCalls = []
+        const saveFile = (file) => {
+          saveCalls.push(file)
+          return Promise.resolve()
+        }
+        let loggedErrors = 0
+        let loggedWarnings = 0
+        let loggedInfos = 0
+        const countingLogger = {
+          info: (...args) => {
+            loggedInfos++
+          },
+          warn: (...args) => {
+            loggedWarnings++
+          },
+          error: (...args) => {
+            loggedErrors++
+          },
+        }
+        let notifierCount = 0
+        const trackingErrorNotifier = () => {
+          notifierCount++
+        }
+        const saver = Saver(
+          getState,
+          saveFile,
+          backupFile,
+          100,
+          10000,
+          countingLogger,
+          DUMMY_ROLLBAR,
+          DUMMY_SHOW_MESSAGE_BOX,
+          trackingErrorNotifier,
+          DUMMY_SERVER_IS_BUSY_RESTARTING
+        )
+        new Promise((resolve) => {
+          setTimeout(resolve, 510)
+        }).then(() => {
+          assertGreaterThan(loggedInfos, 5)
+          assertEqual(loggedWarnings, 0)
+          assertEqual(loggedErrors, 0)
+          assertEqual(notifierCount, 0)
+          expectToMatchArrayLoosely(saveCalls, [THE_STATE], 0, 0)
+          saver.stop()
+        })
+      })
+    })
+    describe('given a state that doesnt change', (describe, it) => {
       describe('and given  a save function that always fails', (describe, it) => {
         it('should report failure each time', () => {
           const THE_STATE = {
