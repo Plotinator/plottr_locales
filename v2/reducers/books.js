@@ -1,4 +1,4 @@
-import { mapValues } from 'lodash'
+import { find, mapValues } from 'lodash'
 import {
   FILE_LOADED,
   NEW_FILE,
@@ -13,6 +13,7 @@ import {
   ADD_BOOK_FROM_TEMPLATE,
   DELETE_IMAGE,
   EDIT_BOOK_IMAGE,
+  DUPLICATE_BOOK,
 } from '../constants/ActionTypes'
 import { isSeries } from '../helpers/books'
 import { book as defaultBook } from '../store/initialState'
@@ -61,6 +62,18 @@ const books =
             genre: action.genre,
             theme: action.theme,
             timelineTemplates: action.templateData ? [action.templateData.id] : [],
+          },
+        }
+      }
+
+      case DUPLICATE_BOOK: {
+        const duplicatedBook = find(state, (book) => book.id === action.id)
+        return {
+          ...state,
+          allIds: [...state.allIds, action.newBookId],
+          [action.newBookId]: {
+            ...duplicatedBook,
+            id: action.newBookId,
           },
         }
       }
