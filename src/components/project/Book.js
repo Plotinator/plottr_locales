@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
+import { TbCopy } from 'react-icons/tb'
 
 import { t } from 'plottr_locales'
 
@@ -68,6 +69,10 @@ const BookConnector = (connector) => {
       this.setState({ hovering: false })
     }
 
+    handleDuplicate = () => {
+      this.props.actions.duplicateBook(this.props.book.id)
+    }
+
     renderDelete() {
       if (!this.state.deleting) return null
 
@@ -91,6 +96,9 @@ const BookConnector = (connector) => {
           <ButtonGroup>
             <Button title={t('Edit')} onClick={this.handleOpenBookDialog}>
               <Glyphicon glyph="edit" />
+            </Button>
+            <Button title={t('Duplicate')} onClick={this.handleDuplicate}>
+              <TbCopy />
             </Button>
             <ImagePicker
               chooseImage={this.chooseImage}
