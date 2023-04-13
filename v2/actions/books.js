@@ -6,6 +6,7 @@ import {
   LOAD_BOOKS,
   ADD_BOOK_FROM_TEMPLATE,
   EDIT_BOOK_IMAGE,
+  DUPLICATE_BOOK,
 } from '../constants/ActionTypes'
 import { book } from '../store/initialState'
 
@@ -35,4 +36,8 @@ export function reorderBooks(ids) {
 
 export function load(patching, books) {
   return { type: LOAD_BOOKS, patching, books }
+}
+
+export function duplicateBook(id) {
+  return { type: DUPLICATE_BOOK, id }
 }
