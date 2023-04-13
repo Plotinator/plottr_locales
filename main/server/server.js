@@ -1068,12 +1068,42 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
     })
   })
 
+  let heartbeatInterval = null
+  let awaitingResponse = null
+  const HEARTBEAT_INTERVAL_MS = 60000
+  const startHeartBeat = () => {
+    heartbeatInterval = setInterval(() => {
+      if (awaitingResponse) {
+        // We didn't hear back from the server in a minute.  Assume
+        // that we're headless and die.
+        clearInterval(heartbeatInterval)
+        process.exit(1)
+        return
+      }
+      process.send('heartbeat')
+      awaitingResponse = new Date()
+    }, HEARTBEAT_INTERVAL_MS)
+  }
+
+  process.on('message', (message) => {
+    if (message === 'ack') {
+      const elapsed = awaitingResponse
+        ? new Date().getTime() - awaitingResponse.getTime()
+        : Infinity
+      basicLogger.info(`Heart beat acknowledged in ${elapsed} (ms)`)
+      awaitingResponse = null
+    }
+  })
+
   ensureUserDataFolderExists()
     .then(testModules)
     .then(() => {
       startupTasks(userDataPath, stores, logInfo).then(() => {
         process.send('ready')
       })
+    })
+    .then(() => {
+      startHeartBeat()
     })
 }
 
