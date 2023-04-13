@@ -711,7 +711,8 @@ const api = (
     const lastModified = new Date()
     const fileId = selectors.fileIdSelector(fullFile)
     const fileName = selectors.fileNameSelector(fullFile)
-    const file = removeSystemKeys(fullFile)
+    const fileJSON = selectors.fullFileStateSelector(fullFile)
+    const file = removeSystemKeys(fileJSON)
 
     return startOfSessionBackup(userId, file, startOfToday, fileId)
       .then((startOfSession) => {
