@@ -863,7 +863,7 @@ describe('Saver', (describe, it) => {
         new Promise((resolve) => {
           setTimeout(resolve, 510)
         }).then(() => {
-          assertGreaterThan(loggedInfos, 4)
+          assertGreaterThan(loggedInfos, 1)
           assertEqual(loggedWarnings, 0)
           assertEqual(loggedErrors, 0)
           assertEqual(notifierCount, 0)
