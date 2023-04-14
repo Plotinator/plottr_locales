@@ -1,4 +1,4 @@
-import { clone, range } from 'lodash'
+import { clone, cloneDeep, mapValues, range } from 'lodash'
 
 import {
   ADD_LINES_FROM_TEMPLATE,
@@ -23,6 +23,7 @@ import {
   ADD_BOOK,
   APPEND_TOP_LEVEL_BEAT,
   UNSAFE_SET_BEATS,
+  DUPLICATE_BOOK,
 } from '../constants/ActionTypes'
 import { beat as defaultBeat } from '../store/initialState'
 import { newFileBeats } from '../store/newFileState'
@@ -76,6 +77,14 @@ const beats =
         const parentId = action.parentId || null
         const position = nextPositionInBook(state, actionBookId, parentId)
         return addNodeToState(state, actionBookId, position, title, parentId)
+      }
+
+      case DUPLICATE_BOOK: {
+        const beats = cloneDeep(state.beats[action.id])
+        return {
+          ...state,
+          [action.newBookId]: beats,
+        }
       }
 
       case ADD_BOOK: {
