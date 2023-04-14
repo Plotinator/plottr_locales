@@ -26,6 +26,7 @@ import {
   MOVE_LINE,
   PIN_PLOTLINE,
   UNPIN_PLOTLINE,
+  DUPLICATE_BOOK,
 } from '../constants/ActionTypes'
 import { line } from '../store/initialState'
 import { newFileLines, newFileSeriesLines } from '../store/newFileState'
@@ -228,6 +229,20 @@ const lines =
         })
         const linesNotInBook = state.filter(({ bookId }) => bookId !== lineToDuplicate.bookId)
         return [...linesInBookWithUpdatedPositions, ...linesNotInBook, duplicatedLine]
+      }
+
+      case DUPLICATE_BOOK: {
+        const linesToDuplicate = state.filter(({ bookId }) => bookId === action.id)
+        return cloneDeep(linesToDuplicate)
+          .map((line) => {
+            return {
+              ...line,
+              bookId: action.newBookId,
+            }
+          })
+          .reduce((acc, nextCard) => {
+            return [{ ...nextCard, id: nextId(acc) }, ...acc]
+          }, state)
       }
 
       case MOVE_LINE: {

@@ -1,9 +1,10 @@
-import { omit } from 'lodash'
+import { cloneDeep, omit } from 'lodash'
 
 import {
   ADD_BOOK,
   ADD_BOOK_FROM_TEMPLATE,
   DELETE_BOOK,
+  DUPLICATE_BOOK,
   EDIT_HIERARCHY_LEVEL,
   LOAD_HIERARCHY,
   SET_HIERARCHY_LEVELS,
@@ -69,6 +70,14 @@ const hierarchy =
         return omit(state, action.id.toString())
       }
 
+      case DUPLICATE_BOOK: {
+        const duplicatedHierarchy = cloneDeep(state[action.id])
+
+        return {
+          ...state,
+          [action.newBookId]: duplicatedHierarchy,
+        }
+      }
       case ADD_BOOK_FROM_TEMPLATE:
       case ADD_BOOK: {
         return {
