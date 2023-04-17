@@ -32,6 +32,7 @@ import {
   UNSAFE_SET_BEATS,
   ADD_CARD,
   REORDER_CARDS_WITHIN_LINE,
+  DUPLICATE_BOOK,
 } from '../constants/ActionTypes'
 import {
   selectedCharacterAttributeTabSelector,
@@ -209,6 +210,24 @@ const root = (dataRepairers) => (state, action) => {
     case ADD_BOOK:
       return mainReducer(state, { ...action, newBookId: objectId(state.books.allIds) })
 
+    case DUPLICATE_BOOK: {
+      const beatsInNewBook = cloneDeep(state.beats[action.id])
+      const copiedCards = cloneDeep(
+        state.cards.filter((card) =>
+          Object.keys(beatsInNewBook.index).includes(String(card.beatId))
+        )
+      )
+
+      return mainReducer(state, {
+        ...action,
+        newBookId: objectId(state.books.allIds),
+        nextLineId: nextId(state.lines),
+        nextBeatId: nextBeatId(state.beats),
+        nextCardId: nextId(state.cards),
+        newBeats: beatsInNewBook,
+        newCards: copiedCards,
+      })
+    }
     case ADD_BOOK_FROM_TEMPLATE:
       // cards from the template need to know the new ids of lines and beats from the template
       // the strategy here is to use the state's next id value + the template id's current value

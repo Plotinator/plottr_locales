@@ -79,14 +79,6 @@ const beats =
         return addNodeToState(state, actionBookId, position, title, parentId)
       }
 
-      case DUPLICATE_BOOK: {
-        const beats = cloneDeep(state.beats[action.id])
-        return {
-          ...state,
-          [action.newBookId]: beats,
-        }
-      }
-
       case ADD_BOOK: {
         const title = 'auto'
         const parentId = null
@@ -102,6 +94,32 @@ const beats =
           }
         } else {
           return state
+        }
+      }
+
+      case DUPLICATE_BOOK: {
+        const beats = action.newBeats
+        const idMap = {}
+        // this recreates the template's tree but with new ids
+        const newBeats = tree.reduce('id')(
+          beats,
+          (newBeatTree, nextBeat, parentId) => {
+            const newId = action.nextBeatId + nextBeat.id // give it a new id
+            idMap[nextBeat.id] = newId
+            const newParentId = idMap[parentId] || null
+            const newBeat = {
+              ...clone(nextBeat),
+              id: newId,
+              bookId: action.newBookId, // add it to the new book
+            }
+            return tree.addNode('id')(newBeatTree, newParentId, newBeat)
+          },
+          clone(newTree)
+        )
+
+        return {
+          ...state,
+          [action.newBookId]: newBeats,
         }
       }
 

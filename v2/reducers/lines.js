@@ -234,6 +234,7 @@ const lines =
       case DUPLICATE_BOOK: {
         const linesToDuplicate = state.filter(({ bookId }) => bookId === action.id)
         return cloneDeep(linesToDuplicate)
+          .filter(({ bookId }) => bookId !== 'series') // this is to protect against a bad template that unnecessarily had a series line
           .map((line) => {
             return {
               ...line,
