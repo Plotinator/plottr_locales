@@ -20,11 +20,8 @@ import {
 import { reorderList } from '../helpers/lists'
 import selectors from '../selectors'
 
-const {
-  currentTimelineSelector,
-  pinnedPlotlinesSelector,
-  sortedLinesByBookSelector,
-} = selectors(identity)
+const { currentTimelineSelector, pinnedPlotlinesSelector, sortedLinesByBookSelector } =
+  selectors(identity)
 
 // N.B. if one does not supply a book ID, then it is assumed that the
 // action refers to the broadest scope possible, i.e. the series of
