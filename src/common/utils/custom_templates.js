@@ -117,6 +117,7 @@ function createCharacterTemplate(pltrData, { name, description, link }) {
 
 function createScenesTemplate(pltrData, { name, description, link }) {
   const data = cloneDeep(pltrData)
+  const attributes = selectors.cardsCustomAttributesSelector(data)
 
   let id = makeNewId('sc')
   return getVersion().then((version) => {
@@ -127,7 +128,7 @@ function createScenesTemplate(pltrData, { name, description, link }) {
       name: name,
       description: description,
       link: link,
-      attributes: data.customAttributes.scenes,
+      attributes,
     }
     return template
   })
