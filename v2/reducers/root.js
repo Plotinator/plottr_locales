@@ -217,6 +217,9 @@ const root = (dataRepairers) => (state, action) => {
           Object.keys(beatsInNewBook.index).includes(String(card.beatId))
         )
       )
+      const copiedLines = cloneDeep(
+        state.lines.filter((line) => copiedCards.find((card) => card.lineId == line.id))
+      )
 
       return mainReducer(state, {
         ...action,
@@ -226,6 +229,7 @@ const root = (dataRepairers) => (state, action) => {
         nextCardId: nextId(state.cards),
         newBeats: beatsInNewBook,
         newCards: copiedCards,
+        newLines: copiedLines,
       })
     }
     case ADD_BOOK_FROM_TEMPLATE:

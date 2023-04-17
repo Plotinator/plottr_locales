@@ -100,6 +100,24 @@ const lines =
         return [...state, ...newLines]
       }
 
+      case DUPLICATE_BOOK: {
+        const linesInBook = state.filter((l) => l.bookId == action.id)
+        const nextPosition = nextPositionInBook(linesInBook, actionBookId)
+        const newLines = action.newLines
+          .filter(({ bookId }) => bookId !== 'series') // this is to protect against a bad template that unnecessarily had a series line
+          .map((l, index) => {
+            const newLine = cloneDeep(l)
+            newLine.id = action.nextLineId + newLine.id // give it a new id
+            newLine.bookId = actionBookId // add it to the new/current book
+            newLine.position = nextPosition + newLine.position // put it in the right position
+            if (!newLine.color || newLine.color == nextColor(0)) {
+              newLine.color = nextColor(linesInBook.length + index)
+            }
+            return newLine
+          })
+        return [...state, ...newLines]
+      }
+
       case EDIT_LINE:
         return state.map((l) =>
           l.id === action.id
@@ -229,21 +247,6 @@ const lines =
         })
         const linesNotInBook = state.filter(({ bookId }) => bookId !== lineToDuplicate.bookId)
         return [...linesInBookWithUpdatedPositions, ...linesNotInBook, duplicatedLine]
-      }
-
-      case DUPLICATE_BOOK: {
-        const linesToDuplicate = state.filter(({ bookId }) => bookId === action.id)
-        return cloneDeep(linesToDuplicate)
-          .filter(({ bookId }) => bookId !== 'series') // this is to protect against a bad template that unnecessarily had a series line
-          .map((line) => {
-            return {
-              ...line,
-              bookId: action.newBookId,
-            }
-          })
-          .reduce((acc, nextCard) => {
-            return [{ ...nextCard, id: nextId(acc) }, ...acc]
-          }, state)
       }
 
       case MOVE_LINE: {

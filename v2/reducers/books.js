@@ -68,9 +68,21 @@ const books =
 
       case DUPLICATE_BOOK: {
         const duplicatedBook = find(state, (book) => book.id === action.id)
+        const duplicatedIndex = state.allIds.indexOf(action.id)
+        let newIds = []
+        if (duplicatedIndex !== -1) {
+          newIds = [
+            ...state.allIds.slice(0, duplicatedIndex + 1),
+            action.newBookId,
+            ...state.allIds.slice(duplicatedIndex + 1),
+          ]
+        } else {
+          newIds = [...state.allIds, action.newBookId]
+        }
+
         return {
           ...state,
-          allIds: [...state.allIds, action.newBookId],
+          allIds: newIds,
           [action.newBookId]: {
             ...duplicatedBook,
             id: action.newBookId,
