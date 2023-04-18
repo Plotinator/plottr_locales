@@ -251,13 +251,23 @@ tellMeWhatOSImOn()
           const isOfflineModeEnabled = selectors.offlineModeEnabledSelector(present)
           const isCloudFile = selectors.isCloudFileSelector(present)
           if (isCloudFile && isOffline && isOfflineModeEnabled) {
-            saveOfflineFile(present).then(() => {
-              store.dispatch(actions.ui.fileSaved())
-            })
+            saveOfflineFile(present)
+              .then(() => {
+                store.dispatch(actions.ui.fileSaved())
+              })
+              .catch((error) => {
+                logger.error('Failed to save offline file', error)
+                showErrorBox(t('Error'), t('There was a problem saving your file'))
+              })
           } else if (!isCloudFile) {
-            saveFile(present.project.fileURL, present).then(() => {
-              store.dispatch(actions.ui.fileSaved())
-            })
+            saveFile(present.project.fileURL, present)
+              .then(() => {
+                store.dispatch(actions.ui.fileSaved())
+              })
+              .catch((error) => {
+                logger.error('Failed to save classic file', error)
+                showErrorBox(t('Error'), t('There was a problem saving your file'))
+              })
           }
         })
 
