@@ -1,24 +1,11 @@
 import { mapValues } from 'lodash'
 
-import { removeSystemKeys } from '../../reducers/systemReducers'
 import selectors from '../../selectors'
 import { emptyFile } from '../../store/newFileState'
-import { addBeat } from '../beats'
-import { addBook, editBook } from '../books'
-import { addCard, changeBeat, changeLine } from '../cards'
-import { addLine } from '../lines'
-import {
-  loadFile,
-  openNewBookDialog,
-  openEditBookDialog,
-  setCardDialogClose,
-  setCardDialogOpen,
-  closeBookDialog,
-} from '../ui'
 import { configureStore, pltrAdaptor } from './fixtures/testStore'
+import actions from '../'
 
 const {
-  fullFileStateSelector,
   allBookIdsSelector,
   allBooksSelector,
   bookDialogBookIdSelector,
@@ -32,6 +19,21 @@ const {
   cardDialogSelector,
   bookDialogSelector,
 } = selectors(pltrAdaptor)
+
+const wiredUpActions = actions(pltrAdaptor)
+
+const { addBeat } = wiredUpActions.beat
+const { addBook, editBook } = wiredUpActions.book
+const { addCard, changeBeat, changeLine } = wiredUpActions.card
+const { addLine } = wiredUpActions.line
+const {
+  loadFile,
+  openNewBookDialog,
+  openEditBookDialog,
+  setCardDialogClose,
+  setCardDialogOpen,
+  closeBookDialog,
+} = wiredUpActions.ui
 
 const EMPTY_FILE = emptyFile('Test file')
 
@@ -84,15 +86,15 @@ function isAnObject(val) {
 }
 
 describe('cardDialog', () => {
-  const store = initialStore()
-  const initialState = removeSystemKeys(fullFileStateSelector(store.getState()))
   describe('given the initial state store', () => {
-    const cardId = cardDialogCardIdSelector(initialState)
-    const beatId = cardDialogBeatIdSelector(initialState)
-    const lineId = cardDialogLineIdSelector(initialState)
-    const isOpen = isCardDialogVisibleSelector(initialState)
+    const store = initialStore()
+    const cardId = cardDialogCardIdSelector(store.getState())
+    const beatId = cardDialogBeatIdSelector(store.getState())
+    const lineId = cardDialogLineIdSelector(store.getState())
+    const isOpen = isCardDialogVisibleSelector(store.getState())
     it('should produce initial state store', () => {
-      expect(initialState.ui.cardDialog).toMatchObject(initialCardDialogState)
+      const cardDialog = cardDialogSelector(store.getState())
+      expect(cardDialog).toMatchObject(initialCardDialogState)
     })
 
     it('should have `null` as initial values for cardId lineId and beatId', () => {
@@ -108,6 +110,7 @@ describe('cardDialog', () => {
 
   describe('given cardDialog actions are dispatched', () => {
     describe('and setCardDialogOpen is dispatched', () => {
+      const store = initialStore()
       const cardId = 1
       const beatId = 1
       const lineId = 1
@@ -129,8 +132,8 @@ describe('cardDialog', () => {
         expect(cardDialogLineId).toBeNull()
       })
 
-      describe('given user create new card', () => {
-        describe('and cardId exist from the `cards` on present state', () => {
+      describe('when the user creates a new card', () => {
+        describe('and the cardId exists', () => {
           store.dispatch(addCard(exampleCard1))
           const cardId = 1
           const beatId = 1
@@ -157,54 +160,54 @@ describe('cardDialog', () => {
           it('should open the matched CardDialog id', () => {
             expect(isOpen).toBeTruthy()
           })
+          describe('when no another cardDialog action is dispatched', () => {
+            const presentState = store.getState()
+
+            const cardId = cardDialogCardIdSelector(presentState)
+            const beatId = cardDialogBeatIdSelector(presentState)
+            const lineId = cardDialogLineIdSelector(presentState)
+            const isOpen = isCardDialogVisibleSelector(presentState)
+
+            it('should not change the values for cardId, lineId, beatId and isOpen', () => {
+              expect(cardId).toEqual(1)
+              expect(lineId).toEqual(1)
+              expect(beatId).toEqual(1)
+              expect(isOpen).toBeTruthy()
+            })
+            describe('and setCardDialogClose is dispatched', () => {
+              const store = initialStore()
+              store.dispatch(setCardDialogClose())
+              const presentState = store.getState()
+
+              const cardId = cardDialogCardIdSelector(presentState)
+              const beatId = cardDialogBeatIdSelector(presentState)
+              const lineId = cardDialogLineIdSelector(presentState)
+              const isOpen = isCardDialogVisibleSelector(presentState)
+
+              it('should have null values for cardId, lineId, beatId', () => {
+                expect(cardId).toBeNull()
+                expect(lineId).toBeNull()
+                expect(beatId).toBeNull()
+              })
+
+              it('should be false for isOpen prop', () => {
+                expect(isOpen).toBeFalsy()
+              })
+
+              it('should match the object from the initial state store', () => {
+                const cardDialog = cardDialogSelector(presentState)
+                expect(cardDialog).toMatchObject(initialCardDialogState)
+              })
+            })
+          })
         })
-      })
-    })
-
-    describe('given no another cardDialog action is dispatched', () => {
-      const presentState = store.getState()
-
-      const cardId = cardDialogCardIdSelector(presentState)
-      const beatId = cardDialogBeatIdSelector(presentState)
-      const lineId = cardDialogLineIdSelector(presentState)
-      const isOpen = isCardDialogVisibleSelector(presentState)
-
-      it('should not change the values for cardId, lineId, beatId and isOpen', () => {
-        expect(cardId).toEqual(1)
-        expect(lineId).toEqual(1)
-        expect(beatId).toEqual(1)
-        expect(isOpen).toBeTruthy()
-      })
-    })
-
-    describe('given setCardDialogClose is dispatched', () => {
-      store.dispatch(setCardDialogClose())
-      const presentState = store.getState()
-
-      const cardId = cardDialogCardIdSelector(presentState)
-      const beatId = cardDialogBeatIdSelector(presentState)
-      const lineId = cardDialogLineIdSelector(presentState)
-      const isOpen = isCardDialogVisibleSelector(presentState)
-
-      it('should have null values for cardId, lineId, beatId', () => {
-        expect(cardId).toBeNull()
-        expect(lineId).toBeNull()
-        expect(beatId).toBeNull()
-      })
-
-      it('should be false for isOpen prop', () => {
-        expect(isOpen).toBeFalsy()
-      })
-
-      it('should match the object from the initial state store', () => {
-        const cardDialog = cardDialogSelector(presentState)
-        expect(cardDialog).toMatchObject(initialCardDialogState)
       })
     })
   })
 
   describe('changeBeat', () => {
     describe('given user add a card and beats, and then opened a card', () => {
+      const store = initialStore()
       const currentBookId = 1
       store.dispatch(addBeat(currentBookId))
       store.dispatch(addCard(exampleCard1))
@@ -237,6 +240,7 @@ describe('cardDialog', () => {
 
   describe('changeLine', () => {
     describe('given user add a card and lines, and then opened a card', () => {
+      const store = initialStore()
       const currentBookId = 1
       store.dispatch(addLine(currentBookId))
       store.dispatch(addLine(currentBookId))
@@ -270,10 +274,9 @@ describe('cardDialog', () => {
 })
 
 describe('bookDialog', () => {
-  const store = initialStore()
-  const initialState = store.getState()
-
   describe('given the initial state store', () => {
+    const store = initialStore()
+    const initialState = store.getState()
     const bookId = bookDialogBookIdSelector(initialState)
     const isOpen = isBookDialogVisibleSelector(initialState)
     it('should produce initial state store', () => {
@@ -292,6 +295,8 @@ describe('bookDialog', () => {
 
   describe('given bookDialog actions are dispatched', () => {
     describe('and openNewBookDialog is dispatched', () => {
+      const store = initialStore()
+      const initialState = store.getState()
       const nextBookNumber = allBookIdsSelector(initialState).length + 1
       store.dispatch(openNewBookDialog())
       const previousState = store.getState()
@@ -380,6 +385,7 @@ describe('bookDialog', () => {
     })
 
     describe('given openEditBookDialog is dispatched', () => {
+      const store = initialStore()
       const bookId = 1
       store.dispatch(openEditBookDialog(bookId))
       const previousState = store.getState()

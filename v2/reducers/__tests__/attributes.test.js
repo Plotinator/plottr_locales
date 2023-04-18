@@ -1,20 +1,8 @@
 import { configureStore, pltrAdaptor } from './fixtures/testStore'
 import { goldilocks } from './fixtures'
 import { emptyFile } from '../../store/newFileState'
-import { loadFile, selectCharacterAttributeBookTab } from '../../actions/ui'
-import { deleteBook, addBook } from '../../actions/books'
-import {
-  reorderCharacterAttribute,
-  deleteCharacterAttribute,
-  editCharacterAttributeMetadata,
-} from '../../actions/attributes'
+import actions from '../../actions'
 import { removeSystemKeys } from '../systemReducers'
-import {
-  addCharacter,
-  createCharacterAttribute,
-  editCharacterAttributeValue,
-  addBook as addBookToCharacter,
-} from '../../actions/characters'
 import selectors from '../../selectors'
 
 const {
@@ -24,6 +12,16 @@ const {
   allCharactersSelector,
   singleCharacterSelector,
 } = selectors(pltrAdaptor)
+
+const wiredUpActions = actions(pltrAdaptor)
+
+const { loadFile, selectCharacterAttributeBookTab } = wiredUpActions.ui
+const { deleteBook, addBook } = wiredUpActions.book
+const { reorderCharacterAttribute, deleteCharacterAttribute, editCharacterAttributeMetadata } =
+  wiredUpActions.attributes
+const { addCharacter, createCharacterAttribute, editCharacterAttributeValue } =
+  wiredUpActions.character
+const addBookToCharacter = wiredUpActions.character.addBook
 
 const EMPTY_FILE = emptyFile('Test file')
 const initialStore = () => {
@@ -640,9 +638,9 @@ describe('deleteBook', () => {
   describe('given a store with no characters in it', () => {
     it('should leave the characters unchanged', () => {
       const store = initialStore()
-      const initialState = removeSystemKeys(store.getState().present)
+      const initialState = removeSystemKeys(store.getState())
       store.dispatch(deleteBook(1))
-      const resultState = removeSystemKeys(store.getState().present)
+      const resultState = removeSystemKeys(store.getState())
       expect(initialState.characters).toEqual(resultState.characters)
     })
   })
@@ -651,9 +649,9 @@ describe('deleteBook', () => {
       it('should leave the characters unchanged', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
-        const initialState = removeSystemKeys(store.getState().present)
+        const initialState = removeSystemKeys(store.getState())
         store.dispatch(deleteBook(1))
-        const resultState = removeSystemKeys(store.getState().present)
+        const resultState = removeSystemKeys(store.getState())
         expect(initialState.characters).toEqual(resultState.characters)
       })
     })
@@ -667,7 +665,7 @@ describe('deleteBook', () => {
           store.dispatch(addBookToCharacter(1, 1))
           store.dispatch(selectCharacterAttributeBookTab(1))
           store.dispatch(editCharacterAttributeValue(1, 1, 'New value'))
-          const originalCharacter = singleCharacterSelector(store.getState().present, 1)
+          const originalCharacter = singleCharacterSelector(store.getState(), 1)
           expect(originalCharacter.attributes).toEqual(
             expect.arrayContaining([
               {
@@ -684,7 +682,7 @@ describe('deleteBook', () => {
           )
           store.dispatch(deleteBook(1))
           const resultState = store.getState()
-          const character = singleCharacterSelector(resultState.present, 1)
+          const character = singleCharacterSelector(resultState, 1)
           expect(character.attributes).toEqual([
             {
               id: 1,
@@ -704,10 +702,10 @@ describe('deleteBook', () => {
           store.dispatch(addBookToCharacter(1, 1))
           store.dispatch(selectCharacterAttributeBookTab(1))
           store.dispatch(editCharacterAttributeValue(1, 1, 'New value'))
-          const originalCharacter = singleCharacterSelector(store.getState().present, 1)
+          const originalCharacter = singleCharacterSelector(store.getState(), 1)
           store.dispatch(deleteBook(2))
           const resultState = store.getState()
-          const character = singleCharacterSelector(resultState.present, 1)
+          const character = singleCharacterSelector(resultState, 1)
           expect(character).toBe(originalCharacter)
         })
       })

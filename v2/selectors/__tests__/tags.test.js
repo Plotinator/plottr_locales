@@ -6,9 +6,9 @@ import actions from '../../actions'
 const wiredUpActions = actions(pltrAdaptor)
 
 const { addCharacter } = wiredUpActions.character
-const { addNoteWithValues, addTag } = wiredUpActions.notes
+const { addNoteWithValues, addTag } = wiredUpActions.note
 const attachTagToCharacter = wiredUpActions.character.addTag
-const { addCreatedTag } = wiredUpActions.tags
+const { addCreatedTag } = wiredUpActions.tag
 const { changeCurrentView, loadFile } = wiredUpActions.ui
 
 const {

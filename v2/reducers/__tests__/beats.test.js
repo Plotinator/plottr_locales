@@ -3,17 +3,19 @@ import { omit, differenceWith, isEqual, sortBy } from 'lodash'
 import { configureStore, pltrAdaptor } from './fixtures/testStore'
 import { multi_tier_zelda } from './fixtures'
 import { emptyFile } from '../../store/newFileState'
-import { loadFile } from '../../actions/ui'
-import { addBook } from '../../actions/books'
-import { changeCurrentTimeline, setTimelineView } from '../../actions/ui'
-import { setHierarchyLevels } from '../../actions/hierarchy'
-import { insertBeat } from '../../actions/beats'
 import { hierarchyLevel } from '../../store/initialState'
 import { maxDepth, depth, nodeParent, findNode } from '../tree'
+import actions from '../../actions'
 import selectors from '../../selectors'
 
 const { allBeatsSelector, beatsForAnotherBookSelector, fullFileStateSelector } =
   selectors(pltrAdaptor)
+
+const wiredUpActions = actions(pltrAdaptor)
+const { changeCurrentTimeline, setTimelineView, loadFile } = wiredUpActions.ui
+const { addBook } = wiredUpActions.book
+const { setHierarchyLevels } = wiredUpActions.hierarchyLevels
+const { insertBeat } = wiredUpActions.beat
 
 const EMPTY_FILE = emptyFile('Test file')
 const initialStore = () => {
@@ -81,10 +83,10 @@ describe('modifying the hierarchy (and its impact on beats)', () => {
     describe('and the current timeline is book 2', () => {
       it('should adjust the number of levels of beats in book 2', () => {
         const store = initialStore()
-        const initialBeats = beatsForAnotherBookSelector(store.getState(), 1)
+        const initialBeats = beatsForAnotherBookSelector(store.getState(), 2)
         store.dispatch(changeCurrentTimeline(2))
         store.dispatch(setHierarchyLevels([{ 0: hierarchyLevel }, { 0: hierarchyLevel }]))
-        const beatsAfter = beatsForAnotherBookSelector(store.getState(), 1)
+        const beatsAfter = beatsForAnotherBookSelector(store.getState(), 2)
         expect(maxDepth('id')(beatsAfter)).toBeGreaterThan(maxDepth('id')(initialBeats))
         expect(maxDepth('id')(beatsAfter)).toEqual(1)
       })
