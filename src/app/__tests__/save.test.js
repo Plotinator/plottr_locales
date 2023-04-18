@@ -250,7 +250,7 @@ const offlineWithOfflineEnabledState = () => {
       },
     })
   )
-  return selectors.appSettingsSelector(store.getState())
+  return selectors.fullFileStateSelector(store.getState())
 }
 const localFileWithBackupsDisabled = () => {
   const store = initialStore()

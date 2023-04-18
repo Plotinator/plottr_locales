@@ -89,6 +89,7 @@ module.exports = {
     '^test(.*)$': '<rootDir>/test/$1',
     '^connected-components$': '<rootDir>/src/connected-components.js',
     '^wired-up-firebase$': '<rootDir>/src/wired-up-firebase.js',
+    '^wired-up-pltr$': '<rootDir>/src/wired-up-pltr.js',
     '^plottr_components$': '<rootDir>/lib/plottr_components/dist/components',
     '^react($|/.+)': '<rootDir>/node_modules/react$1',
     '^react-dom($|/.+)': '<rootDir>/node_modules/react-dom$1',

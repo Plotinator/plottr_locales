@@ -531,7 +531,7 @@ export function bootFile(
     }
     saver = Saver(
       () => {
-        return store.getState()
+        return selectors.fullFileStateSelector(store.getState())
       },
       saveFile(whenClientIsReady, logger, postSaveHook),
       backupFile(
