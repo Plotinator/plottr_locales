@@ -21,7 +21,8 @@ const file =
   (stateWithoutVersionStamp = defaultFile, action) => {
     const shouldNotUpdateVersionStamp =
       action.type.startsWith('@') ||
-      action.type === 'FILE_LOADED' ||
+      action.type === FILE_LOADED ||
+      action.type === FILE_SAVED ||
       LoadActions.indexOf(action.type) !== -1 ||
       SYSTEM_REDUCER_ACTION_TYPES.indexOf(action.type) !== -1 ||
       stateWithoutVersionStamp?.isResuming
