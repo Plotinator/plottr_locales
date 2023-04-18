@@ -1,4 +1,5 @@
 # Environment Variables
+
 This project requires that you specify environment variables in order
 to connect to Firebase.  You may place these into a file called `.env`
 at the root of the project.

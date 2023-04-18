@@ -61,6 +61,9 @@ export const startServer = (log, broadcastPortChange, userDataPath, onFatalError
         log.info('SHUTTING DOWN SOCKET SERVER!')
         weInstructedServerToDie = true
         server.kill()
+      } else if (message === 'heartbeat') {
+        log.info(`Received heartbeat from socket worker.`)
+        server.send('ack')
       } else {
         log.info(message)
       }

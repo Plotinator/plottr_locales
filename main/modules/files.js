@@ -9,13 +9,14 @@ import { t } from 'plottr_locales'
 import { addToKnownFiles, addToKnown } from './known_files'
 import { importFromSnowflake, importFromScrivener } from 'plottr_import_export'
 
-import { helpers, emptyFile, tree, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
+import { helpers, emptyFile, tree, SYSTEM_REDUCER_KEYS, specialCaseFixes } from 'pltr/v2'
 import { openProjectWindow } from './windows/projects'
 import { broadcastToAllWindows } from './broadcast'
 import { OFFLINE_FILE_FILES_PATH, isOfflineFile } from './offlineFilePath'
 import { whenClientIsReady } from '../../shared/socket-client'
 
 const { writeFile } = fs.promises
+const { addHierarchiesIfMissing } = specialCaseFixes
 
 const makeFileModule = () => {
   const TMP_PATH = 'tmp'
@@ -59,16 +60,16 @@ const makeFileModule = () => {
 
   function newFileFromTemplate(template, name) {
     if (!name) {
-      return template.templateData
+      return addHierarchiesIfMissing(template.templateData)
     }
 
-    return {
+    return addHierarchiesIfMissing({
       ...template.templateData,
       series: {
         ...template.templateData.series,
         name,
       },
-    }
+    })
   }
 
   async function createNew(template, name) {
