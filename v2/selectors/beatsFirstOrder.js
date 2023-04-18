@@ -4,7 +4,7 @@
 
 import { createSelector } from 'reselect'
 
-import { maxDepth, nextId, beatsByPosition, rootParentId } from '../helpers/beats'
+import { nextId, beatsByPosition, rootParentId } from '../helpers/beats'
 import { children, depth } from '../reducers/tree'
 
 export const allBeatsSelector = (state) => state.beats
