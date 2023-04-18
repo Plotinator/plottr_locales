@@ -418,7 +418,6 @@ const characters =
         })
 
       case DELETE_BOOK: {
-        debugger
         return state.map((character) => {
           return removeAttributesAssociatedWithDeletedBook(
             removeDeletedBookFromCharacter(character, action.id),
