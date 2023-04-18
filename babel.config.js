@@ -18,8 +18,6 @@ if (isTest) {
         app: './src/app',
         css: './src/css',
         dashboard: './src/dashboard',
-        constants: './src/app/constants',
-        actions: './src/app/actions',
         components: './src/app/components',
       },
     },

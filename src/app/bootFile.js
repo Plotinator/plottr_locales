@@ -534,7 +534,7 @@ export function bootFile(
     const postBackupHook = () => {
       // NOP
     }
-    saver = new Saver(
+    saver = Saver(
       () => {
         return store.getState().present
       },
@@ -546,9 +546,9 @@ export function bootFile(
         logger,
         postBackupHook
       ),
-      logger,
       SAVE_INTERVAL_MS,
       BACKUP_INTERVAL_MS,
+      logger,
       rollbar,
       (title, message) => {
         showMessageBox(title, message)
