@@ -365,8 +365,6 @@ const fileSystemModule = (userDataPath) => {
                     })
                     .map((entry) => {
                       return lstat(path.join(basePath, entry)).then((fileStats) => {
-                        console.log('DUDE', fileStats)
-                        console.log('DUDE2')
                         return {
                           keep: fileStats.isDirectory(),
                           payload: entry,
