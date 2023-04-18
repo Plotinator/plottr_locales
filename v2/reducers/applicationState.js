@@ -469,17 +469,6 @@ function applicationStateReducer(state = INITIAL_STATE, action) {
         },
       }
     }
-    case SET_APP_SETTINGS: {
-      const isInSettingsWizard = action.appSettings.finishedSettingsWizard ? false : true
-      const wizardStep = state.settingsWizard.wizardStep ? state.settingsWizard.wizardStep : 1
-      return {
-        ...state,
-        settingsWizard: {
-          isInSettingsWizard,
-          wizardStep: wizardStep,
-        },
-      }
-    }
     case ADVANCE_SETTINGS_WIZARD: {
       if (!state.settingsWizard.isInSettingsWizard) {
         return state
