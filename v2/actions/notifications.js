@@ -10,8 +10,7 @@ export function showToastNotification(visible, cardAction, newBookId, lineAction
 }
 
 export const showMessage = (message) => (dispatch, getState) => {
-  const rawState = getState()
-  const state = rawState.present ? rawState.present : rawState
+  const state = getState()
   const existingTimeout = timeoutSelector(state)
 
   if (existingTimeout) {

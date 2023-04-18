@@ -1,7 +1,7 @@
 import { configureStore, pltrAdaptor } from './fixtures/testStore'
 import { hamlet, file_with_legacy_character_tags, goldilocks } from './fixtures'
 import { emptyFile } from '../../store/newFileState'
-import actions from '../../actions/characters'
+import actions from '../../actions'
 import { removeSystemKeys } from '../systemReducers'
 import selectors from '../../selectors'
 
@@ -17,12 +17,12 @@ const {
 } = selectors(pltrAdaptor)
 
 const wiredUpActions = actions(pltrAdaptor)
-const { loadFile, selectCharacterAttributeBookTab } = actions.ui
-const { addBook, deleteBook } = actions.books
-const { addTag, deleteTag } = actions.tags
-const { deleteCharacterCategory } = actions.categories
-const { deleteCharacterAttribute, editCharacterAttributeMetadata } = actions.attributes
-const addCharacterToCard = actions.cards.addCharacter
+const { loadFile, selectCharacterAttributeBookTab } = wiredUpActions.ui
+const { addBook, deleteBook } = wiredUpActions.book
+const { addTag, deleteTag } = wiredUpActions.tag
+const { deleteCharacterCategory } = wiredUpActions.category
+const { deleteCharacterAttribute, editCharacterAttributeMetadata } = wiredUpActions.attributes
+const addCharacterToCard = wiredUpActions.card.addCharacter
 const {
   addCharacter,
   addTemplateToCharacter,
@@ -33,10 +33,10 @@ const {
   editDescription,
   editCategory,
 } = wiredUpActions.character
-const addBookToCharacter = wiredUpActions.characetr.addBook
-const addTagToCharacter = wiredUpActions.characetr.addTag
-const removeTagFromCharacter = wiredUpActions.characetr.removeTag
-const removeBookFromCharacter = wiredUpActions.characetr.removeBook
+const addBookToCharacter = wiredUpActions.character.addBook
+const addTagToCharacter = wiredUpActions.character.addTag
+const removeTagFromCharacter = wiredUpActions.character.removeTag
+const removeBookFromCharacter = wiredUpActions.character.removeBook
 
 const EMPTY_FILE = emptyFile('Test file')
 const initialStore = () => {
@@ -107,8 +107,8 @@ describe('editCharacterTemplateAttribute', () => {
         )
       )
       const resultState = removeSystemKeys(fullFileStateSelector(store.getState()))
-      expect(ignoringChangesWeDontCareAbout(fullFileStateSelector(initialState))).toEqual(
-        ignoringChangesWeDontCareAbout(fullFileStateSelector(resultState))
+      expect(ignoringChangesWeDontCareAbout(initialState)).toEqual(
+        ignoringChangesWeDontCareAbout(resultState)
       )
     })
   })
@@ -128,8 +128,8 @@ describe('editCharacterTemplateAttribute', () => {
           )
         )
         const resultState = removeSystemKeys(fullFileStateSelector(store.getState()))
-        expect(ignoringChangesWeDontCareAbout(fullFileStateSelector(initialState))).toEqual(
-          ignoringChangesWeDontCareAbout(fullFileStateSelector(resultState))
+        expect(ignoringChangesWeDontCareAbout(initialState)).toEqual(
+          ignoringChangesWeDontCareAbout(resultState)
         )
       })
     })
@@ -1409,7 +1409,7 @@ describe('editDescription', () => {
             store.dispatch(addCharacter('John Doe'))
             store.dispatch(editDescription(1, 'New value'))
             store.dispatch(addBook())
-            expect(singleCharacterSelector(store.getState(), 1)).toEqual([
+            expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
               {
                 bookId: 'all',
                 id: 1,
@@ -1430,7 +1430,7 @@ describe('editDescription', () => {
               store.dispatch(addBookToCharacter(1, 1))
               store.dispatch(selectCharacterAttributeBookTab('all'))
               store.dispatch(editDescription(1, 'New value'))
-              expect(attributesSelector(store.getState(), 1)).toEqual([
+              expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
                 {
                   bookId: 'all',
                   id: 1,
@@ -1450,7 +1450,7 @@ describe('editDescription', () => {
               store.dispatch(addBookToCharacter(1, 1))
               store.dispatch(selectCharacterAttributeBookTab('1'))
               store.dispatch(editDescription(1, 'New value'))
-              expect(attributesSelector(store.getState(), 1)).toEqual([
+              expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
                 {
                   bookId: '1',
                   id: 1,
@@ -1498,7 +1498,7 @@ describe('editCategory', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(editCategory(1, 'New value'))
-        expect(attributesSelector(store.getState(), 1)).toEqual([
+        expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
           {
             bookId: 'all',
             id: 1,

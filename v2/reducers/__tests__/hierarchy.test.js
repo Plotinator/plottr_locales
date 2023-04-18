@@ -11,8 +11,8 @@ const { hierarchyLevelsForAnotherBookSelector, allHierarchyLevelsSelector } = se
 
 const wiredUpActions = actions(pltrAdaptor)
 const { loadFile, changeCurrentTimeline } = wiredUpActions.ui
-const { addBook, deleteBook } = wiredUpActions.books
-const { editHierarchyLevel, setHierarchyLevels } = wiredUpActions.hierarchy
+const { addBook, deleteBook } = wiredUpActions.book
+const { editHierarchyLevel, setHierarchyLevels } = wiredUpActions.hierarchyLevels
 
 const EMPTY_FILE = emptyFile('Test file')
 const initialStore = () => {

@@ -1,10 +1,9 @@
 import { configureStore, pltrAdaptor } from './fixtures/testStore'
 import { emptyFile } from '../../store/newFileState'
-import { loadFile } from '../../actions/ui'
 import { removeSystemKeys } from '../../reducers/systemReducers'
-import { editCharacterAttributeValue } from '../characters'
 import { goldilocks } from './fixtures'
 import selectors from '../../selectors'
+import actions from '../'
 
 const {
   fullFileStateSelector,
@@ -13,6 +12,10 @@ const {
   characterAttributesSelector,
   singleCharacterSelector,
 } = selectors(pltrAdaptor)
+
+const wiredUpActions = actions(pltrAdaptor)
+const { loadFile } = wiredUpActions.ui
+const { editCharacterAttributeValue } = wiredUpActions.character
 
 const EMPTY_FILE = emptyFile('Test file')
 

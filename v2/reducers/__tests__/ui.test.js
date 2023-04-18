@@ -14,21 +14,21 @@ import actions from '../../actions'
 
 const wiredUpActions = actions(pltrAdaptor)
 
-import {
+const {
   changeOrientation,
   loadFile,
   setCharacterFilter,
   changeCurrentTimeline,
   setCardDialogOpen,
-} from '../../actions/ui'
+} = wiredUpActions.ui
 const { addBook } = wiredUpActions.book
 const { setUserId } = wiredUpActions.client
 const { addLineWithTitle, reorderLines, togglePinPlotline } = wiredUpActions.line
-const { deleteCharacterAttribute, editCharacterAttributeMetadata } = wiredUpActions.attribute
+const { deleteCharacterAttribute, editCharacterAttributeMetadata } = wiredUpActions.attributes
 const { addCard, moveCardToBook } = wiredUpActions.card
-const addCharacterToCard = wiredUpActions.card.wiredUpActions
+const addCharacterToCard = wiredUpActions.card.addCharacter
 const { addCharacter, editCharacterAttributeValue } = wiredUpActions.character
-const { setAppSettings } = wiredUpActions.setting
+const { setAppSettings } = wiredUpActions.settings
 const { setPermission } = wiredUpActions.permission
 
 const {

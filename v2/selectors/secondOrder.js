@@ -291,9 +291,12 @@ export const selectedCharacterSelector = createSelector(
     return null
   }
 )
-const customAttributeOrderSelector = createSelector(uiSelector, ({ customAttributeOrder }) => {
-  return customAttributeOrder || []
-})
+export const customAttributeOrderSelector = createSelector(
+  uiSelector,
+  ({ customAttributeOrder }) => {
+    return customAttributeOrder || []
+  }
+)
 export const characterCustomAttributeOrderSelector = createSelector(
   customAttributeOrderSelector,
   ({ characters }) => characters || []
