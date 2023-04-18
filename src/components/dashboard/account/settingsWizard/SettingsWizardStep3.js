@@ -8,23 +8,13 @@ import OnboardingButtonBar from '../../../onboarding/OnboardingButtonBar'
 import OnboardingStep from '../../../onboarding/OnboardingStep'
 import Button from '../../../Button'
 import UnconnectedBackupSettings from '../../options/BackupSettings'
-import { checkDependencies } from '../../../checkDependencies'
 
 const SettingsWizardStep3Connector = (connector) => {
-  const {
-    platform: {
-      settings: { saveAppSetting },
-    },
-  } = connector
-  checkDependencies({
-    saveAppSetting,
-  })
-
   const BackupSettings = UnconnectedBackupSettings(connector)
 
-  const SettingsWizardStep3 = ({ goBack }) => {
+  const SettingsWizardStep3 = ({ goBack, finishSettingsWizard }) => {
     const handleFinish = () => {
-      saveAppSetting('finishedSettingsWizard', true)
+      finishSettingsWizard()
     }
 
     return (
@@ -56,6 +46,7 @@ const SettingsWizardStep3Connector = (connector) => {
 
   SettingsWizardStep3.propTypes = {
     goBack: PropTypes.func.isRequired,
+    finishSettingsWizard: PropTypes.func.isRequired,
   }
 
   const {
@@ -67,8 +58,8 @@ const SettingsWizardStep3Connector = (connector) => {
     const { connect } = redux
 
     return connect((_state) => ({}), {
-      nextStep: actions.applicationState.advanceSettingsWizard,
       goBack: actions.applicationState.regressSettingsWizard,
+      finishSettingsWizard: actions.applicationState.finishSettingsWizard,
     })(SettingsWizardStep3)
   }
 
