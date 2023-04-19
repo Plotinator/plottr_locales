@@ -4,8 +4,7 @@
 
 import { createSelector } from 'reselect'
 
-import { nextId, beatsByPosition, rootParentId } from '../helpers/beats'
-import { children, depth } from '../reducers/tree'
+import { nextId, beatsByPosition } from '../helpers/beats'
 import { fullFileStateSelector } from './fullFileFirstOrder'
 
 export const allBeatsSelector = createSelector(fullFileStateSelector, (state) => state.beats)
