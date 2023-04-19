@@ -142,6 +142,7 @@ const FilterListConnector = (connector) => {
           charactersFilterItemsSelector,
           placesFilterItemsSelector,
           tagsFilterItemsSelector,
+          allBooksSelector,
         },
       },
     } = connector
@@ -149,14 +150,15 @@ const FilterListConnector = (connector) => {
       charactersFilterItemsSelector,
       placesFilterItemsSelector,
       tagsFilterItemsSelector,
+      allBooksSelector,
     })
 
     return connect((state) => {
       return {
-        characters: charactersFilterItemsSelector(state.present),
-        places: placesFilterItemsSelector(state.present),
-        tags: tagsFilterItemsSelector(state.present),
-        books: state.present.books,
+        characters: charactersFilterItemsSelector(state),
+        places: placesFilterItemsSelector(state),
+        tags: tagsFilterItemsSelector(state),
+        books: allBooksSelector(state),
       }
     })(FilterList)
   }

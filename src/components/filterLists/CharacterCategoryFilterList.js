@@ -44,7 +44,7 @@ const CharacterCategoryFilterListConnector = (connector) => {
 
     return connect((state) => {
       return {
-        categories: categoriesFilterItemsSelector(state.present),
+        categories: categoriesFilterItemsSelector(state),
       }
     })(CharacterCategoryFilterList)
   }

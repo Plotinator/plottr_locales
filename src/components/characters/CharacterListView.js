@@ -486,23 +486,21 @@ const CharacterListViewConnector = (connector) => {
     return connect(
       (state) => {
         return {
-          visibleCharactersByCategory: selectors.visibleSortedSearchedCharactersByCategorySelector(
-            state.present
-          ),
-          filterIsEmpty: selectors.characterFilterIsEmptySelector(state.present),
-          characters: state.present.characters,
-          categories: selectors.sortedCharacterCategoriesSelector(state.present),
-          customAttributes: state.present.customAttributes.characters,
-          customAttributesThatCanChange: selectors.characterCustomAttributesThatCanChangeSelector(
-            state.present
-          ),
-          characterSort: selectors.characterSortSelector(state.present),
-          darkMode: selectors.isDarkModeSelector(state.present),
-          charactersSearchTerm: selectors.charactersSearchTermSelector(state.present),
-          books: selectors.allBooksWithCharactersInThemSelector(state.present),
-          attributeTabId: selectors.characterAttributeTabSelector(state.present),
-          selectedCharacteId: selectors.selectedCharacterSelector(state.present),
-          showTabs: selectors.showBookTabsSelector(state.present),
+          visibleCharactersByCategory:
+            selectors.visibleSortedSearchedCharactersByCategorySelector(state),
+          filterIsEmpty: selectors.characterFilterIsEmptySelector(state),
+          characters: selectors.allCharactersSelector(state),
+          categories: selectors.sortedCharacterCategoriesSelector(state),
+          customAttributes: selectors.characterCustomAttributesSelector(state),
+          customAttributesThatCanChange:
+            selectors.characterCustomAttributesThatCanChangeSelector(state),
+          characterSort: selectors.characterSortSelector(state),
+          darkMode: selectors.isDarkModeSelector(state),
+          charactersSearchTerm: selectors.charactersSearchTermSelector(state),
+          books: selectors.allBooksWithCharactersInThemSelector(state),
+          attributeTabId: selectors.characterAttributeTabSelector(state),
+          selectedCharacteId: selectors.selectedCharacterSelector(state),
+          showTabs: selectors.showBookTabsSelector(state),
         }
       },
       (dispatch) => {

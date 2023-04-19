@@ -116,6 +116,7 @@ const CardAddConnector = (connector) => {
               positionWithinLine={this.props.positionWithinLine + 1}
               color={this.props.color}
               onDone={this.stopCreating}
+              isPinned={this.props.isPinned}
             />
           </div>
         )
@@ -166,6 +167,7 @@ const CardAddConnector = (connector) => {
       dropPosition: PropTypes.number,
       readOnly: PropTypes.bool,
       lastClick: PropTypes.object,
+      isPinned: PropTypes.bool,
     }
   }
 
@@ -179,8 +181,8 @@ const CardAddConnector = (connector) => {
     const { connect } = redux
 
     return connect((state) => ({
-      readOnly: !selectors.canWriteSelector(state.present),
-      lastClick: selectors.lastClickSelector(state.present),
+      readOnly: !selectors.canWriteSelector(state),
+      lastClick: selectors.lastClickSelector(state),
     }))(CardAdd)
   }
 

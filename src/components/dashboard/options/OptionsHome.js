@@ -255,8 +255,8 @@ const OptionsHomeConnector = (connector) => {
 
     return connect((state) => {
       return {
-        settings: selectors.appSettingsSelector(state.present),
-        shouldBeInPro: selectors.shouldBeInProSelector(state.present),
+        settings: selectors.appSettingsSelector(state),
+        shouldBeInPro: selectors.shouldBeInProSelector(state),
       }
     })(OptionsHome)
   }

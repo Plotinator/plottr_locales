@@ -229,9 +229,9 @@ const FilesHomeConnector = (connector) => {
 
     return connect(
       (state) => ({
-        isOnWeb: selectors.isOnWebSelector(state.present),
-        isInOfflineMode: selectors.isInOfflineModeSelector(state.present),
-        settings: selectors.appSettingsSelector(state.present),
+        isOnWeb: selectors.isOnWebSelector(state),
+        isInOfflineMode: selectors.isInOfflineModeSelector(state),
+        settings: selectors.appSettingsSelector(state),
       }),
       (dispatch) => {
         return {

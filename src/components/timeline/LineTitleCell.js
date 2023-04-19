@@ -31,13 +31,8 @@ const {
 } = helpers
 
 const LineTitleCellConnector = (connector) => {
-  const {
-    platform: { isDevelopment },
-  } = connector
   const ColorPicker = UnconnectedColorPicker(connector)
   const Floater = UnconnectedPlottrFloater(connector)
-
-  checkDependencies({ isDevelopment })
 
   const LineTitleCell = ({
     line,
@@ -321,16 +316,14 @@ const LineTitleCellConnector = (connector) => {
             <Button title={t('Change color')} block bsSize="small" onClick={openColorPicker}>
               <Glyphicon glyph="tint" />
             </Button>
-            {isDevelopment ? (
-              <Button
-                title={line?.isPinned ? t('Unpin Plotline') : t('Pin this Plotline')}
-                block
-                bsSize="small"
-                onClick={handlePinPlotLine}
-              >
-                {line?.isPinned ? <TbPinnedOff /> : <BsPinFill />}
-              </Button>
-            ) : null}
+            <Button
+              title={line?.isPinned ? t('Unpin Plotline') : t('Pin this Plotline')}
+              block
+              bsSize="small"
+              onClick={handlePinPlotLine}
+            >
+              {line?.isPinned ? <TbPinnedOff /> : <BsPinFill />}
+            </Button>
             {isSmall ? null : (
               <Button
                 title={t('Duplicate plotline')}
@@ -379,15 +372,13 @@ const LineTitleCellConnector = (connector) => {
               <Button title={t('Change color')} bsSize="small" onClick={openColorPicker}>
                 <Glyphicon glyph="tint" />
               </Button>
-              {isDevelopment ? (
-                <Button
-                  title={line?.isPinned ? t('Unpin Plotline') : t('Pin this Plotline')}
-                  bsSize="small"
-                  onClick={handlePinPlotLine}
-                >
-                  {line?.isPinned ? <TbPinnedOff /> : <BsPinFill />}
-                </Button>
-              ) : null}
+              <Button
+                title={line?.isPinned ? t('Unpin Plotline') : t('Pin this Plotline')}
+                bsSize="small"
+                onClick={handlePinPlotLine}
+              >
+                {line?.isPinned ? <TbPinnedOff /> : <BsPinFill />}
+              </Button>
               {isSmall ? null : (
                 <Button
                   title={t('Duplicate plotline')}
@@ -654,16 +645,16 @@ const LineTitleCellConnector = (connector) => {
     return connect(
       (state, ownProps) => {
         return {
-          darkMode: selectors.isDarkModeSelector(state.present),
-          orientation: selectors.orientationSelector(state.present),
-          timelineIsExpanded: selectors.timelineIsExpandedSelector(state.present),
-          isSmall: isSmallSelector(state.present),
-          isMedium: isMediumSelector(state.present),
-          isLarge: isLargeSelector(state.present),
-          lineIsExpanded: lineIsExpandedSelector(state.present)[ownProps.line.id],
-          books: allBooksSelector(state.present),
-          currentTimeline: selectors.currentTimelineSelector(state.present),
-          allHierarchyLevels: selectors.allHierarchyLevelsSelector(state.present),
+          darkMode: selectors.isDarkModeSelector(state),
+          orientation: selectors.orientationSelector(state),
+          timelineIsExpanded: selectors.timelineIsExpandedSelector(state),
+          isSmall: isSmallSelector(state),
+          isMedium: isMediumSelector(state),
+          isLarge: isLargeSelector(state),
+          lineIsExpanded: lineIsExpandedSelector(state)[ownProps.line.id],
+          books: allBooksSelector(state),
+          currentTimeline: selectors.currentTimelineSelector(state),
+          allHierarchyLevels: selectors.allHierarchyLevelsSelector(state),
         }
       },
       (dispatch, ownProps) => {
