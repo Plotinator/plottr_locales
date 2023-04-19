@@ -10,24 +10,6 @@ import Col from '../../Col'
 import Row from '../../Row'
 import UnconnectedBackupFileDisplay from './BackupFileDisplay'
 
-const safelyDecodeURI = (str) => {
-  try {
-    return decodeURIComponent(str)
-  } catch (error) {
-    return str
-  }
-}
-
-const truncateTitle = (title) => {
-  if (!title) {
-    return t('Untitled')
-  }
-  if (title.length > 80) {
-    return `${title.slice(0, 80)}...`
-  }
-  return safelyDecodeURI(title)
-}
-
 const BackupsTableConnector = (connector) => {
   const BackupFileDisplay = UnconnectedBackupFileDisplay(connector)
 
