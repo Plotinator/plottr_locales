@@ -1,11 +1,12 @@
 // IMPORTANT NOTE: Please don't import other selectors from this file.
 // Use secondOrder and *ThirdOrder for your selector if it has other
 // dependencies.
-
 import { createSelector } from 'reselect'
 import { groupBy } from 'lodash'
 
-export const allNotesSelector = (state) => state.notes
+import { fullFileStateSelector } from './fullFileFirstOrder'
+
+export const allNotesSelector = createSelector(fullFileStateSelector, (state) => state.notes)
 
 const selectId = (state, id) => id
 

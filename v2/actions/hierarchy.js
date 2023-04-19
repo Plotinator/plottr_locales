@@ -1,14 +1,16 @@
+import { identity } from 'lodash'
+
 import {
   SET_HIERARCHY_LEVELS,
   EDIT_HIERARCHY_LEVEL,
   LOAD_HIERARCHY,
 } from '../constants/ActionTypes'
-import { currentTimelineSelector } from '../selectors'
+import selectors from '../selectors'
+
+const { currentTimelineSelector } = selectors(identity)
 
 export const setHierarchyLevels = (newHierarchyLevels) => (dispatch, getState) => {
-  // NOTE: Mobile doesn't use history middleware
-  const fullState = getState()
-  const state = fullState.present ? fullState.present : fullState
+  const state = getState()
   const timeline = currentTimelineSelector(state)
 
   dispatch({
@@ -19,9 +21,7 @@ export const setHierarchyLevels = (newHierarchyLevels) => (dispatch, getState) =
 }
 
 export const editHierarchyLevel = (hierarchyLevel) => (dispatch, getState) => {
-  // NOTE: Mobile doesn't use history middleware
-  const fullState = getState()
-  const state = fullState.present ? fullState.present : fullState
+  const state = getState()
   const timeline = currentTimelineSelector(state)
 
   dispatch({

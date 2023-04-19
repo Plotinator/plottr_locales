@@ -1,21 +1,27 @@
-import { configureStore } from './fixtures/testStore'
+import { configureStore, pltrAdaptor } from './fixtures/testStore'
 import { goldilocks } from './fixtures'
 import { emptyFile } from '../../store/newFileState'
-import { loadFile, selectCharacterAttributeBookTab } from '../../actions/ui'
-import { deleteBook, addBook } from '../../actions/books'
-import {
-  reorderCharacterAttribute,
-  deleteCharacterAttribute,
-  editCharacterAttributeMetadata,
-} from '../../actions/attributes'
+import actions from '../../actions'
 import { removeSystemKeys } from '../systemReducers'
-import {
-  addCharacter,
-  createCharacterAttribute,
-  editCharacterAttributeValue,
-  addBook as addBookToCharacter,
-} from '../../actions/characters'
-import { characterAttributesSelector, singleCharacterSelector } from '../../selectors'
+import selectors from '../../selectors'
+
+const {
+  characterAttributesSelector,
+  fullFileStateSelector,
+  characterCustomAttributesSelector,
+  allCharactersSelector,
+  singleCharacterSelector,
+} = selectors(pltrAdaptor)
+
+const wiredUpActions = actions(pltrAdaptor)
+
+const { loadFile, selectCharacterAttributeBookTab } = wiredUpActions.ui
+const { deleteBook, addBook } = wiredUpActions.book
+const { reorderCharacterAttribute, deleteCharacterAttribute, editCharacterAttributeMetadata } =
+  wiredUpActions.attributes
+const { addCharacter, createCharacterAttribute, editCharacterAttributeValue } =
+  wiredUpActions.character
+const addBookToCharacter = wiredUpActions.character.addBook
 
 const EMPTY_FILE = emptyFile('Test file')
 const initialStore = () => {
@@ -57,9 +63,9 @@ describe('editCharacterAttributeMetadata', () => {
             'device://tmp/dummy-goldilocks.pltr'
           )
         )
-        const initialState = removeSystemKeys(store.getState().present)
+        const initialState = removeSystemKeys(fullFileStateSelector(store.getState()))
         store.dispatch(editCharacterAttributeMetadata(null, 'new-name', 'paragraph', 'blarg'))
-        const resultState = removeSystemKeys(store.getState().present)
+        const resultState = removeSystemKeys(fullFileStateSelector(store.getState()))
         expect(ignoringChangesWeDontCareAbout(initialState)).toEqual(
           ignoringChangesWeDontCareAbout(resultState)
         )
@@ -77,22 +83,23 @@ describe('editCharacterAttributeMetadata', () => {
             'device://tmp/dummy-goldilocks.pltr'
           )
         )
-        expect(store.getState().present.customAttributes.characters).toEqual([
+        const customAttributes = characterCustomAttributesSelector(store.getState())
+        expect(customAttributes).toEqual([
           {
             name: 'Species',
             type: 'text',
           },
         ])
         store.dispatch(editCharacterAttributeMetadata(null, 'new-name', 'paragraph', 'Species'))
-        expect(store.getState().present.customAttributes.characters).toEqual([
+        const customAttributesAfter = characterCustomAttributesSelector(store.getState())
+        expect(customAttributesAfter).toEqual([
           {
             name: 'new-name',
             type: 'paragraph',
           },
         ])
-        const characterSpecies = store
-          .getState()
-          .present.characters.map((character) => character['new-name'])
+        const characters = allCharactersSelector(store.getState())
+        const characterSpecies = characters.map((character) => character['new-name'])
         expect(characterSpecies).toEqual(['Human', 'Bear', 'Bear', 'Bear'])
       })
     })
@@ -100,9 +107,9 @@ describe('editCharacterAttributeMetadata', () => {
   describe('given a store with no characters', () => {
     it('should leave the state unchanged', () => {
       const store = initialStore()
-      const initialState = removeSystemKeys(store.getState().present)
+      const initialState = removeSystemKeys(fullFileStateSelector(store.getState()))
       store.dispatch(editCharacterAttributeMetadata(1, 'John Doe', 'text', 'John Does'))
-      const resultState = removeSystemKeys(store.getState().present)
+      const resultState = removeSystemKeys(fullFileStateSelector(store.getState()))
       expect(ignoringChangesWeDontCareAbout(initialState)).toEqual(
         ignoringChangesWeDontCareAbout(resultState)
       )
@@ -113,9 +120,9 @@ describe('editCharacterAttributeMetadata', () => {
       it('should leave the state unchanged', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
-        const initialState = removeSystemKeys(store.getState().present)
+        const initialState = removeSystemKeys(fullFileStateSelector(store.getState()))
         store.dispatch(editCharacterAttributeMetadata(1, 'John Doe', 'text', 'John Does'))
-        const resultState = removeSystemKeys(store.getState().present)
+        const resultState = removeSystemKeys(fullFileStateSelector(store.getState()))
         expect(ignoringChangesWeDontCareAbout(initialState)).toEqual(
           ignoringChangesWeDontCareAbout(resultState)
         )
@@ -126,7 +133,7 @@ describe('editCharacterAttributeMetadata', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(createCharacterAttribute('text', 'strength'))
-        const initialState = removeSystemKeys(store.getState().present)
+        const initialState = store.getState()
         const initialAttributes = characterAttributesSelector(initialState, 1)
         expect(initialAttributes).toEqual([
           {
@@ -138,7 +145,7 @@ describe('editCharacterAttributeMetadata', () => {
           },
         ])
         store.dispatch(editCharacterAttributeMetadata(1, 'height', 'text', 'strength'))
-        const resultState = removeSystemKeys(store.getState().present)
+        const resultState = store.getState()
         const resultAttributes = characterAttributesSelector(resultState, 1)
         expect(resultAttributes).toEqual([
           {
@@ -154,7 +161,7 @@ describe('editCharacterAttributeMetadata', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(createCharacterAttribute('text', 'strength'))
-        const initialState = removeSystemKeys(store.getState().present)
+        const initialState = store.getState()
         const initialAttributes = characterAttributesSelector(initialState, 1)
         expect(initialAttributes).toEqual([
           {
@@ -166,7 +173,7 @@ describe('editCharacterAttributeMetadata', () => {
           },
         ])
         store.dispatch(editCharacterAttributeMetadata(2, 'height', 'text', 'strength'))
-        const resultState = removeSystemKeys(store.getState().present)
+        const resultState = store.getState()
         const resultAttributes = characterAttributesSelector(resultState, 1)
         expect(resultAttributes).toEqual([
           {
@@ -197,9 +204,9 @@ describe('deleteCharacterAttribute', () => {
               'device://tmp/dummy-goldilocks.pltr'
             )
           )
-          const initialState = removeSystemKeys(store.getState().present)
+          const initialState = removeSystemKeys(fullFileStateSelector(store.getState()))
           store.dispatch(deleteCharacterAttribute(null, 'blarg'))
-          const resultState = removeSystemKeys(store.getState().present)
+          const resultState = removeSystemKeys(fullFileStateSelector(store.getState()))
           expect(ignoringChangesWeDontCareAbout(initialState)).toEqual(
             ignoringChangesWeDontCareAbout(resultState)
           )
@@ -217,15 +224,18 @@ describe('deleteCharacterAttribute', () => {
               'device://tmp/dummy-goldilocks.pltr'
             )
           )
-          expect(store.getState().present.customAttributes.characters).toEqual([
+          const customAttributes = characterCustomAttributesSelector(store.getState())
+          expect(customAttributes).toEqual([
             {
               name: 'Species',
               type: 'text',
             },
           ])
           store.dispatch(deleteCharacterAttribute(null, 'Species'))
-          expect(store.getState().present.customAttributes.characters).toEqual([])
-          const characterSpecies = store.getState().present.characters.map(({ Species }) => Species)
+          const customAttributesAfter = characterCustomAttributesSelector(store.getState())
+          expect(customAttributesAfter).toEqual([])
+          const characters = allCharactersSelector(store.getState())
+          const characterSpecies = characters.map(({ Species }) => Species)
           expect(characterSpecies).toEqual([undefined, undefined, undefined, undefined])
         })
       })
@@ -234,9 +244,9 @@ describe('deleteCharacterAttribute', () => {
   describe('given a store with no characters', () => {
     it('should leave the state unchanged', () => {
       const store = initialStore()
-      const initialState = removeSystemKeys(store.getState().present)
+      const initialState = removeSystemKeys(fullFileStateSelector(store.getState()))
       store.dispatch(deleteCharacterAttribute(1))
-      const resultState = removeSystemKeys(store.getState().present)
+      const resultState = removeSystemKeys(fullFileStateSelector(store.getState()))
       expect(ignoringChangesWeDontCareAbout(initialState)).toEqual(
         ignoringChangesWeDontCareAbout(resultState)
       )
@@ -247,9 +257,9 @@ describe('deleteCharacterAttribute', () => {
       it('should leave the state unchanged', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
-        const initialState = removeSystemKeys(store.getState().present)
+        const initialState = removeSystemKeys(fullFileStateSelector(store.getState()))
         store.dispatch(deleteCharacterAttribute(1))
-        const resultState = removeSystemKeys(store.getState().present)
+        const resultState = removeSystemKeys(fullFileStateSelector(store.getState()))
         expect(ignoringChangesWeDontCareAbout(initialState)).toEqual(
           ignoringChangesWeDontCareAbout(resultState)
         )
@@ -260,7 +270,7 @@ describe('deleteCharacterAttribute', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(createCharacterAttribute('text', 'strength'))
-        const initialState = removeSystemKeys(store.getState().present)
+        const initialState = store.getState()
         const initialAttributes = characterAttributesSelector(initialState, 1)
         expect(initialAttributes).toEqual([
           {
@@ -272,7 +282,7 @@ describe('deleteCharacterAttribute', () => {
           },
         ])
         store.dispatch(deleteCharacterAttribute(1))
-        const resultState = removeSystemKeys(store.getState().present)
+        const resultState = store.getState()
         const resultAttributes = characterAttributesSelector(resultState, 1)
         expect(resultAttributes).toEqual([])
       })
@@ -280,7 +290,7 @@ describe('deleteCharacterAttribute', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(createCharacterAttribute('text', 'strength'))
-        const initialState = removeSystemKeys(store.getState().present)
+        const initialState = store.getState()
         const initialAttributes = characterAttributesSelector(initialState, 1)
         expect(initialAttributes).toEqual([
           {
@@ -292,7 +302,7 @@ describe('deleteCharacterAttribute', () => {
           },
         ])
         store.dispatch(deleteCharacterAttribute(2))
-        const resultState = removeSystemKeys(store.getState().present)
+        const resultState = store.getState()
         const resultAttributes = characterAttributesSelector(resultState, 1)
         expect(resultAttributes).toEqual([
           {
@@ -312,9 +322,9 @@ describe('reorderCharacterAttribute', () => {
   describe('given a store with no characters', () => {
     it('should leave the state unchanged', () => {
       const store = initialStore()
-      const initialState = removeSystemKeys(store.getState().present)
+      const initialState = removeSystemKeys(fullFileStateSelector(store.getState()))
       store.dispatch(reorderCharacterAttribute(1, 1))
-      const resultState = removeSystemKeys(store.getState().present)
+      const resultState = removeSystemKeys(fullFileStateSelector(store.getState()))
       expect(ignoringChangesWeDontCareAbout(initialState)).toEqual(
         ignoringChangesWeDontCareAbout(resultState)
       )
@@ -325,9 +335,9 @@ describe('reorderCharacterAttribute', () => {
       it('should leave the state unchanged', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
-        const initialState = removeSystemKeys(store.getState().present)
+        const initialState = removeSystemKeys(fullFileStateSelector(store.getState()))
         store.dispatch(reorderCharacterAttribute(1, 1))
-        const resultState = removeSystemKeys(store.getState().present)
+        const resultState = removeSystemKeys(fullFileStateSelector(store.getState()))
         expect(ignoringChangesWeDontCareAbout(initialState)).toEqual(
           ignoringChangesWeDontCareAbout(resultState)
         )
@@ -338,7 +348,7 @@ describe('reorderCharacterAttribute', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(createCharacterAttribute('text', 'strength'))
-        const initialState = removeSystemKeys(store.getState().present)
+        const initialState = store.getState()
         const initialAttributes = characterAttributesSelector(initialState, 1)
         expect(initialAttributes).toEqual([
           {
@@ -350,7 +360,7 @@ describe('reorderCharacterAttribute', () => {
           },
         ])
         store.dispatch(reorderCharacterAttribute(1, 0))
-        const resultState = removeSystemKeys(store.getState().present)
+        const resultState = store.getState()
         const resultAttributes = characterAttributesSelector(resultState, 1)
         expect(resultAttributes).toEqual([
           {
@@ -366,7 +376,7 @@ describe('reorderCharacterAttribute', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(createCharacterAttribute('text', 'strength'))
-        const initialState = removeSystemKeys(store.getState().present)
+        const initialState = store.getState()
         const initialAttributes = characterAttributesSelector(initialState, 1)
         expect(initialAttributes).toEqual([
           {
@@ -378,7 +388,7 @@ describe('reorderCharacterAttribute', () => {
           },
         ])
         store.dispatch(reorderCharacterAttribute(1, 1))
-        const resultState = removeSystemKeys(store.getState().present)
+        const resultState = store.getState()
         const resultAttributes = characterAttributesSelector(resultState, 1)
         expect(resultAttributes).toEqual([
           {
@@ -394,7 +404,7 @@ describe('reorderCharacterAttribute', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(createCharacterAttribute('text', 'strength'))
-        const initialState = removeSystemKeys(store.getState().present)
+        const initialState = store.getState()
         const initialAttributes = characterAttributesSelector(initialState, 1)
         expect(initialAttributes).toEqual([
           {
@@ -406,7 +416,7 @@ describe('reorderCharacterAttribute', () => {
           },
         ])
         store.dispatch(reorderCharacterAttribute(1, -1))
-        const resultState = removeSystemKeys(store.getState().present)
+        const resultState = store.getState()
         const resultAttributes = characterAttributesSelector(resultState, 1)
         expect(resultAttributes).toEqual([
           {
@@ -422,7 +432,7 @@ describe('reorderCharacterAttribute', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(createCharacterAttribute('text', 'strength'))
-        const initialState = removeSystemKeys(store.getState().present)
+        const initialState = store.getState()
         const initialAttributes = characterAttributesSelector(initialState, 1)
         expect(initialAttributes).toEqual([
           {
@@ -434,7 +444,7 @@ describe('reorderCharacterAttribute', () => {
           },
         ])
         store.dispatch(reorderCharacterAttribute(1, 1))
-        const resultState = removeSystemKeys(store.getState().present)
+        const resultState = store.getState()
         const resultAttributes = characterAttributesSelector(resultState, 1)
         expect(resultAttributes).toEqual([
           {
@@ -453,7 +463,7 @@ describe('reorderCharacterAttribute', () => {
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(createCharacterAttribute('text', 'strength'))
         store.dispatch(createCharacterAttribute('text', 'height'))
-        const initialState = removeSystemKeys(store.getState().present)
+        const initialState = store.getState()
         const initialAttributes = characterAttributesSelector(initialState, 1)
         expect(initialAttributes).toEqual([
           {
@@ -472,7 +482,7 @@ describe('reorderCharacterAttribute', () => {
           },
         ])
         store.dispatch(reorderCharacterAttribute(1, 0))
-        const resultState = removeSystemKeys(store.getState().present)
+        const resultState = store.getState()
         const resultAttributes = characterAttributesSelector(resultState, 1)
         expect(resultAttributes).toEqual([
           {
@@ -496,7 +506,7 @@ describe('reorderCharacterAttribute', () => {
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(createCharacterAttribute('text', 'strength'))
         store.dispatch(createCharacterAttribute('text', 'height'))
-        const initialState = removeSystemKeys(store.getState().present)
+        const initialState = store.getState()
         const initialAttributes = characterAttributesSelector(initialState, 1)
         expect(initialAttributes).toEqual([
           {
@@ -515,7 +525,7 @@ describe('reorderCharacterAttribute', () => {
           },
         ])
         store.dispatch(reorderCharacterAttribute(1, 1))
-        const resultState = removeSystemKeys(store.getState().present)
+        const resultState = store.getState()
         const resultAttributes = characterAttributesSelector(resultState, 1)
         expect(resultAttributes).toEqual([
           {
@@ -539,7 +549,7 @@ describe('reorderCharacterAttribute', () => {
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(createCharacterAttribute('text', 'strength'))
         store.dispatch(createCharacterAttribute('text', 'height'))
-        const initialState = removeSystemKeys(store.getState().present)
+        const initialState = store.getState()
         const initialAttributes = characterAttributesSelector(initialState, 1)
         expect(initialAttributes).toEqual([
           {
@@ -558,7 +568,7 @@ describe('reorderCharacterAttribute', () => {
           },
         ])
         store.dispatch(reorderCharacterAttribute(1, -1))
-        const resultState = removeSystemKeys(store.getState().present)
+        const resultState = store.getState()
         const resultAttributes = characterAttributesSelector(resultState, 1)
         expect(resultAttributes).toEqual([
           {
@@ -582,7 +592,7 @@ describe('reorderCharacterAttribute', () => {
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(createCharacterAttribute('text', 'strength'))
         store.dispatch(createCharacterAttribute('text', 'height'))
-        const initialState = removeSystemKeys(store.getState().present)
+        const initialState = store.getState()
         const initialAttributes = characterAttributesSelector(initialState, 1)
         expect(initialAttributes).toEqual([
           {
@@ -601,7 +611,7 @@ describe('reorderCharacterAttribute', () => {
           },
         ])
         store.dispatch(reorderCharacterAttribute(3, 1))
-        const resultState = removeSystemKeys(store.getState().present)
+        const resultState = store.getState()
         const resultAttributes = characterAttributesSelector(resultState, 1)
         expect(resultAttributes).toEqual([
           {
@@ -628,9 +638,9 @@ describe('deleteBook', () => {
   describe('given a store with no characters in it', () => {
     it('should leave the characters unchanged', () => {
       const store = initialStore()
-      const initialState = removeSystemKeys(store.getState().present)
+      const initialState = removeSystemKeys(store.getState())
       store.dispatch(deleteBook(1))
-      const resultState = removeSystemKeys(store.getState().present)
+      const resultState = removeSystemKeys(store.getState())
       expect(initialState.characters).toEqual(resultState.characters)
     })
   })
@@ -639,9 +649,9 @@ describe('deleteBook', () => {
       it('should leave the characters unchanged', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
-        const initialState = removeSystemKeys(store.getState().present)
+        const initialState = removeSystemKeys(store.getState())
         store.dispatch(deleteBook(1))
-        const resultState = removeSystemKeys(store.getState().present)
+        const resultState = removeSystemKeys(store.getState())
         expect(initialState.characters).toEqual(resultState.characters)
       })
     })
@@ -655,7 +665,7 @@ describe('deleteBook', () => {
           store.dispatch(addBookToCharacter(1, 1))
           store.dispatch(selectCharacterAttributeBookTab(1))
           store.dispatch(editCharacterAttributeValue(1, 1, 'New value'))
-          const originalCharacter = singleCharacterSelector(store.getState().present, 1)
+          const originalCharacter = singleCharacterSelector(store.getState(), 1)
           expect(originalCharacter.attributes).toEqual(
             expect.arrayContaining([
               {
@@ -672,7 +682,7 @@ describe('deleteBook', () => {
           )
           store.dispatch(deleteBook(1))
           const resultState = store.getState()
-          const character = singleCharacterSelector(resultState.present, 1)
+          const character = singleCharacterSelector(resultState, 1)
           expect(character.attributes).toEqual([
             {
               id: 1,
@@ -692,10 +702,10 @@ describe('deleteBook', () => {
           store.dispatch(addBookToCharacter(1, 1))
           store.dispatch(selectCharacterAttributeBookTab(1))
           store.dispatch(editCharacterAttributeValue(1, 1, 'New value'))
-          const originalCharacter = singleCharacterSelector(store.getState().present, 1)
+          const originalCharacter = singleCharacterSelector(store.getState(), 1)
           store.dispatch(deleteBook(2))
           const resultState = store.getState()
-          const character = singleCharacterSelector(resultState.present, 1)
+          const character = singleCharacterSelector(resultState, 1)
           expect(character).toBe(originalCharacter)
         })
       })

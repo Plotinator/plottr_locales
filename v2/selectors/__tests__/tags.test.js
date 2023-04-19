@@ -1,14 +1,22 @@
-import { addCharacter } from '../../actions/characters'
-import { addNoteWithValues, addTag } from '../../actions/notes'
-import { addTag as attachTagToCharacter } from '../../actions/characters'
-import { addCreatedTag } from '../../actions/tags'
-import { changeCurrentView, loadFile } from '../../actions/ui'
 import { emptyFile } from '../../store/newFileState'
-import { charactersSortedInBookSelector } from '../charactersThirdOrder'
-import { allNotesInBookSelector } from '../notesThirdOrder'
-import { sortedTagsSelector } from '../tagsFirstOrder'
-import { tagsFilterItemsSelector } from '../tagsThirdOrder'
-import { configureStore } from './fixtures/testStore'
+import { configureStore, pltrAdaptor } from './fixtures/testStore'
+import selectors from '../'
+import actions from '../../actions'
+
+const wiredUpActions = actions(pltrAdaptor)
+
+const { addCharacter } = wiredUpActions.character
+const { addNoteWithValues, addTag } = wiredUpActions.note
+const attachTagToCharacter = wiredUpActions.character.addTag
+const { addCreatedTag } = wiredUpActions.tag
+const { changeCurrentView, loadFile } = wiredUpActions.ui
+
+const {
+  charactersSortedInBookSelector,
+  allNotesInBookSelector,
+  sortedTagsSelector,
+  tagsFilterItemsSelector,
+} = selectors(pltrAdaptor)
 
 const EMPTY_FILE = emptyFile('Test file')
 const initialStore = () => {
@@ -45,7 +53,7 @@ const EXAMPLE_TAGS = [
 
 describe('tagsFilterItemsSelector', () => {
   const store = initialStore()
-  const initialState = store.getState().present
+  const initialState = store.getState()
   describe('given a new file', () => {
     it('should produce the empty array', () => {
       expect(tagsFilterItemsSelector(initialState)).toEqual([])
@@ -54,7 +62,7 @@ describe('tagsFilterItemsSelector', () => {
 
   describe('move to tab with tags on filter (Notes)', () => {
     store.dispatch(changeCurrentView('notes'))
-    const stateAfterChangingView = store.getState().present
+    const stateAfterChangingView = store.getState()
     describe('given the view has no contents', () => {
       it('should produce the empty array', () => {
         expect(tagsFilterItemsSelector(stateAfterChangingView)).toEqual([])
@@ -62,7 +70,7 @@ describe('tagsFilterItemsSelector', () => {
     })
     describe('add notes', () => {
       store.dispatch(addNoteWithValues('note 1', 'note 1 description'))
-      const stateAfterAddingNote = store.getState().present
+      const stateAfterAddingNote = store.getState()
       it('should still not have any filter items', () => {
         const currentFilterItems = tagsFilterItemsSelector(stateAfterAddingNote)
         expect(currentFilterItems.length).toBe(0)
@@ -72,7 +80,7 @@ describe('tagsFilterItemsSelector', () => {
     describe('add new tag', () => {
       const tag1 = EXAMPLE_TAGS[0]
       store.dispatch(addCreatedTag({ title: tag1.title, color: tag1.color }))
-      const stateAfterTagisAdded = store.getState().present
+      const stateAfterTagisAdded = store.getState()
       const allTags = sortedTagsSelector(stateAfterTagisAdded)
 
       it('should create 1 tag', () => {
@@ -89,11 +97,11 @@ describe('tagsFilterItemsSelector', () => {
       })
 
       describe('edit note by adding the tag created', () => {
-        const allNotes = allNotesInBookSelector(store.getState().present)
+        const allNotes = allNotesInBookSelector(store.getState())
         const firstNote = allNotes[0]
         const firstTag = allTags[0]
         store.dispatch(addTag(firstNote.id, firstTag.id))
-        const newFilterItems = tagsFilterItemsSelector(store.getState().present)
+        const newFilterItems = tagsFilterItemsSelector(store.getState())
 
         it('should have 1 tag from the Tags filter list', () => {
           expect(newFilterItems.length).toBe(1)
@@ -108,7 +116,7 @@ describe('tagsFilterItemsSelector', () => {
 
   describe('move to tab with tags on filter (Notes)', () => {
     store.dispatch(changeCurrentView('characters'))
-    const stateAfterChangingView = store.getState().present
+    const stateAfterChangingView = store.getState()
     describe('given the view has no contents', () => {
       it('should produce the empty array', () => {
         expect(tagsFilterItemsSelector(stateAfterChangingView)).toEqual([])
@@ -116,7 +124,7 @@ describe('tagsFilterItemsSelector', () => {
     })
     describe('add character', () => {
       store.dispatch(addCharacter('character 1'))
-      const stateAfterAddingNote = store.getState().present
+      const stateAfterAddingNote = store.getState()
       it('should still not have any filter items', () => {
         const currentFilterItems = tagsFilterItemsSelector(stateAfterAddingNote)
         expect(currentFilterItems.length).toBe(0)
@@ -126,7 +134,7 @@ describe('tagsFilterItemsSelector', () => {
     describe('add new tag', () => {
       const tag2 = EXAMPLE_TAGS[1]
       store.dispatch(addCreatedTag({ title: tag2.title, color: tag2.color }))
-      const stateAfterTagisAdded = store.getState().present
+      const stateAfterTagisAdded = store.getState()
       const allTags = sortedTagsSelector(stateAfterTagisAdded)
 
       it('should have 2 tags now', () => {
@@ -143,11 +151,11 @@ describe('tagsFilterItemsSelector', () => {
       })
 
       describe('attach tag to the character with the tag created', () => {
-        const allCharacters = charactersSortedInBookSelector(store.getState().present)
+        const allCharacters = charactersSortedInBookSelector(store.getState())
         const firstCharacter = allCharacters[0]
         const secondTagTag = allTags[1]
         store.dispatch(attachTagToCharacter(firstCharacter.id, secondTagTag.id))
-        const newFilterItems = tagsFilterItemsSelector(store.getState().present)
+        const newFilterItems = tagsFilterItemsSelector(store.getState())
 
         it('should have 1 tag from the Tags filter list', () => {
           expect(newFilterItems.length).toBe(1)

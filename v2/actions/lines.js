@@ -1,3 +1,5 @@
+import { identity } from 'lodash'
+
 import {
   ADD_LINE,
   ADD_LINE_WITH_TITLE,
@@ -16,11 +18,10 @@ import {
   UNPIN_PLOTLINE,
 } from '../constants/ActionTypes'
 import { reorderList } from '../helpers/lists'
-import {
-  currentTimelineSelector,
-  pinnedPlotlinesSelector,
-  sortedLinesByBookSelector,
-} from '../selectors'
+import selectors from '../selectors'
+
+const { currentTimelineSelector, pinnedPlotlinesSelector, sortedLinesByBookSelector } =
+  selectors(identity)
 
 // N.B. if one does not supply a book ID, then it is assumed that the
 // action refers to the broadest scope possible, i.e. the series of
@@ -51,8 +52,7 @@ export function editLineColor(id, color) {
 }
 
 export const reorderLines = (droppedPosition, originalPosition) => (dispatch, getState) => {
-  const fullState = getState()
-  const state = fullState.present ? fullState.present : fullState
+  const state = getState()
   const lines = sortedLinesByBookSelector(state)
   const bookId = currentTimelineSelector(state)
   const isConflictWithPinned = lines.find((line) => {
@@ -88,8 +88,7 @@ export const reorderLines = (droppedPosition, originalPosition) => (dispatch, ge
 }
 
 export const togglePinPlotline = (line) => (dispatch, getState) => {
-  const fullState = getState()
-  const state = fullState.present ? fullState.present : fullState
+  const state = getState()
   const pinnedPlotlines = pinnedPlotlinesSelector(state)
   const lines = sortedLinesByBookSelector(state)
   const bookId = currentTimelineSelector(state)
@@ -97,17 +96,31 @@ export const togglePinPlotline = (line) => (dispatch, getState) => {
   if (line?.id) {
     if (line?.isPinned) {
       const reorderedLines = reorderList(pinnedPlotlines - 1, line?.position, lines)
-      return dispatch({ type: UNPIN_PLOTLINE, lineId: line.id, lines: reorderedLines, bookId })
+      const totalPinnedPlotlines = Math.max(0, pinnedPlotlines - 1)
+      return dispatch({
+        type: UNPIN_PLOTLINE,
+        lineId: line.id,
+        lines: reorderedLines,
+        bookId,
+        totalPinnedPlotlines,
+      })
     } else {
       const reorderedLines = reorderList(pinnedPlotlines, line?.position, lines)
-      return dispatch({ type: PIN_PLOTLINE, lineId: line.id, lines: reorderedLines, bookId })
+      const totalPinnedPlotlines = Math.max(1, pinnedPlotlines + 1)
+      return dispatch({
+        type: PIN_PLOTLINE,
+        lineId: line.id,
+        lines: reorderedLines,
+        bookId,
+        totalPinnedPlotlines,
+      })
     }
   }
   return false
 }
 
-export function deleteLine(id, bookId) {
-  return { type: DELETE_LINE, id, bookId }
+export const deleteLine = (id, bookId, isPinned) => {
+  return { type: DELETE_LINE, id, bookId, isPinned }
 }
 
 export function expandLine(id) {
@@ -118,14 +131,55 @@ export function collapseLine(id) {
   return { type: COLLAPSE_LINE, id }
 }
 
-export function duplicateLine(id, position) {
-  return { type: DUPLICATE_LINE, id, position }
+const pinDuplicatedPlotline = (id, position) => (dispatch, getState) => {
+  const state = getState()
+  const pinnedPlotlines = pinnedPlotlinesSelector(state)
+  const lines = sortedLinesByBookSelector(state)
+  const bookId = currentTimelineSelector(state)
+
+  const selectedLine = lines.find((l) => l.id === id)
+  const duplicatedLine = lines.find(
+    (l) => l.title == selectedLine.title && l?.isPinned && selectedLine?.isPinned
+  )
+  if (duplicatedLine) {
+    const reorderedLines = reorderList(pinnedPlotlines, position, lines)
+    const totalPinnedPlotlines = Math.max(1, pinnedPlotlines + 1)
+    dispatch({
+      type: PIN_PLOTLINE,
+      lineId: id,
+      lines: reorderedLines,
+      bookId,
+      totalPinnedPlotlines,
+    })
+  }
+}
+
+export const duplicateLine = (id, position) => (dispatch, getState) => {
+  const state = getState()
+  const lines = sortedLinesByBookSelector(state)
+
+  dispatch({ type: DUPLICATE_LINE, id, position })
+
+  const selectedLine = lines.find((l) => l.id === id)
+  if (selectedLine?.isPinned) {
+    pinDuplicatedPlotline(id, position)(dispatch, getState)
+  }
 }
 
 export function load(patching, lines) {
   return { type: LOAD_LINES, patching, lines }
 }
 
-export function moveLine(id, destinationBookId) {
+export const pinMovedLine = (id, destinationBookId, reorderedLines, totalPinnedPlotlines) => {
+  return {
+    type: PIN_PLOTLINE,
+    lineId: id,
+    lines: reorderedLines,
+    bookId: destinationBookId,
+    totalPinnedPlotlines,
+  }
+}
+
+export const moveLine = (id, destinationBookId) => {
   return { type: MOVE_LINE, id, destinationBookId }
 }
