@@ -12,14 +12,10 @@ import UnconnectedBeatInsertCell from './BeatInsertCell'
 import UnconnectedTopRow from './TopRow'
 import UnconnectedBeatTitleCell from './BeatTitleCell'
 import UnconnectedAddLineRow from './AddLineRow'
-import { helpers, initialState } from 'pltr/v2'
+import { initialState } from 'pltr/v2'
 import { checkDependencies } from '../checkDependencies'
 
 const { card } = initialState
-
-const {
-  beats: { nextId },
-} = helpers
 
 const TimelineTableConnector = (connector) => {
   const CardCell = UnconnectedCardCell(connector)

@@ -15,7 +15,7 @@ import MousePositionContext from './MousePositionContext'
 import { isEqual } from 'lodash'
 
 const {
-  beats: { nextId, hasChildren },
+  beats: { hasChildren },
   orientedClassName: { orientedClassName },
 } = helpers
 
