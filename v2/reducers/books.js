@@ -37,7 +37,7 @@ const books =
         })
         return {
           ...state,
-          [action.id]: editedBook
+          [action.id]: editedBook,
         }
 
       case EDIT_BOOK_IMAGE:

@@ -40,7 +40,7 @@ const notes =
       case ADD_NOTE:
         const newNote = {
           ...note,
-          id: nextId(state)
+          id: nextId(state),
         }
         // this allows us to add new notes with
         // any predefined param values only within
