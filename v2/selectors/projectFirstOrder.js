@@ -10,59 +10,44 @@ import { emptyFile } from '../store/newFileState'
 import { SYSTEM_REDUCER_KEYS } from '../reducers/systemReducers'
 import { fullFileStateSelector } from './fullFileFirstOrder'
 
-export const projectSelector = createSelector(fullFileStateSelector, (state) => state.project)
+export const projectSelector = createSelector(fullFileStateSelector, ({ project }) => project)
 export const selectedFileSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.project?.selectedFile
+  projectSelector,
+  ({ selectedFile }) => selectedFile || {}
 )
 export const projectNamingModalIsVisibleSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.project.projectNamingModalIsVisible
+  projectSelector,
+  ({ projectNamingModalIsVisible }) => projectNamingModalIsVisible
 )
 export const newProjectTemplateSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.project.template
+  projectSelector,
+  ({ template }) => template
 )
-export const selectedFileIdSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.project?.selectedFile?.id
-)
+export const selectedFileIdSelector = createSelector(selectedFileSelector, ({ id }) => id)
 export const selectedFilePermissionSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.project?.selectedFile?.permission
+  selectedFileSelector,
+  ({ permission }) => permission
 )
-export const fileLoadedSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.project && state.project.fileLoaded
-)
-export const isOfflineSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.project && state.project.isOffline
-)
-export const isResumingSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.project.resuming
-)
+export const fileLoadedSelector = createSelector(projectSelector, ({ fileLoaded }) => fileLoaded)
+export const isOfflineSelector = createSelector(projectSelector, ({ isOffline }) => isOffline)
+export const isResumingSelector = createSelector(projectSelector, ({ resuming }) => resuming)
 export const isCheckingForOfflineDriftSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.project.checkingOfflineDrift
+  projectSelector,
+  ({ checkingOfflineDrift }) => checkingOfflineDrift
 )
 export const isOverwritingCloudWithBackupSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.project.overwritingCloudWithBackup
+  projectSelector,
+  ({ overwritingCloudWithBackup }) => overwritingCloudWithBackup
 )
 export const showResumeMessageDialogSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.project.showResumeMessageDialog
+  projectSelector,
+  ({ showResumeMessageDialog }) => showResumeMessageDialog
 )
 export const backingUpOfflineFileSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.project.backingUpOfflineFile
+  projectSelector,
+  ({ backingUpOfflineFile }) => backingUpOfflineFile
 )
-export const fileURLSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.project.fileURL
-)
+export const fileURLSelector = createSelector(projectSelector, ({ fileURL }) => fileURL)
 export const fileURLLoadedSelector = createSelector(fileURLSelector, (fileURL) => {
   return fileURL && typeof fileURL === 'string' && fileURL.length && fileURL
 })
