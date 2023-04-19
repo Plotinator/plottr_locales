@@ -3,14 +3,24 @@ import axios from 'axios'
 import { DateTime } from 'luxon'
 import { isEqual } from 'lodash'
 
-import { removeSystemKeys, actions, selectors, ARRAY_KEYS, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
+import { removeSystemKeys, ARRAY_KEYS, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
 
 /**
  * auth, database and storage should be thunks that produce instances
  * of the correspending firebase objects from either the firebase JS
  * api or the react-native-firebase api.
  */
-const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop) => {
+const api = (
+  actions,
+  selectors,
+  auth,
+  database,
+  storage,
+  baseAPIDomain,
+  development,
+  log,
+  isDesktop
+) => {
   const BASE_API_URL =
     (!isDesktop && development) || !baseAPIDomain ? '' : `https://${baseAPIDomain || ''}`
 
@@ -701,7 +711,8 @@ const api = (auth, database, storage, baseAPIDomain, development, log, isDesktop
     const lastModified = new Date()
     const fileId = selectors.fileIdSelector(fullFile)
     const fileName = selectors.fileNameSelector(fullFile)
-    const file = removeSystemKeys(fullFile)
+    const fileJSON = selectors.fullFileStateSelector(fullFile)
+    const file = removeSystemKeys(fileJSON)
 
     return startOfSessionBackup(userId, file, startOfToday, fileId)
       .then((startOfSession) => {
