@@ -4,10 +4,10 @@ import { createSelector } from 'reselect'
 import { allBookIdsSelector } from './booksFirstOrder'
 import { uiSelector } from './secondOrder'
 
-const cardDialogSelector = createSelector(uiSelector, ({ cardDialog }) => {
+export const cardDialogSelector = createSelector(uiSelector, ({ cardDialog }) => {
   return cardDialog
 })
-const bookDialogSelector = createSelector(uiSelector, ({ bookDialog }) => {
+export const bookDialogSelector = createSelector(uiSelector, ({ bookDialog }) => {
   return bookDialog
 })
 

@@ -6,8 +6,12 @@ import { createSelector } from 'reselect'
 import { sortBy } from 'lodash'
 
 import { parseStringDate } from '../helpers/date'
+import { fullFileStateSelector } from './fullFileFirstOrder'
 
-export const backupFoldersSelector = (state) => state.backups.folders
+export const backupFoldersSelector = createSelector(
+  fullFileStateSelector,
+  (state) => state.backups.folders
+)
 
 export const nonEmptyBackupFoldersSelector = createSelector(
   backupFoldersSelector,

@@ -2,7 +2,7 @@ import { sortBy, keyBy, times } from 'lodash'
 import { createSelector } from 'reselect'
 
 import { outOfOrderSearch } from '../helpers/outOfOrderSearch'
-import { reduce, depth, findNode, nodeParent, children, forEach } from '../reducers/tree'
+import { reduce, depth, findNode, nodeParent, children, forEach, maxDepth } from '../reducers/tree'
 import {
   beatsByPosition,
   rootParentId,
@@ -15,13 +15,7 @@ import { createDeepEqualSelector } from './createDeepEqualSelector'
 // Other selector dependencies
 import { allLinesSelector } from './linesFirstOrder'
 import { allCardMetaDataSelector, allCardsSelector } from './cardsFirstOrder'
-import {
-  allBeatsSelector,
-  beatIdSelector,
-  visibleBeatsByPositionForTimeline,
-  visibleBeatsByPositionIgnoringCollapsed,
-  visibleBeatsForTopLevelParentByPosition,
-} from './beatsFirstOrder'
+import { allBeatsSelector } from './beatsFirstOrder'
 import { isDarkModeSelector } from './settingsFirstOrder'
 import {
   attributesDialogIsOpenSelector,
@@ -197,6 +191,28 @@ export const cardMapSelector = createSelector(
   }
 )
 
+export const flatCardMapSelector = createSelector(
+  allCardsSelector,
+  collapsedBeatSelector,
+  sortedBeatsByBookSelector,
+  timelineViewIsntDefaultSelector,
+  (cards, collapsedBeats, allSortedBeats, timelineViewIsntDefault) => {
+    const hierarchyIsOn = false
+    const beatIds = allSortedBeats.map(({ id }) => id)
+    const beatPositions = beatIds.map((x) => x)
+    beatIds.forEach((beatId, index) => (beatPositions[beatId] = index))
+    return cards.reduce(
+      cardReduce(
+        'lineId',
+        'beatId',
+        hierarchyIsOn && !timelineViewIsntDefault && collapsedBeats,
+        beatPositions
+      ),
+      {}
+    )
+  }
+)
+
 const visibleBeatsByPosition = (beats, timelineViewIsTabbed) =>
   beatsByPosition(({ expanded }) => {
     return expanded || timelineViewIsTabbed
@@ -209,6 +225,27 @@ export const visibleSortedBeatsByBookSelector = createSelector(
   beatsByBookSelector,
   timelineViewIsTabbedSelector,
   visibleBeatsByPosition
+)
+
+const flatVisibleBeatsByPosition = (beats, timelineViewIsTabbed) => {
+  const beatHierarchyIsOn = false
+  return beatsByPosition(({ expanded }) => {
+    return expanded || !beatHierarchyIsOn || timelineViewIsTabbed
+  })(beats).filter(({ id }) => {
+    const maximumDepth = maxDepth('id')(beats)
+    const currentDepth = depth(beats, id)
+    const beatIsVisible = beatHierarchyIsOn || currentDepth === maximumDepth
+    return (
+      (timelineViewIsTabbed && currentDepth !== 0 && beatIsVisible) ||
+      (!timelineViewIsTabbed && beatIsVisible)
+    )
+  })
+}
+
+export const flatVisibleSortedBeatsByBookSelector = createSelector(
+  beatsByBookSelector,
+  timelineViewIsTabbedSelector,
+  flatVisibleBeatsByPosition
 )
 
 export const lineMaxCardsSelector = createSelector(
@@ -225,6 +262,17 @@ export const lineMaxCardsSelector = createSelector(
       acc[l.id] = max
       return acc
     }, {})
+  }
+)
+
+export const firstVisibleBeatForBookThunkSelector = createSelector(
+  allBeatsSelector,
+  timelineViewIsTabbedSelector,
+  (beats, timelineIsTabbed) => {
+    return (bookId) => {
+      const firstVisibleBeat = visibleBeatsByPosition(beats[bookId], timelineIsTabbed)[0]
+      return firstVisibleBeat
+    }
   }
 )
 
@@ -363,6 +411,7 @@ export const secondTierBeatsInAtLeastTwoTierArrangementSelector = createSelector
   }
 )
 
+const beatIdSelector = (state, beatId) => beatId
 export const makeBeatTitleSelector = () =>
   createSelector(
     beatIndexSelector,
@@ -375,6 +424,30 @@ export const makeBeatTitleSelector = () =>
       const beat = findNode(beats, beatId)
       if (!beat) return ''
       return beatTitle(beatIndex, beats, beat, hierarchyLevels, positionOffset)
+    }
+  )
+
+export const makeFlatBeatTitleSelector = () =>
+  createSelector(
+    beatIndexSelector,
+    beatsByBookSelector,
+    beatIdSelector,
+    sortedHierarchyLevels,
+    positionOffsetSelector,
+    isSeriesSelector,
+    (beatIndex, beats, beatId, hierarchyLevels, positionOffset, isSeries) => {
+      const hierarchyEnabled = true
+      const beat = findNode(beats, beatId)
+      if (!beat) return ''
+      return beatTitle(
+        beatIndex,
+        beats,
+        beat,
+        hierarchyLevels,
+        positionOffset,
+        hierarchyEnabled,
+        isSeries
+      )
     }
   )
 
@@ -403,6 +476,12 @@ export const timelineTabsSelector = createSelector(
   }
 )
 
+const visibleBeatsByPositionIgnoringCollapsed = (beats) =>
+  beatsByPosition(() => {
+    return true
+  })(beats).filter(({ id }) => {
+    return true
+  })
 export const visibleSortedBeatsByBookIgnoringCollapsedSelector = createSelector(
   beatsByBookSelector,
   visibleBeatsByPositionIgnoringCollapsed
@@ -454,6 +533,60 @@ export const timelineActiveTabSelector = createSelector(
     return tabBeatIds[0]
   }
 )
+
+const visibleBeatsForTopLevelParentByPosition = (
+  beats,
+  timelineViewIsTabbed,
+  topLevelParentId,
+  timelineViewIsStacked,
+  timelineViewIsSmall,
+  hierarchyLevelCount
+) => {
+  const maximumDepth = hierarchyLevelCount - 1
+
+  return beatsByPosition(({ id, expanded }) => {
+    return expanded || timelineViewIsTabbed || timelineViewIsStacked
+  })(beats)
+    .filter(({ id }) => {
+      const nodeChildren = children(beats, id)
+      const currentDepth = depth(beats, id)
+      const rootParentNodeId = rootParentId(beats, id)
+      return (
+        (timelineViewIsTabbed && rootParentNodeId === topLevelParentId && currentDepth !== 0) ||
+        (timelineViewIsStacked && (timelineViewIsSmall || nodeChildren.length === 0)) ||
+        (!timelineViewIsTabbed && !timelineViewIsStacked)
+      )
+    })
+    .map((beat) => {
+      const currentDepth = depth(beats, beat.id)
+      if (!timelineViewIsSmall && timelineViewIsStacked && currentDepth !== maximumDepth) {
+        return {
+          ...beat,
+          isInsertChildCell: true,
+        }
+      }
+      return beat
+    })
+}
+
+const visibleBeatsByPositionForTimeline = (
+  beats,
+  timelineViewIsTabbed,
+  activeTab,
+  timelineViewIsStacked,
+  timelineViewIsSmall,
+  hierarchyLevelCount
+) => {
+  const activeParentId = activeTab
+  return visibleBeatsForTopLevelParentByPosition(
+    beats,
+    timelineViewIsTabbed,
+    activeParentId,
+    timelineViewIsStacked,
+    timelineViewIsSmall,
+    hierarchyLevelCount
+  )
+}
 
 export const visibleSortedBeatsForTimelineByBookSelector = createSelector(
   beatsByBookSelector,

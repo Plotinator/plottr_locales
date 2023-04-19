@@ -4,7 +4,11 @@
 
 import { createSelector } from 'reselect'
 
-export const applicationStateSelector = (state) => state.applicationState
+import { fullFileStateSelector } from './fullFileFirstOrder'
+
+export const applicationStateSelector = createSelector(fullFileStateSelector, (state) => {
+  return state.applicationState
+})
 
 export const projectStateSelector = createSelector(
   applicationStateSelector,

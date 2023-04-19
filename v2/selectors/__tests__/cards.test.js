@@ -1,6 +1,10 @@
+import { identity } from 'lodash'
+
 import { richContentIsNonEmpty } from '../../helpers/cards'
 import { newTree } from '../../reducers/tree'
-import { collapsedBeatSelector } from '../index'
+import selectors from '../index'
+
+const { collapsedBeatSelector } = selectors(identity)
 
 describe('collapsedBeatSelector', () => {
   describe('given an empty beat tree', () => {

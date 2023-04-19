@@ -1,6 +1,6 @@
 import { omit } from 'lodash'
 
-import { configureStore } from './fixtures/testStore'
+import { configureStore, pltrAdaptor } from './fixtures/testStore'
 import {
   goldilocks,
   hamlet,
@@ -9,13 +9,29 @@ import {
 } from './fixtures'
 import { emptyFile } from '../../store/newFileState'
 import { uiState } from '../../store/initialState'
-import { changeOrientation, loadFile, setCharacterFilter } from '../../actions/ui'
-import { deleteCharacterAttribute, editCharacterAttributeMetadata } from '../../actions/attributes'
-import { addCard, addCharacter as addCharacterToCard, moveCardToBook } from '../../actions/cards'
-import { addCharacter, editCharacterAttributeValue } from '../../actions/characters'
-import { setAppSettings } from '../../actions/settings'
-import { setPermission } from '../../actions/permission'
-import {
+import selectors from '../../selectors'
+import actions from '../../actions'
+
+const wiredUpActions = actions(pltrAdaptor)
+
+const {
+  changeOrientation,
+  loadFile,
+  setCharacterFilter,
+  changeCurrentTimeline,
+  setCardDialogOpen,
+} = wiredUpActions.ui
+const { addBook } = wiredUpActions.book
+const { setUserId } = wiredUpActions.client
+const { addLineWithTitle, reorderLines, togglePinPlotline } = wiredUpActions.line
+const { deleteCharacterAttribute, editCharacterAttributeMetadata } = wiredUpActions.attributes
+const { addCard, moveCardToBook } = wiredUpActions.card
+const addCharacterToCard = wiredUpActions.card.addCharacter
+const { addCharacter, editCharacterAttributeValue } = wiredUpActions.character
+const { setAppSettings } = wiredUpActions.settings
+const { setPermission } = wiredUpActions.permission
+
+const {
   permissionSelector,
   currentTimelineSelector,
   isCardDialogVisibleSelector,
@@ -23,11 +39,12 @@ import {
   stickyLeftColumnCountSelector,
   sortedLinesByBookSelector,
   pinnedPlotlinesSelector,
-} from '../../selectors'
-import { changeCurrentTimeline, setCardDialogOpen } from '../../actions/ui'
-import { addBook } from '../../actions/books'
-import { setUserId } from '../../actions/client'
-import { addLineWithTitle, reorderLines, togglePinPlotline } from '../../actions/lines'
+  customAttributeOrderSelector,
+  characterFilterSelector,
+  appSettingsSelector,
+  rootUiSelector,
+  uiCollaboratorsSelector,
+} = selectors(pltrAdaptor)
 
 const EMPTY_FILE = emptyFile('Test file')
 const initialStore = () => {
@@ -48,7 +65,7 @@ describe('loadFile', () => {
   describe('given the empty file state', () => {
     it('should include an empty attribute ordering', () => {
       const store = initialStore()
-      expect(store.getState().present.ui.customAttributeOrder).toEqual({
+      expect(customAttributeOrderSelector(store.getState())).toEqual({
         characters: [],
       })
     })
@@ -66,7 +83,7 @@ describe('loadFile', () => {
             'device://tmp/dummy-goldilocks.pltr'
           )
         )
-        expect(store.getState().present.ui.customAttributeOrder).toEqual({
+        expect(customAttributeOrderSelector(store.getState())).toEqual({
           characters: [
             {
               type: 'customAttributes',
@@ -84,7 +101,7 @@ describe('loadFile', () => {
         store.dispatch(
           loadFile('Hamlet', false, hamlet, hamlet.file.version, 'device://tmp/dummy-hamlet.pltr')
         )
-        expect(store.getState().present.ui.customAttributeOrder).toEqual({
+        expect(customAttributeOrderSelector(store.getState())).toEqual({
           characters: [
             {
               name: 'Role',
@@ -140,7 +157,7 @@ describe('loadFile', () => {
             'device://tmp/dummy-hamlet.pltr'
           )
         )
-        expect(store.getState().present.ui.customAttributeOrder).toEqual({
+        expect(customAttributeOrderSelector(store.getState())).toEqual({
           characters: [
             {
               id: 1,
@@ -194,7 +211,7 @@ describe('loadFile', () => {
             'device://tmp/dummy-hamlet.pltr'
           )
         )
-        expect(store.getState().present.ui.customAttributeOrder).toEqual({
+        expect(customAttributeOrderSelector(store.getState())).toEqual({
           characters: [
             {
               id: 1,
@@ -248,7 +265,7 @@ describe('editAttributeMetadata', () => {
           loadFile('Hamlet', false, hamlet, hamlet.file.version, 'device://tmp/dummy-hamlet.pltr')
         )
         store.dispatch(editCharacterAttributeMetadata(null, 'New Name', 'paragraph', 'Role'))
-        expect(store.getState().present.ui.customAttributeOrder).toEqual({
+        expect(customAttributeOrderSelector(store.getState())).toEqual({
           characters: [
             {
               name: 'New Name',
@@ -307,11 +324,11 @@ describe('deleteCharacterAttribute', () => {
               1: ['blah'],
             })
           )
-          expect(store.getState().present.ui.characterFilter).toEqual({
+          expect(characterFilterSelector(store.getState())).toEqual({
             1: ['blah'],
           })
           store.dispatch(deleteCharacterAttribute(1))
-          expect(store.getState().present.ui.characterFilter).toEqual({})
+          expect(characterFilterSelector(store.getState())).toEqual({})
         })
       })
     })
@@ -325,7 +342,7 @@ describe('ui-per-user', () => {
     describe('despite what permission is noted', () => {
       it('should write into the root of the ui object', () => {
         const store = initialStore()
-        const appSettings = store.getState().present.settings.appSettings
+        const appSettings = appSettingsSelector(store.getState())
         store.dispatch(addBook())
         store.dispatch(addBook())
         store.dispatch(addBook())
@@ -340,14 +357,14 @@ describe('ui-per-user', () => {
           })
         )
         store.dispatch(setPermission('owner'))
-        expect(permissionSelector(store.getState().present)).toEqual('owner')
-        const initialUI = store.getState().present.ui
-        const initialTimeline = currentTimelineSelector(store.getState().present)
+        expect(permissionSelector(store.getState())).toEqual('owner')
+        const initialCollaborators = uiCollaboratorsSelector(store.getState())
+        const initialTimeline = currentTimelineSelector(store.getState())
         store.dispatch(changeCurrentTimeline(3))
-        const nextTimeline = currentTimelineSelector(store.getState().present)
+        const nextTimeline = currentTimelineSelector(store.getState())
         expect(nextTimeline).not.toEqual(initialTimeline)
         expect(nextTimeline).toEqual(3)
-        expect(store.getState().present.ui.collaborators).toEqual(initialUI.collaborators)
+        expect(uiCollaboratorsSelector(store.getState())).toEqual(initialCollaborators)
       })
     })
   })
@@ -355,7 +372,7 @@ describe('ui-per-user', () => {
     describe('and no permission is noted', () => {
       it(`should not write into the ui key (because we're waiting for permissions)`, () => {
         const store = initialStore()
-        const appSettings = store.getState().present.settings.appSettings
+        const appSettings = appSettingsSelector(store.getState())
         store.dispatch(addBook())
         store.dispatch(addBook())
         store.dispatch(addBook())
@@ -370,19 +387,19 @@ describe('ui-per-user', () => {
           })
         )
         store.dispatch(setPermission(null))
-        expect(permissionSelector(store.getState().present)).toEqual(null)
-        const initialUI = store.getState().present.ui
-        const initialTimeline = currentTimelineSelector(store.getState().present)
+        expect(permissionSelector(store.getState())).toEqual(null)
+        const initialUI = rootUiSelector(store.getState())
+        const initialTimeline = currentTimelineSelector(store.getState())
         store.dispatch(changeCurrentTimeline(3))
-        const nextTimeline = currentTimelineSelector(store.getState().present)
+        const nextTimeline = currentTimelineSelector(store.getState())
         expect(nextTimeline).toEqual(initialTimeline)
-        expect(store.getState().present.ui).toEqual(initialUI)
+        expect(rootUiSelector(store.getState())).toEqual(initialUI)
       })
     })
     describe('and the permission is "owner"', () => {
       it('should write into the root of the ui key', () => {
         const store = initialStore()
-        const appSettings = store.getState().present.settings.appSettings
+        const appSettings = appSettingsSelector(store.getState())
         store.dispatch(addBook())
         store.dispatch(addBook())
         store.dispatch(addBook())
@@ -397,20 +414,20 @@ describe('ui-per-user', () => {
           })
         )
         store.dispatch(setPermission('owner'))
-        expect(permissionSelector(store.getState().present)).toEqual('owner')
-        const initialUI = store.getState().present.ui
-        const initialTimeline = currentTimelineSelector(store.getState().present)
+        expect(permissionSelector(store.getState())).toEqual('owner')
+        const initialCollaborators = uiCollaboratorsSelector(store.getState())
+        const initialTimeline = currentTimelineSelector(store.getState())
         store.dispatch(changeCurrentTimeline(3))
-        const nextTimeline = currentTimelineSelector(store.getState().present)
+        const nextTimeline = currentTimelineSelector(store.getState())
         expect(nextTimeline).not.toEqual(initialTimeline)
         expect(nextTimeline).toEqual(3)
-        expect(store.getState().present.ui.collaborators).toEqual(initialUI.collaborators)
+        expect(uiCollaboratorsSelector(store.getState())).toEqual(initialCollaborators)
       })
     })
     describe('and the permission is "collaborator"', () => {
       it(`should not write into the ui key (because we don' have a uid yet)`, () => {
         const store = initialStore()
-        const appSettings = store.getState().present.settings.appSettings
+        const appSettings = appSettingsSelector(store.getState())
         store.dispatch(addBook())
         store.dispatch(addBook())
         store.dispatch(addBook())
@@ -425,19 +442,19 @@ describe('ui-per-user', () => {
           })
         )
         store.dispatch(setPermission('collaborator'))
-        expect(permissionSelector(store.getState().present)).toEqual('collaborator')
-        const initialUI = store.getState().present.ui
-        const initialTimeline = currentTimelineSelector(store.getState().present)
+        expect(permissionSelector(store.getState())).toEqual('collaborator')
+        const initialCollaborators = uiCollaboratorsSelector(store.getState())
+        const initialTimeline = currentTimelineSelector(store.getState())
         store.dispatch(changeCurrentTimeline(3))
-        const nextTimeline = currentTimelineSelector(store.getState().present)
+        const nextTimeline = currentTimelineSelector(store.getState())
         expect(nextTimeline).toEqual(initialTimeline)
-        expect(store.getState().present.ui.collaborators).toEqual(initialUI.collaborators)
+        expect(uiCollaboratorsSelector(store.getState())).toEqual(initialCollaborators)
       })
     })
     describe('and the permission is "viewer"', () => {
       it('should not write into the ui key', () => {
         const store = initialStore()
-        const appSettings = store.getState().present.settings.appSettings
+        const appSettings = appSettingsSelector(store.getState())
         store.dispatch(addBook())
         store.dispatch(addBook())
         store.dispatch(addBook())
@@ -452,13 +469,13 @@ describe('ui-per-user', () => {
           })
         )
         store.dispatch(setPermission('viewer'))
-        expect(permissionSelector(store.getState().present)).toEqual('viewer')
-        const initialUI = store.getState().present.ui
-        const initialTimeline = currentTimelineSelector(store.getState().present)
+        expect(permissionSelector(store.getState())).toEqual('viewer')
+        const initialCollaborators = uiCollaboratorsSelector(store.getState())
+        const initialTimeline = currentTimelineSelector(store.getState())
         store.dispatch(changeCurrentTimeline(3))
-        const nextTimeline = currentTimelineSelector(store.getState().present)
+        const nextTimeline = currentTimelineSelector(store.getState())
         expect(nextTimeline).toEqual(initialTimeline)
-        expect(store.getState().present.ui.collaborators).toEqual(initialUI.collaborators)
+        expect(uiCollaboratorsSelector(store.getState())).toEqual(initialCollaborators)
       })
     })
   })
@@ -466,7 +483,7 @@ describe('ui-per-user', () => {
     describe('and no permission is noted', () => {
       it(`should not write into the ui key (because we're waiting for permissions)`, () => {
         const store = initialStore()
-        const appSettings = store.getState().present.settings.appSettings
+        const appSettings = appSettingsSelector(store.getState())
         store.dispatch(addBook())
         store.dispatch(addBook())
         store.dispatch(addBook())
@@ -481,19 +498,19 @@ describe('ui-per-user', () => {
           })
         )
         store.dispatch(setPermission(null))
-        expect(permissionSelector(store.getState().present)).toEqual(null)
-        const initialUI = store.getState().present.ui
-        const initialTimeline = currentTimelineSelector(store.getState().present)
+        expect(permissionSelector(store.getState())).toEqual(null)
+        const initialUI = rootUiSelector(store.getState())
+        const initialTimeline = currentTimelineSelector(store.getState())
         store.dispatch(changeCurrentTimeline(3))
-        const nextTimeline = currentTimelineSelector(store.getState().present)
+        const nextTimeline = currentTimelineSelector(store.getState())
         expect(nextTimeline).toEqual(initialTimeline)
-        expect(store.getState().present.ui).toEqual(initialUI)
+        expect(rootUiSelector(store.getState())).toEqual(initialUI)
       })
     })
     describe('and the permission is "owner"', () => {
       it('should write into the root of the ui key', () => {
         const store = initialStore()
-        const appSettings = store.getState().present.settings.appSettings
+        const appSettings = appSettingsSelector(store.getState())
         store.dispatch(addBook())
         store.dispatch(addBook())
         store.dispatch(addBook())
@@ -509,20 +526,20 @@ describe('ui-per-user', () => {
         )
         store.dispatch(setUserId('dummy-user-id'))
         store.dispatch(setPermission('owner'))
-        expect(permissionSelector(store.getState().present)).toEqual('owner')
-        const initialUI = store.getState().present.ui
-        const initialTimeline = currentTimelineSelector(store.getState().present)
+        expect(permissionSelector(store.getState())).toEqual('owner')
+        const initialCollaborators = uiCollaboratorsSelector(store.getState())
+        const initialTimeline = currentTimelineSelector(store.getState())
         store.dispatch(changeCurrentTimeline(3))
-        const nextTimeline = currentTimelineSelector(store.getState().present)
+        const nextTimeline = currentTimelineSelector(store.getState())
         expect(nextTimeline).not.toEqual(initialTimeline)
         expect(nextTimeline).toEqual(3)
-        expect(store.getState().present.ui.collaborators).toEqual(initialUI.collaborators)
+        expect(uiCollaboratorsSelector(store.getState())).toEqual(initialCollaborators)
       })
     })
     describe('and the permission is "collaborator"', () => {
       it('should write into an entry inside of ui.collaborators.collaborators keyed by the logged-in uid', () => {
         const store = initialStore()
-        const appSettings = store.getState().present.settings.appSettings
+        const appSettings = appSettingsSelector(store.getState())
         store.dispatch(addBook())
         store.dispatch(addBook())
         store.dispatch(addBook())
@@ -538,13 +555,13 @@ describe('ui-per-user', () => {
         )
         store.dispatch(setUserId('dummy-user-id'))
         store.dispatch(setPermission('collaborator'))
-        expect(permissionSelector(store.getState().present)).toEqual('collaborator')
-        const initialTimeline = currentTimelineSelector(store.getState().present)
+        expect(permissionSelector(store.getState())).toEqual('collaborator')
+        const initialTimeline = currentTimelineSelector(store.getState())
         store.dispatch(changeCurrentTimeline(3))
-        const nextTimeline = currentTimelineSelector(store.getState().present)
+        const nextTimeline = currentTimelineSelector(store.getState())
         expect(nextTimeline).not.toEqual(initialTimeline)
         expect(nextTimeline).toEqual(3)
-        expect(store.getState().present.ui.collaborators.collaborators).toEqual([
+        expect(uiCollaboratorsSelector(store.getState()).collaborators).toEqual([
           {
             ...omit(uiState, 'collaborators'),
             id: 'dummy-user-id',
@@ -554,7 +571,7 @@ describe('ui-per-user', () => {
       })
       it('should write subsequent changes into the same entry', () => {
         const store = initialStore()
-        const appSettings = store.getState().present.settings.appSettings
+        const appSettings = appSettingsSelector(store.getState())
         store.dispatch(addBook())
         store.dispatch(addBook())
         store.dispatch(addBook())
@@ -570,13 +587,13 @@ describe('ui-per-user', () => {
         )
         store.dispatch(setUserId('dummy-user-id'))
         store.dispatch(setPermission('collaborator'))
-        expect(permissionSelector(store.getState().present)).toEqual('collaborator')
-        const initialTimeline = currentTimelineSelector(store.getState().present)
+        expect(permissionSelector(store.getState())).toEqual('collaborator')
+        const initialTimeline = currentTimelineSelector(store.getState())
         store.dispatch(changeCurrentTimeline(3))
-        const nextTimeline = currentTimelineSelector(store.getState().present)
+        const nextTimeline = currentTimelineSelector(store.getState())
         expect(nextTimeline).not.toEqual(initialTimeline)
         expect(nextTimeline).toEqual(3)
-        expect(store.getState().present.ui.collaborators.collaborators).toEqual([
+        expect(uiCollaboratorsSelector(store.getState()).collaborators).toEqual([
           {
             ...omit(uiState, 'collaborators'),
             id: 'dummy-user-id',
@@ -584,9 +601,9 @@ describe('ui-per-user', () => {
           },
         ])
         store.dispatch(changeCurrentTimeline(2))
-        const finalTimeline = currentTimelineSelector(store.getState().present)
+        const finalTimeline = currentTimelineSelector(store.getState())
         expect(finalTimeline).toEqual(2)
-        expect(store.getState().present.ui.collaborators.collaborators).toEqual([
+        expect(uiCollaboratorsSelector(store.getState()).collaborators).toEqual([
           {
             ...omit(uiState, 'collaborators'),
             id: 'dummy-user-id',
@@ -597,7 +614,7 @@ describe('ui-per-user', () => {
       describe('when the logged-in uid changes', () => {
         it('should write to a new record corresponding to the new uid', () => {
           const store = initialStore()
-          const appSettings = store.getState().present.settings.appSettings
+          const appSettings = appSettingsSelector(store.getState())
           store.dispatch(addBook())
           store.dispatch(addBook())
           store.dispatch(addBook())
@@ -613,13 +630,13 @@ describe('ui-per-user', () => {
           )
           store.dispatch(setUserId('dummy-user-id'))
           store.dispatch(setPermission('collaborator'))
-          expect(permissionSelector(store.getState().present)).toEqual('collaborator')
-          const initialTimeline = currentTimelineSelector(store.getState().present)
+          expect(permissionSelector(store.getState())).toEqual('collaborator')
+          const initialTimeline = currentTimelineSelector(store.getState())
           store.dispatch(changeCurrentTimeline(3))
-          const nextTimeline = currentTimelineSelector(store.getState().present)
+          const nextTimeline = currentTimelineSelector(store.getState())
           expect(nextTimeline).not.toEqual(initialTimeline)
           expect(nextTimeline).toEqual(3)
-          expect(store.getState().present.ui.collaborators.collaborators).toEqual([
+          expect(uiCollaboratorsSelector(store.getState()).collaborators).toEqual([
             {
               ...omit(uiState, 'collaborators'),
               id: 'dummy-user-id',
@@ -628,9 +645,9 @@ describe('ui-per-user', () => {
           ])
           store.dispatch(setUserId('dummy-user-id-2'))
           store.dispatch(changeCurrentTimeline(2))
-          const finalTimeline = currentTimelineSelector(store.getState().present)
+          const finalTimeline = currentTimelineSelector(store.getState())
           expect(finalTimeline).toEqual(2)
-          expect(store.getState().present.ui.collaborators.collaborators).toEqual([
+          expect(uiCollaboratorsSelector(store.getState()).collaborators).toEqual([
             {
               ...omit(uiState, 'collaborators'),
               id: 'dummy-user-id',
@@ -647,7 +664,7 @@ describe('ui-per-user', () => {
       describe('when the permission changes to viewer', () => {
         it('should write to a new record in viewer', () => {
           const store = initialStore()
-          const appSettings = store.getState().present.settings.appSettings
+          const appSettings = appSettingsSelector(store.getState())
           store.dispatch(addBook())
           store.dispatch(addBook())
           store.dispatch(addBook())
@@ -663,13 +680,13 @@ describe('ui-per-user', () => {
           )
           store.dispatch(setUserId('dummy-user-id'))
           store.dispatch(setPermission('collaborator'))
-          expect(permissionSelector(store.getState().present)).toEqual('collaborator')
-          const initialTimeline = currentTimelineSelector(store.getState().present)
+          expect(permissionSelector(store.getState())).toEqual('collaborator')
+          const initialTimeline = currentTimelineSelector(store.getState())
           store.dispatch(changeCurrentTimeline(3))
-          const nextTimeline = currentTimelineSelector(store.getState().present)
+          const nextTimeline = currentTimelineSelector(store.getState())
           expect(nextTimeline).not.toEqual(initialTimeline)
           expect(nextTimeline).toEqual(3)
-          expect(store.getState().present.ui.collaborators.collaborators).toEqual([
+          expect(uiCollaboratorsSelector(store.getState()).collaborators).toEqual([
             {
               ...omit(uiState, 'collaborators'),
               id: 'dummy-user-id',
@@ -678,9 +695,9 @@ describe('ui-per-user', () => {
           ])
           store.dispatch(setPermission('viewer'))
           store.dispatch(changeCurrentTimeline(2))
-          const finalTimeline = currentTimelineSelector(store.getState().present)
+          const finalTimeline = currentTimelineSelector(store.getState())
           expect(finalTimeline).toEqual(2)
-          expect(store.getState().present.ui.collaborators).toEqual({
+          expect(uiCollaboratorsSelector(store.getState())).toEqual({
             collaborators: [
               {
                 ...omit(uiState, 'collaborators'),
@@ -702,7 +719,7 @@ describe('ui-per-user', () => {
     describe('and the permission is "viewer"', () => {
       it('should write into an entry inside of ui.collaborators.viewers keyed by the logged-in uid', () => {
         const store = initialStore()
-        const appSettings = store.getState().present.settings.appSettings
+        const appSettings = appSettingsSelector(store.getState())
         store.dispatch(addBook())
         store.dispatch(addBook())
         store.dispatch(addBook())
@@ -718,13 +735,13 @@ describe('ui-per-user', () => {
         )
         store.dispatch(setUserId('dummy-user-id'))
         store.dispatch(setPermission('viewer'))
-        expect(permissionSelector(store.getState().present)).toEqual('viewer')
-        const initialTimeline = currentTimelineSelector(store.getState().present)
+        expect(permissionSelector(store.getState())).toEqual('viewer')
+        const initialTimeline = currentTimelineSelector(store.getState())
         store.dispatch(changeCurrentTimeline(3))
-        const nextTimeline = currentTimelineSelector(store.getState().present)
+        const nextTimeline = currentTimelineSelector(store.getState())
         expect(nextTimeline).not.toEqual(initialTimeline)
         expect(nextTimeline).toEqual(3)
-        expect(store.getState().present.ui.collaborators.viewers).toEqual([
+        expect(uiCollaboratorsSelector(store.getState()).viewers).toEqual([
           {
             ...omit(uiState, 'collaborators'),
             id: 'dummy-user-id',
@@ -734,7 +751,7 @@ describe('ui-per-user', () => {
       })
       it('should write subsequent changes into the same entry', () => {
         const store = initialStore()
-        const appSettings = store.getState().present.settings.appSettings
+        const appSettings = appSettingsSelector(store.getState())
         store.dispatch(addBook())
         store.dispatch(addBook())
         store.dispatch(addBook())
@@ -750,13 +767,13 @@ describe('ui-per-user', () => {
         )
         store.dispatch(setUserId('dummy-user-id'))
         store.dispatch(setPermission('viewer'))
-        expect(permissionSelector(store.getState().present)).toEqual('viewer')
-        const initialTimeline = currentTimelineSelector(store.getState().present)
+        expect(permissionSelector(store.getState())).toEqual('viewer')
+        const initialTimeline = currentTimelineSelector(store.getState())
         store.dispatch(changeCurrentTimeline(3))
-        const nextTimeline = currentTimelineSelector(store.getState().present)
+        const nextTimeline = currentTimelineSelector(store.getState())
         expect(nextTimeline).not.toEqual(initialTimeline)
         expect(nextTimeline).toEqual(3)
-        expect(store.getState().present.ui.collaborators.viewers).toEqual([
+        expect(uiCollaboratorsSelector(store.getState()).viewers).toEqual([
           {
             ...omit(uiState, 'collaborators'),
             id: 'dummy-user-id',
@@ -764,9 +781,9 @@ describe('ui-per-user', () => {
           },
         ])
         store.dispatch(changeCurrentTimeline(2))
-        const finalTimeline = currentTimelineSelector(store.getState().present)
+        const finalTimeline = currentTimelineSelector(store.getState())
         expect(finalTimeline).toEqual(2)
-        expect(store.getState().present.ui.collaborators.viewers).toEqual([
+        expect(uiCollaboratorsSelector(store.getState()).viewers).toEqual([
           {
             ...omit(uiState, 'collaborators'),
             id: 'dummy-user-id',
@@ -777,7 +794,7 @@ describe('ui-per-user', () => {
       describe('when the logged-in uid changes', () => {
         it('should write to a new record corresponding to the new uid', () => {
           const store = initialStore()
-          const appSettings = store.getState().present.settings.appSettings
+          const appSettings = appSettingsSelector(store.getState())
           store.dispatch(addBook())
           store.dispatch(addBook())
           store.dispatch(addBook())
@@ -793,13 +810,13 @@ describe('ui-per-user', () => {
           )
           store.dispatch(setUserId('dummy-user-id'))
           store.dispatch(setPermission('viewer'))
-          expect(permissionSelector(store.getState().present)).toEqual('viewer')
-          const initialTimeline = currentTimelineSelector(store.getState().present)
+          expect(permissionSelector(store.getState())).toEqual('viewer')
+          const initialTimeline = currentTimelineSelector(store.getState())
           store.dispatch(changeCurrentTimeline(3))
-          const nextTimeline = currentTimelineSelector(store.getState().present)
+          const nextTimeline = currentTimelineSelector(store.getState())
           expect(nextTimeline).not.toEqual(initialTimeline)
           expect(nextTimeline).toEqual(3)
-          expect(store.getState().present.ui.collaborators.viewers).toEqual([
+          expect(uiCollaboratorsSelector(store.getState()).viewers).toEqual([
             {
               ...omit(uiState, 'collaborators'),
               id: 'dummy-user-id',
@@ -808,9 +825,9 @@ describe('ui-per-user', () => {
           ])
           store.dispatch(setUserId('dummy-user-id-2'))
           store.dispatch(changeCurrentTimeline(2))
-          const finalTimeline = currentTimelineSelector(store.getState().present)
+          const finalTimeline = currentTimelineSelector(store.getState())
           expect(finalTimeline).toEqual(2)
-          expect(store.getState().present.ui.collaborators.viewers).toEqual([
+          expect(uiCollaboratorsSelector(store.getState()).viewers).toEqual([
             {
               ...omit(uiState, 'collaborators'),
               id: 'dummy-user-id',
@@ -841,10 +858,10 @@ describe('moveCardToBook', () => {
       const store = initialStore()
       store.dispatch(addCard(exampleCard1))
       store.dispatch(setCardDialogOpen(1, 1, 1))
-      const cardIsOpen = isCardDialogVisibleSelector(store.getState().present)
+      const cardIsOpen = isCardDialogVisibleSelector(store.getState())
       expect(cardIsOpen).toBeTruthy()
       store.dispatch(moveCardToBook('series', 1))
-      const cardIsOpenAfter = isCardDialogVisibleSelector(store.getState().present)
+      const cardIsOpenAfter = isCardDialogVisibleSelector(store.getState())
       expect(cardIsOpenAfter).toBeFalsy()
     })
   })
@@ -857,7 +874,7 @@ describe('togglePinPlotline horizontal-orientation', () => {
     store.dispatch(addLineWithTitle('second line', currentBook))
     store.dispatch(addLineWithTitle('third line', currentBook))
     store.dispatch(addLineWithTitle('fourth line', currentBook))
-    const initialState = store.getState().present
+    const initialState = store.getState()
     const allLines = sortedLinesByBookSelector(initialState)
 
     it('should have only have 1 sticky header', () => {
@@ -875,7 +892,7 @@ describe('togglePinPlotline horizontal-orientation', () => {
         (line) => line.title === 'Main Plot' && line.bookId === currentBook
       )
       store.dispatch(togglePinPlotline(exampleLine1))
-      const updatedStateAfterFirstPin = store.getState().present
+      const updatedStateAfterFirstPin = store.getState()
       it('should add 1 more sticky header', () => {
         const newStickyHeaderCount = stickyHeaderCountSelector(updatedStateAfterFirstPin)
         expect(newStickyHeaderCount).toEqual(2)
@@ -897,12 +914,12 @@ describe('togglePinPlotline horizontal-orientation', () => {
     })
 
     describe('pin more plotline', () => {
-      const allLines = sortedLinesByBookSelector(store.getState().present)
+      const allLines = sortedLinesByBookSelector(store.getState())
       const exampleLine2 = allLines.find(
         (line) => line.title === 'fourth line' && line.bookId === currentBook
       )
       store.dispatch(togglePinPlotline(exampleLine2))
-      const updatedStateAfterSecondPin = store.getState().present
+      const updatedStateAfterSecondPin = store.getState()
       it('should add 1 more sticky header', () => {
         const updatedStickyHeaderCount = stickyHeaderCountSelector(updatedStateAfterSecondPin)
         expect(updatedStickyHeaderCount).toEqual(3)
@@ -930,12 +947,12 @@ describe('togglePinPlotline horizontal-orientation', () => {
     })
 
     describe('unpin a pinned plotline', () => {
-      const allLines = sortedLinesByBookSelector(store.getState().present)
+      const allLines = sortedLinesByBookSelector(store.getState())
       const exampleLineToUnpin = allLines.find(
         (line) => line.title === 'fourth line' && line.bookId === currentBook
       )
       store.dispatch(togglePinPlotline(exampleLineToUnpin))
-      const stateAfterTogglingAPinnedPlotline = store.getState().present
+      const stateAfterTogglingAPinnedPlotline = store.getState()
       const updatedLines = sortedLinesByBookSelector(stateAfterTogglingAPinnedPlotline)
 
       it('should reduce 1 to sticky header count', () => {
@@ -986,7 +1003,7 @@ describe('togglePinPlotline vertical-orientation', () => {
     store.dispatch(addLineWithTitle('second line', currentBook))
     store.dispatch(addLineWithTitle('third line', currentBook))
     store.dispatch(addLineWithTitle('fourth line', currentBook))
-    const initialState = store.getState().present
+    const initialState = store.getState()
     const allLines = sortedLinesByBookSelector(initialState)
 
     it('should have only have 1 sticky header', () => {
@@ -1004,7 +1021,7 @@ describe('togglePinPlotline vertical-orientation', () => {
         (line) => line.title === 'Main Plot' && line.bookId === currentBook
       )
       store.dispatch(togglePinPlotline(exampleLine1))
-      const updatedStateAfterFirstPin = store.getState().present
+      const updatedStateAfterFirstPin = store.getState()
       it('should not increase/decrease sticky header count', () => {
         const newStickyHeaderCount = stickyHeaderCountSelector(updatedStateAfterFirstPin)
         expect(newStickyHeaderCount).toEqual(1)
@@ -1026,12 +1043,12 @@ describe('togglePinPlotline vertical-orientation', () => {
     })
 
     describe('pin more plotline', () => {
-      const allLines = sortedLinesByBookSelector(store.getState().present)
+      const allLines = sortedLinesByBookSelector(store.getState())
       const exampleLine2 = allLines.find(
         (line) => line.title === 'fourth line' && line.bookId === currentBook
       )
       store.dispatch(togglePinPlotline(exampleLine2))
-      const updatedStateAfterSecondPin = store.getState().present
+      const updatedStateAfterSecondPin = store.getState()
       it('should not increase/decrease sticky header count', () => {
         const updatedStickyHeaderCount = stickyHeaderCountSelector(updatedStateAfterSecondPin)
         expect(updatedStickyHeaderCount).toEqual(1)
@@ -1059,12 +1076,12 @@ describe('togglePinPlotline vertical-orientation', () => {
     })
 
     describe('unpin a pinned plotline', () => {
-      const allLines = sortedLinesByBookSelector(store.getState().present)
+      const allLines = sortedLinesByBookSelector(store.getState())
       const exampleLineToUnpin = allLines.find(
         (line) => line.title === 'fourth line' && line.bookId === currentBook
       )
       store.dispatch(togglePinPlotline(exampleLineToUnpin))
-      const stateAfterTogglingAPinnedPlotline = store.getState().present
+      const stateAfterTogglingAPinnedPlotline = store.getState()
       const updatedLines = sortedLinesByBookSelector(stateAfterTogglingAPinnedPlotline)
 
       it('should not increase/decrease sticky header count', () => {
@@ -1114,7 +1131,7 @@ describe('reorderLines', () => {
     store.dispatch(addLineWithTitle('second line', currentBook))
     store.dispatch(addLineWithTitle('third line', currentBook))
     store.dispatch(addLineWithTitle('fourth line', currentBook))
-    const initialState = store.getState().present
+    const initialState = store.getState()
     let allSortedLines = sortedLinesByBookSelector(initialState)
 
     let mainPlotline = allSortedLines.find(
@@ -1132,7 +1149,7 @@ describe('reorderLines', () => {
 
     store.dispatch(reorderLines(thirdLine.position, mainPlotline.position))
 
-    const allSortedLinesAfterFirstReorder = sortedLinesByBookSelector(store.getState().present)
+    const allSortedLinesAfterFirstReorder = sortedLinesByBookSelector(store.getState())
 
     mainPlotline = allSortedLinesAfterFirstReorder.find(
       (line) => line.title === 'Main Plot' && line.bookId === currentBook
@@ -1166,7 +1183,7 @@ describe('reorderLines', () => {
     store.dispatch(addLineWithTitle('second line', currentBook))
     store.dispatch(addLineWithTitle('third line', currentBook))
     store.dispatch(addLineWithTitle('fourth line', currentBook))
-    const initialState = store.getState().present
+    const initialState = store.getState()
     let allSortedLines = sortedLinesByBookSelector(initialState)
 
     let mainPlotline = allSortedLines.find(
@@ -1186,7 +1203,7 @@ describe('reorderLines', () => {
 
     describe('move the pinned plotline to non-pinned plotline', () => {
       store.dispatch(reorderLines(thirdLine.position, mainPlotline.position))
-      const linesAfterReorderAttempt = sortedLinesByBookSelector(store.getState().present)
+      const linesAfterReorderAttempt = sortedLinesByBookSelector(store.getState())
       mainPlotline = linesAfterReorderAttempt.find(
         (line) => line.title === 'Main Plot' && line.bookId === currentBook
       )
@@ -1209,11 +1226,11 @@ describe('reorderLines', () => {
     })
 
     describe('add pinned plotline', () => {
-      const allLines = sortedLinesByBookSelector(store.getState().present)
+      const allLines = sortedLinesByBookSelector(store.getState())
       const secondPlotlineToPin = allLines.find((line) => line.title === 'third line')
       store.dispatch(togglePinPlotline(secondPlotlineToPin))
-      const pinnedPlotlines = pinnedPlotlinesSelector(store.getState().present)
-      const linesAfterSecondPlotlinePinned = sortedLinesByBookSelector(store.getState().present)
+      const pinnedPlotlines = pinnedPlotlinesSelector(store.getState())
+      const linesAfterSecondPlotlinePinned = sortedLinesByBookSelector(store.getState())
 
       const mainPlotline = linesAfterSecondPlotlinePinned.find(
         (line) => line.title === 'Main Plot' && line.bookId === currentBook
@@ -1257,7 +1274,7 @@ describe('reorderLines', () => {
           (line) => line.title === 'Main Plot'
         )
         store.dispatch(reorderLines(plotlineToReorder1.position, plotlineToReorder2.position))
-        const sortedLinesAfterReorder = sortedLinesByBookSelector(store.getState().present)
+        const sortedLinesAfterReorder = sortedLinesByBookSelector(store.getState())
 
         const mainPlotline = sortedLinesAfterReorder.find(
           (line) => line.title === 'Main Plot' && line.bookId === currentBook

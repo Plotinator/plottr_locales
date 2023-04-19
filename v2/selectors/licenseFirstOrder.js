@@ -1,10 +1,14 @@
 // IMPORTANT NOTE: Please don't import other selectors from this file.
 // Use secondOrder and *ThirdOrder for your selector if it has other
 // dependencies.
-
 import { createSelector } from 'reselect'
 
-export const trialInfoSelector = (state) => state.license.trialInfo
+import { fullFileStateSelector } from './fullFileFirstOrder'
+
+export const trialInfoSelector = createSelector(
+  fullFileStateSelector,
+  (state) => state.license.trialInfo
+)
 export const trialEndSelector = createSelector(trialInfoSelector, ({ endsAt }) => endsAt)
 export const daysLeftOfTrialSelector = createSelector(trialEndSelector, (endsAt) => {
   let oneDay = 24 * 60 * 60 * 1000
@@ -35,7 +39,10 @@ export const trialStartedSelector = createSelector(
 export const trialStartedOnSelector = createSelector(trialInfoSelector, ({ startsAt }) => startsAt)
 export const trialEndsOnSelector = createSelector(trialInfoSelector, ({ endsAt }) => endsAt)
 
-export const licenseInfoSelector = (state) => state.license.licenseInfo
+export const licenseSelector = createSelector(fullFileStateSelector, ({ license }) => {
+  return license || {}
+})
+export const licenseInfoSelector = createSelector(licenseSelector, ({ licenseInfo }) => licenseInfo)
 export const licenseExpiresSelector = createSelector(licenseInfoSelector, ({ expires }) => expires)
 export const licenseItemNameSelector = createSelector(
   licenseInfoSelector,
@@ -96,9 +103,12 @@ export const hasLicenseSelector = createSelector(
   }
 )
 
-export const proInfoSelector = (state) => state.license.proLicenseInfo
+export const proInfoSelector = createSelector(
+  licenseSelector,
+  ({ proLicenseInfo }) => proLicenseInfo || {}
+)
 
-export const proLicenseInfoSelector = (state) => state.license.proLicenseInfo
+export const proLicenseInfoSelector = proInfoSelector
 export const proLicenseExpirationSelector = createSelector(
   proLicenseInfoSelector,
   ({ expiration }) => expiration

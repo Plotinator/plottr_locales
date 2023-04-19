@@ -3,12 +3,7 @@ import { createSelector } from 'reselect'
 
 // Other selector dependencies
 import { isLoggedInSelector } from './clientFirstOrder'
-import {
-  allCustomTemplatesSelector,
-  templateSearchTermSelector,
-  templatesSelector,
-  templateTypeSelector,
-} from './templatesFirstOrder'
+import { allCustomTemplatesSelector, templatesSelector } from './templatesFirstOrder'
 
 export const customTemplatesSelector = createSelector(
   allCustomTemplatesSelector,
@@ -42,6 +37,8 @@ export const templateByIdFnSelector = createSelector(
   }
 )
 
+const templateTypeSelector = (state, type) => type
+const templateSearchTermSelector = (state, _, searchTerm) => searchTerm
 export const filteredSortedCustomTemplatesSelector = createSelector(
   customTemplatesSelector,
   templateTypeSelector,

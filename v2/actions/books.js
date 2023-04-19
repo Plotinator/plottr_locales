@@ -21,6 +21,10 @@ export function editBook(id, title, premise, genre, theme) {
   return { type: EDIT_BOOK, id, title, premise, genre, theme }
 }
 
+export function editBookContent(bookContent = book) {
+  return { type: EDIT_BOOK, ...bookContent }
+}
+
 export function editBookImage(id, imageId) {
   return { type: EDIT_BOOK_IMAGE, id, imageId }
 }

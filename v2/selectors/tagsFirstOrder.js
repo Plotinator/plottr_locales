@@ -5,7 +5,9 @@
 import { sortBy, groupBy } from 'lodash'
 import { createSelector } from 'reselect'
 
-export const allTagsSelector = (state) => state.tags
+import { fullFileStateSelector } from './fullFileFirstOrder'
+
+export const allTagsSelector = createSelector(fullFileStateSelector, (state) => state.tags)
 const selectId = (state, id) => id
 
 export const sortedTagsSelector = createSelector(allTagsSelector, (tags) =>

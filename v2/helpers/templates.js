@@ -6,8 +6,6 @@ import { addBeat } from '../actions/beats'
 import root from '../reducers/root'
 import { addLinesFromTemplate, addLineWithTitle, deleteLine } from '../actions/lines'
 import { nextId } from './nextBeatId'
-import { hierarchyLevelCount } from '../selectors'
-import { currentTimelineSelector } from '../selectors'
 import { nextId as nextLineId } from '../store/newIds'
 
 const children = (beatTree, id) => {
@@ -356,7 +354,7 @@ export const moveLineActions = (file, sourceLineId, destinationBookId) => {
   const addLineAction = addLineWithTitle(sourceLine.title, destinationBookId)
   const bookId = sourceLine.bookId
   // Also deletes the old cards
-  const removeOldLineAction = deleteLine(sourceLineId, bookId)
+  const removeOldLineAction = deleteLine(sourceLineId, bookId, sourceLine?.isPinned)
   const nextAvailableBeatId = nextId(file.beats)
   const linesCards = file.cards.filter((card) => {
     return card.lineId === sourceLineId
@@ -377,15 +375,20 @@ export const moveLineActions = (file, sourceLineId, destinationBookId) => {
     true
   )
 
-  return [addLineAction, removeOldLineAction, ...addBeatActions, ...addCardActions]
+  return {
+    actions: [addLineAction, removeOldLineAction, ...addBeatActions, ...addCardActions],
+    newLineId,
+  }
 }
 
-export const levelsDiffer = (destinationFile, templateData) => {
+export const levelsDiffer = (selectors) => (destinationFile, templateData) => {
+  const { hierarchyLevelCount } = selectors
   const hierarchyLevels = hierarchyLevelCount(destinationFile)
   return maxDepthIncludingRoot(templateData.beats['1']) < hierarchyLevels
 }
 
-export const levelToApplyTo = (destinationFile, template) => {
+export const levelToApplyTo = (selectors) => (destinationFile, template) => {
+  const { currentTimelineSelector } = selectors
   const currentTimeline = currentTimelineSelector(destinationFile)
   const [startDepth] = computeMergeStart(
     destinationFile.beats[currentTimeline],
