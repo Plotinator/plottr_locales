@@ -8,8 +8,12 @@ import { sortBy } from 'lodash'
 import { t } from 'plottr_locales'
 
 import { parseStringDate } from '../helpers/date'
+import { fullFileStateSelector } from './fullFileFirstOrder'
 
-export const backupFoldersSelector = (state) => state.backups.folders
+export const backupFoldersSelector = createSelector(
+  fullFileStateSelector,
+  (state) => state.backups.folders
+)
 
 export const nonEmptyBackupFoldersSelector = createSelector(
   backupFoldersSelector,

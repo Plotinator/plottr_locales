@@ -1,3 +1,5 @@
+import { identity } from 'lodash'
+
 import {
   CHANGE_CURRENT_VIEW,
   CHANGE_ORIENTATION,
@@ -50,7 +52,9 @@ import {
   OPEN_RESTRUCTURE_TIMELINE_MODAL,
   CLOSE_RESTRUCTURE_TIMELINE_MODAL,
 } from '../constants/ActionTypes'
-import { allCardsSelector, fileURLSelector } from '../selectors'
+import selectors from '../selectors'
+
+const { allCardsSelector, fileURLSelector } = selectors(identity)
 
 export function changeCurrentView(view) {
   return { type: CHANGE_CURRENT_VIEW, view }
@@ -141,9 +145,7 @@ export function recordOutlineScrollPosition(position) {
 }
 
 export const editFileName = (persistFileNameChange, newName) => (dispatch, getState) => {
-  // NOTE: Mobile doesn't use history middleware
-  const fullState = getState()
-  const state = fullState.present ? fullState.present : fullState
+  const state = getState()
   const fileURL = fileURLSelector(state)
   // TODO: dispatch an error for not being able to edit the file name.
   persistFileNameChange(fileURL, newName).then(() => {
@@ -208,9 +210,7 @@ export function selectCharacter(id) {
 }
 
 export const setCardDialogOpen = (cardId, beatId, lineId) => (dispatch, getState) => {
-  // NOTE: Mobile doesn't use history middleware
-  const fullState = getState()
-  const state = fullState.present ? fullState.present : fullState
+  const state = getState()
   const allCards = allCardsSelector(state)
   const cardExists = allCards.find((card) => card.id == cardId)
   if (cardExists) {
