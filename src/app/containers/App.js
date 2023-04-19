@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'react-proptypes'
 
 import { t } from 'plottr_locales'
-import { selectors, actions } from 'pltr/v2'
+import { selectors, actions } from 'wired-up-pltr'
 
 import log from '../../../shared/logger'
 import Navigation from 'containers/Navigation'
@@ -280,15 +280,13 @@ App.propTypes = {
 
 function mapStateToProps(state) {
   return {
-    userId: selectors.userIdSelector(state.present),
-    isCloudFile: selectors.isCloudFileSelector(state.present),
-    isOffline: selectors.isOfflineSelector(state.present),
-    isResuming: selectors.isResumingSelector(state.present),
-    userNeedsToLogin: selectors.userNeedsToLoginSelector(state.present),
-    sessionChecked: selectors.sessionCheckedSelector(state.present),
-    applicationIsBusyAndCannotBeQuit: selectors.busyWithWorkThatPreventsQuittingSelector(
-      state.present
-    ),
+    userId: selectors.userIdSelector(state),
+    isCloudFile: selectors.isCloudFileSelector(state),
+    isOffline: selectors.isOfflineSelector(state),
+    isResuming: selectors.isResumingSelector(state),
+    userNeedsToLogin: selectors.userNeedsToLoginSelector(state),
+    sessionChecked: selectors.sessionCheckedSelector(state),
+    applicationIsBusyAndCannotBeQuit: selectors.busyWithWorkThatPreventsQuittingSelector(state),
   }
 }
 

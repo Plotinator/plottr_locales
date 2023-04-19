@@ -1,12 +1,12 @@
 import { isEqual } from 'lodash'
-import {
-  assertEqual,
-  assertLessThan,
-  assertGreaterThan,
-  describe,
-} from '../../../test/simpleIntegrationTest'
+import { assertEqual, assertGreaterThan, describe } from '../../../test/simpleIntegrationTest'
 
-import Saver, { DUMMY_ROLLBAR, DUMMY_SHOW_ERROR_BOX, DUMMY_SHOW_MESSAGE_BOX } from '../saver'
+import Saver, {
+  DUMMY_ROLLBAR,
+  DUMMY_SHOW_ERROR_BOX,
+  DUMMY_SHOW_MESSAGE_BOX,
+  DUMMY_SERVER_IS_BUSY_RESTARTING,
+} from '../saver'
 
 const CONSOLE_LOGGER = {
   info: (...args) => console.log(args),
@@ -73,73 +73,6 @@ function expectToMatchArrayLoosely(received, expected, allowedMissing = 1, allow
 describe('Saver', (describe, it) => {
   describe('save', (describe, it) => {
     describe('given a dummy getState function', (describe, it) => {
-      describe('and a 50ms interval', (describe, it) => {
-        describe('and a save job that takes 10s', (describe, it) => {
-          it('should drop the oldest half of save jobs when we hit 10', () => {
-            let stateCounter = 1
-            const getState = () => {
-              return {
-                stateCounter: stateCounter++,
-              }
-            }
-            const saveCalls = []
-            const saveFile = (...args) => {
-              return new Promise((resolve) => {
-                setTimeout(() => {
-                  saveCalls.push(args)
-                  resolve()
-                }, 10000)
-              })
-            }
-            const backupFile = () => {
-              return Promise.resolve()
-            }
-            const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 50)
-            const waitForEnoughReAttempts = () => {
-              return new Promise((resolve) => {
-                setTimeout(resolve, 50)
-              }).then(() => {
-                if (saver.saveRunner.queueFullCounter < 5) {
-                  return waitForEnoughReAttempts()
-                } else {
-                  return true
-                }
-              })
-            }
-            const verify = () => {
-              expectToMatchArrayLoosely(saveCalls, [], 0, 0)
-              assertGreaterThan(saver.saveRunner.pendingJobBuffer.length, 5)
-              assertLessThan(saver.saveRunner.pendingJobBuffer.length, 10)
-              return waitForEnoughReAttempts()
-                .then(() => {
-                  return new Promise((resolve) => {
-                    setTimeout(resolve, 200)
-                  })
-                })
-                .then(() => {
-                  expectToMatchArrayLoosely(saveCalls, [], 0, 0)
-                  assertLessThan(saver.saveRunner.pendingJobBuffer.length, 10)
-                  assertLessThan(saver.saveRunner.queueFullCounter, 5)
-                })
-                .then(() => {
-                  saver.cancelAllRemainingRequests()
-                })
-            }
-            const waitSomeMore = () => {
-              return new Promise((resolve) => {
-                setTimeout(resolve, 50)
-              }).then(() => {
-                if (saver.saveRunner.pendingJobBuffer.length < 7) {
-                  return waitSomeMore()
-                } else {
-                  return verify()
-                }
-              })
-            }
-            waitSomeMore()
-          })
-        })
-      })
       describe('and a 100ms interval', (describe, it) => {
         it('should attempt to save the same thing 10 times in one second', () => {
           let stateCounter = 1
@@ -156,7 +89,18 @@ describe('Saver', (describe, it) => {
           const backupFile = () => {
             return Promise.resolve()
           }
-          const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 100)
+          const saver = Saver(
+            getState,
+            saveFile,
+            backupFile,
+            100,
+            60000,
+            NOP_LOGGER,
+            DUMMY_ROLLBAR,
+            DUMMY_SHOW_MESSAGE_BOX,
+            DUMMY_SHOW_ERROR_BOX,
+            DUMMY_SERVER_IS_BUSY_RESTARTING
+          )
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
           }).then(() => {
@@ -244,7 +188,18 @@ describe('Saver', (describe, it) => {
             const backupFile = () => {
               return Promise.resolve()
             }
-            const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 100)
+            const saver = Saver(
+              getState,
+              saveFile,
+              backupFile,
+              100,
+              60000,
+              NOP_LOGGER,
+              DUMMY_ROLLBAR,
+              DUMMY_SHOW_MESSAGE_BOX,
+              DUMMY_SHOW_ERROR_BOX,
+              DUMMY_SERVER_IS_BUSY_RESTARTING
+            )
             new Promise((resolve) => {
               setTimeout(resolve, 1100)
             }).then(() => {
@@ -319,16 +274,17 @@ describe('Saver', (describe, it) => {
             const showMessageBox = () => {
               calledShowMessageBox++
             }
-            const saver = new Saver(
+            const saver = Saver(
               getState,
               saveFile,
               backupFile,
-              NOP_LOGGER,
               100,
               10000,
+              NOP_LOGGER,
               DUMMY_ROLLBAR,
               showMessageBox,
-              showErrorBox
+              showErrorBox,
+              DUMMY_SERVER_IS_BUSY_RESTARTING
             )
             assertEqual(calledShowErrorBox, 0)
             assertEqual(calledShowMessageBox, 0)
@@ -386,7 +342,7 @@ describe('Saver', (describe, it) => {
             })
           })
           describe('and a busy restarting function that always reports that it is busy restarting', (describe, it) => {
-            it('should show an error box once and then show a message box to indicate failure and subsequent success', () => {
+            it('should not indicate that there was a failure saving the file', () => {
               let stateCounter = 1
               const getState = () => {
                 return {
@@ -418,13 +374,13 @@ describe('Saver', (describe, it) => {
               const alwaysBusyRestarting = () => {
                 return Promise.resolve(true)
               }
-              const saver = new Saver(
+              const saver = Saver(
                 getState,
                 saveFile,
                 backupFile,
-                NOP_LOGGER,
                 100,
                 10000,
+                NOP_LOGGER,
                 DUMMY_ROLLBAR,
                 showMessageBox,
                 showErrorBox,
@@ -504,7 +460,18 @@ describe('Saver', (describe, it) => {
           const backupFile = () => {
             return Promise.resolve()
           }
-          const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 500)
+          const saver = Saver(
+            getState,
+            saveFile,
+            backupFile,
+            500,
+            60000,
+            NOP_LOGGER,
+            DUMMY_ROLLBAR,
+            DUMMY_SHOW_MESSAGE_BOX,
+            DUMMY_SHOW_ERROR_BOX,
+            DUMMY_SERVER_IS_BUSY_RESTARTING
+          )
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
           }).then(() => {
@@ -548,7 +515,18 @@ describe('Saver', (describe, it) => {
           const backupFile = () => {
             return Promise.resolve()
           }
-          const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 100)
+          const saver = Saver(
+            getState,
+            saveFile,
+            backupFile,
+            100,
+            60000,
+            NOP_LOGGER,
+            DUMMY_ROLLBAR,
+            DUMMY_SHOW_MESSAGE_BOX,
+            DUMMY_SHOW_ERROR_BOX,
+            DUMMY_SERVER_IS_BUSY_RESTARTING
+          )
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
           }).then(() => {
@@ -614,7 +592,7 @@ describe('Saver', (describe, it) => {
         })
         describe('and a save function that takes 200ms to complete', (describe, it) => {
           describe('and we cancel saving after 1 second', (describe, it) => {
-            it('should only save 5 times in 1 second (because it waits for prior instances to complete)', () => {
+            it('should still attempt 10 saves in 1 second (the lockfile in the socket server handles concurrent access errors)', () => {
               let counter = 0
               const getState = () => {
                 counter++
@@ -632,7 +610,18 @@ describe('Saver', (describe, it) => {
               const backupFile = () => {
                 return Promise.resolve()
               }
-              const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 100)
+              const saver = Saver(
+                getState,
+                saveFile,
+                backupFile,
+                100,
+                60000,
+                NOP_LOGGER,
+                DUMMY_ROLLBAR,
+                DUMMY_SHOW_MESSAGE_BOX,
+                DUMMY_SHOW_ERROR_BOX,
+                DUMMY_SERVER_IS_BUSY_RESTARTING
+              )
               new Promise((resolve) => {
                 setTimeout(resolve, 1050)
               }).then(() => {
@@ -665,6 +654,31 @@ describe('Saver', (describe, it) => {
                         counter: 5,
                       },
                     ],
+                    [
+                      {
+                        counter: 6,
+                      },
+                    ],
+                    [
+                      {
+                        counter: 7,
+                      },
+                    ],
+                    [
+                      {
+                        counter: 8,
+                      },
+                    ],
+                    [
+                      {
+                        counter: 9,
+                      },
+                    ],
+                    [
+                      {
+                        counter: 10,
+                      },
+                    ],
                   ],
                   2,
                   2
@@ -683,13 +697,24 @@ describe('Saver', (describe, it) => {
               const saveFile = (...args) => {
                 saveCalls.push(args)
                 return new Promise((resolve) => {
-                  setTimeout(resolve, 200)
+                  setTimeout(resolve, 100)
                 })
               }
               const backupFile = () => {
                 return Promise.resolve()
               }
-              const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 100)
+              const saver = Saver(
+                getState,
+                saveFile,
+                backupFile,
+                200,
+                60000,
+                NOP_LOGGER,
+                DUMMY_ROLLBAR,
+                DUMMY_SHOW_MESSAGE_BOX,
+                DUMMY_SHOW_ERROR_BOX,
+                DUMMY_SERVER_IS_BUSY_RESTARTING
+              )
               new Promise((resolve) => {
                 setTimeout(resolve, 1050)
               }).then(() => {
@@ -752,7 +777,18 @@ describe('Saver', (describe, it) => {
           const backupFile = () => {
             return Promise.resolve()
           }
-          const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 500)
+          const saver = Saver(
+            getState,
+            saveFile,
+            backupFile,
+            500,
+            60000,
+            NOP_LOGGER,
+            DUMMY_ROLLBAR,
+            DUMMY_SHOW_MESSAGE_BOX,
+            DUMMY_SHOW_ERROR_BOX,
+            DUMMY_SERVER_IS_BUSY_RESTARTING
+          )
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
           }).then(() => {
@@ -778,9 +814,67 @@ describe('Saver', (describe, it) => {
         })
       })
     })
-    describe('a state that doesnt change', (describe, it) => {
+    describe('given a state that doesnt change', (describe, it) => {
+      it('should only save once', () => {
+        const THE_STATE = {
+          a: 'haha',
+        }
+        const getState = () => {
+          return THE_STATE
+        }
+        const backupFile = (...args) => {
+          return Promise.resolve()
+        }
+        const saveCalls = []
+        const saveFile = (file) => {
+          saveCalls.push(file)
+          return Promise.resolve()
+        }
+        let loggedErrors = 0
+        let loggedWarnings = 0
+        let loggedInfos = 0
+        const countingLogger = {
+          info: (...args) => {
+            loggedInfos++
+          },
+          warn: (...args) => {
+            loggedWarnings++
+          },
+          error: (...args) => {
+            loggedErrors++
+          },
+        }
+        let notifierCount = 0
+        const trackingErrorNotifier = () => {
+          notifierCount++
+        }
+        const saver = Saver(
+          getState,
+          saveFile,
+          backupFile,
+          100,
+          10000,
+          countingLogger,
+          DUMMY_ROLLBAR,
+          DUMMY_SHOW_MESSAGE_BOX,
+          trackingErrorNotifier,
+          DUMMY_SERVER_IS_BUSY_RESTARTING
+        )
+        new Promise((resolve) => {
+          setTimeout(resolve, 510)
+        }).then(() => {
+          assertGreaterThan(loggedInfos, 1)
+          assertEqual(loggedWarnings, 0)
+          assertEqual(loggedErrors, 0)
+          assertEqual(notifierCount, 0)
+          expectToMatchArrayLoosely(saveCalls, [THE_STATE], 0, 0)
+          saver.stop()
+        })
+      })
+    })
+    describe('given a state that doesnt change', (describe, it) => {
       describe('and given  a save function that always fails', (describe, it) => {
-        it('should report failure once', () => {
+        it('should report failure each time', () => {
           const THE_STATE = {
             a: 'haha',
           }
@@ -811,16 +905,17 @@ describe('Saver', (describe, it) => {
           const trackingErrorNotifier = () => {
             notifierCount++
           }
-          const saver = new Saver(
+          const saver = Saver(
             getState,
             saveFile,
             backupFile,
-            countingLogger,
             100,
             10000,
+            countingLogger,
             DUMMY_ROLLBAR,
             DUMMY_SHOW_MESSAGE_BOX,
-            trackingErrorNotifier
+            trackingErrorNotifier,
+            DUMMY_SERVER_IS_BUSY_RESTARTING
           )
           assertGreaterThan(loggedInfos, 0)
           assertEqual(loggedWarnings, 0)
@@ -837,16 +932,16 @@ describe('Saver', (describe, it) => {
               setTimeout(resolve, 110)
             }).then(() => {
               assertGreaterThan(loggedInfos, 0)
-              assertEqual(loggedWarnings, 1)
+              assertEqual(loggedWarnings, 2)
               assertEqual(loggedErrors, 0)
-              assertEqual(notifierCount, 1)
+              assertEqual(notifierCount, 2)
               new Promise((resolve) => {
                 setTimeout(resolve, 110)
               }).then(() => {
                 assertGreaterThan(loggedInfos, 0)
-                assertEqual(loggedWarnings, 1)
+                assertEqual(loggedWarnings, 3)
                 assertEqual(loggedErrors, 0)
-                assertEqual(notifierCount, 1)
+                assertEqual(notifierCount, 3)
                 saver.cancelAllRemainingRequests()
               })
             })
@@ -873,7 +968,18 @@ describe('Saver', (describe, it) => {
             backupCalls.push(args)
             return Promise.resolve()
           }
-          const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 100000, 100)
+          const saver = Saver(
+            getState,
+            saveFile,
+            backupFile,
+            100000,
+            100,
+            NOP_LOGGER,
+            DUMMY_ROLLBAR,
+            DUMMY_SHOW_MESSAGE_BOX,
+            DUMMY_SHOW_ERROR_BOX,
+            DUMMY_SERVER_IS_BUSY_RESTARTING
+          )
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
           }).then(() => {
@@ -961,7 +1067,18 @@ describe('Saver', (describe, it) => {
             const saveFile = () => {
               return Promise.resolve()
             }
-            const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 10000, 100)
+            const saver = Saver(
+              getState,
+              saveFile,
+              backupFile,
+              10000,
+              100,
+              NOP_LOGGER,
+              DUMMY_ROLLBAR,
+              DUMMY_SHOW_MESSAGE_BOX,
+              DUMMY_SHOW_ERROR_BOX,
+              DUMMY_SERVER_IS_BUSY_RESTARTING
+            )
             new Promise((resolve) => {
               setTimeout(resolve, 1100)
             }).then(() => {
@@ -1042,7 +1159,18 @@ describe('Saver', (describe, it) => {
                 loggedErrors++
               },
             }
-            const saver = new Saver(getState, saveFile, backupFile, countingLogger, 10000, 100)
+            const saver = Saver(
+              getState,
+              saveFile,
+              backupFile,
+              10000,
+              100,
+              countingLogger,
+              DUMMY_ROLLBAR,
+              DUMMY_SHOW_MESSAGE_BOX,
+              DUMMY_SHOW_ERROR_BOX,
+              DUMMY_SERVER_IS_BUSY_RESTARTING
+            )
             assertGreaterThan(loggedInfos, 0)
             assertEqual(loggedWarnings, 0)
             assertEqual(loggedErrors, 0)
@@ -1142,13 +1270,13 @@ describe('Saver', (describe, it) => {
               const alwaysBusyRestarting = () => {
                 return Promise.resolve(true)
               }
-              const saver = new Saver(
+              const saver = Saver(
                 getState,
                 saveFile,
                 backupFile,
-                countingLogger,
                 10000,
                 100,
+                countingLogger,
                 DUMMY_ROLLBAR,
                 DUMMY_SHOW_MESSAGE_BOX,
                 DUMMY_SHOW_ERROR_BOX,
@@ -1233,7 +1361,18 @@ describe('Saver', (describe, it) => {
             backupCalls.push(args)
             return Promise.resolve()
           }
-          const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 10000, 500)
+          const saver = Saver(
+            getState,
+            saveFile,
+            backupFile,
+            10000,
+            500,
+            NOP_LOGGER,
+            DUMMY_ROLLBAR,
+            DUMMY_SHOW_MESSAGE_BOX,
+            DUMMY_SHOW_ERROR_BOX,
+            DUMMY_SERVER_IS_BUSY_RESTARTING
+          )
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
           }).then(() => {
@@ -1277,7 +1416,18 @@ describe('Saver', (describe, it) => {
             backupCalls.push(args)
             return Promise.resolve()
           }
-          const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 10000, 100)
+          const saver = Saver(
+            getState,
+            saveFile,
+            backupFile,
+            10000,
+            100,
+            NOP_LOGGER,
+            DUMMY_ROLLBAR,
+            DUMMY_SHOW_MESSAGE_BOX,
+            DUMMY_SHOW_ERROR_BOX,
+            DUMMY_SERVER_IS_BUSY_RESTARTING
+          )
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
           }).then(() => {
@@ -1343,7 +1493,7 @@ describe('Saver', (describe, it) => {
         })
         describe('and a backup function that takes 200ms to complete', (describe, it) => {
           describe('and we cancel saving after 1 second', (describe, it) => {
-            it('should only backup 5 times in 1 second (because it waits for prior instances to complete)', () => {
+            it('should still backup 5 times in 1 second (the socket server handles concurrent access errors)', () => {
               let counter = 0
               const getState = () => {
                 counter++
@@ -1361,7 +1511,18 @@ describe('Saver', (describe, it) => {
                   setTimeout(resolve, 200)
                 })
               }
-              const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 10000, 100)
+              const saver = Saver(
+                getState,
+                saveFile,
+                backupFile,
+                10000,
+                100,
+                NOP_LOGGER,
+                DUMMY_ROLLBAR,
+                DUMMY_SHOW_MESSAGE_BOX,
+                DUMMY_SHOW_ERROR_BOX,
+                DUMMY_SERVER_IS_BUSY_RESTARTING
+              )
               new Promise((resolve) => {
                 setTimeout(resolve, 1050)
               }).then(() => {
@@ -1394,6 +1555,31 @@ describe('Saver', (describe, it) => {
                         counter: 5,
                       },
                     ],
+                    [
+                      {
+                        counter: 6,
+                      },
+                    ],
+                    [
+                      {
+                        counter: 7,
+                      },
+                    ],
+                    [
+                      {
+                        counter: 8,
+                      },
+                    ],
+                    [
+                      {
+                        counter: 9,
+                      },
+                    ],
+                    [
+                      {
+                        counter: 10,
+                      },
+                    ],
                   ],
                   2,
                   2
@@ -1415,10 +1601,21 @@ describe('Saver', (describe, it) => {
               const backupFile = (...args) => {
                 backupCalls.push(args)
                 return new Promise((resolve) => {
-                  setTimeout(resolve, 200)
+                  setTimeout(resolve, 100)
                 })
               }
-              const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 10000, 100)
+              const saver = Saver(
+                getState,
+                saveFile,
+                backupFile,
+                10000,
+                200,
+                NOP_LOGGER,
+                DUMMY_ROLLBAR,
+                DUMMY_SHOW_MESSAGE_BOX,
+                DUMMY_SHOW_ERROR_BOX,
+                DUMMY_SERVER_IS_BUSY_RESTARTING
+              )
               new Promise((resolve) => {
                 setTimeout(resolve, 1050)
               }).then(() => {
@@ -1481,7 +1678,18 @@ describe('Saver', (describe, it) => {
             backupCalls.push(args)
             return Promise.resolve()
           }
-          const saver = new Saver(getState, saveFile, backupFile, NOP_LOGGER, 10000, 500)
+          const saver = Saver(
+            getState,
+            saveFile,
+            backupFile,
+            10000,
+            500,
+            NOP_LOGGER,
+            DUMMY_ROLLBAR,
+            DUMMY_SHOW_MESSAGE_BOX,
+            DUMMY_SHOW_ERROR_BOX,
+            DUMMY_SERVER_IS_BUSY_RESTARTING
+          )
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
           }).then(() => {

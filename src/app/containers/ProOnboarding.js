@@ -2,7 +2,7 @@ import React from 'react'
 import { PropTypes } from 'prop-types'
 import { connect } from 'react-redux'
 
-import { selectors, actions } from 'pltr/v2'
+import { selectors, actions } from 'wired-up-pltr'
 import { ProOnboarding as ProOnboardingWizard } from 'connected-components'
 
 const ProOnboarding = ({ isOnboarding, finishProOnboarding }) => {
@@ -20,7 +20,7 @@ ProOnboarding.propTypes = {
 
 export default connect(
   (state) => ({
-    isOnboarding: selectors.isOnboardingToProFromRootSelector(state.present),
+    isOnboarding: selectors.isOnboardingToProFromRootSelector(state),
   }),
   {
     finishProOnboarding: actions.applicationState.finishProOnboarding,

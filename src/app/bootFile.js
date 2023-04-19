@@ -1,11 +1,5 @@
-import {
-  helpers,
-  SYSTEM_REDUCER_KEYS,
-  actions,
-  migrateIfNeeded,
-  Migrator,
-  emptyFile,
-} from 'pltr/v2'
+import { helpers, SYSTEM_REDUCER_KEYS, migrateIfNeeded, Migrator, emptyFile } from 'pltr/v2'
+import { actions } from 'wired-up-pltr'
 import { t } from 'plottr_locales'
 import {
   currentUser,
@@ -14,6 +8,7 @@ import {
   saveBackup as saveBackupOnFirebase,
 } from 'wired-up-firebase'
 import exportToSelfContainedPlottrFile from 'plottr_import_export/src/exporter/plottr'
+import { selectors } from 'wired-up-pltr'
 
 import { makeFileSystemAPIs } from '../api'
 import { offlineFileURLFromFile } from '../files'
@@ -534,9 +529,9 @@ export function bootFile(
     const postBackupHook = () => {
       // NOP
     }
-    saver = new Saver(
+    saver = Saver(
       () => {
-        return store.getState().present
+        return selectors.fullFileStateSelector(store.getState())
       },
       saveFile(whenClientIsReady, logger, postSaveHook),
       backupFile(
@@ -546,9 +541,9 @@ export function bootFile(
         logger,
         postBackupHook
       ),
-      logger,
       SAVE_INTERVAL_MS,
       BACKUP_INTERVAL_MS,
+      logger,
       rollbar,
       (title, message) => {
         showMessageBox(title, message)

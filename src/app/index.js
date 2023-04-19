@@ -13,7 +13,8 @@ import { setupI18n, t } from 'plottr_locales'
 
 import { store } from 'store'
 
-import { helpers, actions, selectors, migrateIfNeeded, addMissingKeys } from 'pltr/v2'
+import { helpers, migrateIfNeeded, addMissingKeys } from 'pltr/v2'
+import { actions, selectors } from 'wired-up-pltr'
 
 import { rtfToHTML } from 'pltr/v2/slate_serializers/to_html'
 import { convertHTMLNodeList } from 'pltr/v2/slate_serializers/from_html'
@@ -211,43 +212,50 @@ tellMeWhatOSImOn()
         document.addEventListener('save-custom-template', (event) => {
           const currentState = store.getState()
           const options = event.payload
-          addNewCustomTemplate(currentState.present, options)
+          addNewCustomTemplate(currentState, options)
         })
 
         onExportFileFromMenu(({ type }) => {
           const currentState = store.getState()
-          const {
-            ui,
-            series: { name },
-            books,
-          } = currentState.present
-          const bookId = ui.currentTimeline
+          const bookId = selectors.currentTimelineSelector(currentState)
+          const name = selectors.seriesNameSelector(currentState)
+          const books = selectors.allBooksSelector(currentState)
           const defaultPath =
             bookId == 'series' ? name + ' ' + t('(Series View)') : books[`${bookId}`].title
-          const userId = selectors.userIdSelector(currentState.present)
+          const userId = selectors.userIdSelector(currentState)
+          const file = selectors.fullFileStateSelector(currentState)
 
-          askToExport(defaultPath, currentState.present, type, exportConfig[type], userId).catch(
-            (error) => {
-              logger.error(error)
-              showErrorBox(t('Error'), t('There was an error doing that. Try again'))
-              return
-            }
-          )
+          askToExport(defaultPath, file, type, exportConfig[type], userId).catch((error) => {
+            logger.error(error)
+            showErrorBox(t('Error'), t('There was an error doing that. Try again'))
+            return
+          })
         })
 
         onSave(() => {
-          const { present } = store.getState()
-          const isOffline = selectors.isOfflineSelector(present)
-          const isOfflineModeEnabled = selectors.offlineModeEnabledSelector(present)
-          const isCloudFile = selectors.isCloudFileSelector(present)
+          const state = store.getState()
+          const isOffline = selectors.isOfflineSelector(state)
+          const isOfflineModeEnabled = selectors.offlineModeEnabledSelector(state)
+          const isCloudFile = selectors.isCloudFileSelector(state)
+          const fileState = selectors.fullFileStateSelector(state)
           if (isCloudFile && isOffline && isOfflineModeEnabled) {
-            saveOfflineFile(present).then(() => {
-              store.dispatch(actions.ui.fileSaved())
-            })
+            saveOfflineFile(fileState)
+              .then(() => {
+                store.dispatch(actions.ui.fileSaved())
+              })
+              .catch((error) => {
+                logger.error('Failed to save offline file', error)
+              })
           } else if (!isCloudFile) {
-            saveFile(present.project.fileURL, present).then(() => {
-              store.dispatch(actions.ui.fileSaved())
-            })
+            const fileURL = selectors.fileURLSelector(state)
+            saveFile(fileURL, fileState)
+              .then(() => {
+                store.dispatch(actions.ui.fileSaved())
+              })
+              .catch((error) => {
+                logger.error('Failed to save classic file', error)
+                showErrorBox(t('Error'), t('There was a problem saving your file'))
+              })
           }
         })
 
@@ -351,14 +359,15 @@ tellMeWhatOSImOn()
         }
 
         const moveFromTempHandler = () => {
-          const { present } = store.getState()
-          const isCloudFile = selectors.isCloudFileSelector(present)
+          const state = store.getState()
+          const file = selectors.fullFileStateSelector(state)
+          const isCloudFile = selectors.isCloudFileSelector(state)
           if (isCloudFile) {
             return
           }
 
-          isTempFile(present).then((isTemp) => {
-            const oldFileURL = selectors.fileURLSelector(present)
+          isTempFile(file).then((isTemp) => {
+            const oldFileURL = selectors.fileURLSelector(state)
             if (!oldFileURL) {
               logger.error(
                 `Tried to move the current file from temp but we couldn't compute its URL.`
@@ -366,7 +375,7 @@ tellMeWhatOSImOn()
               return
             }
             if (!isTemp) {
-              saveFile(oldFileURL, present).then(() => {
+              saveFile(oldFileURL, file).then(() => {
                 store.dispatch(actions.ui.fileSaved())
               })
               return
@@ -378,7 +387,7 @@ tellMeWhatOSImOn()
                 if (newFilePath) {
                   // Point at the new file
                   const newFileURL = helpers.file.filePathToFileURL(newFilePath)
-                  const oldFileURL = selectors.fileURLSelector(present)
+                  const oldFileURL = selectors.fileURLSelector(state)
                   if (!newFilePath || !newFileURL) {
                     logger.error(
                       `Tried to move file at ${oldFileURL} to ${newFilePath} (path: ${newFilePath})`
@@ -393,8 +402,8 @@ tellMeWhatOSImOn()
                         actions.ui.loadFile(
                           newFileName,
                           false,
-                          removeSystemKeys(present),
-                          present.file.version,
+                          removeSystemKeys(file),
+                          file.file.version,
                           newFileURL
                         )
                       )
@@ -461,7 +470,7 @@ tellMeWhatOSImOn()
         onCloseDashboard(closeDashboard)
 
         onCreatePlottrCloudFile((json, fileName, isScrivenerFile) => {
-          const state = store.getState().present
+          const state = store.getState()
           const emailAddress = selectors.emailAddressSelector(state)
           const userId = selectors.userIdSelector(state)
           uploadToFirebase(emailAddress, userId, json, fileName)

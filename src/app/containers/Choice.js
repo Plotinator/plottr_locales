@@ -3,7 +3,7 @@ import { PropTypes } from 'prop-types'
 import { connect } from 'react-redux'
 import cx from 'classnames'
 
-import { selectors, actions } from 'pltr/v2'
+import { selectors, actions } from 'wired-up-pltr'
 import { ChoiceView } from 'connected-components'
 
 const reload = () => {}
@@ -25,6 +25,6 @@ Choice.propTypes = {
   startProOnboardingFromRoot: PropTypes.func.isRequired,
 }
 
-export default connect((state) => ({ darkMode: selectors.isDarkModeSelector(state.present) }), {
+export default connect((state) => ({ darkMode: selectors.isDarkModeSelector(state) }), {
   startProOnboardingFromRoot: actions.applicationState.startProOnboardingFromRoot,
 })(Choice)

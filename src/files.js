@@ -1,5 +1,6 @@
 import { t } from 'plottr_locales'
-import { helpers, actions, reducers, emptyFile, selectors } from 'pltr/v2'
+import { helpers, reducers, emptyFile } from 'pltr/v2'
+import { actions, selectors } from 'wired-up-pltr'
 
 import { closeDashboard } from './dashboard-events'
 import { store } from './app/store'
@@ -38,7 +39,7 @@ export const newFile = (
   emailAddress,
   userId,
   fileList,
-  fullState,
+  state,
   clientId,
   template,
   openFile,
@@ -46,7 +47,7 @@ export const newFile = (
 ) => {
   const fileName = newFileName(fileList, name)
   return getVersion().then((version) => {
-    const newFile = newEmptyFile(fileName, version, fullState.present)
+    const newFile = newEmptyFile(fileName, version, state)
     const file = Object.assign({}, newFile, template?.templateData || {})
     if (!file.beats.series) {
       file.beats.series = newFile.beats.series
@@ -106,15 +107,15 @@ export const offlineFileURLFromFile = (file) => {
 }
 
 export const renameFile = (fileURL) => {
-  const present = store.getState().present
-  const isCloudFile = selectors.isCloudFileSelector(present)
-  const isOffline = selectors.isOfflineSelector(present)
+  const state = store.getState()
+  const isCloudFile = selectors.isCloudFileSelector(state)
+  const isOffline = selectors.isOfflineSelector(state)
   if (isOffline && isCloudFile) {
     logger.info('Tried to save-as a file, but it is offline', fileURL)
     return Promise.resolve()
   }
   if (helpers.file.urlPointsToPlottrCloud(fileURL)) {
-    const fileList = selectors.knownFilesSelector(present)
+    const fileList = selectors.knownFilesSelector(state)
     const fileId = fileURL.replace(/^plottr:\/\//, '')
     if (!fileList.find(({ id }) => id === fileId)) {
       logger.error(`Coludn't find file with id: ${fileId} to rename`)
