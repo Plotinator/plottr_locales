@@ -242,12 +242,13 @@ tellMeWhatOSImOn()
           const isCloudFile = selectors.isCloudFileSelector(state)
           const fileState = selectors.fullFileStateSelector(state)
           if (isCloudFile && isOffline && isOfflineModeEnabled) {
-            saveOfflineFile(fileState).then(() => {
-              store.dispatch(actions.ui.fileSaved())
-            })
-            .catch((error) => {
-              logger.error('Failed to save offline file', error)
-            })
+            saveOfflineFile(fileState)
+              .then(() => {
+                store.dispatch(actions.ui.fileSaved())
+              })
+              .catch((error) => {
+                logger.error('Failed to save offline file', error)
+              })
           } else if (!isCloudFile) {
             const fileURL = selectors.fileURLSelector(state)
             saveFile(fileURL, fileState)
