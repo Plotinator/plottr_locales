@@ -20,8 +20,12 @@ import {
 import { reorderList } from '../helpers/lists'
 import selectors from '../selectors'
 
-const { currentTimelineSelector, pinnedPlotlinesSelector, sortedLinesByBookSelector } =
-  selectors(identity)
+const {
+  currentTimelineSelector,
+  pinnedPlotlinesSelector,
+  sortedLinesByBookSelector,
+  fullFileStateSelector,
+} = selectors(identity)
 
 // N.B. if one does not supply a book ID, then it is assumed that the
 // action refers to the broadest scope possible, i.e. the series of
@@ -132,8 +136,7 @@ export function collapseLine(id) {
 }
 
 const pinDuplicatedPlotline = (id, position) => (dispatch, getState) => {
-  const fullState = getState()
-  const state = fullState.present ? fullState.present : fullState
+  const state = fullFileStateSelector(getState())
   const pinnedPlotlines = pinnedPlotlinesSelector(state)
   const lines = sortedLinesByBookSelector(state)
   const bookId = currentTimelineSelector(state)
@@ -145,7 +148,7 @@ const pinDuplicatedPlotline = (id, position) => (dispatch, getState) => {
   if (duplicatedLine) {
     const reorderedLines = reorderList(pinnedPlotlines, position, lines)
     const totalPinnedPlotlines = Math.max(1, pinnedPlotlines + 1)
-    return dispatch({
+    dispatch({
       type: PIN_PLOTLINE,
       lineId: id,
       lines: reorderedLines,
@@ -156,15 +159,14 @@ const pinDuplicatedPlotline = (id, position) => (dispatch, getState) => {
 }
 
 export const duplicateLine = (id, position) => (dispatch, getState) => {
-  const fullState = getState()
-  const state = fullState.present ? fullState.present : fullState
+  const state = fullFileStateSelector(getState())
   const lines = sortedLinesByBookSelector(state)
 
   dispatch({ type: DUPLICATE_LINE, id, position })
 
   const selectedLine = lines.find((l) => l.id === id)
   if (selectedLine?.isPinned) {
-    return pinDuplicatedPlotline(id, position)(dispatch, getState)
+    pinDuplicatedPlotline(id, position)(dispatch, getState)
   }
 }
 
