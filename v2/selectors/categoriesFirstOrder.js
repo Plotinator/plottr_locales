@@ -5,11 +5,39 @@
 import { sortBy } from 'lodash'
 import { createSelector } from 'reselect'
 
-export const allCategoriesSelector = (state) => state.categories
-export const characterCategoriesSelector = (state) => state.categories.characters
-export const noteCategoriesSelector = (state) => state.categories.notes
-export const tagCategoriesSelector = (state) => state.categories.tags
-export const placeCategoriesSelector = (state) => state.categories.places
+import { fullFileStateSelector } from './fullFileFirstOrder'
+
+export const allCategoriesSelector = createSelector(
+  fullFileStateSelector,
+  (state) => state.categories
+)
+export const characterCategoriesSelector = createSelector(
+  fullFileStateSelector,
+  (state) => state.categories.characters
+)
+export const noteCategoriesSelector = createSelector(
+  fullFileStateSelector,
+  (state) => state.categories.notes
+)
+export const tagCategoriesSelector = createSelector(
+  fullFileStateSelector,
+  (state) => state.categories.tags
+)
+export const placeCategoriesSelector = createSelector(
+  fullFileStateSelector,
+  (state) => state.categories.places
+)
+
+const typeSelector = (_state, type) => {
+  return type
+}
+export const categoryByTypeSelector = createSelector(
+  allCategoriesSelector,
+  typeSelector,
+  (categories, categoryType) => {
+    return categories[categoryType]
+  }
+)
 
 export const sortedCharacterCategoriesSelector = createSelector(
   characterCategoriesSelector,

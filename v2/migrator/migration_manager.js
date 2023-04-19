@@ -9,6 +9,7 @@ export default function migrateIfNeeded(appVersion, json, fileURL, backupFunctio
   }
   const fileVersion = json.file.version
   const withSpecialCasesFixed = applyAllFixes(json)
+  const appliedSpecialCaseFix = withSpecialCasesFixed !== json
   const migrator = new Migrator(
     withSpecialCasesFixed,
     fileURL,
@@ -39,7 +40,7 @@ export default function migrateIfNeeded(appVersion, json, fileURL, backupFunctio
         }
       })
     } else {
-      callback(null, false, withSpecialCasesFixed)
+      callback(null, appliedSpecialCaseFix, withSpecialCasesFixed)
     }
   }
 }

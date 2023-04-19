@@ -1,3 +1,5 @@
+import { identity } from 'lodash'
+
 import {
   ADD_LINE,
   ADD_LINE_WITH_TITLE,
@@ -16,11 +18,10 @@ import {
   UNPIN_PLOTLINE,
 } from '../constants/ActionTypes'
 import { reorderList } from '../helpers/lists'
-import {
-  currentTimelineSelector,
-  pinnedPlotlinesSelector,
-  sortedLinesByBookSelector,
-} from '../selectors'
+import selectors from '../selectors'
+
+const { currentTimelineSelector, pinnedPlotlinesSelector, sortedLinesByBookSelector } =
+  selectors(identity)
 
 // N.B. if one does not supply a book ID, then it is assumed that the
 // action refers to the broadest scope possible, i.e. the series of
@@ -51,8 +52,7 @@ export function editLineColor(id, color) {
 }
 
 export const reorderLines = (droppedPosition, originalPosition) => (dispatch, getState) => {
-  const fullState = getState()
-  const state = fullState.present ? fullState.present : fullState
+  const state = getState()
   const lines = sortedLinesByBookSelector(state)
   const bookId = currentTimelineSelector(state)
   const isConflictWithPinned = lines.find((line) => {
@@ -88,8 +88,7 @@ export const reorderLines = (droppedPosition, originalPosition) => (dispatch, ge
 }
 
 export const togglePinPlotline = (line) => (dispatch, getState) => {
-  const fullState = getState()
-  const state = fullState.present ? fullState.present : fullState
+  const state = getState()
   const pinnedPlotlines = pinnedPlotlinesSelector(state)
   const lines = sortedLinesByBookSelector(state)
   const bookId = currentTimelineSelector(state)
@@ -133,8 +132,7 @@ export function collapseLine(id) {
 }
 
 const pinDuplicatedPlotline = (id, position) => (dispatch, getState) => {
-  const fullState = getState()
-  const state = fullState.present ? fullState.present : fullState
+  const state = getState()
   const pinnedPlotlines = pinnedPlotlinesSelector(state)
   const lines = sortedLinesByBookSelector(state)
   const bookId = currentTimelineSelector(state)
@@ -146,7 +144,7 @@ const pinDuplicatedPlotline = (id, position) => (dispatch, getState) => {
   if (duplicatedLine) {
     const reorderedLines = reorderList(pinnedPlotlines, position, lines)
     const totalPinnedPlotlines = Math.max(1, pinnedPlotlines + 1)
-    return dispatch({
+    dispatch({
       type: PIN_PLOTLINE,
       lineId: id,
       lines: reorderedLines,
@@ -157,15 +155,14 @@ const pinDuplicatedPlotline = (id, position) => (dispatch, getState) => {
 }
 
 export const duplicateLine = (id, position) => (dispatch, getState) => {
-  const fullState = getState()
-  const state = fullState.present ? fullState.present : fullState
+  const state = getState()
   const lines = sortedLinesByBookSelector(state)
 
   dispatch({ type: DUPLICATE_LINE, id, position })
 
   const selectedLine = lines.find((l) => l.id === id)
   if (selectedLine?.isPinned) {
-    return pinDuplicatedPlotline(id, position)(dispatch, getState)
+    pinDuplicatedPlotline(id, position)(dispatch, getState)
   }
 }
 

@@ -251,6 +251,7 @@ export const note = {
   id: 1,
   title: '',
   content: RCE_INITIAL_VALUE,
+  categoryId: null,
   tags: [],
   characters: [],
   places: [],

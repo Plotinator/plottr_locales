@@ -5,7 +5,11 @@
 import { createSelector } from 'reselect'
 import { groupBy, mapValues } from 'lodash'
 
-export const attributesSelector = (state) => state.attributes || []
+import { fullFileStateSelector } from './fullFileFirstOrder'
+
+export const attributesSelector = createSelector(fullFileStateSelector, (state) => {
+  return state.attributes || []
+})
 
 export const characterAttributesForBookSelector = createSelector(
   attributesSelector,
@@ -26,8 +30,6 @@ export const allNonBaseCharacterAttributesSelector = createSelector(
     })
   }
 )
-
-export const overriddenBookIdSelector = (_state, _characterId, bookId) => bookId
 
 export const characterAttributsForBookByIdSelector = createSelector(
   characterAttributesForBookSelector,
