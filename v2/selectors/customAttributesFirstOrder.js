@@ -12,23 +12,23 @@ const placeKeys = Object.keys(place)
 
 export const allCustomAttributesSelector = createSelector(
   fullFileStateSelector,
-  (state) => state.customAttributes
+  ({ customAttributes }) => customAttributes || {}
 )
 export const characterCustomAttributesSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.customAttributes.characters
+  allCustomAttributesSelector,
+  ({ characters }) => characters || {}
 )
 export const placeCustomAttributesSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.customAttributes.places
+  allCustomAttributesSelector,
+  ({ places }) => places || {}
 )
 export const cardsCustomAttributesSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.customAttributes.scenes
+  allCustomAttributesSelector,
+  ({ scenes }) => scenes || {}
 )
 export const noteCustomAttributesSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.customAttributes.notes
+  allCustomAttributesSelector,
+  ({ notes }) => notes || {}
 )
 
 export const characterSortCAnamesSelector = createSelector(
