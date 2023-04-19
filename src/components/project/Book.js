@@ -228,10 +228,10 @@ const BookConnector = (connector) => {
     return connect(
       (state, ownProps) => {
         return {
-          darkMode: selectors.isDarkModeSelector(state.present),
-          book: state.present.books[ownProps.bookId],
-          books: selectors.allBooksSelector(state.present),
-          canDelete: selectors.canDeleteBookSelector(state.present),
+          darkMode: selectors.isDarkModeSelector(state),
+          book: selectors.bookByIdSelector(state, ownProps.bookId),
+          books: selectors.allBooksSelector(state),
+          canDelete: selectors.canDeleteBookSelector(state),
         }
       },
       (dispatch) => {

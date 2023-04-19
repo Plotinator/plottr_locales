@@ -72,10 +72,10 @@ const CardDescriptionEditorConnector = (connector) => {
 
     return connect(
       (state, ownProps) => ({
-        undoId: selectors.undoIdSelector(state.present),
-        description: selectors.cardDescriptionByIdSelector(state.present, ownProps.cardId),
+        undoId: selectors.undoIdSelector(state),
+        description: selectors.cardDescriptionByIdSelector(state, ownProps.cardId),
         selection: selectors.selectionSelector(
-          state.present,
+          state,
           helpers.editors.cardDescriptionEditorPath(ownProps.cardId)
         ),
       }),

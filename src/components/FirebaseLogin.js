@@ -44,7 +44,7 @@ const FirebaseLoginConnector = (connector) => {
 
     return connect(
       (state) => ({
-        loggingIn: selectors.isLoggingInSelector(state.present),
+        loggingIn: selectors.isLoggingInSelector(state),
       }),
       {
         startLoggingIn: actions.applicationState.startLoggingIn,

@@ -51,6 +51,7 @@ const subCatMap = {
   screenplay: t('Screenplay'),
   shortstory: t('Short Story'),
   playwriting: t('Playwriting'),
+  poetry: t('Poetry'),
 }
 
 const subCategories = [
@@ -61,6 +62,7 @@ const subCategories = [
   'horror',
   'mystery',
   'playwriting',
+  'poetry',
   'romance',
   'screenplay',
   'shortstory',
@@ -77,6 +79,7 @@ const TemplatePickerConnector = (connector) => {
       log,
       template: { deleteTemplate, editTemplateDetails },
     },
+    pltr: { selectors },
   } = connector
   checkDependencies({
     log,
@@ -210,11 +213,11 @@ const TemplatePickerConnector = (connector) => {
               }
               withFullState((file) => {
                 const fullTemplate = { ...selectedTemplate, templateData: template }
-                const defaultHierarchyLevelIndex = helpers.template.levelToApplyTo(
-                  file.present,
+                const defaultHierarchyLevelIndex = helpers.template.levelToApplyTo(selectors)(
+                  file,
                   fullTemplate
                 )
-                if (helpers.template.levelsDiffer(file.present, template)) {
+                if (helpers.template.levelsDiffer(selectors)(file, template)) {
                   setStagedPlotlineTemplate({
                     template: fullTemplate,
                     level: defaultHierarchyLevelIndex,
@@ -587,7 +590,7 @@ const TemplatePickerConnector = (connector) => {
   }
 
   const {
-    pltr: { selectors, actions },
+    pltr: { actions },
     redux,
   } = connector
 
@@ -595,10 +598,10 @@ const TemplatePickerConnector = (connector) => {
     const { connect } = redux
     return connect(
       (state) => ({
-        starterTemplates: selectors.templatesSelector(state.present),
-        userCustomTemplates: selectors.customTemplatesSelector(state.present),
-        getTemplateById: (templateId) => selectors.templateByIdSelector(state.present, templateId),
-        hierarchyLevels: selectors.sortedHierarchyLevels(state.present),
+        starterTemplates: selectors.templatesSelector(state),
+        userCustomTemplates: selectors.customTemplatesSelector(state),
+        getTemplateById: (templateId) => selectors.templateByIdSelector(state, templateId),
+        hierarchyLevels: selectors.sortedHierarchyLevels(state),
       }),
       {
         withFullState: actions.project.withFullFileState,

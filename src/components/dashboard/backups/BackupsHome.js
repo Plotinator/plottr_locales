@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { PropTypes } from 'prop-types'
 
 import { t } from 'plottr_locales'
 
 import FormControl from '../../FormControl'
 import Glyphicon from '../../Glyphicon'
 import ToolTip from '../../ToolTip'
-import Alert from '../../Alert'
 import Grid from '../../Grid'
 import Col from '../../Col'
 import Row from '../../Row'
@@ -56,10 +54,6 @@ const BackupsHomeConnector = (connector) => {
         </DashboardErrorBoundary>
       </div>
     )
-  }
-
-  BackupsHome.propTypes = {
-    userId: PropTypes.string,
   }
 
   return BackupsHome

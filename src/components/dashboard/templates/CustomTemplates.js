@@ -34,7 +34,7 @@ const CustomTemplatesConnector = (connector) => {
   if (redux) {
     const { connect } = redux
     return connect((state, { type, searchTerm }) => ({
-      templates: selectors.filteredSortedCustomTemplatesSelector(state.present, type, searchTerm),
+      templates: selectors.filteredSortedCustomTemplatesSelector(state, type, searchTerm),
     }))(CustomTemplates)
   }
 

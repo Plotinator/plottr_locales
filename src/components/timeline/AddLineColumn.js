@@ -152,9 +152,9 @@ const AddLineColumnConnector = (connector) => {
 
     return connect(
       (state) => ({
-        currentTimeline: selectors.currentTimelineSelector(state.present),
-        isSmall: selectors.isSmallSelector(state.present),
-        isMedium: selectors.isMediumSelector(state.present),
+        currentTimeline: selectors.currentTimelineSelector(state),
+        isSmall: selectors.isSmallSelector(state),
+        isMedium: selectors.isMediumSelector(state),
       }),
       (dispatch) => ({
         actions: bindActionCreators(actions.line, dispatch),

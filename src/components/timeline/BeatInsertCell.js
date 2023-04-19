@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import PropTypes from 'react-proptypes'
 import { Cell } from 'react-sticky-table'
 import cx from 'classnames'
@@ -39,6 +39,7 @@ const BeatInsertCellConnector = (connector) => {
     } = props
 
     const [hovering, setHovering] = useState(false)
+    const ref = useRef(null)
 
     const insert = () => {
       if (readOnly) return
@@ -119,6 +120,7 @@ const BeatInsertCellConnector = (connector) => {
         level.name == hierarchyLevelName ? true : null
       )
       const isHigherLevel = hierarchyLevels.length - actualHierarchyLevel.level > 1
+      const tableLength = ref.current?.clientWidth + 50 || 50
 
       return (
         <div
@@ -126,7 +128,16 @@ const BeatInsertCellConnector = (connector) => {
           className={orientedClass()}
           onClick={insert}
           style={orientation == 'vertical' ? (isHigherLevel ? null : { marginTop: '10px' }) : null}
+          ref={ref}
         >
+          {isPinned ? (
+            <VisualLine
+              color={color}
+              orientation={orientation}
+              isMedium={isMedium}
+              tableLength={tableLength}
+            />
+          ) : null}
           <div className={wrapperClass()}>
             <Button bsSize="xs" block>
               <Glyphicon glyph="plus" />
@@ -137,8 +148,17 @@ const BeatInsertCellConnector = (connector) => {
     }
 
     const renderLastInsertBeat = () => {
+      const tableLength = ref.current?.clientWidth + 50 || 50
       return (
         <div title={lastTitleText()} className={lastOrientedClass()} onClick={insert}>
+          {isPinned ? (
+            <VisualLine
+              color={color}
+              orientation={orientation}
+              isMedium={isMedium}
+              tableLength={tableLength}
+            />
+          ) : null}
           <div className={lastWrapperClass()}>
             <Glyphicon glyph="plus" />
           </div>
@@ -147,6 +167,8 @@ const BeatInsertCellConnector = (connector) => {
     }
 
     const renderInsertMissingChildBeat = () => {
+      const tableLength = ref.current?.clientWidth + 50 || 50
+
       return (
         <div
           title={childTitleText()}
@@ -156,6 +178,14 @@ const BeatInsertCellConnector = (connector) => {
           })}
           onClick={insert}
         >
+          {isPinned ? (
+            <VisualLine
+              color={color}
+              orientation={orientation}
+              isMedium={isMedium}
+              tableLength={tableLength}
+            />
+          ) : null}
           <div
             className={cx('insert-missing-beat-wrapper insert-beat', {
               'medium-timeline': isMedium,
@@ -253,20 +283,17 @@ const BeatInsertCellConnector = (connector) => {
       const beatToLeftId = ownProps.beatToLeft && ownProps.beatToLeft.id
 
       return {
-        orientation: selectors.orientationSelector(state.present),
-        isSmall: selectors.isSmallSelector(state.present),
-        isMedium: selectors.isMediumSelector(state.present),
-        isLarge: selectors.isLargeSelector(state.present),
-        hierarchyLevels: selectors.sortedHierarchyLevels(state.present),
+        orientation: selectors.orientationSelector(state),
+        isSmall: selectors.isSmallSelector(state),
+        isMedium: selectors.isMediumSelector(state),
+        isLarge: selectors.isLargeSelector(state),
+        hierarchyLevels: selectors.sortedHierarchyLevels(state),
         hierarchyLevelName: selectors.beatInsertControlHierarchyLevelNameSelector(
-          state.present,
+          state,
           beatToLeftId
         ),
-        hierarchyChildLevelName: selectors.hierarchyChildLevelNameSelector(
-          state.present,
-          beatToLeftId
-        ),
-        readOnly: !selectors.canWriteSelector(state.present),
+        hierarchyChildLevelName: selectors.hierarchyChildLevelNameSelector(state, beatToLeftId),
+        readOnly: !selectors.canWriteSelector(state),
       }
     })(BeatInsertCell)
   }
