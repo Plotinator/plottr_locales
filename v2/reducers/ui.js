@@ -1,4 +1,4 @@
-import { omit, isEmpty } from 'lodash'
+import { omit, isEmpty, identity } from 'lodash'
 
 import {
   ADD_PLACES_ATTRIBUTE,
@@ -66,12 +66,16 @@ import {
   SET_EDITING_BEAT_ID,
   PIN_PLOTLINE,
   UNPIN_PLOTLINE,
+  RESET_TIMELINE,
   OPEN_RESTRUCTURE_TIMELINE_MODAL,
   CLOSE_RESTRUCTURE_TIMELINE_MODAL,
+  DELETE_LINE,
 } from '../constants/ActionTypes'
 import { ui as defaultUI } from '../store/initialState'
 import { newFileUI } from '../store/newFileState'
-import { characterAttributesForCurrentBookSelector } from '../selectors'
+import selectors from '../selectors'
+
+const { characterAttributesForCurrentBookSelector } = selectors(identity)
 
 const removeCustomAttributeFilter = (state, action) => {
   if (!state.characterFilter || !state.characterFilter[(action.id || action.name).toString()]) {
@@ -563,6 +567,13 @@ const updateUI = (state, action) => {
           ...state.attributeTabs,
           characters: selectedBook === action.id ? 'all' : selectedBook,
         },
+        timeline: {
+          ...state.timeline,
+          pinnedPlotlines: {
+            ...(state.timeline?.pinnedPlotlines || {}),
+            [action.bookId]: 0,
+          },
+        },
       }
     }
 
@@ -700,40 +711,59 @@ const updateUI = (state, action) => {
     }
 
     case PIN_PLOTLINE: {
-      const currentPinnedPlotlines =
-        !state.timeline?.pinnedPlotlines ||
-        !state.timeline?.pinnedPlotlines[action.bookId] ||
-        isNaN(state.timeline?.pinnedPlotlines[action.bookId])
-          ? 0
-          : parseInt(state.timeline?.pinnedPlotlines[action.bookId])
-
       return {
         ...state,
         timeline: {
           ...state.timeline,
           pinnedPlotlines: {
             ...(state.timeline?.pinnedPlotlines || {}),
-            [action.bookId]: Math.max(1, currentPinnedPlotlines + 1),
+            [action.bookId]: action.totalPinnedPlotlines,
           },
         },
       }
     }
 
     case UNPIN_PLOTLINE: {
-      const currentPinnedPlotlines =
-        !state.timeline?.pinnedPlotlines ||
-        !state.timeline?.pinnedPlotlines[action.bookId] ||
-        isNaN(state.timeline?.pinnedPlotlines[action.bookId])
-          ? 0
-          : parseInt(state.timeline?.pinnedPlotlines[action.bookId])
-
       return {
         ...state,
         timeline: {
           ...state.timeline,
           pinnedPlotlines: {
             ...(state.timeline?.pinnedPlotlines || {}),
-            [action.bookId]: Math.max(0, currentPinnedPlotlines - 1),
+            [action.bookId]: action.totalPinnedPlotlines,
+          },
+        },
+      }
+    }
+
+    case DELETE_LINE: {
+      if (action.isPinned) {
+        const totalPinnedPlotlines = Math.max(
+          1,
+          Number(state.timeline?.pinnedPlotlines[action.bookId] || 1)
+        )
+        return {
+          ...state,
+          timeline: {
+            ...state.timeline,
+            pinnedPlotlines: {
+              ...(state.timeline?.pinnedPlotlines || {}),
+              [action.bookId]: totalPinnedPlotlines - 1,
+            },
+          },
+        }
+      }
+      return state
+    }
+
+    case RESET_TIMELINE: {
+      return {
+        ...state,
+        timeline: {
+          ...state.timeline,
+          pinnedPlotlines: {
+            ...(state.timeline?.pinnedPlotlines || {}),
+            [action.bookId]: 0,
           },
         },
       }

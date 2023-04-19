@@ -20,3 +20,7 @@ export function configureStore(whenClientIsReady, initialState) {
   const store = createStore(reducer, initialState, middlewares)
   return store
 }
+
+export const pltrAdaptor = (state) => {
+  return state.present
+}

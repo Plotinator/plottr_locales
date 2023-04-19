@@ -7,7 +7,7 @@ import { noEntityHasLegacyAttributeBound } from './noEntitiyHasValueBound'
 
 // Other selector dependencies
 import { allCardsSelector } from './cardsFirstOrder'
-import { allBeatsSelector, beatIdSelector } from './beatsFirstOrder'
+import { allBeatsSelector } from './beatsFirstOrder'
 import { previouslyLoggedIntoProSelector } from './settingsFirstOrder'
 import { isOnWebSelector, userIdSelector } from './clientFirstOrder'
 import { permissionSelector } from './permissionFirstOrder'
@@ -18,6 +18,7 @@ import {
   placeCustomAttributesSelector,
 } from './customAttributesFirstOrder'
 import { allNotesSelector } from './notesFirstOrder'
+import { fullFileStateSelector } from './fullFileFirstOrder'
 
 export const shouldBeInProSelector = createSelector(
   previouslyLoggedIntoProSelector,
@@ -27,8 +28,10 @@ export const shouldBeInProSelector = createSelector(
   }
 )
 
-const rootUiSelector = (state) => state.ui
-
+export const rootUiSelector = createSelector(fullFileStateSelector, (state) => state.ui)
+export const uiCollaboratorsSelector = createSelector(rootUiSelector, (rootUi) => {
+  return rootUi.collaborators
+})
 export const uiSelector = createSelector(
   shouldBeInProSelector,
   userIdSelector,
@@ -103,7 +106,7 @@ export const timelineFilterSelector = createSelector(uiSelector, ({ timelineFilt
 export const outlineFilterSelector = createSelector(uiSelector, ({ outlineFilter }) => {
   return outlineFilter
 })
-const timelineSelector = createSelector(uiSelector, ({ timeline }) => {
+export const timelineSelector = createSelector(uiSelector, ({ timeline }) => {
   return timeline
 })
 export const editingBeatTitleIdSelector = createSelector(timelineSelector, ({ editingBeatId }) => {
@@ -191,7 +194,10 @@ export const pinnedPlotlinesSelector = createSelector(
   }
 )
 
-export const allHierarchyLevelsSelector = (state) => state.hierarchyLevels
+export const allHierarchyLevelsSelector = createSelector(
+  fullFileStateSelector,
+  (state) => state.hierarchyLevels
+)
 export const hierarchyLevelsSelector = createSelector(
   allHierarchyLevelsSelector,
   currentTimelineSelector,
@@ -285,9 +291,12 @@ export const selectedCharacterSelector = createSelector(
     return null
   }
 )
-const customAttributeOrderSelector = createSelector(uiSelector, ({ customAttributeOrder }) => {
-  return customAttributeOrder || []
-})
+export const customAttributeOrderSelector = createSelector(
+  uiSelector,
+  ({ customAttributeOrder }) => {
+    return customAttributeOrder || []
+  }
+)
 export const characterCustomAttributeOrderSelector = createSelector(
   customAttributeOrderSelector,
   ({ characters }) => characters || []
@@ -334,12 +343,21 @@ export const sortedHierarchyLevels = createSelector(
     return sortedLevels
   }
 )
+const beatIdSelector = (state, beatId) => beatId
 export const hierarchyLevelSelector = createSelector(
   beatsByBookSelector,
   beatIdSelector,
   sortedHierarchyLevels,
   (beats, beatId, hierarchyLevels) => {
     return hierarchyLevels[depth(beats, beatId)] || hierarchyLevels[hierarchyLevels.length - 1]
+  }
+)
+const bookIdSelector = (_state, id) => id
+export const hierarchyLevelsForAnotherBookSelector = createSelector(
+  allHierarchyLevelsSelector,
+  bookIdSelector,
+  (hierarchies, bookId) => {
+    return hierarchies[bookId]
   }
 )
 
@@ -427,7 +445,7 @@ export const topLevelBeatNameSelector = createSelector(sortedHierarchyLevels, (l
   return levels[0].name
 })
 
-export const filterItemsSelector = createSelector(
+export const filteredItemsSelector = createSelector(
   currentViewSelector,
   timelineFilterSelector,
   characterFilterSelector,

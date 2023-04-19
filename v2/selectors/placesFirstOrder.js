@@ -5,10 +5,11 @@
 import { createSelector } from 'reselect'
 import { sortBy, groupBy } from 'lodash'
 
-export const allPlacesSelector = (state) => state.places
+import { fullFileStateSelector } from './fullFileFirstOrder'
+
+export const allPlacesSelector = createSelector(fullFileStateSelector, (state) => state.places)
 
 const selectId = (state, id) => id
-
 export const singlePlaceSelector = createSelector(allPlacesSelector, selectId, (places, propId) =>
   places.find(({ id }) => id === propId)
 )

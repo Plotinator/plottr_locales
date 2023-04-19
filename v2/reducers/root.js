@@ -1,3 +1,5 @@
+import { identity } from 'lodash'
+
 import unrepairedMainReducer from './main'
 import {
   ADD_BOOK,
@@ -33,7 +35,21 @@ import {
   ADD_CARD,
   REORDER_CARDS_WITHIN_LINE,
 } from '../constants/ActionTypes'
-import {
+import selectors from '../selectors'
+import { reduce, beatsByPosition, nextId as nextBeatId } from '../helpers/beats'
+import { nextId, objectId } from '../store/newIds'
+import * as tree from './tree'
+import { beat as defaultBeat } from '../store/initialState'
+import { cloneDeep, zip, range } from 'lodash'
+import { addBeat } from '../actions/beats'
+import { setTimelineView } from '../actions/ui'
+import { deleteLine } from '../actions/lines'
+import { reorderCardsWithinLine } from '../actions/cards'
+import { applyTemplate, moveLineActions } from '../helpers/templates'
+import { reorderList } from '../helpers/lines'
+import { pinMovedLine } from '../actions/lines'
+
+const {
   selectedCharacterAttributeTabSelector,
   isSeriesSelector,
   timelineViewIsTabbedSelector,
@@ -51,17 +67,7 @@ import {
   timelineViewIsStackedSelector,
   allCardsSelector,
   sortedBeatsByBookSelector,
-} from '../selectors'
-import { reduce, beatsByPosition, nextId as nextBeatId } from '../helpers/beats'
-import { nextId, objectId } from '../store/newIds'
-import * as tree from './tree'
-import { beat as defaultBeat } from '../store/initialState'
-import { cloneDeep, zip, range } from 'lodash'
-import { setTimelineView } from '../actions/ui'
-import { deleteLine } from '../actions/lines'
-import { addBeat } from '../actions/beats'
-import { reorderCardsWithinLine } from '../actions/cards'
-import { applyTemplate, moveLineActions } from '../helpers/templates'
+} = selectors(identity)
 
 const addCharacterAttributeDataForModifyingBaseAttribute = (baseAttributeName, state, action) => {
   const currentBookId = selectedCharacterAttributeTabSelector(state)
@@ -388,16 +394,33 @@ const root = (dataRepairers) => (state, action) => {
         return state
       }
 
-      const createLineBeatsAndCardsActions = moveLineActions(
-        state,
-        action.id,
-        action.destinationBookId
-      )
+      const { actions, newLineId } = moveLineActions(state, action.id, action.destinationBookId)
 
       // Add the new line
-      const withNewLine = createLineBeatsAndCardsActions.reduce((accState, nextAction) => {
+      const withNewLine = actions.reduce((accState, nextAction) => {
         return mainReducer(accState, nextAction)
       }, state)
+
+      if (line.isPinned) {
+        const destinationBookLines = withNewLine.lines.filter(
+          (l) => l.bookId === action.destinationBookId
+        )
+        const destinationBookPinnedPlotlines = Number(
+          withNewLine.ui?.timeline?.pinnedPlotlines[action.destinationBookId] || 0
+        )
+        const totalPinnedPlotlines = Math.max(1, destinationBookPinnedPlotlines + 1)
+        const reorderedLines = reorderList(
+          destinationBookPinnedPlotlines + 1,
+          line.position,
+          destinationBookLines
+        )
+
+        const withLinePinned = mainReducer(
+          withNewLine,
+          pinMovedLine(newLineId, action.destinationBookId, reorderedLines, totalPinnedPlotlines)
+        )
+        return mainReducer(withLinePinned, deleteLine(action.id))
+      }
 
       // Remove the old line & cards
       return mainReducer(withNewLine, deleteLine(action.id))

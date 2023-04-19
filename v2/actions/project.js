@@ -1,3 +1,5 @@
+import { identity } from 'lodash'
+
 import {
   SELECT_FILE,
   SELECT_EMPTY_FILE,
@@ -16,7 +18,8 @@ import {
   FINISH_CREATING_NEW_PROJECT,
   SET_FILE_URL,
 } from '../constants/ActionTypes'
-import { offlineModeEnabledSelector, fileURLSelector } from '../selectors'
+import selectors from '../selectors'
+const { offlineModeEnabledSelector, fileURLSelector } = selectors(identity)
 
 export const withFullFileState = (cb) => (dispatch, getState) => {
   cb(getState())
@@ -45,9 +48,7 @@ export const showLoader = (isLoading) => ({
 })
 
 export const setOffline = (isOffline) => (dispatch, getState) => {
-  // NOTE: Mobile doesn't use history middleware
-  const fullState = getState()
-  const state = fullState.present ? fullState.present : fullState
+  const state = getState()
   const offlineModeIsEnabled = offlineModeEnabledSelector(state)
   const fileIsLoaded = !!fileURLSelector(state)
 

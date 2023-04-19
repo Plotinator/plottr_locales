@@ -5,15 +5,31 @@
 import { createSelector } from 'reselect'
 
 import { character, place } from '../store/initialState'
+import { fullFileStateSelector } from './fullFileFirstOrder'
 
 const characterKeys = Object.keys(character)
 const placeKeys = Object.keys(place)
 
-export const allCustomAttributesSelector = (state) => state.customAttributes
-export const characterCustomAttributesSelector = (state) => state.customAttributes.characters
-export const placeCustomAttributesSelector = (state) => state.customAttributes.places
-export const cardsCustomAttributesSelector = (state) => state.customAttributes.scenes
-export const noteCustomAttributesSelector = (state) => state.customAttributes.notes
+export const allCustomAttributesSelector = createSelector(
+  fullFileStateSelector,
+  ({ customAttributes }) => customAttributes || {}
+)
+export const characterCustomAttributesSelector = createSelector(
+  allCustomAttributesSelector,
+  ({ characters }) => characters || {}
+)
+export const placeCustomAttributesSelector = createSelector(
+  allCustomAttributesSelector,
+  ({ places }) => places || {}
+)
+export const cardsCustomAttributesSelector = createSelector(
+  allCustomAttributesSelector,
+  ({ scenes }) => scenes || {}
+)
+export const noteCustomAttributesSelector = createSelector(
+  allCustomAttributesSelector,
+  ({ notes }) => notes || {}
+)
 
 export const characterSortCAnamesSelector = createSelector(
   characterCustomAttributesSelector,

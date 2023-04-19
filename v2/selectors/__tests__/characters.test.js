@@ -1,10 +1,16 @@
-import { configureStore } from './fixtures/testStore'
+import { configureStore, pltrAdaptor } from './fixtures/testStore'
 import { emptyFile } from '../../store/newFileState'
-import { loadFile } from '../../actions/ui'
-import { allBooksWithCharactersInThemSelector, characterBookCategoriesSelector } from '../index'
-import { addCharacter } from '../../actions/characters'
-import { addBook } from '../../actions/books'
-import { addBook as addBookToCharacter } from '../../actions/characters'
+import selectors from '../index'
+import actions from '../../actions'
+
+const wiredUpActions = actions(pltrAdaptor)
+const { loadFile } = wiredUpActions.ui
+const { addCharacter } = wiredUpActions.character
+const { addBook } = wiredUpActions.book
+const addBookToCharacter = wiredUpActions.character.addBook
+
+const { allBooksWithCharactersInThemSelector, characterBookCategoriesSelector } =
+  selectors(pltrAdaptor)
 
 const EMPTY_FILE = emptyFile('Test file')
 const initialStore = () => {
@@ -25,7 +31,7 @@ describe('characterBookCategoriesSelector', () => {
   describe('given a store with no characters', () => {
     it('should produce the empty array', () => {
       const store = initialStore()
-      const initialState = store.getState().present
+      const initialState = store.getState()
       expect(characterBookCategoriesSelector(initialState)).toEqual([])
     })
   })
@@ -34,7 +40,7 @@ describe('characterBookCategoriesSelector', () => {
       it('should produce an array with a single category called "Not in Book" with the book id in an array as the value', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
-        const initialState = store.getState().present
+        const initialState = store.getState()
         expect(characterBookCategoriesSelector(initialState)).toEqual([
           {
             glyph: 'plus',
@@ -50,7 +56,7 @@ describe('characterBookCategoriesSelector', () => {
           const store = initialStore()
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(addBookToCharacter(1, 1))
-          const initialState = store.getState().present
+          const initialState = store.getState()
           expect(characterBookCategoriesSelector(initialState)).toEqual([
             {
               displayHeading: false,
@@ -66,7 +72,7 @@ describe('characterBookCategoriesSelector', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(addBook())
-        const initialState = store.getState().present
+        const initialState = store.getState()
         expect(characterBookCategoriesSelector(initialState)).toEqual([
           {
             glyph: 'plus',
@@ -83,7 +89,7 @@ describe('characterBookCategoriesSelector', () => {
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(addBook())
           store.dispatch(addBookToCharacter(1, 1))
-          const initialState = store.getState().present
+          const initialState = store.getState()
           expect(characterBookCategoriesSelector(initialState)).toEqual([
             {
               displayHeading: false,
@@ -101,7 +107,7 @@ describe('characterBookCategoriesSelector', () => {
             store.dispatch(addCharacter('Jane Doe'))
             store.dispatch(addBook())
             store.dispatch(addBookToCharacter(1, 1))
-            const initialState = store.getState().present
+            const initialState = store.getState()
             expect(characterBookCategoriesSelector(initialState)).toEqual([
               {
                 displayHeading: false,
@@ -127,7 +133,7 @@ describe('allBooksWithCharactersInThemSelector', () => {
   describe('given the empty file state', () => {
     it('should produce an object containing only the untitled book', () => {
       const store = initialStore()
-      const state = store.getState().present
+      const state = store.getState()
       expect(allBooksWithCharactersInThemSelector(state)).toEqual({
         1: {
           id: 1,
@@ -146,7 +152,7 @@ describe('allBooksWithCharactersInThemSelector', () => {
     it('should produce an object containing both books', () => {
       const store = initialStore()
       store.dispatch(addBook('', '', '', ''))
-      const state = store.getState().present
+      const state = store.getState()
       expect(allBooksWithCharactersInThemSelector(state)).toEqual({
         1: {
           id: 1,
@@ -176,7 +182,7 @@ describe('allBooksWithCharactersInThemSelector', () => {
         store.dispatch(addBook())
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(addBookToCharacter(1, 1))
-        const state = store.getState().present
+        const state = store.getState()
         expect(allBooksWithCharactersInThemSelector(state)).toEqual({
           1: {
             id: 1,

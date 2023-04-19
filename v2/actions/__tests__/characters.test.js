@@ -1,15 +1,21 @@
-import { configureStore } from './fixtures/testStore'
+import { configureStore, pltrAdaptor } from './fixtures/testStore'
 import { emptyFile } from '../../store/newFileState'
-import { loadFile } from '../../actions/ui'
 import { removeSystemKeys } from '../../reducers/systemReducers'
-import { editCharacterAttributeValue } from '../characters'
 import { goldilocks } from './fixtures'
-import {
+import selectors from '../../selectors'
+import actions from '../'
+
+const {
+  fullFileStateSelector,
   characterCustomAttributesSelector,
   allCharacterAttributesSelector,
   characterAttributesSelector,
   singleCharacterSelector,
-} from '../../selectors'
+} = selectors(pltrAdaptor)
+
+const wiredUpActions = actions(pltrAdaptor)
+const { loadFile } = wiredUpActions.ui
+const { editCharacterAttributeValue } = wiredUpActions.character
 
 const EMPTY_FILE = emptyFile('Test file')
 
@@ -42,9 +48,9 @@ describe('editCharacterAttributeValue', () => {
   describe('given the initial state store', () => {
     it('should produce the initial state store', () => {
       const store = initialStore()
-      const initialState = removeSystemKeys(store.getState().present)
+      const initialState = removeSystemKeys(fullFileStateSelector(store.getState()))
       store.dispatch(editCharacterAttributeValue(1, 1, 'test'))
-      const finalState = removeSystemKeys(store.getState().present)
+      const finalState = removeSystemKeys(fullFileStateSelector(store.getState()))
       expect(ignoringChangesWeDontCareAbout(initialState)).toEqual(
         ignoringChangesWeDontCareAbout(finalState)
       )
@@ -57,9 +63,9 @@ describe('editCharacterAttributeValue', () => {
         store.dispatch(
           loadFile('Goldilocks', false, goldilocks, '2020.7.30', 'device:///tmp.dummy.pltr')
         )
-        const initialState = removeSystemKeys(store.getState().present)
+        const initialState = removeSystemKeys(fullFileStateSelector(store.getState()))
         store.dispatch(editCharacterAttributeValue(1, 1, 'test'))
-        const finalState = removeSystemKeys(store.getState().present)
+        const finalState = removeSystemKeys(fullFileStateSelector(store.getState()))
         expect(ignoringChangesWeDontCareAbout(initialState)).toEqual(
           ignoringChangesWeDontCareAbout(finalState)
         )
@@ -71,12 +77,12 @@ describe('editCharacterAttributeValue', () => {
         store.dispatch(
           loadFile('Goldilocks', false, goldilocks, '2020.7.30', 'device:///tmp.dummy.pltr')
         )
-        const otherCharacterBefore = singleCharacterSelector(store.getState().present, 2)
+        const otherCharacterBefore = singleCharacterSelector(store.getState(), 2)
         expect(otherCharacterBefore.Species).toEqual('Bear')
         store.dispatch(editCharacterAttributeValue(1, 'Species', 'Borg'))
-        const legacyAttributes = characterCustomAttributesSelector(store.getState().present)
+        const legacyAttributes = characterCustomAttributesSelector(store.getState())
         expect(legacyAttributes).toEqual([])
-        const otherCharacterAfter = singleCharacterSelector(store.getState().present, 2)
+        const otherCharacterAfter = singleCharacterSelector(store.getState(), 2)
         expect(otherCharacterAfter.Species).toBeUndefined()
         expect(otherCharacterAfter.attributes).toEqual([
           {
@@ -85,9 +91,9 @@ describe('editCharacterAttributeValue', () => {
             value: 'Bear',
           },
         ])
-        const character = singleCharacterSelector(store.getState().present, 1)
+        const character = singleCharacterSelector(store.getState(), 1)
         expect(character.Species).toBeUndefined()
-        const characterAttributes = characterAttributesSelector(store.getState().present, 1)
+        const characterAttributes = characterAttributesSelector(store.getState(), 1)
         expect(characterAttributes).toEqual([
           {
             id: 1,
@@ -97,7 +103,7 @@ describe('editCharacterAttributeValue', () => {
             type: 'text',
           },
         ])
-        const attributes = allCharacterAttributesSelector(store.getState().present)
+        const attributes = allCharacterAttributesSelector(store.getState())
         expect(attributes).toEqual([
           {
             id: 1,
