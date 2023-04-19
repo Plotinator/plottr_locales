@@ -437,9 +437,9 @@ const ImagePickerConnector = (connector) => {
     return connect(
       (state) => {
         return {
-          images: selectors.imagesSelector(state.present),
-          darkMode: selectors.isDarkModeSelector(state.present),
-          isCloudFile: selectors.isCloudFileSelector(state.present),
+          images: selectors.imagesSelector(state),
+          darkMode: selectors.isDarkModeSelector(state),
+          isCloudFile: selectors.isCloudFileSelector(state),
         }
       },
       (dispatch) => {

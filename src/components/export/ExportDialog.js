@@ -72,7 +72,7 @@ const ExportDialogConnector = (connector) => {
         bookId == 'series' ? seriesName + ' ' + t('(Series View)') : books[`${bookId}`].title
 
       projectActions.withFullFileState((state) => {
-        const withoutSystemKeys = removeSystemKeys(state.present)
+        const withoutSystemKeys = removeSystemKeys(state)
         askToExport(defaultPath, withoutSystemKeys, type, options[type], userId)
           .then(() => {
             if (saveOptions) {
@@ -173,11 +173,11 @@ const ExportDialogConnector = (connector) => {
     return connect(
       (state) => {
         return {
-          exportConfig: selectors.exportSettingsSelector(state.present),
-          bookId: selectors.currentTimelineSelector(state.present),
-          seriesName: state.present.series.name,
-          books: state.present.books,
-          userId: selectors.userIdSelector(state.present),
+          exportConfig: selectors.exportSettingsSelector(state),
+          bookId: selectors.currentTimelineSelector(state),
+          seriesName: selectors.seriesNameSelector(state),
+          books: selectors.allBooksSelector(state),
+          userId: selectors.userIdSelector(state),
         }
       },
       (dispatch) => {

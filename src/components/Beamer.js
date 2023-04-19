@@ -76,7 +76,7 @@ const BeamerConnector = (connector) => {
     const { connect } = redux
     return connect((state) => {
       return {
-        user: selectors.userSettingsSelector(state.present),
+        user: selectors.userSettingsSelector(state),
       }
     })(Beamer)
   }

@@ -244,7 +244,7 @@ const CustomAttrFilterListConnector = (connector) => {
     const chooseAttributeValuesPerType = (state, type) => {
       switch (type) {
         case 'characters': {
-          return selectors.characterAttributeValuesForCurrentBookSelector(state.present)
+          return selectors.characterAttributeValuesForCurrentBookSelector(state)
         }
         default: {
           return {}
@@ -254,12 +254,12 @@ const CustomAttrFilterListConnector = (connector) => {
 
     const mapStateToProps = (state, { type }) => {
       return {
-        tags: selectors.sortedTagsSelector(state.present),
-        books: state.present.books,
-        customAttributes: selectors.customAttributesFilter(state.present),
+        tags: selectors.sortedTagsSelector(state),
+        books: selectors.allBooksSelector(state),
+        customAttributes: selectors.customAttributesFilter(state),
         customAttributeValues: chooseAttributeValuesPerType(state, type),
-        items: type === 'outline' ? state.present.cards : state.present[type],
-        filteredItems: selectors.filterItemsSelector(state.present),
+        items: selectors.filterItemsSelector(state, type),
+        filteredItems: selectors.filteredItemsSelector(state),
         showCharacters: type === 'cards' || type === 'notes',
         showPlaces: type === 'cards' || type === 'notes',
         showCategory: type === 'characters',

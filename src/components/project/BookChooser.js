@@ -2,7 +2,8 @@ import React, { Component } from 'react'
 import PropTypes from 'react-proptypes'
 
 import { t } from 'plottr_locales'
-import { actions, helpers } from 'pltr/v2'
+import { helpers } from 'pltr/v2'
+import { actions } from 'wired-up-pltr'
 
 import NavDropdown from '../NavDropdown'
 import MenuItem from '../MenuItem'
@@ -94,10 +95,10 @@ const BookChooserConnector = (connector) => {
     return connect(
       (state) => {
         return {
-          currentTimeline: selectors.currentTimelineSelector(state.present),
-          currentView: selectors.currentViewSelector(state.present),
-          books: state.present.books,
-          series: state.present.series,
+          currentTimeline: selectors.currentTimelineSelector(state),
+          currentView: selectors.currentViewSelector(state),
+          books: selectors.allBooksSelector(state),
+          series: selectors.seriesSelector(state),
         }
       },
       (dispatch) => {
