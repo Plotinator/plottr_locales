@@ -24,7 +24,6 @@ const {
   currentTimelineSelector,
   pinnedPlotlinesSelector,
   sortedLinesByBookSelector,
-  fullFileStateSelector,
 } = selectors(identity)
 
 // N.B. if one does not supply a book ID, then it is assumed that the
@@ -136,7 +135,7 @@ export function collapseLine(id) {
 }
 
 const pinDuplicatedPlotline = (id, position) => (dispatch, getState) => {
-  const state = fullFileStateSelector(getState())
+  const state = getState()
   const pinnedPlotlines = pinnedPlotlinesSelector(state)
   const lines = sortedLinesByBookSelector(state)
   const bookId = currentTimelineSelector(state)
@@ -159,7 +158,7 @@ const pinDuplicatedPlotline = (id, position) => (dispatch, getState) => {
 }
 
 export const duplicateLine = (id, position) => (dispatch, getState) => {
-  const state = fullFileStateSelector(getState())
+  const state = getState()
   const lines = sortedLinesByBookSelector(state)
 
   dispatch({ type: DUPLICATE_LINE, id, position })
