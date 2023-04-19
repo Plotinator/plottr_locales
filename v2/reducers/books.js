@@ -27,7 +27,7 @@ const books =
   (dataRepairers) =>
   (state = initialState, action) => {
     switch (action.type) {
-      case EDIT_BOOK:
+      case EDIT_BOOK: {
         // this allows us to edit new book with
         // any predefined param values only within
         // the scope of the new book schema
@@ -39,6 +39,7 @@ const books =
           ...state,
           [action.id]: editedBook,
         }
+      }
 
       case EDIT_BOOK_IMAGE:
         return {
