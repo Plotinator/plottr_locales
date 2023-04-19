@@ -1584,9 +1584,7 @@ describe('deleteBook', () => {
         store.dispatch(addBook())
         const initialState = store.getState()
         store.dispatch(deleteBook(1))
-        expect(allCharactersSelector(initialState)).toEqual(
-          allCharactersSelector(store.getState())
-        )
+        expect(allCharactersSelector(initialState)).toEqual(allCharactersSelector(store.getState()))
       })
     })
     describe('that is associated with a book', () => {
