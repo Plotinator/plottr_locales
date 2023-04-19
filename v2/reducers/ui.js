@@ -75,6 +75,8 @@ import { ui as defaultUI } from '../store/initialState'
 import { newFileUI } from '../store/newFileState'
 import selectors from '../selectors'
 
+const { characterAttributesForCurrentBookSelector } = selectors(identity)
+
 const removeCustomAttributeFilter = (state, action) => {
   if (!state.characterFilter || !state.characterFilter[(action.id || action.name).toString()]) {
     return state
@@ -89,8 +91,6 @@ const removeCustomAttributeFilter = (state, action) => {
 }
 
 const addCustomAttributeOrdering = (state, fullState) => {
-  const { characterAttributesForCurrentBookSelector } = selectors(identity)
-
   const toAttributeOrderEntry = (attribute) => {
     if (attribute.id) {
       return {
