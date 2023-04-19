@@ -3,7 +3,8 @@ import { useState, useEffect, useRef } from 'react'
 import { PropTypes } from 'prop-types'
 import { connect } from 'react-redux'
 
-import { selectors, actions, helpers } from 'pltr/v2'
+import { helpers } from 'pltr/v2'
+import { selectors, actions } from 'wired-up-pltr'
 import { t } from 'plottr_locales'
 import { InputModal } from 'connected-components'
 import { initialFetch } from 'wired-up-firebase'
@@ -130,11 +131,11 @@ SaveAs.propTypes = {
 
 export default connect(
   (state) => ({
-    emailAddress: selectors.emailAddressSelector(state.present),
-    userId: selectors.userIdSelector(state.present),
-    clientId: selectors.clientIdSelector(state.present),
-    fileList: selectors.knownFilesSelector(state.present),
-    isOfflineMode: selectors.offlineModeEnabledSelector(state.present),
+    emailAddress: selectors.emailAddressSelector(state),
+    userId: selectors.userIdSelector(state),
+    clientId: selectors.clientIdSelector(state),
+    fileList: selectors.knownFilesSelector(state),
+    isOfflineMode: selectors.offlineModeEnabledSelector(state),
   }),
   {
     startSavingFileAs: actions.applicationState.startSavingFileAs,
