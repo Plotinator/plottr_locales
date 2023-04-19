@@ -15,7 +15,7 @@ const ExpiredViewConnector = (connector) => {
   } = connector
   checkDependencies({ openExternal })
 
-  const ExpiredView = ({ startProOnboardingFromRoot }) => {
+  const ExpiredView = ({ startProOnboardingFromRoot, startSettingsWizard }) => {
     const [view, setView] = useState('chooser')
 
     const hideProButton = os() == 'unknown'
@@ -60,7 +60,7 @@ const ExpiredViewConnector = (connector) => {
         </div>
       )
     } else if (view === 'verify') {
-      return <VerifyView goBack={() => setView('chooser')} success={() => {}} />
+      return <VerifyView goBack={() => setView('chooser')} success={startSettingsWizard} />
     }
     // Better than undefined! :P
     return null
@@ -68,6 +68,7 @@ const ExpiredViewConnector = (connector) => {
 
   ExpiredView.propTypes = {
     startProOnboardingFromRoot: PropTypes.func.isRequired,
+    startSettingsWizard: PropTypes.func.isRequired,
   }
 
   const {
@@ -79,6 +80,7 @@ const ExpiredViewConnector = (connector) => {
     const { connect } = redux
     return connect(null, {
       startProOnboardingFromRoot: actions.applicationState.startProOnboardingFromRoot,
+      startSettingsWizard: actions.applicationState.startSettingsWizard,
     })(ExpiredView)
   }
 
