@@ -133,23 +133,17 @@ const CharacterDetailsConnector = (connector) => {
     return connect(
       (state, ownProps) => {
         return {
-          character: selectors.displayedSingleCharacterSelector(
-            state.present,
-            ownProps.characterId
-          ),
-          categories: state.present.categories.characters,
-          customAttributes: selectors.characterAttributesSelector(
-            state.present,
-            ownProps.characterId
-          ),
-          getTemplateById: (templateId) =>
-            selectors.templateByIdSelector(state.present, templateId),
+          character: selectors.displayedSingleCharacterSelector(state, ownProps.characterId),
+          categories: selectors.characterCategoriesSelector(state),
+          customAttributes: selectors.characterAttributesSelector(state, ownProps.characterId),
+          getTemplateById: (templateId) => selectors.templateByIdSelector(state, templateId),
           templateAttributeValue: (templateId, attributeName) => {
             return selectors.characterTemplateAttributeValueSelector(
+              state,
               ownProps.characterId,
               templateId,
               attributeName
-            )(state.present)
+            )
           },
         }
       },

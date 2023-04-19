@@ -84,8 +84,8 @@ const ImageConnector = (connector) => {
     return connect(
       (state, ownProps) => {
         return {
-          image: state.present.images[ownProps.imageId],
-          imageCache: selectors.imageCacheSelector(state.present),
+          image: selectors.imageByIdSelector(state, ownProps.imageId),
+          imageCache: selectors.imageCacheSelector(state),
         }
       },
       {

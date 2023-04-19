@@ -12,14 +12,10 @@ import UnconnectedBeatInsertCell from './BeatInsertCell'
 import UnconnectedTopRow from './TopRow'
 import UnconnectedBeatTitleCell from './BeatTitleCell'
 import UnconnectedAddLineRow from './AddLineRow'
-import { helpers, initialState } from 'pltr/v2'
+import { initialState } from 'pltr/v2'
 import { checkDependencies } from '../checkDependencies'
 
 const { card } = initialState
-
-const {
-  beats: { nextId },
-} = helpers
 
 const TimelineTableConnector = (connector) => {
   const CardCell = UnconnectedCardCell(connector)
@@ -389,6 +385,7 @@ const TimelineTableConnector = (connector) => {
               showLine={beatPosition == 0}
               color={line.color}
               tableLength={this.state.tableLength}
+              isPinned={line.isPinned}
             />
           )
         }
@@ -405,10 +402,19 @@ const TimelineTableConnector = (connector) => {
               beatPosition={beatPosition}
               linePosition={line.position}
               color={line.color}
+              isPinned={line.isPinned}
             />
           )
         } else {
-          cells.push(<BlankCard beatId={beatId} lineId={line.id} key={key} color={line.color} />)
+          cells.push(
+            <BlankCard
+              beatId={beatId}
+              lineId={line.id}
+              key={key}
+              color={line.color}
+              isPinned={line.isPinned}
+            />
+          )
         }
         return cells
       })
@@ -484,9 +490,9 @@ const TimelineTableConnector = (connector) => {
       } else {
         return [
           <TopRow key="top-row" />,
-          toast.visible ? this.renderToastMessage() : null,
           message ? this.renderMessage() : null,
           this.renderRows(),
+          toast.visible ? this.renderToastMessage() : null,
         ]
       }
     }
@@ -517,7 +523,7 @@ const TimelineTableConnector = (connector) => {
     beatPositions: PropTypes.object.isRequired,
     setTableRef: PropTypes.func,
     message: PropTypes.string,
-    activeTab: PropTypes.number.isRequired,
+    activeTab: PropTypes.number,
     timelineViewIsTabbed: PropTypes.bool,
     timelineViewIsStacked: PropTypes.bool,
     pinnedPlotlines: PropTypes.number,
@@ -535,26 +541,26 @@ const TimelineTableConnector = (connector) => {
     return connect(
       (state, { activeTab }) => {
         return {
-          beats: selectors.visibleSortedBeatsForTimelineByBookSelector(state.present),
-          books: state.present.books,
-          beatHasChildrenMap: selectors.beatHasChildrenSelector(state.present),
-          beatMapping: selectors.timelineSparceBeatMap(state.present, activeTab),
-          nextBeatId: nextId(state.present.beats),
-          lines: selectors.sortedLinesByBookSelector(state.present),
-          cardMap: selectors.searchedCardMetaDataMapSelector(state.present),
-          darkMode: selectors.isDarkModeSelector(state.present),
-          orientation: selectors.orientationSelector(state.present),
-          currentTimeline: selectors.currentTimelineSelector(state.present),
-          isSeries: selectors.isSeriesSelector(state.present),
-          isSmall: selectors.isSmallSelector(state.present),
-          isMedium: selectors.isMediumSelector(state.present),
-          isLarge: selectors.isLargeSelector(state.present),
-          toast: selectors.toastNotificationSelector(state.present),
-          beatPositions: selectors.visibleBeatPositions(state.present),
-          message: selectors.messageSelector(state.present),
-          timelineViewIsTabbed: selectors.timelineViewIsTabbedSelector(state.present),
-          timelineViewIsStacked: selectors.timelineViewIsStackedSelector(state.present),
-          pinnedPlotlines: selectors.pinnedPlotlinesSelector(state.present),
+          beats: selectors.visibleSortedBeatsForTimelineByBookSelector(state),
+          books: selectors.allBooksSelector(state),
+          beatHasChildrenMap: selectors.beatHasChildrenSelector(state),
+          beatMapping: selectors.timelineSparceBeatMap(state, activeTab),
+          nextBeatId: selectors.nextBeatIdSelector(state),
+          lines: selectors.sortedLinesByBookSelector(state),
+          cardMap: selectors.searchedCardMetaDataMapSelector(state),
+          darkMode: selectors.isDarkModeSelector(state),
+          orientation: selectors.orientationSelector(state),
+          currentTimeline: selectors.currentTimelineSelector(state),
+          isSeries: selectors.isSeriesSelector(state),
+          isSmall: selectors.isSmallSelector(state),
+          isMedium: selectors.isMediumSelector(state),
+          isLarge: selectors.isLargeSelector(state),
+          toast: selectors.toastNotificationSelector(state),
+          beatPositions: selectors.visibleBeatPositions(state),
+          message: selectors.messageSelector(state),
+          timelineViewIsTabbed: selectors.timelineViewIsTabbedSelector(state),
+          timelineViewIsStacked: selectors.timelineViewIsStackedSelector(state),
+          pinnedPlotlines: selectors.pinnedPlotlinesSelector(state),
         }
       },
       (dispatch) => {

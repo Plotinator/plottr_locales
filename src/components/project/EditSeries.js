@@ -135,7 +135,7 @@ const EditSeriesConnector = (connector) => {
 
   const {
     redux,
-    pltr: { actions },
+    pltr: { actions, selectors },
   } = connector
   const SeriesActions = actions.series
   checkDependencies({ redux, actions, SeriesActions })
@@ -146,7 +146,7 @@ const EditSeriesConnector = (connector) => {
     return connect(
       (state) => {
         return {
-          series: state.present.series,
+          series: selectors.seriesSelector(state),
         }
       },
       (dispatch) => {
