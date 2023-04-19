@@ -37,16 +37,19 @@ const notes =
   (state = initialState, action) => {
     const repair = repairIfPresent(dataRepairers)
     switch (action.type) {
-      case ADD_NOTE:
-        return [
-          ...state,
-          {
-            ...note,
-            id: nextId(state),
-            title: action.title,
-            content: action.content,
-          },
-        ]
+      case ADD_NOTE: {
+        const newNote = {
+          ...note,
+          id: nextId(state),
+        }
+        // this allows us to add new notes with
+        // any predefined param values only within
+        // the scope of the new note schema
+        Object.keys(note).forEach((key) => {
+          if (action[key] !== undefined) newNote[key] = action[key]
+        })
+        return [...state, newNote]
+      }
 
       case EDIT_NOTE: {
         const lastEdited = { lastEdited: new Date().getTime() }

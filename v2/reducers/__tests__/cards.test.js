@@ -1,3 +1,5 @@
+import { identity } from 'lodash'
+
 import {
   ADD_CARD,
   ADD_CARD_IN_BEAT,
@@ -8,7 +10,9 @@ import {
 import { card as defaultCard } from '../../store/initialState'
 import cardsReducerWithoutRepairers from '../cards'
 import { isEqual, uniq } from 'lodash'
-import { allCardsSelector } from '../../selectors'
+import selectors from '../../selectors'
+
+const { allCardsSelector } = selectors(identity)
 
 const cardsReducer = cardsReducerWithoutRepairers({
   normalizeRCEContent: (x) => x,

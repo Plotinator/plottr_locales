@@ -1,24 +1,34 @@
 // IMPORTANT NOTE: Please don't import other selectors from this file.
 // Use secondOrder and *ThirdOrder for your selector if it has other
 // dependencies.
-
 import { createSelector } from 'reselect'
 import { sortBy } from 'lodash'
 
-const unsortedStarterTemplatesSelector = (state) => state.templates.templates
+import { fullFileStateSelector } from './fullFileFirstOrder'
+
+const unsortedStarterTemplatesSelector = createSelector(
+  fullFileStateSelector,
+  (state) => state.templates.templates
+)
 export const templatesSelector = createSelector(unsortedStarterTemplatesSelector, (templates) =>
   sortBy(Object.values(templates), 'name')
 )
-export const allCustomTemplatesSelector = (state) => state.templates.customTemplates
+export const allCustomTemplatesSelector = createSelector(
+  fullFileStateSelector,
+  (state) => state.templates.customTemplates
+)
 export const fileSystemCustomTemplatesSelector = createSelector(
   allCustomTemplatesSelector,
   (customTemplates) => {
     return customTemplates.filter(({ isCloudTemplate }) => !isCloudTemplate)
   }
 )
-export const templateManifestSelector = (state) => state.templates.templateManifets
-export const templateTypeSelector = (state, type) => type
-export const templateSearchTermSelector = (state, _, searchTerm) => searchTerm
+export const templateManifestSelector = createSelector(
+  fullFileStateSelector,
+  (state) => state.templates.templateManifets
+)
+const templateTypeSelector = (state, type) => type
+const templateSearchTermSelector = (state, _, searchTerm) => searchTerm
 export const filteredSortedStarterTemplatesSelector = createSelector(
   templatesSelector,
   templateTypeSelector,

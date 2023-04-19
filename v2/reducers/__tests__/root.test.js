@@ -1,4 +1,4 @@
-import { difference, omit, range, zip } from 'lodash'
+import { difference, omit, range, zip, identity } from 'lodash'
 import fc from 'fast-check'
 
 import {
@@ -14,14 +14,16 @@ import { ADD_LINES_FROM_TEMPLATE } from '../../constants/ActionTypes'
 import rootReducerWithoutRepairers from '../root'
 import * as tree from '../tree'
 import { beatsByPosition } from '../../helpers/beats'
-import {
+import selectors from '../../selectors'
+
+const {
   sortedBeatsForAnotherBookSelector,
   visibleSortedBeatsForTimelineByBookSelector,
   sortedBeatsHierachyLevels,
   sortedHierarchyLevels,
   sortedBeatsByBookSelector,
   allCardsSelector,
-} from '../../selectors'
+} = selectors(identity)
 
 const rootReducer = rootReducerWithoutRepairers({
   normalizeRCEContent: (x) => x,

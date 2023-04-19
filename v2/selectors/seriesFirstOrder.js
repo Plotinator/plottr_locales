@@ -5,11 +5,9 @@ import { createSelector } from 'reselect'
 
 import { fullFileStateSelector } from './fullFileFirstOrder'
 
-export const errorMessageSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.error && state.error.error
-)
-export const partOfStoreWhereErrorOccured = createSelector(
-  fullFileStateSelector,
-  (state) => state.error && state.error.storeKey
-)
+export const seriesSelector = createSelector(fullFileStateSelector, ({ series }) => {
+  return series || {}
+})
+export const seriesNameSelector = createSelector(seriesSelector, ({ name }) => {
+  return name
+})

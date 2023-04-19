@@ -1,35 +1,4 @@
-import * as beatActions from './actions/beats'
-import * as bookActions from './actions/books'
-import * as cardActions from './actions/cards'
-import * as categoryActions from './actions/categories'
-import * as characterActions from './actions/characters'
-import * as customAttributeActions from './actions/customAttributes'
-import * as imageActions from './actions/images'
-import * as lineActions from './actions/lines'
-import * as noteActions from './actions/notes'
-import * as placeActions from './actions/places'
-import * as seriesActions from './actions/series'
-import * as tagActions from './actions/tags'
-import * as uiActions from './actions/ui'
-import * as undoActions from './actions/undo'
-import * as hierarchyActions from './actions/hierarchy'
-import * as featureFlagActions from './actions/featureFlags'
-import * as errorActions from './actions/error'
-import * as permissionActions from './actions/permission'
-import * as projectActions from './actions/project'
-import * as clientActions from './actions/client'
-import * as editorActions from './actions/editors'
-import * as licenseActions from './actions/license'
-import * as knownFilesActions from './actions/knownFiles'
-import * as templatesActions from './actions/templates'
-import * as settingsActions from './actions/settings'
-import * as backupsActions from './actions/backups'
-import * as applicationStateActions from './actions/applicationState'
-import * as imageCacheActions from './actions/imageCache'
-import * as notificationActions from './actions/notifications'
-import * as domEventActions from './actions/domEvents'
-import * as testingAndDiagnosisActions from './actions/testingAndDiagnosis'
-import * as attributeActions from './actions/attributes'
+import actions from './actions'
 
 import * as ActionTypes from './constants/ActionTypes'
 import * as LoadActions from './constants/loadActions'
@@ -50,13 +19,15 @@ import * as timeHelpers from './helpers/time'
 import * as dateHelpers from './helpers/date'
 import * as fileHelpers from './helpers/file'
 import * as templatesHelpers from './helpers/templates'
+import * as characterHelpers from './helpers/characters'
 
 import * as template from './template'
 
 import migrateIfNeeded from './migrator/migration_manager'
 import Migrator from './migrator/migrator.js'
+import addHierarchiesIfMissing from './migrator/handleSpecialCases'
 
-import * as selectors from './selectors'
+import selectors from './selectors'
 
 import rootReducer from './reducers/root'
 import mainReducer from './reducers/main'
@@ -147,41 +118,6 @@ const reducers = {
   testingAndDiagnosis: testingAndDiagnosisReducer,
 }
 
-const actions = {
-  beat: beatActions,
-  book: bookActions,
-  card: cardActions,
-  category: categoryActions,
-  character: characterActions,
-  customAttribute: customAttributeActions,
-  image: imageActions,
-  line: lineActions,
-  note: noteActions,
-  place: placeActions,
-  series: seriesActions,
-  tag: tagActions,
-  ui: uiActions,
-  undo: undoActions,
-  hierarchyLevels: hierarchyActions,
-  featureFlags: featureFlagActions,
-  error: errorActions,
-  permission: permissionActions,
-  project: projectActions,
-  client: clientActions,
-  editors: editorActions,
-  license: licenseActions,
-  knownFiles: knownFilesActions,
-  templates: templatesActions,
-  settings: settingsActions,
-  backups: backupsActions,
-  applicationState: applicationStateActions,
-  imageCache: imageCacheActions,
-  notifications: notificationActions,
-  domEvents: domEventActions,
-  testingAndDiagnosis: testingAndDiagnosisActions,
-  attributes: attributeActions,
-}
-
 const helpers = {
   card: cardHelpers,
   beats: beatHelpers,
@@ -197,6 +133,7 @@ const helpers = {
   date: dateHelpers,
   file: fileHelpers,
   template: templatesHelpers,
+  characters: characterHelpers,
 }
 
 const slate = {
@@ -207,6 +144,10 @@ const slate = {
 const middlewares = {
   externalSync,
   externalSyncWithoutHistory,
+}
+
+const specialCaseFixes = {
+  addHierarchiesIfMissing,
 }
 
 export {
@@ -237,4 +178,5 @@ export {
   middlewares,
   ARRAY_KEYS,
   checkFileIntegrity,
+  specialCaseFixes,
 }
