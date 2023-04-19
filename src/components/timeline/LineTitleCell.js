@@ -645,16 +645,16 @@ const LineTitleCellConnector = (connector) => {
     return connect(
       (state, ownProps) => {
         return {
-          darkMode: selectors.isDarkModeSelector(state.present),
-          orientation: selectors.orientationSelector(state.present),
-          timelineIsExpanded: selectors.timelineIsExpandedSelector(state.present),
-          isSmall: isSmallSelector(state.present),
-          isMedium: isMediumSelector(state.present),
-          isLarge: isLargeSelector(state.present),
-          lineIsExpanded: lineIsExpandedSelector(state.present)[ownProps.line.id],
-          books: allBooksSelector(state.present),
-          currentTimeline: selectors.currentTimelineSelector(state.present),
-          allHierarchyLevels: selectors.allHierarchyLevelsSelector(state.present),
+          darkMode: selectors.isDarkModeSelector(state),
+          orientation: selectors.orientationSelector(state),
+          timelineIsExpanded: selectors.timelineIsExpandedSelector(state),
+          isSmall: isSmallSelector(state),
+          isMedium: isMediumSelector(state),
+          isLarge: isLargeSelector(state),
+          lineIsExpanded: lineIsExpandedSelector(state)[ownProps.line.id],
+          books: allBooksSelector(state),
+          currentTimeline: selectors.currentTimelineSelector(state),
+          allHierarchyLevels: selectors.allHierarchyLevelsSelector(state),
         }
       },
       (dispatch, ownProps) => {

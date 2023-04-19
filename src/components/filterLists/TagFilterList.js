@@ -43,7 +43,7 @@ const TagFilterListConnector = (connector) => {
 
     return connect((state) => {
       return {
-        tags: tagsFilterItemsSelector(state.present),
+        tags: tagsFilterItemsSelector(state),
       }
     })(TagFilterList)
   }

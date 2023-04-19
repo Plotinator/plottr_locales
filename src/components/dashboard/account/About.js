@@ -113,8 +113,8 @@ const AboutConnector = (connector) => {
     const { connect } = redux
     return connect(
       (state) => ({
-        settings: selectors.appSettingsSelector(state.present),
-        inValidLicenseState: selectors.isInSomeValidLicenseStateSelector(state.present),
+        settings: selectors.appSettingsSelector(state),
+        inValidLicenseState: selectors.isInSomeValidLicenseStateSelector(state),
       }),
       { requestCheckForUpdates: actions.applicationState.requestCheckForUpdates }
     )(About)

@@ -352,13 +352,13 @@ const CardConnector = (connector) => {
     return connect(
       (state, ownProps) => {
         return {
-          cardDescription: selectors.cardDescriptionByIdSelector(state.present, ownProps.card.id),
-          tags: state.present.tags,
-          timelineSize: selectors.timelineSizeSelector(state.present),
-          orientation: selectors.orientationSelector(state.present),
-          isVisible: selectors.visibleCardsSelector(state.present)[ownProps.card.id],
-          isSmall: selectors.isSmallSelector(state.present),
-          isMedium: selectors.isMediumSelector(state.present),
+          cardDescription: selectors.cardDescriptionByIdSelector(state, ownProps.card.id),
+          tags: selectors.allTagsSelector(state),
+          timelineSize: selectors.timelineSizeSelector(state),
+          orientation: selectors.orientationSelector(state),
+          isVisible: selectors.visibleCardsSelector(state)[ownProps.card.id],
+          isSmall: selectors.isSmallSelector(state),
+          isMedium: selectors.isMediumSelector(state),
         }
       },
       (dispatch) => {

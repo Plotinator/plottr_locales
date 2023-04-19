@@ -176,9 +176,9 @@ const RCEBoundaryConnector = (connector) => {
     const { connect } = redux
 
     return connect((state) => ({
-      proInfo: selectors.proInfoSelector(state.present),
-      trialInfo: selectors.trialInfoSelector(state.present),
-      user: selectors.userSettingsSelector(state.present),
+      proInfo: selectors.proInfoSelector(state),
+      trialInfo: selectors.trialInfoSelector(state),
+      user: selectors.userSettingsSelector(state),
     }))(RCEBoundary)
   }
 

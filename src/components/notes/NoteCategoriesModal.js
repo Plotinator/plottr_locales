@@ -8,6 +8,14 @@ import { checkDependencies } from '../checkDependencies'
 const NoteCategoriesModalConnector = (connector) => {
   const ItemsManagerModal = UnconnectedItemsManagerModal(connector)
 
+  const {
+    platform: {
+      template: { startSaveAsTemplate },
+    },
+  } = connector
+
+  checkDependencies({ startSaveAsTemplate })
+
   function NoteCategoriesModal({
     categories,
     closeDialog,
@@ -15,7 +23,6 @@ const NoteCategoriesModalConnector = (connector) => {
     deleteNoteCategory,
     updateNoteCategory,
     reorderNoteCategory,
-    startSaveAsTemplate,
   }) {
     return (
       <ItemsManagerModal
@@ -50,25 +57,20 @@ const NoteCategoriesModalConnector = (connector) => {
     deleteNoteCategory: PropTypes.func.isRequired,
     updateNoteCategory: PropTypes.func.isRequired,
     reorderNoteCategory: PropTypes.func.isRequired,
-    startSaveAsTemplate: PropTypes.func.isRequired,
   }
 
   const {
     redux,
-    pltr: { actions },
-    platform: {
-      template: { startSaveAsTemplate },
-    },
+    pltr: { actions, selectors },
   } = connector
-  checkDependencies({ redux, actions, startSaveAsTemplate })
+  checkDependencies({ redux, actions })
 
   if (redux) {
     const { connect, bindActionCreators } = redux
     return connect(
       (state) => {
         return {
-          categories: state.present.categories.notes,
-          startSaveAsTemplate,
+          categories: selectors.noteCategoriesSelector(state),
         }
       },
       (dispatch) => {
