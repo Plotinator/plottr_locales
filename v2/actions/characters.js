@@ -29,6 +29,14 @@ import { character } from '../store/initialState'
 import { escapeBraces } from './customAttributes'
 import { nextId } from '../store/newIds'
 
+const {
+  characterAttributesForCurrentBookSelector,
+  selectedCharacterAttributeTabSelector,
+  legacyCustomCharacterAttributeByName,
+  characterAttributesForBookSelector,
+  allBookIdsSelector,
+} = selectors(identity)
+
 export function addCharacter(name) {
   return {
     type: ADD_CHARACTER,
@@ -66,7 +74,6 @@ export function editCharacterImage(id, imageId) {
 
 export const editCharacterTemplateAttribute =
   (id, templateId, name, value, editorPath, selection) => (dispatch, getState) => {
-    const { selectedCharacterAttributeTabSelector } = selectors(identity)
     const state = getState()
     const bookId = selectedCharacterAttributeTabSelector(state)
 
@@ -94,7 +101,6 @@ export function addTag(id, tagId) {
 }
 
 export const addBook = (id, bookId) => (dispatch, getState) => {
-  const { allBookIdsSelector } = selectors(identity)
   const state = getState()
   const bookIds = allBookIdsSelector(state)
 
@@ -141,12 +147,6 @@ export const editCharacterAttributeValue =
       return
     }
 
-    const {
-      characterAttributesForCurrentBookSelector,
-      selectedCharacterAttributeTabSelector,
-      legacyCustomCharacterAttributeByName,
-      characterAttributesForBookSelector,
-    } = selectors(identity)
     const state = getState()
     const characterAttributesForBook = characterAttributesForCurrentBookSelector(state)
     const selectedBook = selectedCharacterAttributeTabSelector(state)
