@@ -19,6 +19,7 @@ import {
   SET_FILE_URL,
 } from '../constants/ActionTypes'
 import selectors from '../selectors'
+const { offlineModeEnabledSelector, fileURLSelector } = selectors(identity)
 
 export const withFullFileState = (cb) => (dispatch, getState) => {
   cb(getState())
@@ -47,7 +48,6 @@ export const showLoader = (isLoading) => ({
 })
 
 export const setOffline = (isOffline) => (dispatch, getState) => {
-  const { offlineModeEnabledSelector, fileURLSelector } = selectors(identity)
   const state = getState()
   const offlineModeIsEnabled = offlineModeEnabledSelector(state)
   const fileIsLoaded = !!fileURLSelector(state)
