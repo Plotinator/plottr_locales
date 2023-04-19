@@ -129,6 +129,7 @@ export const wireUpAPI = (logger, actions, selectors) => {
     database,
     storage,
     BASE_API_DOMAIN,
+    // eslint-disable-next-line
     __DEV__,
     logger,
     true
