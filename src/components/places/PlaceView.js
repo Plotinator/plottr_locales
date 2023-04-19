@@ -360,7 +360,7 @@ const PlaceViewConnector = (connector) => {
         return {
           customAttributes: selectors.placeCustomAttributesSelector(state),
           cards: selectors.allCardsSelector(state),
-          notes: selectors.singleNoteSelector(state),
+          notes: selectors.allNotesSelector(state),
           darkMode: selectors.isDarkModeSelector(state),
           editorPath,
           selection: selectors.selectionSelector(state, editorPath),
