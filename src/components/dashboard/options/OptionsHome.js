@@ -320,9 +320,9 @@ const OptionsHomeConnector = (connector) => {
 
     return connect((state) => {
       return {
-        hasCurrentProLicense: selectors.hasProSelector(state.present),
-        settings: selectors.appSettingsSelector(state.present),
-        shouldBeInPro: selectors.shouldBeInProSelector(state.present),
+        hasCurrentProLicense: selectors.hasProSelector(state),
+        settings: selectors.appSettingsSelector(state),
+        shouldBeInPro: selectors.shouldBeInProSelector(state),
       }
     })(OptionsHome)
   }

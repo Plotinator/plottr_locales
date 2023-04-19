@@ -124,7 +124,7 @@ const MiniColorPickerConnector = (connector) => {
     const { connect } = redux
 
     return connect((state) => ({
-      darkMode: selectors.isDarkModeSelector(state.present),
+      darkMode: selectors.isDarkModeSelector(state),
     }))(MiniColorPicker)
   }
 

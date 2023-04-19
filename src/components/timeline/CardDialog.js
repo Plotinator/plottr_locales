@@ -691,25 +691,21 @@ const CardDialogConnector = (connector) => {
     return connect(
       (state, ownProps) => {
         return {
-          cardMetaData: selectors.cardMetaDataSelector(state.present, ownProps.cardId),
-          beats: selectors.visibleSortedBeatsByBookIgnoringCollapsedSelector(state.present),
-          lines: selectors.sortedLinesByBookSelector(state.present),
-          tags: selectors.sortedTagsSelector(state.present),
-          characters: selectors.charactersSortedAtoZSelector(state.present),
-          characterBookCategories: selectors.characterBookCategoriesSelector(state.present),
-          places: selectors.placesSortedAtoZSelector(state.present),
-          customAttributes: state.present.customAttributes.scenes,
-          darkMode: selectors.isDarkModeSelector(state.present),
-          books: state.present.books,
-          isSeries: selectors.isSeriesSelector(state.present),
-          currentTimeline: selectors.currentTimelineSelector(state.present),
-          getTemplateById: selectors.templateByIdFnSelector(state.present),
-          // FIXME: these function change each re-render we should
-          // instead create a selector that produces the function.
-          destinationLineId: (bookId) => selectors.firstLineForBookSelector(state.present, bookId),
-          destinationBeatId: (bookId) =>
-            selectors.firstVisibleBeatForBookSelector(state.present, bookId),
-          click: selectors.lastClickSelector(state.present),
+          cardMetaData: selectors.cardMetaDataSelector(state, ownProps.cardId),
+          beats: selectors.visibleSortedBeatsByBookIgnoringCollapsedSelector(state),
+          lines: selectors.sortedLinesByBookSelector(state),
+          tags: selectors.sortedTagsSelector(state),
+          characters: selectors.charactersSortedAtoZSelector(state),
+          characterBookCategories: selectors.characterBookCategoriesSelector(state),
+          places: selectors.placesSortedAtoZSelector(state),
+          customAttributes: selectors.cardsCustomAttributesSelector(state),
+          darkMode: selectors.isDarkModeSelector(state),
+          books: selectors.allBooksSelector(state),
+          isSeries: selectors.isSeriesSelector(state),
+          currentTimeline: selectors.currentTimelineSelector(state),
+          getTemplateById: selectors.templateByIdFnSelector(state),
+          destinationLineId: selectors.firstLineForBookThunkSelector(state),
+          destinationBeatId: selectors.firstVisibleBeatForBookThunkSelector(state),
         }
       },
       (dispatch) => {

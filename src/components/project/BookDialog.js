@@ -168,7 +168,6 @@ const BookDialogConnector = (connector) => {
 
     static propTypes = {
       bookId: PropTypes.number,
-      cancel: PropTypes.func.isRequired,
       darkMode: PropTypes.bool,
       bookNumber: PropTypes.number,
       actions: PropTypes.object.isRequired,
@@ -191,10 +190,10 @@ const BookDialogConnector = (connector) => {
     return connect(
       (state, ownProps) => {
         return {
-          darkMode: selectors.isDarkModeSelector(state.present),
-          books: selectors.allBooksSelector(state.present),
-          bookNumber: selectors.bookNumberSelector(state.present),
-          bookDialogBookId: selectors.bookDialogBookIdSelector(state.present),
+          darkMode: selectors.isDarkModeSelector(state),
+          books: selectors.allBooksSelector(state),
+          bookNumber: selectors.bookNumberSelector(state),
+          bookDialogBookId: selectors.bookDialogBookIdSelector(state),
         }
       },
       (dispatch) => {

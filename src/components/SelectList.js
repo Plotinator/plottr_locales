@@ -253,7 +253,7 @@ const SelectListConnector = (connector) => {
 
     return connect((state) => {
       return {
-        click: selectors.lastClickSelector(state.present),
+        click: selectors.lastClickSelector(state),
       }
     })(SelectList)
   }
