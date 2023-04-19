@@ -37,7 +37,7 @@ const notes =
   (state = initialState, action) => {
     const repair = repairIfPresent(dataRepairers)
     switch (action.type) {
-      case ADD_NOTE:
+      case ADD_NOTE: {
         const newNote = {
           ...note,
           id: nextId(state),
@@ -49,6 +49,7 @@ const notes =
           if (action[key] !== undefined) newNote[key] = action[key]
         })
         return [...state, newNote]
+      }
 
       case EDIT_NOTE: {
         const lastEdited = { lastEdited: new Date().getTime() }

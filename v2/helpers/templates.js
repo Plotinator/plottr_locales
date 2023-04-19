@@ -4,10 +4,9 @@ import * as tree from '../reducers/tree'
 import { addCard } from '../actions/cards'
 import { addBeat } from '../actions/beats'
 import root from '../reducers/root'
-import { addLinesFromTemplate, addLineWithTitle, deleteLine, pinMovedLine } from '../actions/lines'
+import { addLinesFromTemplate, addLineWithTitle, deleteLine } from '../actions/lines'
 import { nextId } from './nextBeatId'
 import { nextId as nextLineId } from '../store/newIds'
-import { reorderList } from './lists'
 
 const children = (beatTree, id) => {
   return tree.children(beatTree, id)
