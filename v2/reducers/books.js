@@ -15,7 +15,7 @@ import {
   EDIT_BOOK_IMAGE,
   DUPLICATE_BOOK,
 } from '../constants/ActionTypes'
-import { isSeries } from '../helpers/books'
+import { getCopyName, isSeries } from '../helpers/books'
 import { book as defaultBook } from '../store/initialState'
 import { newFileBooks } from '../store/newFileState'
 
@@ -71,6 +71,12 @@ const books =
       case DUPLICATE_BOOK: {
         const duplicatedBook = find(state, (book) => book.id === action.id)
         const duplicatedIndex = state.allIds.indexOf(action.id)
+        const titleWithCopy = getCopyName(
+          Object.values(state),
+          `${duplicatedBook.title} - copy`,
+          'title'
+        )
+
         let newIds = []
         if (duplicatedIndex !== -1) {
           newIds = [
@@ -87,6 +93,7 @@ const books =
           allIds: newIds,
           [action.newBookId]: {
             ...duplicatedBook,
+            title: titleWithCopy,
             id: action.newBookId,
           },
         }
