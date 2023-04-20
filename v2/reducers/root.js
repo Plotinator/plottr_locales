@@ -222,9 +222,7 @@ const root = (dataRepairers) => (state, action) => {
           Object.keys(beatsInNewBook.index).includes(String(card.beatId))
         )
       )
-      const copiedLines = cloneDeep(
-        state.lines.filter((line) => copiedCards.find((card) => card.lineId == line.id))
-      )
+      const copiedLines = cloneDeep(state.lines.filter((line) => action.id == line.bookId))
 
       return mainReducer(state, {
         ...action,
