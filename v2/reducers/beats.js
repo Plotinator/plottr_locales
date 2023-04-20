@@ -1,4 +1,4 @@
-import { clone, cloneDeep, mapValues, range } from 'lodash'
+import { clone, range } from 'lodash'
 
 import {
   ADD_LINES_FROM_TEMPLATE,
