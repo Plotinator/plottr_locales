@@ -3,7 +3,7 @@ import PropTypes from 'react-proptypes'
 import cx from 'classnames'
 
 import { t } from 'plottr_locales'
-import { helpers, migrateIfNeeded, addMissingKeys } from 'pltr/v2'
+import { helpers } from 'pltr/v2'
 
 import { checkDependencies } from '../../checkDependencies'
 import Button from '../../Button'
@@ -12,87 +12,17 @@ const BackupFileDisplayConnector = (connector) => {
   const {
     platform: {
       mpq,
-      file: { joinPath, saveFile, doesFileExist, readFile, findUniqueNameInPath },
-      log,
-      userDocumentsPath,
-      addToKnownFilesAndOpen,
-      showSaveDialog,
-      appVersion,
+      file: { createAndOpenCopy },
       duplicateFile,
     },
   } = connector
-  checkDependencies({
-    mpq,
-    joinPath,
-    saveFile,
-    doesFileExist,
-    readFile,
-    findUniqueNameInPath,
-    log,
-    userDocumentsPath,
-    addToKnownFilesAndOpen,
-    showSaveDialog,
-    appVersion,
-    duplicateFile,
-  })
+  checkDependencies({ mpq, createAndOpenCopy, duplicateFile })
 
-  const BackupFileDisplay = ({
-    folder,
-    groupName,
-    file,
-    folderDate,
-    settings,
-    hasCurrentProLicense,
-  }) => {
+  const BackupFileDisplay = ({ folder, groupName, file, folderDate, hasCurrentProLicense }) => {
     const [showActions, setShowActions] = useState(false)
 
-    const migrateSaveAndOpen = (json, oldUrl, newFileURL) => {
-      return appVersion().then((version) => {
-        migrateIfNeeded(version, json, oldUrl, null, (err, _didMigrate, migratedState) => {
-          if (err) {
-            log.error(err)
-          } else {
-            console.log('addMissingKeys(migratedState)', addMissingKeys(migratedState))
-            saveFile(newFileURL, addMissingKeys(migratedState)).then(() => {
-              addToKnownFilesAndOpen(newFileURL, true)
-            })
-          }
-        })
-      })
-    }
-
-    const saveAndOpenCopy = (oldPath, oldFileName, newFileName) => {
-      mpq.push('btn_open_backup')
-      joinPath(oldPath, oldFileName).then((oldFullPath) => {
-        readFile(oldFullPath).then((fileText) => {
-          const fileJSON = JSON.parse(fileText)
-          if (settings.user.defaultFolder && settings.user.defaultFolderLocation) {
-            joinPath(settings.user.defaultFolderLocation, newFileName).then((newFullPath) => {
-              findUniqueNameInPath(newFullPath).then((uniquePath) => {
-                const newFileURL = helpers.file.filePathToFileURL(uniquePath)
-                migrateSaveAndOpen(fileJSON, oldFullPath, newFileURL)
-              })
-            })
-          } else {
-            userDocumentsPath().then((docPath) => {
-              joinPath(docPath, newFileName).then((newFullPath) => {
-                const title = t('Where would you like to save this copy?')
-                const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
-                showSaveDialog(filters, title, newFullPath).then((fileName) => {
-                  if (fileName) {
-                    const newFilePath = helpers.file.ensureEndsInPltr(fileName)
-                    const newFileURL = helpers.file.filePathToFileURL(newFilePath)
-                    migrateSaveAndOpen(fileJSON, oldFullPath, newFileURL)
-                  }
-                })
-              })
-            })
-          }
-        })
-      })
-    }
-
     const handleMakeCopy = () => {
+      mpq.push('btn_open_backup')
       const isCloudBackup = file.storagePath
       // make the name
       const backupText = t('Backup')
@@ -102,7 +32,7 @@ const BackupFileDisplayConnector = (connector) => {
         const fileUrl = helpers.file.fileIdToPlottrCloudFileURL(file.fileId)
         duplicateFile(fileUrl, newName)
       } else {
-        saveAndOpenCopy(folder.path, file.name, newName)
+        createAndOpenCopy(folder.path, file.name, newName)
       }
     }
 
@@ -186,7 +116,6 @@ const BackupFileDisplayConnector = (connector) => {
     groupName: PropTypes.string.isRequired,
     file: PropTypes.object.isRequired,
     folderDate: PropTypes.string,
-    settings: PropTypes.object.isRequired,
     hasCurrentProLicense: PropTypes.bool,
   }
 
@@ -199,8 +128,7 @@ const BackupFileDisplayConnector = (connector) => {
     const { connect } = redux
 
     return connect((state) => ({
-      settings: selectors.appSettingsSelector(state.present),
-      hasCurrentProLicense: selectors.hasProSelector(state.present),
+      hasCurrentProLicense: selectors.hasProSelector(state),
     }))(BackupFileDisplay)
   }
 

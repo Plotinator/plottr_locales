@@ -110,7 +110,7 @@ const BackupsTableConnector = (connector) => {
     const { connect } = redux
 
     return connect((state) => ({
-      backupFolders: selectors.sortedBackupFoldersSelector(state.present),
+      backupFolders: selectors.sortedBackupFoldersSelector(state),
     }))(BackupsTable)
   }
 
