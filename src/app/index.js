@@ -277,7 +277,7 @@ tellMeWhatOSImOn()
                   join(defaultPath, defaultBaseName).then((finalDefaultPath) => {
                     showSaveDialog(filters, title, finalDefaultPath).then((fileName) => {
                       if (fileName) {
-                        const newFilePath = ensureEndsInPltr(fileName)
+                        const newFilePath = helpers.file.ensureEndsInPltr(fileName)
                         const newFileURL = helpers.file.filePathToFileURL(newFilePath)
                         getVersion().then((version) => {
                           whenClientIsReady(({ readFile }) => {
@@ -335,7 +335,7 @@ tellMeWhatOSImOn()
                   join(defaultPath, defaultBaseName).then((finalDefaultPath) => {
                     showSaveDialog(filters, title, finalDefaultPath).then((fileName) => {
                       if (fileName) {
-                        const newFilePath = ensureEndsInPltr(fileName)
+                        const newFilePath = helpers.file.ensureEndsInPltr(fileName)
                         const newFileURL = helpers.file.filePathToFileURL(newFilePath)
                         saveFile(newFileURL, present).then(() => {
                           addToKnownFilesAndOpen(newFileURL)
@@ -347,15 +347,6 @@ tellMeWhatOSImOn()
               }
             })
           })
-        }
-
-        const ensureEndsInPltr = (filePath) => {
-          if (!filePath) return null
-
-          if (!filePath.endsWith('.pltr')) {
-            return `${filePath}.pltr`
-          }
-          return filePath
         }
 
         const moveFromTempHandler = () => {
@@ -383,7 +374,7 @@ tellMeWhatOSImOn()
             const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
             showSaveDialog(filters, t('Where would you like to save this file?')).then(
               (filePath) => {
-                const newFilePath = ensureEndsInPltr(filePath)
+                const newFilePath = helpers.file.ensureEndsInPltr(filePath)
                 if (newFilePath) {
                   // Point at the new file
                   const newFileURL = helpers.file.filePathToFileURL(newFilePath)
@@ -527,7 +518,7 @@ tellMeWhatOSImOn()
                 const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
                 showSaveDialog(filters, title, docPath).then((fileName) => {
                   if (fileName) {
-                    const newFilePath = ensureEndsInPltr(fileName)
+                    const newFilePath = helpers.file.ensureEndsInPltr(fileName)
                     createNewFile(null, newFilePath)
                   }
                 })
