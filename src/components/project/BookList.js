@@ -210,10 +210,10 @@ const BookListConnector = (connector) => {
     return connect(
       (state) => {
         return {
-          books: state.present.books,
-          lines: state.present.lines,
-          cards: state.present.cards,
-          isBookDialogVisible: selectors.isBookDialogVisibleSelector(state.present),
+          books: selectors.allBooksSelector(state),
+          lines: selectors.allLinesSelector(state),
+          cards: selectors.allCardsSelector(state),
+          isBookDialogVisible: selectors.isBookDialogVisibleSelector(state),
         }
       },
       (dispatch) => {

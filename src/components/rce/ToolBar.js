@@ -137,8 +137,8 @@ const UnconnectedToolBar = (connector) => {
 
     return React.memo(
       connect((state) => ({
-        darkMode: selectors.isDarkModeSelector(state.present),
-        settings: selectors.appSettingsSelector(state.present),
+        darkMode: selectors.isDarkModeSelector(state),
+        settings: selectors.appSettingsSelector(state),
       }))(ToolBar)
     )
   }

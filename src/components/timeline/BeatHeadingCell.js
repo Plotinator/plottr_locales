@@ -103,6 +103,11 @@ const BeatHeadingCellConnector = (connector) => {
           const spanIncludingThisBeat = Math.max(1, span)
           const widthWithSpacer = thisHeadingCellWidth + aSpacerCell.getBoundingClientRect().width
           setWidth(widthWithSpacer * spanIncludingThisBeat)
+        } else {
+          const thisHeadingCellWidth = aBeatTitleCell.getBoundingClientRect().width
+          setHeadingCellWidth(thisHeadingCellWidth)
+          const spanIncludingThisBeat = Math.max(1, span)
+          setWidth(thisHeadingCellWidth * spanIncludingThisBeat)
         }
       }
     }, [setWidth, setHeadingCellWidth, beats])
@@ -195,10 +200,15 @@ const BeatHeadingCellConnector = (connector) => {
         case 1:
           break
         case 2:
-          warningMessage = `Are you sure you want to delete all scene cards in "${beatTitle}".`
+          warningMessage = t('Are you sure you want to delete all scene cards in "{beatTitle}".', {
+            beatTitle,
+          })
           break
         case 3:
-          warningMessage = `Are you sure you want to delete all chapters and their scene cards in "${beatTitle}".`
+          warningMessage = warningMessage = t(
+            'Are you sure you want to delete all chapters and their scene cards in "{beatTitle}".',
+            { beatTitle }
+          )
           break
       }
       return (
@@ -299,7 +309,7 @@ const BeatHeadingCellConnector = (connector) => {
     }
 
     const adjustedWidth = () => {
-      return width - (isMedium ? 7 : 27)
+      return width - (span === 1 && beats.length <= 2 ? 0 : isMedium ? 7 : 27)
     }
 
     const handleEsc = (event) => {
@@ -348,7 +358,7 @@ const BeatHeadingCellConnector = (connector) => {
       const { bottom, left } = container.current.getBoundingClientRect()
       return {
         top: bottom - 4,
-        left: left + (width - (isMedium ? 0 : spacerCellWidth)) / 2 - controlWidth / 2,
+        left: left + (width - (isMedium ? 0 : spacerCellWidth || 0)) / 2 - controlWidth / 2,
       }
     }
 
@@ -484,22 +494,22 @@ const BeatHeadingCellConnector = (connector) => {
     return connect(
       (state, ownProps) => {
         return {
-          beatTitle: uniqueBeatTitleSelector(state.present, ownProps.beatId),
-          isMedium: selectors.isMediumSelector(state.present),
-          hierarchyLevel: selectors.hierarchyLevelSelector(state.present, ownProps.beatId),
-          darkMode: selectors.isDarkModeSelector(state.present),
-          timelineSize: selectors.timelineSizeSelector(state.present),
-          readOnly: !selectors.canWriteSelector(state.present),
-          beats: selectors.visibleSortedBeatsForTimelineByBookSelector(state.present),
+          beatTitle: uniqueBeatTitleSelector(state, ownProps.beatId),
+          isMedium: selectors.isMediumSelector(state),
+          hierarchyLevel: selectors.hierarchyLevelSelector(state, ownProps.beatId),
+          darkMode: selectors.isDarkModeSelector(state),
+          timelineSize: selectors.timelineSizeSelector(state),
+          readOnly: !selectors.canWriteSelector(state),
+          beats: selectors.visibleSortedBeatsForTimelineByBookSelector(state),
           hierarchyLevelName: selectors.beatInsertControlHierarchyLevelNameSelector(
-            state.present,
+            state,
             ownProps.beatId
           ),
-          currentTimeline: selectors.currentTimelineSelector(state.present),
-          beat: uniqueBeatsSelector(state.present, ownProps.beatId),
-          hierarchyLevels: selectors.sortedHierarchyLevels(state.present),
-          lastClick: selectors.lastClickSelector(state.present),
-          droppedBeat: selectors.droppedBeatSelector(state.present),
+          currentTimeline: selectors.currentTimelineSelector(state),
+          beat: uniqueBeatsSelector(state, ownProps.beatId),
+          hierarchyLevels: selectors.sortedHierarchyLevels(state),
+          lastClick: selectors.lastClickSelector(state),
+          droppedBeat: selectors.droppedBeatSelector(state),
         }
       },
       {

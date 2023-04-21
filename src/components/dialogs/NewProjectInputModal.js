@@ -56,8 +56,8 @@ const NewProjectInputModalConnector = (connector) => {
 
     return connect(
       (state) => ({
-        projectNamingModalIsVisible: selectors.projectNamingModalIsVisibleSelector(state.present),
-        newProjectTemplate: selectors.newProjectTemplateSelector(state.present),
+        projectNamingModalIsVisible: selectors.projectNamingModalIsVisibleSelector(state),
+        newProjectTemplate: selectors.newProjectTemplateSelector(state),
       }),
       (dispatch) => {
         return {

@@ -188,13 +188,13 @@ const DashboardBodyConnector = (connector) => {
     const { connect } = redux
     return connect(
       (state) => ({
-        hasCurrentProLicense: selectors.hasProSelector(state.present),
-        started: selectors.trialStartedSelector(state.present),
-        expired: selectors.trialExpiredSelector(state.present),
-        hasLicense: selectors.hasLicenseSelector(state.present),
-        licenseInfo: selectors.licenseInfoSelector(state.present),
-        trialMode: selectors.trialModeSelector(state.present),
-        canGetUpdates: selectors.canGetUpdatesSelector(state.present),
+        hasCurrentProLicense: selectors.hasProSelector(state),
+        started: selectors.trialStartedSelector(state),
+        expired: selectors.trialExpiredSelector(state),
+        hasLicense: selectors.hasLicenseSelector(state),
+        licenseInfo: selectors.licenseInfoSelector(state),
+        trialMode: selectors.trialModeSelector(state),
+        canGetUpdates: selectors.canGetUpdatesSelector(state),
       }),
       {}
     )(DashboardBody)

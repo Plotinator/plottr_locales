@@ -44,6 +44,7 @@ import UnconnectedCardDialog from './CardDialog'
 import UnconnectedTimelineTabs from './TimelineTabs'
 import DropdownButton from '../DropdownButton'
 import ToolTip from '../ToolTip'
+import UnconnectedRestructureTimelineModal from '../dialogs/RestructureTimelineModal'
 
 const BREAKPOINT = 890
 
@@ -61,6 +62,7 @@ const TimelineWrapperConnector = (connector) => {
   const SubNav = UnconnectedSubNav(connector)
   const CardDialog = UnconnectedCardDialog(connector)
   const TimelineTabs = UnconnectedTimelineTabs(connector)
+  const RestructureTimelineModal = UnconnectedRestructureTimelineModal(connector)
 
   const {
     platform: {
@@ -83,12 +85,10 @@ const TimelineWrapperConnector = (connector) => {
     isOnWeb,
     timelineSearchTerm,
     timelineView,
-    timelineTabs,
     activeTab,
     timelineViewIsStacked,
     timelineViewIsTabbed,
     hierarchyLevels,
-    topLevelBeatName,
     beatActions,
     isCardDialogVisible,
     cardDialogBeatId,
@@ -97,6 +97,7 @@ const TimelineWrapperConnector = (connector) => {
     actConfigIsOpen,
     stickyHeaderCount,
     stickyLeftColumnCount,
+    restructureModalOpen,
   }) => {
     const [mounted, setMounted] = useState(false)
     const [clearing, setClearing] = useState(false)
@@ -194,7 +195,7 @@ const TimelineWrapperConnector = (connector) => {
         projectActions.withFullFileState((state) => {
           // FIXME: this is dated, but we don't need it so much so I
           // left it untouched when doing the knownFiles refactor.
-          saveFile(helpers.file.filePathToFileURL(state.present.file.fileName), state.present)
+          saveFile(helpers.file.filePathToFileURL(state.file.fileName), state)
         })
       }
     }
@@ -293,7 +294,9 @@ const TimelineWrapperConnector = (connector) => {
       // mpq.push('btn_scroll_end')
       const element = timelineBundle.isSmall ? tableRef.current.parentElement : tableRef.current
       const target =
-        timelineBundle.orientation === 'vertical' ? element.scrollHeight : element.scrollWidth
+        timelineBundle.orientation === 'vertical'
+          ? element.scrollHeight - window.innerHeight
+          : element.scrollWidth - window.innerWidth
 
       if (tableRef.current) scrollTo(target)
     }
@@ -323,9 +326,7 @@ const TimelineWrapperConnector = (connector) => {
     // //////////////
 
     const startSaveAsTemplate = () => {
-      if (cardsExistOnTimeline) saveAsTemplate('plotlines')
-
-      return false
+      saveAsTemplate('plotlines')
     }
 
     // ///////////////
@@ -397,6 +398,9 @@ const TimelineWrapperConnector = (connector) => {
             </Dropdown.Toggle>
             <Dropdown.Menu>
               <MenuItem onSelect={startSaveAsTemplate}>{t('Save as Template')}</MenuItem>
+              <MenuItem onSelect={actions.openRestructureTimelineModal}>
+                {t('Restructure Timeline')}
+              </MenuItem>
               <MenuItem divider />
               <MenuItem onSelect={() => setClearing(true)}>{t('Clear Timeline')}</MenuItem>
             </Dropdown.Menu>
@@ -605,6 +609,8 @@ const TimelineWrapperConnector = (connector) => {
                     darkmode: timelineBundle.darkMode,
                     vertical: timelineBundle.orientation == 'vertical',
                   })}
+                  stickyHeaderCount={stickyHeaderCount}
+                  leftStickyColumnCount={stickyLeftColumnCount}
                 >
                   {mounted ? (
                     <TimelineTable activeTab={activeTab} tableRef={tableRef.current} />
@@ -651,6 +657,14 @@ const TimelineWrapperConnector = (connector) => {
       return <ActsConfigModal isDarkMode={timelineBundle.darkMode} closeDialog={closeBeatConfig} />
     }
 
+    const renderRestructureModal = () => {
+      if (!restructureModalOpen) {
+        return null
+      }
+
+      return <RestructureTimelineModal />
+    }
+
     return (
       <div
         id="timelineview__container"
@@ -659,6 +673,7 @@ const TimelineWrapperConnector = (connector) => {
         {renderSubNav()}
         {renderCustomAttributes()}
         {renderBeatConfig()}
+        {renderRestructureModal()}
         {renderDelete()}
         {renderCardDialog()}
         <div
@@ -681,11 +696,9 @@ const TimelineWrapperConnector = (connector) => {
     isOnWeb: PropTypes.bool,
     timelineSearchTerm: PropTypes.string,
     timelineView: PropTypes.string.isRequired,
-    timelineTabs: PropTypes.array.isRequired,
     timelineViewIsStacked: PropTypes.bool,
     timelineViewIsTabbed: PropTypes.bool,
     hierarchyLevels: PropTypes.array.isRequired,
-    topLevelBeatName: PropTypes.string.isRequired,
     beatActions: PropTypes.object.isRequired,
     cardDialogCardId: PropTypes.number,
     cardDialogLineId: PropTypes.number,
@@ -695,6 +708,7 @@ const TimelineWrapperConnector = (connector) => {
     actConfigIsOpen: PropTypes.bool,
     stickyHeaderCount: PropTypes.number,
     stickyLeftColumnCount: PropTypes.number,
+    restructureModalOpen: PropTypes.bool,
   }
 
   const {
@@ -709,24 +723,25 @@ const TimelineWrapperConnector = (connector) => {
     return connect(
       (state) => {
         return {
-          cardsExistOnTimeline: selectors.cardsExistOnTimelineSelector(state.present),
-          bookId: selectors.currentTimelineSelector(state.present),
-          timelineBundle: selectors.timelineBundleSelector(state.present),
-          testingAndDiagnosisEnabled: selectors.testingAndDiagnosisEnabledSelector(state.present),
-          isOnWeb: selectors.isOnWebSelector(state.present),
-          timelineSearchTerm: selectors.timelineSearchTermSelector(state.present),
-          timelineView: selectors.timelineViewSelector(state.present),
-          timelineViewIsStacked: selectors.timelineViewIsStackedSelector(state.present),
-          timelineViewIsTabbed: selectors.timelineViewIsTabbedSelector(state.present),
-          hierarchyLevels: selectors.sortedHierarchyLevels(state.present),
-          cardDialogCardId: selectors.cardDialogCardIdSelector(state.present),
-          cardDialogLineId: selectors.cardDialogLineIdSelector(state.present),
-          cardDialogBeatId: selectors.cardDialogBeatIdSelector(state.present),
-          isCardDialogVisible: selectors.isCardDialogVisibleSelector(state.present),
-          activeTab: selectors.timelineActiveTabSelector(state.present),
-          actConfigIsOpen: selectors.actConfigModalIsOpenSelector(state.present),
-          stickyHeaderCount: selectors.stickyHeaderCountSelector(state.present),
-          stickyLeftColumnCount: selectors.stickyLeftColumnCountSelector(state.present),
+          cardsExistOnTimeline: selectors.cardsExistOnTimelineSelector(state),
+          bookId: selectors.currentTimelineSelector(state),
+          timelineBundle: selectors.timelineBundleSelector(state),
+          testingAndDiagnosisEnabled: selectors.testingAndDiagnosisEnabledSelector(state),
+          isOnWeb: selectors.isOnWebSelector(state),
+          timelineSearchTerm: selectors.timelineSearchTermSelector(state),
+          timelineView: selectors.timelineViewSelector(state),
+          timelineViewIsStacked: selectors.timelineViewIsStackedSelector(state),
+          timelineViewIsTabbed: selectors.timelineViewIsTabbedSelector(state),
+          hierarchyLevels: selectors.sortedHierarchyLevels(state),
+          cardDialogCardId: selectors.cardDialogCardIdSelector(state),
+          cardDialogLineId: selectors.cardDialogLineIdSelector(state),
+          cardDialogBeatId: selectors.cardDialogBeatIdSelector(state),
+          isCardDialogVisible: selectors.isCardDialogVisibleSelector(state),
+          activeTab: selectors.timelineActiveTabSelector(state),
+          actConfigIsOpen: selectors.actConfigModalIsOpenSelector(state),
+          stickyHeaderCount: selectors.stickyHeaderCountSelector(state),
+          stickyLeftColumnCount: selectors.stickyLeftColumnCountSelector(state),
+          restructureModalOpen: selectors.restructureModalOpenSelector(state),
         }
       },
       (dispatch) => {

@@ -13,6 +13,7 @@ import FormGroup from '../FormGroup'
 import FormControl from '../FormControl'
 import { checkDependencies } from '../checkDependencies'
 import UnconnectedTemplatePicker from '../templates/TemplatePicker'
+import VisualLine from './VisualLine'
 
 const { lightBackground } = lineColors
 
@@ -36,6 +37,7 @@ const BlankCardConnector = (connector) => {
       }
 
       this.titleInputRef = null
+      this.ref = React.createRef()
     }
 
     componentDidUpdate(_, prevState) {
@@ -72,20 +74,33 @@ const BlankCardConnector = (connector) => {
       const json = e.dataTransfer.getData('text/json')
       const droppedData = JSON.parse(json)
 
-      const { beatId, lineId } = this.props
+      const { beatId, lineId, addMissingBeats } = this.props
       if (droppedData.cardIds) {
-        this.props.actions.reorderCardsWithinLine(beatId, lineId, [...droppedData.cardIds])
+        this.props.actions.reorderCardsWithinLine(
+          beatId,
+          lineId,
+          [...droppedData.cardIds],
+          addMissingBeats
+        )
       } else if (droppedData.cardId) {
-        this.props.actions.reorderCardsWithinLine(beatId, lineId, [droppedData.cardId])
+        this.props.actions.reorderCardsWithinLine(
+          beatId,
+          lineId,
+          [droppedData.cardId],
+          addMissingBeats
+        )
       }
 
       return
     }
 
     saveCreate = () => {
+      const { addMissingBeats } = this.props
+
       const newCard = this.buildCard(this.titleInputRef.value)
       this.props.actions.addCard(
-        Object.assign(newCard, this.state.templates ? { templates: this.state.templates } : {})
+        Object.assign(newCard, this.state.templates ? { templates: this.state.templates } : {}),
+        addMissingBeats
       )
       this.setState({
         creating: false,
@@ -95,8 +110,10 @@ const BlankCardConnector = (connector) => {
     }
 
     createFromSmall = () => {
+      const { addMissingBeats } = this.props
+
       const newCard = this.buildCard('')
-      this.props.actions.addCard(newCard)
+      this.props.actions.addCard(newCard, addMissingBeats)
     }
 
     handleFinishCreate = (event) => {
@@ -208,6 +225,7 @@ const BlankCardConnector = (connector) => {
         disabled: readOnly,
         'vertical-blank-card__body': verticalInsertion,
       })
+
       return (
         <div
           className={cx(bodyKlass, {
@@ -256,9 +274,9 @@ const BlankCardConnector = (connector) => {
     }
 
     renderCreateNew() {
-      const { color, isMedium } = this.props
+      const { color, isMedium, isPinned } = this.props
       const cardStyle = { borderColor: color }
-      const bodyKlass = cx('card__body creating', { 'medium-timeline': isMedium })
+      const bodyKlass = cx('card__body creating', { 'medium-timeline': isMedium, isPinned })
       return (
         <div className={bodyKlass} style={cardStyle}>
           <FormGroup>
@@ -281,7 +299,9 @@ const BlankCardConnector = (connector) => {
 
     render() {
       window.SCROLLWITHKEYS = !this.state.creating
-      const { orientation, verticalInsertion, isSmall, isMedium } = this.props
+      const { orientation, verticalInsertion, isSmall, isMedium, isPinned, color } = this.props
+      const tableLength =
+        this.ref.current?.clientWidth + 50 || (!isMedium || orientation == 'vertical' ? 225 : 110)
 
       let body = null
       if (this.state.creating) {
@@ -298,9 +318,21 @@ const BlankCardConnector = (connector) => {
           {verticalInsertion ? (
             body
           ) : (
-            <Cell>
+            <Cell ref={this.ref}>
+              {isPinned ? (
+                <VisualLine
+                  color={color}
+                  orientation={orientation}
+                  isMedium={isMedium}
+                  tableLength={tableLength}
+                />
+              ) : null}
               <div
-                className={cx('card__cell', { vertical, 'medium-timeline': isMedium })}
+                className={cx('card__cell', {
+                  vertical,
+                  'medium-timeline': isMedium,
+                  'card-pinned': isPinned,
+                })}
                 onDragEnter={this.handleDragEnter}
                 onDragOver={this.handleDragOver}
                 onDragLeave={this.handleDragLeave}
@@ -324,6 +356,7 @@ const BlankCardConnector = (connector) => {
       if (this.state.templateHover !== nextState.templateHover) return true
       if (this.state.defaultHover !== nextState.defaultHover) return true
       if (this.state.showTemplatePicker !== nextState.showTemplatePicker) return true
+      if (this.state.isPinned !== nextState.isPinned) return true
       return false
     }
   }
@@ -340,7 +373,9 @@ const BlankCardConnector = (connector) => {
     isSmall: PropTypes.bool,
     isMedium: PropTypes.bool,
     actions: PropTypes.object,
+    notificationActions: PropTypes.object,
     readOnly: PropTypes.bool,
+    addMissingBeats: PropTypes.bool,
     isPinned: PropTypes.bool,
   }
 
@@ -349,6 +384,7 @@ const BlankCardConnector = (connector) => {
     pltr: { actions, selectors },
   } = connector
   const CardActions = actions.card
+  const NotificationActions = actions.notifications
   checkDependencies({
     redux,
     actions,
@@ -360,18 +396,23 @@ const BlankCardConnector = (connector) => {
     const { connect, bindActionCreators } = redux
 
     return connect(
-      (state) => {
+      (state, ownProps) => {
         return {
-          currentTimeline: selectors.currentTimelineSelector(state.present),
-          orientation: selectors.orientationSelector(state.present),
-          isSmall: selectors.isSmallSelector(state.present),
-          isMedium: selectors.isMediumSelector(state.present),
-          readOnly: !selectors.canWriteSelector(state.present),
+          currentTimeline: selectors.currentTimelineSelector(state),
+          orientation: selectors.orientationSelector(state),
+          isSmall: selectors.isSmallSelector(state),
+          isMedium: selectors.isMediumSelector(state),
+          readOnly: !selectors.canWriteSelector(state),
+          addMissingBeats: selectors.parentIsHigherLevelAndViewIsStackedSelector(
+            state,
+            ownProps.beatId
+          ),
         }
       },
       (dispatch) => {
         return {
           actions: bindActionCreators(CardActions, dispatch),
+          notificationActions: bindActionCreators(NotificationActions, dispatch),
         }
       }
     )(BlankCard)

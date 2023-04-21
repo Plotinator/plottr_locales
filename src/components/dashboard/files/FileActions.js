@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import PropTypes from 'react-proptypes'
+import { IoOpenOutline, IoCopyOutline } from 'react-icons/io5'
 
 import { t } from 'plottr_locales'
 
@@ -18,6 +19,7 @@ const FileActionsConnector = (connector) => {
       isMacOS,
       showItemInFolder,
       os,
+      duplicateFile,
     },
   } = connector
   checkDependencies({
@@ -79,6 +81,10 @@ const FileActionsConnector = (connector) => {
       createFileShortcut(fileURL, 'desktop').then((shortcut) => showItemInFolder(shortcut))
     }
 
+    const handleDuplicateFile = () => {
+      duplicateFile(fileURL)
+    }
+
     const doTheThing = (eventKey) => {
       switch (eventKey) {
         case 'open': {
@@ -100,6 +106,9 @@ const FileActionsConnector = (connector) => {
         case 'create-file-shortcut':
           handleCreateDesktopShortcut(fileURL)
           break
+        case 'duplicate-file':
+          handleDuplicateFile()
+          break
       }
     }
 
@@ -112,6 +121,16 @@ const FileActionsConnector = (connector) => {
               <Button bsSize="small" onClick={handleOpen} title={t('Open')}>
                 <Glyphicon glyph="open" />
               </Button>
+              {missing || isTemp ? null : (
+                <Button
+                  bsSize="small"
+                  onClick={handleDuplicateFile}
+                  title={t('Duplicate File')}
+                  disabled={isInOfflineMode}
+                >
+                  <IoCopyOutline />
+                </Button>
+              )}
               <Button
                 bsSize="small"
                 onClick={_renameFile}
@@ -178,9 +197,9 @@ const FileActionsConnector = (connector) => {
     const { connect } = redux
 
     return connect((state, { fileURL }) => ({
-      isOnWeb: selectors.isOnWebSelector(state.present),
-      isTemp: selectors.isTempFileSelector(state.present, fileURL),
-      isInOfflineMode: selectors.isInOfflineModeSelector(state.present),
+      isOnWeb: selectors.isOnWebSelector(state),
+      isTemp: selectors.isTempFileSelector(state, fileURL),
+      isInOfflineMode: selectors.isInOfflineModeSelector(state),
     }))(FileActions)
   }
 

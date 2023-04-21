@@ -325,6 +325,19 @@ const LineTitleCellConnector = (connector) => {
               {line?.isPinned ? <TbPinnedOff /> : <BsPinFill />}
             </Button>
             {isSmall ? null : (
+              <Button
+                title={t('Duplicate plotline')}
+                block
+                bsSize="small"
+                onClick={duplicateThisPlotline}
+              >
+                <FiCopy />
+              </Button>
+            )}
+            <Button title={t('Delete plotline')} block bsSize="small" onClick={handleDelete}>
+              <Glyphicon glyph="trash" />
+            </Button>
+            {isSmall ? null : (
               <>
                 <Button
                   title={t('Expand or collapse stacks')}
@@ -342,22 +355,11 @@ const LineTitleCellConnector = (connector) => {
                 >
                   {allIcon} {t('All')}
                 </Button>
-                <Button
-                  title={t('Duplicate plotline')}
-                  block
-                  bsSize="small"
-                  onClick={duplicateThisPlotline}
-                >
-                  <FiCopy />
-                </Button>
                 <Button title={t('Move plotline')} block bsSize="small" onClick={toggleMovingLine}>
                   <FaBook />
                 </Button>
               </>
             )}
-            <Button title={t('Delete plotline')} block bsSize="small" onClick={handleDelete}>
-              <Glyphicon glyph="trash" />
-            </Button>
           </div>
         )
       } else {
@@ -378,6 +380,18 @@ const LineTitleCellConnector = (connector) => {
                 {line?.isPinned ? <TbPinnedOff /> : <BsPinFill />}
               </Button>
               {isSmall ? null : (
+                <Button
+                  title={t('Duplicate plotline')}
+                  bsSize="small"
+                  onClick={duplicateThisPlotline}
+                >
+                  <FiCopy />
+                </Button>
+              )}
+              <Button title={t('Delete plotline')} bsSize="small" onClick={handleDelete}>
+                <Glyphicon glyph="trash" />
+              </Button>
+              {isSmall ? null : (
                 <>
                   <Button
                     title={t('Expand or collapse stacks')}
@@ -393,21 +407,11 @@ const LineTitleCellConnector = (connector) => {
                   >
                     {allIcon} {t('All')}
                   </Button>
-                  <Button
-                    title={t('Duplicate plotline')}
-                    bsSize="small"
-                    onClick={duplicateThisPlotline}
-                  >
-                    <FiCopy />
-                  </Button>
                   <Button title={t('Move plotline')} bsSize="small" onClick={toggleMovingLine}>
                     <FaBook />
                   </Button>
                 </>
               )}
-              <Button title={t('Delete plotline')} bsSize="small" onClick={handleDelete}>
-                <Glyphicon glyph="trash" />
-              </Button>
             </ButtonGroup>
           </div>
         )
@@ -641,16 +645,16 @@ const LineTitleCellConnector = (connector) => {
     return connect(
       (state, ownProps) => {
         return {
-          darkMode: selectors.isDarkModeSelector(state.present),
-          orientation: selectors.orientationSelector(state.present),
-          timelineIsExpanded: selectors.timelineIsExpandedSelector(state.present),
-          isSmall: isSmallSelector(state.present),
-          isMedium: isMediumSelector(state.present),
-          isLarge: isLargeSelector(state.present),
-          lineIsExpanded: lineIsExpandedSelector(state.present)[ownProps.line.id],
-          books: allBooksSelector(state.present),
-          currentTimeline: selectors.currentTimelineSelector(state.present),
-          allHierarchyLevels: selectors.allHierarchyLevelsSelector(state.present),
+          darkMode: selectors.isDarkModeSelector(state),
+          orientation: selectors.orientationSelector(state),
+          timelineIsExpanded: selectors.timelineIsExpandedSelector(state),
+          isSmall: isSmallSelector(state),
+          isMedium: isMediumSelector(state),
+          isLarge: isLargeSelector(state),
+          lineIsExpanded: lineIsExpandedSelector(state)[ownProps.line.id],
+          books: allBooksSelector(state),
+          currentTimeline: selectors.currentTimelineSelector(state),
+          allHierarchyLevels: selectors.allHierarchyLevelsSelector(state),
         }
       },
       (dispatch, ownProps) => {

@@ -2,7 +2,6 @@ import { connect } from 'react-redux'
 import { PropTypes } from 'prop-types'
 import { assertPropTypes } from 'plottr_check-prop-types'
 import { bindActionCreators } from 'redux'
-import * as pltr from 'pltr/v2'
 import {
   Navbar,
   Grid,
@@ -92,6 +91,7 @@ import {
   ProOnboarding as UnconnectedProOnboarding,
   UpdateNotifier as UnconnectedUpdateNotifier,
   NewProjectInputModal as UnconnectedNewProjectInputModal,
+  RestructureTimelineModal as UnconnectedRestructureTimelineModal,
 } from '../components'
 
 const connector = {
@@ -99,7 +99,6 @@ const connector = {
     connect,
     bindActionCreators,
   },
-  pltr,
 }
 
 // Platform is an object which provides features which are specific to
@@ -242,9 +241,9 @@ export const checkPltrConnector = (platform) => {
   })
 }
 
-export default (platform) => {
+export default (platform, pltr) => {
   checkPltrConnector(platform)
-  var connectorObject = { ...connector, platform }
+  var connectorObject = { ...connector, pltr, platform }
   return {
     Navbar,
     Grid,
@@ -334,5 +333,6 @@ export default (platform) => {
     ProOnboarding: UnconnectedProOnboarding(connectorObject),
     UpdateNotifier: UnconnectedUpdateNotifier(connectorObject),
     NewProjectInputModal: UnconnectedNewProjectInputModal(connectorObject),
+    RestructureTimelineModal: UnconnectedRestructureTimelineModal(connectorObject),
   }
 }
