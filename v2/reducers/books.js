@@ -32,7 +32,8 @@ const books =
         // this allows us to edit new book with
         // any predefined param values only within
         // the scope of the new book schema
-        const editedBook = Object.assign(defaultBook, state[action.id])
+        if (!action.id) return state
+        const editedBook = Object.assign({}, defaultBook, state[action.id])
         Object.keys(defaultBook).forEach((key) => {
           if (action[key] !== undefined) editedBook[key] = action[key]
         })
