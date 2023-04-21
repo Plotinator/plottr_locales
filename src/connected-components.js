@@ -321,11 +321,6 @@ const platform = {
       })
     },
     listOfflineFiles,
-    findUniqueNameInPath: (...args) => {
-      return whenClientIsReady(({ findUniqueNameInPath }) => {
-        return findUniqueNameInPath(...args)
-      })
-    },
     createAndOpenCopy: (oldPath, oldFileName, newFileName) => {
       return createAndOpenCopy(oldPath, oldFileName, newFileName)
     },
