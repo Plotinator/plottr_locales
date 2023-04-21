@@ -20,7 +20,7 @@ const SettingsWizardStep3Connector = (connector) => {
     return (
       <OnboardingStep>
         <StepHeader>
-          <div style={{ textAlign: 'left', marginLeft: '8%' }}>
+          <div className="onboarding__settings">
             <h3>{t('Backups')}</h3>
             <h6>{t('Choose how to backup your work')}</h6>
           </div>

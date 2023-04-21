@@ -16,7 +16,7 @@ const SettingsWizardStep2Connector = (connector) => {
     return (
       <OnboardingStep>
         <StepHeader>
-          <div style={{ textAlign: 'left', marginLeft: '8%' }}>
+          <div className="onboarding__header">
             <h3>{t('Files')}</h3>
             <h6>{t('Choose how to save your files')}</h6>
           </div>

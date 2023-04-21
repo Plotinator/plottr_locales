@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
 import PropTypes from 'react-proptypes'
+import { isObject } from 'lodash'
 
 import { t } from 'plottr_locales'
+import { helpers } from 'pltr/v2'
 
 import UnconnectedNewProjectInputModal from '../../dialogs/NewProjectInputModal'
 import UnconnectedNewFiles from './NewFiles'
@@ -79,8 +81,7 @@ const FilesHomeConnector = (connector) => {
     return userDocumentsPath().then((docPath) => {
       return showSaveDialog(filters, title, docPath).then((fileName) => {
         if (fileName) {
-          const filePath = fileName.endsWith('.pltr') ? fileName : `${fileName}.pltr`
-          return filePath
+          return helpers.file.ensureEndsInPltr(fileName)
         }
         return Promise.resolve()
       })
@@ -142,7 +143,7 @@ const FilesHomeConnector = (connector) => {
       if (isInOfflineMode) return
 
       if (settings.user.defaultFolder && settings.user.defaultFolderLocation) {
-        if (template.constructor.name == 'Object') {
+        if (isObject(template)) {
           mpq.push('btn_create_with_template', { template_name: template.name })
           projectActions.startCreatingNewProject(template)
           setView('recent')
@@ -152,7 +153,7 @@ const FilesHomeConnector = (connector) => {
       } else {
         savePlottrProjectDialog().then((newFilePath) => {
           if (newFilePath) {
-            let templateObj = template.constructor.name == 'Object' ? template : null
+            let templateObj = isObject(template) ? template : null
             createNew(templateObj, newFilePath)
             setView('recent')
           }

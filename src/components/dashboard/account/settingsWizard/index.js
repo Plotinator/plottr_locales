@@ -61,7 +61,7 @@ const SettingsWizardConnector = (connector) => {
 
     return connect((state) => {
       return {
-        step: selectors.currentSettingsWizardStepSelector(state.present),
+        step: selectors.currentSettingsWizardStepSelector(state),
       }
     })(SettingsWizard)
   }
