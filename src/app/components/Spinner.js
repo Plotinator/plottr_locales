@@ -3,7 +3,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { PropTypes } from 'prop-types'
 
-import { selectors } from 'pltr/v2'
+import { selectors } from 'wired-up-pltr'
 import { FullPageSpinner as Spinner } from 'connected-components'
 
 const FullPageSpinner = ({ isLoading }) => {
@@ -17,5 +17,5 @@ FullPageSpinner.propTypes = {
 }
 
 export default connect((state) => ({
-  isLoading: selectors.applicationIsBusyAndUninterruptableSelector(state.present),
+  isLoading: selectors.applicationIsBusyAndUninterruptableSelector(state),
 }))(FullPageSpinner)

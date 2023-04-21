@@ -3,7 +3,7 @@ import { PropTypes } from 'prop-types'
 import { connect } from 'react-redux'
 import { FaSignal } from 'react-icons/fa'
 
-import { selectors } from 'pltr/v2'
+import { selectors } from 'wired-up-pltr'
 
 import { t } from 'plottr_locales'
 
@@ -22,6 +22,6 @@ OfflineBanner.propTypes = {
 }
 
 export default connect((state) => ({
-  isOffline: selectors.isOfflineSelector(state.present),
-  shouldBeInPro: selectors.shouldBeInProSelector(state.present),
+  isOffline: selectors.isOfflineSelector(state),
+  shouldBeInPro: selectors.shouldBeInProSelector(state),
 }))(OfflineBanner)

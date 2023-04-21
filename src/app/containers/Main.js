@@ -4,7 +4,8 @@ import { connect } from 'react-redux'
 import { IoIosAlert } from 'react-icons/io'
 
 import { t } from 'plottr_locales'
-import { helpers, actions, selectors } from 'pltr/v2'
+import { helpers } from 'pltr/v2'
+import { actions, selectors } from 'wired-up-pltr'
 import { Button } from 'plottr_components'
 
 import { bootFile } from '../bootFile'
@@ -569,33 +570,33 @@ Main.propTypes = {
 
 export default connect(
   (state) => ({
-    busyBooting: selectors.applicationIsBusyButFileCouldBeUnloadedSelector(state.present),
-    isFirstTime: selectors.isFirstTimeSelector(state.present),
-    needsToLogin: selectors.userNeedsToLoginSelector(state.present),
-    isInProMode: selectors.hasProSelector(state.present),
-    isInTrialModeWithExpiredTrial: selectors.isInTrialModeWithExpiredTrialSelector(state.present),
-    showDashboard: selectors.showDashboardOnBootSelector(state.present),
-    checkingFileToLoad: selectors.checkingFileToLoadSelector(state.present),
-    checkedFileToLoad: selectors.checkedFileToLoadSelector(state.present),
-    readyToCheckFileToLoad: selectors.readyToCheckFileToLoadSelector(state.present),
-    cantShowFile: selectors.cantShowFileSelector(state.present),
-    selectedFileIsCloudFile: selectors.isCloudFileSelector(state.present),
-    loadingState: selectors.loadingStateSelector(state.present),
-    errorLoadingFile: selectors.errorLoadingFileSelector(state.present) || false,
-    errorIsUpdateError: selectors.errorIsUpdateErrorSelector(state.present) || false,
-    loadingProgress: selectors.loadingProgressSelector(state.present),
-    darkMode: selectors.isDarkModeSelector(state.present),
-    isInOfflineMode: selectors.isInOfflineModeSelector(state.present),
-    currentAppStateIsDashboard: selectors.currentAppStateIsDashboardSelector(state.present),
-    fileName: selectors.fileNameSelector(state.present),
-    fileURL: selectors.fileURLSelector(state.present),
-    isOnboardingFromRoot: selectors.isOnboardingToProFromRootSelector(state.present),
-    isOnboarding: selectors.isOnboardingToProSelector(state.present),
-    fileToUpload: selectors.filePathToUploadSelector(state.present),
-    uploadingFileToCloud: selectors.uploadingFileToCloudSelector(state.present),
-    emailAddress: selectors.emailAddressSelector(state.present),
-    userId: selectors.userIdSelector(state.present),
-    settings: selectors.appSettingsSelector(state.present),
+    busyBooting: selectors.applicationIsBusyButFileCouldBeUnloadedSelector(state),
+    isFirstTime: selectors.isFirstTimeSelector(state),
+    needsToLogin: selectors.userNeedsToLoginSelector(state),
+    isInProMode: selectors.hasProSelector(state),
+    isInTrialModeWithExpiredTrial: selectors.isInTrialModeWithExpiredTrialSelector(state),
+    showDashboard: selectors.showDashboardOnBootSelector(state),
+    checkingFileToLoad: selectors.checkingFileToLoadSelector(state),
+    checkedFileToLoad: selectors.checkedFileToLoadSelector(state),
+    readyToCheckFileToLoad: selectors.readyToCheckFileToLoadSelector(state),
+    cantShowFile: selectors.cantShowFileSelector(state),
+    selectedFileIsCloudFile: selectors.isCloudFileSelector(state),
+    loadingState: selectors.loadingStateSelector(state),
+    errorLoadingFile: selectors.errorLoadingFileSelector(state) || false,
+    errorIsUpdateError: selectors.errorIsUpdateErrorSelector(state) || false,
+    loadingProgress: selectors.loadingProgressSelector(state),
+    darkMode: selectors.isDarkModeSelector(state),
+    isInOfflineMode: selectors.isInOfflineModeSelector(state),
+    currentAppStateIsDashboard: selectors.currentAppStateIsDashboardSelector(state),
+    fileName: selectors.fileNameSelector(state),
+    fileURL: selectors.fileURLSelector(state),
+    isOnboardingFromRoot: selectors.isOnboardingToProFromRootSelector(state),
+    isOnboarding: selectors.isOnboardingToProSelector(state),
+    fileToUpload: selectors.filePathToUploadSelector(state),
+    uploadingFileToCloud: selectors.uploadingFileToCloudSelector(state),
+    emailAddress: selectors.emailAddressSelector(state),
+    userId: selectors.userIdSelector(state),
+    settings: selectors.appSettingsSelector(state),
   }),
   {
     setOffline: actions.project.setOffline,

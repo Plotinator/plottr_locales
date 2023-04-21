@@ -1,13 +1,14 @@
 import electron, { shell, Notification, dialog } from 'electron'
 import currentSettings, { saveAppSetting } from './modules/settings'
 import { setupI18n } from 'plottr_locales'
+import { identity } from 'lodash'
 import https from 'https'
 import fs from 'fs'
 import { machineId } from 'node-machine-id'
 import { parse } from 'dotenv'
 import { v4 as uuid } from 'uuid'
 
-import { helpers } from 'pltr/v2'
+import { helpers, selectors as pltrSelectors } from 'pltr/v2'
 import { askToExport } from 'plottr_import_export'
 import { t } from 'plottr_locales'
 
@@ -37,6 +38,8 @@ import {
 import { editWindowPath, setFilePathForWindowWithId } from './modules/windows/index'
 import { lastOpenedFile, setLastOpenedFilePath } from './modules/lastOpened'
 import { whenClientIsReady } from '../shared/socket-client/index'
+
+const selectors = pltrSelectors(identity)
 
 const { readFile } = fs.promises
 
@@ -680,6 +683,7 @@ export const listenOnIPCMain = (
         stat,
         mkdir,
         basename,
+        selectors,
         (error, success) => {
           if (error) {
             event.sender.send(replyChannel, { error: error.message })

@@ -4,7 +4,7 @@ import { PropTypes } from 'prop-types'
 import cx from 'classnames'
 import { VscChromeClose } from 'react-icons/vsc'
 
-import { selectors } from 'pltr/v2'
+import { selectors } from 'wired-up-pltr'
 import { PlottrModal, ErrorBoundary, DashboardBody, DashboardNav } from 'connected-components'
 
 const modalStyles = {
@@ -62,5 +62,5 @@ DashboardModal.propTypes = {
 }
 
 export default connect((state) => ({
-  darkMode: selectors.isDarkModeSelector(state.present),
+  darkMode: selectors.isDarkModeSelector(state),
 }))(DashboardModal)

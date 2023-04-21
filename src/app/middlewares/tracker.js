@@ -1,4 +1,5 @@
-import { ActionTypes, selectors } from 'pltr/v2'
+import { ActionTypes } from 'pltr/v2'
+import { selectors } from 'wired-up-pltr'
 import makeFileSystemAPIs from '../../api/file-system-apis'
 import MPQ from '../../common/utils/MPQ'
 import { shouldIgnoreAction } from './shouldIgnoreAction'

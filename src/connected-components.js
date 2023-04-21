@@ -3,7 +3,9 @@ import { ActionCreators } from 'redux-undo'
 import { t } from 'plottr_locales'
 import { connections } from 'plottr_components'
 import export_config from 'plottr_import_export/src/exporter/default_config'
-import { actions, selectors, helpers } from 'pltr/v2'
+import { helpers } from 'pltr/v2'
+import * as pltr from 'pltr/v2'
+import { actions, selectors } from 'wired-up-pltr'
 import {
   publishRCEOperations,
   fetchRCEOperations,
@@ -140,14 +142,15 @@ const platform = {
   file: {
     createNew: (template, name) => {
       const state = store.getState()
-      const {
-        client: { emailAddress, userId, clientId },
-      } = state.present
-      const fileList = selectors.knownFilesSelector(state.present)
+      const file = selectors.fullFileStateSelector(state)
+      const emailAddress = selectors.emailAddressSelector(state)
+      const userId = selectors.userIdSelector(state)
+      const clientId = selectors.clientIdSelector(state)
+      const fileList = selectors.knownFilesSelector(state)
       if (userId) {
         store.dispatch(actions.project.showLoader(true))
         store.dispatch(actions.applicationState.startCreatingCloudFile())
-        newFile(emailAddress, userId, fileList, state, clientId, template, openFile, name)
+        newFile(emailAddress, userId, fileList, file, clientId, template, openFile, name)
           .then((fileId) => {
             logger.info('Created new file.', fileId)
             store.dispatch(actions.project.showLoader(false))
@@ -164,10 +167,9 @@ const platform = {
     },
     openExistingFile: () => {
       const state = store.getState()
-      const {
-        client: { userId, emailAddress },
-      } = state.present
-      const isLoggedIn = selectors.isLoggedInSelector(state.present)
+      const emailAddress = selectors.emailAddressSelector(state)
+      const userId = selectors.userIdSelector(state)
+      const isLoggedIn = selectors.isLoggedInSelector(state)
       if (isLoggedIn) {
         store.dispatch(actions.applicationState.startUploadingFileToCloud())
       }
@@ -205,7 +207,7 @@ const platform = {
     // FIXME: this is very poorly named.  Esp. since the second
     // parametor is a flag for whether the file is known XD
     openKnownFile: (fileURL, unknown) => {
-      const state = store.getState().present
+      const state = store.getState()
       const loadedFileURL = selectors.fileURLSelector(state)
       if (fileURL === loadedFileURL) {
         closeDashboard()
@@ -214,7 +216,7 @@ const platform = {
       }
     },
     deleteKnownFile: (fileURL) => {
-      const state = store.getState().present
+      const state = store.getState()
       const currentFileURL = selectors.fileURLSelector(state)
       const userId = selectors.userIdSelector(state)
       const clientId = selectors.clientIdSelector(state)
@@ -289,12 +291,12 @@ const platform = {
     rmRF,
     writeFile,
     createFromSnowflake: (importedPath) => {
-      const state = store.getState().present
+      const state = store.getState()
       const isLoggedIntoPro = selectors.hasProSelector(state)
       createFromSnowflake(importedPath, isLoggedIntoPro)
     },
     createFromScrivener: (importedPath) => {
-      const state = store.getState().present
+      const state = store.getState()
       const isLoggedIntoPro = selectors.hasProSelector(state)
       createFromScrivener(importedPath, isLoggedIntoPro)
     },
@@ -377,14 +379,12 @@ const platform = {
   template: {
     deleteTemplate: (templateId) => {
       const state = store.getState()
-      const {
-        client: { userId },
-      } = state.present
+      const userId = selectors.userIdSelector(state)
       return deleteTemplate(templateId, userId)
     },
     editTemplateDetails: (templateId, templateDetails) => {
       const state = store.getState()
-      const userId = selectors.userIdSelector(state.present)
+      const userId = selectors.userIdSelector(state)
       editTemplateDetails(templateId, templateDetails, userId)
     },
     startSaveAsTemplate: (itemType) => {
@@ -431,7 +431,7 @@ const platform = {
     document.dispatchEvent(event)
   },
   duplicateFile: (fileUrl) => {
-    const state = store.getState().present
+    const state = store.getState()
     const isLoggedIntoPro = selectors.hasProSelector(state)
 
     const event = isLoggedIntoPro
@@ -484,8 +484,8 @@ const platform = {
       if (!storageUrl) return null
       const state = store.getState()
 
-      const fileId = selectors.fileIdSelector(state.present)
-      const userId = selectors.userIdSelector(state.present)
+      const fileId = selectors.fileIdSelector(state)
+      const userId = selectors.userIdSelector(state)
       if (!fileId || !userId) {
         return Promise.reject(
           'No file or you are not logged in.  Either way we cannot fetch a picture.'
@@ -495,16 +495,12 @@ const platform = {
     },
     saveImageToStorageBlob: (blob, name) => {
       const state = store.getState()
-      const {
-        client: { userId },
-      } = state.present
+      const userId = selectors.userIdSelector(state)
       return saveImageToStorageBlobInFirebase(userId, name, blob)
     },
     saveImageToStorageFromURL: (url, name) => {
       const state = store.getState()
-      const {
-        client: { userId },
-      } = state.present
+      const userId = selectors.userIdSelector(state)
       return saveImageToStorageFromURLInFirebase(userId, name, url)
     },
     resizeImage,
@@ -512,7 +508,8 @@ const platform = {
   },
 }
 
-const components = connections.pltr(platform)
+// Override the selectors and actions with the ones that are wired up.
+const components = connections.pltr(platform, { ...pltr, actions, selectors })
 
 export const Navbar = components.Navbar
 export const Grid = components.Grid
