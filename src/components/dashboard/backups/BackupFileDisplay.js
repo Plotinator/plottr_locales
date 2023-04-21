@@ -12,7 +12,7 @@ const BackupFileDisplayConnector = (connector) => {
   const {
     platform: {
       mpq,
-      file: { joinPath, saveFile, doesFileExist, readFile },
+      file: { joinPath, saveFile, doesFileExist, readFile, findUniqueNameInPath },
       log,
       userDocumentsPath,
       addToKnownFilesAndOpen,
@@ -27,6 +27,7 @@ const BackupFileDisplayConnector = (connector) => {
     saveFile,
     doesFileExist,
     readFile,
+    findUniqueNameInPath,
     log,
     userDocumentsPath,
     addToKnownFilesAndOpen,
@@ -44,21 +45,6 @@ const BackupFileDisplayConnector = (connector) => {
     hasCurrentProLicense,
   }) => {
     const [showActions, setShowActions] = useState(false)
-
-    const findPathThatDoesntExist = (originalPath, index = 0) => {
-      return doesFileExist(originalPath).then((exists) => {
-        if (exists) {
-          // add one and try again
-          const newIndex = index + 1
-          const newPath = index
-            ? originalPath.replace(` - ${index}.pltr`, ` - ${newIndex}.pltr`)
-            : originalPath.replace(`.pltr`, ` - ${newIndex}.pltr`)
-          return findPathThatDoesntExist(newPath, newIndex)
-        } else {
-          return originalPath
-        }
-      })
-    }
 
     const migrateSaveAndOpen = (json, oldUrl, newFileURL) => {
       return appVersion().then((version) => {
@@ -82,7 +68,7 @@ const BackupFileDisplayConnector = (connector) => {
           const fileJSON = JSON.parse(fileText)
           if (settings.user.defaultFolder && settings.user.defaultFolderLocation) {
             joinPath(settings.user.defaultFolderLocation, newFileName).then((newFullPath) => {
-              findPathThatDoesntExist(newFullPath).then((uniquePath) => {
+              findUniqueNameInPath(newFullPath).then((uniquePath) => {
                 const newFileURL = helpers.file.filePathToFileURL(uniquePath)
                 migrateSaveAndOpen(fileJSON, oldFullPath, newFileURL)
               })

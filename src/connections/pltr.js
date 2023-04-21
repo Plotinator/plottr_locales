@@ -143,6 +143,7 @@ const pltrTypeSpecs = {
     createFromScrivener: PropTypes.func.isRequired,
     joinPath: PropTypes.func.isRequired,
     listOfflineFiles: PropTypes.func.isRequired,
+    findUniqueNameInPath: PropTypes.func.isRequired,
   }),
   update: PropTypes.shape({
     quitToInstall: PropTypes.func.isRequired,
