@@ -37,6 +37,7 @@ import {
   newFile,
   uploadExisting,
   deleteCloudBackupFile,
+  createAndOpenCopy,
 } from './files'
 import logger from '../shared/logger'
 import { closeDashboard } from './dashboard-events'
@@ -324,6 +325,9 @@ const platform = {
       return whenClientIsReady(({ findUniqueNameInPath }) => {
         return findUniqueNameInPath(...args)
       })
+    },
+    createAndOpenCopy: (oldPath, oldFileName, newFileName) => {
+      return createAndOpenCopy(oldPath, oldFileName, newFileName)
     },
   },
   update: {
