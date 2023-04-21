@@ -320,6 +320,11 @@ const platform = {
       })
     },
     listOfflineFiles,
+    findUniqueNameInPath: (...args) => {
+      return whenClientIsReady(({ findUniqueNameInPath }) => {
+        return findUniqueNameInPath(...args)
+      })
+    },
   },
   update: {
     quitToInstall: () => {

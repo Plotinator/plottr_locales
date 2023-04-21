@@ -13,6 +13,8 @@ const extname = path.extname
 
 const resolvePath = path.resolve
 
+const MAX_ATTEMPTS_TO_FIND_TEMP_FILE_NAME = 50
+
 function removeSystemKeys(jsonData) {
   const withoutSystemKeys = {}
   Object.keys(jsonData).map((key) => {
@@ -364,6 +366,26 @@ const fileModule = (userDataPath) => {
       return mkdir(path, { recursive: true })
     }
 
+    const findUniqueNameInPath = (originalPath, counter = 0) => {
+      return fileExists(originalPath).then((exists) => {
+        if (exists) {
+          if (counter > MAX_ATTEMPTS_TO_FIND_TEMP_FILE_NAME) {
+            const errorMessage = `We couldn't save your file to ${originalPath}`
+            logger.error(errorMessage, 'reached max attempts to find unique file name')
+            return Promise.reject(new Error('Could not find a unique name for the file'))
+          }
+          // add one and try again
+          const newCounter = counter + 1
+          const newPath = counter
+            ? originalPath.replace(` - ${counter}.pltr`, ` - ${newCounter}.pltr`)
+            : originalPath.replace(`.pltr`, ` - ${newCounter}.pltr`)
+          return findUniqueNameInPath(newPath, newCounter)
+        } else {
+          return originalPath
+        }
+      })
+    }
+
     return {
       saveFile,
       saveOfflineFile,
@@ -385,6 +407,7 @@ const fileModule = (userDataPath) => {
       stat,
       readdir,
       mkdir: makeDirectory,
+      findUniqueNameInPath,
     }
   }
 }

@@ -6,49 +6,14 @@ import { helpers } from 'pltr/v2'
 
 const { lstat, mkdir } = fs.promises
 
-const MAX_ATTEMPTS_TO_FIND_TEMP_FILE_NAME = 50
-
 const makeDefaultLocationModule = (settings, fileModule, logger) => {
   const { readSettings } = settings
-  const { fileExists, saveFile } = fileModule
+  const { saveFile, findUniqueNameInPath } = fileModule
 
   function uniqueFilePath(fileName) {
     return readSettings().then((settings) => {
       const defaultFolderLocation = settings.user.defaultFolderLocation
-      function iter(counter, filePath) {
-        if (counter > MAX_ATTEMPTS_TO_FIND_TEMP_FILE_NAME) {
-          const errorMessage = `We couldn't save your file to ${filePath}`
-          logger.error(errorMessage, 'reached max attempts to find unique file name')
-          return Promise.reject(new Error(errorMessage))
-        }
-        return fileExists(filePath).then((exists) => {
-          if (exists) {
-            logger.warn(`File exists at ${filePath}.  Attempting to create a new name`)
-            const tempName = `${fileName}-${counter + 1}.pltr`
-            return iter(counter + 1, path.join(defaultFolderLocation, tempName))
-          }
-
-          return filePath
-        })
-      }
-
-      return iter(0, path.join(defaultFolderLocation, `${fileName}.pltr`)).then((filePath) => {
-        return lstat(filePath)
-          .then(() => {
-            const errorMessage = `File: ${filePath} already exists.`
-            logger.error(errorMessage)
-            return Promise.reject(new Error(errorMessage))
-          })
-          .catch((error) => {
-            if (error.code === 'ENOENT') {
-              return filePath
-            }
-
-            const message = `Couldn't create a unique path for file ${fileName}`
-            logger.error(message, error)
-            return Promise.reject(error)
-          })
-      })
+      return findUniqueNameInPath(path.join(defaultFolderLocation, `${fileName}.pltr`), 0)
     })
   }
 

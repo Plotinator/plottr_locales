@@ -85,6 +85,7 @@ import {
   STAT,
   MKDIR,
   CREATE_SHORTCUT,
+  FIND_UNIQUE_NAME_IN_PATH,
 } from '../../shared/socket-server-message-types'
 import { makeLogger } from './logger'
 import wireupFileModule from './files'
@@ -190,6 +191,7 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
       stat,
       readdir,
       mkdir,
+      findUniqueNameInPath,
     } = fileModule
     const fileSystemModule = makeFileSystemModule(stores, logger)
     const {
@@ -908,6 +910,14 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
               () => ['Joining path args to create an OS path', pathArgs],
               () => statusManager.registerTask(join(...pathArgs), JOIN),
               () => ['Joining path args to create an OS path', pathArgs]
+            )
+          }
+          case FIND_UNIQUE_NAME_IN_PATH: {
+            const { path } = payload
+            return handlePromise(
+              () => ['Finding a unique name in path', path],
+              () => statusManager.registerTask(findUniqueNameInPath(...path), JOIN),
+              () => ['Finding a unique name in path', path]
             )
           }
           case PATH_SEP: {
