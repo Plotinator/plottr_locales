@@ -75,7 +75,7 @@ const SettingsWizardStep1Connector = (connector) => {
     return (
       <OnboardingStep>
         <StepHeader>
-          <div style={{ textAlign: 'left', marginLeft: '8%' }}>
+          <div className="onboarding__settings">
             <h3>{t('The Basics')}</h3>
             <h6>{t('Some easy choices')}</h6>
           </div>
@@ -151,7 +151,7 @@ const SettingsWizardStep1Connector = (connector) => {
 
     return connect(
       (state) => ({
-        settings: selectors.appSettingsSelector(state.present),
+        settings: selectors.appSettingsSelector(state),
       }),
       {
         nextStep: actions.applicationState.advanceSettingsWizard,
