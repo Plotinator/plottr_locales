@@ -45,15 +45,6 @@ const BackupFileDisplayConnector = (connector) => {
   }) => {
     const [showActions, setShowActions] = useState(false)
 
-    const ensureEndsInPltr = (filePath) => {
-      if (!filePath) return null
-
-      if (!filePath.endsWith('.pltr')) {
-        return `${filePath}.pltr`
-      }
-      return filePath
-    }
-
     const findPathThatDoesntExist = (originalPath, index = 0) => {
       return doesFileExist(originalPath).then((exists) => {
         if (exists) {
@@ -103,7 +94,7 @@ const BackupFileDisplayConnector = (connector) => {
                 const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
                 showSaveDialog(filters, title, newFullPath).then((fileName) => {
                   if (fileName) {
-                    const newFilePath = ensureEndsInPltr(fileName)
+                    const newFilePath = helpers.file.ensureEndsInPltr(fileName)
                     const newFileURL = helpers.file.filePathToFileURL(newFilePath)
                     migrateSaveAndOpen(fileJSON, oldFullPath, newFileURL)
                   }
