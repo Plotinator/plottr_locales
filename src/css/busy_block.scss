@@ -1,9 +1,0 @@
-.busy {
-  animation: Pulsate 2s linear infinite;
-}
-
-@keyframes Pulsate {
-  from { opacity: 1; }
-  50% { opacity: 0; }
-  to { opacity: 1; }
-}
