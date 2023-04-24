@@ -1,10 +1,20 @@
 import React from 'react'
-import * as pltr from 'pltr/v2'
+import { identity } from 'lodash'
+
+import * as rawPltr from 'pltr/v2'
+
 import fileState from './example-state'
 
-const identity = (x) => x
+const selectors = rawPltr.selectors(identity)
+const actions = rawPltr.actions(identity)
 
-const state = { present: fileState }
+const pltr = {
+  ...rawPltr,
+  selectors,
+  actions,
+}
+
+const state = fileState
 
 const connector = {
   redux: {

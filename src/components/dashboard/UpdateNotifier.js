@@ -241,17 +241,17 @@ const UpdateNotifierConnector = (connector) => {
 
     return connect(
       (state) => ({
-        shouldCheck: selectors.shouldCheckForUpdatesSelector(state.present),
-        available: selectors.updateAvailableSelector(state.present),
-        downloadInProgress: selectors.downloadInProgressSelector(state.present),
-        percentDownloaded: selectors.percentDownloadedSelector(state.present),
-        finishedDownloading: selectors.finishedDownloadingSelector(state.present),
-        error: selectors.updateErrorSelector(state.present),
-        info: selectors.updateInfoSelector(state.present),
-        hidden: selectors.updateNotificationHiddenSelector(state.present),
-        checking: selectors.checkingForUpdatesSelector(state.present),
-        darkMode: selectors.isDarkModeSelector(state.present),
-        settings: selectors.appSettingsSelector(state.present),
+        shouldCheck: selectors.shouldCheckForUpdatesSelector(state),
+        available: selectors.updateAvailableSelector(state),
+        downloadInProgress: selectors.downloadInProgressSelector(state),
+        percentDownloaded: selectors.percentDownloadedSelector(state),
+        finishedDownloading: selectors.finishedDownloadingSelector(state),
+        error: selectors.updateErrorSelector(state),
+        info: selectors.updateInfoSelector(state),
+        hidden: selectors.updateNotificationHiddenSelector(state),
+        checking: selectors.checkingForUpdatesSelector(state),
+        darkMode: selectors.isDarkModeSelector(state),
+        settings: selectors.appSettingsSelector(state),
       }),
       {
         requestCheckForUpdates: actions.applicationState.requestCheckForUpdates,

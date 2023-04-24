@@ -274,7 +274,7 @@ const TagViewConnector = (connector) => {
     return connect(
       (state) => {
         return {
-          darkMode: selectors.isDarkModeSelector(state.present),
+          darkMode: selectors.isDarkModeSelector(state),
         }
       },
       (dispatch) => {

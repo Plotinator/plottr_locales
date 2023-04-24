@@ -153,10 +153,10 @@ const DashboardErrorBoundaryConnector = (connector) => {
     const { connect } = redux
 
     return connect((state) => ({
-      proInfo: selectors.proInfoSelector(state.present),
-      trialInfo: selectors.trialInfoSelector(state.present),
-      darkMode: selectors.isDarkModeSelector(state.present),
-      user: selectors.userSettingsSelector(state.present),
+      proInfo: selectors.proInfoSelector(state),
+      trialInfo: selectors.trialInfoSelector(state),
+      darkMode: selectors.isDarkModeSelector(state),
+      user: selectors.userSettingsSelector(state),
     }))(DashboardErrorBoundary)
   }
 

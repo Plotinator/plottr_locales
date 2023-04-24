@@ -485,24 +485,22 @@ const CharacterEditDetailsConnector = (connector) => {
       (state, ownProps) => {
         const editorPath = helpers.editors.characterNotesEditorPath(ownProps.characterId)
         return {
-          character: selectors.displayedSingleCharacterSelector(
-            state.present,
-            ownProps.characterId
-          ),
-          attributes: selectors.characterAttributesSelector(state.present, ownProps.characterId),
-          selection: selectors.selectionSelector(state.present, editorPath),
+          character: selectors.displayedSingleCharacterSelector(state, ownProps.characterId),
+          attributes: selectors.characterAttributesSelector(state, ownProps.characterId),
+          selection: selectors.selectionSelector(state, editorPath),
           editorPath,
-          darkMode: selectors.isDarkModeSelector(state.present),
-          getTemplateById: (templateId) =>
-            selectors.templateByIdSelector(state.present, templateId),
+          darkMode: selectors.isDarkModeSelector(state),
+          getTemplateById: (templateId) => selectors.templateByIdSelector(state, templateId),
           templateAttributeValue: (templateId, attributeName) => {
-            return selectors.characterTemplateAttributeValueSelector(
-              ownProps.characterId,
-              templateId,
-              attributeName
-            )
+            return (state) =>
+              selectors.characterTemplateAttributeValueSelector(
+                state,
+                ownProps.characterId,
+                templateId,
+                attributeName
+              )
           },
-          charactersSearchTerm: selectors.charactersSearchTermSelector(state.present),
+          charactersSearchTerm: selectors.charactersSearchTermSelector(state),
         }
       },
       (dispatch) => {

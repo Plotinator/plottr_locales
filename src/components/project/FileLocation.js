@@ -13,7 +13,7 @@ const FileLocationConnector = (connector) => {
   } = connector
   checkDependencies({ moveFromTemp, showItemInFolder, isMacOS, os })
 
-  const FileLocation = ({ fileURL, state, hasCurrentProLicense, isTemp }) => {
+  const FileLocation = ({ fileURL, withFullState, hasCurrentProLicense, isTemp }) => {
     let showInMessage = t('Show in File Explorer')
     if (isMacOS()) {
       showInMessage = t('Show in Finder')
@@ -41,7 +41,9 @@ const FileLocationConnector = (connector) => {
         <Button
           bsSize="small"
           onClick={() => {
-            chooseLocation(state)
+            withFullState((state) => {
+              return chooseLocation(state)
+            })
           }}
           title={t('Choose where to save this file on your computer')}
         >
@@ -55,34 +57,35 @@ const FileLocationConnector = (connector) => {
 
   FileLocation.propTypes = {
     fileURL: PropTypes.string.isRequired,
-    state: PropTypes.object.isRequired,
     hasCurrentProLicense: PropTypes.bool,
+    withFullState: PropTypes.func.isRequired,
     isTemp: PropTypes.bool,
   }
 
   const {
     redux,
-    pltr: { selectors },
+    pltr: { selectors, actions },
   } = connector
-  checkDependencies({ redux })
+  checkDependencies({ redux, actions, selectors })
 
   if (redux) {
     const { connect } = redux
 
-    return connect((state) => {
-      return {
-        fileURL: selectors.fileURLSelector(state.present),
-        state: state.present,
-        hasCurrentProLicense: selectors.hasProSelector(state.present),
-        // NOTE: In other places we call this selector with a given
-        // prop for the fileURL selector.  That's why fileURL isn't
-        // *inside* isTempFileSelector.
-        isTemp: selectors.isTempFileSelector(
-          state.present,
-          selectors.fileURLSelector(state.present)
-        ),
+    return connect(
+      (state) => {
+        return {
+          fileURL: selectors.fileURLSelector(state),
+          hasCurrentProLicense: selectors.hasProSelector(state),
+          // NOTE: In other places we call this selector with a given
+          // prop for the fileURL selector.  That's why fileURL isn't
+          // *inside* isTempFileSelector.
+          isTemp: selectors.isTempFileSelector(state, selectors.fileURLSelector(state)),
+        }
+      },
+      {
+        withFullState: actions.project.withFullFileState,
       }
-    })(FileLocation)
+    )(FileLocation)
   }
 
   throw new Error('Could not connect FileLocation')

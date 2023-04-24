@@ -111,8 +111,8 @@ const PlottrFloaterConnector = (connector) => {
 
     return connect((state) => {
       return {
-        lastClick: selectors.lastClickSelector(state.present),
-        darkMode: selectors.isDarkModeSelector(state.present),
+        lastClick: selectors.lastClickSelector(state),
+        darkMode: selectors.isDarkModeSelector(state),
       }
     })(PlottrFloater)
   }

@@ -57,7 +57,7 @@ const PlottrModalConnector = (connector) => {
     const { connect } = redux
 
     return connect((state) => ({
-      isDarkMode: selectors.isDarkModeSelector(state.present),
+      isDarkMode: selectors.isDarkModeSelector(state),
     }))(PlottrModal)
   }
 
