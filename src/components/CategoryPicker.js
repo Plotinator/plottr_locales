@@ -53,14 +53,17 @@ const CategoryPickerConnector = (connector) => {
     }
   }
 
-  const { redux } = connector
+  const {
+    redux,
+    pltr: { selectors },
+  } = connector
   checkDependencies({ redux })
 
   if (redux) {
     const { connect } = redux
     return connect((state, ownProps) => {
       return {
-        categories: state.present.categories[ownProps.type],
+        categories: selectors.categoryByTypeSelector(state, ownProps.type),
       }
     })(CategoryPicker)
   }

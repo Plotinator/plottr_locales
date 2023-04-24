@@ -156,10 +156,10 @@ const ErrorBoundaryConnector = (connector) => {
 
     return connect((state) => {
       return {
-        darkMode: selectors.isDarkModeSelector(state.present),
-        proInfo: selectors.proInfoSelector(state.present),
-        trialInfo: selectors.trialInfoSelector(state.present),
-        user: selectors.userSettingsSelector(state.present),
+        darkMode: selectors.isDarkModeSelector(state),
+        proInfo: selectors.proInfoSelector(state),
+        trialInfo: selectors.trialInfoSelector(state),
+        user: selectors.userSettingsSelector(state),
       }
     })(ErrorBoundary)
   }

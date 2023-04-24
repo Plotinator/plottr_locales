@@ -251,12 +251,12 @@ const OutlineViewConnector = (connector) => {
     lines: PropTypes.array.isRequired,
     card2Dmap: PropTypes.object.isRequired,
     allCards: PropTypes.array,
-    outlineFilter: PropTypes.object,
+    outlineFilter: PropTypes.array,
     currentTimeline: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     isSeries: PropTypes.bool,
     actions: PropTypes.object.isRequired,
     outlineSearchTerm: PropTypes.string,
-    outlineScrollPosition: PropTypes.object,
+    outlineScrollPosition: PropTypes.number,
   }
 
   const {
@@ -271,15 +271,15 @@ const OutlineViewConnector = (connector) => {
     return connect(
       (state) => {
         return {
-          beats: selectors.visibleSortedBeatsByBookIgnoringCollapsedSelector(state.present),
-          lines: selectors.sortedLinesByBookSelector(state.present),
-          beatMapping: selectors.sparceBeatMap(state.present),
-          card2Dmap: selectors.outlineSearchedCardMapSelector(state.present),
-          outlineFilter: selectors.outlineFilterSelector(state.present),
-          allCards: selectors.allCardsSelector(state.present),
-          isSeries: selectors.isSeriesSelector(state.present),
-          outlineSearchTerm: selectors.outlineSearchTermSelector(state.present),
-          outlineScrollPosition: selectors.outlineScrollPositionSelector(state.present),
+          beats: selectors.visibleSortedBeatsByBookIgnoringCollapsedSelector(state),
+          lines: selectors.sortedLinesByBookSelector(state),
+          beatMapping: selectors.sparceBeatMap(state),
+          card2Dmap: selectors.outlineSearchedCardMapSelector(state),
+          outlineFilter: selectors.outlineFilterSelector(state),
+          allCards: selectors.allCardsSelector(state),
+          isSeries: selectors.isSeriesSelector(state),
+          outlineSearchTerm: selectors.outlineSearchTermSelector(state),
+          outlineScrollPosition: selectors.outlineScrollPositionSelector(state),
         }
       },
       (dispatch) => {

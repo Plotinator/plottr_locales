@@ -197,9 +197,9 @@ const FileActionsConnector = (connector) => {
     const { connect } = redux
 
     return connect((state, { fileURL }) => ({
-      isOnWeb: selectors.isOnWebSelector(state.present),
-      isTemp: selectors.isTempFileSelector(state.present, fileURL),
-      isInOfflineMode: selectors.isInOfflineModeSelector(state.present),
+      isOnWeb: selectors.isOnWebSelector(state),
+      isTemp: selectors.isTempFileSelector(state, fileURL),
+      isInOfflineMode: selectors.isInOfflineModeSelector(state),
     }))(FileActions)
   }
 

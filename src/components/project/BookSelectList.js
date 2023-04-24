@@ -144,9 +144,9 @@ const BookSelectListConnector = (connector) => {
 
     return connect((state) => {
       return {
-        books: state.present.books,
-        series: state.present.series,
-        click: selectors.lastClickSelector(state.present),
+        books: selectors.allBooksSelector(state),
+        series: selectors.seriesSelector(state),
+        click: selectors.lastClickSelector(state),
       }
     })(BookSelectList)
   }
