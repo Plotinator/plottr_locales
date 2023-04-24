@@ -1,8 +1,7 @@
-import React, { useRef, useState } from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
 import { FiCopy } from 'react-icons/fi'
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 
 import { t } from 'plottr_locales'
 
@@ -60,7 +59,6 @@ const CharacterEditDetailsConnector = (connector) => {
     const [removeWhichTemplate, setRemoveWhichTemplate] = useState(null)
     const [activeTab, setActiveTab] = useState(1)
     const [showTemplatePicker, setShowTemplatePicker] = useState(false)
-    const tabsRef = useRef(null)
 
     const deleteCharacter = (e) => {
       e.stopPropagation()
@@ -250,7 +248,7 @@ const CharacterEditDetailsConnector = (connector) => {
       })
     }
 
-    const renderTemplates = () => {
+    const renderEditingTemplates = () => {
       return character.templates.map((template, idx) => {
         const templateData = getTemplateById(template.id)
         const attrs = template.attributes.map((attr, index) => {
@@ -293,78 +291,32 @@ const CharacterEditDetailsConnector = (connector) => {
           )
         }
         return (
-          <Draggable key={template.id} draggableId={template.id.toString()} index={idx}>
-            {(provided, snapshot) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.draggableProps}
-                {...provided.dragHandleProps}
-                style={provided.draggableProps.style}
-                className={cx('custom-attribute__droppable', {
-                  dragging: snapshot.isDragging,
-                })}
+          <Tab
+            eventKey={idx + 3}
+            title={templateData?.name || template.name || t('Template')}
+            key={`tab-${idx}`}
+          >
+            <div className="template-tab__details">
+              <p>
+                {templateData?.description}
+                {link}
+              </p>
+              <Button
+                bsStyle="link"
+                className="text-danger"
+                onClick={() => beginRemoveTemplate(template.id)}
               >
-                <Tab
-                  eventKey={idx + 3}
-                  title={templateData?.name || template.name || t('Template')}
-                  key={`tab-${idx}`}
-                  tabTemplate={templateData || template}
-                >
-                  <div className="template-tab__details">
-                    <p>
-                      {templateData?.description}
-                      {link}
-                    </p>
-                    <Button
-                      bsStyle="link"
-                      className="text-danger"
-                      onClick={() => beginRemoveTemplate(template.id)}
-                    >
-                      {t('Remove template')}
-                    </Button>
-                  </div>
-                  {attrs}
-                </Tab>
-              </div>
-            )}
-          </Draggable>
+                {t('Remove template')}
+              </Button>
+            </div>
+            {attrs}
+          </Tab>
         )
       })
     }
 
-    const renderEditingTemplates = () => {
-      return (
-        <DragDropContext onDragEnd={handleDragEnd}>
-          <Droppable
-            key={character.templates[0]?.id}
-            droppableId={character.templates[0]?.id?.toString()}
-          >
-            {(droppableProvided, droppableSnapshot) => {
-              return (
-                <div
-                  ref={droppableProvided.innerRef}
-                  id="character-custom-attributes-templates"
-                  className={cx('custom-attributes-templates__list', {
-                    dragging: droppableSnapshot.isDraggingOver,
-                  })}
-                  {...droppableProvided.droppableProps}
-                >
-                  {droppableProvided.placeholder}
-                  {renderTemplates()}
-                </div>
-              )
-            }}
-          </Droppable>
-        </DragDropContext>
-      )
-    }
-
     const handleDuplicate = () => {
       actions.duplicateCharacter(character.id)
-    }
-
-    const handleDragEnd = (event) => {
-      console.log('event', event)
     }
 
     return (
