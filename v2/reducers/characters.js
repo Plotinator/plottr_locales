@@ -35,12 +35,14 @@ import {
   EDIT_CHARACTER_NAME,
   EDIT_CHARACTER_IMAGE,
   DELETE_CHARACTER_LEGACY_CUSTOM_ATTRIBUTE,
+  REORDER_CHARACTER_TEMPLATES,
 } from '../constants/ActionTypes'
 import { character as defaultCharacter } from '../store/initialState'
 import { newFileCharacters } from '../store/newFileState'
 import { nextId } from '../store/newIds'
 import { applyToCustomAttributes } from './applyToCustomAttributes'
 import { repairIfPresent } from './repairIfPresent'
+import { reorderList } from '../helpers/lists'
 
 const initialState = [defaultCharacter]
 
@@ -314,6 +316,23 @@ const characters =
             return character
           }
         })
+
+      case REORDER_CHARACTER_TEMPLATES: {
+        return state.map((character) => {
+          if (character.id === action.id) {
+            const reorderedTemplates = reorderList(
+              action.destination,
+              action.originalPosition,
+              character.templates
+            )
+            return {
+              ...character,
+              templates: reorderedTemplates,
+            }
+          }
+          return character
+        })
+      }
 
       case ATTACH_CHARACTER_TO_CARD:
         return state.map((character) => {
