@@ -21,15 +21,13 @@ const sameActionCloseInTime = (action, currentState, _previousHistory) => {
   const sameKeysAsLastTime = isEqual([...Object.keys(action)], currentState.actions.lastActionKeys)
 
   if (sameActionAsLastTime && sameKeysAsLastTime) {
-    const editorPath = action.editorMetadata && action.editorMetadata.editorPath
-    const editorPathSuffix = editorPath ? '_' + editorPath : ''
     const timeNow = new Date() * 1
     const timeDelta = timeNow - currentState.actions.lastActionTimestamp
     const actionCountBatch = Math.floor(currentState.actions.editCount / ACTIONS_TO_BATCH)
     if (timeDelta > TIME_DELTA_TO_BUNDLE_UNDOS) {
-      return `${action.type}_${timeNow}${editorPathSuffix}_${actionCountBatch}`
+      return `${action.type}_${timeNow}_${actionCountBatch}`
     }
-    return `${action.type}_${currentState.actions.startTimestamp}${editorPathSuffix}_${actionCountBatch}`
+    return `${action.type}_${currentState.actions.startTimestamp}_${actionCountBatch}`
   }
 
   return null
