@@ -304,7 +304,7 @@ function mapStateToProps(state) {
     userNeedsToLogin: selectors.userNeedsToLoginSelector(state),
     sessionChecked: selectors.sessionCheckedSelector(state),
     applicationIsBusyAndCannotBeQuit: selectors.busyWithWorkThatPreventsQuittingSelector(state),
-    searchDialogIsOpen: selectors.searchDialogIsOpenSelector(state.present),
+    searchDialogIsOpen: selectors.searchDialogIsOpenSelector(state),
   }
 }
 
