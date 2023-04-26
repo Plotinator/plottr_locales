@@ -386,6 +386,10 @@ const fileModule = (userDataPath) => {
       })
     }
 
+    const filePathAsArray = (filePath) => {
+      return Promise.resolve(filePath.split(separator))
+    }
+
     return {
       saveFile,
       saveOfflineFile,
@@ -408,6 +412,7 @@ const fileModule = (userDataPath) => {
       readdir,
       mkdir: makeDirectory,
       findUniqueNameInPath,
+      filePathAsArray,
     }
   }
 }

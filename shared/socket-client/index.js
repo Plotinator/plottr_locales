@@ -143,6 +143,8 @@ import {
   CREATE_SHORTCUT_ERROR_REPLY,
   FIND_UNIQUE_NAME_IN_PATH,
   FIND_UNIQUE_NAME_IN_PATH_ERROR_REPLY,
+  FILE_PATH_AS_ARRAY,
+  FILE_PATH_AS_ARRAY_ERROR_REPLY,
 } from '../socket-server-message-types'
 import { setPort, getPort } from './workerPort'
 
@@ -324,6 +326,7 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           case MKDIR:
           case RESOLVE:
           case FIND_UNIQUE_NAME_IN_PATH:
+          case FILE_PATH_AS_ARRAY:
           case PING: {
             resolvePromise()
             return
@@ -407,6 +410,7 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           case STAT_ERROR_REPLY:
           case MKDIR_ERROR_REPLY:
           case FIND_UNIQUE_NAME_IN_PATH_ERROR_REPLY:
+          case FILE_PATH_AS_ARRAY_ERROR_REPLY:
           case FILE_EXISTS_ERROR_REPLY: {
             rejectPromise()
             return
@@ -625,6 +629,10 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
       return sendPromise(FIND_UNIQUE_NAME_IN_PATH, { path })
     }
 
+    const filePathAsArray = (path) => {
+      return sendPromise(FILE_PATH_AS_ARRAY, { path })
+    }
+
     // ===File System APIs===
 
     const backupBasePath = () => {
@@ -827,6 +835,7 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           close: clientConnection.close.bind(clientConnection),
           inBadState,
           findUniqueNameInPath,
+          filePathAsArray,
         })
       })
     })

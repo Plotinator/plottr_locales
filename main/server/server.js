@@ -86,6 +86,7 @@ import {
   MKDIR,
   CREATE_SHORTCUT,
   FIND_UNIQUE_NAME_IN_PATH,
+  FILE_PATH_AS_ARRAY,
 } from '../../shared/socket-server-message-types'
 import { makeLogger } from './logger'
 import wireupFileModule from './files'
@@ -192,6 +193,7 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
       readdir,
       mkdir,
       findUniqueNameInPath,
+      filePathAsArray,
     } = fileModule
     const fileSystemModule = makeFileSystemModule(stores, logger)
     const {
@@ -916,8 +918,16 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
             const { path } = payload
             return handlePromise(
               () => ['Finding a unique name in path', path],
-              () => statusManager.registerTask(findUniqueNameInPath(...path), JOIN),
+              () => statusManager.registerTask(findUniqueNameInPath(path), JOIN),
               () => ['Finding a unique name in path', path]
+            )
+          }
+          case FILE_PATH_AS_ARRAY: {
+            const { path } = payload
+            return handlePromise(
+              () => ['Splitting path into array on separator', path],
+              () => statusManager.registerTask(filePathAsArray(path), JOIN),
+              () => ['Splitting path into array on separator', path]
             )
           }
           case PATH_SEP: {

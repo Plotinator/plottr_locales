@@ -209,6 +209,11 @@ const platform = {
         return basename(filePath)
       })
     },
+    filePathAsArray: (filePath) => {
+      return whenClientIsReady(({ filePathAsArray }) => {
+        return filePathAsArray(filePath)
+      })
+    },
     // FIXME: this is very poorly named.  Esp. since the second
     // parametor is a flag for whether the file is known XD
     openKnownFile: (fileURL, unknown) => {
