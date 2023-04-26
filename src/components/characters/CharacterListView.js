@@ -111,9 +111,10 @@ const CharacterListViewConnector = (connector) => {
     const [detailsVisible, setDetailsVisible] = useState(true)
 
     useEffect(() => {
-      uiActions.selectCharacter(
-        selectedId(visibleCharactersByCategory, characters, categories, selectedCharacteId)
-      )
+      const id = selectedId(visibleCharactersByCategory, characters, categories, selectedCharacteId)
+      if (id !== selectedCharacteId) {
+        uiActions.selectCharacter(id)
+      }
     }, [visibleCharactersByCategory, characters, categories])
 
     const editSelected = () => {
