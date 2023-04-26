@@ -220,6 +220,7 @@ export const EDIT_BOOK_IMAGE = 'EDIT_BOOK_IMAGE'
 export const DELETE_BOOK = 'DELETE_BOOK'
 export const REORDER_BOOKS = 'REORDER_BOOKS'
 export const LOAD_BOOKS = 'LOAD_BOOKS'
+export const DUPLICATE_BOOK = 'DUPLICATE_BOOK'
 
 // category actions
 export const ADD_CHARACTER_CATEGORY = 'ADD_CHARACTER_CATEGORY'
