@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import PropTypes from 'react-proptypes'
 
 import { t, setupI18n } from 'plottr_locales'
+import { defaultSettings } from 'pltr/v2'
 
 import Tab from '../../Tab'
 import Tabs from '../../Tabs'
@@ -84,10 +85,9 @@ const OptionsHomeConnector = (connector) => {
 
     const spellCheckText = spellCheckAtFirstIsOn ? t('Enabled') : t('Disabled')
 
-    // TODO: pull the default values from the right place (default_settings)
-    const rceFontIsDefault = settings.user.font === undefined || settings.user.font === 'Forum'
-    const rceFontSizeIsDefault =
-      settings.user.fontSize === undefined || settings.user.fontSize === 20
+    const { user } = defaultSettings.defaultsForPlatform(os())
+    const rceFontIsDefault = settings.user.font === user?.font
+    const rceFontSizeIsDefault = settings.user.fontSize === user?.fontSize
     const rceIsDefault = rceFontIsDefault && rceFontSizeIsDefault
 
     const handleSelectLanguage = useCallback(

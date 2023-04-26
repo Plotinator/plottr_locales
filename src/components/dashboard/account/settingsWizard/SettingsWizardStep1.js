@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'react-proptypes'
 
 import { t, setupI18n } from 'plottr_locales'
+import { defaultSettings } from 'pltr/v2'
 
 import { StepBody, StepFooter, StepHeader } from '../../../onboarding/Step'
 import OnboardingButtonBar from '../../../onboarding/OnboardingButtonBar'
@@ -66,10 +67,9 @@ const SettingsWizardStep1Connector = (connector) => {
       saveAppSetting('user.fontSize', 20)
     }, [saveAppSetting])
 
-    // TODO: pull the default values from the right place (default_settings)
-    const rceFontIsDefault = settings.user.font === undefined || settings.user.font === 'Forum'
-    const rceFontSizeIsDefault =
-      settings.user.fontSize === undefined || settings.user.fontSize === 20
+    const { user } = defaultSettings.defaultsForPlatform(os())
+    const rceFontIsDefault = settings.user.font === user?.font
+    const rceFontSizeIsDefault = settings.user.fontSize === user?.fontSize
     const rceIsDefault = rceFontIsDefault && rceFontSizeIsDefault
 
     return (
