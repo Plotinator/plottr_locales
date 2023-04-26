@@ -72,6 +72,7 @@ import * as lineColors from './store/lineColors'
 import { emptyFile, addMissingKeys } from './store/newFileState'
 import * as newIds from './store/newIds'
 import * as borderStyle from './store/borderStyle'
+import * as defaultSettings from './store/defaultSettings'
 
 import externalSync, { externalSyncWithoutHistory } from './middlewares/externalSync'
 
@@ -174,6 +175,7 @@ export {
   template,
   tree,
   borderStyle,
+  defaultSettings,
   slate,
   middlewares,
   ARRAY_KEYS,
