@@ -323,21 +323,22 @@ tellMeWhatOSImOn()
                   })
                 })
               } else {
-                const { present } = store.getState()
-                const isInOfflineMode = selectors.isInOfflineModeSelector(present)
+                const currentState = store.getState()
+                const isInOfflineMode = selectors.isInOfflineModeSelector(currentState)
+                const fileState = selectors.fullFileStateSelector(currentState)
                 if (isInOfflineMode) {
                   logger.info('Tried to save-as a file, but it is offline')
                   return Promise.resolve()
                 }
-                return basename(present.file.fileName, '.pltr').then((fileBaseName) => {
-                  defaultPath = useUserDefault ? defaultPath : present.file.fileName
+                return basename(fileState.file.fileName, '.pltr').then((fileBaseName) => {
+                  defaultPath = useUserDefault ? defaultPath : fileState.file.fileName
                   let defaultBaseName = useUserDefault ? fileBaseName : ''
                   join(defaultPath, defaultBaseName).then((finalDefaultPath) => {
                     showSaveDialog(filters, title, finalDefaultPath).then((fileName) => {
                       if (fileName) {
                         const newFilePath = helpers.file.ensureEndsInPltr(fileName)
                         const newFileURL = helpers.file.filePathToFileURL(newFilePath)
-                        saveFile(newFileURL, present).then(() => {
+                        saveFile(newFileURL, fileState).then(() => {
                           addToKnownFilesAndOpen(newFileURL)
                         })
                       }
