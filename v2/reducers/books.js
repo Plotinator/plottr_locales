@@ -1,4 +1,4 @@
-import { mapValues } from 'lodash'
+import { find, mapValues } from 'lodash'
 import {
   FILE_LOADED,
   NEW_FILE,
@@ -13,8 +13,9 @@ import {
   ADD_BOOK_FROM_TEMPLATE,
   DELETE_IMAGE,
   EDIT_BOOK_IMAGE,
+  DUPLICATE_BOOK,
 } from '../constants/ActionTypes'
-import { isSeries } from '../helpers/books'
+import { getCopyName, isSeries } from '../helpers/books'
 import { book as defaultBook } from '../store/initialState'
 import { newFileBooks } from '../store/newFileState'
 
@@ -31,7 +32,8 @@ const books =
         // this allows us to edit new book with
         // any predefined param values only within
         // the scope of the new book schema
-        const editedBook = Object.assign(defaultBook, state[action.id])
+        if (!action.id) return state
+        const editedBook = Object.assign({}, defaultBook, state[action.id])
         Object.keys(defaultBook).forEach((key) => {
           if (action[key] !== undefined) editedBook[key] = action[key]
         })
@@ -63,6 +65,37 @@ const books =
             genre: action.genre,
             theme: action.theme,
             timelineTemplates: action.templateData ? [action.templateData.id] : [],
+          },
+        }
+      }
+
+      case DUPLICATE_BOOK: {
+        const duplicatedBook = find(state, (book) => book.id === action.id)
+        const duplicatedIndex = state.allIds.indexOf(action.id)
+        const titleWithCopy = getCopyName(
+          Object.values(state),
+          `${duplicatedBook.title} - copy`,
+          'title'
+        )
+
+        let newIds = []
+        if (duplicatedIndex !== -1) {
+          newIds = [
+            ...state.allIds.slice(0, duplicatedIndex + 1),
+            action.newBookId,
+            ...state.allIds.slice(duplicatedIndex + 1),
+          ]
+        } else {
+          newIds = [...state.allIds, action.newBookId]
+        }
+
+        return {
+          ...state,
+          allIds: newIds,
+          [action.newBookId]: {
+            ...duplicatedBook,
+            title: titleWithCopy,
+            id: action.newBookId,
           },
         }
       }
