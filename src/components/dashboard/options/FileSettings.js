@@ -12,7 +12,7 @@ const FileSettingsConnector = (connector) => {
   const {
     platform: {
       settings: { saveAppSetting },
-      file: { joinPath },
+      file: { joinPath, filePathAsArray },
       showOpenDialog,
       showItemInFolder,
       userDocumentsPath,
@@ -24,10 +24,12 @@ const FileSettingsConnector = (connector) => {
     showItemInFolder,
     userDocumentsPath,
     joinPath,
+    filePathAsArray,
   })
 
   const FileSettings = ({ settings }) => {
     const [defaultPath, setDefaultPath] = useState('')
+    const [displayPath, setDisplayPath] = useState('')
 
     useEffect(() => {
       userDocumentsPath().then((docPath) => {
@@ -42,9 +44,15 @@ const FileSettingsConnector = (connector) => {
       }
     }, [settings, defaultPath])
 
-    const displayPath = (pathStr) => {
-      pathStr = pathStr[0] == '/' ? `${pathStr.substring(1)}` : pathStr
-      return pathStr.replace(/\\/g, ' » ').replace(/\//g, ' » ')
+    useEffect(() => {
+      createDisplayPath(folderPath()).then(setDisplayPath)
+    }, [defaultPath, settings.user.defaultFolderLocation])
+
+    const createDisplayPath = (pathStr) => {
+      return filePathAsArray(pathStr).then((pathArr) => {
+        if (pathArr[0] == '') pathArr.shift()
+        return pathArr.join(' » ')
+      })
     }
 
     const onChangeDefaultFolderLocation = () => {
@@ -93,7 +101,7 @@ const FileSettingsConnector = (connector) => {
               <Button onClick={onChangeDefaultFolderLocation}>{t('Choose...')}</Button>
               {'  '}
               <Button bsStyle="link" onClick={() => showItemInFolder(folderPath())}>
-                {displayPath(folderPath())}
+                {displayPath}
               </Button>
             </p>
           </div>
@@ -115,7 +123,7 @@ const FileSettingsConnector = (connector) => {
     const { connect } = redux
 
     return connect((state) => ({
-      settings: selectors.appSettingsSelector(state.present),
+      settings: selectors.appSettingsSelector(state),
     }))(FileSettings)
   }
 

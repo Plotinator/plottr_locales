@@ -19,7 +19,7 @@ const BackupSettingsConnector = (connector) => {
       os,
       userDocumentsPath,
       settings: { saveAppSetting },
-      file: { joinPath },
+      file: { joinPath, filePathAsArray },
     },
   } = connector
   checkDependencies({
@@ -30,12 +30,14 @@ const BackupSettingsConnector = (connector) => {
     saveAppSetting,
     joinPath,
     userDocumentsPath,
+    filePathAsArray,
   })
 
   const BackupOptions = UnconnectedBackupOptions(connector)
 
   const BackupSettings = ({ hasCurrentProLicense, settings, newDefault }) => {
     const [defaultBackupPath, setDefaultBackupPath] = useState('')
+    const [displayPath, setDisplayPath] = useState('')
 
     useEffect(() => {
       // right now newDefault only gets set during the Settings Wizard (the first time a user uses Plottr)
@@ -56,6 +58,10 @@ const BackupSettingsConnector = (connector) => {
         saveAppSetting('user.backupLocation', backupFolderPath())
       }
     }, [newDefault, settings, defaultBackupPath])
+
+    useEffect(() => {
+      createDisplayPath(backupFolderPath()).then(setDisplayPath)
+    }, [defaultBackupPath, settings.user.backupLocation])
 
     const osIsUnknown = os() === 'unknown'
 
@@ -84,9 +90,11 @@ const BackupSettingsConnector = (connector) => {
       )
     }
 
-    const displayPath = (pathStr) => {
-      pathStr = pathStr[0] == '/' ? `${pathStr.substring(1)}` : pathStr
-      return pathStr.replace(/\\/g, ' » ').replace(/\//g, ' » ')
+    const createDisplayPath = (pathStr) => {
+      return filePathAsArray(pathStr).then((pathArr) => {
+        if (pathArr[0] == '') pathArr.shift()
+        return pathArr.join(' » ')
+      })
     }
 
     const backupFolderPath = () => {
@@ -129,7 +137,7 @@ const BackupSettingsConnector = (connector) => {
                 <Button onClick={onChangeBackupLocation}>{t('Choose...')}</Button>
                 {'  '}
                 <Button bsStyle="link" onClick={() => showItemInFolder(backupFolderPath())}>
-                  {displayPath(backupFolderPath())}
+                  {displayPath}
                 </Button>
               </p>
               {showRestoreButton() ? (
@@ -164,9 +172,9 @@ const BackupSettingsConnector = (connector) => {
 
     return connect((state) => {
       return {
-        hasCurrentProLicense: selectors.hasProSelector(state.present),
-        settings: selectors.appSettingsSelector(state.present),
-        shouldBeInPro: selectors.shouldBeInProSelector(state.present),
+        hasCurrentProLicense: selectors.hasProSelector(state),
+        settings: selectors.appSettingsSelector(state),
+        shouldBeInPro: selectors.shouldBeInProSelector(state),
       }
     })(BackupSettings)
   }

@@ -144,6 +144,7 @@ const pltrTypeSpecs = {
     joinPath: PropTypes.func.isRequired,
     listOfflineFiles: PropTypes.func.isRequired,
     createAndOpenCopy: PropTypes.func.isRequired,
+    filePathAsArray: PropTypes.func.isRequired,
   }),
   update: PropTypes.shape({
     quitToInstall: PropTypes.func.isRequired,
