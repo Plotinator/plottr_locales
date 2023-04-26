@@ -14,7 +14,6 @@ const {
   fullFileStateSelector,
   attributesSelector,
   allCharactersSelector,
-  templateByIdSelector,
 } = selectors(pltrAdaptor)
 
 const wiredUpActions = actions(pltrAdaptor)
@@ -2041,8 +2040,10 @@ describe('reorderCharacterTemplateAttribute', () => {
         store.dispatch(addTemplateToCharacter(1, CHARACTER_TEMPLATES[2]))
         const template1OldPosition = 0
         const template1NewPosition = 2
-        const template2OldPosition = 0
-        const template2NewPosition = 1
+        const template2OldPosition = 0 //CHARACTER_TEMPLATES[1]
+        const template2NewPosition = 1 //CHARACTER_TEMPLATES[1]
+        const template1SecondReorderOldPosition = 2 //CHARACTER_TEMPLATES[0]
+        const template1SecondReorderNewPosition = 1 //CHARACTER_TEMPLATES[0]
         it('should be able to move the tab to the target position', () => {
           store.dispatch(
             reorderCharacterTemplateAttribute(template1OldPosition, template1NewPosition, 1)
@@ -2064,14 +2065,32 @@ describe('reorderCharacterTemplateAttribute', () => {
           store.dispatch(
             reorderCharacterTemplateAttribute(template2OldPosition, template2NewPosition, 1)
           )
-          const resultState = store.getState()
-          const singleCharacter = singleCharacterSelector(resultState, 1)
+          const secondShuffleState = store.getState()
+          const singleCharacterAfterShuffle = singleCharacterSelector(secondShuffleState, 1)
 
-          singleCharacter.templates.forEach((template, idx) => {
+          singleCharacterAfterShuffle.templates.forEach((template, idx) => {
             if (template.id === CHARACTER_TEMPLATES[1].id) {
-              expect(idx).toEqual(template2NewPosition)
+              expect(idx).toEqual(template1SecondReorderNewPosition)
             } else {
               expect(template.id).not.toEqual(CHARACTER_TEMPLATES[1].id)
+            }
+          })
+
+          store.dispatch(
+            reorderCharacterTemplateAttribute(
+              template1SecondReorderOldPosition,
+              template1SecondReorderNewPosition,
+              1
+            )
+          )
+          const thirdShuffleState = store.getState()
+          const singleCharacterAfterThirdShuffle = singleCharacterSelector(thirdShuffleState, 1)
+
+          singleCharacterAfterThirdShuffle.templates.forEach((template, idx) => {
+            if (template.id === CHARACTER_TEMPLATES[0].id) {
+              expect(idx).toEqual(template2NewPosition)
+            } else {
+              expect(template.id).not.toEqual(CHARACTER_TEMPLATES[0].id)
             }
           })
         })
