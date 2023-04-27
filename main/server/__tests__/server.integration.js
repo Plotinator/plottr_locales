@@ -124,7 +124,10 @@ describe('startServer', (describe, it) => {
                                                 )
                                                 const parsedConfigFile = JSON.parse(configFile)
                                                 assertEqual(typeof parsedConfigFile, 'object')
-                                                assertEqual(parsedConfigFile, defaultSettings.desktop())
+                                                assertEqual(
+                                                  parsedConfigFile,
+                                                  defaultSettings.desktop()
+                                                )
                                                 console.log(
                                                   '[Server Integration Test]: Config file parsed...'
                                                 )
