@@ -2,9 +2,8 @@ import { basename } from 'path'
 
 import export_config from 'plottr_import_export/src/exporter/default_config'
 
-import { helpers } from 'pltr/v2'
+import { helpers, defaultSettings } from 'pltr/v2'
 
-import defaultSettings from '../../shared/default_settings'
 import Store from '../lib/store'
 
 export const TRIAL_INFO_PATH = 'trial_info'
@@ -114,7 +113,7 @@ const makeStores = (userDataPath, logger, isAlphaOrBeta = false) => {
 
   const settingsStorePath = `${CONFIG_STORE_PATH}${suffix}`
   const SETTINGS = new Store(userDataPath, logger, {
-    defaults: defaultSettings,
+    defaults: defaultSettings.desktop(),
     name: settingsStorePath,
     watch: true,
   })

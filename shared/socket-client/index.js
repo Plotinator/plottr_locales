@@ -104,10 +104,8 @@ import {
   ADD_KNOWN_FILE_WITH_FIX_ERROR_REPLY,
   DELETE_KNOWN_FILE,
   DELETE_KNOWN_FILE_ERROR_REPLY,
-  SAVE_TO_TEMP_FILE,
-  REMOVE_FROM_TEMP_FILES,
-  REMOVE_FROM_TEMP_FILES_ERROR_REPLY,
-  SAVE_TO_TEMP_FILE_ERROR_REPLY,
+  SAVE_TO_DEFAULT_LOCATION,
+  SAVE_TO_DEFAULT_LOCATION_ERROR_REPLY,
   BUSY,
   DONE,
   LAST_OPENED_FILE,
@@ -143,6 +141,10 @@ import {
   MKDIR_ERROR_REPLY,
   CREATE_SHORTCUT,
   CREATE_SHORTCUT_ERROR_REPLY,
+  FIND_UNIQUE_NAME_IN_PATH,
+  FIND_UNIQUE_NAME_IN_PATH_ERROR_REPLY,
+  FILE_PATH_AS_ARRAY,
+  FILE_PATH_AS_ARRAY_ERROR_REPLY,
 } from '../socket-server-message-types'
 import { setPort, getPort } from './workerPort'
 
@@ -266,9 +268,8 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           // Normal replies
           case COPY_FILE:
           case CREATE_SHORTCUT:
-          case REMOVE_FROM_TEMP_FILES:
           case REMOVE_FROM_KNOWN_FILES:
-          case SAVE_TO_TEMP_FILE:
+          case SAVE_TO_DEFAULT_LOCATION:
           case DELETE_KNOWN_FILE:
           case ADD_KNOWN_FILE_WITH_FIX:
           case ADD_KNOWN_FILE:
@@ -324,6 +325,8 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           case STAT:
           case MKDIR:
           case RESOLVE:
+          case FIND_UNIQUE_NAME_IN_PATH:
+          case FILE_PATH_AS_ARRAY:
           case PING: {
             resolvePromise()
             return
@@ -351,8 +354,7 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           }
           // Error return types
           case NUKE_LAST_OPENED_FILE_URL_ERROR_REPLY:
-          case REMOVE_FROM_TEMP_FILES_ERROR_REPLY:
-          case SAVE_TO_TEMP_FILE_ERROR_REPLY:
+          case SAVE_TO_DEFAULT_LOCATION_ERROR_REPLY:
           case DELETE_KNOWN_FILE_ERROR_REPLY:
           case REMOVE_FROM_KNOWN_FILES_ERROR_REPLY:
           case ADD_KNOWN_FILE_WITH_FIX_ERROR_REPLY:
@@ -407,6 +409,8 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           case READDIR_ERROR_REPLY:
           case STAT_ERROR_REPLY:
           case MKDIR_ERROR_REPLY:
+          case FIND_UNIQUE_NAME_IN_PATH_ERROR_REPLY:
+          case FILE_PATH_AS_ARRAY_ERROR_REPLY:
           case FILE_EXISTS_ERROR_REPLY: {
             rejectPromise()
             return
@@ -541,12 +545,8 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
       return sendPromise(UPDATE_KNOWN_FILE_NAME, { fileURL, newName })
     }
 
-    const removeFromTempFiles = (fileURL, doDelete) => {
-      return sendPromise(REMOVE_FROM_TEMP_FILES, { fileURL, doDelete })
-    }
-
-    const saveToTempFile = (json, name) => {
-      return sendPromise(SAVE_TO_TEMP_FILE, { json, name })
+    const saveToDefaultLocation = (json, name) => {
+      return sendPromise(SAVE_TO_DEFAULT_LOCATION, { json, name })
     }
 
     const removeFromKnownFiles = (fileURL) => {
@@ -623,6 +623,14 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
 
     const mkdir = (path) => {
       return sendPromise(MKDIR, { path })
+    }
+
+    const findUniqueNameInPath = (path) => {
+      return sendPromise(FIND_UNIQUE_NAME_IN_PATH, { path })
+    }
+
+    const filePathAsArray = (path) => {
+      return sendPromise(FILE_PATH_AS_ARRAY, { path })
     }
 
     // ===File System APIs===
@@ -778,8 +786,7 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           removeFromKnownFiles,
           deleteKnownFile,
           updateKnownFileName,
-          removeFromTempFiles,
-          saveToTempFile,
+          saveToDefaultLocation,
           addKnownFile,
           addKnownFileWithFix,
           editKnownFilePath,
@@ -827,6 +834,8 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           mkdir,
           close: clientConnection.close.bind(clientConnection),
           inBadState,
+          findUniqueNameInPath,
+          filePathAsArray,
         })
       })
     })

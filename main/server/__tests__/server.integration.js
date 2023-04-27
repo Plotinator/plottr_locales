@@ -6,7 +6,7 @@ import { assertEqual, assertGreaterThan, describe } from '../../../test/simpleIn
 import { createClient, whenClientIsReady } from '../../../shared/socket-client/index'
 
 import { startServer } from '../init'
-import defaultSettings from '../../../shared/default_settings'
+import { defaultSettings } from 'pltr/v2'
 import export_config from 'plottr_import_export/src/exporter/default_config'
 
 const NOP_LOGGER = {
@@ -124,7 +124,10 @@ describe('startServer', (describe, it) => {
                                                 )
                                                 const parsedConfigFile = JSON.parse(configFile)
                                                 assertEqual(typeof parsedConfigFile, 'object')
-                                                assertEqual(parsedConfigFile, defaultSettings)
+                                                assertEqual(
+                                                  parsedConfigFile,
+                                                  defaultSettings.desktop()
+                                                )
                                                 console.log(
                                                   '[Server Integration Test]: Config file parsed...'
                                                 )

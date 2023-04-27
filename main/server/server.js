@@ -67,8 +67,7 @@ import {
   UPDATE_LAST_OPENED_DATE,
   ADD_KNOWN_FILE_WITH_FIX,
   DELETE_KNOWN_FILE,
-  REMOVE_FROM_TEMP_FILES,
-  SAVE_TO_TEMP_FILE,
+  SAVE_TO_DEFAULT_LOCATION,
   LAST_OPENED_FILE,
   SET_LAST_OPENED_FILE,
   COPY_FILE,
@@ -86,6 +85,8 @@ import {
   STAT,
   MKDIR,
   CREATE_SHORTCUT,
+  FIND_UNIQUE_NAME_IN_PATH,
+  FILE_PATH_AS_ARRAY,
 } from '../../shared/socket-server-message-types'
 import { makeLogger } from './logger'
 import wireupFileModule from './files'
@@ -95,9 +96,9 @@ import wireupTemplateFetcher from './template_fetcher'
 import makeStores from './stores'
 import makeSettingsModule from './settings'
 import makeKnownFilesModule from './knownFiles'
-import makeTempFilesModule from './tempFiles'
 import StatusManager from './StatusManager'
 import makeTrashModule from './trash'
+import makeDefaultLocationModule from './defaultLocation'
 
 const parseArgs = () => {
   return {
@@ -191,6 +192,8 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
       stat,
       readdir,
       mkdir,
+      findUniqueNameInPath,
+      filePathAsArray,
     } = fileModule
     const fileSystemModule = makeFileSystemModule(stores, logger)
     const {
@@ -232,14 +235,10 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
     } = fileSystemModule
     const trashModule = makeTrashModule(userDataPath, logger)
     const { trashByURL } = trashModule
-    const tempFilesModule = makeTempFilesModule(
-      userDataPath,
-      stores,
-      fileModule,
-      trashModule,
-      logger
-    )
-    const { removeFromTempFiles, saveToTempFile } = tempFilesModule
+
+    const defaultLocationModule = makeDefaultLocationModule(settings, fileModule, logger)
+    const { saveToDefaultLocation } = defaultLocationModule
+
     const {
       removeFromKnownFiles,
       addKnownFile,
@@ -248,15 +247,8 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
       updateLastOpenedDate,
       deleteKnownFile,
       updateKnownFileName,
-    } = makeKnownFilesModule(
-      stores,
-      fileModule,
-      fileSystemModule,
-      tempFilesModule,
-      trashModule,
-      backupModule,
-      logger
-    )
+    } = makeKnownFilesModule(stores, fileModule, trashModule, backupModule, logger)
+
     const attemptToFetchTemplates = () => {
       return wireupTemplateFetcher(userDataPath)(stores, logInfo).then((templateFetcher) => {
         return templateFetcher.fetch()
@@ -627,32 +619,24 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
               () => `Error updating file name of known file record: ${fileURL} to ${newName}`
             )
           }
-          case REMOVE_FROM_TEMP_FILES: {
-            const { fileURL, doDelete } = payload
-            return handlePromise(
-              () => `Removing ${fileURL} from temp files (deleting? ${doDelete})`,
-              () =>
-                statusManager.registerTask(
-                  removeFromTempFiles(fileURL, doDelete),
-                  REMOVE_FROM_TEMP_FILES
-                ),
-              () => `Error removing ${fileURL} from temp files (deleting? ${doDelete})`
-            )
-          }
-          case SAVE_TO_TEMP_FILE: {
+          case SAVE_TO_DEFAULT_LOCATION: {
             const { json, name } = payload
             return handlePromise(
               () => [
-                `Saving to temp file named ${name} (reduced payload)`,
+                `Saving to file named ${name} (reduced payload)`,
                 {
                   file: {
                     ...json.file,
                   },
                 },
               ],
-              () => statusManager.registerTask(saveToTempFile(json, name), SAVE_TO_TEMP_FILE),
+              () =>
+                statusManager.registerTask(
+                  saveToDefaultLocation(json, name),
+                  SAVE_TO_DEFAULT_LOCATION
+                ),
               () => [
-                `Error saving to temp file named ${name} (reduced payload)`,
+                `Error saving to file named ${name} (reduced payload)`,
                 {
                   file: {
                     ...json?.file,
@@ -928,6 +912,22 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
               () => ['Joining path args to create an OS path', pathArgs],
               () => statusManager.registerTask(join(...pathArgs), JOIN),
               () => ['Joining path args to create an OS path', pathArgs]
+            )
+          }
+          case FIND_UNIQUE_NAME_IN_PATH: {
+            const { path } = payload
+            return handlePromise(
+              () => ['Finding a unique name in path', path],
+              () => statusManager.registerTask(findUniqueNameInPath(path), JOIN),
+              () => ['Finding a unique name in path', path]
+            )
+          }
+          case FILE_PATH_AS_ARRAY: {
+            const { path } = payload
+            return handlePromise(
+              () => ['Splitting path into array on separator', path],
+              () => statusManager.registerTask(filePathAsArray(path), JOIN),
+              () => ['Splitting path into array on separator', path]
             )
           }
           case PATH_SEP: {

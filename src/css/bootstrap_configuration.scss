@@ -67,12 +67,16 @@ $btn-default-bg:                 white;
 $btn-default-border:             $gray-6;
 $btn-default-hover-bg:           $gray-9;
 
-$btn-success-color:              $green-9;
-$btn-success-bg:                 $brand-success !default;
-$btn-success-border:             $green-6;
-$btn-success-hover-bg:           $green-6;
+$btn-success-color:              white;
+$btn-success-bg:                 $orange-5 !default;
+$btn-success-border:             $orange-5;
+$btn-success-hover-bg:           $orange-6;
 
-$btn-primary-hover-bg:           $blue-6;
+$btn-primary-color:              $orange-5;
+$btn-primary-bg:                 white !default;
+$btn-primary-border:             $orange-5;
+$btn-primary-hover-bg:           $orange-6;
+
 $btn-danger-hover-bg:            $red-6;
 $btn-warning-hover-bg:           $yellow-6;
 

@@ -1,5 +1,5 @@
 import { t } from 'plottr_locales'
-import { helpers, reducers, emptyFile } from 'pltr/v2'
+import { helpers, reducers, emptyFile, migrateIfNeeded, addMissingKeys } from 'pltr/v2'
 import { actions, selectors } from 'wired-up-pltr'
 
 import { closeDashboard } from './dashboard-events'
@@ -11,7 +11,14 @@ import { makeMainProcessClient } from './app/mainProcessClient'
 
 const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
 
-const { getVersion, showSaveDialog, showErrorBox, editKnownFilePath } = makeMainProcessClient()
+const {
+  getVersion,
+  showSaveDialog,
+  showErrorBox,
+  editKnownFilePath,
+  userDocumentsPath,
+  addToKnownFilesAndOpen,
+} = makeMainProcessClient()
 
 export const newEmptyFile = (fileName, appVersion, currentFile) => {
   const emptyFileState = emptyFile(fileName, appVersion)
@@ -170,6 +177,57 @@ export const deleteCloudBackupFile = (fileURL) => {
       return rmRf(filePath).catch((error) => {
         // Ignore errors deleting the backup file.
         return true
+      })
+    })
+  })
+}
+
+export const migrateSaveAndOpen = (json, oldUrl, newFileURL) => {
+  return getVersion().then((version) => {
+    return new Promise((resolve, reject) => {
+      migrateIfNeeded(version, json, oldUrl, null, (err, _didMigrate, migratedState) => {
+        if (err) {
+          reject(err)
+        } else {
+          console.log('addMissingKeys(migratedState)', addMissingKeys(migratedState))
+          saveFile(newFileURL, addMissingKeys(migratedState)).then(() => {
+            addToKnownFilesAndOpen(newFileURL, true).then(resolve).catch(reject)
+          })
+        }
+      })
+    })
+  })
+}
+
+export const createAndOpenCopy = (oldPath, oldFileName, newFileName) => {
+  return whenClientIsReady(({ join, findUniqueNameInPath, currentAppSettings, readFile }) => {
+    currentAppSettings().then((settings) => {
+      join(oldPath, oldFileName).then((oldFullPath) => {
+        readFile(oldFullPath).then((fileText) => {
+          const fileJSON = JSON.parse(fileText)
+          if (settings.user.defaultFolder && settings.user.defaultFolderLocation) {
+            join(settings.user.defaultFolderLocation, newFileName).then((newFullPath) => {
+              findUniqueNameInPath(newFullPath).then((uniquePath) => {
+                const newFileURL = helpers.file.filePathToFileURL(uniquePath)
+                migrateSaveAndOpen(fileJSON, oldFullPath, newFileURL)
+              })
+            })
+          } else {
+            userDocumentsPath().then((docPath) => {
+              join(docPath, newFileName).then((newFullPath) => {
+                const title = t('Where would you like to save this copy?')
+                const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
+                showSaveDialog(filters, title, newFullPath).then((fileName) => {
+                  if (fileName) {
+                    const newFilePath = helpers.file.ensureEndsInPltr(fileName)
+                    const newFileURL = helpers.file.filePathToFileURL(newFilePath)
+                    migrateSaveAndOpen(fileJSON, oldFullPath, newFileURL)
+                  }
+                })
+              })
+            })
+          }
+        })
       })
     })
   })

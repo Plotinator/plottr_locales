@@ -30,6 +30,7 @@ const SaveAs = ({
 }) => {
   const [visible, setVisible] = useState(false)
   const [fileId, setFileId] = useState(null)
+  const [suggestedName, setSuggestedName] = useState('')
   const saveFileAs = useRef(false)
 
   const renameFile = (newName) => {
@@ -56,6 +57,7 @@ const SaveAs = ({
               logger.info(`Saved file with id ${fileId} as ${newName}`)
               setFileId(null)
               setVisible(false)
+              setSuggestedName('')
               finishSavingFileAs()
               saveFileAs.current = false
               return fileId
@@ -77,11 +79,13 @@ const SaveAs = ({
       .finally(() => {
         setFileId(null)
         setVisible(false)
+        setSuggestedName('')
         saveFileAs.current = false
       })
   }
 
   useEffect(() => {
+    // this event comes from the File menu
     const unsubscribe = onSaveAsOnPro((fileUrl) => {
       if (isOfflineMode) return
 
@@ -89,11 +93,13 @@ const SaveAs = ({
       setFileId(helpers.file.withoutProtocol(fileUrl))
       saveFileAs.current = true
     })
+    // this event comes from the dashboard
     const saveAsPro = document.addEventListener('save-as--pro', (event) => {
       const fileId = helpers.file.withoutProtocol(event.fileUrl)
       if (isOfflineMode) return
       setVisible(true)
       setFileId(fileId)
+      setSuggestedName(event.suggestedNewName ?? '')
       saveFileAs.current = true
     })
     return () => {
@@ -112,6 +118,7 @@ const SaveAs = ({
     <InputModal
       title={t('Name')}
       getValue={renameFile}
+      defaultValue={suggestedName}
       isOpen={true}
       cancel={hideRenamer}
       type="text"

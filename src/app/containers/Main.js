@@ -17,6 +17,7 @@ import Login from './Login'
 import Expired from './Expired'
 import Dashboard from './Dashboard'
 import ProOnboarding from './ProOnboarding'
+import SettingsWizard from './SettingsWizard'
 import UploadOfflineFile from '../components/UploadOfflineFile'
 import { uploadProject } from '../../common/utils/upload_project'
 import { whenClientIsReady } from '../../../shared/socket-client'
@@ -115,6 +116,7 @@ const Main = ({
   clearErrorLoadingFile,
   windowId,
   setWindowTitle,
+  isInSettingsWizard,
 }) => {
   // The user needs a way to dismiss the files dashboard and continue
   // to the file that's open.
@@ -503,6 +505,10 @@ const Main = ({
     return <Expired />
   }
 
+  if (isInSettingsWizard) {
+    return <SettingsWizard />
+  }
+
   if (cantShowFile || ((currentAppStateIsDashboard || showDashboard) && !dashboardClosed)) {
     return (
       <Dashboard
@@ -566,6 +572,7 @@ Main.propTypes = {
   clearErrorLoadingFile: PropTypes.func.isRequired,
   windowId: PropTypes.func.isRequired,
   setWindowTitle: PropTypes.func.isRequired,
+  isInSettingsWizard: PropTypes.bool,
 }
 
 export default connect(
@@ -597,6 +604,7 @@ export default connect(
     emailAddress: selectors.emailAddressSelector(state),
     userId: selectors.userIdSelector(state),
     settings: selectors.appSettingsSelector(state),
+    isInSettingsWizard: selectors.isInSettingsWizardSelector(state),
   }),
   {
     setOffline: actions.project.setOffline,
