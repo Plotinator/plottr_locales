@@ -49,6 +49,7 @@ const App = ({
   showErrorBox,
   searchDialogIsOpen,
   openSearch,
+  startSearching,
 }) => {
   const [showTemplateCreate, setShowTemplateCreate] = useState(false)
   const [type, setType] = useState(null)
@@ -122,6 +123,7 @@ const App = ({
     const searchListener = (event) => {
       if (!searchDialogIsOpen && event.key === 'f' && (event.ctrlKey || event.metaKey)) {
         openSearch()
+        startSearching()
       }
     }
     document.addEventListener('keydown', searchListener)
@@ -293,6 +295,8 @@ App.propTypes = {
   clickOnDom: PropTypes.func,
   applicationIsBusyAndCannotBeQuit: PropTypes.bool,
   showErrorBox: PropTypes.func.isRequired,
+  openSearch: PropTypes.func.isRequired,
+  startSearching: PropTypes.func.isRequired,
 }
 
 function mapStateToProps(state) {
@@ -311,4 +315,5 @@ function mapStateToProps(state) {
 export default connect(mapStateToProps, {
   clickOnDom: actions.domEvents.clickOnDom,
   openSearch: actions.ui.openSearch,
+  startSearching: actions.applicationState.startSearching,
 })(App)
