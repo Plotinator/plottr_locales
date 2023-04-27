@@ -380,14 +380,27 @@ const fileSystemModule = (userDataPath) => {
                   directories.map((directory) => {
                     const thisPath = path.join(basePath, directory)
                     return readdir(thisPath).then((entries) => {
-                      const files = entries.filter((entry) => {
-                        return entry.endsWith('.pltr')
+                      return Promise.all(
+                        entries
+                          .filter((entry) => {
+                            return entry.endsWith('.pltr')
+                          })
+                          .map((entry) => {
+                            return lstat(path.join(thisPath, entry)).then((fileStats) => {
+                              return {
+                                name: entry,
+                                size: fileStats.size,
+                                lastEdited: fileStats.mtimeMs,
+                              }
+                            })
+                          })
+                      ).then((files) => {
+                        return {
+                          path: thisPath,
+                          date: americanToYearFirst(directory),
+                          backups: files,
+                        }
                       })
-                      return {
-                        path: thisPath,
-                        date: americanToYearFirst(directory),
-                        backups: files,
-                      }
                     })
                   })
                 )

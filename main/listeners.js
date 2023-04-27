@@ -28,8 +28,6 @@ import {
   openFile,
   createNew,
   createFromSnowflake,
-  TEMP_FILES_PATH,
-  removeFromTempFiles,
   removeFromKnownFiles,
   deleteKnownFile,
   editKnownFilePath,
@@ -85,6 +83,7 @@ function saveDialog(window, filters, title, defaultPath) {
     filters,
     title,
     defaultPath,
+    properties: ['createDirectory'],
   })
 }
 
@@ -301,21 +300,6 @@ export const listenOnIPCMain = (
         log.error('Error opening known file', fileURL, error)
         event.sender.send(replyChannel, { error: error.message })
       })
-  })
-
-  ipcMain.on('remove-from-temp-files-if-temp', (event, replyChannel, fileURL) => {
-    if (fileURL.includes(TEMP_FILES_PATH)) {
-      removeFromTempFiles(fileURL, false)
-        .then(() => {
-          event.sender.send(replyChannel, 'done')
-        })
-        .catch((error) => {
-          log.error(`Error removing ${fileURL} from temp files`, error)
-          event.sender.send(replyChannel, { error: error.message })
-        })
-    } else {
-      event.sender.send(replyChannel, 'Not temp')
-    }
   })
 
   ipcMain.on('remove-from-known-files', (event, replyChannel, fileURL) => {
@@ -625,12 +609,13 @@ export const listenOnIPCMain = (
     }
   })
 
-  ipcMain.on('show-open-dialog', (event, replyChannel, title, filters, properties) => {
+  ipcMain.on('show-open-dialog', (event, replyChannel, title, filters, properties, defaultPath) => {
     dialog
       .showOpenDialog(event.sender.getOwnerBrowserWindow(), {
         title,
         filters,
         properties,
+        defaultPath,
       })
       .then((files) => {
         event.sender.send(replyChannel, files.filePaths)

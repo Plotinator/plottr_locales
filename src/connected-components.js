@@ -37,6 +37,7 @@ import {
   newFile,
   uploadExisting,
   deleteCloudBackupFile,
+  createAndOpenCopy,
 } from './files'
 import logger from '../shared/logger'
 import { closeDashboard } from './dashboard-events'
@@ -67,6 +68,7 @@ const {
   hostLocale,
   openExternal,
   showOpenDialog,
+  showSaveDialog,
   machineId,
   openKnownFile,
   pleaseSetDarkModeSetting,
@@ -92,6 +94,9 @@ const {
   showErrorBox,
   askToExport,
   userDesktopPath,
+  userDocumentsPath,
+  pleaseOpenWindow,
+  addToKnownFilesAndOpen,
 } = makeMainProcessClient()
 
 export const rmRF = (path, ...args) => {
@@ -202,6 +207,11 @@ const platform = {
     basename: (filePath) => {
       return whenClientIsReady(({ basename }) => {
         return basename(filePath)
+      })
+    },
+    filePathAsArray: (filePath) => {
+      return whenClientIsReady(({ filePathAsArray }) => {
+        return filePathAsArray(filePath)
       })
     },
     // FIXME: this is very poorly named.  Esp. since the second
@@ -316,6 +326,9 @@ const platform = {
       })
     },
     listOfflineFiles,
+    createAndOpenCopy: (oldPath, oldFileName, newFileName) => {
+      return createAndOpenCopy(oldPath, oldFileName, newFileName)
+    },
   },
   update: {
     quitToInstall: () => {
@@ -411,7 +424,11 @@ const platform = {
   handleCustomerServiceCode,
   log: logger,
   showOpenDialog,
+  showSaveDialog,
   showErrorBox,
+  userDocumentsPath,
+  pleaseOpenWindow,
+  addToKnownFilesAndOpen,
   node: {
     env: isDevelopment() ? 'development' : 'production',
   },
@@ -430,14 +447,15 @@ const platform = {
     const event = new Event('move-from-temp')
     document.dispatchEvent(event)
   },
-  duplicateFile: (fileUrl) => {
+  duplicateFile: (fileUrl, suggestedNewName) => {
     const state = store.getState()
     const isLoggedIntoPro = selectors.hasProSelector(state)
 
     const event = isLoggedIntoPro
-      ? new Event('save-as--pro', { fileUrl })
+      ? new Event('save-as--pro', { fileUrl, suggestedNewName })
       : new Event('save-as', { fileUrl })
     event.fileUrl = fileUrl
+    event.suggestedNewName = suggestedNewName
     document.dispatchEvent(event)
   },
   showItemInFolder: (fileURL) => {
@@ -597,4 +615,5 @@ export const ExpiredView = components.ExpiredView
 export const ProOnboarding = components.ProOnboarding
 export const UpdateNotifier = components.UpdateNotifier
 export const NewProjectInputModal = components.NewProjectInputModal
+export const SettingsWizard = components.SettingsWizard
 export const RestructureTimelineModal = components.RestructureTimelineModal

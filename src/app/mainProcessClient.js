@@ -95,8 +95,8 @@ const _makeMainProcessClient = () => {
     return ask('user-logs-path')
   }
 
-  const showOpenDialog = (title, filters, properties) => {
-    return ask('show-open-dialog', title, filters, properties)
+  const showOpenDialog = (title, filters, properties, defaultPath) => {
+    return ask('show-open-dialog', title, filters, properties, defaultPath)
   }
 
   const openExternal = (url) => {
@@ -196,10 +196,6 @@ const _makeMainProcessClient = () => {
 
   const onSaveAs = (cb) => {
     return subscribeTo('save-as', cb)
-  }
-
-  const removeFromTempFilesIfTemp = (fileURL) => {
-    return ask('remove-from-temp-files-if-temp', fileURL)
   }
 
   const editKnownFilePath = (oldFileURL, newFileURL) => {
@@ -448,7 +444,6 @@ const _makeMainProcessClient = () => {
     onExportFileFromMenu,
     onSave,
     onSaveAs,
-    removeFromTempFilesIfTemp,
     editKnownFilePath,
     pleaseTellDashboardToReloadRecents,
     onUndo,
