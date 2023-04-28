@@ -62,7 +62,7 @@ function makeBrowserWindow(fileURL) {
         },
       }
 
-      config.backgroundColor = '#f7f7f7'
+      config.backgroundColor = settings.user?.dark === 'dark' ? '#666666' : '#f7f7f7'
 
       // Create the browser window
       let newWindow = new BrowserWindow(config)
