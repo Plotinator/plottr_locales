@@ -40,12 +40,14 @@ import {
   DUPLICATE_LINE,
   MOVE_LINE,
   DUPLICATE_BOOK,
+  REORDER_CARD_TEMPLATE_ATTRIBUTES,
 } from '../constants/ActionTypes'
 import { newFileCards } from '../store/newFileState'
 import { card as defaultCard } from '../store/initialState'
 import { nextId } from '../store/newIds'
 import { applyToCustomAttributes } from './applyToCustomAttributes'
 import { repairIfPresent } from './repairIfPresent'
+import { reorderList } from '../helpers/lists'
 
 const INITIAL_STATE = []
 
@@ -152,6 +154,23 @@ const cards =
         return state.map((card) =>
           card.id === action.id ? Object.assign({}, card, diffObj) : card
         )
+      }
+
+      case REORDER_CARD_TEMPLATE_ATTRIBUTES: {
+        return state.map((card) => {
+          if (card.id === action.id) {
+            const reorderedTemplates = reorderList(
+              action.destination,
+              action.originalPosition,
+              card.templates
+            )
+            return {
+              ...card,
+              templates: reorderedTemplates,
+            }
+          }
+          return card
+        })
       }
 
       case EDIT_CARD_TEMPLATE_ATTRIBUTE:
