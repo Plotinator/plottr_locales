@@ -22,6 +22,7 @@ import {
   EDIT_CHARACTER_NAME,
   EDIT_CHARACTER_IMAGE,
   DELETE_CHARACTER_LEGACY_CUSTOM_ATTRIBUTE,
+  REORDER_CHARACTER_TEMPLATES,
 } from '../constants/ActionTypes'
 import { editorMetadataIfPresent } from '../helpers/editors'
 import selectors from '../selectors'
@@ -214,5 +215,14 @@ export const editCategory = (characterId, categoryId) => {
     type: EDIT_CHARACTER_CATEGORY,
     characterId,
     value: categoryId,
+  }
+}
+
+export const reorderCharacterTemplateAttribute = (originalPosition, destination, characterId) => {
+  return {
+    type: REORDER_CHARACTER_TEMPLATES,
+    originalPosition,
+    destination,
+    id: characterId,
   }
 }

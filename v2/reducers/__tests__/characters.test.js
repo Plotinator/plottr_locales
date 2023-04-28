@@ -32,6 +32,7 @@ const {
   editShortDescription,
   editDescription,
   editCategory,
+  reorderCharacterTemplateAttribute,
 } = wiredUpActions.character
 const addBookToCharacter = wiredUpActions.character.addBook
 const addTagToCharacter = wiredUpActions.character.addTag
@@ -91,6 +92,78 @@ const A_CHARACTER_TEMPLATE = {
     },
   ],
 }
+
+const CHARACTER_TEMPLATES = [
+  {
+    id: 'ch1',
+    type: 'characters',
+    name: 'Enneagram1',
+    description: 'Personality types',
+    link: 'https://www.enneagraminstitute.com/type-descriptions',
+    version: '2022.7.20',
+    attributes: [
+      {
+        name: 'Type',
+        type: 'text',
+        description: 'Type of personality based on the Enneagram test',
+      },
+      {
+        name: 'Core Desire',
+        type: 'text',
+      },
+      {
+        name: 'Core Fear',
+        type: 'text',
+      },
+    ],
+  },
+  {
+    id: 'ch2',
+    type: 'characters',
+    name: 'Enneagram2',
+    description: 'Personality types',
+    link: 'https://www.enneagraminstitute.com/type-descriptions',
+    version: '2022.7.20',
+    attributes: [
+      {
+        name: 'Type',
+        type: 'text',
+        description: 'Type of personality based on the Enneagram test',
+      },
+      {
+        name: 'Core Desire',
+        type: 'text',
+      },
+      {
+        name: 'Core Fear',
+        type: 'text',
+      },
+    ],
+  },
+  {
+    id: 'ch3',
+    type: 'characters',
+    name: 'Enneagram3',
+    description: 'Personality types',
+    link: 'https://www.enneagraminstitute.com/type-descriptions',
+    version: '2022.7.20',
+    attributes: [
+      {
+        name: 'Type',
+        type: 'text',
+        description: 'Type of personality based on the Enneagram test',
+      },
+      {
+        name: 'Core Desire',
+        type: 'text',
+      },
+      {
+        name: 'Core Fear',
+        type: 'text',
+      },
+    ],
+  },
+]
 
 describe('editCharacterTemplateAttribute', () => {
   describe('given a store with no characters', () => {
@@ -1949,6 +2022,76 @@ describe('editAttributeMetadata', () => {
                 },
               ])
             })
+          })
+        })
+      })
+    })
+  })
+})
+
+describe('reorderCharacterTemplateAttribute', () => {
+  describe('given a state with a character', () => {
+    describe('and user added templates to the character', () => {
+      describe('and user try to move first template tab to last position', () => {
+        const store = initialStore()
+        store.dispatch(addCharacter('John Doe'))
+        store.dispatch(addTemplateToCharacter(1, CHARACTER_TEMPLATES[0]))
+        store.dispatch(addTemplateToCharacter(1, CHARACTER_TEMPLATES[1]))
+        store.dispatch(addTemplateToCharacter(1, CHARACTER_TEMPLATES[2]))
+        const template1OldPosition = 0
+        const template1NewPosition = 2
+        const template2OldPosition = 0 //CHARACTER_TEMPLATES[1]
+        const template2NewPosition = 1 //CHARACTER_TEMPLATES[1]
+        const template1SecondReorderOldPosition = 2 //CHARACTER_TEMPLATES[0]
+        const template1SecondReorderNewPosition = 1 //CHARACTER_TEMPLATES[0]
+        it('should be able to move the tab to the target position', () => {
+          store.dispatch(
+            reorderCharacterTemplateAttribute(template1OldPosition, template1NewPosition, 1)
+          )
+          const resultState = store.getState()
+          const singleCharacter = singleCharacterSelector(resultState, 1)
+
+          singleCharacter.templates.forEach((template, idx) => {
+            if (template.id === CHARACTER_TEMPLATES[0].id) {
+              expect(idx).toEqual(template1NewPosition)
+            } else {
+              expect(idx).toBeLessThan(template1NewPosition)
+              expect(template.id).not.toEqual(CHARACTER_TEMPLATES[0].id)
+            }
+          })
+        })
+
+        it('should be able to move or shuffle the template tabs order', () => {
+          store.dispatch(
+            reorderCharacterTemplateAttribute(template2OldPosition, template2NewPosition, 1)
+          )
+          const secondShuffleState = store.getState()
+          const singleCharacterAfterShuffle = singleCharacterSelector(secondShuffleState, 1)
+
+          singleCharacterAfterShuffle.templates.forEach((template, idx) => {
+            if (template.id === CHARACTER_TEMPLATES[1].id) {
+              expect(idx).toEqual(template1SecondReorderNewPosition)
+            } else {
+              expect(template.id).not.toEqual(CHARACTER_TEMPLATES[1].id)
+            }
+          })
+
+          store.dispatch(
+            reorderCharacterTemplateAttribute(
+              template1SecondReorderOldPosition,
+              template1SecondReorderNewPosition,
+              1
+            )
+          )
+          const thirdShuffleState = store.getState()
+          const singleCharacterAfterThirdShuffle = singleCharacterSelector(thirdShuffleState, 1)
+
+          singleCharacterAfterThirdShuffle.templates.forEach((template, idx) => {
+            if (template.id === CHARACTER_TEMPLATES[0].id) {
+              expect(idx).toEqual(template2NewPosition)
+            } else {
+              expect(template.id).not.toEqual(CHARACTER_TEMPLATES[0].id)
+            }
           })
         })
       })
