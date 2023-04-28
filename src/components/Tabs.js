@@ -75,6 +75,10 @@ const propTypes = {
   onDragOver: PropTypes.func,
 
   tabClasses: PropTypes.func,
+
+  draggable: PropTypes.bool,
+  onDragStart: PropTypes.func,
+  onTabDragOver: PropTypes.func,
 }
 
 const defaultProps = {
@@ -103,7 +107,17 @@ class Tabs extends React.Component {
   }
 
   renderTab(child) {
-    const { title, eventKey, disabled, tabClassName, noHandlers } = child.props
+    const {
+      title,
+      eventKey,
+      disabled,
+      tabClassName,
+      noHandlers,
+      draggable,
+      onDragStart,
+      onDragOver,
+      position,
+    } = child.props
     if (title == null) {
       return null
     }
@@ -129,8 +143,11 @@ class Tabs extends React.Component {
         className={tabClassName}
         onClose={this.props.onCloseTab}
         onContextMenu={this.props.onContextMenu}
-        onDragOver={this.props.onDragOver}
+        onDragOver={onDragOver}
         tabClasses={this.props.tabClasses}
+        draggable={draggable}
+        onDragStart={onDragStart}
+        position={position}
       >
         {title}
       </NavItem>
@@ -161,7 +178,12 @@ class Tabs extends React.Component {
         style={style}
       >
         <div>
-          <Nav {...omit(props, ['activeKey'])} activeKey={activeKey} role="tablist">
+          <Nav
+            {...omit(props, ['activeKey'])}
+            activeKey={activeKey}
+            role="tablist"
+            onDragOver={this.props.onTabDragOver}
+          >
             {ValidComponentChildren.map(children, this.renderTab)}
           </Nav>
 
