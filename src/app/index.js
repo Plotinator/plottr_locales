@@ -96,7 +96,7 @@ const connectToSocketServer = (port) => {
   let doneTimeout = null
   const socketServerEventHandlers = {
     onBusy: () => {
-      store.dispatch(actions.applicationState.startWorkThatPreventsQuitting())
+      store().dispatch(actions.applicationState.startWorkThatPreventsQuitting())
     },
     onDone: () => {
       if (doneTimeout) {
@@ -104,7 +104,7 @@ const connectToSocketServer = (port) => {
         doneTimeout = null
       }
       doneTimeout = setTimeout(() => {
-        store.dispatch(actions.applicationState.finishWorkThatPreventsQuitting())
+        store().dispatch(actions.applicationState.finishWorkThatPreventsQuitting())
       }, 2000)
     },
   }
@@ -206,17 +206,17 @@ tellMeWhatOSImOn()
         // TODO: fix this by exporting store from the configureStore file
         // kind of a hack to enable store dispatches in otherwise hard situations
         window.specialDelivery = (action) => {
-          store.dispatch(action)
+          store().dispatch(action)
         }
 
         document.addEventListener('save-custom-template', (event) => {
-          const currentState = store.getState()
+          const currentState = store().getState()
           const options = event.payload
           addNewCustomTemplate(currentState, options)
         })
 
         onExportFileFromMenu(({ type }) => {
-          const currentState = store.getState()
+          const currentState = store().getState()
           const bookId = selectors.currentTimelineSelector(currentState)
           const name = selectors.seriesNameSelector(currentState)
           const books = selectors.allBooksSelector(currentState)
@@ -233,7 +233,7 @@ tellMeWhatOSImOn()
         })
 
         onSave(() => {
-          const state = store.getState()
+          const state = store().getState()
           const isOffline = selectors.isOfflineSelector(state)
           const isOfflineModeEnabled = selectors.offlineModeEnabledSelector(state)
           const isCloudFile = selectors.isCloudFileSelector(state)
@@ -241,7 +241,7 @@ tellMeWhatOSImOn()
           if (isCloudFile && isOffline && isOfflineModeEnabled) {
             saveOfflineFile(fileState)
               .then(() => {
-                store.dispatch(actions.ui.fileSaved())
+                store().dispatch(actions.ui.fileSaved())
               })
               .catch((error) => {
                 logger.error('Failed to save offline file', error)
@@ -250,7 +250,7 @@ tellMeWhatOSImOn()
             const fileURL = selectors.fileURLSelector(state)
             saveFile(fileURL, fileState)
               .then(() => {
-                store.dispatch(actions.ui.fileSaved())
+                store().dispatch(actions.ui.fileSaved())
               })
               .catch((error) => {
                 logger.error('Failed to save classic file', error)
@@ -303,7 +303,7 @@ tellMeWhatOSImOn()
                                       } else {
                                         saveFile(newFileURL, addMissingKeys(migratedState))
                                           .then(() => {
-                                            store.dispatch(
+                                            store().dispatch(
                                               actions.applicationState.finishRenamingFile()
                                             )
                                             return addToKnownFilesAndOpen(newFileURL)
@@ -323,7 +323,7 @@ tellMeWhatOSImOn()
                   })
                 })
               } else {
-                const currentState = store.getState()
+                const currentState = store().getState()
                 const isInOfflineMode = selectors.isInOfflineModeSelector(currentState)
                 const fileState = selectors.fullFileStateSelector(currentState)
                 if (isInOfflineMode) {
@@ -351,7 +351,7 @@ tellMeWhatOSImOn()
         }
 
         const moveFromTempHandler = () => {
-          const state = store.getState()
+          const state = store().getState()
           const file = selectors.fullFileStateSelector(state)
           const isCloudFile = selectors.isCloudFileSelector(state)
           if (isCloudFile) {
@@ -368,7 +368,7 @@ tellMeWhatOSImOn()
             }
             if (!isTemp) {
               saveFile(oldFileURL, file).then(() => {
-                store.dispatch(actions.ui.fileSaved())
+                store().dispatch(actions.ui.fileSaved())
               })
               return
             }
@@ -390,7 +390,7 @@ tellMeWhatOSImOn()
                     return basename(newFilePath).then((newFileName) => {
                       // load the new file: the only way to set a new
                       // `project.fileURL`(!)
-                      store.dispatch(
+                      store().dispatch(
                         actions.ui.loadFile(
                           newFileName,
                           false,
@@ -413,11 +413,11 @@ tellMeWhatOSImOn()
         document.addEventListener('save-as', saveAsHandler)
 
         onUndo(() => {
-          store.dispatch(ActionCreators.undo())
+          store().dispatch(ActionCreators.undo())
         })
 
         onRedu(() => {
-          store.dispatch(ActionCreators.redo())
+          store().dispatch(ActionCreators.redo())
         })
 
         window.addEventListener('error', (message, file, line, column, err) => {
@@ -462,7 +462,7 @@ tellMeWhatOSImOn()
         onCloseDashboard(closeDashboard)
 
         onCreatePlottrCloudFile((json, fileName, isScrivenerFile) => {
-          const state = store.getState()
+          const state = store().getState()
           const emailAddress = selectors.emailAddressSelector(state)
           const userId = selectors.userIdSelector(state)
           uploadToFirebase(emailAddress, userId, json, fileName)
@@ -477,7 +477,7 @@ tellMeWhatOSImOn()
               openFile(fileURL, false)
 
               if (isScrivenerFile) {
-                store.dispatch(actions.applicationState.finishScrivenerImporter())
+                store().dispatch(actions.applicationState.finishScrivenerImporter())
               }
 
               closeDashboard()
@@ -489,13 +489,13 @@ tellMeWhatOSImOn()
         })
 
         onFinishCreatingLocalScrivenerImportedFile(() => {
-          store.dispatch(actions.applicationState.finishScrivenerImporter())
+          store().dispatch(actions.applicationState.finishScrivenerImporter())
         })
 
         onErrorImportingScrivener((error) => {
           logger.warn('[scrivener import]', error)
           rollbar.warn({ message: error })
-          store.dispatch(actions.applicationState.finishScrivenerImporter())
+          store().dispatch(actions.applicationState.finishScrivenerImporter())
           showErrorBox(t('Error'), t('There was an error doing that. Try again'))
         })
 
@@ -512,7 +512,7 @@ tellMeWhatOSImOn()
         onNewProject(() => {
           fileSystemAPIs.currentAppSettings().then((settings) => {
             if (settings.user.defaultFolder && settings.user.defaultFolderLocation) {
-              store.dispatch(actions.project.startCreatingNewProject())
+              store().dispatch(actions.project.startCreatingNewProject())
             } else {
               userDocumentsPath().then((docPath) => {
                 const title = t('Choose where to save this file on your computer')
@@ -550,14 +550,14 @@ tellMeWhatOSImOn()
 
         onError(({ message, source }) => {
           logger.error(`Error reported via IPC from <${source}> with message: ${message}`)
-          store.dispatch(actions.error.saveTempFileError(message))
+          store().dispatch(actions.error.saveTempFileError(message))
         })
 
         onReloadDarkMode((newValue) => {
           fileSystemAPIs.saveAppSetting('user.dark', newValue).catch((error) => {
             logger.error(`Failed to set user.dark to ${newValue}`, error)
           })
-          store.dispatch(actions.settings.setDarkMode(newValue))
+          store().dispatch(actions.settings.setDarkMode(newValue))
         })
 
         onImportScrivenerFile((sourceFile, destinationFile) => {
@@ -570,7 +570,7 @@ tellMeWhatOSImOn()
         //
         // Could be important to do so because it might set up inotify
         // listeners and too many of those cause slow-downs.
-        const _unsubscribeToPublishers = world(whenClientIsReady).publishChangesToStore(store)
+        const _unsubscribeToPublishers = world(whenClientIsReady).publishChangesToStore(store())
 
         const root = rootComponent()
 

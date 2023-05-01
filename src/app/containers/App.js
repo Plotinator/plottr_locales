@@ -202,7 +202,7 @@ const App = ({
   const saveAndClose = (saveFile, saveOfflineFile) => () => {
     setBlockClosing(false)
     setShowAskToSave(false)
-    const { present } = store.getState()
+    const { present } = store().getState()
     if (isOffline) {
       saveOfflineFile(present)
     } else {

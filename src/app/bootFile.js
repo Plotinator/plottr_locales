@@ -78,7 +78,7 @@ function waitForUser() {
 
 // NOTE: Only for cloud files.
 const loadFileIntoRedux = (data, fileId) => {
-  store.dispatch(
+  store().dispatch(
     actions.ui.loadFile(
       data.file.fileName,
       false,
@@ -87,7 +87,7 @@ const loadFileIntoRedux = (data, fileId) => {
       helpers.file.fileIdToPlottrCloudFileURL(fileId)
     )
   )
-  store.dispatch(
+  store().dispatch(
     actions.project.selectFile({
       ...data.file,
       id: fileId,
@@ -116,7 +116,7 @@ const migrate = (originalFile, fileId) => (overwrittenFile) => {
         } else {
           machineId().then((clientId) => {
             loadFileIntoRedux(json, fileId)
-            store.dispatch(actions.client.setClientId(clientId))
+            store().dispatch(actions.client.setClientId(clientId))
             resolve(json)
           })
         }
@@ -145,13 +145,13 @@ const migrate = (originalFile, fileId) => (overwrittenFile) => {
                 overwriteAllKeys(fileId, clientId, removeSystemKeys(data))
                   .then((results) => {
                     loadFileIntoRedux(data, fileId)
-                    store.dispatch(actions.client.setClientId(clientId))
+                    store().dispatch(actions.client.setClientId(clientId))
                     return results
                   })
                   .then(resolve, reject)
               } else {
                 loadFileIntoRedux(data, fileId)
-                store.dispatch(actions.client.setClientId(clientId))
+                store().dispatch(actions.client.setClientId(clientId))
                 resolve(data)
               }
             })
@@ -428,7 +428,7 @@ export function bootFile(
                       }
                       return reject(`bootLocalFile002: migration (${fileURL})`)
                     }
-                    store.dispatch(
+                    store().dispatch(
                       actions.ui.loadFile(
                         state.file.fileName || helpers.file.withoutProtocol(fileURL),
                         didMigrate,
@@ -444,7 +444,7 @@ export function bootFile(
                         fileURL
                       )
                     )
-                    store.dispatch(
+                    store().dispatch(
                       actions.project.selectFile({
                         ...state.file,
                         fileURL,
@@ -463,10 +463,10 @@ export function bootFile(
                     )
 
                     if (state && state.tour && state.tour.showTour)
-                      store.dispatch(actions.ui.changeOrientation('horizontal'))
+                      store().dispatch(actions.ui.changeOrientation('horizontal'))
 
                     return machineId().then((clientId) => {
-                      store.dispatch(actions.client.setClientId(clientId))
+                      store().dispatch(actions.client.setClientId(clientId))
 
                       resolve()
                     })
@@ -483,10 +483,10 @@ export function bootFile(
     if (!helpers.file.isProtocolString(fileURL)) {
       const message = `Can't boot a file without a protocol: ${fileURL}`
       logger.error(message)
-      store.dispatch(actions.applicationState.errorLoadingFile())
+      store().dispatch(actions.applicationState.errorLoadingFile())
       return Promise.reject(new Error(message))
     }
-    store.dispatch(actions.applicationState.startLoadingFile())
+    store().dispatch(actions.applicationState.startLoadingFile())
 
     // Now that we know what the file path for this window should be,
     // tell the main process.
@@ -501,19 +501,19 @@ export function bootFile(
             : bootLocalFile(fileURL, numOpenFiles, saveBackup)
         )
           .then(() => {
-            store.dispatch(actions.applicationState.finishLoadingFile())
+            store().dispatch(actions.applicationState.finishLoadingFile())
           })
           .catch((error) => {
             logger.error(error)
             rollbar.error(error)
-            store.dispatch(
+            store().dispatch(
               actions.applicationState.errorLoadingFile(error.message === 'Need to update Plottr')
             )
           })
       } catch (error) {
         logger.error(error)
         rollbar.error(error)
-        store.dispatch(actions.applicationState.errorLoadingFile())
+        store().dispatch(actions.applicationState.errorLoadingFile())
         return Promise.reject(error)
       }
     })
@@ -524,14 +524,14 @@ export function bootFile(
       saver.cancelAllRemainingRequests()
     }
     const postSaveHook = () => {
-      store.dispatch(actions.ui.fileSaved())
+      store().dispatch(actions.ui.fileSaved())
     }
     const postBackupHook = () => {
       // NOP
     }
     saver = Saver(
       () => {
-        return selectors.fullFileStateSelector(store.getState())
+        return selectors.fullFileStateSelector(store().getState())
       },
       saveFile(whenClientIsReady, logger, postSaveHook),
       backupFile(

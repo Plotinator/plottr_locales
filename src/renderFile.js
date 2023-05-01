@@ -44,7 +44,7 @@ export const renderFile = (root, whenClientIsReady) => {
   }
 
   const saveBackup = (filePath, file) => {
-    const state = store.getState()
+    const state = store().getState()
     const onCloud = selectors.isCloudFileSelector(state)
     const userId = selectors.userIdSelector(state)
     const localBackupsEnabled = selectors.localBackupsEnabledSelector(state)
@@ -72,7 +72,7 @@ export const renderFile = (root, whenClientIsReady) => {
   const { saveAppSetting } = makeFileSystemAPIs(whenClientIsReady)
 
   render(
-    <Provider store={store}>
+    <Provider store={store()}>
       <MainIntegrationContext.Provider
         value={{
           saveOfflineFile,

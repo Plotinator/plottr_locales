@@ -1,5 +1,11 @@
 import { configureStore } from './configureStore'
 import { whenClientIsReady } from '../../../shared/socket-client'
 
-const store = configureStore(whenClientIsReady)
+let _store = null
+const store = () => {
+  if (!_store) {
+    _store = configureStore(whenClientIsReady)
+  }
+  return _store
+}
 export { store }

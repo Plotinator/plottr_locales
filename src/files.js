@@ -114,7 +114,7 @@ export const offlineFileURLFromFile = (file) => {
 }
 
 export const renameFile = (fileURL) => {
-  const state = store.getState()
+  const state = store().getState()
   const isCloudFile = selectors.isCloudFileSelector(state)
   const isOffline = selectors.isOfflineSelector(state)
   if (isOffline && isCloudFile) {
@@ -145,13 +145,13 @@ export const renameFile = (fileURL) => {
                 return trash(fileURL, true)
               })
               .then(() => {
-                store.dispatch(actions.applicationState.finishRenamingFile())
+                store().dispatch(actions.applicationState.finishRenamingFile())
               })
           })
         })
       } catch (error) {
         logger.error(error)
-        store.dispatch(actions.applicationState.finishRenamingFile())
+        store().dispatch(actions.applicationState.finishRenamingFile())
         return showErrorBox(t('Error'), t('There was an error doing that. Try again')).then(() => {
           return Promise.reject(error)
         })
