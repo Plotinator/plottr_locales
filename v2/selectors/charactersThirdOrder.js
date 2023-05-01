@@ -499,6 +499,23 @@ export const allBooksWithCharactersInThemSelector = createSelector(
   }
 )
 
+export const allBooksWithCharactersSortedByBookAllIdsPositionSelector = createSelector(
+  allBooksWithCharactersInThemSelector,
+  allBookIdsSelector,
+  (allCharacterBooks, allIds) => {
+    const characterWithAllBooks = {}
+    const sorted = allIds.map((id) =>
+      Object.values(allCharacterBooks).find((book) => book.id === id)
+    )
+
+    sorted.forEach((book, index) => {
+      characterWithAllBooks[index] = book
+    })
+
+    return characterWithAllBooks
+  }
+)
+
 export const charactersSortedInBookSelector = createSelector(
   charactersSortedAtoZSelector,
   currentTimelineSelector,
