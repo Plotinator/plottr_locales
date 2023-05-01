@@ -127,11 +127,13 @@ export const moveNode = (tree, nodeId, newParent) => {
 export const nextId =
   (idProp) =>
   ({ index }) => {
-    return (
-      Object.values(index)
-        .map((x) => x[idProp])
-        .reduce((maxId, id) => Math.max(id, maxId), 0) + 1
-    )
+    if (index && typeof index === 'object') {
+      return (
+        Object.values(index)
+          .map((x) => x[idProp])
+          .reduce((maxId, id) => Math.max(id, maxId), 0) + 1
+      )
+    }
   }
 
 export const newTree = (idProp, ...rootEntities) => {
