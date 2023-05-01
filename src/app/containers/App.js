@@ -272,12 +272,12 @@ const App = ({
       </main>
       <React.StrictMode>
         <Spinner />
-        {searchDialogIsOpen ? <SearchModal /> : null}
         {renderTemplateCreate()}
         {renderAskToSave()}
         {renderAdvanceExportModal()}
         {renderActStructureHelpModal()}
         {renderImagePickerModal()}
+        {searchDialogIsOpen ? <SearchModal /> : null}
       </React.StrictMode>
     </ErrorBoundary>
   )
