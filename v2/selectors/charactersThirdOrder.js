@@ -509,7 +509,9 @@ export const allBooksWithCharactersSortedByBookAllIdsPositionSelector = createSe
     )
 
     sorted.forEach((book, index) => {
-      characterWithAllBooks[index] = book
+      if (book) {
+        characterWithAllBooks[index] = book
+      }
     })
 
     return characterWithAllBooks
