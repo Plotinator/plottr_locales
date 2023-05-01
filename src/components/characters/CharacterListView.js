@@ -498,7 +498,7 @@ const CharacterListViewConnector = (connector) => {
           characterSort: selectors.characterSortSelector(state),
           darkMode: selectors.isDarkModeSelector(state),
           charactersSearchTerm: selectors.charactersSearchTermSelector(state),
-          books: selectors.allBooksWithCharactersInThemSelector(state),
+          books: selectors.allBooksWithCharactersSortedByBookAllIdsPositionSelector(state),
           attributeTabId: selectors.characterAttributeTabSelector(state),
           selectedCharacteId: selectors.selectedCharacterSelector(state),
           showTabs: selectors.showBookTabsSelector(state),
