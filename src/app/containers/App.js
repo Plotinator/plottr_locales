@@ -49,6 +49,7 @@ const App = ({
   showErrorBox,
   searchDialogIsOpen,
   openSearch,
+  openReplace,
   startSearching,
 }) => {
   const [showTemplateCreate, setShowTemplateCreate] = useState(false)
@@ -122,6 +123,8 @@ const App = ({
   useEffect(() => {
     const searchListener = (event) => {
       if (!searchDialogIsOpen && event.key === 'f' && (event.ctrlKey || event.metaKey)) {
+        event.preventDefault()
+        event.stopPropagation()
         openSearch()
         startSearching()
       }
@@ -129,6 +132,21 @@ const App = ({
     document.addEventListener('keydown', searchListener)
     return () => {
       document.removeEventListener('keydown', searchListener)
+    }
+  }, [searchDialogIsOpen, openSearch])
+
+  useEffect(() => {
+    const replaceListener = (event) => {
+      if (!searchDialogIsOpen && event.key === 'r' && (event.ctrlKey || event.metaKey)) {
+        event.preventDefault()
+        event.stopPropagation()
+        openReplace()
+        startSearching()
+      }
+    }
+    document.addEventListener('keydown', replaceListener)
+    return () => {
+      document.removeEventListener('keydown', replaceListener)
     }
   }, [searchDialogIsOpen, openSearch])
 
@@ -296,6 +314,7 @@ App.propTypes = {
   applicationIsBusyAndCannotBeQuit: PropTypes.bool,
   showErrorBox: PropTypes.func.isRequired,
   openSearch: PropTypes.func.isRequired,
+  openReplace: PropTypes.func.isRequired,
   startSearching: PropTypes.func.isRequired,
 }
 
@@ -315,5 +334,6 @@ function mapStateToProps(state) {
 export default connect(mapStateToProps, {
   clickOnDom: actions.domEvents.clickOnDom,
   openSearch: actions.ui.openSearch,
+  openReplace: actions.ui.openReplace,
   startSearching: actions.applicationState.startSearching,
 })(App)
