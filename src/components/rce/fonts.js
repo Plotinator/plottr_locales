@@ -8,6 +8,7 @@ let darwinFonts = [
   'Forum',
   'Georgia',
   'Impact',
+  'OpenDyslexic',
   'Times New Roman',
   'Trebuchet MS',
   'Verdana',
@@ -21,6 +22,7 @@ let windowsFonts = [
   'Courier New',
   'Forum',
   'Impact',
+  'OpenDyslexic',
   'Segoe Script',
   'Tahoma',
   'Times New Roman',
@@ -51,7 +53,7 @@ let webFonts = [
   'Verdana',
 ]
 
-let plottrFonts = ['Forum', 'IBM Plex Serif', 'Lato', 'Yellowtail']
+let plottrFonts = ['Forum', 'IBM Plex Serif', 'Lato', 'OpenDyslexic', 'Yellowtail']
 let recentlyUsed = ['Forum']
 
 export function getFonts(os) {
