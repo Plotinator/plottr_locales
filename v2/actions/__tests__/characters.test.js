@@ -12,7 +12,6 @@ const {
   characterAttributesSelector,
   singleCharacterSelector,
   allCharactersSelector,
-  allBooksSelector,
   allBookIdsSelector,
   characterAttributeTabSelector,
 } = selectors(pltrAdaptor)
