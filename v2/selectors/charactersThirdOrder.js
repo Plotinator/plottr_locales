@@ -504,13 +504,13 @@ export const allBooksWithCharactersSortedByBookAllIdsPositionSelector = createSe
   allBookIdsSelector,
   (allCharacterBooks, allIds) => {
     const characterWithAllBooks = {}
-    const sorted = allIds.map((id) =>
-      Object.values(allCharacterBooks).find((book) => book.id === id)
-    )
+    const sorted = allIds
+      .map((id) => Object.values(allCharacterBooks).find((book) => book.id === id))
+      .filter(Boolean)
 
-    sorted.forEach((book, index) => {
+    sorted.forEach((book) => {
       if (book) {
-        characterWithAllBooks[index] = book
+        characterWithAllBooks[book.id] = book
       }
     })
 
