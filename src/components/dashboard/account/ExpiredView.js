@@ -60,7 +60,10 @@ const ExpiredViewConnector = (connector) => {
         </div>
       )
     } else if (view === 'verify') {
-      return <VerifyView goBack={() => setView('chooser')} success={startSettingsWizard} />
+      // MARKER: default folders
+      // return <VerifyView goBack={() => setView('chooser')} success={startSettingsWizard} />
+      // MARKER: remove for default folders
+      return <VerifyView goBack={() => setView('chooser')} success={() => {}} />
     }
     // Better than undefined! :P
     return null
