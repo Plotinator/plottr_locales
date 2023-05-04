@@ -11,15 +11,13 @@ const {
   allCharacterAttributesSelector,
   characterAttributesSelector,
   singleCharacterSelector,
-  allCharactersSelector,
-  allBookIdsSelector,
   characterAttributeTabSelector,
 } = selectors(pltrAdaptor)
 
 const wiredUpActions = actions(pltrAdaptor)
 const { loadFile, selectCharacterAttributeBookTab } = wiredUpActions.ui
 const { addBook } = wiredUpActions.book
-const { editCharacterAttributeValue } = wiredUpActions.character
+const { editCharacterAttributeValue, addCharacter } = wiredUpActions.character
 const removeBookFromCharacter = wiredUpActions.character.removeBook
 const addBookToCharacter = wiredUpActions.character.addBook
 
@@ -143,58 +141,47 @@ describe('editCharacterAttributeValue', () => {
 
 describe('characterDeleteBook', () => {
   describe('given the state with emptyFile', () => {
-    describe('and loads Goldilocks file', () => {
-      const store = initialStore()
+    const store = initialStore()
+    store.dispatch(addCharacter('character 1'))
+    store.dispatch(addCharacter('character 2'))
+    describe('and add 3 books', () => {
       store.dispatch(
-        loadFile('Goldilocks', false, goldilocks, '2020.7.30', 'device:///tmp.dummy.pltr')
+        addBook(exampleBook1.title, exampleBook1.premise, exampleBook1.genre, exampleBook1.theme)
       )
-      describe('and add 3 books', () => {
-        store.dispatch(
-          addBook(exampleBook1.title, exampleBook1.premise, exampleBook1.genre, exampleBook1.theme)
-        )
-        store.dispatch(
-          addBook(exampleBook2.title, exampleBook2.premise, exampleBook2.genre, exampleBook2.theme)
-        )
-        store.dispatch(
-          addBook(exampleBook3.title, exampleBook3.premise, exampleBook3.genre, exampleBook3.theme)
-        )
-        it('should return the goldilocks characters', () => {
-          const allCharacters = allCharactersSelector(store.getState())
-          expect(allCharacters).toHaveLength(4)
+      store.dispatch(
+        addBook(exampleBook2.title, exampleBook2.premise, exampleBook2.genre, exampleBook2.theme)
+      )
+      store.dispatch(
+        addBook(exampleBook3.title, exampleBook3.premise, exampleBook3.genre, exampleBook3.theme)
+      )
+      describe('and add books to characters', () => {
+        const bookIdToRemove = 3
+        store.dispatch(addBookToCharacter(1, 1))
+        store.dispatch(addBookToCharacter(1, 2))
+        store.dispatch(addBookToCharacter(1, bookIdToRemove))
+        store.dispatch(addBookToCharacter(1, 4))
+        store.dispatch(addBookToCharacter(2, 2))
+        store.dispatch(addBookToCharacter(2, bookIdToRemove))
+        store.dispatch(addBookToCharacter(2, 4))
+        const stateAfterAddingBooks = store.getState()
+        const character1 = singleCharacterSelector(stateAfterAddingBooks, 1)
+        const character2 = singleCharacterSelector(stateAfterAddingBooks, 2)
+
+        it('should have all books attach to each character', () => {
+          expect(character1.bookIds).toHaveLength(4)
+          expect(character2.bookIds).toHaveLength(3)
         })
-        it('should have all 4 books', () => {
-          const allBookIds = allBookIdsSelector(store.getState())
-          expect(allBookIds).toHaveLength(4)
-        })
-        describe('and add books to characters', () => {
-          const bookIdToRemove = 3
-          store.dispatch(addBookToCharacter(1, 1))
-          store.dispatch(addBookToCharacter(1, 2))
-          store.dispatch(addBookToCharacter(1, bookIdToRemove))
-          store.dispatch(addBookToCharacter(1, 4))
-          store.dispatch(addBookToCharacter(2, 2))
-          store.dispatch(addBookToCharacter(2, bookIdToRemove))
-          store.dispatch(addBookToCharacter(2, 4))
-          const stateAfterAddingBooks = store.getState()
-          const character1 = singleCharacterSelector(stateAfterAddingBooks, 1)
-          const character2 = singleCharacterSelector(stateAfterAddingBooks, 2)
 
-          it('should have all books attach to each character', () => {
-            expect(character1.bookIds.length).toBe(4)
-            expect(character2.bookIds).toHaveLength(3)
-          })
+        const stateAfterBooksRemove = store.getState()
+        describe('given the user move to specific book tab', () => {
+          describe('and removes from the character the book', () => {
+            store.dispatch(selectCharacterAttributeBookTab())
+            store.dispatch(removeBookFromCharacter(character1.id, bookIdToRemove))
+            store.dispatch(removeBookFromCharacter(character2.id, bookIdToRemove))
 
-          const stateAfterBooksRemove = store.getState()
-          describe('given the user move to specific book tab', () => {
-            describe('and removes from the character the book', () => {
-              store.dispatch(selectCharacterAttributeBookTab())
-              store.dispatch(removeBookFromCharacter(character1.id, bookIdToRemove))
-              store.dispatch(removeBookFromCharacter(character2.id, bookIdToRemove))
-
-              it('should select the "Series" tab if the book has no characters', () => {
-                const currentTab = characterAttributeTabSelector(stateAfterBooksRemove)
-                expect(currentTab).toBe('all')
-              })
+            it('should select the "Series" tab if the book has no characters', () => {
+              const currentTab = characterAttributeTabSelector(stateAfterBooksRemove)
+              expect(currentTab).toBe('all')
             })
           })
         })
