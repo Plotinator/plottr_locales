@@ -5,45 +5,24 @@ import { isEqual } from 'lodash'
 
 import { removeSystemKeys, ARRAY_KEYS, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
 
-const doNothingWithPartialResult = () => {}
-
-const sequencePromiseThunks = (log, batchSize = 10) => (thunks, onPartialResult = doNothingWithPartialResult) => {
-  return new Promise((resolve, reject) => {
-    const iter = (results, remainingThunks) => {
-      if (remainingThunks.length === 0) {
-        resolve(results)
-        return
-      }
-
-      const nextThunks = remainingThunks.slice(0, 10)
-      Promise.all(
-        nextThunks.map((f) => {
-          return f()
-        }))
-        .then((newResults) => {
-          const currentResults = [...newResults, ...results]
-          onPartialResult(currentResults)
-          iter(currentResults, remainingThunks.slice(1))
-        })
-        .catch((error) => {
-          log.error('Failed to execute a sequenced promise', error.message, error)
-        })
-    }
-
-    iter([], thunks)
-  })
-}
-
 /**
  * auth, database and storage should be thunks that produce instances
  * of the correspending firebase objects from either the firebase JS
  * api or the react-native-firebase api.
  */
-const api = (actions, selectors, auth, database, storage, baseAPIDomain, development, log, isDesktop) => {
+const api = (
+  actions,
+  selectors,
+  auth,
+  database,
+  storage,
+  baseAPIDomain,
+  development,
+  log,
+  isDesktop
+) => {
   const BASE_API_URL =
     (!isDesktop && development) || !baseAPIDomain ? '' : `https://${baseAPIDomain || ''}`
-
-  const sequence = sequencePromiseThunks(log)
 
   const defaultErrorHandler = (error) => {
     log.error('Error communicating with Firebase.', error.message, error)
@@ -732,7 +711,8 @@ const api = (actions, selectors, auth, database, storage, baseAPIDomain, develop
     const lastModified = new Date()
     const fileId = selectors.fileIdSelector(fullFile)
     const fileName = selectors.fileNameSelector(fullFile)
-    const file = removeSystemKeys(fullFile)
+    const fileJSON = selectors.fullFileStateSelector(fullFile)
+    const file = removeSystemKeys(fileJSON)
 
     return startOfSessionBackup(userId, file, startOfToday, fileId)
       .then((startOfSession) => {
@@ -986,7 +966,9 @@ const api = (actions, selectors, auth, database, storage, baseAPIDomain, develop
   const filePublicURL = (storageProtocolURL, fileId, userId) => {
     return axios
       .get(
-        `${BASE_API_URL}/api/file-public-url?url=${storageProtocolURL}&fileId=${fileId}&userId=${userId}`
+        `${BASE_API_URL}/api/file-public-url?url=${encodeURIComponent(
+          storageProtocolURL
+        )}&fileId=${fileId}&userId=${userId}`
       )
       .then((response) => {
         return response.data.publicURL
