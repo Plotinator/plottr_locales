@@ -292,26 +292,14 @@ describe('characterDeleteBook', () => {
           })
 
           it('character bookIds should have same order as the book bookIds', () => {
-            const allBooksIDsWithCharactersOrdered = Object.keys(allBooksWithCharactersOrdered).map(
-              (id) => parseInt(id)
+            const stringifiedAllBookIds = allBookIds.map((id) => String(id))
+            const allBooksWithCharactersIdsOrdered = allBooksWithCharactersOrdered.map(({ id }) =>
+              String(id)
             )
-            const filteredBookIds = allBookIds.filter((id) =>
-              allBooksIDsWithCharactersOrdered.includes(id)
+            const filteredBookIds = stringifiedAllBookIds.filter((id) =>
+              allBooksWithCharactersIdsOrdered.includes(id)
             )
-            expect(filteredBookIds).toEqual(allBooksIDsWithCharactersOrdered)
-
-            Object.values(allBooksWithCharactersOrdered).forEach((book, idx) => {
-              if (book && allBooksIDsWithCharactersOrdered[idx + 1]) {
-                expect(Number(allBooksIDsWithCharactersOrdered[idx + 1])).toBeGreaterThan(
-                  Number(book?.id)
-                )
-              }
-              if (book && allBooksIDsWithCharactersOrdered[idx - 1]) {
-                expect(Number(allBooksIDsWithCharactersOrdered[idx - 1])).toBeLessThan(
-                  Number(book?.id)
-                )
-              }
-            })
+            expect(filteredBookIds).toEqual(allBooksWithCharactersIdsOrdered)
           })
         })
       })

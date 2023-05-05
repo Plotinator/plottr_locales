@@ -1,4 +1,4 @@
-import { groupBy, differenceWith, isEqual, mapValues, uniq, omit } from 'lodash'
+import { groupBy, differenceWith, isEqual, mapValues, uniq, omit, orderBy } from 'lodash'
 import { createSelector } from 'reselect'
 
 import { outOfOrderSearch } from '../helpers/outOfOrderSearch'
@@ -504,17 +504,19 @@ export const allBooksWithCharactersSortedByBookAllIdsPositionSelector = createSe
   allBookIdsSelector,
   (allCharacterBooks, allIds) => {
     const characterWithAllBooks = {}
-    const sorted = allIds
-      .map((id) => Object.values(allCharacterBooks).find((book) => book.id === id))
-      .filter(Boolean)
 
-    sorted.forEach((book) => {
-      if (book) {
-        characterWithAllBooks[book.id] = book
-      }
-    })
+    allIds
+      .map((id) => Object.values(allCharacterBooks).find((book) => book.id == id))
+      .forEach((item, idx) => {
+        if (item) {
+          characterWithAllBooks[item.id] = {
+            ...item,
+            position: idx,
+          }
+        }
+      })
 
-    return characterWithAllBooks
+    return orderBy(characterWithAllBooks, 'position')
   }
 )
 
