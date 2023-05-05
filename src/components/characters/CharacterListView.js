@@ -433,7 +433,7 @@ const CharacterListViewConnector = (connector) => {
                     style={{ marginBottom: '16px' }}
                   >
                     <Tab eventKey={'all'} title={t('Series')}></Tab>
-                    {Object.values(books).map((book, index) => {
+                    {books.map((book, index) => {
                       if (Array.isArray(book)) {
                         return null
                       }
@@ -461,7 +461,7 @@ const CharacterListViewConnector = (connector) => {
     characterSort: PropTypes.string,
     darkMode: PropTypes.bool,
     charactersSearchTerm: PropTypes.string,
-    books: PropTypes.object.isRequired,
+    books: PropTypes.array.isRequired,
     selectedCharacteId: PropTypes.number,
     showTabs: PropTypes.bool,
     attributeTabId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
