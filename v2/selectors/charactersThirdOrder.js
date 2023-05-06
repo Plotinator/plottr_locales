@@ -38,10 +38,12 @@ const displayedSingleCharacter = (character, bookId, currentBookAttributeDescirp
     })?.value ||
     (bookId === 'all' && character.tags) ||
     []
-  allCharacterTags.push(characterPerBookTags)
+  if (characterPerBookTags.length) {
+    allCharacterTags.push(characterPerBookTags)
+  }
 
   if (character.tags) {
-    character.tags.forEach((tag) => {
+    character.tags?.forEach((tag) => {
       if (!allCharacterTags.includes(tag)) {
         allCharacterTags.push(tag)
       }
