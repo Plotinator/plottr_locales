@@ -52,7 +52,10 @@ const ChoiceViewConnector = (connector) => {
             </div>
           )
         case 'verify':
-          return <VerifyView goBack={goBack} success={startSettingsWizard} />
+          // MARKER: default folders
+          // return <VerifyView goBack={goBack} success={startSettingsWizard} />
+          // MARKER: remove for default folders
+          return <VerifyView goBack={goBack} success={goToAccount} />
         case 'explain':
           return (
             <div>
@@ -65,7 +68,10 @@ const ChoiceViewConnector = (connector) => {
                   bsStyle="default"
                   onClick={() => {
                     startTrial()
-                    startSettingsWizard()
+                    // MARKER: default folders
+                    // startSettingsWizard()
+                    // MARKER: remove for default folders
+                    goToAccount()
                   }}
                 >
                   {t('Start my Free Trial')}

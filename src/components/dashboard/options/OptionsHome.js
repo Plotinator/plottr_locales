@@ -179,11 +179,6 @@ const OptionsHomeConnector = (connector) => {
                 </div>
               </div>
             </Tab>
-            {!osIsUnknown ? (
-              <Tab eventKey={2} title={t('Files')}>
-                <FileSettings />
-              </Tab>
-            ) : null}
             <Tab eventKey={3} title={t('Dashboard')}>
               <div className="dashboard__options__item">
                 <h4>{t('Always Open Dashboard First')}</h4>
