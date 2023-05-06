@@ -411,6 +411,7 @@ const CardDialogConnector = (connector) => {
             draggable
             onDragStart={(evt) => handleDragStart(evt, idx)}
             position={idx}
+            isDroppable={newTemplateTabPosition && idx === Number(newTemplateTabPosition)}
           >
             <div className="template-tab__details">
               <p>
