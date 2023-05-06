@@ -142,22 +142,30 @@ const FilesHomeConnector = (connector) => {
     const handleCreateNewProject = (template) => {
       if (isInOfflineMode) return
 
-      if (settings.user.defaultFolder && settings.user.defaultFolderLocation) {
-        if (isObject(template)) {
-          mpq.push('btn_create_with_template', { template_name: template.name })
-          projectActions.startCreatingNewProject(template)
-          setView('recent')
-        } else {
-          projectActions.startCreatingNewProject()
-        }
+      // MARKER: default folders
+      // if (settings.user.defaultFolder && settings.user.defaultFolderLocation) {
+      //   if (isObject(template)) {
+      //     mpq.push('btn_create_with_template', { template_name: template.name })
+      //     projectActions.startCreatingNewProject(template)
+      //     setView('recent')
+      //   } else {
+      //     projectActions.startCreatingNewProject()
+      //   }
+      // } else {
+      //   savePlottrProjectDialog().then((newFilePath) => {
+      //     if (newFilePath) {
+      //       let templateObj = isObject(template) ? template : null
+      //       createNew(templateObj, newFilePath)
+      //       setView('recent')
+      //     }
+      //   })
+      // }
+      // MARKER: remove for default folders
+      if (template.constructor.name == 'Object') {
+        mpq.push('btn_create_with_template', { template_name: template.name })
+        projectActions.startCreatingNewProject(template)
       } else {
-        savePlottrProjectDialog().then((newFilePath) => {
-          if (newFilePath) {
-            let templateObj = isObject(template) ? template : null
-            createNew(templateObj, newFilePath)
-            setView('recent')
-          }
-        })
+        projectActions.startCreatingNewProject()
       }
     }
 
@@ -170,7 +178,7 @@ const FilesHomeConnector = (connector) => {
             modal={false}
             types={['custom', 'project', 'plotlines']}
             onChooseTemplate={handleCreateNewProject}
-            showCancelButton
+            showCancelButton={false}
             close={() => setView('recent')}
             confirmButtonText={t('Create New Project')}
           />
