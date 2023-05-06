@@ -114,7 +114,7 @@ describe('tagsFilterItemsSelector', () => {
     })
   })
 
-  describe('move to tab with tags on filter (Notes)', () => {
+  describe('move to tab with tags on filter (Characters)', () => {
     store.dispatch(changeCurrentView('characters'))
     const stateAfterChangingView = store.getState()
     describe('given the view has no contents', () => {
