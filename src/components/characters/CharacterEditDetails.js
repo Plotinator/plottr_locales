@@ -327,6 +327,7 @@ const CharacterEditDetailsConnector = (connector) => {
             onDragStart={(evt) => handleDragStart(evt, idx)}
             position={idx}
             draggable
+            isDroppable={newTemplateTabPosition && idx === Number(newTemplateTabPosition)}
           >
             <div className="template-tab__details">
               <p>
