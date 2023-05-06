@@ -39,7 +39,7 @@ const displayedSingleCharacter = (character, bookId, currentBookAttributeDescirp
     (bookId === 'all' && character.tags) ||
     []
   if (characterPerBookTags.length) {
-    allCharacterTags.push(characterPerBookTags)
+    allCharacterTags.push(...characterPerBookTags)
   }
 
   if (character.tags) {
