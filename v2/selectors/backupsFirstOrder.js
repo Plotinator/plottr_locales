@@ -3,12 +3,12 @@
 // dependencies.
 
 import { createSelector } from 'reselect'
-import { sortBy, groupBy } from 'lodash'
+import { sortBy } from 'lodash'
+
+import { t } from 'plottr_locales'
 
 import { parseStringDate } from '../helpers/date'
 import { fullFileStateSelector } from './fullFileFirstOrder'
-
-import { t } from 'plottr_locales'
 
 export const backupFoldersSelector = createSelector(
   fullFileStateSelector,
@@ -24,42 +24,42 @@ export const nonEmptyBackupFoldersSelector = createSelector(
   }
 )
 
+const visualDateStringFromDateString = (dateString) => {
+  return t('{date, date, medium}', {
+    date: parseStringDate(dateString),
+  })
+}
+const searchTermSelector = (state, searchTerm) => searchTerm
+const folderSearchSelector = (state, _searchTerm, folderSearch) => folderSearch
 const sortFolders = (folders) => {
   return sortBy(folders, (folder) => {
     return parseStringDate(folder.date)
   }).reverse()
 }
-const groupableName = (fileObj) => {
-  if (fileObj.storagePath) {
-    return fileObj.fileId
-  } else {
-    return fileObj.name.replace('(start-session)-', '').replace('.pltr', '')
-  }
+const matchesSearchTerm = (searchTerm) => (file) => {
+  return file.fileName && file.fileName.toLowerCase().includes(searchTerm.toLowerCase())
 }
-const makeDateString = (dateObj, makeShort) => {
-  let dateStr = ''
-  try {
-    const date = dateObj instanceof Date ? dateObj : parseStringDate(dateObj)
-    const style = makeShort ? '{date, date, monthDay}' : '{date, date, medium}'
-    dateStr = t(style, { date })
-  } catch (error) {
-    console.error(error)
-  }
-  return dateStr
-}
-export const groupedSortedBackupFoldersSelector = createSelector(
+export const filteredSortedBackupsSelector = createSelector(
   nonEmptyBackupFoldersSelector,
-  (backupFolders) => {
-    const sortedFolders = sortFolders(backupFolders)
-    return sortedFolders.map((f) => {
-      const groups = groupBy(f.backups, groupableName)
-      // const groupsWithName = Object.entries(f.groups).map((group) => {})
-      return {
-        ...f,
-        groups,
-        longDateStr: makeDateString(f.date, false),
-        shortDateStr: makeDateString(f.date, true),
-      }
-    })
+  searchTermSelector,
+  folderSearchSelector,
+  (backupFolders, searchTerm, folderSearch) => {
+    if (searchTerm && searchTerm.length > 1) {
+      const matchingFolders = backupFolders.reduce((acc, obj) => {
+        const matches = folderSearch
+          ? obj.backups
+          : obj.backups.filter(matchesSearchTerm(searchTerm))
+        const folderDate = visualDateStringFromDateString(
+          typeof obj.date === 'string' ? obj.date : obj.path.toString()
+        ).toLowerCase()
+        if (folderDate.includes(searchTerm.toLowerCase()) || (matches.length && !folderSearch)) {
+          acc.push({ ...obj, backups: matches })
+        }
+        return acc
+      }, [])
+      return sortFolders(matchingFolders)
+    }
+
+    return sortFolders(backupFolders)
   }
 )
