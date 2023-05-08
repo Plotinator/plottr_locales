@@ -17,7 +17,6 @@ const {
   allNotesInBookSelector,
   sortedTagsSelector,
   tagsFilterItemsSelector,
-  singleCharacterSelector,
   allCharactersSelector,
   allTagsSelector,
 } = selectors(pltrAdaptor)
