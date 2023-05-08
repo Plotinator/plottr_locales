@@ -22,6 +22,7 @@ import {
   EDIT_CHARACTER_NAME,
   EDIT_CHARACTER_IMAGE,
   DELETE_CHARACTER_LEGACY_CUSTOM_ATTRIBUTE,
+  SELECT_CHARACTER_ATTRIBUTE_BOOK_TAB,
   REORDER_CHARACTER_TEMPLATES,
 } from '../constants/ActionTypes'
 import { editorMetadataIfPresent } from '../helpers/editors'
@@ -36,6 +37,7 @@ const {
   legacyCustomCharacterAttributeByName,
   characterAttributesForBookSelector,
   allBookIdsSelector,
+  allDisplayedCharactersForCurrentBookSelector,
 } = selectors(identity)
 
 export function addCharacter(name) {
@@ -115,8 +117,14 @@ export function removeTag(id, tagId) {
   return { type: REMOVE_TAG_FROM_CHARACTER, id, tagId }
 }
 
-export function removeBook(id, bookId) {
-  return { type: REMOVE_BOOK_FROM_CHARACTER, id, bookId }
+export const removeBook = (id, bookId) => (dispatch, getState) => {
+  const state = getState()
+  const allCharactersByBook = allDisplayedCharactersForCurrentBookSelector(state)
+
+  dispatch({ type: REMOVE_BOOK_FROM_CHARACTER, id, bookId })
+  if (allCharactersByBook.length === 1) {
+    dispatch({ type: SELECT_CHARACTER_ATTRIBUTE_BOOK_TAB, bookId: 'all' })
+  }
 }
 
 export function removeTemplateFromCharacter(id, templateId) {
