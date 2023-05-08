@@ -13,7 +13,7 @@ const {
   singleCharacterSelector,
   allBookIdsSelector,
   allCharactersSelector,
-  allBooksWithCharactersSortedByBookAllIdsPositionSelector,
+  allBooksWithCharactersInThemSortedByPositionInAllBookIdsSelector,
 } = selectors(pltrAdaptor)
 
 const wiredUpActions = actions(pltrAdaptor)
@@ -199,7 +199,7 @@ describe('characterDeleteBook', () => {
           const character2 = singleCharacterSelector(stateAfterAddingBooks, 2)
           const allBookIds = allBookIdsSelector(stateAfterAddingBooks)
           const allBooksWithCharactersOrdered =
-            allBooksWithCharactersSortedByBookAllIdsPositionSelector(stateAfterAddingBooks)
+            allBooksWithCharactersInThemSortedByPositionInAllBookIdsSelector(stateAfterAddingBooks)
 
           it('should have attached the 5 books attach to each character', () => {
             expect(character1.bookIds).toHaveLength(5)
