@@ -499,7 +499,7 @@ export const allBooksWithCharactersInThemSelector = createSelector(
   }
 )
 
-export const allBooksWithCharactersSortedByBookAllIdsPositionSelector = createSelector(
+export const allBooksWithCharactersInThemSortedByPositionInAllBookIdsSelector = createSelector(
   allBooksWithCharactersInThemSelector,
   allBookIdsSelector,
   (allCharacterBooks, allIds) => {
