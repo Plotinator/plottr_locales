@@ -27,8 +27,8 @@ import { allCardsSelector } from './cardsFirstOrder'
 
 const displayedSingleCharacter = (character, bookId, currentBookAttributeDescirptorsById) => {
   const currentBookAttributes = character.attributes || []
-
-  const tags =
+  const allCharacterTags = []
+  const characterPerBookTags =
     currentBookAttributes.find((attribute) => {
       return (
         attribute.bookId === bookId &&
@@ -38,6 +38,17 @@ const displayedSingleCharacter = (character, bookId, currentBookAttributeDescirp
     })?.value ||
     (bookId === 'all' && character.tags) ||
     []
+  if (characterPerBookTags.length) {
+    allCharacterTags.push(...characterPerBookTags)
+  }
+
+  if (character.tags) {
+    character.tags?.forEach((tag) => {
+      if (!allCharacterTags.includes(tag)) {
+        allCharacterTags.push(tag)
+      }
+    })
+  }
 
   const description =
     currentBookAttributes.find((attribute) => {
@@ -75,7 +86,7 @@ const displayedSingleCharacter = (character, bookId, currentBookAttributeDescirp
 
   return {
     ...character,
-    tags,
+    tags: allCharacterTags,
     description,
     notes,
     categoryId,
