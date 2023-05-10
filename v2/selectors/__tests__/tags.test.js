@@ -2,6 +2,7 @@ import { emptyFile } from '../../store/newFileState'
 import { configureStore, pltrAdaptor } from './fixtures/testStore'
 import selectors from '../'
 import actions from '../../actions'
+import goldilocks from './fixtures/goldilocks.json'
 
 const wiredUpActions = actions(pltrAdaptor)
 
@@ -16,6 +17,8 @@ const {
   allNotesInBookSelector,
   sortedTagsSelector,
   tagsFilterItemsSelector,
+  allCharactersSelector,
+  allTagsSelector,
 } = selectors(pltrAdaptor)
 
 const EMPTY_FILE = emptyFile('Test file')
@@ -114,7 +117,7 @@ describe('tagsFilterItemsSelector', () => {
     })
   })
 
-  describe('move to tab with tags on filter (Notes)', () => {
+  describe('move to tab with tags on filter (Characters)', () => {
     store.dispatch(changeCurrentView('characters'))
     const stateAfterChangingView = store.getState()
     describe('given the view has no contents', () => {
@@ -163,6 +166,46 @@ describe('tagsFilterItemsSelector', () => {
 
         it('should have the tag from the tag attached to the character', () => {
           expect(newFilterItems).toEqual(expect.arrayContaining([EXAMPLE_TAGS[1]]))
+        })
+      })
+    })
+  })
+
+  describe('given the new empty file', () => {
+    describe('and loads goldilocks file', () => {
+      const store = configureStore()
+      store.dispatch(
+        loadFile('Goldilocks', false, goldilocks, '2020.7.30', 'device:///tmp.dummy.pltr')
+      )
+
+      const initialState = store.getState()
+      const allCharacters = allCharactersSelector(initialState)
+      const allTags = allTagsSelector(initialState)
+      const tagFilterItems = tagsFilterItemsSelector(initialState)
+      it('should have all 4 characters', () => {
+        expect(allCharacters).toHaveLength(4)
+      })
+      it('should have all 9 tags', () => {
+        expect(allTags).toHaveLength(9)
+      })
+      it('should have to tagFilterItems yet', () => {
+        expect(tagFilterItems).toHaveLength(0)
+      })
+
+      store.dispatch(changeCurrentView('characters'))
+      describe('move to tab with tags on filter (Characters)', () => {
+        const stateAfterChangeTab = store.getState()
+        const allCharacters = allCharactersSelector(stateAfterChangeTab)
+        const allTags = allTagsSelector(stateAfterChangeTab)
+        const tagFilterItems = tagsFilterItemsSelector(stateAfterChangeTab)
+        it('should have all 4 characters', () => {
+          expect(allCharacters).toHaveLength(4)
+        })
+        it('should have all 9 tags', () => {
+          expect(allTags).toHaveLength(9)
+        })
+        it('should have 3 tagFilterItems', () => {
+          expect(tagFilterItems).toHaveLength(3)
         })
       })
     })
