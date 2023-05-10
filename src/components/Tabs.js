@@ -4,6 +4,7 @@ import requiredForA11y from 'prop-types-extra/lib/isRequiredForA11y'
 import { uncontrollable } from 'uncontrollable'
 import elementType from 'prop-types-extra/lib/elementType'
 import { omit } from 'lodash'
+import cx from 'classnames'
 
 import Nav from './Nav'
 import NavItem from './NavItem'
@@ -117,6 +118,7 @@ class Tabs extends React.Component {
       onDragStart,
       onDragOver,
       position,
+      isDroppable,
     } = child.props
     if (title == null) {
       return null
@@ -140,7 +142,7 @@ class Tabs extends React.Component {
         onSelect={this.props.onSelect}
         eventKey={eventKey}
         disabled={disabled}
-        className={tabClassName}
+        className={cx({ draggable: draggable, isDroppable: isDroppable, ...tabClassName })}
         onClose={this.props.onCloseTab}
         onContextMenu={this.props.onContextMenu}
         onDragOver={onDragOver}

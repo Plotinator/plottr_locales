@@ -200,6 +200,23 @@
     }
   }
   .character-list__character__tabs {
+    .nav-tabs {
+      user-select: none;
+      li.draggable {
+        a {
+          user-select: auto;
+          cursor: grab;
+        }
+        a:active {
+          cursor: grabbing;
+        }
+        &.isDroppable a {
+          box-sizing: border-box;
+          border: 2px dashed $gray-6;
+          padding: 9px 14px;
+        }
+      }
+    }
     .tab-content {
       padding: 16px;
       border-left: 1px solid $gray-8;
