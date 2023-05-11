@@ -309,7 +309,7 @@ const BeatHeadingCellConnector = (connector) => {
     }
 
     const adjustedWidth = () => {
-      return width - (span === 1 && beats.length <= 2 ? 0 : isMedium ? 7 : 27)
+      return width - (span === 1 && beats.length <= 1 ? 0 : isMedium ? 7 : 27)
     }
 
     const handleEsc = (event) => {
@@ -439,9 +439,11 @@ const BeatHeadingCellConnector = (connector) => {
                         onDragOver={handleDragOver}
                         onDragLeave={handleDragLeave}
                       >
-                        <div className={cx('beat__heading-drag-handle', { hovering })}>
-                          <FaGripLinesVertical />
-                        </div>
+                        {span > 1 ? (
+                          <div className={cx('beat__heading-drag-handle', { hovering })}>
+                            <FaGripLinesVertical />
+                          </div>
+                        ) : null}
                         {renderTitle()}
                       </div>
                     </Floater>

@@ -58,6 +58,7 @@ const CharacterEditDetailsConnector = (connector) => {
     const [removing, setRemoving] = useState(false)
     const [removeWhichTemplate, setRemoveWhichTemplate] = useState(null)
     const [activeTab, setActiveTab] = useState(1)
+    const [newTemplateTabPosition, setNewTemplateTabPosition] = useState(null)
     const [showTemplatePicker, setShowTemplatePicker] = useState(false)
 
     const deleteCharacter = (e) => {
@@ -248,9 +249,37 @@ const CharacterEditDetailsConnector = (connector) => {
       })
     }
 
+    const handleTabDragOver = (e) => {
+      if (e) {
+        e.preventDefault()
+        const newPosition = e.target?.getAttribute('position')
+        if (newPosition != newTemplateTabPosition) {
+          setNewTemplateTabPosition(newPosition)
+        }
+      }
+    }
+
+    const handleDropTab = (event) => {
+      event.stopPropagation()
+
+      var json = event.dataTransfer.getData('text/json')
+      var droppedTab = JSON.parse(json)
+      actions.reorderCharacterTemplateAttribute(
+        droppedTab.position,
+        Number(newTemplateTabPosition),
+        character.id
+      )
+      setNewTemplateTabPosition(null)
+    }
+
     const renderEditingTemplates = () => {
       return character.templates.map((template, idx) => {
         const templateData = getTemplateById(template.id)
+        const handleDragStart = (e, idx) => {
+          e.dataTransfer.effectAllowed = 'move'
+          e.dataTransfer.setData('text/json', JSON.stringify({ ...template, position: idx }))
+        }
+
         const attrs = template.attributes.map((attr, index) => {
           const editorPath = helpers.editors.characterTemplateAttributeEditorPath(
             character.id,
@@ -295,6 +324,10 @@ const CharacterEditDetailsConnector = (connector) => {
             eventKey={idx + 3}
             title={templateData?.name || template.name || t('Template')}
             key={`tab-${idx}`}
+            onDragStart={(evt) => handleDragStart(evt, idx)}
+            position={idx}
+            draggable
+            isDroppable={newTemplateTabPosition && idx === Number(newTemplateTabPosition)}
           >
             <div className="template-tab__details">
               <p>
@@ -366,6 +399,8 @@ const CharacterEditDetailsConnector = (connector) => {
             id="tabs"
             className="character-list__character__tabs"
             onSelect={selectTab}
+            onDrop={handleDropTab}
+            onTabDragOver={handleTabDragOver}
           >
             <Tab eventKey={1} title={t('Notes')}>
               <RichText
