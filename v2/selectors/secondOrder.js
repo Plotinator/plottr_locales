@@ -386,13 +386,22 @@ export const beatInsertControlHierarchyLevelNameSelector = createSelector(
   beatIdSelector,
   sortedHierarchyLevels,
   timelineViewIsTabbedSelector,
-  (beats, beatId, hierarchyLevels, timelineViewIsTabbed) => {
-    if (timelineViewIsTabbed && (!beatId || depth(beats, beatId) === 0)) {
-      return (hierarchyLevels[1] || hierarchyLevels[0]).name
+  timelineViewIsDefaultSelector,
+  (beats, beatId, hierarchyLevels, timelineViewIsTabbed, timelineViewIsDefault) => {
+    if (timelineViewIsTabbed) {
+      if (depth(beats, beatId) === 0) {
+        return (hierarchyLevels[1] || hierarchyLevels[0]).name
+      } else if (!beatId) {
+        return (hierarchyLevels[2] || hierarchyLevels[1] || hierarchyLevels[0]).name
+      }
     }
 
-    return (hierarchyLevels[depth(beats, beatId)] || hierarchyLevels[hierarchyLevels.length - 1])
-      .name
+    if (timelineViewIsDefault && !beatId) {
+      return hierarchyLevels[0].name
+    } else {
+      return (hierarchyLevels[depth(beats, beatId)] || hierarchyLevels[hierarchyLevels.length - 1])
+        .name
+    }
   }
 )
 
