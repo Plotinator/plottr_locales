@@ -2,6 +2,9 @@
 
 .timeline-tabbed-view-body {
   display: flex;
+  .tablist {
+    overflow-y: hidden;
+  }
 }
 
 .nav-with-cross,
