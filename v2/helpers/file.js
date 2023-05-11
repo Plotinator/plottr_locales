@@ -93,3 +93,12 @@ export const filePathToFileURL = (filePath) => {
 
   return `device://${filePath}`
 }
+
+export const ensureEndsInPltr = (filePath) => {
+  if (!filePath) return null
+
+  if (!filePath.endsWith('.pltr')) {
+    return `${filePath}.pltr`
+  }
+  return filePath
+}

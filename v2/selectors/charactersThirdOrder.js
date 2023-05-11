@@ -1,4 +1,4 @@
-import { groupBy, differenceWith, isEqual, mapValues, uniq, omit } from 'lodash'
+import { groupBy, differenceWith, isEqual, mapValues, uniq, omit, orderBy } from 'lodash'
 import { createSelector } from 'reselect'
 
 import { outOfOrderSearch } from '../helpers/outOfOrderSearch'
@@ -27,8 +27,8 @@ import { allCardsSelector } from './cardsFirstOrder'
 
 const displayedSingleCharacter = (character, bookId, currentBookAttributeDescirptorsById) => {
   const currentBookAttributes = character.attributes || []
-
-  const tags =
+  const allCharacterTags = []
+  const characterPerBookTags =
     currentBookAttributes.find((attribute) => {
       return (
         attribute.bookId === bookId &&
@@ -38,6 +38,17 @@ const displayedSingleCharacter = (character, bookId, currentBookAttributeDescirp
     })?.value ||
     (bookId === 'all' && character.tags) ||
     []
+  if (characterPerBookTags.length) {
+    allCharacterTags.push(...characterPerBookTags)
+  }
+
+  if (character.tags) {
+    character.tags?.forEach((tag) => {
+      if (!allCharacterTags.includes(tag)) {
+        allCharacterTags.push(tag)
+      }
+    })
+  }
 
   const description =
     currentBookAttributes.find((attribute) => {
@@ -75,7 +86,7 @@ const displayedSingleCharacter = (character, bookId, currentBookAttributeDescirp
 
   return {
     ...character,
-    tags,
+    tags: allCharacterTags,
     description,
     notes,
     categoryId,
@@ -496,6 +507,27 @@ export const allBooksWithCharactersInThemSelector = createSelector(
           [next.id]: next,
         }
       }, {})
+  }
+)
+
+export const allBooksWithCharactersInThemSortedByPositionInAllBookIdsSelector = createSelector(
+  allBooksWithCharactersInThemSelector,
+  allBookIdsSelector,
+  (allCharacterBooks, allIds) => {
+    const characterWithAllBooks = {}
+
+    allIds
+      .map((id) => Object.values(allCharacterBooks).find((book) => book.id == id))
+      .forEach((item, idx) => {
+        if (item) {
+          characterWithAllBooks[item.id] = {
+            ...item,
+            position: idx,
+          }
+        }
+      })
+
+    return orderBy(characterWithAllBooks, 'position')
   }
 )
 
