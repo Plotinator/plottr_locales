@@ -2,6 +2,7 @@ import { configureStore, pltrAdaptor } from './fixtures/testStore'
 import { emptyFile } from '../../store/newFileState'
 import selectors from '../index'
 import actions from '../../actions'
+import goldilocksTestFile from './fixtures/goldilocks.json'
 
 const wiredUpActions = actions(pltrAdaptor)
 const { loadFile } = wiredUpActions.ui
@@ -9,8 +10,12 @@ const { addCharacter } = wiredUpActions.character
 const { addBook } = wiredUpActions.book
 const addBookToCharacter = wiredUpActions.character.addBook
 
-const { allBooksWithCharactersInThemSelector, characterBookCategoriesSelector } =
-  selectors(pltrAdaptor)
+const {
+  allBooksWithCharactersInThemSelector,
+  characterBookCategoriesSelector,
+  displayedSingleCharacterSelector,
+  allCharactersSelector,
+} = selectors(pltrAdaptor)
 
 const EMPTY_FILE = emptyFile('Test file')
 const initialStore = () => {
@@ -195,6 +200,39 @@ describe('allBooksWithCharactersInThemSelector', () => {
             imageId: null,
           },
         })
+      })
+    })
+  })
+})
+
+describe('displayedSingleCharacterSelector', () => {
+  describe('given the new empty file', () => {
+    describe('and loads goldilocks file', () => {
+      const store = configureStore()
+      store.dispatch(
+        loadFile('Goldilocks', false, goldilocksTestFile, '2020.7.30', 'device:///tmp.dummy.pltr')
+      )
+
+      const state = store.getState()
+      const allCharacters = allCharactersSelector(state)
+
+      it('should have loaded all 4 characters', () => {
+        expect(allCharacters).toHaveLength(4)
+      })
+
+      const goldilocks = allCharacters.find((character) => character.name === 'Goldilocks')
+      const goldilocksProperties = displayedSingleCharacterSelector(state, goldilocks.id)
+      it('should have a character named Goldilocks', () => {
+        expect(goldilocks).toBeDefined()
+        expect(goldilocks.id).toBe(1)
+      })
+
+      it('should have 2 legacy tags', () => {
+        expect(goldilocks.tags).toHaveLength(2)
+      })
+
+      it('should have 3 tags attached to it', () => {
+        expect(goldilocksProperties.tags).toHaveLength(3)
       })
     })
   })

@@ -1,4 +1,4 @@
-import { FILE_LOADED } from '../../v1/constants/ActionTypes'
+import { isEmpty } from 'lodash'
 import {
   ATTACH_BOOK_TO_CHARACTER,
   ATTACH_TAG_TO_CHARACTER,
@@ -10,12 +10,17 @@ import {
   EDIT_CHARACTER_CATEGORY,
   REMOVE_TAG_FROM_CHARACTER,
   LOAD_ATTRIBUTES,
+  FILE_LOADED,
 } from '../constants/ActionTypes'
 
 const EMPTY_ATTRIBUTE_STATE = []
 
 const INITIAL_STATE = {
   characters: EMPTY_ATTRIBUTE_STATE,
+}
+
+const initialStateIfEmpty = (newState, state) => {
+  return !newState || isEmpty(newState) ? INITIAL_STATE : newState
 }
 
 const attributesReducer =
@@ -155,11 +160,11 @@ const attributesReducer =
       }
 
       case FILE_LOADED: {
-        return action.data.attributes || INITIAL_STATE
+        return initialStateIfEmpty(action.data.attributes)
       }
 
       case LOAD_ATTRIBUTES: {
-        return action.attributes
+        return initialStateIfEmpty(action.attributes)
       }
 
       default: {
