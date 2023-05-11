@@ -439,9 +439,11 @@ const BeatHeadingCellConnector = (connector) => {
                         onDragOver={handleDragOver}
                         onDragLeave={handleDragLeave}
                       >
-                        <div className={cx('beat__heading-drag-handle', { hovering })}>
-                          <FaGripLinesVertical />
-                        </div>
+                        {span > 1 ? (
+                          <div className={cx('beat__heading-drag-handle', { hovering })}>
+                            <FaGripLinesVertical />
+                          </div>
+                        ) : null}
                         {renderTitle()}
                       </div>
                     </Floater>
