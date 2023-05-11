@@ -58,7 +58,7 @@
      - [X] ~hideCardDialogTemplatePicker~,
      - [X] ~startRemovingTemplateFromCardDialog~,
      - [X] ~stopRemovingTemplateFromCardDialog~,
-     - [ ] ~setActiveTabOnCardDialog~,
+     - [X] ~setActiveTabOnCardDialog~,
      - [ ] ~showPlaceAttributeDialog~,
      - [ ] ~hidePlaceAttributeDialog~,
      - [ ] ~startEditingSelectedPlace~,
