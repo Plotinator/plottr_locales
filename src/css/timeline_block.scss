@@ -2,6 +2,9 @@
 
 .timeline-tabbed-view-body {
   display: flex;
+  .tablist {
+    overflow-y: hidden;
+  }
 }
 
 .nav-with-cross,
@@ -518,7 +521,7 @@
 
   .timeline__tab {
     width: 100vw;
-    height: 78vh;
+    height: max-content;
     overflow: auto;
   }
 

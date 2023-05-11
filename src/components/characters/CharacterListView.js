@@ -111,9 +111,10 @@ const CharacterListViewConnector = (connector) => {
     const [detailsVisible, setDetailsVisible] = useState(true)
 
     useEffect(() => {
-      uiActions.selectCharacter(
-        selectedId(visibleCharactersByCategory, characters, categories, selectedCharacteId)
-      )
+      const id = selectedId(visibleCharactersByCategory, characters, categories, selectedCharacteId)
+      if (id !== selectedCharacteId) {
+        uiActions.selectCharacter(id)
+      }
     }, [visibleCharactersByCategory, characters, categories])
 
     const editSelected = () => {
@@ -432,7 +433,7 @@ const CharacterListViewConnector = (connector) => {
                     style={{ marginBottom: '16px' }}
                   >
                     <Tab eventKey={'all'} title={t('Series')}></Tab>
-                    {Object.values(books).map((book, index) => {
+                    {books.map((book, index) => {
                       if (Array.isArray(book)) {
                         return null
                       }
@@ -460,7 +461,7 @@ const CharacterListViewConnector = (connector) => {
     characterSort: PropTypes.string,
     darkMode: PropTypes.bool,
     charactersSearchTerm: PropTypes.string,
-    books: PropTypes.object.isRequired,
+    books: PropTypes.array.isRequired,
     selectedCharacteId: PropTypes.number,
     showTabs: PropTypes.bool,
     attributeTabId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
@@ -497,7 +498,7 @@ const CharacterListViewConnector = (connector) => {
           characterSort: selectors.characterSortSelector(state),
           darkMode: selectors.isDarkModeSelector(state),
           charactersSearchTerm: selectors.charactersSearchTermSelector(state),
-          books: selectors.allBooksWithCharactersInThemSelector(state),
+          books: selectors.allBooksWithCharactersInThemSortedByPositionInAllBookIdsSelector(state),
           attributeTabId: selectors.characterAttributeTabSelector(state),
           selectedCharacteId: selectors.selectedCharacterSelector(state),
           showTabs: selectors.showBookTabsSelector(state),
