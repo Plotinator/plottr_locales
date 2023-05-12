@@ -89,7 +89,7 @@
      - [X] ~hideCharactersTemplatePicker~,
      - [X] ~startCreatingCharacter~,
      - [X] ~finishCreatingCharacter~,
-     - [ ] ~setCharacterTemplateData~,
+     - [X] ~setCharacterTemplateData~,
      - [ ] ~showCharacterFilter~,
      - [ ] ~hideCharacterFilter~,
      - [ ] ~showCharacterSort~,
