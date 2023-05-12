@@ -203,6 +203,10 @@ const _makeMainProcessClient = () => {
     return subscribeTo('save-as', cb)
   }
 
+  const removeFromTempFilesIfTemp = (fileURL) => {
+    return ask('remove-from-temp-files-if-temp', fileURL)
+  }
+
   const editKnownFilePath = (oldFileURL, newFileURL) => {
     return ask('edit-known-file-path', oldFileURL, newFileURL)
   }
@@ -450,6 +454,7 @@ const _makeMainProcessClient = () => {
     onExportFileFromMenu,
     onSave,
     onSaveAs,
+    removeFromTempFilesIfTemp,
     editKnownFilePath,
     pleaseTellDashboardToReloadRecents,
     onUndo,

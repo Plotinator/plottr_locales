@@ -6,23 +6,17 @@
   padding: 32px;
 
   .row {
+    margin-bottom: 20px;
     display: flex;
     align-items: center;
   }
 
   .dashboard__search {
     margin-left: -15px;
+    // position: absolute;
+    // top: 55px;
+    // right: 15px;
     width: 300px;
-  }
-}
-
-.dashboard__backups__header-div {
-  display: flex;
-  align-items: baseline;
-
-  span.glyphicon {
-    margin-left: 16px;
-    font-size: larger;
   }
 
   h1 {
@@ -33,57 +27,66 @@
 }
 
 .dashboard__backups__wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
   height: calc(100% - 49px);
   overflow: auto;
   padding-bottom: 100px;
 }
 
-.dashboard__backups__projects-table {
-  margin-left: 96px;
-  .dashboard__backups__project-row {
-    .dashboard__backups__project-backup {
-      .dashboard__backups__item {
-        padding: 10px 15px;
-        background-color: white;
-        border: 1px solid $gray-8;
-        border-radius: 4px;
-        user-select: none;
-        position: relative;
-        & > div {
-          width: 100%;
-        }
-        .dashboard__backups__item-actions {
-          position: absolute;
-          top: 5px;
-          right: 8px;
-          display: flex;
-          justify-content: flex-end;
-          .dashboard__backups__item-button {
-            margin-left: 4px;
-            visibility: hidden;
-            &.active {
-              visibility: visible;
-            }
-          }
-        }
-      }
-      .dashboard__backups__item-title {
-        margin-bottom: 4px;
-      }
-      .dashboard__backups__item-details {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        color: $gray-4;
+.dashboard__backups__item {
+  width: 200px;
+  height: 150px;
+  margin-right: 2px;
+  margin-bottom: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all .1s ease-in;
+  position: relative;
+  user-select: none;
+
+  .badge {
+    position: absolute;
+    background-color: $blue-5;
+  }
+
+  p {
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  &.icon {
+    svg {
+      font-size: 50pt;
+      color: $gray-7;
+    }
+    &:hover {
+      svg {
+        color: $gray-5;
+        // transform: scale(1.2);
       }
     }
   }
-}
 
-.dashboard__backups__item {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
+  &.file {
+    justify-content: flex-start;
+    padding-top: 2px;
+    div {
+      padding: 4px;
+      overflow: auto;
+    }
+  }
+
+  &:hover {
+    color: $blue-0;
+    background-color: $blue-9;
+    box-shadow: $blue-highlight-box-shadow;
+  }
 }
 
 .custom-file-input::-webkit-file-upload-button {

@@ -2,9 +2,19 @@ import { basename } from 'path'
 
 import { helpers } from 'pltr/v2'
 
-const makeKnownFilesModule = (stores, fileModule, trashModule, backupModule, logger) => {
+const makeKnownFilesModule = (
+  stores,
+  fileModule,
+  fileSystemModule,
+  tempFilesModule,
+  trashModule,
+  backupModule,
+  logger
+) => {
   const { knownFilesStore } = stores
   const { offlineFilesFilesPath } = fileModule
+  const { TEMP_FILES_PATH } = fileSystemModule
+  const { removeFromTempFiles } = tempFilesModule
   const { trash } = trashModule
   const { backupBasePath } = backupModule
 
@@ -23,6 +33,12 @@ const makeKnownFilesModule = (stores, fileModule, trashModule, backupModule, log
       return removeFromKnownFiles(fileURL)
         .then(() => {
           return trash(filePath)
+        })
+        .then(() => {
+          if (filePath.includes(TEMP_FILES_PATH)) {
+            return removeFromTempFiles(fileURL, false)
+          }
+          return true
         })
         .catch((error) => {
           logger.warn(error)
