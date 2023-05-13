@@ -117,6 +117,7 @@ const Main = ({
   windowId,
   setWindowTitle,
   isInSettingsWizard,
+  setDarkMode,
 }) => {
   // The user needs a way to dismiss the files dashboard and continue
   // to the file that's open.
@@ -275,6 +276,9 @@ const Main = ({
         '--default-rce-font-size',
         String(settings.user.fontSize) + 'px'
       )
+    }
+    if (settings.user?.dark) {
+      setDarkMode(settings.user?.dark)
     }
   }, [settings.user])
 
@@ -573,6 +577,7 @@ Main.propTypes = {
   windowId: PropTypes.func.isRequired,
   setWindowTitle: PropTypes.func.isRequired,
   isInSettingsWizard: PropTypes.bool,
+  setDarkMode: PropTypes.func.isRequired,
 }
 
 export default connect(
@@ -619,5 +624,6 @@ export default connect(
     enableTestUtilities: actions.testingAndDiagnosis.enableTestUtilities,
     generalError: actions.error.generalError,
     clearErrorLoadingFile: actions.applicationState.clearErrorLoadingFile,
+    setDarkMode: actions.settings.setDarkMode,
   }
 )(Main)
