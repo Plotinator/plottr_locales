@@ -84,7 +84,7 @@ const BackupFilesConnector = (connector) => {
             onClick={() => {
               const filePathPromise = isCloudBackup
                 ? Promise.resolve(b.storagePath)
-                : joinPath(folder.path, b)
+                : joinPath(folder.path, b.name)
               filePathPromise.then((filePath) => {
                 const fileURL = helpers.file.isProtocolString(filePath)
                   ? filePath
