@@ -16,6 +16,7 @@ import {
   EDIT_FILENAME,
   FILE_LOADED,
   FILE_SAVED,
+  SET_KNOWN_FILES,
 } from '../constants/ActionTypes'
 import { urlPointsToPlottrCloud } from '../helpers/file'
 import { SYSTEM_REDUCER_ACTION_TYPES } from '../reducers/systemReducers'
@@ -152,6 +153,19 @@ const projectReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         unsavedChanges: false,
+      }
+    }
+    case SET_KNOWN_FILES: {
+      const selectedFileURL = state.selectedFile?.fileURL
+      const foundInList =
+        (typeof selectedFileURL !== 'undefined' &&
+          action.knownFiles.find(({ fileURL }) => {
+            return fileURL === selectedFileURL
+          })) ||
+        null
+      return {
+        ...state,
+        selectedFile: foundInList,
       }
     }
     default: {
