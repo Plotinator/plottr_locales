@@ -154,10 +154,6 @@ const _makeMainProcessClient = () => {
     return subscribeTo('image-picker-file-from-menu', cb)
   }
 
-  const onTurnOnActsHelp = (cb) => {
-    return subscribeTo('turn-on-acts-help', cb)
-  }
-
   const onReload = (cb) => {
     return subscribeTo('reload', cb)
   }
@@ -442,7 +438,6 @@ const _makeMainProcessClient = () => {
     devOpenAnalyzerFile,
     pleaseOpenWindow,
     onAdvancedExportFileFromMenu,
-    onTurnOnActsHelp,
     onReload,
     onReloadFromFile,
     pleaseFetchState,
