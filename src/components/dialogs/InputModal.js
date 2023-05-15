@@ -59,7 +59,7 @@ export default class InputModal extends Component {
                 <div className="input-modal__controls">
                   <div className="input-modal__controls__control">
                     <Button
-                      disabled={this.props.disabled}
+                      disabled={this.props.disabled || this.state.inputValue === ''}
                       data-testid={testIds.ok}
                       bsStyle="success"
                       onClick={this.handleOK}
