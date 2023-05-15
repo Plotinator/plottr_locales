@@ -19,7 +19,7 @@ export default class InputModal extends Component {
 
   handleOK = () => {
     if (this.props.disabled) return
-    this.props.getValue(this.state.inputValue)
+    this.props.getValue(this.state.inputValue || this.props.defaultValue)
   }
 
   handleChange = (e) => {
@@ -59,9 +59,9 @@ export default class InputModal extends Component {
                 <div className="input-modal__controls">
                   <div className="input-modal__controls__control">
                     <Button
-                      disabled={this.props.disabled}
+                      disabled={this.props.disabled || this.state.inputValue === ''}
                       data-testid={testIds.ok}
-                      bsStyle="primary"
+                      bsStyle="success"
                       onClick={this.handleOK}
                     >
                       {okText}

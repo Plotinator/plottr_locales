@@ -64,10 +64,10 @@ const BookDialogConnector = (connector) => {
       return (
         <ButtonToolbar>
           <Button onClick={this.handleCancel}>{i18n('Cancel')}</Button>
-          <Button bsStyle="success" onClick={() => this.saveEdit()}>
+          <Button bsStyle="primary" onClick={() => this.saveEdit()}>
             {i18n('Save')}
           </Button>
-          <Button className="pull-right" bsStyle="primary" onClick={() => this.saveEdit(true)}>
+          <Button className="pull-right" bsStyle="success" onClick={() => this.saveEdit(true)}>
             {i18n('Save and Open')}
           </Button>
         </ButtonToolbar>

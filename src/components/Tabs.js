@@ -4,6 +4,7 @@ import requiredForA11y from 'prop-types-extra/lib/isRequiredForA11y'
 import { uncontrollable } from 'uncontrollable'
 import elementType from 'prop-types-extra/lib/elementType'
 import { omit } from 'lodash'
+import cx from 'classnames'
 
 import Nav from './Nav'
 import NavItem from './NavItem'
@@ -75,6 +76,10 @@ const propTypes = {
   onDragOver: PropTypes.func,
 
   tabClasses: PropTypes.func,
+
+  draggable: PropTypes.bool,
+  onDragStart: PropTypes.func,
+  onTabDragOver: PropTypes.func,
 }
 
 const defaultProps = {
@@ -103,7 +108,18 @@ class Tabs extends React.Component {
   }
 
   renderTab(child) {
-    const { title, eventKey, disabled, tabClassName, noHandlers } = child.props
+    const {
+      title,
+      eventKey,
+      disabled,
+      tabClassName,
+      noHandlers,
+      draggable,
+      onDragStart,
+      onDragOver,
+      position,
+      isDroppable,
+    } = child.props
     if (title == null) {
       return null
     }
@@ -126,11 +142,14 @@ class Tabs extends React.Component {
         onSelect={this.props.onSelect}
         eventKey={eventKey}
         disabled={disabled}
-        className={tabClassName}
+        className={cx({ draggable: draggable, isDroppable: isDroppable, ...tabClassName })}
         onClose={this.props.onCloseTab}
         onContextMenu={this.props.onContextMenu}
-        onDragOver={this.props.onDragOver}
+        onDragOver={onDragOver}
         tabClasses={this.props.tabClasses}
+        draggable={draggable}
+        onDragStart={onDragStart}
+        position={position}
       >
         {title}
       </NavItem>
@@ -161,7 +180,12 @@ class Tabs extends React.Component {
         style={style}
       >
         <div>
-          <Nav {...omit(props, ['activeKey'])} activeKey={activeKey} role="tablist">
+          <Nav
+            {...omit(props, ['activeKey'])}
+            activeKey={activeKey}
+            role="tablist"
+            onDragOver={this.props.onTabDragOver}
+          >
             {ValidComponentChildren.map(children, this.renderTab)}
           </Nav>
 

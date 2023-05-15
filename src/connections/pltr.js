@@ -91,6 +91,7 @@ import {
   ProOnboarding as UnconnectedProOnboarding,
   UpdateNotifier as UnconnectedUpdateNotifier,
   NewProjectInputModal as UnconnectedNewProjectInputModal,
+  SettingsWizard as UnconnectedSettingsWizard,
   RestructureTimelineModal as UnconnectedRestructureTimelineModal,
 } from '../components'
 
@@ -142,6 +143,8 @@ const pltrTypeSpecs = {
     createFromScrivener: PropTypes.func.isRequired,
     joinPath: PropTypes.func.isRequired,
     listOfflineFiles: PropTypes.func.isRequired,
+    createAndOpenCopy: PropTypes.func.isRequired,
+    filePathAsArray: PropTypes.func.isRequired,
   }),
   update: PropTypes.shape({
     quitToInstall: PropTypes.func.isRequired,
@@ -333,6 +336,7 @@ export default (platform, pltr) => {
     ProOnboarding: UnconnectedProOnboarding(connectorObject),
     UpdateNotifier: UnconnectedUpdateNotifier(connectorObject),
     NewProjectInputModal: UnconnectedNewProjectInputModal(connectorObject),
+    SettingsWizard: UnconnectedSettingsWizard(connectorObject),
     RestructureTimelineModal: UnconnectedRestructureTimelineModal(connectorObject),
   }
 }

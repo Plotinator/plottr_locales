@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
 import PropTypes from 'react-proptypes'
+import { isObject } from 'lodash'
 
 import { t } from 'plottr_locales'
+import { helpers } from 'pltr/v2'
 
 import UnconnectedNewProjectInputModal from '../../dialogs/NewProjectInputModal'
 import UnconnectedNewFiles from './NewFiles'
@@ -17,6 +19,8 @@ const FilesHomeConnector = (connector) => {
       log,
       showErrorBox,
       showOpenDialog,
+      showSaveDialog,
+      userDocumentsPath,
       mpq,
     },
   } = connector
@@ -27,6 +31,8 @@ const FilesHomeConnector = (connector) => {
     log,
     showErrorBox,
     showOpenDialog,
+    showSaveDialog,
+    userDocumentsPath,
     mpq,
   })
 
@@ -69,7 +75,27 @@ const FilesHomeConnector = (connector) => {
     })
   }
 
-  const FilesHome = ({ errorActions, importActions, isOnWeb, projectActions, isInOfflineMode }) => {
+  function savePlottrProjectDialog() {
+    const title = t('Choose where to save this file on your computer')
+    const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
+    return userDocumentsPath().then((docPath) => {
+      return showSaveDialog(filters, title, docPath).then((fileName) => {
+        if (fileName) {
+          return helpers.file.ensureEndsInPltr(fileName)
+        }
+        return Promise.resolve()
+      })
+    })
+  }
+
+  const FilesHome = ({
+    errorActions,
+    importActions,
+    isOnWeb,
+    projectActions,
+    isInOfflineMode,
+    settings,
+  }) => {
     const [view, setView] = useState('recent')
 
     const createFromSnowflakeImport = () => {
@@ -116,6 +142,25 @@ const FilesHomeConnector = (connector) => {
     const handleCreateNewProject = (template) => {
       if (isInOfflineMode) return
 
+      // MARKER: default folders
+      // if (settings.user.defaultFolder && settings.user.defaultFolderLocation) {
+      //   if (isObject(template)) {
+      //     mpq.push('btn_create_with_template', { template_name: template.name })
+      //     projectActions.startCreatingNewProject(template)
+      //     setView('recent')
+      //   } else {
+      //     projectActions.startCreatingNewProject()
+      //   }
+      // } else {
+      //   savePlottrProjectDialog().then((newFilePath) => {
+      //     if (newFilePath) {
+      //       let templateObj = isObject(template) ? template : null
+      //       createNew(templateObj, newFilePath)
+      //       setView('recent')
+      //     }
+      //   })
+      // }
+      // MARKER: remove for default folders
       if (template.constructor.name == 'Object') {
         mpq.push('btn_create_with_template', { template_name: template.name })
         projectActions.startCreatingNewProject(template)
@@ -134,6 +179,7 @@ const FilesHomeConnector = (connector) => {
             types={['custom', 'project', 'plotlines']}
             onChooseTemplate={handleCreateNewProject}
             showCancelButton={false}
+            close={() => setView('recent')}
             confirmButtonText={t('Create New Project')}
           />
         )
@@ -173,6 +219,7 @@ const FilesHomeConnector = (connector) => {
     projectActions: PropTypes.object,
     isOnWeb: PropTypes.bool,
     isInOfflineMode: PropTypes.bool,
+    settings: PropTypes.object.isRequired,
   }
 
   const {
@@ -193,6 +240,7 @@ const FilesHomeConnector = (connector) => {
       (state) => ({
         isOnWeb: selectors.isOnWebSelector(state),
         isInOfflineMode: selectors.isInOfflineModeSelector(state),
+        settings: selectors.appSettingsSelector(state),
       }),
       (dispatch) => {
         return {
