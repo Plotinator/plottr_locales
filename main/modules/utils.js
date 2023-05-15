@@ -69,7 +69,7 @@ function makeBrowserWindow(fileURL) {
 
       // Create the browser window
       let newWindow = new BrowserWindow(config)
-      newWindow.setBackgroundColor(settings.user?.dark === 'dark' ? '#666666' : '#f7f7f7')
+      newWindow.setBackgroundColor(backgroundColor)
 
       // register listeners on the window
       stateKeeper.manage(newWindow)
