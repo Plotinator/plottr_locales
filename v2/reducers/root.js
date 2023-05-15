@@ -47,7 +47,7 @@ import { setTimelineView } from '../actions/ui'
 import { deleteLine } from '../actions/lines'
 import { reorderCardsWithinLine } from '../actions/cards'
 import { applyTemplate, moveLineActions } from '../helpers/templates'
-import { reorderList } from '../helpers/lines'
+import { reorderList } from '../helpers/lists'
 import { pinMovedLine } from '../actions/lines'
 
 const {
