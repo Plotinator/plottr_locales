@@ -644,8 +644,10 @@ export const listenOnIPCMain = (
   })
 
   ipcMain.on('open-external', (event, replyChannel, url) => {
+    // If there's no protocal, assume that 'https://' was meant.
+    const urlToOpen = url.match(/^[a-zA-Z]+:\/\//) ? url : `https://${url}`
     shell
-      .openExternal(url)
+      .openExternal(urlToOpen)
       .then(() => {
         event.sender.send(replyChannel, 'done')
       })
