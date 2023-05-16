@@ -314,7 +314,7 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
 // ///////////
 
 .vertical-beat__cell {
-  width: $cell_width + 25px;
+  max-width: $cell_width + 25px;
 
   &.medium-timeline {
     width: 96px;
