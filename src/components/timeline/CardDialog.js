@@ -676,6 +676,7 @@ const CardDialogConnector = (connector) => {
                     href="#"
                     className="card-dialog__custom-attributes-configuration-link"
                     onClick={uiActions.openAttributesDialog}
+                    draggable={false}
                   >
                     {t('Configure')}
                   </a>
