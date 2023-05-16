@@ -644,13 +644,15 @@ export const listenOnIPCMain = (
   })
 
   ipcMain.on('open-external', (event, replyChannel, url) => {
-    try {
-      shell.openExternal(url)
-      event.sender.send(replyChannel, 'done')
-    } catch (error) {
-      log.error(`Error opening external ${url}`, error)
-      event.sender.send(replyChannel, { error: error.message })
-    }
+    shell
+      .openExternal(url)
+      .then(() => {
+        event.sender.send(replyChannel, 'done')
+      })
+      .catch((error) => {
+        log.error(`Error opening external ${url}`, error)
+        event.sender.send(replyChannel, { error: error.message })
+      })
   })
 
   ipcMain.on('open-path', (event, replyChannel, path) => {
