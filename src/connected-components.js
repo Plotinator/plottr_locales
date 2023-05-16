@@ -418,7 +418,12 @@ const platform = {
   isDevelopment: isDevelopment(),
   isWindows: () => !!isWindows(),
   isMacOS: () => !!isMacOS(),
-  openExternal,
+  openExternal: (...args) => {
+    return openExternal(...args).catch((error) => {
+      logger.error(`Error opening URL ${args}`, error)
+      store.dispatch(actions.error.generalError(`Error opening URL ${args}`))
+    })
+  },
   createErrorReport,
   createFullErrorReport,
   handleCustomerServiceCode,
