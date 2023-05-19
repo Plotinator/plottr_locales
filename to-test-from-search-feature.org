@@ -116,18 +116,18 @@
      - [X] ~toggleHitMarkedForReplacement~,
      - [ ] ~replaceMarkedHits~,
    - helpers/beats:
-     - [ ] ~allBeatsAsArray~,
+     - [X] ~allBeatsAsArray~,
    - helpers/cards:
-     - [ ] ~cardFocusPath~,
-     - [ ] ~outlineCardFocusPath~,
+     - [X] ~cardFocusPath~,
+     - [X] ~outlineCardFocusPath~,
    - helpers/characters:
-     - [ ] ~characterFocusPath~,
+     - [X] ~characterFocusPath~,
    - helpers/notes:
-     - [ ] ~noteFocusPath~,
+     - [X] ~noteFocusPath~,
    - helpers/places:
-     - [ ] ~placeFocusPath~,
+     - [X] ~placeFocusPath~,
    - helpers/project:
-     - [ ] ~projectFocusPath~,
+     - [X] ~projectFocusPath~,
    - helpers/tags:
      - [ ] ~tagFocusPath~,
    - sortByHitPosition:
