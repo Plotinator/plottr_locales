@@ -129,6 +129,6 @@
    - helpers/project:
      - [X] ~projectFocusPath~,
    - helpers/tags:
-     - [ ] ~tagFocusPath~,
+     - [X] ~tagFocusPath~,
    - sortByHitPosition:
-     - [ ] ~sortByHitPosition~,
+     - [X] ~sortByHitPosition~,
