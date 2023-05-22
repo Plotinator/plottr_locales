@@ -49,7 +49,7 @@
      - [X] ~selectPlace~,
      - [X] ~selectTag~,
      - [X] ~jumpToHit~,
-     - [ ] ~pushFocus~,
+     - [X] ~pushFocus~,
      - [X] ~nextSearchHit~,
      - [X] ~previousSearchHit~,
      - [X] ~startDeletingCardFromCardDialog~,
