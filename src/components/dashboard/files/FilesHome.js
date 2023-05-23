@@ -178,7 +178,7 @@ const FilesHomeConnector = (connector) => {
             modal={false}
             types={['custom', 'project', 'plotlines']}
             onChooseTemplate={handleCreateNewProject}
-            showCancelButton
+            showCancelButton={false}
             close={() => setView('recent')}
             confirmButtonText={t('Create New Project')}
           />
