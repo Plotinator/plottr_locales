@@ -68,6 +68,23 @@
     margin-bottom: 16px;
     font-size: 16px;
     height: calc(100% - 60px);
+    .nav-tabs {
+      user-select: none;
+      li.draggable {
+        a {
+          user-select: auto;
+          cursor: grab;
+        }
+        a:active {
+          cursor: grabbing;
+        }
+        &.isDroppable a {
+          box-sizing: border-box;
+          border: 2px dashed $gray-6;
+          padding: 9px 14px;
+        }
+      }
+    }
     .tab-content {
       height: calc(100% - 44px);
       padding: 16px;
@@ -194,6 +211,7 @@
   display: block;
   padding: 4px;
   margin-bottom: 4px;
+  user-select: none;
 }
 
 .card-dialog__custom-attributes-label {

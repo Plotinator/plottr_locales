@@ -411,6 +411,7 @@ const CardDialogConnector = (connector) => {
             draggable
             onDragStart={(evt) => handleDragStart(evt, idx)}
             position={idx}
+            isDroppable={newTemplateTabPosition && idx === Number(newTemplateTabPosition)}
           >
             <div className="template-tab__details">
               <p>
@@ -663,7 +664,6 @@ const CardDialogConnector = (connector) => {
                 id="tabs"
                 className="card-dialog__tabs"
                 onSelect={selectTab}
-                draggable
                 onTabDragOver={handleTabDragOver}
                 onDrop={handleDropTab}
               >
@@ -675,6 +675,7 @@ const CardDialogConnector = (connector) => {
                     href="#"
                     className="card-dialog__custom-attributes-configuration-link"
                     onClick={uiActions.openAttributesDialog}
+                    draggable={false}
                   >
                     {t('Configure')}
                   </a>
