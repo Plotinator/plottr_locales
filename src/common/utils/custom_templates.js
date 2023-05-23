@@ -35,9 +35,9 @@ export function addNewCustomTemplate(pltrData, { type, data }) {
 }
 
 function createPlotlineTemplate(pltrData, { name, description, link, bias }) {
-  const data = cloneDeep(pltrData)
+  const data = selectors.fullFileStateSelector(pltrData)
   const id = makeNewId('pl')
-  const bookId = selectors.currentTimelineSelector(data)
+  const bookId = selectors.currentTimelineSelector(pltrData)
 
   return getVersion().then((version) => {
     let template = {

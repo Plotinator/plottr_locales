@@ -8,7 +8,7 @@ import { BACKUP_BASE_PATH, CUSTOM_TEMPLATES_PATH } from './stores'
 
 import { helpers } from 'pltr/v2'
 
-const { readdir, mkdir, lstat, cp, symlink } = fs.promises
+const { readdir, mkdir, lstat, cp, symlink, link } = fs.promises
 
 const TRIAL_LENGTH = 14
 const EXTENSIONS = 2
@@ -442,11 +442,17 @@ const fileSystemModule = (userDataPath) => {
           shortCutExt
       )
       if (os.platform() == 'win32') {
-        return symlink(sourceURL, newShortcutPath, 'file')
-          .then(() => newShortcutPath.replace(/\//g, '\\'))
+        logger.info('Creating hard link on windows')
+        return link(sourceURL, newShortcutPath)
+          .then(() => {
+            return newShortcutPath.replace(/\//g, '\\')
+          })
           .catch((error) => {
             if (error.code == 'EEXIST') {
               return createFileShortcut(sourceFileURL, destinationURL, counter + 1)
+            } else {
+              logger.error('Failed to create hard link on windows', error)
+              return Promise.reject(error)
             }
           })
       } else {
@@ -455,6 +461,8 @@ const fileSystemModule = (userDataPath) => {
           .catch((error) => {
             if (error.code == 'EEXIST') {
               return createFileShortcut(sourceFileURL, destinationURL, counter + 1)
+            } else {
+              return Promise.reject(error)
             }
           })
       }

@@ -1,6 +1,6 @@
 {
   "name": "plottr",
-  "version": "2023.4.20",
+  "version": "2023.5.12-alpha.6",
   "description": "A visual story-planning tool",
   "repository": "https://github.com/cameronsutter/plottr_electron.git",
   "homepage": "plottr.com",
@@ -199,7 +199,7 @@
     "dmg-license": "^1.0.11"
   },
   "build": {
-    "electronVersion": "22.0.1",
+    "electronVersion": "22.3.1",
     "appId": "com.plottr.app",
     "artifactName": "${productName}-${os}-${arch}-installer-latest.${ext}",
     "npmRebuild": false,

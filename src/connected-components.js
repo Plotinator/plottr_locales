@@ -411,7 +411,12 @@ const platform = {
   isDevelopment: isDevelopment(),
   isWindows: () => !!isWindows(),
   isMacOS: () => !!isMacOS(),
-  openExternal,
+  openExternal: (...args) => {
+    return openExternal(...args).catch((error) => {
+      logger.error(`Error opening URL ${args}`, error)
+      store.dispatch(actions.error.generalError(`Error opening URL ${args}`))
+    })
+  },
   createErrorReport,
   createFullErrorReport,
   handleCustomerServiceCode,
@@ -577,7 +582,6 @@ export const ProjectTemplateDetails = components.ProjectTemplateDetails
 export const CharacterTemplateDetails = components.CharacterTemplateDetails
 export const ActsConfigModal = components.ActsConfigModal
 export const AskToSaveModal = components.AskToSaveModal
-export const ActsHelpModal = components.ActsHelpModal
 export const FilterList = components.FilterList
 export const TagView = components.TagView
 export const TagListView = components.TagListView

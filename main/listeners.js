@@ -28,6 +28,8 @@ import {
   openFile,
   createNew,
   createFromSnowflake,
+  TEMP_FILES_PATH,
+  removeFromTempFiles,
   removeFromKnownFiles,
   deleteKnownFile,
   editKnownFilePath,
@@ -300,6 +302,21 @@ export const listenOnIPCMain = (
         log.error('Error opening known file', fileURL, error)
         event.sender.send(replyChannel, { error: error.message })
       })
+  })
+
+  ipcMain.on('remove-from-temp-files-if-temp', (event, replyChannel, fileURL) => {
+    if (fileURL.includes(TEMP_FILES_PATH)) {
+      removeFromTempFiles(fileURL, false)
+        .then(() => {
+          event.sender.send(replyChannel, 'done')
+        })
+        .catch((error) => {
+          log.error(`Error removing ${fileURL} from temp files`, error)
+          event.sender.send(replyChannel, { error: error.message })
+        })
+    } else {
+      event.sender.send(replyChannel, 'Not temp')
+    }
   })
 
   ipcMain.on('remove-from-known-files', (event, replyChannel, fileURL) => {
@@ -627,13 +644,17 @@ export const listenOnIPCMain = (
   })
 
   ipcMain.on('open-external', (event, replyChannel, url) => {
-    try {
-      shell.openExternal(url)
-      event.sender.send(replyChannel, 'done')
-    } catch (error) {
-      log.error(`Error opening external ${url}`, error)
-      event.sender.send(replyChannel, { error: error.message })
-    }
+    // If there's no protocal, assume that 'https://' was meant.
+    const urlToOpen = url.match(/^[a-zA-Z]+:\/\//) ? url : `https://${url}`
+    shell
+      .openExternal(urlToOpen)
+      .then(() => {
+        event.sender.send(replyChannel, 'done')
+      })
+      .catch((error) => {
+        log.error(`Error opening external ${url}`, error)
+        event.sender.send(replyChannel, { error: error.message })
+      })
   })
 
   ipcMain.on('open-path', (event, replyChannel, path) => {

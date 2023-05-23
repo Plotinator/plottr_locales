@@ -14,7 +14,6 @@ import {
   TemplateCreate,
   ErrorBoundary,
   ExportDialog,
-  ActsHelpModal,
   UpdateNotifier,
   NewProjectInputModal,
   SearchModal,
@@ -29,7 +28,6 @@ import { makeMainProcessClient } from '../mainProcessClient'
 
 const {
   onAdvancedExportFileFromMenu,
-  onTurnOnActsHelp,
   onReload,
   onWantsToClose,
   pleaseReloadMenu,
@@ -57,7 +55,6 @@ const App = ({
   const [showAskToSave, setShowAskToSave] = useState(false)
   const [showExportDialog, setShowExportDialog] = useState(false)
   const [showImagePicker, setShowImagePicker] = useState(false)
-  const [showActsGuideHelp, setShowActsGuideHelp] = useState(false)
 
   // FIXME: the close logic is broken and overly complicated.  I only
   // made the addition here because we found a problem close to
@@ -108,15 +105,11 @@ const App = ({
     const unsubscribeFromImagePickerMenu = onOpenImagePickerFromMenu(() => {
       setShowImagePicker(true)
     })
-    const unsubscribeFromTurnOnActsHelp = onTurnOnActsHelp(() => {
-      setShowActsGuideHelp(true)
-    })
 
     return () => {
       document.removeEventListener('save-as-template-start', saveAsTemplateListener)
       unsubscribeFromAdvancedExportFromMenu()
       unsubscribeFromImagePickerMenu()
-      unsubscribeFromTurnOnActsHelp()
     }
   }, [])
 
@@ -263,11 +256,6 @@ const App = ({
     return <ImagePicker fromMenu close={() => setShowImagePicker(false)} />
   }
 
-  const renderActStructureHelpModal = () => {
-    if (!showActsGuideHelp) return null
-    return <ActsHelpModal close={() => setShowActsGuideHelp(false)} />
-  }
-
   return (
     <ErrorBoundary>
       <ErrorBoundary>
@@ -293,7 +281,6 @@ const App = ({
         {renderTemplateCreate()}
         {renderAskToSave()}
         {renderAdvanceExportModal()}
-        {renderActStructureHelpModal()}
         {renderImagePickerModal()}
         {searchDialogIsOpen ? <SearchModal /> : null}
       </React.StrictMode>
