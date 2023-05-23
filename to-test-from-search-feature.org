@@ -112,9 +112,9 @@
      - [X] ~finishEditingSelectedTag~,
      - [X] ~toggleReplaceSearch~,
      - [X] ~setReplacementText~,
-     - [ ] ~replaceSearchStringAndAdvance~,
+     - [X] ~replaceSearchStringAndAdvance~,
      - [X] ~toggleHitMarkedForReplacement~,
-     - [ ] ~replaceMarkedHits~,
+     - [X] ~replaceMarkedHits~,
    - helpers/beats:
      - [X] ~allBeatsAsArray~,
    - helpers/cards:
