@@ -154,10 +154,6 @@ const _makeMainProcessClient = () => {
     return subscribeTo('image-picker-file-from-menu', cb)
   }
 
-  const onTurnOnActsHelp = (cb) => {
-    return subscribeTo('turn-on-acts-help', cb)
-  }
-
   const onReload = (cb) => {
     return subscribeTo('reload', cb)
   }
@@ -201,6 +197,10 @@ const _makeMainProcessClient = () => {
 
   const onSaveAs = (cb) => {
     return subscribeTo('save-as', cb)
+  }
+
+  const removeFromTempFilesIfTemp = (fileURL) => {
+    return ask('remove-from-temp-files-if-temp', fileURL)
   }
 
   const editKnownFilePath = (oldFileURL, newFileURL) => {
@@ -438,7 +438,6 @@ const _makeMainProcessClient = () => {
     devOpenAnalyzerFile,
     pleaseOpenWindow,
     onAdvancedExportFileFromMenu,
-    onTurnOnActsHelp,
     onReload,
     onReloadFromFile,
     pleaseFetchState,
@@ -450,6 +449,7 @@ const _makeMainProcessClient = () => {
     onExportFileFromMenu,
     onSave,
     onSaveAs,
+    removeFromTempFilesIfTemp,
     editKnownFilePath,
     pleaseTellDashboardToReloadRecents,
     onUndo,
