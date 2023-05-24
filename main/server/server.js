@@ -96,7 +96,6 @@ import wireupTemplateFetcher from './template_fetcher'
 import makeStores from './stores'
 import makeSettingsModule from './settings'
 import makeKnownFilesModule from './knownFiles'
-import makeTempFilesModule from './tempFiles'
 import StatusManager from './StatusManager'
 import makeTrashModule from './trash'
 import makeDefaultLocationModule from './defaultLocation'
@@ -236,7 +235,6 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
     } = fileSystemModule
     const trashModule = makeTrashModule(userDataPath, logger)
     const { trashByURL } = trashModule
-    const tempFilesModule = makeTempFilesModule(stores, trashModule)
 
     const defaultLocationModule = makeDefaultLocationModule(settings, fileModule, logger)
     const { saveToDefaultLocation } = defaultLocationModule
@@ -249,15 +247,7 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
       updateLastOpenedDate,
       deleteKnownFile,
       updateKnownFileName,
-    } = makeKnownFilesModule(
-      stores,
-      fileModule,
-      fileSystemModule,
-      tempFilesModule,
-      trashModule,
-      backupModule,
-      logger
-    )
+    } = makeKnownFilesModule(stores, fileModule, trashModule, backupModule, logger)
 
     const attemptToFetchTemplates = () => {
       return wireupTemplateFetcher(userDataPath)(stores, logInfo).then((templateFetcher) => {
