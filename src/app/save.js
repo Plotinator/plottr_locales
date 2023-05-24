@@ -56,6 +56,8 @@ export const backupFile =
     const cloudBackup =
       !isOffline && isCloudFile ? saveBackupOnFirebase(userId, state) : Promise.resolve()
 
+    const emptyFileState = emptyFile('DummyFile', '2022.11.2')
+
     return cloudBackup
       .then(() => {
         return whenClientIsReady(({ saveBackup, offlineFileBasePath }) => {

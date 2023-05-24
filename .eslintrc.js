@@ -33,6 +33,8 @@ module.exports = {
     'lib/plottr_check-prop-types/**',
     'lib/tree-changes',
     'bin/electron_main.js',
+    'lib/pltr/docs/**/*',
+    'lib/pltr/template/**/*',
   ],
   rules: {
     'no-unused-vars': [

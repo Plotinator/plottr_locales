@@ -91,8 +91,6 @@ const {
   onCreateFileShortcut,
   showItemInFolder,
   userDesktopPath,
-  userDocumentsPath,
-  createNewFile,
   askToExport,
   getVersion,
 } = makeMainProcessClient()
