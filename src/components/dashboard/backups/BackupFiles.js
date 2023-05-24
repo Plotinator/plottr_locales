@@ -42,7 +42,7 @@ const BackupFilesConnector = (connector) => {
       showItemInFolder(fileURL)
     }
 
-    const fileNameFromPath = ({ name }) => {
+    const fileNameFromPath = (name) => {
       if (name.includes('(start-session)-')) {
         const nameSansStart = name.replace('(start-session)-', '')
         return (
@@ -74,7 +74,7 @@ const BackupFilesConnector = (connector) => {
 
     const renderedFiles = folder.backups.reduce((acc, b, index) => {
       const isCloudBackup = b.storagePath
-      const fileName = isCloudBackup ? b.fileName?.toLowerCase() : b.name.toLowerCase()
+      const fileName = isCloudBackup ? b.fileName?.toLowerCase() : b.toLowerCase()
       if (fileName?.includes(searchTerm.toLowerCase())) {
         return [
           ...acc,

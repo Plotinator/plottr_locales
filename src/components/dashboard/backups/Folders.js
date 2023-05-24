@@ -28,7 +28,7 @@ const FoldersConnector = (connector) => {
               <IoIosFolder />
               <Badge>
                 {f?.backups?.filter((folder) => {
-                  return typeof folder?.name === 'string' || typeof folder?.fileName === 'string'
+                  return typeof folder === 'string' || typeof folder?.fileName === 'string'
                 })?.length || 0}
               </Badge>
             </div>
