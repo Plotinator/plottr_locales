@@ -13,7 +13,7 @@ import { setupI18n, t } from 'plottr_locales'
 
 import { store } from 'store'
 
-import { helpers, migrateIfNeeded, addMissingKeys, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
+import { helpers, migrateIfNeeded, addMissingKeys } from 'pltr/v2'
 import { actions, selectors } from 'wired-up-pltr'
 
 import { rtfToHTML } from 'pltr/v2/slate_serializers/to_html'
@@ -51,8 +51,6 @@ import { downloadStorageImage } from '../common/downloadStorageImage'
 const {
   showErrorBox,
   showSaveDialog,
-  setRepresentedFileName,
-  setFileURL,
   getEnvObject,
   tellMeWhatOSImOn,
   pleaseTellMeTheSocketServerPort,
@@ -61,9 +59,6 @@ const {
   onSave,
   onSaveAs,
   addToKnownFilesAndOpen,
-  removeFromTempFilesIfTemp,
-  editKnownFilePath,
-  pleaseTellDashboardToReloadRecents,
   onUndo,
   onRedu,
   onCreateErrorReport,
@@ -390,23 +385,6 @@ tellMeWhatOSImOn()
                           newFileURL
                         )
                       )
-                      // remove from tmp store
-                      removeFromTempFilesIfTemp(oldFileURL)
-                        .then(() => {
-                          // update in known files
-                          return editKnownFilePath(oldFileURL, newFileURL)
-                        })
-                        .then(() => {
-                          // change the window's title
-                          setRepresentedFileName(newFilePath)
-                        })
-                        .then(() => {
-                          setFileURL(newFileURL)
-                        })
-                        .then(() => {
-                          // send event to dashboard
-                          pleaseTellDashboardToReloadRecents()
-                        })
                     })
                   })
                 }
