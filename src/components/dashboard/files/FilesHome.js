@@ -92,6 +92,7 @@ const FilesHomeConnector = (connector) => {
     errorActions,
     importActions,
     isOnWeb,
+    isLoggedIn,
     projectActions,
     isInOfflineMode,
     settings,
@@ -151,13 +152,17 @@ const FilesHomeConnector = (connector) => {
           projectActions.startCreatingNewProject()
         }
       } else {
-        savePlottrProjectDialog().then((newFilePath) => {
-          if (newFilePath) {
-            let templateObj = isObject(template) ? template : null
-            createNew(templateObj, newFilePath)
-            setView('recent')
-          }
-        })
+        if (isOnWeb || isLoggedIn) {
+          projectActions.startCreatingNewProject()
+        } else {
+          savePlottrProjectDialog().then((newFilePath) => {
+            if (newFilePath) {
+              let templateObj = isObject(template) ? template : null
+              createNew(templateObj, newFilePath)
+              setView('recent')
+            }
+          })
+        }
       }
     }
 
@@ -210,6 +215,7 @@ const FilesHomeConnector = (connector) => {
     importActions: PropTypes.object,
     projectActions: PropTypes.object,
     isOnWeb: PropTypes.bool,
+    isLoggedIn: PropTypes.bool,
     isInOfflineMode: PropTypes.bool,
     settings: PropTypes.object.isRequired,
   }
@@ -230,6 +236,7 @@ const FilesHomeConnector = (connector) => {
 
     return connect(
       (state) => ({
+        isLoggedIn: selectors.isLoggedInSelector(state),
         isOnWeb: selectors.isOnWebSelector(state),
         isInOfflineMode: selectors.isInOfflineModeSelector(state),
         settings: selectors.appSettingsSelector(state),
