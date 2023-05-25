@@ -1,0 +1,23 @@
+* Introduction
+
+In Plottr Pro, cards are limited to 1MB in size.  In practice, we've
+received around one complaint per week relating to users who've
+exceeded this limit.  Some of these users are very angry because they
+lost work when the cards weren't saved.
+
+In the past, we've viewed this as somewhat of an anomaly because we
+found it hard to imagine that many users would run into this problem,
+but we're receiving an increasing number of complaints.
+
+This document addresses that concern by proposing a new structure for
+storing cards on Firebase that grows indefinitely.  In solving the
+problem, it's important to consider how to maintain backwards
+compatibility and accommodate ~plottr_mobile~.
+
+* Firebase Schema
+
+In Firebase, a Plottr file's cards are stored as an object where each
+of the keys of the object are integer ids, and the values are the
+cards that have that particular id.  When the cards are read from
+Firebase to either Plottr Web, Desktop or Mobile, they're transformed
+into a flat array and then overwrite the value in Firebase.
