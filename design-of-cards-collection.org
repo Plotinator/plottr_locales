@@ -277,8 +277,8 @@ it is for all other collections.
 ** Query for Cards
 
 Plottr queries cards according to which file they belong to.  We don't
-need to transform the payload in Emacs anymore because it'll already
-have the correct type: an array.
+need to transform the payload in ~plottr_firebase~ anymore because it'll
+already have the correct type: an array.
 
 The following listing queries Firebase for all the cards belonging to
 a particular file.
