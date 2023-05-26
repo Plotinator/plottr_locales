@@ -328,9 +328,6 @@ export function bootFile(
   const bootWithUser = (fileId, saveBackup) => (user) => {
     const userId = user.uid
     const email = user.email
-    fileSystemAPIs.currentAppSettings().then((settings) => {
-      store.dispatch(actions.settings.setDarkMode(settings.user?.dark))
-    })
     return Promise.all([getVersion(), machineId()]).then(([version, clientId]) => {
       return initialFetch(userId, fileId, clientId, version)
         .then((fetchedFile) => {
@@ -375,9 +372,6 @@ export function bootFile(
   }
 
   function bootLocalFile(fileURL, numOpenFiles, saveBackup) {
-    fileSystemAPIs.currentAppSettings().then((settings) => {
-      store.dispatch(actions.settings.setDarkMode(settings.user?.dark))
-    })
     return setWindowTitle('Plottr')
       .then(() => {
         return setRepresentedFileName(helpers.file.withoutProtocol(fileURL))
@@ -492,9 +486,6 @@ export function bootFile(
       store.dispatch(actions.applicationState.errorLoadingFile())
       return Promise.reject(new Error(message))
     }
-    fileSystemAPIs.currentAppSettings().then((settings) => {
-      store.dispatch(actions.settings.setDarkMode(settings.user?.dark))
-    })
     store.dispatch(actions.applicationState.startLoadingFile())
 
     // Now that we know what the file path for this window should be,
@@ -529,9 +520,6 @@ export function bootFile(
   }
 
   return _bootFile(fileURL, options, numOpenFiles, saveBackup).then(() => {
-    fileSystemAPIs.currentAppSettings().then((settings) => {
-      store.dispatch(actions.settings.setDarkMode(settings.user?.dark))
-    })
     if (saver) {
       saver.cancelAllRemainingRequests()
     }
