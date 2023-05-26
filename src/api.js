@@ -200,6 +200,17 @@ const api = (
       )
     }
 
+  const listenToFlatArrayAtPath =
+    (path) =>
+    (userId, fileId, clientId, withAction, errorHandler = defaultErrorHandler) => {
+      const values = (x) => Object.values(x)
+      const { doc, onSnapshot } = database()
+      return onSnapshot(
+        doc(`${path}/${fileId}`),
+        handleSnapshot(withAction, fileId, path, identity, true, clientId)
+      )
+    }
+
   const WHEN_BEATS_BECAME_AN_OBJECT = '2021.4.13'
 
   const listenToBeats = (
