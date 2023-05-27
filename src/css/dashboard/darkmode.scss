@@ -58,6 +58,7 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
   nav {
     background-color: $dark-gray-1 !important;
   }
+
   .dashboard__navigation-tab {
     background-color: $dark-gray-1;
     border-bottom-color: $dark-gray-3;
@@ -107,11 +108,13 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
   .dashboard__new-files__item {
     color: $dark-text;
     background: $dark-gray-1;
+
     &.icon {
       svg {
         color: $dark-gray-5;
       }
     }
+
     &:hover,
     &.active {
       background-color: $dark-gray-2;
@@ -133,16 +136,20 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
         .sticky-table-cell {
           background-color: $dark-gray-1;
           color: $dark-text;
+
           &:first-child {
             border-right-color: $dark-gray-3;
           }
         }
       }
+
       .sticky-table-row:not(:first-child) {
         border-left-color: $dark-gray-1;
+
         .sticky-table-cell:not(:first-child) {
           border-left-color: $dark-gray-3;
         }
+
         .sticky-table-cell {
           border-color: $dark-gray-1;
         }
@@ -150,17 +157,20 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
         &:hover,
         &.selected {
           color: $dark-text;
+
           .sticky-table-cell:first-child {
             // background-color: $dark-gray-1;
             background-color: hsl(0, 0%, 30%); // in between $dark-gray-1 and $dark-gray-2
           }
         }
       }
+
       .sticky-table-row:nth-of-type(even) {
         .sticky-table-cell {
           background-color: $dark-gray-4;
         }
       }
+
       .sticky-table-row:nth-of-type(odd):not(:first-child) {
         .sticky-table-cell {
           background-color: $dark-gray-2;
@@ -174,6 +184,7 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
       li.list-group-item {
         background-color: $dark-gray-1;
         border-color: $dark-gray-2;
+
         &:hover,
         &.selected {
           color: $dark-text;
@@ -181,13 +192,16 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
         }
       }
     }
+
     .template-picker__details {
       .panel-body {
         background-color: $dark-gray-4;
+
         button {
           color: $dark-text;
           background-color: $dark-gray-1;
           border-color: $dark-text;
+
           &:hover {
             background-color: $dark-gray-2;
           }
@@ -204,12 +218,14 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
       svg {
         color: $dark-text;
       }
+
       &:hover {
         svg {
           color: $dark-text;
         }
       }
     }
+
     &:hover {
       color: $dark-text;
       background-color: $dark-gray-1;
@@ -225,49 +241,64 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
         color: $dark-gray-6;
       }
     }
+
     .option-switch-label:not(.checked) {
       background-color: $dark-gray-6;
     }
+
     .option-switch-labeltext {
       color: $dark-text;
     }
+
     div#settings-tabs {
       .nav-tabs {
         border-bottom-color: $darkmode-border;
       }
-      .nav-tabs > li:not(.active) > a:not(:hover) {
+
+      .nav-tabs>li:not(.active)>a:not(:hover) {
         color: $darkmode-link-text;
         border-bottom-color: $darkmode-border;
       }
+
       .tab-content {
         border-color: $darkmode-border;
+
         .card-dialog__custom-attributes-configuration-link {
           color: $darkmode-link-text;
         }
       }
     }
   }
+
   .dashboard__options__item {
     select {
       color: $dark-gray-1;
     }
+
     input {
       color: $dark-gray-1;
     }
+
     .help-block {
       color: $dark-text;
     }
+
     .btn-link {
       color: $dark-link;
-      &:hover,&:focus {
+
+      &:hover,
+      &:focus {
         color: $dark-link-active;
       }
     }
+
     &.disabled {
       color: $dark-gray-6;
+
       .help-block {
         color: $dark-gray-6;
       }
+
       .form-control {
         background-color: $dark-gray-1;
         color: $dark-gray-6;
@@ -283,15 +314,19 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
       border-color: $darkmode-border;
     }
   }
+
   .dashboard__help__item {
     &.links {
       button.btn-link {
         color: $dark-link;
-        &:hover,&:focus {
+
+        &:hover,
+        &:focus {
           color: $dark-link-active;
         }
       }
     }
+
     &.actions {
       #customerServiceCode {
         background-color: $dark-gray-1;
@@ -307,6 +342,46 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
       color: $dark-text;
       background-color: $dark-gray-1;
       border-color: $dark-text;
+    }
+  }
+}
+
+
+.darkmode {
+  .dashboard__main.darkmode {
+    background-color: $darkmode-v2-card-background !important;
+    color: #ddd !important;
+
+    .dashboard__recent-files .dashboard__search {
+      background-color: $darkmode-v2-background;
+      border-color: $darkmode-v2-border;
+    }
+
+    .dashboard__help__item {
+      &.actions {
+        #customerServiceCode {
+          background-color: $darkmode-v2-background;
+          border-color: $darkmode-v2-border;
+        }
+      }
+    }
+
+    nav {
+      background-color: $darkmode-v2-darker-background !important;
+    }
+
+    .dashboard__options {
+      div#settings-tabs {
+        .nav-tabs {
+          color: #bbb;
+          border-bottom-color: $darkmode-v2-nav-tabs-border;
+
+          >li:not(.active)>a:not(:hover) {
+            color: #bbb;
+            border-bottom-color: $darkmode-v2-nav-tabs-border;
+          }
+        }
+      }
     }
   }
 }
