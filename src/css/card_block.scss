@@ -3,9 +3,11 @@
 .card__cell {
   .card__body-wrapper {
     margin-bottom: 2px;
+
     &.lastOne {
       margin-bottom: 2px;
     }
+
     .card__drop-zone {
       text-align: center;
       margin-bottom: 4px;
@@ -14,6 +16,7 @@
       font-size: 10px;
       width: 85%;
       margin: auto;
+
       svg {
         color: $gray-8;
       }
@@ -23,12 +26,14 @@
       word-break: break-word;
     }
   }
+
   .card__add-card {
     font-size: 12px;
     text-align: center;
     color: transparent;
     cursor: pointer;
   }
+
   &:hover {
     .card__add-card {
       color: $blue-5;
@@ -37,19 +42,23 @@
 
   &.vertical {
     display: flex;
-    & > div {
+
+    &>div {
       display: flex;
     }
-    & > div:first-child {
+
+    &>div:first-child {
       padding-left: 25px;
     }
+
     .card__add-card {
       height: 70px;
       line-height: 70px;
     }
   }
+
   &.vertical.medium-timeline {
-    & > div:first-child {
+    &>div:first-child {
       padding-left: 29px;
     }
   }
@@ -64,19 +73,24 @@
     width: 150px;
     margin-left: 12.5px;
     margin-right: 12.5px;
+
     &.medium-timeline {
       width: 80px;
     }
   }
+
   span:first-child {
     text-align: left;
   }
+
   .card__body {
     cursor: move;
+
     .card__title {
       font-style: italic;
     }
   }
+
   .card__behind {
     position: absolute;
     width: 150px;
@@ -89,6 +103,7 @@
     background-color: $body-background-color;
     cursor: pointer;
   }
+
   .card__add-card {
     margin-top: 8px;
   }
@@ -98,6 +113,7 @@
       display: block;
       z-index: 10;
     }
+
     &:hover .card__add-card {
       .glyphicon {
         background-color: $body-background-color;
@@ -108,14 +124,17 @@
         margin-right: -19px;
       }
     }
+
     .card__behind {
       right: 18px;
       bottom: 16px;
     }
+
     .card__drop-zone {
       margin: auto;
     }
   }
+
   &.medium-timeline {
     .card__behind {
       right: -2px;
@@ -125,6 +144,7 @@
       top: 8px;
     }
   }
+
   &.vertical.medium-timeline {
     .card__behind {
       left: 38px;
@@ -144,8 +164,10 @@
   border-radius: 4px;
   max-height: calc(0.8 * 100vh);
   overflow-y: auto;
+
   .card__body-wrapper {
     margin-bottom: 6px;
+
     &.lastOne {
       margin-bottom: 0;
     }
@@ -171,11 +193,14 @@
 
   &.creating {
     padding: 1px 8px 0 8px;
+
     .form-group {
       margin-bottom: 0;
+
       .control-label {
         margin-bottom: 0;
       }
+
       .form-control {
         padding: 5px 6px;
       }
@@ -184,6 +209,7 @@
 
   &.medium-timeline {
     width: 80px;
+
     .card__title {
       font-size: 14px;
       padding: 6px;
@@ -224,20 +250,25 @@
     justify-content: center;
     align-items: center;
   }
+
   div.template {
     @include application-text;
     text-align: center;
     font-size: 14px;
   }
+
   &.medium-timeline {
     flex-direction: column-reverse;
     margin-bottom: 0;
+
     div.template {
       font-size: 12px;
     }
   }
+
   &.drop-disabled {
     background: none;
+
     .non-template {
       .glyphicon {
         background-color: $body-background-color;
@@ -245,6 +276,7 @@
       }
     }
   }
+
   &.create-disabled {
     cursor: not-allowed;
   }
@@ -269,14 +301,17 @@
     justify-content: center;
     align-items: center;
   }
+
   div.template {
     @include application-text;
     text-align: center;
     font-size: 14px;
   }
+
   &.medium-timeline {
     font-size: 12px;
     flex-direction: column-reverse;
+
     div {
       padding: 6px 4px;
     }
@@ -295,6 +330,7 @@
 }
 
 .card__cell:hover {
+
   .blank-card__body,
   .vertical-blank-card__body {
     visibility: visible;
@@ -325,6 +361,7 @@
   display: flex;
   flex-wrap: wrap;
   padding-bottom: 12px;
+
   .label {
     margin: 2px;
   }
@@ -333,12 +370,14 @@
 .sticky-table.darkmode {
   .card__cell {
     background-color: $darkmode-card-background;
+
     .card__body,
     .blank-card__body {
       background-color: $darkmode-card-background;
       color: $darkmode-text;
     }
   }
+
   .card__cell__overview-cell {
     .card__behind {
       background-color: $darkmode-card-background;
@@ -346,3 +385,20 @@
   }
 }
 
+.darkmode {
+  .card__hidden-cards {
+    background-color: $darkmode-v2-background;
+  }
+
+  .card__body,
+  .card__behind {
+    background-color: $darkmode-v2-card-background;
+    color: $darkmode-v2-text;
+  }
+
+  .card__cell {
+    .card__body-wrapper .card__title {
+      color: #ddd;
+    }
+  }
+}
