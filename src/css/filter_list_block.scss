@@ -4,13 +4,16 @@
   overflow-y: scroll;
   padding-top: 4px;
   max-height: 70vh;
-  & > div {
+
+  &>div {
     min-width: 110px;
     padding: 0 4px;
-    & > .filter-list__list {
+
+    &>.filter-list__list {
       padding-left: 10px;
     }
   }
+
   p {
     margin: 0px;
     padding-top: 3px;
@@ -19,12 +22,15 @@
     cursor: pointer;
     user-select: none;
   }
+
   p:hover {
     background-color: $body-background-color;
   }
+
   .filter-list__list {
     list-style: none;
     padding-left: 0;
+
     li {
       cursor: pointer;
       user-select: none;
@@ -32,6 +38,7 @@
       max-width: 250px;
       overflow-wrap: break-word;
     }
+
     li:hover {
       background-color: $body-background-color;
     }
@@ -49,33 +56,44 @@
   list-style: none;
   padding-left: 0px;
   width: auto;
+
   li {
     cursor: pointer;
     -webkit-user-select: none;
     padding-top: 2px;
     padding-bottom: 2px;
+
     span.not-active {
       margin-left: 20px;
     }
   }
+
   li:hover {
     background-color: $body-background-color;
   }
 }
 
-body.darkmode {
+.darkmode {
   .filter-list {
-    p:hover {
-      background-color: $darkmode-darker-background;
-    }
+
+    p:hover,
     li:hover {
-      background-color: $darkmode-darker-background;
+      background-color: $darkmode-v2-card-background;
+    }
+
+    .filter-list__list {
+
+      p,
+      li,
+      .secondary-text {
+        color: $darkmode-v2-darker-text;
+      }
     }
   }
 
   .sort-list {
     li:hover {
-      background-color: $darkmode-darker-background;
+      background-color: $darkmode-v2-card-background;
     }
   }
 }

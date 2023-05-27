@@ -49,6 +49,7 @@
 
   @media (max-width: 1000px) {
     margin: 0 !important;
+
     .form-group .control-label {
       text-align: left;
     }
@@ -60,11 +61,13 @@
     width: 100%;
     margin: 0 !important;
     margin-top: 10px !important;
+
     .form-control {
       width: 60%;
     }
   }
 }
+
 .color-picker__box-wrapper {
   p {
     @include header-font;
@@ -81,12 +84,15 @@
 
 .color-picker__wrapper.darkmode {
   background-color: $darkmode-card-background;
+
   .color-picker__title {
     color: $darkmode-text;
   }
+
   h5.secondary-text {
     color: $darkmode-darker-text;
   }
+
   p {
     color: $darkmode-text;
   }
@@ -101,17 +107,21 @@
   border: 1px solid $gray-9;
   box-shadow: 0 0.25rem 1rem rgba(48, 55, 66, 0.15);
   padding: 4px;
+
   p {
     margin: 0;
   }
+
   .color-picker__box {
     .color-picker__choice {
       margin: 1px;
+
       button {
         height: 20px;
         width: 12px;
         border-radius: 4px 0px 4px 0px;
       }
+
       button::after {
         border-radius: 4px 0px 4px 0px;
       }
@@ -126,6 +136,7 @@
 
 .color-picker__choice {
   margin: 3px;
+
   button {
     height: 50px;
     width: 60px;
@@ -133,6 +144,7 @@
     border-width: 0px;
     transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
   }
+
   button::after {
     content: '';
     z-index: -1;
@@ -147,10 +159,20 @@
     opacity: 0;
     transition: opacity 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
   }
+
   button:hover {
     transform: scale(1.25, 1.25);
   }
+
   button:hover::after {
     opacity: 1;
+  }
+}
+
+.darkmode {
+  .color-picker__input-box {
+    border-top: 1px solid #4d4d4f;
+    border-bottom: 1px solid #4d4d4f;
+    margin-bottom: 10px;
   }
 }

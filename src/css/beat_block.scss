@@ -31,6 +31,7 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
   cursor: grab;
   font-size: 16px;
   margin-right: -14px;
+
   &.hovering {
     opacity: 1;
   }
@@ -40,8 +41,7 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
   opacity: 0;
 }
 
-.beat__heading-wrapper {
-}
+.beat__heading-wrapper {}
 
 .beat__heading {
   @include sub-header-font;
@@ -57,18 +57,20 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
   outline: 5px solid $body-background-color;
 
   &.darkmode {
-    background-color: $darkmode-background !important;
+    background-color: $darkmode-background;
     outline: 5px solid $darkmode-background;
   }
 
   .form-group {
     text-align: left;
+
     .control-label {
       @include secondary-text;
       font-weight: normal;
       font-size: 16px;
       margin-bottom: 0;
     }
+
     .control-label.darkmode {
       color: $darkmode-darker-text;
     }
@@ -78,23 +80,28 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
     border: 3px dashed $blue-7;
     cursor: move;
   }
+
   &.dropping {
     border: $new-item-border;
   }
+
   &.medium-timeline {
     width: $medium_width + 6px; // +6px for the 3px border
     font-size: 14px;
     padding: 12px 4px;
+
     .form-group {
       .control-label {
         font-size: 12px;
       }
+
       input {
         font-size: 12px;
         padding: 6px 2px;
       }
     }
   }
+
   &.disabled {
     cursor: not-allowed;
   }
@@ -106,14 +113,17 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
   text-align: center;
   transition: all 0.4s $cubic;
   border: 3px dashed transparent;
+
   .form-group {
     text-align: left;
+
     .control-label {
       @include secondary-text;
       font-weight: normal;
       font-size: 16px;
       margin-bottom: 0;
     }
+
     .control-label.darkmode {
       color: $darkmode-darker-text;
     }
@@ -123,24 +133,29 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
     border: 3px dashed $blue-7;
     cursor: move;
   }
+
   &.dropping {
     border: $new-item-border;
   }
+
   &.medium-timeline {
     width: $medium_width + 6px; // +6px for the 3px border
     font-size: 14px;
     padding: 12px 4px;
     margin: auto;
+
     .form-group {
       .control-label {
         font-size: 12px;
       }
+
       input {
         font-size: 12px;
         padding: 6px 2px;
       }
     }
   }
+
   &.disabled {
     cursor: not-allowed;
   }
@@ -185,11 +200,13 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
     margin-top: 25px;
     padding-bottom: 40px;
   }
+
   &:not(.medium-timeline):not(.insert-child) {
     margin-top: 38px;
     padding-bottom: 40px;
     margin-left: 1px;
   }
+
   &.medium-timeline:not(.insert-child) {
     margin-top: 16px;
     padding-bottom: 0px;
@@ -203,53 +220,64 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
   transition: all 0.4s $cubic;
   font-size: 16px;
   cursor: pointer;
+
   &:not(.small-timeline):not(.medium-timeline) {
     margin-left: 0px;
     margin-right: 0px;
   }
+
   &:last-child:not(.small-timeline):not(.medium-timeline) {
     margin-top: 8px;
   }
+
   &:first-child:not(.small-timeline):not(.medium-timeline) {
     height: 82.5px;
     margin: 5px 2px;
   }
+
   &.insert-beat {
     height: 50px;
     margin: 5px 2px;
   }
+
   .insert-beat-wrapper {
     .glyphicon {
       margin-top: -1px;
       margin-right: -1px;
     }
   }
+
   .insert-beat-wrapper.append-beat {
     &.large-timeline {
       padding: 11px 70px 10px 70px;
       margin-left: 35px;
       margin-top: 5px;
     }
+
     &.medium-timeline {
       margin-top: 10px;
       margin-right: 8px;
       padding: 14px 35px;
     }
+
     color: $blue-5;
     border: none;
     margin-right: 50px;
     border: 3px dotted $blue-8;
+
     &:hover {
       border: 3px dotted $blue-8;
       background-color: $blue-8;
     }
   }
+
   .insert-missing-beat-wrapper {
     .glyphicon {
       margin-top: -1px;
       margin-right: -1px;
     }
   }
+
   .insert-missing-beat-wrapper.insert-beat {
     display: flex;
     align-items: center;
@@ -283,8 +311,8 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
 
 .beat-list__insert:hover {
   color: $blue-5;
-  .insert-beat-wrapper.append-beat {
-  }
+
+  .insert-beat-wrapper.append-beat {}
 }
 
 .insert-missing-beat-wrapper:hover {
@@ -293,6 +321,7 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
 
 .beat-list__insert:hover {
   color: $blue-5;
+
   .insert-missing-beat-wrapper.insert-beat {
     border: none;
   }
@@ -302,6 +331,7 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
   .beat-list__insert:hover {
     color: $blue-8;
   }
+
   .beat-list__insert {
     .insert-beat-wrapper.append-beat {
       color: $blue-7;
@@ -331,18 +361,22 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
   padding: 10px;
   transition: all 0.4s $cubic;
   border: 3px dashed transparent;
+
   .form-group {
     text-align: left;
+
     .control-label {
       @include secondary-text;
       font-weight: normal;
       font-size: 16px;
       margin-bottom: 0;
     }
+
     .control-label.darkmode {
       color: $darkmode-darker-text;
     }
   }
+
   &.medium-timeline {
     display: flex;
     flex-direction: column;
@@ -351,16 +385,19 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
     width: $medium_width + 16px; // +6px for the 3px border
     font-size: 14px;
     padding: 12px 8px;
+
     .form-group {
       .control-label {
         font-size: 12px;
       }
+
       input {
         font-size: 12px;
         padding: 6px 2px;
       }
     }
   }
+
   span:first-child {
     word-break: break-word;
   }
@@ -381,6 +418,7 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
   margin-left: 2px;
   margin-top: -20px;
   visibility: hidden;
+
   button.btn-block {
     margin-top: 1px;
   }
@@ -403,18 +441,22 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
   font-size: 16px;
   cursor: pointer;
   margin: -5px 11px 0 52px;
+
   button {
     // width: 41px;
     // height: 35px;
   }
+
   .vertical-insert-beat-wrapper {
     .large-timeline {
       height: 40px;
     }
+
     display: flex;
     flex-direction: row;
     justify-content: space-around;
   }
+
   .vertical-insert-beat-wrapper.insert-beat-spacer {
     .glyphicon {
       position: relative;
@@ -433,10 +475,12 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
   justify-content: center;
   flex-direction: column;
   margin: -70px -37px 10px 0px;
+
   button {
     height: 35px;
     width: 41px;
   }
+
   &:last-child:not(.small-timeline) {
     margin-left: 2px;
   }
@@ -453,18 +497,22 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
   margin-top: 38px;
   margin-left: 75px;
   margin-right: 24px;
+
   .vertical-insert-beat-wrapper.append-beat {
     padding: 20px $title_height;
     color: $blue-5;
     border: none;
     margin-top: 10px;
   }
+
   .vertical-insert-beat-wrapper.append-beat:hover {
     border: none;
   }
+
   &.medium-timeline {
     width: $medium_width;
     margin-left: 35px;
+
     .vertical-insert-beat-wrapper.append-beat {
       margin-left: 30px;
       padding: 12px 32px;
@@ -478,6 +526,7 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
 
 .vertical-beat-list__insert:hover {
   color: $blue-5;
+
   .insert-beat-wrapper.append-beat {
     border: 3px dashed $blue-7;
   }
@@ -485,7 +534,19 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
 
 .beat-list__insert--always-visible {
   color: $blue-5;
+
   .insert-beat-wrapper.append-beat {
     border: 3px dashed $blue-7;
+  }
+}
+
+.darkmode {
+  .beat__heading.darkmode {
+    background-color: $darkmode-v2-card-background;
+    outline: 5px solid $darkmode-v2-card-background;
+  }
+
+  .control-label {
+    color: $darkmode-v2-heading-text;
   }
 }
