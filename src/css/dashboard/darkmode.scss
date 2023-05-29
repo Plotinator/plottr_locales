@@ -182,16 +182,19 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
   .template-picker__wrapper {
     .template-picker__list {
       li.list-group-item {
-        background-color: $dark-gray-1;
-        border-color: $dark-gray-2;
-
-        &:hover,
-        &.selected {
-          color: $dark-text;
-          background-color: $dark-gray-1;
-        }
+      color: $darkmode-v2-darker-text;
+      border-color: $darkmode-v2-border;
+      background-color: $darkmode-v2-background;
+  
+      &.selected,
+      &:hover,
+      &:focus {
+        background-color: #24252c;
+        border: 1px solid $darkmode-v2-border;
       }
     }
+
+  }
 
     .template-picker__details {
       .panel-body {

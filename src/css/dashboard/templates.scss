@@ -77,9 +77,13 @@
     .template-picker__list {
 
       li.list-group-item {
+        color: $darkmode-v2-darker-text;
+        border-color: $darkmode-v2-border;
+        background-color: $darkmode-v2-background;
 
         &:hover,
-        &.selected {
+        &.selected,
+        &:focus {
           background-color: #24252c;
           border-color: $darkmode-v2-border;
         }
