@@ -50,11 +50,15 @@ function displayFileName(fileName, fileURL, displayFilePath) {
   })
 }
 
-const LoadingSplash = ({ loadingState, loadingProgress }) => {
+const LoadingSplash = ({ loadingState, loadingProgress, darkMode }) => {
   return (
     <div id="temporary-inner">
       <div className="loading-splash">
-        <img src="../icons/logo_28_500.png" height="500" />
+        {darkMode ? (
+          <img src="../icons/logo_dark_28_500.png" height="500" />
+        ) : (
+          <img src="../icons/logo_light_28_500.png" height="500" />
+        )}
         {loadingState ? <h3>{loadingState}</h3> : null}
         {loadingProgress ? (
           <div className="loading-splash__progress">
@@ -71,6 +75,7 @@ const LoadingSplash = ({ loadingState, loadingProgress }) => {
 LoadingSplash.propTypes = {
   loadingState: PropTypes.string,
   loadingProgress: PropTypes.number,
+  darkMode: PropTypes.bool,
 }
 
 const Main = ({
@@ -353,7 +358,7 @@ const Main = ({
   }
 
   if (needsToLogin) {
-    return <Login />
+    return <Login darkMode={darkMode} />
   }
 
   if (fileToUpload) {
@@ -362,7 +367,7 @@ const Main = ({
         {({ readFile }) => {
           return (
             <>
-              <LoadingSplash />
+              <LoadingSplash darkMode={darkMode} />
               <UploadOfflineFile
                 fileURL={fileToUpload}
                 onUploadFile={() => {
@@ -482,7 +487,11 @@ const Main = ({
 
     const body = (
       <>
-        <img src="../icons/logo_28_500.png" height="500" />
+        {darkMode ? (
+          <img src="../icons/logo_dark_28_500.png" height="500" />
+        ) : (
+          <img src="../icons/logo_light_28_500.png" height="500" />
+        )}
         <h3>{loadingState}</h3>
         <div className="loading-splash__progress">
           <div className="loading-splash__progress__bar" style={{ width: `${loadingProgress}%` }} />
