@@ -32,7 +32,7 @@ const BackupsHomeConnector = (connector) => {
             id="backup-warning-tooltip"
             placement="right"
             text={t(
-              'Plottr creates two backup files per session. One at the beginning and one at the end.'
+              'Plottr creates two backup files per session. One at the start and one at the end.'
             )}
           >
             <Glyphicon glyph="info-sign" />
