@@ -1,7 +1,7 @@
 import semverGt from 'semver/functions/gt'
 import axios from 'axios'
 import { DateTime } from 'luxon'
-import { isEqual } from 'lodash'
+import { isEqual, identity, isObject } from 'lodash'
 
 import { removeSystemKeys, ARRAY_KEYS, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
 
@@ -181,7 +181,6 @@ const api = (
   const listenForObjectAtPath =
     (path) =>
     (userId, fileId, clientId, withAction, errorHandler = defaultErrorHandler) => {
-      const identity = (x) => x
       const { doc, onSnapshot } = database()
       return onSnapshot(
         doc(`${path}/${fileId}`),
@@ -200,13 +199,12 @@ const api = (
       )
     }
 
-  const listenToFlatArrayAtPath =
-    (path) =>
+  const listenForFlatArrayAtPath =
+    (path, subPath) =>
     (userId, fileId, clientId, withAction, errorHandler = defaultErrorHandler) => {
-      const values = (x) => Object.values(x)
       const { doc, onSnapshot } = database()
       return onSnapshot(
-        doc(`${path}/${fileId}`),
+        doc(`${path}/${fileId}/${subPath}`),
         handleSnapshot(withAction, fileId, path, identity, true, clientId)
       )
     }
@@ -246,6 +244,7 @@ const api = (
   const listenToHierarchyLevels = listenForObjectAtPath('hierarchyLevels')
   const listenToImages = listenForObjectAtPath('images')
   const listenToAttributes = listenForObjectAtPath('attributes')
+  const listenToFlatCards = listenForFlatArrayAtPath('flatCards', 'cards')
 
   const onFetched = (fileId, path, withData, clientId) => (documentRef) => {
     const data = documentRef && documentRef.data()
@@ -255,15 +254,20 @@ const api = (
     }
     delete data.fileId
     delete data.clientId
-    return {
-      [path]: withData(data),
-    }
+    return [path, withData(data)]
   }
 
   const fetchArrayAtPath = (path) => (userId, fileId, clientId) => {
     const values = (x) => Object.values(x)
     const { doc, getDoc } = database()
     return getDoc(doc(`${path}/${fileId}`)).then(onFetched(fileId, path, values, clientId))
+  }
+
+  const fetchFlatArrayAtPath = (path, subPath) => (userId, fileId, clientId) => {
+    const { doc, getDoc } = database()
+    return getDoc(doc(`${path}/${fileId}/${subPath}`)).then(
+      onFetched(fileId, subPath, identity, clientId)
+    )
   }
 
   const fetchObjectAtPath = (path) => (userId, fileId, clientId) => {
@@ -308,6 +312,7 @@ const api = (
   const fetchhierarchyLevels = fetchObjectAtPath('hierarchyLevels')
   const fetchImages = fetchObjectAtPath('images')
   const fetchAttributes = fetchObjectAtPath('attributes')
+  const fetchFlatCards = fetchFlatArrayAtPath('flatCards', 'cards')
 
   const toFirestoreArray = (array) =>
     array.reduce((acc, value, index) => Object.assign(acc, { [index]: value }), {})
@@ -356,6 +361,7 @@ const api = (
           fetchhierarchyLevels(userId, fileId, clientId),
           fetchImages(userId, fileId, clientId),
           fetchAttributes(userId, fileId, clientId),
+          fetchFlatCards(userId, fileId, clientId),
         ]).then((results) => {
           return [file, ...results]
         })
@@ -378,7 +384,25 @@ const api = (
           })
       })
       .then(({ results, newOpenDate }) => {
-        const json = Object.assign({}, ...results)
+        const json = results.reduce((acc, next) => {
+          const [key, value] = next
+          const newValue =
+            typeof acc[key] === 'undefined'
+              ? value
+              : Array.isArray(acc[key])
+              ? [...acc[key], value]
+              : isObject(acc[key])
+              ? { ...acc[key], ...value }
+              : null
+          if (newValue) {
+            return {
+              ...acc,
+              [key]: newValue,
+            }
+          } else {
+            return acc
+          }
+        }, {})
         return pingAuth(userId, fileId).then(() => {
           return {
             ...json,
@@ -1024,6 +1048,7 @@ const api = (
     listenToHierarchyLevels,
     listenToImages,
     listenToAttributes,
+    listenToFlatCards,
     toFirestoreArray,
     overwriteAllKeys,
     initialFetch,
