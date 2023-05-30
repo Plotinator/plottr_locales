@@ -257,6 +257,22 @@ const api = (
     return [path, withData(data)]
   }
 
+  const onFetchedArray = (fileId, path, withData, clientId) => (documentRef) => {
+    const documents = []
+    documentRef.forEach((document) => {
+      const data = document.data()
+      if (data.deleted) return
+
+      documents.push({
+        id: document.id,
+        ...data,
+        fileURL: `plottr://${fileId}`,
+        isCloudFile: true,
+      })
+    })
+    return [path, withData(documents)]
+  }
+
   const fetchArrayAtPath = (path) => (userId, fileId, clientId) => {
     const values = (x) => Object.values(x)
     const { doc, getDoc } = database()
@@ -266,7 +282,7 @@ const api = (
   const fetchFlatArrayAtPath = (path, subPath) => (userId, fileId, clientId) => {
     const { collection, getDocs } = database()
     return getDocs(collection(`${path}/${fileId}/${subPath}`)).then(
-      onFetched(fileId, subPath, identity, clientId)
+      onFetchedArray(fileId, subPath, identity, clientId)
     )
   }
 
@@ -298,7 +314,30 @@ const api = (
 
   const fetchUI = fetchObjectAtPath('ui')
   const fetchChapters = fetchArrayAtPath('chapters')
-  const fetchCards = fetchArrayAtPath('cards')
+  const fetchCards = (userId, fileId, clientId) => {
+    return fetchArrayAtPath('cards')(userId, fileId, clientId).then((entry) => {
+      const [_key, value] = entry
+      if (Array.isArray(value) && value.length > 0) {
+        return overwrite('oldCards', fileId, value, clientId)
+          .then(() => {
+            return Promise.all(
+              value.map((card) => {
+                return overwrite('cards', fileId, card, clientId)
+              })
+            )
+          })
+          .then(() => {
+            const { doc, deleteDoc } = database()
+            return deleteDoc(doc(`cards/${fileId}`))
+          })
+          .then(() => {
+            return entry
+          })
+      } else {
+        return entry
+      }
+    })
+  }
   const fetchSeries = fetchObjectAtPath('series')
   const fetchBooks = fetchObjectAtPath('books')
   const fetchCategories = fetchObjectAtPath('categories')
@@ -323,17 +362,32 @@ const api = (
       if (SYSTEM_REDUCER_KEYS.indexOf(key) !== -1) {
         return
       }
-      const payload = ARRAY_KEYS.indexOf(key) !== -1 ? toFirestoreArray(state[key]) : state[key]
-      requests.push(
-        overwrite(key, fileId, payload, clientId)
-          .catch((error) => {
-            log.error(`Error while force updating file ${fileId} at key: ${key}`, error)
-            return Promise.reject(error)
-          })
-          .then(() => ({
-            [key]: ARRAY_KEYS.indexOf(key) !== -1 ? Object.values(payload) : payload,
-          }))
-      )
+      if (key === 'cards') {
+        state[key].forEach((payload) => {
+          requests.push(
+            overwrite(key, fileId, payload, clientId)
+              .catch((error) => {
+                log.error(`Error while force updating file ${fileId} at key: ${key}`, error)
+                return Promise.reject(error)
+              })
+              .then(() => ({
+                [key]: ARRAY_KEYS.indexOf(key) !== -1 ? Object.values(payload) : payload,
+              }))
+          )
+        })
+      } else {
+        const payload = ARRAY_KEYS.indexOf(key) !== -1 ? toFirestoreArray(state[key]) : state[key]
+        requests.push(
+          overwrite(key, fileId, payload, clientId)
+            .catch((error) => {
+              log.error(`Error while force updating file ${fileId} at key: ${key}`, error)
+              return Promise.reject(error)
+            })
+            .then(() => ({
+              [key]: ARRAY_KEYS.indexOf(key) !== -1 ? Object.values(payload) : payload,
+            }))
+        )
+      }
     })
     return Promise.all(requests).then((results) => {
       return Object.assign({}, ...results)
@@ -385,15 +439,16 @@ const api = (
       })
       .then(({ results, newOpenDate }) => {
         const json = results.reduce((acc, next) => {
+<<<<<<< variant A
           console.log('next', next)
+>>>>>>> variant B
+======= end
           const [key, value] = next
           const newValue =
             typeof acc[key] === 'undefined'
               ? value
-              : Array.isArray(acc[key])
-              ? [...acc[key], value]
-              : isObject(acc[key])
-              ? { ...acc[key], ...value }
+              : Array.isArray(acc[key]) || isObject(acc[key])
+              ? [...acc[key], ...value]
               : null
           if (newValue) {
             return {
@@ -585,7 +640,9 @@ const api = (
 
   const overwrite = (path, fileId, payload, clientId) => {
     const { doc, setDoc } = database()
-    return setDoc(doc(`${path}/${fileId}`), {
+    const documentPath =
+      path === 'cards' ? `flatCards/${fileId}/cards/${payload.id}` : `${path}/${fileId}`
+    return setDoc(doc(documentPath), {
       ...payload,
       clientId,
       fileId,
