@@ -23,6 +23,7 @@ import {
   ADD_BOOK,
   APPEND_TOP_LEVEL_BEAT,
   UNSAFE_SET_BEATS,
+  DUPLICATE_BOOK,
 } from '../constants/ActionTypes'
 import { beat as defaultBeat } from '../store/initialState'
 import { newFileBeats } from '../store/newFileState'
@@ -93,6 +94,32 @@ const beats =
           }
         } else {
           return state
+        }
+      }
+
+      case DUPLICATE_BOOK: {
+        const beats = action.newBeats
+        const idMap = {}
+        // this recreates the template's tree but with new ids
+        const newBeats = tree.reduce('id')(
+          beats,
+          (newBeatTree, nextBeat, parentId) => {
+            const newId = action.nextBeatId + nextBeat.id // give it a new id
+            idMap[nextBeat.id] = newId
+            const newParentId = idMap[parentId] || null
+            const newBeat = {
+              ...clone(nextBeat),
+              id: newId,
+              bookId: action.newBookId, // add it to the new book
+            }
+            return tree.addNode('id')(newBeatTree, newParentId, newBeat)
+          },
+          clone(newTree)
+        )
+
+        return {
+          ...state,
+          [action.newBookId]: newBeats,
         }
       }
 

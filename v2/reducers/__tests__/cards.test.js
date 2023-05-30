@@ -4,8 +4,10 @@ import {
   ADD_CARD,
   ADD_CARD_IN_BEAT,
   ADD_LINES_FROM_TEMPLATE,
+  ADD_TEMPLATE_TO_CARD,
   EDIT_CARD_DETAILS,
   EDIT_CARDS_ATTRIBUTE,
+  REORDER_CARD_TEMPLATE_ATTRIBUTES,
 } from '../../constants/ActionTypes'
 import { card as defaultCard } from '../../store/initialState'
 import cardsReducerWithoutRepairers from '../cards'
@@ -32,6 +34,87 @@ const card2 = { ...defaultCard, id: 2 }
 const card3 = { ...defaultCard, id: 3 }
 const card4 = { ...defaultCard, id: 4 }
 const fourCardState = [card1, card2, card3, card4]
+
+const cardtemplate1 = {
+  id: 'sc1',
+  type: 'scenes',
+  name: 'Three Story Scene 1',
+  description: 'Based on the book Three Story Method by J. Thorn',
+  link: 'https://thecareerauthor.com/threestorymethod/',
+  version: '2022.7.20',
+  attributes: [
+    {
+      name: 'Conflict',
+      type: 'text',
+      description: 'What is the central conflict of the scene?',
+    },
+    {
+      name: 'Choice',
+      type: 'text',
+      description: "What choice do the characters make to deal with the scene's conflict?",
+    },
+    {
+      name: 'Consequence',
+      type: 'text',
+      description:
+        'What is the consequence of the choice? Use the consequence as a hook to the next scene',
+    },
+  ],
+}
+
+const cardtemplate2 = {
+  id: 'sc2',
+  type: 'scenes',
+  name: 'Three Story Scene 2',
+  description: 'Based on the book Three Story Method by J. Thorn',
+  link: 'https://thecareerauthor.com/threestorymethod/',
+  version: '2022.7.20',
+  attributes: [
+    {
+      name: 'Conflict',
+      type: 'text',
+      description: 'What is the central conflict of the scene?',
+    },
+    {
+      name: 'Choice',
+      type: 'text',
+      description: "What choice do the characters make to deal with the scene's conflict?",
+    },
+    {
+      name: 'Consequence',
+      type: 'text',
+      description:
+        'What is the consequence of the choice? Use the consequence as a hook to the next scene',
+    },
+  ],
+}
+
+const cardtemplate3 = {
+  id: 'sc3',
+  type: 'scenes',
+  name: 'Three Story Scene 3',
+  description: 'Based on the book Three Story Method by J. Thorn',
+  link: 'https://thecareerauthor.com/threestorymethod/',
+  version: '2022.7.20',
+  attributes: [
+    {
+      name: 'Conflict',
+      type: 'text',
+      description: 'What is the central conflict of the scene?',
+    },
+    {
+      name: 'Choice',
+      type: 'text',
+      description: "What choice do the characters make to deal with the scene's conflict?",
+    },
+    {
+      name: 'Consequence',
+      type: 'text',
+      description:
+        'What is the consequence of the choice? Use the consequence as a hook to the next scene',
+    },
+  ],
+}
 
 // cardsReducer(undefined, {
 //   type: ADD_LINES_FROM_TEMPLATE,
@@ -265,6 +348,128 @@ describe('cardsReducer', () => {
             'do-you-even-lift?': 'You bet!',
           })
         })
+      })
+    })
+  })
+})
+
+describe('reorderCardTemplateAttribute', () => {
+  describe('given a four templates card state', () => {
+    const template1OldPosition = 0 //cardtemplate1
+    const template1NewPosition = 2 //cardtemplate1
+    const template2OldPosition = 0 //cardtemplate2
+    const template2NewPosition = 1 //cardtemplate2
+    const template1SecondReorderOldPosition = 2 //cardtemplate1
+    const template1SecondReorderNewPosition = 1 //cardtemplate1
+
+    const withTemplate1 = allCardsSelector(
+      mountToState(
+        cardsReducer(oneCardState, {
+          type: ADD_TEMPLATE_TO_CARD,
+          templateData: cardtemplate1,
+          id: 1,
+        })
+      )
+    )
+    const withTemplate2 = allCardsSelector(
+      mountToState(
+        cardsReducer(withTemplate1, {
+          type: ADD_TEMPLATE_TO_CARD,
+          templateData: cardtemplate2,
+          id: 1,
+        })
+      )
+    )
+    const cardWithTemplates = allCardsSelector(
+      mountToState(
+        cardsReducer(withTemplate2, {
+          type: ADD_TEMPLATE_TO_CARD,
+          templateData: cardtemplate3,
+          id: 1,
+        })
+      )
+    )
+
+    const cardAfterFirstReorder = cardIdInState(
+      mountToState(
+        cardsReducer(cardWithTemplates, {
+          type: REORDER_CARD_TEMPLATE_ATTRIBUTES,
+          originalPosition: template1OldPosition,
+          destination: template1NewPosition,
+          id: 1,
+        })
+      ),
+      1
+    )
+    const allCardsAfterReorder = allCardsSelector(
+      mountToState(
+        cardsReducer(cardWithTemplates, {
+          type: REORDER_CARD_TEMPLATE_ATTRIBUTES,
+          originalPosition: template1OldPosition,
+          destination: template1NewPosition,
+          id: 1,
+        })
+      )
+    )
+
+    it('should be able to move the tab to the target position', () => {
+      cardAfterFirstReorder.templates.forEach((template, idx) => {
+        if (template.id === cardtemplate1.id) {
+          expect(idx).toEqual(template1NewPosition)
+        } else {
+          expect(template.id).not.toEqual(cardtemplate1.id)
+        }
+      })
+    })
+
+    it('should be able to move or shuffle card templates attribute', () => {
+      const newCardState = cardIdInState(
+        mountToState(
+          cardsReducer(allCardsAfterReorder, {
+            type: REORDER_CARD_TEMPLATE_ATTRIBUTES,
+            originalPosition: template2OldPosition,
+            destination: template2NewPosition,
+            id: 1,
+          })
+        ),
+        1
+      )
+      const cardsAfterSecondReorder = allCardsSelector(
+        mountToState(
+          cardsReducer(allCardsAfterReorder, {
+            type: REORDER_CARD_TEMPLATE_ATTRIBUTES,
+            originalPosition: template2OldPosition,
+            destination: template2NewPosition,
+            id: 1,
+          })
+        )
+      )
+
+      newCardState.templates.forEach((template, idx) => {
+        if (template.id === cardtemplate2.id) {
+          expect(idx).toEqual(template2NewPosition)
+        } else {
+          expect(template.id).not.toEqual(cardtemplate2.id)
+        }
+      })
+
+      const cardStateAfterThirdShuffle = cardIdInState(
+        mountToState(
+          cardsReducer(cardsAfterSecondReorder, {
+            type: REORDER_CARD_TEMPLATE_ATTRIBUTES,
+            originalPosition: template1SecondReorderOldPosition,
+            destination: template1SecondReorderNewPosition,
+            id: 1,
+          })
+        ),
+        1
+      )
+      cardStateAfterThirdShuffle.templates.forEach((template, idx) => {
+        if (template.id === cardtemplate1.id) {
+          expect(idx).toEqual(template1SecondReorderNewPosition)
+        } else {
+          expect(template.id).not.toEqual(cardtemplate1.id)
+        }
       })
     })
   })

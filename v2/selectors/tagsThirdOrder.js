@@ -67,7 +67,7 @@ export const tagsFilterItemsSelector = createSelector(
       }
       case 'characters': {
         const filteredItems = tags.filter((tag) => {
-          return characters.find((character) => {
+          const tagAttributes = characters.find((character) => {
             const tagAttr = characterAttributes.find((charAttr) => charAttr.name === 'tags')
             if (character?.attributes?.length && tagAttr) {
               return character.attributes.find(
@@ -76,10 +76,14 @@ export const tagsFilterItemsSelector = createSelector(
                   attr.value.includes(tag.id) &&
                   tagAttr.id === attr.id
               )
-            } else {
-              return character.tags?.includes(tag.id)
             }
           })
+          const legacyTags = characters.find((character) => {
+            if (character.tags) {
+              return character.tags.includes(tag.id)
+            }
+          })
+          return tagAttributes || legacyTags
         })
         return filteredItems
       }

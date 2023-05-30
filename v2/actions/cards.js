@@ -21,6 +21,7 @@ import {
   REMOVE_TEMPLATE_FROM_CARD,
   DUPLICATE_CARD,
   MOVE_CARD_TO_BOOK,
+  REORDER_CARD_TEMPLATE_ATTRIBUTES,
 } from '../constants/ActionTypes'
 import { editorMetadataIfPresent } from '../helpers/editors'
 
@@ -143,4 +144,13 @@ export function moveCardToBook(bookId, cardId) {
   // NOTE: we rely on the root reducer to compute the destination beat
   // and line ids.
   return { type: MOVE_CARD_TO_BOOK, bookId, cardId }
+}
+
+export const reorderCardTemplateAttribute = (originalPosition, destination, cardId) => {
+  return {
+    type: REORDER_CARD_TEMPLATE_ATTRIBUTES,
+    originalPosition,
+    destination,
+    id: cardId,
+  }
 }
