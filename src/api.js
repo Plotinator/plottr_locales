@@ -1,7 +1,7 @@
 import semverGt from 'semver/functions/gt'
 import axios from 'axios'
 import { DateTime } from 'luxon'
-import { isEqual } from 'lodash'
+import { isEqual, identity, isObject } from 'lodash'
 
 import { removeSystemKeys, ARRAY_KEYS, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
 
@@ -181,7 +181,6 @@ const api = (
   const listenForObjectAtPath =
     (path) =>
     (userId, fileId, clientId, withAction, errorHandler = defaultErrorHandler) => {
-      const identity = (x) => x
       const { doc, onSnapshot } = database()
       return onSnapshot(
         doc(`${path}/${fileId}`),
@@ -197,6 +196,16 @@ const api = (
       return onSnapshot(
         doc(`${path}/${fileId}`),
         handleSnapshot(withAction, fileId, path, values, true, clientId)
+      )
+    }
+
+  const listenForFlatArrayAtPath =
+    (path, subPath) =>
+    (userId, fileId, clientId, withAction, errorHandler = defaultErrorHandler) => {
+      const { doc, onSnapshot } = database()
+      return onSnapshot(
+        doc(`${path}/${fileId}/${subPath}`),
+        handleSnapshot(withAction, fileId, path, identity, true, clientId)
       )
     }
 
@@ -235,24 +244,46 @@ const api = (
   const listenToHierarchyLevels = listenForObjectAtPath('hierarchyLevels')
   const listenToImages = listenForObjectAtPath('images')
   const listenToAttributes = listenForObjectAtPath('attributes')
+  const listenToFlatCards = listenForFlatArrayAtPath('flatCards', 'cards')
 
   const onFetched = (fileId, path, withData, clientId) => (documentRef) => {
     const data = documentRef && documentRef.data()
     if (!data) {
       log.warn(`No entry for ${path} on file ${fileId}`)
-      return {}
+      return [path, withData({})]
     }
     delete data.fileId
     delete data.clientId
-    return {
-      [path]: withData(data),
-    }
+    return [path, withData(data)]
+  }
+
+  const onFetchedArray = (fileId, path, withData, clientId) => (documentRef) => {
+    const documents = []
+    documentRef.forEach((document) => {
+      const data = document.data()
+      if (data.deleted) return
+
+      documents.push({
+        id: document.id,
+        ...data,
+        fileURL: `plottr://${fileId}`,
+        isCloudFile: true,
+      })
+    })
+    return [path, withData(documents)]
   }
 
   const fetchArrayAtPath = (path) => (userId, fileId, clientId) => {
     const values = (x) => Object.values(x)
     const { doc, getDoc } = database()
     return getDoc(doc(`${path}/${fileId}`)).then(onFetched(fileId, path, values, clientId))
+  }
+
+  const fetchFlatArrayAtPath = (path, subPath) => (userId, fileId, clientId) => {
+    const { collection, getDocs } = database()
+    return getDocs(collection(`${path}/${fileId}/${subPath}`)).then(
+      onFetchedArray(fileId, subPath, identity, clientId)
+    )
   }
 
   const fetchObjectAtPath = (path) => (userId, fileId, clientId) => {
@@ -283,7 +314,30 @@ const api = (
 
   const fetchUI = fetchObjectAtPath('ui')
   const fetchChapters = fetchArrayAtPath('chapters')
-  const fetchCards = fetchArrayAtPath('cards')
+  const fetchCards = (userId, fileId, clientId) => {
+    return fetchArrayAtPath('cards')(userId, fileId, clientId).then((entry) => {
+      const [_key, value] = entry
+      if (Array.isArray(value) && value.length > 0) {
+        return overwrite('oldCards', fileId, value, clientId)
+          .then(() => {
+            return Promise.all(
+              value.map((card) => {
+                return overwrite('cards', fileId, card, clientId)
+              })
+            )
+          })
+          .then(() => {
+            const { doc, deleteDoc } = database()
+            return deleteDoc(doc(`cards/${fileId}`))
+          })
+          .then(() => {
+            return entry
+          })
+      } else {
+        return entry
+      }
+    })
+  }
   const fetchSeries = fetchObjectAtPath('series')
   const fetchBooks = fetchObjectAtPath('books')
   const fetchCategories = fetchObjectAtPath('categories')
@@ -297,6 +351,7 @@ const api = (
   const fetchhierarchyLevels = fetchObjectAtPath('hierarchyLevels')
   const fetchImages = fetchObjectAtPath('images')
   const fetchAttributes = fetchObjectAtPath('attributes')
+  const fetchFlatCards = fetchFlatArrayAtPath('flatCards', 'cards')
 
   const toFirestoreArray = (array) =>
     array.reduce((acc, value, index) => Object.assign(acc, { [index]: value }), {})
@@ -307,17 +362,32 @@ const api = (
       if (SYSTEM_REDUCER_KEYS.indexOf(key) !== -1) {
         return
       }
-      const payload = ARRAY_KEYS.indexOf(key) !== -1 ? toFirestoreArray(state[key]) : state[key]
-      requests.push(
-        overwrite(key, fileId, payload, clientId)
-          .catch((error) => {
-            log.error(`Error while force updating file ${fileId} at key: ${key}`, error)
-            return Promise.reject(error)
-          })
-          .then(() => ({
-            [key]: ARRAY_KEYS.indexOf(key) !== -1 ? Object.values(payload) : payload,
-          }))
-      )
+      if (key === 'cards') {
+        state[key].forEach((payload) => {
+          requests.push(
+            overwrite(key, fileId, payload, clientId)
+              .catch((error) => {
+                log.error(`Error while force updating file ${fileId} at key: ${key}`, error)
+                return Promise.reject(error)
+              })
+              .then(() => ({
+                [key]: ARRAY_KEYS.indexOf(key) !== -1 ? Object.values(payload) : payload,
+              }))
+          )
+        })
+      } else {
+        const payload = ARRAY_KEYS.indexOf(key) !== -1 ? toFirestoreArray(state[key]) : state[key]
+        requests.push(
+          overwrite(key, fileId, payload, clientId)
+            .catch((error) => {
+              log.error(`Error while force updating file ${fileId} at key: ${key}`, error)
+              return Promise.reject(error)
+            })
+            .then(() => ({
+              [key]: ARRAY_KEYS.indexOf(key) !== -1 ? Object.values(payload) : payload,
+            }))
+        )
+      }
     })
     return Promise.all(requests).then((results) => {
       return Object.assign({}, ...results)
@@ -330,7 +400,7 @@ const api = (
         return Promise.all([
           fetchUI(userId, fileId, clientId),
           fetchChapters(userId, fileId, clientId),
-          fetchBeats(userId, fileId, clientId, file.file.version),
+          fetchBeats(userId, fileId, clientId, file[1].version),
           fetchCards(userId, fileId, clientId),
           fetchSeries(userId, fileId, clientId),
           fetchBooks(userId, fileId, clientId),
@@ -345,6 +415,7 @@ const api = (
           fetchhierarchyLevels(userId, fileId, clientId),
           fetchImages(userId, fileId, clientId),
           fetchAttributes(userId, fileId, clientId),
+          fetchFlatCards(userId, fileId, clientId),
         ]).then((results) => {
           return [file, ...results]
         })
@@ -367,7 +438,23 @@ const api = (
           })
       })
       .then(({ results, newOpenDate }) => {
-        const json = Object.assign({}, ...results)
+        const json = results.reduce((acc, next) => {
+          const [key, value] = next
+          const newValue =
+            typeof acc[key] === 'undefined'
+              ? value
+              : Array.isArray(acc[key]) || isObject(acc[key])
+              ? [...acc[key], ...value]
+              : null
+          if (newValue) {
+            return {
+              ...acc,
+              [key]: newValue,
+            }
+          } else {
+            return acc
+          }
+        }, {})
         return pingAuth(userId, fileId).then(() => {
           return {
             ...json,
@@ -549,7 +636,9 @@ const api = (
 
   const overwrite = (path, fileId, payload, clientId) => {
     const { doc, setDoc } = database()
-    return setDoc(doc(`${path}/${fileId}`), {
+    const documentPath =
+      path === 'cards' ? `flatCards/${fileId}/cards/${payload.id}` : `${path}/${fileId}`
+    return setDoc(doc(documentPath), {
       ...payload,
       clientId,
       fileId,
@@ -1013,6 +1102,7 @@ const api = (
     listenToHierarchyLevels,
     listenToImages,
     listenToAttributes,
+    listenToFlatCards,
     toFirestoreArray,
     overwriteAllKeys,
     initialFetch,
