@@ -29,6 +29,7 @@ export const logger = {
   },
   error: (...args) => {
     try {
+      console.error(...args)
       self.postMessage({
         type: LOG_FROM_WORKER,
         payload: {
