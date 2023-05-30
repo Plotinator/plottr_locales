@@ -257,6 +257,22 @@ const api = (
     return [path, withData(data)]
   }
 
+  const onFetchedArray = (fileId, path, withData, clientId) => (documentRef) => {
+    const authorisedDocuments = []
+    documentRef.forEach((document) => {
+      const data = document.data()
+      if (data.deleted) return
+
+      authorisedDocuments.push({
+        id: document.id,
+        ...data,
+        fileURL: `plottr://${document.id}`,
+        isCloudFile: true,
+      })
+    })
+    return [path, withData(authorisedDocuments)]
+  }
+
   const fetchArrayAtPath = (path) => (userId, fileId, clientId) => {
     const values = (x) => Object.values(x)
     const { doc, getDoc } = database()
@@ -266,7 +282,7 @@ const api = (
   const fetchFlatArrayAtPath = (path, subPath) => (userId, fileId, clientId) => {
     const { collection, getDocs } = database()
     return getDocs(collection(`${path}/${fileId}/${subPath}`)).then(
-      onFetched(fileId, subPath, identity, clientId)
+      onFetchedArray(fileId, subPath, identity, clientId)
     )
   }
 
@@ -385,7 +401,6 @@ const api = (
       })
       .then(({ results, newOpenDate }) => {
         const json = results.reduce((acc, next) => {
-          console.log('next', next)
           const [key, value] = next
           const newValue =
             typeof acc[key] === 'undefined'
