@@ -339,17 +339,32 @@ const api = (
       if (SYSTEM_REDUCER_KEYS.indexOf(key) !== -1) {
         return
       }
-      const payload = ARRAY_KEYS.indexOf(key) !== -1 ? toFirestoreArray(state[key]) : state[key]
-      requests.push(
-        overwrite(key, fileId, payload, clientId)
-          .catch((error) => {
-            log.error(`Error while force updating file ${fileId} at key: ${key}`, error)
-            return Promise.reject(error)
-          })
-          .then(() => ({
-            [key]: ARRAY_KEYS.indexOf(key) !== -1 ? Object.values(payload) : payload,
-          }))
-      )
+      if (key === 'cards') {
+        state[key].forEach((payload) => {
+          requests.push(
+            overwrite(key, fileId, payload, clientId)
+              .catch((error) => {
+                log.error(`Error while force updating file ${fileId} at key: ${key}`, error)
+                return Promise.reject(error)
+              })
+              .then(() => ({
+                [key]: ARRAY_KEYS.indexOf(key) !== -1 ? Object.values(payload) : payload,
+              }))
+          )
+        })
+      } else {
+        const payload = ARRAY_KEYS.indexOf(key) !== -1 ? toFirestoreArray(state[key]) : state[key]
+        requests.push(
+          overwrite(key, fileId, payload, clientId)
+            .catch((error) => {
+              log.error(`Error while force updating file ${fileId} at key: ${key}`, error)
+              return Promise.reject(error)
+            })
+            .then(() => ({
+              [key]: ARRAY_KEYS.indexOf(key) !== -1 ? Object.values(payload) : payload,
+            }))
+        )
+      }
     })
     return Promise.all(requests).then((results) => {
       return Object.assign({}, ...results)
@@ -600,7 +615,9 @@ const api = (
 
   const overwrite = (path, fileId, payload, clientId) => {
     const { doc, setDoc } = database()
-    return setDoc(doc(`${path}/${fileId}`), {
+    const documentPath =
+      path === 'cards' ? `flatCards/${fileId}/cards/${payload.id}` : `${path}/${fileId}`
+    return setDoc(doc(documentPath), {
       ...payload,
       clientId,
       fileId,
