@@ -31,24 +31,20 @@ const BackupsHomeConnector = (connector) => {
           <ToolTip
             id="backup-warning-tooltip"
             placement="right"
-            text={t('Backups are read-only and can only be copied, not edited')}
+            text={t(
+              'Plottr creates two backup files per session. One at the beginning and one at the end.'
+            )}
           >
             <Glyphicon glyph="info-sign" />
           </ToolTip>
         </div>
-        <Grid fluid>
-          <Row>
-            <Col xs={8} sm={6} md={4} lg={3}>
-              <FormControl
-                type="search"
-                placeholder={t('Search')}
-                className="dashboard__search"
-                onChange={(event) => setSearchTerm(event.target.value)}
-                value={searchTerm}
-              />
-            </Col>
-          </Row>
-        </Grid>
+        <FormControl
+          type="search"
+          placeholder={t('Search')}
+          className="dashboard__search"
+          onChange={(event) => setSearchTerm(event.target.value)}
+          value={searchTerm}
+        />
         <DashboardErrorBoundary>
           {showTable ? <BackupsTable searchTerm={searchTerm} /> : <Spinner />}
         </DashboardErrorBoundary>
