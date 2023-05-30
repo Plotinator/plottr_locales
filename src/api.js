@@ -420,10 +420,8 @@ const api = (
           const newValue =
             typeof acc[key] === 'undefined'
               ? value
-              : Array.isArray(acc[key])
-              ? [...acc[key], value]
-              : isObject(acc[key])
-              ? { ...acc[key], ...value }
+              : Array.isArray(acc[key]) || isObject(acc[key])
+              ? [...acc[key], ...value]
               : null
           if (newValue) {
             return {
