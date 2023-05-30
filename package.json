@@ -11,13 +11,16 @@
     "url": "https://medium.com/@camsutter"
   },
   "main": "main.js",
-  "scripts": {},
+  "scripts": {
+    "generate-docs": "jsdoc -c jsdoc.json"
+  },
   "dependencies": {
     "dom-parser": "^0.1.6",
     "image-extensions": "^1.1.0",
     "immer": "^9.0.6",
     "is-plain-object": "^5.0.0",
     "is-url": "^1.2.4",
+    "jsdoc": "~4.0.2",
     "jsrtf": "^0.0.3",
     "lodash": "^4.17.21",
     "pagedown": "^1.1.0",

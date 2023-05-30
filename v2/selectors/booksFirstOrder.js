@@ -21,17 +21,18 @@ const bookIdSelector = (_state, bookId) => {
 export const bookByIdSelector = createSelector(
   allBooksSelector,
   bookIdSelector,
-  (books, bookIdSelector) => {
-    return books[bookIdSelector]
+  (books, bookId) => {
+    return books[bookId]
   }
 )
 
-const bookIdSelector = (_state, bookId) => {
-  return bookId
-}
-export const singleBookSelector = createSelector(allBooksSelector, bookIdSelector, (books, bookId) => {
-  return books[bookId]
-})
+export const singleBookSelector = createSelector(
+  allBooksSelector,
+  bookIdSelector,
+  (books, bookId) => {
+    return books[bookId]
+  }
+)
 
 export const canDeleteBookSelector = createSelector(
   allBookIdsSelector,
