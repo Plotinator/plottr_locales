@@ -250,7 +250,7 @@ const api = (
     const data = documentRef && documentRef.data()
     if (!data) {
       log.warn(`No entry for ${path} on file ${fileId}`)
-      return {}
+      return [path, withData({})]
     }
     delete data.fileId
     delete data.clientId
@@ -264,8 +264,8 @@ const api = (
   }
 
   const fetchFlatArrayAtPath = (path, subPath) => (userId, fileId, clientId) => {
-    const { doc, getDoc } = database()
-    return getDoc(doc(`${path}/${fileId}/${subPath}`)).then(
+    const { collection, getDocs } = database()
+    return getDocs(collection(`${path}/${fileId}/${subPath}`)).then(
       onFetched(fileId, subPath, identity, clientId)
     )
   }
@@ -346,7 +346,7 @@ const api = (
         return Promise.all([
           fetchUI(userId, fileId, clientId),
           fetchChapters(userId, fileId, clientId),
-          fetchBeats(userId, fileId, clientId, file.file.version),
+          fetchBeats(userId, fileId, clientId, file[1].version),
           fetchCards(userId, fileId, clientId),
           fetchSeries(userId, fileId, clientId),
           fetchBooks(userId, fileId, clientId),
@@ -385,6 +385,7 @@ const api = (
       })
       .then(({ results, newOpenDate }) => {
         const json = results.reduce((acc, next) => {
+          console.log('next', next)
           const [key, value] = next
           const newValue =
             typeof acc[key] === 'undefined'
