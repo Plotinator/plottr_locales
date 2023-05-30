@@ -258,19 +258,19 @@ const api = (
   }
 
   const onFetchedArray = (fileId, path, withData, clientId) => (documentRef) => {
-    const authorisedDocuments = []
+    const documents = []
     documentRef.forEach((document) => {
       const data = document.data()
       if (data.deleted) return
 
-      authorisedDocuments.push({
+      documents.push({
         id: document.id,
         ...data,
-        fileURL: `plottr://${document.id}`,
+        fileURL: `plottr://${fileId}`,
         isCloudFile: true,
       })
     })
-    return [path, withData(authorisedDocuments)]
+    return [path, withData(documents)]
   }
 
   const fetchArrayAtPath = (path) => (userId, fileId, clientId) => {
@@ -314,7 +314,30 @@ const api = (
 
   const fetchUI = fetchObjectAtPath('ui')
   const fetchChapters = fetchArrayAtPath('chapters')
-  const fetchCards = fetchArrayAtPath('cards')
+  const fetchCards = (userId, fileId, clientId) => {
+    return fetchArrayAtPath('cards')(userId, fileId, clientId).then((entry) => {
+      const [_key, value] = entry
+      if (Array.isArray(value) && value.length > 0) {
+        return overwrite('oldCards', fileId, value, clientId)
+          .then(() => {
+            return Promise.all(
+              value.map((card) => {
+                return overwrite('cards', fileId, card, clientId)
+              })
+            )
+          })
+          .then(() => {
+            const { doc, deleteDoc } = database()
+            return deleteDoc(doc(`cards/${fileId}`))
+          })
+          .then(() => {
+            return entry
+          })
+      } else {
+        return entry
+      }
+    })
+  }
   const fetchSeries = fetchObjectAtPath('series')
   const fetchBooks = fetchObjectAtPath('books')
   const fetchCategories = fetchObjectAtPath('categories')
