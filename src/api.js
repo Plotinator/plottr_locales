@@ -439,10 +439,6 @@ const api = (
       })
       .then(({ results, newOpenDate }) => {
         const json = results.reduce((acc, next) => {
-<<<<<<< variant A
-          console.log('next', next)
->>>>>>> variant B
-======= end
           const [key, value] = next
           const newValue =
             typeof acc[key] === 'undefined'
