@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { PropTypes } from 'prop-types'
 import { connect } from 'react-redux'
 
@@ -92,6 +92,30 @@ const Listener = ({
 
     return unsubscribeFunction
   }, [offlineModeIsEnabled, selectedFile, userId, clientId, fileLoaded, isOffline, resuming])
+
+  const selectedFileVersionRef = useRef(null)
+  useEffect(() => {
+    if (fileLoaded && selectedFile) {
+      if (
+        selectedFileVersionRef.current &&
+        selectedFileVersionRef.current !== selectedFile.version
+      ) {
+        // The version changed.  We need to reload the window.
+        showErrorBox(
+          t('We need to reboot Plottr'),
+          t('You wont lose any work. Sorry for the inconvenience.')
+        ).then(() => {
+          window.location.reload()
+        })
+        return
+      } else {
+        selectedFileVersionRef.current = selectedFile.version
+        return
+      }
+    } else {
+      selectedFileVersionRef.current = null
+    }
+  }, [fileLoaded, selectedFile])
 
   // ====Pro Session====
 
