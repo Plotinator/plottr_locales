@@ -71,7 +71,7 @@ const NewFilesConnector = (connector) => {
                 className={cx('dashboard__new-files__item icon', {
                   disabled: isInOfflineMode,
                 })}
-                onClick={doCreateNewProject}
+                onClick={() => doCreateNewProject()}
               >
                 <IoIosDocument />
                 <div>{t('Create Blank Project')}</div>
