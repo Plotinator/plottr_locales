@@ -627,7 +627,10 @@ const api = (
 
   const patch = (path, fileId, payload, clientId) => {
     const { doc, updateDoc } = database()
-    return updateDoc(doc(`${path}/${fileId}`), {
+    const documentPath =
+      path === 'cards' ? `flatCards/${fileId}/cards/${payload.id}` : `${path}/${fileId}`
+
+    return updateDoc(doc(documentPath), {
       ...payload,
       clientId,
       fileId,
