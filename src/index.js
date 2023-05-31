@@ -224,6 +224,7 @@ export const wireUpAPI = (logger, actions, selectors) => {
     listenToFile: wiredUp.listenToFile,
     listenToBeats: wiredUp.listenToBeats,
     listenToCards: wiredUp.listenToCards,
+    listenToFlatCards: wiredUp.listenToFlatCards,
     listenToSeries: wiredUp.listenToSeries,
     listenToBooks: wiredUp.listenToBooks,
     listenToCategories: wiredUp.listenToCategories,
