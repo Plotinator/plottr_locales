@@ -64,11 +64,26 @@ const sync = (selectState) => (previous, present, patch, withData, store, action
     }
     if (!isEqual(previous[key], state[key])) {
       const payload = withData(key, state[key])
-      patch(key, fileId, payload, clientId).catch((error) => {
-        if (error.code === 'permission-denied') {
-          store.dispatch(permissionError(key, action, error.code))
-        }
-      })
+      if (key === 'cards') {
+        payload.forEach((card, index) => {
+          const oldCard = previous[key].find((otherCard) => {
+            return otherCard.id === card.id
+          })
+          if (oldCard !== card) {
+            patch(key, fileId, card, clientId).catch((error) => {
+              if (error.code === 'permission-denied') {
+                store.dispatch(permissionError(key, action, error.code))
+              }
+            })
+          }
+        })
+      } else {
+        patch(key, fileId, payload, clientId).catch((error) => {
+          if (error.code === 'permission-denied') {
+            store.dispatch(permissionError(key, action, error.code))
+          }
+        })
+      }
     }
   })
 
