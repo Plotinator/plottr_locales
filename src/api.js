@@ -475,7 +475,6 @@ const api = (
     }
     const setDeleted = (path) => patch(path, fileId, { deleted: true }, clientId)
     const setDeletedfile = () => setDeleted('file')
-    const setDeletedCards = () => setDeleted('cards')
     const setDeletedSeries = () => setDeleted('series')
     const setDeletedBooks = () => setDeleted('books')
     const setDeletedCategories = () => setDeleted('categories')
@@ -489,6 +488,25 @@ const api = (
     const setDeletedHierarchyLevels = () => setDeleted('hierarchyLevels')
     const setDeletedImages = () => setDeleted('images')
     const setDeletedAttributes = () => setDeleted('attributes')
+
+    const setEachDeleted = (path, subPath) => {
+      const { getDocs, collection } = database()
+      return getDocs(collection(`${path}/${fileId}/${subPath}`)).then((ref) => {
+        const entitys = []
+        ref.forEach((entity) => {
+          const data = entity.data()
+          if (data.deleted) return
+
+          entitys.push({ ...entity, id: entity.id })
+        })
+        return Promise.all(
+          entitys.map((entity) => {
+            return patch(path, fileId, { deleted: true, id: entity.id }, clientId)
+          })
+        )
+      })
+    }
+    const setDeletedCards = () => setEachDeleted('flatCards', 'cards')
 
     return setDeletedAuthorisation()
       .then(setDeletedfile)
