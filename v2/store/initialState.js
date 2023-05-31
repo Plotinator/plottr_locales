@@ -56,7 +56,7 @@ export const uiState = {
   orientation: 'horizontal',
   darkMode: false, // <- Deprecated, but keep here for a while for backwards compatibility.
   characterSort: 'name~asc',
-  characterFilter: null,
+  characterFilter: {},
   placeSort: 'name~asc',
   placeFilter: null,
   noteSort: 'title~asc',
@@ -85,7 +85,7 @@ export const uiState = {
     timeline: null,
   },
   attributeTabs: {
-    characters: null,
+    characters: 'all',
   },
   characterTab: {
     selectedCharacter: null,

@@ -26,7 +26,7 @@ export const linesForBookSelector = createSelector(
   }
 )
 
-export const firstLineForBookThunkSelector = createSelector(linesForBookSelector, (lines) => {
+export const firstLineForBookThunkSelector = createSelector(allLinesSelector, (lines) => {
   return (bookId) => {
     const linesInBook = lines.filter((l) => l && l.bookId == bookId)
     return sortBy(linesInBook, 'position')[0]

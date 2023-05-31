@@ -34,6 +34,7 @@ import {
   UNSAFE_SET_BEATS,
   ADD_CARD,
   REORDER_CARDS_WITHIN_LINE,
+  DUPLICATE_BOOK,
 } from '../constants/ActionTypes'
 import selectors from '../selectors'
 import { reduce, beatsByPosition, nextId as nextBeatId } from '../helpers/beats'
@@ -46,7 +47,7 @@ import { setTimelineView } from '../actions/ui'
 import { deleteLine } from '../actions/lines'
 import { reorderCardsWithinLine } from '../actions/cards'
 import { applyTemplate, moveLineActions } from '../helpers/templates'
-import { reorderList } from '../helpers/lines'
+import { reorderList } from '../helpers/lists'
 import { pinMovedLine } from '../actions/lines'
 
 const {
@@ -214,6 +215,26 @@ const root = (dataRepairers) => (state, action) => {
     case ADD_BOOK:
       return mainReducer(state, { ...action, newBookId: objectId(state.books.allIds) })
 
+    case DUPLICATE_BOOK: {
+      const beatsInNewBook = cloneDeep(state.beats[action.id])
+      const copiedCards = cloneDeep(
+        state.cards.filter((card) =>
+          Object.keys(beatsInNewBook.index).includes(String(card.beatId))
+        )
+      )
+      const copiedLines = cloneDeep(state.lines.filter((line) => action.id == line.bookId))
+
+      return mainReducer(state, {
+        ...action,
+        newBookId: objectId(state.books.allIds),
+        nextLineId: nextId(state.lines),
+        nextBeatId: nextBeatId(state.beats),
+        nextCardId: nextId(state.cards),
+        newBeats: beatsInNewBook,
+        newCards: copiedCards,
+        newLines: copiedLines,
+      })
+    }
     case ADD_BOOK_FROM_TEMPLATE:
       // cards from the template need to know the new ids of lines and beats from the template
       // the strategy here is to use the state's next id value + the template id's current value
