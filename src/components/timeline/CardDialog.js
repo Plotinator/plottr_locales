@@ -664,7 +664,6 @@ const CardDialogConnector = (connector) => {
                 id="tabs"
                 className="card-dialog__tabs"
                 onSelect={selectTab}
-                draggable
                 onTabDragOver={handleTabDragOver}
                 onDrop={handleDropTab}
               >
