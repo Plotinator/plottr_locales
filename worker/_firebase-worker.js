@@ -60,7 +60,7 @@ const updateAuthFileName = wiredUp.updateAuthFileName
 const listenToUI = wiredUp.listenToUI
 const listenToFile = wiredUp.listenToFile
 const listenToBeats = wiredUp.listenToBeats
-const listenToCards = wiredUp.listenToCards
+const listenToFlatCards = wiredUp.listenToFlatCards
 const listenToSeries = wiredUp.listenToSeries
 const listenToBooks = wiredUp.listenToBooks
 const listenToCategories = wiredUp.listenToCategories
@@ -251,7 +251,7 @@ self.onmessage = (event) => {
         fileVersion,
         replyWithReduxAction
       )
-      const unsubscribeToCards = listenToCards(userId, fileId, clientId, replyWithReduxAction)
+      const unsubscribeToCards = listenToFlatCards(userId, fileId, clientId, replyWithReduxAction)
       const unsubscribeToSeries = listenToSeries(userId, fileId, clientId, replyWithReduxAction)
       const unsubscribeToBooks = listenToBooks(userId, fileId, clientId, replyWithReduxAction)
       const unsubscribeToCategories = listenToCategories(
