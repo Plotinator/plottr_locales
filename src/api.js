@@ -22,7 +22,11 @@ const api = (
   isDesktop
 ) => {
   const BASE_API_URL =
-    (!isDesktop && development) || !baseAPIDomain ? '' : `https://${baseAPIDomain || ''}`
+    (!isDesktop && development) || !baseAPIDomain
+      ? ''
+      : baseAPIDomain === '/'
+      ? ''
+      : `https://${baseAPIDomain || ''}`
 
   const defaultErrorHandler = (error) => {
     log.error('Error communicating with Firebase.', error.message, error)
