@@ -251,6 +251,7 @@ export const wireUpAPI = (logger, actions, selectors) => {
     hasUndefinedValue: wiredUp.hasUndefinedValue,
     patch: wiredUp.patch,
     overwrite: wiredUp.overwrite,
+    syncOverwrite: wiredUp.syncOverwrite,
     shareDocument: wiredUp.shareDocument,
     releaseRCELock: wiredUp.releaseRCELock,
     lockRCE: wiredUp.lockRCE,
