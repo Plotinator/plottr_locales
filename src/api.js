@@ -1,7 +1,7 @@
 import semverGt from 'semver/functions/gt'
 import axios from 'axios'
 import { DateTime } from 'luxon'
-import { isEqual, identity, isObject } from 'lodash'
+import { isEqual, identity, isObject, omit } from 'lodash'
 
 import { removeSystemKeys, ARRAY_KEYS, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
 
@@ -152,11 +152,47 @@ const api = (
         delete data.fileId
         delete data.clientId
         withAction(
-          patchActions(path)[loadFunctionKey](
+          patchAction[loadFunctionKey](
             patching,
             withData({ ...usingFromDocRef(documentRef), ...data })
           )
         )
+      },
+      error: (error) => {
+        log.error(
+          `Error listening to ${fileId} at ${path} with a loadFunctionKey of ${loadFunctionKey}`,
+          error.message
+        )
+      },
+    }
+  }
+
+  const handleFlatArraySnapshot = (
+    withAction,
+    fileId,
+    path,
+    withData,
+    patching,
+    clientId,
+    loadFunctionKey = 'load',
+    usingFromDocRef = () => ({})
+  ) => {
+    return {
+      next: (documentRef) => {
+        const results = []
+        documentRef.forEach((document) => {
+          results.push(omit(document.data(), ['fileId', 'clientId']))
+        })
+        const changed = results.some((document) => {
+          return document.clientId !== clientId
+        })
+        if (!changed) return
+        const patchAction = patchActions(path === 'flatCards' ? 'cards' : path)
+        if (!patchAction) {
+          log.error('No patch action for ', path)
+          return
+        }
+        withAction(patchAction[loadFunctionKey](patching, withData(results)))
       },
       error: (error) => {
         log.error(
@@ -211,7 +247,7 @@ const api = (
       const { collection, onSnapshot, query } = database()
       return onSnapshot(
         query(collection(`${path}/${fileId}/${subPath}`)),
-        handleSnapshot(withAction, fileId, path, withData, true, clientId)
+        handleFlatArraySnapshot(withAction, fileId, path, withData, true, clientId)
       )
     }
 
@@ -260,8 +296,9 @@ const api = (
     return listenForFlatArrayAtPath('flatCards', 'cards')(
       userId,
       fileId,
+      clientId,
       withAction,
-      deserialiseRootKeys,
+      (xs) => xs.map(deserialiseRootKeys('cards')),
       errorHandler
     )
   }
