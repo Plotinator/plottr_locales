@@ -208,9 +208,9 @@ const api = (
   const listenForFlatArrayAtPath =
     (path, subPath) =>
     (userId, fileId, clientId, withAction, withData, errorHandler = defaultErrorHandler) => {
-      const { doc, onSnapshot } = database()
+      const { collection, onSnapshot, query } = database()
       return onSnapshot(
-        doc(`${path}/${fileId}/${subPath}`),
+        query(collection(`${path}/${fileId}/${subPath}`)),
         handleSnapshot(withAction, fileId, path, withData, true, clientId)
       )
     }
@@ -690,6 +690,7 @@ const api = (
 
     return setDoc(doc(documentPath), {
       ...preparedPayload,
+      id: payload.id,
       clientId,
       fileId,
     })
