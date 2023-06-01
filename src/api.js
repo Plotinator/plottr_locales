@@ -80,8 +80,18 @@ const api = (
     })
   }
 
+  const FLAT_CARD_PATH_MAPPING = {
+    flatCards: 'cards',
+  }
+
+  const reinterpretPath = (path) => {
+    const mappedValue = FLAT_CARD_PATH_MAPPING[path]
+    return typeof mappedValue !== 'undefined' ? mappedValue : path
+  }
+
   const patchActions = (path) => {
-    switch (path) {
+    const reinterpretedPath = reinterpretPath(path)
+    switch (reinterpretedPath) {
       case 'ui':
         return actions.ui
       case 'beats':
@@ -181,7 +191,7 @@ const api = (
           return document.clientId !== clientId
         })
         if (!changed) return
-        const patchAction = patchActions(path === 'flatCards' ? 'cards' : path)
+        const patchAction = patchActions(path)
         if (!patchAction) {
           log.error('No patch action for ', path)
           return
@@ -393,13 +403,19 @@ const api = (
   const toFirestoreArray = (array) =>
     array.reduce((acc, value, index) => Object.assign(acc, { [index]: value }), {})
 
+  const FLAT_ARRAY_KEYS = ['cards']
+
+  const isFlatArrayKey = (key) => {
+    return FLAT_ARRAY_KEYS.indexOf(key) !== -1
+  }
+
   const overwriteAllKeys = (fileId, clientId, state) => {
     const requests = []
     Object.keys(state).forEach((key) => {
       if (SYSTEM_REDUCER_KEYS.indexOf(key) !== -1) {
         return
       }
-      if (key === 'cards') {
+      if (isFlatArrayKey(key)) {
         state[key].forEach((payload) => {
           requests.push(
             overwrite(key, fileId, payload, clientId)
@@ -680,10 +696,13 @@ const api = (
     )
   }
 
+  const computeDocumentPath = (path, fileId, payload = {}) => {
+    return isFlatArrayKey(path) ? `flatCards/${fileId}/cards/${payload.id}` : `${path}/${fileId}`
+  }
+
   const patch = (path, fileId, payload, clientId) => {
     const { doc, updateDoc } = database()
-    const documentPath =
-      path === 'cards' ? `flatCards/${fileId}/cards/${payload.id}` : `${path}/${fileId}`
+    const documentPath = computeDocumentPath(path, fileId, payload)
 
     return updateDoc(doc(documentPath), {
       ...payload,
@@ -694,8 +713,7 @@ const api = (
 
   const patchOrCreate = (path, fileId, payload, clientId) => {
     const { doc, setDoc } = database()
-    const documentPath =
-      path === 'cards' ? `flatCards/${fileId}/cards/${payload.id}` : `${path}/${fileId}`
+    const documentPath = computeDocumentPath(path, fileId, payload)
 
     return setDoc(
       doc(documentPath),
@@ -710,8 +728,8 @@ const api = (
 
   const overwrite = (path, fileId, payload, clientId) => {
     const { doc, setDoc } = database()
-    const documentPath =
-      path === 'cards' ? `flatCards/${fileId}/cards/${payload.id}` : `${path}/${fileId}`
+    const documentPath = computeDocumentPath(path, fileId, payload)
+
     return setDoc(doc(documentPath), {
       ...payload,
       clientId,
