@@ -1,7 +1,7 @@
 import semverGt from 'semver/functions/gt'
 import axios from 'axios'
 import { DateTime } from 'luxon'
-import { isEqual, identity, isObject, omit } from 'lodash'
+import { isEqual, identity, isObject, omit, capitalize } from 'lodash'
 
 import { removeSystemKeys, ARRAY_KEYS, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
 
@@ -84,8 +84,21 @@ const api = (
     })
   }
 
+  const FLAT_CARD_PATH_MAPPING = {
+    flatCards: 'cards',
+    flatNotes: 'notes',
+    flatPlaces: 'places',
+    flatCharacters: 'characters',
+  }
+
+  const reinterpretPath = (path) => {
+    const mappedValue = FLAT_CARD_PATH_MAPPING[path]
+    return typeof mappedValue !== 'undefined' ? mappedValue : path
+  }
+
   const patchActions = (path) => {
-    switch (path) {
+    const reinterpretedPath = reinterpretPath(path)
+    switch (reinterpretedPath) {
       case 'ui':
         return actions.ui
       case 'beats':
@@ -185,7 +198,7 @@ const api = (
           return document.clientId !== clientId
         })
         if (!changed) return
-        const patchAction = patchActions(path === 'flatCards' ? 'cards' : path)
+        const patchAction = patchActions(path)
         if (!patchAction) {
           log.error('No patch action for ', path)
           return
@@ -285,6 +298,9 @@ const api = (
   const listenToImages = listenForObjectAtPath('images')
   const listenToAttributes = listenForObjectAtPath('attributes')
   const listenToFlatCards = listenForFlatArrayAtPath('flatCards', 'cards')
+  const listenToFlatCharacters = listenForFlatArrayAtPath('flatCharacters', 'characters')
+  const listenToFlatNotes = listenForFlatArrayAtPath('flatNotes', 'notes')
+  const listenToFlatPlaces = listenForFlatArrayAtPath('flatPlaces', 'places')
 
   const onFetched = (fileId, path, withData, clientId) => (documentRef) => {
     const data = documentRef && documentRef.data()
@@ -352,50 +368,63 @@ const api = (
     })
   }
 
+  const fetchOldArrayObject = (path) => (userId, fileId, clientId) => {
+    {
+      return fetchArrayAtPath(path)(userId, fileId, clientId).then((entry) => {
+        const [_key, value] = entry
+        if (Array.isArray(value) && value.length > 0) {
+          const timestamp = new Date().toISOString()
+          return patchOrCreate(`old${capitalize(path)}`, fileId, { [timestamp]: value }, clientId)
+            .then(() => {
+              return Promise.all(
+                value.map((entity) => {
+                  return overwrite(path, fileId, entity, clientId)
+                })
+              )
+            })
+            .then(() => {
+              const { doc, deleteDoc } = database()
+              return deleteDoc(doc(`${path}/${fileId}`))
+            })
+            .then(() => {
+              return entry
+            })
+        } else {
+          return entry
+        }
+      })
+    }
+  }
+
   const fetchUI = fetchObjectAtPath('ui')
   const fetchChapters = fetchArrayAtPath('chapters')
-  const fetchCards = (userId, fileId, clientId) => {
-    return fetchArrayAtPath('cards')(userId, fileId, clientId).then((entry) => {
-      const [_key, value] = entry
-      if (Array.isArray(value) && value.length > 0) {
-        const timestamp = new Date().toISOString()
-        return patchOrCreate('oldCards', fileId, { [timestamp]: value }, clientId)
-          .then(() => {
-            return Promise.all(
-              value.map((card) => {
-                return overwrite('cards', fileId, card, clientId)
-              })
-            )
-          })
-          .then(() => {
-            const { doc, deleteDoc } = database()
-            return deleteDoc(doc(`cards/${fileId}`))
-          })
-          .then(() => {
-            return entry
-          })
-      } else {
-        return entry
-      }
-    })
-  }
+  const fetchCards = fetchOldArrayObject('cards')
   const fetchSeries = fetchObjectAtPath('series')
   const fetchBooks = fetchObjectAtPath('books')
   const fetchCategories = fetchObjectAtPath('categories')
-  const fetchCharacters = fetchArrayAtPath('characters')
+  const fetchCharacters = fetchOldArrayObject('characters')
   const fetchCustomAttributes = fetchObjectAtPath('customAttributes')
   const fetchEditors = fetchObjectAtPath('featureFlags')
   const fetchLines = fetchArrayAtPath('lines')
-  const fetchNotes = fetchArrayAtPath('notes')
-  const fetchPlaces = fetchArrayAtPath('places')
+  const fetchNotes = fetchOldArrayObject('notes')
+  const fetchPlaces = fetchOldArrayObject('places')
   const fetchTags = fetchArrayAtPath('tags')
   const fetchhierarchyLevels = fetchObjectAtPath('hierarchyLevels')
   const fetchImages = fetchObjectAtPath('images')
   const fetchAttributes = fetchObjectAtPath('attributes')
   const fetchFlatCards = fetchFlatArrayAtPath('flatCards', 'cards')
+  const fetchFlatCharacters = fetchFlatArrayAtPath('flatCharacters', 'characters')
+  const fetchFlatNotes = fetchFlatArrayAtPath('flatNotes', 'notes')
+  const fetchFlatPlaces = fetchFlatArrayAtPath('flatPlaces', 'places')
 
   const toFirestoreArray = (array) =>
     array.reduce((acc, value, index) => Object.assign(acc, { [index]: value }), {})
+
+  const FLAT_ARRAY_KEYS = ['cards', 'notes', 'characters', 'places']
+
+  const isFlatArrayKey = (key) => {
+    return FLAT_ARRAY_KEYS.indexOf(key) !== -1
+  }
 
   const overwriteAllKeys = (fileId, clientId, state) => {
     const requests = []
@@ -403,7 +432,7 @@ const api = (
       if (SYSTEM_REDUCER_KEYS.indexOf(key) !== -1) {
         return
       }
-      if (key === 'cards') {
+      if (isFlatArrayKey(key)) {
         state[key].forEach((payload) => {
           requests.push(
             overwrite(key, fileId, payload, clientId)
@@ -457,6 +486,9 @@ const api = (
           fetchImages(userId, fileId, clientId),
           fetchAttributes(userId, fileId, clientId),
           fetchFlatCards(userId, fileId, clientId),
+          fetchFlatCharacters(userId, fileId, clientId),
+          fetchFlatNotes(userId, fileId, clientId),
+          fetchFlatPlaces(userId, fileId, clientId),
         ]).then((results) => {
           return [file, ...results]
         })
@@ -684,10 +716,15 @@ const api = (
     )
   }
 
+  const computeDocumentPath = (path, fileId, payload = {}) => {
+    return isFlatArrayKey(path)
+      ? `flat${capitalize(path)}/${fileId}/${path}/${payload.id}`
+      : `${path}/${fileId}`
+  }
+
   const patch = (path, fileId, payload, clientId) => {
     const { doc, updateDoc } = database()
-    const documentPath =
-      path === 'cards' ? `flatCards/${fileId}/cards/${payload.id}` : `${path}/${fileId}`
+    const documentPath = computeDocumentPath(path, fileId, payload)
 
     return updateDoc(doc(documentPath), {
       ...payload,
@@ -698,8 +735,7 @@ const api = (
 
   const patchOrCreate = (path, fileId, payload, clientId) => {
     const { doc, setDoc } = database()
-    const documentPath =
-      path === 'cards' ? `flatCards/${fileId}/cards/${payload.id}` : `${path}/${fileId}`
+    const documentPath = computeDocumentPath(path, fileId, payload)
 
     return setDoc(
       doc(documentPath),
@@ -714,8 +750,8 @@ const api = (
 
   const overwrite = (path, fileId, payload, clientId) => {
     const { doc, setDoc } = database()
-    const documentPath =
-      path === 'cards' ? `flatCards/${fileId}/cards/${payload.id}` : `${path}/${fileId}`
+    const documentPath = computeDocumentPath(path, fileId, payload)
+
     return setDoc(doc(documentPath), {
       ...payload,
       clientId,
@@ -1181,6 +1217,9 @@ const api = (
     listenToImages,
     listenToAttributes,
     listenToFlatCards,
+    listenToFlatCharacters,
+    listenToFlatNotes,
+    listenToFlatPlaces,
     toFirestoreArray,
     overwriteAllKeys,
     initialFetch,
