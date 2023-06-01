@@ -1,6 +1,6 @@
 export const serialiseRootKeys = (key) => (object) => {
   switch (key) {
-    case 'cards': {
+    case 'cardsz': {
       return Object.entries(object).reduce((acc, entry) => {
         const [key, value] = entry
         return {
@@ -17,7 +17,7 @@ export const serialiseRootKeys = (key) => (object) => {
 
 export const deserialiseRootKeys = (key) => (object) => {
   switch (key) {
-    case 'cards': {
+    case 'cardsz': {
       return Object.entries(object).reduce((acc, entry) => {
         const [key, value] = entry
         try {
