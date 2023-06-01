@@ -714,7 +714,7 @@ const api = (
 
   const computeDocumentPath = (path, fileId, payload = {}) => {
     return isFlatArrayKey(path)
-      ? `flat${path}/${fileId}/${path}/${payload.id}`
+      ? `flat${capitalize(path)}/${fileId}/${path}/${payload.id}`
       : `${path}/${fileId}`
   }
 
