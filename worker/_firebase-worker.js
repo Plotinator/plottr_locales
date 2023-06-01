@@ -295,6 +295,30 @@ self.onmessage = (event) => {
         clientId,
         replyWithReduxAction
       )
+      const unsubscribeToFlatCards = wiredUp.listenToFlatCards(
+        userId,
+        fileId,
+        clientId,
+        replyWithReduxAction
+      )
+      const unsubscribeToFlatCharacters = wiredUp.listenToFlatCharacters(
+        userId,
+        fileId,
+        clientId,
+        replyWithReduxAction
+      )
+      const unsubscribeToFlatNotes = wiredUp.listenToFlatNotes(
+        userId,
+        fileId,
+        clientId,
+        replyWithReduxAction
+      )
+      const unsubscribeToFlatPlaces = wiredUp.listenToFlatPlaces(
+        userId,
+        fileId,
+        clientId,
+        replyWithReduxAction
+      )
       const unsubscribe = () => {
         unsubscribeToUI()
         unsubscribeToFile()
@@ -313,6 +337,10 @@ self.onmessage = (event) => {
         unsubscribeToLevels()
         unsubscribeToImages()
         unsubscribeToAttributes()
+        unsubscribeToFlatCards()
+        unsubscribeToFlatCharacters()
+        unsubscribeToFlatNotes()
+        unsubscribeToFlatPlaces()
       }
       unsubscribeFunctions.set(messageId, unsubscribe)
       return
