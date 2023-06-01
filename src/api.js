@@ -354,7 +354,8 @@ const api = (
     return fetchArrayAtPath('cards')(userId, fileId, clientId).then((entry) => {
       const [_key, value] = entry
       if (Array.isArray(value) && value.length > 0) {
-        return overwrite('oldCards', fileId, value, clientId)
+        const timestamp = new Date().toISOString()
+        return patchOrCreate('oldCards', fileId, { [timestamp]: value }, clientId)
           .then(() => {
             return Promise.all(
               value.map((card) => {
@@ -689,6 +690,22 @@ const api = (
       clientId,
       fileId,
     })
+  }
+
+  const patchOrCreate = (path, fileId, payload, clientId) => {
+    const { doc, setDoc } = database()
+    const documentPath =
+      path === 'cards' ? `flatCards/${fileId}/cards/${payload.id}` : `${path}/${fileId}`
+
+    return setDoc(
+      doc(documentPath),
+      {
+        ...payload,
+        clientId,
+        fileId,
+      },
+      { merge: true }
+    )
   }
 
   const overwrite = (path, fileId, payload, clientId) => {
