@@ -252,9 +252,6 @@ export const firebaseWorker = (logger, mintSessionClientId) => {
   const overwrite = (path, fileId, payload, clientId) => {
     return sendPromise(OVERWRITE, { path, fileId, payload, clientId })
   }
-  const syncOverwrite = (path, fileId, payload, clientId) => {
-    return sendPromise(SYNC_OVERWRITE, { path, fileId, payload, clientId })
-  }
   const shareDocument = (userId, fileId, emailAddress, permission) => {
     return sendPromise(SHARE_DOCUMENT, { userId, fileId, emailAddress, permission })
   }
@@ -459,7 +456,6 @@ export const firebaseWorker = (logger, mintSessionClientId) => {
     currentUser,
     patch,
     overwrite,
-    syncOverwrite,
     shareDocument,
     releaseRCELock,
     lockRCE,

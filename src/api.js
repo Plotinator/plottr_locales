@@ -5,8 +5,6 @@ import { isEqual, identity, isObject, omit } from 'lodash'
 
 import { removeSystemKeys, ARRAY_KEYS, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
 
-import { serialiseRootKeys, deserialiseRootKeys } from './serialiseRootKeys'
-
 /**
  * auth, database and storage should be thunks that produce instances
  * of the correspending firebase objects from either the firebase JS
@@ -239,11 +237,11 @@ const api = (
 
   const listenForFlatArrayAtPath =
     (path, subPath) =>
-    (userId, fileId, clientId, withAction, withData, errorHandler = defaultErrorHandler) => {
+    (userId, fileId, clientId, withAction, errorHandler = defaultErrorHandler) => {
       const { collection, onSnapshot, query } = database()
       return onSnapshot(
         query(collection(`${path}/${fileId}/${subPath}`)),
-        handleFlatArraySnapshot(withAction, fileId, path, withData, true, clientId)
+        handleFlatArraySnapshot(withAction, fileId, path, identity, true, clientId)
       )
     }
 
@@ -282,22 +280,7 @@ const api = (
   const listenToHierarchyLevels = listenForObjectAtPath('hierarchyLevels')
   const listenToImages = listenForObjectAtPath('images')
   const listenToAttributes = listenForObjectAtPath('attributes')
-  const listenToFlatCards = (
-    userId,
-    fileId,
-    clientId,
-    withAction,
-    errorHandler = defaultErrorHandler
-  ) => {
-    return listenForFlatArrayAtPath('flatCards', 'cards')(
-      userId,
-      fileId,
-      clientId,
-      withAction,
-      (xs) => xs.map(deserialiseRootKeys('cards')),
-      errorHandler
-    )
-  }
+  const listenToFlatCards = listenForFlatArrayAtPath('flatCards', 'cards')
 
   const onFetched = (fileId, path, withData, clientId) => (documentRef) => {
     const data = documentRef && documentRef.data()
@@ -404,11 +387,7 @@ const api = (
   const fetchhierarchyLevels = fetchObjectAtPath('hierarchyLevels')
   const fetchImages = fetchObjectAtPath('images')
   const fetchAttributes = fetchObjectAtPath('attributes')
-  const fetchFlatCards = (userId, fileId, clientId, errorHandler = defaultErrorHandler) => {
-    return fetchFlatArrayAtPath('flatCards', 'cards')(userId, fileId, clientId).then((result) => {
-      return [result[0], result[1].map(deserialiseRootKeys('cards'))]
-    })
-  }
+  const fetchFlatCards = fetchFlatArrayAtPath('flatCards', 'cards')
 
   const toFirestoreArray = (array) =>
     array.reduce((acc, value, index) => Object.assign(acc, { [index]: value }), {})
@@ -707,23 +686,6 @@ const api = (
 
     return updateDoc(doc(documentPath), {
       ...payload,
-      clientId,
-      fileId,
-    })
-  }
-
-  // syncOverwrite is like overwrite, but it serialises the values on
-  // objects in flat arrays first to ensure that changes trigger
-  // snapshots.
-  const syncOverwrite = (path, fileId, payload, clientId) => {
-    const { doc, setDoc } = database()
-    const documentPath =
-      path === 'cards' ? `flatCards/${fileId}/cards/${payload.id}` : `${path}/${fileId}`
-    const preparedPayload = path === 'cards' ? serialiseRootKeys(path)(payload) : payload
-
-    return setDoc(doc(documentPath), {
-      ...preparedPayload,
-      id: payload.id,
       clientId,
       fileId,
     })
@@ -1210,7 +1172,6 @@ const api = (
     currentUser,
     hasUndefinedValue,
     patch,
-    syncOverwrite,
     overwrite,
     shareDocument,
     releaseRCELock,

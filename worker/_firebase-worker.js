@@ -21,7 +21,6 @@ import {
   HAS_UNDEFINED_VALUE,
   PATCH,
   OVERWRITE,
-  SYNC_OVERWRITE,
   SHARE_DOCUMENT,
   PUBLISH_RCE_OPERATIONS,
   CATCHUP_EDITS_SEEN,
@@ -86,7 +85,6 @@ const onSessionChange = wiredUp.onSessionChange
 const currentUser = wiredUp.currentUser
 const patch = wiredUp.patch
 const overwrite = wiredUp.overwrite
-const syncOverwrite = wiredUp.syncOverwrite
 const shareDocument = wiredUp.shareDocument
 const releaseRCELock = wiredUp.releaseRCELock
 const lockRCE = wiredUp.lockRCE
@@ -463,19 +461,6 @@ self.onmessage = (event) => {
         .then(replyToPromise(OVERWRITE))
         .catch((error) => {
           logger.error(`Error overwriting file with id <${fileId}> at path ${path}`, error.message)
-          replyToPromiseWithError(type, error.message)
-        })
-      return
-    }
-    case SYNC_OVERWRITE: {
-      const { path, fileId, payload, clientId } = messagePayload
-      syncOverwrite(path, fileId, payload, clientId)
-        .then(replyToPromise(OVERWRITE))
-        .catch((error) => {
-          logger.error(
-            `Error sync-overwriting file with id <${fileId}> at path ${path}`,
-            error.message
-          )
           replyToPromiseWithError(type, error.message)
         })
       return
