@@ -190,6 +190,8 @@ const api = (
         documentRef.forEach((document) => {
           results.push(omit(document.data(), ['fileId', 'clientId']))
         })
+        // TODO: This isn't correct.  We need a better way to check
+        // whether we should accept a card or not.
         const changed = results.some((document) => {
           return document.clientId !== clientId
         })
