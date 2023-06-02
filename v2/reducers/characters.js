@@ -483,7 +483,11 @@ const characters =
             ...applyToCustomAttributes(
               character,
               normalizeRCEContent,
-              action.data.customAttributes.characters,
+              action.data.customAttributes.characters.filter(({ name }) => {
+                // Special case this attribute name because it blows
+                // up if we try to normalise new attributes.
+                return name !== 'attributes'
+              }),
               'paragraph'
             ),
             notes: normalizeRCEContent(character.notes),

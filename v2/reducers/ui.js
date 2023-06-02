@@ -1,4 +1,4 @@
-import { omit, isEmpty, identity } from 'lodash'
+import { omit, isEmpty, identity, groupBy, countBy } from 'lodash'
 
 import {
   ADD_PLACES_ATTRIBUTE,
@@ -70,6 +70,7 @@ import {
   OPEN_RESTRUCTURE_TIMELINE_MODAL,
   CLOSE_RESTRUCTURE_TIMELINE_MODAL,
   DELETE_LINE,
+  LOAD_LINES,
 } from '../constants/ActionTypes'
 import { ui as defaultUI } from '../store/initialState'
 import { newFileUI } from '../store/newFileState'
@@ -166,6 +167,26 @@ const updateUI = (state, action) => {
         }
       }
       return state
+    }
+
+    case LOAD_LINES: {
+      const linesPerBook = groupBy(action.lines, 'bookId')
+      const pinnedPlotlines = {}
+
+      Object.entries(linesPerBook).forEach(([bookId, group]) => {
+        const pinnedCount = countBy(group, 'isPinned')[true] || 0
+        if (pinnedCount > 0) {
+          pinnedPlotlines[String(bookId)] = pinnedCount
+        }
+      })
+
+      return {
+        ...state,
+        timeline: {
+          ...state.timeline,
+          pinnedPlotlines,
+        },
+      }
     }
 
     case NAVIGATE_TO_BOOK_TIMELINE:
