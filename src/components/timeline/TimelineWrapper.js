@@ -108,6 +108,7 @@ const TimelineWrapperConnector = (connector) => {
     const [isSmallerThanToolbar, setIsSmallerThanToolbar] = useState(false)
     const [filterIsOpen, setFilterIsOpen] = useState(false)
 
+    const orientationIsSmallRef = useRef(false)
     const scrollTimeoutRef = useRef(null)
     const tableRef = useRef(null)
     const scrollableRef = useRef(
@@ -115,6 +116,18 @@ const TimelineWrapperConnector = (connector) => {
         return timelineBundle.isSmall ? tableRef.current.parentElement : tableRef.current
       })
     )
+
+    useEffect(() => {
+      if (
+        !orientationIsSmallRef.current ||
+        orientationIsSmallRef.current !== timelineBundle.isSmall
+      ) {
+        scrollableRef.current = new Scrollable(() => {
+          return timelineBundle.isSmall ? tableRef.current.parentElement : tableRef.current
+        })
+        orientationIsSmallRef.current = timelineBundle.isSmall
+      }
+    }, [timelineBundle.isSmall])
 
     useEffect(() => {
       if (tableRef.current) tableRef.current.onscroll = scrollHandler
