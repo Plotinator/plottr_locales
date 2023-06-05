@@ -80,7 +80,7 @@ const HelpHomeConnector = (connector) => {
             <Button bsSize="large" bsStyle="link" onClick={l('plottr.com/support')}>
               {t('Request a Feature')}
             </Button>
-            <Button bsSize="large" bsStyle="link" onClick={l('plottr.com/our-roadmap')}>
+            <Button bsSize="large" bsStyle="link" onClick={l('plottr.com/roadmap/')}>
               {t('Roadmap')}
             </Button>
           </div>
