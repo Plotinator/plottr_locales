@@ -72,7 +72,7 @@ const BackupFileDisplayConnector = (connector) => {
     return (
       <div className="dashboard__backups__item">
         <div>{renderFileDetails(file)}</div>
-        {!hasCurrentProLicense || (hasCurrentProLicense && isCloudBackup) ? (
+        {!isCloudBackup || (hasCurrentProLicense && isCloudBackup) ? (
           <div className="dashboard__backups__item-actions">
             <div className={cx('dashboard__backups__item-button', { active: showActions })}>
               <Button bsSize="xs" bsStyle="primary" onClick={handleMakeCopy}>
