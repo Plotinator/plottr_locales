@@ -22,6 +22,7 @@ const UnMemoisedMarkButton = ({ mark, icon, editor, logger }) => {
 
   return (
     <Button
+      className={markIsActive ? 'active' : ''}
       bsStyle={markIsActive ? 'primary' : 'default'}
       onMouseDown={(event) => {
         event.preventDefault()
