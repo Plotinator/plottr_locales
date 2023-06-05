@@ -30,7 +30,7 @@ const BackupsFolderConnector = (connector) => {
       // group by file name (without Session Start) to put them in "projects"
       // display each project as another row
       return Object.entries(folder.groups).map(([groupName, files]) => {
-        const displayableGroupName = makeDisplayableGroupName(groupName, files[0])
+        const displayableGroupName = makeDisplayableGroupName(files[0].name, files[0])
         let row = null
         if (displayableGroupName?.toLowerCase().includes(searchTerm.toLowerCase())) {
           row = <BackupsProjectRow folder={folder} groupName={displayableGroupName} files={files} />
