@@ -201,30 +201,41 @@ export const migrateSaveAndOpen = (json, oldUrl, newFileURL) => {
 
 export const createAndOpenCopy = (oldPath, oldFileName, newFileName) => {
   return whenClientIsReady(({ join, findUniqueNameInPath, currentAppSettings, readFile }) => {
-    currentAppSettings().then((settings) => {
-      join(oldPath, oldFileName).then((oldFullPath) => {
-        readFile(oldFullPath).then((fileText) => {
+    return currentAppSettings().then((settings) => {
+      return join(oldPath, helpers.file.ensureEndsInPltr(oldFileName)).then((oldFullPath) => {
+        return readFile(oldFullPath).then((fileText) => {
           const fileJSON = JSON.parse(fileText)
           if (settings.user.defaultFolder && settings.user.defaultFolderLocation) {
-            join(settings.user.defaultFolderLocation, newFileName).then((newFullPath) => {
-              findUniqueNameInPath(newFullPath).then((uniquePath) => {
+            return join(
+              settings.user.defaultFolderLocation,
+              helpers.file.ensureEndsInPltr(newFileName)
+            ).then((newFullPath) => {
+              return findUniqueNameInPath(newFullPath).then((uniquePath) => {
                 const newFileURL = helpers.file.filePathToFileURL(uniquePath)
-                migrateSaveAndOpen(fileJSON, oldFullPath, newFileURL)
+                return migrateSaveAndOpen(fileJSON, oldFullPath, newFileURL)
               })
             })
           } else {
-            userDocumentsPath().then((docPath) => {
-              join(docPath, newFileName).then((newFullPath) => {
-                const title = t('Where would you like to save this copy?')
-                const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
-                showSaveDialog(filters, title, newFullPath).then((fileName) => {
-                  if (fileName) {
-                    const newFilePath = helpers.file.ensureEndsInPltr(fileName)
-                    const newFileURL = helpers.file.filePathToFileURL(newFilePath)
-                    migrateSaveAndOpen(fileJSON, oldFullPath, newFileURL)
-                  }
-                })
-              })
+            return userDocumentsPath().then((docPath) => {
+              return join(docPath, helpers.file.ensureEndsInPltr(newFileName)).then(
+                (newFullPath) => {
+                  const title = t('Where would you like to save this copy?')
+                  const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
+                  return showSaveDialog(filters, title, newFullPath).then((fileName) => {
+                    if (fileName) {
+                      const newFilePath = helpers.file.ensureEndsInPltr(fileName)
+                      const newFileURL = helpers.file.filePathToFileURL(newFilePath)
+                      return migrateSaveAndOpen(fileJSON, oldFullPath, newFileURL)
+                    } else {
+                      return Promise.reject(
+                        new Error(
+                          `Failed to create new file name for creating and opening a copy: ${newFileName}`
+                        )
+                      )
+                    }
+                  })
+                }
+              )
             })
           }
         })
