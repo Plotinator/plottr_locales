@@ -184,32 +184,41 @@ const api = (
     loadFunctionKey = 'load',
     usingFromDocRef = () => ({})
   ) => {
-    return {
-      next: (documentRef) => {
-        const results = []
-        documentRef.forEach((document) => {
-          results.push(omit(document.data(), ['fileId', 'clientId']))
-        })
-        // TODO: This isn't correct.  We need a better way to check
-        // whether we should accept a card or not.
-        const changed = results.some((document) => {
-          return document.clientId !== clientId
-        })
-        if (!changed) return
-        const patchAction = patchActions(path)
-        if (!patchAction) {
-          log.error('No patch action for ', path)
-          return
-        }
-        withAction(patchAction[loadFunctionKey](patching, withData(results)))
-      },
-      error: (error) => {
-        log.error(
-          `Error listening to ${fileId} at ${path} with a loadFunctionKey of ${loadFunctionKey}`,
-          error.message
-        )
-      },
-    }
+    return (() => {
+      let lastResults = []
+
+      return {
+        next: (documentRef) => {
+          const results = []
+          documentRef.forEach((document) => {
+            results.push(document.data())
+          })
+          // NOTE: We can't only rely on the client id anymore.
+          const unChanged = results.every((document) => {
+            return (
+              document.clientId === clientId ||
+              lastResults.find((previousDocument) => {
+                return isEqual(document, previousDocument)
+              })
+            )
+          })
+          if (unChanged) return
+          lastResults = results
+          const patchAction = patchActions(path)
+          if (!patchAction) {
+            log.error('No patch action for ', path)
+            return
+          }
+          withAction(patchAction[loadFunctionKey](patching, withData(results)))
+        },
+        error: (error) => {
+          log.error(
+            `Error listening to ${fileId} at ${path} with a loadFunctionKey of ${loadFunctionKey}`,
+            error.message
+          )
+        },
+      }
+    })()
   }
 
   const listenToFile = (
