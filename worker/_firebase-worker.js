@@ -260,12 +260,6 @@ self.onmessage = (event) => {
         clientId,
         replyWithReduxAction
       )
-      const unsubscribeToCharacters = listenToCharacters(
-        userId,
-        fileId,
-        clientId,
-        replyWithReduxAction
-      )
       const unsubscribeToCustomAttributes = listenToCustomAttributes(
         userId,
         fileId,
@@ -279,8 +273,6 @@ self.onmessage = (event) => {
         replyWithReduxAction
       )
       const unsubscribeToLines = listenToLines(userId, fileId, clientId, replyWithReduxAction)
-      const unsubscribeToNotes = listenToNotes(userId, fileId, clientId, replyWithReduxAction)
-      const unsubscribeToPlaces = listenToPlaces(userId, fileId, clientId, replyWithReduxAction)
       const unsubscribeToTags = listenToTags(userId, fileId, clientId, replyWithReduxAction)
       const unsubscribeToLevels = listenToHierarchyLevels(
         userId,
@@ -327,12 +319,9 @@ self.onmessage = (event) => {
         unsubscribeToSeries()
         unsubscribeToBooks()
         unsubscribeToCategories()
-        unsubscribeToCharacters()
         unsubscribeToCustomAttributes()
         unsubscribeToFlags()
         unsubscribeToLines()
-        unsubscribeToNotes()
-        unsubscribeToPlaces()
         unsubscribeToTags()
         unsubscribeToLevels()
         unsubscribeToImages()
