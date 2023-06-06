@@ -716,7 +716,7 @@ export const cardMetaDataMapSelector = createDeepEqualSelector(
   }
 )
 
-export const searchedCardMetaDataMapSelector = createDeepEqualSelector(
+export const _searchedCardMetaDataMapSelector = createDeepEqualSelector(
   allCardMetaDataSelector,
   collapsedBeatSelector,
   visibleSortedBeatsForTimelineByBookSelector,
@@ -762,6 +762,12 @@ export const searchedCardMetaDataMapSelector = createDeepEqualSelector(
       cardReduce('lineId', 'beatId', !timelineViewIsntDefault && collapsedBeats, beatPositions),
       {}
     )
+  }
+)
+export const searchedCardMetaDataMapSelector = createDeepEqualSelector(
+  _searchedCardMetaDataMapSelector,
+  (cardMap) => {
+    return cardMap
   }
 )
 
