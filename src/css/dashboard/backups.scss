@@ -64,6 +64,7 @@
   background-color: darken($gray-9, 3%);
   margin: 2px;
   cursor: pointer;
+  user-select: none;
 
   & > div {
     display: flex;
@@ -111,6 +112,7 @@
   .dashboard__backups__columns {
     margin-top: 8px;
     color: $gray-5;
+    user-select: none;
   }
   .dashboard__backups__project-row {
     &.row {
@@ -120,7 +122,6 @@
     }
     .dashboard__backups__project-backup {
       .dashboard__backups__item {
-        user-select: none;
         padding: 10px 0;
         display: flex;
         align-items: center;
