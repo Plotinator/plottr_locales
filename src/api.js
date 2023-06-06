@@ -1,7 +1,7 @@
 import semverGt from 'semver/functions/gt'
 import axios from 'axios'
 import { DateTime } from 'luxon'
-import { isEqual, identity, isObject } from 'lodash'
+import { isEqual, identity, isObject, omit, capitalize } from 'lodash'
 
 import { removeSystemKeys, ARRAY_KEYS, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
 
@@ -22,7 +22,11 @@ const api = (
   isDesktop
 ) => {
   const BASE_API_URL =
-    (!isDesktop && development) || !baseAPIDomain ? '' : `https://${baseAPIDomain || ''}`
+    (!isDesktop && development) || !baseAPIDomain
+      ? ''
+      : baseAPIDomain === '/'
+      ? ''
+      : `https://${baseAPIDomain || ''}`
 
   const defaultErrorHandler = (error) => {
     log.error('Error communicating with Firebase.', error.message, error)
@@ -80,8 +84,21 @@ const api = (
     })
   }
 
+  const FLAT_CARD_PATH_MAPPING = {
+    flatCards: 'cards',
+    flatNotes: 'notes',
+    flatPlaces: 'places',
+    flatCharacters: 'characters',
+  }
+
+  const reinterpretPath = (path) => {
+    const mappedValue = FLAT_CARD_PATH_MAPPING[path]
+    return typeof mappedValue !== 'undefined' ? mappedValue : path
+  }
+
   const patchActions = (path) => {
-    switch (path) {
+    const reinterpretedPath = reinterpretPath(path)
+    switch (reinterpretedPath) {
       case 'ui':
         return actions.ui
       case 'beats':
@@ -146,7 +163,7 @@ const api = (
         delete data.fileId
         delete data.clientId
         withAction(
-          patchActions(path)[loadFunctionKey](
+          patchAction[loadFunctionKey](
             patching,
             withData({ ...usingFromDocRef(documentRef), ...data })
           )
@@ -159,6 +176,53 @@ const api = (
         )
       },
     }
+  }
+
+  const handleFlatArraySnapshot = (
+    withAction,
+    fileId,
+    path,
+    withData,
+    patching,
+    clientId,
+    loadFunctionKey = 'load',
+    usingFromDocRef = () => ({})
+  ) => {
+    return (() => {
+      let lastResults = []
+
+      return {
+        next: (documentRef) => {
+          const results = []
+          documentRef.forEach((document) => {
+            results.push(document.data())
+          })
+          // NOTE: We can't only rely on the client id anymore.
+          const unChanged = results.every((document) => {
+            return (
+              document.clientId === clientId ||
+              lastResults.find((previousDocument) => {
+                return isEqual(document, previousDocument)
+              })
+            )
+          })
+          if (unChanged) return
+          lastResults = results
+          const patchAction = patchActions(path)
+          if (!patchAction) {
+            log.error('No patch action for ', path)
+            return
+          }
+          withAction(patchAction[loadFunctionKey](patching, withData(results)))
+        },
+        error: (error) => {
+          log.error(
+            `Error listening to ${fileId} at ${path} with a loadFunctionKey of ${loadFunctionKey}`,
+            error.message
+          )
+        },
+      }
+    })()
   }
 
   const listenToFile = (
@@ -202,10 +266,10 @@ const api = (
   const listenForFlatArrayAtPath =
     (path, subPath) =>
     (userId, fileId, clientId, withAction, errorHandler = defaultErrorHandler) => {
-      const { doc, onSnapshot } = database()
+      const { collection, onSnapshot, query } = database()
       return onSnapshot(
-        doc(`${path}/${fileId}/${subPath}`),
-        handleSnapshot(withAction, fileId, path, identity, true, clientId)
+        query(collection(`${path}/${fileId}/${subPath}`)),
+        handleFlatArraySnapshot(withAction, fileId, path, identity, true, clientId)
       )
     }
 
@@ -245,6 +309,9 @@ const api = (
   const listenToImages = listenForObjectAtPath('images')
   const listenToAttributes = listenForObjectAtPath('attributes')
   const listenToFlatCards = listenForFlatArrayAtPath('flatCards', 'cards')
+  const listenToFlatCharacters = listenForFlatArrayAtPath('flatCharacters', 'characters')
+  const listenToFlatNotes = listenForFlatArrayAtPath('flatNotes', 'notes')
+  const listenToFlatPlaces = listenForFlatArrayAtPath('flatPlaces', 'places')
 
   const onFetched = (fileId, path, withData, clientId) => (documentRef) => {
     const data = documentRef && documentRef.data()
@@ -312,49 +379,63 @@ const api = (
     })
   }
 
+  const fetchOldArrayObject = (path) => (userId, fileId, clientId) => {
+    {
+      return fetchArrayAtPath(path)(userId, fileId, clientId).then((entry) => {
+        const [_key, value] = entry
+        if (Array.isArray(value) && value.length > 0) {
+          const timestamp = new Date().toISOString()
+          return patchOrCreate(`old${capitalize(path)}`, fileId, { [timestamp]: value }, clientId)
+            .then(() => {
+              return Promise.all(
+                value.map((entity) => {
+                  return overwrite(path, fileId, entity, clientId)
+                })
+              )
+            })
+            .then(() => {
+              const { doc, deleteDoc } = database()
+              return deleteDoc(doc(`${path}/${fileId}`))
+            })
+            .then(() => {
+              return entry
+            })
+        } else {
+          return entry
+        }
+      })
+    }
+  }
+
   const fetchUI = fetchObjectAtPath('ui')
   const fetchChapters = fetchArrayAtPath('chapters')
-  const fetchCards = (userId, fileId, clientId) => {
-    return fetchArrayAtPath('cards')(userId, fileId, clientId).then((entry) => {
-      const [_key, value] = entry
-      if (Array.isArray(value) && value.length > 0) {
-        return overwrite('oldCards', fileId, value, clientId)
-          .then(() => {
-            return Promise.all(
-              value.map((card) => {
-                return overwrite('cards', fileId, card, clientId)
-              })
-            )
-          })
-          .then(() => {
-            const { doc, deleteDoc } = database()
-            return deleteDoc(doc(`cards/${fileId}`))
-          })
-          .then(() => {
-            return entry
-          })
-      } else {
-        return entry
-      }
-    })
-  }
+  const fetchCards = fetchOldArrayObject('cards')
   const fetchSeries = fetchObjectAtPath('series')
   const fetchBooks = fetchObjectAtPath('books')
   const fetchCategories = fetchObjectAtPath('categories')
-  const fetchCharacters = fetchArrayAtPath('characters')
+  const fetchCharacters = fetchOldArrayObject('characters')
   const fetchCustomAttributes = fetchObjectAtPath('customAttributes')
   const fetchEditors = fetchObjectAtPath('featureFlags')
   const fetchLines = fetchArrayAtPath('lines')
-  const fetchNotes = fetchArrayAtPath('notes')
-  const fetchPlaces = fetchArrayAtPath('places')
+  const fetchNotes = fetchOldArrayObject('notes')
+  const fetchPlaces = fetchOldArrayObject('places')
   const fetchTags = fetchArrayAtPath('tags')
   const fetchhierarchyLevels = fetchObjectAtPath('hierarchyLevels')
   const fetchImages = fetchObjectAtPath('images')
   const fetchAttributes = fetchObjectAtPath('attributes')
   const fetchFlatCards = fetchFlatArrayAtPath('flatCards', 'cards')
+  const fetchFlatCharacters = fetchFlatArrayAtPath('flatCharacters', 'characters')
+  const fetchFlatNotes = fetchFlatArrayAtPath('flatNotes', 'notes')
+  const fetchFlatPlaces = fetchFlatArrayAtPath('flatPlaces', 'places')
 
   const toFirestoreArray = (array) =>
     array.reduce((acc, value, index) => Object.assign(acc, { [index]: value }), {})
+
+  const FLAT_ARRAY_KEYS = ['cards', 'notes', 'characters', 'places']
+
+  const isFlatArrayKey = (key) => {
+    return FLAT_ARRAY_KEYS.indexOf(key) !== -1
+  }
 
   const overwriteAllKeys = (fileId, clientId, state) => {
     const requests = []
@@ -362,7 +443,7 @@ const api = (
       if (SYSTEM_REDUCER_KEYS.indexOf(key) !== -1) {
         return
       }
-      if (key === 'cards') {
+      if (isFlatArrayKey(key)) {
         state[key].forEach((payload) => {
           requests.push(
             overwrite(key, fileId, payload, clientId)
@@ -416,6 +497,9 @@ const api = (
           fetchImages(userId, fileId, clientId),
           fetchAttributes(userId, fileId, clientId),
           fetchFlatCards(userId, fileId, clientId),
+          fetchFlatCharacters(userId, fileId, clientId),
+          fetchFlatNotes(userId, fileId, clientId),
+          fetchFlatPlaces(userId, fileId, clientId),
         ]).then((results) => {
           return [file, ...results]
         })
@@ -475,7 +559,6 @@ const api = (
     }
     const setDeleted = (path) => patch(path, fileId, { deleted: true }, clientId)
     const setDeletedfile = () => setDeleted('file')
-    const setDeletedCards = () => setDeleted('cards')
     const setDeletedSeries = () => setDeleted('series')
     const setDeletedBooks = () => setDeleted('books')
     const setDeletedCategories = () => setDeleted('categories')
@@ -489,6 +572,25 @@ const api = (
     const setDeletedHierarchyLevels = () => setDeleted('hierarchyLevels')
     const setDeletedImages = () => setDeleted('images')
     const setDeletedAttributes = () => setDeleted('attributes')
+
+    const setEachDeleted = (path, subPath) => {
+      const { getDocs, collection } = database()
+      return getDocs(collection(`${path}/${fileId}/${subPath}`)).then((ref) => {
+        const entitys = []
+        ref.forEach((entity) => {
+          const data = entity.data()
+          if (data.deleted) return
+
+          entitys.push({ ...entity, id: entity.id })
+        })
+        return Promise.all(
+          entitys.map((entity) => {
+            return patch(path, fileId, { deleted: true, id: entity.id }, clientId)
+          })
+        )
+      })
+    }
+    const setDeletedCards = () => setEachDeleted('flatCards', 'cards')
 
     return setDeletedAuthorisation()
       .then(setDeletedfile)
@@ -625,19 +727,42 @@ const api = (
     )
   }
 
+  const computeDocumentPath = (path, fileId, payload = {}) => {
+    return isFlatArrayKey(path)
+      ? `flat${capitalize(path)}/${fileId}/${path}/${payload.id}`
+      : `${path}/${fileId}`
+  }
+
   const patch = (path, fileId, payload, clientId) => {
     const { doc, updateDoc } = database()
-    return updateDoc(doc(`${path}/${fileId}`), {
+    const documentPath = computeDocumentPath(path, fileId, payload)
+
+    return updateDoc(doc(documentPath), {
       ...payload,
       clientId,
       fileId,
     })
   }
 
+  const patchOrCreate = (path, fileId, payload, clientId) => {
+    const { doc, setDoc } = database()
+    const documentPath = computeDocumentPath(path, fileId, payload)
+
+    return setDoc(
+      doc(documentPath),
+      {
+        ...payload,
+        clientId,
+        fileId,
+      },
+      { merge: true }
+    )
+  }
+
   const overwrite = (path, fileId, payload, clientId) => {
     const { doc, setDoc } = database()
-    const documentPath =
-      path === 'cards' ? `flatCards/${fileId}/cards/${payload.id}` : `${path}/${fileId}`
+    const documentPath = computeDocumentPath(path, fileId, payload)
+
     return setDoc(doc(documentPath), {
       ...payload,
       clientId,
@@ -1103,6 +1228,9 @@ const api = (
     listenToImages,
     listenToAttributes,
     listenToFlatCards,
+    listenToFlatCharacters,
+    listenToFlatNotes,
+    listenToFlatPlaces,
     toFirestoreArray,
     overwriteAllKeys,
     initialFetch,
