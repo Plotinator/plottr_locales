@@ -3,7 +3,9 @@ import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
 import { lock } from 'proper-lockfile'
 
-import { checkFileIntegrity, SYSTEM_REDUCER_KEYS, helpers } from 'pltr/v2'
+import { checkFileIntegrity, SYSTEM_REDUCER_KEYS, helpers, errorCodes } from 'pltr/v2'
+
+const { FILE_LACKS_ALL_KEYS } = errorCodes
 
 const { readFile, lstat, writeFile, open, unlink, readdir, mkdir } = fs.promises
 
@@ -131,15 +133,19 @@ const fileModule = (userDataPath) => {
           logger.error(message)
           return Promise.reject(message)
         }
-        console.log('jsonData', jsonData)
         const withoutSystemKeys = removeSystemKeys(jsonData)
-        return checkFileIntegrity(withoutSystemKeys, filePath).then(() => {
-          const payload =
-            process.env.NODE_ENV == 'development'
-              ? JSON.stringify(withoutSystemKeys, null, 2)
-              : JSON.stringify(withoutSystemKeys)
-          return writeAndWaitForFlush(filePath, payload)
-        })
+        return checkFileIntegrity(withoutSystemKeys, filePath)
+          .catch((error) => {
+            error.code = FILE_LACKS_ALL_KEYS
+            return Promise.reject(error)
+          })
+          .then(() => {
+            const payload =
+              process.env.NODE_ENV == 'development'
+                ? JSON.stringify(withoutSystemKeys, null, 2)
+                : JSON.stringify(withoutSystemKeys)
+            return writeAndWaitForFlush(filePath, payload)
+          })
       })
     }
 

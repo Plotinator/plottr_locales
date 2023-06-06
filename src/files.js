@@ -1,5 +1,5 @@
 import { t } from 'plottr_locales'
-import { helpers, reducers, emptyFile, migrateIfNeeded, addMissingKeys } from 'pltr/v2'
+import { helpers, reducers, emptyFile, migrateIfNeeded, addMissingKeys, errorCodes } from 'pltr/v2'
 import { actions, selectors } from 'wired-up-pltr'
 
 import { closeDashboard } from './dashboard-events'
@@ -153,10 +153,17 @@ export const renameFile = (fileURL) => {
         }).catch((error) => {
           logger.error('Error renaming file', error)
           store.dispatch(actions.applicationState.finishRenamingFile())
-          return showErrorBox(t('Error'), t('There was an error doing that. Try again'))
+          if (error.code === errorCodes.FILE_LACKS_ALL_KEYS) {
+            return showErrorBox(
+              t('File too old'),
+              t('Please open and then close the file before renaming it.')
+            )
+          } else {
+            return showErrorBox(t('Error'), t('There was an error doing that. Try again'))
+          }
         })
       } catch (error) {
-        logger.error(error)
+        logger.error('Error renaming file', error)
         store.dispatch(actions.applicationState.finishRenamingFile())
         return showErrorBox(t('Error'), t('There was an error doing that. Try again'))
       }
