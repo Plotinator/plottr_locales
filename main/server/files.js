@@ -131,6 +131,7 @@ const fileModule = (userDataPath) => {
           logger.error(message)
           return Promise.reject(message)
         }
+        console.log('jsonData', jsonData)
         const withoutSystemKeys = removeSystemKeys(jsonData)
         return checkFileIntegrity(withoutSystemKeys, filePath).then(() => {
           const payload =

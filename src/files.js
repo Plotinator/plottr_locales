@@ -136,7 +136,6 @@ export const renameFile = (fileURL) => {
       try {
         const newFilePath = fileName.includes('.pltr') ? fileName : `${fileName}.pltr`
         const newFileURL = `device://${newFilePath}`
-        editKnownFilePath(fileURL, newFileURL)
         return whenClientIsReady(({ readFile, trash }) => {
           return readFile(helpers.file.withoutProtocol(fileURL), 'utf-8').then((rawFile) => {
             const contents = JSON.parse(rawFile)
@@ -145,16 +144,21 @@ export const renameFile = (fileURL) => {
                 return trash(fileURL, true)
               })
               .then(() => {
+                return editKnownFilePath(fileURL, newFileURL)
+              })
+              .then(() => {
                 store.dispatch(actions.applicationState.finishRenamingFile())
               })
           })
+        }).catch((error) => {
+          logger.error('Error renaming file', error)
+          store.dispatch(actions.applicationState.finishRenamingFile())
+          return showErrorBox(t('Error'), t('There was an error doing that. Try again'))
         })
       } catch (error) {
         logger.error(error)
         store.dispatch(actions.applicationState.finishRenamingFile())
-        return showErrorBox(t('Error'), t('There was an error doing that. Try again')).then(() => {
-          return Promise.reject(error)
-        })
+        return showErrorBox(t('Error'), t('There was an error doing that. Try again'))
       }
     }
     return Promise.resolve()
