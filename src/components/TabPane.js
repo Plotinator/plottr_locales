@@ -2,6 +2,7 @@ import classNames from 'classnames'
 import React from 'react'
 import PropTypes from 'prop-types'
 import warning from 'warning'
+import { omit } from 'lodash'
 
 import { bsClass, getClassSet, prefix, splitBsPropsAndOmit } from './utils/bootstrapUtils'
 
@@ -82,7 +83,7 @@ class TabPane extends React.Component {
 
     const pane = (
       <div
-        {...elementProps}
+        {...omit(elementProps, 'draggable')}
         role="tabpanel"
         aria-hidden={!active}
         className={classNames(className, classes)}
