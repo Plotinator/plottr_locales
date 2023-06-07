@@ -47,6 +47,12 @@
     margin: 0;
     padding: 0 2px;
   }
+
+  .dashboard__backups__body-table-header {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
 }
 
 .dashboard__backups__wrapper {
