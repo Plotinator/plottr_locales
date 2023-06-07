@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
 
@@ -14,9 +14,10 @@ const BackupFileDisplayConnector = (connector) => {
       mpq,
       file: { createAndOpenCopy },
       duplicateFile,
+      uploadToProAsDuplicate,
     },
   } = connector
-  checkDependencies({ mpq, createAndOpenCopy, duplicateFile })
+  checkDependencies({ mpq, createAndOpenCopy, duplicateFile, uploadToProAsDuplicate })
 
   const BackupFileDisplay = ({
     folder,
@@ -37,7 +38,11 @@ const BackupFileDisplayConnector = (connector) => {
         const fileUrl = helpers.file.fileIdToPlottrCloudFileURL(file.fileId)
         duplicateFile(fileUrl, newName)
       } else {
-        createAndOpenCopy(folder.path, file.name, newName)
+        if (hasCurrentProLicense) {
+          uploadToProAsDuplicate(file.localFilePathSegments, newName)
+        } else {
+          createAndOpenCopy(file.localFilePathSegments, newName)
+        }
       }
     }
 
