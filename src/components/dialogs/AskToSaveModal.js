@@ -9,14 +9,19 @@ import getTestIds from '../getTestIds'
 
 export const testIds = getTestIds()
 
-export default function AskToSaveModal({ save }) {
+export default function AskToSaveModal({ save, busy, dismiss }) {
   return (
-    <Modal show={true} onHide={save} dialogClassName="center-modal-vertically">
+    <Modal show={true} onHide={dismiss} dialogClassName="center-modal-vertically">
       <Modal.Header closeButton>{i18n('There are unsaved changes')}</Modal.Header>
       <Modal.Body>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Button data-testid={testIds.ok} bsStyle="success" onClick={save}>
-            {i18n('Save')}
+          <Button
+            data-testid={testIds.ok}
+            bsStyle="success"
+            onClick={busy ? () => {} : save}
+            disabled={busy}
+          >
+            {busy ? i18n('Busy...') : i18n('Save')}
           </Button>
         </div>
       </Modal.Body>
@@ -26,4 +31,6 @@ export default function AskToSaveModal({ save }) {
 
 AskToSaveModal.propTypes = {
   save: PropTypes.func,
+  dismiss: PropTypes.func,
+  busy: PropTypes.bool,
 }
