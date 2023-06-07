@@ -30,7 +30,7 @@ const makeDateString = (dateObj, makeShort) => {
   }
   return dateStr
 }
-const addFileNameToCloudFile = (cloudFiles) => (fileObject) => {
+const addFileNameToCloudFile = (folderPath, cloudFiles) => (fileObject) => {
   if (fileObject.storagePath) {
     const proFile = cloudFiles.find(({ id }) => {
       return id === fileObject.id
@@ -44,17 +44,20 @@ const addFileNameToCloudFile = (cloudFiles) => (fileObject) => {
     return {
       ...fileObject,
       name,
+      localFilePathSegments: [folderPath, fileObject.name],
     }
   }
 }
-
 export const groupedSortedBackupFoldersSelector = createSelector(
   nonEmptyBackupFoldersSelector,
   cloudFileListSelector,
   (backupFolders, cloudFiles) => {
     const sortedFolders = sortFolders(backupFolders)
     return sortedFolders.map((f) => {
-      const groups = groupBy(f.backups.map(addFileNameToCloudFile(cloudFiles)), groupableName)
+      const groups = groupBy(
+        f.backups.map(addFileNameToCloudFile(f.path, cloudFiles)),
+        groupableName
+      )
       // const groupsWithName = Object.entries(f.groups).map((group) => {})
       return {
         ...f,
