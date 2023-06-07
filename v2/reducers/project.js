@@ -169,7 +169,7 @@ const projectReducer = (state = INITIAL_STATE, action) => {
       }
     }
     default: {
-      if (SYSTEM_REDUCER_ACTION_TYPES.indexOf(action.type) === -1) {
+      if (!action.type.startsWith('@') && SYSTEM_REDUCER_ACTION_TYPES.indexOf(action.type) === -1) {
         return {
           ...state,
           unsavedChanges: true,
