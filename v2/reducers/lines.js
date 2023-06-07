@@ -72,7 +72,7 @@ const lines =
             ...line,
             id: nextId(state),
             bookId: actionBookId,
-            title: action.title || t('Main Plot'),
+            title: (action.type !== ADD_BOOK && action.title) || t('Main Plot'),
             color: nextColor(linesInBook_),
             position: nextPositionInBook(state, actionBookId),
           },

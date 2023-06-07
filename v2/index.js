@@ -4,6 +4,7 @@ import * as ActionTypes from './constants/ActionTypes'
 import * as LoadActions from './constants/loadActions'
 import * as colors from './constants/CSScolors'
 import * as featureFlags from './constants/featureFlags'
+import * as errorCodes from './constants/errorCodes'
 
 import * as lineHelpers from './helpers/lines'
 import * as cardHelpers from './helpers/cards'
@@ -158,6 +159,7 @@ export {
   helpers,
   colors,
   featureFlags,
+  errorCodes,
   migrateIfNeeded,
   Migrator,
   rootReducer,
