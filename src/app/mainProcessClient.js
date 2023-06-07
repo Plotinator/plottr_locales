@@ -407,6 +407,10 @@ const _makeMainProcessClient = () => {
     return ask('are-we-restarting-socket-server')
   }
 
+  const createDesktopShortcut = (sourceFileURL, newFileURL) => {
+    return ask('create-desktop-shortcut', sourceFileURL, newFileURL)
+  }
+
   return {
     setWindowTitle,
     setRepresentedFileName,
@@ -498,6 +502,7 @@ const _makeMainProcessClient = () => {
     isRestarting,
     onCreateFileShortcut,
     onOpenImagePickerFromMenu,
+    createDesktopShortcut,
   }
 }
 

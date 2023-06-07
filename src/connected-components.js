@@ -98,6 +98,7 @@ const {
   userDocumentsPath,
   pleaseOpenWindow,
   addToKnownFilesAndOpen,
+  createDesktopShortcut,
 } = makeMainProcessClient()
 
 export const rmRF = (path, ...args) => {
@@ -284,14 +285,22 @@ const platform = {
     createFileShortcut: (sourceFileURL, destinationURL) => {
       if (destinationURL == 'desktop') {
         return userDesktopPath().then((userDesktopPath) => {
+          if (isWindows()) {
+            return createDesktopShortcut(sourceFileURL, userDesktopPath)
+          } else {
+            return whenClientIsReady(({ createFileShortcut }) => {
+              return createFileShortcut(sourceFileURL, userDesktopPath)
+            })
+          }
+        })
+      } else {
+        if (isWindows()) {
+          return createDesktopShortcut(sourceFileURL, userDesktopPath)
+        } else {
           return whenClientIsReady(({ createFileShortcut }) => {
             return createFileShortcut(sourceFileURL, userDesktopPath)
           })
-        })
-      } else {
-        return whenClientIsReady(({ createFileShortcut }) => {
-          return createFileShortcut(sourceFileURL, destinationURL)
-        })
+        }
       }
     },
     readFile: (fileURL) => {

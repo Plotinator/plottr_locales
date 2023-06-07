@@ -425,7 +425,7 @@ const fileSystemModule = (userDataPath) => {
     }
 
     const createFileShortcut = async (sourceFileURL, destinationURL, counter = 0) => {
-      let shortcutDestination = helpers.file.withoutProtocol(destinationURL)
+      const shortcutDestination = helpers.file.withoutProtocol(destinationURL)
       const sourceURL = helpers.file.withoutProtocol(sourceFileURL)
       const shortcutSuffix = ' - Shortcut'
       const shortCutExt = os.platform() != 'linux' ? '.lnk' : '.sh'
@@ -442,6 +442,8 @@ const fileSystemModule = (userDataPath) => {
           shortCutExt
       )
       if (os.platform() == 'win32') {
+        // NOTE: this doesn't work on windows.  Use the main process
+        // client instead.
         logger.info('Creating hard link on windows')
         return link(sourceURL, newShortcutPath)
           .then(() => {
