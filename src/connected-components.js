@@ -62,6 +62,7 @@ import { notifyUser } from './notifyUser'
 import { exportSaveDialog } from './export-save-dialog'
 import { whenClientIsReady } from '../shared/socket-client'
 import { makeMainProcessClient } from './app/mainProcessClient'
+import { uploadToFirebase } from './upload-to-firebase'
 
 const {
   getVersion,
@@ -326,8 +327,8 @@ const platform = {
       })
     },
     listOfflineFiles,
-    createAndOpenCopy: (oldPath, oldFileName, newFileName) => {
-      return createAndOpenCopy(oldPath, oldFileName, newFileName)
+    createAndOpenCopy: (oldFilePath, newFileName) => {
+      return createAndOpenCopy(oldFilePath, newFileName)
     },
   },
   update: {
@@ -528,6 +529,37 @@ const platform = {
     },
     resizeImage,
     downloadStorageImage,
+  },
+  uploadToProAsDuplicate: (sourceFilePathSegments, newName) => {
+    return whenClientIsReady(({ join, readFile }) => {
+      return join(...sourceFilePathSegments).then((sourceFilePath) => {
+        return readFile(sourceFilePath).then((fileData) => {
+          try {
+            const fileJSON = JSON.parse(fileData)
+            const state = store.getState()
+            const emailAddress = selectors.emailAddressSelector(state)
+            const userId = selectors.userIdSelector(state)
+            return uploadToFirebase(emailAddress, userId, fileJSON, newName).then((response) => {
+              const fileId = response.data.fileId
+              if (!fileId) {
+                const message = `Tried to create cloud file for ${sourceFilePath} but we didn't get a fileId back`
+                logger.error(message)
+                return Promise.reject(new Error(message))
+              }
+              const fileURL = helpers.file.fileIdToPlottrCloudFileURL(fileId)
+              return openFile(fileURL, false)
+            })
+          } catch (error) {
+            return Promise.reject(
+              new Error(
+                `Couldn't parse file data to upload backup at ${sourceFilePath} to Firebase`,
+                error
+              )
+            )
+          }
+        })
+      })
+    })
   },
 }
 

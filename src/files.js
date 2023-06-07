@@ -210,11 +210,11 @@ export const migrateSaveAndOpen = (json, oldUrl, newFileURL) => {
   })
 }
 
-export const createAndOpenCopy = (oldPath, oldFileName, newFileName) => {
+export const createAndOpenCopy = (oldFilePathSegments, newFileName) => {
   return whenClientIsReady(({ join, findUniqueNameInPath, currentAppSettings, readFile }) => {
     return currentAppSettings().then((settings) => {
-      return join(oldPath, helpers.file.ensureEndsInPltr(oldFileName)).then((oldFullPath) => {
-        return readFile(oldFullPath).then((fileText) => {
+      return join(...oldFilePathSegments).then((oldFilePath) => {
+        return readFile(oldFilePath).then((fileText) => {
           const fileJSON = JSON.parse(fileText)
           if (settings.user.defaultFolder && settings.user.defaultFolderLocation) {
             return join(
@@ -223,7 +223,7 @@ export const createAndOpenCopy = (oldPath, oldFileName, newFileName) => {
             ).then((newFullPath) => {
               return findUniqueNameInPath(newFullPath).then((uniquePath) => {
                 const newFileURL = helpers.file.filePathToFileURL(uniquePath)
-                return migrateSaveAndOpen(fileJSON, oldFullPath, newFileURL)
+                return migrateSaveAndOpen(fileJSON, oldFilePath, newFileURL)
               })
             })
           } else {
@@ -236,7 +236,7 @@ export const createAndOpenCopy = (oldPath, oldFileName, newFileName) => {
                     if (fileName) {
                       const newFilePath = helpers.file.ensureEndsInPltr(fileName)
                       const newFileURL = helpers.file.filePathToFileURL(newFilePath)
-                      return migrateSaveAndOpen(fileJSON, oldFullPath, newFileURL)
+                      return migrateSaveAndOpen(fileJSON, oldFilePath, newFileURL)
                     } else {
                       return Promise.reject(
                         new Error(
