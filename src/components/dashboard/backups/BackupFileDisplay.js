@@ -47,7 +47,7 @@ const BackupFileDisplayConnector = (connector) => {
         const date = helpers.time.convertFromNanosAndSeconds(file.lastModified)
         return (
           <div className="dashboard__backups__item-details">
-            <div>{file.lastModified ? t('Last Edited: {date, time, short}', { date }) : ''}</div>
+            <div>{file.lastModified ? t('{date, time, short}', { date }) : ''}</div>
             <small className="accented-text">{t('Saved in the cloud')}</small>
           </div>
         )
