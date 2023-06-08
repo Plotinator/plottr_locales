@@ -167,9 +167,15 @@ const platform = {
             logger.error('Error creating a new file', error)
             store.dispatch(actions.project.showLoader(false))
             store.dispatch(actions.applicationState.finishCreatingCloudFile())
+            showErrorBox(t('Error'), t('There was a problem doing that.  Please try again.'))
           })
       } else {
-        createNewFile(template, name)
+        createNewFile(template, name).catch((error) => {
+          logger.error('Error creating a new file', error)
+          store.dispatch(actions.project.showLoader(false))
+          store.dispatch(actions.applicationState.finishCreatingCloudFile())
+          showErrorBox(t('Error'), t('There was a problem doing that.  Please try again.'))
+        })
       }
     },
     openExistingFile: () => {

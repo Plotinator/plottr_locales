@@ -7,7 +7,7 @@ const ask = (channel, ...args) => {
     try {
       const listener = (event, ...args) => {
         window.api.stopListening(listenToken, listener)
-        if (args[0] && args[0].error) {
+        if (args[0] && typeof args[0].error === 'string') {
           reject(new Error(args[0].error))
         } else if (args.length === 1) {
           resolve(args[0])
