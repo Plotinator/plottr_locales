@@ -32,6 +32,8 @@ const withFromFileSystem = (backupFolder) => ({
 
 const BACKUP_FOLDER_REGEX = /^1?[0-9]_[123]?[0-9]_[0-9][0-9][0-9][0-9]/
 
+const BACKUP_WATCH_INTERVAL_MILLISECONDS = 10000
+
 function isOfflineFile(fileURL, offlineFileFilesPath) {
   return fileURL && helpers.file.withoutProtocol(fileURL).startsWith(offlineFileFilesPath)
 }
@@ -308,7 +310,7 @@ const fileSystemModule = (userDataPath) => {
     }
 
     const listenToBackupsChanges = (cb) => {
-      let watcher = () => {}
+      let stopWatching = () => {}
       ensureBackupDirExists().then(() => {
         readBackupsDirectory((error, initialBackups) => {
           if (error) {
@@ -317,26 +319,22 @@ const fileSystemModule = (userDataPath) => {
           } else {
             cb(initialBackups)
           }
-          backupBasePath().then((basePath) => {
-            watcher = fs.watch(basePath, (event, fileName) => {
-              // Do we care about event and fileName?
-              //
-              // NOTE: event could be 'changed' or 'renamed'.
-              readBackupsDirectory((error, newBackups) => {
-                if (error) {
-                  logger.error('Failed to read backups directory', error)
-                  return
-                }
-                cb(newBackups)
-              })
+          const intervalId = setInterval(() => {
+            readBackupsDirectory((error, newBackups) => {
+              if (error) {
+                logger.error('Failed to read backups directory', error)
+                return
+              }
+              cb(newBackups)
             })
-          })
+          }, BACKUP_WATCH_INTERVAL_MILLISECONDS)
+          stopWatching = () => {
+            clearInterval(intervalId)
+          }
         })
       })
 
-      return () => {
-        watcher.close()
-      }
+      return stopWatching
     }
     const currentBackups = () => {
       return new Promise((resolve, reject) => {
