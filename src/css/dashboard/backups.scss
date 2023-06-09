@@ -200,8 +200,16 @@
 }
 
 .darkmode {
-  .dashboard__backups__item {
-    background-color: transparent !important;
+  .dashboard__backups__projects-summary {
+    background-color: transparent;
+
+    &.active {
+      background-color: $orange;
+    }
+  }
+  .dashboard__backups__item,
+  .dashboard__backups__project-row.row  {
+    background-color: transparent;
 
     .badge {
       background-color: #2c649e;
