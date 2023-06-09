@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'react-proptypes'
 
 import { t } from 'plottr_locales'
@@ -6,68 +6,31 @@ import { t } from 'plottr_locales'
 import Grid from '../../Grid'
 import Col from '../../Col'
 import Row from '../../Row'
-import UnconnectedBackupFileDisplay from './BackupFileDisplay'
+import { Spinner } from '../../Spinner'
+import UnconnectedBackupsFolder from './BackupsFolder'
 
 const BackupsTableConnector = (connector) => {
-  const BackupFileDisplay = UnconnectedBackupFileDisplay(connector)
+  const BackupsFolder = UnconnectedBackupsFolder(connector)
 
   const BackupsTable = ({ backupFolders, searchTerm }) => {
-    const makeDisplayableGroupName = (groupName, firstFile) => {
-      // sometimes firstFile.fileName will be undefined
-      if (firstFile?.storagePath && firstFile?.fileName) {
-        return firstFile.fileName
-      } else {
-        return groupName
-      }
-    }
+    const [maxRender, setMaxRender] = useState(1)
 
-    const renderFiles = (folder, groupName, files) => {
-      // NOTE: this works because the 'start session' version always comes first
-      return files.map((file, index) => {
-        return (
-          <Col key={index} xs={12} sm={6} md={4} className="dashboard__backups__project-backup">
-            <BackupFileDisplay
-              folder={folder}
-              groupName={groupName}
-              file={file}
-              folderDate={folder.shortDateStr}
-            />
-          </Col>
-        )
-      })
-    }
-
-    const renderProjects = (folder) => {
-      // group by file name (without Session Start) to put them in "projects"
-      // display each project as another column
-      return Object.entries(folder.groups).map(([groupName, files]) => {
-        const displayableGroupName = makeDisplayableGroupName(groupName, files[0])
-        let row = null
-        if (displayableGroupName?.toLowerCase().includes(searchTerm.toLowerCase())) {
-          row = (
-            <Row key={groupName} className="dashboard__backups__project-row">
-              <Col xs={12} sm={6} md={3}>
-                <h6>{displayableGroupName}</h6>
-              </Col>
-              {renderFiles(folder, displayableGroupName, files)}
-            </Row>
-          )
-        }
-        return row
-      })
-    }
+    useEffect(() => {
+      setTimeout(() => setMaxRender(-1), 500)
+    }, [backupFolders])
 
     const renderBody = () => {
       if (!backupFolders.length) return <h3>{t('No backups yet')}</h3>
 
-      return backupFolders.map((folder) => {
-        const projects = renderProjects(folder)
-        if (searchTerm?.length > 1 && !projects.filter(Boolean).length) return null
+      return backupFolders.map((folder, index) => {
+        if (maxRender > 0 && index >= maxRender) return null
         return (
-          <div key={folder.longDateStr}>
-            <h5>{folder.longDateStr}</h5>
-            <Grid className="dashboard__backups__projects-table">{projects}</Grid>
-          </div>
+          <BackupsFolder
+            folder={folder}
+            searchTerm={searchTerm}
+            openByDefault={index == 0}
+            key={folder.longDateStr}
+          />
         )
       })
     }
@@ -77,7 +40,34 @@ const BackupsTableConnector = (connector) => {
       body = <h3>{t('No matches')}</h3>
     }
 
-    return <div className="dashboard__backups__wrapper">{body}</div>
+    let loadingSpinner = null
+    if (maxRender > 0) {
+      loadingSpinner = <Spinner />
+    }
+
+    return (
+      <div className="dashboard__backups__body">
+        <Grid fluid>
+          <Row>
+            <Col sm={1}>
+              <div style={{ paddingLeft: '16px' }}>{t('Date')}</div>
+            </Col>
+            <Col sm={1} xsOffset={1} mdOffset={10}>
+              <div style={{ paddingLeft: '32px' }}>{t('Count')}</div>
+            </Col>
+          </Row>
+          <Row>
+            <Col xs={12}>
+              <hr />
+            </Col>
+          </Row>
+        </Grid>
+        <div className="dashboard__backups__wrapper">
+          {body}
+          {loadingSpinner}
+        </div>
+      </div>
+    )
   }
 
   BackupsTable.propTypes = {
