@@ -392,7 +392,7 @@
 
   .card__body,
   .card__behind {
-    background-color: $darkmode-v2-card-background;
+    background-color: $darkmode-v2-card-background !important;
     color: $darkmode-v2-text;
   }
 

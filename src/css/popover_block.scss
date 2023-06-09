@@ -79,15 +79,32 @@
     }
   }
 
-  .popover-arrow {
-    border-right: 10px solid $darkmode-v2-background !important;
-    border-bottom: 10px solid transparent !important;
+  .popover-arrow-container.left {
+    .popover-arrow {
+      border-bottom: 10px solid transparent !important;
+      border-left: 10px solid $darkmode-v2-background !important;
+
+    }
   }
 
   .popover-arrow-container.bottom {
     .popover-arrow {
       border-right: 10px solid transparent !important;
       border-bottom: 10px solid $darkmode-v2-background !important;
+    }
+  }
+
+  .popover-arrow-container.right {
+    .popover-arrow {
+      border-top: 10px solid transparent !important;
+      border-right: 10px solid $darkmode-v2-background !important;
+    }
+  }
+
+  .popover-arrow-container.top {
+    .popover-arrow {
+      border-left: 10px solid transparent !important;
+      border-top: 10px solid $darkmode-v2-background !important;
     }
   }
 
