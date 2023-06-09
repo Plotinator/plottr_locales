@@ -34,7 +34,7 @@ const StarterTemplatesConnector = (connector) => {
   if (redux) {
     const { connect } = redux
     return connect((state, { type, searchTerm }) => ({
-      templates: selectors.filteredSortedStarterTemplatesSelector(state.present, type, searchTerm),
+      templates: selectors.filteredSortedStarterTemplatesSelector(state, type, searchTerm),
     }))(StarterTemplates)
   }
 

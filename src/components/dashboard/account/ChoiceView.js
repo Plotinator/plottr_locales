@@ -19,7 +19,7 @@ const ChoiceViewConnector = (connector) => {
   const VerifyView = UnconnectedVerifyView(connector)
   const VerifyPro = UnconnectedVerifyPro(connector)
 
-  const ChoiceView = ({ goToAccount, startProOnboarding, finishProOnboarding }) => {
+  const ChoiceView = ({ goToAccount, startProOnboarding, startSettingsWizard }) => {
     const [view, setView] = useState('chooser')
 
     const goBack = () => setView('chooser')
@@ -52,7 +52,7 @@ const ChoiceViewConnector = (connector) => {
             </div>
           )
         case 'verify':
-          return <VerifyView goBack={goBack} success={goToAccount} />
+          return <VerifyView goBack={goBack} success={startSettingsWizard} />
         case 'explain':
           return (
             <div>
@@ -65,7 +65,7 @@ const ChoiceViewConnector = (connector) => {
                   bsStyle="default"
                   onClick={() => {
                     startTrial()
-                    goToAccount()
+                    startSettingsWizard()
                   }}
                 >
                   {t('Start my Free Trial')}
@@ -93,7 +93,7 @@ const ChoiceViewConnector = (connector) => {
   ChoiceView.propTypes = {
     goToAccount: PropTypes.func.isRequired,
     startProOnboarding: PropTypes.func.isRequired,
-    finishProOnboarding: PropTypes.func.isRequired,
+    startSettingsWizard: PropTypes.func.isRequired,
   }
 
   const {
@@ -105,7 +105,7 @@ const ChoiceViewConnector = (connector) => {
     const { connect } = redux
 
     return connect(null, {
-      finishProOnboarding: actions.applicationState.finishProOnboarding,
+      startSettingsWizard: actions.applicationState.startSettingsWizard,
     })(ChoiceView)
   }
 

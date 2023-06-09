@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import { PropTypes } from 'prop-types'
 
-import UnconnectedEditOrDisplay from './EditOrDisplay'
-import { actions, borderStyle as borderStyles, helpers } from 'pltr/v2'
+import { actions } from 'wired-up-pltr'
+import { borderStyle as borderStyles, helpers } from 'pltr/v2'
 import { getBorderColor } from 'pltr/v2/helpers/colors'
+
+import UnconnectedEditOrDisplay from './EditOrDisplay'
 import { checkDependencies } from '../checkDependencies'
 
 const {

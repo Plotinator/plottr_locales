@@ -30,7 +30,6 @@ import ItemsManagerModal, { ListItem } from './dialogs/ItemsManagerModal'
 import InputModal from './dialogs/InputModal'
 import ActsConfigModal from './dialogs/ActsConfigModal'
 import AskToSaveModal from './dialogs/AskToSaveModal'
-import ActsHelpModal from './dialogs/ActsHelpModal'
 import NewProjectInputModal from './dialogs/NewProjectInputModal'
 import RestructureTimelineModal from './dialogs/RestructureTimelineModal'
 
@@ -115,6 +114,7 @@ import DashboardNav from './dashboard/navigation/DashboardNav'
 import ChoiceView from './dashboard/account/ChoiceView'
 import ExpiredView from './dashboard/account/ExpiredView'
 import ProOnboarding from './dashboard/account/proOnboarding/index'
+import SettingsWizard from './dashboard/account/settingsWizard/index'
 import UpdateNotifier from './dashboard/UpdateNotifier'
 
 // Firebase
@@ -197,7 +197,6 @@ export {
   TimelineWrapper,
   ActsConfigModal,
   AskToSaveModal,
-  ActsHelpModal,
   ErrorBoundary,
   DashboardErrorBoundary,
   SelectList,
@@ -214,6 +213,7 @@ export {
   ProOnboarding,
   UpdateNotifier,
   NewProjectInputModal,
+  SettingsWizard,
   RestructureTimelineModal,
   connections,
 }

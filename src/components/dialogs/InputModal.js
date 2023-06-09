@@ -18,16 +18,19 @@ export default class InputModal extends Component {
   }
 
   handleOK = () => {
-    this.props.getValue(this.state.inputValue)
+    if (this.props.disabled) return
+    this.props.getValue(this.state.inputValue || this.props.defaultValue)
   }
 
   handleChange = (e) => {
+    if (this.props.disabled) return
     this.setState({
       inputValue: e.target.value,
     })
   }
 
   onSubmit = (e) => {
+    if (this.props.disabled) return
     e.preventDefault()
     this.handleOK()
   }
@@ -55,12 +58,24 @@ export default class InputModal extends Component {
                 />
                 <div className="input-modal__controls">
                   <div className="input-modal__controls__control">
-                    <Button data-testid={testIds.ok} bsStyle="primary" onClick={this.handleOK}>
+                    <Button
+                      disabled={
+                        this.props.disabled ||
+                        (this.state.inputValue === '' && this.props.defaultValue === '')
+                      }
+                      data-testid={testIds.ok}
+                      bsStyle="success"
+                      onClick={this.handleOK}
+                    >
                       {okText}
                     </Button>
                   </div>
                   <div className="input-modal__controls__control">
-                    <Button data-testid={testIds.cancel} onClick={this.props.cancel}>
+                    <Button
+                      disabled={this.props.disabled}
+                      data-testid={testIds.cancel}
+                      onClick={this.props.cancel}
+                    >
                       {i18n('Cancel')}
                     </Button>
                   </div>
@@ -81,5 +96,6 @@ export default class InputModal extends Component {
     title: PropTypes.string,
     defaultValue: PropTypes.any,
     customOkButtonText: PropTypes.string,
+    disabled: PropTypes.bool,
   }
 }

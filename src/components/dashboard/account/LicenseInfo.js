@@ -90,7 +90,7 @@ const LicenseInfoConnector = (connector) => {
   }
 
   LicenseInfo.propTypes = {
-    expires: PropTypes.number,
+    expires: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     itemName: PropTypes.string,
     customerEmail: PropTypes.string,
     licenseKey: PropTypes.string,
@@ -106,11 +106,11 @@ const LicenseInfoConnector = (connector) => {
   if (redux) {
     const { connect } = redux
     return connect((state) => ({
-      expires: selectors.licenseExpiresSelector(state.present),
-      itemName: selectors.licenseItemNameSelector(state.present),
-      customerEmail: selectors.licenseCustomerEmailSelector(state.present),
-      licenseKey: selectors.licenseKeySelector(state.present),
-      settings: selectors.appSettingsSelector(state.present),
+      expires: selectors.licenseExpiresSelector(state),
+      itemName: selectors.licenseItemNameSelector(state),
+      customerEmail: selectors.licenseCustomerEmailSelector(state),
+      licenseKey: selectors.licenseKeySelector(state),
+      settings: selectors.appSettingsSelector(state),
     }))(LicenseInfo)
   }
 

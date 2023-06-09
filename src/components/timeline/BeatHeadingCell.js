@@ -309,7 +309,7 @@ const BeatHeadingCellConnector = (connector) => {
     }
 
     const adjustedWidth = () => {
-      return width - (span === 1 && beats.length <= 2 ? 0 : isMedium ? 7 : 27)
+      return width - (span === 1 && beats.length <= 1 ? 0 : isMedium ? 7 : 27)
     }
 
     const handleEsc = (event) => {
@@ -439,9 +439,11 @@ const BeatHeadingCellConnector = (connector) => {
                         onDragOver={handleDragOver}
                         onDragLeave={handleDragLeave}
                       >
-                        <div className={cx('beat__heading-drag-handle', { hovering })}>
-                          <FaGripLinesVertical />
-                        </div>
+                        {span > 1 ? (
+                          <div className={cx('beat__heading-drag-handle', { hovering })}>
+                            <FaGripLinesVertical />
+                          </div>
+                        ) : null}
                         {renderTitle()}
                       </div>
                     </Floater>
@@ -494,22 +496,22 @@ const BeatHeadingCellConnector = (connector) => {
     return connect(
       (state, ownProps) => {
         return {
-          beatTitle: uniqueBeatTitleSelector(state.present, ownProps.beatId),
-          isMedium: selectors.isMediumSelector(state.present),
-          hierarchyLevel: selectors.hierarchyLevelSelector(state.present, ownProps.beatId),
-          darkMode: selectors.isDarkModeSelector(state.present),
-          timelineSize: selectors.timelineSizeSelector(state.present),
-          readOnly: !selectors.canWriteSelector(state.present),
-          beats: selectors.visibleSortedBeatsForTimelineByBookSelector(state.present),
+          beatTitle: uniqueBeatTitleSelector(state, ownProps.beatId),
+          isMedium: selectors.isMediumSelector(state),
+          hierarchyLevel: selectors.hierarchyLevelSelector(state, ownProps.beatId),
+          darkMode: selectors.isDarkModeSelector(state),
+          timelineSize: selectors.timelineSizeSelector(state),
+          readOnly: !selectors.canWriteSelector(state),
+          beats: selectors.visibleSortedBeatsForTimelineByBookSelector(state),
           hierarchyLevelName: selectors.beatInsertControlHierarchyLevelNameSelector(
-            state.present,
+            state,
             ownProps.beatId
           ),
-          currentTimeline: selectors.currentTimelineSelector(state.present),
-          beat: uniqueBeatsSelector(state.present, ownProps.beatId),
-          hierarchyLevels: selectors.sortedHierarchyLevels(state.present),
-          lastClick: selectors.lastClickSelector(state.present),
-          droppedBeat: selectors.droppedBeatSelector(state.present),
+          currentTimeline: selectors.currentTimelineSelector(state),
+          beat: uniqueBeatsSelector(state, ownProps.beatId),
+          hierarchyLevels: selectors.sortedHierarchyLevels(state),
+          lastClick: selectors.lastClickSelector(state),
+          droppedBeat: selectors.droppedBeatSelector(state),
         }
       },
       {

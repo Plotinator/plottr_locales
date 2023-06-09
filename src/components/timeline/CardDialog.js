@@ -85,6 +85,7 @@ const CardDialogConnector = (connector) => {
     const [removing, setRemoving] = useState(false)
     const [removeWhichTemplate, setRemoveWhichTemplate] = useState(null)
     const [activeTab, setActiveTab] = useState(1)
+    const [newTemplateTabPosition, setNewTemplateTabPosition] = useState(null)
 
     const titleInputRef = useRef()
     const colourPickerButtonRef = useRef()
@@ -327,9 +328,38 @@ const CardDialogConnector = (connector) => {
       })
     }
 
+    const handleTabDragOver = (e) => {
+      if (e) {
+        e.preventDefault()
+        const newPosition = e.target?.getAttribute('position')
+        if (newPosition != newTemplateTabPosition) {
+          setNewTemplateTabPosition(newPosition)
+        }
+      }
+    }
+
+    const handleDropTab = (event) => {
+      event.stopPropagation()
+
+      var json = event.dataTransfer.getData('text/json')
+      var droppedTab = JSON.parse(json)
+      actions.reorderCardTemplateAttribute(
+        droppedTab.position,
+        Number(newTemplateTabPosition),
+        cardId
+      )
+      setNewTemplateTabPosition(null)
+    }
+
     const renderEditingTemplates = () => {
       return templates.map((template, idx) => {
         const templateData = getTemplateById(template.id) || template || {}
+
+        const handleDragStart = (e, idx) => {
+          e.dataTransfer.effectAllowed = 'move'
+          e.dataTransfer.setData('text/json', JSON.stringify({ ...templateData, position: idx }))
+        }
+
         const attrs = template.attributes.map((attr, index) => {
           const editorPath = helpers.editors.cardTemplateAttributeEditorPath(
             cardId,
@@ -374,7 +404,15 @@ const CardDialogConnector = (connector) => {
           )
         }
         return (
-          <Tab eventKey={idx + 3} title={templateData.name || t('Template')} key={`tab-${idx}`}>
+          <Tab
+            eventKey={idx + 3}
+            title={templateData.name || t('Template')}
+            key={`tab-${idx}`}
+            draggable
+            onDragStart={(evt) => handleDragStart(evt, idx)}
+            position={idx}
+            isDroppable={newTemplateTabPosition && idx === Number(newTemplateTabPosition)}
+          >
             <div className="template-tab__details">
               <p>
                 {templateData.description}
@@ -626,6 +664,8 @@ const CardDialogConnector = (connector) => {
                 id="tabs"
                 className="card-dialog__tabs"
                 onSelect={selectTab}
+                onTabDragOver={handleTabDragOver}
+                onDrop={handleDropTab}
               >
                 <Tab eventKey={1} title={t('Description')}>
                   <CardDescriptionEditor cardId={cardId} />
@@ -635,6 +675,7 @@ const CardDialogConnector = (connector) => {
                     href="#"
                     className="card-dialog__custom-attributes-configuration-link"
                     onClick={uiActions.openAttributesDialog}
+                    draggable={false}
                   >
                     {t('Configure')}
                   </a>
@@ -691,25 +732,21 @@ const CardDialogConnector = (connector) => {
     return connect(
       (state, ownProps) => {
         return {
-          cardMetaData: selectors.cardMetaDataSelector(state.present, ownProps.cardId),
-          beats: selectors.visibleSortedBeatsByBookIgnoringCollapsedSelector(state.present),
-          lines: selectors.sortedLinesByBookSelector(state.present),
-          tags: selectors.sortedTagsSelector(state.present),
-          characters: selectors.charactersSortedAtoZSelector(state.present),
-          characterBookCategories: selectors.characterBookCategoriesSelector(state.present),
-          places: selectors.placesSortedAtoZSelector(state.present),
-          customAttributes: state.present.customAttributes.scenes,
-          darkMode: selectors.isDarkModeSelector(state.present),
-          books: state.present.books,
-          isSeries: selectors.isSeriesSelector(state.present),
-          currentTimeline: selectors.currentTimelineSelector(state.present),
-          getTemplateById: selectors.templateByIdFnSelector(state.present),
-          // FIXME: these function change each re-render we should
-          // instead create a selector that produces the function.
-          destinationLineId: (bookId) => selectors.firstLineForBookSelector(state.present, bookId),
-          destinationBeatId: (bookId) =>
-            selectors.firstVisibleBeatForBookSelector(state.present, bookId),
-          click: selectors.lastClickSelector(state.present),
+          cardMetaData: selectors.cardMetaDataSelector(state, ownProps.cardId),
+          beats: selectors.visibleSortedBeatsByBookIgnoringCollapsedSelector(state),
+          lines: selectors.sortedLinesByBookSelector(state),
+          tags: selectors.sortedTagsSelector(state),
+          characters: selectors.charactersSortedAtoZSelector(state),
+          characterBookCategories: selectors.characterBookCategoriesSelector(state),
+          places: selectors.placesSortedAtoZSelector(state),
+          customAttributes: selectors.cardsCustomAttributesSelector(state),
+          darkMode: selectors.isDarkModeSelector(state),
+          books: selectors.allBooksSelector(state),
+          isSeries: selectors.isSeriesSelector(state),
+          currentTimeline: selectors.currentTimelineSelector(state),
+          getTemplateById: selectors.templateByIdFnSelector(state),
+          destinationLineId: selectors.firstLineForBookThunkSelector(state),
+          destinationBeatId: selectors.firstVisibleBeatForBookThunkSelector(state),
         }
       },
       (dispatch) => {

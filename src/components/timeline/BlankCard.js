@@ -398,13 +398,13 @@ const BlankCardConnector = (connector) => {
     return connect(
       (state, ownProps) => {
         return {
-          currentTimeline: selectors.currentTimelineSelector(state.present),
-          orientation: selectors.orientationSelector(state.present),
-          isSmall: selectors.isSmallSelector(state.present),
-          isMedium: selectors.isMediumSelector(state.present),
-          readOnly: !selectors.canWriteSelector(state.present),
+          currentTimeline: selectors.currentTimelineSelector(state),
+          orientation: selectors.orientationSelector(state),
+          isSmall: selectors.isSmallSelector(state),
+          isMedium: selectors.isMediumSelector(state),
+          readOnly: !selectors.canWriteSelector(state),
           addMissingBeats: selectors.parentIsHigherLevelAndViewIsStackedSelector(
-            state.present,
+            state,
             ownProps.beatId
           ),
         }

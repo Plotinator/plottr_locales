@@ -2,8 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react'
 import PropTypes from 'react-proptypes'
 
 import { t, setupI18n } from 'plottr_locales'
+import { defaultSettings } from 'pltr/v2'
 
-import HelpBlock from '../../HelpBlock'
 import Tab from '../../Tab'
 import Tabs from '../../Tabs'
 import Button from '../../Button'
@@ -11,7 +11,8 @@ import Switch from '../../Switch'
 import ButtonGroup from '../../ButtonGroup'
 import UnconnectedLanguagePicker from '../../LanguagePicker'
 import UnconnectedDarkOptionsSelect from './DarkOptionsSelect'
-import UnconnectedBackupOptions from './BackupOptions'
+import UnconnectedBackupSettings from './BackupSettings'
+import UnconnectedFileSettings from './FileSettings'
 import { checkDependencies } from '../../checkDependencies'
 import { addRecent, getFonts, getRecent } from '../../rce/fonts'
 import { FontSettingDropdown } from './FontSettingDropdown'
@@ -23,8 +24,6 @@ const OptionsHomeConnector = (connector) => {
     platform: {
       hostLocale,
       openExternal,
-      defaultBackupLocation,
-      showOpenDialog,
       updateLanguage,
       os,
       log,
@@ -34,26 +33,21 @@ const OptionsHomeConnector = (connector) => {
   checkDependencies({
     hostLocale,
     openExternal,
-    defaultBackupLocation,
-    showOpenDialog,
     updateLanguage,
     os,
+    log,
     saveAppSetting,
   })
 
   const LanguagePicker = UnconnectedLanguagePicker(connector)
   const DarkOptionsSelect = UnconnectedDarkOptionsSelect(connector)
-  const BackupOptions = UnconnectedBackupOptions(connector)
+  const BackupSettings = UnconnectedBackupSettings(connector)
+  const FileSettings = UnconnectedFileSettings(connector)
 
-  const OptionsHome = ({ hasCurrentProLicense, settings, shouldBeInPro }) => {
+  const OptionsHome = ({ settings, shouldBeInPro }) => {
     const [activeTab, setActiveTab] = useState(1)
     const [fonts, setFonts] = useState(null)
     const [recentFonts, setRecentFonts] = useState(settings.user.font ? [settings.user.font] : null)
-    const [defaultBackupPath, setDefaultBackupPath] = useState('')
-
-    useEffect(() => {
-      defaultBackupLocation().then(setDefaultBackupPath)
-    }, [])
 
     useEffect(() => {
       hostLocale().then((locale) => {
@@ -74,27 +68,9 @@ const OptionsHomeConnector = (connector) => {
 
     const osIsUnknown = os() === 'unknown'
 
-    const onChangeBackupLocation = () => {
-      const title = t('Choose your backup location')
-      const properties = ['openDirectory', 'createDirectory']
-      showOpenDialog(title, [], properties).then((files) => {
-        if (files && files.length) {
-          let folderPath = files[0]
-          saveAppSetting('user.backupLocation', folderPath)
-        }
-      })
-    }
-
     const toggleEnableOfflineMode = () => {
       const newValue = !settings.user.enableOfflineMode
       saveAppSetting('user.enableOfflineMode', newValue)
-    }
-
-    // show if:
-    // - not web
-    // - not Pro, unless Pro & localBackups
-    const showBackupLocation = () => {
-      return (!osIsUnknown && !hasCurrentProLicense) || (!osIsUnknown && settings.user.localBackups)
     }
 
     const dashboardAtFirstIsOn =
@@ -109,10 +85,9 @@ const OptionsHomeConnector = (connector) => {
 
     const spellCheckText = spellCheckAtFirstIsOn ? t('Enabled') : t('Disabled')
 
-    // TODO: pull the default values from the right place (default_settings)
-    const rceFontIsDefault = settings.user.font === undefined || settings.user.font === 'Forum'
-    const rceFontSizeIsDefault =
-      settings.user.fontSize === undefined || settings.user.fontSize === 20
+    const { user } = defaultSettings.defaultsForPlatform(os())
+    const rceFontIsDefault = settings.user.font === user?.font
+    const rceFontSizeIsDefault = settings.user.fontSize === user?.fontSize
     const rceIsDefault = rceFontIsDefault && rceFontSizeIsDefault
 
     const handleSelectLanguage = useCallback(
@@ -204,7 +179,12 @@ const OptionsHomeConnector = (connector) => {
                 </div>
               </div>
             </Tab>
-            <Tab eventKey={2} title={t('Dashboard')}>
+            {!shouldBeInPro ? (
+              <Tab eventKey={2} title={t('Files')}>
+                <FileSettings />
+              </Tab>
+            ) : null}
+            <Tab eventKey={3} title={t('Dashboard')}>
               <div className="dashboard__options__item">
                 <h4>{t('Always Open Dashboard First')}</h4>
                 <Switch
@@ -231,55 +211,11 @@ const OptionsHomeConnector = (connector) => {
                 />
               </div>
             </Tab>
-            <Tab eventKey={3} title={t('Backups')}>
-              <div className="dashboard__options__item">
-                <h4>{t('Save Backups')}</h4>
-                <Switch
-                  isOn={!!settings.backup}
-                  handleToggle={() => saveAppSetting('backup', !settings.backup)}
-                  labelText={t('Automatically save daily backups')}
-                />
-              </div>
-              {!osIsUnknown && hasCurrentProLicense ? (
-                <div className="dashboard__options__item">
-                  <h4>{t('Also save backups on this device')}</h4>
-                  <Switch
-                    isOn={!!settings.user.localBackups}
-                    handleToggle={() =>
-                      saveAppSetting('user.localBackups', !settings.user.localBackups)
-                    }
-                    labelText={t('Save backups to this device as well as in the cloud')}
-                  />
-                </div>
-              ) : null}
-              {showBackupLocation() ? (
-                <>
-                  <div className="dashboard__options__item">
-                    <h4>{t('Backup Location')}</h4>
-                    <HelpBlock className="dashboard__options-item-help">
-                      {t('Folder where backups are stored')}
-                    </HelpBlock>
-                    <p>
-                      <Button onClick={onChangeBackupLocation}>{t('Choose...')}</Button>
-                      {'  '}
-                      {!settings.user.backupLocation || settings.user.backupLocation === 'default'
-                        ? defaultBackupPath
-                        : settings.user.backupLocation}
-                    </p>
-                    {settings.user.backupLocation !== 'default' ? (
-                      <Button onClick={() => saveAppSetting('user.backupLocation', 'default')}>
-                        {t('Restore Default')}
-                      </Button>
-                    ) : null}
-                  </div>
-                  <div className="dashboard__options__item">
-                    <BackupOptions />
-                  </div>
-                </>
-              ) : null}
+            <Tab eventKey={4} title={t('Backups')}>
+              <BackupSettings />
             </Tab>
             {!osIsUnknown && shouldBeInPro ? (
-              <Tab eventKey={4} title={t('Beta')}>
+              <Tab eventKey={5} title={t('Beta')}>
                 <div className="dashboard__options__item">
                   <h4>{t('Offline Mode')}</h4>
                   <Switch
@@ -305,7 +241,6 @@ const OptionsHomeConnector = (connector) => {
   }
 
   OptionsHome.propTypes = {
-    hasCurrentProLicense: PropTypes.bool,
     settings: PropTypes.object.isRequired,
     shouldBeInPro: PropTypes.bool,
   }
@@ -320,9 +255,8 @@ const OptionsHomeConnector = (connector) => {
 
     return connect((state) => {
       return {
-        hasCurrentProLicense: selectors.hasProSelector(state.present),
-        settings: selectors.appSettingsSelector(state.present),
-        shouldBeInPro: selectors.shouldBeInProSelector(state.present),
+        settings: selectors.appSettingsSelector(state),
+        shouldBeInPro: selectors.shouldBeInProSelector(state),
       }
     })(OptionsHome)
   }
