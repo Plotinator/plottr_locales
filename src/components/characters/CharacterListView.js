@@ -111,9 +111,10 @@ const CharacterListViewConnector = (connector) => {
     const [detailsVisible, setDetailsVisible] = useState(true)
 
     useEffect(() => {
-      uiActions.selectCharacter(
-        selectedId(visibleCharactersByCategory, characters, categories, selectedCharacteId)
-      )
+      const id = selectedId(visibleCharactersByCategory, characters, categories, selectedCharacteId)
+      if (id !== selectedCharacteId) {
+        uiActions.selectCharacter(id)
+      }
     }, [visibleCharactersByCategory, characters, categories])
 
     const editSelected = () => {
@@ -432,7 +433,7 @@ const CharacterListViewConnector = (connector) => {
                     style={{ marginBottom: '16px' }}
                   >
                     <Tab eventKey={'all'} title={t('Series')}></Tab>
-                    {Object.values(books).map((book, index) => {
+                    {books.map((book, index) => {
                       if (Array.isArray(book)) {
                         return null
                       }
@@ -460,7 +461,7 @@ const CharacterListViewConnector = (connector) => {
     characterSort: PropTypes.string,
     darkMode: PropTypes.bool,
     charactersSearchTerm: PropTypes.string,
-    books: PropTypes.object.isRequired,
+    books: PropTypes.array.isRequired,
     selectedCharacteId: PropTypes.number,
     showTabs: PropTypes.bool,
     attributeTabId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
@@ -486,23 +487,21 @@ const CharacterListViewConnector = (connector) => {
     return connect(
       (state) => {
         return {
-          visibleCharactersByCategory: selectors.visibleSortedSearchedCharactersByCategorySelector(
-            state.present
-          ),
-          filterIsEmpty: selectors.characterFilterIsEmptySelector(state.present),
-          characters: state.present.characters,
-          categories: selectors.sortedCharacterCategoriesSelector(state.present),
-          customAttributes: state.present.customAttributes.characters,
-          customAttributesThatCanChange: selectors.characterCustomAttributesThatCanChangeSelector(
-            state.present
-          ),
-          characterSort: selectors.characterSortSelector(state.present),
-          darkMode: selectors.isDarkModeSelector(state.present),
-          charactersSearchTerm: selectors.charactersSearchTermSelector(state.present),
-          books: selectors.allBooksWithCharactersInThemSelector(state.present),
-          attributeTabId: selectors.characterAttributeTabSelector(state.present),
-          selectedCharacteId: selectors.selectedCharacterSelector(state.present),
-          showTabs: selectors.showBookTabsSelector(state.present),
+          visibleCharactersByCategory:
+            selectors.visibleSortedSearchedCharactersByCategorySelector(state),
+          filterIsEmpty: selectors.characterFilterIsEmptySelector(state),
+          characters: selectors.allCharactersSelector(state),
+          categories: selectors.sortedCharacterCategoriesSelector(state),
+          customAttributes: selectors.characterCustomAttributesSelector(state),
+          customAttributesThatCanChange:
+            selectors.characterCustomAttributesThatCanChangeSelector(state),
+          characterSort: selectors.characterSortSelector(state),
+          darkMode: selectors.isDarkModeSelector(state),
+          charactersSearchTerm: selectors.charactersSearchTermSelector(state),
+          books: selectors.allBooksWithCharactersInThemSortedByPositionInAllBookIdsSelector(state),
+          attributeTabId: selectors.characterAttributeTabSelector(state),
+          selectedCharacteId: selectors.selectedCharacterSelector(state),
+          showTabs: selectors.showBookTabsSelector(state),
         }
       },
       (dispatch) => {

@@ -224,8 +224,8 @@ const UnconnectedOutlineOptions = (connector) => {
     const { connect } = redux
 
     return connect((state) => ({
-      outlineFilter: selectors.outlineFilterSelector(state.present),
-      lines: selectors.sortedLinesByBookSelector(state.present),
+      outlineFilter: selectors.outlineFilterSelector(state),
+      lines: selectors.sortedLinesByBookSelector(state),
     }))(OutlineOptions)
   }
 

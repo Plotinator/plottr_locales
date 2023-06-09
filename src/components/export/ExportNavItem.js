@@ -60,7 +60,7 @@ const ExportNavItemConnector = (connector) => {
         bookId == 'series' ? seriesName + ' ' + t('(Series View)') : books[`${bookId}`].title
 
       withFullFileState((state) => {
-        const withoutSystemKeys = removeSystemKeys(state.present)
+        const withoutSystemKeys = removeSystemKeys(state)
         askToExport(defaultPath, withoutSystemKeys, type, export_config[type], userId).catch(
           (error) => {
             log.error(error)
@@ -151,10 +151,10 @@ const ExportNavItemConnector = (connector) => {
 
     return connect(
       (state) => ({
-        currentTimeline: selectors.currentTimelineSelector(state.present),
-        seriesName: state.present.series.name,
-        books: state.present.books,
-        userId: selectors.userIdSelector(state.present),
+        currentTimeline: selectors.currentTimelineSelector(state),
+        seriesName: selectors.seriesNameSelector(state),
+        books: selectors.allBooksSelector(state),
+        userId: selectors.userIdSelector(state),
       }),
       {
         withFullFileState: actions.project.withFullFileState,

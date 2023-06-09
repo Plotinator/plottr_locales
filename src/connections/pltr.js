@@ -2,7 +2,6 @@ import { connect } from 'react-redux'
 import { PropTypes } from 'prop-types'
 import { assertPropTypes } from 'plottr_check-prop-types'
 import { bindActionCreators } from 'redux'
-import * as pltr from 'pltr/v2'
 import {
   Navbar,
   Grid,
@@ -85,13 +84,13 @@ import {
   CharacterTemplateDetails,
   DashboardBody as UnconnectedDashboardBody,
   DashboardNav,
-  ActsHelpModal as UnconnectedActsHelpModal,
   FirebaseLogin as UnconnectedFirebaseLogin,
   ChoiceView as UnconnectedChoiceView,
   ExpiredView as UnconnectedExpiredView,
   ProOnboarding as UnconnectedProOnboarding,
   UpdateNotifier as UnconnectedUpdateNotifier,
   NewProjectInputModal as UnconnectedNewProjectInputModal,
+  SettingsWizard as UnconnectedSettingsWizard,
   RestructureTimelineModal as UnconnectedRestructureTimelineModal,
 } from '../components'
 
@@ -100,7 +99,6 @@ const connector = {
     connect,
     bindActionCreators,
   },
-  pltr,
 }
 
 // Platform is an object which provides features which are specific to
@@ -144,6 +142,8 @@ const pltrTypeSpecs = {
     createFromScrivener: PropTypes.func.isRequired,
     joinPath: PropTypes.func.isRequired,
     listOfflineFiles: PropTypes.func.isRequired,
+    createAndOpenCopy: PropTypes.func.isRequired,
+    filePathAsArray: PropTypes.func.isRequired,
   }),
   update: PropTypes.shape({
     quitToInstall: PropTypes.func.isRequired,
@@ -243,9 +243,9 @@ export const checkPltrConnector = (platform) => {
   })
 }
 
-export default (platform) => {
+export default (platform, pltr) => {
   checkPltrConnector(platform)
-  var connectorObject = { ...connector, platform }
+  var connectorObject = { ...connector, pltr, platform }
   return {
     Navbar,
     Grid,
@@ -328,13 +328,13 @@ export default (platform) => {
     CharacterTemplateDetails,
     DashboardBody: UnconnectedDashboardBody(connectorObject),
     DashboardNav,
-    ActsHelpModal: UnconnectedActsHelpModal(connectorObject),
     FirebaseLogin: UnconnectedFirebaseLogin(connectorObject),
     ChoiceView: UnconnectedChoiceView(connectorObject),
     ExpiredView: UnconnectedExpiredView(connectorObject),
     ProOnboarding: UnconnectedProOnboarding(connectorObject),
     UpdateNotifier: UnconnectedUpdateNotifier(connectorObject),
     NewProjectInputModal: UnconnectedNewProjectInputModal(connectorObject),
+    SettingsWizard: UnconnectedSettingsWizard(connectorObject),
     RestructureTimelineModal: UnconnectedRestructureTimelineModal(connectorObject),
   }
 }

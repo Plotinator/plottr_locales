@@ -162,12 +162,12 @@ const AddLineRowConnector = (connector) => {
     return connect(
       (state) => {
         return {
-          currentTimeline: selectors.currentTimelineSelector(state.present),
-          isSmall: selectors.isSmallSelector(state.present),
-          isMedium: selectors.isMediumSelector(state.present),
-          beats: selectors.sortedBeatsByBookSelector(state.present),
-          lines: selectors.linesByBookSelector(state.present),
-          cards: state.present.cards,
+          currentTimeline: selectors.currentTimelineSelector(state),
+          isSmall: selectors.isSmallSelector(state),
+          isMedium: selectors.isMediumSelector(state),
+          beats: selectors.sortedBeatsByBookSelector(state),
+          lines: selectors.linesByBookSelector(state),
+          cards: selectors.allCardsSelector(state),
         }
       },
       (dispatch) => {

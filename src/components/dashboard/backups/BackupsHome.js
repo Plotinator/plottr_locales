@@ -1,114 +1,58 @@
-import React, { useState, useEffect } from 'react'
-import { PropTypes } from 'prop-types'
+import React, { useEffect, useState } from 'react'
 
 import { t } from 'plottr_locales'
-import { helpers } from 'pltr/v2'
 
+import FormControl from '../../FormControl'
+import Glyphicon from '../../Glyphicon'
+import ToolTip from '../../ToolTip'
 import Grid from '../../Grid'
 import Col from '../../Col'
 import Row from '../../Row'
-import FormControl from '../../FormControl'
 import UnconnectedDashboardErrorBoundary from '../../containers/DashboardErrorBoundary'
-import UnconnectedBackupFiles from './BackupFiles'
-import UnconnectedFolders from './Folders'
+import UnconnectedBackupsTable from './BackupsTable'
+import { Spinner } from '../../Spinner'
 
 const BackupsHomeConnector = (connector) => {
-  const BackupFiles = UnconnectedBackupFiles(connector)
-  const Folders = UnconnectedFolders(connector)
+  const BackupsTable = UnconnectedBackupsTable(connector)
   const DashboardErrorBoundary = UnconnectedDashboardErrorBoundary(connector)
 
-  const BackupsHome = ({ userId, computeFolders }) => {
-    const [selectedFolder, selectFolder] = useState(null)
+  const BackupsHome = () => {
     const [searchTerm, setSearchTerm] = useState('')
-    const [folders, setFolders] = useState([])
+    const [showTable, setShowTable] = useState(false)
 
     useEffect(() => {
-      setFolders(computeFolders(searchTerm, selectedFolder))
-    }, [searchTerm, selectedFolder, setFolders, computeFolders])
+      setTimeout(() => setShowTable(true), 300)
+    }, [])
 
-    useEffect(() => {
-      setSearchTerm('')
-    }, [selectedFolder])
-
-    // NOTE: It's important to render the dashboard body wrapper here
-    // to make sure that scrolling resets when changing folders etc.
-    const Body = () => (
-      <div className="dashboard__backups__wrapper">
+    return (
+      <div className="dashboard__backups">
+        <div className="dashboard__backups__header-div">
+          <h1>{t('Backups')}</h1>
+          <ToolTip
+            id="backup-warning-tooltip"
+            placement="right"
+            text={t(
+              'Plottr creates two backup files per session. One at the start and one at the end.'
+            )}
+          >
+            <Glyphicon glyph="info-sign" />
+          </ToolTip>
+        </div>
+        <FormControl
+          type="search"
+          placeholder={t('Search')}
+          className="dashboard__search"
+          onChange={(event) => setSearchTerm(event.target.value)}
+          value={searchTerm}
+        />
         <DashboardErrorBoundary>
-          {selectedFolder ? (
-            <BackupFiles folder={selectedFolder} searchTerm={searchTerm} />
-          ) : (
-            <Folders selectFolder={selectFolder} folders={folders} searchTerm={searchTerm} />
-          )}
+          {showTable ? <BackupsTable searchTerm={searchTerm} /> : <Spinner />}
         </DashboardErrorBoundary>
       </div>
     )
-
-    let breadcrumb = null
-    if (selectedFolder) {
-      const date = selectedFolder.date
-      const dateStr = t('{date, date, medium}', {
-        date: date instanceof Date ? date : helpers.date.parseStringDate(date),
-      })
-      breadcrumb = (
-        <div className="dashboard__breadcrumb">
-          <a href="#" onClick={() => selectFolder(null)}>
-            {t('All')}
-          </a>
-          <span> » </span>
-          <span>{dateStr}</span>
-        </div>
-      )
-    }
-
-    // <FormControl type='search' placeholder={t('Search')} className='dashboard__search' />
-    return (
-      <div className="dashboard__backups">
-        <h1>{t('Backups')}</h1>
-        <Grid fluid>
-          <Row>
-            <Col xs={4} sm={6} md={8} lg={9}>
-              {breadcrumb}
-            </Col>
-          </Row>
-          <Row>
-            <Col xs={8} sm={6} md={4} lg={3}>
-              <FormControl
-                type="search"
-                placeholder={t('Search')}
-                className="dashboard__search"
-                onChange={(event) => setSearchTerm(event.target.value)}
-                value={searchTerm}
-              />
-            </Col>
-          </Row>
-        </Grid>
-        <Body />
-      </div>
-    )
   }
 
-  BackupsHome.propTypes = {
-    userId: PropTypes.string,
-    computeFolders: PropTypes.func.isRequired,
-  }
-
-  const {
-    pltr: { selectors },
-    redux,
-  } = connector
-
-  if (redux) {
-    const { connect } = redux
-
-    return connect((state) => ({
-      userId: selectors.userIdSelector(state.present),
-      computeFolders: (searchTerm, selectedFolder) =>
-        selectors.filteredSortedBackupsSelector(state.present, searchTerm, !selectedFolder),
-    }))(BackupsHome)
-  }
-
-  throw new Error('Could not connect BackupsHome')
+  return BackupsHome
 }
 
 export default BackupsHomeConnector

@@ -358,20 +358,17 @@ const PlaceListViewConnector = (connector) => {
     return connect(
       (state) => {
         return {
-          places: state.present.places,
-          visiblePlacesByCategory: selectors.visibleSortedSearchedPlacesByCategorySelector(
-            state.present
-          ),
-          categories: selectors.sortedPlaceCategoriesSelector(state.present),
-          filterIsEmpty: selectors.placeFilterIsEmptySelector(state.present),
-          customAttributes: state.present.customAttributes.places,
-          customAttributesThatCanChange: selectors.placeCustomAttributesThatCanChangeSelector(
-            state.present
-          ),
-          restrictedValues: selectors.placeCustomAttributesRestrictedValues(state.present),
-          darkMode: selectors.isDarkModeSelector(state.present),
-          placeSort: selectors.placeSortSelector(state.present),
-          placeSearchTerm: selectors.placesSearchTermSelector(state.present),
+          places: selectors.allPlacesSelector(state),
+          visiblePlacesByCategory: selectors.visibleSortedSearchedPlacesByCategorySelector(state),
+          categories: selectors.sortedPlaceCategoriesSelector(state),
+          filterIsEmpty: selectors.placeFilterIsEmptySelector(state),
+          customAttributes: selectors.placeCustomAttributesSelector(state),
+          customAttributesThatCanChange:
+            selectors.placeCustomAttributesThatCanChangeSelector(state),
+          restrictedValues: selectors.placeCustomAttributesRestrictedValues(state),
+          darkMode: selectors.isDarkModeSelector(state),
+          placeSort: selectors.placeSortSelector(state),
+          placeSearchTerm: selectors.placesSearchTermSelector(state),
         }
       },
       (dispatch) => {
