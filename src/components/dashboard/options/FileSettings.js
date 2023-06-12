@@ -16,6 +16,7 @@ const FileSettingsConnector = (connector) => {
       showOpenDialog,
       showItemInFolder,
       userDocumentsPath,
+      showErrorBox,
     },
   } = connector
   checkDependencies({
@@ -25,6 +26,7 @@ const FileSettingsConnector = (connector) => {
     userDocumentsPath,
     joinPath,
     filePathAsArray,
+    showErrorBox,
   })
 
   const FileSettings = ({ settings }) => {
@@ -60,8 +62,15 @@ const FileSettingsConnector = (connector) => {
       const properties = ['openDirectory', 'createDirectory']
       showOpenDialog(title, [], properties, folderPath()).then((files) => {
         if (files && files.length) {
-          let folderPath = files[0]
-          saveAppSetting('user.defaultFolderLocation', folderPath)
+          const folderPath = files[0]
+          if (folderPath === settings.user.backupLocation) {
+            showErrorBox(
+              t('Invalid default folder location'),
+              t('Please set your default folder to a different location from your backups')
+            )
+          } else {
+            saveAppSetting('user.defaultFolderLocation', folderPath)
+          }
         }
       })
     }
