@@ -156,7 +156,7 @@ const TopRowConnector = (connector) => {
               beatToLeft={beat}
               orientation={orientation}
             />,
-            <Cell key={`beatId-${beat.id}-insert-child-peer-dummy-cell`} />,
+            ...(isMedium ? [] : [<Cell key={`beatId-${beat.id}-insert-child-peer-dummy-cell`} />]),
           ])
         } else {
           cells.push(

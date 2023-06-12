@@ -30,7 +30,6 @@ import ItemsManagerModal, { ListItem } from './dialogs/ItemsManagerModal'
 import InputModal from './dialogs/InputModal'
 import ActsConfigModal from './dialogs/ActsConfigModal'
 import AskToSaveModal from './dialogs/AskToSaveModal'
-import ActsHelpModal from './dialogs/ActsHelpModal'
 import NewProjectInputModal from './dialogs/NewProjectInputModal'
 import RestructureTimelineModal from './dialogs/RestructureTimelineModal'
 
@@ -198,7 +197,6 @@ export {
   TimelineWrapper,
   ActsConfigModal,
   AskToSaveModal,
-  ActsHelpModal,
   ErrorBoundary,
   DashboardErrorBoundary,
   SelectList,

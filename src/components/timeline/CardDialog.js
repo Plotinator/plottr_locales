@@ -664,7 +664,6 @@ const CardDialogConnector = (connector) => {
                 id="tabs"
                 className="card-dialog__tabs"
                 onSelect={selectTab}
-                draggable
                 onTabDragOver={handleTabDragOver}
                 onDrop={handleDropTab}
               >
@@ -676,6 +675,7 @@ const CardDialogConnector = (connector) => {
                     href="#"
                     className="card-dialog__custom-attributes-configuration-link"
                     onClick={uiActions.openAttributesDialog}
+                    draggable={false}
                   >
                     {t('Configure')}
                   </a>

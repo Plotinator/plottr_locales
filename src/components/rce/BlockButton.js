@@ -183,6 +183,7 @@ const BlockButton = ({ editor, format, icon, logger }) => {
 
   return (
     <Button
+      className={blockIsActive ? 'active' : ''}
       bsStyle={blockIsActive ? 'primary' : 'default'}
       onMouseDown={(event) => {
         event.preventDefault()
