@@ -4,6 +4,7 @@ import * as ActionTypes from './constants/ActionTypes'
 import * as LoadActions from './constants/loadActions'
 import * as colors from './constants/CSScolors'
 import * as featureFlags from './constants/featureFlags'
+import * as errorCodes from './constants/errorCodes'
 
 import * as lineHelpers from './helpers/lines'
 import * as cardHelpers from './helpers/cards'
@@ -72,6 +73,7 @@ import * as lineColors from './store/lineColors'
 import { emptyFile, addMissingKeys } from './store/newFileState'
 import * as newIds from './store/newIds'
 import * as borderStyle from './store/borderStyle'
+import * as defaultSettings from './store/defaultSettings'
 
 import externalSync, { externalSyncWithoutHistory } from './middlewares/externalSync'
 
@@ -157,6 +159,7 @@ export {
   helpers,
   colors,
   featureFlags,
+  errorCodes,
   migrateIfNeeded,
   Migrator,
   rootReducer,
@@ -174,6 +177,7 @@ export {
   template,
   tree,
   borderStyle,
+  defaultSettings,
   slate,
   middlewares,
   ARRAY_KEYS,

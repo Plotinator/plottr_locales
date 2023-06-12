@@ -682,11 +682,10 @@ const stringifiedCardsByIdSelector = createSelector(allCardsSelector, (cards) =>
 
 export const outlineSearchedCardMapSelector = createSelector(
   allCardsSelector,
-  collapsedBeatSelector,
   sortedBeatsByBookSelector,
   outlineSearchTermSelector,
   stringifiedCardsByIdSelector,
-  (cards, collapsedBeats, allSortedBeats, outlineSearchTerm, stringifiedCards) => {
+  (cards, allSortedBeats, outlineSearchTerm, stringifiedCards) => {
     const beatIds = allSortedBeats.map(({ id }) => id)
     const beatPositions = beatIds.map((x) => x)
     beatIds.forEach((beatId, index) => (beatPositions[beatId] = index))
@@ -701,7 +700,7 @@ export const outlineSearchedCardMapSelector = createSelector(
           return outOfOrderSearch(lowerCaseSearchTerms, stringifiedCards[id])
         })
       : cards
-    return filteredCards.reduce(cardReduce('lineId', 'beatId', collapsedBeats, beatPositions), {})
+    return filteredCards.reduce(cardReduce('lineId', 'beatId', new Map(), beatPositions), {})
   }
 )
 

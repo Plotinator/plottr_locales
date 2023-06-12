@@ -26,6 +26,7 @@ import {
   MOVE_LINE,
   PIN_PLOTLINE,
   UNPIN_PLOTLINE,
+  DUPLICATE_BOOK,
 } from '../constants/ActionTypes'
 import { line } from '../store/initialState'
 import { newFileLines, newFileSeriesLines } from '../store/newFileState'
@@ -71,7 +72,7 @@ const lines =
             ...line,
             id: nextId(state),
             bookId: actionBookId,
-            title: action.title || t('Main Plot'),
+            title: (action.type !== ADD_BOOK && action.title) || t('Main Plot'),
             color: nextColor(linesInBook_),
             position: nextPositionInBook(state, actionBookId),
           },
@@ -94,6 +95,18 @@ const lines =
             if (!newLine.color || newLine.color == nextColor(0)) {
               newLine.color = nextColor(linesInBook.length + index)
             }
+            return newLine
+          })
+        return [...state, ...newLines]
+      }
+
+      case DUPLICATE_BOOK: {
+        const newLines = action.newLines
+          .filter(({ bookId }) => bookId !== 'series') // this is to protect against a bad template that unnecessarily had a series line
+          .map((l, index) => {
+            const newLine = cloneDeep(l)
+            newLine.id = action.nextLineId + newLine.id // give it a new id
+            newLine.bookId = action.newBookId // add it to the new/current book
             return newLine
           })
         return [...state, ...newLines]
