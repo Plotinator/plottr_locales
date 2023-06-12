@@ -20,6 +20,7 @@ const BackupSettingsConnector = (connector) => {
       userDocumentsPath,
       settings: { saveAppSetting },
       file: { joinPath, filePathAsArray },
+      showErrorBox,
     },
   } = connector
   checkDependencies({
@@ -31,6 +32,7 @@ const BackupSettingsConnector = (connector) => {
     joinPath,
     userDocumentsPath,
     filePathAsArray,
+    showErrorBox,
   })
 
   const BackupOptions = UnconnectedBackupOptions(connector)
@@ -70,8 +72,15 @@ const BackupSettingsConnector = (connector) => {
       const properties = ['openDirectory', 'createDirectory']
       showOpenDialog(title, [], properties).then((files) => {
         if (files && files.length) {
-          let folderPath = files[0]
-          saveAppSetting('user.backupLocation', folderPath)
+          const folderPath = files[0]
+          if (folderPath === settings.user.defaultFolderLocation) {
+            showErrorBox(
+              t('Invalid backup location'),
+              t('Please store your backups in a different location to your default folder')
+            )
+          } else {
+            saveAppSetting('user.backupLocation', folderPath)
+          }
         }
       })
     }
