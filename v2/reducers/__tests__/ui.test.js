@@ -30,6 +30,7 @@ const addCharacterToCard = wiredUpActions.card.addCharacter
 const { addCharacter, editCharacterAttributeValue } = wiredUpActions.character
 const { setAppSettings } = wiredUpActions.settings
 const { setPermission } = wiredUpActions.permission
+const loadLines = wiredUpActions.line.load
 
 const {
   permissionSelector,
@@ -839,6 +840,107 @@ describe('ui-per-user', () => {
               currentTimeline: 2,
             },
           ])
+        })
+      })
+    })
+
+    describe('given the permission changes', () => {
+      const store = initialStore()
+      describe('given the permission is "owner"', () => {
+        it('should write into the root of the ui key', () => {
+          const appSettings = appSettingsSelector(store.getState())
+          store.dispatch(
+            setAppSettings({
+              ...appSettings,
+              user: {
+                ...appSettings.user,
+                frbId: 'frb-dummy-owner-id',
+              },
+            })
+          )
+          store.dispatch(setUserId('dummy-owner-id'))
+          store.dispatch(setPermission('owner'))
+          store.dispatch(addLineWithTitle('second line', 1))
+          store.dispatch(addLineWithTitle('third line', 1))
+          store.dispatch(addLineWithTitle('fourth line', 1))
+          store.dispatch(addLineWithTitle('fifth line', 1))
+          const allLines = sortedLinesByBookSelector(store.getState())
+          const exampleLine2 = allLines.find((line) => line.title === 'second line')
+          store.dispatch(togglePinPlotline(exampleLine2))
+          const stateAfterLineChanges = store.getState()
+          const pinnedPlotlines = pinnedPlotlinesSelector(stateAfterLineChanges)
+          const allLinesInBook = sortedLinesByBookSelector(stateAfterLineChanges)
+          const allPinnedLines = allLinesInBook.filter((line) => line.isPinned)
+          expect(pinnedPlotlines).toBe(1)
+          expect(allPinnedLines).toHaveLength(1)
+        })
+      })
+
+      describe('given the permission is changed to "collaborator"', () => {
+        it('should load the owners ui state', () => {
+          const appSettings = appSettingsSelector(store.getState())
+          store.dispatch(
+            setAppSettings({
+              ...appSettings,
+              user: {
+                ...appSettings.user,
+                frbId: 'frb-dummy-collaborator-id',
+              },
+            })
+          )
+          store.dispatch(setUserId('dummy-collaborator-id'))
+          store.dispatch(setPermission('collaborator'))
+          const stateAfterLineChanges = store.getState()
+          const pinnedPlotlines = pinnedPlotlinesSelector(stateAfterLineChanges)
+          const allLinesInBook = sortedLinesByBookSelector(stateAfterLineChanges)
+          const allPinnedLines = allLinesInBook.filter((line) => line.isPinned)
+          expect(permissionSelector(store.getState())).toEqual('collaborator')
+          expect(pinnedPlotlines).toBe(1)
+          expect(allPinnedLines.length).toEqual(pinnedPlotlines)
+        })
+
+        it('should write into an entry inside of ui.collaborators.viewers keyed by the logged-in uid', () => {
+          const allLines = sortedLinesByBookSelector(store.getState())
+          const exampleLine3 = allLines.find((line) => line.title === 'third line')
+          store.dispatch(togglePinPlotline(exampleLine3))
+          const stateAfterSecondPin = store.getState()
+          const pinnedPlotlines = pinnedPlotlinesSelector(stateAfterSecondPin)
+          const allLinesInBook = sortedLinesByBookSelector(stateAfterSecondPin)
+          const allPinnedLines = allLinesInBook.filter((line) => line.isPinned)
+          expect(pinnedPlotlines).toBe(2)
+          expect(allPinnedLines.length).toEqual(pinnedPlotlines)
+        })
+      })
+
+      describe('given the permission is changed back to "owner"', () => {
+        it('should read ui changes from both "owner" and "collaborator"', () => {
+          store
+          const appSettings = appSettingsSelector(store.getState())
+          store.dispatch(
+            setAppSettings({
+              ...appSettings,
+              user: {
+                ...appSettings.user,
+                frbId: 'frb-dummy-owner-id',
+              },
+            })
+          )
+          store.dispatch(setUserId('dummy-owner-id'))
+          store.dispatch(setPermission('owner'))
+          const stateAfterChangePermission = store.getState()
+          const allLinesInBook = sortedLinesByBookSelector(stateAfterChangePermission)
+          store.dispatch(loadLines({}, allLinesInBook))
+          const stateAfterLoadLines = store.getState()
+          const pinnedPlotlines = pinnedPlotlinesSelector(stateAfterLoadLines)
+          const allPinnedLines = allLinesInBook.filter((line) => line.isPinned)
+          const exampleLine4 = allLinesInBook.find((line) => line.title === 'fourth line')
+          expect(permissionSelector(stateAfterChangePermission)).toEqual('owner')
+          expect(pinnedPlotlines).toBe(2)
+          expect(allPinnedLines.length).toEqual(pinnedPlotlines)
+
+          store.dispatch(togglePinPlotline(exampleLine4))
+          const stateAfterPinningAnotherLine = store.getState()
+          expect(pinnedPlotlinesSelector(stateAfterPinningAnotherLine)).toBe(3)
         })
       })
     })

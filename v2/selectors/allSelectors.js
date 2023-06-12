@@ -44,6 +44,7 @@ import * as timelineThirdOrder from './timelineThirdOrder'
 import * as uiThirdOrder from './uiThirdOrder'
 import * as categoriesThirdOrder from './categoriesThirdOrder'
 import * as booksThirdOrder from './booksThirdOrder'
+import * as backupsThirdOrder from './backupsThirdOrder'
 
 const allSelectors = {
   ...fullFileFirstOrder,
@@ -92,6 +93,7 @@ const allSelectors = {
   ...uiThirdOrder,
   ...categoriesThirdOrder,
   ...booksThirdOrder,
+  ...backupsThirdOrder,
 }
 
 export default allSelectors

@@ -7,7 +7,7 @@ import {
 
 // Other selector dependencies
 import { allCharactersSelector } from './charactersFirstOrder'
-import { attributesSelector } from './attributesFirstOrder'
+import { attributesSelector, allNonBaseCharacterAttributesSelector } from './attributesFirstOrder'
 import {
   cardsCustomAttributesSelector,
   characterCustomAttributesSelector,
@@ -59,5 +59,22 @@ export const customAttributesFilter = createSelector(
       default:
         return {}
     }
+  }
+)
+
+export const allLegacyAndNewCharacterAttributesSelector = createSelector(
+  characterCustomAttributesSelector,
+  allNonBaseCharacterAttributesSelector,
+  (legacyAttributes, newNonBaseAttributes) => {
+    return [
+      ...legacyAttributes.filter(({ name }) => {
+        return (
+          newNonBaseAttributes.findIndex((newAttribute) => {
+            return name !== newAttribute.name
+          }) !== -1
+        )
+      }),
+      ...newNonBaseAttributes,
+    ]
   }
 )

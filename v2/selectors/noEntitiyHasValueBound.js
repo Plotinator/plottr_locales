@@ -47,8 +47,11 @@ export function hasNoValue(item, id) {
 
   if (!val.length) return true
   if (val.length > 1) return false // more than 1 paragraph
-  if (val[0].children.length > 1) return false // more than 1 text node
-  if (val[0].children[0].text == '') return true // no text
+  if (val.text && val.text !== '') return false
+  if (val.children) {
+    if (val[0].children.length > 1) return false // more than 1 text node
+    if (val[0].children[0].text == '') return true // no text
+  }
   return false
 }
 
