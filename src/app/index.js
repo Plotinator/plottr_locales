@@ -28,12 +28,7 @@ import initMixpanel from '../common/utils/mixpanel'
 import { ActionCreators } from 'redux-undo'
 import { addNewCustomTemplate } from '../common/utils/custom_templates'
 import { createFullErrorReport } from '../common/utils/full_error_report'
-import {
-  openDashboard,
-  closeDashboard,
-  createFromTemplate,
-  openExistingProj,
-} from '../dashboard-events'
+import { openDashboard, closeDashboard, createFromTemplate } from '../dashboard-events'
 import { makeFileSystemAPIs } from '../api'
 import { renderFile } from '../renderFile'
 import { setOS } from '../isOS'
@@ -42,6 +37,7 @@ import { openFile } from 'connected-components'
 // import { instrumentLongRunningTasks } from './longRunning'
 import { rootComponent } from './rootComponent'
 import { makeFileModule } from './files'
+import { openExistingFile } from '../files'
 import { createClient, getPort, whenClientIsReady, setPort } from '../../shared/socket-client'
 import logger from '../../shared/logger'
 import { removeSystemKeys } from './bootFile'
@@ -542,7 +538,7 @@ tellMeWhatOSImOn()
           }
         })
 
-        onOpenExisting(() => openExistingProj())
+        onOpenExisting(() => openExistingFile())
         onFromTemplate(() => {
           openDashboard()
           setTimeout(createFromTemplate, 300)

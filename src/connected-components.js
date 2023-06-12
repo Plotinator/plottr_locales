@@ -38,6 +38,7 @@ import {
   uploadExisting,
   deleteCloudBackupFile,
   createAndOpenCopy,
+  openExistingFile,
 } from './files'
 import logger from '../shared/logger'
 import { closeDashboard } from './dashboard-events'
@@ -55,7 +56,6 @@ import { deleteTemplate, editTemplateDetails } from './common/utils/templates'
 import { createFullErrorReport } from './common/utils/full_error_report'
 import { createErrorReport } from './common/utils/error_reporter'
 import MPQ from './common/utils/MPQ'
-import { openExistingFile as _openExistingFile } from './common/utils/window_manager'
 import { doesFileExist, removeFromKnownFiles, listOfflineFiles } from './common/utils/files'
 import { handleCustomerServiceCode } from './common/utils/customer_service_codes'
 import { notifyUser } from './notifyUser'
@@ -178,34 +178,7 @@ const platform = {
         })
       }
     },
-    openExistingFile: () => {
-      const state = store.getState()
-      const emailAddress = selectors.emailAddressSelector(state)
-      const userId = selectors.userIdSelector(state)
-      const isLoggedIn = selectors.isLoggedInSelector(state)
-      if (isLoggedIn) {
-        store.dispatch(actions.applicationState.startUploadingFileToCloud())
-      }
-
-      store.dispatch(actions.project.showLoader(true))
-      _openExistingFile(!!userId, userId, emailAddress)
-        .then(() => {
-          logger.info('Opened existing file')
-          store.dispatch(actions.project.showLoader(false))
-          if (isLoggedIn) {
-            store.dispatch(actions.applicationState.finishUploadingFileToCloud())
-          }
-        })
-        .catch((error) => {
-          logger.error('Error opening existing file', error)
-          showErrorBox(t('Error'), t('There was an error doing that. Try again.')).then(() => {
-            store.dispatch(actions.project.showLoader(false))
-            if (isLoggedIn) {
-              store.dispatch(actions.applicationState.finishUploadingFileToCloud())
-            }
-          })
-        })
-    },
+    openExistingFile,
     doesFileExist,
     pathSep: () => {
       return whenClientIsReady(({ pathSep }) => {

@@ -2,6 +2,7 @@ import { t } from 'plottr_locales'
 import { helpers, reducers, emptyFile, migrateIfNeeded, addMissingKeys, errorCodes } from 'pltr/v2'
 import { actions, selectors } from 'wired-up-pltr'
 
+import { openExistingFile as _openExistingFile } from './common/utils/window_manager'
 import { closeDashboard } from './dashboard-events'
 import { store } from './app/store'
 import logger from '../shared/logger'
@@ -253,4 +254,36 @@ export const createAndOpenCopy = (oldFilePathSegments, newFileName) => {
       })
     })
   })
+}
+
+export const openExistingFile = () => {
+  const state = store.getState()
+  const isInOfflineMode = selectors.isInOfflineModeSelector(state)
+  if (!isInOfflineMode) {
+    const emailAddress = selectors.emailAddressSelector(state)
+    const userId = selectors.userIdSelector(state)
+    const isLoggedIn = selectors.isLoggedInSelector(state)
+    if (isLoggedIn) {
+      store.dispatch(actions.applicationState.startUploadingFileToCloud())
+    }
+
+    store.dispatch(actions.project.showLoader(true))
+    _openExistingFile(!!userId, userId, emailAddress)
+      .then(() => {
+        logger.info('Opened existing file')
+        store.dispatch(actions.project.showLoader(false))
+        if (isLoggedIn) {
+          store.dispatch(actions.applicationState.finishUploadingFileToCloud())
+        }
+      })
+      .catch((error) => {
+        logger.error('Error opening existing file', error)
+        showErrorBox(t('Error'), t('There was an error doing that. Try again.')).then(() => {
+          store.dispatch(actions.project.showLoader(false))
+          if (isLoggedIn) {
+            store.dispatch(actions.applicationState.finishUploadingFileToCloud())
+          }
+        })
+      })
+  }
 }
