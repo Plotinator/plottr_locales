@@ -33,7 +33,7 @@ export const firstLineForBookThunkSelector = createSelector(allLinesSelector, (l
   }
 })
 
-export const firstLineForBookSelector = createSelector(allLinesSelector, (lines) => {
+export const firstLineForBookSelector = createSelector(linesForBookSelector, (lines) => {
   return sortBy(lines, 'position')[0]
 })
 
