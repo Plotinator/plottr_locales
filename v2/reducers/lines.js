@@ -138,7 +138,7 @@ const lines =
       case PIN_PLOTLINE: {
         const bookLines = action.lines.map((l) =>
           l.id === action.lineId && l.bookId === action.bookId
-            ? Object.assign({}, l, { isPinned: true })
+            ? Object.assign({}, l, { isPinned: true, expanded: false })
             : l
         )
         return [
@@ -170,7 +170,9 @@ const lines =
         ]
 
       case EXPAND_LINE:
-        return state.map((l) => (l.id === action.id ? Object.assign({}, l, { expanded: true }) : l))
+        return state.map((l) =>
+          l.id === action.id && !l?.isPinned ? Object.assign({}, l, { expanded: true }) : l
+        )
 
       case COLLAPSE_LINE:
         return state.map((l) =>
@@ -179,7 +181,7 @@ const lines =
 
       case COLLAPSE_TIMELINE:
       case EXPAND_TIMELINE:
-        return state.map((l) => Object.assign({}, l, { expanded: null }))
+        return state.map((l) => (!l?.isPinned ? Object.assign({}, l, { expanded: null }) : l))
 
       case CLEAR_TEMPLATE_FROM_TIMELINE: {
         const values = state.reduce(
