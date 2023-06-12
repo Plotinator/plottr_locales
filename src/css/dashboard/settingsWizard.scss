@@ -42,7 +42,7 @@
         grid-area: body;
         padding-top: 0;
         padding-bottom: 0;
-        overflow: scroll;
+        overflow-y: auto;
       }
 
       .step__body .onboarding__settings .dashboard__options__item .form-group {
