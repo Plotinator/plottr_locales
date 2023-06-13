@@ -31,7 +31,7 @@ import { createFullErrorReport } from '../common/utils/full_error_report'
 import { openDashboard, closeDashboard, createFromTemplate } from '../dashboard-events'
 import { makeFileSystemAPIs } from '../api'
 import { renderFile } from '../renderFile'
-import { setOS } from '../isOS'
+import { setOS, isWindows } from '../isOS'
 import { uploadToFirebase } from '../upload-to-firebase'
 import { openFile } from 'connected-components'
 // import { instrumentLongRunningTasks } from './longRunning'
@@ -86,6 +86,7 @@ const {
   createNewFile,
   askToExport,
   getVersion,
+  createDesktopShortcut,
 } = makeMainProcessClient()
 
 const connectToSocketServer = (port) => {
@@ -526,15 +527,27 @@ tellMeWhatOSImOn()
 
         onCreateFileShortcut((sourceFile, destinationURL) => {
           if (destinationURL == 'desktop') {
-            userDesktopPath().then((desktopPath) => {
-              createFileShortcut(sourceFile, desktopPath).then((shortcut) =>
-                showItemInFolder(shortcut)
-              )
+            return userDesktopPath().then((desktopPath) => {
+              if (isWindows()) {
+                return createDesktopShortcut(sourceFile, desktopPath).then((shortcut) => {
+                  return showItemInFolder(shortcut)
+                })
+              } else {
+                return createFileShortcut(sourceFile, desktopPath).then((shortcut) => {
+                  return showItemInFolder(shortcut)
+                })
+              }
             })
           } else {
-            createFileShortcut(sourceFile, destinationURL).then((shortcut) =>
-              showItemInFolder(shortcut)
-            )
+            if (isWindows()) {
+              return createDesktopShortcut(sourceFile, destinationURL).then((shortcut) => {
+                return showItemInFolder(shortcut)
+              })
+            } else {
+              return createFileShortcut(sourceFile, destinationURL).then((shortcut) => {
+                return showItemInFolder(shortcut)
+              })
+            }
           }
         })
 
