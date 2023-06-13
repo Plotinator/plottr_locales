@@ -51,6 +51,10 @@ const BREAKPOINT = 890
 // takes into account spacing
 const SCENE_CELL_WIDTH = 175 + 17
 const SCENE_CELL_HEIGHT = 74 + 40
+const SMALL_SCENE_CELL_WIDTH = 19
+const SMALL_SCENE_CELL_HEIGHT = 45
+const NAV_HEIGHT = 50
+const SUB_NAV_HEIGHT = 48
 
 const TimelineWrapperConnector = (connector) => {
   const Floater = UnconnectedPlottrFloater(connector)
@@ -104,6 +108,7 @@ const TimelineWrapperConnector = (connector) => {
     const [isSmallerThanToolbar, setIsSmallerThanToolbar] = useState(false)
     const [filterIsOpen, setFilterIsOpen] = useState(false)
 
+    const orientationIsSmallRef = useRef(false)
     const scrollTimeoutRef = useRef(null)
     const tableRef = useRef(null)
     const scrollableRef = useRef(
@@ -111,6 +116,18 @@ const TimelineWrapperConnector = (connector) => {
         return timelineBundle.isSmall ? tableRef.current.parentElement : tableRef.current
       })
     )
+
+    useEffect(() => {
+      if (
+        !orientationIsSmallRef.current ||
+        orientationIsSmallRef.current !== timelineBundle.isSmall
+      ) {
+        scrollableRef.current = new Scrollable(() => {
+          return timelineBundle.isSmall ? tableRef.current.parentElement : tableRef.current
+        })
+        orientationIsSmallRef.current = timelineBundle.isSmall
+      }
+    }, [timelineBundle.isSmall])
 
     useEffect(() => {
       if (tableRef.current) tableRef.current.onscroll = scrollHandler
@@ -258,8 +275,8 @@ const TimelineWrapperConnector = (connector) => {
 
     const scrollDistance = () => {
       return timelineBundle?.orientation === 'vertical'
-        ? 2 * SCENE_CELL_HEIGHT
-        : 2 * SCENE_CELL_WIDTH
+        ? 2 * (timelineBundle.isSmall ? SMALL_SCENE_CELL_HEIGHT : SCENE_CELL_HEIGHT)
+        : 2 * (timelineBundle.isSmall ? SMALL_SCENE_CELL_WIDTH : SCENE_CELL_WIDTH)
     }
 
     const scrollLeft = () => {
@@ -295,7 +312,7 @@ const TimelineWrapperConnector = (connector) => {
       const element = timelineBundle.isSmall ? tableRef.current.parentElement : tableRef.current
       const target =
         timelineBundle.orientation === 'vertical'
-          ? element.scrollHeight - window.innerHeight
+          ? element.scrollHeight - (window.innerHeight - NAV_HEIGHT - SUB_NAV_HEIGHT)
           : element.scrollWidth - window.innerWidth
 
       if (tableRef.current) scrollTo(target)

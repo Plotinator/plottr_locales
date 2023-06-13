@@ -69,6 +69,10 @@
 
   cursor: pointer;
 
+  &.medium-timeline {
+    max-width: 72px;
+  }
+
   .card__cell__overview__drag-anchor {
     width: 150px;
     margin-left: 12.5px;
