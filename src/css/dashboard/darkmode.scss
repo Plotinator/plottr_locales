@@ -218,12 +218,12 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
   /////////////
   .dashboard__backups__projects-summary {
     color: $dark-text;
-    background-color: $dark-gray-2;
+    background-color: $darkmode-v2-background;
     .count-circle {
       border-color: white;
     }
     &.active {
-      background-color: $dark-gray-1;
+      background-color: $darkmode-v2-darker-background;
     }
   }
   .dashboard__backups__columns {
@@ -231,7 +231,7 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
   }
   .dashboard__backups__project-row {
     &.row {
-      background-color: $dark-gray-2;
+      background-color: transparent;
     }
     .dashboard__backups__project-backup .dashboard__backups__item {
       .dashboard__backups__item-details small {

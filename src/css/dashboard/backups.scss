@@ -126,6 +126,10 @@
       margin: 4px 1px;
       border-radius: 8px;
       background-color: darken($gray-9, 3%);
+
+      h6 {
+        word-break: break-all;
+      }
     }
     .dashboard__backups__project-backup {
       .dashboard__backups__item {
