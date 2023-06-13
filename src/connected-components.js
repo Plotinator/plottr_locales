@@ -39,6 +39,7 @@ import {
   deleteCloudBackupFile,
   createAndOpenCopy,
   openExistingFile,
+  duplicateFile,
 } from './files'
 import logger from '../shared/logger'
 import { closeDashboard } from './dashboard-events'
@@ -441,17 +442,7 @@ const platform = {
     const event = new Event('move-from-temp')
     document.dispatchEvent(event)
   },
-  duplicateFile: (fileUrl, suggestedNewName) => {
-    const state = store.getState()
-    const isLoggedIntoPro = selectors.hasProSelector(state)
-
-    const event = isLoggedIntoPro
-      ? new Event('save-as--pro', { fileUrl, suggestedNewName })
-      : new Event('save-as', { fileUrl })
-    event.fileUrl = fileUrl
-    event.suggestedNewName = suggestedNewName
-    document.dispatchEvent(event)
-  },
+  duplicateFile,
   showItemInFolder: (fileURL) => {
     isStorageURL(fileURL).then((storageURL) => {
       if (!storageURL) {

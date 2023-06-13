@@ -256,12 +256,17 @@ tellMeWhatOSImOn()
           }
         })
 
-        const saveAsHandler = ({ fileUrl }) => {
+        const saveAsHandler = ({ fileUrl, suggestedNewName, forceCloseWhenDone }) => {
           const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
           const title = t('Where would you like to save this copy?')
 
+          const forceCloseWindow = () => {
+            const event = new Event('force-close')
+            window.dispatchEvent(event)
+          }
+
           whenClientIsReady(({ basename, join }) => {
-            fileSystemAPIs.currentAppSettings().then((settings) => {
+            return fileSystemAPIs.currentAppSettings().then((settings) => {
               const useUserDefault =
                 settings.user.defaultFolder && settings.user.defaultFolderLocation
               let defaultPath = settings.user.defaultFolderLocation
@@ -269,52 +274,60 @@ tellMeWhatOSImOn()
                 const fileUrlSansProto = helpers.file.withoutProtocol(fileUrl)
                 return basename(fileUrlSansProto).then((fileBaseName) => {
                   defaultPath = useUserDefault ? defaultPath : fileUrlSansProto
-                  let defaultBaseName = useUserDefault ? fileBaseName : ''
+                  const defaultBaseName = suggestedNewName || (useUserDefault ? fileBaseName : '')
 
-                  join(defaultPath, defaultBaseName).then((finalDefaultPath) => {
-                    showSaveDialog(filters, title, finalDefaultPath).then((fileName) => {
+                  return join(defaultPath, defaultBaseName).then((finalDefaultPath) => {
+                    return showSaveDialog(filters, title, finalDefaultPath).then((fileName) => {
                       if (fileName) {
                         const newFilePath = helpers.file.ensureEndsInPltr(fileName)
                         const newFileURL = helpers.file.filePathToFileURL(newFilePath)
-                        getVersion().then((version) => {
-                          whenClientIsReady(({ readFile }) => {
-                            return readFile(helpers.file.withoutProtocol(fileUrl), 'utf-8').then(
-                              (rawFile) => {
-                                const contents = JSON.parse(rawFile)
-                                return new Promise((resolve, reject) => {
-                                  migrateIfNeeded(
-                                    version,
-                                    contents,
-                                    fileUrl,
-                                    null,
-                                    (err, didMigrate, migratedState) => {
-                                      if (err) {
-                                        rollbar.error(err)
-                                        logger.error(err)
-                                        if (err === 'Plottr behind file') {
-                                          showErrorBox(t('Error'), t('Please update Plottr'))
-                                          reject(new Error('Need to update Plottr'))
+                        return getVersion()
+                          .then((version) => {
+                            return whenClientIsReady(({ readFile }) => {
+                              return readFile(helpers.file.withoutProtocol(fileUrl), 'utf-8').then(
+                                (rawFile) => {
+                                  const contents = JSON.parse(rawFile)
+                                  return new Promise((resolve, reject) => {
+                                    migrateIfNeeded(
+                                      version,
+                                      contents,
+                                      fileUrl,
+                                      null,
+                                      (err, didMigrate, migratedState) => {
+                                        if (err) {
+                                          rollbar.error(err)
+                                          logger.error(err)
+                                          if (err === 'Plottr behind file') {
+                                            showErrorBox(t('Error'), t('Please update Plottr'))
+                                            reject(new Error('Need to update Plottr'))
+                                          } else {
+                                            reject(err)
+                                          }
                                         } else {
-                                          reject(err)
+                                          saveFile(newFileURL, addMissingKeys(migratedState))
+                                            .then(() => {
+                                              store.dispatch(
+                                                actions.applicationState.finishRenamingFile()
+                                              )
+                                              return addToKnownFilesAndOpen(newFileURL)
+                                            })
+                                            .then(resolve)
+                                            .catch(reject)
                                         }
-                                      } else {
-                                        saveFile(newFileURL, addMissingKeys(migratedState))
-                                          .then(() => {
-                                            store.dispatch(
-                                              actions.applicationState.finishRenamingFile()
-                                            )
-                                            return addToKnownFilesAndOpen(newFileURL)
-                                          })
-                                          .then(resolve)
-                                          .catch(reject)
                                       }
-                                    }
-                                  )
-                                })
-                              }
-                            )
+                                    )
+                                  })
+                                }
+                              )
+                            })
                           })
-                        })
+                          .then(() => {
+                            if (forceCloseWhenDone) {
+                              forceCloseWindow()
+                            }
+                          })
+                      } else {
+                        return Promise.resolve()
                       }
                     })
                   })
@@ -329,15 +342,23 @@ tellMeWhatOSImOn()
                 }
                 return basename(fileState.file.fileName, '.pltr').then((fileBaseName) => {
                   defaultPath = useUserDefault ? defaultPath : fileState.file.fileName
-                  let defaultBaseName = useUserDefault ? fileBaseName : ''
-                  join(defaultPath, defaultBaseName).then((finalDefaultPath) => {
-                    showSaveDialog(filters, title, finalDefaultPath).then((fileName) => {
+                  let defaultBaseName = suggestedNewName || (useUserDefault ? fileBaseName : '')
+                  return join(defaultPath, defaultBaseName).then((finalDefaultPath) => {
+                    return showSaveDialog(filters, title, finalDefaultPath).then((fileName) => {
                       if (fileName) {
                         const newFilePath = helpers.file.ensureEndsInPltr(fileName)
                         const newFileURL = helpers.file.filePathToFileURL(newFilePath)
-                        saveFile(newFileURL, fileState).then(() => {
-                          addToKnownFilesAndOpen(newFileURL)
-                        })
+                        return saveFile(newFileURL, fileState)
+                          .then(() => {
+                            return addToKnownFilesAndOpen(newFileURL)
+                          })
+                          .then(() => {
+                            if (forceCloseWhenDone) {
+                              forceCloseWindow()
+                            }
+                          })
+                      } else {
+                        return Promise.resolve()
                       }
                     })
                   })

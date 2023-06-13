@@ -131,6 +131,17 @@ const App = ({
   }
 
   useEffect(() => {
+    const forceClose = () => {
+      removeReloadListeners()
+      window.close()
+    }
+    window.addEventListener('force-close', forceClose)
+    return () => {
+      window.removeEventListener('force-close', forceClose)
+    }
+  }, [])
+
+  useEffect(() => {
     const unsubscribeFromReload = onReload(() => {
       askToSave({}, true, false)
     })
