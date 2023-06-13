@@ -111,7 +111,7 @@ function buildFileMenu(fileURL, getTrialInfo) {
           visible: !!fileURL,
           click: function (event, focusedWindow) {
             log.info('sending wants-to-close')
-            focusedWindow.webContents.send('wants-to-close')
+            focusedWindow.close()
           },
         },
         {

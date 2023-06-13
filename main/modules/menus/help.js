@@ -54,7 +54,7 @@ function buildHelpMenu() {
       },
       {
         label: t('Roadmap'),
-        click: () => shell.openExternal('https://plottr.com/our-roadmap'),
+        click: () => shell.openExternal('https://plottr.com/roadmap/'),
       },
     ],
   }

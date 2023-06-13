@@ -11,4 +11,6 @@ bin/electron_main.js
 lib/plottr_components/dist/**/*
 lib/plottr_locales/lib/**/*
 lib/tree-changes/**/*
+lib/pltr/docs/**/*
+lib/pltr/template/**/*
 build/version.js

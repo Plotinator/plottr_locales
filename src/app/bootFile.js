@@ -56,7 +56,7 @@ const isPlottrCloudFile = (filePath) => filePath && filePath.startsWith('plottr:
 
 const MAX_ATTEMPTS = 5
 
-const UPDATE_MESSAGE ='Need to update Plottr'
+const UPDATE_MESSAGE = 'Need to update Plottr'
 
 function waitForUser() {
   return new Promise((resolve, reject) => {

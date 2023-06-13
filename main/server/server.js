@@ -263,13 +263,14 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
           return `${messageType}_ERROR_REPLY`
         }
 
-        const replyWithErrorMessage = (errorMessage) => {
+        const replyWithErrorMessage = (errorMessage, errorCode) => {
           webSocket.send(
             JSON.stringify({
               type: typeToErrorReplyType(type),
               messageId,
               payload: 'truncated',
               result: errorMessage,
+              errorCode,
             })
           )
         }
@@ -293,7 +294,7 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
               error.message,
               error.stack,
             ])
-            replyWithErrorMessage(error.message)
+            replyWithErrorMessage(error.message, error.code)
           }
         }
 
@@ -318,7 +319,7 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
                 error.message,
                 error.stack,
               ])
-              replyWithErrorMessage(error.message)
+              replyWithErrorMessage(error.message, error.code)
             })
         }
 
