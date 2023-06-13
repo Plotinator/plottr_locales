@@ -157,9 +157,17 @@ const FilesHomeConnector = (connector) => {
         } else {
           savePlottrProjectDialog().then((newFilePath) => {
             if (newFilePath) {
-              let templateObj = isObject(template) ? template : null
-              createNew(templateObj, newFilePath)
-              setView('recent')
+              if (newFilePath.startsWith(settings.user.backupLocation)) {
+                log.error(new Error('Attempted to save to backup location', newFilePath))
+                showErrorBox(
+                  t('Error'),
+                  t('Please choose a destination other than your backup folder')
+                )
+              } else {
+                let templateObj = isObject(template) ? template : null
+                createNew(templateObj, newFilePath)
+                setView('recent')
+              }
             }
           })
         }
