@@ -1,6 +1,18 @@
 @import 'vars';
 
 .card__cell {
+  .card__add-card {
+    .glyphicon-plus {
+      visibility: hidden;
+    }
+  }
+
+  &:hover .card__add-card {
+    .glyphicon-plus {
+      visibility: visible;
+    }
+  }
+
   .card__body-wrapper {
     margin-bottom: 2px;
 
