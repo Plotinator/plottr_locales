@@ -465,7 +465,7 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
 
   &.medium-timeline {
     width: $medium_width;
-    margin-left: 33px;
+    margin-left: 10px;
   }
 }
 
@@ -494,27 +494,22 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
   @extend .vertical-beat-list__insert;
   height: $title_height;
   margin-bottom: 50px;
-  margin-top: 38px;
-  margin-left: 75px;
-  margin-right: 24px;
-
+  margin-right: 0px;
   .vertical-insert-beat-wrapper.append-beat {
     padding: 20px $title_height;
     color: $blue-5;
-    border: none;
+    border: 3px dotted $blue-8;
     margin-top: 10px;
   }
 
   .vertical-insert-beat-wrapper.append-beat:hover {
-    border: none;
+    border: 3px dotted $blue-8;
+    background-color: $blue-8;
   }
 
   &.medium-timeline {
     width: $medium_width;
-    margin-left: 35px;
-
     .vertical-insert-beat-wrapper.append-beat {
-      margin-left: 30px;
       padding: 12px 32px;
     }
   }

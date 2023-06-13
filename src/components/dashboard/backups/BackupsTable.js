@@ -48,14 +48,10 @@ const BackupsTableConnector = (connector) => {
     return (
       <div className="dashboard__backups__body">
         <Grid fluid>
-          <Row>
-            <Col sm={1}>
-              <div style={{ paddingLeft: '16px' }}>{t('Date')}</div>
-            </Col>
-            <Col sm={1} xsOffset={1} mdOffset={10}>
-              <div style={{ paddingLeft: '32px' }}>{t('Count')}</div>
-            </Col>
-          </Row>
+          <div className="dashboard__backups__body-table-header">
+            <div>{t('Date')}</div>
+            <div>{t('Count')}</div>
+          </div>
           <Row>
             <Col xs={12}>
               <hr />

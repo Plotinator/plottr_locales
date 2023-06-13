@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
 
@@ -14,9 +14,10 @@ const BackupFileDisplayConnector = (connector) => {
       mpq,
       file: { createAndOpenCopy },
       duplicateFile,
+      uploadToProAsDuplicate,
     },
   } = connector
-  checkDependencies({ mpq, createAndOpenCopy, duplicateFile })
+  checkDependencies({ mpq, createAndOpenCopy, duplicateFile, uploadToProAsDuplicate })
 
   const BackupFileDisplay = ({
     folder,
@@ -37,7 +38,11 @@ const BackupFileDisplayConnector = (connector) => {
         const fileUrl = helpers.file.fileIdToPlottrCloudFileURL(file.fileId)
         duplicateFile(fileUrl, newName)
       } else {
-        createAndOpenCopy(folder.path, file.name, newName)
+        if (hasCurrentProLicense) {
+          uploadToProAsDuplicate(file.localFilePathSegments, newName)
+        } else {
+          createAndOpenCopy(file.localFilePathSegments, newName)
+        }
       }
     }
 
@@ -47,7 +52,7 @@ const BackupFileDisplayConnector = (connector) => {
         const date = helpers.time.convertFromNanosAndSeconds(file.lastModified)
         return (
           <div className="dashboard__backups__item-details">
-            <div>{file.lastModified ? t('Last Edited: {date, time, short}', { date }) : ''}</div>
+            <div>{file.lastModified ? t('{date, time, short}', { date }) : ''}</div>
             <small className="accented-text">{t('Saved in the cloud')}</small>
           </div>
         )
@@ -72,7 +77,7 @@ const BackupFileDisplayConnector = (connector) => {
     return (
       <div className="dashboard__backups__item">
         <div>{renderFileDetails(file)}</div>
-        {!hasCurrentProLicense || (hasCurrentProLicense && isCloudBackup) ? (
+        {!isCloudBackup || (hasCurrentProLicense && isCloudBackup) ? (
           <div className="dashboard__backups__item-actions">
             <div className={cx('dashboard__backups__item-button', { active: showActions })}>
               <Button bsSize="xs" bsStyle="primary" onClick={handleMakeCopy}>

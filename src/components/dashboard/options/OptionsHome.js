@@ -179,7 +179,7 @@ const OptionsHomeConnector = (connector) => {
                 </div>
               </div>
             </Tab>
-            {!osIsUnknown ? (
+            {!shouldBeInPro ? (
               <Tab eventKey={2} title={t('Files')}>
                 <FileSettings />
               </Tab>
