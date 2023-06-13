@@ -553,8 +553,16 @@ tellMeWhatOSImOn()
                 const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
                 showSaveDialog(filters, title, docPath).then((fileName) => {
                   if (fileName) {
-                    const newFilePath = helpers.file.ensureEndsInPltr(fileName)
-                    createNewFile(null, newFilePath)
+                    const backupFolder = selectors.backupFolderPathSelector(store.getState())
+                    if (fileName.startsWith(backupFolder)) {
+                      showErrorBox(
+                        t('Error'),
+                        t('Please choose a destination other than your backup folder')
+                      )
+                    } else {
+                      const newFilePath = helpers.file.ensureEndsInPltr(fileName)
+                      createNewFile(null, newFilePath)
+                    }
                   }
                 })
               })
