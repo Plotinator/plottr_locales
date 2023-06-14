@@ -235,11 +235,15 @@ const RecentFilesConnector = (connector) => {
               <Cell> </Cell>
             ) : null}
             <Cell className={cx({ disabled: !!missing })}>
-              <div className="lastOpen">
-                <span>{t.date(lastOpen, 'monthDay')}</span>
-                <span> </span>
-                <span>{renderLastOpenTime(lastOpen)}</span>
-              </div>
+              {f.lastOpened !== null && lastOpen ? (
+                <div className="lastOpen">
+                  <span>{t.date(lastOpen, 'monthDay')}</span>
+                  <span> </span>
+                  <span>{renderLastOpenTime(lastOpen)}</span>
+                </div>
+              ) : (
+                t('Never opened')
+              )}
             </Cell>
           </Row>
         )
