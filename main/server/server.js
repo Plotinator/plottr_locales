@@ -232,6 +232,7 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
       setLastOpenedFilePath,
       copyFile,
       createFileShortcut,
+      watchForFilesInDefaultFolder,
     } = fileSystemModule
     const trashModule = makeTrashModule(userDataPath, logger)
     const { trashByURL } = trashModule
@@ -348,6 +349,8 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
           unsubscribeFunctions.set(messageId, unsubscribe)
           return unsubscribe
         }
+
+        watchForFilesInDefaultFolder()
 
         switch (type) {
           case PING: {
