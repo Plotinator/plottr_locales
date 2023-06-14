@@ -1,9 +1,20 @@
 import React, { useState } from 'react'
 import PropTypes from 'react-proptypes'
+import { sortBy } from 'lodash'
 
 import Col from '../../Col'
 import Row from '../../Row'
 import UnconnectedBackupFileDisplay from './BackupFileDisplay'
+
+const isStartOfSession = (file) => {
+  return file.storagePath
+    ? file?.storagePath?.match(/start-of-session/)
+      ? -1
+      : 1
+    : file?.localFilePathSegments[file.localFilePathSegments.length - 1]?.match(/start-session/)
+    ? -1
+    : 1
+}
 
 const BackupsProjectRowConnector = (connector) => {
   const BackupFileDisplay = UnconnectedBackupFileDisplay(connector)
@@ -12,8 +23,7 @@ const BackupsProjectRowConnector = (connector) => {
     const [showActions, setShowActions] = useState(false)
 
     const renderFiles = () => {
-      // NOTE: this works because the 'start session' version always comes first
-      return files.map((file, index) => {
+      return sortBy(files, isStartOfSession).map((file, index) => {
         return (
           <Col key={index} xs={12} sm={6} md={3} className="dashboard__backups__project-backup">
             <BackupFileDisplay

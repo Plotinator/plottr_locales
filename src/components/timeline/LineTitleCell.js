@@ -339,14 +339,26 @@ const LineTitleCellConnector = (connector) => {
             </Button>
             {isSmall ? null : (
               <>
-                <Button
-                  title={t('Expand or collapse stacks')}
-                  block
-                  bsSize="small"
-                  onClick={toggleLine}
-                >
-                  {expandedIcon}
-                </Button>
+                {line?.isPinned ? (
+                  <ToolTip
+                    id={`expand-line-${line.id}-tooltip`}
+                    placement="bottom"
+                    text={t('Unable to expand pinned plotlines')}
+                  >
+                    <Button block bsSize="small" className="disabled">
+                      {expandedIcon}
+                    </Button>
+                  </ToolTip>
+                ) : (
+                  <Button
+                    title={t('Expand or collapse stacks')}
+                    block
+                    bsSize="small"
+                    onClick={toggleLine}
+                  >
+                    {expandedIcon}
+                  </Button>
+                )}
                 <Button
                   title={t('Expand or collapse all stacks')}
                   block
@@ -393,13 +405,25 @@ const LineTitleCellConnector = (connector) => {
               </Button>
               {isSmall ? null : (
                 <>
-                  <Button
-                    title={t('Expand or collapse stacks')}
-                    bsSize="small"
-                    onClick={toggleLine}
-                  >
-                    {expandedIcon}
-                  </Button>
+                  {line?.isPinned ? (
+                    <ToolTip
+                      id={`expand-line-${line.id}-tooltip`}
+                      placement="bottom"
+                      text={t('Unable to expand pinned plotlines')}
+                    >
+                      <Button className="disabled" bsSize="small">
+                        {expandedIcon}
+                      </Button>
+                    </ToolTip>
+                  ) : (
+                    <Button
+                      title={t('Expand or collapse stacks')}
+                      bsSize="small"
+                      onClick={toggleLine}
+                    >
+                      {expandedIcon}
+                    </Button>
+                  )}
                   <Button
                     title={t('Expand or collapse all stacks')}
                     bsSize="small"
