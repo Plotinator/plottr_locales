@@ -28,6 +28,12 @@ export const previouslyLoggedIntoProSelector = createSelector(
 export const backupEnabledSelector = createSelector(appSettingsSelector, ({ backup }) => {
   return backup
 })
+export const backupFolderPathSelector = createSelector(
+  appUserSettingsSelector,
+  ({ backupLocation }) => {
+    return backupLocation
+  }
+)
 export const showDashboardOnBootSelector = createSelector(
   appUserSettingsSelector,
   ({ openDashboardFirst }) => openDashboardFirst
@@ -52,4 +58,15 @@ export const trialModeSelector = createSelector(appSettingsSelector, ({ trialMod
 export const canGetUpdatesSelector = createSelector(
   appSettingsSelector,
   ({ canGetUpdates }) => canGetUpdates
+)
+export const hasDefaultFolderSelector = createSelector(
+  appUserSettingsSelector,
+  ({ defaultFolder, defaultFolderLocation }) => {
+    return (
+      typeof defaultFolder === 'boolean' &&
+      defaultFolder &&
+      typeof defaultFolderLocation === 'string' &&
+      defaultFolderLocation !== ''
+    )
+  }
 )
