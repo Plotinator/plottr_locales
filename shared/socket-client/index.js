@@ -1,6 +1,8 @@
 import { v4 as uuidv4 } from 'uuid'
 import { Buffer } from 'buffer/'
 
+import { errorCodes } from 'pltr/v2'
+
 import {
   PING,
   RM_RF,
@@ -104,10 +106,6 @@ import {
   ADD_KNOWN_FILE_WITH_FIX_ERROR_REPLY,
   DELETE_KNOWN_FILE,
   DELETE_KNOWN_FILE_ERROR_REPLY,
-  SAVE_TO_TEMP_FILE,
-  REMOVE_FROM_TEMP_FILES,
-  REMOVE_FROM_TEMP_FILES_ERROR_REPLY,
-  SAVE_TO_TEMP_FILE_ERROR_REPLY,
   SAVE_TO_DEFAULT_LOCATION,
   SAVE_TO_DEFAULT_LOCATION_ERROR_REPLY,
   BUSY,
@@ -224,7 +222,7 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
     on('message', (eventOrData) => {
       const data = usingBrowserWebsocketClient ? eventOrData.data : eventOrData
       try {
-        const { type, payload, messageId, result } = JSON.parse(data)
+        const { type, payload, messageId, result, errorCode } = JSON.parse(data)
         const resolvePromise = () => {
           const unresolvedPromise = promises.get(messageId)
           if (!unresolvedPromise) {
@@ -246,7 +244,9 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
             return
           }
           promises.delete(messageId)
-          unresolvedPromise.reject(result)
+          const error = new Error(result)
+          error.code = errorCode
+          unresolvedPromise.reject(error)
         }
 
         // TODO: handle SAVE_BACKUP_ERRORs
@@ -272,9 +272,7 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           // Normal replies
           case COPY_FILE:
           case CREATE_SHORTCUT:
-          case REMOVE_FROM_TEMP_FILES:
           case REMOVE_FROM_KNOWN_FILES:
-          case SAVE_TO_TEMP_FILE:
           case SAVE_TO_DEFAULT_LOCATION:
           case DELETE_KNOWN_FILE:
           case ADD_KNOWN_FILE_WITH_FIX:
@@ -360,8 +358,6 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           }
           // Error return types
           case NUKE_LAST_OPENED_FILE_URL_ERROR_REPLY:
-          case REMOVE_FROM_TEMP_FILES_ERROR_REPLY:
-          case SAVE_TO_TEMP_FILE_ERROR_REPLY:
           case SAVE_TO_DEFAULT_LOCATION_ERROR_REPLY:
           case DELETE_KNOWN_FILE_ERROR_REPLY:
           case REMOVE_FROM_KNOWN_FILES_ERROR_REPLY:
@@ -551,14 +547,6 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
 
     const updateKnownFileName = (fileURL, newName) => {
       return sendPromise(UPDATE_KNOWN_FILE_NAME, { fileURL, newName })
-    }
-
-    const removeFromTempFiles = (fileURL, doDelete) => {
-      return sendPromise(REMOVE_FROM_TEMP_FILES, { fileURL, doDelete })
-    }
-
-    const saveToTempFile = (json, name) => {
-      return sendPromise(SAVE_TO_TEMP_FILE, { json, name })
     }
 
     const saveToDefaultLocation = (json, name) => {
@@ -802,8 +790,6 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           removeFromKnownFiles,
           deleteKnownFile,
           updateKnownFileName,
-          removeFromTempFiles,
-          saveToTempFile,
           saveToDefaultLocation,
           addKnownFile,
           addKnownFileWithFix,

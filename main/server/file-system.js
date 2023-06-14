@@ -8,7 +8,7 @@ import { BACKUP_BASE_PATH, CUSTOM_TEMPLATES_PATH } from './stores'
 
 import { helpers } from 'pltr/v2'
 
-const { readdir, mkdir, lstat, cp, symlink } = fs.promises
+const { readdir, mkdir, lstat, cp, symlink, link } = fs.promises
 
 const TRIAL_LENGTH = 14
 const EXTENSIONS = 2
@@ -32,8 +32,16 @@ const withFromFileSystem = (backupFolder) => ({
 
 const BACKUP_FOLDER_REGEX = /^1?[0-9]_[123]?[0-9]_[0-9][0-9][0-9][0-9]/
 
+const BACKUP_WATCH_INTERVAL_MILLISECONDS = 10000
+
 function isOfflineFile(fileURL, offlineFileFilesPath) {
   return fileURL && helpers.file.withoutProtocol(fileURL).startsWith(offlineFileFilesPath)
+}
+
+const sequenceThunks = (thunks) => {
+  return thunks.reduce((acc, next) => {
+    return acc.then(next)
+  }, Promise.resolve())
 }
 
 const fileSystemModule = (userDataPath) => {
@@ -172,7 +180,7 @@ const fileSystemModule = (userDataPath) => {
     }
 
     const isValidKnownFile = (file) => {
-      return typeof file.fileURL === 'string' && file.lastOpened
+      return typeof file.fileURL === 'string' && typeof file.lastOpened !== 'undefined'
     }
 
     const listenToknownFilesChanges = (cb) => {
@@ -308,7 +316,7 @@ const fileSystemModule = (userDataPath) => {
     }
 
     const listenToBackupsChanges = (cb) => {
-      let watcher = () => {}
+      let stopWatching = () => {}
       ensureBackupDirExists().then(() => {
         readBackupsDirectory((error, initialBackups) => {
           if (error) {
@@ -317,26 +325,22 @@ const fileSystemModule = (userDataPath) => {
           } else {
             cb(initialBackups)
           }
-          backupBasePath().then((basePath) => {
-            watcher = fs.watch(basePath, (event, fileName) => {
-              // Do we care about event and fileName?
-              //
-              // NOTE: event could be 'changed' or 'renamed'.
-              readBackupsDirectory((error, newBackups) => {
-                if (error) {
-                  logger.error('Failed to read backups directory', error)
-                  return
-                }
-                cb(newBackups)
-              })
+          const intervalId = setInterval(() => {
+            readBackupsDirectory((error, newBackups) => {
+              if (error) {
+                logger.error('Failed to read backups directory', error)
+                return
+              }
+              cb(newBackups)
             })
-          })
+          }, BACKUP_WATCH_INTERVAL_MILLISECONDS)
+          stopWatching = () => {
+            clearInterval(intervalId)
+          }
         })
       })
 
-      return () => {
-        watcher.close()
-      }
+      return stopWatching
     }
     const currentBackups = () => {
       return new Promise((resolve, reject) => {
@@ -425,7 +429,7 @@ const fileSystemModule = (userDataPath) => {
     }
 
     const createFileShortcut = async (sourceFileURL, destinationURL, counter = 0) => {
-      let shortcutDestination = helpers.file.withoutProtocol(destinationURL)
+      const shortcutDestination = helpers.file.withoutProtocol(destinationURL)
       const sourceURL = helpers.file.withoutProtocol(sourceFileURL)
       const shortcutSuffix = ' - Shortcut'
       const shortCutExt = os.platform() != 'linux' ? '.lnk' : '.sh'
@@ -442,11 +446,19 @@ const fileSystemModule = (userDataPath) => {
           shortCutExt
       )
       if (os.platform() == 'win32') {
-        return symlink(sourceURL, newShortcutPath, 'file')
-          .then(() => newShortcutPath.replace(/\//g, '\\'))
+        // NOTE: this doesn't work on windows.  Use the main process
+        // client instead.
+        logger.info('Creating hard link on windows')
+        return link(sourceURL, newShortcutPath)
+          .then(() => {
+            return newShortcutPath.replace(/\//g, '\\')
+          })
           .catch((error) => {
             if (error.code == 'EEXIST') {
               return createFileShortcut(sourceFileURL, destinationURL, counter + 1)
+            } else {
+              logger.error('Failed to create hard link on windows', error)
+              return Promise.reject(error)
             }
           })
       } else {
@@ -455,8 +467,59 @@ const fileSystemModule = (userDataPath) => {
           .catch((error) => {
             if (error.code == 'EEXIST') {
               return createFileShortcut(sourceFileURL, destinationURL, counter + 1)
+            } else {
+              return Promise.reject(error)
             }
           })
+      }
+    }
+
+    const watchForFilesInDefaultFolder = () => {
+      let defaultFolder = SETTINGS.get('user.defaultFolder')
+      let defaultFolderLocation = SETTINGS.get('user.defaultFolderLocation')
+      let watcher = null
+      const stopListeningToSettings = SETTINGS.onDidAnyChange((settings) => {
+        if (
+          defaultFolder &&
+          typeof defaultFolderLocation === 'string' &&
+          defaultFolderLocation !== ''
+        ) {
+          logger.info(
+            'Settings changed.  Re-estiblishing default folder watcher.',
+            defaultFolderLocation
+          )
+          if (watcher) {
+            watcher.close()
+          }
+          const readDirectory = () => {
+            return readdir(defaultFolderLocation).then((entries) => {
+              return Promise.all(
+                entries.filter((d) => {
+                  return d.endsWith('.pltr')
+                })
+              ).then((files) => {
+                const thunks = files.map((file) => () => {
+                  const fileURL = helpers.file.filePathToFileURL(
+                    path.join(defaultFolderLocation, file)
+                  )
+                  const hasFile = knownFilesStore.has(fileURL)
+                  const fileName = path.basename(file).replace(/\.pltr$/, '')
+                  if (!hasFile) {
+                    logger.info('Adding from watcher', file)
+                    knownFilesStore.setRawKey(fileURL, { fileURL, fileName, lastOpened: null })
+                  }
+                })
+                sequenceThunks(thunks)
+              })
+            })
+          }
+          readDirectory()
+          watcher = fs.watch(defaultFolderLocation, readDirectory)
+        }
+      })
+      return () => {
+        watcher.close()
+        stopListeningToSettings()
       }
     }
 
@@ -497,6 +560,7 @@ const fileSystemModule = (userDataPath) => {
       setLastOpenedFilePath,
       copyFile,
       createFileShortcut,
+      watchForFilesInDefaultFolder,
     }
   }
 }

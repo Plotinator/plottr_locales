@@ -67,8 +67,6 @@ import {
   UPDATE_LAST_OPENED_DATE,
   ADD_KNOWN_FILE_WITH_FIX,
   DELETE_KNOWN_FILE,
-  REMOVE_FROM_TEMP_FILES,
-  SAVE_TO_TEMP_FILE,
   SAVE_TO_DEFAULT_LOCATION,
   LAST_OPENED_FILE,
   SET_LAST_OPENED_FILE,
@@ -98,7 +96,6 @@ import wireupTemplateFetcher from './template_fetcher'
 import makeStores from './stores'
 import makeSettingsModule from './settings'
 import makeKnownFilesModule from './knownFiles'
-import makeTempFilesModule from './tempFiles'
 import StatusManager from './StatusManager'
 import makeTrashModule from './trash'
 import makeDefaultLocationModule from './defaultLocation'
@@ -235,17 +232,10 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
       setLastOpenedFilePath,
       copyFile,
       createFileShortcut,
+      watchForFilesInDefaultFolder,
     } = fileSystemModule
     const trashModule = makeTrashModule(userDataPath, logger)
     const { trashByURL } = trashModule
-    const tempFilesModule = makeTempFilesModule(
-      userDataPath,
-      stores,
-      fileModule,
-      trashModule,
-      logger
-    )
-    const { removeFromTempFiles, saveToTempFile } = tempFilesModule
 
     const defaultLocationModule = makeDefaultLocationModule(settings, fileModule, logger)
     const { saveToDefaultLocation } = defaultLocationModule
@@ -258,15 +248,7 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
       updateLastOpenedDate,
       deleteKnownFile,
       updateKnownFileName,
-    } = makeKnownFilesModule(
-      stores,
-      fileModule,
-      fileSystemModule,
-      tempFilesModule,
-      trashModule,
-      backupModule,
-      logger
-    )
+    } = makeKnownFilesModule(stores, fileModule, trashModule, backupModule, logger)
 
     const attemptToFetchTemplates = () => {
       return wireupTemplateFetcher(userDataPath)(stores, logInfo).then((templateFetcher) => {
@@ -282,13 +264,14 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
           return `${messageType}_ERROR_REPLY`
         }
 
-        const replyWithErrorMessage = (errorMessage) => {
+        const replyWithErrorMessage = (errorMessage, errorCode) => {
           webSocket.send(
             JSON.stringify({
               type: typeToErrorReplyType(type),
               messageId,
               payload: 'truncated',
               result: errorMessage,
+              errorCode,
             })
           )
         }
@@ -312,7 +295,7 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
               error.message,
               error.stack,
             ])
-            replyWithErrorMessage(error.message)
+            replyWithErrorMessage(error.message, error.code)
           }
         }
 
@@ -337,7 +320,7 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
                 error.message,
                 error.stack,
               ])
-              replyWithErrorMessage(error.message)
+              replyWithErrorMessage(error.message, error.code)
             })
         }
 
@@ -366,6 +349,8 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
           unsubscribeFunctions.set(messageId, unsubscribe)
           return unsubscribe
         }
+
+        watchForFilesInDefaultFolder()
 
         switch (type) {
           case PING: {
@@ -636,41 +621,6 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
                   UPDATE_KNOWN_FILE_NAME
                 ),
               () => `Error updating file name of known file record: ${fileURL} to ${newName}`
-            )
-          }
-          case REMOVE_FROM_TEMP_FILES: {
-            const { fileURL, doDelete } = payload
-            return handlePromise(
-              () => `Removing ${fileURL} from temp files (deleting? ${doDelete})`,
-              () =>
-                statusManager.registerTask(
-                  removeFromTempFiles(fileURL, doDelete),
-                  REMOVE_FROM_TEMP_FILES
-                ),
-              () => `Error removing ${fileURL} from temp files (deleting? ${doDelete})`
-            )
-          }
-          case SAVE_TO_TEMP_FILE: {
-            const { json, name } = payload
-            return handlePromise(
-              () => [
-                `Saving to temp file named ${name} (reduced payload)`,
-                {
-                  file: {
-                    ...json.file,
-                  },
-                },
-              ],
-              () => statusManager.registerTask(saveToTempFile(json, name), SAVE_TO_TEMP_FILE),
-              () => [
-                `Error saving to temp file named ${name} (reduced payload)`,
-
-                {
-                  file: {
-                    ...json?.file,
-                  },
-                },
-              ]
             )
           }
           case SAVE_TO_DEFAULT_LOCATION: {

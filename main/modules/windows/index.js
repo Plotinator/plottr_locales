@@ -47,12 +47,18 @@ function addNewWindow(browserWindow, fileURL) {
   windows.push({
     id: browserWindow.id,
     browserWindow: browserWindow,
-    fileURL: fileURL,
+    fileURL,
   })
 }
 
 function getWindowById(id) {
   return windows.find((window) => window.id == id)
+}
+
+function getWindowByObjectEq(window) {
+  return windows.find(({ browserWindow }) => {
+    return browserWindow === window
+  })
 }
 
 function focusFirstWindow() {
@@ -103,7 +109,7 @@ function reloadAllWindows() {
 }
 
 function dereferenceWindow(winObj) {
-  const index = windows.findIndex((win) => win.id === winObj.id)
+  const index = windows.findIndex((win) => win === winObj)
   if (index >= 0) {
     lastClosed = windows[index]
   }
@@ -124,6 +130,7 @@ export {
   dereferenceWindow,
   closeWindow,
   getWindowById,
+  getWindowByObjectEq,
   numberOfWindows,
   focusIfOpen,
   editWindowPath,

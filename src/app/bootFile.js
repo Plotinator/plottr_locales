@@ -56,6 +56,8 @@ const isPlottrCloudFile = (filePath) => filePath && filePath.startsWith('plottr:
 
 const MAX_ATTEMPTS = 5
 
+const UPDATE_MESSAGE = 'Need to update Plottr'
+
 function waitForUser() {
   return new Promise((resolve, reject) => {
     function iter(attempts) {
@@ -112,7 +114,7 @@ const migrate = (originalFile, fileId) => (overwrittenFile) => {
       if (json.file.permission !== 'owner') {
         const migrator = new Migrator(json, fileURL, json.file.version, version, () => {}, logger)
         if (migrator.plottrBehindFile()) {
-          reject(new Error('Need to update Plottr'))
+          reject(new Error(UPDATE_MESSAGE))
         } else {
           machineId().then((clientId) => {
             loadFileIntoRedux(json, fileId)
@@ -131,7 +133,7 @@ const migrate = (originalFile, fileId) => (overwrittenFile) => {
             if (error) {
               rollbar.error(error)
               if (error === 'Plottr behind file') {
-                reject(new Error('Need to update Plottr'))
+                reject(new Error(UPDATE_MESSAGE))
                 return
               }
               reject(error)
@@ -339,23 +341,31 @@ export function bootFile(
           const errorMessage = `Error fetching ${fileId} for user: ${userId}, clientId: ${clientId}`
           logger.error(errorMessage, error)
           rollbar.error(errorMessage, error)
-          return showErrorBox(t('Error'), t('There was an error doing that. Try again')).then(
-            () => {
-              return Promise.reject(error)
-            }
-          )
+          if (error.message === UPDATE_MESSAGE) {
+            return Promise.reject(error)
+          } else {
+            return showErrorBox(t('Error'), t('There was an error doing that. Try again')).then(
+              () => {
+                return Promise.reject(error)
+              }
+            )
+          }
         })
     })
   }
 
   const handleErrorBootingFile = (fileId) => (error) => {
-    machineId().then((clientId) => {
+    return machineId().then((clientId) => {
       const errorMessage = `Error booting ${fileId} clientId: ${clientId}`
       logger.error(errorMessage, error)
       rollbar.error(errorMessage, error)
-      return showErrorBox(t('Error'), t('There was an error doing that. Try again')).then(() => {
+      if (error.message === UPDATE_MESSAGE) {
         return Promise.reject(error)
-      })
+      } else {
+        return showErrorBox(t('Error'), t('There was an error doing that. Try again')).then(() => {
+          return Promise.reject(error)
+        })
+      }
     })
   }
 
@@ -424,7 +434,7 @@ export function bootFile(
                       rollbar.error(err)
                       logger.error(err)
                       if (err === 'Plottr behind file') {
-                        return reject(new Error('Need to update Plottr'))
+                        return reject(new Error(UPDATE_MESSAGE))
                       }
                       return reject(`bootLocalFile002: migration (${fileURL})`)
                     }
@@ -507,7 +517,7 @@ export function bootFile(
             logger.error(error)
             rollbar.error(error)
             store.dispatch(
-              actions.applicationState.errorLoadingFile(error.message === 'Need to update Plottr')
+              actions.applicationState.errorLoadingFile(error.message === UPDATE_MESSAGE)
             )
           })
       } catch (error) {

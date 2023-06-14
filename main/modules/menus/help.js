@@ -15,17 +15,6 @@ function buildHelpMenu() {
         click: () => shell.openExternal('https://plottr.com/demos/'),
       },
       {
-        label: t('Guided Tours'),
-        submenu: [
-          {
-            label: t('Act Structure'),
-            click: function (event, focusedWindow) {
-              focusedWindow.webContents.send('turn-on-acts-help')
-            },
-          },
-        ],
-      },
-      {
         label: t('Documentation'),
         click: () => shell.openExternal('https://docs.plottr.com'),
       },
@@ -65,7 +54,7 @@ function buildHelpMenu() {
       },
       {
         label: t('Roadmap'),
-        click: () => shell.openExternal('https://plottr.com/our-roadmap'),
+        click: () => shell.openExternal('https://plottr.com/roadmap/'),
       },
     ],
   }

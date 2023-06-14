@@ -14,25 +14,21 @@ import {
   TemplateCreate,
   ErrorBoundary,
   ExportDialog,
-  ActsHelpModal,
   UpdateNotifier,
   NewProjectInputModal,
   ImagePicker,
 } from 'connected-components'
-import { hasPreviousAction } from '../../common/utils/error_reporter'
 import { store } from '../store'
-import { focusIsEditable } from '../../common/utils/undo'
 import MainIntegrationContext from '../../mainIntegrationContext'
 import logger from '../../../shared/logger'
 import { makeMainProcessClient } from '../mainProcessClient'
 
 const {
   onAdvancedExportFileFromMenu,
-  onTurnOnActsHelp,
   onReload,
-  onWantsToClose,
   pleaseReloadMenu,
   onOpenImagePickerFromMenu,
+  showMessageBox,
 } = makeMainProcessClient()
 
 const App = ({
@@ -46,32 +42,16 @@ const App = ({
   clickOnDom,
   applicationIsBusyAndCannotBeQuit,
   showErrorBox,
+  unsavedChanges,
+  fileSaved,
 }) => {
   const [showTemplateCreate, setShowTemplateCreate] = useState(false)
   const [type, setType] = useState(null)
   const [showAskToSave, setShowAskToSave] = useState(false)
   const [showExportDialog, setShowExportDialog] = useState(false)
   const [showImagePicker, setShowImagePicker] = useState(false)
-  const [showActsGuideHelp, setShowActsGuideHelp] = useState(false)
-
-  // FIXME: the close logic is broken and overly complicated.  I only
-  // made the addition here because we found a problem close to
-  // release.
-  const [blockClosing, setBlockClosing] = useState(true)
-  const isTryingToReload = useRef(false)
-  const isTryingToClose = useRef(false)
-  const alreadyClosingOrRefreshing = useRef(false)
-
-  const closeOrRefresh = (shouldClose) => {
-    alreadyClosingOrRefreshing.current = true
-    if (isTryingToReload.current) {
-      console.log('Trying to reload')
-      window.location.reload()
-    } else {
-      console.log('Trying to close')
-      if (shouldClose) window.close()
-    }
-  }
+  const [waitingForSaveDoneSignal, setWaitingForSaveDoneSignal] = useState(false)
+  const unsubscribeFromUnloadRef = useRef()
 
   useEffect(() => {
     pleaseReloadMenu()
@@ -103,95 +83,101 @@ const App = ({
     const unsubscribeFromImagePickerMenu = onOpenImagePickerFromMenu(() => {
       setShowImagePicker(true)
     })
-    const unsubscribeFromTurnOnActsHelp = onTurnOnActsHelp(() => {
-      setShowActsGuideHelp(true)
-    })
 
     return () => {
       document.removeEventListener('save-as-template-start', saveAsTemplateListener)
       unsubscribeFromAdvancedExportFromMenu()
       unsubscribeFromImagePickerMenu()
-      unsubscribeFromTurnOnActsHelp()
     }
   }, [])
 
-  const askToSave = (event) => {
-    console.log(
-      'In ask to save.',
-      event,
-      isTryingToClose.current,
-      isTryingToReload.current,
-      blockClosing,
-      alreadyClosingOrRefreshing.current,
-      applicationIsBusyAndCannotBeQuit
-    )
-    if (applicationIsBusyAndCannotBeQuit) {
+  const closeOrRefresh = (reloading) => {
+    if (reloading) {
+      window.location.reload()
+    } else {
+      window.close()
+    }
+  }
+
+  const removeReloadListeners = () => {
+    if (unsubscribeFromUnloadRef.current) {
+      unsubscribeFromUnloadRef.current()
+      unsubscribeFromUnloadRef.current = null
+    }
+  }
+
+  const askToSave = (event, reloading = false) => {
+    // Socket server is busy
+    if (unsavedChanges && !isCloudFile) {
+      logger.info("There are unsaved changes so we're not quitting")
+      event.preventDefault()
+      event.returnValue = 'nope'
+      setShowAskToSave(true)
+    } else if (applicationIsBusyAndCannotBeQuit) {
       logger.info('The socket server is busy and we cannot quit')
+      showMessageBox(t('Plottr is Busy'), t("Plottr is busy and can't quit"))
       if (event.preventDefault && typeof event.preventDefault === 'function') {
         event.preventDefault()
+        event.returnValue = 'nope'
       }
-      event.returnValue = 'nope'
+      return
+    } else {
+      removeReloadListeners()
+      if (reloading) {
+        closeOrRefresh(reloading)
+      }
       return
     }
-    if (alreadyClosingOrRefreshing.current) return
-    if (!blockClosing) return
-    if (process.env.NODE_ENV == 'development') {
-      closeOrRefresh(isTryingToClose.current)
-      return
-    }
-
-    if (focusIsEditable()) {
-      // TODO: make this work to save people from closing when they are still editing something
-      // event.returnValue = 'nope'
-      // alert(i18n('Save the work in the open text editor before closing'))
-    }
-    // No actions yet? doesn't need to save
-    //
-    // Cloud files are saved as we go.
-    if (!hasPreviousAction() || isCloudFile) {
-      setBlockClosing(false)
-      closeOrRefresh(isTryingToClose.current)
-      return
-    }
-
-    event.returnValue = 'nope'
-    setShowAskToSave(true)
   }
 
   useEffect(() => {
+    const forceClose = () => {
+      removeReloadListeners()
+      window.close()
+    }
+    window.addEventListener('force-close', forceClose)
+    return () => {
+      window.removeEventListener('force-close', forceClose)
+    }
+  }, [])
+
+  useEffect(() => {
     const unsubscribeFromReload = onReload(() => {
-      isTryingToReload.current = true
-      askToSave({})
-    })
-    const unsubscribeFromWantsToClose = onWantsToClose(() => {
-      log.info('received wants-to-close')
-      isTryingToClose.current = true
-      askToSave({})
+      askToSave({}, true, false)
     })
     window.addEventListener('beforeunload', askToSave)
-    return () => {
-      unsubscribeFromReload()
-      unsubscribeFromWantsToClose()
+    const unsubscribeFromUnload = () => {
       window.removeEventListener('beforeunload', askToSave)
     }
-  }, [blockClosing, applicationIsBusyAndCannotBeQuit, closeOrRefresh])
+    const unsubscribeAll = () => {
+      unsubscribeFromReload()
+      unsubscribeFromUnload()
+    }
 
-  const dontSaveAndClose = () => {
-    setBlockClosing(false)
-    setShowAskToSave(false)
-    closeOrRefresh(true)
-  }
+    unsubscribeFromUnloadRef.current = unsubscribeAll
+    return unsubscribeAll
+  }, [applicationIsBusyAndCannotBeQuit, unsavedChanges, isCloudFile])
+
+  useEffect(() => {
+    if (!applicationIsBusyAndCannotBeQuit) {
+      setWaitingForSaveDoneSignal(applicationIsBusyAndCannotBeQuit)
+    }
+  }, [applicationIsBusyAndCannotBeQuit, setWaitingForSaveDoneSignal])
 
   const saveAndClose = (saveFile, saveOfflineFile) => () => {
-    setBlockClosing(false)
-    setShowAskToSave(false)
     const { present } = store.getState()
-    if (isOffline) {
-      saveOfflineFile(present)
-    } else {
-      saveFile(present.project.fileURL, present)
-    }
-    closeOrRefresh(true)
+    return (isOffline ? saveOfflineFile(present) : saveFile(present.project.fileURL, present)).then(
+      () => {
+        fileSaved()
+        setWaitingForSaveDoneSignal(true)
+        setShowAskToSave(false)
+      }
+    )
+  }
+
+  const dismissAskToSave = () => {
+    setWaitingForSaveDoneSignal(false)
+    setShowAskToSave(false)
   }
 
   const renderTemplateCreate = () => {
@@ -201,16 +187,16 @@ const App = ({
   }
 
   const renderAskToSave = () => {
-    if (!showAskToSave || isCloudFile) return null
+    if (!waitingForSaveDoneSignal && (!showAskToSave || isCloudFile)) return null
 
     return (
       <MainIntegrationContext.Consumer>
-        {({ saveFile }) => {
+        {({ saveFile, saveOfflineFile }) => {
           return (
             <AskToSaveModal
-              dontSave={dontSaveAndClose}
-              save={saveAndClose(saveFile)}
-              cancel={() => setShowAskToSave(false)}
+              save={saveAndClose(saveFile, saveOfflineFile)}
+              busy={waitingForSaveDoneSignal}
+              dismiss={dismissAskToSave}
             />
           )
         }}
@@ -226,11 +212,6 @@ const App = ({
   const renderImagePickerModal = () => {
     if (!showImagePicker) return null
     return <ImagePicker fromMenu close={() => setShowImagePicker(false)} />
-  }
-
-  const renderActStructureHelpModal = () => {
-    if (!showActsGuideHelp) return null
-    return <ActsHelpModal close={() => setShowActsGuideHelp(false)} />
   }
 
   return (
@@ -258,7 +239,6 @@ const App = ({
         {renderTemplateCreate()}
         {renderAskToSave()}
         {renderAdvanceExportModal()}
-        {renderActStructureHelpModal()}
         {renderImagePickerModal()}
       </React.StrictMode>
     </ErrorBoundary>
@@ -276,6 +256,8 @@ App.propTypes = {
   clickOnDom: PropTypes.func,
   applicationIsBusyAndCannotBeQuit: PropTypes.bool,
   showErrorBox: PropTypes.func.isRequired,
+  unsavedChanges: PropTypes.bool,
+  fileSaved: PropTypes.func.isRequired,
 }
 
 function mapStateToProps(state) {
@@ -287,7 +269,11 @@ function mapStateToProps(state) {
     userNeedsToLogin: selectors.userNeedsToLoginSelector(state),
     sessionChecked: selectors.sessionCheckedSelector(state),
     applicationIsBusyAndCannotBeQuit: selectors.busyWithWorkThatPreventsQuittingSelector(state),
+    unsavedChanges: selectors.unsavedChangesSelector(state),
   }
 }
 
-export default connect(mapStateToProps, { clickOnDom: actions.domEvents.clickOnDom })(App)
+export default connect(mapStateToProps, {
+  clickOnDom: actions.domEvents.clickOnDom,
+  fileSaved: actions.ui.fileSaved,
+})(App)

@@ -7,7 +7,7 @@ const ask = (channel, ...args) => {
     try {
       const listener = (event, ...args) => {
         window.api.stopListening(listenToken, listener)
-        if (args[0] && args[0].error) {
+        if (args[0] && typeof args[0].error === 'string') {
           reject(new Error(args[0].error))
         } else if (args.length === 1) {
           resolve(args[0])
@@ -154,10 +154,6 @@ const _makeMainProcessClient = () => {
     return subscribeTo('image-picker-file-from-menu', cb)
   }
 
-  const onTurnOnActsHelp = (cb) => {
-    return subscribeTo('turn-on-acts-help', cb)
-  }
-
   const onReload = (cb) => {
     return subscribeTo('reload', cb)
   }
@@ -201,10 +197,6 @@ const _makeMainProcessClient = () => {
 
   const onSaveAs = (cb) => {
     return subscribeTo('save-as', cb)
-  }
-
-  const removeFromTempFilesIfTemp = (fileURL) => {
-    return ask('remove-from-temp-files-if-temp', fileURL)
   }
 
   const editKnownFilePath = (oldFileURL, newFileURL) => {
@@ -367,8 +359,8 @@ const _makeMainProcessClient = () => {
     return ask('pls-update-language', newLanguage)
   }
 
-  const downloadFileAndShow = (fileURL) => {
-    return ask('download-file-and-show', fileURL)
+  const downloadFileAndShow = (fileURL, fileName) => {
+    return ask('download-file-and-show', fileURL, fileName)
   }
 
   const pleaseOpenLoginPopup = () => {
@@ -415,6 +407,10 @@ const _makeMainProcessClient = () => {
     return ask('are-we-restarting-socket-server')
   }
 
+  const createDesktopShortcut = (sourceFileURL, newFileURL) => {
+    return ask('create-desktop-shortcut', sourceFileURL, newFileURL)
+  }
+
   return {
     setWindowTitle,
     setRepresentedFileName,
@@ -442,7 +438,6 @@ const _makeMainProcessClient = () => {
     devOpenAnalyzerFile,
     pleaseOpenWindow,
     onAdvancedExportFileFromMenu,
-    onTurnOnActsHelp,
     onReload,
     onReloadFromFile,
     pleaseFetchState,
@@ -454,7 +449,6 @@ const _makeMainProcessClient = () => {
     onExportFileFromMenu,
     onSave,
     onSaveAs,
-    removeFromTempFilesIfTemp,
     editKnownFilePath,
     pleaseTellDashboardToReloadRecents,
     onUndo,
@@ -508,6 +502,7 @@ const _makeMainProcessClient = () => {
     isRestarting,
     onCreateFileShortcut,
     onOpenImagePickerFromMenu,
+    createDesktopShortcut,
   }
 }
 
