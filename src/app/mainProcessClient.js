@@ -359,8 +359,8 @@ const _makeMainProcessClient = () => {
     return ask('pls-update-language', newLanguage)
   }
 
-  const downloadFileAndShow = (fileURL) => {
-    return ask('download-file-and-show', fileURL)
+  const downloadFileAndShow = (fileURL, fileName) => {
+    return ask('download-file-and-show', fileURL, fileName)
   }
 
   const pleaseOpenLoginPopup = () => {

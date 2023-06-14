@@ -361,9 +361,9 @@ export const listenOnIPCMain = (
     }
   })
 
-  ipcMain.on('download-file-and-show', (event, replyChannel, url) => {
+  ipcMain.on('download-file-and-show', (event, replyChannel, url, fileName) => {
     const downloadDirectory = app.getPath('downloads')
-    const fullPath = path.join(downloadDirectory, 'backup-download.pltr')
+    const fullPath = path.join(downloadDirectory, fileName || 'backup-download.pltr')
     const outputStream = fs.createWriteStream(fullPath)
     log.info(`Downloading ${url} to ${downloadDirectory}`)
     https

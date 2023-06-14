@@ -443,12 +443,12 @@ const platform = {
     document.dispatchEvent(event)
   },
   duplicateFile,
-  showItemInFolder: (fileURL) => {
+  showItemInFolder: (fileURL, fileName) => {
     isStorageURL(fileURL).then((storageURL) => {
       if (!storageURL) {
         showItemInFolder(fileURL)
       } else {
-        backupPublicURL(fileURL).then((url) => downloadFileAndShow(url))
+        backupPublicURL(fileURL).then((url) => downloadFileAndShow(url, fileName))
       }
     })
   },
