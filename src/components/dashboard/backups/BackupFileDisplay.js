@@ -39,10 +39,9 @@ const BackupFileDisplayConnector = (connector) => {
       const isCloudBackup = file.storagePath
       // make the name
       const backupText = t('Backup')
-      const extension = isCloudBackup ? '' : '.pltr'
-      const newName = `${groupName} [${backupText} ${folderDate}]${extension}`
+      const newName = `${groupName} [${backupText} ${folderDate}].pltr`
       if (isCloudBackup) {
-        showItemInFolder(file.storagePath)
+        showItemInFolder(file.storagePath, newName)
       } else {
         if (hasCurrentProLicense) {
           uploadToProAsDuplicate(file.localFilePathSegments, newName)
