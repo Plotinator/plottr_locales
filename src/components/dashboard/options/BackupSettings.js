@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import PropTypes from 'react-proptypes'
 
 import { t } from 'plottr_locales'
+import { helpers } from 'pltr/v2'
 
 import HelpBlock from '../../HelpBlock'
 import Button from '../../Button'
@@ -74,8 +75,10 @@ const BackupSettingsConnector = (connector) => {
         if (files && files.length) {
           const folderPath = files[0]
           if (
-            folderPath.startsWith(settings.user.defaultFolderLocation) ||
-            settings.user.defaultFolderLocation.startsWith(folderPath)
+            !helpers.file.neitherPathContainsTheOther(
+              folderPath,
+              settings.user.defaultFolderLocation
+            )
           ) {
             showErrorBox(
               t('Invalid backup location'),
