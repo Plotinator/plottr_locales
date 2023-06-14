@@ -73,7 +73,10 @@ const BackupSettingsConnector = (connector) => {
       showOpenDialog(title, [], properties).then((files) => {
         if (files && files.length) {
           const folderPath = files[0]
-          if (folderPath === settings.user.defaultFolderLocation) {
+          if (
+            folderPath.startsWith(settings.user.defaultFolderLocation) ||
+            settings.user.defaultFolderLocation.startsWith(folderPath)
+          ) {
             showErrorBox(
               t('Invalid backup location'),
               t('Please store your backups in a different location to your default folder')

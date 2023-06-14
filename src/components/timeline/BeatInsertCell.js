@@ -34,7 +34,6 @@ const BeatInsertCellConnector = (connector) => {
       hierarchyLevelName,
       hierarchyLevels,
       readOnly,
-      isEmpty,
       isPinned,
     } = props
 
@@ -212,7 +211,7 @@ const BeatInsertCellConnector = (connector) => {
     // Style for last beat is off, it's too wide...
     if (isInsertChildCell) {
       insideDiv = renderInsertMissingChildBeat()
-    } else if (isLast || (orientation === 'vertical' && isEmpty)) {
+    } else if (isLast) {
       insideDiv = renderLastInsertBeat()
     } else if (orientation === 'vertical') {
       insideDiv = (
@@ -266,7 +265,6 @@ const BeatInsertCellConnector = (connector) => {
     hierarchyLevelName: PropTypes.string,
     hierarchyLevels: PropTypes.array.isRequired,
     readOnly: PropTypes.bool,
-    isEmpty: PropTypes.bool,
     isPinned: PropTypes.bool,
   }
 
