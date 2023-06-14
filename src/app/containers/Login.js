@@ -14,7 +14,7 @@ const Login = ({ darkMode }) => {
         <div className="login__right">
           <div className="login__logo">
             {darkMode ? (
-              <img src="../icons/logo_dark_28_500.png" alt="Plottr Logo" width="358" height="500" />
+              <img src="../icons/logo_dark_28_500.png" alt="Plottr Logo" height="500" />
             ) : (
               <img
                 src="../icons/logo_light_28_500.png"
