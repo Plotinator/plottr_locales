@@ -11,7 +11,7 @@ import { store } from '../store'
 import logger from '../../../shared/logger'
 import { makeFileSystemAPIs, licenseServerAPIs } from '../../api'
 import { whenClientIsReady } from '../../../shared/socket-client'
-import { makeFileModule } from '../files'
+import { duplicateFile } from '../../files'
 import { makeMainProcessClient } from '../mainProcessClient'
 
 const { pleaseOpenWindow } = makeMainProcessClient()
@@ -36,6 +36,7 @@ const Listener = ({
   selectFile,
   offlineModeIsEnabled,
   resuming,
+  hasDefaultFolder,
   withFullFileState,
   isLoggedIn,
   checkedSession,
@@ -49,25 +50,66 @@ const Listener = ({
   showErrorBox,
 }) => {
   const fileSystemAPIs = makeFileSystemAPIs(whenClientIsReady)
-  const { saveAsTempFile } = makeFileModule(whenClientIsReady)
 
   // Prevent users from changing backups by closing the backup and
   // opening a temp version instead.
   useEffect(() => {
     if (fileURL) {
       fileSystemAPIs.backupBasePath().then((backupPath) => {
-        if (helpers.file.withoutProtocol(fileURL).startsWith(backupPath)) {
-          withFullFileState((state) => {
-            saveAsTempFile(state).then((newFileURL) => {
-              pleaseOpenWindow(newFileURL).then(() => {
-                window.close()
+        return new Promise((resolve, reject) => {
+          if (helpers.file.withoutProtocol(fileURL).startsWith(backupPath)) {
+            if (hasDefaultFolder) {
+              withFullFileState((state) => {
+                whenClientIsReady(({ saveToDefaultLocation, basename, addKnownFile }) => {
+                  return basename(fileName)
+                    .then((name) => {
+                      return name.replace(/\.pltr$/, '')
+                    })
+                    .then((name) => {
+                      const backupText = t('Backup')
+                      const date = new Date()
+                      const month = date.getMonth() + 1
+                      const day = date.getDate()
+                      const year = date.getUTCFullYear()
+                      const backupDate = `${t('Resumed at')}:${month}-${day}-${year}`
+                      return saveToDefaultLocation(
+                        state,
+                        `${name} [${backupText} ${backupDate}]`
+                      ).then((newFileURL) => {
+                        return pleaseOpenWindow(newFileURL)
+                          .then(() => {
+                            return addKnownFile(newFileURL)
+                          })
+                          .then(() => {
+                            const event = new Event('force-close')
+                            window.dispatchEvent(event)
+                          })
+                      })
+                    })
+                }).then(resolve, reject)
               })
-            })
-          })
-        }
+            } else {
+              whenClientIsReady(({ basename }) => {
+                return basename(fileName)
+                  .then((name) => {
+                    return name.replace(/\.pltr$/, '')
+                  })
+                  .then((name) => {
+                    const backupText = t('Backup')
+                    const date = new Date()
+                    const month = date.getMonth() + 1
+                    const day = date.getDate()
+                    const year = date.getUTCFullYear()
+                    const backupDate = `${t('Resumed at')}:${month}-${day}-${year}`
+                    duplicateFile(fileURL, `${name} [${backupText} ${backupDate}].pltr`, true)
+                  })
+              }).then(resolve, reject)
+            }
+          }
+        })
       })
     }
-  }, [fileURL])
+  }, [fileURL, hasDefaultFolder, fileName])
 
   // ====Listen to the file on Plottr Cloud====
 
@@ -198,6 +240,7 @@ Listener.propTypes = {
   cloudFileURL: PropTypes.string,
   selectFile: PropTypes.func.isRequired,
   resuming: PropTypes.bool,
+  hasDefaultFolder: PropTypes.bool,
   isCloudFile: PropTypes.bool,
   withFullFileState: PropTypes.func.isRequired,
   isLoggedIn: PropTypes.bool,
@@ -211,6 +254,7 @@ Listener.propTypes = {
   startLoadingALicenseType: PropTypes.func.isRequired,
   finishLoadingALicenseType: PropTypes.func.isRequired,
   showErrorBox: PropTypes.func.isRequired,
+  startCreatingNewProject: PropTypes.func.isRequired,
 }
 
 export default connect(
@@ -233,6 +277,7 @@ export default connect(
     offlineModeIsEnabled: selectors.offlineModeEnabledSelector(state),
     checkingProSubscription: selectors.checkingProSubscriptionSelector(state),
     knownFiles: selectors.knownFilesSelector(state),
+    hasDefaultFolder: selectors.hasDefaultFolderSelector(state),
   }),
   {
     setPermission: actions.permission.setPermission,
@@ -246,5 +291,6 @@ export default connect(
     setProLicenseInfo: actions.license.setProLicenseInfo,
     startLoadingALicenseType: actions.applicationState.startLoadingALicenseType,
     finishLoadingALicenseType: actions.applicationState.finishLoadingALicenseType,
+    startCreatingNewProject: actions.project.startCreatingNewProject,
   }
 )(Listener)

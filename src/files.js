@@ -287,3 +287,16 @@ export const openExistingFile = () => {
       })
   }
 }
+
+export const duplicateFile = (fileUrl, suggestedNewName, forceCloseWhenDone) => {
+  const state = store.getState()
+  const isLoggedIntoPro = selectors.hasProSelector(state)
+
+  const event = isLoggedIntoPro
+    ? new Event('save-as--pro', { fileUrl, suggestedNewName })
+    : new Event('save-as', { fileUrl })
+  event.fileUrl = fileUrl
+  event.suggestedNewName = suggestedNewName
+  event.forceCloseWhenDone = forceCloseWhenDone
+  document.dispatchEvent(event)
+}
