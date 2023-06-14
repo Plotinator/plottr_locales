@@ -102,3 +102,16 @@ export const ensureEndsInPltr = (filePath) => {
   }
   return filePath
 }
+
+export const neitherPathContainsTheOther = (path1, path2) => {
+  const segments1 = path1.split(/\\|\//)
+  const segments2 = path2.split(/\\|\//)
+  const longer = segments1.length > segments2.length ? segments1 : segments2
+  const shorter = segments1.length <= segments2.length ? segments1 : segments2
+  for (let i = 0; i < shorter.length; ++i) {
+    if (longer[i] !== shorter[i]) {
+      return true
+    }
+  }
+  return false
+}
