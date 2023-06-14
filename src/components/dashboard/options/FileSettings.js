@@ -63,7 +63,10 @@ const FileSettingsConnector = (connector) => {
       showOpenDialog(title, [], properties, folderPath()).then((files) => {
         if (files && files.length) {
           const folderPath = files[0]
-          if (folderPath === settings.user.backupLocation) {
+          if (
+            folderPath.startsWith(settings.user.backupLocation) ||
+            settings.user.backupLocation.startsWith(folderPath)
+          ) {
             showErrorBox(
               t('Invalid default folder location'),
               t('Please set your default folder to a different location from your backups')
