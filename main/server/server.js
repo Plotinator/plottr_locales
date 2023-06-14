@@ -111,13 +111,14 @@ const parseArgs = () => {
 const { rm, mkdir, lstat } = fs.promises
 
 const startupTasks = (userDataPath, stores, logInfo) => {
-  return wireupTemplateFetcher(userDataPath)(stores, logInfo).then((templateFetcher) => {
-    return templateFetcher.fetch().catch((error) => {
-      logInfo(
-        `ERROR: couldn't fetch templates at startup.  Continueing anyway.  Error message: ${error.message}.\n${error.stack}`
-      )
+  return wireupTemplateFetcher(userDataPath)(stores, logInfo)
+    .then((templateFetcher) => {
+      return templateFetcher.fetch().catch((error) => {
+        logInfo(
+          `ERROR: couldn't fetch templates at startup.  Continueing anyway.  Error message: ${error.message}.\n${error.stack}`
+        )
+      })
     })
-  })
 }
 
 const ONE_GIGABYTE = 1073741824
@@ -232,6 +233,7 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
       setLastOpenedFilePath,
       copyFile,
       createFileShortcut,
+      watchForFilesInDefaultFolder,
     } = fileSystemModule
     const trashModule = makeTrashModule(userDataPath, logger)
     const { trashByURL } = trashModule
@@ -348,6 +350,8 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
           unsubscribeFunctions.set(messageId, unsubscribe)
           return unsubscribe
         }
+
+        watchForFilesInDefaultFolder()
 
         switch (type) {
           case PING: {

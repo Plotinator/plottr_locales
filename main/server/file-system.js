@@ -38,6 +38,12 @@ function isOfflineFile(fileURL, offlineFileFilesPath) {
   return fileURL && helpers.file.withoutProtocol(fileURL).startsWith(offlineFileFilesPath)
 }
 
+const sequenceThunks = (thunks) => {
+  return thunks.reduce((acc, next) => {
+    return acc.then(next)
+  }, Promise.resolve())
+}
+
 const fileSystemModule = (userDataPath) => {
   const OFFLINE_FILE_FILES_PATH = path.join(userDataPath, 'offline')
   const BACKUP_BASE_PATH = path.join(userDataPath, 'backups')
@@ -174,7 +180,7 @@ const fileSystemModule = (userDataPath) => {
     }
 
     const isValidKnownFile = (file) => {
-      return typeof file.fileURL === 'string' && file.lastOpened
+      return typeof file.fileURL === 'string' && typeof file.lastOpened !== 'undefined'
     }
 
     const listenToknownFilesChanges = (cb) => {
@@ -468,6 +474,55 @@ const fileSystemModule = (userDataPath) => {
       }
     }
 
+    const watchForFilesInDefaultFolder = () => {
+      let defaultFolder = SETTINGS.get('user.defaultFolder')
+      let defaultFolderLocation = SETTINGS.get('user.defaultFolderLocation')
+      let watcher = null
+      const stopListeningToSettings = SETTINGS.onDidAnyChange((settings) => {
+        if (
+          defaultFolder &&
+          typeof defaultFolderLocation === 'string' &&
+          defaultFolderLocation !== ''
+        ) {
+          logger.info(
+            'Settings changed.  Re-estiblishing default folder watcher.',
+            defaultFolderLocation
+          )
+          if (watcher) {
+            watcher.close()
+          }
+          const readDirectory = () => {
+            return readdir(defaultFolderLocation).then((entries) => {
+              return Promise.all(
+                entries.filter((d) => {
+                  return d.endsWith('.pltr')
+                })
+              ).then((files) => {
+                const thunks = files.map((file) => () => {
+                  const fileURL = helpers.file.filePathToFileURL(
+                    path.join(defaultFolderLocation, file)
+                  )
+                  const hasFile = knownFilesStore.has(fileURL)
+                  const fileName = path.basename(file).replace(/\.pltr$/, '')
+                  if (!hasFile) {
+                    logger.info('Adding from watcher', file)
+                    knownFilesStore.setRawKey(fileURL, { fileURL, fileName, lastOpened: null })
+                  }
+                })
+                sequenceThunks(thunks)
+              })
+            })
+          }
+          readDirectory()
+          watcher = fs.watch(defaultFolderLocation, readDirectory)
+        }
+      })
+      return () => {
+        watcher.close()
+        stopListeningToSettings()
+      }
+    }
+
     return {
       TEMP_FILES_PATH,
       setTemplate,
@@ -505,6 +560,7 @@ const fileSystemModule = (userDataPath) => {
       setLastOpenedFilePath,
       copyFile,
       createFileShortcut,
+      watchForFilesInDefaultFolder,
     }
   }
 }
