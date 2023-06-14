@@ -13,11 +13,18 @@ const BackupFileDisplayConnector = (connector) => {
     platform: {
       mpq,
       file: { createAndOpenCopy },
+      showItemInFolder,
       duplicateFile,
       uploadToProAsDuplicate,
     },
   } = connector
-  checkDependencies({ mpq, createAndOpenCopy, duplicateFile, uploadToProAsDuplicate })
+  checkDependencies({
+    mpq,
+    createAndOpenCopy,
+    duplicateFile,
+    uploadToProAsDuplicate,
+    showItemInFolder,
+  })
 
   const BackupFileDisplay = ({
     folder,
@@ -35,8 +42,7 @@ const BackupFileDisplayConnector = (connector) => {
       const extension = isCloudBackup ? '' : '.pltr'
       const newName = `${groupName} [${backupText} ${folderDate}]${extension}`
       if (isCloudBackup) {
-        const fileUrl = helpers.file.fileIdToPlottrCloudFileURL(file.fileId)
-        duplicateFile(fileUrl, newName)
+        showItemInFolder(file.storagePath)
       } else {
         if (hasCurrentProLicense) {
           uploadToProAsDuplicate(file.localFilePathSegments, newName)
