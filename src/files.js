@@ -1,7 +1,8 @@
 import { t } from 'plottr_locales'
-import { helpers, reducers, emptyFile, migrateIfNeeded, addMissingKeys } from 'pltr/v2'
+import { helpers, reducers, emptyFile, migrateIfNeeded, addMissingKeys, errorCodes } from 'pltr/v2'
 import { actions, selectors } from 'wired-up-pltr'
 
+import { openExistingFile as _openExistingFile } from './common/utils/window_manager'
 import { closeDashboard } from './dashboard-events'
 import { store } from './app/store'
 import logger from '../shared/logger'
@@ -136,7 +137,6 @@ export const renameFile = (fileURL) => {
       try {
         const newFilePath = fileName.includes('.pltr') ? fileName : `${fileName}.pltr`
         const newFileURL = `device://${newFilePath}`
-        editKnownFilePath(fileURL, newFileURL)
         return whenClientIsReady(({ readFile, trash }) => {
           return readFile(helpers.file.withoutProtocol(fileURL), 'utf-8').then((rawFile) => {
             const contents = JSON.parse(rawFile)
@@ -145,16 +145,28 @@ export const renameFile = (fileURL) => {
                 return trash(fileURL, true)
               })
               .then(() => {
+                return editKnownFilePath(fileURL, newFileURL)
+              })
+              .then(() => {
                 store.dispatch(actions.applicationState.finishRenamingFile())
               })
           })
+        }).catch((error) => {
+          logger.error('Error renaming file', error)
+          store.dispatch(actions.applicationState.finishRenamingFile())
+          if (error.code === errorCodes.FILE_LACKS_ALL_KEYS) {
+            return showErrorBox(
+              t('File too old'),
+              t('Please open and then close the file before renaming it.')
+            )
+          } else {
+            return showErrorBox(t('Error'), t('There was an error doing that. Try again'))
+          }
         })
       } catch (error) {
-        logger.error(error)
+        logger.error('Error renaming file', error)
         store.dispatch(actions.applicationState.finishRenamingFile())
-        return showErrorBox(t('Error'), t('There was an error doing that. Try again')).then(() => {
-          return Promise.reject(error)
-        })
+        return showErrorBox(t('Error'), t('There was an error doing that. Try again'))
       }
     }
     return Promise.resolve()
@@ -199,11 +211,11 @@ export const migrateSaveAndOpen = (json, oldUrl, newFileURL) => {
   })
 }
 
-export const createAndOpenCopy = (oldPath, oldFileName, newFileName) => {
+export const createAndOpenCopy = (oldFilePathSegments, newFileName) => {
   return whenClientIsReady(({ join, findUniqueNameInPath, currentAppSettings, readFile }) => {
     return currentAppSettings().then((settings) => {
-      return join(oldPath, helpers.file.ensureEndsInPltr(oldFileName)).then((oldFullPath) => {
-        return readFile(oldFullPath).then((fileText) => {
+      return join(...oldFilePathSegments).then((oldFilePath) => {
+        return readFile(oldFilePath).then((fileText) => {
           const fileJSON = JSON.parse(fileText)
           if (settings.user.defaultFolder && settings.user.defaultFolderLocation) {
             return join(
@@ -212,7 +224,7 @@ export const createAndOpenCopy = (oldPath, oldFileName, newFileName) => {
             ).then((newFullPath) => {
               return findUniqueNameInPath(newFullPath).then((uniquePath) => {
                 const newFileURL = helpers.file.filePathToFileURL(uniquePath)
-                return migrateSaveAndOpen(fileJSON, oldFullPath, newFileURL)
+                return migrateSaveAndOpen(fileJSON, oldFilePath, newFileURL)
               })
             })
           } else {
@@ -225,7 +237,7 @@ export const createAndOpenCopy = (oldPath, oldFileName, newFileName) => {
                     if (fileName) {
                       const newFilePath = helpers.file.ensureEndsInPltr(fileName)
                       const newFileURL = helpers.file.filePathToFileURL(newFilePath)
-                      return migrateSaveAndOpen(fileJSON, oldFullPath, newFileURL)
+                      return migrateSaveAndOpen(fileJSON, oldFilePath, newFileURL)
                     } else {
                       return Promise.reject(
                         new Error(
@@ -242,4 +254,49 @@ export const createAndOpenCopy = (oldPath, oldFileName, newFileName) => {
       })
     })
   })
+}
+
+export const openExistingFile = () => {
+  const state = store.getState()
+  const isInOfflineMode = selectors.isInOfflineModeSelector(state)
+  if (!isInOfflineMode) {
+    const emailAddress = selectors.emailAddressSelector(state)
+    const userId = selectors.userIdSelector(state)
+    const isLoggedIn = selectors.isLoggedInSelector(state)
+    if (isLoggedIn) {
+      store.dispatch(actions.applicationState.startUploadingFileToCloud())
+    }
+
+    store.dispatch(actions.project.showLoader(true))
+    _openExistingFile(!!userId, userId, emailAddress)
+      .then(() => {
+        logger.info('Opened existing file')
+        store.dispatch(actions.project.showLoader(false))
+        if (isLoggedIn) {
+          store.dispatch(actions.applicationState.finishUploadingFileToCloud())
+        }
+      })
+      .catch((error) => {
+        logger.error('Error opening existing file', error)
+        showErrorBox(t('Error'), t('There was an error doing that. Try again.')).then(() => {
+          store.dispatch(actions.project.showLoader(false))
+          if (isLoggedIn) {
+            store.dispatch(actions.applicationState.finishUploadingFileToCloud())
+          }
+        })
+      })
+  }
+}
+
+export const duplicateFile = (fileUrl, suggestedNewName, forceCloseWhenDone) => {
+  const state = store.getState()
+  const isLoggedIntoPro = selectors.hasProSelector(state)
+
+  const event = isLoggedIntoPro
+    ? new Event('save-as--pro', { fileUrl, suggestedNewName })
+    : new Event('save-as', { fileUrl })
+  event.fileUrl = fileUrl
+  event.suggestedNewName = suggestedNewName
+  event.forceCloseWhenDone = forceCloseWhenDone
+  document.dispatchEvent(event)
 }

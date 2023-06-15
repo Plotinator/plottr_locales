@@ -7,7 +7,7 @@ const ask = (channel, ...args) => {
     try {
       const listener = (event, ...args) => {
         window.api.stopListening(listenToken, listener)
-        if (args[0] && args[0].error) {
+        if (args[0] && typeof args[0].error === 'string') {
           reject(new Error(args[0].error))
         } else if (args.length === 1) {
           resolve(args[0])
@@ -359,8 +359,8 @@ const _makeMainProcessClient = () => {
     return ask('pls-update-language', newLanguage)
   }
 
-  const downloadFileAndShow = (fileURL) => {
-    return ask('download-file-and-show', fileURL)
+  const downloadFileAndShow = (fileURL, fileName) => {
+    return ask('download-file-and-show', fileURL, fileName)
   }
 
   const pleaseOpenLoginPopup = () => {
@@ -405,6 +405,10 @@ const _makeMainProcessClient = () => {
 
   const isRestarting = () => {
     return ask('are-we-restarting-socket-server')
+  }
+
+  const createDesktopShortcut = (sourceFileURL, newFileURL) => {
+    return ask('create-desktop-shortcut', sourceFileURL, newFileURL)
   }
 
   return {
@@ -498,6 +502,7 @@ const _makeMainProcessClient = () => {
     isRestarting,
     onCreateFileShortcut,
     onOpenImagePickerFromMenu,
+    createDesktopShortcut,
   }
 }
 

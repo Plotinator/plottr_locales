@@ -1,6 +1,8 @@
 import { v4 as uuidv4 } from 'uuid'
 import { Buffer } from 'buffer/'
 
+import { errorCodes } from 'pltr/v2'
+
 import {
   PING,
   RM_RF,
@@ -220,7 +222,7 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
     on('message', (eventOrData) => {
       const data = usingBrowserWebsocketClient ? eventOrData.data : eventOrData
       try {
-        const { type, payload, messageId, result } = JSON.parse(data)
+        const { type, payload, messageId, result, errorCode } = JSON.parse(data)
         const resolvePromise = () => {
           const unresolvedPromise = promises.get(messageId)
           if (!unresolvedPromise) {
@@ -242,7 +244,9 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
             return
           }
           promises.delete(messageId)
-          unresolvedPromise.reject(result)
+          const error = new Error(result)
+          error.code = errorCode
+          unresolvedPromise.reject(error)
         }
 
         // TODO: handle SAVE_BACKUP_ERRORs

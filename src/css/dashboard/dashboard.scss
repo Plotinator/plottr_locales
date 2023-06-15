@@ -96,6 +96,12 @@ $header-height: 40px;
     grid-area: main;
     overflow: hidden;
 
+    &:has(.dashboard__files) {
+      display: flex;
+      height: 100%;
+      flex-direction: column;
+    }
+
     .beamer-wrapper.win32 {
       position: absolute;
       right: 0;

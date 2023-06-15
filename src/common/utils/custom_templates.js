@@ -95,7 +95,7 @@ function createCharacterTemplate(pltrData, { name, description, link }) {
   const data = cloneDeep(pltrData)
 
   let id = makeNewId('ch')
-  const attributes = selectors.allNonBaseCharacterAttributesSelector(data).map((attribute) => {
+  const attributes = selectors.allLegacyAndNewCharacterAttributesSelector(data).map((attribute) => {
     return {
       type: attribute.type,
       name: attribute.name,

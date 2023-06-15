@@ -24,10 +24,12 @@
       margin-top: 16px;
       background-color: $gray-8;
       border-radius: 16px;
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-areas: 'header' 'body' 'footer';
+      grid-template-rows: auto 1fr auto;
 
       .step__header {
+        grid-area: header;
         padding-bottom: 0;
 
         .onboarding__header {
@@ -37,8 +39,10 @@
       }
 
       .step__body {
+        grid-area: body;
         padding-top: 0;
         padding-bottom: 0;
+        overflow-y: auto;
       }
 
       .step__body .onboarding__settings .dashboard__options__item .form-group {
@@ -46,6 +50,7 @@
       }
 
       .step__footer {
+        grid-area: footer;
         margin-top: auto;
         padding-top: 0;
       }
