@@ -10,21 +10,28 @@ import {
   SET_OFFLINE,
   SET_RESUMING,
   RECORD_LAST_ACTION,
+  CLICK_ON_DOM,
   SELECT_FILE,
 } from '../constants/ActionTypes'
 import { file as defaultFile } from '../store/initialState'
 import { SYSTEM_REDUCER_ACTION_TYPES } from './systemReducers'
 import LoadActions from '../constants/loadActions'
 
+const ACTIONS_NOT_TO_UPDATE_ON = [
+  CLICK_ON_DOM,
+  RECORD_LAST_ACTION,
+  FILE_LOADED,
+  FILE_SAVED,
+  ...SYSTEM_REDUCER_ACTION_TYPES,
+]
+
 const file =
   (dataRepairers) =>
   (stateWithoutVersionStamp = defaultFile, action) => {
     const shouldNotUpdateVersionStamp =
       action.type?.startsWith('@') ||
-      action.type === FILE_LOADED ||
-      action.type === FILE_SAVED ||
+      ACTIONS_NOT_TO_UPDATE_ON.indexOf(action.type) !== -1 ||
       LoadActions.indexOf(action.type) !== -1 ||
-      SYSTEM_REDUCER_ACTION_TYPES.indexOf(action.type) !== -1 ||
       stateWithoutVersionStamp?.isResuming
     const state = stateWithoutVersionStamp && {
       ...stateWithoutVersionStamp,

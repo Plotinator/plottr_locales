@@ -4,6 +4,12 @@ import { permissionError } from '../actions/error'
 import { SYSTEM_REDUCER_KEYS } from '../reducers/systemReducers'
 import selectors from '../selectors'
 
+const FLAT_ARRAY_KEYS = ['cards', 'notes', 'places', 'characters']
+
+const isFlatArrayKey = (key) => {
+  return FLAT_ARRAY_KEYS.indexOf(key) !== -1
+}
+
 // Synchronise with Firebase.  We know to sync if there's a difference
 // between the previous value and the current value.  Synchronise
 // Redux key by key in a subset of keys that are appropriate for
@@ -64,11 +70,26 @@ const sync = (selectState) => (previous, present, patch, withData, store, action
     }
     if (!isEqual(previous[key], state[key])) {
       const payload = withData(key, state[key])
-      patch(key, fileId, payload, clientId).catch((error) => {
-        if (error.code === 'permission-denied') {
-          store.dispatch(permissionError(key, action, error.code))
-        }
-      })
+      if (isFlatArrayKey(key)) {
+        payload.forEach((entity, index) => {
+          const oldEntity = previous[key].find((otherEntity) => {
+            return otherEntity.id === entity.id
+          })
+          if (oldEntity !== entity) {
+            patch(key, fileId, entity, clientId).catch((error) => {
+              if (error.code === 'permission-denied') {
+                store.dispatch(permissionError(key, action, error.code))
+              }
+            })
+          }
+        })
+      } else {
+        patch(key, fileId, payload, clientId).catch((error) => {
+          if (error.code === 'permission-denied') {
+            store.dispatch(permissionError(key, action, error.code))
+          }
+        })
+      }
     }
   })
 

@@ -389,7 +389,9 @@ export const secondTierBeatsInAtLeastTwoTierArrangementSelector = createSelector
         // chapter.
         const priorBeat = beatsAtSecondTier[index - 1]
         const priorBeatParent = priorBeat && nodeParent(beats, priorBeat.id)
-        closestIndexBackwardOfParentWithNoChildren++
+        if (!(index === 0 && indexOfParentInParents > 0)) {
+          closestIndexBackwardOfParentWithNoChildren++
+        }
         if (
           closestIndexBackwardOfParentWithNoChildren < indexOfParentInParents &&
           priorBeatParent !== beatParent
@@ -716,7 +718,7 @@ export const cardMetaDataMapSelector = createDeepEqualSelector(
   }
 )
 
-export const searchedCardMetaDataMapSelector = createDeepEqualSelector(
+export const _searchedCardMetaDataMapSelector = createDeepEqualSelector(
   allCardMetaDataSelector,
   collapsedBeatSelector,
   visibleSortedBeatsForTimelineByBookSelector,
@@ -762,6 +764,12 @@ export const searchedCardMetaDataMapSelector = createDeepEqualSelector(
       cardReduce('lineId', 'beatId', !timelineViewIsntDefault && collapsedBeats, beatPositions),
       {}
     )
+  }
+)
+export const searchedCardMetaDataMapSelector = createDeepEqualSelector(
+  _searchedCardMetaDataMapSelector,
+  (cardMap) => {
+    return cardMap
   }
 )
 

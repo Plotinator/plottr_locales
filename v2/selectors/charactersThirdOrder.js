@@ -24,6 +24,7 @@ import { charactersSortedAtoZSelector } from './charactersFirstOrder'
 import { placesSortedAtoZSelector } from './placesFirstOrder'
 import { allNotesInBookSelector } from './notesThirdOrder'
 import { allCardsSelector } from './cardsFirstOrder'
+import { createDeepEqualSelector } from './createDeepEqualSelector'
 
 const displayedSingleCharacter = (character, bookId, currentBookAttributeDescirptorsById) => {
   const currentBookAttributes = character.attributes || []
@@ -286,6 +287,31 @@ export const visibleSortedSearchedCharactersByCategorySelector = createSelector(
   }
 )
 
+const characterMetadata = (character) => {
+  return {
+    id: character.id,
+  }
+}
+const _visibleSortedSearchedCharacterMetadataByCategorySelector = createSelector(
+  visibleSortedSearchedCharactersByCategorySelector,
+  (categories) => {
+    return Object.entries(categories).reduce((acc, nextEntry) => {
+      const [key, characters] = nextEntry
+
+      return {
+        ...acc,
+        [key]: characters.map(characterMetadata),
+      }
+    }, {})
+  }
+)
+export const visibleSortedSearchedCharacterMetadataByCategorySelector = createDeepEqualSelector(
+  _visibleSortedSearchedCharacterMetadataByCategorySelector,
+  (characterCategoryMetadata) => {
+    return characterCategoryMetadata
+  }
+)
+
 // This selector produces a character with overridden attributes based
 // on the book we're looking at.
 export const displayedSingleCharacterSelector = createSelector(
@@ -510,26 +536,27 @@ export const allBooksWithCharactersInThemSelector = createSelector(
   }
 )
 
-export const allBooksWithCharactersInThemSortedByPositionInAllBookIdsSelector = createSelector(
-  allBooksWithCharactersInThemSelector,
-  allBookIdsSelector,
-  (allCharacterBooks, allIds) => {
-    const characterWithAllBooks = {}
+export const allBooksWithCharactersInThemSortedByPositionInAllBookIdsSelector =
+  createDeepEqualSelector(
+    allBooksWithCharactersInThemSelector,
+    allBookIdsSelector,
+    (allCharacterBooks, allIds) => {
+      const characterWithAllBooks = {}
 
-    allIds
-      .map((id) => Object.values(allCharacterBooks).find((book) => book.id == id))
-      .forEach((item, idx) => {
-        if (item) {
-          characterWithAllBooks[item.id] = {
-            ...item,
-            position: idx,
+      allIds
+        .map((id) => Object.values(allCharacterBooks).find((book) => book.id == id))
+        .forEach((item, idx) => {
+          if (item) {
+            characterWithAllBooks[item.id] = {
+              ...item,
+              position: idx,
+            }
           }
-        }
-      })
+        })
 
-    return orderBy(characterWithAllBooks, 'position')
-  }
-)
+      return orderBy(characterWithAllBooks, 'position')
+    }
+  )
 
 export const charactersSortedInBookSelector = createSelector(
   charactersSortedAtoZSelector,
