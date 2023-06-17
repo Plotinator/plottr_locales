@@ -82,6 +82,13 @@ body.darkmode {
     }
   }
 
+  select,
+  option {
+    background-color: $darkmode-v2-background;
+    border-color: $darkmode-v2-border;
+    color: #bbb;
+  }
+
   .dropdown-menu {
     background-color: #1e2124;
 
