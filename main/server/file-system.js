@@ -513,8 +513,25 @@ const fileSystemModule = (userDataPath) => {
               })
             })
           }
-          readDirectory()
-          watcher = fs.watch(defaultFolderLocation, readDirectory)
+          lstat(defaultFolderLocation)
+            .catch((error) => {
+              if (error.code === 'ENOENT') {
+                logger.error("The default directory doesn't exist.  Creating it.")
+                return mkdir(defaultFolderLocation).then(() => {
+                  return new Promise((resolve) => {
+                    setTimeout(resolve, 1000)
+                  })
+                })
+              } else {
+                logger.error('Error checking whether the default directory exists', error)
+                return Promise.reject(error)
+              }
+            })
+            .then(() => {
+              logger.info('The default folder exists.')
+              readDirectory()
+              watcher = fs.watch(defaultFolderLocation, readDirectory)
+            })
         }
       })
       return () => {
