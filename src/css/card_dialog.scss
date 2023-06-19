@@ -10,27 +10,34 @@
 
 .card-dialog.darkmode {
   color: $darkmode-text;
+
   .card-dialog__description .card-dialog__tabs {
     .nav-tabs {
       border-bottom-color: $darkmode-border;
     }
-    .nav-tabs > li:not(.active) > a:not(:hover) {
+
+    .nav-tabs>li:not(.active)>a:not(:hover) {
       color: $darkmode-link-text;
       border-bottom-color: $darkmode-border;
     }
+
     .tab-content {
       border-color: $darkmode-border;
+
       .card-dialog__custom-attributes-configuration-link {
         color: $darkmode-link-text;
       }
     }
+
     .template-picker__link.dark {
       color: $darkmode-link-text;
     }
   }
+
   .card-dialog__left-side {
     border-color: $darkmode-border;
   }
+
   .card-dialog__button-bar {
     border-color: $darkmode-border;
   }
@@ -64,20 +71,25 @@
   padding-left: 10px;
   overflow-y: auto;
   font-size: 20px;
+
   .card-dialog__tabs {
     margin-bottom: 16px;
     font-size: 16px;
     height: calc(100% - 60px);
+
     .nav-tabs {
       user-select: none;
+
       li.draggable {
         a {
           user-select: auto;
           cursor: grab;
         }
+
         a:active {
           cursor: grabbing;
         }
+
         &.isDroppable a {
           box-sizing: border-box;
           border: 2px dashed $gray-6;
@@ -85,13 +97,15 @@
         }
       }
     }
+
     .tab-content {
       height: calc(100% - 44px);
       padding: 16px;
       border-left: 1px solid $gray-8;
       border-right: 1px solid $gray-8;
       border-bottom: 1px solid $gray-8;
-      & > .tab-pane {
+
+      &>.tab-pane {
         height: 100%;
         overflow: auto;
         position: relative;
@@ -99,6 +113,7 @@
         .card-dialog__custom-attributes__wrapper {
           position: relative;
           margin-bottom: 16px;
+
           .lock-icon__wrapper {
             position: absolute;
             padding: 20px;
@@ -144,31 +159,38 @@
           }
         }
       }
-      & > .tab-pane .template-picker__link {
+
+      &>.tab-pane .template-picker__link {
         cursor: pointer;
         margin-left: 4px;
         vertical-align: middle;
+
         &.dark {
           color: $gray-2;
         }
       }
-      & > .tab-pane .template-tab__details {
+
+      &>.tab-pane .template-tab__details {
         display: flex;
         justify-content: space-between;
+
         .text-danger {
           color: $red-5 !important;
         }
       }
     }
   }
+
   textarea {
     @include rce-text-font;
   }
+
   .slate-editor__wrapper {
     height: 100%;
     overflow-y: auto;
     margin: 0;
   }
+
   .slate-editor__editor {
     height: calc(100% - 30px);
     overflow-y: auto;
@@ -178,10 +200,12 @@
 
 .card-dialog__custom-attributes__wrapper {
   position: relative;
+
   .lock-icon__wrapper {
     position: absolute;
     top: 55% !important;
   }
+
   .slate-editor__wrapper {
     overflow-y: unset;
   }
@@ -225,6 +249,7 @@
   display: inline-block;
   margin-bottom: 5px;
   height: 100%;
+
   button {
     margin-left: 5px;
   }
@@ -241,6 +266,7 @@
   border-bottom: 2px solid #f2cb8000;
   transition: border-bottom 0.5s;
   font-weight: bold;
+
   &.darkmode {
     color: $text-color;
   }
@@ -303,6 +329,7 @@
 .card-dialog__book-selector {
   display: flex;
   align-items: center;
+
   svg {
     margin-right: 5px;
     color: $yellow-5;
@@ -324,6 +351,7 @@
 .editor-toolbar {
   border-radius: 4px;
   border: 1px solid $gray-5;
+
   a {
     display: inline-block;
     text-align: center;
@@ -336,11 +364,13 @@
     border-radius: 3px;
     cursor: pointer;
   }
+
   a:hover {
     text-decoration: none;
     color: $gray-1 !important;
     border: 1px solid $gray-5;
   }
+
   .separator {
     font-style: normal;
     display: inline-block;
@@ -354,15 +384,18 @@
 }
 
 .card-dialog__left-side {
+
   // The dropdowns for plotline and beat cause a horizontal scrollbar
   // when the titles are very long because the menu items don't wrap
-  .dropdown-menu > li > a {
+  .dropdown-menu>li>a {
     white-space: normal;
   }
+
   .color-picker__box {
     .buttons {
       visibility: hidden;
     }
+
     &:hover {
       .buttons {
         visibility: visible;
@@ -390,5 +423,46 @@
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+  }
+}
+
+.darkmode {
+  .card-dialog__details-label {
+    color: #bbb;
+  }
+
+  .card-dialog.darkmode {
+    .card-dialog__description {
+
+      .nav-tabs {
+        color: #bbb;
+        border-bottom-color: $darkmode-v2-border;
+      }
+
+      .card-dialog__tabs {
+
+        .tab-content,
+        .card-dialog__button-bar {
+          border-color: $darkmode-v2-border;
+          border-top: solid 1px $darkmode-v2-border;
+
+          &.btn-toolbar {
+            .btn-success {
+              background: transparent;
+            }
+          }
+        }
+
+        .tab-content {
+          border-left: 1px solid $darkmode-v2-border;
+          border-right: 1px solid $darkmode-v2-border;
+          border-bottom: 1px solid $darkmode-v2-border;
+        }
+      }
+    }
+
+    .card-dialog__left-side {
+      border-color: transparent;
+    }
   }
 }

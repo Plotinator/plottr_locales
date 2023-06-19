@@ -36,7 +36,7 @@ const PlottrFloaterConnector = (connector) => {
             arrowColor={darkMode ? '#555' : 'white'}
             arrowSize={10}
             arrowStyle={{}}
-            className={cx('popover-arrow-container', {
+            className={cx('popover-arrow-container', position, {
               resize:
                 (boundaryRect.height == boundaryRect.bottom &&
                   boundaryRect.width == boundaryRect.right) ||
