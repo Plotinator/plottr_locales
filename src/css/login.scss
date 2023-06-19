@@ -1,4 +1,5 @@
 $font-size: 20px;
+$darkmode-v2-btn-success-orange: #d63e00;
 
 .login {
   display: flex;
@@ -23,13 +24,13 @@ $font-size: 20px;
 }
 
 .login__left {
-  align-items: flex-start;
+  align-items: center;
   justify-content: flex-start;
   display: flex;
   flex-direction: column;
   padding-top: 80px;
   padding-right: 40px;
-  width: 50%;
+  width: 60%;
   height: 100%;
   display: flex;
 }
@@ -99,6 +100,30 @@ $font-size: 20px;
     padding: 0;
     .firebaseui-card-content {
       padding: 0;
+    }
+  }
+}
+
+.darkmode {
+  .login {
+    // darken the bg image
+    background-blend-mode: luminosity;
+  }
+  .login__left {
+    .btn-success {
+      background-color: $darkmode-v2-btn-success-orange;
+      color: #fff;
+    }
+
+    h1 {
+      color: #000;
+    }
+  }
+
+  .login__right {
+    img {
+      width: 80%;
+      height: 100%;
     }
   }
 }

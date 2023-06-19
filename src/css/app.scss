@@ -20,6 +20,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -79,6 +80,7 @@
     border-radius: 0;
     margin-bottom: 0;
     z-index: 1000;
+
     .container-fluid {
       padding: 0;
 
@@ -93,6 +95,7 @@
       .navbar-header {
         margin-right: 0;
         margin-left: 0;
+
         .navbar-toggle {
           border-color: $gray-6;
           margin-left: 16px;
@@ -204,22 +207,28 @@ h3.popover-title {
 .svg-save-template {
   vertical-align: middle;
 }
+
 .navbar-brand {
   @include header-font;
   font-size: 24px;
 }
+
 .nav.navbar-nav {
   @include application-text;
 }
+
 .navbar-default .navbar-text {
   color: $green-3;
 }
+
 .btn {
   @include application-text;
 }
+
 .modal-header {
   @include header-font;
 }
+
 .nav.nav-tabs {
   @include application-text;
 }
@@ -227,6 +236,7 @@ h3.popover-title {
 .control-label {
   @include application-text;
 }
+
 input[type='file'] {
   @include application-text;
 }
@@ -239,6 +249,7 @@ input[type='file'] {
   from {
     transform: rotate(360deg);
   }
+
   to {
     transform: rotate(0deg);
   }
@@ -254,6 +265,7 @@ input[type='file'] {
   text-align: center;
   font-size: 25px;
   @include header-font;
+
   .fa-spinner {
     color: $orange-5;
     font-size: 2.5em;
@@ -266,22 +278,26 @@ input[type='file'] {
     max-height: 100vh;
   }
 }
+
 .plottr-popover {
   .popover-content:has(.card__popover-wrapper) {
     max-height: 70vh;
   }
+
   .popover-content {
     // 35 is the height of the popover title
     max-height: calc(80vh - 35px);
     overflow: auto;
   }
 }
+
 #list-popover.popover {
   .popover-content {
     max-height: 93vh;
     overflow: auto;
   }
 }
+
 #filter.popover {
   .popover-content {
     max-height: 83vh;
@@ -300,6 +316,7 @@ input[type='file'] {
   .beamer_icon {
     top: 5px;
   }
+
   svg {
     vertical-align: text-bottom;
   }
@@ -328,5 +345,11 @@ input[type='file'] {
   .reactour__dot {
     height: 12px !important;
     width: 12px !important;
+  }
+}
+
+.darkmode {
+  .secondary-text.darkmode {
+    color: $darkmode-v2-darker-text;
   }
 }
