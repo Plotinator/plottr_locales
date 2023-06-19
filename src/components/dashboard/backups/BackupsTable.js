@@ -4,7 +4,6 @@ import PropTypes from 'react-proptypes'
 import { t } from 'plottr_locales'
 
 import Grid from '../../Grid'
-import Col from '../../Col'
 import Row from '../../Row'
 import { Spinner } from '../../Spinner'
 import UnconnectedBackupsFolder from './BackupsFolder'
@@ -29,7 +28,7 @@ const BackupsTableConnector = (connector) => {
             folder={folder}
             searchTerm={searchTerm}
             openByDefault={index == 0}
-            key={folder.longDateStr}
+            key={`${folder.longDateStr}-${index}`}
           />
         )
       })
@@ -53,9 +52,7 @@ const BackupsTableConnector = (connector) => {
             <div>{t('Count')}</div>
           </div>
           <Row>
-            <Col xs={12}>
-              <hr />
-            </Col>
+            <hr />
           </Row>
         </Grid>
         <div className="dashboard__backups__wrapper">
