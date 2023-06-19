@@ -215,18 +215,16 @@ const App = ({
   }
 
   return (
-    <ErrorBoundary>
-      <ErrorBoundary>
-        <React.StrictMode>
-          <Navigation forceProjectDashboard={forceProjectDashboard} />
-        </React.StrictMode>
-      </ErrorBoundary>
+    <>
+      <React.StrictMode>
+        <Navigation forceProjectDashboard={forceProjectDashboard} />
+      </React.StrictMode>
       <main
         className="project-main tour-end"
-        onClick={(event) => {
-          // The other part of this click handler is in Navigation
-          clickOnDom(event.clientX, event.clientY)
-        }}
+        /* onClick={(event) => { */
+        /*   // The other part of this click handler is in Navigation */
+        /*   clickOnDom(event.clientX, event.clientY) */
+        /* }} */
       >
         <React.StrictMode>
           <Body />
@@ -241,7 +239,7 @@ const App = ({
         {renderAdvanceExportModal()}
         {renderImagePickerModal()}
       </React.StrictMode>
-    </ErrorBoundary>
+    </>
   )
 }
 
