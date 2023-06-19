@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'react-proptypes'
-import cx from 'classnames'
 
 import { t } from 'plottr_locales'
 import { helpers } from 'pltr/v2'
@@ -19,14 +18,7 @@ const BackupFileDisplayConnector = (connector) => {
   } = connector
   checkDependencies({ mpq, createAndOpenCopy, duplicateFile, uploadToProAsDuplicate })
 
-  const BackupFileDisplay = ({
-    folder,
-    groupName,
-    file,
-    folderDate,
-    hasCurrentProLicense,
-    showActions,
-  }) => {
+  const BackupFileDisplay = ({ folder, groupName, file, folderDate, hasCurrentProLicense }) => {
     const handleMakeCopy = () => {
       mpq.push('btn_open_backup')
       const isCloudBackup = file.storagePath
@@ -79,8 +71,8 @@ const BackupFileDisplayConnector = (connector) => {
         <div>{renderFileDetails(file)}</div>
         {!isCloudBackup || (hasCurrentProLicense && isCloudBackup) ? (
           <div className="dashboard__backups__item-actions">
-            <div className={cx('dashboard__backups__item-button', { active: showActions })}>
-              <Button bsSize="xs" bsStyle="primary" onClick={handleMakeCopy}>
+            <div className="dashboard__backups__item-button">
+              <Button bsSize="xs" onClick={handleMakeCopy}>
                 {t('Open Backup')}
               </Button>
             </div>
