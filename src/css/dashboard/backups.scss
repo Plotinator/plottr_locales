@@ -16,6 +16,8 @@
   .row {
     display: flex;
     align-items: center;
+    width: 100%;
+    justify-content: space-between;
   }
 
   .dashboard__search {
@@ -81,14 +83,14 @@
       margin-right: 12px;
 
       svg {
-        color: $orange;
+        color: $gray-5;
       }
     }
   }
 
   &.active {
     color: white;
-    background-color: $orange;
+    background-color: $gray-5;
     border-radius: 12px;
 
     svg {
@@ -104,8 +106,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 21px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     border: 2px solid $gray-1;
     font-size: 10pt;
@@ -113,22 +115,52 @@
 }
 
 .dashboard__backups__projects-table {
-  margin-left: 96px;
   padding: 0 16px 0 38px;
   margin-bottom: 4px;
   .dashboard__backups__columns {
     margin-top: 8px;
     color: $gray-5;
     user-select: none;
+    width: 100%;
+
   }
+  
+  .dashboard__backups__header-columns {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0px 12px;
+
+    & > :not(:first-child) {
+      width: 50%;
+    }
+
+    >:first-child {
+      width: 100%;
+    }
+  }
+
   .dashboard__backups__project-row {
     &.row {
       margin: 4px 1px;
       border-radius: 8px;
-      background-color: darken($gray-9, 3%);
+      width: 100%;
 
       h6 {
         word-break: break-all;
+        padding: 0px 12px;
+      }
+
+      > :first-child {
+        width: 50%;
+      }
+
+      > :not(:first-child) {
+        width: 50%;
+        flex-direction: row;
+        display: flex;
+        align-items: center;
+        padding: 0 5px;
       }
     }
     .dashboard__backups__project-backup {
@@ -149,14 +181,7 @@
           .dashboard__backups__item-button {
             margin-left: 8px;
             visibility: hidden;
-
-            &.active {
-              visibility: visible;
-            }
           }
-        }
-        .dashboard__backups__item-details small {
-          color: $gray-5;
         }
       }
 
@@ -169,6 +194,36 @@
         justify-content: space-between;
         align-items: center;
         color: $gray-4;
+      }
+    }
+
+    .dashboard__backups__item {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      align-items: center;
+    }
+
+    .dashboard__backups__item-button {
+      display: none;
+
+      button {
+        background-color: $orange-5;
+        color: #fff;
+        border: none;
+      }
+    }
+
+    small {
+      color: $gray-5;
+    }
+
+    &:hover {
+      background-color: darken($gray-9, 3%);
+
+      .dashboard__backups__item-button {
+        display: block;
+        margin-left: 8px;
       }
     }
   }
@@ -233,6 +288,15 @@
 
     .icon svg {
       color: #bbb;
+    }
+
+    .dashboard__backups__item-button {
+      button {
+        border: 1px solid $orange-5;
+        &:hover {
+          background-color: transparent;
+        }
+      }
     }
   }
 }
