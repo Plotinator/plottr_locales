@@ -28,13 +28,13 @@ ipcMain.on('pls-open-window', (event, replyChannel, fileURL, unknown) => {
 
 function openProjectWindow(fileURL) {
   if (focusIfOpen(fileURL)) {
-    log.info(`Project window for ${fileURL} is already oepen, focussing it.`)
+    log.info(`Project window for ${fileURL} is already open, focusing it.`)
     return Promise.resolve()
   }
   log.info('Opening new browserWindow for', fileURL)
   return makeBrowserWindow(fileURL)
     .then((newWindow) => {
-      const entryFile = filePrefix(path.join(__dirname, 'app.html'))
+      const entryFile = filePrefix(path.join(__dirname, 'dark_app.html'))
       newWindow.loadURL(entryFile)
 
       newWindow.on('close', function (e) {
