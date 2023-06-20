@@ -31,7 +31,7 @@ const list = [
   'm2022_5_17_1',
   '*m2023_1_7',
   '*m2023_3_29',
-  '*m2023_7_5',
+  '*m2023_7_19',
 ]
 
 export default list.sort((thisVersion, thatVersion) =>
