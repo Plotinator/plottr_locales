@@ -3,9 +3,8 @@ import { app, ipcMain } from 'electron'
 import log from 'electron-log'
 import { makeBrowserWindow } from '../utils'
 import { filePrefix } from '../helpers'
-import { updateOpenFiles } from './files'
 import { rollbar } from '../rollbar'
-import { getWindowById, addNewWindow, dereferenceWindow, focusIfOpen } from '.'
+import { getWindowByObjectEq, addNewWindow, dereferenceWindow, focusIfOpen } from '.'
 import { addToKnown } from '../known_files'
 import { setLastOpenedFilePath } from '../lastOpened'
 
@@ -39,12 +38,12 @@ function openProjectWindow(fileURL) {
       newWindow.loadURL(entryFile)
 
       newWindow.on('close', function (e) {
-        const win = getWindowById(this.id) || e.sender // depends on 'this' being the window
-        if (win) {
-          updateOpenFiles(win.fileURL)
-          dereferenceWindow(win)
-          win.browserWindow.webContents.destroy()
-        }
+        e.sender.send('wants-to-close')
+      })
+
+      newWindow.on('closed', function (e) {
+        const win = getWindowByObjectEq(this)
+        dereferenceWindow(win)
       })
 
       try {

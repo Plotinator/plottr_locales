@@ -31,6 +31,8 @@ import {
   uploadExisting,
   deleteCloudBackupFile,
   createAndOpenCopy,
+  openExistingFile,
+  duplicateFile,
 } from './files'
 import logger from '../shared/logger'
 import { closeDashboard } from './dashboard-events'
@@ -48,13 +50,13 @@ import { deleteTemplate, editTemplateDetails } from './common/utils/templates'
 import { createFullErrorReport } from './common/utils/full_error_report'
 import { createErrorReport } from './common/utils/error_reporter'
 import MPQ from './common/utils/MPQ'
-import { openExistingFile as _openExistingFile } from './common/utils/window_manager'
 import { doesFileExist, removeFromKnownFiles, listOfflineFiles } from './common/utils/files'
 import { handleCustomerServiceCode } from './common/utils/customer_service_codes'
 import { notifyUser } from './notifyUser'
 import { exportSaveDialog } from './export-save-dialog'
 import { whenClientIsReady } from '../shared/socket-client'
 import { makeMainProcessClient } from './app/mainProcessClient'
+import { uploadToFirebase } from './upload-to-firebase'
 
 const {
   getVersion,
@@ -90,6 +92,7 @@ const {
   userDocumentsPath,
   pleaseOpenWindow,
   addToKnownFilesAndOpen,
+  createDesktopShortcut,
 } = makeMainProcessClient()
 
 export const rmRF = (path, ...args) => {
@@ -158,39 +161,18 @@ const platform = {
             logger.error('Error creating a new file', error)
             store().dispatch(actions.project.showLoader(false))
             store().dispatch(actions.applicationState.finishCreatingCloudFile())
+            showErrorBox(t('Error'), t('There was a problem doing that.  Please try again.'))
           })
       } else {
-        createNewFile(template, name)
-      }
-    },
-    openExistingFile: () => {
-      const state = store().getState()
-      const emailAddress = selectors.emailAddressSelector(state)
-      const userId = selectors.userIdSelector(state)
-      const isLoggedIn = selectors.isLoggedInSelector(state)
-      if (isLoggedIn) {
-        store().dispatch(actions.applicationState.startUploadingFileToCloud())
-      }
-
-      store().dispatch(actions.project.showLoader(true))
-      _openExistingFile(!!userId, userId, emailAddress)
-        .then(() => {
-          logger.info('Opened existing file')
+        createNewFile(template, name).catch((error) => {
+          logger.error('Error creating a new file', error)
           store().dispatch(actions.project.showLoader(false))
-          if (isLoggedIn) {
-            store().dispatch(actions.applicationState.finishUploadingFileToCloud())
-          }
+          store().dispatch(actions.applicationState.finishCreatingCloudFile())
+          showErrorBox(t('Error'), t('There was a problem doing that.  Please try again.'))
         })
-        .catch((error) => {
-          logger.error('Error opening existing file', error)
-          showErrorBox(t('Error'), t('There was an error doing that. Try again.')).then(() => {
-            store().dispatch(actions.project.showLoader(false))
-            if (isLoggedIn) {
-              store().dispatch(actions.applicationState.finishUploadingFileToCloud())
-            }
-          })
-        })
+      }
     },
+    openExistingFile,
     doesFileExist,
     pathSep: () => {
       return whenClientIsReady(({ pathSep }) => {
@@ -276,14 +258,22 @@ const platform = {
     createFileShortcut: (sourceFileURL, destinationURL) => {
       if (destinationURL == 'desktop') {
         return userDesktopPath().then((userDesktopPath) => {
+          if (isWindows()) {
+            return createDesktopShortcut(sourceFileURL, userDesktopPath)
+          } else {
+            return whenClientIsReady(({ createFileShortcut }) => {
+              return createFileShortcut(sourceFileURL, userDesktopPath)
+            })
+          }
+        })
+      } else {
+        if (isWindows()) {
+          return createDesktopShortcut(sourceFileURL, userDesktopPath)
+        } else {
           return whenClientIsReady(({ createFileShortcut }) => {
             return createFileShortcut(sourceFileURL, userDesktopPath)
           })
-        })
-      } else {
-        return whenClientIsReady(({ createFileShortcut }) => {
-          return createFileShortcut(sourceFileURL, destinationURL)
-        })
+        }
       }
     },
     readFile: (fileURL) => {
@@ -319,8 +309,8 @@ const platform = {
       })
     },
     listOfflineFiles,
-    createAndOpenCopy: (oldPath, oldFileName, newFileName) => {
-      return createAndOpenCopy(oldPath, oldFileName, newFileName)
+    createAndOpenCopy: (oldFilePath, newFileName) => {
+      return createAndOpenCopy(oldFilePath, newFileName)
     },
   },
   update: {
@@ -414,7 +404,7 @@ const platform = {
   openExternal: (...args) => {
     return openExternal(...args).catch((error) => {
       logger.error(`Error opening URL ${args}`, error)
-      store.dispatch(actions.error.generalError(`Error opening URL ${args}`))
+      store().dispatch(actions.error.generalError(`Error opening URL ${args}`))
     })
   },
   createErrorReport,
@@ -445,23 +435,13 @@ const platform = {
     const event = new Event('move-from-temp')
     document.dispatchEvent(event)
   },
-  duplicateFile: (fileUrl, suggestedNewName) => {
-    const state = store().getState()
-    const isLoggedIntoPro = selectors.hasProSelector(state)
-
-    const event = isLoggedIntoPro
-      ? new Event('save-as--pro', { fileUrl, suggestedNewName })
-      : new Event('save-as', { fileUrl })
-    event.fileUrl = fileUrl
-    event.suggestedNewName = suggestedNewName
-    document.dispatchEvent(event)
-  },
-  showItemInFolder: (fileURL) => {
+  duplicateFile,
+  showItemInFolder: (fileURL, fileName) => {
     isStorageURL(fileURL).then((storageURL) => {
       if (!storageURL) {
         showItemInFolder(fileURL)
       } else {
-        backupPublicURL(fileURL).then((url) => downloadFileAndShow(url))
+        backupPublicURL(fileURL).then((url) => downloadFileAndShow(url, fileName))
       }
     })
   },
@@ -514,6 +494,37 @@ const platform = {
     },
     resizeImage,
     downloadStorageImage,
+  },
+  uploadToProAsDuplicate: (sourceFilePathSegments, newName) => {
+    return whenClientIsReady(({ join, readFile }) => {
+      return join(...sourceFilePathSegments).then((sourceFilePath) => {
+        return readFile(sourceFilePath).then((fileData) => {
+          try {
+            const fileJSON = JSON.parse(fileData)
+            const state = store().getState()
+            const emailAddress = selectors.emailAddressSelector(state)
+            const userId = selectors.userIdSelector(state)
+            return uploadToFirebase(emailAddress, userId, fileJSON, newName).then((response) => {
+              const fileId = response.data.fileId
+              if (!fileId) {
+                const message = `Tried to create cloud file for ${sourceFilePath} but we didn't get a fileId back`
+                logger.error(message)
+                return Promise.reject(new Error(message))
+              }
+              const fileURL = helpers.file.fileIdToPlottrCloudFileURL(fileId)
+              return openFile(fileURL, false)
+            })
+          } catch (error) {
+            return Promise.reject(
+              new Error(
+                `Couldn't parse file data to upload backup at ${sourceFilePath} to Firebase`,
+                error
+              )
+            )
+          }
+        })
+      })
+    })
   },
 }
 

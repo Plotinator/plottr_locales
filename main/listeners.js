@@ -28,8 +28,6 @@ import {
   openFile,
   createNew,
   createFromSnowflake,
-  TEMP_FILES_PATH,
-  removeFromTempFiles,
   removeFromKnownFiles,
   deleteKnownFile,
   editKnownFilePath,
@@ -304,21 +302,6 @@ export const listenOnIPCMain = (
       })
   })
 
-  ipcMain.on('remove-from-temp-files-if-temp', (event, replyChannel, fileURL) => {
-    if (fileURL.includes(TEMP_FILES_PATH)) {
-      removeFromTempFiles(fileURL, false)
-        .then(() => {
-          event.sender.send(replyChannel, 'done')
-        })
-        .catch((error) => {
-          log.error(`Error removing ${fileURL} from temp files`, error)
-          event.sender.send(replyChannel, { error: error.message })
-        })
-    } else {
-      event.sender.send(replyChannel, 'Not temp')
-    }
-  })
-
   ipcMain.on('remove-from-known-files', (event, replyChannel, fileURL) => {
     removeFromKnownFiles(fileURL)
       .then(() => {
@@ -378,9 +361,9 @@ export const listenOnIPCMain = (
     }
   })
 
-  ipcMain.on('download-file-and-show', (event, replyChannel, url) => {
+  ipcMain.on('download-file-and-show', (event, replyChannel, url, fileName) => {
     const downloadDirectory = app.getPath('downloads')
-    const fullPath = path.join(downloadDirectory, 'backup-download.pltr')
+    const fullPath = path.join(downloadDirectory, fileName || 'backup-download.pltr')
     const outputStream = fs.createWriteStream(fullPath)
     log.info(`Downloading ${url} to ${downloadDirectory}`)
     https
@@ -739,4 +722,48 @@ export const listenOnIPCMain = (
     )
     event.sender.send(replyChannel, restartingServerStateRef.restarting)
   })
+
+  ipcMain.on(
+    'create-desktop-shortcut',
+    (event, replyChannel, sourceFileURL, destinationFolderPath) => {
+      function createShortcut(counter = 0) {
+        try {
+          const shortcutDestination = helpers.file.withoutProtocol(destinationFolderPath)
+          const sourceFilePath = helpers.file.withoutProtocol(sourceFileURL)
+          const shortcutSuffix = ' - Shortcut'
+          const shortCutExt = '.lnk'
+
+          let newShortcutPath = path.join(
+            shortcutDestination,
+            shortcutSuffix +
+              path.basename(sourceFilePath, path.extname(sourceFilePath)) +
+              shortCutExt
+          )
+          newShortcutPath = path.join(
+            shortcutDestination,
+            path.basename(sourceFilePath, path.extname(sourceFilePath)) +
+              shortcutSuffix +
+              (counter ? ' ' + counter : '') +
+              shortCutExt
+          )
+          const result = shell.writeShortcutLink(newShortcutPath, { target: sourceFilePath })
+          if (result) {
+            event.sender.send(replyChannel, true)
+            shell.showItemInFolder(newShortcutPath)
+          } else {
+            const errorMessage = `Error creating a desktop shortcut to ${sourceFilePath} at ${destinationFolderPath}`
+            log.error(errorMessage)
+            event.sender.send(replyChannel, { error: errorMessage })
+          }
+        } catch (error) {
+          log.error(
+            `Error creating a desktop shortcut to ${sourceFileURL} at ${destinationFolderPath}`,
+            error
+          )
+          event.sender.send(replyChannel, { error: error.message })
+        }
+      }
+      createShortcut()
+    }
+  )
 }

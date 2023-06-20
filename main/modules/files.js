@@ -19,18 +19,9 @@ const { writeFile } = fs.promises
 const { addHierarchiesIfMissing } = specialCaseFixes
 
 const makeFileModule = () => {
-  const TMP_PATH = 'tmp'
-  const TEMP_FILES_PATH = path.join(app.getPath('userData'), 'tmp')
-
   const saveFile = (fileURL, jsonData) => {
     return whenClientIsReady(({ saveFile }) => {
       return saveFile(fileURL, jsonData)
-    })
-  }
-
-  function removeFromTempFiles(fileURL, doDelete) {
-    return whenClientIsReady(({ removeFromTempFiles }) => {
-      return removeFromTempFiles(fileURL, doDelete)
     })
   }
 
@@ -52,9 +43,9 @@ const makeFileModule = () => {
     })
   }
 
-  function saveToTempFile(json, name) {
-    return whenClientIsReady(({ saveToTempFile }) => {
-      return saveToTempFile(json, name)
+  function saveToDefaultLocation(json, name) {
+    return whenClientIsReady(({ saveToDefaultLocation }) => {
+      return saveToDefaultLocation(json, name)
     })
   }
 
@@ -73,32 +64,29 @@ const makeFileModule = () => {
   }
 
   async function createNew(template, name) {
-    if (template) {
-      const fileName = name || t('Untitled')
-      const templateFileJSON = newFileFromTemplate(template, fileName)
-      if (templateFileJSON.books[1]) {
-        templateFileJSON.books[1].title = fileName
+    return currentSettings().then(async (settings) => {
+      let projectName = name || t('Untitled')
+      if (!settings.user.defaultFolder) {
+        projectName = path.basename(name, '.pltr')
       }
+
+      let fileJSON = template
+        ? newFileFromTemplate(template, projectName)
+        : emptyFile(projectName, app.getVersion())
+
+      if (template && fileJSON.books[1]) {
+        fileJSON.books[1].title = projectName
+      }
+
       try {
-        const fileURL = await saveToTempFile(templateFileJSON, name)
+        const fileURL = await saveToDefaultLocation(fileJSON, name)
         await addToKnownFiles(fileURL)
         await openFile(fileURL)
       } catch (error) {
         log.error('Failed to create a new file', name, error)
         throw error
       }
-    } else {
-      const fileName = name || t('Untitled')
-      const emptyPlottrFile = emptyFile(fileName, app.getVersion())
-      try {
-        const fileURL = await saveToTempFile(emptyPlottrFile, name)
-        await addToKnownFiles(fileURL)
-        await openFile(fileURL)
-      } catch (error) {
-        log.error('Failed to create a new file', name, error)
-        throw error
-      }
-    }
+    })
   }
 
   function createFromSnowflake(importedPath, sender, isLoggedIntoPro) {
@@ -116,7 +104,7 @@ const makeFileModule = () => {
           return Promise.resolve()
         }
 
-        return saveToTempFile(importedJson, storyName)
+        return saveToDefaultLocation(importedJson, storyName)
           .then((fileURL) => {
             return addToKnownFiles(fileURL).then(() => {
               return openFile(fileURL)
@@ -187,7 +175,7 @@ const makeFileModule = () => {
           app.quit()
         })
       } else {
-        return saveToTempFile(importedJson, storyName)
+        return saveToDefaultLocation(importedJson, storyName)
           .then((fileURL) => {
             return addToKnownFiles(fileURL).then(() => {
               return openFile(fileURL)
@@ -244,7 +232,6 @@ const makeFileModule = () => {
   return {
     saveFile,
     editKnownFilePath,
-    removeFromTempFiles,
     createNew,
     createFromSnowflake,
     createFromScrivener,
@@ -257,7 +244,6 @@ const makeFileModule = () => {
 const {
   saveFile,
   editKnownFilePath,
-  removeFromTempFiles,
   createNew,
   createFromSnowflake,
   createFromScrivener,
@@ -269,7 +255,6 @@ const {
 export {
   saveFile,
   editKnownFilePath,
-  removeFromTempFiles,
   createNew,
   createFromSnowflake,
   createFromScrivener,

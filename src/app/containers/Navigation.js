@@ -20,7 +20,6 @@ const Navigation = ({
   changeCurrentView,
   clickOnDom,
   appIsBusyWithWork,
-  unsavedChanges,
 }) => {
   const [dashboardView, setDashboardView] = useState(null)
 
@@ -117,7 +116,6 @@ Navigation.propTypes = {
   forceProjectDashboard: PropTypes.bool,
   appIsBusyWithWork: PropTypes.bool,
   clickOnDom: PropTypes.func.isRequired,
-  unsavedChanges: PropTypes.bool,
 }
 
 function mapStateToProps(state) {
@@ -126,7 +124,6 @@ function mapStateToProps(state) {
     currentView: selectors.currentViewSelector(state),
     darkMode: selectors.isDarkModeSelector(state),
     appIsBusyWithWork: selectors.busyWithWorkThatPreventsQuittingSelector(state),
-    unsavedChanges: selectors.unsavedChangesSelector(state),
   }
 }
 

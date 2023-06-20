@@ -199,20 +199,27 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
   /////////////
   // backups //
   /////////////
-  .dashboard__backups__item {
-    &.icon {
-      svg {
-        color: $dark-text;
-      }
-      &:hover {
-        svg {
-          color: $dark-text;
-        }
-      }
+  .dashboard__backups__projects-summary {
+    color: $dark-text;
+    background-color: $dark-gray-2;
+    .count-circle {
+      border-color: white;
     }
-    &:hover {
-      color: $dark-text;
+    &.active {
       background-color: $dark-gray-1;
+    }
+  }
+  .dashboard__backups__columns {
+    color: $dark-text;
+  }
+  .dashboard__backups__project-row {
+    &.row {
+      background-color: $dark-gray-2;
+    }
+    .dashboard__backups__project-backup .dashboard__backups__item {
+      .dashboard__backups__item-details small {
+        color: $dark-gray-6;
+      }
     }
   }
 
@@ -301,12 +308,37 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
   }
 }
 
+
+/////////////////////
+// update notifier //
+/////////////////////
+
 .update-notifier {
   &.alert {
     &.darkmode {
       color: $dark-text;
       background-color: $dark-gray-1;
       border-color: $dark-text;
+    }
+  }
+}
+
+
+/////////////////////
+// settings Wizard //
+/////////////////////
+body.darkmode {
+  .settings-wizard__wrapper {
+    .onboarding__step {
+      background-color: $dark-gray-1;
+      .step__body {
+        .option-switch-labeltext {
+          color: $dark-gray-6;
+        }
+        .help-block {
+          color: $dark-gray-6;
+        }
+      }
     }
   }
 }
