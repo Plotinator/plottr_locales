@@ -6,13 +6,15 @@ import { selectors } from 'wired-up-pltr'
 
 const FLAT_ARRAY_KEYS = ['cards', 'notes', 'places', 'characters']
 
+const externalSync = middlewares.externalSync(identity)
+
 const firebaseSync = (store) => (next) => (action) => {
   if (!action.type || SYSTEM_REDUCER_ACTION_TYPES.indexOf(action.type) !== -1) {
     return next(action)
   } else {
     const isCloudFile = selectors.isCloudFileSelector(store.getState())
     if (isCloudFile) {
-      return middlewares.externalSync(identity)(overwrite, (key, data) => {
+      return externalSync(overwrite, (key, data) => {
         return FLAT_ARRAY_KEYS.indexOf(key) === -1 && ARRAY_KEYS.indexOf(key) !== -1
           ? toFirestoreArray(data)
           : data
