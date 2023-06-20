@@ -28,6 +28,8 @@ const actionRecorder = (store) => (next) => (action) => {
         },
       })
       return result
+    } else {
+      return next(action)
     }
   } else {
     return next(action)
