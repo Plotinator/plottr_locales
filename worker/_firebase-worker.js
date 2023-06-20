@@ -251,7 +251,6 @@ self.onmessage = (event) => {
         fileVersion,
         replyWithReduxAction
       )
-      const unsubscribeToCards = listenToFlatCards(userId, fileId, clientId, replyWithReduxAction)
       const unsubscribeToSeries = listenToSeries(userId, fileId, clientId, replyWithReduxAction)
       const unsubscribeToBooks = listenToBooks(userId, fileId, clientId, replyWithReduxAction)
       const unsubscribeToCategories = listenToCategories(
@@ -315,7 +314,6 @@ self.onmessage = (event) => {
         unsubscribeToUI()
         unsubscribeToFile()
         unsubscribeToBeats()
-        unsubscribeToCards()
         unsubscribeToSeries()
         unsubscribeToBooks()
         unsubscribeToCategories()
