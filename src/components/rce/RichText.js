@@ -139,7 +139,7 @@ const RichTextConnector = (connector) => {
       }
 
       return () => {
-        if (releaseRCELock && lock?.clientId === props.clientId) {
+        if (releaseRCELock && lock?.clientId === props.clientId && props.id) {
           releaseRCELock(props.fileId, props.id)
         }
       }
