@@ -562,12 +562,9 @@ const api = (
     const setDeletedSeries = () => setDeleted('series')
     const setDeletedBooks = () => setDeleted('books')
     const setDeletedCategories = () => setDeleted('categories')
-    const setDeletedCharacters = () => setDeleted('characters')
     const setDeletedCustomAttributes = () => setDeleted('customAttributes')
     const setDeletedLines = () => setDeleted('lines')
     const setDeletedBeats = () => setDeleted('beats')
-    const setDeletedNotes = () => setDeleted('notes')
-    const setDeletedPlaces = () => setDeleted('places')
     const setDeletedTags = () => setDeleted('tags')
     const setDeletedHierarchyLevels = () => setDeleted('hierarchyLevels')
     const setDeletedImages = () => setDeleted('images')
@@ -591,6 +588,9 @@ const api = (
       })
     }
     const setDeletedCards = () => setEachDeleted('flatCards', 'cards')
+    const setDeletedCharacters = () => setEachDeleted('flatCharacters', 'characters')
+    const setDeletedNotes = () => setEachDeleted('flatNotes', 'notes')
+    const setDeletedPlaces = () => setEachDeleted('flatPlaces', 'places')
 
     return setDeletedAuthorisation()
       .then(setDeletedfile)
