@@ -2,8 +2,14 @@ import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { Popover, ArrowContainer } from 'react-tiny-popover'
 import cx from 'classnames'
+import { omit, isEqual } from 'lodash'
 
 const PORTAL_ID = 'plottr-floater-portal'
+
+const nonComponentsPropsAreEqual = (prevProps, newProps) => {
+  const withoutChildrenOrComponent = (props) => omit(props, ['children', 'component'])
+  return isEqual(withoutChildrenOrComponent(prevProps), withoutChildrenOrComponent(newProps))
+}
 
 const PlottrFloaterConnector = (connector) => {
   const PlottrFloater = ({
@@ -114,7 +120,7 @@ const PlottrFloaterConnector = (connector) => {
         lastClick: selectors.lastClickSelector(state),
         darkMode: selectors.isDarkModeSelector(state),
       }
-    })(PlottrFloater)
+    })(React.memo(PlottrFloater, nonComponentsPropsAreEqual))
   }
 
   throw new Error('Could not connect PlottrFloater')

@@ -598,6 +598,7 @@ const TimelineWrapperConnector = (connector) => {
                   setTableRef={setTableRef}
                   tableRef={tableRef.current}
                   activeTab={activeTab}
+                  isCardDialogVisible={isCardDialogVisible}
                 />
               )}
             />
@@ -610,6 +611,7 @@ const TimelineWrapperConnector = (connector) => {
               }}
               tableRef={tableRef.current}
               activeTab={activeTab}
+              isCardDialogVisible={isCardDialogVisible}
             />
           )
         }
@@ -630,7 +632,11 @@ const TimelineWrapperConnector = (connector) => {
                   leftStickyColumnCount={stickyLeftColumnCount}
                 >
                   {mounted ? (
-                    <TimelineTable activeTab={activeTab} tableRef={tableRef.current} />
+                    <TimelineTable
+                      activeTab={activeTab}
+                      tableRef={tableRef.current}
+                      isCardDialogVisible={isCardDialogVisible}
+                    />
                   ) : (
                     <FunSpinner />
                   )}
@@ -651,7 +657,14 @@ const TimelineWrapperConnector = (connector) => {
                 vertical: timelineBundle.orientation == 'vertical',
               })}
             >
-              {mounted ? <TimelineTable tableRef={tableRef.current} /> : <FunSpinner />}
+              {mounted ? (
+                <TimelineTable
+                  tableRef={tableRef.current}
+                  isCardDialogVisible={isCardDialogVisible}
+                />
+              ) : (
+                <FunSpinner />
+              )}
             </StickyTable>
           )
         }

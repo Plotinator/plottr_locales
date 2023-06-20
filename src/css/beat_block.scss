@@ -157,13 +157,17 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
 
   &.small-timeline {
     visibility: visible;
-    width: 100px;
     position: absolute !important;
     top: 41px !important;
     left: -14px !important;
     transform: none !important;
     border: none !important;
     background-color: transparent !important;
+    .btn-group {
+      display: flex;
+      flex-direction: row;
+      min-width: fit-content;
+    }
   }
 }
 
