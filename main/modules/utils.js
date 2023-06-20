@@ -47,7 +47,7 @@ function makeBrowserWindow(fileURL) {
       const backgroundColor =
         (settings.user?.dark === 'system' && nativeTheme.shouldUseDarkColors) ||
         settings.user?.dark === 'dark'
-          ? '#666666'
+          ? '#2a2b32'
           : '#f7f7f7'
       let config = {
         x: stateKeeper.x,
@@ -57,6 +57,7 @@ function makeBrowserWindow(fileURL) {
         fullscreen: stateKeeper.isFullScreen || null,
         show: false,
         fullscreenable: true,
+        backgroundColor,
         webPreferences: {
           nodeIntegration: false,
           spellcheck:
