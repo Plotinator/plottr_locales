@@ -181,6 +181,12 @@
   }
 }
 
+.template-picker__dialog-wrapper {
+  .card-dialog__button-bar {
+    margin-bottom: 10px;
+  }
+}
+
 .dashboard__template-picker {
   &.template-picker__wrapper {
     justify-content: flex-start;
