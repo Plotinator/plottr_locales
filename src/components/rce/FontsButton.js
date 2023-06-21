@@ -46,11 +46,13 @@ const UnMemoisedFontsButton = ({
   const changeFont = (font) => {
     // The editor's never been focused.
     if (editor.selection === null) {
-      ReactEditor.focus(editor)
-      new Promise((resolve) => setTimeout(resolve, 100)).then(() => {
-        setActiveFont(font)
-        addRecent(font)
-        addFontMark(editor, font)
+      new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
+        ReactEditor.focus(editor)
+        return new Promise((resolve) => setTimeout(resolve, 100)).then(() => {
+          setActiveFont(font)
+          addRecent(font)
+          addFontMark(editor, font)
+        })
       })
     } else {
       setActiveFont(font)
