@@ -200,7 +200,7 @@ const App = ({
   }, [applicationIsBusyAndCannotBeQuit, setWaitingForSaveDoneSignal])
 
   const saveAndClose = (saveFile, saveOfflineFile) => () => {
-    const { present } = store.getState()
+    const { present } = store().getState()
     return (isOffline ? saveOfflineFile(present) : saveFile(present.project.fileURL, present)).then(
       () => {
         fileSaved()
