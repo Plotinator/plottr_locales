@@ -389,7 +389,9 @@ export const secondTierBeatsInAtLeastTwoTierArrangementSelector = createSelector
         // chapter.
         const priorBeat = beatsAtSecondTier[index - 1]
         const priorBeatParent = priorBeat && nodeParent(beats, priorBeat.id)
-        closestIndexBackwardOfParentWithNoChildren++
+        if (!(index === 0 && indexOfParentInParents > 0)) {
+          closestIndexBackwardOfParentWithNoChildren++
+        }
         if (
           closestIndexBackwardOfParentWithNoChildren < indexOfParentInParents &&
           priorBeatParent !== beatParent

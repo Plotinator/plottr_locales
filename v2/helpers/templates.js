@@ -1,4 +1,4 @@
-import { sortBy } from 'lodash'
+import { sortBy, range } from 'lodash'
 
 import * as tree from '../reducers/tree'
 import { addCard } from '../actions/cards'
@@ -291,6 +291,20 @@ const mergeTrees = (
   return [finalTree, finalNextBeatId, addCardActions, addBeatActions]
 }
 
+const findFirstLeaf = (treeToTraverse) => {
+  function iter(key) {
+    const nodeChildren = sortBy(children(treeToTraverse, key), 'position')
+    if (Array.isArray(nodeChildren) && nodeChildren.length === 0) {
+      return key
+    } else {
+      const firstChild = nodeChildren[0]
+      return iter(firstChild.id)
+    }
+  }
+
+  return iter(null)
+}
+
 // ASSUME: that there's one book in the template(!)
 export const applyTemplate = (fileState, bookId, template, selectedIndex) => {
   // Create a reducer to do some heavy lifting.
@@ -301,6 +315,32 @@ export const applyTemplate = (fileState, bookId, template, selectedIndex) => {
   const addLinesAction = addLinesFromTemplate({ ...template.templateData, cards: [] }, template.id)
   const withNewLines = rootReducer(fileState, addLinesAction)
 
+  const initialDestinationTree = withNewLines.beats[bookId]
+  const maxDestinationDepth = maxDepthIncludingRoot(initialDestinationTree, null)
+
+  const destinationConfiguredHierarchyLevels = withNewLines.hierarchyLevels[bookId]
+  const destinationConfiguredHierarchyLevelCount = Object.keys(
+    destinationConfiguredHierarchyLevels
+  ).length
+  const beatsToAdd =
+    selectedIndex >= maxDestinationDepth &&
+    selectedIndex <= destinationConfiguredHierarchyLevelCount
+      ? Math.min(
+          destinationConfiguredHierarchyLevelCount - maxDestinationDepth,
+          selectedIndex + 1 - maxDestinationDepth
+        )
+      : 0
+  const adjustedState =
+    beatsToAdd > 0
+      ? range(0, beatsToAdd).reduce((newState, _idx) => {
+          const currentTree = newState.beats[bookId]
+          const deepestFirstBeat = findFirstLeaf(currentTree)
+          return rootReducer(newState, addBeat(bookId, deepestFirstBeat))
+        }, withNewLines)
+      : withNewLines
+  const destinationTree = adjustedState.beats[bookId]
+  const sourceTree = Object.values(template.templateData.beats)[0]
+
   // Compute a mapping function to place new cards onto lines by their
   // new ids.
   //
@@ -308,6 +348,7 @@ export const applyTemplate = (fileState, bookId, template, selectedIndex) => {
   //  - that lines are added to new state in the same order as they
   //    appear in the template, and
   const templateDataLines = template.templateData.lines
+  // NOTE: Here, we want the id of the state without lines added.
   const maxLineId = nextLineId(fileState.lines)
   const lineMapping = templateDataLines.reduce(
     // Added lines
@@ -319,15 +360,15 @@ export const applyTemplate = (fileState, bookId, template, selectedIndex) => {
     },
     {}
   )
-  const nextAvailableBeatId = nextId(fileState.beats)
+  const nextAvailableBeatId = nextId(adjustedState.beats)
   // Recursively process the source and destination trees, expanding
   // the destination tree when required to accomodate as many beats at
   // the same path that the source has.
   const [_mergedTree, _nextBeatId, addCardActions, addBeatActions] = mergeTrees(
     nextAvailableBeatId,
     bookId,
-    fileState.beats[bookId],
-    Object.values(template.templateData.beats)[0],
+    destinationTree,
+    sourceTree,
     template.templateData.cards,
     lineMapping,
     template.mergeBias || 'top',
@@ -337,7 +378,7 @@ export const applyTemplate = (fileState, bookId, template, selectedIndex) => {
   // Apply the actions to add beats and cards.
   const withNewBeatsAndCards = addBeatActions.concat(addCardActions).reduce((acc, nextAction) => {
     return rootReducer(acc, nextAction)
-  }, withNewLines)
+  }, adjustedState)
 
   return withNewBeatsAndCards
 }
