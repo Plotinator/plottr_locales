@@ -649,40 +649,42 @@
   "places": [],
   "tags": [],
   "hierarchyLevels": {
-    "0": {
-      "name": "Chapter",
-      "level": 0,
-      "autoNumber": true,
-      "textSize": 24,
-      "borderStyle": "DASHED",
-      "backgroundColor": "none",
-      "textColor": "#78be20",
-      "borderColor": "#78be20",
-      "dark": {
-        "textColor": "#baed79",
-        "borderColor": "#baed79"
-      },
-      "light": {
-        "textColor": "#78be20",
-        "borderColor": "#78be20"
-      }
-    },
     "1": {
-      "name": "Chapter",
-      "level": 1,
-      "autoNumber": true,
-      "textSize": 24,
-      "borderStyle": "NONE",
-      "backgroundColor": "none",
-      "textColor": "#0b1117",
-      "borderColor": "#6cace4",
-      "dark": {
-        "borderColor": "#c9e6ff",
-        "textColor": "#c9e6ff"
+      "0": {
+        "name": "Chapter",
+        "level": 0,
+        "autoNumber": true,
+        "textSize": 24,
+        "borderStyle": "DASHED",
+        "backgroundColor": "none",
+        "textColor": "#78be20",
+        "borderColor": "#78be20",
+        "dark": {
+          "textColor": "#baed79",
+          "borderColor": "#baed79"
+        },
+        "light": {
+          "textColor": "#78be20",
+          "borderColor": "#78be20"
+        }
       },
-      "light": {
+      "1": {
+        "name": "Chapter",
+        "level": 1,
+        "autoNumber": true,
+        "textSize": 24,
+        "borderStyle": "NONE",
+        "backgroundColor": "none",
+        "textColor": "#0b1117",
         "borderColor": "#6cace4",
-        "textColor": "#0b1117"
+        "dark": {
+          "borderColor": "#c9e6ff",
+          "textColor": "#c9e6ff"
+        },
+        "light": {
+          "borderColor": "#6cace4",
+          "textColor": "#0b1117"
+        }
       }
     }
   },
