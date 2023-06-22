@@ -266,31 +266,29 @@ const TimelineTableConnector = (connector) => {
       } else {
         const lastBeat = beats[beats.length - 1]
         finalRows = []
-        if (isLarge) {
-          if (timelineViewIsTabbed) {
-            // Cell has height to accomodate hover controls
-            finalRows.push(
-              <Row>
-                <Cell
-                  key={`beatId-second-last-insert-controls-place-holder`}
-                  style={{ height: '40px' }}
-                >
-                  <div>&nbsp;</div>
-                </Cell>
-              </Row>
-            )
-          } else {
-            finalRows.push(
-              <Row key="second-last-insert">
-                <BeatInsertCell
-                  isInBeatList={true}
-                  handleInsert={this.handleInsertNewBeat}
-                  beatToLeft={lastBeat}
-                  isEmpty={!beats.length}
-                />
-              </Row>
-            )
-          }
+        if (timelineViewIsTabbed) {
+          // Cell has height to accomodate hover controls
+          finalRows.push(
+            <Row>
+              <Cell
+                key={`beatId-second-last-insert-controls-place-holder`}
+                style={{ height: '40px' }}
+              >
+                <div>&nbsp;</div>
+              </Cell>
+            </Row>
+          )
+        } else {
+          finalRows.push(
+            <Row key="second-last-insert">
+              <BeatInsertCell
+                isInBeatList={true}
+                handleInsert={this.handleInsertNewBeat}
+                beatToLeft={lastBeat}
+                isLast={true}
+              />
+            </Row>
+          )
         }
       }
 
