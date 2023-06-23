@@ -397,22 +397,28 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
       }
     }
   }
-}
-/////////////////////
-// settings Wizard //
-/////////////////////
-body.darkmode {
+
+  /////////////////////
+  // settings Wizard //
+  /////////////////////
+  
   .settings-wizard__wrapper {
     .onboarding__step {
-      background-color: $dark-gray-1;
+      background-color: $darkmode-v2-darker-background;
       .step__body {
         .option-switch-labeltext {
-          color: $dark-gray-6;
+          color: $darkmode-v2-darker-text;
         }
         .help-block {
-          color: $dark-gray-6;
+          color: $darkmode-v2-darker-text;
         }
       }
+    }
+  }
+
+  .onboarding__progress__titles {
+    > div {
+      color: $darkmode-v2-darker-text;
     }
   }
 }

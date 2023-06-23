@@ -282,6 +282,10 @@ body.darkmode {
     }
   }
 
+  .btn-link {
+    background-color: transparent !important;
+  }
+
   .btn-toolbar .btn {
     background: $darkmode-v2-card-background;
   }
