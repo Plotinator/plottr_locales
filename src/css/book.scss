@@ -419,4 +419,10 @@
       background: $darkmode-v2-darker-background;
     }
   }
+
+  .book-container__cover-image-wrapper {
+    > svg {
+      color: $darkmode-v2-darker-text;
+    }
+  }
 }
