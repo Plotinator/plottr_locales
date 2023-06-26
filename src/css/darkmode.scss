@@ -82,6 +82,11 @@ body.darkmode {
     }
   }
 
+  input {
+    background-color: $darkmode-v2-background;
+    color: #bbb;
+  }
+
   select,
   option {
     background-color: $darkmode-v2-background;
@@ -424,7 +429,7 @@ body.darkmode {
 
         .sticky-table-cell,
         .sticky-table-cell:not(:first-child) {
-          border-color: #19171d;
+          border-left: none;
         }
 
         &:hover .sticky-table-cell:first-child,
@@ -450,7 +455,7 @@ body.darkmode {
         }
 
         .sticky-table-cell:first-child {
-          border-right-color: #4b4d4f;
+          border-right-color: transparent;
         }
 
         .sticky-table-cell:nth-child(2) {
@@ -678,6 +683,11 @@ body.darkmode {
 
   .container-with-sub-nav .tab-body {
     background: $darkmode-v2-card-background;
+  }
+
+  .tab-body {
+    background: $darkmode-v2-card-background;
+    width: 100vw;
   }
 
   // Templates

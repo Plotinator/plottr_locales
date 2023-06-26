@@ -136,22 +136,17 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
         .sticky-table-cell {
           background-color: $dark-gray-1;
           color: $dark-text;
-
+          
           &:first-child {
-            border-right-color: $dark-gray-3;
+            border-right: none;
           }
         }
       }
 
       .sticky-table-row:not(:first-child) {
-        border-left-color: $dark-gray-1;
-
-        .sticky-table-cell:not(:first-child) {
-          border-left-color: $dark-gray-3;
-        }
-
+        
         .sticky-table-cell {
-          border-color: $dark-gray-1;
+          border-left: none;
         }
 
         &:hover,
