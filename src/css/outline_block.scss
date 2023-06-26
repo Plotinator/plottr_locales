@@ -328,7 +328,7 @@
 
     &:hover,
     .outline__card__description:not(.editing) {
-      border: 2px dashed $darkmode-v2-border;
+      border: 1px dashed $darkmode-v2-border;
       background-color: $darkmode-v2-background;
     }
   }

@@ -161,4 +161,29 @@
       color: $darkmode-v2-darker-text;
     }
   }
+
+  .progress {
+    background-color: $darkmode-v2-progress;
+    border: none;
+  }
+
+  .onboarding__scrolling-list {
+    .list-group-item {
+      background-color: $darkmode-v2-card-background;
+      border-color: $darkmode-v2-border;
+
+      &:hover {
+        background-color: $darkmode-v2-darker-background;
+      }
+
+      p.secondary-text {
+        color: #ccc;
+      }
+      .checkbox {
+        color: $darkmode-v2-darker-text;
+        padding-left: 0;
+      }
+    }
+  }
+
 }
