@@ -148,6 +148,16 @@
 }
 
 .darkmode {
+  .tag-list__wrapper {
+    background-color: transparent;
+
+    .tag-category-list {
+      .tag-list__category-wrapper.darkmode {
+        background-color: transparent;
+      }
+    }
+  }
+
   .tag-list__tag.darkmode {
     background-color: #24252c;
     color: $darkmode-v2-darker-text;

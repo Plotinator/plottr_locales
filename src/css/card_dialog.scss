@@ -322,7 +322,6 @@
   padding-top: 10px;
   display: flex;
   flex-direction: row-reverse;
-  border-top: 1px solid $gray-8;
   min-height: 50px;
 }
 
@@ -444,7 +443,6 @@
         .tab-content,
         .card-dialog__button-bar {
           border-color: $darkmode-v2-border;
-          border-top: solid 1px $darkmode-v2-border;
 
           &.btn-toolbar {
             .btn-success {

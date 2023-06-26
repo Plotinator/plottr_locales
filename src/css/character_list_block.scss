@@ -376,7 +376,7 @@
 
     .character-list__character:hover {
       .character-list__character-notes {
-        border: 2px dashed $darkmode-v2-border;
+        border: 1px dashed $darkmode-v2-border;
         background-color: $darkmode-v2-background;
       }
     }
@@ -441,7 +441,7 @@
       &.selected,
       &:hover,
       &:focus {
-        border: 2px dashed $darkmode-v2-border;
+        border: 1px dashed $darkmode-v2-border;
         background-color: #24252c;
       }
     }
