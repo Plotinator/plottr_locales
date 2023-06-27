@@ -153,7 +153,11 @@ const FilesHomeConnector = (connector) => {
         }
       } else {
         if (isOnWeb || isLoggedIn) {
-          projectActions.startCreatingNewProject()
+          if (isObject(template)) {
+            projectActions.startCreatingNewProject(template)
+          } else {
+            projectActions.startCreatingNewProject()
+          }
         } else {
           savePlottrProjectDialog().then((newFilePath) => {
             if (newFilePath) {
