@@ -256,6 +256,8 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
       })
     }
 
+    watchForFilesInDefaultFolder()
+
     webSocket.on('message', (message) => {
       try {
         const { type, messageId, payload } = JSON.parse(message)
@@ -349,8 +351,6 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
           unsubscribeFunctions.set(messageId, unsubscribe)
           return unsubscribe
         }
-
-        watchForFilesInDefaultFolder()
 
         switch (type) {
           case PING: {
