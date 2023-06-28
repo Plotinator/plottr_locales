@@ -1,7 +1,7 @@
 import semverGt from 'semver/functions/gt'
 import axios from 'axios'
 import { DateTime } from 'luxon'
-import { isEqual } from 'lodash'
+import { isEqual, identity, isObject, capitalize } from 'lodash'
 
 import { removeSystemKeys, ARRAY_KEYS, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
 
@@ -22,7 +22,11 @@ const api = (
   isDesktop
 ) => {
   const BASE_API_URL =
-    (!isDesktop && development) || !baseAPIDomain ? '' : `https://${baseAPIDomain || ''}`
+    (!isDesktop && development) || !baseAPIDomain
+      ? ''
+      : baseAPIDomain === '/'
+      ? ''
+      : `https://${baseAPIDomain || ''}`
 
   const defaultErrorHandler = (error) => {
     log.error('Error communicating with Firebase.', error.message, error)
@@ -80,8 +84,21 @@ const api = (
     })
   }
 
+  const FLAT_CARD_PATH_MAPPING = {
+    flatCards: 'cards',
+    flatNotes: 'notes',
+    flatPlaces: 'places',
+    flatCharacters: 'characters',
+  }
+
+  const reinterpretPath = (path) => {
+    const mappedValue = FLAT_CARD_PATH_MAPPING[path]
+    return typeof mappedValue !== 'undefined' ? mappedValue : path
+  }
+
   const patchActions = (path) => {
-    switch (path) {
+    const reinterpretedPath = reinterpretPath(path)
+    switch (reinterpretedPath) {
       case 'ui':
         return actions.ui
       case 'beats':
@@ -146,7 +163,7 @@ const api = (
         delete data.fileId
         delete data.clientId
         withAction(
-          patchActions(path)[loadFunctionKey](
+          patchAction[loadFunctionKey](
             patching,
             withData({ ...usingFromDocRef(documentRef), ...data })
           )
@@ -159,6 +176,52 @@ const api = (
         )
       },
     }
+  }
+
+  const handleFlatArraySnapshot = (
+    withAction,
+    fileId,
+    path,
+    withData,
+    patching,
+    clientId,
+    loadFunctionKey = 'load',
+    usingFromDocRef = () => ({})
+  ) => {
+    return (() => {
+      let lastResults = null
+
+      return {
+        next: (documentRef) => {
+          const results = []
+          documentRef.forEach((document) => {
+            results.push(document.data())
+          })
+          // NOTE: We can't only rely on the client id anymore.
+          const unChanged = results.every((document) => {
+            const previousDocument = lastResults?.get(document.id)
+            return document.clientId === clientId || isEqual(document, previousDocument)
+          })
+          if (unChanged) return
+          lastResults = results.reduce((acc, next) => {
+            acc.set(next.id)
+            return acc
+          }, new Map())
+          const patchAction = patchActions(path)
+          if (!patchAction) {
+            log.error('No patch action for ', path)
+            return
+          }
+          withAction(patchAction[loadFunctionKey](patching, withData(results)))
+        },
+        error: (error) => {
+          log.error(
+            `Error listening to ${fileId} at ${path} with a loadFunctionKey of ${loadFunctionKey}`,
+            error.message
+          )
+        },
+      }
+    })()
   }
 
   const listenToFile = (
@@ -181,7 +244,6 @@ const api = (
   const listenForObjectAtPath =
     (path) =>
     (userId, fileId, clientId, withAction, errorHandler = defaultErrorHandler) => {
-      const identity = (x) => x
       const { doc, onSnapshot } = database()
       return onSnapshot(
         doc(`${path}/${fileId}`),
@@ -197,6 +259,16 @@ const api = (
       return onSnapshot(
         doc(`${path}/${fileId}`),
         handleSnapshot(withAction, fileId, path, values, true, clientId)
+      )
+    }
+
+  const listenForFlatArrayAtPath =
+    (path, subPath) =>
+    (userId, fileId, clientId, withAction, errorHandler = defaultErrorHandler) => {
+      const { collection, onSnapshot, query } = database()
+      return onSnapshot(
+        query(collection(`${path}/${fileId}/${subPath}`)),
+        handleFlatArraySnapshot(withAction, fileId, path, identity, true, clientId)
       )
     }
 
@@ -235,24 +307,49 @@ const api = (
   const listenToHierarchyLevels = listenForObjectAtPath('hierarchyLevels')
   const listenToImages = listenForObjectAtPath('images')
   const listenToAttributes = listenForObjectAtPath('attributes')
+  const listenToFlatCards = listenForFlatArrayAtPath('flatCards', 'cards')
+  const listenToFlatCharacters = listenForFlatArrayAtPath('flatCharacters', 'characters')
+  const listenToFlatNotes = listenForFlatArrayAtPath('flatNotes', 'notes')
+  const listenToFlatPlaces = listenForFlatArrayAtPath('flatPlaces', 'places')
 
   const onFetched = (fileId, path, withData, clientId) => (documentRef) => {
     const data = documentRef && documentRef.data()
     if (!data) {
       log.warn(`No entry for ${path} on file ${fileId}`)
-      return {}
+      return [path, withData({})]
     }
     delete data.fileId
     delete data.clientId
-    return {
-      [path]: withData(data),
-    }
+    return [path, withData(data)]
+  }
+
+  const onFetchedArray = (fileId, path, withData, clientId) => (documentRef) => {
+    const documents = []
+    documentRef.forEach((document) => {
+      const data = document.data()
+      if (data.deleted) return
+
+      documents.push({
+        id: document.id,
+        ...data,
+        fileURL: `plottr://${fileId}`,
+        isCloudFile: true,
+      })
+    })
+    return [path, withData(documents)]
   }
 
   const fetchArrayAtPath = (path) => (userId, fileId, clientId) => {
     const values = (x) => Object.values(x)
     const { doc, getDoc } = database()
     return getDoc(doc(`${path}/${fileId}`)).then(onFetched(fileId, path, values, clientId))
+  }
+
+  const fetchFlatArrayAtPath = (path, subPath) => (userId, fileId, clientId) => {
+    const { collection, getDocs } = database()
+    return getDocs(collection(`${path}/${fileId}/${subPath}`)).then(
+      onFetchedArray(fileId, subPath, identity, clientId)
+    )
   }
 
   const fetchObjectAtPath = (path) => (userId, fileId, clientId) => {
@@ -281,25 +378,72 @@ const api = (
     })
   }
 
+  const fetchOldArrayObject = (path) => (userId, fileId, clientId) => {
+    {
+      return fetchArrayAtPath(path)(userId, fileId, clientId).then((entry) => {
+        const [_key, value] = entry
+        if (Array.isArray(value) && value.length > 0) {
+          const timestamp = new Date().toISOString()
+          return Promise.all(
+            value.map((entity) => {
+              return overwriteWithNoPathTranslation(
+                `old${capitalize(path)}/${fileId}/${timestamp}/${entity.id}`,
+                fileId,
+                entity,
+                clientId
+              )
+            })
+          )
+            .then(() => {
+              return Promise.all(
+                value.map((entity) => {
+                  return overwrite(path, fileId, entity, clientId)
+                })
+              )
+            })
+            .then(() => {
+              const { doc, deleteDoc } = database()
+              return deleteDoc(doc(`${path}/${fileId}`))
+            })
+            .then(() => {
+              return entry
+            })
+        } else {
+          return entry
+        }
+      })
+    }
+  }
+
   const fetchUI = fetchObjectAtPath('ui')
   const fetchChapters = fetchArrayAtPath('chapters')
-  const fetchCards = fetchArrayAtPath('cards')
+  const fetchCards = fetchOldArrayObject('cards')
   const fetchSeries = fetchObjectAtPath('series')
   const fetchBooks = fetchObjectAtPath('books')
   const fetchCategories = fetchObjectAtPath('categories')
-  const fetchCharacters = fetchArrayAtPath('characters')
+  const fetchCharacters = fetchOldArrayObject('characters')
   const fetchCustomAttributes = fetchObjectAtPath('customAttributes')
   const fetchEditors = fetchObjectAtPath('featureFlags')
   const fetchLines = fetchArrayAtPath('lines')
-  const fetchNotes = fetchArrayAtPath('notes')
-  const fetchPlaces = fetchArrayAtPath('places')
+  const fetchNotes = fetchOldArrayObject('notes')
+  const fetchPlaces = fetchOldArrayObject('places')
   const fetchTags = fetchArrayAtPath('tags')
   const fetchhierarchyLevels = fetchObjectAtPath('hierarchyLevels')
   const fetchImages = fetchObjectAtPath('images')
   const fetchAttributes = fetchObjectAtPath('attributes')
+  const fetchFlatCards = fetchFlatArrayAtPath('flatCards', 'cards')
+  const fetchFlatCharacters = fetchFlatArrayAtPath('flatCharacters', 'characters')
+  const fetchFlatNotes = fetchFlatArrayAtPath('flatNotes', 'notes')
+  const fetchFlatPlaces = fetchFlatArrayAtPath('flatPlaces', 'places')
 
   const toFirestoreArray = (array) =>
     array.reduce((acc, value, index) => Object.assign(acc, { [index]: value }), {})
+
+  const FLAT_ARRAY_KEYS = ['cards', 'notes', 'characters', 'places']
+
+  const isFlatArrayKey = (key) => {
+    return FLAT_ARRAY_KEYS.indexOf(key) !== -1
+  }
 
   const overwriteAllKeys = (fileId, clientId, state) => {
     const requests = []
@@ -307,17 +451,32 @@ const api = (
       if (SYSTEM_REDUCER_KEYS.indexOf(key) !== -1) {
         return
       }
-      const payload = ARRAY_KEYS.indexOf(key) !== -1 ? toFirestoreArray(state[key]) : state[key]
-      requests.push(
-        overwrite(key, fileId, payload, clientId)
-          .catch((error) => {
-            log.error(`Error while force updating file ${fileId} at key: ${key}`, error)
-            return Promise.reject(error)
-          })
-          .then(() => ({
-            [key]: ARRAY_KEYS.indexOf(key) !== -1 ? Object.values(payload) : payload,
-          }))
-      )
+      if (isFlatArrayKey(key)) {
+        state[key].forEach((payload) => {
+          requests.push(
+            overwrite(key, fileId, payload, clientId)
+              .catch((error) => {
+                log.error(`Error while force updating file ${fileId} at key: ${key}`, error)
+                return Promise.reject(error)
+              })
+              .then(() => ({
+                [key]: ARRAY_KEYS.indexOf(key) !== -1 ? Object.values(payload) : payload,
+              }))
+          )
+        })
+      } else {
+        const payload = ARRAY_KEYS.indexOf(key) !== -1 ? toFirestoreArray(state[key]) : state[key]
+        requests.push(
+          overwrite(key, fileId, payload, clientId)
+            .catch((error) => {
+              log.error(`Error while force updating file ${fileId} at key: ${key}`, error)
+              return Promise.reject(error)
+            })
+            .then(() => ({
+              [key]: ARRAY_KEYS.indexOf(key) !== -1 ? Object.values(payload) : payload,
+            }))
+        )
+      }
     })
     return Promise.all(requests).then((results) => {
       return Object.assign({}, ...results)
@@ -330,7 +489,7 @@ const api = (
         return Promise.all([
           fetchUI(userId, fileId, clientId),
           fetchChapters(userId, fileId, clientId),
-          fetchBeats(userId, fileId, clientId, file.file.version),
+          fetchBeats(userId, fileId, clientId, file[1].version),
           fetchCards(userId, fileId, clientId),
           fetchSeries(userId, fileId, clientId),
           fetchBooks(userId, fileId, clientId),
@@ -345,6 +504,10 @@ const api = (
           fetchhierarchyLevels(userId, fileId, clientId),
           fetchImages(userId, fileId, clientId),
           fetchAttributes(userId, fileId, clientId),
+          fetchFlatCards(userId, fileId, clientId),
+          fetchFlatCharacters(userId, fileId, clientId),
+          fetchFlatNotes(userId, fileId, clientId),
+          fetchFlatPlaces(userId, fileId, clientId),
         ]).then((results) => {
           return [file, ...results]
         })
@@ -367,7 +530,23 @@ const api = (
           })
       })
       .then(({ results, newOpenDate }) => {
-        const json = Object.assign({}, ...results)
+        const json = results.reduce((acc, next) => {
+          const [key, value] = next
+          const newValue =
+            typeof acc[key] === 'undefined'
+              ? value
+              : Array.isArray(acc[key]) || isObject(acc[key])
+              ? [...acc[key], ...value]
+              : null
+          if (newValue) {
+            return {
+              ...acc,
+              [key]: newValue,
+            }
+          } else {
+            return acc
+          }
+        }, {})
         return pingAuth(userId, fileId).then(() => {
           return {
             ...json,
@@ -388,20 +567,44 @@ const api = (
     }
     const setDeleted = (path) => patch(path, fileId, { deleted: true }, clientId)
     const setDeletedfile = () => setDeleted('file')
-    const setDeletedCards = () => setDeleted('cards')
     const setDeletedSeries = () => setDeleted('series')
     const setDeletedBooks = () => setDeleted('books')
     const setDeletedCategories = () => setDeleted('categories')
-    const setDeletedCharacters = () => setDeleted('characters')
     const setDeletedCustomAttributes = () => setDeleted('customAttributes')
     const setDeletedLines = () => setDeleted('lines')
     const setDeletedBeats = () => setDeleted('beats')
-    const setDeletedNotes = () => setDeleted('notes')
-    const setDeletedPlaces = () => setDeleted('places')
     const setDeletedTags = () => setDeleted('tags')
     const setDeletedHierarchyLevels = () => setDeleted('hierarchyLevels')
     const setDeletedImages = () => setDeleted('images')
     const setDeletedAttributes = () => setDeleted('attributes')
+
+    const setEachDeleted = (path, subPath) => {
+      const { getDocs, collection } = database()
+      const rootPath = `${path}/${fileId}/${subPath}`
+      return getDocs(collection(rootPath)).then((ref) => {
+        const entitys = []
+        ref.forEach((entity) => {
+          const data = entity.data()
+          if (data.deleted) return
+
+          entitys.push({ ...entity, id: entity.id })
+        })
+        return Promise.all(
+          entitys.map((entity) => {
+            return patchWithNoPathTranslation(
+              `${rootPath}/${entity.id}`,
+              fileId,
+              { deleted: true, id: entity.id },
+              clientId
+            )
+          })
+        )
+      })
+    }
+    const setDeletedCards = () => setEachDeleted('flatCards', 'cards')
+    const setDeletedCharacters = () => setEachDeleted('flatCharacters', 'characters')
+    const setDeletedNotes = () => setEachDeleted('flatNotes', 'notes')
+    const setDeletedPlaces = () => setEachDeleted('flatPlaces', 'places')
 
     return setDeletedAuthorisation()
       .then(setDeletedfile)
@@ -538,9 +741,27 @@ const api = (
     )
   }
 
+  const computeDocumentPath = (path, fileId, payload = {}) => {
+    return isFlatArrayKey(path)
+      ? `flat${capitalize(path)}/${fileId}/${path}/${payload.id}`
+      : `${path}/${fileId}`
+  }
+
   const patch = (path, fileId, payload, clientId) => {
     const { doc, updateDoc } = database()
-    return updateDoc(doc(`${path}/${fileId}`), {
+    const documentPath = computeDocumentPath(path, fileId, payload)
+
+    return updateDoc(doc(documentPath), {
+      ...payload,
+      clientId,
+      fileId,
+    })
+  }
+
+  const patchWithNoPathTranslation = (path, fileId, payload, clientId) => {
+    const { doc, updateDoc } = database()
+
+    return updateDoc(doc(path), {
       ...payload,
       clientId,
       fileId,
@@ -549,7 +770,19 @@ const api = (
 
   const overwrite = (path, fileId, payload, clientId) => {
     const { doc, setDoc } = database()
-    return setDoc(doc(`${path}/${fileId}`), {
+    const documentPath = computeDocumentPath(path, fileId, payload)
+
+    return setDoc(doc(documentPath), {
+      ...payload,
+      clientId,
+      fileId,
+    })
+  }
+
+  const overwriteWithNoPathTranslation = (path, fileId, payload, clientId) => {
+    const { doc, setDoc } = database()
+
+    return setDoc(doc(path), {
       ...payload,
       clientId,
       fileId,
@@ -1013,6 +1246,10 @@ const api = (
     listenToHierarchyLevels,
     listenToImages,
     listenToAttributes,
+    listenToFlatCards,
+    listenToFlatCharacters,
+    listenToFlatNotes,
+    listenToFlatPlaces,
     toFirestoreArray,
     overwriteAllKeys,
     initialFetch,
