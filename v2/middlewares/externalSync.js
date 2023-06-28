@@ -71,12 +71,12 @@ const sync = (selectState) => {
       if (!isEqual(previous[key], state[key])) {
         const payload = withData(key, state[key])
         if (isFlatArrayKey(key)) {
-          const oldEntitiesById = previous[key].reduce((acc, next) => {
-            acc.set(next.id, next)
-            return acc
-          }, new Map())
+          const oldEntitiesById = new Map()
+          previous[key].forEach((next) => {
+            oldEntitiesById.set(next.id, next)
+          })
           payload.forEach((entity, index) => {
-            const oldEntity = oldEntitiesById.get(entity.id)
+            const oldEntity = oldEntitiesById && oldEntitiesById.get(entity.id)
             if (oldEntity !== entity) {
               patch(key, fileId, entity, clientId).catch((error) => {
                 if (error.code === 'permission-denied') {
