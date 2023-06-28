@@ -402,7 +402,6 @@ const api = (
                 })
               )
             })
-            .then()
             .then(() => {
               const { doc, deleteDoc } = database()
               return deleteDoc(doc(`${path}/${fileId}`))
