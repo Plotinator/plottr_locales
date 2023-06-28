@@ -64,12 +64,12 @@ const listenToFlatCards = wiredUp.listenToFlatCards
 const listenToSeries = wiredUp.listenToSeries
 const listenToBooks = wiredUp.listenToBooks
 const listenToCategories = wiredUp.listenToCategories
-const listenToCharacters = wiredUp.listenToCharacters
+const listenToFlatCharacters = wiredUp.listenToFlatCharacters
 const listenToCustomAttributes = wiredUp.listenToCustomAttributes
 const listenToFeatureFlags = wiredUp.listenToFeatureFlags
 const listenToLines = wiredUp.listenToLines
-const listenToNotes = wiredUp.listenToNotes
-const listenToPlaces = wiredUp.listenToPlaces
+const listenToFlatNotes = wiredUp.listenToFlatNotes
+const listenToFlatPlaces = wiredUp.listenToFlatPlaces
 const listenToTags = wiredUp.listenToTags
 const listenToHierarchyLevels = wiredUp.listenToHierarchyLevels
 const listenToImages = wiredUp.listenToImages
@@ -286,25 +286,25 @@ self.onmessage = (event) => {
         clientId,
         replyWithReduxAction
       )
-      const unsubscribeToFlatCards = wiredUp.listenToFlatCards(
+      const unsubscribeToFlatCards = listenToFlatCards(
         userId,
         fileId,
         clientId,
         replyWithReduxAction
       )
-      const unsubscribeToFlatCharacters = wiredUp.listenToFlatCharacters(
+      const unsubscribeToFlatCharacters = listenToFlatCharacters(
         userId,
         fileId,
         clientId,
         replyWithReduxAction
       )
-      const unsubscribeToFlatNotes = wiredUp.listenToFlatNotes(
+      const unsubscribeToFlatNotes = listenToFlatNotes(
         userId,
         fileId,
         clientId,
         replyWithReduxAction
       )
-      const unsubscribeToFlatPlaces = wiredUp.listenToFlatPlaces(
+      const unsubscribeToFlatPlaces = listenToFlatPlaces(
         userId,
         fileId,
         clientId,
