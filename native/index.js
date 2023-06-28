@@ -75,7 +75,11 @@ const database = () => {
       }
     },
     onSnapshot: (ref, handleSnapshot) => {
-      return ref.onSnapshot(handleSnapshot)
+      if (ref.type === 'query') {
+        return translate(ref).onSnapshot(handleSnapshot)
+      } else {
+        return ref.onSnapshot(handleSnapshot)
+      }
     },
     getDoc: (ref) => {
       return ref.get()
@@ -95,6 +99,9 @@ const database = () => {
     addDoc: (ref, document) => {
       return ref.add(document)
     },
+    deleteDoc: (ref) => {
+      return ref.delete()
+    }
   }
 }
 
