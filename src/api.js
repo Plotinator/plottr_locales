@@ -385,7 +385,16 @@ const api = (
         const [_key, value] = entry
         if (Array.isArray(value) && value.length > 0) {
           const timestamp = new Date().toISOString()
-          return patchOrCreate(`old${capitalize(path)}`, fileId, { [timestamp]: value }, clientId)
+          return Promise.all(
+            value.map((entity) => {
+              return overwriteWithNoPathTranslation(
+                `old${capitalize(path)}/${fileId}/${timestamp}/${entity.id}`,
+                fileId,
+                entity,
+                clientId
+              )
+            })
+          )
             .then(() => {
               return Promise.all(
                 value.map((entity) => {
@@ -764,6 +773,16 @@ const api = (
     const documentPath = computeDocumentPath(path, fileId, payload)
 
     return setDoc(doc(documentPath), {
+      ...payload,
+      clientId,
+      fileId,
+    })
+  }
+
+  const overwriteWithNoPathTranslation = (path, fileId, payload, clientId) => {
+    const { doc, setDoc } = database()
+
+    return setDoc(doc(path), {
       ...payload,
       clientId,
       fileId,

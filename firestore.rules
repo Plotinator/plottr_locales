@@ -29,7 +29,9 @@ service cloud.firestore {
       }
     }
     match /oldCards/{document} {
-      allow read, write, update, create: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
+      match /{subDocument=**} {
+        allow read, write, update, create: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
+      }
     }
     match /categories/{document} {
       allow read, write, update, create: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
@@ -49,7 +51,9 @@ service cloud.firestore {
       }
     }
     match /oldCharacters/{document} {
-      allow read, write, update, create: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
+      match /{subDocument=**} {
+        allow read, write, update, create: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
+      }
     }
     match /attributes/{document} {
       allow read, write, update, create: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
@@ -100,7 +104,9 @@ service cloud.firestore {
       }
     }
     match /oldNotes/{document} {
-      allow read, write, update, create: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
+      match /{subDocument=**} {
+        allow read, write, update, create: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
+      }
     }
     match /places/{document} {
       allow read, write, update, create, delete: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
@@ -115,7 +121,9 @@ service cloud.firestore {
       }
     }
     match /oldPlaces/{document} {
-      allow read, write, update, create: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
+      match /{subDocument=**} {
+        allow read, write, update, create: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
+      }
     }
     match /series/{document} {
       allow read, write, update, create: if request.auth != null && get(/databases/$(database)/documents/authorisation/$(request.auth.uid)/granted/$(document)).data.permission == 'owner';
