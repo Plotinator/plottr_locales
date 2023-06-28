@@ -189,7 +189,7 @@ const api = (
     usingFromDocRef = () => ({})
   ) => {
     return (() => {
-      let lastResults = []
+      let lastResults = null
 
       return {
         next: (documentRef) => {
@@ -199,15 +199,14 @@ const api = (
           })
           // NOTE: We can't only rely on the client id anymore.
           const unChanged = results.every((document) => {
-            return (
-              document.clientId === clientId ||
-              lastResults.find((previousDocument) => {
-                return isEqual(document, previousDocument)
-              })
-            )
+            const previousDocument = lastResults?.get(document.id)
+            return document.clientId === clientId || isEqual(document, previousDocument)
           })
           if (unChanged) return
-          lastResults = results
+          lastResults = results.reduce((acc, next) => {
+            acc.set(next.id)
+            return acc
+          }, new Map())
           const patchAction = patchActions(path)
           if (!patchAction) {
             log.error('No patch action for ', path)
