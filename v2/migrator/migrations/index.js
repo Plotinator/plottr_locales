@@ -25,6 +25,7 @@ import m2022_5_17 from './2022.5.17'
 import m2022_5_17_1 from './2022.5.17-1'
 import m2023_1_7 from './2023.1.7'
 import m2023_3_29 from './2023.3.29'
+import m2023_7_19 from './2023.7.19'
 
 export default {
   m0_6,
@@ -54,4 +55,5 @@ export default {
   m2022_5_17_1,
   m2023_1_7,
   m2023_3_29,
+  m2023_7_19,
 }

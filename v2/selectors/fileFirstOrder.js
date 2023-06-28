@@ -27,3 +27,6 @@ export const fileIdSelector = createSelector(fullFileStateSelector, (state) => {
   }
   return file.id
 })
+export const fileVersionSelector = createSelector(fileSelector, ({ version }) => {
+  return version
+})

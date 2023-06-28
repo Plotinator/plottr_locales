@@ -93,7 +93,7 @@ export const togglePinPlotline = (line) => (dispatch, getState) => {
   const lines = sortedLinesByBookSelector(state)
   const bookId = currentTimelineSelector(state)
 
-  if (line?.id) {
+  if (!isNaN(line?.id)) {
     if (line?.isPinned) {
       const reorderedLines = reorderList(pinnedPlotlines - 1, line?.position, lines)
       const totalPinnedPlotlines = Math.max(0, pinnedPlotlines - 1)

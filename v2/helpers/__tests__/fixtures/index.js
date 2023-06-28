@@ -22,6 +22,9 @@ import three_level_biased_bottom_plotline_template from './three-level-biased-bo
 import file_with_one_level from './file-with-one-level.json'
 import file_with_two_levels from './file-with-two-levels.json'
 import file_with_three_levels from './file-with-three-levels.json'
+import file_with_two_levels_but_no_chapter from './file-with-two-levels-but-no-chapter.json'
+import file_with_three_levels_but_no_chapter from './file-with-three-levels-but-no-chapter.json'
+import file_with_three_levels_but_no_scene from './file-with-three-levels-but-no-scene.json'
 
 export {
   // Templates
@@ -41,4 +44,7 @@ export {
   file_with_one_level,
   file_with_two_levels,
   file_with_three_levels,
+  file_with_two_levels_but_no_chapter,
+  file_with_three_levels_but_no_chapter,
+  file_with_three_levels_but_no_scene,
 }
