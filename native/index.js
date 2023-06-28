@@ -99,6 +99,9 @@ const database = () => {
     addDoc: (ref, document) => {
       return ref.add(document)
     },
+    deleteDoc: (ref) => {
+      return ref.delete()
+    }
   }
 }
 
