@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import PropTypes from 'react-proptypes'
 import { FiCopy } from 'react-icons/fi'
 import cx from 'classnames'
@@ -91,6 +91,10 @@ const CardDialogConnector = (connector) => {
     const colourPickerButtonRef = useRef()
     const colourPickerPaletteListRef = useRef()
     const previousClick = useRef(click)
+
+    const closeColourPicker = useCallback(() => {
+      setShowColorPicker(false)
+    }, [showColorPicker])
 
     useEffect(() => {
       if (!colourPickerPaletteListRef.current || !colourPickerButtonRef.current) return
@@ -618,7 +622,7 @@ const CardDialogConnector = (connector) => {
               open={showColorPicker}
               placement="bottom"
               component={renderColourPicker}
-              onClose={() => setShowColorPicker(false)}
+              onClose={closeColourPicker}
             >
               <ColorPickerColor
                 color={cardMetaData.color || cardMetaData.color === null ? 'none' : '#F1F5F8'} // $gray-9

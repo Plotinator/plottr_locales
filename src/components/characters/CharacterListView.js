@@ -32,13 +32,12 @@ import { withEventTargetValue } from '../withEventTargetValue'
 import Tabs from '../Tabs'
 import Tab from '../Tab'
 
-const { nextId } = newIds
+const { nextIdAcrossCategories } = newIds
 const {
   card: { truncateTitle },
 } = helpers
 
-const selectedId = (charactersByCategory, characters, categories, characterDetailId) => {
-  if (!characters.length) return null
+const selectedId = (charactersByCategory, categories, characterDetailId) => {
   if (!Object.keys(charactersByCategory).length) return null
   const allCategories = [...categories, { id: null }] // uncategorized
 
@@ -82,24 +81,23 @@ const CharacterListViewConnector = (connector) => {
 
   checkDependencies({ templatesDisabled, exportDisabled })
 
-  const CharacterListView = ({
-    visibleCharactersByCategory,
-    filterIsEmpty,
-    characters,
-    categories,
-    customAttributes,
-    customAttributesThatCanChange,
-    characterSort,
-    darkMode,
-    charactersSearchTerm,
-    books,
-    attributeTabId,
-    selectedCharacteId,
-    showTabs,
-    actions,
-    customAttributeActions,
-    uiActions,
-  }) => {
+  const CharacterListView = (props) => {
+    const {
+      visibleCharactersByCategory,
+      filterIsEmpty,
+      categories,
+      customAttributes,
+      characterSort,
+      darkMode,
+      charactersSearchTerm,
+      books,
+      attributeTabId,
+      selectedCharacteId,
+      showTabs,
+      actions,
+      uiActions,
+    } = props
+
     const [attributesDialogOpen, setAttributesDialogOpen] = useState(false)
     const [categoriesDialogOpen, setCategoriesDialogOpen] = useState(false)
     const [editingSelected, setEditingSelected] = useState(false)
@@ -111,11 +109,11 @@ const CharacterListViewConnector = (connector) => {
     const [detailsVisible, setDetailsVisible] = useState(true)
 
     useEffect(() => {
-      const id = selectedId(visibleCharactersByCategory, characters, categories, selectedCharacteId)
+      const id = selectedId(visibleCharactersByCategory, categories, selectedCharacteId)
       if (id !== selectedCharacteId) {
         uiActions.selectCharacter(id)
       }
-    }, [visibleCharactersByCategory, characters, categories])
+    }, [visibleCharactersByCategory, categories])
 
     const editSelected = () => {
       setEditingSelected(true)
@@ -134,7 +132,7 @@ const CharacterListViewConnector = (connector) => {
       // setState({ creating: true })
 
       // going back to old way (without modal) to think it over
-      const id = nextId(characters)
+      const id = nextIdAcrossCategories(visibleCharactersByCategory)
       actions.addCharacter()
       uiActions.selectCharacter(id)
       setEditingSelected(true)
@@ -144,7 +142,7 @@ const CharacterListViewConnector = (connector) => {
       // setState({ showTemplatePicker: false, templateData: templateData, creating: true })
 
       // going back to old way (without modal) to think it over
-      const id = nextId(characters)
+      const id = nextIdAcrossCategories(visibleCharactersByCategory)
       actions.addCharacterWithTemplate(null, templateData)
       uiActions.selectCharacter(id)
       setEditingSelected(true)
@@ -152,7 +150,7 @@ const CharacterListViewConnector = (connector) => {
     }
 
     const handleFinishCreate = (name) => {
-      const id = nextId(characters)
+      const id = nextIdAcrossCategories(visibleCharactersByCategory)
       if (templateData) {
         actions.addCharacterWithTemplate(name, templateData)
       } else {
@@ -356,13 +354,12 @@ const CharacterListViewConnector = (connector) => {
     const renderCharacterDetails = () => {
       if (!detailsVisible) return null
 
-      let character = characters.find((char) => char.id == selectedCharacteId)
-      if (!character) return null
+      if (!selectedCharacteId) return null
 
       return (
         <CharacterView
-          key={`character-${character.id}`}
-          characterId={character.id}
+          key={`character-${selectedCharacteId}`}
+          characterId={selectedCharacteId}
           editing={editingSelected}
           stopEditing={stopEditing}
           startEditing={editSelected}
@@ -454,10 +451,8 @@ const CharacterListViewConnector = (connector) => {
   CharacterListView.propTypes = {
     visibleCharactersByCategory: PropTypes.object.isRequired,
     filterIsEmpty: PropTypes.bool.isRequired,
-    characters: PropTypes.array.isRequired,
     categories: PropTypes.array.isRequired,
     customAttributes: PropTypes.array.isRequired,
-    customAttributesThatCanChange: PropTypes.array,
     characterSort: PropTypes.string,
     darkMode: PropTypes.bool,
     charactersSearchTerm: PropTypes.string,
@@ -466,7 +461,6 @@ const CharacterListViewConnector = (connector) => {
     showTabs: PropTypes.bool,
     attributeTabId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     actions: PropTypes.object.isRequired,
-    customAttributeActions: PropTypes.object.isRequired,
     uiActions: PropTypes.object.isRequired,
   }
 
@@ -488,13 +482,10 @@ const CharacterListViewConnector = (connector) => {
       (state) => {
         return {
           visibleCharactersByCategory:
-            selectors.visibleSortedSearchedCharactersByCategorySelector(state),
+            selectors.visibleSortedSearchedCharacterMetadataByCategorySelector(state),
           filterIsEmpty: selectors.characterFilterIsEmptySelector(state),
-          characters: selectors.allCharactersSelector(state),
           categories: selectors.sortedCharacterCategoriesSelector(state),
           customAttributes: selectors.characterCustomAttributesSelector(state),
-          customAttributesThatCanChange:
-            selectors.characterCustomAttributesThatCanChangeSelector(state),
           characterSort: selectors.characterSortSelector(state),
           darkMode: selectors.isDarkModeSelector(state),
           charactersSearchTerm: selectors.charactersSearchTermSelector(state),
@@ -507,7 +498,6 @@ const CharacterListViewConnector = (connector) => {
       (dispatch) => {
         return {
           actions: bindActionCreators(actions.character, dispatch),
-          customAttributeActions: bindActionCreators(actions.customAttribute, dispatch),
           uiActions: bindActionCreators(actions.ui, dispatch),
         }
       }
