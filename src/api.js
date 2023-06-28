@@ -580,7 +580,8 @@ const api = (
 
     const setEachDeleted = (path, subPath) => {
       const { getDocs, collection } = database()
-      return getDocs(collection(`${path}/${fileId}/${subPath}`)).then((ref) => {
+      const rootPath = `${path}/${fileId}/${subPath}`
+      return getDocs(collection(rootPath)).then((ref) => {
         const entitys = []
         ref.forEach((entity) => {
           const data = entity.data()
@@ -590,7 +591,12 @@ const api = (
         })
         return Promise.all(
           entitys.map((entity) => {
-            return patch(path, fileId, { deleted: true, id: entity.id }, clientId)
+            return patchWithNoPathTranslation(
+              `${rootPath}/${entity.id}`,
+              fileId,
+              { deleted: true, id: entity.id },
+              clientId
+            )
           })
         )
       })
@@ -752,19 +758,14 @@ const api = (
     })
   }
 
-  const patchOrCreate = (path, fileId, payload, clientId) => {
-    const { doc, setDoc } = database()
-    const documentPath = computeDocumentPath(path, fileId, payload)
+  const patchWithNoPathTranslation = (path, fileId, payload, clientId) => {
+    const { doc, updateDoc } = database()
 
-    return setDoc(
-      doc(documentPath),
-      {
-        ...payload,
-        clientId,
-        fileId,
-      },
-      { merge: true }
-    )
+    return updateDoc(doc(path), {
+      ...payload,
+      clientId,
+      fileId,
+    })
   }
 
   const overwrite = (path, fileId, payload, clientId) => {
