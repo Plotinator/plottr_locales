@@ -3,7 +3,7 @@ import { createSelector } from 'reselect'
 import { allBooksSelector } from './booksFirstOrder'
 import { allCardsSelector } from './cardsFirstOrder'
 import { charactersSortedAtoZSelector } from './charactersFirstOrder'
-import { allNotesInBookSelector } from './notesThirdOrder'
+import { allNotesSelector } from './notesFirstOrder'
 import { placesSortedAtoZSelector } from './placesFirstOrder'
 import { currentViewSelector } from './secondOrder'
 
@@ -11,7 +11,7 @@ export const booksFilterItemsSelector = createSelector(
   currentViewSelector,
   allBooksSelector,
   placesSortedAtoZSelector,
-  allNotesInBookSelector,
+  allNotesSelector,
   charactersSortedAtoZSelector,
   allCardsSelector,
   (currentView, books, places, notes, characters, cards) => {
