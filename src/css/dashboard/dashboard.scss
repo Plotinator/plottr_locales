@@ -11,6 +11,7 @@
 @import 'help';
 @import 'darkmode';
 @import 'settingsWizard';
+@import '../vars';
 
 $header-height: 40px;
 
@@ -114,5 +115,66 @@ $header-height: 40px;
     top: 20px;
     right: 20px;
     cursor: pointer;
+  }
+}
+
+.darkmode {
+  .dashboard__main.darkmode {
+    background-color: $darkmode-v2-card-background;
+    color: #ddd;
+
+    nav {
+      background-color: $darkmode-v2-darker-background;
+    }
+
+    .dashboard__navigation-tab {
+      background-color: $darkmode-v2-darker-background;
+      border-bottom-color: #3c3c3c;
+      color: #ddd;
+
+      &:hover {
+        background-color: $darkmode-v2-background;
+      }
+
+      &:first-child {
+        border: none;
+      }
+    }
+
+    .dashboard__navigation-tab.selected {
+      background-color: $darkmode-v2-card-background;
+    }
+
+    hr {
+      border-color: #4b4d4f;
+    }
+
+    .dashboard__new-files__item {
+      color: #ccc;
+      background: #19171d;
+
+      &:hover,
+      &:active {
+        box-shadow: none;
+        border-left: 4px solid #f47e38;
+      }
+    }
+
+    .dashboard__new-files__item.icon svg {
+      color: #f47e38;
+    }
+
+    button#new-files-dropdown {
+      background: none;
+
+      > div {
+        color: $darkmode-v2-darker-text;
+      }
+    }
+
+    .secondary-text,
+    .sub-header {
+      color: $darkmode-v2-darker-text;
+    }
   }
 }

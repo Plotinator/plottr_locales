@@ -139,7 +139,7 @@ tellMeWhatOSImOn()
   })
   .then((socketWorkerPort) => {
     setPort(socketWorkerPort)
-    connectToSocketServer(socketWorkerPort)
+    return connectToSocketServer(socketWorkerPort)
   })
   .then(() => {
     return setupRollbar('app.html').then((newRollbar) => {
@@ -170,6 +170,7 @@ tellMeWhatOSImOn()
     fileSystemAPIs
       .currentAppSettings()
       .then((settings) => {
+        store.dispatch(actions.settings.setDarkMode(settings.user?.dark))
         return getLocale().then((locale) => {
           setupI18n(settings, { locale })
         })

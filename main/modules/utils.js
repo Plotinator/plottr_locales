@@ -1,6 +1,6 @@
 import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
-import { dialog, app, screen, BrowserWindow } from 'electron'
+import { dialog, app, screen, BrowserWindow, nativeTheme } from 'electron'
 import windowStateKeeper from 'electron-window-state'
 import i18n from 'plottr_locales'
 import log from 'electron-log'
@@ -44,6 +44,11 @@ function makeBrowserWindow(fileURL) {
 
   return currentSettings()
     .then((settings) => {
+      const backgroundColor =
+        (settings.user?.dark === 'system' && nativeTheme.shouldUseDarkColors) ||
+        settings.user?.dark === 'dark'
+          ? '#2a2b32'
+          : '#f7f7f7'
       let config = {
         x: stateKeeper.x,
         y: stateKeeper.y,
@@ -52,6 +57,7 @@ function makeBrowserWindow(fileURL) {
         fullscreen: stateKeeper.isFullScreen || null,
         show: false,
         fullscreenable: true,
+        backgroundColor,
         webPreferences: {
           nodeIntegration: false,
           spellcheck:
@@ -62,10 +68,9 @@ function makeBrowserWindow(fileURL) {
         },
       }
 
-      config.backgroundColor = '#f7f7f7'
-
       // Create the browser window
       let newWindow = new BrowserWindow(config)
+      newWindow.setBackgroundColor(backgroundColor)
 
       // register listeners on the window
       stateKeeper.manage(newWindow)

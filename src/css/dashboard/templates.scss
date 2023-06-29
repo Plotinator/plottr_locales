@@ -71,3 +71,31 @@
     box-shadow: $blue-highlight-box-shadow;
   }
 }
+
+.darkmode {
+  .template-picker__wrapper {
+    .template-picker__list {
+
+      li.list-group-item {
+        color: $darkmode-v2-darker-text;
+        border-color: $darkmode-v2-border;
+        background-color: $darkmode-v2-background;
+
+        &:hover,
+        &.selected,
+        &:focus {
+          background-color: #24252c;
+          border-color: $darkmode-v2-border;
+        }
+      }
+    }
+  }
+
+  .template-picker__confirmation__row {
+    .template-picker__confirmation__option {
+      &.selected {
+        background-color: transparent;
+      }
+    }
+  }
+}
