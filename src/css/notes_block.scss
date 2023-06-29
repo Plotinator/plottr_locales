@@ -234,7 +234,6 @@
 
 .note-list__note-view.darkmode {
   background-color: $darkmode-darker-background;
-  color: $darkmode-text;
   border-color: $darkmode-darker-border;
 
   .note-list__note:hover {
@@ -257,7 +256,7 @@
 
   &.darkmode {
     background-color: $darkmode-darker-background;
-    color: $darkmode-text;
+    color: #aaa;
   }
 
   .lock-icon__wrapper {
@@ -297,7 +296,7 @@
 
   .note-list__note-view.darkmode {
     background-color: #24252c;
-    color: #bbb;
+    color: #aaa;
     border-color: $darkmode-v2-border;
 
     &.editing {
