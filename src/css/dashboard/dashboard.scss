@@ -11,6 +11,7 @@
 @import 'help';
 @import 'darkmode';
 @import 'settingsWizard';
+@import '../vars';
 
 $header-height: 40px;
 
@@ -165,6 +166,10 @@ $header-height: 40px;
 
     button#new-files-dropdown {
       background: none;
+
+      > div {
+        color: $darkmode-v2-darker-text;
+      }
     }
 
     .secondary-text,

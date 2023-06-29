@@ -17,14 +17,14 @@ body.darkmode {
 
   h1,
   h3,
-  h4,
   h5,
   h6,
   .control-label {
     color: $darkmode-v2-heading-text;
   }
 
-  h2 {
+  h2,
+  h4 {
     color: #ddd
   }
 
@@ -130,8 +130,11 @@ body.darkmode {
     background-color: $darkmode-v2-background;
   }
 
-  .export-list li:hover {
-    background-color: $darkmode-v2-card-background;
+  .export-list {
+    color: #bbb;
+    li:hover {
+      background-color: $darkmode-v2-card-background;
+    }
   }
 
   .modal-header {
@@ -263,6 +266,10 @@ body.darkmode {
   .slate-editor__editor.darkmode {
     background-color: $darkmode-v2-background;
     border: 1px solid $darkmode-v2-border;
+
+    div > * {
+      color: #aaa !important;
+    }
   }
 
   // Buttons
@@ -494,8 +501,28 @@ body.darkmode {
   }
 
   .dashboard__options__item,
-  .dashboard__options .option-switch-labeltext {
-    color: $darkmode-v2-text;
+  .dashboard__options {
+    .option-switch-labeltext {
+      color: #d2d2d2;
+      font-weight: 500;
+    }
+  }
+
+  .dashboard__options__item {
+    div.alert.alert-danger {
+      background-color: transparent;
+      border-color: $darkmode-v2-btn-danger;
+      color: #D1D2D4;
+    }
+
+    .btn-link {
+      color: #ddd;
+    }
+
+    .help-block {
+      color: #d2d2d2 !important;
+      font-weight: 500;
+    }
   }
 
   .dashboard__options__item select:focus-visible {
@@ -567,7 +594,7 @@ body.darkmode {
   .subnav__container.navbar.navbar-default.darkmode button:not(.active):not(.navbar-toggle) {
     border-color: #4d4d4f;
     background-color: $darkmode-v2-background;
-    color: #eeeeee;
+    color: #aaa;
   }
 
   .panel {

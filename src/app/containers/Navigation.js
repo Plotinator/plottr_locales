@@ -44,7 +44,7 @@ const Navigation = ({
     if (!isInTrialMode) return null
 
     return (
-      <Button bsStyle="link" onClick={() => openBuyWindow()}>
+      <Button onClick={() => openBuyWindow()} style={{ marginRight: 5 }}>
         <FaKey /> {t('Get a License')}
       </Button>
     )
