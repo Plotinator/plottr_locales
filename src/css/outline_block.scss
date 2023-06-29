@@ -296,7 +296,6 @@
 .darkmode {
   .outline-list__card-view.darkmode {
     background-color: #24252c;
-    color: $darkmode-v2-darker-text;
     border-color: $darkmode-v2-border;
   }
 
@@ -322,6 +321,10 @@
     .outline-divider {
       border-top: 1px solid $darkmode-v2-border;
     }
+  }
+
+  .outline__scene-title {
+    color: $darkmode-v2-heading-text;
   }
 
   .outline-list__card-view.darkmode {

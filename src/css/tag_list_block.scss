@@ -177,16 +177,37 @@
     transition: 0.2s;
   }
 
-  .tag-list__tag__hover-options.darkmode {
-    background: #24252c;
-
+  .tag-list__tag__hover-options {
     .btn-group {
-      .btn {
-        background: $darkmode-v2-background;
-        border: $darkmode-v2-border solid;
+      .btn,
+      .btn-default,
+      .btn-warning,
+      .btn-danger {
+        background-color: $darkmode-v2-background;
+        border-color: #4d4d4f;
 
         &:hover {
-          background: #24252c;
+          background-color: $darkmode-v2-card-background;
+        }
+      }
+
+      .btn-warning {
+        &:hover {
+          background-color: #bfa93f !important;
+  
+          .glyphicon {
+            color: #fff;
+          }
+        }
+      }
+
+      .btn-danger {
+        &:hover {
+          background-color: #bd3755 !important;
+  
+          .glyphicon {
+            color: #fff;
+          }
         }
       }
     }

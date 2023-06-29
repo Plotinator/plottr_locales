@@ -33,6 +33,12 @@
     color: $darkmode-text;
   }
 
+  .slate-editor__editor {
+    div > * {
+      color: #aaa;
+    }
+  }
+
   .popover-title {
     background-color: $darkmode-darker-background;
     border-bottom: 1px solid #444;

@@ -389,6 +389,42 @@
       background-color: $darkmode-v2-darker-background;
       color: #ddd;
     }
+
+    .hover-options {
+      .btn-group {
+        .btn,
+        .btn-default,
+        .btn-warning,
+        .btn-danger {
+          background-color: $darkmode-v2-background;
+          border-color: #4d4d4f;
+
+          &:hover {
+            background-color: $darkmode-v2-card-background;
+          }
+        }
+
+        .btn-warning {
+          &:hover {
+            background-color: #bfa93f !important;
+    
+            .glyphicon {
+              color: #fff;
+            }
+          }
+        }
+  
+        .btn-danger {
+          &:hover {
+            background-color: #bd3755 !important;
+    
+            .glyphicon {
+              color: #fff;
+            }
+          }
+        }
+      }
+    }
   }
 
   .book-container .front>div .book-container__add {
@@ -423,6 +459,13 @@
   .book-container__cover-image-wrapper {
     > svg {
       color: $darkmode-v2-darker-text;
+    }
+  }
+
+  .book-list__container,
+  .edit-book__container {
+    h2 {
+      color: $darkmode-v2-heading-text;
     }
   }
 }
