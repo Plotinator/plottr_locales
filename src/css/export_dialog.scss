@@ -151,4 +151,16 @@ body.darkmode {
       color: $darkmode-darker-text;
     }
   }
+
+  .export-dialog__header {
+    .export-dialog__type-chooser {
+      .right-side {
+        .nav-pills {
+          li.active a {
+            background-color: $darkmode-v2-btn-primary;
+          }
+        }
+      }
+    }
+  }
 }

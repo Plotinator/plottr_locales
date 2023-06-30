@@ -198,6 +198,9 @@
 
         &:hover {
           background-color: #bfa93f !important;
+          .glyphicon {
+            color: $darkmode-v2-text;
+          }
         }
       }
 
@@ -208,6 +211,9 @@
 
         &:hover {
           background-color: #bd3755 !important;
+          .glyphicon {
+            color: $darkmode-v2-text;
+          }
         }
       }
     }

@@ -617,16 +617,29 @@
 
 .darkmode {
   #timelineview__root {
-    background-color: $darkmode-v2-background;
-
     // Tabbed
-    ul.nav.nav-tabs.-nav {
-      background: $darkmode-v2-background;
+    .timeline-tabbed-view-body {
+      ul.nav.nav-tabs.-nav {
+        background: $darkmode-v2-background;
+  
+      }
+      
     }
-
     .nav-tabs {
       background: $darkmode-v2-background;
       border-bottom: solid 1px $darkmode-v2-border;
+
+      li:last-child {
+        a {
+          border: none !important;
+        }
+      }
+  
+      li {
+        a {
+          margin: 0 !important;
+        }
+      }
     }
 
     li a {

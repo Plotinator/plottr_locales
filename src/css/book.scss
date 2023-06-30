@@ -411,6 +411,9 @@
 
           &:hover {
             background-color: #bfa93f !important;
+            .glyphicon {
+              color: $darkmode-v2-text;
+            }
           }
         }
   
@@ -421,6 +424,9 @@
 
           &:hover {
             background-color: #bd3755 !important;
+            .glyphicon {
+              color: $darkmode-v2-text;
+            }
           }
         }
       }
@@ -453,6 +459,12 @@
 
     &.modal-dialog .btn-default:hover {
       background: $darkmode-v2-darker-background;
+    }
+
+    .modal-footer {
+      .btn-success:hover {
+        background-color: $darkmode-v2-btn-primary;
+      }
     }
   }
 
