@@ -77,7 +77,7 @@ const BackupFileDisplayConnector = (connector) => {
         {!isCloudBackup || (hasCurrentProLicense && isCloudBackup) ? (
           <div className="dashboard__backups__item-actions">
             <div className="dashboard__backups__item-button">
-              <Button bsSize="xs" onClick={handleMakeCopy}>
+              <Button bsSize="xs" bsStyle="success" onClick={handleMakeCopy}>
                 {t('Open Backup')}
               </Button>
             </div>

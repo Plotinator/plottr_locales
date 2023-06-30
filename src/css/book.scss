@@ -405,22 +405,22 @@
         }
 
         .btn-warning {
+          .glyphicon {
+            color: #bbb;
+          }
+
           &:hover {
             background-color: #bfa93f !important;
-    
-            .glyphicon {
-              color: #fff;
-            }
           }
         }
   
         .btn-danger {
+          .glyphicon {
+            color: #bbb;
+          }
+
           &:hover {
             background-color: #bd3755 !important;
-    
-            .glyphicon {
-              color: #fff;
-            }
           }
         }
       }

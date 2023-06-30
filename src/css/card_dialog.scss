@@ -17,8 +17,7 @@
     }
 
     .nav-tabs>li:not(.active)>a:not(:hover) {
-      color: $darkmode-link-text;
-      border-bottom-color: $darkmode-border;
+      color: #bbb;
     }
 
     .tab-content {
