@@ -435,6 +435,16 @@
       .nav-tabs {
         color: #bbb;
         border-bottom-color: $darkmode-v2-border;
+
+        li.active {
+          a {
+            background-color: $darkmode-v2-background;
+  
+            &:hover {
+              background-color: $darkmode-v2-background;
+            }
+          }
+        }
       }
 
       .card-dialog__tabs {
