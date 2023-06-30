@@ -206,12 +206,6 @@
 
     .dashboard__backups__item-button {
       display: none;
-
-      button {
-        background-color: $orange-5;
-        color: #fff;
-        border: none;
-      }
     }
 
     small {
@@ -268,8 +262,21 @@
   .dashboard__backups__projects-summary {
     background-color: transparent;
 
+    .count-circle {
+      border-color: $gray-5;
+      color: $gray-5;
+    }
+
     &.active {
       background-color: $orange;
+      .count-circle {
+        border-color: $darkmode-v2-text;
+        color: $darkmode-v2-text;
+      }
+
+      svg {
+        color: $darkmode-v2-text;
+      }
     }
   }
   .dashboard__backups__item,
@@ -288,15 +295,6 @@
 
     .icon svg {
       color: #bbb;
-    }
-
-    .dashboard__backups__item-button {
-      button {
-        border: 1px solid $orange-5;
-        &:hover {
-          background-color: transparent;
-        }
-      }
     }
   }
 }
