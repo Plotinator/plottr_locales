@@ -55,9 +55,9 @@ const LoadingSplash = ({ loadingState, loadingProgress, darkMode }) => {
     <div id="temporary-inner">
       <div className="loading-splash">
         {darkMode ? (
-          <img src="../icons/logo_dark_28_500.png" height="500" />
+          <img src="../icons/logo_dark_28_500.png" height="375" />
         ) : (
-          <img src="../icons/logo_light_28_500.png" height="500" />
+          <img src="../icons/logo_light_28_500.png" height="375" />
         )}
         {loadingState ? <h3>{loadingState}</h3> : null}
         {loadingProgress ? (
@@ -488,9 +488,9 @@ const Main = ({
     const body = (
       <>
         {darkMode ? (
-          <img src="../icons/logo_dark_28_500.png" height="500" />
+          <img src="../icons/logo_dark_28_500.png" height="375" />
         ) : (
-          <img src="../icons/logo_light_28_500.png" height="500" />
+          <img src="../icons/logo_light_28_500.png" height="375" />
         )}
         <h3>{loadingState}</h3>
         <div className="loading-splash__progress">

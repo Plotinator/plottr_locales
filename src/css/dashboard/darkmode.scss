@@ -222,13 +222,13 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
     &.active {
       background-color: $darkmode-v2-darker-background;
       .count-circle {
-        border-color: #fff;
-        color: #fff;
+        border-color: $darkmode-v2-text;
+        color: $darkmode-v2-text;
       }
     }
   }
   .dashboard__backups__columns {
-    color: $dark-text;
+    color: $darkmode-v2-text;
   }
   .dashboard__backups__project-row {
     &.row {
@@ -237,6 +237,14 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
     .dashboard__backups__project-backup .dashboard__backups__item {
       .dashboard__backups__item-details small {
         color: $dark-gray-6;
+      }
+    }
+
+    .dashboard__backups__item {
+      .dashboard__backups__item-details {
+        > div {
+          color: #bfbfbf;
+        }
       }
     }
   }

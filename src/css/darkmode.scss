@@ -290,7 +290,7 @@ body.darkmode {
     border-color: $darkmode-v2-btn-primary-border;
 
     &:hover {
-      background-color: $darkmode-v2-btn-primary-hover;
+      background-color: $darkmode-v2-btn-primary;
       border-color: $darkmode-v2-btn-success-hover-border;
     }
   }
@@ -574,6 +574,12 @@ body.darkmode {
     border: none;
     border-radius: 25px;
     background: $darkmode-v2-darker-background !important;
+
+    .btn-success {
+      &:hover {
+        background-color: $darkmode-v2-btn-primary;
+      }
+    }
   }
 
   .ReactModal__Content,
