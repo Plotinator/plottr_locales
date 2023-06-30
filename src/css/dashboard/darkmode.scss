@@ -215,10 +215,16 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
     color: $dark-text;
     background-color: $darkmode-v2-background;
     .count-circle {
-      border-color: white;
+      border-color: $gray-5;
+      color: $gray-5;
     }
+
     &.active {
       background-color: $darkmode-v2-darker-background;
+      .count-circle {
+        border-color: #fff;
+        color: #fff;
+      }
     }
   }
   .dashboard__backups__columns {

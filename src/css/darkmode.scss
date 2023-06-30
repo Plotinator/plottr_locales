@@ -241,8 +241,9 @@ body.darkmode {
     .nav-pills {
       li.active {
         a {
-          background-color: #ff7f32;
+          background-color: transparent;
           color: $darkmode-v2-text;
+          border: 1px solid $darkmode-v2-btn-primary-border;
         }
       }
 
@@ -268,7 +269,7 @@ body.darkmode {
     border: 1px solid $darkmode-v2-border;
 
     div > * {
-      color: #aaa !important;
+      color: #ccc !important;
     }
   }
 
@@ -397,7 +398,7 @@ body.darkmode {
     li {
       &.active>a {
         color: #ccc !important;
-        background-color: #333640;
+        background-color: $darkmode-v2-background;
         border: 1px solid $darkmode-v2-nav-tabs-border;
         border-bottom-color: #00000000;
         font-weight: bold;
