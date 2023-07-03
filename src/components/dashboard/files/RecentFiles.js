@@ -86,6 +86,8 @@ const RecentFilesConnector = (connector) => {
     offlineModeEnabled,
     isOnWeb,
     hasCurrentProLicense,
+    settings,
+    hasDefaultFolder,
   }) => {
     const [searchTerm, setSearchTerm] = useState('')
     const [sortedFiles, setSortedFiles] = useState(sortedKnownFiles)
@@ -185,6 +187,8 @@ const RecentFilesConnector = (connector) => {
 
         const isProFile = helpers.file.isPlottrCloudFile(f)
         const lastOpen = helpers.file.getDateValue(f)
+        const isInDefaultFolder =
+          hasDefaultFolder && f.fileURL.includes(settings.user.defaultFolderLocation)
         let formattedPath = ''
         if (!isProFile && f.fileURL && !f.isTempFile) {
           formattedPath = f.pathToContainingFolder.join(' » ')
@@ -226,6 +230,7 @@ const RecentFilesConnector = (connector) => {
                   openFile={openFile}
                   permission={f.permission}
                   isCloudFile={f.isCloudFile}
+                  isInDefaultFolder={isInDefaultFolder}
                 />
               </div>
             </Cell>
@@ -286,6 +291,8 @@ const RecentFilesConnector = (connector) => {
     offlineModeEnabled: PropTypes.bool,
     isOnWeb: PropTypes.bool,
     hasCurrentProLicense: PropTypes.bool,
+    settings: PropTypes.object,
+    hasDefaultFolder: PropTypes.bool,
   }
 
   const {
@@ -305,6 +312,8 @@ const RecentFilesConnector = (connector) => {
       offlineModeEnabled: selectors.offlineModeEnabledSelector(state),
       isOnWeb: selectors.isOnWebSelector(state),
       hasCurrentProLicense: selectors.hasProSelector(state),
+      settings: selectors.appSettingsSelector(state),
+      hasDefaultFolder: selectors.hasDefaultFolderSelector(state),
     }))(RecentFiles)
   }
 
