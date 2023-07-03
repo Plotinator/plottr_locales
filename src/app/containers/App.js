@@ -166,13 +166,20 @@ const App = ({
 
   const saveAndClose = (saveFile, saveOfflineFile) => () => {
     const { present } = store.getState()
-    return (isOffline ? saveOfflineFile(present) : saveFile(present.project.fileURL, present)).then(
-      () => {
+    setWaitingForSaveDoneSignal(true)
+    return (isOffline ? saveOfflineFile(present) : saveFile(present.project.fileURL, present))
+      .then(() => {
+        return new Promise((resolve) => {
+          setTimeout(resolve, 1000)
+        })
+      })
+      .then(() => {
         fileSaved()
-        setWaitingForSaveDoneSignal(true)
+        setWaitingForSaveDoneSignal(false)
         setShowAskToSave(false)
-      }
-    )
+        removeReloadListeners()
+        window.close()
+      })
   }
 
   const dismissAskToSave = () => {
