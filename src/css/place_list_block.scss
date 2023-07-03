@@ -318,11 +318,11 @@
       background-color: $darkmode-v2-background;
       color: $darkmode-v2-darker-text;
       border-color: $darkmode-v2-border;
-    }
 
-    &.selected {
-      border: 1px dashed $darkmode-v2-border;
-      background-color: #24252c;
+      &.selected {
+        border: 2px dashed #aaa;
+        background-color: #24252c;
+      }
     }
   }
 }

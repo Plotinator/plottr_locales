@@ -448,10 +448,8 @@
       color: $darkmode-v2-darker-text;
       border-color: $darkmode-v2-border;
 
-      &.selected,
-      &:hover,
-      &:focus {
-        border: 1px dashed $darkmode-v2-border;
+      &.selected {
+        border: 2px dashed #aaa;
         background-color: #24252c;
       }
     }
