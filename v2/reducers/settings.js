@@ -122,7 +122,7 @@ const INITIAL_STATE = {
       autoSave: true,
       backupDays: null,
       backupLocation: 'default',
-      dark: 'dark',
+      dark: 'system',
       numberOfBackups: null,
       openDashboardFirst: true,
       backupType: 'never-delete',
@@ -165,7 +165,10 @@ const settingsReducer = (state = INITIAL_STATE, action) => {
         ...state,
         appSettings: {
           ...state.appSettings,
-          dark: action.value,
+          user: {
+            ...state.appSettings.user,
+            dark: action.value,
+          },
         },
       }
     }
