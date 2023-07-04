@@ -136,7 +136,10 @@ export const listenOnIPCMain = (
         return currentSettings().then((settings) => {
           // If the user asked for dashboard first, then never reply
           // with the last known file.
-          return (settings?.user?.openDashboardFirst && null) || lastFile
+          return (
+            (settings?.user?.openDashboardFirst && null) ||
+            (!settings?.user?.openDashboardFirst && lastFile)
+          )
         })
       })
       .then((lastFile) => {
