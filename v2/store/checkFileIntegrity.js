@@ -1,6 +1,7 @@
 import { uniq } from 'lodash'
 
-import { emptyFile, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
+import { emptyFile } from './newFileState'
+import { SYSTEM_REDUCER_KEYS } from '../reducers/systemReducers'
 
 const BLANK_FILE = emptyFile()
 
