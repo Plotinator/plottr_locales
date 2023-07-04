@@ -3,7 +3,7 @@ import axios from 'axios'
 import { DateTime } from 'luxon'
 import { isEqual, identity, isObject, capitalize } from 'lodash'
 
-import { removeSystemKeys, ARRAY_KEYS, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
+import { removeSystemKeys, ARRAY_KEYS, SYSTEM_REDUCER_KEYS, helpers } from 'pltr/v2'
 
 /**
  * auth, database and storage should be thunks that produce instances
@@ -519,13 +519,13 @@ const api = (
             log.info(`Attempted to update file (${fileId}) timestamp and couldn't`, error)
             return {
               results,
-              newOpenDate,
+              newOpenDate: newOpenDate.getDate(),
             }
           })
           .then(() => {
             return {
               results,
-              newOpenDate,
+              newOpenDate: newOpenDate.getDate(),
             }
           })
       })
@@ -553,6 +553,7 @@ const api = (
             file: {
               ...json.file,
               lastOpened: newOpenDate,
+              timeStamp: helpers.time.convertFromNanosAndSeconds(json.file.timeStamp).getDate(),
             },
           }
         })
@@ -642,6 +643,8 @@ const api = (
           authorisedDocuments.push({
             id: authorisation.id,
             ...data,
+            timeStamp: helpers.time.convertFromNanosAndSeconds(data.timeStamp).getTime(),
+            lastOpened: helpers.time.convertFromNanosAndSeconds(data.lastOpened).getTime(),
             fileURL: `plottr://${authorisation.id}`,
             isCloudFile: true,
           })
@@ -667,6 +670,8 @@ const api = (
         authorisedDocuments.push({
           id: authorisation.id,
           ...data,
+          timeStamp: helpers.time.convertFromNanosAndSeconds(data.timeStamp).getTime(),
+          lastOpened: helpers.time.convertFromNanosAndSeconds(data.lastOpened).getTime(),
           fileURL: `plottr://${authorisation.id}`,
           isCloudFile: true,
         })
