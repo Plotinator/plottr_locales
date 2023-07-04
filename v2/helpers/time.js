@@ -1,3 +1,7 @@
+export const convertFromNanosAndSecondsOrDefault = (nanosAndSecondsObject) => {
+  return convertFromNanosAndSeconds(nanosAndSecondsObject) || new Date()
+}
+
 export const convertFromNanosAndSeconds = (nanosAndSecondsObject) => {
   if (
     !nanosAndSecondsObject ||
