@@ -100,7 +100,7 @@ function focusIfOpen(fileURL) {
 }
 
 function reloadAllWindows() {
-  windows.forEach((w) => w.browserWindow.webContents.send('reload'))
+  windows.forEach((w) => w.browserWindow.webContents.send('force-reload'))
 }
 
 function dereferenceWindow(winObj) {

@@ -9,9 +9,9 @@ import { DashboardBody, DashboardNav, FullPageSpinner as Spinner } from 'connect
 import OfflineBanner from '../components/OfflineBanner'
 import { makeMainProcessClient } from '../mainProcessClient'
 
-const { onReload } = makeMainProcessClient()
+const { onReload, listenToForceReload } = makeMainProcessClient()
 
-const Dashboard = ({ darkMode, closeDashboard, cantShowFile, busy, openTo }) => {
+const Dashboard = ({ darkMode, closeDashboard, cantShowFile, busy, isOffline, openTo }) => {
   const [activeView, setActiveView] = useState(openTo || 'files')
 
   useEffect(() => {
@@ -24,6 +24,13 @@ const Dashboard = ({ darkMode, closeDashboard, cantShowFile, busy, openTo }) => 
       document.removeEventListener('close-dashboard', closeListener)
       unsubscribeFromReload()
     }
+  }, [])
+
+  useEffect(() => {
+    const forceReload = () => {
+      window.location.reload()
+    }
+    return listenToForceReload(forceReload)
   }, [])
 
   return (
@@ -43,6 +50,7 @@ Dashboard.propTypes = {
   closeDashboard: PropTypes.func.isRequired,
   cantShowFile: PropTypes.bool,
   busy: PropTypes.bool,
+  isOffline: PropTypes.bool,
   openTo: PropTypes.string,
 }
 
@@ -50,5 +58,6 @@ export default React.memo(
   connect((state) => ({
     darkMode: selectors.isDarkModeSelector(state),
     busy: selectors.manipulatingAFileSelector(state),
+    isOffline: selectors.isOfflineSelector(state),
   }))(Dashboard)
 )

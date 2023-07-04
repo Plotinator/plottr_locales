@@ -22,6 +22,7 @@ import { store } from '../store'
 import MainIntegrationContext from '../../mainIntegrationContext'
 import logger from '../../../shared/logger'
 import { makeMainProcessClient } from '../mainProcessClient'
+import { whenClientIsReady } from '../../../shared/socket-client/index'
 
 const {
   onAdvancedExportFileFromMenu,
@@ -29,6 +30,7 @@ const {
   pleaseReloadMenu,
   onOpenImagePickerFromMenu,
   showMessageBox,
+  listenToForceReload,
 } = makeMainProcessClient()
 
 const App = ({
@@ -139,6 +141,25 @@ const App = ({
     return () => {
       window.removeEventListener('force-close', forceClose)
     }
+  }, [])
+
+  useEffect(() => {
+    const forceReload = () => {
+      whenClientIsReady(({ saveOfflineFile, saveFile }) => {
+        const { present } = store.getState()
+        return isOffline ? saveOfflineFile(present) : saveFile(present.project.fileURL, present)
+      })
+        .then(() => {
+          return new Promise((resolve) => {
+            setTimeout(resolve, 1000)
+          })
+        })
+        .then(() => {
+          removeReloadListeners()
+          window.location.reload()
+        })
+    }
+    return listenToForceReload(forceReload)
   }, [])
 
   useEffect(() => {
