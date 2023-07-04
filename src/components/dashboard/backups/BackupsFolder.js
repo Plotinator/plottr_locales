@@ -6,8 +6,6 @@ import cx from 'classnames'
 import { t } from 'plottr_locales'
 
 import Grid from '../../Grid'
-import Col from '../../Col'
-import Row from '../../Row'
 import Collapse from '../../Collapse'
 import UnconnectedBackupsProjectRow from './BackupsProjectRow'
 
@@ -33,7 +31,14 @@ const BackupsFolderConnector = (connector) => {
         const displayableGroupName = makeDisplayableGroupName(files[0].name, files[0])
         let row = null
         if (displayableGroupName?.toLowerCase().includes(searchTerm.toLowerCase())) {
-          row = <BackupsProjectRow folder={folder} groupName={displayableGroupName} files={files} />
+          row = (
+            <BackupsProjectRow
+              folder={folder}
+              groupName={displayableGroupName}
+              files={files}
+              key={`${groupName}-${files[0].name}`}
+            />
+          )
         }
         return row
       })
@@ -55,28 +60,14 @@ const BackupsFolderConnector = (connector) => {
         </div>
         <Collapse in={isOpen}>
           <Grid fluid className="dashboard__backups__projects-table">
-            <Row>
-              <Col xs={12} sm={6} md={6}>
-                <div className="dashboard__backups__columns">{t('Project Name')}</div>
-              </Col>
-              <Col xs={12} sm={6} md={3}>
-                <div className="dashboard__backups__columns">{t('Start Session')}</div>
-              </Col>
-              <Col xs={12} sm={6} md={3}>
-                <div className="dashboard__backups__columns">{t('End Session')}</div>
-              </Col>
-            </Row>
-            <Row>
-              <Col xs={12}>
-                <hr />
-              </Col>
-            </Row>
+            <div className="dashboard__backups__header-columns">
+              <div className="dashboard__backups__columns">{t('Project Name')}</div>
+              <div className="dashboard__backups__columns">{t('Start Session')}</div>
+              <div className="dashboard__backups__columns">{t('End Session')}</div>
+            </div>
+            <hr />
             {projects}
-            <Row>
-              <Col xs={12}>
-                <hr />
-              </Col>
-            </Row>
+            <hr />
           </Grid>
         </Collapse>
       </div>

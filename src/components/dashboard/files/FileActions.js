@@ -43,6 +43,7 @@ const FileActionsConnector = (connector) => {
     isOnWeb,
     isTemp,
     isInOfflineMode,
+    isInDefaultFolder,
   }) => {
     const [deleting, setDeleting] = useState(false)
 
@@ -163,7 +164,7 @@ const FileActionsConnector = (connector) => {
                     {t('Create Desktop Shortcut')}
                   </MenuItem>
                 )}
-                {isCloudFile || osIsUnknown ? null : (
+                {isCloudFile || osIsUnknown || isInDefaultFolder ? null : (
                   <MenuItem eventKey="remove">{t('Remove from this list')}</MenuItem>
                 )}
               </Dropdown.Menu>
@@ -186,6 +187,7 @@ const FileActionsConnector = (connector) => {
     isOnWeb: PropTypes.bool,
     isTemp: PropTypes.bool,
     isInOfflineMode: PropTypes.bool,
+    isInDefaultFolder: PropTypes.bool,
   }
 
   const {

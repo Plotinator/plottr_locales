@@ -202,9 +202,7 @@ const NoteEditDetailsConnector = (connector) => {
             {/* {renderEditingTemplates()} */}
           </div>
           <ButtonToolbar className="card-dialog__button-bar">
-            <Button bsStyle="success" onClick={finishEditing}>
-              {i18n('Close')}
-            </Button>
+            <Button onClick={finishEditing}>{i18n('Close')}</Button>
             <Button className="card-dialog__duplicate" onClick={handleDuplicate}>
               <FiCopy />
               {' ' + i18n('Duplicate')}

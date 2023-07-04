@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react'
 import { PropTypes } from 'prop-types'
+import cx from 'classnames'
 
 import { t } from 'plottr_locales'
 
@@ -11,6 +12,7 @@ import DropdownButton from '../DropdownButton'
 import MenuItem from '../MenuItem'
 import UnconnectedHierarchyLevel from './HierarchyLevel'
 import { checkDependencies } from '../checkDependencies'
+import ToolTip from '../ToolTip'
 
 const modalStyles = {
   overlay: {
@@ -128,18 +130,34 @@ const ActsConfigModalConnector = (connector) => {
                       <MenuItem key={'default'} onSelect={() => setTimelineView('default')}>
                         <div className="acts-modal__timeline-view-selector">{t('Default')}</div>
                       </MenuItem>
-                      <MenuItem
-                        disabled={hierarchyLevels.length < 2}
-                        key={'tabbed'}
-                        onSelect={() => setTimelineView('tabbed')}
-                        title={
-                          hierarchyLevels.length < 2
-                            ? t('At least two levels of hierarchy required to view as tabs')
-                            : t('View timeline ith tabs for the highest level')
-                        }
-                      >
-                        <div className="acts-modal__timeline-view-selector">{t('Tabbed')}</div>
-                      </MenuItem>
+                      {hierarchyLevels.length < 2 ? (
+                        <ToolTip
+                          id={`acts-modal-tabbed-tooltip`}
+                          placement="right"
+                          text={t('At least two levels of hierarchy required to view as tabs')}
+                        >
+                          <MenuItem key={'tabbed'} disabled={true}>
+                            <div className="acts-modal__timeline-view-selector disabled">
+                              {t('Tabbed')}
+                            </div>
+                          </MenuItem>
+                        </ToolTip>
+                      ) : (
+                        <MenuItem
+                          disabled={hierarchyLevels.length < 2}
+                          key={'tabbed'}
+                          onSelect={() => setTimelineView('tabbed')}
+                          title={t('View timeline ith tabs for the highest level')}
+                        >
+                          <div
+                            className={cx(`acts-modal__timeline-view-selector`, {
+                              disabled: hierarchyLevels.length < 2,
+                            })}
+                          >
+                            {t('Tabbed')}
+                          </div>
+                        </MenuItem>
+                      )}
                       <MenuItem key={'stacked'} onSelect={() => setTimelineView('stacked')}>
                         <div className="acts-modal__timeline-view-selector">{t('Stacked')}</div>
                       </MenuItem>

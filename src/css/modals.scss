@@ -48,3 +48,15 @@
 .modal-container .modal-backdrop {
   position: absolute;
 }
+
+.darkmode {
+  .ReactModal__Content--after-open {
+    border-color: $darkmode-v2-border !important;
+  }
+
+  .center-modal-vertically {
+    .modal-content {
+      border: 1px solid $darkmode-v2-border;
+    }
+  }
+}

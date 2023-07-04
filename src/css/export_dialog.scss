@@ -148,7 +148,19 @@ body.darkmode {
   }
   .export-dialog__option-lists {
     ul {
-      color: $darkmode-text;
+      color: $darkmode-darker-text;
+    }
+  }
+
+  .export-dialog__header {
+    .export-dialog__type-chooser {
+      .right-side {
+        .nav-pills {
+          li.active a {
+            background-color: $darkmode-v2-btn-primary;
+          }
+        }
+      }
     }
   }
 }
