@@ -60,16 +60,16 @@ const updateAuthFileName = wiredUp.updateAuthFileName
 const listenToUI = wiredUp.listenToUI
 const listenToFile = wiredUp.listenToFile
 const listenToBeats = wiredUp.listenToBeats
-const listenToCards = wiredUp.listenToCards
+const listenToFlatCards = wiredUp.listenToFlatCards
 const listenToSeries = wiredUp.listenToSeries
 const listenToBooks = wiredUp.listenToBooks
 const listenToCategories = wiredUp.listenToCategories
-const listenToCharacters = wiredUp.listenToCharacters
+const listenToFlatCharacters = wiredUp.listenToFlatCharacters
 const listenToCustomAttributes = wiredUp.listenToCustomAttributes
 const listenToFeatureFlags = wiredUp.listenToFeatureFlags
 const listenToLines = wiredUp.listenToLines
-const listenToNotes = wiredUp.listenToNotes
-const listenToPlaces = wiredUp.listenToPlaces
+const listenToFlatNotes = wiredUp.listenToFlatNotes
+const listenToFlatPlaces = wiredUp.listenToFlatPlaces
 const listenToTags = wiredUp.listenToTags
 const listenToHierarchyLevels = wiredUp.listenToHierarchyLevels
 const listenToImages = wiredUp.listenToImages
@@ -251,16 +251,9 @@ self.onmessage = (event) => {
         fileVersion,
         replyWithReduxAction
       )
-      const unsubscribeToCards = listenToCards(userId, fileId, clientId, replyWithReduxAction)
       const unsubscribeToSeries = listenToSeries(userId, fileId, clientId, replyWithReduxAction)
       const unsubscribeToBooks = listenToBooks(userId, fileId, clientId, replyWithReduxAction)
       const unsubscribeToCategories = listenToCategories(
-        userId,
-        fileId,
-        clientId,
-        replyWithReduxAction
-      )
-      const unsubscribeToCharacters = listenToCharacters(
         userId,
         fileId,
         clientId,
@@ -279,8 +272,6 @@ self.onmessage = (event) => {
         replyWithReduxAction
       )
       const unsubscribeToLines = listenToLines(userId, fileId, clientId, replyWithReduxAction)
-      const unsubscribeToNotes = listenToNotes(userId, fileId, clientId, replyWithReduxAction)
-      const unsubscribeToPlaces = listenToPlaces(userId, fileId, clientId, replyWithReduxAction)
       const unsubscribeToTags = listenToTags(userId, fileId, clientId, replyWithReduxAction)
       const unsubscribeToLevels = listenToHierarchyLevels(
         userId,
@@ -295,24 +286,48 @@ self.onmessage = (event) => {
         clientId,
         replyWithReduxAction
       )
+      const unsubscribeToFlatCards = listenToFlatCards(
+        userId,
+        fileId,
+        clientId,
+        replyWithReduxAction
+      )
+      const unsubscribeToFlatCharacters = listenToFlatCharacters(
+        userId,
+        fileId,
+        clientId,
+        replyWithReduxAction
+      )
+      const unsubscribeToFlatNotes = listenToFlatNotes(
+        userId,
+        fileId,
+        clientId,
+        replyWithReduxAction
+      )
+      const unsubscribeToFlatPlaces = listenToFlatPlaces(
+        userId,
+        fileId,
+        clientId,
+        replyWithReduxAction
+      )
       const unsubscribe = () => {
         unsubscribeToUI()
         unsubscribeToFile()
         unsubscribeToBeats()
-        unsubscribeToCards()
         unsubscribeToSeries()
         unsubscribeToBooks()
         unsubscribeToCategories()
-        unsubscribeToCharacters()
         unsubscribeToCustomAttributes()
         unsubscribeToFlags()
         unsubscribeToLines()
-        unsubscribeToNotes()
-        unsubscribeToPlaces()
         unsubscribeToTags()
         unsubscribeToLevels()
         unsubscribeToImages()
         unsubscribeToAttributes()
+        unsubscribeToFlatCards()
+        unsubscribeToFlatCharacters()
+        unsubscribeToFlatNotes()
+        unsubscribeToFlatPlaces()
       }
       unsubscribeFunctions.set(messageId, unsubscribe)
       return
