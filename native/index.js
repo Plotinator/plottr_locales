@@ -75,7 +75,11 @@ const database = () => {
       }
     },
     onSnapshot: (ref, handleSnapshot) => {
-      return ref.onSnapshot(handleSnapshot)
+      if (ref.type === 'query') {
+        return translate(ref).onSnapshot(handleSnapshot)
+      } else {
+        return ref.onSnapshot(handleSnapshot)
+      }
     },
     getDoc: (ref) => {
       return ref.get()
@@ -95,6 +99,9 @@ const database = () => {
     addDoc: (ref, document) => {
       return ref.add(document)
     },
+    deleteDoc: (ref) => {
+      return ref.delete()
+    }
   }
 }
 
@@ -184,6 +191,20 @@ export const wireUpAPI = (logger, actions, selectors) => {
       clientId,
       withResponse
     )
+    const unsubscribeToFlatCards = wiredUp.listenToFlatCards(userId, fileId, clientId, withResponse)
+    const unsubscribeToFlatCharacters = wiredUp.listenToFlatCharacters(
+      userId,
+      fileId,
+      clientId,
+      withResponse
+    )
+    const unsubscribeToFlatNotes = wiredUp.listenToFlatNotes(userId, fileId, clientId, withResponse)
+    const unsubscribeToFlatPlaces = wiredUp.listenToFlatPlaces(
+      userId,
+      fileId,
+      clientId,
+      withResponse
+    )
     const unsubscribe = () => {
       unsubscribeToUI()
       unsubscribeToFile()
@@ -202,6 +223,10 @@ export const wireUpAPI = (logger, actions, selectors) => {
       unsubscribeToLevels()
       unsubscribeToImages()
       unsubscribeToAttributes()
+      unsubscribeToFlatCards()
+      unsubscribeToFlatCharacters()
+      unsubscribeToFlatNotes()
+      unsubscribeToFlatPlaces()
     }
     return Promise.resolve(unsubscribe)
   }
