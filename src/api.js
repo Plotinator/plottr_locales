@@ -643,8 +643,8 @@ const api = (
           authorisedDocuments.push({
             id: authorisation.id,
             ...data,
-            timeStamp: helpers.time.convertFromNanosAndSeconds(data.timeStamp).getTime(),
-            lastOpened: helpers.time.convertFromNanosAndSeconds(data.lastOpened).getTime(),
+            timeStamp: helpers.time.convertFromNanosAndSecondsOrDefault(data.timeStamp).getTime(),
+            lastOpened: helpers.time.convertFromNanosAndSecondsOrDefault(data.lastOpened).getTime(),
             fileURL: `plottr://${authorisation.id}`,
             isCloudFile: true,
           })
@@ -670,8 +670,8 @@ const api = (
         authorisedDocuments.push({
           id: authorisation.id,
           ...data,
-          timeStamp: helpers.time.convertFromNanosAndSeconds(data.timeStamp).getTime(),
-          lastOpened: helpers.time.convertFromNanosAndSeconds(data.lastOpened).getTime(),
+          timeStamp: helpers.time.convertFromNanosAndSecondsOrDefault(data.timeStamp).getTime(),
+          lastOpened: helpers.time.convertFromNanosAndSecondsOrDefault(data.lastOpened).getTime(),
           fileURL: `plottr://${authorisation.id}`,
           isCloudFile: true,
         })
