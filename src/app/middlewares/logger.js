@@ -1,6 +1,9 @@
 import { selectors } from 'wired-up-pltr'
 
 const logger = (store) => (next) => (action) => {
+  // Support redux-thunk and friends where non-objects are dispatched.
+  if (!action.type) return next(action)
+
   // eslint-disable-next-line
   if (LOGGER === 'true') {
     console.info('----------START Redux Change Logger START----------')

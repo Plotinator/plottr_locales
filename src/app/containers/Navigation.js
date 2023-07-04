@@ -36,9 +36,9 @@ const Navigation = ({
     }
   }, [])
 
-  const handleSelect = (selectedKey) => {
+  const handleSelect = useCallback((selectedKey) => {
     changeCurrentView(selectedKey)
-  }
+  }, [])
 
   const TrialLinks = () => {
     if (!isInTrialMode) return null

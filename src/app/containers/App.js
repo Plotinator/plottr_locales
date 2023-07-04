@@ -244,11 +244,9 @@ const App = ({
 
   return (
     <ErrorBoundary>
-      <ErrorBoundary>
-        <React.StrictMode>
-          <Navigation forceProjectDashboard={forceProjectDashboard} />
-        </React.StrictMode>
-      </ErrorBoundary>
+      <React.StrictMode>
+        <Navigation forceProjectDashboard={forceProjectDashboard} />
+      </React.StrictMode>
       <main
         className="project-main tour-end"
         onClick={(event) => {

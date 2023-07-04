@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { PropTypes } from 'prop-types'
 import { connect } from 'react-redux'
 
@@ -36,6 +36,7 @@ const Listener = ({
   selectFile,
   offlineModeIsEnabled,
   resuming,
+  fileVersion,
   hasDefaultFolder,
   withFullFileState,
   isLoggedIn,
@@ -126,14 +127,44 @@ const Listener = ({
     let unsubscribeFunction = () => {}
     if (fileLoaded) {
       const fileId = helpers.file.fileIdFromPlottrProFile(fileURL)
-      unsubscribeFunction = listen(store, userId, fileId, clientId, selectedFile.version)
+      unsubscribeFunction = listen(store, userId, fileId, clientId, fileVersion)
       setPermission(selectedFile.permission)
     } else {
       setFileLoaded()
     }
 
     return unsubscribeFunction
-  }, [offlineModeIsEnabled, selectedFile, userId, clientId, fileLoaded, isOffline, resuming])
+  }, [
+    offlineModeIsEnabled,
+    fileVersion,
+    selectedFile,
+    userId,
+    clientId,
+    fileLoaded,
+    isOffline,
+    resuming,
+  ])
+
+  const selectedFileVersionRef = useRef(null)
+  useEffect(() => {
+    if (fileLoaded && fileVersion) {
+      if (selectedFileVersionRef.current && selectedFileVersionRef.current !== fileVersion) {
+        // The version changed.  We need to reload the window.
+        showErrorBox(
+          t('We need to reboot Plottr'),
+          t('You wont lose any work. Sorry for the inconvenience.')
+        ).then(() => {
+          window.location.reload()
+        })
+        return
+      } else {
+        selectedFileVersionRef.current = fileVersion
+        return
+      }
+    } else {
+      selectedFileVersionRef.current = null
+    }
+  }, [fileLoaded, fileVersion])
 
   // ====Pro Session====
 
@@ -242,6 +273,7 @@ Listener.propTypes = {
   resuming: PropTypes.bool,
   hasDefaultFolder: PropTypes.bool,
   isCloudFile: PropTypes.bool,
+  fileVersion: PropTypes.string,
   withFullFileState: PropTypes.func.isRequired,
   isLoggedIn: PropTypes.bool,
   checkedSession: PropTypes.bool,
@@ -277,6 +309,7 @@ export default connect(
     offlineModeIsEnabled: selectors.offlineModeEnabledSelector(state),
     checkingProSubscription: selectors.checkingProSubscriptionSelector(state),
     knownFiles: selectors.knownFilesSelector(state),
+    fileVersion: selectors.fileVersionSelector(state),
     hasDefaultFolder: selectors.hasDefaultFolderSelector(state),
   }),
   {

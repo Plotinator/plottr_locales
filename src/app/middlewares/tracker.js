@@ -27,6 +27,8 @@ const tracker = (whenClientIsReady) => {
 
   return (store) => (next) => (action) => {
     const result = next(action)
+    // Support redux-thunk and friends where non-objects are dispatched.
+    if (!action.type) return result
     if (shouldIgnoreAction(action)) return result
     if (!WHITE_LIST.includes(action.type)) return result
 
