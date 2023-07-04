@@ -3,7 +3,7 @@ import axios from 'axios'
 import { DateTime } from 'luxon'
 import { isEqual, identity, isObject, capitalize } from 'lodash'
 
-import { removeSystemKeys, ARRAY_KEYS, SYSTEM_REDUCER_KEYS } from 'pltr/v2'
+import { removeSystemKeys, ARRAY_KEYS, SYSTEM_REDUCER_KEYS, helpers } from 'pltr/v2'
 
 /**
  * auth, database and storage should be thunks that produce instances
@@ -28,8 +28,8 @@ const api = (
       ? ''
       : `https://${baseAPIDomain || ''}`
 
-  const defaultErrorHandler = (error) => {
-    log.error('Error communicating with Firebase.', error.message, error)
+  const defaultErrorHandler = (label) => (error) => {
+    log.error(`[${label}]: Error communicating with Firebase.`, error.message, error)
   }
 
   const pingAuth = (userId, fileId) => {
@@ -229,7 +229,7 @@ const api = (
     fileId,
     clientId,
     withAction,
-    errorHandler = defaultErrorHandler
+    errorHandler = defaultErrorHandler('listenToFile')
   ) => {
     const withIsCloud = (x) => ({ ...x, isCloudFile: true, id: fileId, path: `plottr://${fileId}` })
     const { doc, onSnapshot } = database()
@@ -243,7 +243,7 @@ const api = (
 
   const listenForObjectAtPath =
     (path) =>
-    (userId, fileId, clientId, withAction, errorHandler = defaultErrorHandler) => {
+    (userId, fileId, clientId, withAction, errorHandler = defaultErrorHandler('listenForObjectAtPath')) => {
       const { doc, onSnapshot } = database()
       return onSnapshot(
         doc(`${path}/${fileId}`),
@@ -253,7 +253,7 @@ const api = (
 
   const listenForArrayAtPath =
     (path) =>
-    (userId, fileId, clientId, withAction, errorHandler = defaultErrorHandler) => {
+    (userId, fileId, clientId, withAction, errorHandler = defaultErrorHandler('listenForArrayAtPath')) => {
       const values = (x) => Object.values(x)
       const { doc, onSnapshot } = database()
       return onSnapshot(
@@ -264,7 +264,7 @@ const api = (
 
   const listenForFlatArrayAtPath =
     (path, subPath) =>
-    (userId, fileId, clientId, withAction, errorHandler = defaultErrorHandler) => {
+    (userId, fileId, clientId, withAction, errorHandler = defaultErrorHandler('listenForFlatArrayAtPath')) => {
       const { collection, onSnapshot, query } = database()
       return onSnapshot(
         query(collection(`${path}/${fileId}/${subPath}`)),
@@ -280,7 +280,7 @@ const api = (
     clientId,
     version,
     withAction,
-    errorHandler = defaultErrorHandler
+    errorHandler = defaultErrorHandler('listenToBeats')
   ) => {
     const transform = semverGt(version, WHEN_BEATS_BECAME_AN_OBJECT)
       ? (x) => x
@@ -519,13 +519,13 @@ const api = (
             log.info(`Attempted to update file (${fileId}) timestamp and couldn't`, error)
             return {
               results,
-              newOpenDate,
+              newOpenDate: newOpenDate.getDate(),
             }
           })
           .then(() => {
             return {
               results,
-              newOpenDate,
+              newOpenDate: newOpenDate.getDate(),
             }
           })
       })
@@ -553,6 +553,7 @@ const api = (
             file: {
               ...json.file,
               lastOpened: newOpenDate,
+              timeStamp: helpers.time.convertFromNanosAndSeconds(json.file.timeStamp).getDate(),
             },
           }
         })
@@ -630,7 +631,7 @@ const api = (
       )
   }
 
-  const listenToFiles = (userId, callback, errorHandler = defaultErrorHandler) => {
+  const listenToFiles = (userId, callback, errorHandler = defaultErrorHandler('listenToFiles')) => {
     const { collection, onSnapshot } = database()
     return onSnapshot(collection(`authorisation/${userId}/granted`), {
       next: (authorisationsRef) => {
@@ -642,6 +643,8 @@ const api = (
           authorisedDocuments.push({
             id: authorisation.id,
             ...data,
+            timeStamp: helpers.time.convertFromNanosAndSeconds(data.timeStamp).getTime(),
+            lastOpened: helpers.time.convertFromNanosAndSeconds(data.lastOpened).getTime(),
             fileURL: `plottr://${authorisation.id}`,
             isCloudFile: true,
           })
@@ -667,6 +670,8 @@ const api = (
         authorisedDocuments.push({
           id: authorisation.id,
           ...data,
+          timeStamp: helpers.time.convertFromNanosAndSeconds(data.timeStamp).getTime(),
+          lastOpened: helpers.time.convertFromNanosAndSeconds(data.lastOpened).getTime(),
           fileURL: `plottr://${authorisation.id}`,
           isCloudFile: true,
         })
@@ -705,7 +710,7 @@ const api = (
       })
   }
 
-  const onSessionChange = (cb, errorHandler = defaultErrorHandler) => {
+  const onSessionChange = (cb, errorHandler = defaultErrorHandler('onSessionChange')) => {
     return auth().onAuthStateChanged((user) => {
       if (user) {
         return mintCookieToken(user).then(() => {
@@ -1097,7 +1102,7 @@ const api = (
     })
   }
 
-  const listenToCustomTemplates = (userId, callback, errorHandler = defaultErrorHandler) => {
+  const listenToCustomTemplates = (userId, callback, errorHandler = defaultErrorHandler('listenToCustomTemplates')) => {
     const { collection, onSnapshot } = database()
     return onSnapshot(collection(`templates/${userId}/userTemplates`), {
       next: (documentsRef) => {
