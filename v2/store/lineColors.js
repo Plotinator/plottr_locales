@@ -20,7 +20,7 @@ export function nextColor(length) {
 export function nextDarkColor(length) {
   switch (length) {
     case 0:
-      return '#c9e6ff'
+      return '#ccc'
     case 1:
       return '#baed79'
     case 2:
