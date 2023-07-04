@@ -9,11 +9,11 @@ const INITIAL_STATE = {
 }
 
 const actionsReducer = (state = INITIAL_STATE, action) => {
-  if (action.type === RESET_ACTION_RECORDER) return INITIAL_STATE
+  if (action?.actionRecorder?.type === RESET_ACTION_RECORDER) return INITIAL_STATE
 
-  if (action.type !== RECORD_LAST_ACTION) return state
+  if (action?.actionRecorder?.type !== RECORD_LAST_ACTION) return state
 
-  const { lastAction, lastActionKeys, lastActionTimestamp } = action
+  const { lastAction, lastActionKeys, lastActionTimestamp } = action.actionRecorder || {}
   return {
     editCount: state.editCount + 1,
     startTimestamp: state.startTimestamp || lastActionTimestamp,
