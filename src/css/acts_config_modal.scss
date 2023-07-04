@@ -1,3 +1,5 @@
+@import "vars";
+
 .acts-modal__wrapper {
   height: 100%;
   display: grid;
@@ -169,4 +171,58 @@ input[type='checkbox'].acts-modal__toggle-control {
   margin: 0;
   height: 20px;
   width: 20px;
+}
+
+.darkmode {
+  .acts-modal__timeline-controls-wrapper {
+    .acts-modal__timeline-view-dropdown {
+      .acts-modal__select-line {
+        color: #bbb;
+        #select-timeline-view {
+          color: #bbb;
+        }
+        li {
+          background-color: $darkmode-v2-background !important;
+          a {
+            background-color: $darkmode-v2-background !important;
+            color: #bbb;
+          }
+        }
+        li.disabled {
+          &:hover {
+            background-color: $darkmode-v2-background;
+          }
+          a {
+            color: #666666;
+          }
+
+          .acts-modal__timeline-view-selector {
+            color: #666666;
+          }
+        }
+      }
+    }
+
+    .acts-modal__hierarchy-count-controls {
+      color: #bfbfbf;
+      .glyphicon {
+        color: #bfbfbf;
+      }
+    }
+  }
+
+  .acts-modal__levels-table {
+    .acts-modal__levels-table-header {
+      color: #bfbfbf;
+      border-bottom: 1px solid #bfbfbf;
+
+      .acts-modal__levels-table-cell {
+        color: #bfbfbf;
+      }
+    }
+
+    .acts-modal__levels-table-row {
+      color: #bfbfbf;
+    }
+  }
 }

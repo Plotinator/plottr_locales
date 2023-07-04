@@ -9,13 +9,16 @@
 .outline__grid {
   width: 100vw;
   padding-left: 0;
+
   .row {
     height: 100%;
     overflow: hidden;
+
     .outline__grid__minimap {
       height: 100%;
       overflow: auto;
     }
+
     .outline__grid__beats {
       height: 100%;
       overflow: auto;
@@ -28,6 +31,7 @@
   .outline__grid__minimap.col-md-3 {
     width: 20%;
   }
+
   .outline__grid__beats.col-md-9 {
     width: 80%;
   }
@@ -39,6 +43,7 @@
     width: 14px;
     margin-right: 4px;
   }
+
   span.glyphicon {
     width: 14px;
     margin-right: 4px;
@@ -50,6 +55,7 @@
   color: $yellow-3;
   cursor: pointer;
   font-size: 14px;
+
   &:hover {
     color: $yellow-1;
   }
@@ -63,6 +69,7 @@
     margin-bottom: 4px;
     border: 2px dashed $gray-8;
     padding-top: 4px;
+
     svg {
       color: $gray-8;
     }
@@ -81,10 +88,12 @@
   .outline__card__description {
     &.editing {
       width: 100%;
+
       .glyphicon-pencil {
         display: none;
       }
     }
+
     &:not(.editing) {
       display: flex;
       justify-content: space-between;
@@ -111,6 +120,7 @@
   .outline__card-top {
     flex-direction: column;
   }
+
   .outline__card__line-title,
   .outline__card__grip,
   .outline__card-top {
@@ -128,16 +138,20 @@
       color: $gray-8;
       // vertical-align: text-top;
     }
+
     h3 {
       margin: 5px 2px;
       // display: inline-block;
     }
+
     &.editing {
       display: none;
     }
+
     &.dragging {
       width: 30%;
       overflow: hidden;
+
       h3 {
         white-space: nowrap;
       }
@@ -163,6 +177,7 @@
       border: 2px dashed $blue-7;
       border-radius: 4px;
       background-color: $gray-9;
+
       .glyphicon-pencil {
         visibility: visible;
       }
@@ -185,6 +200,7 @@
 
 .outline__card__label-list {
   margin: 8px 0;
+
   .label {
     margin-right: 5px;
     padding-top: 4px;
@@ -201,10 +217,11 @@
   border-radius: 0px;
 
   li {
-    &.active > a {
+    &.active>a {
       background-color: $new-item-background;
     }
-    & > a {
+
+    &>a {
       color: inherit;
       cursor: pointer;
       padding: 3px 10px 3px 10px !important;
@@ -241,13 +258,16 @@
 .outline__minimap.darkmode {
   background-color: $darkmode-darker-background;
   color: $darkmode-text;
-  li.active > a {
+
+  li.active>a {
     background-color: $darkmode-background;
+
     &:focus {
       background-color: $darkmode-background;
     }
   }
-  li > a:hover {
+
+  li>a:hover {
     background-color: $darkmode-background;
     color: $darkmode-text;
   }
@@ -255,6 +275,7 @@
 
 .outline__scene-title {
   margin-left: 20px;
+
   &.darkmode {
     color: $darkmode-text;
   }
@@ -264,9 +285,54 @@
     margin-bottom: 4px;
     border: 2px dashed $gray-8;
     padding-top: 4px;
+
     svg {
       color: $gray-8;
       height: 20px;
+    }
+  }
+}
+
+.darkmode {
+  .outline-list__card-view.darkmode {
+    background-color: #24252c;
+    border-color: $darkmode-v2-border;
+  }
+
+  .outline__minimap.darkmode {
+    background-color: #24252c;
+    color: $darkmode-v2-darker-text;
+    border: 0px;
+    border-right: 1px solid $darkmode-v2-border;
+
+    li>a:hover,
+    li.active>a,
+    li.active>a:focus {
+      background-color: $darkmode-v2-card-background;
+    }
+  }
+
+  .outline__scene-title.darkmode,
+  .outline-list__card-view {
+    .outline__card__grip svg {
+      color: #bbb;
+    }
+
+    .outline-divider {
+      border-top: 1px solid $darkmode-v2-border;
+    }
+  }
+
+  .outline__scene-title {
+    color: $darkmode-v2-heading-text;
+  }
+
+  .outline-list__card-view.darkmode {
+
+    &:hover,
+    .outline__card__description:not(.editing) {
+      border: 1px dashed $darkmode-v2-border;
+      background-color: $darkmode-v2-background;
     }
   }
 }

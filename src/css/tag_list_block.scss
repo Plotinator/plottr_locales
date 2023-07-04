@@ -7,6 +7,7 @@
     width: 99vw;
     margin-left: 0.5vw;
   }
+
   .tag-list__wrapper {
     display: flex;
     justify-content: flex-start;
@@ -121,6 +122,7 @@
 
 .tag-list__color-edit-container {
   display: flex;
+
   .tag-list__tag-color {
     width: 40px;
     height: 38px;
@@ -133,6 +135,7 @@
 
 .tag-list__color-label {
   margin-top: 5px;
+
   .label {
     vertical-align: middle;
     padding-top: 5px;
@@ -142,4 +145,77 @@
 .tag-list__tag__button-bar {
   display: flex;
   justify-content: flex-end;
+}
+
+.darkmode {
+  .tag-list__wrapper {
+    background-color: transparent;
+
+    .tag-category-list {
+      .tag-list__category-wrapper.darkmode {
+        background-color: transparent;
+      }
+    }
+  }
+
+  .tag-list__tag.darkmode {
+    background-color: #24252c;
+    color: $darkmode-v2-darker-text;
+    border-color: $darkmode-v2-border;
+    transition: 0.2s;
+
+    &:not(.editing):hover,
+    &:hover {
+      background-color: $darkmode-v2-background;
+    }
+  }
+
+  .tag-list__new.darkmode {
+    background-color: #24252c;
+    color: $darkmode-v2-darker-text;
+    border-color: $darkmode-v2-border;
+    transition: 0.2s;
+  }
+
+  .tag-list__tag__hover-options {
+    .btn-group {
+      .btn,
+      .btn-default,
+      .btn-warning,
+      .btn-danger {
+        background-color: $darkmode-v2-background;
+        border-color: #4d4d4f;
+
+        &:hover {
+          background-color: $darkmode-v2-card-background;
+        }
+      }
+
+      .btn-warning {
+        .glyphicon {
+          color: #bbb;
+        }
+
+        &:hover {
+          background-color: #bfa93f !important;
+          .glyphicon {
+            color: $darkmode-v2-text;
+          }
+        }
+      }
+
+      .btn-danger {
+        .glyphicon {
+          color: #bbb;
+        }
+
+        &:hover {
+          background-color: #bd3755 !important;
+          .glyphicon {
+            color: $darkmode-v2-text;
+          }
+        }
+      }
+    }
+  }
 }

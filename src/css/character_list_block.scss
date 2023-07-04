@@ -5,17 +5,21 @@
     text-align: center;
     @include application-text;
   }
+
   .tab-body {
     width: 99vw;
     overflow: hidden;
+
     .row {
       height: 100%;
     }
+
     .col-sm-3,
     .col-sm-9 {
       height: 100%;
       position: relative;
     }
+
     .col-sm-9 {
       padding-top: 16px;
     }
@@ -26,6 +30,7 @@
   overflow: auto;
   height: calc(100% - 77px);
   position: relative;
+
   h2 {
     font-size: 17px;
   }
@@ -50,6 +55,7 @@
         position: absolute;
         right: 0;
         visibility: hidden;
+
         &:hover {
           visibility: visible;
         }
@@ -64,6 +70,7 @@
           max-width: 75px;
           max-height: 75px;
         }
+
         margin-right: 10px;
       }
 
@@ -71,6 +78,7 @@
         font-size: 16px;
       }
     }
+
     &:hover {
       background: $new-item-background;
 
@@ -78,6 +86,7 @@
         visibility: visible;
       }
     }
+
     &.selected {
       border: 2px dashed $blue-6;
       background-color: $gray-7;
@@ -95,6 +104,7 @@
     &:hover {
       background: $darkmode-background;
     }
+
     &.selected {
       border: 2px dashed $darkmode-border;
       background-color: $darkmode-darker-border;
@@ -104,6 +114,7 @@
     h6 {
       color: $darkmode-text;
     }
+
     p {
       color: $darkmode-darker-text;
     }
@@ -165,6 +176,7 @@
       margin-left: 100px;
       margin-bottom: 20px;
     }
+
     .character-list__right-side {
       .glyphicon {
         color: $blue-7;
@@ -179,6 +191,7 @@
       border: 2px dashed $blue-7;
       border-radius: 4px;
       background-color: $gray-9;
+
       .glyphicon {
         visibility: visible;
       }
@@ -188,28 +201,34 @@
   .character-list__character__edit-form {
     padding-left: 5px;
     display: flex;
+
     .character-list__inputs__normal {
       width: 50%;
       padding-right: 3%;
       border-right: solid 1px #eee;
     }
+
     .character-list__inputs__custom {
       width: 50%;
       padding-right: 3%;
       padding-left: 3%;
     }
   }
+
   .character-list__character__tabs {
     .nav-tabs {
       user-select: none;
+
       li.draggable {
         a {
           user-select: auto;
           cursor: grab;
         }
+
         a:active {
           cursor: grabbing;
         }
+
         &.isDroppable a {
           box-sizing: border-box;
           border: 2px dashed $gray-6;
@@ -217,14 +236,17 @@
         }
       }
     }
+
     .tab-content {
       padding: 16px;
       border-left: 1px solid $gray-8;
       border-right: 1px solid $gray-8;
-      & > .tab-pane {
+
+      &>.tab-pane {
         .card-dialog__custom-attributes__wrapper {
           margin-bottom: 16px;
         }
+
         .template-attr__description-label {
           @include application-text;
           font-size: 14px;
@@ -232,26 +254,32 @@
           margin-top: -4px;
         }
       }
-      & > .tab-pane .template-picker__link {
+
+      &>.tab-pane .template-picker__link {
         cursor: pointer;
         margin-left: 4px;
         vertical-align: middle;
+
         &.dark {
           color: $gray-2;
         }
       }
-      & > .tab-pane .template-tab__details {
+
+      &>.tab-pane .template-tab__details {
         display: flex;
         justify-content: space-between;
+
         .text-danger {
           color: $red-5 !important;
         }
       }
     }
+
     .slate-editor__wrapper {
       margin: 0;
     }
   }
+
   .btn-toolbar {
     display: flex;
     flex-direction: row-reverse;
@@ -261,6 +289,7 @@
 .character-list__character__edit-image-wrapper {
   display: flex;
   align-items: center;
+
   .character-list__character__edit-image {
     max-width: 200px;
     margin-right: 10px;
@@ -284,18 +313,23 @@
     .nav-tabs {
       border-bottom-color: $darkmode-border;
     }
-    .nav-tabs > li:not(.active) > a:not(:hover) {
+
+    .nav-tabs>li:not(.active)>a:not(:hover) {
       color: $darkmode-link-text;
       border-bottom-color: $darkmode-border;
     }
+
     .tab-content {
       border-color: $darkmode-border;
+
       .card-dialog__custom-attributes-configuration-link {
         color: $darkmode-link-text;
       }
-      > .active {
+
+      >.active {
         position: relative !important;
       }
+
       .template-picker__link.dark {
         color: $darkmode-link-text;
       }
@@ -327,8 +361,97 @@
     top: 67%;
     font-size: 12px;
     padding: 20px;
+
     svg {
       font-size: 1.5rem;
+    }
+  }
+}
+
+.darkmode {
+  .character-list__character-view.darkmode {
+    background-color: #24252c;
+    color: #aaa;
+    border-color: $darkmode-v2-border;
+
+    .character-list__character:hover {
+      .character-list__character-notes {
+        border: 2px dashed $darkmode-v2-border;
+        background-color: $darkmode-v2-background;
+      }
+    }
+
+    .character-list__character__tabs {
+
+      .tab-content,
+      .nav-tabs {
+        border-color: $darkmode-v2-border;
+
+        >li:not(.active)>a:not(:hover) {
+          color: #bbb;
+          border-bottom-color: $darkmode-v2-border;
+        }
+
+        li.active {
+          a {
+            background-color: $darkmode-v2-background;
+  
+            &:hover {
+              background-color: $darkmode-v2-background;
+            }
+          }
+        }
+      }
+
+      .tab-content {
+        padding: 16px;
+        border-left: 1px solid $darkmode-v2-border;
+        border-right: 1px solid $darkmode-v2-border;
+
+        .card-dialog__custom-attributes-configuration-link {
+          color: #bbb;
+        }
+      }
+    }
+
+    .card-dialog__button-bar {
+      border-color: $darkmode-v2-border;
+    }
+
+    .character-list__character-view__left-side {
+      border-right: 1px solid $darkmode-v2-border;
+    }
+
+    .card-dialog__button-bar {
+      border-color: $darkmode-v2-border;
+    }
+  }
+
+  .character-list__character.darkmode {
+    &.editing {
+      background-color: #24252c;
+      color: #ddd;
+    }
+
+    .character-list__character__edit-form {
+      .character-list__inputs__normal {
+        border-right: solid 1px $darkmode-v2-border;
+      }
+    }
+  }
+
+  .character-list__list.darkmode {
+    background-color: $darkmode-v2-background;
+
+    .list-group-item {
+      background-color: $darkmode-v2-background;
+      color: $darkmode-v2-darker-text;
+      border-color: $darkmode-v2-border;
+
+      &.selected {
+        border: 2px dashed #aaa;
+        background-color: #24252c;
+      }
     }
   }
 }

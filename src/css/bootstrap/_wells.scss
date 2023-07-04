@@ -27,3 +27,11 @@
   padding: 9px;
   border-radius: $border-radius-small;
 }
+
+.darkmode {
+  .well {
+    background-color: $darkmode-v2-darker-background;
+    color: #aaa;
+    border-color: #4d4d4f;
+  }
+}
