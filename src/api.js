@@ -519,13 +519,13 @@ const api = (
             log.info(`Attempted to update file (${fileId}) timestamp and couldn't`, error)
             return {
               results,
-              newOpenDate: newOpenDate.getDate(),
+              newOpenDate: newOpenDate.getTime(),
             }
           })
           .then(() => {
             return {
               results,
-              newOpenDate: newOpenDate.getDate(),
+              newOpenDate: newOpenDate.getTime(),
             }
           })
       })
@@ -553,7 +553,7 @@ const api = (
             file: {
               ...json.file,
               lastOpened: newOpenDate,
-              timeStamp: helpers.time.convertFromNanosAndSeconds(json.file.timeStamp).getDate(),
+              timeStamp: helpers.time.convertFromNanosAndSecondsOrDefault(json.file.timeStamp).getTime(),
             },
           }
         })
