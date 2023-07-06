@@ -11,6 +11,7 @@ $medium_width: 80px;
   position: relative;
   margin-left: 5px;
   margin-bottom: 35px;
+  display: flex;
 
   &.medium-timeline {
     width: $medium_width !important;
@@ -46,6 +47,9 @@ $medium_width: 80px;
   transition: all 0.4s $cubic;
   border: 3px dashed transparent;
   word-break: break-word;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   .form-group {
     text-align: left;
     .control-label {
@@ -210,6 +214,12 @@ $medium_width: 80px;
       }
     }
   }
+
+  .vertical-line-list__append-line__double {
+    div.template:not(:hover) {
+      color: #aaa;
+    }
+  }
   .line-list__insert-beat:hover {
     color: $blue-7;
   }
@@ -223,6 +233,7 @@ $medium_width: 80px;
   width: 200px;
   min-height: 100px;
   text-align: center;
+  display: flex;
 
   &.medium-timeline {
     min-height: 60px;
@@ -240,6 +251,9 @@ $medium_width: 80px;
   transition: all 0.4s $cubic;
   border: 3px dashed transparent;
   word-break: break-word;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   .form-group {
     text-align: left;
     .control-label {

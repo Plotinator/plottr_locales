@@ -45,6 +45,10 @@
     }
   }
 
+  .sticky-table-row:last-child {
+    display: contents;
+  }
+
   .sticky-table.darkmode {
     background-color: $darkmode-card-background;
     color: $darkmode-text;
