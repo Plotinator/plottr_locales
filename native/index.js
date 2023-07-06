@@ -101,7 +101,7 @@ const database = () => {
     },
     deleteDoc: (ref) => {
       return ref.delete()
-    }
+    },
   }
 }
 
