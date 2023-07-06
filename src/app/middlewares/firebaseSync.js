@@ -19,8 +19,9 @@ const firebaseSync = (store) => (next) => (action) => {
           ? toFirestoreArray(data)
           : data
       })(store)(next)(action)
+    } else {
+      return next(action)
     }
-    return next(action)
   }
 }
 
