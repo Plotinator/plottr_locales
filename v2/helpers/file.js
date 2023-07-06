@@ -14,6 +14,10 @@ export const isDeviceFileURL = (url) => {
   return url && url.startsWith('device://')
 }
 
+export const isStoragePath = (url) => {
+  return url && url.startsWith('storage://')
+}
+
 export const fileIdFromPlottrProFile = (fileURL) => {
   if (fileURL && fileURL.startsWith('plottr://')) {
     return fileURL.substring(9)
@@ -58,8 +62,9 @@ export function getDateValue(fileObj) {
     return VERY_OLD_DATE
   }
 
-  // At some point, we stored a timestamp in this field.  Now it's a
-  // `seconds`, and `nanoseconds` object.
+  // At some point, we stored a timestamp in this field, then we went
+  // to a `seconds`, and `nanoseconds` object.  Now, we're back to a
+  // timestamp because it plays better with mobile's use of Sagas.
   const lastOpenedIsString = typeof fileObj.lastOpened === 'string'
   const lastOpenedIsObject = typeof fileObj.lastOpened === 'object'
   const lastOpenedIsNumber = typeof fileObj.lastOpened === 'number'
