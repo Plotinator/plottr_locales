@@ -19,8 +19,8 @@ describe('2021.6.9', () => {
     it('should produce a hierarchy with dark and light attributes', () => {
       const migrated = migration(stateWithHierarchy)
       expect(migrated.hierarchyLevels[0].dark).toEqual({
-        borderColor: '#c9e6ff',
-        textColor: '#c9e6ff',
+        borderColor: '#ccc',
+        textColor: '#ccc',
       })
       expect(migrated.hierarchyLevels[0].light).toEqual({
         borderColor: '#6cace4',

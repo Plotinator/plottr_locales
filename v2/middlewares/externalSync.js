@@ -68,7 +68,7 @@ const sync = (selectState) => {
       if (key === 'file' && userPermission !== 'owner') {
         return
       }
-      if (!isEqual(previous[key], state[key])) {
+      if (previous[key] !== state[key]) {
         const payload = withData(key, state[key])
         if (isFlatArrayKey(key)) {
           const oldEntitiesById = new Map()

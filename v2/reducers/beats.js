@@ -362,8 +362,8 @@ const beats =
 
       case NEW_FILE: {
         return {
-          1: newTree('id', ...newFileChapters),
-          series: newTree('id', ...newFileBeats),
+          1: tree.newTree('id', ...newFileChapters),
+          series: tree.newTree('id', ...newFileBeats),
         }
       }
 
