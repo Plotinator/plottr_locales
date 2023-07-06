@@ -32,8 +32,8 @@ const displayedSingleCharacter = (character, bookId, currentBookAttributeDescirp
     currentBookAttributes.find((attribute) => {
       return (
         attribute.bookId === bookId &&
-        currentBookAttributeDescirptorsById[attribute.id].type === 'base-attribute' &&
-        currentBookAttributeDescirptorsById[attribute.id].name === 'tags'
+        currentBookAttributeDescirptorsById[attribute.id]?.type === 'base-attribute' &&
+        currentBookAttributeDescirptorsById[attribute.id]?.name === 'tags'
       )
     })?.value ||
     (bookId === 'all' && character.tags) ||
@@ -54,8 +54,8 @@ const displayedSingleCharacter = (character, bookId, currentBookAttributeDescirp
     currentBookAttributes.find((attribute) => {
       return (
         attribute.bookId === bookId &&
-        currentBookAttributeDescirptorsById[attribute.id].type === 'base-attribute' &&
-        currentBookAttributeDescirptorsById[attribute.id].name === 'shortDescription'
+        currentBookAttributeDescirptorsById[attribute.id]?.type === 'base-attribute' &&
+        currentBookAttributeDescirptorsById[attribute.id]?.name === 'shortDescription'
       )
     })?.value ||
     (bookId === 'all' && character.description) ||
@@ -65,8 +65,8 @@ const displayedSingleCharacter = (character, bookId, currentBookAttributeDescirp
     currentBookAttributes.find((attribute) => {
       return (
         attribute.bookId === bookId &&
-        currentBookAttributeDescirptorsById[attribute.id].type === 'base-attribute' &&
-        currentBookAttributeDescirptorsById[attribute.id].name === 'description'
+        currentBookAttributeDescirptorsById[attribute.id]?.type === 'base-attribute' &&
+        currentBookAttributeDescirptorsById[attribute.id]?.name === 'description'
       )
     })?.value ||
     (bookId === 'all' && character.notes) ||
@@ -75,8 +75,8 @@ const displayedSingleCharacter = (character, bookId, currentBookAttributeDescirp
   const category = currentBookAttributes.find((attribute) => {
     return (
       attribute.bookId === bookId &&
-      currentBookAttributeDescirptorsById[attribute.id].type === 'base-attribute' &&
-      currentBookAttributeDescirptorsById[attribute.id].name === 'category'
+      currentBookAttributeDescirptorsById[attribute.id]?.type === 'base-attribute' &&
+      currentBookAttributeDescirptorsById[attribute.id]?.name === 'category'
     )
   })
   const categoryId =
