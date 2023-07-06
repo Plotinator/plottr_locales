@@ -164,7 +164,7 @@ const FileActionsConnector = (connector) => {
                     {t('Create Desktop Shortcut')}
                   </MenuItem>
                 )}
-                {isCloudFile || osIsUnknown || isInDefaultFolder ? null : (
+                {isCloudFile || osIsUnknown || (isInDefaultFolder && !missing) ? null : (
                   <MenuItem eventKey="remove">{t('Remove from this list')}</MenuItem>
                 )}
               </Dropdown.Menu>
