@@ -284,17 +284,6 @@ body.darkmode {
     }
   }
 
-  .btn-success {
-    color: $darkmode-v2-darker-text;
-    background-color: transparent;
-    border-color: $darkmode-v2-btn-primary-border;
-
-    &:hover {
-      background-color: $darkmode-v2-btn-primary;
-      border-color: $darkmode-v2-btn-success-hover-border;
-    }
-  }
-
   .btn-link {
     background-color: transparent !important;
   }
@@ -309,6 +298,17 @@ body.darkmode {
 
   button.active.btn.btn-sm.btn-default {
     background: #26232d;
+  }
+
+  .btn-success {
+    color: $darkmode-v2-darker-text;
+    background-color: transparent;
+    border-color: $darkmode-v2-btn-primary-border;
+
+    &:hover {
+      background-color: $darkmode-v2-btn-primary;
+      border-color: $darkmode-v2-btn-success-hover-border;
+    }
   }
 
   .btn-default {
