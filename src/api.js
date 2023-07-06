@@ -243,7 +243,13 @@ const api = (
 
   const listenForObjectAtPath =
     (path) =>
-    (userId, fileId, clientId, withAction, errorHandler = defaultErrorHandler('listenForObjectAtPath')) => {
+    (
+      userId,
+      fileId,
+      clientId,
+      withAction,
+      errorHandler = defaultErrorHandler('listenForObjectAtPath')
+    ) => {
       const { doc, onSnapshot } = database()
       return onSnapshot(
         doc(`${path}/${fileId}`),
@@ -253,7 +259,13 @@ const api = (
 
   const listenForArrayAtPath =
     (path) =>
-    (userId, fileId, clientId, withAction, errorHandler = defaultErrorHandler('listenForArrayAtPath')) => {
+    (
+      userId,
+      fileId,
+      clientId,
+      withAction,
+      errorHandler = defaultErrorHandler('listenForArrayAtPath')
+    ) => {
       const values = (x) => Object.values(x)
       const { doc, onSnapshot } = database()
       return onSnapshot(
@@ -264,7 +276,13 @@ const api = (
 
   const listenForFlatArrayAtPath =
     (path, subPath) =>
-    (userId, fileId, clientId, withAction, errorHandler = defaultErrorHandler('listenForFlatArrayAtPath')) => {
+    (
+      userId,
+      fileId,
+      clientId,
+      withAction,
+      errorHandler = defaultErrorHandler('listenForFlatArrayAtPath')
+    ) => {
       const { collection, onSnapshot, query } = database()
       return onSnapshot(
         query(collection(`${path}/${fileId}/${subPath}`)),
@@ -553,7 +571,9 @@ const api = (
             file: {
               ...json.file,
               lastOpened: newOpenDate,
-              timeStamp: helpers.time.convertFromNanosAndSecondsOrTimestampOrNull(json.file.timeStamp),
+              timeStamp: helpers.time.convertFromNanosAndSecondsOrTimestampOrNull(
+                json.file.timeStamp
+              ),
             },
           }
         })
@@ -1102,7 +1122,11 @@ const api = (
     })
   }
 
-  const listenToCustomTemplates = (userId, callback, errorHandler = defaultErrorHandler('listenToCustomTemplates')) => {
+  const listenToCustomTemplates = (
+    userId,
+    callback,
+    errorHandler = defaultErrorHandler('listenToCustomTemplates')
+  ) => {
     const { collection, onSnapshot } = database()
     return onSnapshot(collection(`templates/${userId}/userTemplates`), {
       next: (documentsRef) => {
