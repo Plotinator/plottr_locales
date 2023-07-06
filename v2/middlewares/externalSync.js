@@ -1,5 +1,3 @@
-import { isEqual } from 'lodash'
-
 import { permissionError } from '../actions/error'
 import { SYSTEM_REDUCER_KEYS } from '../reducers/systemReducers'
 import selectors from '../selectors'
@@ -8,6 +6,15 @@ const FLAT_ARRAY_KEYS = ['cards', 'notes', 'places', 'characters']
 
 const isFlatArrayKey = (key) => {
   return FLAT_ARRAY_KEYS.indexOf(key) !== -1
+}
+
+const withOrderingPrecedence = (fileKeys) => {
+  return [
+    'attributes',
+    ...fileKeys.filter((key) => {
+      return key !== 'attributes'
+    }),
+  ]
 }
 
 // Synchronise with Firebase.  We know to sync if there's a difference
@@ -61,7 +68,7 @@ const sync = (selectState) => {
     if (!previous) return false
 
     const state = fullFileStateSelector(present)
-    Object.keys(state).forEach((key) => {
+    withOrderingPrecedence(Object.keys(state)).forEach((key) => {
       // Keys we don't sync
       if (SYSTEM_REDUCER_KEYS.indexOf(key) > -1) return
       // Also don't sync file record changes unless we're the owner
