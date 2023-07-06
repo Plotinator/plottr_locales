@@ -137,6 +137,13 @@ const removeTag = (attributeName, value, action, state) => {
 
       return {
         ...character,
+        ...(character.tags
+          ? {
+              tags: character.tags.filter((tag) => {
+                return tag !== value
+              }),
+            }
+          : {}),
         attributes,
       }
     }
