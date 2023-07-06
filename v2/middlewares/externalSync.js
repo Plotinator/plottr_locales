@@ -121,9 +121,6 @@ const externalSync = (selectState) => {
 
 export default externalSync
 
-// NOTE: uses a polyfilled map that's based on the JavaScript objects
-// rather than on the Map class in newer versions of Javascript.  we
-// use this for React-Native because it seems to support it poorly.
 let previous = null
 export const externalSyncWithoutHistory = (selectState) => {
   const wiredSync = sync(selectState)
