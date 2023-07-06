@@ -1,3 +1,15 @@
+export const convertFromNanosAndSecondsOrTimestampOrNull = (date) => {
+  if (!date) {
+    return null
+  } else if (typeof date.nanoseconds !== 'undefined' && typeof date.seconds !== 'undefined') {
+    return convertFromNanosAndSecondsOrDefault(date).getTime()
+  } else if (typeof date === 'number') {
+    return date
+  } else {
+    return null
+  }
+}
+
 export const convertFromNanosAndSecondsOrDefault = (nanosAndSecondsObject) => {
   return convertFromNanosAndSeconds(nanosAndSecondsObject) || new Date()
 }
