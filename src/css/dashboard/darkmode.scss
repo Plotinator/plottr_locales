@@ -134,8 +134,8 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
     .sticky-table-table {
       .sticky-table-row:first-child {
         .sticky-table-cell {
-          background-color: $dark-gray-1;
-          color: $dark-text;
+          background-color: #444;
+          color: $darkmode-v2-darker-text;
           
           &:first-child {
             border-right: none;
@@ -212,7 +212,7 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
   // backups //
   /////////////
   .dashboard__backups__projects-summary {
-    color: $dark-text;
+    color: $darkmode-v2-text;
     background-color: $darkmode-v2-background;
     .count-circle {
       border-color: $gray-5;
@@ -358,9 +358,9 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
 .update-notifier {
   &.alert {
     &.darkmode {
-      color: $dark-text;
-      background-color: $dark-gray-1;
-      border-color: $dark-text;
+      color: $darkmode-v2-text;
+      background-color: $darkmode-v2-darker-background;
+      border-color: $darkmode-v2-border;
     }
   }
 }

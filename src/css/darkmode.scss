@@ -25,11 +25,11 @@ body.darkmode {
 
   h2,
   h4 {
-    color: #ddd
+    color: $darkmode-v2-darker-text;
   }
 
   p {
-    color: #aaa;
+    color: #c2c2c2;
   }
 
   hr {
@@ -53,6 +53,18 @@ body.darkmode {
           li a:hover {
             background-color: $darkmode-v2-nav-background;
           }
+        }
+      }
+    }
+  }
+
+  .dropdown {
+    &.btn-group {
+      button {
+        &:hover,
+        &:active,
+        &:focus {
+          border-color: $darkmode-v2-border;
         }
       }
     }
@@ -175,6 +187,29 @@ body.darkmode {
           &:hover {
             background-color: $darkmode-v2-nav-background;
             color: #ddd;
+          }
+        }
+      }
+
+      .dropdown {
+        &.open {
+          .dropdown-menu {
+            li:first-child {
+              a {
+                color: #bbb;
+              }
+            }
+
+            li:not(:first-child) {
+              background-color: $darkmode-v2-background;
+
+              a {
+                color: #bbb;
+                &:hover {
+                  background-color: $darkmode-v2-nav-background;
+                }
+              }
+            }
           }
         }
       }
@@ -319,6 +354,7 @@ body.darkmode {
     &:hover {
       background-color: $darkmode-v2-background;
       color: #ccc;
+      border-color: $darkmode-v2-border;
     }
 
     &.active:focus,
@@ -348,6 +384,13 @@ body.darkmode {
   }
 
   .btn-group {
+    button {
+      &:hover,
+      &:active,
+      &:focus {
+        border-color: $darkmode-v2-border;
+      }
+    }
 
     >&:last-child:not(:first-child)>.btn:first-child {
       color: $darkmode-v2-text;
@@ -360,12 +403,13 @@ body.darkmode {
     }
 
     >.btn {
+      background-color: $darkmode-v2-background;
 
       &:active,
       &:hover,
       &:focus {
         color: #ddd;
-        background-color: $darkmode-v2-background;
+        background-color: $darkmode-v2-nav-background;
       }
 
       .glyphicon {
@@ -429,8 +473,8 @@ body.darkmode {
   .dashboard__recent-files__table {
     .sticky-table-table {
       .sticky-table-row:first-child .sticky-table-cell {
-        background-color: #19171d !important;
-        color: #ddd;
+        background-color: #444;
+        color: $darkmode-v2-darker-text;
       }
 
       .sticky-table-row:nth-of-type(even) .sticky-table-cell {
@@ -545,7 +589,7 @@ body.darkmode {
   // Help
   .dashboard__help__item.links {
     button.btn-link {
-      color: #ddd !important;
+      color: $darkmode-v2-darker-text !important;
       text-decoration: none !important;
 
       &:active,
@@ -560,6 +604,7 @@ body.darkmode {
   .dropdown.disabled>#book_chooser {
     background-color: $darkmode-v2-darker-background;
   }
+  
 
   .table-striped {
     >tbody {
@@ -606,6 +651,10 @@ body.darkmode {
     border-color: #4d4d4f;
     background-color: $darkmode-v2-background;
     color: #aaa;
+
+    .glyphicon {
+      color: #aaa;
+    }
   }
 
   .panel {
@@ -838,6 +887,15 @@ body.darkmode {
 
       ol {
         color: $darkmode-v2-text;
+      }
+    }
+  }
+
+  // beamer
+  .project-nav__beamer-button {
+    &.btn-default {
+      &:hover {
+        background-color: $darkmode-v2-nav-background !important;
       }
     }
   }
