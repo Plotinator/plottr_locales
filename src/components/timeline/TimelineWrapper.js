@@ -102,6 +102,7 @@ const TimelineWrapperConnector = (connector) => {
     stickyHeaderCount,
     stickyLeftColumnCount,
     restructureModalOpen,
+    canOpenRestructureModal,
   }) => {
     const [mounted, setMounted] = useState(false)
     const [clearing, setClearing] = useState(false)
@@ -415,9 +416,15 @@ const TimelineWrapperConnector = (connector) => {
             </Dropdown.Toggle>
             <Dropdown.Menu>
               <MenuItem onSelect={startSaveAsTemplate}>{t('Save as Template')}</MenuItem>
-              <MenuItem onSelect={actions.openRestructureTimelineModal}>
-                {t('Restructure Timeline')}
-              </MenuItem>
+              {canOpenRestructureModal ? (
+                <MenuItem onSelect={actions.openRestructureTimelineModal}>
+                  {t('Restructure Timeline')}
+                </MenuItem>
+              ) : (
+                <ToolTip id="flip-tooltip" text={t('Add another beat to use this control.')}>
+                  <MenuItem disabled={true}>{t('Restructure Timeline')}</MenuItem>
+                </ToolTip>
+              )}
               <MenuItem divider />
               <MenuItem onSelect={() => setClearing(true)}>{t('Clear Timeline')}</MenuItem>
             </Dropdown.Menu>
@@ -726,6 +733,7 @@ const TimelineWrapperConnector = (connector) => {
     stickyHeaderCount: PropTypes.number,
     stickyLeftColumnCount: PropTypes.number,
     restructureModalOpen: PropTypes.bool,
+    canOpenRestructureModal: PropTypes.bool,
   }
 
   const {
@@ -759,6 +767,7 @@ const TimelineWrapperConnector = (connector) => {
           stickyHeaderCount: selectors.stickyHeaderCountSelector(state),
           stickyLeftColumnCount: selectors.stickyLeftColumnCountSelector(state),
           restructureModalOpen: selectors.restructureModalOpenSelector(state),
+          canOpenRestructureModal: selectors.canOpenRestructureModalSelector(state),
         }
       },
       (dispatch) => {
