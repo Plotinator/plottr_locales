@@ -832,3 +832,7 @@ export const parentIsHigherLevelAndViewIsStackedSelector = createSelector(
     return timelineIsStackedView && hierarchyLevel.level !== sortedLevels.length - 1
   }
 )
+
+export const canOpenRestructureModalSelector = createSelector(beatsByBookSelector, (beats) => {
+  return Object.keys(beats.index || {}).length > 1
+})
