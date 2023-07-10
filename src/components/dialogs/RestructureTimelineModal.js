@@ -160,37 +160,39 @@ const RestructureTimelineModalConnector = (connector) => {
     }
 
     const handleDrop = (id) => {
-      const beatDraggedIndex = stagedBeats.findIndex((beat) => {
-        return beat.id === beatDraggedId
-      })
-      const beatDroppedIndex = stagedBeats.findIndex((beat) => {
-        return beat.id === id
-      })
+      if (id !== beatDraggedId) {
+        const beatDraggedIndex = stagedBeats.findIndex((beat) => {
+          return beat.id === beatDraggedId
+        })
+        const beatDroppedIndex = stagedBeats.findIndex((beat) => {
+          return beat.id === id
+        })
 
-      const beatDragged = stagedBeats[beatDraggedIndex]
-      const newBeats = stagedBeats.flatMap((beat) => {
-        if (beat.id === beatDraggedId) {
-          return []
-        } else if (beat.id === id) {
-          return [beatDragged, beat]
-        } else {
-          return [beat]
-        }
-      })
+        const beatDragged = stagedBeats[beatDraggedIndex]
+        const newBeats = stagedBeats.flatMap((beat) => {
+          if (beat.id === beatDraggedId) {
+            return []
+          } else if (beat.id === id) {
+            return [beatDragged, beat]
+          } else {
+            return [beat]
+          }
+        })
 
-      const hierarchyDragged = stagedHierarchyLevels[beatDraggedIndex]
-      const newHierarchyLevels = stagedHierarchyLevels.flatMap((hierarchyLevel, index) => {
-        if (index === beatDraggedIndex) {
-          return []
-        } else if (index === beatDroppedIndex) {
-          return [hierarchyDragged, hierarchyLevel]
-        } else {
-          return [hierarchyLevel]
-        }
-      })
-      setStagedBeats(newBeats)
-      setStagedHierarchyLevels(newHierarchyLevels)
-      setBeatDraggedId(null)
+        const hierarchyDragged = stagedHierarchyLevels[beatDraggedIndex]
+        const newHierarchyLevels = stagedHierarchyLevels.flatMap((hierarchyLevel, index) => {
+          if (index === beatDraggedIndex) {
+            return []
+          } else if (index === beatDroppedIndex) {
+            return [hierarchyDragged, hierarchyLevel]
+          } else {
+            return [hierarchyLevel]
+          }
+        })
+        setStagedBeats(newBeats)
+        setStagedHierarchyLevels(newHierarchyLevels)
+        setBeatDraggedId(null)
+      }
     }
 
     const restructureAndCloseDialog = () => {
