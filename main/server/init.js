@@ -32,16 +32,17 @@ export const startServer = (log, broadcastPortChange, userDataPath, onFatalError
         return
       }
       log.warn(`Socket server died with code: ${code}`)
-      if (code === 1) {
+      if (code === 1 || code === 7) {
         log.warn(`Restarting the server on a new port.`)
         attempts++
         attemptAStart(resolve, reject)
         return
+      } else {
+        log.error(`Failed with an unhandled error.  Killing the server.`)
+        reject(new Error(`Socket worker died with unhandled error code: ${code}`))
+        onFatalError(`Socket worker died with unhandled error code: ${code}`)
+        return
       }
-      log.error(`Failed with an unhandled error.  Killing the server.`)
-      reject(new Error(`Socket worker died with unhandled error code: ${code}`))
-      onFatalError(`Socket worker died with unhandled error code: ${code}`)
-      return
     })
     server.on('message', (message) => {
       if (message === 'ready') {
