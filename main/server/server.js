@@ -1117,4 +1117,11 @@ const startServer = () => {
   setupListeners(port, userDataPath, isBetaOrAlpha)
 }
 
+process.on('uncaughtException', (error, origin) => {
+  process.send(
+    `Uncaught exception killed socket server.  Error: ${error.message}.  Origin: ${origin}.  Stacktrace: ${error.stack}`
+  )
+  throw error
+})
+
 startServer()
