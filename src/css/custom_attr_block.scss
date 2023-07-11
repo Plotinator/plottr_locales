@@ -11,15 +11,19 @@
   &.darkmode {
     background-color: $darkmode-background;
     color: $darkmode-text;
+
     h3 {
       color: $darkmode-text;
     }
+
     p.sub-header {
       color: $darkmode-darker-text;
     }
+
     .list-group-item {
       background-color: $darkmode-darker-background;
     }
+
     .custom-attr-item__input {
       color: $darkmode-text;
       background-color: $darkmode-background;
@@ -38,6 +42,7 @@
       align-self: center;
       margin: 0;
     }
+
     .custom-attr-item__checkbox-label {
       margin-right: 50px;
     }
@@ -58,6 +63,7 @@
 .custom-attr__add-button {
   width: 50%;
   display: flex;
+
   .btn {
     margin-left: 7px;
     margin-top: 11px;
@@ -73,6 +79,7 @@
   .custom-attr__add-button {
     width: 100% !important;
   }
+
   .custom-attr__save-as-template {
     margin-right: 0;
   }
@@ -105,6 +112,7 @@
   align-items: center;
   display: flex;
   width: 140px;
+
   input {
     margin-right: 8px !important;
     align-self: center;
@@ -134,4 +142,30 @@
   width: 30px;
   color: $gray-5;
   font-size: 12px;
+}
+
+.darkmode {
+  .custom-attr__wrapper.darkmode {
+    h3 {
+      color: #ccc;
+    }
+
+    p.sub-header {
+      color: #bbb;
+    }
+
+    .list-group-item {
+      background-color: $darkmode-v2-background;
+      border: $darkmode-v2-border solid 1px;
+    }
+
+    .custom-attr-item__input {
+      background-color: $darkmode-v2-background;
+    }
+
+    .custom-attr-item__input:focus-visible {
+      outline: $darkmode-v2-border solid 1px;
+      border: $darkmode-v2-border solid 1px;
+    }
+  }
 }

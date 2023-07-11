@@ -21,7 +21,7 @@ export default function AskToSaveModal({ save, busy, dismiss }) {
             onClick={busy ? () => {} : save}
             disabled={busy}
           >
-            {busy ? i18n('Busy...') : i18n('Save')}
+            {busy ? i18n('Saving...') : i18n('Save')}
           </Button>
         </div>
       </Modal.Body>

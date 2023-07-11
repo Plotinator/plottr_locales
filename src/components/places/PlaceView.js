@@ -233,9 +233,7 @@ const PlaceViewConnector = (connector) => {
               <div className="place-list__inputs__custom">{renderEditingCustomAttributes()}</div>
             </div>
             <ButtonToolbar className="card-dialog__button-bar">
-              <Button bsStyle="success" onClick={saveEdit}>
-                {t('Close')}
-              </Button>
+              <Button onClick={saveEdit}>{t('Close')}</Button>
               <Button className="card-dialog__duplicate" onClick={handleDuplicate}>
                 <FiCopy />
                 {' ' + t('Duplicate')}

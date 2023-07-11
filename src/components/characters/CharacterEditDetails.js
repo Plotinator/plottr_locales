@@ -426,9 +426,7 @@ const CharacterEditDetailsConnector = (connector) => {
             {!templatesDisabled && <Tab eventKey="new" title={t('+ Add Template')}></Tab>}
           </Tabs>
           <ButtonToolbar className="card-dialog__button-bar">
-            <Button bsStyle="success" onClick={finishEditing}>
-              {t('Close')}
-            </Button>
+            <Button onClick={finishEditing}>{t('Close')}</Button>
             <Button className="card-dialog__duplicate" onClick={handleDuplicate}>
               <FiCopy />
               {' ' + t('Duplicate')}

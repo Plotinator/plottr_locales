@@ -5,17 +5,21 @@
     text-align: center;
     @include application-text;
   }
+
   .tab-body {
     width: 99vw;
     overflow: hidden;
+
     .row {
       height: 100%;
     }
+
     .col-sm-3,
     .col-sm-9 {
       height: 100%;
       position: relative;
     }
+
     .col-sm-9 {
       padding-top: 16px;
     }
@@ -26,6 +30,7 @@
   overflow: auto;
   height: calc(100% - 77px);
   position: relative;
+
   h2 {
     font-size: 17px;
   }
@@ -50,6 +55,7 @@
         position: absolute;
         right: 0;
         visibility: hidden;
+
         &:hover {
           visibility: visible;
         }
@@ -64,6 +70,7 @@
           max-width: 75px;
           max-height: 75px;
         }
+
         margin-right: 10px;
       }
 
@@ -71,6 +78,7 @@
         font-size: 16px;
       }
     }
+
     &:hover {
       background: $new-item-background;
 
@@ -78,6 +86,7 @@
         visibility: visible;
       }
     }
+
     &.selected {
       border: 2px dashed $blue-6;
       background-color: $gray-7;
@@ -95,6 +104,7 @@
     &:hover {
       background: $darkmode-background;
     }
+
     &.selected {
       border: 2px dashed $darkmode-border;
       background-color: $darkmode-darker-border;
@@ -104,6 +114,7 @@
     h6 {
       color: $darkmode-text;
     }
+
     p {
       color: $darkmode-darker-text;
     }
@@ -165,6 +176,7 @@
       margin-left: 100px;
       margin-bottom: 20px;
     }
+
     .note-list__right-side {
       .glyphicon {
         color: $blue-7;
@@ -179,6 +191,7 @@
       border: 2px dashed $blue-7;
       border-radius: 4px;
       background-color: $gray-9;
+
       .glyphicon {
         visibility: visible;
       }
@@ -188,17 +201,20 @@
   .note-list__note__edit-form {
     padding-left: 5px;
     display: flex;
+
     .note-list__inputs__normal {
       width: 50%;
       padding-right: 3%;
       border-right: solid 1px #eee;
     }
+
     .note-list__inputs__custom {
       width: 50%;
       padding-right: 3%;
       padding-left: 3%;
     }
   }
+
   .btn-toolbar {
     display: flex;
     flex-direction: row-reverse;
@@ -208,6 +224,7 @@
 .note-list__note__edit-image-wrapper {
   display: flex;
   align-items: center;
+
   .note-list__note__edit-image {
     max-width: 200px;
     margin-right: 10px;
@@ -217,7 +234,6 @@
 
 .note-list__note-view.darkmode {
   background-color: $darkmode-darker-background;
-  color: $darkmode-text;
   border-color: $darkmode-darker-border;
 
   .note-list__note:hover {
@@ -240,13 +256,14 @@
 
   &.darkmode {
     background-color: $darkmode-darker-background;
-    color: $darkmode-text;
+    color: #aaa;
   }
 
   .lock-icon__wrapper {
     top: 64%;
     font-size: 12px;
     padding: 20px;
+
     svg {
       font-size: 1.5rem;
     }
@@ -254,6 +271,7 @@
 
   .note-list__rce__wrapper {
     position: relative;
+
     .lock-icon__wrapper {
       position: absolute;
       padding: 20px;
@@ -264,6 +282,57 @@
         font-size: 2rem;
         margin: auto;
         display: flex;
+      }
+    }
+  }
+}
+
+.darkmode {
+  .note-list__note-wrapper {
+    .editing {
+      background-color: #24252c;
+    }
+  }
+
+  .note-list__note-view.darkmode {
+    background-color: #24252c;
+    color: #aaa;
+    border-color: $darkmode-v2-border;
+
+    &.editing {
+      background-color: #24252c;
+      color: #ddd;
+    }
+
+    .note-list__note {
+      &:hover {
+        .note-list__note-notes {
+          border: 2px dashed $darkmode-v2-border;
+          background-color: $darkmode-v2-background;
+        }
+      }
+
+      .note-list__note__edit-form {
+        .note-list__inputs__normal {
+          border-right: solid 1px $darkmode-v2-border;
+        }
+      }
+    }
+
+    .note-list__note-view__left-side {
+      border-right: 1px solid $darkmode-v2-border;
+    }
+  }
+
+  .note-list__list.darkmode {
+    .list-group-item {
+      background-color: $darkmode-v2-background;
+      color: $darkmode-v2-darker-text;
+      border-color: $darkmode-v2-border;
+
+      &.selected {
+        border: 2px dashed #aaa;
+        background-color: #24252c;
       }
     }
   }

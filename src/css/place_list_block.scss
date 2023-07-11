@@ -5,18 +5,22 @@
     text-align: center;
     @include application-text;
   }
+
   .tab-body {
     width: 99vw;
     overflow: hidden;
     padding-bottom: 4px;
+
     .row {
       height: 100%;
     }
+
     .col-sm-3,
     .col-sm-9 {
       height: 100%;
       position: relative;
     }
+
     .col-sm-9 {
       padding-top: 16px;
     }
@@ -27,6 +31,7 @@
   overflow: auto;
   height: calc(100% - 77px);
   position: relative;
+
   h2 {
     font-size: 17px;
   }
@@ -56,6 +61,7 @@
         position: absolute;
         right: 0;
         visibility: hidden;
+
         &:hover {
           visibility: visible;
         }
@@ -69,6 +75,7 @@
         img {
           max-width: 75px;
         }
+
         margin-right: 10px;
       }
 
@@ -76,6 +83,7 @@
         font-size: 16px;
       }
     }
+
     &:hover {
       background: $new-item-background;
 
@@ -83,6 +91,7 @@
         visibility: visible;
       }
     }
+
     &.selected {
       border: 2px dashed $blue-7;
       background-color: $gray-7;
@@ -100,6 +109,7 @@
     &:hover {
       background: $darkmode-background;
     }
+
     &.selected {
       border: 2px dashed $darkmode-border;
       background-color: $darkmode-darker-border;
@@ -109,6 +119,7 @@
     h6 {
       color: $darkmode-text;
     }
+
     p {
       color: $darkmode-darker-text;
     }
@@ -164,11 +175,13 @@
   .place-list__place__edit-form {
     padding-left: 5px;
     display: flex;
+
     .place-list__inputs__normal {
       width: 50%;
       padding-right: 3%;
       border-right: solid 1px #eee;
     }
+
     .place-list__inputs__custom {
       width: 50%;
       padding-right: 3%;
@@ -181,22 +194,27 @@
       }
     }
   }
+
   .btn-toolbar {
     display: flex;
     flex-direction: row-reverse;
   }
+
   .place-list__place-inner {
     border: 2px dashed transparent;
     display: flex;
     justify-content: space-between;
     padding: 4px 0;
+
     .place-list__right-side {
       display: flex;
       width: 100%;
       align-items: center;
+
       .img-responsive {
         min-width: fit-content;
       }
+
       .glyphicon {
         color: $blue-7;
         visibility: hidden;
@@ -214,6 +232,7 @@
       border: 2px dashed $blue-7;
       border-radius: 4px;
       background-color: $gray-9;
+
       .place-list__right-side {
         .glyphicon {
           visibility: visible;
@@ -225,7 +244,6 @@
 
 .place-list__place-view.darkmode {
   background-color: $darkmode-darker-background;
-  color: $darkmode-text;
   border-color: $darkmode-darker-border;
 
   .place-list__place-wrapper:hover {
@@ -251,6 +269,7 @@
     left: 20%;
     font-size: 12px;
     padding: 12px;
+
     svg {
       font-size: 2rem;
     }
@@ -260,9 +279,50 @@
 .place-list__place__edit-image-wrapper {
   display: flex;
   align-items: center;
+
   .place-list__place__edit-image {
     max-width: 200px;
     margin-right: 10px;
     margin-bottom: 10px;
+  }
+}
+
+.darkmode {
+  .place-list__place-view.darkmode {
+    background-color: #24252c;
+    color: #aaa;
+    border-color: $darkmode-v2-border;
+
+    .place-list__place-wrapper:hover {
+      .place-list__place-inner {
+        border: 2px dashed $darkmode-v2-border;
+        background-color: $darkmode-v2-background;
+      }
+    }
+
+    .place-list__place-view__left-side {
+      border-right: 1px solid $darkmode-v2-border;
+    }
+  }
+
+  .place-list__place {
+    .place-list__place__edit-form {
+      .place-list__inputs__normal {
+        border-right: 1px solid $darkmode-v2-border;
+      }
+    }
+  }
+
+  .place-list__list.darkmode {
+    .list-group-item {
+      background-color: $darkmode-v2-background;
+      color: $darkmode-v2-darker-text;
+      border-color: $darkmode-v2-border;
+
+      &.selected {
+        border: 2px dashed #aaa;
+        background-color: #24252c;
+      }
+    }
   }
 }

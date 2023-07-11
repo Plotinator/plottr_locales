@@ -2,6 +2,7 @@
 
 .timeline-tabbed-view-body {
   display: flex;
+
   .tablist {
     overflow-y: hidden;
   }
@@ -27,15 +28,15 @@
   }
 
   .sticky-table-table {
-    white-space: normal !important;
-    transform-origin: left top !important;
+    white-space: normal;
+    transform-origin: left top;
   }
 
   .sticky-table-cell {
-    padding: 0 !important;
-    background-color: $body-background-color !important;
-    vertical-align: top !important;
-    border: none !important;
+    padding: 0;
+    background-color: $body-background-color;
+    vertical-align: top;
+    border: none;
   }
 
   .sticky-table-cell:hover {
@@ -44,15 +45,21 @@
     }
   }
 
+  .sticky-table-row:last-child {
+    display: contents;
+  }
+
   .sticky-table.darkmode {
-    background-color: $darkmode-card-background !important;
+    background-color: $darkmode-card-background;
     color: $darkmode-text;
+
     .sticky-table-row {
-      background-color: $darkmode-card-background !important;
+      background-color: $darkmode-card-background;
       color: $darkmode-text;
     }
+
     .sticky-table-cell {
-      background-color: $darkmode-card-background !important;
+      background-color: $darkmode-card-background;
       color: $darkmode-text;
     }
   }
@@ -60,18 +67,18 @@
   // vertical orientation, border under the plotline titles
   .sticky-table.vertical {
     .sticky-table-cell {
-      vertical-align: middle !important;
+      vertical-align: middle;
 
       &.medium-timeline {
-        vertical-align: top !important;
+        vertical-align: top;
       }
     }
 
     .sticky-table-cell:has(.card-pinned) {
       z-index: 3;
 
-      > .vertical-line-title__line-line {
-        z-index: 2 !important;
+      >.vertical-line-title__line-line {
+        z-index: 2;
       }
     }
 
@@ -90,6 +97,7 @@
         padding-top: 1px;
         border-bottom: 1px solid $gray-6;
       }
+
       .sticky-table-cell:first-child:after {
         border: none;
       }
@@ -101,27 +109,33 @@
     display: flex;
     flex-direction: row;
     overflow-x: auto;
+
     li {
       max-height: 44px;
       min-width: max-content;
+
       span.glyphicon {
         font-size: 13px;
       }
+
       a {
         border-radius: 0;
         border-top: none;
-        outline: none !important;
+        outline: none;
         color: $text-color;
         min-width: 145px;
+
         div {
           width: 100%;
           display: flex;
           flex-direction: row;
           justify-content: space-between;
           align-items: center;
+
           svg {
             opacity: 0;
           }
+
           &:hover {
             svg {
               opacity: 1;
@@ -129,20 +143,23 @@
           }
         }
       }
+
       &.active {
         a {
-          color: $link-color !important;
+          color: $link-color;
         }
+
         div {
           svg {
             opacity: 1;
           }
         }
       }
+
       &.context-menu-open {
         div {
           svg {
-            opacity: 1 !important;
+            opacity: 1;
           }
         }
       }
@@ -150,19 +167,19 @@
   }
 
   .sticky-table-cell.card-pinned:has(.vertical-line-title__line-line) {
-    z-index: 8 !important;
+    z-index: 8;
   }
 
   .sticky-table-cell.card-pinned:has(.card__body-wrapper, .card__behind, .creating) {
-    z-index: 10 !important;
+    z-index: 10;
   }
 
   .sticky-table-cell:has(.card__cell.card-pinned .creating) {
-    z-index: 10 !important;
+    z-index: 10;
   }
 
   .sticky-table-cell.card-pinned:has(.vertical-insert-beat-wrapper:not(.transparent)) {
-    z-index: 10 !important;
+    z-index: 10;
   }
 }
 
@@ -181,7 +198,7 @@
   background-clip: padding-box;
 
   // Links within the dropdown menu
-  > li > a {
+  >li>a {
     display: block;
     padding: 3px 20px;
     clear: both;
@@ -189,6 +206,7 @@
     line-height: $line-height-base;
     color: $dropdown-link-color;
     white-space: nowrap; // prevent links from randomly breaking onto new lines
+
     &:hover,
     &:focus {
       text-decoration: none;
@@ -200,6 +218,7 @@
 
 .view-selector__select-line {
   @include user-text;
+
   button {
     font-size: 14px;
     height: 33px;
@@ -211,6 +230,7 @@
 .view-selector__timeline-view-selector {
   display: flex;
   align-items: center;
+
   svg {
     margin-right: 5px;
     color: $yellow-5;
@@ -246,6 +266,7 @@
   .table-header-rotated {
     margin-left: 2px;
   }
+
   /////////////////////
   // copied and modified from https://www.jimmybonney.com/articles/column_header_rotation_css/
   /////////////////////
@@ -276,7 +297,7 @@
     }
 
     &.dropping {
-      & > div {
+      &>div {
         border: $new-item-border;
       }
     }
@@ -289,6 +310,7 @@
   .table-header-rotated tr {
     &:last-child {
       border-bottom: 1px dashed $gray-8;
+
       td {
         border-style: dashed;
         border-color: $gray-8;
@@ -319,6 +341,7 @@
       background-color: black;
       margin: 1px auto;
       cursor: pointer;
+
       .card__title {
         padding: 6px;
       }
@@ -380,7 +403,7 @@
     top: 0;
 
     &.dropping {
-      & > div {
+      &>div {
         border: 1px dotted #aaa;
       }
     }
@@ -388,16 +411,18 @@
     &:nth-child(2) {
       background-color: $gray-9;
       z-index: 10;
-      & > div {
+
+      &>div {
         background-color: $gray-9;
         border-left: 1px solid $gray-8;
       }
     }
+
     &:nth-child(3) {
       background-color: $gray-9;
     }
 
-    & > div {
+    &>div {
       position: relative;
       top: 0px;
       left: 21px;
@@ -418,7 +443,8 @@
           padding: inherit;
           border: none;
           margin-right: 0;
-          & > span {
+
+          &>span {
             transform: translate(5px) skew(45deg, 0deg);
           }
         }
@@ -429,7 +455,7 @@
         }
       }
 
-      & > span {
+      &>span {
         transform: skew(45deg, 0deg) rotate(315deg);
         font-size: 8px;
         position: absolute;
@@ -440,29 +466,35 @@
         // width: 100%;
         width: 85px; // 80 / cos(45) - 40 cos (45) = 85 where 80 is the height of the cell, 40 the width of the cell and 45 the transform angle
         text-align: left;
-        white-space: nowrap; /*whether to display in one line or not*/
+        white-space: nowrap;
+        /*whether to display in one line or not*/
       }
     }
   }
 
   .small-timeline__wrapper.darkmode {
     color: $darkmode-text;
+
     .table-header-rotated thead {
       th:first-child {
         background-color: $darkmode-background;
       }
     }
+
     .table-header-rotated th.row-header {
       background-color: $darkmode-background;
     }
+
     .table-header-rotated th.rotate-45 {
       &:nth-child(2) {
         background-color: $darkmode-background;
       }
+
       &:nth-child(3) {
         background-color: $darkmode-background;
       }
-      & > div {
+
+      &>div {
         background-color: $darkmode-background;
       }
     }
@@ -470,6 +502,7 @@
 
   .small-timeline__wrapper.vertical {
     padding-bottom: 4px;
+
     .table-header-rotated {
       margin-left: 20px;
 
@@ -485,6 +518,7 @@
           width: unset;
           margin: 0;
           font-size: 8px;
+
           .vertical-insert-beat-wrapper.append-beat {
             padding: 2px 0;
             border: none;
@@ -526,13 +560,13 @@
   }
 
   .timeline__tabs-wrapper {
-    & > div {
+    &>div {
       @include application-text;
       @include secondary-text;
     }
 
     .nav-pills {
-      & > li {
+      &>li {
         svg {
           opacity: 0;
         }
@@ -542,20 +576,24 @@
             opacity: 1;
           }
         }
+
         outline: none;
         margin: 10px;
       }
-      & > li > a {
+
+      &>li>a {
         outline: none;
         padding: 10px;
         background: none !important;
         color: rgba(22, 34, 45, 0.7) !important;
       }
-      & > li {
+
+      &>li {
         &.active {
           svg {
             opacity: 1;
           }
+
           a {
             outline: 2px solid rgba(22, 34, 45, 0.7) !important;
           }
@@ -567,16 +605,118 @@
 
 #timelineview__root .isPinned .sticky-table-cell:not(:first-child):not(:nth-child(2)):not(:has(.card__body-wrapper, .card__cell__overview-cell, .creating)) {
   z-index: 3;
+
   &:hover {
     z-index: 5;
   }
 }
 
-#timelineview__root
-  .isPinned
-  .sticky-table-cell:not(:first-child):not(:nth-child(2)):not(:has(.card__body-wrapper, .card__cell__overview-cell)) {
+#timelineview__root .isPinned .sticky-table-cell:not(:first-child):not(:nth-child(2)):not(:has(.card__body-wrapper, .card__cell__overview-cell)) {
   z-index: 3;
+
   &:hover {
     z-index: 5;
+  }
+}
+
+.darkmode {
+  #timelineview__root {
+    // Tabbed
+    .timeline-tabbed-view-body {
+      ul.nav.nav-tabs.-nav {
+        background: $darkmode-v2-background;
+  
+      }
+      
+    }
+    .nav-tabs {
+      background: $darkmode-v2-background;
+      border-bottom: solid 1px $darkmode-v2-border;
+
+      li:last-child {
+        a {
+          border: none !important;
+        }
+      }
+  
+      li {
+        a {
+          margin: 0 !important;
+        }
+      }
+    }
+
+    li a {
+      color: #aaa;
+    }
+
+    li.active a {
+      color: #ccc;
+    }
+
+    >li>a {
+      color: #aaa;
+    }
+
+    .sticky-table.darkmode {
+      background-color: $darkmode-v2-card-background;
+      color: $darkmode-v2-darker-text;
+
+      .sticky-table-row {
+        background-color: $darkmode-v2-card-background;
+      }
+
+      .sticky-table-cell {
+        background-color: $darkmode-v2-card-background;
+        color: #ccc;
+      }
+
+      .sticky-table-cell,
+      .card__cell,
+      .card__cell__overview-cell,
+      .card__cell .card__body,
+      .card__cell__overview-cell .card__body,
+      .card__cell__overview-cell .blank-card__body,
+      .card__cell .vertical-blank-card__body,
+      .card__cell__overview-cell .vertical-blank-card__body,
+      .card__cell .blank-card__body {
+        background-color: $darkmode-v2-card-background;
+      }
+    }
+
+    .sticky-table-table {
+      background-color: $darkmode-v2-card-background;
+    }
+
+    .small-timeline__wrapper.darkmode {
+      color: $darkmode-v2-darker-text;
+      background: $darkmode-v2-card-background;
+
+      .table-header-rotated {
+        th.rotate-45>div {
+          background-color: $darkmode-v2-card-background;
+        }
+
+        th.row-header,
+        thead th:first-child,
+        th.rotate-45:nth-child(2),
+        th.rotate-45:nth-child(3) {
+          background-color: $darkmode-v2-card-background;
+        }
+      }
+    }
+
+    .table-header-rotated {
+      td {
+        border-top: 1px solid #bbb;
+        border-right: 1px solid #bbb;
+      }
+
+      th.rotate-45>div {
+        background-color: #f1f5f8;
+        border-right: 1px solid #bbb;
+        border-top: 1px solid #bbb;
+      }
+    }
   }
 }

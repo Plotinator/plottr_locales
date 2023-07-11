@@ -28,16 +28,19 @@
 .image-picker__body {
   grid-area: body;
   overflow: hidden;
+
   .container-fluid {
     height: 100%;
     width: 100%;
     padding-left: 0;
     padding-right: 0;
+
     .row {
       height: 100%;
       width: 100%;
       margin-left: 0;
       margin-right: 0;
+
       .col-xs-9,
       .col-xs-3,
       .col-xs-12 {
@@ -103,6 +106,7 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
+
   .form-group {
     width: 80%;
   }
@@ -120,12 +124,15 @@
 
 .image-picker__wrapper.darkmode {
   background-color: $darkmode-card-background;
+
   .image-picker__title {
     color: $darkmode-text;
   }
+
   h5.secondary-text {
     color: $darkmode-darker-text;
   }
+
   p {
     color: $darkmode-text;
   }
@@ -134,7 +141,7 @@
     border-bottom-color: $darkmode-border;
   }
 
-  .nav-tabs li.active > a {
+  .nav-tabs li.active>a {
     background-color: $darkmode-darker-background;
 
     &:hover,
@@ -143,7 +150,7 @@
     }
   }
 
-  .nav-tabs li > a {
+  .nav-tabs li>a {
     border-color: $darkmode-border;
     border-bottom-color: transparent;
 
@@ -246,4 +253,52 @@
   @extend .image-square;
   height: 25px;
   width: 25px;
+}
+
+.darkmode {
+  .image-picker__wrapper.darkmode {
+    background-color: $darkmode-v2-darker-background;
+
+    .nav-tabs {
+
+      li>a,
+      li.active>a {
+        border-color: $darkmode-v2-border;
+        border-bottom-color: $darkmode-v2-border;
+        background-color: $darkmode-v2-background;
+      }
+
+      li {
+        a {
+          color: $darkmode-v2-text;
+
+          &:hover,
+          &:focus {
+            background-color: #24252c;
+            border-bottom-color: $darkmode-v2-border;
+          }
+        }
+      }
+    }
+
+    .image-picker__sidebar {
+      background-color: $darkmode-v2-background;
+    }
+
+    .image-picker__title {
+      color: #bbb;
+    }
+  }
+
+  .image-picker__dropzone {
+    border: 3px dashed $darkmode-v2-border;
+
+    h2 {
+      color: #bbb;
+    }
+  }
+
+  .btn.image-picker__upload-button:hover {
+    background-color: #ddd;
+  }
 }

@@ -139,3 +139,20 @@
     margin-top: 4px;
   }
 }
+
+.darkmode {
+  .slate-editor__editor {
+    color: #aaa;
+  }
+
+  .slate-editor__toolbar-wrapper {
+    .btn-toolbar {
+      .btn-group {
+        > * {
+          background-color: $darkmode-v2-nav-background;
+          color: #d2d2d2;
+        }
+      }
+    }
+  }
+}
