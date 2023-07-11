@@ -29,7 +29,7 @@ body.darkmode {
   }
 
   p {
-    color: #c2c2c2;
+    color: $darkmode-v2-darker-text;
   }
 
   hr {
@@ -52,6 +52,20 @@ body.darkmode {
           li a:active,
           li a:hover {
             background-color: $darkmode-v2-nav-background;
+          }
+        }
+      }
+
+    }
+  }
+  .subnav__container {
+    .nav.navbar-nav {
+      .dropdown.open {
+        ul.dropdown-menu {
+          li {
+            a:hover {
+              background-color: $darkmode-v2-card-background;
+            }
           }
         }
       }
@@ -197,6 +211,9 @@ body.darkmode {
             li:first-child {
               a {
                 color: #bbb;
+                &:hover {
+                  background-color: $darkmode-v2-nav-background;
+                }
               }
             }
 
@@ -473,7 +490,7 @@ body.darkmode {
   .dashboard__recent-files__table {
     .sticky-table-table {
       .sticky-table-row:first-child .sticky-table-cell {
-        background-color: #444;
+        background-color: $darkmode-v2-darker-background !important;
         color: $darkmode-v2-darker-text;
       }
 
@@ -490,7 +507,7 @@ body.darkmode {
 
         &:hover .sticky-table-cell:first-child,
         &.selected .sticky-table-cell:first-child {
-          background-color: $darkmode-v2-darker-background !important;
+          background-color: #19171d !important;
           color: #ddd;
         }
       }
