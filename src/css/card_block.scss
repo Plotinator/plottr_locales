@@ -413,8 +413,20 @@
   }
 
   .card__cell {
-    .card__body-wrapper .card__title {
-      color: #ddd;
+    .card__body-wrapper {
+      .card__title {
+        color: $darkmode-v2-darker-text;
+
+        &:hover {
+          color: $darkmode-v2-darker-text;
+        }
+      }
+    }
+  }
+
+  .card__popover {
+    .popover-title {
+      color: $darkmode-v2-darker-text;
     }
   }
 }

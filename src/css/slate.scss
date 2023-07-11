@@ -142,7 +142,7 @@
 
 .darkmode {
   .slate-editor__editor {
-    color: #aaa;
+    color: $darkmode-v2-darker-text;
   }
 
   .slate-editor__toolbar-wrapper {
@@ -150,9 +150,13 @@
       .btn-group {
         > * {
           background-color: $darkmode-v2-nav-background;
-          color: #d2d2d2;
+          color: $darkmode-v2-darker-text;
         }
       }
+    }
+
+    .btn {
+      border-color: #555;
     }
   }
 }

@@ -421,7 +421,10 @@ const TimelineWrapperConnector = (connector) => {
                   {t('Restructure Timeline')}
                 </MenuItem>
               ) : (
-                <ToolTip id="flip-tooltip" text={t('Add another beat to use this control.')}>
+                <ToolTip
+                  id="flip-tooltip"
+                  text={t('Add another heading (e.g. Chapter or Beat) to use this control')}
+                >
                   <MenuItem disabled={true}>{t('Restructure Timeline')}</MenuItem>
                 </ToolTip>
               )}

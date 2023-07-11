@@ -112,7 +112,7 @@
     }
 
     h6 {
-      color: $darkmode-text;
+      color: $darkmode-v2-text;
     }
 
     p {
@@ -448,9 +448,25 @@
       color: $darkmode-v2-darker-text;
       border-color: $darkmode-v2-border;
 
+      h6 {
+        color: $darkmode-v2-text;
+      }
+
       &.selected {
-        border: 2px dashed #aaa;
+        border: 1px dashed #aaa;
         background-color: #24252c;
+      }
+    }
+  }
+
+  .character-list__character__edit-image-wrapper {
+    .btn-warning {
+      border-color: $darkmode-v2-border;
+      color: $darkmode-v2-text;
+
+      &:hover {
+        background-color: #bfa93f !important;
+        border: #8c7228 solid 1px;
       }
     }
   }

@@ -320,8 +320,12 @@
       border-color: $darkmode-v2-border;
 
       &.selected {
-        border: 2px dashed #aaa;
+        border: 1px dashed #aaa;
         background-color: #24252c;
+      }
+
+      h6 {
+        color: $darkmode-v2-text;
       }
     }
   }

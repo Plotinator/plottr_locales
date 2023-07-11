@@ -139,6 +139,10 @@
 
   .nav-tabs {
     border-bottom-color: $darkmode-border;
+
+    li.active {
+      border-color: $darkmode-v2-border;
+    }
   }
 
   .nav-tabs li.active>a {
@@ -146,12 +150,12 @@
 
     &:hover,
     &:focus {
-      border-bottom-color: transparent;
+      border-color: $darkmode-v2-border;
     }
   }
 
   .nav-tabs li>a {
-    border-color: $darkmode-border;
+    border-color: $darkmode-v2-border;
     border-bottom-color: transparent;
 
     &:hover,
@@ -260,23 +264,31 @@
     background-color: $darkmode-v2-darker-background;
 
     .nav-tabs {
+      border-color: $darkmode-v2-border;
 
       li>a,
       li.active>a {
-        border-color: $darkmode-v2-border;
-        border-bottom-color: $darkmode-v2-border;
-        background-color: $darkmode-v2-background;
+        background-color: $darkmode-v2-nav-background;
       }
 
       li {
         a {
+          background-color: $darkmode-v2-darker-background;
           color: $darkmode-v2-text;
+          border-color: $darkmode-v2-border;
 
           &:hover,
           &:focus {
-            background-color: #24252c;
-            border-bottom-color: $darkmode-v2-border;
+            background-color: $darkmode-v2-background;
           }
+        }
+      }
+    }
+
+    .image-picker__header {
+      .pull-right {
+        .btn-success {
+          background-color: $darkmode-v2-btn-primary;
         }
       }
     }

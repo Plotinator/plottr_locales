@@ -192,8 +192,8 @@
 
   &:hover {
     .outline__card__description:not(.editing) {
-      border: 2px dashed $darkmode-border;
-      background-color: $darkmode-background;
+      border: 2px dashed $darkmode-v2-border;
+      background-color: $darkmode-v2-background;
     }
   }
 }
@@ -328,11 +328,11 @@
   }
 
   .outline-list__card-view.darkmode {
-
-    &:hover,
     .outline__card__description:not(.editing) {
-      border: 1px dashed $darkmode-v2-border;
+    &:hover {
+      border: 2px dashed $darkmode-v2-border;
       background-color: $darkmode-v2-background;
+    }
     }
   }
 }

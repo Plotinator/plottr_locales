@@ -168,6 +168,12 @@
     &:hover {
       background-color: $darkmode-v2-background;
     }
+
+    .tag-list__tag-normal {
+      h6 {
+        color: $darkmode-v2-darker-text;
+      }
+    }
   }
 
   .tag-list__new.darkmode {
