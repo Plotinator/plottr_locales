@@ -492,64 +492,78 @@ const fileSystemModule = (userDataPath) => {
               'user.defaultFolderLocation'
             )
             if (
-              (newDefaultFolder !== defaultFolder ||
-                newDefaultFolderLocation !== defaultFolderLocation) &&
               newDefaultFolder &&
               typeof newDefaultFolderLocation === 'string' &&
               newDefaultFolderLocation !== ''
             ) {
-              logger.info('Default folder', newDefaultFolder)
-              logger.info('Default folder location', newDefaultFolderLocation)
-              defaultFolder = newDefaultFolder
-              defaultFolderLocation = newDefaultFolderLocation
-              logger.info(
-                'Settings changed.  Re-establishing default folder watcher.',
-                defaultFolderLocation
-              )
+              if (
+                newDefaultFolder !== defaultFolder ||
+                newDefaultFolderLocation !== defaultFolderLocation
+              ) {
+                logger.info('Default folder', newDefaultFolder)
+                logger.info('Default folder location', newDefaultFolderLocation)
+                defaultFolder = newDefaultFolder
+                defaultFolderLocation = newDefaultFolderLocation
+                logger.info(
+                  'Settings changed.  Re-establishing default folder watcher.',
+                  defaultFolderLocation
+                )
+                if (watcher) {
+                  watcher.close()
+                }
+                const readDirectory = () => {
+                  return readdir(defaultFolderLocation).then((entries) => {
+                    return Promise.all(
+                      entries.filter((d) => {
+                        return d.endsWith('.pltr')
+                      })
+                    ).then((files) => {
+                      const thunks = files.map((file) => () => {
+                        const fileURL = helpers.file.filePathToFileURL(
+                          path.join(defaultFolderLocation, file)
+                        )
+                        const hasFile = knownFilesStore.has(fileURL)
+                        const fileName = path.basename(file).replace(/\.pltr$/, '')
+                        if (!hasFile) {
+                          logger.info('Adding from watcher', file)
+                          knownFilesStore.setRawKey(fileURL, {
+                            fileURL,
+                            fileName,
+                            lastOpened: null,
+                          })
+                        }
+                      })
+                      sequenceThunks(thunks)
+                    })
+                  })
+                }
+                lstat(defaultFolderLocation)
+                  .catch((error) => {
+                    if (error.code === 'ENOENT') {
+                      logger.error("The default directory doesn't exist.  Creating it.")
+                      return mkdir(defaultFolderLocation).then(() => {
+                        return new Promise((resolve) => {
+                          setTimeout(resolve, 1000)
+                        })
+                      })
+                    } else {
+                      logger.error('Error checking whether the default directory exists', error)
+                      return Promise.reject(error)
+                    }
+                  })
+                  .then(() => {
+                    logger.info('The default folder exists.')
+                    readDirectory()
+                    watcher = fs.watch(defaultFolderLocation, readDirectory)
+                  })
+              }
+            } else {
               if (watcher) {
                 watcher.close()
               }
-              const readDirectory = () => {
-                return readdir(defaultFolderLocation).then((entries) => {
-                  return Promise.all(
-                    entries.filter((d) => {
-                      return d.endsWith('.pltr')
-                    })
-                  ).then((files) => {
-                    const thunks = files.map((file) => () => {
-                      const fileURL = helpers.file.filePathToFileURL(
-                        path.join(defaultFolderLocation, file)
-                      )
-                      const hasFile = knownFilesStore.has(fileURL)
-                      const fileName = path.basename(file).replace(/\.pltr$/, '')
-                      if (!hasFile) {
-                        logger.info('Adding from watcher', file)
-                        knownFilesStore.setRawKey(fileURL, { fileURL, fileName, lastOpened: null })
-                      }
-                    })
-                    sequenceThunks(thunks)
-                  })
-                })
+              if (timeout) {
+                clearTimeout(timeout)
               }
-              lstat(defaultFolderLocation)
-                .catch((error) => {
-                  if (error.code === 'ENOENT') {
-                    logger.error("The default directory doesn't exist.  Creating it.")
-                    return mkdir(defaultFolderLocation).then(() => {
-                      return new Promise((resolve) => {
-                        setTimeout(resolve, 1000)
-                      })
-                    })
-                  } else {
-                    logger.error('Error checking whether the default directory exists', error)
-                    return Promise.reject(error)
-                  }
-                })
-                .then(() => {
-                  logger.info('The default folder exists.')
-                  readDirectory()
-                  watcher = fs.watch(defaultFolderLocation, readDirectory)
-                })
             }
           })
         }
