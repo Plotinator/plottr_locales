@@ -385,6 +385,9 @@ tellMeWhatOSImOn()
           })
         }
 
+        // FIXME: remove this in the next release!!!  Kept for the
+        // default folder release because this was discovered on the
+        // eve of releasing.
         const moveFromTempHandler = () => {
           const state = store.getState()
           const file = selectors.fullFileStateSelector(state)
