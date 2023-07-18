@@ -1,4 +1,4 @@
-import { groupBy } from 'lodash'
+import { groupBy, sortBy, uniqBy } from 'lodash'
 
 import { helpers } from 'pltr/v2'
 import {
@@ -133,6 +133,32 @@ export const currentCustomTemplates = () => {
   return _currentCustomTemplates
 }
 
+const dedupBackups = (backups) => {
+  const latestStartOfSession = uniqBy(
+    sortBy(
+      backups.filter(({ startOfSession }) => {
+        return startOfSession
+      }),
+      ({ backupTime }) => backupTime?.seconds || Math.POSITIVE_INFINITY
+    ),
+    ({ fileId }) => {
+      return fileId
+    }
+  )
+  const latestNonStartOfSession = uniqBy(
+    sortBy(
+      backups.filter(({ startOfSession }) => {
+        return !startOfSession
+      }),
+      ({ backupTime }) => backupTime?.seconds || Math.POSITIVE_INFINITY
+    ),
+    ({ fileId }) => {
+      return fileId
+    }
+  )
+  return [...latestStartOfSession, ...latestNonStartOfSession]
+}
+
 let _currentBackups = []
 export const currentBackups = () => {
   return _currentBackups
@@ -152,7 +178,7 @@ export const listenToBackupsChanges = (cb) => {
           const backupFolders = []
           Object.keys(grouped).forEach((key) => {
             backupFolders.push({
-              backups: grouped[key],
+              backups: dedupBackups(grouped[key]),
               path: key,
               date: key,
               isCloudBackup: true,

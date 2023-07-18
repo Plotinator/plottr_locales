@@ -132,44 +132,63 @@ export const renameFile = (fileURL) => {
     if (fileId) messageRenameFile(fileId)
     return Promise.resolve()
   }
-  return showSaveDialog(filters, t('Give this file a new name'), fileURL).then((fileName) => {
-    if (fileName) {
-      try {
-        const newFilePath = fileName.includes('.pltr') ? fileName : `${fileName}.pltr`
-        const newFileURL = `device://${newFilePath}`
-        return whenClientIsReady(({ readFile, trash }) => {
-          return readFile(helpers.file.withoutProtocol(fileURL), 'utf-8').then((rawFile) => {
-            const contents = JSON.parse(rawFile)
-            return saveFile(newFileURL, contents)
-              .then(() => {
-                return trash(fileURL, true)
-              })
-              .then(() => {
-                return editKnownFilePath(fileURL, newFileURL)
-              })
-              .then(() => {
-                store.dispatch(actions.applicationState.finishRenamingFile())
-              })
+  return whenClientIsReady(({ currentAppSettings, basename, join }) => {
+    return basename(helpers.file.withoutProtocol(fileURL))
+      .then((basenameWithExtension) => {
+        return currentAppSettings().then((settings) => {
+          const basePath = settings?.user?.defaultFolder
+            ? Promise.resolve(settings?.user?.defaultFolderLocation)
+            : userDocumentsPath()
+          return basePath.then((path) => {
+            return join(path, basenameWithExtension)
           })
-        }).catch((error) => {
-          logger.error('Error renaming file', error)
-          store.dispatch(actions.applicationState.finishRenamingFile())
-          if (error.code === errorCodes.FILE_LACKS_ALL_KEYS) {
-            return showErrorBox(
-              t('File too old'),
-              t('Please open and then close the file before renaming it.')
-            )
-          } else {
-            return showErrorBox(t('Error'), t('There was an error doing that. Try again'))
-          }
         })
-      } catch (error) {
-        logger.error('Error renaming file', error)
-        store.dispatch(actions.applicationState.finishRenamingFile())
-        return showErrorBox(t('Error'), t('There was an error doing that. Try again'))
-      }
-    }
-    return Promise.resolve()
+      })
+      .then((defaultPath) => {
+        return showSaveDialog(filters, t('Give this file a new name'), defaultPath).then(
+          (fileName) => {
+            if (fileName) {
+              try {
+                const newFilePath = fileName.includes('.pltr') ? fileName : `${fileName}.pltr`
+                const newFileURL = `device://${newFilePath}`
+                return whenClientIsReady(({ readFile, trash }) => {
+                  return readFile(helpers.file.withoutProtocol(fileURL), 'utf-8').then(
+                    (rawFile) => {
+                      const contents = JSON.parse(rawFile)
+                      return saveFile(newFileURL, contents)
+                        .then(() => {
+                          return trash(fileURL, true)
+                        })
+                        .then(() => {
+                          return editKnownFilePath(fileURL, newFileURL)
+                        })
+                        .then(() => {
+                          store.dispatch(actions.applicationState.finishRenamingFile())
+                        })
+                    }
+                  )
+                }).catch((error) => {
+                  logger.error('Error renaming file', error)
+                  store.dispatch(actions.applicationState.finishRenamingFile())
+                  if (error.code === errorCodes.FILE_LACKS_ALL_KEYS) {
+                    return showErrorBox(
+                      t('File too old'),
+                      t('Please open and then close the file before renaming it.')
+                    )
+                  } else {
+                    return showErrorBox(t('Error'), t('There was an error doing that. Try again'))
+                  }
+                })
+              } catch (error) {
+                logger.error('Error renaming file', error)
+                store.dispatch(actions.applicationState.finishRenamingFile())
+                return showErrorBox(t('Error'), t('There was an error doing that. Try again'))
+              }
+            }
+            return Promise.resolve()
+          }
+        )
+      })
   })
 }
 

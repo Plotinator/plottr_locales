@@ -147,7 +147,9 @@ const App = ({
     const forceReload = () => {
       whenClientIsReady(({ saveOfflineFile, saveFile }) => {
         const { present } = store.getState()
-        return isOffline ? saveOfflineFile(present) : saveFile(present.project.fileURL, present)
+        return isCloudFile && isOffline
+          ? saveOfflineFile(present)
+          : saveFile(present.project.fileURL, present)
       })
         .then(() => {
           return new Promise((resolve) => {
@@ -188,7 +190,11 @@ const App = ({
   const saveAndClose = (saveFile, saveOfflineFile) => () => {
     const { present } = store.getState()
     setWaitingForSaveDoneSignal(true)
-    return (isOffline ? saveOfflineFile(present) : saveFile(present.project.fileURL, present))
+    return (
+      isCloudFile && isOffline
+        ? saveOfflineFile(present)
+        : saveFile(present.project.fileURL, present)
+    )
       .then(() => {
         return new Promise((resolve) => {
           setTimeout(resolve, 1000)
