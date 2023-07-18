@@ -44,6 +44,7 @@ import {
   REGRESS_SETTINGS_WIZARD,
   START_SETTINGS_WIZARD,
   FINISH_SETTINGS_WIZARD,
+  STAGE_LANGUAGE,
 } from '../constants/ActionTypes'
 
 // Project states
@@ -216,4 +217,9 @@ export const startWorkThatPreventsQuitting = () => ({
 
 export const finishWorkThatPreventsQuitting = () => ({
   type: DONE_WITH_WORK_THAT_PREVENTS_QUITTING,
+})
+
+export const stageLanguage = (language) => ({
+  type: STAGE_LANGUAGE,
+  language,
 })

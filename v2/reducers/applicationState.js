@@ -46,6 +46,7 @@ import {
   REGRESS_SETTINGS_WIZARD,
   FINISH_SETTINGS_WIZARD,
   SET_APP_SETTINGS,
+  STAGE_LANGUAGE,
 } from '../constants/ActionTypes'
 
 const INITIAL_STATE = {
@@ -93,6 +94,7 @@ const INITIAL_STATE = {
   settingsWizard: {
     isInSettingsWizard: false,
     wizardStep: null,
+    stagedLanguage: null,
   },
   update: {
     requestedCheck: false,
@@ -519,6 +521,19 @@ function applicationStateReducer(state = INITIAL_STATE, action) {
           isInSettingsWizard: false,
           wizardStep: 1,
         },
+      }
+    }
+    case STAGE_LANGUAGE: {
+      if (!state.settingsWizard.isInSettingsWizard) {
+        return state
+      } else {
+        return {
+          ...state,
+          settingsWizard: {
+            ...state.settingsWizard,
+            stagedLanguage: action.language,
+          },
+        }
       }
     }
     case ADVANCE_PRO_ONBOARDING: {
