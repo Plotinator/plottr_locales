@@ -5,7 +5,7 @@ import { localeNames, getCurrentLocale } from 'plottr_locales'
 const LanguagePickerConnector = (connector) => {
   const { platform } = connector
 
-  function LanguagePicker({ onSelectLanguage, settings }) {
+  function LanguagePicker({ onSelectLanguage, settings, forcedSelection }) {
     const [locale, setLocale] = useState(getCurrentLocale(settings, platform))
 
     const onSelect = (event) => {
@@ -21,7 +21,7 @@ const LanguagePickerConnector = (connector) => {
       )
     })
     return (
-      <select onChange={onSelect} value={locale}>
+      <select onChange={onSelect} value={forcedSelection || locale}>
         {renderedOptions}
       </select>
     )
@@ -30,6 +30,7 @@ const LanguagePickerConnector = (connector) => {
   LanguagePicker.propTypes = {
     onSelectLanguage: PropTypes.func.isRequired,
     settings: PropTypes.object.isRequired,
+    forcedSelection: PropTypes.string,
   }
 
   const {

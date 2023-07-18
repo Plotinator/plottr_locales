@@ -38,7 +38,7 @@ const SettingsWizardStep1Connector = (connector) => {
   const LanguagePicker = UnconnectedLanguagePicker(connector)
   const DarkOptionsSelect = UnconnectedDarkOptionsSelect(connector)
 
-  const SettingsWizardStep1 = ({ nextStep, settings }) => {
+  const SettingsWizardStep1 = ({ nextStep, settings, stagedLanguage, stageLanguage }) => {
     const [fonts, setFonts] = useState(null)
     const [recentFonts, setRecentFonts] = useState(settings.user.font ? [settings.user.font] : null)
 
@@ -46,14 +46,6 @@ const SettingsWizardStep1Connector = (connector) => {
       if (!fonts) setFonts(getFonts(os()))
       setRecentFonts(getRecent())
     }, [settings.user.font])
-
-    const handleSelectLanguage = useCallback(
-      (newLanguage) => {
-        saveAppSetting('locale', newLanguage)
-        updateLanguage(newLanguage)
-      },
-      [saveAppSetting, updateLanguage]
-    )
 
     useEffect(() => {
       hostLocale().then((locale) => {
@@ -84,7 +76,12 @@ const SettingsWizardStep1Connector = (connector) => {
           <div className="onboarding__settings">
             <div className="dashboard__options__item">
               <h4>{t('Language')}</h4>
-              <LanguagePicker onSelectLanguage={handleSelectLanguage} />
+              <LanguagePicker onSelectLanguage={stageLanguage} forcedSelection={stagedLanguage} />
+              {stagedLanguage ? (
+                <p style={{ paddingTop: '8px', margin: 0 }}>
+                  {t("The language will update once you've completed Step 3")}
+                </p>
+              ) : null}
             </div>
             <div className="dashboard__options__item">
               <h4>{t('Appearance: Dark/Light')}</h4>
@@ -139,6 +136,8 @@ const SettingsWizardStep1Connector = (connector) => {
   SettingsWizardStep1.propTypes = {
     nextStep: PropTypes.func,
     settings: PropTypes.object.isRequired,
+    stagedLanguage: PropTypes.string,
+    stageLanguage: PropTypes.func.isRequired,
   }
 
   const {
@@ -152,9 +151,11 @@ const SettingsWizardStep1Connector = (connector) => {
     return connect(
       (state) => ({
         settings: selectors.appSettingsSelector(state),
+        stagedLanguage: selectors.stagedLanguageSelector(state),
       }),
       {
         nextStep: actions.applicationState.advanceSettingsWizard,
+        stageLanguage: actions.applicationState.stageLanguage,
       }
     )(SettingsWizardStep1)
   }
