@@ -26,6 +26,12 @@ const copyFile = (oldFilePathOrURL, newFilePathOrURL) => {
   })
 }
 
+const backupBasePath = () => {
+  return whenClientIsReady(({ backupBasePath }) => {
+    return backupBasePath()
+  })
+}
+
 ipcMain.on('pls-open-window', (event, replyChannel, fileURL, unknown) => {
   log.info('Received command to open window for', fileURL)
   openProjectWindow(fileURL)
@@ -50,11 +56,11 @@ function openProjectWindow(fileURL) {
     return Promise.resolve()
   } else {
     log.info('Opening new browserWindow for', fileURL)
-    return currentSettings().then((settings) => {
+    return Promise.all([currentSettings(), backupBasePath()]).then(([settings, backupLocation]) => {
       if (
         fileURL &&
         !settings?.user?.defaultFolder &&
-        helpers.file.withoutProtocol(fileURL).startsWith(settings?.user?.backupLocation)
+        helpers.file.withoutProtocol(fileURL).startsWith(backupLocation)
       ) {
         console.log('File is a backup and default folder is disabled.  Asking user to save file.')
         const documentsPath = app.getPath('documents')
