@@ -297,4 +297,17 @@
       color: #bbb;
     }
   }
+
+  .dashboard__backups__item-button {
+    .btn-success {
+      &.btn-xs {
+        background-color: $darkmode-v2-btn-primary;
+
+        &:hover {
+          background-color: transparent;
+          border-color: $darkmode-v2-btn-primary-border;
+        }
+      }
+    }
+  }
 }
