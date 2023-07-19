@@ -98,4 +98,10 @@
       }
     }
   }
+
+  .dashboard__recent-project {
+    .accented-text {
+      @include accented-text;
+    }
+  }
 }
