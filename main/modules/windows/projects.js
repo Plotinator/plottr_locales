@@ -65,24 +65,25 @@ function openProjectWindow(fileURL) {
             title: t('Save'),
             defaultPath: documentsPath,
           })
-          .then(({ cancelled, filePath }) => {
-            if (cancelled) {
+          .then(({ canceled, filePath }) => {
+            if (canceled) {
               return Promise.resolve()
             } else {
               const date = new Date()
               const newFilePath =
                 filePath.replace(/\.pltr$/, '') +
                 ` from backup accessed on ${date.toDateString()}.pltr`
-              return copyFile(fileURL, newFilePath).then(() => {
-                return newFilePath
-              })
+              return copyFile(fileURL, newFilePath)
+                .then(() => {
+                  return newFilePath
+                })
+                .then((filePath) => {
+                  const fileURL = helpers.file.filePathToFileURL(filePath)
+                  return openProjectWindow(fileURL).then(() => {
+                    return addToKnown(fileURL)
+                  })
+                })
             }
-          })
-          .then((filePath) => {
-            const fileURL = helpers.file.filePathToFileURL(filePath)
-            return openProjectWindow(fileURL).then(() => {
-              return addToKnown(fileURL)
-            })
           })
           .catch((error) => {
             log.error('Error saving backup to new location', error)
