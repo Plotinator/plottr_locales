@@ -271,74 +271,84 @@ tellMeWhatOSImOn()
               let defaultPath = settings.user.defaultFolderLocation
               if (fileUrl) {
                 const fileUrlSansProto = helpers.file.withoutProtocol(fileUrl)
-                return basename(fileUrlSansProto).then((fileBaseName) => {
-                  defaultPath = useUserDefault ? defaultPath : fileUrlSansProto
-                  const defaultBaseName = suggestedNewName || (useUserDefault ? fileBaseName : '')
-                  return join(defaultPath, defaultBaseName).then((finalDefaultPath) => {
-                    return getVersion()
-                      .then((version) => {
-                        return whenClientIsReady(({ readFile }) => {
-                          return readFile(helpers.file.withoutProtocol(fileUrl), 'utf-8').then(
-                            (rawFile) => {
-                              const contents = JSON.parse(rawFile)
-                              return new Promise((resolve, reject) => {
-                                migrateIfNeeded(
-                                  version,
-                                  contents,
-                                  fileUrl,
-                                  null,
-                                  (err, didMigrate, migratedState) => {
-                                    if (err) {
-                                      rollbar.error(err)
-                                      logger.error(err)
-                                      if (err === 'Plottr behind file') {
-                                        showErrorBox(t('Error'), t('Please update Plottr'))
-                                        reject(new Error('Need to update Plottr'))
+                return basename(fileUrlSansProto)
+                  .then((fileBaseName) => {
+                    defaultPath = useUserDefault ? defaultPath : fileUrlSansProto
+                    const defaultBaseName = suggestedNewName || (useUserDefault ? fileBaseName : '')
+                    return useUserDefault
+                      ? defaultBaseName
+                      : userDocumentsPath().then((documentsPath) => {
+                          return join(documentsPath, fileBaseName)
+                        })
+                  })
+                  .then((defaultBaseName) => {
+                    return join(defaultPath, defaultBaseName).then((finalDefaultPath) => {
+                      return getVersion()
+                        .then((version) => {
+                          return whenClientIsReady(({ readFile }) => {
+                            return readFile(helpers.file.withoutProtocol(fileUrl), 'utf-8').then(
+                              (rawFile) => {
+                                const contents = JSON.parse(rawFile)
+                                return new Promise((resolve, reject) => {
+                                  migrateIfNeeded(
+                                    version,
+                                    contents,
+                                    fileUrl,
+                                    null,
+                                    (err, didMigrate, migratedState) => {
+                                      if (err) {
+                                        rollbar.error(err)
+                                        logger.error(err)
+                                        if (err === 'Plottr behind file') {
+                                          showErrorBox(t('Error'), t('Please update Plottr'))
+                                          reject(new Error('Need to update Plottr'))
+                                        } else {
+                                          reject(err)
+                                        }
                                       } else {
-                                        reject(err)
+                                        resolve(contents)
                                       }
-                                    } else {
-                                      resolve(contents)
                                     }
-                                  }
+                                  )
+                                })
+                              }
+                            )
+                          })
+                        })
+                        .then((migratedState) => {
+                          return showSaveDialog(filters, title, finalDefaultPath).then(
+                            (fileName) => {
+                              if (fileName) {
+                                const backupFolder = selectors.backupFolderPathSelector(
+                                  store.getState()
                                 )
-                              })
+                                if (fileName.startsWith(backupFolder)) {
+                                  return showErrorBox(
+                                    t('Error'),
+                                    t('Please choose a destination other than your backup folder')
+                                  )
+                                } else {
+                                  const newFilePath = helpers.file.ensureEndsInPltr(fileName)
+                                  const newFileURL = helpers.file.filePathToFileURL(newFilePath)
+                                  return saveFile(newFileURL, addMissingKeys(migratedState))
+                                    .then(() => {
+                                      store.dispatch(actions.applicationState.finishRenamingFile())
+                                      return addToKnownFilesAndOpen(newFileURL)
+                                    })
+                                    .then(() => {
+                                      if (forceCloseWhenDone) {
+                                        forceCloseWindow()
+                                      }
+                                    })
+                                }
+                              } else {
+                                return Promise.resolve()
+                              }
                             }
                           )
                         })
-                      })
-                      .then((migratedState) => {
-                        return showSaveDialog(filters, title, finalDefaultPath).then((fileName) => {
-                          if (fileName) {
-                            const backupFolder = selectors.backupFolderPathSelector(
-                              store.getState()
-                            )
-                            if (fileName.startsWith(backupFolder)) {
-                              return showErrorBox(
-                                t('Error'),
-                                t('Please choose a destination other than your backup folder')
-                              )
-                            } else {
-                              const newFilePath = helpers.file.ensureEndsInPltr(fileName)
-                              const newFileURL = helpers.file.filePathToFileURL(newFilePath)
-                              return saveFile(newFileURL, addMissingKeys(migratedState))
-                                .then(() => {
-                                  store.dispatch(actions.applicationState.finishRenamingFile())
-                                  return addToKnownFilesAndOpen(newFileURL)
-                                })
-                                .then(() => {
-                                  if (forceCloseWhenDone) {
-                                    forceCloseWindow()
-                                  }
-                                })
-                            }
-                          } else {
-                            return Promise.resolve()
-                          }
-                        })
-                      })
+                    })
                   })
-                })
               } else {
                 const currentState = store.getState()
                 const isInOfflineMode = selectors.isInOfflineModeSelector(currentState)
@@ -350,39 +360,50 @@ tellMeWhatOSImOn()
                 return basename(fileState.file.fileName, '.pltr').then((fileBaseName) => {
                   defaultPath = useUserDefault ? defaultPath : fileState.file.fileName
                   let defaultBaseName = suggestedNewName || (useUserDefault ? fileBaseName : '')
-                  return join(defaultPath, defaultBaseName).then((finalDefaultPath) => {
-                    return showSaveDialog(filters, title, finalDefaultPath).then((fileName) => {
-                      if (fileName) {
-                        const backupFolder = selectors.backupFolderPathSelector(store.getState())
-                        if (fileName.startsWith(backupFolder)) {
-                          return showErrorBox(
-                            t('Error'),
-                            t('Please choose a destination other than your backup folder')
-                          )
-                        } else {
-                          const newFilePath = helpers.file.ensureEndsInPltr(fileName)
-                          const newFileURL = helpers.file.filePathToFileURL(newFilePath)
-                          return saveFile(newFileURL, fileState)
-                            .then(() => {
-                              return addToKnownFilesAndOpen(newFileURL)
-                            })
-                            .then(() => {
-                              if (forceCloseWhenDone) {
-                                forceCloseWindow()
-                              }
-                            })
-                        }
-                      } else {
-                        return Promise.resolve()
-                      }
+                  return join(defaultPath, defaultBaseName)
+                    .then((defaultPath) => {
+                      return useUserDefault
+                        ? defaultPath
+                        : userDocumentsPath().then((documentsPath) => {
+                            return join(documentsPath, fileBaseName)
+                          })
                     })
-                  })
+                    .then((finalDefaultPath) => {
+                      return showSaveDialog(filters, title, finalDefaultPath).then((fileName) => {
+                        if (fileName) {
+                          const backupFolder = selectors.backupFolderPathSelector(store.getState())
+                          if (fileName.startsWith(backupFolder)) {
+                            return showErrorBox(
+                              t('Error'),
+                              t('Please choose a destination other than your backup folder')
+                            )
+                          } else {
+                            const newFilePath = helpers.file.ensureEndsInPltr(fileName)
+                            const newFileURL = helpers.file.filePathToFileURL(newFilePath)
+                            return saveFile(newFileURL, fileState)
+                              .then(() => {
+                                return addToKnownFilesAndOpen(newFileURL)
+                              })
+                              .then(() => {
+                                if (forceCloseWhenDone) {
+                                  forceCloseWindow()
+                                }
+                              })
+                          }
+                        } else {
+                          return Promise.resolve()
+                        }
+                      })
+                    })
                 })
               }
             })
           })
         }
 
+        // FIXME: remove this in the next release!!!  Kept for the
+        // default folder release because this was discovered on the
+        // eve of releasing.
         const moveFromTempHandler = () => {
           const state = store.getState()
           const file = selectors.fullFileStateSelector(state)

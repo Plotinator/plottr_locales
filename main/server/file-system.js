@@ -475,68 +475,112 @@ const fileSystemModule = (userDataPath) => {
     }
 
     const watchForFilesInDefaultFolder = () => {
-      let defaultFolder = SETTINGS.get('user.defaultFolder')
-      let defaultFolderLocation = SETTINGS.get('user.defaultFolderLocation')
       let watcher = null
-      const stopListeningToSettings = SETTINGS.onDidAnyChange((settings) => {
-        if (
-          defaultFolder &&
-          typeof defaultFolderLocation === 'string' &&
-          defaultFolderLocation !== ''
-        ) {
-          logger.info(
-            'Settings changed.  Re-estiblishing default folder watcher.',
-            defaultFolderLocation
-          )
-          if (watcher) {
-            watcher.close()
-          }
-          const readDirectory = () => {
-            return readdir(defaultFolderLocation).then((entries) => {
-              return Promise.all(
-                entries.filter((d) => {
-                  return d.endsWith('.pltr')
-                })
-              ).then((files) => {
-                const thunks = files.map((file) => () => {
-                  const fileURL = helpers.file.filePathToFileURL(
-                    path.join(defaultFolderLocation, file)
-                  )
-                  const hasFile = knownFilesStore.has(fileURL)
-                  const fileName = path.basename(file).replace(/\.pltr$/, '')
-                  if (!hasFile) {
-                    logger.info('Adding from watcher', file)
-                    knownFilesStore.setRawKey(fileURL, { fileURL, fileName, lastOpened: null })
-                  }
-                })
-                sequenceThunks(thunks)
-              })
-            })
-          }
-          lstat(defaultFolderLocation)
-            .catch((error) => {
-              if (error.code === 'ENOENT') {
-                logger.error("The default directory doesn't exist.  Creating it.")
-                return mkdir(defaultFolderLocation).then(() => {
-                  return new Promise((resolve) => {
-                    setTimeout(resolve, 1000)
+      let stopListeningToSettings = null
+      let timeout = null
+      let defaultFolder = null
+      let defaultFolderLocation = null
+
+      function listenWhenSettingsReady() {
+        if (!SETTINGS.isInitialReadComplete()) {
+          timeout = setTimeout(listenWhenSettingsReady, 1000)
+        } else {
+          timeout = null
+          stopListeningToSettings = SETTINGS.onDidAnyChange((settings) => {
+            const newDefaultFolder = SETTINGS.getKeyWithoutDefault('user.defaultFolder')
+            const newDefaultFolderLocation = SETTINGS.getKeyWithoutDefault(
+              'user.defaultFolderLocation'
+            )
+            if (
+              newDefaultFolder &&
+              typeof newDefaultFolderLocation === 'string' &&
+              newDefaultFolderLocation !== ''
+            ) {
+              if (
+                newDefaultFolder !== defaultFolder ||
+                newDefaultFolderLocation !== defaultFolderLocation
+              ) {
+                logger.info('Default folder', newDefaultFolder)
+                logger.info('Default folder location', newDefaultFolderLocation)
+                defaultFolder = newDefaultFolder
+                defaultFolderLocation = newDefaultFolderLocation
+                logger.info(
+                  'Settings changed.  Re-establishing default folder watcher.',
+                  defaultFolderLocation
+                )
+                if (watcher) {
+                  watcher.close()
+                }
+                const readDirectory = () => {
+                  return readdir(defaultFolderLocation).then((entries) => {
+                    return Promise.all(
+                      entries.filter((d) => {
+                        return d.endsWith('.pltr')
+                      })
+                    ).then((files) => {
+                      const thunks = files.map((file) => () => {
+                        const fileURL = helpers.file.filePathToFileURL(
+                          path.join(defaultFolderLocation, file)
+                        )
+                        const hasFile = knownFilesStore.has(fileURL)
+                        const fileName = path.basename(file).replace(/\.pltr$/, '')
+                        if (!hasFile) {
+                          logger.info('Adding from watcher', file)
+                          knownFilesStore.setRawKey(fileURL, {
+                            fileURL,
+                            fileName,
+                            lastOpened: null,
+                          })
+                        }
+                      })
+                      sequenceThunks(thunks)
+                    })
                   })
-                })
-              } else {
-                logger.error('Error checking whether the default directory exists', error)
-                return Promise.reject(error)
+                }
+                lstat(defaultFolderLocation)
+                  .catch((error) => {
+                    if (error.code === 'ENOENT') {
+                      logger.error("The default directory doesn't exist.  Creating it.")
+                      return mkdir(defaultFolderLocation).then(() => {
+                        return new Promise((resolve) => {
+                          setTimeout(resolve, 1000)
+                        })
+                      })
+                    } else {
+                      logger.error('Error checking whether the default directory exists', error)
+                      return Promise.reject(error)
+                    }
+                  })
+                  .then(() => {
+                    logger.info('The default folder exists.')
+                    readDirectory()
+                    watcher = fs.watch(defaultFolderLocation, readDirectory)
+                  })
               }
-            })
-            .then(() => {
-              logger.info('The default folder exists.')
-              readDirectory()
-              watcher = fs.watch(defaultFolderLocation, readDirectory)
-            })
+            } else {
+              if (watcher) {
+                watcher.close()
+              }
+              if (timeout) {
+                clearTimeout(timeout)
+              }
+            }
+          })
         }
-      })
+      }
+
+      listenWhenSettingsReady()
+
       return () => {
-        watcher.close()
-        stopListeningToSettings()
+        if (watcher) {
+          watcher.close()
+        }
+        if (stopListeningToSettings) {
+          stopListeningToSettings()
+        }
+        if (timeout) {
+          clearTimeout(timeout)
+        }
       }
     }
 
