@@ -409,12 +409,24 @@ body.darkmode {
       }
     }
 
+    .btn-danger.btn-sm {
+      border-color: $darkmode-v2-border;
+
+      &:hover {
+        background-color: $darkmode-v2-btn-danger;
+        border-color: $darkmode-v2-btn-danger;
+        color: $darkmode-v2-text;
+      }
+    }
+
     >&:last-child:not(:first-child)>.btn:first-child {
       color: $darkmode-v2-text;
       background: $darkmode-v2-background;
 
-      .dashboard__recent-files__file-actions button.btn.btn-sm.btn-default:hover {
-        background: $darkmode-v2-card-background;
+      .dashboard__recent-files__file-actions {
+        button.btn.btn-sm.btn-default:hover {
+          background: $darkmode-v2-card-background;
+        }
       }
 
     }
