@@ -275,6 +275,15 @@ export const createAndOpenCopy = (oldFilePathSegments, newFileName) => {
   })
 }
 
+export const userFilePickerDefaultFolder = () => {
+  const hasDefaultFolder = selectors.hasDefaultFolderSelector(store.getState())
+  if (hasDefaultFolder) {
+    return Promise.resolve(selectors.defaultFolderLocationSelector(store.getState()))
+  } else {
+    return userDocumentsPath()
+  }
+}
+
 export const openExistingFile = () => {
   const state = store.getState()
   const isInOfflineMode = selectors.isInOfflineModeSelector(state)
@@ -287,23 +296,25 @@ export const openExistingFile = () => {
     }
 
     store.dispatch(actions.project.showLoader(true))
-    _openExistingFile(!!userId, userId, emailAddress)
-      .then(() => {
-        logger.info('Opened existing file')
-        store.dispatch(actions.project.showLoader(false))
-        if (isLoggedIn) {
-          store.dispatch(actions.applicationState.finishUploadingFileToCloud())
-        }
-      })
-      .catch((error) => {
-        logger.error('Error opening existing file', error)
-        showErrorBox(t('Error'), t('There was an error doing that. Try again.')).then(() => {
+    userFilePickerDefaultFolder().then((defaultPath) => {
+      _openExistingFile(!!userId, userId, emailAddress, defaultPath)
+        .then(() => {
+          logger.info('Opened existing file')
           store.dispatch(actions.project.showLoader(false))
           if (isLoggedIn) {
             store.dispatch(actions.applicationState.finishUploadingFileToCloud())
           }
         })
-      })
+        .catch((error) => {
+          logger.error('Error opening existing file', error)
+          showErrorBox(t('Error'), t('There was an error doing that. Try again.')).then(() => {
+            store.dispatch(actions.project.showLoader(false))
+            if (isLoggedIn) {
+              store.dispatch(actions.applicationState.finishUploadingFileToCloud())
+            }
+          })
+        })
+    })
   }
 }
 

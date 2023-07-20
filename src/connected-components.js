@@ -40,6 +40,7 @@ import {
   createAndOpenCopy,
   openExistingFile,
   duplicateFile,
+  userFilePickerDefaultFolder,
 } from './files'
 import logger from '../shared/logger'
 import { closeDashboard } from './dashboard-events'
@@ -422,6 +423,7 @@ const platform = {
   showSaveDialog,
   showErrorBox,
   userDocumentsPath,
+  userFilePickerDefaultFolder,
   pleaseOpenWindow,
   addToKnownFilesAndOpen,
   node: {
