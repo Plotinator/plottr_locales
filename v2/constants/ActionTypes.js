@@ -478,7 +478,8 @@ export const APPLICATION_STATE_ACTIONS = [
 
 // Image Cache
 export const CACHE_IMAGE = 'CACHE_IMAGE'
-export const IMAGE_CACHE_ACTIONS = [CACHE_IMAGE]
+export const PURGE_IMAGE = 'PURGE_IMAGE'
+export const IMAGE_CACHE_ACTIONS = [CACHE_IMAGE, PURGE_IMAGE]
 
 // Notifications
 export const SHOW_TOAST_NOTIFICATION = 'SHOW_TOAST_NOTIFICATION'

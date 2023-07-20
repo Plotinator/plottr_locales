@@ -26,7 +26,7 @@ import {
   DUPLICATE_BOOK,
 } from '../constants/ActionTypes'
 import { beat as defaultBeat } from '../store/initialState'
-import { newFileBeats } from '../store/newFileState'
+import { newFileBeats, newFileChapters } from '../store/newFileState'
 import { positionReset, nextPositionInBook, moveNextToSibling } from '../helpers/beats'
 import { associateWithBroadestScope } from '../helpers/lines'
 import * as tree from './tree'
@@ -360,8 +360,12 @@ const beats =
         }
       }
 
-      case NEW_FILE:
-        return newFileBeats
+      case NEW_FILE: {
+        return {
+          1: tree.newTree('id', ...newFileChapters),
+          series: tree.newTree('id', ...newFileBeats),
+        }
+      }
 
       case LOAD_BEATS:
         return action.beats

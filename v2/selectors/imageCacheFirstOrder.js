@@ -5,4 +5,6 @@ import { createSelector } from 'reselect'
 
 import { fullFileStateSelector } from './fullFileFirstOrder'
 
-export const imageCacheSelector = createSelector(fullFileStateSelector, (state) => state.imageCache)
+export const imageCacheSelector = createSelector(fullFileStateSelector, ({ imageCache }) => {
+  return imageCache || {}
+})

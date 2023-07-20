@@ -5,10 +5,7 @@
     "dirty": true,
     "version": "2023.6.16-alpha.4",
     "id": null,
-    "appliedMigrations": [
-      "*m2023_1_7",
-      "*m2023_3_29"
-    ],
+    "appliedMigrations": ["*m2023_1_7", "*m2023_3_29"],
     "initialVersion": "2023.6.16-alpha.4",
     "isCloudFile": false,
     "versionStamp": "9caa24a2-db40-49cc-9983-de266ae14506"
@@ -101,29 +98,18 @@
       "timelineTemplates": [],
       "imageId": null
     },
-    "allIds": [
-      1
-    ]
+    "allIds": [1]
   },
   "beats": {
     "1": {
       "children": {
-        "4": [
-          23
-        ],
+        "4": [23],
         "19": [],
-        "22": [
-          25
-        ],
+        "22": [25],
         "23": [],
         "24": [],
         "25": [],
-        "null": [
-          4,
-          19,
-          22,
-          24
-        ]
+        "null": [4, 19, 22, 24]
       },
       "heap": {
         "4": null,
@@ -198,9 +184,7 @@
     "series": {
       "children": {
         "1": [],
-        "null": [
-          1
-        ]
+        "null": [1]
       },
       "heap": {
         "1": null
