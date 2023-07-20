@@ -603,7 +603,9 @@
   }
 }
 
-#timelineview__root .isPinned .sticky-table-cell:not(:first-child):not(:nth-child(2)):not(:has(.card__body-wrapper, .card__cell__overview-cell, .creating)) {
+#timelineview__root
+  .isPinned
+  .sticky-table-cell:not(:first-child):not(:nth-child(2)):not(:has(.card__body-wrapper, .card__cell__overview-cell, .creating)) {
   z-index: 3;
 
   &:hover {

@@ -20,7 +20,7 @@ const FilesHomeConnector = (connector) => {
       showErrorBox,
       showOpenDialog,
       showSaveDialog,
-      userDocumentsPath,
+      userFilePickerDefaultFolder,
       mpq,
     },
   } = connector
@@ -32,7 +32,7 @@ const FilesHomeConnector = (connector) => {
     showErrorBox,
     showOpenDialog,
     showSaveDialog,
-    userDocumentsPath,
+    userFilePickerDefaultFolder,
     mpq,
   })
 
@@ -45,16 +45,18 @@ const FilesHomeConnector = (connector) => {
     const title = t('Choose your Snowflake Pro file')
     const filters = [{ name: 'Snowflake Pro file', extensions: ['snowXML'] }]
     const properties = ['openFile']
-    return showOpenDialog(title, filters, properties).then((files) => {
-      if (files && files[0]) {
-        if (files[0].toLowerCase().includes('.snowxml')) {
-          return files[0]
-        } else {
-          errorActions.importError('Wrong file format')
-          return null
+    return userFilePickerDefaultFolder().then((defaultPath) => {
+      return showOpenDialog(title, filters, properties, defaultPath).then((files) => {
+        if (files && files[0]) {
+          if (files[0].toLowerCase().includes('.snowxml')) {
+            return files[0]
+          } else {
+            errorActions.importError('Wrong file format')
+            return null
+          }
         }
-      }
-      return null
+        return null
+      })
     })
   }
 
@@ -62,23 +64,25 @@ const FilesHomeConnector = (connector) => {
     const title = t('Choose your Scrivener project')
     const filters = [{ name: t('Scrivener file') }]
     const properties = ['openFile', 'openDirectory']
-    return showOpenDialog(title, filters, properties).then((files) => {
-      if (files && files[0]) {
-        if (files[0].toLowerCase().includes('.scriv')) {
-          return files[0]
-        } else {
-          errorActions.importError(t('Wrong file format'))
-          return null
+    return userFilePickerDefaultFolder().then((defaultPath) => {
+      return showOpenDialog(title, filters, properties, defaultPath).then((files) => {
+        if (files && files[0]) {
+          if (files[0].toLowerCase().includes('.scriv')) {
+            return files[0]
+          } else {
+            errorActions.importError(t('Wrong file format'))
+            return null
+          }
         }
-      }
-      return null
+        return null
+      })
     })
   }
 
   function savePlottrProjectDialog() {
     const title = t('Choose where to save this file on your computer')
     const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
-    return userDocumentsPath().then((docPath) => {
+    return userFilePickerDefaultFolder().then((docPath) => {
       return showSaveDialog(filters, title, docPath).then((fileName) => {
         if (fileName) {
           return helpers.file.ensureEndsInPltr(fileName)

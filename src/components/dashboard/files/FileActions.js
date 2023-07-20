@@ -145,6 +145,7 @@ const FileActionsConnector = (connector) => {
                 onClick={() => setDeleting(true)}
                 title={t('Delete')}
                 disabled={isInOfflineMode}
+                bsStyle="danger"
               >
                 <Glyphicon glyph="trash" />
               </Button>
