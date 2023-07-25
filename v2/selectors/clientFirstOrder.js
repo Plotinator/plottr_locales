@@ -5,7 +5,7 @@
 import { createSelector } from 'reselect'
 
 const clientSelector = (state) => {
-  return state.client || {}
+  return state?.client || {}
 }
 export const userIdSelector = createSelector(clientSelector, ({ userId }) => userId)
 export const clientIdSelector = createSelector(clientSelector, ({ clientId }) => clientId)
@@ -27,4 +27,20 @@ export const currentAppStateSelector = createSelector(
 export const currentAppStateIsDashboardSelector = createSelector(
   currentAppStateSelector,
   (currentAppState) => currentAppState === 'dashboard'
+)
+const dataClientIdsSelector = createSelector(
+  clientSelector,
+  ({ dataClientIds }) => {
+    return dataClientIds || {}
+  }
+)
+const pathSelector = (_state, path) => {
+  return path
+}
+export const clientIdForPathSelector = createSelector(
+  dataClientIdsSelector,
+  pathSelector,
+  (clientIds, path) => {
+    return clientIds[path] || null
+  }
 )

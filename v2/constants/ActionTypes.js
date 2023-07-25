@@ -320,6 +320,7 @@ export const SET_HAS_ONBOARDED = 'SET_HAS_ONBOARDED'
 export const SET_HAS_PRO = 'SET_HAS_PRO'
 export const SET_IS_ON_WEB = 'SET_IS_ON_WEB'
 export const SET_CURRENT_APP_STATE = 'SET_CURRENT_APP_STATE'
+export const RECORD_DATA_CLIENT_ID = 'RECORD_DATA_CLIENT_ID'
 // IMPORTANT: Please keep this up to date(!).  Impacts our ability to
 // track actual changes to the content of a file as apposed to system
 // data.
@@ -331,6 +332,7 @@ export const CLIENT_ACTIONS = [
   SET_HAS_ONBOARDED,
   SET_IS_ON_WEB,
   SET_CURRENT_APP_STATE,
+  RECORD_DATA_CLIENT_ID,
 ]
 
 // action actions (for undo)

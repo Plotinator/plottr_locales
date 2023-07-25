@@ -6,6 +6,7 @@ import {
   SET_HAS_PRO,
   SET_IS_ON_WEB,
   SET_CURRENT_APP_STATE,
+  RECORD_DATA_CLIENT_ID,
 } from '../constants/ActionTypes'
 
 const INITIAL_STATE = {
@@ -16,6 +17,10 @@ const INITIAL_STATE = {
   hasPro: null,
   isOnWeb: null,
   currentAppState: null,
+  // dataClientIds is: {
+  //   [<path-to-data-in-store>: <last-client-id-that-wrote-it>]*
+  // }
+  dataClientIds: {}
 }
 
 const clientReducer = (state = INITIAL_STATE, action) => {
@@ -56,6 +61,15 @@ const clientReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         currentAppState: action.appState,
+      }
+    }
+    case RECORD_DATA_CLIENT_ID: {
+      return {
+        ...state,
+        dataClientIds: {
+          ...state.dataClientIds,
+          [action.path]: action.clientId
+        }
       }
     }
     default:

@@ -18,8 +18,6 @@ import exampleProFile from '../v2/store/exampleProFile'
 
 const { writeFile } = fs.promises
 
-debugger
-
 const KNOWN_SLATE_PATHS = [
   ['cards', 'description'],
   ['characters', 'notes'],

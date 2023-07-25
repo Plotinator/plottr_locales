@@ -164,7 +164,7 @@ export const characterAttributesForCurrentBookSelector = createSelector(
       }
     })
     const missing = differenceWith([...newAttributes, ...legacyAttributes], ordered, isEqual)
-    return [...ordered, ...missing]
+    return [...ordered, ...missing].filter(Boolean)
   }
 )
 
@@ -175,8 +175,8 @@ export const characterFilterIsEmptySelector = createSelector(
     if (!filter) return true
     const allAttributes = [{ name: 'tag' }, { name: 'book' }, { name: 'category' }, ...attributes]
     return !allAttributes.some((attr) => {
-      const key = attr.id || attr.name
-      return filter[key] && filter[key].length
+      const key = attr?.id || attr?.name
+      return typeof key !== 'undefined' && filter[key] && filter[key].length
     })
   }
 )
@@ -349,14 +349,14 @@ export const characterTemplateAttributeValueSelector = createSelector(
   (characterId, templateId, attributeName, bookId, character) => {
     const templateOnCharacter = character && character.templates.find(({ id }) => id === templateId)
     const valueInAttributes =
-      templateOnCharacter &&
-      templateOnCharacter.attributes.find(({ name }) => name === attributeName).value
+          templateOnCharacter &&
+          templateOnCharacter.attributes.find(({ name }) => name === attributeName).value
     const valueOnTemplate = templateOnCharacter && templateOnCharacter[attributeName]
     const valueForBook =
-      templateOnCharacter.values &&
-      templateOnCharacter.values.find((value) => {
-        return value.name === attributeName && value.bookId === bookId
-      })?.value
+          templateOnCharacter.values &&
+          templateOnCharacter.values.find((value) => {
+            return value.name === attributeName && value.bookId === bookId
+          })?.value
     return valueForBook || (bookId === 'all' && (valueInAttributes || valueOnTemplate))
   }
 )

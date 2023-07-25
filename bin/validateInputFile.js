@@ -1,8 +1,6 @@
 import exampleFile from '../v2/store/exampleFile'
 import { schema } from '../v2/store/fileSchema'
 
-debugger
-
 function main() {
   const errors = schema(exampleFile)
   errors.forEach((error) => {
