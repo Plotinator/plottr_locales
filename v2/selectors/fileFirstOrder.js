@@ -6,7 +6,7 @@ import { get } from 'lodash'
 
 import { fullFileStateSelector } from './fullFileFirstOrder'
 
-export const fileSelector = createSelector(fullFileStateSelector, ({ file }) => file)
+export const fileSelector = createSelector(fullFileStateSelector, ({ file }) => file || {})
 export const fileNameSelector = createSelector(fullFileStateSelector, (state) =>
   get(state, 'file.fileName')
 )
@@ -21,7 +21,7 @@ export const cloudFilePathSelector = createSelector(fullFileStateSelector, (stat
   return file.isCloudFile ? `plottr://${file.id}` : null
 })
 export const fileIdSelector = createSelector(fullFileStateSelector, (state) => {
-  const file = state.file
+  const file = state?.file
   if (!file) {
     return null
   }

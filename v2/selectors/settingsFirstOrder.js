@@ -59,6 +59,12 @@ export const canGetUpdatesSelector = createSelector(
   appSettingsSelector,
   ({ canGetUpdates }) => canGetUpdates
 )
+export const defaultFolderLocationSelector = createSelector(
+  appUserSettingsSelector,
+  ({ defaultFolderLocation }) => {
+    return defaultFolderLocation
+  }
+)
 export const hasDefaultFolderSelector = createSelector(
   appUserSettingsSelector,
   ({ defaultFolder, defaultFolderLocation }) => {

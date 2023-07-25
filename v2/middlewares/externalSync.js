@@ -1,6 +1,7 @@
 import { permissionError } from '../actions/error'
 import { SYSTEM_REDUCER_KEYS } from '../reducers/systemReducers'
 import selectors from '../selectors'
+import actions from '../actions'
 
 const FLAT_ARRAY_KEYS = ['cards', 'notes', 'places', 'characters']
 
@@ -31,6 +32,7 @@ const sync = (selectState) => {
     selectedFileIdSelector,
     selectedFilePermissionSelector,
     fullFileStateSelector,
+    clientIdForPathSelector,
   } = selectors(selectState)
   return (previous, present, patch, withData, store, action) => {
     const isCloudFile = isCloudFileSelector(present)
@@ -84,7 +86,8 @@ const sync = (selectState) => {
           })
           payload.forEach((entity, index) => {
             const oldEntity = oldEntitiesById && oldEntitiesById.get(entity.id)
-            if (oldEntity !== entity) {
+            const lastRecordedClientId = clientIdForPathSelector(present, `${key}/${index}`)
+            if (oldEntity !== entity && lastRecordedClientId && lastRecordedClientId === clientId) {
               patch(key, fileId, entity, clientId).catch((error) => {
                 if (error.code === 'permission-denied') {
                   store.dispatch(permissionError(key, action, error.code))
@@ -93,11 +96,14 @@ const sync = (selectState) => {
             }
           })
         } else {
-          patch(key, fileId, payload, clientId).catch((error) => {
-            if (error.code === 'permission-denied') {
-              store.dispatch(permissionError(key, action, error.code))
-            }
-          })
+          const lastRecordedClientId = clientIdForPathSelector(present, key)
+          if (lastRecordedClientId && lastRecordedClientId === clientId) {
+            patch(key, fileId, payload, clientId).catch((error) => {
+              if (error.code === 'permission-denied') {
+                store.dispatch(permissionError(key, action, error.code))
+              }
+            })
+          }
         }
       }
     })
@@ -106,10 +112,49 @@ const sync = (selectState) => {
   }
 }
 
+
+const updateLastWrittenClientIds = (previous, store, wiredSelectors, wiredActions) => {
+  const { clientIdSelector, fullFileStateSelector } = wiredSelectors
+
+  const fullState = fullFileStateSelector(store.getState())
+  const clientId = clientIdSelector(store.getState())
+
+  // Go through each key and potentially do something if they changed.
+  //
+  // Note that we were the ones who changed it.
+  //
+  // Only call this function when we're not patching (i.e. receiving
+  // changes from remote.)
+  Object.keys(fullState).forEach((key) => {
+    if (SYSTEM_REDUCER_KEYS.indexOf(key) === -1) {
+      if (isFlatArrayKey(key) && Array.isArray(fullState[key])) {
+        fullState[key].forEach((value, index) => {
+          if (fullState[key][index] !== previous[key[index]]) {
+            store.dispatch(wiredActions.client.recordDataClientId(`${key}/${index}`, clientId))
+          }
+        })
+      } else {
+        if (fullState[key] !== previous[key]) {
+          store.dispatch(wiredActions.client.recordDataClientId(key, clientId))
+        }
+      }
+    }
+  })
+}
+
 const externalSync = (selectState) => {
   const wiredSync = sync(selectState)
+  const wiredSelectors = selectors(selectState)
+  const wiredActions = actions(selectState)
   return (patch, withData) => (store) => (next) => (action) => {
     const result = next(action)
+
+    // Update last written client ids when we didn't receive a patch
+    // from Firebase.  Helps us figure out who changed data so we
+    // don't get into a sync loop.
+    if (!action.patching) {
+      updateLastWrittenClientIds(previous, store, wiredSelectors, wiredActions)
+    }
 
     const { future, present, past } = store.getState()
     const previous = action.type === '@@redux-undo/UNDO' ? future[0] : past[past.length - 1]
@@ -121,12 +166,25 @@ const externalSync = (selectState) => {
 
 export default externalSync
 
+// NOTE: uses a polyfilled map that's based on the JavaScript objects
+// rather than on the Map class in newer versions of Javascript.  we
+// use this for React-Native because it seems to support it poorly.
 let previous = null
 export const externalSyncWithoutHistory = (selectState) => {
   const wiredSync = sync(selectState)
+  const wiredSelectors = selectors(selectState)
+  const wiredActions = actions(selectState)
   const { fullFileStateSelector } = selectors(selectState)
   return (patch, withData) => (store) => (next) => (action) => {
     const result = next(action)
+
+    // Update last written client ids when we didn't receive a patch
+    // from Firebase.  Helps us figure out who changed data so we
+    // don't get into a sync loop.
+    if (!action.patching && previous) {
+      updateLastWrittenClientIds(previous, store, wiredSelectors, wiredActions)
+    }
+
     const present = store.getState()
 
     const synchronised = wiredSync(previous, present, patch, withData, store, action)

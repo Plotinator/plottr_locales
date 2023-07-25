@@ -157,6 +157,10 @@ export const isInSettingsWizardSelector = createSelector(
   settingsWizardStateSelector,
   ({ isInSettingsWizard }) => isInSettingsWizard
 )
+export const stagedLanguageSelector = createSelector(
+  settingsWizardStateSelector,
+  ({ stagedLanguage }) => stagedLanguage
+)
 
 export const proOnboardingStateSelector = createSelector(
   applicationStateSelector,

@@ -20,14 +20,16 @@ export function hasNoLegacyValue(item, attr) {
 
 export const noEntityHasLegacyAttributeBound = (entities, attrs) => {
   return attrs.reduce((acc, attr) => {
-    if (attr.type == 'text') {
+    if (!attr) {
+      return acc
+    } else if (attr.type == 'text') {
       acc.push(attr.name)
       return acc
+    } else {
+      const changeable = entities.every((ch) => hasNoLegacyValue(ch, attr.name))
+      if (changeable) acc.push(attr.name)
+      return acc
     }
-
-    const changeable = entities.every((ch) => hasNoLegacyValue(ch, attr.name))
-    if (changeable) acc.push(attr.name)
-    return acc
   }, [])
 }
 
@@ -57,17 +59,17 @@ export function hasNoValue(item, id) {
 
 export const noEntityHasAttributeBound = (entities, attrs) => {
   return attrs.reduce((acc, attr) => {
-    if (attr.type === 'base-attribute') {
+    if (!attr) {
       return acc
-    }
-
-    if (attr.type == 'text') {
+    } else if (attr.type === 'base-attribute') {
+      return acc
+    } else if (attr.type == 'text') {
       acc.push(attr.name)
       return acc
+    } else {
+      const changeable = entities.every((ch) => hasNoValue(ch, attr.id))
+      if (changeable) acc.push(attr.name)
+      return acc
     }
-
-    const changeable = entities.every((ch) => hasNoValue(ch, attr.id))
-    if (changeable) acc.push(attr.name)
-    return acc
   }, [])
 }
