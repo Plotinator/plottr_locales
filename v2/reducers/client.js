@@ -20,7 +20,7 @@ const INITIAL_STATE = {
   // dataClientIds is: {
   //   [<path-to-data-in-store>: <last-client-id-that-wrote-it>]*
   // }
-  dataClientIds: {}
+  dataClientIds: {},
 }
 
 const clientReducer = (state = INITIAL_STATE, action) => {
@@ -68,8 +68,8 @@ const clientReducer = (state = INITIAL_STATE, action) => {
         ...state,
         dataClientIds: {
           ...state.dataClientIds,
-          [action.path]: action.clientId
-        }
+          [action.path]: action.clientId,
+        },
       }
     }
     default:

@@ -112,7 +112,6 @@ const sync = (selectState) => {
   }
 }
 
-
 const updateLastWrittenClientIds = (previous, store, wiredSelectors, wiredActions) => {
   const { clientIdSelector, fullFileStateSelector } = wiredSelectors
 

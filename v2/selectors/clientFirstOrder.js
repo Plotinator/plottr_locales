@@ -28,12 +28,9 @@ export const currentAppStateIsDashboardSelector = createSelector(
   currentAppStateSelector,
   (currentAppState) => currentAppState === 'dashboard'
 )
-const dataClientIdsSelector = createSelector(
-  clientSelector,
-  ({ dataClientIds }) => {
-    return dataClientIds || {}
-  }
-)
+const dataClientIdsSelector = createSelector(clientSelector, ({ dataClientIds }) => {
+  return dataClientIds || {}
+})
 const pathSelector = (_state, path) => {
   return path
 }
