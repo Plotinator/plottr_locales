@@ -112,11 +112,11 @@ const sync = (selectState) => {
   }
 }
 
-const updateLastWrittenClientIds = (previous, store, wiredSelectors, wiredActions) => {
+const updateLastWrittenClientIds = (previous, state, store, wiredSelectors, wiredActions) => {
   const { clientIdSelector, fullFileStateSelector } = wiredSelectors
 
-  const fullState = fullFileStateSelector(store.getState())
-  const clientId = clientIdSelector(store.getState())
+  const fullState = fullFileStateSelector(state)
+  const clientId = clientIdSelector(state)
 
   // Go through each key and potentially do something if they changed.
   //
@@ -152,7 +152,7 @@ const externalSync = (selectState) => {
     // from Firebase.  Helps us figure out who changed data so we
     // don't get into a sync loop.
     if (!action.patching) {
-      updateLastWrittenClientIds(previous, store, wiredSelectors, wiredActions)
+      updateLastWrittenClientIds(previous, store.getState().present, store, wiredSelectors, wiredActions)
     }
 
     const { future, present, past } = store.getState()
@@ -181,7 +181,7 @@ export const externalSyncWithoutHistory = (selectState) => {
     // from Firebase.  Helps us figure out who changed data so we
     // don't get into a sync loop.
     if (!action.patching && previous) {
-      updateLastWrittenClientIds(previous, store, wiredSelectors, wiredActions)
+      updateLastWrittenClientIds(previous, store.getState(), store, wiredSelectors, wiredActions)
     }
 
     const present = store.getState()
