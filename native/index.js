@@ -152,16 +152,9 @@ export const wireUpAPI = (logger, actions, selectors) => {
       fileVersion,
       withResponse
     )
-    const unsubscribeToCards = wiredUp.listenToCards(userId, fileId, clientId, withResponse)
     const unsubscribeToSeries = wiredUp.listenToSeries(userId, fileId, clientId, withResponse)
     const unsubscribeToBooks = wiredUp.listenToBooks(userId, fileId, clientId, withResponse)
     const unsubscribeToCategories = wiredUp.listenToCategories(
-      userId,
-      fileId,
-      clientId,
-      withResponse
-    )
-    const unsubscribeToCharacters = wiredUp.listenToCharacters(
       userId,
       fileId,
       clientId,
@@ -175,8 +168,6 @@ export const wireUpAPI = (logger, actions, selectors) => {
     )
     const unsubscribeToFlags = wiredUp.listenToFeatureFlags(userId, fileId, clientId, withResponse)
     const unsubscribeToLines = wiredUp.listenToLines(userId, fileId, clientId, withResponse)
-    const unsubscribeToNotes = wiredUp.listenToNotes(userId, fileId, clientId, withResponse)
-    const unsubscribeToPlaces = wiredUp.listenToPlaces(userId, fileId, clientId, withResponse)
     const unsubscribeToTags = wiredUp.listenToTags(userId, fileId, clientId, withResponse)
     const unsubscribeToLevels = wiredUp.listenToHierarchyLevels(
       userId,
@@ -209,16 +200,12 @@ export const wireUpAPI = (logger, actions, selectors) => {
       unsubscribeToUI()
       unsubscribeToFile()
       unsubscribeToBeats()
-      unsubscribeToCards()
       unsubscribeToSeries()
       unsubscribeToBooks()
       unsubscribeToCategories()
-      unsubscribeToCharacters()
       unsubscribeToCustomAttributes()
       unsubscribeToFlags()
       unsubscribeToLines()
-      unsubscribeToNotes()
-      unsubscribeToPlaces()
       unsubscribeToTags()
       unsubscribeToLevels()
       unsubscribeToImages()

@@ -96,6 +96,11 @@ const api = (
     return typeof mappedValue !== 'undefined' ? mappedValue : path
   }
 
+  const updateClientIdAction = (path, clientId) => {
+    const reinterpretedPath = reinterpretPath(path)
+    return actions.client.recordDataClientId(path, clientId)
+  }
+
   const patchActions = (path) => {
     const reinterpretedPath = reinterpretPath(path)
     switch (reinterpretedPath) {
@@ -162,6 +167,7 @@ const api = (
         }
         delete data.fileId
         delete data.clientId
+        withAction(updateClientIdAction(path, clientId))
         withAction(
           patchAction[loadFunctionKey](
             patching,
@@ -212,6 +218,7 @@ const api = (
             log.error('No patch action for ', path)
             return
           }
+          withAction(updateClientIdAction(path, clientId))
           withAction(patchAction[loadFunctionKey](patching, withData(results)))
         },
         error: (error) => {
