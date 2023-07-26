@@ -281,6 +281,18 @@ const Main = ({
         String(settings.user.fontSize) + 'px'
       )
     }
+    if (settings.user?.applicationFont) {
+      window.document.documentElement.style.setProperty(
+        '--default-app-font',
+        settings.user.applicationFont
+      )
+    }
+    if (settings.user?.applicationFontSizeMultiplier) {
+      window.document.documentElement.style.setProperty(
+        '--default-app-font',
+        settings.user.applicationFontSizeMultiplier
+      )
+    }
   }, [settings.user])
 
   useEffect(() => {
