@@ -1,0 +1,105 @@
+Possible schema: Manuscript > Chapters > Lines > Cards
+Children are "BinderItem"s.
+
+Possible strategy:
+ - Write a recursive interpreter that accumulates into an intermediary
+   object as it goes.  You'll know whether you're processing a
+   plotline etc because that's what the section title will be.
+
+Existing algorithm.
+ - Read the root scrivener XML file to a Javascript object.
+ - Read all ~rtf~ and ~txt~ files into an in-memory index.
+ - Convert all ~rtf~ and ~txt~ files into Slate paragraphs.  (!! This
+   seems like the wrong time to do this.)
+ - Create a book to write everything into.
+ - Use the root file path as the book's title.
+ - Find the "manuscript".  (It's a binder item in the ~ScrivenerProject~
+   that's either the ~DraftFolder~ by ~Type~ attribute (according to an
+   attribute) or has a ~Title~ of ~Manuscript~)
+ - Find the "sections".  (They're the ~ScrivenerProject~'s ~BinderItem~'s
+   that don't have an attribute of ~Type~ equal to ~DraftFolder~ or
+   ~TrashFolder~.)
+ - For each of "Notes", "Characters" and "Places", go through the
+   sections and retrieve items that are either a ~Folder~ by attribute
+   ~Type~, or a ~ResearchFolder~ by that same type, and they have ~Children~
+   ~BinderItem~ s which have a ~Title~ equal to the section name.  If we
+   went down the ~ResearchFolder~ route, check it's sub folders.  (This
+   is something that happens in version 2.7 of Scrivener.)  Produce
+   the ~section~ that met those criteria (!! It could have a different
+   schema because of version differences.  This is where I should
+   transform things into a unified internal schema.)
+ - Add the story line: a mega function.
+   1. If the manuscript object has a ~Children~ ~BinderItem~.
+   2. The manuscript (the story line node) at ~Children~ ~BinderItem~
+      might be an array or not.  If it isn't then wrap it to make an
+      array.  These are the "chapters".
+   3. Start the lineId at 1 or the given count.
+   4. For each chapter, use either its ~UUID~ or ~ID~ attribute as its ~ID~.
+   5. Use the chapter's ~Title~ ~_text~ as the title for the chapter.
+   6. If there isn't a title, use ~Beat {num}~ (!! this should instead
+      be "auto" so that Plottr can take care of numbering it.)
+   7. Use the order of the chapters in the array from the manuscript
+      to specify the position in Plottr.
+   8. If there wasn't a chapter folder don't add any beats.  The
+      chapter folder is any one of the ~Chapter~ s from above that has
+      an ~_attribute~ of ~Type~ with value ~Folder~.
+   9. Consider the chapters.  If there was a chapter folder, filter
+      down to those chapters that have an attribute ~Type~ of ~Folder~,
+      otherwise filter down to those that have an attribute ~Type~ of
+      ~Text~.
+   10. Use the chapters attribute ~UUID~ or ~ID~ as the id of the beat.
+   11. If this chapter has a ~BinderItem~ that's an array, use that
+       array, otherwise, wrap the chapter's ~BinderItem~ in an array and
+       call that the cards.
+   12. If there's a chapter folder, consider the chapters that have an
+       attribute ~Type~ with value ~Folder~ in the chapters array.
+   13. Use each child's ~UUID~ or ~ID~ as the child's ID.
+   14. Use each child's ~Title~'s ~_text~ as the title.
+   15. Push a new line with those attributes into the Plottr file so
+       far.
+   16. Construct a children array with the ~Children~ ~BinderItem~
+   17. Use the ~Title~'s ~_text~ for the card's title.
+   18. Find the files that match this card's id.  Files can match
+       either because they have the ID as their file path, or as the
+       first part of the file name before ~_synopsis.txt~ or ~_notes.rtf~.
+       Version 3 files don't seem to have an extension.
+   19. If there were matches for data files, then go through each
+       match.
+       1. If the match was a text file, remove the word
+          "Description" from the top and a seemingly arbitrary amount
+          of white space from the end of the line.
+       2. Destructively write the content into the ~fileContents~'s
+          ~txtContent~.
+       3. If the match was a rich text file, and the ~contents~ of that
+          node are an array, flatten them.  If there's something after
+          flattening, return it.  Otherwise, return undefined.
+       4. Accumulate the rtf contents to the ~fileContents~'s
+          ~rtfContents~.
+   20. Accumulate "sections" (i.e. notes, characters, places etc.) in
+       the manuscript.  i.e. get those that are associated with the
+       card we're processing.
+       1. For each element in the RTF contents, if we're on a line
+          that's bold, treat it as either an inline title or a title
+          for a paragraph.  If it's not bold, treat it as the value
+          for the last title.
+       2. If we were on a title, use the first part of the title, up
+          to the colon, or the bold part as the type of thing we're
+          looking at.  Accumulate the corresponding type of thing by
+          mutating the ~fileContents~.
+       3. Use the text up to the next index as the value.  (!! huh?
+          This is a very confusing decision.)
+   21. Then keep the RTF contents that have text and append them to
+       the ~fileContents~ ~txtContent~.
+   22. Set the ~fileContents~ ~rtfContents~ ~characters~ to the contents
+       that are ~characters~, and do the same for places, tags and
+       plotlines.
+   23. Repeat the above dance to get scene cards that don't have
+       plotlines.
+   24. If there were sections with a title of "Notes", "Places",
+       "Characters" and generate pltr equivalents for each.
+   25. Create a Note, Character or Place for each matching entity.
+   26. Extract each base and custom attribute from the entity using
+       inline titles for the base attributes.
+   27. If no places, characters etc. match in the current node of the
+       tree, traverse it deeper to try and find them.
+   28. Finally replace any UUIDs in the file with integer ids.
