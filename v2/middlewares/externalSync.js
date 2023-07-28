@@ -141,6 +141,15 @@ const updateLastWrittenClientIds = (previous, state, store, wiredSelectors, wire
   })
 }
 
+const handleClientIds = (action, store, wiredSelectors, wiredActions) => {
+  const { future, present, past } = store.getState()
+  const previous = action.type === '@@redux-undo/UNDO' ? future[0] : past[past.length - 1]
+
+  if (!action.patching && previous) {
+    updateLastWrittenClientIds(previous, present, store, wiredSelectors, wiredActions)
+  }
+}
+
 const externalSync = (selectState) => {
   const wiredSync = sync(selectState)
   const wiredSelectors = selectors(selectState)
@@ -151,12 +160,13 @@ const externalSync = (selectState) => {
     // Update last written client ids when we didn't receive a patch
     // from Firebase.  Helps us figure out who changed data so we
     // don't get into a sync loop.
-    if (!action.patching) {
-      updateLastWrittenClientIds(previous, store.getState().present, store, wiredSelectors, wiredActions)
-    }
+    handleClientIds(action, store, wiredSelectors, wiredActions)
 
+    // IMPORTANT: we need the state *after* handling data client ids
+    // so that we know what to sync!
     const { future, present, past } = store.getState()
     const previous = action.type === '@@redux-undo/UNDO' ? future[0] : past[past.length - 1]
+
     wiredSync(previous, present, patch, withData, store, action)
 
     return result

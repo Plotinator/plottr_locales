@@ -40,5 +40,5 @@ export function reorderCharacterAttribute(attributeId, toIndex, attributeName) {
 }
 
 export function load(patching, attributes) {
-  return { type: LOAD_ATTRIBUTES, attributes }
+  return { type: LOAD_ATTRIBUTES, attributes, patching }
 }
