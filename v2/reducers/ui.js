@@ -92,8 +92,6 @@ const removeCustomAttributeFilter = (state, action) => {
 }
 
 const addCustomAttributeOrdering = (state, fullState) => {
-  const { characterAttributesForCurrentBookSelector } = selectors(identity)
-
   const toAttributeOrderEntry = (attribute) => {
     if (attribute.id) {
       return {
