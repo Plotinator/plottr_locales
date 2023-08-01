@@ -56,21 +56,21 @@ $new-item-border-color: #aaa;
 $new-item-border: 2px dashed $new-item-border-color;
 
 @mixin header-font {
-  font-family: 'IBM Plex Serif', serif !important;
+  font-family: var(--default-app-font, 'IBM Plex Serif'), serif !important;
 }
 
 @mixin sub-header-font {
-  font-family: 'IBM Plex Serif', serif;
-  font-size: 20px;
+  font-family: var(--default-app-font, 'IBM Plex Serif'), serif !important;
+  font-size: var(--default-app-base-font-size, 16px) !important;
 }
 
 @mixin body-text-font {
-  font-family: 'Forum', sans-serif !important;
-  font-size: 16px !important;
+  font-family: var(--default-app-font, 'Forum'), sans-serif !important;
+  font-size: var(--default-app-base-font-size, 16px) !important;
 }
 
 @mixin application-text {
-  font-family: 'Lato', sans-serif !important;
+  font-family: var(--default-app-font, 'Lato'), sans-serif !important;
 }
 
 @mixin rce-text-font {
@@ -78,13 +78,8 @@ $new-item-border: 2px dashed $new-item-border-color;
   font-size: var(--default-rce-font-size, 20px) !important;
 }
 
-@mixin rce-text-font {
-  font-family: var(--default-app-font), sans-serif !important;
-  font-size: var(--default-app-font-size) !important;
-}
-
 @mixin user-text {
-  font-family: 'Forum', sans-serif !important;
+  font-family: var(--default-app-font, 'Forum'), sans-serif !important;
 }
 
 @mixin secondary-text {

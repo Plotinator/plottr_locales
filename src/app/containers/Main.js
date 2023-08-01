@@ -287,10 +287,10 @@ const Main = ({
         settings.user.applicationFont
       )
     }
-    if (settings.user?.applicationFontSizeMultiplier) {
+    if (settings.user?.applicationBaseFontSize) {
       window.document.documentElement.style.setProperty(
-        '--default-app-font',
-        settings.user.applicationFontSizeMultiplier
+        '--default-app-font-size',
+        String(settings.user.applicationBaseFontSize) + 'px'
       )
     }
   }, [settings.user])
