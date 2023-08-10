@@ -1,82 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <SearchIndexes Version="1.0">
     <Documents>
-        <Document ID="B3147E02-B8EE-441E-877A-A3095F7768D9">
-            <Title>Laertes returns from France in a rage</Title>
-            <Synopsis>Description
-
-Gertrude is worried about Ophelia, who appears to have gone mad at the loss of her father. Claudius then enters and sees Ophelia acting strange, and informs Gertrude that there are many suspicious whispers around court about what happened to Polonius. He also tells her that Laertes has returned from France, and then right after that, there is a commotion in the castle. 
-A guard tells King Claudius that Laertes has arrived and brought with him a small mob, with whom he plans to potentially try and overthrow the castle to become the new king. Laertes enters in a fit of rage about his father's death, and Claudius attempts to calm him down, but to no avail. When Ophelia comes back in, clearly having lost her mind, it only further fans Laertes's anger. But Claudius finally manages to convince Laertes to listen to him and let him explain what happened to Polonius.</Synopsis>
-            <Notes>characters
-Gertrude, Claudius, Ophelia, Laertes
-places
-Hamlet
-tags
-STAGE: Climax, THEME: Revenge, THEME: Madness, THEME: Corruption
-</Notes>
-        </Document>
-        <Document ID="AF1B6FB8-ABBF-4FF7-B8BC-B6229694F26A">
-            <Title>Marcellus</Title>
-            <Text>Marcellus  Description
-A palace guard
+        <Document ID="A263D162-6DB9-4E50-9285-67F26D19249C">
+            <Title>Reynaldo</Title>
+            <Text>Reynaldo  Description
+Polonius's servant
 Notes
-One of the two guards who see the ghost of Hamlet's father walking around Elsinore castle, and who ask Horatio if he sees the ghost too.
+A servant to Polonius who is sent to France to spy on Laertes.
 Role
 Extra
 Motivation
-To protect Elsinore castle.
+To do his master's bidding in fetching his son back from France.
 Gender
 Male
 Characters That Die
 No
 Tags
-STAGE: Exposition, STAGE: Rising Action, THEME: Madness, THEME: Health of the Nation
+STAGE: Rising Action, Foreshadowing, THEME: Corruption, THEME: Health of the Nation
 Category
 Other
 </Text>
         </Document>
-        <Document ID="F8898650-72B2-494B-A73D-D28F2020C016">
-            <Title>Hamlet confronts his mother &amp; kills Polonius</Title>
+        <Document ID="3A407AFE-2FC6-4EC2-97AD-B095FAA51D17">
+            <Title>Rosencrantz and Guildenstern confront Hamlet</Title>
             <Synopsis>Description
 
-Polonius tells Queen Gertrude to be harsh with her son in hopes of coaxing out of him the reason for his recent madness. He then hides behind a tapestry while Hamlet enters to confront his mother.
-Hamlet chastises his mother for her betrayal in marrying his uncle, and begins violently yelling at her. When he does this, Polonius cries out from behind the tapestry for help, and Hamlet, not knowing who it is, stabs through the tapestry, killing Polonius. 
-As he continues arguing with his mother, the ghost appears once again, but she is unable to see it. Before disappearing, the ghost reminds Hamlet that he must carry out his mission in killing Claudius, and that he should not be as hard on his mother.
-Because Gertrude cannot see the ghost, Hamlet assures her that he hasn't been actually going mad, it was all a facade, but that the ghost is real. Before dragging away Polonius's body, he tells his mother that while he will go to England with Rosencrantz and Guildenstern, he doesn't trust either of them.</Synopsis>
+Rosencrantz and Guildenstern arrive to meet with Hamlet, who has just finished disposing of Polonius's body. He refuses to tell them what he did with the body, but reminds them that Polonius's blood is on Claudius's hands. He then accuses them of being spies for the King, but ultimately agrees to be taken by the two old friends to an audience with his uncle.</Synopsis>
             <Notes>characters
-Hamlet, Gertrude, Polonius, The Ghost
+Hamlet, Rosencrantz and Guildenstern
 places
-Hamlet
+Elsinore Castle
 tags
-STAGE: Rising Action, STAGE: Climax, THEME: Mortality, Character Death, THEME: Revenge, THEME: Madness, THEME: Corruption
+STAGE: Rising Action, Foreshadowing, STAGE: Climax, THEME: Madness, THEME: Corruption, THEME: Health of the Nation, THEME: Revenge
 </Notes>
         </Document>
-        <Document ID="F728CE5F-F8A0-4847-8E23-6B0291C9B5AF">
-            <Title>Hamlet meets an untimely end</Title>
-            <Notes>characters
-Hamlet, Claudius, Gertrude, Polonius, Horatio, Ophelia, Laertes, Fortinbras, Rosencrantz and Guildenstern, Marcellus, Gravediggers, Sailors, Osric
-places
-Hamlet
-tags
-STAGE: Climax, THEME: Mortality, Character Death, THEME: Madness, THEME: Corruption, THEME: Health of the Nation, THEME: Revenge
-</Notes>
-        </Document>
-        <Document ID="2D3CD02E-5F95-4DBE-A976-5AAB1B476E16">
-            <Title>Hamlet goes after the ghost of his father</Title>
-            <Synopsis>Description
-
-Hamlet waits outside on the castle ramparts with Marcellus and Horatio, hoping to catch a glimpse of the ghost. In the midst of doing so, they hear loud canons and revelry happening, and Hamlet explains it is a Danish custom for the new King. He expresses disdain for it, saying it makes his country look silly to others, and he wishes it would change.
-Then they see the ghost and Hamlet tries calling out to it. When it doesn't answer but beckons Hamlet to follow, Marcellus and Horatio warn him that he shouldn't go. But Hamlet articulates that he doesn't care what happens to him and that if his soul is immortal, he has nothing to fear. 
-Horatio and Marcellus talk about how they think this is an ill omen for their country, and they debate briefly about whether or not to follow Hamlet, before deciding that they want to make sure their friend is safe.</Synopsis>
-            <Notes>characters
-Hamlet, The Ghost, Marcellus, Horatio
-places
-Hamlet
-tags
-STAGE: Exposition, Foreshadowing, Character Death, THEME: Madness, THEME: Revenge
-</Notes>
-        </Document>
-        <Document ID="C8763C76-412F-47CF-BC75-5769759C3C75">
+        <Document ID="8C54F356-3270-4D2E-8191-3660DFE05576">
             <Title>Rosencrantz and Guildenstern</Title>
             <Text>Rosencrantz and Guildenstern  Description
 Two courtiers
@@ -104,41 +62,7 @@ Category
 Supporting
 </Text>
         </Document>
-        <Document ID="80629661-0BF9-4136-B0DE-1D1822E9FF01">
-            <Title>Character Sketches</Title>
-            <Text>Character Sketches  Content
-This infographic () breaks down five of the key figures in Hamlet: Ophelia, King Hamlet, Claudius, Gertrude, and Prince Hamlet himself.
-tags
-Character Death, Foreshadowing, THEME: Mortality, THEME: Revenge, THEME: Corruption
-characters
-Hamlet, Claudius, Gertrude, Ophelia, The Ghost
-places
-Hamlet
-category
-Other
-</Text>
-        </Document>
-        <Document ID="B639B04D-FFFD-41FF-8EDB-59BD90F098BD">
-            <Title>Voltimand and Cornelius</Title>
-            <Text>Voltimand and Cornelius  Description
-Courtiers
-Notes
-The two courtiers that Claudius sends to Norway so they can try and persuade Fortinbras not to attack Denmark.
-Role
-Extras
-Motivation
-To deliver a message to Norway from one king to another.
-Gender
-Male
-Characters That Die
-No
-Tags
-STAGE: Rising Action, STAGE: Exposition, THEME: Health of the Nation, Foreshadowing
-Category
-Other
-</Text>
-        </Document>
-        <Document ID="AA3A86F4-0ED7-404F-8B27-F71C10F01224">
+        <Document ID="28CD79C1-5416-4EFF-8ADE-2859FA192C93">
             <Title>Hamlet speaks with his father's ghost</Title>
             <Synopsis>Description
 
@@ -148,521 +72,12 @@ Just as the ghost fades away, Horatio and Marcellus catch up with Hamlet and ask
             <Notes>characters
 Hamlet, The Ghost, Marcellus, Horatio
 places
-Hamlet
+Elsinore Castle
 tags
 STAGE: Exposition, Foreshadowing, THEME: Mortality, Character Death, THEME: Revenge
 </Notes>
         </Document>
-        <Document ID="CF46D084-1305-45C4-9D1C-D5888D2DA8DB">
-            <Title>Act 2</Title>
-        </Document>
-        <Document ID="45A14959-231C-4551-8BB3-E50E5A67B665">
-            <Title>Horatio</Title>
-            <Text>Horatio  Description
-Hamlet's best friend
-Notes
-Hamlet's best friend who studied with him at Wittenberg. He's a loyal person who aids Hamlet many times during the play. He is the one who lives to tell Hamlet's story.
-Role
-Supporting character
-Motivation
-To be a loyal friend and a good countrymen
-Gender
-Male
-Fatal Flaws
-n/a
-Inner Conflict
-Wants to do what is best for Denmark
-How They Die
-n/a
-Attended Wittenberg
-Yes
-Royal Family Member
-No
-Characters That Die
-No
-Tags
-STAGE: Exposition, STAGE: Rising Action, STAGE: Climax, STAGE: Falling Action, STAGE: Resolution, THEME: Mortality
-Category
-Supporting
-</Text>
-        </Document>
-        <Document ID="1946E5F3-5C54-4FEF-9CEA-6A4F2E85EAFB">
-            <Title>Characters</Title>
-        </Document>
-        <Document ID="90B2BCDD-6E6E-4B1E-941D-0F49087BA86D">
-            <Title>The guards see a ghost</Title>
-            <Synopsis>Description
-
-After a long, cold night on the ramparts guarding Elsinore castle, Bernardo comes to relieve Francisco, and is soon joined by Marcellus. The two of them summon Horatio to join them, because for the past few nights, they have noticed a ghostly apparition walking the ramparts, who they believe to be the ghost of King Hamlet.
-Horatio doesn't want to believe them, until suddenly the Ghost appears before them for a few moments, and then vanishes. He points out how much the ghost looks like the slain King, and says that he believes this to be a bad omen for Denmark, alluding to a possible military incursion that could be led by the Prince of Norway.
-The Ghost appears again and Horatio tries to talk to it, but it remains silent. He then suggests that they should tell the King's son, Hamlet, about the apparition, because if the ghost is going to speak to anyone, he believes it would be his son.</Synopsis>
-            <Notes>characters
-Marcellus, Horatio, The Ghost, Francisco, Bernardo
-places
-Hamlet
-tags
-THEME: Health of the Nation, Foreshadowing, STAGE: Exposition
-</Notes>
-        </Document>
-        <Document ID="D7BBA3B6-D424-4FE0-9143-EC7FB0B040BC">
-            <Title>Fortinbras</Title>
-            <Text>Fortinbras  Description
-The Prince of Norway
-Notes
-Son of King Fortinbras of Norway. He wants to attack Denmark to avenge his father, who Hamlet's father killed. 
-Role
-Antagonist
-Motivation
-To avenge his own father and take back the plot of land that was stolen from his country.
-Gender
-Male
-Inner Conflict
-Wants to get back his plot of land, but is willing to negotiate with the Danes to get it.
-Characters That Die
-No
-Tags
-Foreshadowing, STAGE: Rising Action, STAGE: Resolution, THEME: Revenge, THEME: Health of the Nation
-Category
-Other
-</Text>
-        </Document>
-        <Document ID="9FE5D6D4-DF5F-438F-B478-024E35039AD1">
-            <Title>Character Chart</Title>
-            <Text>Character Chart  Content
-From  character chart &amp; worksheet. 
-tags
-STAGE: Exposition, STAGE: Rising Action, STAGE: Climax, STAGE: Falling Action, STAGE: Resolution
-characters
-Hamlet, Claudius, Gertrude, Polonius, Horatio, Ophelia, Laertes, Fortinbras, The Ghost, Rosencrantz and Guildenstern, Osric, Voltimand and Cornelius, Marcellus, Francisco, Reynaldo, Bernardo, The Players, Sailors, Gravediggers
-places
-Hamlet, Polonius, Horatio
-category
-Main
-note custom attribute 2
-here's some more content
-</Text>
-        </Document>
-        <Document ID="E235A432-B452-4060-9D20-6DD5E47D4102">
-            <Title>Act 1</Title>
-        </Document>
-        <Document ID="69FB6B8D-9B66-4CAD-95AD-EF4006D510D5">
-            <Title>Hamlet denounces Ophelia</Title>
-            <Synopsis>Description
-
-Claudius and Gertrude ask Rosencrantz and Guildenstern about their encounter with Hamlet, but the two of them tell the King and Queen that they couldn't figure it out, and that he seemed in good spirits about the players that arrived. Polonius then arrives and Claudius sends the others away so that they can spy on Hamlet and Ophelia.
-Hamlet enters, musing on the futility of live and beauty, delivering his "To be or not to be" soliloquy. Then when he encounters Ophelia, things take a turn for the worse. Ophelia tries to give him back the letters and tokens of affection, and he goes off on Ophelia, in a mad rant, declaring her, and all women and mankind to be worthless. He sways between saying he never loved her and that he always will. Ophelia leaves heartbroken.
-Polonius and Claudius confer and decide that it doesn't appear to be Ophelia causing his madness, and the two agree to spy on him again after the play to come that night. Polonius says he will spy on Hamlet interacting with Gertrude to root out the cause of his madness.</Synopsis>
-            <Notes>characters
-Hamlet, Claudius, Ophelia, Polonius, Rosencrantz and Guildenstern
-places
-Hamlet
-tags
-STAGE: Rising Action, THEME: Mortality, Foreshadowing, THEME: Madness, THEME: Revenge, THEME: Corruption
-</Notes>
-        </Document>
-        <Document ID="3AC0493B-EC63-4F97-BDB0-726B9960B682">
-            <Title>Notes</Title>
-        </Document>
-        <Document ID="5E035DFD-1BC1-4011-8F42-BBEDE78E23C7">
-            <Title>Hamlet carries out his plan to prove Claudius guilty</Title>
-            <Notes>characters
-Hamlet, Claudius, Gertrude, Polonius, Horatio, Ophelia, Rosencrantz and Guildenstern, Reynaldo, The Players
-places
-Hamlet
-tags
-THEME: Madness, THEME: Revenge, Character Death, THEME: Mortality, THEME: Corruption, Foreshadowing, STAGE: Rising Action
-</Notes>
-        </Document>
-        <Document ID="12C64C45-A734-47C5-A703-303FC1837F02">
-            <Title>Polonius speaks with Ophelia</Title>
-            <Synopsis>Description
-
-Polonius sends his servant Reynaldo to France to spy on his son Laertes, and commands him to report back with what he finds. As the servant leaves, Ophelia comes in, crying and distraught about an interaction with Hamlet.
-She tells her father that Hamlet looked "wild eyed" and was breathing heavy, but didn't say anything to her. Polonius believes that Hamlet has gone mad because Ophelia was distancing herself from him, so he rushes off to speak with Claudius about it.</Synopsis>
-            <Notes>characters
-Ophelia, Polonius, Reynaldo
-places
-Hamlet
-tags
-THEME: Corruption, STAGE: Exposition, Foreshadowing, THEME: Madness
-</Notes>
-        </Document>
-        <Document ID="7086627E-4471-42B8-A52C-754DB8F1F585">
-            <Title>Court watches The Murder of Gonzago</Title>
-            <Synopsis>Description
-
-The court readies for the play, as Hamlet gives the players their parts. He then summons Horatio and tells his friend how highly he thinks of him, and entrusts him with the secret of what the ghost told him. He hopes that Horatio will be able to keep an eye on Claudius to see if he shows any signs of guilt. 
-As everyone enters the room to watch the play, Hamlet starts acting mad once again in front of Polonius, and messes with Ophelia by telling her a lot of erotic puns. The play then begins, and Hamlet comments on it throughout, teasing Ophelia as he goes. 
-When the play reaches the point where the character poisons the king in the garden, Claudius gets loud, angry, and storms out of the room. Hamlet and Horatio agree that such a reaction was damning. 
-Afterwards, Rosencrantz and Guildenstern try again to find out what has been causing him to act crazy, and he gets upset with them. Polonius then enters to escort Hamlet to his mother's chambers, and Hamlet takes a moment to ready himself for the confrontation that's about to ensue.
-</Synopsis>
-            <Notes>characters
-Hamlet, Ophelia, Claudius, Gertrude, Horatio, Polonius, Rosencrantz and Guildenstern, The Players
-places
-Hamlet
-tags
-STAGE: Rising Action, Foreshadowing, THEME: Mortality, THEME: Madness, THEME: Corruption
-</Notes>
-        </Document>
-        <Document ID="0F717255-B2BC-4161-98A3-61F1AAFC67F6">
-            <Title>Graveyard</Title>
-            <Text>Graveyard  Description
-The graveyard where Ophelia is buried
-tags
-STAGE: Rising Action, THEME: Corruption, THEME: Health of the Nation
-</Text>
-        </Document>
-        <Document ID="2D7864C3-7FAB-4C70-87C3-3855DA25D047">
-            <Title>The duel between Laertes and Hamlet</Title>
-            <Synopsis>Description
-
-Back at Elsinore, Hamlet tells Horatio that he swapped the letter meant to kill him and that instead Rosencrantz and Guildenstern will be killed for their betrayal and siding with Claudius. Then, a courtier named Osric enters and tells Hamlet that Laertes wishes to duel him, and starts singing Laertes's praises. Horatio tries to encourage Hamlet not to fight in the duel, but Hamlet decides to anyway. 
-They are summoned to court for the duel. Hamlet and Laertes hash things out, and while Laertes says he won't forgive him fully, he'll at least accept his apology. The two men recieve the swords they are to use for the duel, and Claudius says if Hamlet gets the first or second hit, he will drink to Hamlet's health and then offer a cup to Hamlet. (which will actually contain poison) Hamlet gets the first strike in, but refuses to drink from the cup. Then when he hits Laertes again, Gertrude gets up to drink from the cup, even though Claudius tries to warn her not to.. But it is too late. She's already done it.
-Before they fight another round, Laertes muses if he should lay down his sword, but decides not to, and on the third one, Laertes manages to cut Hamlet with the poisoned blade. But as they continue to fight, their swords accidentally get mixed up and Hamlet ends up cutting and thus poisoning Laertes. Queen Gertrude proclaims the wine was poisoned and dies, just as Laertes admits the sword was also poisoned, and that is was Claudius's idea for both. Laertes dies too, but not before saying he forgives Hamlet. Hamlet then takes up the poisoned sword and at last, kills his uncle by running Claudius through with the blade and forcing him to drink the last of the poison that killed his wife.
-As Fortinbras arrives at the castle, Hamlet clings to Horatio, asking his friend not to die by suicide, but to live on and tell the story of what happened there. He also asks the Fortinbras be made the new king of Denmark. Horatio vows to tell his story, just as Fortinbras enters and asks that Hamlet be given a soldier's send off. </Synopsis>
-            <Notes>characters
-Hamlet, Horatio, Osric, Claudius, Gertrude, Laertes, Fortinbras
-places
-Hamlet
-tags
-STAGE: Resolution, THEME: Mortality, Character Death, THEME: Health of the Nation, THEME: Corruption, THEME: Revenge, THEME: Madness
-</Notes>
-        </Document>
-        <Document ID="C670CBED-94C6-4E6B-8DCD-5884AD33015C">
-            <Title>Hamlet learns the truth from the ghost of his father</Title>
-            <Notes>characters
-Hamlet, Claudius, Gertrude, Polonius, Horatio, Ophelia, Laertes, Fortinbras, The Ghost, Marcellus, Bernardo, Francisco, Reynaldo
-places
-Hamlet
-tags
-STAGE: Exposition, Foreshadowing, THEME: Mortality, THEME: Revenge, THEME: Madness, THEME: Corruption, THEME: Health of the Nation
-test 1
-some text
-test 2
-some other text
-</Notes>
-        </Document>
-        <Document ID="F88E94D4-CAC9-4E5D-85F0-B8A4FFD8C03C">
-            <Title>The Ghost</Title>
-            <Text>The Ghost  Description
-The ghost of Hamlet's father
-Notes
-The ghost of Hamlet's father who returns to tell his son that he was murdered by Claudius so that Claudius could assume the throne. He wants Hamlet to avenge him. The character is ambiguous—Hamlet wonders if the ghost is a demon trying to deceive him—and there is no definitive resolution in the play to what causes the ghost to appear.
-Role
-Protagonist's Father
-Motivation
-To warn his son of the fact that his uncle murdered him, and to challenge him to seek vengence for his death.
-Gender
-Male
-Fatal Flaws
-Too trusting of his brother
-Inner Conflict
-Wants his son to kill his brother to restore his honor
-How They Die
-Poisoned in the ear while sleeping in a garden
-Characters That Die
-No
-Tags
-STAGE: Exposition, STAGE: Falling Action, Foreshadowing, THEME: Mortality, THEME: Revenge, THEME: Religion, THEME: Corruption, THEME: Health of the Nation, Character Death
-Category
-Other
-</Text>
-        </Document>
-        <Document ID="3C5CAE5B-25AE-4230-8E27-F561FA1F1D3A">
-            <Title>Hamlet</Title>
-            <Text>Hamlet  Description
-Prince of Denmark
-Notes
-The title character, Hamlet is the 30 year old Prince of Denmark, nephew to King Claudius, and son of Queen Gertrude. He hates his uncle and resents his mother. Studied at the University of Wittenberg, he is a thoughtful and melancholy individual, but who often makes impulsive, rash decisions. 
-Role
-Protagonist
-Motivation
-Hamlet seeks to get revenge for his father's death
-Gender
-Male
-Fatal Flaws
-Too melancholy, acts before thinking it through
-Inner Conflict
-Wants to take his own life AND get revenge for his father's murder
-How They Die
-Cut with a poisoned sword in a duel with Laertes
-Attended Wittenberg
-Yes
-Royal Family Member
-Yes
-Characters That Die
-Yes
-Tags
-STAGE: Exposition, STAGE: Rising Action, STAGE: Climax, STAGE: Falling Action, STAGE: Resolution, THEME: Mortality, THEME: Revenge, THEME: Madness, Character Death
-Category
-Main
-</Text>
-        </Document>
-        <Document ID="9EA82C71-32EE-4488-8697-9E5AC83F9445">
-            <Title>Gertrude tells Claudius of Hamlet's actions</Title>
-            <Synopsis>Description
-
-Gertrude runs in on Claudius when he is with Rosencrantz and Guildenstern and asks to speak to him alone. When they leave, she tells him about everything that happened when Hamlet came to see her, namely that her son has killed Polonius. Claudius is immediately afraid that news of this could ruin his plans to rule Denmark, and so he summons back Rosencrantz and Guildenstern, telling them to get Hamlet to England with all haste so that he can find a way to explain everything that happened to the people without making himself look bad.</Synopsis>
-            <Notes>characters
-Gertrude, Claudius, Rosencrantz and Guildenstern
-places
-Hamlet
-tags
-THEME: Revenge, Foreshadowing, STAGE: Climax, THEME: Corruption, THEME: Health of the Nation
-</Notes>
-        </Document>
-        <Document ID="93D1B0CB-9C34-475A-8C4C-46A30354A756">
-            <Title>Act 5</Title>
-        </Document>
-        <Document ID="903DFEA2-DF7F-456C-A427-AFEB31702B3B">
-            <Title>Gravediggers</Title>
-            <Text>Gravediggers  Description
-Two gravediggers who dig Ophelia's grave
-Role
-Extras
-Motivation
-Dig the grave to bury Ophelia in.
-Gender
-Male
-Characters That Die
-No
-Tags
-STAGE: Resolution, Foreshadowing, THEME: Mortality, THEME: Religion
-Category
-Other
-</Text>
-        </Document>
-        <Document ID="E71FFDE2-157F-44E5-B04C-E8082C8072DE">
-            <Title>Laertes leaves for France</Title>
-            <Synopsis>Description
-
-As Laertes is preparing to depart for France, he has a conversation with his sister, Ophelia. He cautions her about falling for Hamlet because he believes that Hamlet is too far above Ophelia's station for the two of them to ever be a match. 
-Laertes then says goodbye to his father, who gives him a some extensive advice for how to live and behave while he is away in France. 
-As Laertes finally leaves, Polonius asks Ophelia what she and her brother talked about. She confesses that it was about Hamlet, and that he claims to love her. Polonius agrees with his son in telling Ophelia that he believes Hamlet to be insincere about his affections, and forbids her from seeing him further. </Synopsis>
-            <Notes>characters
-Polonius, Laertes, Ophelia
-places
-Gertrude, Hamlet
-tags
-STAGE: Exposition, THEME: Corruption, THEME: Health of the Nation, Foreshadowing, THEME: Mortality
-</Notes>
-        </Document>
-        <Document ID="8547F603-0668-4F48-81DA-F4229F235040">
-            <Title>Hamlet encounters Fortinbras on the way to England</Title>
-            <Synopsis>Description
-
-While on his way to the ship that will take him to England, Hamlet runs into Fortinbras and his army. Fortinbras has sent word to the castle to confirm that he and his army may pass through Denmark on the way to attacking Poland, which he explains to Hamlet.
-Hamlet asks why they are attacking and Fortinbras explains it is over a small patch of land that he must win back. Hamlet muses on how bloody mankind's appetites are, even for something so insignificant, and then vows to himself that he will be more ruthless in seeking out Claudius for his father's revenge.</Synopsis>
-            <Notes>characters
-Hamlet, Fortinbras, Rosencrantz and Guildenstern
-places
-Polonius
-tags
-STAGE: Climax, Foreshadowing, THEME: Health of the Nation, THEME: Revenge, THEME: Mortality
-</Notes>
-        </Document>
-        <Document ID="0DD52DD2-D33B-40B6-A890-D7D1BFE10A07">
-            <Title>Rosencrantz and Guildenstern confront Hamlet</Title>
-            <Synopsis>Description
-
-Rosencrantz and Guildenstern arrive to meet with Hamlet, who has just finished disposing of Polonius's body. He refuses to tell them what he did with the body, but reminds them that Polonius's blood is on Claudius's hands. He then accuses them of being spies for the King, but ultimately agrees to be taken by the two old friends to an audience with his uncle.</Synopsis>
-            <Notes>characters
-Hamlet, Rosencrantz and Guildenstern
-places
-Hamlet
-tags
-STAGE: Rising Action, Foreshadowing, STAGE: Climax, THEME: Madness, THEME: Corruption, THEME: Health of the Nation, THEME: Revenge
-</Notes>
-        </Document>
-        <Document ID="C98FB962-A614-4049-B9D2-C39F4B8D3396">
-            <Title>Ophelia</Title>
-            <Text>Ophelia  Description
-Hamlet's love interest
-Notes
-Ophelia is the daughter of Polonius, sister to Laertes, and the woman that Hamlet is in love with. She's a sweet girl but who depends on the men around her to tell her what to do, and ultimately, it leads to her untimely death. She eventually goes mad and dies by falling in a river.
-Motivation
-Be a good daughter and sister
-Gender
-Female
-Fatal Flaws
-Relies too much on others
-Inner Conflict
-Wants to be with Hamlet, but doesn't want to defy her father
-How They Die
-Falls into a river and drowns
-Attended Wittenberg
-No
-Royal Family Member
-No
-Characters That Die
-Yes
-Tags
-THEME: Mortality, THEME: Madness, Character Death, STAGE: Exposition, STAGE: Rising Action, STAGE: Climax, THEME: Revenge
-Category
-Supporting
-</Text>
-        </Document>
-        <Document ID="BE108F44-E212-4A50-B220-D35A18629A38">
-            <Title>A busy day at court</Title>
-            <Synopsis>Description
-
-Claudius and Gertrude summon Rosencrantz and Guildenstern, two friends of Hamlet's from when he was at Wittenberg. The King and Queen ask that the two courtiers try to brighten Hamlet's spirits, and in so doing also find out why he has been acting so strangely.
-Then Polonius arrives to tell Claudius that his ambassadors he sent to Norway are back with a reply from the King. They tell him that the King has decided not to attack Denmark, and has given his son an army with which to attack the Poles instead of the Danes. Prince Fortinbras asks only that his armies be allowed to pass through Denmark on their way to Poland, which Claudius agrees to.
-Polonius then tells Claudius that he believes Hamlet has gone made, and pitches a plan for finding out if he has lost his mind because of his love for Ophelia, or if it is for some other reason. 
-Claudius and Gertrude leave when they see Hamlet approaching, but Polonius stays to speak with him. Hamlet acts as if he has gone insane and insults Polonius with a number of jabs that have some truth to them.
-When Polonious leaves, Rosencrantz and Guildenstern enter and Hamlet seems happy to see them. But quickly their facade of concern crumbles and Hamlet expresses that he knows they have been sent to spy on him. They then tell him that a troupe of players is coming to the castle and that might cheer him up.
-The players arrive and Hamlet demands they present on the history of Troy. He is very impressed with the speech and says that the following night, he wants them to stage the play The Murder of Gonzago. Once Hamlet is alone again, he expresses how he wishes he could experience the depth of emotion that the actors do. 
-He then devises a plan for bringing down his uncle, in which he plans to stage a play that is similar to how Claudius killed Hamlet's father. If Claudius reacts negatively, Hamlet can consider that proof that he committed the crime.
-
-</Synopsis>
-            <Notes>characters
-Gertrude, Claudius, Rosencrantz and Guildenstern, Voltimand and Cornelius, Polonius, Hamlet, The Players
-places
-Hamlet
-tags
-STAGE: Rising Action, THEME: Madness, THEME: Corruption, THEME: Health of the Nation, Foreshadowing
-</Notes>
-        </Document>
-        <Document ID="BD3D457D-B158-47AC-909B-B5DB7E51F945">
-            <Title>Horatio receives word from Hamlet</Title>
-            <Synopsis>Description
-
-Horatio gets a letter from Hamlet, who lets him know that the ship meant to take him to England was set upon by pirates and he needed to turn back towards Denmark. The sailors bearing the message say they also have messages for Gertrude and Claudius, so they go to see them, before stealing away to find Hamlet in the countryside, not far from the castle.</Synopsis>
-            <Notes>characters
-Horatio, Sailors
-places
-Hamlet
-tags
-STAGE: Climax, Foreshadowing, THEME: Mortality, THEME: Corruption
-</Notes>
-        </Document>
-        <Document ID="86B7CB4C-67D8-4B6E-9322-F1C616707D71">
-            <Title>Field in Denmark</Title>
-            <Text>Field in Denmark  Description
-Where Hamlet encounters Fortinbras
-category
-Other
-</Text>
-        </Document>
-        <Document ID="693F2F25-75A9-46AB-9797-9B202D1B0162">
-            <Title>Univerisity of Wittenberg</Title>
-            <Text>Univerisity of Wittenberg  Description
-Hamlet &amp; Horatio's university
-</Text>
-        </Document>
-        <Document ID="08C95A73-A991-4558-9589-92A522877970">
-            <Title>Gertrude</Title>
-            <Text>Gertrude  Description
-The Queen of Denmark
-Notes
-The Queen of Denmark, wife of Claudius, and mother of Hamlet. While she loves her son very much, her desperation and need for affection leads her to behave selfishly. Has a very gray moral compass.
-Motivation
-Self-preservation at all costs
-Gender
-Female
-Fatal Flaws
-Selfish
-Inner Conflict
-Doesn't want to give up her own comfort, but also feels she did wrong by her first husband
-How They Die
-Poisoned wine from Claudius
-Attended Wittenberg
-No
-Royal Family Member
-Yes
-Characters That Die
-Yes
-Tags
-Character Death, STAGE: Rising Action, STAGE: Climax, STAGE: Exposition, STAGE: Falling Action, THEME: Corruption
-Category
-Main
-</Text>
-        </Document>
-        <Document ID="6F1C2C5D-EA76-4C11-943B-A58200274794">
-            <Title>Thematic Ideas</Title>
-            <Text>Thematic Ideas  Content
- unpacks the main themes of the play, as well as digs deeper into some of the more subtle themes. These include...
- •	Madness 
-•	Revenge 
-•	Religion 
-•	Subversion of Relationships 
-•	Delay 
-•	Honor 
-•	Ambiguity of Language 
-•	Human Beings 
-•	Political Intrigues 
-•	Suicide 
-This  also digs more into the complicated themes in Hamlet.
-tags
-Foreshadowing, THEME: Mortality, THEME: Revenge, THEME: Madness, THEME: Religion, THEME: Corruption, THEME: Health of the Nation
-characters
-Hamlet, Claudius, Gertrude, Polonius, Horatio, Ophelia, Laertes
-places
-Hamlet, Horatio, Polonius
-</Text>
-        </Document>
-        <Document ID="DDD3D764-8607-435D-BBB4-4E7FD1531E4A">
-            <Title>Elsinore Castle</Title>
-            <Text>Elsinore Castle  Description
-The Denmark palace
-Notes
-Where most of the action takes place in the story.
-tags
-STAGE: Resolution, STAGE: Falling Action, STAGE: Climax, Foreshadowing
-category
-Main
-</Text>
-        </Document>
-        <Document ID="3511976D-181F-4B5E-A000-D4ED959B8EF3">
-            <Title>Claudius</Title>
-            <Text>Claudius  Description
-King of Denmark
-Notes
-Claudius is Hamlet's uncle, and the King of Denmark who dethroned the former King and married his wife, Gertrude. He's the villain, who is calculating and conniving and will do whatever it takes to get ahead.
-Role
-Antagonist
-Motivation
-He wants to be ruler of Denmark so much that he would do anything to get and keep that position
-Gender
-Male
-Fatal Flaws
-Power hungry
-Inner Conflict
-Regrets over marrying his brother's wife
-How They Die
-Killed with a poisonous sword &amp; goblet by Hamlet
-Attended Wittenberg
-No
-Royal Family Member
-Yes
-Characters That Die
-Yes
-Tags
-Character Death, STAGE: Exposition, STAGE: Rising Action, STAGE: Climax, STAGE: Falling Action, STAGE: Resolution, THEME: Religion, THEME: Corruption
-Category
-Main
-</Text>
-        </Document>
-        <Document ID="63B26B1F-FC2C-4CAB-B414-CE05C964A890">
-            <Title>Act 3</Title>
-        </Document>
-        <Document ID="0A2B265E-E08E-4D8D-B0AC-62867BFE5F3C">
-            <Title>Claudius makes an announcement &amp; Hamlet laments</Title>
-            <Synopsis>Description
-
-The following morning, King Claudius makes an announcement that he has married Queen Gertrude, wife of the former King. He says he's done this in an attempt to help the nation heal after losing his leader, because the marriage is something to celebrate. 
-He also shares that the Prince of Norway, Fortinbras, has written to him threatening to invade and take back lands that he feels were stolen by Denmark. Claudius then sends Voltimand and Cornelius to try and convince Fortinbras not to invade. He also agrees with Polonius in allowing Laertes to return to France now that the King's coronation ceremonies are over.
-Claudius then addresses Hamlet, asking why he is still so sad over the loss of his father. He encourages Hamlet to move on, but Hamlet refuses and says he will continue to mourn. Claudius then asks Hamlet to stay in Denmark rather than returning to the University of Wittenberg. Hamlet's mother Gertrude also really wants him to stay, and so he begrudgingly agrees. 
-Hamlet then has a moment where he laments over having lost his father, his mother deciding to marry his uncle and talks about how he wishes he could die.</Synopsis>
-            <Notes>characters
-Claudius, Gertrude, Hamlet, Polonius, Laertes, Voltimand and Cornelius
-places
-Hamlet
-tags
-THEME: Health of the Nation, STAGE: Exposition, THEME: Corruption, THEME: Mortality, Foreshadowing
-</Notes>
-        </Document>
-        <Document ID="13AC049F-B5EA-4CF0-8E16-3FBD2987E695">
+        <Document ID="16CB55E7-B83A-423B-8E6E-89434E243509">
             <Title>Death in Hamlet</Title>
             <Text>Death in Hamlet  Content
 This infographic, which , maps out the deaths in Hamlet, where they happen in the story, and their meaning. It also unpacks themes, character motivations, and more.
@@ -672,81 +87,10 @@ THEME: Mortality, Character Death, Foreshadowing, THEME: Madness, THEME: Corrupt
 characters
 Hamlet, Claudius, Gertrude, Polonius, Ophelia, Laertes
 places
-Hamlet, Horatio
+Elsinore Castle, Graveyard
 </Text>
         </Document>
-        <Document ID="8946B394-83D3-4C5E-9CBE-F844315CD2DC">
-            <Title>Act 4</Title>
-        </Document>
-        <Document ID="1B8C3D14-2B10-44C3-892D-6B1EDA3C8607">
-            <Title>Francisco</Title>
-            <Text>Francisco  Description
-An Elsinore guardd
-Role
-Extra
-Motivation
-Protect Elsinore castle.
-Gender
-Male
-Characters That Die
-No
-Tags
-STAGE: Exposition, Foreshadowing, THEME: Madness
-Category
-Other
-</Text>
-        </Document>
-        <Document ID="7B02791C-2EB7-4241-BAC9-F54D51BBCCD3">
-            <Title>Sailors</Title>
-            <Text>Sailors  Description
-A pair of sailors sent by Hamlet
-Notes
-They carry a message from Hamlet to Horatio and the King and Queen after Hamlet's ship is set upon by pirates.
-Role
-Extra
-Motivation
-To deliver a message from Hamlet to those at Elsinore Castle.
-Gender
-Male
-Characters That Die
-No
-Tags
-STAGE: Falling Action, Foreshadowing, THEME: Revenge
-Category
-Other
-</Text>
-        </Document>
-        <Document ID="68E6B84C-AB92-4F22-8122-7DC7CFC823C8">
-            <Title>Hamlet is sent away, but Laertes returns</Title>
-            <Notes>characters
-Gertrude, Claudius, Rosencrantz and Guildenstern, Fortinbras, Laertes, Ophelia, Horatio, Sailors
-places
-Hamlet, Polonius
-tags
-THEME: Corruption, THEME: Health of the Nation, THEME: Revenge, Foreshadowing, STAGE: Climax, THEME: Madness, STAGE: Rising Action, THEME: Mortality
-</Notes>
-        </Document>
-        <Document ID="F9A6962C-8F50-422F-80E0-37A8A5DEB47A">
-            <Title>Bernardo</Title>
-            <Text>Bernardo  Description
-A palace guard
-Notes
-One of the two guards who see the ghost of Hamlet's father walking around Elsinore castle, and who ask Horatio if he sees the ghost too.
-Role
-Extra
-Motivation
-To protect Elsinore castle.
-Gender
-Male
-Characters That Die
-No
-Tags
-STAGE: Exposition, STAGE: Rising Action, Foreshadowing, THEME: Madness, THEME: Health of the Nation
-Category
-Other
-</Text>
-        </Document>
-        <Document ID="15DD1FCD-C19B-44BC-B49A-75CDBE1E12BF">
+        <Document ID="6EE9C038-79CB-4062-AFF8-92F244252C08">
             <Title>Laertes</Title>
             <Text>Laertes  Description
 Ophelia's brother
@@ -776,23 +120,57 @@ Category
 Main
 </Text>
         </Document>
-        <Document ID="5EAD81E2-EC7B-4F94-8812-CC154004F182">
-            <Title>Osric</Title>
-            <Text>Osric  Description
-A courtier
-Notes
-The courtier who summons Hamlet when he has to duel Laertes.
+        <Document ID="D88FC21C-BA7D-4ACA-8AFC-AA50E90AE469">
+            <Title>Claudius and Laertes plan to kill Hamlet</Title>
+            <Synopsis>Description
+
+Claudius finally tells Laertes the truth of what happened between Hamlet and Polonius, and the two determine that Hamlet needs to be taken care of in a way that is not as conspicuous to the people of Denmark. Just then, the sailors and Horatio come to tell the men that Hamlet will be back at the court the next day because of the pirates attacking Hamlet's ship. They then devise to tempt Hamlet into a duel, and Laertes plots to use a sharpened sword that has been dipped in poison, so all he needs to do will be the cut Hamlet quickly and he'll die from the poison. Claudius even proposes a back up plan of giving Hamlet a glass of poisoned wine even if he wins the duel. 
+
+At this point, Gertrude enters to tell them the sad news that Ophelia has fallen into a river and drowned, which further stokes Laertes anger and lust for revenge. He storms from the room, which leaves Claudius feeling uneasy.
+</Synopsis>
+            <Notes>characters
+Claudius, Laertes, Gertrude
+places
+Elsinore Castle
+tags
+THEME: Madness, THEME: Corruption, THEME: Revenge, STAGE: Climax, Character Death
+</Notes>
+        </Document>
+        <Document ID="58600A07-9FCD-4974-AA05-2D4B39812775">
+            <Title>The duel between Laertes and Hamlet</Title>
+            <Synopsis>Description
+
+Back at Elsinore, Hamlet tells Horatio that he swapped the letter meant to kill him and that instead Rosencrantz and Guildenstern will be killed for their betrayal and siding with Claudius. Then, a courtier named Osric enters and tells Hamlet that Laertes wishes to duel him, and starts singing Laertes's praises. Horatio tries to encourage Hamlet not to fight in the duel, but Hamlet decides to anyway. 
+They are summoned to court for the duel. Hamlet and Laertes hash things out, and while Laertes says he won't forgive him fully, he'll at least accept his apology. The two men recieve the swords they are to use for the duel, and Claudius says if Hamlet gets the first or second hit, he will drink to Hamlet's health and then offer a cup to Hamlet. (which will actually contain poison) Hamlet gets the first strike in, but refuses to drink from the cup. Then when he hits Laertes again, Gertrude gets up to drink from the cup, even though Claudius tries to warn her not to.. But it is too late. She's already done it.
+Before they fight another round, Laertes muses if he should lay down his sword, but decides not to, and on the third one, Laertes manages to cut Hamlet with the poisoned blade. But as they continue to fight, their swords accidentally get mixed up and Hamlet ends up cutting and thus poisoning Laertes. Queen Gertrude proclaims the wine was poisoned and dies, just as Laertes admits the sword was also poisoned, and that is was Claudius's idea for both. Laertes dies too, but not before saying he forgives Hamlet. Hamlet then takes up the poisoned sword and at last, kills his uncle by running Claudius through with the blade and forcing him to drink the last of the poison that killed his wife.
+As Fortinbras arrives at the castle, Hamlet clings to Horatio, asking his friend not to die by suicide, but to live on and tell the story of what happened there. He also asks the Fortinbras be made the new king of Denmark. Horatio vows to tell his story, just as Fortinbras enters and asks that Hamlet be given a soldier's send off. </Synopsis>
+            <Notes>characters
+Hamlet, Horatio, Osric, Claudius, Gertrude, Laertes, Fortinbras
+places
+Elsinore Castle
+tags
+STAGE: Resolution, THEME: Mortality, Character Death, THEME: Health of the Nation, THEME: Corruption, THEME: Revenge, THEME: Madness
+</Notes>
+        </Document>
+        <Document ID="8FB00F9F-4026-4BBC-810C-7D66688DF47C">
+            <Title>Gravediggers</Title>
+            <Text>Gravediggers  Description
+Two gravediggers who dig Ophelia's grave
+Role
+Extras
+Motivation
+Dig the grave to bury Ophelia in.
 Gender
 Male
 Characters That Die
 No
 Tags
-STAGE: Resolution, THEME: Mortality, THEME: Madness, THEME: Corruption
+STAGE: Resolution, Foreshadowing, THEME: Mortality, THEME: Religion
 Category
 Other
 </Text>
         </Document>
-        <Document ID="BECB7D60-87B6-4F1F-8E2F-9868327752CF">
+        <Document ID="9218057F-08EA-4F0C-A7E7-06758D5E4369">
             <Title>Hamlet and Horatio witness Ophelia's funeral</Title>
             <Synopsis>Description
 
@@ -802,12 +180,652 @@ Among the mourners are the King and Queen and Laertes, who is visibly upset abou
             <Notes>characters
 Hamlet, Horatio, Claudius, Gertrude, Laertes, Ophelia, Gravediggers
 places
-Horatio
+Graveyard
 tags
 STAGE: Falling Action, THEME: Mortality, Foreshadowing, THEME: Corruption, THEME: Religion, THEME: Revenge
 </Notes>
         </Document>
-        <Document ID="A89AEA83-CB8D-461E-B287-75F9F2FF2524">
+        <Document ID="BBCFF23F-74A3-4165-AA25-35CB760C8B33">
+            <Title>Bernardo</Title>
+            <Text>Bernardo  Description
+A palace guard
+Notes
+One of the two guards who see the ghost of Hamlet's father walking around Elsinore castle, and who ask Horatio if he sees the ghost too.
+Role
+Extra
+Motivation
+To protect Elsinore castle.
+Gender
+Male
+Characters That Die
+No
+Tags
+STAGE: Exposition, STAGE: Rising Action, Foreshadowing, THEME: Madness, THEME: Health of the Nation
+Category
+Other
+</Text>
+        </Document>
+        <Document ID="7DD061E6-6822-4AB6-A88F-68C7D98BC360">
+            <Title>Horatio</Title>
+            <Text>Horatio  Description
+Hamlet's best friend
+Notes
+Hamlet's best friend who studied with him at Wittenberg. He's a loyal person who aids Hamlet many times during the play. He is the one who lives to tell Hamlet's story.
+Role
+Supporting character
+Motivation
+To be a loyal friend and a good countrymen
+Gender
+Male
+Fatal Flaws
+n/a
+Inner Conflict
+Wants to do what is best for Denmark
+How They Die
+n/a
+Attended Wittenberg
+Yes
+Royal Family Member
+No
+Characters That Die
+No
+Tags
+STAGE: Exposition, STAGE: Rising Action, STAGE: Climax, STAGE: Falling Action, STAGE: Resolution, THEME: Mortality
+Category
+Supporting
+</Text>
+        </Document>
+        <Document ID="4D71E49F-9D5F-42C1-B27B-A4190998AC96">
+            <Title>Voltimand and Cornelius</Title>
+            <Text>Voltimand and Cornelius  Description
+Courtiers
+Notes
+The two courtiers that Claudius sends to Norway so they can try and persuade Fortinbras not to attack Denmark.
+Role
+Extras
+Motivation
+To deliver a message to Norway from one king to another.
+Gender
+Male
+Characters That Die
+No
+Tags
+STAGE: Rising Action, STAGE: Exposition, THEME: Health of the Nation, Foreshadowing
+Category
+Other
+</Text>
+        </Document>
+        <Document ID="88B1BD3E-A4C2-434A-99B8-77CD08742562">
+            <Title>Elsinore Castle</Title>
+            <Text>Elsinore Castle  Description
+The Denmark palace
+Notes
+Where most of the action takes place in the story.
+tags
+STAGE: Resolution, STAGE: Falling Action, STAGE: Climax, Foreshadowing
+category
+Main
+</Text>
+        </Document>
+        <Document ID="EAB3BD5E-1574-4B3D-AFB6-345572F64141">
+            <Title>Laertes returns from France in a rage</Title>
+            <Synopsis>Description
+
+Gertrude is worried about Ophelia, who appears to have gone mad at the loss of her father. Claudius then enters and sees Ophelia acting strange, and informs Gertrude that there are many suspicious whispers around court about what happened to Polonius. He also tells her that Laertes has returned from France, and then right after that, there is a commotion in the castle. 
+A guard tells King Claudius that Laertes has arrived and brought with him a small mob, with whom he plans to potentially try and overthrow the castle to become the new king. Laertes enters in a fit of rage about his father's death, and Claudius attempts to calm him down, but to no avail. When Ophelia comes back in, clearly having lost her mind, it only further fans Laertes's anger. But Claudius finally manages to convince Laertes to listen to him and let him explain what happened to Polonius.</Synopsis>
+            <Notes>characters
+Gertrude, Claudius, Ophelia, Laertes
+places
+Elsinore Castle
+tags
+STAGE: Climax, THEME: Revenge, THEME: Madness, THEME: Corruption
+</Notes>
+        </Document>
+        <Document ID="2DA1E539-7DB1-48FF-A08C-78D47D83F67C">
+            <Title>Character Chart</Title>
+            <Text>Character Chart  Content
+From  character chart &amp; worksheet. 
+tags
+STAGE: Exposition, STAGE: Rising Action, STAGE: Climax, STAGE: Falling Action, STAGE: Resolution
+characters
+Hamlet, Claudius, Gertrude, Polonius, Horatio, Ophelia, Laertes, Fortinbras, The Ghost, Rosencrantz and Guildenstern, Osric, Voltimand and Cornelius, Marcellus, Francisco, Reynaldo, Bernardo, The Players, Sailors, Gravediggers
+places
+Elsinore Castle, Field in Denmark, Graveyard
+category
+Main
+note custom attribute 2
+here's some more content
+</Text>
+        </Document>
+        <Document ID="709C8D54-4F3A-4D56-96CA-02BA97955476">
+            <Title>A busy day at court</Title>
+            <Synopsis>Description
+
+Claudius and Gertrude summon Rosencrantz and Guildenstern, two friends of Hamlet's from when he was at Wittenberg. The King and Queen ask that the two courtiers try to brighten Hamlet's spirits, and in so doing also find out why he has been acting so strangely.
+Then Polonius arrives to tell Claudius that his ambassadors he sent to Norway are back with a reply from the King. They tell him that the King has decided not to attack Denmark, and has given his son an army with which to attack the Poles instead of the Danes. Prince Fortinbras asks only that his armies be allowed to pass through Denmark on their way to Poland, which Claudius agrees to.
+Polonius then tells Claudius that he believes Hamlet has gone made, and pitches a plan for finding out if he has lost his mind because of his love for Ophelia, or if it is for some other reason. 
+Claudius and Gertrude leave when they see Hamlet approaching, but Polonius stays to speak with him. Hamlet acts as if he has gone insane and insults Polonius with a number of jabs that have some truth to them.
+When Polonious leaves, Rosencrantz and Guildenstern enter and Hamlet seems happy to see them. But quickly their facade of concern crumbles and Hamlet expresses that he knows they have been sent to spy on him. They then tell him that a troupe of players is coming to the castle and that might cheer him up.
+The players arrive and Hamlet demands they present on the history of Troy. He is very impressed with the speech and says that the following night, he wants them to stage the play The Murder of Gonzago. Once Hamlet is alone again, he expresses how he wishes he could experience the depth of emotion that the actors do. 
+He then devises a plan for bringing down his uncle, in which he plans to stage a play that is similar to how Claudius killed Hamlet's father. If Claudius reacts negatively, Hamlet can consider that proof that he committed the crime.
+
+</Synopsis>
+            <Notes>characters
+Gertrude, Claudius, Rosencrantz and Guildenstern, Voltimand and Cornelius, Polonius, Hamlet, The Players
+places
+Elsinore Castle
+tags
+STAGE: Rising Action, THEME: Madness, THEME: Corruption, THEME: Health of the Nation, Foreshadowing
+</Notes>
+        </Document>
+        <Document ID="56D5788E-531A-49DF-B057-8A421431F780">
+            <Title>Thematic Ideas</Title>
+            <Text>Thematic Ideas  Content
+ unpacks the main themes of the play, as well as digs deeper into some of the more subtle themes. These include...
+ •	Madness 
+•	Revenge 
+•	Religion 
+•	Subversion of Relationships 
+•	Delay 
+•	Honor 
+•	Ambiguity of Language 
+•	Human Beings 
+•	Political Intrigues 
+•	Suicide 
+This  also digs more into the complicated themes in Hamlet.
+tags
+Foreshadowing, THEME: Mortality, THEME: Revenge, THEME: Madness, THEME: Religion, THEME: Corruption, THEME: Health of the Nation
+characters
+Hamlet, Claudius, Gertrude, Polonius, Horatio, Ophelia, Laertes
+places
+Elsinore Castle, Graveyard, Field in Denmark
+</Text>
+        </Document>
+        <Document ID="9BC1A576-367F-419A-B3B6-77D9775A2AEB">
+            <Title>Hamlet</Title>
+            <Text>Hamlet  Description
+Prince of Denmark
+Notes
+The title character, Hamlet is the 30 year old Prince of Denmark, nephew to King Claudius, and son of Queen Gertrude. He hates his uncle and resents his mother. Studied at the University of Wittenberg, he is a thoughtful and melancholy individual, but who often makes impulsive, rash decisions. 
+Role
+Protagonist
+Motivation
+Hamlet seeks to get revenge for his father's death
+Gender
+Male
+Fatal Flaws
+Too melancholy, acts before thinking it through
+Inner Conflict
+Wants to take his own life AND get revenge for his father's murder
+How They Die
+Cut with a poisoned sword in a duel with Laertes
+Attended Wittenberg
+Yes
+Royal Family Member
+Yes
+Characters That Die
+Yes
+Tags
+STAGE: Exposition, STAGE: Rising Action, STAGE: Climax, STAGE: Falling Action, STAGE: Resolution, THEME: Mortality, THEME: Revenge, THEME: Madness, Character Death
+Category
+Main
+</Text>
+        </Document>
+        <Document ID="AA4B3619-C977-48E7-86B6-28F394F47D52">
+            <Title>Character Sketches</Title>
+            <Text>Character Sketches  Content
+This infographic () breaks down five of the key figures in Hamlet: Ophelia, King Hamlet, Claudius, Gertrude, and Prince Hamlet himself.
+tags
+Character Death, Foreshadowing, THEME: Mortality, THEME: Revenge, THEME: Corruption
+characters
+Hamlet, Claudius, Gertrude, Ophelia, The Ghost
+places
+Elsinore Castle
+category
+Other
+</Text>
+        </Document>
+        <Document ID="7755A2B8-5AAD-48AD-9DFC-5B0A340137C1">
+            <Title>Horatio receives word from Hamlet</Title>
+            <Synopsis>Description
+
+Horatio gets a letter from Hamlet, who lets him know that the ship meant to take him to England was set upon by pirates and he needed to turn back towards Denmark. The sailors bearing the message say they also have messages for Gertrude and Claudius, so they go to see them, before stealing away to find Hamlet in the countryside, not far from the castle.</Synopsis>
+            <Notes>characters
+Horatio, Sailors
+places
+Elsinore Castle
+tags
+STAGE: Climax, Foreshadowing, THEME: Mortality, THEME: Corruption
+</Notes>
+        </Document>
+        <Document ID="7F8CC7DA-F36C-4DDE-923A-8277F412F6D0">
+            <Title>Hamlet encounters Fortinbras on the way to England</Title>
+            <Synopsis>Description
+
+While on his way to the ship that will take him to England, Hamlet runs into Fortinbras and his army. Fortinbras has sent word to the castle to confirm that he and his army may pass through Denmark on the way to attacking Poland, which he explains to Hamlet.
+Hamlet asks why they are attacking and Fortinbras explains it is over a small patch of land that he must win back. Hamlet muses on how bloody mankind's appetites are, even for something so insignificant, and then vows to himself that he will be more ruthless in seeking out Claudius for his father's revenge.</Synopsis>
+            <Notes>characters
+Hamlet, Fortinbras, Rosencrantz and Guildenstern
+places
+Field in Denmark
+tags
+STAGE: Climax, Foreshadowing, THEME: Health of the Nation, THEME: Revenge, THEME: Mortality
+</Notes>
+        </Document>
+        <Document ID="B626A092-AC7A-44B9-A36A-4CD1DA86C5CE">
+            <Title>Field in Denmark</Title>
+            <Text>Field in Denmark  Description
+Where Hamlet encounters Fortinbras
+category
+Other
+</Text>
+        </Document>
+        <Document ID="CA247183-B041-4893-A312-9D75D316FC83">
+            <Title>Hamlet carries out his plan to prove Claudius guilty</Title>
+            <Notes>characters
+Hamlet, Claudius, Gertrude, Polonius, Horatio, Ophelia, Rosencrantz and Guildenstern, Reynaldo, The Players
+places
+Elsinore Castle
+tags
+THEME: Madness, THEME: Revenge, Character Death, THEME: Mortality, THEME: Corruption, Foreshadowing, STAGE: Rising Action
+</Notes>
+        </Document>
+        <Document ID="C1721383-0614-4B96-995B-1231715C406A">
+            <Title>Graveyard</Title>
+            <Text>Graveyard  Description
+The graveyard where Ophelia is buried
+tags
+STAGE: Rising Action, THEME: Corruption, THEME: Health of the Nation
+</Text>
+        </Document>
+        <Document ID="35E18F27-89B4-46DD-B83A-678F9F5990DD">
+            <Title>Notes</Title>
+        </Document>
+        <Document ID="A263B676-96D3-434B-B0C2-D8529FDE23C6">
+            <Title>Gertrude tells Claudius of Hamlet's actions</Title>
+            <Synopsis>Description
+
+Gertrude runs in on Claudius when he is with Rosencrantz and Guildenstern and asks to speak to him alone. When they leave, she tells him about everything that happened when Hamlet came to see her, namely that her son has killed Polonius. Claudius is immediately afraid that news of this could ruin his plans to rule Denmark, and so he summons back Rosencrantz and Guildenstern, telling them to get Hamlet to England with all haste so that he can find a way to explain everything that happened to the people without making himself look bad.</Synopsis>
+            <Notes>characters
+Gertrude, Claudius, Rosencrantz and Guildenstern
+places
+Elsinore Castle
+tags
+THEME: Revenge, Foreshadowing, STAGE: Climax, THEME: Corruption, THEME: Health of the Nation
+</Notes>
+        </Document>
+        <Document ID="CD7B1533-F96D-4D65-88A9-8EE34707E19E">
+            <Title>Claudius demands to know where Polonius's body is</Title>
+            <Synopsis>Description
+
+Claudius is seen informing courtiers of the untimely death of Polonius, when Hamlet is brought before him to be confronted. He asks Hamlet where he has placed Polonius's body, but at first, Hamlet refuses to tell him. Hamlet insults him by saying that Claudius could seek him out in heaven, or join him in hell. But ultimately, he tells Claudius that the body has been hidden under the stairs in the palace.
+Claudius then dismisses Hamlet, ordering him to board the ship to England at once, under the supervision of Rosencrantz and Guildenstern. Once they are all gone, Claudius admits that he has sent sealed orders to England to see to it that Hamlet is killed upon his arrival.</Synopsis>
+            <Notes>characters
+Claudius, Hamlet, Rosencrantz and Guildenstern
+places
+Elsinore Castle
+tags
+Foreshadowing, THEME: Madness, THEME: Corruption, THEME: Health of the Nation, STAGE: Climax
+</Notes>
+        </Document>
+        <Document ID="DE7FA6E1-0B5B-434F-A953-15B9FF71BCAA">
+            <Title>Hamlet goes after the ghost of his father</Title>
+            <Synopsis>Description
+
+Hamlet waits outside on the castle ramparts with Marcellus and Horatio, hoping to catch a glimpse of the ghost. In the midst of doing so, they hear loud canons and revelry happening, and Hamlet explains it is a Danish custom for the new King. He expresses disdain for it, saying it makes his country look silly to others, and he wishes it would change.
+Then they see the ghost and Hamlet tries calling out to it. When it doesn't answer but beckons Hamlet to follow, Marcellus and Horatio warn him that he shouldn't go. But Hamlet articulates that he doesn't care what happens to him and that if his soul is immortal, he has nothing to fear. 
+Horatio and Marcellus talk about how they think this is an ill omen for their country, and they debate briefly about whether or not to follow Hamlet, before deciding that they want to make sure their friend is safe.</Synopsis>
+            <Notes>characters
+Hamlet, The Ghost, Marcellus, Horatio
+places
+Elsinore Castle
+tags
+STAGE: Exposition, Foreshadowing, Character Death, THEME: Madness, THEME: Revenge
+</Notes>
+        </Document>
+        <Document ID="96D5430F-B330-4C0E-BDB4-C0EE7FBE530C">
+            <Title>The guards see a ghost</Title>
+            <Synopsis>Description
+
+After a long, cold night on the ramparts guarding Elsinore castle, Bernardo comes to relieve Francisco, and is soon joined by Marcellus. The two of them summon Horatio to join them, because for the past few nights, they have noticed a ghostly apparition walking the ramparts, who they believe to be the ghost of King Hamlet.
+Horatio doesn't want to believe them, until suddenly the Ghost appears before them for a few moments, and then vanishes. He points out how much the ghost looks like the slain King, and says that he believes this to be a bad omen for Denmark, alluding to a possible military incursion that could be led by the Prince of Norway.
+The Ghost appears again and Horatio tries to talk to it, but it remains silent. He then suggests that they should tell the King's son, Hamlet, about the apparition, because if the ghost is going to speak to anyone, he believes it would be his son.</Synopsis>
+            <Notes>characters
+Marcellus, Horatio, The Ghost, Francisco, Bernardo
+places
+Elsinore Castle
+tags
+THEME: Health of the Nation, Foreshadowing, STAGE: Exposition
+</Notes>
+        </Document>
+        <Document ID="C4C9B4FA-C970-4B48-8C56-94020E791CFE">
+            <Title>Act 4</Title>
+        </Document>
+        <Document ID="69EE5CEB-3EA5-41A7-A74A-913EEFAD6A2F">
+            <Title>France</Title>
+            <Text>France  Description
+Where Laertes spends part of the play
+</Text>
+        </Document>
+        <Document ID="A0CED6CF-E94E-4350-9B47-D1438AF92D08">
+            <Title>Francisco</Title>
+            <Text>Francisco  Description
+An Elsinore guardd
+Role
+Extra
+Motivation
+Protect Elsinore castle.
+Gender
+Male
+Characters That Die
+No
+Tags
+STAGE: Exposition, Foreshadowing, THEME: Madness
+Category
+Other
+</Text>
+        </Document>
+        <Document ID="EDD0FCC4-04E5-483D-A9B9-DDCF500F3952">
+            <Title>Polonius speaks with Ophelia</Title>
+            <Synopsis>Description
+
+Polonius sends his servant Reynaldo to France to spy on his son Laertes, and commands him to report back with what he finds. As the servant leaves, Ophelia comes in, crying and distraught about an interaction with Hamlet.
+She tells her father that Hamlet looked "wild eyed" and was breathing heavy, but didn't say anything to her. Polonius believes that Hamlet has gone mad because Ophelia was distancing herself from him, so he rushes off to speak with Claudius about it.</Synopsis>
+            <Notes>characters
+Ophelia, Polonius, Reynaldo
+places
+Elsinore Castle
+tags
+THEME: Corruption, STAGE: Exposition, Foreshadowing, THEME: Madness
+</Notes>
+        </Document>
+        <Document ID="E7C7F854-1A7E-4BE8-9FBD-1F3AC0B199B7">
+            <Title>Characters</Title>
+        </Document>
+        <Document ID="3FB2BFB1-6509-4852-9237-1D30930EA70F">
+            <Title>Places</Title>
+        </Document>
+        <Document ID="484A35AE-7664-440E-9BBE-C04A4C1D63EA">
+            <Title>Fortinbras</Title>
+            <Text>Fortinbras  Description
+The Prince of Norway
+Notes
+Son of King Fortinbras of Norway. He wants to attack Denmark to avenge his father, who Hamlet's father killed. 
+Role
+Antagonist
+Motivation
+To avenge his own father and take back the plot of land that was stolen from his country.
+Gender
+Male
+Inner Conflict
+Wants to get back his plot of land, but is willing to negotiate with the Danes to get it.
+Characters That Die
+No
+Tags
+Foreshadowing, STAGE: Rising Action, STAGE: Resolution, THEME: Revenge, THEME: Health of the Nation
+Category
+Other
+</Text>
+        </Document>
+        <Document ID="87DDB0F1-6E02-4730-A0E2-13A8B294C101">
+            <Title>The Players</Title>
+            <Text>The Players  Description
+The theater troupe
+Notes
+The theater troupe that passes through town and delivers speeches about Troy and puts on the play The Murder of Gonzago.
+Role
+Extras
+Motivation
+To put on a play for the royal court of Denmark.
+Gender
+Male
+Characters That Die
+No
+Tags
+STAGE: Rising Action, STAGE: Climax, Foreshadowing, THEME: Mortality, THEME: Revenge, THEME: Corruption
+Category
+Other
+</Text>
+        </Document>
+        <Document ID="62D9143F-0AC3-4E7E-9B1D-C1B0526FF374">
+            <Title>Act 5</Title>
+        </Document>
+        <Document ID="D612AF0A-C5DA-45AC-9A52-D8BF12B8C4BB">
+            <Title>Gertrude</Title>
+            <Text>Gertrude  Description
+The Queen of Denmark
+Notes
+The Queen of Denmark, wife of Claudius, and mother of Hamlet. While she loves her son very much, her desperation and need for affection leads her to behave selfishly. Has a very gray moral compass.
+Motivation
+Self-preservation at all costs
+Gender
+Female
+Fatal Flaws
+Selfish
+Inner Conflict
+Doesn't want to give up her own comfort, but also feels she did wrong by her first husband
+How They Die
+Poisoned wine from Claudius
+Attended Wittenberg
+No
+Royal Family Member
+Yes
+Characters That Die
+Yes
+Tags
+Character Death, STAGE: Rising Action, STAGE: Climax, STAGE: Exposition, STAGE: Falling Action, THEME: Corruption
+Category
+Main
+</Text>
+        </Document>
+        <Document ID="FBEBFA4A-86C3-42AF-9FAA-6ED5D1F5C924">
+            <Title>Hamlet confronts his mother &amp; kills Polonius</Title>
+            <Synopsis>Description
+
+Polonius tells Queen Gertrude to be harsh with her son in hopes of coaxing out of him the reason for his recent madness. He then hides behind a tapestry while Hamlet enters to confront his mother.
+Hamlet chastises his mother for her betrayal in marrying his uncle, and begins violently yelling at her. When he does this, Polonius cries out from behind the tapestry for help, and Hamlet, not knowing who it is, stabs through the tapestry, killing Polonius. 
+As he continues arguing with his mother, the ghost appears once again, but she is unable to see it. Before disappearing, the ghost reminds Hamlet that he must carry out his mission in killing Claudius, and that he should not be as hard on his mother.
+Because Gertrude cannot see the ghost, Hamlet assures her that he hasn't been actually going mad, it was all a facade, but that the ghost is real. Before dragging away Polonius's body, he tells his mother that while he will go to England with Rosencrantz and Guildenstern, he doesn't trust either of them.</Synopsis>
+            <Notes>characters
+Hamlet, Gertrude, Polonius, The Ghost
+places
+Elsinore Castle
+tags
+STAGE: Rising Action, STAGE: Climax, THEME: Mortality, Character Death, THEME: Revenge, THEME: Madness, THEME: Corruption
+</Notes>
+        </Document>
+        <Document ID="C4176A39-2455-402A-B13D-EEA27644778F">
+            <Title>Ophelia</Title>
+            <Text>Ophelia  Description
+Hamlet's love interest
+Notes
+Ophelia is the daughter of Polonius, sister to Laertes, and the woman that Hamlet is in love with. She's a sweet girl but who depends on the men around her to tell her what to do, and ultimately, it leads to her untimely death. She eventually goes mad and dies by falling in a river.
+Motivation
+Be a good daughter and sister
+Gender
+Female
+Fatal Flaws
+Relies too much on others
+Inner Conflict
+Wants to be with Hamlet, but doesn't want to defy her father
+How They Die
+Falls into a river and drowns
+Attended Wittenberg
+No
+Royal Family Member
+No
+Characters That Die
+Yes
+Tags
+THEME: Mortality, THEME: Madness, Character Death, STAGE: Exposition, STAGE: Rising Action, STAGE: Climax, THEME: Revenge
+Category
+Supporting
+</Text>
+        </Document>
+        <Document ID="C361771E-E506-47A9-93C7-940FC628BA6B">
+            <Title>Hamlet denounces Ophelia</Title>
+            <Synopsis>Description
+
+Claudius and Gertrude ask Rosencrantz and Guildenstern about their encounter with Hamlet, but the two of them tell the King and Queen that they couldn't figure it out, and that he seemed in good spirits about the players that arrived. Polonius then arrives and Claudius sends the others away so that they can spy on Hamlet and Ophelia.
+Hamlet enters, musing on the futility of live and beauty, delivering his "To be or not to be" soliloquy. Then when he encounters Ophelia, things take a turn for the worse. Ophelia tries to give him back the letters and tokens of affection, and he goes off on Ophelia, in a mad rant, declaring her, and all women and mankind to be worthless. He sways between saying he never loved her and that he always will. Ophelia leaves heartbroken.
+Polonius and Claudius confer and decide that it doesn't appear to be Ophelia causing his madness, and the two agree to spy on him again after the play to come that night. Polonius says he will spy on Hamlet interacting with Gertrude to root out the cause of his madness.</Synopsis>
+            <Notes>characters
+Hamlet, Claudius, Ophelia, Polonius, Rosencrantz and Guildenstern
+places
+Elsinore Castle
+tags
+STAGE: Rising Action, THEME: Mortality, Foreshadowing, THEME: Madness, THEME: Revenge, THEME: Corruption
+</Notes>
+        </Document>
+        <Document ID="4744159A-C2B3-409E-930B-0E3714F4C6F0">
+            <Title>Act 3</Title>
+        </Document>
+        <Document ID="C594D440-F2E6-449F-B242-8DBBA11EBFE3">
+            <Title>The Ghost</Title>
+            <Text>The Ghost  Description
+The ghost of Hamlet's father
+Notes
+The ghost of Hamlet's father who returns to tell his son that he was murdered by Claudius so that Claudius could assume the throne. He wants Hamlet to avenge him. The character is ambiguous—Hamlet wonders if the ghost is a demon trying to deceive him—and there is no definitive resolution in the play to what causes the ghost to appear.
+Role
+Protagonist's Father
+Motivation
+To warn his son of the fact that his uncle murdered him, and to challenge him to seek vengence for his death.
+Gender
+Male
+Fatal Flaws
+Too trusting of his brother
+Inner Conflict
+Wants his son to kill his brother to restore his honor
+How They Die
+Poisoned in the ear while sleeping in a garden
+Characters That Die
+No
+Tags
+STAGE: Exposition, STAGE: Falling Action, Foreshadowing, THEME: Mortality, THEME: Revenge, THEME: Religion, THEME: Corruption, THEME: Health of the Nation, Character Death
+Category
+Other
+</Text>
+        </Document>
+        <Document ID="DF42E24D-BBA8-498A-B985-C0B90B524011">
+            <Title>Act 1</Title>
+        </Document>
+        <Document ID="4074237D-139C-48FB-94D2-6647169555AD">
+            <Title>Hamlet is sent away, but Laertes returns</Title>
+            <Notes>characters
+Gertrude, Claudius, Rosencrantz and Guildenstern, Fortinbras, Laertes, Ophelia, Horatio, Sailors
+places
+Elsinore Castle, Field in Denmark
+tags
+THEME: Corruption, THEME: Health of the Nation, THEME: Revenge, Foreshadowing, STAGE: Climax, THEME: Madness, STAGE: Rising Action, THEME: Mortality
+</Notes>
+        </Document>
+        <Document ID="9C331E48-552B-4360-9A57-90E8BBD8D8A8">
+            <Title>Court watches The Murder of Gonzago</Title>
+            <Synopsis>Description
+
+The court readies for the play, as Hamlet gives the players their parts. He then summons Horatio and tells his friend how highly he thinks of him, and entrusts him with the secret of what the ghost told him. He hopes that Horatio will be able to keep an eye on Claudius to see if he shows any signs of guilt. 
+As everyone enters the room to watch the play, Hamlet starts acting mad once again in front of Polonius, and messes with Ophelia by telling her a lot of erotic puns. The play then begins, and Hamlet comments on it throughout, teasing Ophelia as he goes. 
+When the play reaches the point where the character poisons the king in the garden, Claudius gets loud, angry, and storms out of the room. Hamlet and Horatio agree that such a reaction was damning. 
+Afterwards, Rosencrantz and Guildenstern try again to find out what has been causing him to act crazy, and he gets upset with them. Polonius then enters to escort Hamlet to his mother's chambers, and Hamlet takes a moment to ready himself for the confrontation that's about to ensue.
+</Synopsis>
+            <Notes>characters
+Hamlet, Ophelia, Claudius, Gertrude, Horatio, Polonius, Rosencrantz and Guildenstern, The Players
+places
+Elsinore Castle
+tags
+STAGE: Rising Action, Foreshadowing, THEME: Mortality, THEME: Madness, THEME: Corruption
+</Notes>
+        </Document>
+        <Document ID="A6AE7299-B73C-4A1D-934A-CA62EE34AC3B">
+            <Title>Sailors</Title>
+            <Text>Sailors  Description
+A pair of sailors sent by Hamlet
+Notes
+They carry a message from Hamlet to Horatio and the King and Queen after Hamlet's ship is set upon by pirates.
+Role
+Extra
+Motivation
+To deliver a message from Hamlet to those at Elsinore Castle.
+Gender
+Male
+Characters That Die
+No
+Tags
+STAGE: Falling Action, Foreshadowing, THEME: Revenge
+Category
+Other
+</Text>
+        </Document>
+        <Document ID="4E502B7D-C857-4F92-ABC8-3472351DBC28">
+            <Title>Claudius</Title>
+            <Text>Claudius  Description
+King of Denmark
+Notes
+Claudius is Hamlet's uncle, and the King of Denmark who dethroned the former King and married his wife, Gertrude. He's the villain, who is calculating and conniving and will do whatever it takes to get ahead.
+Role
+Antagonist
+Motivation
+He wants to be ruler of Denmark so much that he would do anything to get and keep that position
+Gender
+Male
+Fatal Flaws
+Power hungry
+Inner Conflict
+Regrets over marrying his brother's wife
+How They Die
+Killed with a poisonous sword &amp; goblet by Hamlet
+Attended Wittenberg
+No
+Royal Family Member
+Yes
+Characters That Die
+Yes
+Tags
+Character Death, STAGE: Exposition, STAGE: Rising Action, STAGE: Climax, STAGE: Falling Action, STAGE: Resolution, THEME: Religion, THEME: Corruption
+Category
+Main
+</Text>
+        </Document>
+        <Document ID="EA49C65F-2920-4404-B332-2B72C503C571">
+            <Title>Act 2</Title>
+        </Document>
+        <Document ID="9F8F7C20-CEE1-4C5A-AE5C-3A6F2EC91CC9">
+            <Title>Claudius makes an announcement &amp; Hamlet laments</Title>
+            <Synopsis>Description
+
+The following morning, King Claudius makes an announcement that he has married Queen Gertrude, wife of the former King. He says he's done this in an attempt to help the nation heal after losing his leader, because the marriage is something to celebrate. 
+He also shares that the Prince of Norway, Fortinbras, has written to him threatening to invade and take back lands that he feels were stolen by Denmark. Claudius then sends Voltimand and Cornelius to try and convince Fortinbras not to invade. He also agrees with Polonius in allowing Laertes to return to France now that the King's coronation ceremonies are over.
+Claudius then addresses Hamlet, asking why he is still so sad over the loss of his father. He encourages Hamlet to move on, but Hamlet refuses and says he will continue to mourn. Claudius then asks Hamlet to stay in Denmark rather than returning to the University of Wittenberg. Hamlet's mother Gertrude also really wants him to stay, and so he begrudgingly agrees. 
+Hamlet then has a moment where he laments over having lost his father, his mother deciding to marry his uncle and talks about how he wishes he could die.</Synopsis>
+            <Notes>characters
+Claudius, Gertrude, Hamlet, Polonius, Laertes, Voltimand and Cornelius
+places
+Elsinore Castle
+tags
+THEME: Health of the Nation, STAGE: Exposition, THEME: Corruption, THEME: Mortality, Foreshadowing
+</Notes>
+        </Document>
+        <Document ID="FF836F1E-B70A-481A-9CB9-A6C21C5EBB94">
+            <Title>Marcellus</Title>
+            <Text>Marcellus  Description
+A palace guard
+Notes
+One of the two guards who see the ghost of Hamlet's father walking around Elsinore castle, and who ask Horatio if he sees the ghost too.
+Role
+Extra
+Motivation
+To protect Elsinore castle.
+Gender
+Male
+Characters That Die
+No
+Tags
+STAGE: Exposition, STAGE: Rising Action, THEME: Madness, THEME: Health of the Nation
+Category
+Other
+</Text>
+        </Document>
+        <Document ID="70DB1320-7A6F-42E9-900A-E0296639FE27">
             <Title>Polonius</Title>
             <Text>Polonius  Description
 Lord Chamberlin
@@ -837,7 +855,68 @@ Category
 Supporting
 </Text>
         </Document>
-        <Document ID="2B4C810B-CB4D-4CB7-B503-116D130AD817">
+        <Document ID="93A0AF1C-F8DE-431E-802E-57B25FBD7162">
+            <Title>Univerisity of Wittenberg</Title>
+            <Text>Univerisity of Wittenberg  Description
+Hamlet &amp; Horatio's university
+</Text>
+        </Document>
+        <Document ID="7BA3B0DE-3906-434E-8C6F-10E0E072FE46">
+            <Title>Laertes leaves for France</Title>
+            <Synopsis>Description
+
+As Laertes is preparing to depart for France, he has a conversation with his sister, Ophelia. He cautions her about falling for Hamlet because he believes that Hamlet is too far above Ophelia's station for the two of them to ever be a match. 
+Laertes then says goodbye to his father, who gives him a some extensive advice for how to live and behave while he is away in France. 
+As Laertes finally leaves, Polonius asks Ophelia what she and her brother talked about. She confesses that it was about Hamlet, and that he claims to love her. Polonius agrees with his son in telling Ophelia that he believes Hamlet to be insincere about his affections, and forbids her from seeing him further. </Synopsis>
+            <Notes>characters
+Polonius, Laertes, Ophelia
+places
+France, Elsinore Castle
+tags
+STAGE: Exposition, THEME: Corruption, THEME: Health of the Nation, Foreshadowing, THEME: Mortality
+</Notes>
+        </Document>
+        <Document ID="D409A841-555F-404D-8D4B-DD547F1B7387">
+            <Title>Osric</Title>
+            <Text>Osric  Description
+A courtier
+Notes
+The courtier who summons Hamlet when he has to duel Laertes.
+Gender
+Male
+Characters That Die
+No
+Tags
+STAGE: Resolution, THEME: Mortality, THEME: Madness, THEME: Corruption
+Category
+Other
+</Text>
+        </Document>
+        <Document ID="A2078832-8434-487C-8BC8-FEEA6725CD43">
+            <Title>Hamlet learns the truth from the ghost of his father</Title>
+            <Notes>characters
+Hamlet, Claudius, Gertrude, Polonius, Horatio, Ophelia, Laertes, Fortinbras, The Ghost, Marcellus, Bernardo, Francisco, Reynaldo
+places
+Elsinore Castle
+tags
+STAGE: Exposition, Foreshadowing, THEME: Mortality, THEME: Revenge, THEME: Madness, THEME: Corruption, THEME: Health of the Nation
+test 1
+some text
+test 2
+some other text
+</Notes>
+        </Document>
+        <Document ID="DA6412A9-01BF-4A18-AA8A-AB965FCC6BFA">
+            <Title>Members of court meet &amp; conspire</Title>
+            <Notes>characters
+Ophelia, Polonius, Reynaldo, Claudius, Gertrude, Rosencrantz and Guildenstern, Voltimand and Cornelius, Hamlet, The Players
+places
+Elsinore Castle
+tags
+STAGE: Rising Action, Foreshadowing, THEME: Mortality, THEME: Corruption, THEME: Health of the Nation, THEME: Madness
+</Notes>
+        </Document>
+        <Document ID="0F76CD0E-1871-4EF8-95FD-D5F29ABEE50E">
             <Title>Claudius prays for forgiveness</Title>
             <Synopsis>Description
 
@@ -846,99 +925,20 @@ Once alone, he begins praying and asking for forgiveness for the evils and wrong
             <Notes>characters
 Claudius, Hamlet, Rosencrantz and Guildenstern
 places
-Hamlet
+Elsinore Castle
 tags
 STAGE: Rising Action, Foreshadowing, THEME: Mortality, THEME: Religion, THEME: Corruption, THEME: Madness
 </Notes>
         </Document>
-        <Document ID="AA74008F-B576-48E9-B949-911A7F3C4475">
-            <Title>France</Title>
-            <Text>France  Description
-Where Laertes spends part of the play
-</Text>
-        </Document>
-        <Document ID="501EA732-428B-48FF-9E6D-C721444C62EE">
-            <Title>The Players</Title>
-            <Text>The Players  Description
-The theater troupe
-Notes
-The theater troupe that passes through town and delivers speeches about Troy and puts on the play The Murder of Gonzago.
-Role
-Extras
-Motivation
-To put on a play for the royal court of Denmark.
-Gender
-Male
-Characters That Die
-No
-Tags
-STAGE: Rising Action, STAGE: Climax, Foreshadowing, THEME: Mortality, THEME: Revenge, THEME: Corruption
-Category
-Other
-</Text>
-        </Document>
-        <Document ID="F0C838A0-C58E-4F79-BD8D-6ADE09091A02">
-            <Title>Claudius demands to know where Polonius's body is</Title>
-            <Synopsis>Description
-
-Claudius is seen informing courtiers of the untimely death of Polonius, when Hamlet is brought before him to be confronted. He asks Hamlet where he has placed Polonius's body, but at first, Hamlet refuses to tell him. Hamlet insults him by saying that Claudius could seek him out in heaven, or join him in hell. But ultimately, he tells Claudius that the body has been hidden under the stairs in the palace.
-Claudius then dismisses Hamlet, ordering him to board the ship to England at once, under the supervision of Rosencrantz and Guildenstern. Once they are all gone, Claudius admits that he has sent sealed orders to England to see to it that Hamlet is killed upon his arrival.</Synopsis>
+        <Document ID="627D60FB-CACE-4F32-80C6-C3E35E621ECC">
+            <Title>Hamlet meets an untimely end</Title>
             <Notes>characters
-Claudius, Hamlet, Rosencrantz and Guildenstern
+Hamlet, Claudius, Gertrude, Polonius, Horatio, Ophelia, Laertes, Fortinbras, Rosencrantz and Guildenstern, Marcellus, Gravediggers, Sailors, Osric
 places
-Hamlet
+Elsinore Castle
 tags
-Foreshadowing, THEME: Madness, THEME: Corruption, THEME: Health of the Nation, STAGE: Climax
+STAGE: Climax, THEME: Mortality, Character Death, THEME: Madness, THEME: Corruption, THEME: Health of the Nation, THEME: Revenge
 </Notes>
-        </Document>
-        <Document ID="33A41A06-7801-4C27-A62A-94A3DE8B4D95">
-            <Title>Reynaldo</Title>
-            <Text>Reynaldo  Description
-Polonius's servant
-Notes
-A servant to Polonius who is sent to France to spy on Laertes.
-Role
-Extra
-Motivation
-To do his master's bidding in fetching his son back from France.
-Gender
-Male
-Characters That Die
-No
-Tags
-STAGE: Rising Action, Foreshadowing, THEME: Corruption, THEME: Health of the Nation
-Category
-Other
-</Text>
-        </Document>
-        <Document ID="E9CEDFBD-AAB7-4E2A-A577-91141D91E3FE">
-            <Title>Members of court meet &amp; conspire</Title>
-            <Notes>characters
-Ophelia, Polonius, Reynaldo, Claudius, Gertrude, Rosencrantz and Guildenstern, Voltimand and Cornelius, Hamlet, The Players
-places
-Hamlet
-tags
-STAGE: Rising Action, Foreshadowing, THEME: Mortality, THEME: Corruption, THEME: Health of the Nation, THEME: Madness
-</Notes>
-        </Document>
-        <Document ID="604C6F03-1E9D-410E-BE0D-F533B7F94EDE">
-            <Title>Claudius and Laertes plan to kill Hamlet</Title>
-            <Synopsis>Description
-
-Claudius finally tells Laertes the truth of what happened between Hamlet and Polonius, and the two determine that Hamlet needs to be taken care of in a way that is not as conspicuous to the people of Denmark. Just then, the sailors and Horatio come to tell the men that Hamlet will be back at the court the next day because of the pirates attacking Hamlet's ship. They then devise to tempt Hamlet into a duel, and Laertes plots to use a sharpened sword that has been dipped in poison, so all he needs to do will be the cut Hamlet quickly and he'll die from the poison. Claudius even proposes a back up plan of giving Hamlet a glass of poisoned wine even if he wins the duel. 
-
-At this point, Gertrude enters to tell them the sad news that Ophelia has fallen into a river and drowned, which further stokes Laertes anger and lust for revenge. He storms from the room, which leaves Claudius feeling uneasy.
-</Synopsis>
-            <Notes>characters
-Claudius, Laertes, Gertrude
-places
-Hamlet
-tags
-THEME: Madness, THEME: Corruption, THEME: Revenge, STAGE: Climax, Character Death
-</Notes>
-        </Document>
-        <Document ID="47E3BEA0-BBB8-4D24-B307-3BED8D5532C0">
-            <Title>Places</Title>
         </Document>
     </Documents>
 </SearchIndexes>

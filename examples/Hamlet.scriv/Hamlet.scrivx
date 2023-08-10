@@ -1,46 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ScrivenerProject Identifier="3CD63FDA-5049-4569-BF87-95F60A85B769" Version="2.0" Creator="SCRMAC-3.2.3-14869" Device="Edwards-MacBook-Air" Author="" Modified="2023-08-10 13:32:20 +0200" ModID="70A171E7-80CF-4CF4-9AE6-D3829858E1A2">
+<ScrivenerProject Identifier="A07AF808-6AEF-45E7-958E-4794A16C9A2F" Version="2.0" Creator="SCRMAC-3.2.3-14869" Device="Edwards-MacBook-Air" Author="" Modified="2023-08-10 14:18:36 +0200" ModID="505955B1-1AE6-4EF2-A351-CFFE6248F2BD">
     <Binder>
-        <BinderItem UUID="9311C4E7-97C8-455F-84D9-3941FB20E92E" Type="DraftFolder" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+        <BinderItem UUID="F8C0AC18-E0EC-4C39-8A89-940E3D0AC26D" Type="DraftFolder" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
             <Title>Manuscript</Title>
             <Children>
-                <BinderItem UUID="E235A432-B452-4060-9D20-6DD5E47D4102" Type="Folder" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                <BinderItem UUID="DF42E24D-BBA8-498A-B985-C0B90B524011" Type="Folder" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                     <Title>Act 1</Title>
                     <TextSettings>
                         <TextSelection>0,0</TextSelection>
                     </TextSettings>
                     <Children>
-                        <BinderItem UUID="C670CBED-94C6-4E6B-8DCD-5884AD33015C" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="A2078832-8434-487C-8BC8-FEEA6725CD43" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Hamlet learns the truth from the ghost of his father</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="90B2BCDD-6E6E-4B1E-941D-0F49087BA86D" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="96D5430F-B330-4C0E-BDB4-C0EE7FBE530C" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>The guards see a ghost</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="0A2B265E-E08E-4D8D-B0AC-62867BFE5F3C" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="9F8F7C20-CEE1-4C5A-AE5C-3A6F2EC91CC9" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Claudius makes an announcement &amp; Hamlet laments</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="E71FFDE2-157F-44E5-B04C-E8082C8072DE" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="7BA3B0DE-3906-434E-8C6F-10E0E072FE46" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Laertes leaves for France</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="2D3CD02E-5F95-4DBE-A976-5AAB1B476E16" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="DE7FA6E1-0B5B-434F-A953-15B9FF71BCAA" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Hamlet goes after the ghost of his father</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="AA3A86F4-0ED7-404F-8B27-F71C10F01224" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="28CD79C1-5416-4EFF-8ADE-2859FA192C93" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Hamlet speaks with his father's ghost</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
@@ -48,25 +48,25 @@
                         </BinderItem>
                     </Children>
                 </BinderItem>
-                <BinderItem UUID="CF46D084-1305-45C4-9D1C-D5888D2DA8DB" Type="Folder" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                <BinderItem UUID="EA49C65F-2920-4404-B332-2B72C503C571" Type="Folder" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                     <Title>Act 2</Title>
                     <TextSettings>
                         <TextSelection>0,0</TextSelection>
                     </TextSettings>
                     <Children>
-                        <BinderItem UUID="E9CEDFBD-AAB7-4E2A-A577-91141D91E3FE" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="DA6412A9-01BF-4A18-AA8A-AB965FCC6BFA" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Members of court meet &amp; conspire</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="12C64C45-A734-47C5-A703-303FC1837F02" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="EDD0FCC4-04E5-483D-A9B9-DDCF500F3952" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Polonius speaks with Ophelia</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="BE108F44-E212-4A50-B220-D35A18629A38" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="709C8D54-4F3A-4D56-96CA-02BA97955476" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>A busy day at court</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
@@ -74,37 +74,37 @@
                         </BinderItem>
                     </Children>
                 </BinderItem>
-                <BinderItem UUID="63B26B1F-FC2C-4CAB-B414-CE05C964A890" Type="Folder" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                <BinderItem UUID="4744159A-C2B3-409E-930B-0E3714F4C6F0" Type="Folder" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                     <Title>Act 3</Title>
                     <TextSettings>
                         <TextSelection>0,0</TextSelection>
                     </TextSettings>
                     <Children>
-                        <BinderItem UUID="5E035DFD-1BC1-4011-8F42-BBEDE78E23C7" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="CA247183-B041-4893-A312-9D75D316FC83" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Hamlet carries out his plan to prove Claudius guilty</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="69FB6B8D-9B66-4CAD-95AD-EF4006D510D5" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="C361771E-E506-47A9-93C7-940FC628BA6B" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Hamlet denounces Ophelia</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="7086627E-4471-42B8-A52C-754DB8F1F585" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="9C331E48-552B-4360-9A57-90E8BBD8D8A8" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Court watches The Murder of Gonzago</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="2B4C810B-CB4D-4CB7-B503-116D130AD817" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="0F76CD0E-1871-4EF8-95FD-D5F29ABEE50E" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Claudius prays for forgiveness</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="F8898650-72B2-494B-A73D-D28F2020C016" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="FBEBFA4A-86C3-42AF-9FAA-6ED5D1F5C924" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Hamlet confronts his mother &amp; kills Polonius</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
@@ -112,55 +112,55 @@
                         </BinderItem>
                     </Children>
                 </BinderItem>
-                <BinderItem UUID="8946B394-83D3-4C5E-9CBE-F844315CD2DC" Type="Folder" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                <BinderItem UUID="C4C9B4FA-C970-4B48-8C56-94020E791CFE" Type="Folder" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                     <Title>Act 4</Title>
                     <TextSettings>
                         <TextSelection>0,0</TextSelection>
                     </TextSettings>
                     <Children>
-                        <BinderItem UUID="68E6B84C-AB92-4F22-8122-7DC7CFC823C8" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="4074237D-139C-48FB-94D2-6647169555AD" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Hamlet is sent away, but Laertes returns</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="9EA82C71-32EE-4488-8697-9E5AC83F9445" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="A263B676-96D3-434B-B0C2-D8529FDE23C6" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Gertrude tells Claudius of Hamlet's actions</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="0DD52DD2-D33B-40B6-A890-D7D1BFE10A07" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="3A407AFE-2FC6-4EC2-97AD-B095FAA51D17" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Rosencrantz and Guildenstern confront Hamlet</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="F0C838A0-C58E-4F79-BD8D-6ADE09091A02" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="CD7B1533-F96D-4D65-88A9-8EE34707E19E" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Claudius demands to know where Polonius's body is</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="8547F603-0668-4F48-81DA-F4229F235040" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="7F8CC7DA-F36C-4DDE-923A-8277F412F6D0" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Hamlet encounters Fortinbras on the way to England</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="B3147E02-B8EE-441E-877A-A3095F7768D9" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="EAB3BD5E-1574-4B3D-AFB6-345572F64141" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Laertes returns from France in a rage</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="BD3D457D-B158-47AC-909B-B5DB7E51F945" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="7755A2B8-5AAD-48AD-9DFC-5B0A340137C1" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Horatio receives word from Hamlet</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="604C6F03-1E9D-410E-BE0D-F533B7F94EDE" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="D88FC21C-BA7D-4ACA-8AFC-AA50E90AE469" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Claudius and Laertes plan to kill Hamlet</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
@@ -168,25 +168,25 @@
                         </BinderItem>
                     </Children>
                 </BinderItem>
-                <BinderItem UUID="93D1B0CB-9C34-475A-8C4C-46A30354A756" Type="Folder" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                <BinderItem UUID="62D9143F-0AC3-4E7E-9B1D-C1B0526FF374" Type="Folder" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                     <Title>Act 5</Title>
                     <TextSettings>
                         <TextSelection>0,0</TextSelection>
                     </TextSettings>
                     <Children>
-                        <BinderItem UUID="F728CE5F-F8A0-4847-8E23-6B0291C9B5AF" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="627D60FB-CACE-4F32-80C6-C3E35E621ECC" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Hamlet meets an untimely end</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="BECB7D60-87B6-4F1F-8E2F-9868327752CF" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="9218057F-08EA-4F0C-A7E7-06758D5E4369" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Hamlet and Horatio witness Ophelia's funeral</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="2D7864C3-7FAB-4C70-87C3-3855DA25D047" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="58600A07-9FCD-4974-AA05-2D4B39812775" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>The duel between Laertes and Hamlet</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
@@ -196,124 +196,124 @@
                 </BinderItem>
             </Children>
         </BinderItem>
-        <BinderItem UUID="2E4A2CF7-A1CC-4581-B04B-BAC47E9E6EB5" Type="ResearchFolder" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+        <BinderItem UUID="22998A1C-F17A-477D-8374-82449F20E102" Type="ResearchFolder" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
             <Title>Notes</Title>
             <Children>
-                <BinderItem UUID="1946E5F3-5C54-4FEF-9CEA-6A4F2E85EAFB" Type="Folder" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                <BinderItem UUID="E7C7F854-1A7E-4BE8-9FBD-1F3AC0B199B7" Type="Folder" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                     <Title>Characters</Title>
                     <TextSettings>
                         <TextSelection>0,0</TextSelection>
                     </TextSettings>
                     <Children>
-                        <BinderItem UUID="3C5CAE5B-25AE-4230-8E27-F561FA1F1D3A" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="9BC1A576-367F-419A-B3B6-77D9775A2AEB" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Hamlet</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="3511976D-181F-4B5E-A000-D4ED959B8EF3" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="4E502B7D-C857-4F92-ABC8-3472351DBC28" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Claudius</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="08C95A73-A991-4558-9589-92A522877970" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="D612AF0A-C5DA-45AC-9A52-D8BF12B8C4BB" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Gertrude</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="A89AEA83-CB8D-461E-B287-75F9F2FF2524" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="70DB1320-7A6F-42E9-900A-E0296639FE27" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Polonius</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="45A14959-231C-4551-8BB3-E50E5A67B665" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="7DD061E6-6822-4AB6-A88F-68C7D98BC360" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Horatio</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="C98FB962-A614-4049-B9D2-C39F4B8D3396" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="C4176A39-2455-402A-B13D-EEA27644778F" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Ophelia</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="15DD1FCD-C19B-44BC-B49A-75CDBE1E12BF" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="6EE9C038-79CB-4062-AFF8-92F244252C08" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Laertes</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="D7BBA3B6-D424-4FE0-9143-EC7FB0B040BC" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="484A35AE-7664-440E-9BBE-C04A4C1D63EA" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Fortinbras</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="F88E94D4-CAC9-4E5D-85F0-B8A4FFD8C03C" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="C594D440-F2E6-449F-B242-8DBBA11EBFE3" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>The Ghost</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="C8763C76-412F-47CF-BC75-5769759C3C75" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="8C54F356-3270-4D2E-8191-3660DFE05576" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Rosencrantz and Guildenstern</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="5EAD81E2-EC7B-4F94-8812-CC154004F182" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="D409A841-555F-404D-8D4B-DD547F1B7387" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Osric</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="B639B04D-FFFD-41FF-8EDB-59BD90F098BD" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="4D71E49F-9D5F-42C1-B27B-A4190998AC96" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Voltimand and Cornelius</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="AF1B6FB8-ABBF-4FF7-B8BC-B6229694F26A" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="FF836F1E-B70A-481A-9CB9-A6C21C5EBB94" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Marcellus</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="1B8C3D14-2B10-44C3-892D-6B1EDA3C8607" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="A0CED6CF-E94E-4350-9B47-D1438AF92D08" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Francisco</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="33A41A06-7801-4C27-A62A-94A3DE8B4D95" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="A263D162-6DB9-4E50-9285-67F26D19249C" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Reynaldo</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="F9A6962C-8F50-422F-80E0-37A8A5DEB47A" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="BBCFF23F-74A3-4165-AA25-35CB760C8B33" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Bernardo</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="501EA732-428B-48FF-9E6D-C721444C62EE" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="87DDB0F1-6E02-4730-A0E2-13A8B294C101" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>The Players</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="7B02791C-2EB7-4241-BAC9-F54D51BBCCD3" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="A6AE7299-B73C-4A1D-934A-CA62EE34AC3B" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Sailors</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="903DFEA2-DF7F-456C-A427-AFEB31702B3B" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="8FB00F9F-4026-4BBC-810C-7D66688DF47C" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Gravediggers</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
@@ -321,37 +321,37 @@
                         </BinderItem>
                     </Children>
                 </BinderItem>
-                <BinderItem UUID="47E3BEA0-BBB8-4D24-B307-3BED8D5532C0" Type="Folder" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                <BinderItem UUID="3FB2BFB1-6509-4852-9237-1D30930EA70F" Type="Folder" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                     <Title>Places</Title>
                     <TextSettings>
                         <TextSelection>0,0</TextSelection>
                     </TextSettings>
                     <Children>
-                        <BinderItem UUID="DDD3D764-8607-435D-BBB4-4E7FD1531E4A" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="88B1BD3E-A4C2-434A-99B8-77CD08742562" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Elsinore Castle</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="86B7CB4C-67D8-4B6E-9322-F1C616707D71" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="B626A092-AC7A-44B9-A36A-4CD1DA86C5CE" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Field in Denmark</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="AA74008F-B576-48E9-B949-911A7F3C4475" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="69EE5CEB-3EA5-41A7-A74A-913EEFAD6A2F" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>France</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="0F717255-B2BC-4161-98A3-61F1AAFC67F6" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="C1721383-0614-4B96-995B-1231715C406A" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Graveyard</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="693F2F25-75A9-46AB-9797-9B202D1B0162" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="93A0AF1C-F8DE-431E-802E-57B25FBD7162" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Univerisity of Wittenberg</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
@@ -359,31 +359,31 @@
                         </BinderItem>
                     </Children>
                 </BinderItem>
-                <BinderItem UUID="3AC0493B-EC63-4F97-BDB0-726B9960B682" Type="Folder" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                <BinderItem UUID="35E18F27-89B4-46DD-B83A-678F9F5990DD" Type="Folder" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                     <Title>Notes</Title>
                     <TextSettings>
                         <TextSelection>0,0</TextSelection>
                     </TextSettings>
                     <Children>
-                        <BinderItem UUID="9FE5D6D4-DF5F-438F-B478-024E35039AD1" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="2DA1E539-7DB1-48FF-A08C-78D47D83F67C" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Character Chart</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="13AC049F-B5EA-4CF0-8E16-3FBD2987E695" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="16CB55E7-B83A-423B-8E6E-89434E243509" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Death in Hamlet</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="6F1C2C5D-EA76-4C11-943B-A58200274794" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="56D5788E-531A-49DF-B057-8A421431F780" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Thematic Ideas</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
                             </TextSettings>
                         </BinderItem>
-                        <BinderItem UUID="80629661-0BF9-4136-B0DE-1D1822E9FF01" Type="Text" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+                        <BinderItem UUID="AA4B3619-C977-48E7-86B6-28F394F47D52" Type="Text" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
                             <Title>Character Sketches</Title>
                             <TextSettings>
                                 <TextSelection>0,0</TextSelection>
@@ -393,33 +393,33 @@
                 </BinderItem>
             </Children>
         </BinderItem>
-        <BinderItem UUID="D16A86A7-8DFA-4E21-BDA6-EBF64BE3DFBD" Type="TrashFolder" Created="2023-08-10 13:32:17 +0200" Modified="2023-08-10 13:32:17 +0200">
+        <BinderItem UUID="F8506E6D-E509-4A50-9A53-5655D21190AA" Type="TrashFolder" Created="2023-08-10 14:18:33 +0200" Modified="2023-08-10 14:18:33 +0200">
             <Title>Trash</Title>
         </BinderItem>
     </Binder>
     <Collections>
-        <Collection Type="Binder" ID="D43D604C-080C-49D9-8115-EE2822518BAD" Color="0.112547 0.112547 0.112547">
+        <Collection Type="Binder" ID="09BF175C-FD3B-407C-9430-10B3EE311B0B" Color="0.112547 0.112547 0.112547">
             <Title>Binder</Title>
         </Collection>
-        <Collection Type="RecentSearch" ID="4216F717-2EA0-4829-A363-BEC094A32766" Color="0.190666 0.172707 0.216531">
+        <Collection Type="RecentSearch" ID="2651890D-1496-40B5-B6C5-015F5A16DB4E" Color="0.190666 0.172707 0.216531">
             <Title>Search Results</Title>
         </Collection>
     </Collections>
     <SectionTypes>
         <TypeDefinitions>
-            <Type ID="E227F009-62F3-46D9-B4CA-8C23209AB686">Heading</Type>
-            <Type ID="248A6EE8-294E-4664-8A28-A488FBECA9C6">Sub-Heading</Type>
-            <Type ID="94787613-0278-4DC6-8440-15BB476408B1">Section</Type>
+            <Type ID="E7C3008D-F997-4C53-B86C-54F0D1A1F18B">Heading</Type>
+            <Type ID="9DEA5139-6C5A-4759-8AA7-93BCB0626009">Sub-Heading</Type>
+            <Type ID="7007592D-6FAE-4202-96F6-90CEC1E7736E">Section</Type>
         </TypeDefinitions>
         <LevelTypes>
             <Folders>
-                <Type>E227F009-62F3-46D9-B4CA-8C23209AB686</Type>
+                <Type>E7C3008D-F997-4C53-B86C-54F0D1A1F18B</Type>
             </Folders>
             <Containers>
-                <Type>94787613-0278-4DC6-8440-15BB476408B1</Type>
+                <Type>7007592D-6FAE-4202-96F6-90CEC1E7736E</Type>
             </Containers>
             <Files>
-                <Type>94787613-0278-4DC6-8440-15BB476408B1</Type>
+                <Type>7007592D-6FAE-4202-96F6-90CEC1E7736E</Type>
             </Files>
         </LevelTypes>
     </SectionTypes>
@@ -450,11 +450,11 @@
         </StatusItems>
     </StatusSettings>
     <ProjectTargets Notify="No">
-        <DraftTarget Type="Words" CountIncludedOnly="Yes" CurrentCompileGroupOnly="No" Deadline="2023-08-10 13:32:10 +0200" IgnoreDeadline="Yes">0</DraftTarget>
+        <DraftTarget Type="Words" CountIncludedOnly="Yes" CurrentCompileGroupOnly="No" Deadline="2023-08-10 14:18:31 +0200" IgnoreDeadline="Yes">0</DraftTarget>
         <SessionTarget Type="Words" CountDraftOnly="Yes" AllowNegatives="Yes" NextResetDate="2023-08-11 00:00:00 +0200" ResetType="Time" ResetTime="00:00" DeterminedFromDeadline="No" WritingDays="" CanWriteOnDeadlineDate="No">0</SessionTarget>
-        <PreviousSession Words="0" Characters="0" Date="2023-08-10 13:32:10 +0200"/>
+        <PreviousSession Words="0" Characters="0" Date="2023-08-10 14:18:31 +0200"/>
     </ProjectTargets>
-    <RecentWritingHistory Date="2023-08-10 13:32:10 +0200">
+    <RecentWritingHistory Date="2023-08-10 14:18:31 +0200">
         <DraftWordCount>0</DraftWordCount>
         <DraftCharCount>0</DraftCharCount>
         <OtherWordCount>0</OtherWordCount>
