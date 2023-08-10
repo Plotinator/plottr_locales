@@ -7,51 +7,16 @@
 	<key>binderSplitFrames</key>
 	<array>
 		<string>{{0, 0}, {265, 650}}</string>
-		<string>{{266, 0}, {734, 650}}</string>
+		<string>{{266, 0}, {980, 650}}</string>
 	</array>
 	<key>bookmarksSelectionInfo</key>
 	<dict>
-		<key>16CB55E7-B83A-423B-8E6E-89434E243509</key>
+		<key>BB664270-D5D3-4922-92BA-13828AE114CE</key>
 		<dict>
 			<key>Row</key>
 			<integer>-1</integer>
 		</dict>
-		<key>2DA1E539-7DB1-48FF-A08C-78D47D83F67C</key>
-		<dict>
-			<key>Row</key>
-			<integer>-1</integer>
-		</dict>
-		<key>3FB2BFB1-6509-4852-9237-1D30930EA70F</key>
-		<dict>
-			<key>Row</key>
-			<integer>-1</integer>
-		</dict>
-		<key>4E502B7D-C857-4F92-ABC8-3472351DBC28</key>
-		<dict>
-			<key>Row</key>
-			<integer>-1</integer>
-		</dict>
-		<key>56D5788E-531A-49DF-B057-8A421431F780</key>
-		<dict>
-			<key>Row</key>
-			<integer>-1</integer>
-		</dict>
-		<key>69EE5CEB-3EA5-41A7-A74A-913EEFAD6A2F</key>
-		<dict>
-			<key>Row</key>
-			<integer>-1</integer>
-		</dict>
-		<key>9BC1A576-367F-419A-B3B6-77D9775A2AEB</key>
-		<dict>
-			<key>Row</key>
-			<integer>-1</integer>
-		</dict>
-		<key>AA4B3619-C977-48E7-86B6-28F394F47D52</key>
-		<dict>
-			<key>Row</key>
-			<integer>-1</integer>
-		</dict>
-		<key>B626A092-AC7A-44B9-A36A-4CD1DA86C5CE</key>
+		<key>FC30AB95-1AF3-43DF-A33B-8BE3795B931C</key>
 		<dict>
 			<key>Row</key>
 			<integer>-1</integer>
@@ -66,14 +31,15 @@
 	</dict>
 	<key>inspectorSplitFrames</key>
 	<array>
-		<string>{{0, 0}, {288, 640}}</string>
+		<string>{{0, 0}, {734, 620}}</string>
+		<string>{{735, 0}, {245, 620}}</string>
 	</array>
 	<key>inspectorWidth</key>
 	<real>245</real>
 	<key>mainDocumentEditor.scrollRect</key>
 	<string>{{0, 0}, {620, 564}}</string>
 	<key>mainWindowFrame</key>
-	<string>0 197 1000 678 0 0 1440 875 </string>
+	<string>0 197 1246 678 0 0 1440 875 </string>
 	<key>supportingDocumentEditor.scrollRect</key>
 	<string>{{0, 0}, {620, 294}}</string>
 	<key>supportingDocumentViewIsCurrent</key>

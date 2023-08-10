@@ -57,8 +57,8 @@
     <FormatSettings>
         <Format ID="DEFAULT">
             <SectionLayouts>
-                <Type ID="E7C3008D-F997-4C53-B86C-54F0D1A1F18B">NEW-PAGE-HEADER-WITH-TEXT</Type>
-                <Type ID="7007592D-6FAE-4202-96F6-90CEC1E7736E">TEXT-SECTION</Type>
+                <Type ID="892D6F86-4765-470C-BA6B-BF7B7463AD9B">NEW-PAGE-HEADER-WITH-TEXT</Type>
+                <Type ID="5FFE59A7-3299-43B4-AC71-2E048B79BF05">TEXT-SECTION</Type>
             </SectionLayouts>
         </Format>
     </FormatSettings>
