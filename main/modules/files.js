@@ -151,7 +151,8 @@ const makeFileModule = () => {
             .catch((error) => {
               log.error('Failed to create file from snowflake', error)
               return Promise.reject(error)
-            })}
+            })
+        }
       })
     })
   }
