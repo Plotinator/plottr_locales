@@ -34,7 +34,7 @@ export default function LoginModal({ closeLoginModal }) {
           </div>
           <div className="login__right">
             <div className="login__logo">
-              <img src="../icons/logo_28_500.png" alt="Plottr Logo" width="358" height="500" />
+              <img src="../icons/logo_28_500.png" alt="Plottr Logo" height="375" />
             </div>
           </div>
         </div>

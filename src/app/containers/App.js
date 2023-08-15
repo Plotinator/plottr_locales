@@ -23,6 +23,7 @@ import { store } from '../store'
 import MainIntegrationContext from '../../mainIntegrationContext'
 import logger from '../../../shared/logger'
 import { makeMainProcessClient } from '../mainProcessClient'
+import { whenClientIsReady } from '../../../shared/socket-client/index'
 
 const {
   onAdvancedExportFileFromMenu,
@@ -30,6 +31,7 @@ const {
   pleaseReloadMenu,
   onOpenImagePickerFromMenu,
   showMessageBox,
+  listenToForceReload,
 } = makeMainProcessClient()
 
 const App = ({
@@ -177,6 +179,27 @@ const App = ({
   }, [])
 
   useEffect(() => {
+    const forceReload = () => {
+      whenClientIsReady(({ saveOfflineFile, saveFile }) => {
+        const { present } = store.getState()
+        return isCloudFile && isOffline
+          ? saveOfflineFile(present)
+          : saveFile(present.project.fileURL, present)
+      })
+        .then(() => {
+          return new Promise((resolve) => {
+            setTimeout(resolve, 1000)
+          })
+        })
+        .then(() => {
+          removeReloadListeners()
+          window.location.reload()
+        })
+    }
+    return listenToForceReload(forceReload)
+  }, [])
+
+  useEffect(() => {
     const unsubscribeFromReload = onReload(() => {
       askToSave({}, true, false)
     })
@@ -201,13 +224,24 @@ const App = ({
 
   const saveAndClose = (saveFile, saveOfflineFile) => () => {
     const { present } = store().getState()
-    return (isOffline ? saveOfflineFile(present) : saveFile(present.project.fileURL, present)).then(
-      () => {
-        fileSaved()
-        setWaitingForSaveDoneSignal(true)
-        setShowAskToSave(false)
-      }
+    setWaitingForSaveDoneSignal(true)
+    return (
+      isCloudFile && isOffline
+        ? saveOfflineFile(present)
+        : saveFile(present.project.fileURL, present)
     )
+      .then(() => {
+        return new Promise((resolve) => {
+          setTimeout(resolve, 1000)
+        })
+      })
+      .then(() => {
+        fileSaved()
+        setWaitingForSaveDoneSignal(false)
+        setShowAskToSave(false)
+        removeReloadListeners()
+        window.close()
+      })
   }
 
   const dismissAskToSave = () => {
@@ -251,11 +285,9 @@ const App = ({
 
   return (
     <ErrorBoundary>
-      <ErrorBoundary>
-        <React.StrictMode>
-          <Navigation forceProjectDashboard={forceProjectDashboard} />
-        </React.StrictMode>
-      </ErrorBoundary>
+      <React.StrictMode>
+        <Navigation forceProjectDashboard={forceProjectDashboard} />
+      </React.StrictMode>
       <main
         className="project-main tour-end"
         onClick={(event) => {

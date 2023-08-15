@@ -99,13 +99,8 @@ function focusIfOpen(fileURL) {
   }
 }
 
-function reloadWindow() {
-  let win = BrowserWindow.getFocusedWindow()
-  win.webContents.reload()
-}
-
 function reloadAllWindows() {
-  windows.forEach((w) => w.browserWindow.webContents.send('reload'))
+  windows.forEach((w) => w.browserWindow.webContents.send('force-reload'))
 }
 
 function dereferenceWindow(winObj) {
@@ -124,7 +119,6 @@ function closeWindow(id) {
 export {
   addNewWindow,
   allWindows,
-  reloadWindow,
   hasWindows,
   focusFirstWindow,
   dereferenceWindow,

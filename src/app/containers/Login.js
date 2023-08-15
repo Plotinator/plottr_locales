@@ -1,8 +1,9 @@
 import React from 'react'
+import { PropTypes } from 'prop-types'
 
 import { FirebaseLogin } from 'connected-components'
 
-const Login = () => {
+const Login = ({ darkMode }) => {
   return (
     <div className="login">
       <div className="login__main">
@@ -12,12 +13,20 @@ const Login = () => {
         </div>
         <div className="login__right">
           <div className="login__logo">
-            <img src="../icons/logo_28_500.png" alt="Plottr Logo" width="358" height="500" />
+            {darkMode ? (
+              <img src="../icons/logo_dark_28_500.png" alt="Plottr Logo" height="375" />
+            ) : (
+              <img src="../icons/logo_light_28_500.png" alt="Plottr Logo" height="375" />
+            )}
           </div>
         </div>
       </div>
     </div>
   )
+}
+
+Login.propTypes = {
+  darkMode: PropTypes.bool,
 }
 
 export default Login

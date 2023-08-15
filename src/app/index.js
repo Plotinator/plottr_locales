@@ -1,13 +1,11 @@
 // Uncomment this to get helpful debug logs in the console re. what's
 // causing re-renders! :)
-//
+
 // import React from 'react'
-// if (process.env.NODE_ENV === 'development') {
-//   const whyDidYouRender = require('@welldone-software/why-did-you-render')
-//   whyDidYouRender(React, {
-//     trackAllPureComponents: true,
-//   })
-// }
+// const whyDidYouRender = require('@welldone-software/why-did-you-render')
+// whyDidYouRender(React, {
+//   trackAllPureComponents: true,
+// })
 
 import { setupI18n, t } from 'plottr_locales'
 
@@ -85,6 +83,8 @@ const {
   askToExport,
   getVersion,
   createDesktopShortcut,
+  userDocumentsPath,
+  createNewFile,
 } = makeMainProcessClient()
 
 const connectToSocketServer = (port) => {
@@ -137,7 +137,7 @@ tellMeWhatOSImOn()
   })
   .then((socketWorkerPort) => {
     setPort(socketWorkerPort)
-    connectToSocketServer(socketWorkerPort)
+    return connectToSocketServer(socketWorkerPort)
   })
   .then(() => {
     return setupRollbar('app.html').then((newRollbar) => {
@@ -168,6 +168,7 @@ tellMeWhatOSImOn()
     fileSystemAPIs
       .currentAppSettings()
       .then((settings) => {
+        store().dispatch(actions.settings.setDarkMode(settings.user?.dark))
         return getLocale().then((locale) => {
           setupI18n(settings, { locale })
         })
@@ -270,76 +271,88 @@ tellMeWhatOSImOn()
               let defaultPath = settings.user.defaultFolderLocation
               if (fileUrl) {
                 const fileUrlSansProto = helpers.file.withoutProtocol(fileUrl)
-                return basename(fileUrlSansProto).then((fileBaseName) => {
-                  defaultPath = useUserDefault ? defaultPath : fileUrlSansProto
-                  const defaultBaseName = suggestedNewName || (useUserDefault ? fileBaseName : '')
-                  return join(defaultPath, defaultBaseName).then((finalDefaultPath) => {
-                    return getVersion()
-                      .then((version) => {
-                        return whenClientIsReady(({ readFile }) => {
-                          return readFile(helpers.file.withoutProtocol(fileUrl), 'utf-8').then(
-                            (rawFile) => {
-                              const contents = JSON.parse(rawFile)
-                              return new Promise((resolve, reject) => {
-                                migrateIfNeeded(
-                                  version,
-                                  contents,
-                                  fileUrl,
-                                  null,
-                                  (err, didMigrate, migratedState) => {
-                                    if (err) {
-                                      rollbar.error(err)
-                                      logger.error(err)
-                                      if (err === 'Plottr behind file') {
-                                        showErrorBox(t('Error'), t('Please update Plottr'))
-                                        reject(new Error('Need to update Plottr'))
+                return basename(fileUrlSansProto)
+                  .then((fileBaseName) => {
+                    defaultPath = useUserDefault ? defaultPath : fileUrlSansProto
+                    const defaultBaseName = suggestedNewName || (useUserDefault ? fileBaseName : '')
+                    return useUserDefault
+                      ? defaultBaseName
+                      : userDocumentsPath().then((documentsPath) => {
+                          return join(documentsPath, fileBaseName)
+                        })
+                  })
+                  .then((defaultBaseName) => {
+                    return join(defaultPath, defaultBaseName).then((finalDefaultPath) => {
+                      return getVersion()
+                        .then((version) => {
+                          return whenClientIsReady(({ readFile }) => {
+                            return readFile(helpers.file.withoutProtocol(fileUrl), 'utf-8').then(
+                              (rawFile) => {
+                                const contents = JSON.parse(rawFile)
+                                return new Promise((resolve, reject) => {
+                                  migrateIfNeeded(
+                                    version,
+                                    contents,
+                                    fileUrl,
+                                    null,
+                                    (err, didMigrate, migratedState) => {
+                                      if (err) {
+                                        rollbar.error(err)
+                                        logger.error(err)
+                                        if (err === 'Plottr behind file') {
+                                          showErrorBox(t('Error'), t('Please update Plottr'))
+                                          reject(new Error('Need to update Plottr'))
+                                        } else {
+                                          reject(err)
+                                        }
                                       } else {
-                                        reject(err)
+                                        resolve(contents)
                                       }
-                                    } else {
-                                      resolve(contents)
                                     }
-                                  }
+                                  )
+                                })
+                              }
+                            )
+                          })
+                        })
+                        .then((migratedState) => {
+                          return showSaveDialog(filters, title, finalDefaultPath).then(
+                            (fileName) => {
+                              if (fileName) {
+                                const backupFolder = selectors.backupFolderPathSelector(
+                                  store().getState()
                                 )
-                              })
+                                if (fileName.startsWith(backupFolder)) {
+                                  return showErrorBox(
+                                    t('Error'),
+                                    t('Please choose a destination other than your backup folder')
+                                  )
+                                } else {
+                                  const newFilePath = helpers.file.ensureEndsInPltr(fileName)
+                                  const newFileURL = helpers.file.filePathToFileURL(newFilePath)
+                                  return saveFile(newFileURL, addMissingKeys(migratedState))
+                                    .then(() => {
+                                      store().dispatch(
+                                        actions.applicationState.finishRenamingFile()
+                                      )
+                                      return addToKnownFilesAndOpen(newFileURL)
+                                    })
+                                    .then(() => {
+                                      if (forceCloseWhenDone) {
+                                        forceCloseWindow()
+                                      }
+                                    })
+                                }
+                              } else {
+                                return Promise.resolve()
+                              }
                             }
                           )
                         })
-                      })
-                      .then((migratedState) => {
-                        return showSaveDialog(filters, title, finalDefaultPath).then((fileName) => {
-                          if (fileName) {
-                            const backupFolder = selectors.backupFolderPathSelector(
-                              store.getState()
-                            )
-                            if (fileName.startsWith(backupFolder)) {
-                              return showErrorBox(
-                                t('Error'),
-                                t('Please choose a destination other than your backup folder')
-                              )
-                            } else {
-                              const newFilePath = helpers.file.ensureEndsInPltr(fileName)
-                              const newFileURL = helpers.file.filePathToFileURL(newFilePath)
-                              return saveFile(newFileURL, addMissingKeys(migratedState))
-                                .then(() => {
-                                  store.dispatch(actions.applicationState.finishRenamingFile())
-                                  return addToKnownFilesAndOpen(newFileURL)
-                                })
-                                .then(() => {
-                                  if (forceCloseWhenDone) {
-                                    forceCloseWindow()
-                                  }
-                                })
-                            }
-                          } else {
-                            return Promise.resolve()
-                          }
-                        })
-                      })
+                    })
                   })
-                })
               } else {
-                const currentState = store.getState()
+                const currentState = store().getState()
                 const isInOfflineMode = selectors.isInOfflineModeSelector(currentState)
                 const fileState = selectors.fullFileStateSelector(currentState)
                 if (isInOfflineMode) {
@@ -349,39 +362,52 @@ tellMeWhatOSImOn()
                 return basename(fileState.file.fileName, '.pltr').then((fileBaseName) => {
                   defaultPath = useUserDefault ? defaultPath : fileState.file.fileName
                   let defaultBaseName = suggestedNewName || (useUserDefault ? fileBaseName : '')
-                  return join(defaultPath, defaultBaseName).then((finalDefaultPath) => {
-                    return showSaveDialog(filters, title, finalDefaultPath).then((fileName) => {
-                      if (fileName) {
-                        const backupFolder = selectors.backupFolderPathSelector(store.getState())
-                        if (fileName.startsWith(backupFolder)) {
-                          return showErrorBox(
-                            t('Error'),
-                            t('Please choose a destination other than your backup folder')
-                          )
-                        } else {
-                          const newFilePath = helpers.file.ensureEndsInPltr(fileName)
-                          const newFileURL = helpers.file.filePathToFileURL(newFilePath)
-                          return saveFile(newFileURL, fileState)
-                            .then(() => {
-                              return addToKnownFilesAndOpen(newFileURL)
-                            })
-                            .then(() => {
-                              if (forceCloseWhenDone) {
-                                forceCloseWindow()
-                              }
-                            })
-                        }
-                      } else {
-                        return Promise.resolve()
-                      }
+                  return join(defaultPath, defaultBaseName)
+                    .then((defaultPath) => {
+                      return useUserDefault
+                        ? defaultPath
+                        : userDocumentsPath().then((documentsPath) => {
+                            return join(documentsPath, fileBaseName)
+                          })
                     })
-                  })
+                    .then((finalDefaultPath) => {
+                      return showSaveDialog(filters, title, finalDefaultPath).then((fileName) => {
+                        if (fileName) {
+                          const backupFolder = selectors.backupFolderPathSelector(
+                            store().getState()
+                          )
+                          if (fileName.startsWith(backupFolder)) {
+                            return showErrorBox(
+                              t('Error'),
+                              t('Please choose a destination other than your backup folder')
+                            )
+                          } else {
+                            const newFilePath = helpers.file.ensureEndsInPltr(fileName)
+                            const newFileURL = helpers.file.filePathToFileURL(newFilePath)
+                            return saveFile(newFileURL, fileState)
+                              .then(() => {
+                                return addToKnownFilesAndOpen(newFileURL)
+                              })
+                              .then(() => {
+                                if (forceCloseWhenDone) {
+                                  forceCloseWindow()
+                                }
+                              })
+                          }
+                        } else {
+                          return Promise.resolve()
+                        }
+                      })
+                    })
                 })
               }
             })
           })
         }
 
+        // FIXME: remove this in the next release!!!  Kept for the
+        // default folder release because this was discovered on the
+        // eve of releasing.
         const moveFromTempHandler = () => {
           const state = store().getState()
           const file = selectors.fullFileStateSelector(state)
@@ -544,14 +570,14 @@ tellMeWhatOSImOn()
         onNewProject(() => {
           fileSystemAPIs.currentAppSettings().then((settings) => {
             if (settings.user.defaultFolder && settings.user.defaultFolderLocation) {
-              store.dispatch(actions.project.startCreatingNewProject())
+              store().dispatch(actions.project.startCreatingNewProject())
             } else {
               userDocumentsPath().then((docPath) => {
                 const title = t('Choose where to save this file on your computer')
                 const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
                 showSaveDialog(filters, title, docPath).then((fileName) => {
                   if (fileName) {
-                    const backupFolder = selectors.backupFolderPathSelector(store.getState())
+                    const backupFolder = selectors.backupFolderPathSelector(store().getState())
                     if (fileName.startsWith(backupFolder)) {
                       showErrorBox(
                         t('Error'),

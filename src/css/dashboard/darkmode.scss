@@ -58,6 +58,7 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
   nav {
     background-color: $dark-gray-1 !important;
   }
+
   .dashboard__navigation-tab {
     background-color: $dark-gray-1;
     border-bottom-color: $dark-gray-3;
@@ -107,11 +108,13 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
   .dashboard__new-files__item {
     color: $dark-text;
     background: $dark-gray-1;
+
     &.icon {
       svg {
         color: $dark-gray-5;
       }
     }
+
     &:hover,
     &.active {
       background-color: $dark-gray-2;
@@ -131,36 +134,38 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
     .sticky-table-table {
       .sticky-table-row:first-child {
         .sticky-table-cell {
-          background-color: $dark-gray-1;
-          color: $dark-text;
+          background-color: #444;
+          color: $darkmode-v2-darker-text;
+          
           &:first-child {
-            border-right-color: $dark-gray-3;
+            border-right: none;
           }
         }
       }
+
       .sticky-table-row:not(:first-child) {
-        border-left-color: $dark-gray-1;
-        .sticky-table-cell:not(:first-child) {
-          border-left-color: $dark-gray-3;
-        }
+        
         .sticky-table-cell {
-          border-color: $dark-gray-1;
+          border-left: none;
         }
 
         &:hover,
         &.selected {
           color: $dark-text;
+
           .sticky-table-cell:first-child {
             // background-color: $dark-gray-1;
             background-color: hsl(0, 0%, 30%); // in between $dark-gray-1 and $dark-gray-2
           }
         }
       }
+
       .sticky-table-row:nth-of-type(even) {
         .sticky-table-cell {
           background-color: $dark-gray-4;
         }
       }
+
       .sticky-table-row:nth-of-type(odd):not(:first-child) {
         .sticky-table-cell {
           background-color: $dark-gray-2;
@@ -172,22 +177,29 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
   .template-picker__wrapper {
     .template-picker__list {
       li.list-group-item {
-        background-color: $dark-gray-1;
-        border-color: $dark-gray-2;
-        &:hover,
-        &.selected {
-          color: $dark-text;
-          background-color: $dark-gray-1;
-        }
+      color: $darkmode-v2-darker-text;
+      border-color: $darkmode-v2-border;
+      background-color: $darkmode-v2-background;
+  
+      &.selected,
+      &:hover,
+      &:focus {
+        background-color: #24252c;
+        border: 1px solid $darkmode-v2-border;
       }
     }
+
+  }
+
     .template-picker__details {
       .panel-body {
         background-color: $dark-gray-4;
+
         button {
           color: $dark-text;
           background-color: $dark-gray-1;
           border-color: $dark-text;
+
           &:hover {
             background-color: $dark-gray-2;
           }
@@ -200,25 +212,39 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
   // backups //
   /////////////
   .dashboard__backups__projects-summary {
-    color: $dark-text;
-    background-color: $dark-gray-2;
+    color: $darkmode-v2-text;
+    background-color: $darkmode-v2-background;
     .count-circle {
-      border-color: white;
+      border-color: $gray-5;
+      color: $gray-5;
     }
+
     &.active {
-      background-color: $dark-gray-1;
+      background-color: $darkmode-v2-darker-background;
+      .count-circle {
+        border-color: $darkmode-v2-text;
+        color: $darkmode-v2-text;
+      }
     }
   }
   .dashboard__backups__columns {
-    color: $dark-text;
+    color: $darkmode-v2-text;
   }
   .dashboard__backups__project-row {
     &.row {
-      background-color: $dark-gray-2;
+      background-color: transparent;
     }
     .dashboard__backups__project-backup .dashboard__backups__item {
       .dashboard__backups__item-details small {
         color: $dark-gray-6;
+      }
+    }
+
+    .dashboard__backups__item {
+      .dashboard__backups__item-details {
+        > div {
+          color: #bfbfbf;
+        }
       }
     }
   }
@@ -232,49 +258,61 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
         color: $dark-gray-6;
       }
     }
+
     .option-switch-label:not(.checked) {
       background-color: $dark-gray-6;
     }
+
     .option-switch-labeltext {
-      color: $dark-text;
+      color: #d2d2d2;
+      font-weight: 500;
     }
+
     div#settings-tabs {
       .nav-tabs {
         border-bottom-color: $darkmode-border;
       }
-      .nav-tabs > li:not(.active) > a:not(:hover) {
+
+      .nav-tabs>li:not(.active)>a:not(:hover) {
         color: $darkmode-link-text;
         border-bottom-color: $darkmode-border;
       }
+
       .tab-content {
         border-color: $darkmode-border;
+
         .card-dialog__custom-attributes-configuration-link {
           color: $darkmode-link-text;
         }
       }
     }
   }
+
   .dashboard__options__item {
     select {
-      color: $dark-gray-1;
+      color: #bbb;
     }
+
     input {
-      color: $dark-gray-1;
+      color: #bbb;
     }
+
     .help-block {
-      color: $dark-text;
+      color: #d2d2d2;
+      font-weight: 500;
     }
+
     .btn-link {
-      color: $dark-link;
-      &:hover,&:focus {
-        color: $dark-link-active;
-      }
+      color: #ddd;
     }
+
     &.disabled {
       color: $dark-gray-6;
+
       .help-block {
         color: $dark-gray-6;
       }
+
       .form-control {
         background-color: $dark-gray-1;
         color: $dark-gray-6;
@@ -290,15 +328,19 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
       border-color: $darkmode-border;
     }
   }
+
   .dashboard__help__item {
     &.links {
       button.btn-link {
         color: $dark-link;
-        &:hover,&:focus {
+
+        &:hover,
+        &:focus {
           color: $dark-link-active;
         }
       }
     }
+
     &.actions {
       #customerServiceCode {
         background-color: $dark-gray-1;
@@ -316,29 +358,73 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
 .update-notifier {
   &.alert {
     &.darkmode {
-      color: $dark-text;
-      background-color: $dark-gray-1;
-      border-color: $dark-text;
+      color: $darkmode-v2-text;
+      background-color: $darkmode-v2-darker-background;
+      border-color: $darkmode-v2-border;
     }
   }
 }
 
 
-/////////////////////
-// settings Wizard //
-/////////////////////
-body.darkmode {
-  .settings-wizard__wrapper {
-    .onboarding__step {
-      background-color: $dark-gray-1;
-      .step__body {
-        .option-switch-labeltext {
-          color: $dark-gray-6;
-        }
-        .help-block {
-          color: $dark-gray-6;
+.darkmode {
+  .dashboard__main.darkmode {
+    background-color: $darkmode-v2-card-background !important;
+    color: #ddd !important;
+
+    .dashboard__recent-files .dashboard__search {
+      background-color: $darkmode-v2-background;
+      border-color: $darkmode-v2-border;
+    }
+
+    .dashboard__help__item {
+      &.actions {
+        #customerServiceCode {
+          background-color: $darkmode-v2-background;
+          border-color: $darkmode-v2-border;
         }
       }
+    }
+
+    nav {
+      background-color: $darkmode-v2-darker-background !important;
+    }
+
+    .dashboard__options {
+      div#settings-tabs {
+        .nav-tabs {
+          color: #bbb;
+          border-bottom-color: $darkmode-v2-nav-tabs-border;
+
+          >li:not(.active)>a:not(:hover) {
+            color: #bbb;
+            border-bottom-color: $darkmode-v2-nav-tabs-border;
+          }
+        }
+      }
+    }
+  }
+
+  /////////////////////
+  // settings Wizard //
+  /////////////////////
+  
+  .settings-wizard__wrapper {
+    .onboarding__step {
+      background-color: $darkmode-v2-darker-background;
+      .step__body {
+        .option-switch-labeltext {
+          color: $darkmode-v2-darker-text;
+        }
+        .help-block {
+          color: $darkmode-v2-darker-text;
+        }
+      }
+    }
+  }
+
+  .onboarding__progress__titles {
+    > div {
+      color: $darkmode-v2-darker-text;
     }
   }
 }

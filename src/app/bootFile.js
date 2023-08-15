@@ -177,6 +177,11 @@ export function bootFile(
   saveBackup,
   bootingOfflineFile
 ) {
+  const nukeLastKnown = () =>
+    whenClientIsReady(({ nukeLastOpenedFileURL }) => {
+      return nukeLastOpenedFileURL()
+    })
+
   const fileSystemAPIs = makeFileSystemAPIs(whenClientIsReady)
 
   const { backupOfflineBackupForResume } = makeFileModule(whenClientIsReady)
@@ -514,6 +519,7 @@ export function bootFile(
             store().dispatch(actions.applicationState.finishLoadingFile())
           })
           .catch((error) => {
+            nukeLastKnown()
             logger.error(error)
             rollbar.error(error)
             store.dispatch(
@@ -521,6 +527,7 @@ export function bootFile(
             )
           })
       } catch (error) {
+        nukeLastKnown()
         logger.error(error)
         rollbar.error(error)
         store().dispatch(actions.applicationState.errorLoadingFile())

@@ -1,8 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import { Buffer } from 'buffer/'
 
-import { errorCodes } from 'pltr/v2'
-
 import {
   PING,
   RM_RF,

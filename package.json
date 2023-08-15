@@ -1,6 +1,6 @@
 {
   "name": "plottr",
-  "version": "2023.6.16-beta.2",
+  "version": "2023.8.21",
   "description": "A visual story-planning tool",
   "repository": "https://github.com/cameronsutter/plottr_electron.git",
   "homepage": "plottr.com",
@@ -153,6 +153,7 @@
     "prettier": "^2.2.1",
     "pretty-date": "^0.2.0",
     "proper-lockfile": "^4.1.2",
+    "ramda": "^0.29.0",
     "rc-tooltip": "^6.0.1",
     "react": "^16.8.6",
     "react-beautiful-dnd": "^13.0.0",

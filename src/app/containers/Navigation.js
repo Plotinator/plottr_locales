@@ -36,15 +36,15 @@ const Navigation = ({
     }
   }, [])
 
-  const handleSelect = (selectedKey) => {
+  const handleSelect = useCallback((selectedKey) => {
     changeCurrentView(selectedKey)
-  }
+  }, [])
 
   const TrialLinks = () => {
     if (!isInTrialMode) return null
 
     return (
-      <Button bsStyle="link" onClick={() => openBuyWindow()}>
+      <Button onClick={() => openBuyWindow()} style={{ marginRight: 5 }}>
         <FaKey /> {t('Get a License')}
       </Button>
     )

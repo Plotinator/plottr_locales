@@ -29,6 +29,10 @@ class Store {
     })
   }
 
+  isInitialReadComplete = () => {
+    return this.initialReadComplete
+  }
+
   stop = () => {
     if (this.watcher && typeof this.watcher.close === 'function') {
       this.watcher.close()
@@ -328,6 +332,10 @@ class Store {
         return predicate(value, key)
       })
     })
+  }
+
+  getKeyWithoutDefault = (key) => {
+    return get(this.store, key)
   }
 
   get = (key) => {

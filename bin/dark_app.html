@@ -21,6 +21,15 @@
         overflow: hidden;
       }
 
+      #temporary-inner,
+      .loading-splash {
+        background-color: #2a2b32;
+      }
+
+      #temporary-inner h3 {
+        color: #bbb;
+      }
+
       #temporary-inner {
         height: 100vh;
         display: flex;
@@ -46,13 +55,11 @@
     <div id="react-root">
       <div id="temporary-inner">
         <div class="loading-splash">
-          <img src="../icons/logo_light_28_500.png" height="375" />
+          <img src="../icons/logo_dark_28_500.png" height="375" />
           <h3>Loading...</h3>
         </div>
       </div>
     </div>
-    <div id="book-modal"></div>
-    <div id="search-modal"></div>
     <script async src="app.bundle.js"></script>
   </body>
 </html>

@@ -110,25 +110,23 @@ app.userAgentFallback =
 let openedFile = false
 
 const broadcastPortChange = (port) => {
-  if (!isInitialised()) {
-    createClient(
-      port,
-      log,
-      WebSocket,
-      (error) => {
-        log.error(`Failed to connect to socket server on port: <${port}>.  Killing the app.`, error)
-        app.quit()
+  createClient(
+    port,
+    log,
+    WebSocket,
+    (error) => {
+      log.error(`Failed to connect to socket server on port: <${port}>.  Killing the app.`, error)
+      app.quit()
+    },
+    {
+      onBusy: () => {
+        safelyExitModule.busy()
       },
-      {
-        onBusy: () => {
-          safelyExitModule.busy()
-        },
-        onDone: () => {
-          safelyExitModule.done()
-        },
-      }
-    )
-  }
+      onDone: () => {
+        safelyExitModule.done()
+      },
+    }
+  )
   setPort(port)
   broadcastToAllWindows('update-worker-port', port)
 }

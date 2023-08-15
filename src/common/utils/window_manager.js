@@ -13,12 +13,12 @@ export const openFile = (fileURL, unknown) => {
   openKnownFile(fileURL, unknown)
 }
 
-export function openExistingFile(loggedIn, userId, email) {
+export function openExistingFile(loggedIn, userId, email, defaultPath) {
   // ask user where it is
   const properties = ['openFile', 'createDirectory']
   const filters = [{ name: t('Plottr project file'), extensions: ['pltr'] }]
 
-  return showOpenDialog('', filters, properties).then((files) => {
+  return showOpenDialog('', filters, properties, defaultPath).then((files) => {
     const filePath = files && files.length && files[0]
 
     if (typeof filePath !== 'string') {

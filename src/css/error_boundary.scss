@@ -45,10 +45,15 @@
 }
 
 body.darkmode {
-  .error-boundary-title {
-    color: $text-color;
-  }
+  .error-boundary-title,
   .error-boundary-body {
-    color: $text-color;
+    color: #aaa;
+  }
+
+  .text-center {
+    h1,
+    h2 {
+      color: #bfbfbf;
+    }
   }
 }

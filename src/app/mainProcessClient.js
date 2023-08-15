@@ -406,6 +406,10 @@ const _makeMainProcessClient = () => {
     return ask('create-desktop-shortcut', sourceFileURL, newFileURL)
   }
 
+  const listenToForceReload = (cb) => {
+    return subscribeTo('force-reload', cb)
+  }
+
   return {
     setWindowTitle,
     setRepresentedFileName,
@@ -497,6 +501,7 @@ const _makeMainProcessClient = () => {
     onCreateFileShortcut,
     onOpenImagePickerFromMenu,
     createDesktopShortcut,
+    listenToForceReload,
   }
 }
 
