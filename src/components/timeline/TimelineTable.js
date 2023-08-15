@@ -83,14 +83,6 @@ const TimelineTableConnector = (connector) => {
       setTimeout(() => {
         this.setLength()
       }, 50)
-
-      const { visible } = this.props.toast
-
-      if (visible) {
-        setTimeout(() => {
-          this.handleCloseToast()
-        }, 5000)
-      }
     }
 
     handleReorderBeats = (droppedPositionId, originalPositionId) => {
@@ -303,49 +295,8 @@ const TimelineTableConnector = (connector) => {
       }
     }
 
-    handleCloseToast = () => {
-      this.props.notificationActions.showToastNotification(false)
-    }
-
     handleCloseMessage = () => {
       this.props.notificationActions.dismissMessage()
-    }
-
-    getToastMessage = (cardAction, newBookId, lineAction) => {
-      if ((cardAction === 'move' || lineAction === 'move') && newBookId) {
-        const { books, actions } = this.props
-        const bookTitle = newBookId === 'series' ? t('Series') : this.bookTitle(books[newBookId])
-        const entityType = cardAction ? 'Scene card' : 'Plotline'
-
-        // if card is moved to another book, create the book link
-        return (
-          <div className="toast-message-with-anchor">
-            {t(`Woohoo! ${entityType} moved to`)}
-            <a href="#" onClick={() => actions.changeCurrentTimeline(newBookId)}>
-              {` ${bookTitle}`}
-            </a>
-          </div>
-        )
-      } else {
-        return t('Woohoo! Scene card duplicated')
-      }
-    }
-
-    renderToastMessage = () => {
-      const { toast } = this.props
-      return (
-        <div
-          className={cx(
-            'update-notifier scene-card-update-toast alert alert-info alert-dismissible'
-          )}
-          role="alert"
-        >
-          {this.getToastMessage(toast.cardAction, toast.newBookId, toast.lineAction)}
-          <button className="close" onClick={() => this.handleCloseToast()}>
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-      )
     }
 
     renderMessage = () => {
@@ -463,7 +414,7 @@ const TimelineTableConnector = (connector) => {
     }
 
     render() {
-      const { darkMode, orientation, isSmall, toast, message } = this.props
+      const { darkMode, orientation, isSmall, message } = this.props
 
       if (isSmall) {
         return (
@@ -481,17 +432,11 @@ const TimelineTableConnector = (connector) => {
             >
               <TopRow />
               <tbody>{this.renderRows()}</tbody>
-              {toast.visible ? this.renderToastMessage() : null}
             </table>
           </div>
         )
       } else {
-        return [
-          <TopRow key="top-row" />,
-          message ? this.renderMessage() : null,
-          this.renderRows(),
-          toast.visible ? this.renderToastMessage() : null,
-        ]
+        return [<TopRow key="top-row" />, message ? this.renderMessage() : null, this.renderRows()]
       }
     }
   }
