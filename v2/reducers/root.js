@@ -129,9 +129,11 @@ const root = (dataRepairers) => (state, action) => {
     }
     case ADD_CHARACTER: {
       const currentBookId = selectedCharacterAttributeTabSelector(state)
+      const nextCharacterId = nextId(state.characters)
       return mainReducer(state, {
         ...action,
         currentBookId,
+        nextCharacterId,
       })
     }
     // We might need to mint the books attribute when attaching a book

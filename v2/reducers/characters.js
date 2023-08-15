@@ -208,7 +208,7 @@ const characters =
           ...state,
           {
             ...defaultCharacter,
-            id: nextId(state),
+            id: action.nextCharacterId,
             name: action.name,
             description: action.description,
             notes: action.notes,

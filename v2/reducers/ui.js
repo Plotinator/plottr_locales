@@ -462,6 +462,10 @@ const updateUI = (state, action) => {
           ...state.searchTerms,
           characters: null,
         },
+        characterTab: {
+          ...state.characterTab,
+          selectedCharacter: action.nextCharacterId,
+        },
       }
     }
 

@@ -211,10 +211,7 @@ function mergeSchemas(schemaOne, schemaTwo) {
                 [next]:
                   subSchemaOne && subSchemaTwo
                     ? mergeSchemas(subSchemaOne, subSchemaTwo)
-                    : {
-                        $type: 'one-of',
-                        schema: [subSchemaOne || subSchemaTwo, { $type: 'unbound' }],
-                      },
+                    : mergeSchemas(subSchemaOne || subSchemaTwo, { $type: 'unbound' }),
               }
             },
             {}
