@@ -99,22 +99,59 @@ const makeFileModule = () => {
     }
     json.lines = []
     return whenClientIsReady(({ readFile }) => {
-      return importFromSnowflake(importedPath, true, json, readFile).then((importedJson) => {
+      return Promise.all([
+        currentSettings(),
+        importFromSnowflake(importedPath, true, json, readFile),
+      ]).then(([settings, importedJson]) => {
         if (isLoggedIntoPro) {
           sender.send('create-plottr-cloud-file', importedJson, storyName)
           return Promise.resolve()
         }
 
-        return saveToDefaultLocation(importedJson, storyName)
-          .then((fileURL) => {
-            return addToKnownFiles(fileURL).then(() => {
-              return openFile(fileURL)
+        if (!settings.user.defaultFolder) {
+          const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
+          const title = t('Where would you like to save the imported file?')
+          const destinationPath = dialog.showSaveDialog({
+            filters,
+            title,
+            defaultPath: app.getPath('documents'),
+          })
+          return destinationPath.then(({ filePath, canceled }) => {
+            if (canceled) {
+              return Promise.resolve()
+            } else {
+              const finalPath = helpers.file.ensureEndsInPltr(filePath)
+              return writeFile(finalPath, JSON.stringify(importedJson, null, 2)).then(() => {
+                // Right now, this is only used for testing so we want to quit when we're done.
+                log.info(`Finished importing from ${importedPath} to ${finalPath}`)
+                const fileURL = helpers.file.filePathToFileURL(finalPath)
+                return addToKnownFiles(fileURL).then(() => {
+                  return openFile(fileURL)
+                    .then(() => {
+                      log.info('Opened file from imported snowflake data', storyName)
+                      sender.send('finish-creating-local-scrivener-imported-file')
+                      return true
+                    })
+                    .catch((error) => {
+                      sender.send('error-importing-scrivener', error)
+                      log.error('Failed to open a known file after importing from Snowflake', error)
+                      return Promise.reject(error)
+                    })
+                })
+              })
+            }
+          })
+        } else {
+          return saveToDefaultLocation(importedJson, storyName)
+            .then((fileURL) => {
+              return addToKnownFiles(fileURL).then(() => {
+                return openFile(fileURL)
+              })
             })
-          })
-          .catch((error) => {
-            log.error('Failed to create file from snowflake', error)
-            return Promise.reject(error)
-          })
+            .catch((error) => {
+              log.error('Failed to create file from snowflake', error)
+              return Promise.reject(error)
+            })}
       })
     })
   }
