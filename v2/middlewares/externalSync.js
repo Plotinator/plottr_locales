@@ -124,21 +124,23 @@ const updateLastWrittenClientIds = (previous, state, store, wiredSelectors, wire
   //
   // Only call this function when we're not patching (i.e. receiving
   // changes from remote.)
+  const paths = []
   Object.keys(fullState).forEach((key) => {
     if (SYSTEM_REDUCER_KEYS.indexOf(key) === -1) {
       if (isFlatArrayKey(key) && Array.isArray(fullState[key])) {
         fullState[key].forEach((value, index) => {
           if (fullState[key][index] !== previous[key[index]]) {
-            store.dispatch(wiredActions.client.recordDataClientId(`${key}/${index}`, clientId))
+            paths.push(`${key}/${index}`)
           }
         })
       } else {
         if (fullState[key] !== previous[key]) {
-          store.dispatch(wiredActions.client.recordDataClientId(key, clientId))
+          paths.push(key)
         }
       }
     }
   })
+  store.dispatch(wiredActions.client.recordDataClientIds(paths, clientId))
 }
 
 const handleClientIds = (action, store, wiredSelectors, wiredActions) => {

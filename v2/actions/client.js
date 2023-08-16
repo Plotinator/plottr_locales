@@ -7,6 +7,7 @@ import {
   SET_IS_ON_WEB,
   SET_CURRENT_APP_STATE,
   RECORD_DATA_CLIENT_ID,
+  RECORD_DATA_CLIENT_IDS,
 } from '../constants/ActionTypes'
 
 export const setUserId = (userId) => ({
@@ -48,4 +49,8 @@ export function setCurrentAppStateToApplication() {
 
 export function recordDataClientId(path, clientId) {
   return { type: RECORD_DATA_CLIENT_ID, path, clientId }
+}
+
+export function recordDataClientIds(paths, clientId) {
+  return { type: RECORD_DATA_CLIENT_IDS, paths, clientId }
 }
