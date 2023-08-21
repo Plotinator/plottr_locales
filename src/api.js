@@ -97,7 +97,6 @@ const api = (
   }
 
   const updateClientIdAction = (path, clientId) => {
-    const reinterpretedPath = reinterpretPath(path)
     return actions.client.recordDataClientId(path, clientId)
   }
 
@@ -166,8 +165,9 @@ const api = (
           return
         }
         delete data.fileId
+        const incomingClientId = data.clientId
         delete data.clientId
-        withAction(updateClientIdAction(path, clientId))
+        withAction(updateClientIdAction(path, incomingClientId))
         withAction(
           patchAction[loadFunctionKey](
             patching,
@@ -204,9 +204,14 @@ const api = (
             results.push(document.data())
           })
           // NOTE: We can't only rely on the client id anymore.
-          const unChanged = results.every((document) => {
+          const unChanged = results.every((document, index) => {
             const previousDocument = lastResults?.get(document.id)
-            return document.clientId === clientId || isEqual(document, previousDocument)
+            const unchanged = document.clientId === clientId || isEqual(document, previousDocument)
+            if (!unchanged) {
+              const reinterpretedPath = reinterpretPath(path)
+              withAction(updateClientIdAction(`${reinterpretedPath}/${index}`, document.clientId))
+            }
+            return unchanged
           })
           if (unChanged) return
           lastResults = results.reduce((acc, next) => {
@@ -218,7 +223,6 @@ const api = (
             log.error('No patch action for ', path)
             return
           }
-          withAction(updateClientIdAction(path, clientId))
           withAction(patchAction[loadFunctionKey](patching, withData(results)))
         },
         error: (error) => {
