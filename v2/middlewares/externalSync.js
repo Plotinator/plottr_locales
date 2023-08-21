@@ -159,6 +159,11 @@ const externalSync = (selectState) => {
   return (patch, withData) => (store) => (next) => (action) => {
     const result = next(action)
 
+    // IMPORTANT: we need the past state prior to meddling with
+    // client ids.
+    const past = store.getState()
+    const previous = action.type === '@@redux-undo/UNDO' ? future[0] : past[past.length - 1]
+
     // Update last written client ids when we didn't receive a patch
     // from Firebase.  Helps us figure out who changed data so we
     // don't get into a sync loop.
@@ -166,8 +171,7 @@ const externalSync = (selectState) => {
 
     // IMPORTANT: we need the state *after* handling data client ids
     // so that we know what to sync!
-    const { future, present, past } = store.getState()
-    const previous = action.type === '@@redux-undo/UNDO' ? future[0] : past[past.length - 1]
+    const { future, present } = store.getState()
 
     wiredSync(previous, present, patch, withData, store, action)
 
