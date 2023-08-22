@@ -7,6 +7,7 @@ import {
   SET_IS_ON_WEB,
   SET_CURRENT_APP_STATE,
   RECORD_DATA_CLIENT_ID,
+  RECORD_DATA_CLIENT_IDS,
 } from '../constants/ActionTypes'
 
 const INITIAL_STATE = {
@@ -70,6 +71,17 @@ const clientReducer = (state = INITIAL_STATE, action) => {
           ...state.dataClientIds,
           [action.path]: action.clientId,
         },
+      }
+    }
+    case RECORD_DATA_CLIENT_IDS: {
+      return {
+        ...state,
+        dataClientIds: action.paths.reduce((existingPaths, nextPath) => {
+          return {
+            ...existingPaths,
+            [nextPath]: action.clientId,
+          }
+        }, state.dataClientIds),
       }
     }
     default:

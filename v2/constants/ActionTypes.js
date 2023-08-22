@@ -103,6 +103,7 @@ export const LOAD_LINES = 'LOAD_LINES'
 export const MOVE_LINE = 'MOVE_LINE'
 export const PIN_PLOTLINE = 'PIN_PLOTLINE'
 export const UNPIN_PLOTLINE = 'UNPIN_PLOTLINE'
+export const APPLY_TIMELINE_TEMPLATE = 'APPLY_TIMELINE_TEMPLATE'
 
 // places actions
 export const ADD_PLACE = 'ADD_PLACE'
@@ -321,6 +322,7 @@ export const SET_HAS_PRO = 'SET_HAS_PRO'
 export const SET_IS_ON_WEB = 'SET_IS_ON_WEB'
 export const SET_CURRENT_APP_STATE = 'SET_CURRENT_APP_STATE'
 export const RECORD_DATA_CLIENT_ID = 'RECORD_DATA_CLIENT_ID'
+export const RECORD_DATA_CLIENT_IDS = 'RECORD_DATA_CLIENT_IDS'
 // IMPORTANT: Please keep this up to date(!).  Impacts our ability to
 // track actual changes to the content of a file as apposed to system
 // data.
@@ -333,6 +335,7 @@ export const CLIENT_ACTIONS = [
   SET_IS_ON_WEB,
   SET_CURRENT_APP_STATE,
   RECORD_DATA_CLIENT_ID,
+  RECORD_DATA_CLIENT_IDS,
 ]
 
 // action actions (for undo)
@@ -365,13 +368,7 @@ export const KNOWN_FILES_ACTIONS = [SET_KNOWN_FILES]
 export const SET_TEMPLATES = 'SET_TEMPLATES'
 export const SET_CUSTOM_TEMPLATES = 'SET_CUSTOM_TEMPLATES'
 export const SET_TEMPLATE_MANIFEST = 'SET_TEMPLATE_MANIFEST'
-export const APPLY_TIMELINE_TEMPLATE = 'APPLY_TIMELINE_TEMPLATE'
-export const TEMPLATE_ACTIONS = [
-  SET_TEMPLATES,
-  SET_CUSTOM_TEMPLATES,
-  SET_TEMPLATE_MANIFEST,
-  APPLY_TIMELINE_TEMPLATE,
-]
+export const TEMPLATE_ACTIONS = [SET_TEMPLATES, SET_CUSTOM_TEMPLATES, SET_TEMPLATE_MANIFEST]
 
 // Settings
 export const SET_EXPORT_SETTINGS = 'SET_EXPORT_SETTINGS'

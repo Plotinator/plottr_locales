@@ -303,164 +303,10 @@ const validator = hasSameShapeAs({
           position: isNumber,
           title: isString,
           time: isNumber,
-          templates: oneOf([
-            oneOf([
-              oneOf([
-                oneOf([
-                  oneOf([
-                    oneOf([
-                      oneOf([
-                        oneOf([
-                          oneOf([
-                            oneOf([
-                              oneOf([
-                                oneOf([
-                                  oneOf([
-                                    oneOf([
-                                      oneOf([
-                                        oneOf([
-                                          oneOf([
-                                            oneOf([
-                                              oneOf([
-                                                oneOf([
-                                                  oneOf([
-                                                    oneOf([
-                                                      oneOf([
-                                                        oneOf([
-                                                          oneOf([
-                                                            oneOf([
-                                                              oneOf([
-                                                                oneOf([
-                                                                  isArrayOf(isAny),
-                                                                  isUnbound,
-                                                                ]),
-                                                                isUnbound,
-                                                              ]),
-                                                              isUnbound,
-                                                            ]),
-                                                            isUnbound,
-                                                            isArrayOf(isAny),
-                                                          ]),
-                                                          isUnbound,
-                                                        ]),
-                                                        isUnbound,
-                                                      ]),
-                                                      isUnbound,
-                                                    ]),
-                                                    isUnbound,
-                                                  ]),
-                                                  isUnbound,
-                                                ]),
-                                                isUnbound,
-                                              ]),
-                                              isUnbound,
-                                            ]),
-                                            isUnbound,
-                                          ]),
-                                          isUnbound,
-                                        ]),
-                                        isUnbound,
-                                      ]),
-                                      isUnbound,
-                                    ]),
-                                    isUnbound,
-                                  ]),
-                                  isUnbound,
-                                ]),
-                                isUnbound,
-                              ]),
-                              isUnbound,
-                            ]),
-                            isUnbound,
-                          ]),
-                          isUnbound,
-                        ]),
-                        isUnbound,
-                      ]),
-                      isUnbound,
-                    ]),
-                    isUnbound,
-                  ]),
-                  isUnbound,
-                ]),
-                isUnbound,
-              ]),
-              isUnbound,
-            ]),
-            isUnbound,
-            isArrayOf(isAny),
-          ]),
+          templates: oneOf([isArrayOf(isAny), isUnbound]),
           autoOutlineSort: isBoolean,
-          fromTemplateId: oneOf([oneOf([isNull, isString]), isUnbound]),
-          expanded: oneOf([
-            oneOf([
-              oneOf([
-                oneOf([
-                  oneOf([
-                    oneOf([
-                      oneOf([
-                        oneOf([
-                          oneOf([
-                            oneOf([
-                              oneOf([
-                                oneOf([
-                                  oneOf([
-                                    oneOf([
-                                      oneOf([
-                                        oneOf([
-                                          oneOf([
-                                            oneOf([
-                                              oneOf([
-                                                oneOf([
-                                                  oneOf([
-                                                    oneOf([
-                                                      oneOf([isBoolean, isUnbound]),
-                                                      isUnbound,
-                                                    ]),
-                                                    isUnbound,
-                                                  ]),
-                                                  isUnbound,
-                                                ]),
-                                                isUnbound,
-                                              ]),
-                                              isUnbound,
-                                            ]),
-                                            isUnbound,
-                                          ]),
-                                          isUnbound,
-                                        ]),
-                                        isUnbound,
-                                      ]),
-                                      isUnbound,
-                                    ]),
-                                    isUnbound,
-                                  ]),
-                                  isUnbound,
-                                ]),
-                                isUnbound,
-                              ]),
-                              isUnbound,
-                            ]),
-                            isUnbound,
-                          ]),
-                          isUnbound,
-                        ]),
-                        isUnbound,
-                        isBoolean,
-                      ]),
-                      isUnbound,
-                    ]),
-                    isUnbound,
-                  ]),
-                  isUnbound,
-                ]),
-                isUnbound,
-              ]),
-              isUnbound,
-            ]),
-            isUnbound,
-            isBoolean,
-          ]),
+          fromTemplateId: oneOf([isNull, isString, isUnbound]),
+          expanded: oneOf([isBoolean, isUnbound]),
         })(beat)
         popPath()
       })
@@ -631,13 +477,10 @@ const validator = hasSameShapeAs({
       color: isString,
       title: isString,
       position: isNumber,
-      characterId: oneOf([oneOf([isNull, isUnbound]), isUnbound]),
+      characterId: oneOf([isNull, isUnbound]),
       expanded: isNull,
       fromTemplateId: oneOf([isNull, isString]),
-      isPinned: oneOf([
-        oneOf([oneOf([oneOf([isBoolean, isUnbound]), isUnbound, isBoolean]), isUnbound]),
-        isUnbound,
-      ]),
+      isPinned: oneOf([isBoolean, isUnbound]),
     })
   ),
   notes: isArrayOf(
@@ -652,7 +495,7 @@ const validator = hasSameShapeAs({
       templates: isArrayOf(isAny),
       imageId: isString,
       bookIds: isArrayOf(oneOf([isNumber, isAny])),
-      categoryId: oneOf([oneOf([isString, isUnbound]), isUnbound]),
+      categoryId: oneOf([isString, isUnbound]),
     })
   ),
   places: isArrayOf(

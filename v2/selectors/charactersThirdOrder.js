@@ -27,70 +27,74 @@ import { allCardsSelector } from './cardsFirstOrder'
 import { createDeepEqualSelector } from './createDeepEqualSelector'
 
 const displayedSingleCharacter = (character, bookId, currentBookAttributeDescirptorsById) => {
-  const currentBookAttributes = character.attributes || []
-  const allCharacterTags = []
-  const characterPerBookTags =
-    currentBookAttributes.find((attribute) => {
+  if (!character) {
+    return null
+  } else {
+    const currentBookAttributes = character.attributes || []
+    const allCharacterTags = []
+    const characterPerBookTags =
+      currentBookAttributes.find((attribute) => {
+        return (
+          attribute.bookId === bookId &&
+          currentBookAttributeDescirptorsById[attribute.id]?.type === 'base-attribute' &&
+          currentBookAttributeDescirptorsById[attribute.id]?.name === 'tags'
+        )
+      })?.value ||
+      (bookId === 'all' && character.tags) ||
+      []
+    if (characterPerBookTags.length) {
+      allCharacterTags.push(...characterPerBookTags)
+    }
+
+    if (character.tags) {
+      character.tags?.forEach((tag) => {
+        if (!allCharacterTags.includes(tag)) {
+          allCharacterTags.push(tag)
+        }
+      })
+    }
+
+    const description =
+      currentBookAttributes.find((attribute) => {
+        return (
+          attribute.bookId === bookId &&
+          currentBookAttributeDescirptorsById[attribute.id]?.type === 'base-attribute' &&
+          currentBookAttributeDescirptorsById[attribute.id]?.name === 'shortDescription'
+        )
+      })?.value ||
+      (bookId === 'all' && character.description) ||
+      ''
+
+    const notes =
+      currentBookAttributes.find((attribute) => {
+        return (
+          attribute.bookId === bookId &&
+          currentBookAttributeDescirptorsById[attribute.id]?.type === 'base-attribute' &&
+          currentBookAttributeDescirptorsById[attribute.id]?.name === 'description'
+        )
+      })?.value ||
+      (bookId === 'all' && character.notes) ||
+      ''
+
+    const category = currentBookAttributes.find((attribute) => {
       return (
         attribute.bookId === bookId &&
         currentBookAttributeDescirptorsById[attribute.id]?.type === 'base-attribute' &&
-        currentBookAttributeDescirptorsById[attribute.id]?.name === 'tags'
+        currentBookAttributeDescirptorsById[attribute.id]?.name === 'category'
       )
-    })?.value ||
-    (bookId === 'all' && character.tags) ||
-    []
-  if (characterPerBookTags.length) {
-    allCharacterTags.push(...characterPerBookTags)
-  }
-
-  if (character.tags) {
-    character.tags?.forEach((tag) => {
-      if (!allCharacterTags.includes(tag)) {
-        allCharacterTags.push(tag)
-      }
     })
-  }
+    const categoryId =
+      typeof category?.value !== 'undefined'
+        ? category?.value
+        : (bookId === 'all' && character.categoryId) || null
 
-  const description =
-    currentBookAttributes.find((attribute) => {
-      return (
-        attribute.bookId === bookId &&
-        currentBookAttributeDescirptorsById[attribute.id]?.type === 'base-attribute' &&
-        currentBookAttributeDescirptorsById[attribute.id]?.name === 'shortDescription'
-      )
-    })?.value ||
-    (bookId === 'all' && character.description) ||
-    ''
-
-  const notes =
-    currentBookAttributes.find((attribute) => {
-      return (
-        attribute.bookId === bookId &&
-        currentBookAttributeDescirptorsById[attribute.id]?.type === 'base-attribute' &&
-        currentBookAttributeDescirptorsById[attribute.id]?.name === 'description'
-      )
-    })?.value ||
-    (bookId === 'all' && character.notes) ||
-    ''
-
-  const category = currentBookAttributes.find((attribute) => {
-    return (
-      attribute.bookId === bookId &&
-      currentBookAttributeDescirptorsById[attribute.id]?.type === 'base-attribute' &&
-      currentBookAttributeDescirptorsById[attribute.id]?.name === 'category'
-    )
-  })
-  const categoryId =
-    typeof category?.value !== 'undefined'
-      ? category?.value
-      : (bookId === 'all' && character.categoryId) || null
-
-  return {
-    ...character,
-    tags: allCharacterTags,
-    description,
-    notes,
-    categoryId,
+    return {
+      ...character,
+      tags: allCharacterTags,
+      description,
+      notes,
+      categoryId,
+    }
   }
 }
 

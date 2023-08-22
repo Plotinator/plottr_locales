@@ -124,21 +124,32 @@ const updateLastWrittenClientIds = (previous, state, store, wiredSelectors, wire
   //
   // Only call this function when we're not patching (i.e. receiving
   // changes from remote.)
+  const paths = []
   Object.keys(fullState).forEach((key) => {
     if (SYSTEM_REDUCER_KEYS.indexOf(key) === -1) {
       if (isFlatArrayKey(key) && Array.isArray(fullState[key])) {
         fullState[key].forEach((value, index) => {
           if (fullState[key][index] !== previous[key[index]]) {
-            store.dispatch(wiredActions.client.recordDataClientId(`${key}/${index}`, clientId))
+            paths.push(`${key}/${index}`)
           }
         })
       } else {
         if (fullState[key] !== previous[key]) {
-          store.dispatch(wiredActions.client.recordDataClientId(key, clientId))
+          paths.push(key)
         }
       }
     }
   })
+  store.dispatch(wiredActions.client.recordDataClientIds(paths, clientId))
+}
+
+const handleClientIds = (action, store, wiredSelectors, wiredActions) => {
+  const { future, present, past } = store.getState()
+  const previous = action.type === '@@redux-undo/UNDO' ? future[0] : past[past.length - 1]
+
+  if (!action.patching && previous) {
+    updateLastWrittenClientIds(previous, present, store, wiredSelectors, wiredActions)
+  }
 }
 
 const externalSync = (selectState) => {
@@ -148,15 +159,19 @@ const externalSync = (selectState) => {
   return (patch, withData) => (store) => (next) => (action) => {
     const result = next(action)
 
-    const { future, present, past } = store.getState()
+    // IMPORTANT: we need the past state prior to meddling with
+    // client ids.
+    const { past, future } = store.getState()
     const previous = action.type === '@@redux-undo/UNDO' ? future[0] : past[past.length - 1]
 
     // Update last written client ids when we didn't receive a patch
     // from Firebase.  Helps us figure out who changed data so we
     // don't get into a sync loop.
-    if (!action.patching && previous) {
-      updateLastWrittenClientIds(previous, present, store, wiredSelectors, wiredActions)
-    }
+    handleClientIds(action, store, wiredSelectors, wiredActions)
+
+    // IMPORTANT: we need the state *after* handling data client ids
+    // so that we know what to sync!
+    const { present } = store.getState()
 
     wiredSync(previous, present, patch, withData, store, action)
 
