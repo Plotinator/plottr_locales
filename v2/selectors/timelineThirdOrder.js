@@ -8,13 +8,18 @@ import {
   rootParentId,
   beatTitle,
   numberOfPriorChildrenAtSameDepth,
-  beatOneIsPrologue,
+  beatOneIsPrologue
 } from '../helpers/beats'
+import { cardMapping } from '../helpers/cards'
 import { createDeepEqualSelector } from './createDeepEqualSelector'
 
 // Other selector dependencies
 import { allLinesSelector } from './linesFirstOrder'
-import { allCardMetaDataSelector, allCardsSelector } from './cardsFirstOrder'
+import {
+  allCardMetaDataSelector,
+  allCardsSelector,
+  allCardIdAndKeyDataSelector
+} from './cardsFirstOrder'
 import { allBeatsSelector } from './beatsFirstOrder'
 import { isDarkModeSelector } from './settingsFirstOrder'
 import {
@@ -38,7 +43,7 @@ import {
   timelineViewIsStackedSelector,
   timelineViewIsTabbedSelector,
   uiSelector,
-  hierarchyLevelSelector,
+  hierarchyLevelSelector
 } from './secondOrder'
 
 const selectedOrientationSelector = createSelector(uiSelector, ({ orientation }) => {
@@ -97,7 +102,7 @@ export const timelineBundleSelector = createSelector(
     filterIsEmpty,
     isSmall,
     isMedium,
-    isLarge,
+    isLarge
   })
 )
 
@@ -213,6 +218,28 @@ export const flatCardMapSelector = createSelector(
   }
 )
 
+export const flatCardIdAndKeyDataMapSelector = createDeepEqualSelector(
+  allCardIdAndKeyDataSelector,
+  collapsedBeatSelector,
+  sortedBeatsByBookSelector,
+  timelineViewIsntDefaultSelector,
+  (cards, collapsedBeats, allSortedBeats, timelineViewIsntDefault) => {
+    const hierarchyIsOn = false
+    const beatIds = allSortedBeats.map(({ id }) => id)
+    const beatPositions = beatIds.map((x) => x)
+    beatIds.forEach((beatId, index) => (beatPositions[beatId] = index))
+    return cards.reduce(
+      cardReduce(
+        'lineId',
+        'beatId',
+        hierarchyIsOn && !timelineViewIsntDefault && collapsedBeats,
+        beatPositions
+      ),
+      {}
+    )
+  }
+)
+
 const visibleBeatsByPosition = (beats, timelineViewIsTabbed) =>
   beatsByPosition(({ expanded }) => {
     return expanded || timelineViewIsTabbed
@@ -246,6 +273,15 @@ export const flatVisibleSortedBeatsByBookSelector = createSelector(
   beatsByBookSelector,
   timelineViewIsTabbedSelector,
   flatVisibleBeatsByPosition
+)
+
+export const mobileOutlineCardMapSelector = createSelector(
+  flatCardIdAndKeyDataMapSelector,
+  flatVisibleSortedBeatsByBookSelector,
+  sortedLinesByBookSelector,
+  (card2DMap, chapters, lines) => {
+    return cardMapping(chapters || [], lines, card2DMap, null)
+  }
 )
 
 export const lineMaxCardsSelector = createSelector(
@@ -302,13 +338,13 @@ export const visibleBeatPositions = createSelector(
           }
           return {
             ...acc,
-            [beat.id]: index - lastRootIndex,
+            [beat.id]: index - lastRootIndex
           }
         }
       : (acc, beat, index) => {
           return {
             ...acc,
-            [beat.id]: index,
+            [beat.id]: index
           }
         }
     return visibleBeatsByPosition(beats, timelineViewIsTabbed).reduce(reducer, {})
@@ -400,10 +436,10 @@ export const secondTierBeatsInAtLeastTwoTierArrangementSelector = createSelector
           return [
             ...times(indexOfParentInParents - closestIndexBackwardOfParentWithNoChildren, () => {
               return {
-                type: 'insert-placeholder',
+                type: 'insert-placeholder'
               }
             }),
-            beat,
+            beat
           ]
         }
         return [beat]
@@ -564,7 +600,7 @@ const visibleBeatsForTopLevelParentByPosition = (
       if (!timelineViewIsSmall && timelineViewIsStacked && currentDepth !== maximumDepth) {
         return {
           ...beat,
-          isInsertChildCell: true,
+          isInsertChildCell: true
         }
       }
       return beat
@@ -677,7 +713,7 @@ const stringifiedCardsByIdSelector = createSelector(allCardsSelector, (cards) =>
   return cards.reduce((acc, nextCard) => {
     return {
       ...acc,
-      [nextCard.id]: JSON.stringify(nextCard).toLowerCase(),
+      [nextCard.id]: JSON.stringify(nextCard).toLowerCase()
     }
   }, {})
 })

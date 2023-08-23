@@ -65,6 +65,26 @@ export const allCardMetaDataSelector = createSelector(fullFileStateSelector, (st
   state.cards.map(cardMetaData)
 )
 
+const cardIdAndKeyData = (card) => {
+  const {
+    id,
+    beatId,
+    lineId,
+    positionWithinLine,
+  } = card
+
+  return {
+    id,
+    beatId,
+    lineId,
+    positionWithinLine,
+  }
+}
+
+export const allCardIdAndKeyDataSelector = createSelector(fullFileStateSelector, (state) =>
+  state.cards.map(cardIdAndKeyData)
+)
+
 export const nextCardIdSelector = createSelector(allCardsSelector, (cards) => nextId(cards))
 
 const cardIdSelector = (state, cardId) => cardId

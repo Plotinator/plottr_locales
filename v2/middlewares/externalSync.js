@@ -14,7 +14,7 @@ const withOrderingPrecedence = (fileKeys) => {
     'attributes',
     ...fileKeys.filter((key) => {
       return key !== 'attributes'
-    }),
+    })
   ]
 }
 
@@ -32,9 +32,9 @@ const sync = (selectState) => {
     selectedFileIdSelector,
     selectedFilePermissionSelector,
     fullFileStateSelector,
-    clientIdForPathSelector,
+    clientIdForPathSelector
   } = selectors(selectState)
-  return (previous, present, patch, withData, store, action) => {
+  return (previous, present, patch, withData, store, action, updatedPaths) => {
     const isCloudFile = isCloudFileSelector(present)
     const isOffline = isOfflineSelector(present)
     const isResuming = isResumingSelector(present)
@@ -70,53 +70,38 @@ const sync = (selectState) => {
     if (!previous) return false
 
     const state = fullFileStateSelector(present)
-    withOrderingPrecedence(Object.keys(state)).forEach((key) => {
-      // Keys we don't sync
-      if (SYSTEM_REDUCER_KEYS.indexOf(key) > -1) return
-      // Also don't sync file record changes unless we're the owner
-      if (key === 'file' && userPermission !== 'owner') {
-        return
-      }
-      if (previous[key] !== state[key]) {
-        const payload = withData(key, state[key])
-        if (isFlatArrayKey(key)) {
-          const oldEntitiesById = new Map()
-          previous[key].forEach((next) => {
-            oldEntitiesById.set(next.id, next)
-          })
-          payload.forEach((entity, index) => {
-            const oldEntity = oldEntitiesById && oldEntitiesById.get(entity.id)
-            const lastRecordedClientId = clientIdForPathSelector(present, `${key}/${index}`)
-            if (oldEntity !== entity && lastRecordedClientId && lastRecordedClientId === clientId) {
-              patch(key, fileId, entity, clientId).catch((error) => {
-                if (error.code === 'permission-denied') {
-                  store.dispatch(permissionError(key, action, error.code))
-                }
-              })
-            }
-          })
-        } else {
-          const lastRecordedClientId = clientIdForPathSelector(present, key)
-          if (lastRecordedClientId && lastRecordedClientId === clientId) {
-            patch(key, fileId, payload, clientId).catch((error) => {
-              if (error.code === 'permission-denied') {
-                store.dispatch(permissionError(key, action, error.code))
-              }
-            })
+    for (let i = 0; i < updatedPaths.length; ++i) {
+      const path = updatedPaths[i]
+      const key = path[0]
+      const payload = withData(key, state[key])
+      if (isFlatArrayKey(key)) {
+        const index = path[1]
+        const oldEntity = previous[key][index]
+        const entity = state[key][index]
+        patch(key, fileId, entity, clientId).catch((error) => {
+          if (error.code === 'permission-denied') {
+            store.dispatch(permissionError(key, action, error.code))
           }
-        }
+        })
+      } else {
+        patch(key, fileId, payload, clientId).catch((error) => {
+          if (error.code === 'permission-denied') {
+            store.dispatch(permissionError(key, action, error.code))
+          }
+        })
       }
-    })
+    }
 
     return true
   }
 }
 
 const updateLastWrittenClientIds = (previous, state, store, wiredSelectors, wiredActions) => {
-  const { clientIdSelector, fullFileStateSelector } = wiredSelectors
+  const { clientIdSelector, fullFileStateSelector, selectedFilePermissionSelector } = wiredSelectors
 
   const fullState = fullFileStateSelector(state)
   const clientId = clientIdSelector(state)
+  const userPermission = selectedFilePermissionSelector(state)
 
   // Go through each key and potentially do something if they changed.
   //
@@ -125,31 +110,30 @@ const updateLastWrittenClientIds = (previous, state, store, wiredSelectors, wire
   // Only call this function when we're not patching (i.e. receiving
   // changes from remote.)
   const paths = []
-  Object.keys(fullState).forEach((key) => {
-    if (SYSTEM_REDUCER_KEYS.indexOf(key) === -1) {
-      if (isFlatArrayKey(key) && Array.isArray(fullState[key])) {
-        fullState[key].forEach((value, index) => {
-          if (fullState[key][index] !== previous[key[index]]) {
+  const resultPaths = []
+  const fullStateKeys = Object.keys(fullState)
+  for (let i = 0; i < fullStateKeys.length; ++i) {
+    const key = fullStateKeys[i]
+    const isFileAndHasntGotPermission = key === 'file' && userPermission !== 'owner'
+    if (SYSTEM_REDUCER_KEYS.indexOf(key) === -1 && !isFileAndHasntGotPermission) {
+      if (isFlatArrayKey(key) && Array.isArray(fullState[key]) && fullState[key] !== previous[key]) {
+        for (let index = 0; index < fullState[key].length; ++index) {
+          if (!Object.is(fullState[key][index], previous[key][index])) {
             paths.push(`${key}/${index}`)
+            resultPaths.push([key, index])
           }
-        })
+        }
       } else {
         if (fullState[key] !== previous[key]) {
           paths.push(key)
+          resultPaths.push([key])
         }
       }
     }
-  })
-  store.dispatch(wiredActions.client.recordDataClientIds(paths, clientId))
-}
-
-const handleClientIds = (action, store, wiredSelectors, wiredActions) => {
-  const { future, present, past } = store.getState()
-  const previous = action.type === '@@redux-undo/UNDO' ? future[0] : past[past.length - 1]
-
-  if (!action.patching && previous) {
-    updateLastWrittenClientIds(previous, present, store, wiredSelectors, wiredActions)
   }
+  store.dispatch(wiredActions.client.recordDataClientIds(paths, clientId))
+
+  return resultPaths
 }
 
 const externalSync = (selectState) => {
@@ -159,21 +143,29 @@ const externalSync = (selectState) => {
   return (patch, withData) => (store) => (next) => (action) => {
     const result = next(action)
 
-    // IMPORTANT: we need the past state prior to meddling with
-    // client ids.
-    const { past, future } = store.getState()
-    const previous = action.type === '@@redux-undo/UNDO' ? future[0] : past[past.length - 1]
-
     // Update last written client ids when we didn't receive a patch
     // from Firebase.  Helps us figure out who changed data so we
     // don't get into a sync loop.
-    handleClientIds(action, store, wiredSelectors, wiredActions)
+    if (!action.patching) {
+      // IMPORTANT: we need the past state prior to meddling with
+      // client ids.
+      const { past, future } = store.getState()
+      const previous = action.type === '@@redux-undo/UNDO' ? future[0] : past[past.length - 1]
 
-    // IMPORTANT: we need the state *after* handling data client ids
-    // so that we know what to sync!
-    const { present } = store.getState()
+      const updatedPaths = updateLastWrittenClientIds(
+        previous,
+        store.getState().present,
+        store,
+        wiredSelectors,
+        wiredActions
+      )
 
-    wiredSync(previous, present, patch, withData, store, action)
+      // IMPORTANT: we need the state *after* handling data client ids
+      // so that we know what to sync!
+      const { present } = store.getState()
+
+      wiredSync(previous, present, patch, withData, store, action, updatedPaths)
+    }
 
     return result
   }
@@ -196,15 +188,32 @@ export const externalSyncWithoutHistory = (selectState) => {
     // Update last written client ids when we didn't receive a patch
     // from Firebase.  Helps us figure out who changed data so we
     // don't get into a sync loop.
-    if (!action.patching && previous) {
-      updateLastWrittenClientIds(previous, store.getState(), store, wiredSelectors, wiredActions)
-    }
-
-    const present = store.getState()
-
-    const synchronised = wiredSync(previous, present, patch, withData, store, action)
-    if (synchronised || !previous) {
-      previous = fullFileStateSelector(present)
+    if (!action.patching) {
+      if (previous) {
+        const updatedPaths = updateLastWrittenClientIds(
+          previous,
+          store.getState(),
+          store,
+          wiredSelectors,
+          wiredActions
+        )
+        const present = store.getState()
+        const synchronised = wiredSync(
+          previous,
+          present,
+          patch,
+          withData,
+          store,
+          action,
+          updatedPaths
+        )
+        if (synchronised || !previous) {
+          previous = fullFileStateSelector(present)
+        }
+      } else if (!previous) {
+        const present = store.getState()
+        previous = fullFileStateSelector(present)
+      }
     }
 
     return result

@@ -2,7 +2,7 @@
 // Use secondOrder and *ThirdOrder for your selector if it has other
 // dependencies.
 
-import { sortBy } from 'lodash'
+import { sortBy, keyBy } from 'lodash'
 import { createSelector } from 'reselect'
 
 import { nextId } from '../store/newIds'
@@ -14,6 +14,10 @@ export const allSeriesLinesSelector = createSelector(fullFileStateSelector, (sta
 )
 
 export const allLinesSelector = createSelector(fullFileStateSelector, (state) => state.lines)
+
+export const allLinesByIdSelector = createSelector(allLinesSelector, (lines) => {
+  return keyBy(lines, 'id')
+})
 
 export const nextLineIdSelector = createSelector(allLinesSelector, (lines) => nextId(lines))
 
