@@ -10,11 +10,16 @@ import {
   numberOfPriorChildrenAtSameDepth,
   beatOneIsPrologue,
 } from '../helpers/beats'
+import { cardMapping } from '../helpers/cards'
 import { createDeepEqualSelector } from './createDeepEqualSelector'
 
 // Other selector dependencies
 import { allLinesSelector } from './linesFirstOrder'
-import { allCardMetaDataSelector, allCardsSelector } from './cardsFirstOrder'
+import {
+  allCardMetaDataSelector,
+  allCardsSelector,
+  allCardIdAndKeyDataSelector,
+} from './cardsFirstOrder'
 import { allBeatsSelector } from './beatsFirstOrder'
 import { isDarkModeSelector } from './settingsFirstOrder'
 import {
@@ -213,6 +218,28 @@ export const flatCardMapSelector = createSelector(
   }
 )
 
+export const flatCardIdAndKeyDataMapSelector = createDeepEqualSelector(
+  allCardIdAndKeyDataSelector,
+  collapsedBeatSelector,
+  sortedBeatsByBookSelector,
+  timelineViewIsntDefaultSelector,
+  (cards, collapsedBeats, allSortedBeats, timelineViewIsntDefault) => {
+    const hierarchyIsOn = false
+    const beatIds = allSortedBeats.map(({ id }) => id)
+    const beatPositions = beatIds.map((x) => x)
+    beatIds.forEach((beatId, index) => (beatPositions[beatId] = index))
+    return cards.reduce(
+      cardReduce(
+        'lineId',
+        'beatId',
+        hierarchyIsOn && !timelineViewIsntDefault && collapsedBeats,
+        beatPositions
+      ),
+      {}
+    )
+  }
+)
+
 const visibleBeatsByPosition = (beats, timelineViewIsTabbed) =>
   beatsByPosition(({ expanded }) => {
     return expanded || timelineViewIsTabbed
@@ -246,6 +273,15 @@ export const flatVisibleSortedBeatsByBookSelector = createSelector(
   beatsByBookSelector,
   timelineViewIsTabbedSelector,
   flatVisibleBeatsByPosition
+)
+
+export const mobileOutlineCardMapSelector = createSelector(
+  flatCardIdAndKeyDataMapSelector,
+  flatVisibleSortedBeatsByBookSelector,
+  sortedLinesByBookSelector,
+  (card2DMap, chapters, lines) => {
+    return cardMapping(chapters || [], lines, card2DMap, null)
+  }
 )
 
 export const lineMaxCardsSelector = createSelector(
