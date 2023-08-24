@@ -1,11 +1,13 @@
 import { firebaseWorker } from 'plottr_firebase/worker/firebase-worker'
 
+import { selectors } from 'wired-up-pltr'
+
 import logger from '../shared/logger'
 import { makeMainProcessClient } from './app/mainProcessClient'
 
 const { machineId } = makeMainProcessClient()
 
-const worker = firebaseWorker(logger, machineId)
+const worker = firebaseWorker(logger, machineId, selectors)
 
 export const editFileName = worker.editFileName
 export const updateAuthFileName = worker.updateAuthFileName
