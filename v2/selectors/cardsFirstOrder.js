@@ -66,12 +66,7 @@ export const allCardMetaDataSelector = createSelector(fullFileStateSelector, (st
 )
 
 const cardIdAndKeyData = (card) => {
-  const {
-    id,
-    beatId,
-    lineId,
-    positionWithinLine,
-  } = card
+  const { id, beatId, lineId, positionWithinLine } = card
 
   return {
     id,
