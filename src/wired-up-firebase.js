@@ -23,6 +23,7 @@ export const onSessionChange = worker.onSessionChange
 export const currentUser = worker.currentUser
 export const patch = worker.patch
 export const overwrite = worker.overwrite
+export const overwriteAll = worker.overwriteAll
 export const shareDocument = worker.shareDocument
 export const releaseRCELock = worker.releaseRCELock
 export const lockRCE = worker.lockRCE
