@@ -114,7 +114,9 @@ import {
   LOGIN_WITH_EMAIL_AND_PASSWORD_ERROR_REPLY,
 } from './firebase-messages'
 
-export const firebaseWorker = (logger, mintSessionClientId) => {
+export const firebaseWorker = (logger, mintSessionClientId, selectors) => {
+  const { fileIdSelector } = selectors
+
   let initialised = false
   let store = null
 
@@ -345,7 +347,10 @@ export const firebaseWorker = (logger, mintSessionClientId) => {
           logger.error('Store not set before reply heard from RCE worker!')
           throw new Error('Reply heard from RCE worker listener before store was set.')
         }
-        store.dispatch(action)
+        const currentFileId = fileIdSelector(store.getState())
+        if (action.fileId && action.fileId === currentFileId) {
+          store.dispatch(action)
+        }
         return
       }
       case IS_STORAGE_URL_REPLY:

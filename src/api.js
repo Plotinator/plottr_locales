@@ -204,26 +204,23 @@ const api = (
             results.push(document.data())
           })
           // NOTE: We can't only rely on the client id anymore.
-          const unChanged = results.every((document, index) => {
-            const previousDocument = lastResults?.get(document.id)
-            const unchanged = document.clientId === clientId || isEqual(document, previousDocument)
-            if (!unchanged) {
-              const reinterpretedPath = reinterpretPath(path)
-              withAction(updateClientIdAction(`${reinterpretedPath}/${index}`, document.clientId))
-            }
-            return unchanged
+          const unChangedDocuments = results.every((document, index) => {
+            const previousDocument = lastResults[index]
+            return document.clientId === clientId || document.id === previousDocument?.id
           })
-          if (unChanged) return
-          lastResults = results.reduce((acc, next) => {
-            acc.set(next.id)
-            return acc
-          }, new Map())
-          const patchAction = patchActions(path)
-          if (!patchAction) {
-            log.error('No patch action for ', path)
+          const unchanged =
+            unChangedDocuments && (!lastResults || lastResults.length === results.length)
+          if (unchanged) {
             return
+          } else {
+            lastResults = results
+            const patchAction = patchActions(path)
+            if (!patchAction) {
+              log.error('No patch action for ', path)
+              return
+            }
+            withAction(patchAction[loadFunctionKey](patching, withData(results), fileId))
           }
-          withAction(patchAction[loadFunctionKey](patching, withData(results)))
         },
         error: (error) => {
           log.error(
