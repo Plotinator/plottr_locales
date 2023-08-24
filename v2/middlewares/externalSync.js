@@ -24,7 +24,7 @@ const sync = (selectState) => {
     selectedFilePermissionSelector,
     fullFileStateSelector,
   } = selectors(selectState)
-  return (previous, present, patch, withData, store, action, updatedPaths) => {
+  return (previous, present, patch, overwriteAll, withData, store, action, updatedPaths) => {
     const isCloudFile = isCloudFileSelector(present)
     const isOffline = isOfflineSelector(present)
     const isResuming = isResumingSelector(present)
@@ -66,12 +66,20 @@ const sync = (selectState) => {
       const payload = withData(key, state[key])
       if (isFlatArrayKey(key)) {
         const index = path[1]
-        const entity = state[key][index] || null
-        patch(key, fileId, entity, clientId, index).catch((error) => {
-          if (error.code === 'permission-denied') {
-            store.dispatch(permissionError(key, action, error.code))
-          }
-        })
+        if (index === 'overwrite') {
+          overwriteAll(key, fileId, state[key], clientId, previous[key].length).catch((error) => {
+            if (error.code === 'permission-denied') {
+              store.dispatch(permissionError(key, action, error.code))
+            }
+          })
+        } else {
+          const entity = state[key][index] || null
+          patch(key, fileId, entity, clientId, index).catch((error) => {
+            if (error.code === 'permission-denied') {
+              store.dispatch(permissionError(key, action, error.code))
+            }
+          })
+        }
       } else {
         patch(key, fileId, payload, clientId).catch((error) => {
           if (error.code === 'permission-denied') {
@@ -108,13 +116,13 @@ const computeNewPaths = (previous, state, store, wiredSelectors, wiredActions) =
         Array.isArray(fullState[key]) &&
         fullState[key] !== previous[key]
       ) {
-        for (
-          let index = 0;
-          index < Math.max(fullState[key].length, previous[key].length);
-          ++index
-        ) {
-          if (!Object.is(fullState[key][index], previous[key][index])) {
-            resultPaths.push([key, index])
+        if (previous[key].length !== fullState[key].length) {
+          resultPaths.push([key, 'overwrite'])
+        } else {
+          for (let index = 0; index < fullState[key].length; ++index) {
+            if (!Object.is(fullState[key][index], previous[key][index])) {
+              resultPaths.push([key, index])
+            }
           }
         }
       } else {
@@ -131,7 +139,7 @@ const externalSync = (selectState) => {
   const wiredSync = sync(selectState)
   const wiredSelectors = selectors(selectState)
   const wiredActions = actions(selectState)
-  return (patch, withData) => (store) => (next) => (action) => {
+  return (patch, overwriteAll, withData) => (store) => (next) => (action) => {
     const result = next(action)
 
     // Update last written client ids when we didn't receive a patch
@@ -155,7 +163,7 @@ const externalSync = (selectState) => {
       // so that we know what to sync!
       const { present } = store.getState()
 
-      wiredSync(previous, present, patch, withData, store, action, updatedPaths)
+      wiredSync(previous, present, patch, overwriteAll, withData, store, action, updatedPaths)
     }
 
     return result
@@ -173,7 +181,7 @@ export const externalSyncWithoutHistory = (selectState) => {
   const wiredSelectors = selectors(selectState)
   const wiredActions = actions(selectState)
   const { fullFileStateSelector } = selectors(selectState)
-  return (patch, withData) => (store) => (next) => (action) => {
+  return (patch, overwriteAll, withData) => (store) => (next) => (action) => {
     const result = next(action)
 
     // Update last written client ids when we didn't receive a patch
@@ -193,6 +201,7 @@ export const externalSyncWithoutHistory = (selectState) => {
           previous,
           present,
           patch,
+          overwriteAll,
           withData,
           store,
           action,
