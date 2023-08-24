@@ -461,8 +461,8 @@ self.onmessage = (event) => {
       return
     }
     case PATCH: {
-      const { path, fileId, payload, clientId } = messagePayload
-      patch(path, fileId, payload, clientId)
+      const { path, fileId, payload, clientId, index } = messagePayload
+      patch(path, fileId, payload, clientId, index)
         .then(replyToPromise(PATCH))
         .catch((error) => {
           logger.error(`Failed to patch file with id <${fileId}> at path ${path}`, error.message)
@@ -471,8 +471,8 @@ self.onmessage = (event) => {
       return
     }
     case OVERWRITE: {
-      const { path, fileId, payload, clientId } = messagePayload
-      overwrite(path, fileId, payload, clientId)
+      const { path, fileId, payload, clientId, id } = messagePayload
+      overwrite(path, fileId, payload, clientId, id)
         .then(replyToPromise(OVERWRITE))
         .catch((error) => {
           logger.error(`Error overwriting file with id <${fileId}> at path ${path}`, error.message)

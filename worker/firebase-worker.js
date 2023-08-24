@@ -246,11 +246,11 @@ export const firebaseWorker = (logger, mintSessionClientId, selectors) => {
   const currentUser = () => {
     return sendPromise(CURRENT_USER, {})
   }
-  const patch = (path, fileId, payload, clientId) => {
-    return sendPromise(PATCH, { path, fileId, payload, clientId })
+  const patch = (path, fileId, payload, clientId, index) => {
+    return sendPromise(PATCH, { path, fileId, payload, clientId, index })
   }
-  const overwrite = (path, fileId, payload, clientId) => {
-    return sendPromise(OVERWRITE, { path, fileId, payload, clientId })
+  const overwrite = (path, fileId, payload, clientId, id) => {
+    return sendPromise(OVERWRITE, { path, fileId, payload, clientId, id })
   }
   const shareDocument = (userId, fileId, emailAddress, permission) => {
     return sendPromise(SHARE_DOCUMENT, { userId, fileId, emailAddress, permission })

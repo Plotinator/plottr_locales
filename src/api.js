@@ -96,10 +96,6 @@ const api = (
     return typeof mappedValue !== 'undefined' ? mappedValue : path
   }
 
-  const updateClientIdAction = (path, clientId) => {
-    return actions.client.recordDataClientId(path, clientId)
-  }
-
   const patchActions = (path) => {
     const reinterpretedPath = reinterpretPath(path)
     switch (reinterpretedPath) {
@@ -165,15 +161,14 @@ const api = (
           return
         }
         delete data.fileId
-        const incomingClientId = data.clientId
         delete data.clientId
-        withAction(updateClientIdAction(path, incomingClientId))
-        withAction(
-          patchAction[loadFunctionKey](
+        withAction({
+          ...patchAction[loadFunctionKey](
             patching,
             withData({ ...usingFromDocRef(documentRef), ...data })
-          )
-        )
+          ),
+          fileId,
+        })
       },
       error: (error) => {
         log.error(
@@ -205,8 +200,8 @@ const api = (
           })
           // NOTE: We can't only rely on the client id anymore.
           const unChangedDocuments = results.every((document, index) => {
-            const previousDocument = lastResults[index]
-            return document.clientId === clientId || document.id === previousDocument?.id
+            const previousDocument = lastResults && lastResults[index]
+            return document.clientId === clientId && document.id === previousDocument?.id
           })
           const unchanged =
             unChangedDocuments && (!lastResults || lastResults.length === results.length)
@@ -219,7 +214,10 @@ const api = (
               log.error('No patch action for ', path)
               return
             }
-            withAction(patchAction[loadFunctionKey](patching, withData(results), fileId))
+            withAction({
+              ...patchAction[loadFunctionKey](patching, withData(results)),
+              fileId,
+            })
           }
         },
         error: (error) => {
@@ -411,9 +409,9 @@ const api = (
         if (Array.isArray(value) && value.length > 0) {
           const timestamp = new Date().toISOString()
           return Promise.all(
-            value.map((entity) => {
+            value.map((entity, index) => {
               return overwriteWithNoPathTranslation(
-                `old${capitalize(path)}/${fileId}/${timestamp}/${entity.id}`,
+                `old${capitalize(path)}/${fileId}/${timestamp}/${index}`,
                 fileId,
                 entity,
                 clientId
@@ -478,9 +476,9 @@ const api = (
         return
       }
       if (isFlatArrayKey(key)) {
-        state[key].forEach((payload) => {
+        state[key].forEach((payload, index) => {
           requests.push(
-            overwrite(key, fileId, payload, clientId)
+            overwrite(key, fileId, payload, clientId, index)
               .catch((error) => {
                 log.error(`Error while force updating file ${fileId} at key: ${key}`, error)
                 return Promise.reject(error)
@@ -619,9 +617,9 @@ const api = (
           entitys.push({ ...entity, id: entity.id })
         })
         return Promise.all(
-          entitys.map((entity) => {
+          entitys.map((entity, index) => {
             return patchWithNoPathTranslation(
-              `${rootPath}/${entity.id}`,
+              `${rootPath}/${index}`,
               fileId,
               { deleted: true, id: entity.id },
               clientId
@@ -774,15 +772,22 @@ const api = (
     )
   }
 
-  const computeDocumentPath = (path, fileId, payload = {}) => {
-    return isFlatArrayKey(path)
-      ? `flat${capitalize(path)}/${fileId}/${path}/${payload.id}`
-      : `${path}/${fileId}`
+  const computeDocumentPath = (path, fileId, id) => {
+    const isFlatArray = isFlatArrayKey(path)
+    if (isFlatArray) {
+      if (typeof id === 'undefined') {
+        return 'non-existant-path'
+      } else {
+        return `flat${capitalize(path)}/${fileId}/${path}/${id}`
+      }
+    } else {
+      return `${path}/${fileId}`
+    }
   }
 
-  const patch = (path, fileId, payload, clientId) => {
+  const patch = (path, fileId, payload, clientId, index) => {
     const { doc, updateDoc } = database()
-    const documentPath = computeDocumentPath(path, fileId, payload)
+    const documentPath = computeDocumentPath(path, fileId, index)
 
     return updateDoc(doc(documentPath), {
       ...payload,
@@ -801,15 +806,19 @@ const api = (
     })
   }
 
-  const overwrite = (path, fileId, payload, clientId) => {
-    const { doc, setDoc } = database()
-    const documentPath = computeDocumentPath(path, fileId, payload)
+  const overwrite = (path, fileId, payload, clientId, id) => {
+    const { doc, setDoc, deleteDoc } = database()
+    const documentPath = computeDocumentPath(path, fileId, id)
 
-    return setDoc(doc(documentPath), {
-      ...payload,
-      clientId,
-      fileId,
-    })
+    if (payload === null) {
+      return deleteDoc(doc(documentPath))
+    } else {
+      return setDoc(doc(documentPath), {
+        ...payload,
+        clientId,
+        fileId,
+      })
+    }
   }
 
   const overwriteWithNoPathTranslation = (path, fileId, payload, clientId) => {
