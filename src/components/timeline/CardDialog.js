@@ -87,7 +87,6 @@ const CardDialogConnector = (connector) => {
     const [activeTab, setActiveTab] = useState(1)
     const [newTemplateTabPosition, setNewTemplateTabPosition] = useState(null)
 
-    const titleInputRef = useRef()
     const colourPickerButtonRef = useRef()
     const colourPickerPaletteListRef = useRef()
     const previousClick = useRef(click)
@@ -111,11 +110,7 @@ const CardDialogConnector = (connector) => {
     }, [click])
 
     const saveEdit = () => {
-      if (!titleInputRef.current) {
-        return
-      }
-      var newTitle = titleInputRef.current.value
-      actions.editCardAttributes(cardId, { title: newTitle })
+      // NOP.
     }
 
     useEffect(() => {
@@ -203,13 +198,6 @@ const CardDialogConnector = (connector) => {
     const handleEnter = (event) => {
       if (event.which === 13) {
         saveAndClose()
-      }
-    }
-
-    // FIXME: unused
-    const _handleEsc = (event) => {
-      if (event.which === 27) {
-        saveEdit()
       }
     }
 
@@ -509,8 +497,9 @@ const CardDialogConnector = (connector) => {
           style={{ fontSize: '24px', textAlign: 'center', marginBottom: '6px' }}
           onKeyPress={handleEnter}
           type="text"
-          inputRef={(ref) => {
-            titleInputRef.current = ref
+          onChange={(event) => {
+            var newTitle = event.target.value
+            actions.editCardAttributes(cardId, { title: newTitle })
           }}
           defaultValue={title}
         />
