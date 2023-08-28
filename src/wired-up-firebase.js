@@ -22,6 +22,7 @@ export const mintCookieToken = worker.mintCookieToken
 export const onSessionChange = worker.onSessionChange
 export const currentUser = worker.currentUser
 export const patch = worker.patch
+export const deleteSingle = worker.deleteSingle
 export const overwrite = worker.overwrite
 export const overwriteAll = worker.overwriteAll
 export const shareDocument = worker.shareDocument
