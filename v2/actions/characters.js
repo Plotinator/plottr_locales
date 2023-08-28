@@ -8,6 +8,8 @@ import {
   DELETE_CHARACTER,
   EDIT_CHARACTER,
   LOAD_CHARACTERS,
+  LOAD_CHARACTER,
+  REMOVE_CHARACTER,
   ADD_TEMPLATE_TO_CHARACTER,
   REMOVE_TEMPLATE_FROM_CHARACTER,
   REMOVE_BOOK_FROM_CHARACTER,
@@ -131,8 +133,22 @@ export function removeTemplateFromCharacter(id, templateId) {
   return { type: REMOVE_TEMPLATE_FROM_CHARACTER, id, templateId }
 }
 
+// NOTE: "load", "loadSingle" and "removeSingle" are for external sync and
+// not for general use.
 export function load(patching, characters) {
   return { type: LOAD_CHARACTERS, patching, characters }
+}
+
+// NOTE: "load", "loadSingle" and "removeSingle" are for external sync and
+// not for general use.
+export function loadSingle(patching, character) {
+  return { type: LOAD_CHARACTER, patching, character }
+}
+
+// NOTE: "load", "loadSingle" and "removeSingle" are for external sync and
+// not for general use.
+export function removeSingle(patching, character) {
+  return { type: REMOVE_CHARACTER, patching, character }
 }
 
 export function duplicateCharacter(id) {

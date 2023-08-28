@@ -21,6 +21,8 @@ import {
   EDIT_NOTES_ATTRIBUTE,
   DELETE_NOTE_CATEGORY,
   LOAD_NOTES,
+  LOAD_NOTE,
+  REMOVE_NOTE,
   EDIT_NOTE_TEMPLATE_ATTRIBUTE,
   DUPLICATE_NOTE,
 } from '../constants/ActionTypes'
@@ -260,6 +262,30 @@ const notes =
 
       case LOAD_NOTES:
         return action.notes
+
+      case LOAD_NOTE: {
+        let didUpdate = false
+        const updated = state.map((note) => {
+          if (note.id === action.note.id) {
+            didUpdate = true
+            return action.note
+          } else {
+            return note
+          }
+        })
+
+        if (didUpdate) {
+          return updated
+        } else {
+          return [...state, action.note]
+        }
+      }
+
+      case REMOVE_NOTE: {
+        return state.filter(({ id }) => {
+          return id !== action.note.id
+        })
+      }
 
       default:
         return state

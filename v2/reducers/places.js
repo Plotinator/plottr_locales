@@ -21,6 +21,8 @@ import {
   REMOVE_BOOK_FROM_PLACE,
   DELETE_TAG,
   LOAD_PLACES,
+  LOAD_PLACE,
+  REMOVE_PLACE,
   EDIT_PLACE_TEMPLATE_ATTRIBUTE,
   DUPLICATE_PLACE,
   DELETE_PLACE_CATEGORY,
@@ -248,6 +250,30 @@ const places =
 
       case LOAD_PLACES:
         return action.places
+
+      case LOAD_PLACE: {
+        let didUpdate = false
+        const updated = state.map((place) => {
+          if (place.id === action.place.id) {
+            didUpdate = true
+            return action.place
+          } else {
+            return place
+          }
+        })
+
+        if (didUpdate) {
+          return updated
+        } else {
+          return [...state, action.place]
+        }
+      }
+
+      case REMOVE_PLACE: {
+        return state.filter(({ id }) => {
+          return id !== action.place.id
+        })
+      }
 
       case DUPLICATE_PLACE: {
         const itemToDuplicate = state.find(({ id }) => id === action.id)

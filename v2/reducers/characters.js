@@ -20,6 +20,8 @@ import {
   DELETE_CHARACTER_CATEGORY,
   DELETE_TAG,
   LOAD_CHARACTERS,
+  LOAD_CHARACTER,
+  REMOVE_CHARACTER,
   ADD_TEMPLATE_TO_CHARACTER,
   REMOVE_TEMPLATE_FROM_CHARACTER,
   EDIT_CHARACTER_TEMPLATE_ATTRIBUTE,
@@ -548,6 +550,30 @@ const characters =
 
       case LOAD_CHARACTERS:
         return action.characters
+
+      case LOAD_CHARACTER: {
+        let didUpdate = false
+        const updated = state.map((character) => {
+          if (character.id === action.character.id) {
+            didUpdate = true
+            return action.character
+          } else {
+            return character
+          }
+        })
+
+        if (didUpdate) {
+          return updated
+        } else {
+          return [...state, action.character]
+        }
+      }
+
+      case REMOVE_CHARACTER: {
+        return state.filter(({ id }) => {
+          return id !== action.character.id
+        })
+      }
 
       case DUPLICATE_CHARACTER: {
         const itemToDuplicate = state.find(({ id }) => id === action.id)
