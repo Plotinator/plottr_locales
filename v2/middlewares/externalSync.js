@@ -4,7 +4,7 @@ import selectors from '../selectors'
 
 const FLAT_ARRAY_KEYS = ['cards', 'notes', 'places', 'characters']
 
-const isFlatArrayKey = (key) => {
+export const isFlatArrayKey = (key) => {
   return FLAT_ARRAY_KEYS.indexOf(key) !== -1
 }
 
@@ -16,7 +16,7 @@ const DELETED = 'DELETED'
 // between the previous value and the current value.  Synchronise
 // Redux key by key in a subset of keys that are appropriate for
 // Firebase.  Produce true if we actually synchronised.
-const sync = (selectState) => {
+export const sync = (selectState) => {
   const {
     fileIdSelector,
     clientIdSelector,
@@ -96,12 +96,11 @@ const sync = (selectState) => {
   }
 }
 
-const computeNewPaths = (previous, state, wiredSelectors) => {
-  const { fullFileStateSelector, selectedFilePermissionSelector, clientIdSelector } = wiredSelectors
+export const computeNewPaths = (previous, state, wiredSelectors) => {
+  const { fullFileStateSelector, selectedFilePermissionSelector } = wiredSelectors
 
   const fullState = fullFileStateSelector(state)
   const userPermission = selectedFilePermissionSelector(state)
-  const clientId = clientIdSelector(state)
 
   const resultPaths = []
   const fullStateKeys = Object.keys(fullState)
@@ -136,7 +135,7 @@ const computeNewPaths = (previous, state, wiredSelectors) => {
   return resultPaths
 }
 
-function keyFlatArraysById(state) {
+export function keyFlatArraysById(state) {
   const keyedById = (array) => {
     const byId = new Map()
     for (const element of array) {
@@ -161,12 +160,12 @@ function keyFlatArraysById(state) {
   }, {})
 }
 
-function updatePrevious(previous, updatedPaths, state) {
+export function updatePrevious(previous, updatedPaths, state) {
   for (const updatedPath of updatedPaths) {
     const { path, change, index } = updatedPath
     const [key, id] = path
     if (isFlatArrayKey(key)) {
-      if (change === UPDATED && index) {
+      if (change === UPDATED && index !== null) {
         const currentEntity = state[key][index]
         if (currentEntity) {
           previous[key].set(id, currentEntity)

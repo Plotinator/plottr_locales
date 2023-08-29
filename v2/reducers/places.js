@@ -186,17 +186,27 @@ const places =
       case DELETE_NOTE:
         return state.map((place) => {
           let notes = cloneDeep(place.noteIds)
-          if (!notes) return place
-          notes.splice(notes.indexOf(action.id), 1)
-          return Object.assign({}, place, { noteIds: notes })
+          if (!notes) {
+            return place
+          } else if (!notes.includes(action.id)) {
+            return place
+          } else {
+            notes.splice(notes.indexOf(action.id), 1)
+            return Object.assign({}, place, { noteIds: notes })
+          }
         })
 
       case DELETE_CARD:
         return state.map((place) => {
           let cards = cloneDeep(place.cards)
-          if (!cards) return place
-          cards.splice(cards.indexOf(action.id), 1)
-          return Object.assign({}, place, { cards: cards })
+          if (!cards) {
+            return place
+          } else if (cards.indexOf(action.id) === -1) {
+            return place
+          } else {
+            cards.splice(cards.indexOf(action.id), 1)
+            return Object.assign({}, place, { cards: cards })
+          }
         })
 
       case DELETE_PLACE:

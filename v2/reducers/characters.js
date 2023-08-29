@@ -457,15 +457,23 @@ const characters =
       case DELETE_NOTE:
         return state.map((character) => {
           let notes = cloneDeep(character.noteIds)
-          notes.splice(notes.indexOf(action.id), 1)
-          return Object.assign({}, character, { noteIds: notes })
+          if (!notes || !notes.includes(action.id)) {
+            return character
+          } else {
+            notes.splice(notes.indexOf(action.id), 1)
+            return Object.assign({}, character, { noteIds: notes })
+          }
         })
 
       case DELETE_CARD:
         return state.map((character) => {
-          let cards = cloneDeep(character.cards)
-          cards.splice(cards.indexOf(action.id), 1)
-          return Object.assign({}, character, { cards: cards })
+          if (character.cards.indexOf(action.id) === -1) {
+            return character
+          } else {
+            let cards = cloneDeep(character.cards)
+            cards.splice(cards.indexOf(action.id), 1)
+            return Object.assign({}, character, { cards: cards })
+          }
         })
 
       case DELETE_CHARACTER:
