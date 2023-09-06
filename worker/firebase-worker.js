@@ -37,8 +37,12 @@ import {
   HAS_UNDEFINED_VALUE_REPLY,
   PATCH,
   PATCH_REPLY,
+  DELETE_SINGLE,
+  DELETE_SINGLE_REPLY,
   OVERWRITE,
   OVERWRITE_REPLY,
+  OVERWRITE_ALL,
+  OVERWRITE_ALL_REPLY,
   SHARE_DOCUMENT,
   SHARE_DOCUMENT_REPLY,
   PUBLISH_RCE_OPERATIONS,
@@ -249,8 +253,14 @@ export const firebaseWorker = (logger, mintSessionClientId, selectors) => {
   const patch = (path, fileId, payload, clientId, index) => {
     return sendPromise(PATCH, { path, fileId, payload, clientId, index })
   }
+  const deleteSingle = (path, fileId, payload, clientId, id) => {
+    return sendPromise(DELETE_SINGLE, { path, fileId, payload, clientId, id })
+  }
   const overwrite = (path, fileId, payload, clientId, id) => {
     return sendPromise(OVERWRITE, { path, fileId, payload, clientId, id })
+  }
+  const overwriteAll = (path, fileId, entities, clientId, previousLength) => {
+    return sendPromise(OVERWRITE_ALL, { path, fileId, entities, clientId, previousLength })
   }
   const shareDocument = (userId, fileId, emailAddress, permission) => {
     return sendPromise(SHARE_DOCUMENT, { userId, fileId, emailAddress, permission })
@@ -366,7 +376,9 @@ export const firebaseWorker = (logger, mintSessionClientId, selectors) => {
       case LOCK_RCE_REPLY:
       case RELEASE_RCE_LOCK_REPLY:
       case SHARE_DOCUMENT_REPLY:
+      case DELETE_SINGLE_REPLY:
       case OVERWRITE_REPLY:
+      case OVERWRITE_ALL_REPLY:
       case PATCH_REPLY:
       case CURRENT_USER_REPLY:
       case MINT_COOKIE_TOKEN_REPLY:
@@ -457,7 +469,9 @@ export const firebaseWorker = (logger, mintSessionClientId, selectors) => {
     onSessionChange,
     currentUser,
     patch,
+    deleteSingle,
     overwrite,
+    overwriteAll,
     shareDocument,
     releaseRCELock,
     lockRCE,

@@ -20,7 +20,9 @@ import {
   CURRENT_USER,
   HAS_UNDEFINED_VALUE,
   PATCH,
+  DELETE_SINGLE,
   OVERWRITE,
+  OVERWRITE_ALL,
   SHARE_DOCUMENT,
   PUBLISH_RCE_OPERATIONS,
   CATCHUP_EDITS_SEEN,
@@ -84,7 +86,9 @@ const mintCookieToken = wiredUp.mintCookieToken
 const onSessionChange = wiredUp.onSessionChange
 const currentUser = wiredUp.currentUser
 const patch = wiredUp.patch
+const deleteSingle = wiredUp.deleteSingle
 const overwrite = wiredUp.overwrite
+const overwriteAll = wiredUp.overwriteAll
 const shareDocument = wiredUp.shareDocument
 const releaseRCELock = wiredUp.releaseRCELock
 const lockRCE = wiredUp.lockRCE
@@ -461,8 +465,18 @@ self.onmessage = (event) => {
       return
     }
     case PATCH: {
-      const { path, fileId, payload, clientId, index } = messagePayload
-      patch(path, fileId, payload, clientId, index)
+      const { path, fileId, payload, clientId, id } = messagePayload
+      patch(path, fileId, payload, clientId, id)
+        .then(replyToPromise(PATCH))
+        .catch((error) => {
+          logger.error(`Failed to patch file with id <${fileId}> at path ${path}`, error.message)
+          replyToPromiseWithError(type, error.message)
+        })
+      return
+    }
+    case DELETE_SINGLE: {
+      const { path, fileId, payload, clientId, id } = messagePayload
+      deleteSingle(path, fileId, payload, clientId, id)
         .then(replyToPromise(PATCH))
         .catch((error) => {
           logger.error(`Failed to patch file with id <${fileId}> at path ${path}`, error.message)
@@ -474,6 +488,16 @@ self.onmessage = (event) => {
       const { path, fileId, payload, clientId, id } = messagePayload
       overwrite(path, fileId, payload, clientId, id)
         .then(replyToPromise(OVERWRITE))
+        .catch((error) => {
+          logger.error(`Error overwriting file with id <${fileId}> at path ${path}`, error.message)
+          replyToPromiseWithError(type, error.message)
+        })
+      return
+    }
+    case OVERWRITE_ALL: {
+      const { path, fileId, entities, clientId, previousLength } = messagePayload
+      overwriteAll(path, fileId, entities, clientId, previousLength)
+        .then(replyToPromise(OVERWRITE_ALL))
         .catch((error) => {
           logger.error(`Error overwriting file with id <${fileId}> at path ${path}`, error.message)
           replyToPromiseWithError(type, error.message)

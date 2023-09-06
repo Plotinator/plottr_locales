@@ -186,48 +186,54 @@ const api = (
     withData,
     patching,
     clientId,
-    loadFunctionKey = 'load',
-    usingFromDocRef = () => ({})
+    loadFunctionKey = 'loadSingle',
+    removeFunctionKey = 'removeSingle'
   ) => {
-    return (() => {
-      let lastResults = null
-
-      return {
-        next: (documentRef) => {
-          const results = []
-          documentRef.forEach((document) => {
-            results.push(document.data())
-          })
-          // NOTE: We can't only rely on the client id anymore.
-          const unChangedDocuments = results.every((document, index) => {
-            const previousDocument = lastResults && lastResults[index]
-            return document.clientId === clientId && document.id === previousDocument?.id
-          })
-          const unchanged =
-            unChangedDocuments && (!lastResults || lastResults.length === results.length)
-          if (unchanged) {
-            return
+    return {
+      next: (snapshot) => {
+        snapshot.docChanges().forEach((docChange) => {
+          const patchAction = patchActions(path)
+          if (!patchAction) {
+            log.error('No patch action for ', path)
           } else {
-            lastResults = results
-            const patchAction = patchActions(path)
-            if (!patchAction) {
-              log.error('No patch action for ', path)
-              return
+            const document = docChange.doc.data()
+            switch (docChange.type) {
+              case 'modified': {
+                if (document.clientId !== clientId) {
+                  withAction({
+                    ...patchAction[loadFunctionKey](patching, withData(document)),
+                    fileId,
+                  })
+                }
+                break
+              }
+              case 'added': {
+                if (document.clientId !== clientId) {
+                  withAction({
+                    ...patchAction[loadFunctionKey](patching, withData(document)),
+                    fileId,
+                  })
+                }
+                break
+              }
+              case 'removed': {
+                withAction({
+                  ...patchAction[removeFunctionKey](patching, withData(document)),
+                  fileId,
+                })
+                break
+              }
             }
-            withAction({
-              ...patchAction[loadFunctionKey](patching, withData(results)),
-              fileId,
-            })
           }
-        },
-        error: (error) => {
-          log.error(
-            `Error listening to ${fileId} at ${path} with a loadFunctionKey of ${loadFunctionKey}`,
-            error.message
-          )
-        },
-      }
-    })()
+        })
+      },
+      error: (error) => {
+        log.error(
+          `Error listening to ${fileId} at ${path} with a loadFunctionKey of ${loadFunctionKey}`,
+          error.message
+        )
+      },
+    }
   }
 
   const listenToFile = (
@@ -421,7 +427,7 @@ const api = (
             .then(() => {
               return Promise.all(
                 value.map((entity) => {
-                  return overwrite(path, fileId, entity, clientId)
+                  return overwrite(path, fileId, entity, clientId, entity.id)
                 })
               )
             })
@@ -476,18 +482,20 @@ const api = (
         return
       }
       if (isFlatArrayKey(key)) {
-        state[key].forEach((payload, index) => {
-          requests.push(
-            overwrite(key, fileId, payload, clientId, index)
-              .catch((error) => {
-                log.error(`Error while force updating file ${fileId} at key: ${key}`, error)
-                return Promise.reject(error)
-              })
-              .then(() => ({
-                [key]: ARRAY_KEYS.indexOf(key) !== -1 ? Object.values(payload) : payload,
-              }))
-          )
-        })
+        // TODO!!!: need to batch overwrite the collection when this happens
+        //
+        // state[key].forEach((payload, index) => {
+        //   requests.push(
+        //     overwrite(key, fileId, payload, clientId, index)
+        //       .catch((error) => {
+        //         log.error(`Error while force updating file ${fileId} at key: ${key}`, error)
+        //         return Promise.reject(error)
+        //       })
+        //       .then(() => ({
+        //         [key]: ARRAY_KEYS.indexOf(key) !== -1 ? Object.values(payload) : payload,
+        //       }))
+        //   )
+        // })
       } else {
         const payload = ARRAY_KEYS.indexOf(key) !== -1 ? toFirestoreArray(state[key]) : state[key]
         requests.push(
@@ -775,11 +783,7 @@ const api = (
   const computeDocumentPath = (path, fileId, id) => {
     const isFlatArray = isFlatArrayKey(path)
     if (isFlatArray) {
-      if (typeof id === 'undefined') {
-        return 'non-existant-path'
-      } else {
-        return `flat${capitalize(path)}/${fileId}/${path}/${id}`
-      }
+      return `flat${capitalize(path)}/${fileId}/${path}/${id}`
     } else {
       return `${path}/${fileId}`
     }
@@ -806,19 +810,41 @@ const api = (
     })
   }
 
-  const overwrite = (path, fileId, payload, clientId, id) => {
-    const { doc, setDoc, deleteDoc } = database()
+  const deleteSingle = (path, fileId, payload, clientId, id) => {
+    const { doc, deleteDoc } = database()
     const documentPath = computeDocumentPath(path, fileId, id)
 
-    if (payload === null) {
-      return deleteDoc(doc(documentPath))
-    } else {
-      return setDoc(doc(documentPath), {
-        ...payload,
-        clientId,
-        fileId,
+    return deleteDoc(doc(documentPath))
+  }
+
+  const overwrite = (path, fileId, payload, clientId, id) => {
+    const { doc, setDoc } = database()
+    const documentPath = computeDocumentPath(path, fileId, id)
+
+    return setDoc(doc(documentPath), {
+      ...payload,
+      clientId,
+      fileId,
+    })
+  }
+
+  const overwriteAll = (path, fileId, entities, clientId, previousLength) => {
+    const { doc, runTransaction } = database()
+    return runTransaction((transactions) => {
+      entities.forEach((entity, index) => {
+        const documentPath = computeDocumentPath(path, fileId, index)
+        transactions.set(doc(documentPath), {
+          ...entity,
+          clientId,
+          fileId,
+        })
       })
-    }
+      for (let index = entities.length; index < previousLength; ++index) {
+        const documentPath = computeDocumentPath(path, fileId, index)
+        transactions.delete(doc(documentPath))
+      }
+      return Promise.resolve('Done')
+    })
   }
 
   const overwriteWithNoPathTranslation = (path, fileId, payload, clientId) => {
@@ -1128,7 +1154,7 @@ const api = (
     return Promise.all(
       documents.map(({ path }) => {
         return templatePublicURL(path).catch((error) => {
-          log.error(`Failed to get public URL for template at ${path}`)
+          log.error(`Failed to get public URL for template at ${path}`, error)
           return Promise.resolve('IGNORE')
         })
       })
@@ -1155,19 +1181,24 @@ const api = (
           .then((urls) =>
             Promise.all(
               urls.map((url) =>
-                fetch(url).then((response) => {
-                  if (response.ok) {
-                    return response.json()
-                  }
+                fetch(url)
+                  .then((response) => {
+                    if (response.ok) {
+                      return response.json()
+                    }
 
-                  return response.text().then((body) => {
-                    return Promise.reject(
-                      new Error(
-                        `HTTP request for custom template failed: ${response.status}.  Body: ${body}`
+                    return response.text().then((body) => {
+                      return Promise.reject(
+                        new Error(
+                          `HTTP request for custom template failed: ${response.status}.  Body: ${body}`
+                        )
                       )
-                    )
+                    })
                   })
-                })
+                  .catch((error) => {
+                    log.error(`Failed to fetch custom template at ${url}`, error)
+                    return Promise.resolve('IGNORE')
+                  })
               )
             )
           )
@@ -1308,7 +1339,9 @@ const api = (
     currentUser,
     hasUndefinedValue,
     patch,
+    deleteSingle,
     overwrite,
+    overwriteAll,
     shareDocument,
     releaseRCELock,
     lockRCE,
