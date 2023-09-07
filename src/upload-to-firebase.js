@@ -11,7 +11,7 @@ export const uploadToFirebase = (emailAddress, userId, file, fileName) => {
   }
   delete newFile.id
   return axios.post(
-    `https://${process.env.API_BASE_DOMAIN}/api/new-file`,
+    `https://${process.env.API_BASE_DOMAIN}/api/v2/new-file`,
     {
       fileRecord: newFile,
       file,

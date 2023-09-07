@@ -1,11 +1,13 @@
 import { firebaseWorker } from 'plottr_firebase/worker/firebase-worker'
 
+import { selectors } from 'wired-up-pltr'
+
 import logger from '../shared/logger'
 import { makeMainProcessClient } from './app/mainProcessClient'
 
 const { machineId } = makeMainProcessClient()
 
-const worker = firebaseWorker(logger, machineId)
+const worker = firebaseWorker(logger, machineId, selectors)
 
 export const editFileName = worker.editFileName
 export const updateAuthFileName = worker.updateAuthFileName
@@ -20,7 +22,9 @@ export const mintCookieToken = worker.mintCookieToken
 export const onSessionChange = worker.onSessionChange
 export const currentUser = worker.currentUser
 export const patch = worker.patch
+export const deleteSingle = worker.deleteSingle
 export const overwrite = worker.overwrite
+export const overwriteAll = worker.overwriteAll
 export const shareDocument = worker.shareDocument
 export const releaseRCELock = worker.releaseRCELock
 export const lockRCE = worker.lockRCE
