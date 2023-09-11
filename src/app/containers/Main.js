@@ -274,7 +274,7 @@ const Main = ({
   useEffect(() => {
     if (settings.user?.fonts?.global?.headingFont) {
       window.document.documentElement.style.setProperty(
-        '--global-heading-font',
+        '--global-header-font',
         settings.user.fonts.global.headingFont
       )
     }
@@ -284,40 +284,40 @@ const Main = ({
         settings.user.fonts.global.bodyFont
       )
     }
-    if (settings.user?.fonts?.timeline?.headingFont) {
+    if (settings.user?.fonts?.timeline?.headings?.font) {
       window.document.documentElement.style.setProperty(
-        '--timeline-heading-font',
-        settings.user.fonts.timeline.headingFont
+        '--timeline-header-font',
+        settings.user.fonts.timeline.headings.font
       )
     }
-    if (settings.user?.fonts?.timeline?.fontSize) {
+    if (settings.user?.fonts?.timeline?.headings?.fontSize) {
       window.document.documentElement.style.setProperty(
         '--timeline-body-fontSize',
-        settings.user.fonts.timeline.fontSize
+        settings.user.fonts.timeline.headings.fontSize
       )
     }
-    if (settings.user?.fonts?.plotline?.font) {
+    if (settings.user?.fonts?.timeline?.plotlines?.font) {
       window.document.documentElement.style.setProperty(
         '--plotline-font',
-        settings.user.fonts.plotline.font
+        settings.user.fonts.timeline.plotlines.font
       )
     }
-    if (settings.user?.fonts?.plotline?.fontSize) {
+    if (settings.user?.fonts?.timeline?.plotlines?.fontSize) {
       window.document.documentElement.style.setProperty(
         '--plotline-fontSize',
-        settings.user.fonts.plotline.fontSize
+        settings.user.fonts.timeline.plotlines.fontSize
       )
     }
-    if (settings.user?.fonts?.sceneCardTitles?.font) {
+    if (settings.user?.fonts?.timeline?.sceneCardTitles?.font) {
       window.document.documentElement.style.setProperty(
         '--scenecard-title-font',
-        settings.user.fonts.sceneCardTitles.font
+        settings.user.fonts.timeline.sceneCardTitles.font
       )
     }
-    if (settings.user?.fonts?.sceneCardTitles?.fontSize) {
+    if (settings.user?.fonts?.timeline?.sceneCardTitles?.fontSize) {
       window.document.documentElement.style.setProperty(
         '--scenecard-title-font-size',
-        settings.user.fonts.sceneCardTitles.fontSize
+        settings.user.fonts.timeline.sceneCardTitles.fontSize
       )
     }
     if (settings.user?.fonts?.rce?.defaultFont) {

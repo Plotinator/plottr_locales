@@ -316,12 +316,18 @@ body.darkmode {
   }
 
   // RCE
-  .slate-editor__editor.darkmode {
-    background-color: $darkmode-v2-background;
-    border: 1px solid $darkmode-v2-border;
+  .slate-editor__editor {
 
-    div > * {
-      color: #ccc !important;
+    &.darkmode {
+      background-color: $darkmode-v2-background;
+      border: 1px solid $darkmode-v2-border;
+    }
+
+    @include rce-text-font;
+    @include rce-darkmode-font-color;
+
+    p {
+      color: inherit;
     }
   }
 
