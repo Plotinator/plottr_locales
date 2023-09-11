@@ -1,4 +1,4 @@
-import { BrowserWindow, ipcMain } from 'electron'
+import { ipcMain } from 'electron'
 import log from 'electron-log'
 import { openBuyWindow } from './buy'
 import { offlineFileURL } from '../offlineFilePath'
