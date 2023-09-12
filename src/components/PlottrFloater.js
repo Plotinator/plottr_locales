@@ -7,7 +7,7 @@ import { omit, isEqual } from 'lodash'
 const PORTAL_ID = 'plottr-floater-portal'
 
 const nonComponentsPropsAreEqual = (prevProps, newProps) => {
-  const withoutChildrenOrComponent = (props) => omit(props, ['children', 'component'])
+  const withoutChildrenOrComponent = (props) => omit(props, ['component'])
   return isEqual(withoutChildrenOrComponent(prevProps), withoutChildrenOrComponent(newProps))
 }
 
