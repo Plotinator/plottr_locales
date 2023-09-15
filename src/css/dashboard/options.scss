@@ -8,6 +8,7 @@
   padding: 32px;
 
   h1 {
+    @include header-font;
     font-size: 20pt;
     margin-top: 0;
     margin-bottom: 20px;

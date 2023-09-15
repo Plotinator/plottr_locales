@@ -28,8 +28,21 @@ body.darkmode {
     color: $darkmode-v2-darker-text;
   }
 
+  h1 {
+    @include header-font;
+  }
+
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @include sub-header-font;
+  }
+
   p {
     color: $darkmode-v2-darker-text;
+    @include body-text-font;
   }
 
   hr {
@@ -326,8 +339,16 @@ body.darkmode {
     @include rce-text-font;
     @include rce-darkmode-font-color;
 
-    p {
-      color: inherit;
+    h1 {
+      @include header-font;
+      @include rce-title-font;
+      @include rce-title-darkmode-font-color;
+    }
+
+    h2 {
+      @include sub-header-font;
+      @include rce-subtitle-font;
+      @include rce-subtitle-darkmode-font-color;
     }
   }
 

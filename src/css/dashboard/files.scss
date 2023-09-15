@@ -134,6 +134,7 @@
   overflow: hidden;
 
   h1 {
+    @include header-font;
     font-size: 20pt;
     margin: 0;
   }

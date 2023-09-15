@@ -21,8 +21,12 @@
       }
     }
     h2 {
-      font-size: 14pt;
+      @include sub-header-font;
       color: $gray-4;
+    }
+
+    h1 {
+      @include header-font;
     }
 
     li.list-group-item:hover {

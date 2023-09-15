@@ -116,6 +116,7 @@ $darkmode-v2-btn-success-orange: #d63e00;
     }
 
     h1 {
+      @include header-font;
       color: #000;
     }
   }

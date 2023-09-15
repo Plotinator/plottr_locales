@@ -15,6 +15,7 @@
   }
 
   h1 {
+    @include header-font;
     font-size: 20pt;
     margin-top: 10px;
   }
@@ -38,6 +39,7 @@
 
 .dashboard__account__header {
   h1 {
+    @include header-font;
     margin-top: 0;
     font-family: 'Yellowtail' !important;
     font-weight: 400 !important;
@@ -57,6 +59,7 @@
   margin-bottom: 20px;
 
   h2 {
+    @include sub-header-font;
     font-size: 16pt;
     margin-top: 10px;
     text-align: left;
@@ -93,6 +96,7 @@
   padding: 32px 0;
 
   h1 {
+    @include header-font;
     font-size: 20pt;
     margin-top: 0;
     margin-bottom: 20px;
