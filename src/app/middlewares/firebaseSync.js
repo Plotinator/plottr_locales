@@ -6,21 +6,37 @@ const FLAT_ARRAY_KEYS = ['cards', 'notes', 'places', 'characters']
 
 const externalSync = middlewares.externalSync(selectPresentState)
 
-const firebaseSync = () => {
+const FIREBASE_REQUEST_TIMEOUT = 30000
+
+const firebaseSync = (logger) => {
   const inflightRequests = {
     counter: 0,
   }
 
   const overwritePreventingDefault = (...args) => {
     inflightRequests.counter++
+    const timeout = setTimeout(() => {
+      if (logger) {
+        logger.warn('Request to overwrite a document in firebase timed out', ...args)
+      }
+      inflightRequests.counter = Math.max(0, inflightRequests.counter - 1)
+    }, FIREBASE_REQUEST_TIMEOUT)
     return overwrite(...args).finally(() => {
+      clearTimeout(timeout)
       inflightRequests.counter = Math.max(0, inflightRequests.counter - 1)
     })
   }
 
   const deleteSinglePreventingDefault = (...args) => {
     inflightRequests.counter++
+    const timeout = setTimeout(() => {
+      if (logger) {
+        logger.warn('Request to delete a document in firebase timed out', ...args)
+      }
+      inflightRequests.counter = Math.max(0, inflightRequests.counter - 1)
+    }, FIREBASE_REQUEST_TIMEOUT)
     return deleteSingle(...args).finally(() => {
+      clearTimeout(timeout)
       inflightRequests.counter = Math.max(0, inflightRequests.counter - 1)
     })
   }

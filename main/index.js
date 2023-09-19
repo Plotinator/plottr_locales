@@ -25,13 +25,7 @@ import { addToKnown } from './modules/known_files'
 import { TEMP_FILES_PATH } from './modules/files'
 import { startServer } from './server'
 import { listenOnIPCMain } from './listeners'
-import {
-  createClient,
-  isInitialised,
-  resetInitialised,
-  setPort,
-  getPort,
-} from '../shared/socket-client'
+import { createClient, resetInitialised, setPort, getPort } from '../shared/socket-client'
 import ProcessSwitches from './modules/processSwitches'
 import makeSafelyExitModule from './modules/safelyExit'
 
