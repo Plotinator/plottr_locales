@@ -46,14 +46,15 @@ export function configureStore(whenClientIsReady, initialState) {
       ...SYSTEM_REDUCER_ACTION_TYPES,
     ]),
   })
+  const middlewareWithInflightRequestTracker = firebaseSync(logger)
   const middlewares = applyMiddleware(
     thunk,
     actionRecorder,
-    firebaseSync,
+    middlewareWithInflightRequestTracker.firebaseMiddleware,
     tracker(whenClientIsReady),
     logger,
     reporter
   )
   const store = createStore(reducer, initialState, middlewares)
-  return store
+  return { store, inflightFirebaseRequests: middlewareWithInflightRequestTracker.inflightRequests }
 }
