@@ -20,6 +20,9 @@ import {
   DELETE_CHARACTER_CATEGORY,
   DELETE_TAG,
   LOAD_CHARACTERS,
+  LOAD_CHARACTER,
+  BATCH_LOAD_CHARACTER,
+  REMOVE_CHARACTER,
   ADD_TEMPLATE_TO_CHARACTER,
   REMOVE_TEMPLATE_FROM_CHARACTER,
   EDIT_CHARACTER_TEMPLATE_ATTRIBUTE,
@@ -455,15 +458,23 @@ const characters =
       case DELETE_NOTE:
         return state.map((character) => {
           let notes = cloneDeep(character.noteIds)
-          notes.splice(notes.indexOf(action.id), 1)
-          return Object.assign({}, character, { noteIds: notes })
+          if (!notes || !notes.includes(action.id)) {
+            return character
+          } else {
+            notes.splice(notes.indexOf(action.id), 1)
+            return Object.assign({}, character, { noteIds: notes })
+          }
         })
 
       case DELETE_CARD:
         return state.map((character) => {
-          let cards = cloneDeep(character.cards)
-          cards.splice(cards.indexOf(action.id), 1)
-          return Object.assign({}, character, { cards: cards })
+          if (character.cards.indexOf(action.id) === -1) {
+            return character
+          } else {
+            let cards = cloneDeep(character.cards)
+            cards.splice(cards.indexOf(action.id), 1)
+            return Object.assign({}, character, { cards: cards })
+          }
         })
 
       case DELETE_CHARACTER:
@@ -548,6 +559,53 @@ const characters =
 
       case LOAD_CHARACTERS:
         return action.characters
+
+      case LOAD_CHARACTER: {
+        let didUpdate = false
+        const updated = state.map((character) => {
+          if (character.id === action.character.id) {
+            didUpdate = true
+            return action.character
+          } else {
+            return character
+          }
+        })
+
+        if (didUpdate) {
+          return updated
+        } else {
+          return [...state, action.character]
+        }
+      }
+
+      case BATCH_LOAD_CHARACTER: {
+        const indexedCharactersToLoad = action.characters.reduce((acc, next) => {
+          acc.set(next.id, next)
+          return acc
+        }, new Map())
+        const existingCharacters = new Set()
+        const updated = state.map((character) => {
+          existingCharacters.add(character.id)
+          const characterToSwapIn = indexedCharactersToLoad.get(character.id)
+          if (typeof characterToSwapIn !== 'undefined') {
+            return characterToSwapIn
+          } else {
+            return character
+          }
+        })
+
+        const newCharacters = action.characters.filter((newCharacter) => {
+          return !existingCharacters.has(newCharacter.id)
+        })
+
+        return [...updated, ...newCharacters]
+      }
+
+      case REMOVE_CHARACTER: {
+        return state.filter(({ id }) => {
+          return id !== action.character.id
+        })
+      }
 
       case DUPLICATE_CHARACTER: {
         const itemToDuplicate = state.find(({ id }) => id === action.id)

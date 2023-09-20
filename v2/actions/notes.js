@@ -12,6 +12,9 @@ import {
   REMOVE_BOOK_FROM_NOTE,
   ATTACH_BOOK_TO_NOTE,
   LOAD_NOTES,
+  LOAD_NOTE,
+  BATCH_LOAD_NOTE,
+  REMOVE_NOTE,
   DUPLICATE_NOTE,
 } from '../constants/ActionTypes'
 import { editorMetadataIfPresent } from '../helpers/editors'
@@ -80,8 +83,28 @@ export function removeBook(id, bookId) {
   return { type: REMOVE_BOOK_FROM_NOTE, id, bookId }
 }
 
+// NOTE: "load", "loadSingle", "batchLoad" and "removeSingle" are for
+// external sync and not for general use.
 export function load(patching, notes) {
   return { type: LOAD_NOTES, patching, notes }
+}
+
+// NOTE: "load", "loadSingle", "batchLoad" and "removeSingle" are for
+// external sync and not for general use.
+export function loadSingle(patching, note) {
+  return { type: LOAD_NOTE, patching, note }
+}
+
+// NOTE: "load", "loadSingle", "batchLoad" and "removeSingle" are for
+// external sync and not for general use.
+export function batchLoad(patching, notes) {
+  return { type: BATCH_LOAD_NOTE, patching, notes }
+}
+
+// NOTE: "load", "loadSingle", "batchLoad" and "removeSingle" are for
+// external sync and not for general use.
+export function removeSingle(patching, note) {
+  return { type: REMOVE_NOTE, patching, note }
 }
 
 export function duplicateNote(id) {

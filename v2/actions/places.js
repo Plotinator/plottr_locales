@@ -8,6 +8,9 @@ import {
   EDIT_PLACE,
   EDIT_PLACE_TEMPLATE_ATTRIBUTE,
   LOAD_PLACES,
+  LOAD_PLACE,
+  BATCH_LOAD_PLACE,
+  REMOVE_PLACE,
   REMOVE_BOOK_FROM_PLACE,
   REMOVE_TAG_FROM_PLACE,
 } from '../constants/ActionTypes'
@@ -61,6 +64,26 @@ export function removeBook(id, bookId) {
   return { type: REMOVE_BOOK_FROM_PLACE, id, bookId }
 }
 
+// NOTE: "load", "loadSingle", "batchLoad" and "removeSingle" are for
+// external sync and not for general use.
 export function load(patching, places) {
   return { type: LOAD_PLACES, patching, places }
+}
+
+// NOTE: "load", "loadSingle", "batchLoad" and "removeSingle" are for
+// external sync and not for general use.
+export function loadSingle(patching, place) {
+  return { type: LOAD_PLACE, patching, place }
+}
+
+// NOTE: "load", "loadSingle", "batchLoad" and "removeSingle" are for
+// external sync and not for general use.
+export function batchLoad(patching, places) {
+  return { type: BATCH_LOAD_PLACE, patching, places }
+}
+
+// NOTE: "load", "loadSingle", "batchLoad" and "removeSingle" are for
+// external sync and not for general use.
+export function removeSingle(patching, place) {
+  return { type: REMOVE_PLACE, patching, place }
 }

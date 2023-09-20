@@ -32,3 +32,20 @@ export const templateBeatsForBookOne = createSelector(
   beatsForBookOne,
   beatsByPosition(() => true)
 )
+
+const beatIdSelector = (_state, beatId) => {
+  return beatId
+}
+export const beatByIdSelector = createSelector(
+  allBeatsSelector,
+  beatIdSelector,
+  (beatTrees, beatId) => {
+    return Object.values(beatTrees).reduce((found, nextTree) => {
+      if (found) {
+        return found
+      } else {
+        return nextTree.index[beatId] || null
+      }
+    }, null)
+  }
+)

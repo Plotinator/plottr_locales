@@ -31,6 +31,9 @@ import {
   RESET_TIMELINE,
   DELETE_BOOK,
   LOAD_CARDS,
+  LOAD_CARD,
+  BATCH_LOAD_CARD,
+  REMOVE_CARD,
   EDIT_CARD_TEMPLATE_ATTRIBUTE,
   ADD_TEMPLATE_TO_CARD,
   REMOVE_TEMPLATE_FROM_CARD,
@@ -429,6 +432,53 @@ const cards =
 
       case LOAD_CARDS:
         return action.cards
+
+      case LOAD_CARD: {
+        let didUpdate = false
+        const updated = state.map((card) => {
+          if (card.id === action.card.id) {
+            didUpdate = true
+            return action.card
+          } else {
+            return card
+          }
+        })
+
+        if (didUpdate) {
+          return updated
+        } else {
+          return [...state, action.card]
+        }
+      }
+
+      case BATCH_LOAD_CARD: {
+        const indexedCardsToLoad = action.cards.reduce((acc, next) => {
+          acc.set(next.id, next)
+          return acc
+        }, new Map())
+        const existingCards = new Set()
+        const updated = state.map((card) => {
+          existingCards.add(card.id)
+          const cardToSwapIn = indexedCardsToLoad.get(card.id)
+          if (typeof cardToSwapIn !== 'undefined') {
+            return cardToSwapIn
+          } else {
+            return card
+          }
+        })
+
+        const newCards = action.cards.filter((newCard) => {
+          return !existingCards.has(newCard.id)
+        })
+
+        return [...updated, ...newCards]
+      }
+
+      case REMOVE_CARD: {
+        return state.filter(({ id }) => {
+          return id !== action.card.id
+        })
+      }
 
       case DUPLICATE_CARD: {
         const existingCard = state.find(({ id }) => id === action.id)

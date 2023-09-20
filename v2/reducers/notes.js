@@ -21,6 +21,9 @@ import {
   EDIT_NOTES_ATTRIBUTE,
   DELETE_NOTE_CATEGORY,
   LOAD_NOTES,
+  LOAD_NOTE,
+  BATCH_LOAD_NOTE,
+  REMOVE_NOTE,
   EDIT_NOTE_TEMPLATE_ATTRIBUTE,
   DUPLICATE_NOTE,
 } from '../constants/ActionTypes'
@@ -260,6 +263,53 @@ const notes =
 
       case LOAD_NOTES:
         return action.notes
+
+      case LOAD_NOTE: {
+        let didUpdate = false
+        const updated = state.map((note) => {
+          if (note.id === action.note.id) {
+            didUpdate = true
+            return action.note
+          } else {
+            return note
+          }
+        })
+
+        if (didUpdate) {
+          return updated
+        } else {
+          return [...state, action.note]
+        }
+      }
+
+      case BATCH_LOAD_NOTE: {
+        const indexedNotesToLoad = action.notes.reduce((acc, next) => {
+          acc.set(next.id, next)
+          return acc
+        }, new Map())
+        const existingNotes = new Set()
+        const updated = state.map((note) => {
+          existingNotes.add(note.id)
+          const noteToSwapIn = indexedNotesToLoad.get(note.id)
+          if (typeof noteToSwapIn !== 'undefined') {
+            return noteToSwapIn
+          } else {
+            return note
+          }
+        })
+
+        const newNotes = action.notes.filter((newNote) => {
+          return !existingNotes.has(newNote.id)
+        })
+
+        return [...updated, ...newNotes]
+      }
+
+      case REMOVE_NOTE: {
+        return state.filter(({ id }) => {
+          return id !== action.note.id
+        })
+      }
 
       default:
         return state

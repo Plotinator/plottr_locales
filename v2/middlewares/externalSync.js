@@ -1,19 +1,22 @@
 import { permissionError } from '../actions/error'
 import { SYSTEM_REDUCER_KEYS } from '../reducers/systemReducers'
 import selectors from '../selectors'
-import actions from '../actions'
 
 const FLAT_ARRAY_KEYS = ['cards', 'notes', 'places', 'characters']
 
-const isFlatArrayKey = (key) => {
+export const isFlatArrayKey = (key) => {
   return FLAT_ARRAY_KEYS.indexOf(key) !== -1
 }
+
+const ADDED = 'ADDED'
+const UPDATED = 'UPDATED'
+const DELETED = 'DELETED'
 
 // Synchronise with Firebase.  We know to sync if there's a difference
 // between the previous value and the current value.  Synchronise
 // Redux key by key in a subset of keys that are appropriate for
 // Firebase.  Produce true if we actually synchronised.
-const sync = (selectState) => {
+export const sync = (selectState) => {
   const {
     fileIdSelector,
     clientIdSelector,
@@ -24,7 +27,7 @@ const sync = (selectState) => {
     selectedFilePermissionSelector,
     fullFileStateSelector,
   } = selectors(selectState)
-  return (previous, present, patch, withData, store, action, updatedPaths) => {
+  return (previous, present, patch, deleteSingle, withData, store, action, updatedPaths) => {
     const isCloudFile = isCloudFileSelector(present)
     const isOffline = isOfflineSelector(present)
     const isResuming = isResumingSelector(present)
@@ -61,17 +64,25 @@ const sync = (selectState) => {
 
     const state = fullFileStateSelector(present)
     for (let i = 0; i < updatedPaths.length; ++i) {
-      const path = updatedPaths[i]
+      const { path, change, index } = updatedPaths[i]
       const key = path[0]
       const payload = withData(key, state[key])
       if (isFlatArrayKey(key)) {
-        const index = path[1]
-        const entity = state[key][index]
-        patch(key, fileId, entity, clientId).catch((error) => {
-          if (error.code === 'permission-denied') {
-            store.dispatch(permissionError(key, action, error.code))
-          }
-        })
+        const entity = state[key][index] || null
+        if (change === DELETED) {
+          const id = path[1]
+          deleteSingle(key, fileId, entity, clientId, id).catch((error) => {
+            if (error.code === 'permission-denied') {
+              store.dispatch(permissionError(key, action, error.code))
+            }
+          })
+        } else {
+          patch(key, fileId, entity, clientId, entity.id).catch((error) => {
+            if (error.code === 'permission-denied') {
+              store.dispatch(permissionError(key, action, error.code))
+            }
+          })
+        }
       } else {
         patch(key, fileId, payload, clientId).catch((error) => {
           if (error.code === 'permission-denied') {
@@ -85,37 +96,38 @@ const sync = (selectState) => {
   }
 }
 
-const computeNewPaths = (previous, state, store, wiredSelectors, wiredActions) => {
+export const computeNewPaths = (previous, state, wiredSelectors) => {
   const { fullFileStateSelector, selectedFilePermissionSelector } = wiredSelectors
 
   const fullState = fullFileStateSelector(state)
   const userPermission = selectedFilePermissionSelector(state)
 
-  // Go through each key and potentially do something if they changed.
-  //
-  // Note that we were the ones who changed it.
-  //
-  // Only call this function when we're not patching (i.e. receiving
-  // changes from remote.)
   const resultPaths = []
   const fullStateKeys = Object.keys(fullState)
   for (let i = 0; i < fullStateKeys.length; ++i) {
     const key = fullStateKeys[i]
     const isFileAndHasntGotPermission = key === 'file' && userPermission !== 'owner'
     if (SYSTEM_REDUCER_KEYS.indexOf(key) === -1 && !isFileAndHasntGotPermission) {
-      if (
-        isFlatArrayKey(key) &&
-        Array.isArray(fullState[key]) &&
-        fullState[key] !== previous[key]
-      ) {
+      if (isFlatArrayKey(key)) {
+        const here = new Set()
         for (let index = 0; index < fullState[key].length; ++index) {
-          if (!Object.is(fullState[key][index], previous[key][index])) {
-            resultPaths.push([key, index])
+          const entity = fullState[key][index]
+          here.add(entity.id)
+          const previousEntity = previous[key].get(entity.id)
+          if (!previousEntity) {
+            resultPaths.push({ path: [key, entity.id], change: ADDED, index })
+          } else if (!Object.is(entity, previousEntity)) {
+            resultPaths.push({ path: [key, entity.id], change: UPDATED, index })
+          }
+        }
+        for (const previousId of previous[key].keys()) {
+          if (!here.has(previousId)) {
+            resultPaths.push({ path: [key, previousId], change: DELETED, index: null })
           }
         }
       } else {
         if (fullState[key] !== previous[key]) {
-          resultPaths.push([key])
+          resultPaths.push({ path: [key], change: UPDATED, index: null })
         }
       }
     }
@@ -123,35 +135,94 @@ const computeNewPaths = (previous, state, store, wiredSelectors, wiredActions) =
   return resultPaths
 }
 
+export function keyFlatArraysById(state) {
+  const keyedById = (array) => {
+    const byId = new Map()
+    for (const element of array) {
+      byId.set(element.id, element)
+    }
+    return byId
+  }
+
+  return Object.entries(state).reduce((acc, next) => {
+    const [key, value] = next
+    if (isFlatArrayKey(key)) {
+      return {
+        ...acc,
+        [key]: keyedById(value),
+      }
+    } else {
+      return {
+        ...acc,
+        [key]: value,
+      }
+    }
+  }, {})
+}
+
+export function updatePrevious(previous, updatedPaths, state) {
+  for (const updatedPath of updatedPaths) {
+    const { path, change, index } = updatedPath
+    const [key, id] = path
+    if (isFlatArrayKey(key)) {
+      if (change === UPDATED && index !== null) {
+        const currentEntity = state[key][index]
+        if (currentEntity) {
+          previous[key].set(id, currentEntity)
+        }
+      } else if (change === ADDED) {
+        const currentEntity = state[key][index]
+        if (currentEntity) {
+          previous[key].set(id, currentEntity)
+        }
+      } else {
+        previous[key].delete(id)
+      }
+    } else {
+      previous[key] = state[key]
+    }
+  }
+}
+
 const externalSync = (selectState) => {
+  // Note: we mutate previous in-place each time there's a change.
+  let previous = null
   const wiredSync = sync(selectState)
   const wiredSelectors = selectors(selectState)
-  const wiredActions = actions(selectState)
-  return (patch, withData) => (store) => (next) => (action) => {
+  const { fullFileStateSelector } = selectors(selectState)
+  return (patch, deleteSingle, withData) => (store) => (next) => (action) => {
+    if (previous === null) {
+      previous = keyFlatArraysById(fullFileStateSelector(store.getState()))
+    } else {
+      const fileChanged = previous?.file?.id !== fullFileStateSelector(store.getState())?.file?.id
+      if (fileChanged) {
+        previous = keyFlatArraysById(fullFileStateSelector(store.getState()))
+      }
+    }
+
     const result = next(action)
 
-    // Update last written client ids when we didn't receive a patch
-    // from Firebase.  Helps us figure out who changed data so we
-    // don't get into a sync loop.
-    if (!action.patching) {
-      // IMPORTANT: we need the past state prior to meddling with
-      // client ids.
-      const { past, future } = store.getState()
-      const previous = action.type === '@@redux-undo/UNDO' ? future[0] : past[past.length - 1]
-
-      const updatedPaths = computeNewPaths(
+    const present = store.getState()
+    const updatedPaths = computeNewPaths(previous, present, wiredSelectors)
+    // If we're patching in data from remote, then we need to update
+    // our record of the previous state to equal what the server
+    // said so that we don't echo it back in an infinite loop.
+    if (action.patching) {
+      updatePrevious(previous, updatedPaths, fullFileStateSelector(present))
+    } else {
+      const synchronised = wiredSync(
         previous,
-        store.getState().present,
+        present,
+        patch,
+        deleteSingle,
+        withData,
         store,
-        wiredSelectors,
-        wiredActions
+        action,
+        updatedPaths
       )
-
-      // IMPORTANT: we need the state *after* handling data client ids
-      // so that we know what to sync!
-      const { present } = store.getState()
-
-      wiredSync(previous, present, patch, withData, store, action, updatedPaths)
+      if (synchronised) {
+        updatePrevious(previous, updatedPaths, fullFileStateSelector(present))
+      }
     }
 
     return result
@@ -160,49 +231,4 @@ const externalSync = (selectState) => {
 
 export default externalSync
 
-// NOTE: uses a polyfilled map that's based on the JavaScript objects
-// rather than on the Map class in newer versions of Javascript.  we
-// use this for React-Native because it seems to support it poorly.
-let previous = null
-export const externalSyncWithoutHistory = (selectState) => {
-  const wiredSync = sync(selectState)
-  const wiredSelectors = selectors(selectState)
-  const wiredActions = actions(selectState)
-  const { fullFileStateSelector } = selectors(selectState)
-  return (patch, withData) => (store) => (next) => (action) => {
-    const result = next(action)
-
-    // Update last written client ids when we didn't receive a patch
-    // from Firebase.  Helps us figure out who changed data so we
-    // don't get into a sync loop.
-    if (!action.patching) {
-      if (previous) {
-        const updatedPaths = computeNewPaths(
-          previous,
-          store.getState(),
-          store,
-          wiredSelectors,
-          wiredActions
-        )
-        const present = store.getState()
-        const synchronised = wiredSync(
-          previous,
-          present,
-          patch,
-          withData,
-          store,
-          action,
-          updatedPaths
-        )
-        if (synchronised || !previous) {
-          previous = fullFileStateSelector(present)
-        }
-      } else if (!previous) {
-        const present = store.getState()
-        previous = fullFileStateSelector(present)
-      }
-    }
-
-    return result
-  }
-}
+export const externalSyncWithoutHistory = externalSync
