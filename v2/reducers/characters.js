@@ -21,6 +21,7 @@ import {
   DELETE_TAG,
   LOAD_CHARACTERS,
   LOAD_CHARACTER,
+  BATCH_LOAD_CHARACTER,
   REMOVE_CHARACTER,
   ADD_TEMPLATE_TO_CHARACTER,
   REMOVE_TEMPLATE_FROM_CHARACTER,
@@ -575,6 +576,29 @@ const characters =
         } else {
           return [...state, action.character]
         }
+      }
+
+      case BATCH_LOAD_CHARACTER: {
+        const indexedCharactersToLoad = action.characters.reduce((acc, next) => {
+          acc.set(next.id, next)
+          return acc
+        }, new Map())
+        const existingCharacters = new Set()
+        const updated = state.map((character) => {
+          existingCharacters.add(character.id)
+          const characterToSwapIn = indexedCharactersToLoad.get(character.id)
+          if (typeof characterToSwapIn !== 'undefined') {
+            return characterToSwapIn
+          } else {
+            return character
+          }
+        })
+
+        const newCharacters = action.characters.filter((newCharacter) => {
+          return !existingCharacters.has(newCharacter.id)
+        })
+
+        return [...updated, ...newCharacters]
       }
 
       case REMOVE_CHARACTER: {

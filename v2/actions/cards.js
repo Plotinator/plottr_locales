@@ -17,6 +17,7 @@ import {
   ADD_CARD_IN_BEAT,
   LOAD_CARDS,
   LOAD_CARD,
+  BATCH_LOAD_CARD,
   REMOVE_CARD,
   EDIT_CARD_TEMPLATE_ATTRIBUTE,
   ADD_TEMPLATE_TO_CARD,
@@ -134,20 +135,26 @@ export function removeTemplateFromCard(id, templateId) {
   return { type: REMOVE_TEMPLATE_FROM_CARD, id, templateId }
 }
 
-// NOTE: "load", "loadSingle" and "removeSingle" are for external sync and
-// not for general use.
+// NOTE: "load", "loadSingle", "batchLoad" and "removeSingle" are for
+// external sync and not for general use.
 export function load(patching, cards) {
   return { type: LOAD_CARDS, patching, cards }
 }
 
-// NOTE: "load", "loadSingle" and "removeSingle" are for external sync and
-// not for general use.
+// NOTE: "load", "loadSingle", "batchLoad" and "removeSingle" are for
+// external sync and not for general use.
 export function loadSingle(patching, card) {
   return { type: LOAD_CARD, patching, card }
 }
 
-// NOTE: "load", "loadSingle" and "removeSingle" are for external sync and
-// not for general use.
+// NOTE: "load", "loadSingle", "batchLoad" and "removeSingle" are for
+// external sync and not for general use.
+export function batchLoad(patching, cards) {
+  return { type: BATCH_LOAD_CARD, patching, cards }
+}
+
+// NOTE: "load", "loadSingle", "batchLoad" and "removeSingle" are for
+// external sync and not for general use.
 export function removeSingle(patching, card) {
   return { type: REMOVE_CARD, patching, card }
 }

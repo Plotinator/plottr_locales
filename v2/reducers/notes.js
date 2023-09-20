@@ -22,6 +22,7 @@ import {
   DELETE_NOTE_CATEGORY,
   LOAD_NOTES,
   LOAD_NOTE,
+  BATCH_LOAD_NOTE,
   REMOVE_NOTE,
   EDIT_NOTE_TEMPLATE_ATTRIBUTE,
   DUPLICATE_NOTE,
@@ -279,6 +280,29 @@ const notes =
         } else {
           return [...state, action.note]
         }
+      }
+
+      case BATCH_LOAD_NOTE: {
+        const indexedNotesToLoad = action.notes.reduce((acc, next) => {
+          acc.set(next.id, next)
+          return acc
+        }, new Map())
+        const existingNotes = new Set()
+        const updated = state.map((note) => {
+          existingNotes.add(note.id)
+          const noteToSwapIn = indexedNotesToLoad.get(note.id)
+          if (typeof noteToSwapIn !== 'undefined') {
+            return noteToSwapIn
+          } else {
+            return note
+          }
+        })
+
+        const newNotes = action.notes.filter((newNote) => {
+          return !existingNotes.has(newNote.id)
+        })
+
+        return [...updated, ...newNotes]
       }
 
       case REMOVE_NOTE: {

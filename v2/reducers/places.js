@@ -22,6 +22,7 @@ import {
   DELETE_TAG,
   LOAD_PLACES,
   LOAD_PLACE,
+  BATCH_LOAD_PLACE,
   REMOVE_PLACE,
   EDIT_PLACE_TEMPLATE_ATTRIBUTE,
   DUPLICATE_PLACE,
@@ -277,6 +278,29 @@ const places =
         } else {
           return [...state, action.place]
         }
+      }
+
+      case BATCH_LOAD_PLACE: {
+        const indexedPlacesToLoad = action.places.reduce((acc, next) => {
+          acc.set(next.id, next)
+          return acc
+        }, new Map())
+        const existingPlaces = new Set()
+        const updated = state.map((place) => {
+          existingPlaces.add(place.id)
+          const placeToSwapIn = indexedPlacesToLoad.get(place.id)
+          if (typeof placeToSwapIn !== 'undefined') {
+            return placeToSwapIn
+          } else {
+            return place
+          }
+        })
+
+        const newPlaces = action.places.filter((newPlace) => {
+          return !existingPlaces.has(newPlace.id)
+        })
+
+        return [...updated, ...newPlaces]
       }
 
       case REMOVE_PLACE: {
