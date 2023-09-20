@@ -23,6 +23,10 @@
 #timelineview__root {
   width: 100vw;
 
+  &.timeline-tabbed-view-body {
+    position: relative;
+  }
+
   .sticky-table {
     user-select: none;
   }
