@@ -11,6 +11,7 @@ import reporter from '../middlewares/reporter'
 import actionRecorder from '../middlewares/actionRecorder'
 import firebaseSync from '../middlewares/firebaseSync'
 import dataRepairers from './dataRepairers'
+import log from '../../../shared/logger'
 
 // Ten seconds
 const TIME_DELTA_TO_BUNDLE_UNDOS = 10000
@@ -44,14 +45,15 @@ export function configureStore(whenClientIsReady, initialState) {
       ...SYSTEM_REDUCER_ACTION_TYPES,
     ]),
   })
+  const middlewareWithInflightRequestTracker = firebaseSync(log)
   const middlewares = applyMiddleware(
     thunk,
     actionRecorder,
-    firebaseSync,
+    middlewareWithInflightRequestTracker.firebaseMiddleware,
     tracker(whenClientIsReady),
     logger,
     reporter
   )
   const store = createStore(reducer, initialState, middlewares)
-  return store
+  return { store, inflightFirebaseRequests: middlewareWithInflightRequestTracker.inflightRequests }
 }

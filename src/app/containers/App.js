@@ -5,6 +5,7 @@ import PropTypes from 'react-proptypes'
 import { t } from 'plottr_locales'
 import { selectors, actions } from 'wired-up-pltr'
 
+import { inflightFirebaseRequests } from '../store'
 import log from '../../../shared/logger'
 import Navigation from 'containers/Navigation'
 import Body from 'containers/Body'
@@ -144,26 +145,31 @@ const App = ({
   }
 
   const askToSave = (event, reloading = false) => {
-    // Socket server is busy
-    if (unsavedChanges && !isCloudFile) {
+    // There are outstanding firebase requests
+    if (inflightFirebaseRequests.counter > 0) {
+      logger.info("There are outstanding requests to Firebase so we're not quitting")
+      event.preventDefault()
+      event.returnValue = 'nope'
+      showMessageBox(t('Plottr is Busy'), t("Plottr is busy and can't quit"))
+    } else if (unsavedChanges && !isCloudFile) {
+      // There are unsaved changes to a classic file
       logger.info("There are unsaved changes so we're not quitting")
       event.preventDefault()
       event.returnValue = 'nope'
       setShowAskToSave(true)
     } else if (applicationIsBusyAndCannotBeQuit) {
+      // Socket server is busy
       logger.info('The socket server is busy and we cannot quit')
       showMessageBox(t('Plottr is Busy'), t("Plottr is busy and can't quit"))
       if (event.preventDefault && typeof event.preventDefault === 'function') {
         event.preventDefault()
         event.returnValue = 'nope'
       }
-      return
     } else {
       removeReloadListeners()
       if (reloading) {
         closeOrRefresh(reloading)
       }
-      return
     }
   }
 
