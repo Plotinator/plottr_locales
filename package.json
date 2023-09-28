@@ -107,7 +107,7 @@
     "dotenv-stringify": "^2.0.7",
     "dotenv-webpack": "^7.1.0",
     "duplicate-package-checker-webpack-plugin": "^3.0.0",
-    "electron": "^22.3.1",
+    "electron": "^22.3.24",
     "electron-builder": "^23.0.4",
     "electron-context-menu": "^2.5.2",
     "electron-log": "^4.4.8",
@@ -200,7 +200,7 @@
     "dmg-license": "^1.0.11"
   },
   "build": {
-    "electronVersion": "22.3.1",
+    "electronVersion": "22.3.24",
     "appId": "com.plottr.app",
     "artifactName": "${productName}-${os}-${arch}-installer-latest.${ext}",
     "npmRebuild": false,
