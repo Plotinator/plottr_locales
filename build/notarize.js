@@ -16,6 +16,7 @@ exports.default = async function notarizing(context) {
     appleId: process.env.APPLEID,
     appleIdPassword: process.env.APPLEIDPASS,
     ascProvider: process.env.APPLETEAMID,
+    tool: 'notarytool',
   })
 
   console.log('done notarizing', new Date().getTime() - start, 'ms')
