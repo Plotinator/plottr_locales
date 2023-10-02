@@ -1,3 +1,5 @@
+/** @module Reducers */
+
 import { identity } from 'lodash'
 
 import unrepairedMainReducer from './main'
