@@ -5,10 +5,8 @@ import { IoIosAlert } from 'react-icons/io'
 
 import { t as i18n } from 'plottr_locales'
 
-import setupRollbar from '../../utils/rollbar'
 import { checkDependencies } from '../checkDependencies'
 import Button from '../Button'
-import { makeErrorWindow } from '../errorWindow'
 
 const DashboardErrorBoundaryConnector = (connector) => {
   const {
@@ -18,7 +16,7 @@ const DashboardErrorBoundaryConnector = (connector) => {
       openExternal,
       appVersion,
       node: { env },
-      rollbar: { rollbarAccessToken, platform },
+      errorReporter: { errorReporterAccessToken, errorReporter, platform },
     },
   } = connector
   checkDependencies({
@@ -27,7 +25,8 @@ const DashboardErrorBoundaryConnector = (connector) => {
     openExternal,
     appVersion,
     env,
-    rollbarAccessToken,
+    errorReporterAccessToken,
+    errorReporter,
     platform,
   })
 
@@ -36,7 +35,7 @@ const DashboardErrorBoundaryConnector = (connector) => {
       hasError: false,
       viewError: false,
       count: 0,
-      rollbar: null,
+      errorReporter: null,
     }
 
     static getDerivedStateFromError(error) {
@@ -44,35 +43,37 @@ const DashboardErrorBoundaryConnector = (connector) => {
     }
 
     componentDidMount() {
-      Promise.all([appVersion(), platform()])
-        .then(([version, currentPlatform]) => {
-          return setupRollbar(
-            'DashboardErrorBoundary',
+      // If we're in classic, get the user-identifying data from the
+      // "user" object which comes from EDD.
+      const userId = this.props.userId || this.props.user.payment_id || 'UNKNOWN_USER'
+      const userEmail = this.props.email || this.props.user.customer_email || 'UNKNOWN_EMAIL'
+      Promise.all([platform(), appVersion()])
+        .then(([os, version]) => {
+          return errorReporter(
+            errorReporterAccessToken,
             version,
-            this.props.user,
             env,
-            rollbarAccessToken,
-            currentPlatform
+            log,
+            'DashboardErrorBoundary',
+            os,
+            userId,
+            userEmail
           )
         })
         .then((rollbar) => {
-          this.setState({ rollbar })
+          this.setState({ errorReporter })
         })
         .catch((error) => {
           log.error('Could not construct rollbar instance.', error)
         })
     }
 
-    withErrorWindow = makeErrorWindow(' logging to Rollbar ')
-
     componentDidCatch(error, errorInfo) {
       this.error = error
       this.errorInfo = errorInfo
       log.error(error, errorInfo)
-      if (this.state.rollbar) {
-        this.withErrorWindow(() => {
-          this.state.rollbar.error(error, errorInfo)
-        })
+      if (this.state.errorReporter) {
+        this.state.errorReporter.error(error, errorInfo)
       }
     }
 
@@ -142,6 +143,8 @@ const DashboardErrorBoundaryConnector = (connector) => {
     proInfo: PropTypes.object,
     trialInfo: PropTypes.object,
     user: PropTypes.object.isRequired,
+    userId: PropTypes.string,
+    email: PropTypes.string,
   }
 
   const {
@@ -157,6 +160,8 @@ const DashboardErrorBoundaryConnector = (connector) => {
       trialInfo: selectors.trialInfoSelector(state),
       darkMode: selectors.isDarkModeSelector(state),
       user: selectors.userSettingsSelector(state),
+      userId: selectors.userIdSelector(state),
+      email: selectors.emailAddressSelector(state),
     }))(DashboardErrorBoundary)
   }
 

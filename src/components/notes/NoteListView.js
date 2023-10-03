@@ -131,19 +131,26 @@ const NoteListViewConnector = (connector) => {
     }
 
     const renderVisibleNotes = (categoryId) => {
-      if (!visibleNotesByCategory[categoryId]) return []
+      const notes =
+        categoryId === null
+          ? [...(visibleNotesByCategory[null] || []), ...(visibleNotesByCategory[undefined] || [])]
+          : visibleNotesByCategory[categoryId]
 
-      return visibleNotesByCategory[categoryId].map((n) => (
-        <NoteItem
-          editing={editingSelected}
-          key={n.id}
-          note={n}
-          selected={n.id == noteDetailId}
-          startEdit={startEditing}
-          stopEdit={stopEditing}
-          select={() => setNoteDetailId(n.id)}
-        />
-      ))
+      if (!notes) return []
+
+      return notes.map((n) => {
+        return (
+          <NoteItem
+            editing={editingSelected}
+            key={n.id}
+            note={n}
+            selected={n.id == noteDetailId}
+            startEdit={startEditing}
+            stopEdit={stopEditing}
+            select={() => setNoteDetailId(n.id)}
+          />
+        )
+      })
     }
 
     const renderNotes = () => {
@@ -364,7 +371,6 @@ const NoteListViewConnector = (connector) => {
           visibleNotesByCategory: selectors.visibleSortedSearchedNotesByCategorySelector(state),
           filterIsEmpty: selectors.noteFilterIsEmptySelector(state),
           customAttributes: selectors.characterCustomAttributesSelector(state),
-          noteSortSelector: selectors.noteSortSelector(state),
           noteSort: selectors.noteSortSelector(state),
           notesSearchTerm: selectors.notesSearchTermSelector(state),
         }

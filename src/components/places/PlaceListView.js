@@ -239,17 +239,19 @@ const PlaceListViewConnector = (connector) => {
 
       if (!places) return []
 
-      return places.map((pl) => (
-        <PlaceItem
-          key={pl.id}
-          place={pl}
-          selected={pl.id == placeDetailId}
-          startEdit={editSelected}
-          stopEdit={stopEditing}
-          select={() => setPlaceDetailId(pl.id)}
-          editing={editingSelected}
-        />
-      ))
+      return places.map((pl) => {
+        return (
+          <PlaceItem
+            key={pl.id}
+            place={pl}
+            selected={pl.id == placeDetailId}
+            startEdit={editSelected}
+            stopEdit={stopEditing}
+            select={() => setPlaceDetailId(pl.id)}
+            editing={editingSelected}
+          />
+        )
+      })
     }
 
     const renderCategory = (category) => {
@@ -369,6 +371,7 @@ const PlaceListViewConnector = (connector) => {
           darkMode: selectors.isDarkModeSelector(state),
           placeSort: selectors.placeSortSelector(state),
           placeSearchTerm: selectors.placesSearchTermSelector(state),
+          isPlacesManuallySorted: selectors.isPlacesManuallySortedSelector(state),
         }
       },
       (dispatch) => {

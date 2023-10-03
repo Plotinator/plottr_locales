@@ -17,6 +17,7 @@ const PlaceItemConnector = (connector) => {
 
   const PlaceItem = ({ place, selected, select, startEdit, stopEdit, actions, editing }) => {
     const [deleting, setDeleting] = useState(false)
+    const [newPlaceIdPosition, setNewPlaceIdPosition] = useState(null)
 
     const ref = useRef()
 
@@ -106,8 +107,54 @@ const PlaceItemConnector = (connector) => {
       )
     }
 
+    const handleDragOver = (e) => {
+      e.preventDefault()
+      if (newPlaceIdPosition != place.id) {
+        setNewPlaceIdPosition(place.id)
+      }
+    }
+
+    const handleDragLeave = (e) => {
+      e.preventDefault()
+      if (typeof newPlaceIdPosition !== 'undefined') {
+        setNewPlaceIdPosition(null)
+      }
+    }
+
+    const handleDropItem = (e) => {
+      e.stopPropagation()
+      e.preventDefault()
+
+      const json = e.dataTransfer.getData('text/json')
+      const droppedData = JSON.parse(json)
+      actions.reorderPlaces(
+        droppedData.id,
+        droppedData.position,
+        place.position,
+        place.categoryId || null
+      )
+      setNewPlaceIdPosition(null)
+    }
+
+    const handleDragStart = (e) => {
+      e.dataTransfer.effectAllowed = 'move'
+      e.dataTransfer.setData('text/json', JSON.stringify({ ...place }))
+    }
+
     return (
-      <div className={cx('list-group-item', { selected })} ref={ref} onClick={selectPlace}>
+      <div
+        className={cx('list-group-item', {
+          selected,
+          isDroppable: !!newPlaceIdPosition && place.id == newPlaceIdPosition,
+        })}
+        ref={ref}
+        onClick={selectPlace}
+        draggable
+        onDragStart={handleDragStart}
+        onDrop={handleDropItem}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+      >
         {renderDelete()}
         <div className="place-list__item-inner">
           {img}
