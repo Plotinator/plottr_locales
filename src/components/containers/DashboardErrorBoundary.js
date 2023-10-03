@@ -60,8 +60,8 @@ const DashboardErrorBoundaryConnector = (connector) => {
             userEmail
           )
         })
-        .then((rollbar) => {
-          this.setState({ errorReporter })
+        .then((reporter) => {
+          this.setState({ errorReporter: reporter })
         })
         .catch((error) => {
           log.error('Could not construct rollbar instance.', error)

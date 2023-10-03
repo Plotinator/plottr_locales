@@ -5,7 +5,6 @@ import { IoIosAlert } from 'react-icons/io'
 
 import { t as i18n } from 'plottr_locales'
 
-import setupRollbar from '../../utils/rollbar'
 import { checkDependencies } from '../checkDependencies'
 import Button from '../Button'
 import { makeErrorWindow } from '../errorWindow'
@@ -18,7 +17,7 @@ const ErrorBoundaryConnector = (connector) => {
       openExternal,
       appVersion,
       node: { env },
-      rollbar: { rollbarAccessToken, platform },
+      errorReporter: { errorReporterAccessToken, errorReporter, platform },
     },
   } = connector
   checkDependencies({
@@ -27,7 +26,8 @@ const ErrorBoundaryConnector = (connector) => {
     openExternal,
     appVersion,
     env,
-    rollbarAccessToken,
+    errorReporterAccessToken,
+    errorReporter,
     platform,
   })
 
@@ -44,19 +44,25 @@ const ErrorBoundaryConnector = (connector) => {
     }
 
     componentDidMount() {
-      Promise.all([appVersion(), platform()])
-        .then(([version, currentPlatform]) => {
-          return setupRollbar(
-            'ErrorBoundary',
+      // If we're in classic, get the user-identifying data from the
+      // "user" object which comes from EDD.
+      const userId = this.props.userId || this.props.user.payment_id || 'UNKNOWN_USER'
+      const userEmail = this.props.email || this.props.user.customer_email || 'UNKNOWN_EMAIL'
+      Promise.all([platform(), appVersion()])
+        .then(([os, version]) => {
+          return errorReporter(
+            errorReporterAccessToken,
             version,
-            this.props.user,
             env,
-            rollbarAccessToken,
-            currentPlatform
+            log,
+            'RCEErrorBoundary',
+            os,
+            userId,
+            userEmail
           )
         })
-        .then((rollbar) => {
-          this.setState({ rollbar })
+        .then((reporter) => {
+          this.setState({ errorReporter: reporter })
         })
         .catch((error) => {
           log.error('Could not construct rollbar instance.', error)
@@ -142,6 +148,8 @@ const ErrorBoundaryConnector = (connector) => {
     proInfo: PropTypes.object,
     trialInfo: PropTypes.object,
     user: PropTypes.object.isRequired,
+    userId: PropTypes.string,
+    email: PropTypes.string,
   }
 
   const {
@@ -160,6 +168,8 @@ const ErrorBoundaryConnector = (connector) => {
         proInfo: selectors.proInfoSelector(state),
         trialInfo: selectors.trialInfoSelector(state),
         user: selectors.userSettingsSelector(state),
+        userId: selectors.userIdSelector(state),
+        email: selectors.emailAddressSelector(state),
       }
     })(ErrorBoundary)
   }
