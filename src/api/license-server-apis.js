@@ -62,7 +62,6 @@ export function verifyLicense(license, callback) {
         } else {
           log.info('license check request failed', productID)
           log.error(productID)
-          // rollbar.warn(productID, err)
           return false
         }
       })
