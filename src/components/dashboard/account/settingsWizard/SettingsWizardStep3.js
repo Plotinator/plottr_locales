@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import PropTypes from 'react-proptypes'
 
 import { t } from 'plottr_locales'
@@ -8,13 +8,36 @@ import OnboardingButtonBar from '../../../onboarding/OnboardingButtonBar'
 import OnboardingStep from '../../../onboarding/OnboardingStep'
 import Button from '../../../Button'
 import UnconnectedBackupSettings from '../../options/BackupSettings'
+import { checkDependencies } from '../../../checkDependencies'
 
 const SettingsWizardStep3Connector = (connector) => {
   const BackupSettings = UnconnectedBackupSettings(connector)
 
-  const SettingsWizardStep3 = ({ goBack, finishSettingsWizard }) => {
+  const SettingsWizardStep3 = ({ goBack, finishSettingsWizard, stagedLanguage }) => {
+    const {
+      platform: {
+        settings: { saveAppSetting },
+        updateLanguage,
+      },
+    } = connector
+    checkDependencies({
+      updateLanguage,
+      saveAppSetting,
+    })
+
+    const setLanguage = useCallback(
+      (newLanguage) => {
+        saveAppSetting('locale', newLanguage)
+        updateLanguage(newLanguage)
+      },
+      [saveAppSetting, updateLanguage]
+    )
+
     const handleFinish = () => {
       finishSettingsWizard()
+      if (typeof stagedLanguage === 'string') {
+        setLanguage(stagedLanguage)
+      }
     }
 
     return (
@@ -47,20 +70,26 @@ const SettingsWizardStep3Connector = (connector) => {
   SettingsWizardStep3.propTypes = {
     goBack: PropTypes.func.isRequired,
     finishSettingsWizard: PropTypes.func.isRequired,
+    stagedLanguage: PropTypes.string,
   }
 
   const {
-    pltr: { actions },
+    pltr: { actions, selectors },
     redux,
   } = connector
 
   if (redux) {
     const { connect } = redux
 
-    return connect((_state) => ({}), {
-      goBack: actions.applicationState.regressSettingsWizard,
-      finishSettingsWizard: actions.applicationState.finishSettingsWizard,
-    })(SettingsWizardStep3)
+    return connect(
+      (state) => ({
+        stagedLanguage: selectors.stagedLanguageSelector(state),
+      }),
+      {
+        goBack: actions.applicationState.regressSettingsWizard,
+        finishSettingsWizard: actions.applicationState.finishSettingsWizard,
+      }
+    )(SettingsWizardStep3)
   }
 
   throw new Error('Could not connect SettingsWizardStep3')

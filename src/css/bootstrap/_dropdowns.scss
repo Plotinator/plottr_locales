@@ -121,6 +121,11 @@
   &.disabled > #book_chooser {
   color: $neutral-gray-5;
   }
+
+  .dropdown-menu {
+    max-height: 70vh;
+    overflow-y: auto;
+  }
 }
 
 // Open state for the dropdown

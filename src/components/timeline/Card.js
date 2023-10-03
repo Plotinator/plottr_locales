@@ -121,6 +121,7 @@ const CardConnector = (connector) => {
         <Popover
           id={`card-popover-${this.props.card.id}`}
           title={truncateTitle(this.props.card.title, 150)}
+          className="card__popover"
         >
           <div className="card__popover-wrapper">
             <RichText

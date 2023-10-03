@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo, useEffect, useRef } from 'react'
 import PropTypes from 'react-proptypes'
 import { FaPlus, FaMinus } from 'react-icons/fa'
 import cx from 'classnames'
@@ -24,14 +24,40 @@ const BackupsFolderConnector = (connector) => {
       }
     }
 
-    const renderProjects = (folder) => {
-      // group by file name (without Session Start) to put them in "projects"
-      // display each project as another row
-      return Object.entries(folder.groups).map(([groupName, files]) => {
-        const displayableGroupName = makeDisplayableGroupName(files[0].name, files[0])
-        let row = null
-        if (displayableGroupName?.toLowerCase().includes(searchTerm.toLowerCase())) {
-          row = (
+    const displayableGroups = useMemo(() => {
+      return Object.entries(folder.groups)
+        .map(([groupName, files]) => {
+          const displayableGroupName = makeDisplayableGroupName(files[0].name, files[0])
+          let row = null
+          if (displayableGroupName?.toLowerCase().includes(searchTerm.toLowerCase())) {
+            return {
+              groupName,
+              displayableGroupName,
+              folder,
+              files,
+            }
+          }
+          return row
+        })
+        .filter(Boolean)
+    }, [searchTerm, folder])
+
+    const prevSearchTerm = useRef('')
+
+    useEffect(() => {
+      if (searchTerm && displayableGroups.length > 0 && !isOpen) {
+        setOpen(true)
+      } else if (searchTerm === '' && prevSearchTerm.current !== '' && isOpen) {
+        setOpen(false)
+      }
+      prevSearchTerm.current = searchTerm
+    }, [folder, searchTerm, isOpen])
+
+    // group by file name (without Session Start) to put them in
+    // "projects" display each project as another row
+    const projects = displayableGroups
+      ? displayableGroups.map(({ groupName, displayableGroupName, folder, files }) => {
+          return (
             <BackupsProjectRow
               folder={folder}
               groupName={displayableGroupName}
@@ -39,12 +65,8 @@ const BackupsFolderConnector = (connector) => {
               key={`${groupName}-${files[0].name}`}
             />
           )
-        }
-        return row
-      })
-    }
-
-    const projects = renderProjects(folder)
+        })
+      : []
     if (searchTerm?.length > 1 && !projects.filter(Boolean).length) return null
     return (
       <div>

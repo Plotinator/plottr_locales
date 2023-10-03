@@ -23,6 +23,10 @@
 #timelineview__root {
   width: 100vw;
 
+  &.timeline-tabbed-view-body {
+    position: relative;
+  }
+
   .sticky-table {
     user-select: none;
   }
@@ -43,6 +47,10 @@
     .line-list__insert-beat {
       color: $blue-5;
     }
+  }
+
+  .sticky-table-row:last-child {
+    display: contents;
   }
 
   .sticky-table.darkmode {
@@ -553,6 +561,12 @@
     width: 100vw;
     height: max-content;
     overflow: auto;
+
+    .sticky-table,
+    .small-timeline__wrapper {
+      position: absolute;
+      width: 100%;
+    }
   }
 
   .timeline__tabs-wrapper {

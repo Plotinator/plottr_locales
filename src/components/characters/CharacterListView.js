@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
 
@@ -129,12 +129,7 @@ const CharacterListViewConnector = (connector) => {
     }
 
     const handleCreateNewCharacter = () => {
-      // setState({ creating: true })
-
-      // going back to old way (without modal) to think it over
-      const id = nextIdAcrossCategories(visibleCharactersByCategory)
       actions.addCharacter()
-      uiActions.selectCharacter(id)
       setEditingSelected(true)
     }
 

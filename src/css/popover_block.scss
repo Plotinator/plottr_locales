@@ -35,7 +35,7 @@
 
   .slate-editor__editor {
     div > * {
-      color: #aaa;
+      color: $darkmode-v2-darker-text;
     }
   }
 
@@ -120,6 +120,18 @@
     .popover-title {
       border-bottom: 1px solid $darkmode-v2-border;
       background-color: $darkmode-v2-background;
+    }
+
+    .popover-content {
+      li {
+        color: #bbb;
+      }
+
+      small {
+        i {
+          color: #bbb;
+        }
+      }
     }
   }
 }

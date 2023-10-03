@@ -102,6 +102,10 @@ const TimelineWrapperConnector = (connector) => {
     stickyHeaderCount,
     stickyLeftColumnCount,
     restructureModalOpen,
+    canOpenRestructureModal,
+    toast,
+    books,
+    notificationActions,
   }) => {
     const [mounted, setMounted] = useState(false)
     const [clearing, setClearing] = useState(false)
@@ -167,6 +171,14 @@ const TimelineWrapperConnector = (connector) => {
     }, [mounted])
 
     useEffect(() => {
+      const { visible } = toast
+
+      if (visible) {
+        setTimeout(() => {
+          handleCloseToast()
+        }, 5000)
+      }
+
       return () => {
         window.removeEventListener('resize', handleResize)
         if (tableRef.current) {
@@ -364,6 +376,49 @@ const TimelineWrapperConnector = (connector) => {
       )
     }
 
+    const handleCloseToast = () => {
+      notificationActions.showToastNotification(false)
+    }
+
+    const getBookTitle = (book) => {
+      return book.title || t('Untitled')
+    }
+
+    const getToastMessage = (cardAction, newBookId, lineAction) => {
+      if ((cardAction === 'move' || lineAction === 'move') && newBookId) {
+        const bookTitle = newBookId === 'series' ? t('Series') : getBookTitle(books[newBookId])
+        const entityType = cardAction ? 'Scene card' : 'Plotline'
+
+        // if card is moved to another book, create the book link
+        return (
+          <div className="toast-message-with-anchor">
+            {t(`Woohoo! ${entityType} moved to`)}
+            <a href="#" onClick={() => actions.changeCurrentTimeline(newBookId)}>
+              {` ${bookTitle}`}
+            </a>
+          </div>
+        )
+      } else {
+        return t('Woohoo! Scene card duplicated')
+      }
+    }
+
+    const renderToastMessage = () => {
+      return (
+        <div
+          className={cx(
+            'update-notifier scene-card-update-toast alert alert-info alert-dismissible'
+          )}
+          role="alert"
+        >
+          {getToastMessage(toast.cardAction, toast.newBookId, toast.lineAction)}
+          <button className="close" onClick={() => handleCloseToast()}>
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      )
+    }
+
     const renderSubNav = () => {
       let glyph = <CgArrowLongDown style={{ marginBottom: -2, marginRight: -2 }} />
       let scrollDirectionFirst = <HiOutlineChevronLeft style={{ marginBottom: -2 }} />
@@ -415,9 +470,18 @@ const TimelineWrapperConnector = (connector) => {
             </Dropdown.Toggle>
             <Dropdown.Menu>
               <MenuItem onSelect={startSaveAsTemplate}>{t('Save as Template')}</MenuItem>
-              <MenuItem onSelect={actions.openRestructureTimelineModal}>
-                {t('Restructure Timeline')}
-              </MenuItem>
+              {canOpenRestructureModal ? (
+                <MenuItem onSelect={actions.openRestructureTimelineModal}>
+                  {t('Restructure Timeline')}
+                </MenuItem>
+              ) : (
+                <ToolTip
+                  id="flip-tooltip"
+                  text={t('Add another heading (e.g. Chapter or Beat) to use this control')}
+                >
+                  <MenuItem disabled={true}>{t('Restructure Timeline')}</MenuItem>
+                </ToolTip>
+              )}
               <MenuItem divider />
               <MenuItem onSelect={() => setClearing(true)}>{t('Clear Timeline')}</MenuItem>
             </Dropdown.Menu>
@@ -706,6 +770,7 @@ const TimelineWrapperConnector = (connector) => {
         {renderRestructureModal()}
         {renderDelete()}
         {renderCardDialog()}
+        {toast.visible ? renderToastMessage() : null}
         <div
           id="timelineview__root"
           className={cx('tab-body', { 'timeline-tabbed-view-body': timelineViewIsTabbed })}
@@ -739,6 +804,11 @@ const TimelineWrapperConnector = (connector) => {
     stickyHeaderCount: PropTypes.number,
     stickyLeftColumnCount: PropTypes.number,
     restructureModalOpen: PropTypes.bool,
+    canOpenRestructureModal: PropTypes.bool,
+    toast: PropTypes.object,
+    message: PropTypes.string,
+    books: PropTypes.object.isRequired,
+    notificationActions: PropTypes.object,
   }
 
   const {
@@ -772,6 +842,10 @@ const TimelineWrapperConnector = (connector) => {
           stickyHeaderCount: selectors.stickyHeaderCountSelector(state),
           stickyLeftColumnCount: selectors.stickyLeftColumnCountSelector(state),
           restructureModalOpen: selectors.restructureModalOpenSelector(state),
+          canOpenRestructureModal: selectors.canOpenRestructureModalSelector(state),
+          toast: selectors.toastNotificationSelector(state),
+          message: selectors.messageSelector(state),
+          books: selectors.allBooksSelector(state),
         }
       },
       (dispatch) => {
@@ -779,6 +853,7 @@ const TimelineWrapperConnector = (connector) => {
           actions: bindActionCreators(actions.ui, dispatch),
           projectActions: bindActionCreators(actions.project, dispatch),
           beatActions: bindActionCreators(actions.beat, dispatch),
+          notificationActions: bindActionCreators(actions.notifications, dispatch),
         }
       }
     )(TimelineWrapper)

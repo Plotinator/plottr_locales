@@ -145,6 +145,7 @@ const FileActionsConnector = (connector) => {
                 onClick={() => setDeleting(true)}
                 title={t('Delete')}
                 disabled={isInOfflineMode}
+                bsStyle="danger"
               >
                 <Glyphicon glyph="trash" />
               </Button>
@@ -164,7 +165,7 @@ const FileActionsConnector = (connector) => {
                     {t('Create Desktop Shortcut')}
                   </MenuItem>
                 )}
-                {isCloudFile || osIsUnknown || isInDefaultFolder ? null : (
+                {isCloudFile || osIsUnknown || (isInDefaultFolder && !missing) ? null : (
                   <MenuItem eventKey="remove">{t('Remove from this list')}</MenuItem>
                 )}
               </Dropdown.Menu>

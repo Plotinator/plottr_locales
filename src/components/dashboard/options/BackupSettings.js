@@ -71,7 +71,7 @@ const BackupSettingsConnector = (connector) => {
     const onChangeBackupLocation = () => {
       const title = t('Choose your backup location')
       const properties = ['openDirectory', 'createDirectory']
-      showOpenDialog(title, [], properties).then((files) => {
+      showOpenDialog(title, [], properties, backupFolderPath()).then((files) => {
         if (files && files.length) {
           const folderPath = files[0]
           if (

@@ -572,6 +572,7 @@ const BeatTitleCellConnector = (connector) => {
       )
     }
 
+    const editingKeySuffix = editing ? 'editing' : 'displaying'
     if (isSmall) {
       const isHorizontal = orientation == 'horizontal'
       const klasses = {
@@ -608,7 +609,7 @@ const BeatTitleCellConnector = (connector) => {
           ref={(ref) => {
             container.current = ref
           }}
-          key={`beat-title-cell-${beatId}`}
+          key={`beat-title-cell-${beatId}--${editingKeySuffix}--${beatTitle}`}
         >
           {renderTitleCell()}
         </Cell>
@@ -620,11 +621,13 @@ const BeatTitleCellConnector = (connector) => {
           ref={(ref) => {
             container.current = ref
           }}
-          key={`beat-title-cell-${beatId}`}
+          key={`beat-title-cell-${beatId}--${editingKeySuffix}--${beatTitle}`}
         >
           {renderTitleCell()}
         </Cell>,
-        <Cell key={`beat-insert-cell-${beatId}`}>{renderInsertPeer()}</Cell>,
+        <Cell key={`beat-insert-cell-${beatId}--${editingKeySuffix}--${beatTitle}`}>
+          {renderInsertPeer()}
+        </Cell>,
       ]
     }
   }

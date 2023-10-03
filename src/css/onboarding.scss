@@ -178,10 +178,14 @@
 
       p.secondary-text {
         color: #ccc;
+        word-break: break-word;
       }
       .checkbox {
         color: $darkmode-v2-darker-text;
         padding-left: 0;
+      }
+      span {
+        word-break: break-word;
       }
     }
   }

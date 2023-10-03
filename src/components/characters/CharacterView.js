@@ -28,39 +28,43 @@ const CharacterViewConnector = (connector) => {
         openAttributes,
       } = this.props
 
-      return (
-        <div className={cx('character-list__character-view', { darkmode: darkMode })}>
-          <div className="character-list__character-view__left-side">
-            <BookSelectList
-              selectedBooks={character.bookIds}
-              parentId={character.id}
-              add={actions.addBook}
-              remove={actions.removeBook}
-            />
-            <SelectList
-              parentId={character.id}
-              type={'Tags'}
-              selectedItems={character.tags}
-              allItems={tags}
-              add={actions.addTag}
-              remove={actions.removeTag}
-            />
+      if (!character) {
+        return null
+      } else {
+        return (
+          <div className={cx('character-list__character-view', { darkmode: darkMode })}>
+            <div className="character-list__character-view__left-side">
+              <BookSelectList
+                selectedBooks={character.bookIds}
+                parentId={character.id}
+                add={actions.addBook}
+                remove={actions.removeBook}
+              />
+              <SelectList
+                parentId={character.id}
+                type={'Tags'}
+                selectedItems={character.tags}
+                allItems={tags}
+                add={actions.addTag}
+                remove={actions.removeTag}
+              />
+            </div>
+            <div className="character-list__character-view__right-side">
+              <ErrorBoundary>
+                {editing ? (
+                  <CharacterEditDetails
+                    characterId={character.id}
+                    finishEditing={stopEditing}
+                    openAttributes={openAttributes}
+                  />
+                ) : (
+                  <CharacterDetails characterId={character.id} startEditing={startEditing} />
+                )}
+              </ErrorBoundary>
+            </div>
           </div>
-          <div className="character-list__character-view__right-side">
-            <ErrorBoundary>
-              {editing ? (
-                <CharacterEditDetails
-                  characterId={character.id}
-                  finishEditing={stopEditing}
-                  openAttributes={openAttributes}
-                />
-              ) : (
-                <CharacterDetails characterId={character.id} startEditing={startEditing} />
-              )}
-            </ErrorBoundary>
-          </div>
-        </div>
-      )
+        )
+      }
     }
 
     static propTypes = {

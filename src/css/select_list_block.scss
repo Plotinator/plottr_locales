@@ -174,9 +174,19 @@ body.darkmode {
     }
   }
 
+  .select-list__line {
+    cursor: default;
+    background-color: transparent !important;
+    hr {
+      border-top: 1px solid $darkmode-v2-border;
+      background-color: transparent;
+    }
+  }
+
   .chip {
+    color: $darkmode-v2-text;
     .glyphicon-remove {
-      color: $darkmode-darker-text;
+      color: $darkmode-v2-darker-text;
     }
 
     &:hover {

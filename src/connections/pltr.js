@@ -189,6 +189,8 @@ const pltrTypeSpecs = {
     warn: PropTypes.func.isRequired,
     error: PropTypes.func.isRequired,
   }),
+  userDocumentsPath: PropTypes.func.isRequired,
+  userFilePickerDefaultFolder: PropTypes.func.isRequired,
   showErrorBox: PropTypes.func.isRequired,
   showOpenDialog: PropTypes.func.isRequired,
   node: PropTypes.shape({

@@ -77,7 +77,7 @@ const HelpHomeConnector = (connector) => {
             >
               {t('Facebook Group')}
             </Button>
-            <Button bsSize="large" bsStyle="link" onClick={l('plottr.com/support')}>
+            <Button bsSize="large" bsStyle="link" onClick={l('plottr.com/roadmap')}>
               {t('Request a Feature')}
             </Button>
             <Button bsSize="large" bsStyle="link" onClick={l('plottr.com/roadmap/')}>
