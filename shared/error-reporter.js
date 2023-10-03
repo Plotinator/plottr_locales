@@ -3,6 +3,21 @@ import Rollbar from 'rollbar'
 const MAX_ERROR_REPORTS_PER_MINUTE = 5
 
 /**
+ * Determine the URL of various sourcemaps to augment stack traces.
+ */
+function requestURL(url, version) {
+  const baseURL = `https://raw.githubusercontent.com/Plotinator/pltr_sourcemaps/main/${version}`
+  if (url.includes('app.html') || url.includes('app.bundle.js')) return `${baseURL}/app.bundle.js`
+  if (url.includes('dashboard.html') || url.includes('dashboard.bundle.js'))
+    return `${baseURL}/dashboard.bundle.js`
+  if (url.includes('expired.html') || url.includes('expired.bundle.js'))
+    return `${baseURL}/expired.bundle.js`
+  if (url.includes('verify.html') || url.includes('verify.bundle.js'))
+    return `${baseURL}/verify.bundle.js`
+  return `${baseURL}/commons.bundle.js`
+}
+
+/**
  * Construct an object that reports errors to our error reporting
  * service.  Today, that's Rollbar, in the future, it might be another
  * service.
@@ -28,14 +43,11 @@ const ErrorReporter = (
   userId,
   userEmail
 ) => {
-  Rollbar.global({
-    itemsPerMinute: MAX_ERROR_REPORTS_PER_MINUTE,
-  })
   const MAX_ROLLBAR_API_RETRIES = 1
   const SEND_RETRY_INTERVAL_MILLISECONDS = 5000
   const MAX_DEPTH_OF_STACK_TRACES = 50
   const REQUEST_TIMEOUT_MILLISECONDS = 5000
-  Rollbar.configure({
+  Rollbar.init({
     accessToken: accessToken,
     enabled: environment === 'production',
     maxRetries: MAX_ROLLBAR_API_RETRIES,
@@ -58,7 +70,22 @@ const ErrorReporter = (
         id: userId,
         email: userEmail,
       },
+      server: {
+        root: `https://raw.githubusercontent.com/Plotinator/pltr_sourcemaps/main/${appVersion}/`,
+      },
     },
+    transform: function (payload) {
+      payload.request.url = requestURL(payload.request.url, appVersion)
+      if (payload.body.trace) {
+        payload.body.trace.frames = payload.body.trace.frames.map((fr) => {
+          fr.filename = requestURL(fr.filename, appVersion)
+          return fr
+        })
+      }
+    },
+  })
+  Rollbar.global({
+    itemsPerMinute: MAX_ERROR_REPORTS_PER_MINUTE,
   })
 
   const extraContext = { os }

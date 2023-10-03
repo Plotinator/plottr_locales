@@ -148,8 +148,8 @@ export const listenOnIPCMain = (
             ? helpers.file.filePathToFileURL(lastFile)
             : lastFile) || null
         const win = getWindowById(event.sender.getOwnerBrowserWindow().id)
-        const fileURL = win.fileURL || lastFileURL
         if (win) {
+          const fileURL = win.fileURL || lastFileURL
           featureFlags().then((flags) => {
             event.sender.send(
               replyChannel,

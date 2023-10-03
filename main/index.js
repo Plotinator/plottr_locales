@@ -16,7 +16,7 @@ import contextMenu from 'electron-context-menu'
 import { helpers } from 'pltr/v2'
 
 import './modules/updater_events'
-import { setupRollbar } from './modules/rollbar'
+import createErrorReporter from '../shared/error-reporter'
 import { loadMenu } from './modules/menus'
 import { focusFirstWindow, hasWindows } from './modules/windows'
 import { openProjectWindow } from './modules/windows/projects'
@@ -57,16 +57,18 @@ import { broadcastToAllWindows } from './modules/broadcast'
 import { setDarkMode } from './modules/theme'
 config({ path: ENV_FILE_PATH })
 
-let rollbar = {
-  error: () => {},
-}
-setupRollbar('main', {})
-  .then((instance) => {
-    rollbar = instance
-  })
-  .catch((error) => {
-    log.error('Failed to set up rollbar for main', error)
-  })
+const environment = process.env.NODE_ENV === 'development' ? 'development' : 'production'
+const errorReporterAccessToken = process.env.ROLLBAR_ACCESS_TOKEN
+const errorReporter = createErrorReporter(
+  errorReporterAccessToken,
+  app.getVersion(),
+  environment,
+  log,
+  'MainProcess',
+  process.platform,
+  'not-knowable-from-main',
+  'not-knowable-from-main'
+)
 
 // https://github.com/sindresorhus/electron-context-menu
 contextMenu({
@@ -79,14 +81,14 @@ if (!is.development) {
   process.on('uncaughtException', function (error) {
     console.error('Uncaught exception.  Quitting...', error)
     log.error('Uncaught exception.  Quitting...', error)
-    rollbar.error(error, function (sendErr, data) {
+    errorReporter.error('Uncaught exception', error, function () {
       gracefullyQuit(safelyExitModule)
     })
   })
   process.on('unhandledRejection', function (error) {
     console.error('Unhandled rejection.', error)
     log.error('Unhandled rejection.', error)
-    rollbar.error(error)
+    errorReporter.error('Unhandled rejection', error)
   })
   // ensure only 1 instance is running
   const gotTheLock = app.requestSingleInstanceLock()
