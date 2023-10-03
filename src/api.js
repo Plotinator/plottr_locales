@@ -5,6 +5,14 @@ import { isEqual, identity, isObject, capitalize } from 'lodash'
 
 import { removeSystemKeys, ARRAY_KEYS, SYSTEM_REDUCER_KEYS, helpers } from 'pltr/v2'
 
+const safeParseInt = (x) => {
+  try {
+    return parseInt(x)
+  } catch (error) {
+    return x
+  }
+}
+
 /**
  * auth, database and storage should be thunks that produce instances
  * of the correspending firebase objects from either the firebase JS
@@ -188,32 +196,32 @@ const api = (
     clientId,
     loadFunctionKey = 'loadSingle',
     removeFunctionKey = 'removeSingle',
-    bulkLoadFunctionKey = 'batchLoad',
+    bulkLoadFunctionKey = 'batchLoad'
   ) => {
     return {
       next: (snapshot) => {
         const documentsToAdd = []
         const patchAction = patchActions(path)
         if (!patchAction) {
-            log.error('No patch action for ', path)
+          log.error('No patch action for ', path)
         } else {
           snapshot.docChanges().forEach((docChange) => {
             const document = docChange.doc.data()
             switch (docChange.type) {
-            case 'added':
-            case 'modified': {
-              if (document.clientId !== clientId) {
-                documentsToAdd.push(withData(document))
+              case 'added':
+              case 'modified': {
+                if (document.clientId !== clientId) {
+                  documentsToAdd.push(withData(document))
+                }
+                break
               }
-              break
-            }
-            case 'removed': {
-              withAction({
-                ...patchAction[removeFunctionKey](patching, withData(document)),
-                fileId,
-              })
-              break
-            }
+              case 'removed': {
+                withAction({
+                  ...patchAction[removeFunctionKey](patching, withData(document)),
+                  fileId,
+                })
+                break
+              }
             }
           })
         }
@@ -362,8 +370,8 @@ const api = (
       if (data.deleted) return
 
       documents.push({
-        id: document.id,
         ...data,
+        id: safeParseInt(document.id),
         fileURL: `plottr://${fileId}`,
         isCloudFile: true,
       })
@@ -484,9 +492,9 @@ const api = (
         return
       }
       if (isFlatArrayKey(key)) {
-        state[key].forEach((payload, index) => {
+        state[key].forEach((payload) => {
           requests.push(
-            overwrite(key, fileId, payload, clientId, index)
+            overwrite(key, fileId, payload, clientId, payload.id)
               .catch((error) => {
                 log.error(`Error while force updating file ${fileId} at key: ${key}`, error)
                 return Promise.reject(error)
