@@ -57,7 +57,6 @@
     "react-proptypes": "^1.0.0",
     "react-redux": "^7.2.4",
     "redux": "^4.1.0",
-    "rollbar": "^2.19.4",
     "sass": "^1.25.0",
     "tls": "0.0.1",
     "web-vitals": "^1.0.1"

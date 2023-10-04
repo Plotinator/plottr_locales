@@ -17,7 +17,7 @@ const CharacterItemConnector = (connector) => {
   const Image = UnconnectedImage(connector)
 
   class CharacterItem extends Component {
-    state = { deleting: false, hovering: false }
+    state = { deleting: false, hovering: false, newCharacterIdPosition: null }
 
     constructor(props) {
       super(props)
@@ -82,6 +82,38 @@ const CharacterItemConnector = (connector) => {
       )
     }
 
+    handleDragOver = (e) => {
+      e.preventDefault()
+      const { character } = this.props
+      if (this.state.newCharacterIdPosition != character.id) {
+        this.setState({ newCharacterIdPosition: character.id })
+      }
+    }
+
+    handleDragLeave = (e) => {
+      e.preventDefault()
+      if (typeof this.state.newCharacterIdPosition !== 'undefined') {
+        this.setState({ newCharacterIdPosition: null })
+      }
+    }
+
+    handleDropItem = (e) => {
+      e.stopPropagation()
+      e.preventDefault()
+      const { character, actions, absolutePosition } = this.props
+
+      const json = e.dataTransfer.getData('text/json')
+      const droppedData = JSON.parse(json)
+      actions.reorderCharacter(droppedData.id, absolutePosition, character.categoryId || null)
+      this.setState({ newCharacterIdPosition: null })
+    }
+
+    handleDragStart = (e) => {
+      const { character, absolutePosition } = this.props
+      e.dataTransfer.effectAllowed = 'move'
+      e.dataTransfer.setData('text/json', JSON.stringify({ ...character, absolutePosition }))
+    }
+
     renderHoverOptions = () => {
       return (
         <ButtonGroup className="character-list__item-buttons">
@@ -98,16 +130,9 @@ const CharacterItemConnector = (connector) => {
       )
     }
 
-    startHovering = () => {
-      this.setState({ hovering: true })
-    }
-
-    stopHovering = () => {
-      this.setState({ hovering: false })
-    }
-
     render() {
       const { character, selected } = this.props
+
       let img = null
       if (character.imageId) {
         img = (
@@ -119,9 +144,19 @@ const CharacterItemConnector = (connector) => {
 
       return (
         <div
-          className={cx('list-group-item', { selected })}
+          className={cx('list-group-item', {
+            selected,
+            isDroppable:
+              !!this.state.newCharacterIdPosition &&
+              character.id == this.state.newCharacterIdPosition,
+          })}
           ref={this.ref}
           onClick={this.selectCharacter}
+          draggable
+          onDragStart={this.handleDragStart}
+          onDrop={this.handleDropItem}
+          onDragOver={this.handleDragOver}
+          onDragLeave={this.handleDragLeave}
         >
           <div className="character-list__item-inner">
             {img}
@@ -157,6 +192,7 @@ const CharacterItemConnector = (connector) => {
       startEdit: PropTypes.func.isRequired,
       stopEdit: PropTypes.func.isRequired,
       actions: PropTypes.object.isRequired,
+      absolutePosition: PropTypes.number,
     }
   }
 

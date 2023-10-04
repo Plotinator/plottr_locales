@@ -17,7 +17,7 @@ const NoteItemConnector = (connector) => {
   const Image = UnconnectedImage(connector)
 
   class NoteItem extends Component {
-    state = { deleting: false, hovering: false }
+    state = { deleting: false, hovering: false, newNoteIdPosition: null }
 
     constructor(props) {
       super(props)
@@ -82,6 +82,43 @@ const NoteItemConnector = (connector) => {
       this.props.actions.duplicateNote(this.props.note.id)
     }
 
+    handleDragOver = (e) => {
+      e.preventDefault()
+      const { note } = this.props
+      const { newNoteIdPosition } = this.state
+      if (newNoteIdPosition != note.id) {
+        this.setState({ newNoteIdPosition: note.id })
+      }
+    }
+
+    handleDragLeave = (e) => {
+      e.preventDefault()
+      if (typeof this.state.newNoteIdPosition !== 'undefined') {
+        this.setState({ newNoteIdPosition: null })
+      }
+    }
+
+    handleDropItem = (e, idx) => {
+      e.stopPropagation()
+      e.preventDefault()
+      const { note } = this.props
+
+      const json = e.dataTransfer.getData('text/json')
+      const droppedData = JSON.parse(json)
+      this.props.actions.reorderNotes(
+        droppedData.id,
+        droppedData.position,
+        note.position,
+        note.categoryId || null
+      )
+      this.setState({ newNoteIdPosition: null })
+    }
+
+    handleDragStart = (e, idx) => {
+      e.dataTransfer.effectAllowed = 'move'
+      e.dataTransfer.setData('text/json', JSON.stringify({ ...this.props.note }))
+    }
+
     renderDelete() {
       if (!this.state.deleting) return null
 
@@ -112,6 +149,8 @@ const NoteItemConnector = (connector) => {
 
     render() {
       const { note, selected } = this.props
+      const isDroppable = !!this.state.newNoteIdPosition && note.id == this.state.newNoteIdPosition
+
       let img = null
       if (note.imageId) {
         img = (
@@ -131,9 +170,14 @@ const NoteItemConnector = (connector) => {
 
       return (
         <div
-          className={cx('list-group-item', { selected })}
+          className={cx('list-group-item', { selected, isDroppable })}
           ref={this.ref}
           onClick={this.selectNote}
+          draggable
+          onDragStart={this.handleDragStart}
+          onDrop={this.handleDropItem}
+          onDragOver={this.handleDragOver}
+          onDragLeave={this.handleDragLeave}
         >
           {this.renderDelete()}
           <div className="note-list__item-inner">

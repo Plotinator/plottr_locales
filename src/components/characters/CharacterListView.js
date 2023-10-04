@@ -307,24 +307,27 @@ const CharacterListViewConnector = (connector) => {
       )
     }
 
-    const renderVisibleCharacters = (categoryId) => {
+    const renderVisibleCharacters = (categoryId, startingIndex) => {
       if (!visibleCharactersByCategory[categoryId]) return []
 
-      return visibleCharactersByCategory[categoryId].map((ch) => (
-        <CharacterItem
-          key={ch.id}
-          characterId={ch.id}
-          selected={ch.id == selectedCharacteId}
-          startEdit={editSelected}
-          stopEdit={stopEditing}
-          editing={editingSelected}
-          select={() => uiActions.selectCharacter(ch.id)}
-        />
-      ))
+      return visibleCharactersByCategory[categoryId].map((ch, idx) => {
+        return (
+          <CharacterItem
+            key={ch.id}
+            absolutePosition={idx + startingIndex}
+            characterId={ch.id}
+            selected={ch.id == selectedCharacteId}
+            startEdit={editSelected}
+            stopEdit={stopEditing}
+            editing={editingSelected}
+            select={() => uiActions.selectCharacter(ch.id)}
+          />
+        )
+      })
     }
 
-    const renderCategory = (category) => {
-      const charactersInCategory = renderVisibleCharacters(category.id)
+    const renderCategory = (category, startingIndex) => {
+      const charactersInCategory = renderVisibleCharacters(category.id, startingIndex)
       if (!charactersInCategory.length) return null
       return (
         <div key={`category-${category.id}`}>
@@ -341,9 +344,12 @@ const CharacterListViewConnector = (connector) => {
     }
 
     const renderCharacters = () => {
-      return [...categories, { id: null, name: t('Uncategorized') }].map((cat) =>
-        renderCategory(cat)
-      )
+      let startingIndex = 0
+      return [...categories, { id: null, name: t('Uncategorized') }].map((cat) => {
+        const result = renderCategory(cat, startingIndex)
+        startingIndex += (visibleCharactersByCategory[cat.id] || []).length
+        return result
+      })
     }
 
     const renderCharacterDetails = () => {
