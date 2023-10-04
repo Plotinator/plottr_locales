@@ -64,7 +64,7 @@ const DashboardErrorBoundaryConnector = (connector) => {
           this.setState({ errorReporter: reporter })
         })
         .catch((error) => {
-          log.error('Could not construct rollbar instance.', error)
+          log.error('Could not construct error reporter instance.', error)
         })
     }
 
@@ -73,7 +73,7 @@ const DashboardErrorBoundaryConnector = (connector) => {
       this.errorInfo = errorInfo
       log.error(error, errorInfo)
       if (this.state.errorReporter) {
-        this.state.errorReporter.error(error, errorInfo)
+        this.state.errorReporter.error('Error in React component on Dashboard', error, errorInfo)
       }
     }
 
