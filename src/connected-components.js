@@ -28,6 +28,7 @@ import {
   listenForRCELock,
   lockRCE,
   releaseRCELock,
+  deleteProBackup,
 } from 'wired-up-firebase'
 
 import {
@@ -548,6 +549,11 @@ const platform = {
         })
       })
     })
+  },
+  deleteProBackup: (backupRecordId, storageProtocolURL) => {
+    const state = store.getState()
+    const userId = selectors.userIdSelector(state)
+    return deleteProBackup(userId, backupRecordId, storageProtocolURL)
   },
 }
 
