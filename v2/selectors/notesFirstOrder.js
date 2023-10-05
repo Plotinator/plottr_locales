@@ -5,6 +5,7 @@ import { createSelector } from 'reselect'
 import { groupBy } from 'lodash'
 
 import { fullFileStateSelector } from './fullFileFirstOrder'
+import { positionReset } from '../helpers/lists'
 
 export const allNotesSelector = createSelector(fullFileStateSelector, (state) => state.notes)
 
@@ -15,12 +16,25 @@ export const singleNoteSelector = createSelector(allNotesSelector, selectId, (no
 )
 
 export const notesByCategorySelector = createSelector(allNotesSelector, (notes) => {
-  const grouped = groupBy(notes, 'categoryId')
+  const notesWithCategory = notes.map((note) => {
+    if (!note.categoryId) {
+      return {
+        ...note,
+        categoryId: null,
+      }
+    }
+    return note
+  })
+  const grouped = groupBy(notesWithCategory, 'categoryId')
   if (grouped[undefined] !== undefined) {
     grouped[null] = grouped[undefined].concat(grouped[null] || [])
     delete grouped[undefined]
   }
-  return grouped
+
+  const groupWithPosition = Object.values(grouped).map((group) => {
+    return positionReset(group)
+  })
+  return groupBy(groupWithPosition.flat(), 'categoryId')
 })
 
 export const stringifiedNotesByIdSelector = createSelector(allNotesSelector, (notes) => {

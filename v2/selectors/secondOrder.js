@@ -139,6 +139,16 @@ export const timelineScrollPositionSelector = createSelector(
     return timelineScrollPosition
   }
 )
+export const isNotesManuallySortedSelector = createSelector(noteSortSelector, (sort) => {
+  return sort == 'manual'
+})
+export const isCharactersManuallySortedSelector = createSelector(characterSortSelector, (sort) => {
+  return sort == 'manual'
+})
+export const isPlacesManuallySortedSelector = createSelector(placeSortSelector, (sort) => {
+  return sort == 'manual'
+})
+
 export const attributesDialogIsOpenSelector = createSelector(
   uiSelector,
   ({ attributesDialogIsOpen }) => {

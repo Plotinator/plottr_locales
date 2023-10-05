@@ -364,6 +364,7 @@ function generateValidator(schemaNode) {
 }
 
 const uiCharacterFilterLens = lensPath(['schema', 'characterFilter', 'schema'])
+const fullUICharacterFilterLens = lensPath(['schema', 'characterFilter'])
 const NON_CUSTOM_UI_CHARACTER_FILTER_TYPES = ['tag', 'book', 'category', 'color']
 const removeCustomUICharacterFilterTypes = (x) => pick(x, NON_CUSTOM_UI_CHARACTER_FILTER_TYPES)
 const setKnownCharacterFilterTypesToObject = (x) =>
@@ -376,12 +377,25 @@ const setKnownCharacterFilterTypesToObject = (x) =>
       },
     }
   }, x)
+const schemaOrNull = (schema) => {
+  return {
+    $type: 'one-of',
+    schema: [
+      schema,
+      {
+        $type: 'null',
+      },
+    ],
+  }
+}
 const fixUICharacterFilter = compose(
+  over(fullUICharacterFilterLens, schemaOrNull),
   over(uiCharacterFilterLens, removeCustomUICharacterFilterTypes),
   over(uiCharacterFilterLens, setKnownCharacterFilterTypesToObject)
 )
 
 const uiPlaceFilterLens = lensPath(['schema', 'placeFilter', 'schema'])
+const fullUIPlaceFilterLens = lensPath(['schema', 'placeFilter'])
 const NON_CUSTOM_UI_PLACE_FILTER_TYPES = ['tag', 'book', 'category', 'color']
 const removeCustomUIPlaceFilterTypes = (x) => pick(x, NON_CUSTOM_UI_PLACE_FILTER_TYPES)
 const setKnownPlaceFilterTypesToObject = (x) =>
@@ -395,11 +409,13 @@ const setKnownPlaceFilterTypesToObject = (x) =>
     }
   }, x)
 const fixUIPlaceFilter = compose(
-  over(uiPlaceFilterLens, removeCustomUIPlaceFilterTypes),
-  over(uiPlaceFilterLens, setKnownPlaceFilterTypesToObject)
+  over(fullUIPlaceFilterLens, schemaOrNull),
+  over(uiPlaceFilterLens, setKnownPlaceFilterTypesToObject),
+  over(uiPlaceFilterLens, removeCustomUIPlaceFilterTypes)
 )
 
 const uiNoteFilterLens = lensPath(['schema', 'noteFilter', 'schema'])
+const fullUINoteFilterLens = lensPath(['schema', 'noteFilter'])
 const NON_CUSTOM_UI_NOTE_FILTER_TYPES = ['tag', 'book', 'category', 'color', 'place', 'character']
 const removeCustomUINoteFilterTypes = (x) => pick(x, NON_CUSTOM_UI_NOTE_FILTER_TYPES)
 const setKnownNoteFilterTypesToObject = (x) =>
@@ -413,11 +429,13 @@ const setKnownNoteFilterTypesToObject = (x) =>
     }
   }, x)
 const fixUINoteFilter = compose(
+  over(fullUINoteFilterLens, schemaOrNull),
   over(uiNoteFilterLens, removeCustomUINoteFilterTypes),
   over(uiNoteFilterLens, setKnownNoteFilterTypesToObject)
 )
 
 const uiTimelineFilterLens = lensPath(['schema', 'timelineFilter', 'schema'])
+const fullUITimelineFilterLens = lensPath(['schema', 'timelineFilter'])
 const NON_CUSTOM_UI_TIMELINE_FILTER_TYPES = ['tag', 'character', 'place']
 const removeCustomUITimelineFilterTypes = (x) => pick(x, NON_CUSTOM_UI_TIMELINE_FILTER_TYPES)
 const setKnownTimelineFilterTypesToObject = (x) =>
@@ -431,15 +449,18 @@ const setKnownTimelineFilterTypesToObject = (x) =>
     }
   }, x)
 const fixUITimelineFilter = compose(
+  over(fullUITimelineFilterLens, schemaOrNull),
   over(uiTimelineFilterLens, removeCustomUITimelineFilterTypes),
   over(uiTimelineFilterLens, setKnownTimelineFilterTypesToObject)
 )
 
 const uiOutlineFilterSchemaLens = lensPath(['schema', 'outlineFilter', 'schema'])
+const fullUIOutlineFilterSchemaLens = lensPath(['schema', 'outlineFilter'])
 const setOutlineFilterSchemaToEmptyObject = always({})
 const uiOutlineFilterTypeLens = lensPath(['schema', 'outlineFilter', '$type'])
 const setOutlineFilterTypeToObject = always('object')
 const fixUIOutlineFilter = compose(
+  over(fullUIOutlineFilterSchemaLens, schemaOrNull),
   over(uiOutlineFilterSchemaLens, setOutlineFilterSchemaToEmptyObject),
   over(uiOutlineFilterTypeLens, setOutlineFilterTypeToObject)
 )
@@ -818,7 +839,7 @@ function hasSameShapeAs(subSchema) {
   return function(x) {
     return Object.keys(subSchema).forEach((schemaKey) => {
       pushPath(schemaKey)
-      subSchema[schemaKey](x[schemaKey])
+      subSchema[schemaKey](x && x[schemaKey])
       popPath()
     })
   }

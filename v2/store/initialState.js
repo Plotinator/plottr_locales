@@ -157,6 +157,7 @@ export const character = {
   categoryId: null,
   imageId: null,
   bookIds: [],
+  position: 0,
 }
 
 export const categories = {
@@ -184,6 +185,7 @@ export const place = {
   tags: [],
   imageId: null,
   bookIds: [],
+  position: 0,
 }
 
 export const tag = {
@@ -259,6 +261,7 @@ export const note = {
   templates: [],
   imageId: null,
   bookIds: [],
+  position: 0,
 }
 
 export const image = {

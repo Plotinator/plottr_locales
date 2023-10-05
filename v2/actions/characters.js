@@ -1,4 +1,4 @@
-import { identity } from 'lodash'
+import { identity, sortBy } from 'lodash'
 
 import {
   ADD_CHARACTER,
@@ -27,6 +27,7 @@ import {
   DELETE_CHARACTER_LEGACY_CUSTOM_ATTRIBUTE,
   SELECT_CHARACTER_ATTRIBUTE_BOOK_TAB,
   REORDER_CHARACTER_TEMPLATES,
+  REORDER_CHARACTER_MANUALLY,
 } from '../constants/ActionTypes'
 import { editorMetadataIfPresent } from '../helpers/editors'
 import selectors from '../selectors'
@@ -41,6 +42,7 @@ const {
   characterAttributesForBookSelector,
   allBookIdsSelector,
   allDisplayedCharactersForCurrentBookSelector,
+  visibleSortedCharactersByCategorySelector,
 } = selectors(identity)
 
 export function addCharacter(name) {
@@ -257,3 +259,25 @@ export const reorderCharacterTemplateAttribute = (originalPosition, destination,
     id: characterId,
   }
 }
+
+export const reorderCharacter =
+  (characterId, newPosition, newCategoryId) => (dispatch, getState) => {
+    const characterIdsInOrder = sortBy(
+      Object.entries(visibleSortedCharactersByCategorySelector(getState())),
+      ([groupName, _characters]) => groupName
+    )
+      .flatMap(([groupName, characters]) => {
+        return characters
+      })
+      .map(({ id }) => {
+        return id
+      })
+
+    dispatch({
+      type: REORDER_CHARACTER_MANUALLY,
+      characterIdsInOrder,
+      characterId,
+      newPosition,
+      newCategoryId,
+    })
+  }

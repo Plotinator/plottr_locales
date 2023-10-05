@@ -910,16 +910,27 @@
       "bookIds": []
     }
   ],
-  "beats": [
-    {
-      "id": 1,
-      "position": 0,
-      "title": "Beat 1",
-      "time": 0,
-      "templates": [],
-      "autoOutlineSort": true
+  "beats": {
+    "series": {
+      "children": {
+         "1": [],
+         "null": [1]
+       },
+       "heap": {
+         "1": null
+       },
+       "index": {
+         "1": {
+           "id": 1,
+           "position": 0,
+           "title": "Beat 1",
+           "time": 0,
+           "templates": [],
+           "autoOutlineSort": true
+         }
+       }
     }
-  ],
+  },
   "seriesLines": [
     {
       "id": 1,

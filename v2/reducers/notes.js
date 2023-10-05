@@ -1,4 +1,4 @@
-import { cloneDeep } from 'lodash'
+import { cloneDeep, groupBy, sortBy } from 'lodash'
 import {
   ADD_NOTE,
   EDIT_NOTE,
@@ -26,12 +26,14 @@ import {
   REMOVE_NOTE,
   EDIT_NOTE_TEMPLATE_ATTRIBUTE,
   DUPLICATE_NOTE,
+  REORDER_NOTE_MANUALLY,
 } from '../constants/ActionTypes'
 import { note } from '../store/initialState'
 import { newFileNotes } from '../store/newFileState'
 import { nextId } from '../store/newIds'
 import { applyToCustomAttributes } from './applyToCustomAttributes'
 import { repairIfPresent } from './repairIfPresent'
+import { positionReset, reorderList } from '../helpers/lists'
 
 const initialState = [note]
 
@@ -59,6 +61,34 @@ const notes =
         return state.map((note) =>
           note.id === action.id ? Object.assign({}, note, action.attributes, lastEdited) : note
         )
+      }
+
+      case REORDER_NOTE_MANUALLY: {
+        const { id, oldPosition, newPosition, newCategoryId } = action
+        const originalNote = state.find((note) => note.id == id)
+        const isNewcategory = originalNote.categoryId != newCategoryId
+        const notesByCategory = groupBy(state, 'categoryId')
+
+        const reorderedList = Object.values(notesByCategory).flatMap((group) => {
+          const groupCategory = group[0].categoryId
+
+          if (!isNewcategory && groupCategory == newCategoryId) {
+            return reorderList(newPosition, oldPosition, group)
+          } else if (isNewcategory && groupCategory == newCategoryId) {
+            const note = {
+              ...originalNote,
+              position: newPosition,
+              categoryId: newCategoryId,
+            }
+            return positionReset(sortBy([...group, note], ['position', 'lastEdited']))
+          } else if (isNewcategory && originalNote.categoryId == groupCategory) {
+            const filteredGroup = group.filter((grp) => grp.id != id)
+            return positionReset(sortBy(filteredGroup, ['position', 'lastEdited']))
+          }
+          return group
+        })
+
+        return reorderedList
       }
 
       case DUPLICATE_NOTE: {

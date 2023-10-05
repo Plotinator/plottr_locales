@@ -12,6 +12,7 @@ import {
 } from './notesFirstOrder'
 import {
   currentTimelineSelector,
+  isNotesManuallySortedSelector,
   noteFilterIsEmptySelector,
   noteFilterSelector,
   noteSortSelector,
@@ -24,7 +25,8 @@ export const visibleSortedNotesByCategorySelector = createSelector(
   noteFilterSelector,
   noteFilterIsEmptySelector,
   noteSortSelector,
-  (allNotes, notesByCategory, filter, filterIsEmpty, sort) => {
+  isNotesManuallySortedSelector,
+  (allNotes, notesByCategory, filter, filterIsEmpty, sort, isManuallySorted) => {
     if (!allNotes.length) return {}
 
     let visible = notesByCategory
@@ -71,7 +73,7 @@ export const visibleSortedNotesByCategorySelector = createSelector(
       }
     }
 
-    return sortEachCategory(visible, sort)
+    return sortEachCategory(visible, sort, isManuallySorted)
   }
 )
 

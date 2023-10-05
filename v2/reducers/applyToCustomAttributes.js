@@ -1,3 +1,5 @@
+/** @module Reducers */
+
 /**
  * Produce a new object in which a function is applied to all of the
  * custom attributes of a particular type.

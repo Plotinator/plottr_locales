@@ -6,6 +6,7 @@ import { createSelector } from 'reselect'
 import { sortBy, groupBy } from 'lodash'
 
 import { fullFileStateSelector } from './fullFileFirstOrder'
+import { positionReset } from '../helpers/lists'
 
 export const allPlacesSelector = createSelector(fullFileStateSelector, (state) => state.places)
 
@@ -18,9 +19,23 @@ export const placesSortedAtoZSelector = createSelector(allPlacesSelector, (place
   sortBy(places, 'name')
 )
 
-export const placesByCategorySelector = createSelector(allPlacesSelector, (places) =>
-  groupBy(places, 'categoryId')
-)
+export const placesByCategorySelector = createSelector(allPlacesSelector, (places) => {
+  const placesWithCategory = places.map((note) => {
+    if (!note.categoryId) {
+      return {
+        ...note,
+        categoryId: null,
+      }
+    }
+    return note
+  })
+  const grouped = groupBy(placesWithCategory, 'categoryId')
+
+  const groupWithPosition = Object.values(grouped).map((group) => {
+    return positionReset(group)
+  })
+  return groupBy(groupWithPosition.flat(), 'categoryId')
+})
 
 export const stringifiedPlacesByIdSelector = createSelector(allPlacesSelector, (places) => {
   return places.reduce((acc, nextPlace) => {

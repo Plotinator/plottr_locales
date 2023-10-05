@@ -13,6 +13,7 @@ import {
   REMOVE_PLACE,
   REMOVE_BOOK_FROM_PLACE,
   REMOVE_TAG_FROM_PLACE,
+  REORDER_PLACE_MANUALLY,
 } from '../constants/ActionTypes'
 import { editorMetadataIfPresent } from '../helpers/editors'
 import { place } from '../store/initialState'
@@ -86,4 +87,14 @@ export function batchLoad(patching, places) {
 // external sync and not for general use.
 export function removeSingle(patching, place) {
   return { type: REMOVE_PLACE, patching, place }
+}
+
+export const reorderPlaces = (placeId, oldPosition, newPosition, newCategoryId) => {
+  return {
+    type: REORDER_PLACE_MANUALLY,
+    id: placeId,
+    oldPosition,
+    newPosition,
+    newCategoryId,
+  }
 }

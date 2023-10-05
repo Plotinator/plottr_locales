@@ -11,6 +11,7 @@ import {
   REMOVE_TAG_FROM_CHARACTER,
   LOAD_ATTRIBUTES,
   FILE_LOADED,
+  REORDER_CHARACTER_MANUALLY,
 } from '../constants/ActionTypes'
 
 const EMPTY_ATTRIBUTE_STATE = []
@@ -36,6 +37,60 @@ const attributesReducer =
             ...characterAttributeState,
             { ...action.attribute, id: action.nextAttributeId },
           ],
+        }
+      }
+
+      case REORDER_CHARACTER_MANUALLY: {
+        const categoryExists = state.characters.some((attribute) => {
+          return attribute.name == 'category'
+        })
+
+        const positionExists = state.characters.some((attribute) => {
+          return attribute.name == 'position'
+        })
+        if (!categoryExists && !positionExists) {
+          return {
+            ...state,
+            characters: [
+              ...state.characters,
+              {
+                name: 'category',
+                type: 'base-attribute',
+                id: action.categoryAttributeId,
+              },
+              {
+                name: 'position',
+                type: 'base-attribute',
+                id: action.positionAttributeId,
+              },
+            ],
+          }
+        } else if (!categoryExists) {
+          return {
+            ...state,
+            characters: [
+              ...state.characters,
+              {
+                name: 'category',
+                type: 'base-attribute',
+                id: action.categoryAttributeId,
+              },
+            ],
+          }
+        } else if (!positionExists) {
+          return {
+            ...state,
+            characters: [
+              ...state.characters,
+              {
+                name: 'position',
+                type: 'base-attribute',
+                id: action.positionAttributeId,
+              },
+            ],
+          }
+        } else {
+          return state
         }
       }
 

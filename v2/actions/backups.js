@@ -1,4 +1,4 @@
-/** @module BackupActions */
+/** @module Actions */
 import { SET_BACKUP_FOLDERS } from '../constants/ActionTypes'
 
 /**

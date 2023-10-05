@@ -1,4 +1,4 @@
-/** @module TagActions */
+/** @module Actions */
 import {
   ADD_TAG,
   ADD_TAG_WITH_VALUES,
@@ -21,6 +21,7 @@ export function addTag() {
  * Adds a tag with values
  * @param {string} title the title of the tag
  * @param {string} color the color of the tag (either a hex value or a color name)
+ * @returns {Array} test something
  */
 export function addTagWithValues(title, color) {
   return { type: ADD_TAG_WITH_VALUES, title, color }

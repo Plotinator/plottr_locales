@@ -1,3 +1,5 @@
+import rtf from 'jsrtf'
+
 import actions from './actions'
 
 import * as ActionTypes from './constants/ActionTypes'
@@ -183,4 +185,5 @@ export {
   ARRAY_KEYS,
   checkFileIntegrity,
   specialCaseFixes,
+  rtf,
 }

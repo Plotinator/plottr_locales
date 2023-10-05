@@ -1,3 +1,5 @@
+/** @module Reducers */
+
 import {
   SET_LICENSE_INFO,
   SET_TRIAL_INFO,

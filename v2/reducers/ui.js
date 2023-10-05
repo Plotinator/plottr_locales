@@ -71,6 +71,9 @@ import {
   CLOSE_RESTRUCTURE_TIMELINE_MODAL,
   DELETE_LINE,
   LOAD_LINES,
+  REORDER_NOTE_MANUALLY,
+  REORDER_CHARACTER_MANUALLY,
+  REORDER_PLACE_MANUALLY,
 } from '../constants/ActionTypes'
 import { ui as defaultUI } from '../store/initialState'
 import { newFileUI } from '../store/newFileState'
@@ -210,6 +213,15 @@ const updateUI = (state, action) => {
 
     case SET_NOTE_SORT:
       return Object.assign({}, state, { noteSort: `${action.attr}~${action.direction}` })
+
+    case REORDER_CHARACTER_MANUALLY:
+      return Object.assign({}, state, { characterSort: 'manual' })
+
+    case REORDER_PLACE_MANUALLY:
+      return Object.assign({}, state, { placeSort: 'manual' })
+
+    case REORDER_NOTE_MANUALLY:
+      return Object.assign({}, state, { noteSort: 'manual' })
 
     case SET_NOTE_FILTER:
       return Object.assign({}, state, { noteFilter: action.filter })

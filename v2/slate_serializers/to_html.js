@@ -14,31 +14,30 @@ function stringToArrayBuffer(string) {
   return buffer
 }
 
+function stripListTable(rtfString) {
+  const startListTable = rtfString.indexOf('{\\*\\listtable')
+  if (startListTable === -1) {
+    return rtfString
+  } else {
+    // 12 is the length of the string that starts the list table.
+    let endListTable = startListTable + 12
+    for (let depth = 1; endListTable < rtfString.length && depth > 0; ++endListTable) {
+      if (rtfString[endListTable] === '}') {
+        --depth
+      } else if (rtfString[endListTable] === '{') {
+        ++depth
+      }
+    }
+    return rtfString.slice(0, startListTable) + rtfString.slice(endListTable)
+  }
+}
+
 // String -> Promise<NodeList>
 export const rtfToHTML = (string) => {
-  const doc = new RTFJS.Document(stringToArrayBuffer(string))
-  return doc
-    .render()
-    .then((htmlElements) => {
-      const nodeLists = htmlElements.map((el) => el.querySelectorAll('span'))
-      const result = []
-      for (let i = 0; i < nodeLists.length; ++i) {
-        const nodeList = nodeLists[i]
-        for (let j = 0; j < nodeList.length; ++j) {
-          result.push(nodeList[j])
-        }
-
-        if (!nodeList.length) {
-          const span = document.createElement('span')
-          const node = document.createTextNode('...')
-          result.push(span.appendChild(node))
-        }
-      }
-      return result
-    })
-    .catch((error) => {
-      // FIXME: this wont work on the web :/
-      console.error('rtfjs', error)
-      return []
-    })
+  const doc = new RTFJS.Document(stringToArrayBuffer(stripListTable(string)))
+  return doc.render().catch((error) => {
+    // FIXME: this wont work on the web :/
+    console.error('rtfjs', error)
+    return []
+  })
 }
