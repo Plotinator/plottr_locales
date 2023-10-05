@@ -110,7 +110,8 @@ const CardConnector = (connector) => {
       clearTimeout(this.state.hoverTimeout)
       this.setState({ hovering: false, hoverTimeout: null })
     }
-    openDialog = () => {
+    openDialog = (event) => {
+      event.stopPropagation()
       const { card, beatId, lineId, uiActions } = this.props
       uiActions.setCardDialogOpen(card.id, beatId, lineId)
       this.stopHovering()

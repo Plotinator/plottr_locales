@@ -242,6 +242,7 @@ const pltrTypeSpecs = {
     downloadStorageImage: PropTypes.func.isRequired,
   }),
   uploadToProAsDuplicate: PropTypes.func.isRequired,
+  deleteProBackup: PropTypes.func.isRequired,
 }
 
 export const checkPltrConnector = (platform) => {

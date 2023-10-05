@@ -16,7 +16,7 @@ const withoutDefault = (f) => {
 }
 
 export default function DeleteConfirmModal(props) {
-  const { name, customText, onDelete, onCancel, notSubmit, confirmText } = props
+  const { name, customText, onDelete, onCancel, notSubmit, confirmText, disabled } = props
   return (
     <Modal show={true} dialogClassName="center-modal-vertically" animation={false}>
       <Modal.Body>
@@ -33,10 +33,18 @@ export default function DeleteConfirmModal(props) {
             if (event.which == 27) onCancel(event)
           }}
         >
-          <Button onClick={onDelete} type="submit" autoFocus={!notSubmit} bsStyle="danger">
+          <Button
+            onClick={onDelete}
+            type="submit"
+            autoFocus={!notSubmit}
+            disabled={disabled}
+            bsStyle="danger"
+          >
             {confirmText ? upperCase(confirmText) : i18n('DELETE')}
           </Button>
-          <Button onClick={onCancel}>{i18n('Cancel')}</Button>
+          <Button onClick={onCancel} disabled={disabled}>
+            {i18n('Cancel')}
+          </Button>
         </Form>
       </Modal.Footer>
     </Modal>
@@ -50,4 +58,5 @@ DeleteConfirmModal.propTypes = {
   onCancel: PropTypes.func,
   notSubmit: PropTypes.bool,
   confirmText: PropTypes.string,
+  disabled: PropTypes.bool,
 }

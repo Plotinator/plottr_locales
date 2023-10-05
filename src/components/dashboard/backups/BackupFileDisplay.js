@@ -1,31 +1,42 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'react-proptypes'
 
 import { t } from 'plottr_locales'
 import { helpers } from 'pltr/v2'
 
 import { checkDependencies } from '../../checkDependencies'
+import Glyphicon from '../../Glyphicon'
 import Button from '../../Button'
+import DeleteConfirmModal from '../../dialogs/DeleteConfirmModal'
 
 const BackupFileDisplayConnector = (connector) => {
   const {
     platform: {
+      log,
       mpq,
       file: { createAndOpenCopy },
       showItemInFolder,
       duplicateFile,
       uploadToProAsDuplicate,
+      deleteProBackup,
+      showErrorBox,
     },
   } = connector
   checkDependencies({
+    log,
     mpq,
     createAndOpenCopy,
     duplicateFile,
     uploadToProAsDuplicate,
     showItemInFolder,
+    deleteProBackup,
+    showErrorBox,
   })
 
   const BackupFileDisplay = ({ folder, groupName, file, folderDate, hasCurrentProLicense }) => {
+    const [deleting, setDeleting] = useState(false)
+    const [busyDeleting, setBusyDeleting] = useState(false)
+
     const handleMakeCopy = () => {
       mpq.push('btn_open_backup')
       const isCloudBackup = file.storagePath
@@ -40,6 +51,48 @@ const BackupFileDisplayConnector = (connector) => {
         } else {
           createAndOpenCopy(file.localFilePathSegments, newName)
         }
+      }
+    }
+
+    const handleDelete = () => {
+      const isCloudBackup = file.storagePath
+      const hasProRecordId = typeof file.proRecordId === 'string' && file.proRecordId
+      if (isCloudBackup && hasProRecordId) {
+        setDeleting(true)
+      }
+    }
+
+    const handleConfirmDelete = () => {
+      setBusyDeleting(true)
+      deleteProBackup(file.proRecordId, file.storagePath)
+        .catch((error) => {
+          log.error('Error deleting pro backup', error)
+          showErrorBox(t('Error'), t('There was an error doing that. Try again'))
+        })
+        .finally(() => {
+          setDeleting(false)
+          setBusyDeleting(false)
+        })
+    }
+
+    const handleAbortDelete = () => {
+      setDeleting(false)
+      setBusyDeleting(false)
+    }
+
+    const renderConfirmDelete = () => {
+      if (deleting) {
+        return (
+          <DeleteConfirmModal
+            name={file.fileName || file.name}
+            onDelete={handleConfirmDelete}
+            onCancel={handleAbortDelete}
+            disabled={busyDeleting}
+            notSubmit
+          />
+        )
+      } else {
+        return null
       }
     }
 
@@ -75,14 +128,26 @@ const BackupFileDisplayConnector = (connector) => {
       <div className="dashboard__backups__item">
         <div>{renderFileDetails(file)}</div>
         {!isCloudBackup || (hasCurrentProLicense && isCloudBackup) ? (
-          <div className="dashboard__backups__item-actions">
-            <div className="dashboard__backups__item-button">
-              <Button bsSize="xs" bsStyle="success" onClick={handleMakeCopy}>
-                {t('Open Backup')}
-              </Button>
+          <>
+            <div className="dashboard__backups__item-actions">
+              <div className="dashboard__backups__item-button">
+                <Button bsSize="xs" bsStyle="success" onClick={handleMakeCopy}>
+                  {t('Open Backup')}
+                </Button>
+              </div>
             </div>
-          </div>
+            {isCloudBackup ? (
+              <div className="dashboard__backups__item-actions">
+                <div className="dashboard__backups__item-button">
+                  <Button bsSize="xs" bsStyle="danger" onClick={handleDelete}>
+                    <Glyphicon glyph="trash" />
+                  </Button>
+                </div>
+              </div>
+            ) : null}
+          </>
         ) : null}
+        {renderConfirmDelete()}
       </div>
     )
   }
