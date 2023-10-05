@@ -489,13 +489,19 @@ tellMeWhatOSImOn()
           store.dispatch(ActionCreators.redo())
         })
 
+        let lastError = null
         window.addEventListener('error', (event) => {
           // If we hit an unhandled error, let this be the handler.
           event.preventDefault()
           event.stopPropagation()
           const error = event.error
-          logger.error(error)
-          errorReporter.error('Top level error handler', error)
+          if (error === lastError) {
+            return
+          } else {
+            logger.error(error)
+            errorReporter.error('Top level error handler', error)
+          }
+          lastError = error
         })
 
         window.SCROLLWITHKEYS = true
