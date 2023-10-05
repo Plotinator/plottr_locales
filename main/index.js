@@ -77,19 +77,20 @@ contextMenu({
 
 const safelyExitModule = makeSafelyExitModule(log)
 
+process.on('uncaughtException', function (error) {
+  console.error('Uncaught exception.  Quitting...', error)
+  log.error('Uncaught exception.  Quitting...', error)
+  errorReporter.error('Uncaught exception', error, function () {
+    gracefullyQuit(safelyExitModule)
+  })
+})
+process.on('unhandledRejection', function (error) {
+  console.error('Unhandled rejection.', error)
+  log.error('Unhandled rejection.', error)
+  errorReporter.error('Unhandled rejection', error)
+})
+
 if (!is.development) {
-  process.on('uncaughtException', function (error) {
-    console.error('Uncaught exception.  Quitting...', error)
-    log.error('Uncaught exception.  Quitting...', error)
-    errorReporter.error('Uncaught exception', error, function () {
-      gracefullyQuit(safelyExitModule)
-    })
-  })
-  process.on('unhandledRejection', function (error) {
-    console.error('Unhandled rejection.', error)
-    log.error('Unhandled rejection.', error)
-    errorReporter.error('Unhandled rejection', error)
-  })
   // ensure only 1 instance is running
   const gotTheLock = app.requestSingleInstanceLock()
   if (!gotTheLock) {

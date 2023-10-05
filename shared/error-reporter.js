@@ -111,39 +111,45 @@ const ErrorReporter = (
       : messageIsError
       ? rawMessage
       : new Error(
-          `No error supplied.  Other args: message: ${rawMessage.toString()}, error: ${rawError.toString()}`
+          `No error supplied.  Other args: message: ${
+            rawMessage?.toString() ?? 'No message supplied'
+          }, error: ${rawError?.toString() ?? 'No error supplied'}`
         )
 
     return [message, error]
   }
 
   const error = (rawMessage, rawError) => {
-    if (typeof rawMessage !== 'string') {
-      logger.warn(
-        `Passed wrong type to first argument of rollbar.error().  Expected a string, got ${typeof rawMessage}`,
-        new Error('Invalid 1st argument')
-      )
-    }
-    if (!(rawError instanceof Error)) {
-      logger.warn(
-        `Passed wrong type to second argument of rollbar.error().  Expected an Error, got ${typeof rawError}`
-      )
-    }
-    const [message, error] = validMessageAndError(rawMessage, rawError)
-    if (environment !== 'production') {
-      logger.error(
-        'Error from rollbar (not reporting because environment is not "production")',
-        message,
-        error,
-        context
-      )
-      return Promise.resolve()
-    } else {
-      return new Promise((resolve) => {
-        Rollbar.error(message, error, extraContext, () => {
-          resolve()
+    try {
+      if (typeof rawMessage !== 'string') {
+        logger.warn(
+          `Passed wrong type to first argument of rollbar.error().  Expected a string, got ${typeof rawMessage}`
+        )
+      }
+      if (!(rawError instanceof Error)) {
+        logger.warn(
+          `Passed wrong type to second argument of rollbar.error().  Expected an Error, got ${typeof rawError}`
+        )
+      }
+      const [message, error] = validMessageAndError(rawMessage, rawError)
+      if (environment !== 'production') {
+        logger.error(
+          'Error from rollbar (not reporting because environment is not "production")',
+          message,
+          error,
+          context
+        )
+        return Promise.resolve()
+      } else {
+        return new Promise((resolve) => {
+          Rollbar.error(message, error, extraContext, () => {
+            resolve()
+          })
         })
-      })
+      }
+    } catch (error) {
+      console.warn('Error logging an error', error, rawMessage, rawError)
+      return Promise.resolve()
     }
   }
 

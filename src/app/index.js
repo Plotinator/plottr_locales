@@ -489,9 +489,13 @@ tellMeWhatOSImOn()
           store.dispatch(ActionCreators.redo())
         })
 
-        window.addEventListener('error', (message, file, line, column, err) => {
-          logger.error(err)
-          errorReporter.error('Top level error handler', err)
+        window.addEventListener('error', (event) => {
+          // If we hit an unhandled error, let this be the handler.
+          event.preventDefault()
+          event.stopPropagation()
+          const error = event.error
+          logger.error(error)
+          errorReporter.error('Top level error handler', error)
         })
 
         window.SCROLLWITHKEYS = true
