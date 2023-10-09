@@ -57,10 +57,6 @@ const ItemsManagerModelConnector = (connector) => {
   }) {
     const [inputValue, setInputValue] = useState('')
     const restrictedValues = useMemo(() => new Set(items.map(({ name }) => name)), [items])
-    useEffect(() => {
-      window.SCROLLWITHKEYS = false
-      return () => (window.SCROLLWITHKEYS = true)
-    }, [])
 
     const saveAsTemplate = () => {
       if (items.length) startSaveAsTemplate(itemType)

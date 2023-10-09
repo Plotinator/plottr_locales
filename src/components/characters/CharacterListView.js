@@ -390,9 +390,6 @@ const CharacterListViewConnector = (connector) => {
       )
     }
 
-    if (editingSelected) window.SCROLLWITHKEYS = false
-    else window.SCROLLWITHKEYS = true
-
     return (
       <div className="character-list container-with-sub-nav">
         {renderSubNav()}

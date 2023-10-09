@@ -298,7 +298,6 @@ const BlankCardConnector = (connector) => {
     }
 
     render() {
-      window.SCROLLWITHKEYS = !this.state.creating
       const { orientation, verticalInsertion, isSmall, isMedium, isPinned, color } = this.props
       const tableLength =
         this.ref.current?.clientWidth + 50 || (!isMedium || orientation == 'vertical' ? 225 : 110)

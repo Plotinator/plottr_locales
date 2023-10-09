@@ -90,10 +90,6 @@ const LineTitleCellConnector = (connector) => {
       }
     }, [movingLine])
 
-    useEffect(() => {
-      window.SCROLLWITHKEYS = false
-    }, [editing])
-
     const deleteLine = (e) => {
       e.stopPropagation()
       actions.deleteLine(line.id)
