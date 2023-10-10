@@ -395,6 +395,44 @@ export const listenOnIPCMain = (
       })
   })
 
+  ipcMain.on('download-pro-backup-file-into-memory', (event, replyChannel, url, fileName) => {
+    const downloadDirectory = app.getPath('temp')
+    const fullPath = path.join(downloadDirectory, fileName || 'backup-download.pltr')
+    const outputStream = fs.createWriteStream(fullPath)
+    log.info(`Downloading ${url} to ${downloadDirectory}`)
+    https
+      .get(url, (response) => {
+        if (Math.floor(response.statusCode / 200) !== 1) {
+          log.error(`Error downloading file from ${url}`)
+          return
+        }
+        response.on('data', (data) => {
+          outputStream.write(data)
+        })
+        response.on('close', () => {
+          outputStream.close((error) => {
+            if (error) {
+              log.error(`Error closing write stream for file download: of ${url}`, error)
+            } else {
+              readFile(fullPath).then((fileBytes) => {
+                try {
+                  const file = JSON.parse(fileBytes)
+                  event.sender.send(replyChannel, JSON.stringify(file))
+                } catch (error) {
+                  log.error(`Error deserialising file from ${url}`, error)
+                  event.sender.send(replyChannel, { error: error.message })
+                }
+              })
+            }
+          })
+        })
+      })
+      .on('error', (error) => {
+        log.error(`Error downloading file from ${url}`, error)
+        event.sender.send(replyChannel, { error: error.message })
+      })
+  })
+
   ipcMain.on('show-item-in-folder', (event, replyChannel, fileURL) => {
     try {
       shell.showItemInFolder(helpers.file.withoutProtocol(fileURL))
@@ -769,4 +807,8 @@ export const listenOnIPCMain = (
       createShortcut()
     }
   )
+
+  ipcMain.on('what-is-the-download-directory-path', (event, replyChannel) => {
+    event.sender.send(replyChannel, app.getPath('downloads'))
+  })
 }

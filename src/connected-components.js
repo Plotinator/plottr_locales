@@ -3,6 +3,7 @@ import { ActionCreators } from 'redux-undo'
 import { t } from 'plottr_locales'
 import { connections } from 'plottr_components'
 import export_config from 'plottr_import_export/src/exporter/default_config'
+import exportToSelfContainedPlottrFile from 'plottr_import_export/src/exporter/plottr'
 import { helpers } from 'pltr/v2'
 import * as pltr from 'pltr/v2'
 import { actions, selectors } from 'wired-up-pltr'
@@ -54,7 +55,7 @@ import { store } from './app/store'
 
 import extractImages from './common/extract_images'
 import { resizeImage } from './common/resizeImage'
-import { downloadStorageImage } from './common/downloadStorageImage'
+import { downloadStorageImage, makeCachedDownloadStorageImage } from './common/downloadStorageImage'
 
 import { deleteTemplate, editTemplateDetails } from './common/utils/templates'
 import { createFullErrorReport } from './common/utils/full_error_report'
@@ -93,7 +94,7 @@ const {
   pleaseUpdateLanguage,
   pleaseReloadMenu,
   showItemInFolder,
-  downloadFileAndShow,
+  downloadProBackupFileIntoMemory,
   pleaseOpenLoginPopup,
   pleaseTellMeWhatPlatformIAmOn,
   showErrorBox,
@@ -103,6 +104,7 @@ const {
   pleaseOpenWindow,
   addToKnownFilesAndOpen,
   createDesktopShortcut,
+  downloadDirectoryPath,
 } = makeMainProcessClient()
 
 export const rmRF = (path, ...args) => {
@@ -129,6 +131,8 @@ let unsubscribeFromUpdateerUpdateAvailable = null
 let unsubscribeFromUpdaterUpdateNotAvailable = null
 let unsubscribeFromUpdaterDownloadProgress = null
 let unsubscribeFromUpdaterUpdateDownloaded = null
+
+const cachedDowloadStorageImage = makeCachedDownloadStorageImage(downloadStorageImage)
 
 const platform = {
   undo: () => {
@@ -458,7 +462,31 @@ const platform = {
       if (!storageURL) {
         showItemInFolder(fileURL)
       } else {
-        backupPublicURL(fileURL).then((url) => downloadFileAndShow(url, fileName))
+        backupPublicURL(fileURL)
+          .then((url) => downloadProBackupFileIntoMemory(url, fileName))
+          .then((fileString) => {
+            try {
+              const userId = selectors.userIdSelector(store.getState())
+              const file = JSON.parse(fileString)
+              return exportToSelfContainedPlottrFile(
+                file,
+                userId,
+                cachedDowloadStorageImage.downloadStorageImage
+              ).then((file) => {
+                return downloadDirectoryPath().then((path) => {
+                  return whenClientIsReady(({ writeFile, join }) => {
+                    return join(path, fileName || 'backup.pltr').then((fullPath) => {
+                      return writeFile(fullPath, JSON.stringify(file)).then(() => {
+                        return showItemInFolder(fullPath)
+                      })
+                    })
+                  })
+                })
+              })
+            } catch (error) {
+              return Promise.reject(error)
+            }
+          })
       }
     })
   },
