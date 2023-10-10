@@ -520,7 +520,6 @@ const BeatTitleCellConnector = (connector) => {
       }
     }
 
-    window.SCROLLWITHKEYS = !editing
     const innerKlass = cx(orientedClassName('beat__body', orientation), {
       'medium-timeline': isMedium,
       hover: hovering,

@@ -27,14 +27,6 @@ const ColorPickerConnector = (connector) => {
       this.hexRef = null
     }
 
-    componentDidMount() {
-      window.SCROLLWITHKEYS = false
-    }
-
-    componentWillUnmount() {
-      window.SCROLLWITHKEYS = true
-    }
-
     closeDialog = (color) => {
       this.props.closeDialog(color)
     }

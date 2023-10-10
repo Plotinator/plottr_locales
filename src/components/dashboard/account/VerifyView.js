@@ -20,11 +20,13 @@ const VerifyViewConnector = (connector) => {
   const {
     platform: {
       license: { saveLicenseInfo, startTrial, verifyLicense, trial90days, trial60days },
+      errorReporter: { getInstance },
       openExternal,
       log,
     },
   } = connector
   checkDependencies({
+    getInstance,
     saveLicenseInfo,
     verifyLicense,
     trial90days,
@@ -114,7 +116,9 @@ const VerifyViewConnector = (connector) => {
                   setTimeout(success, 500)
                 })
                 .catch((error) => {
-                  log.error(`Failed to save license info!`, error)
+                  getInstance().then((errorReporter) => {
+                    errorReporter.error(`Failed to save license info!`, error)
+                  })
                 })
             }, 500)
           } else {

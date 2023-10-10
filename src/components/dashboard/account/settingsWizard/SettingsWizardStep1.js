@@ -25,15 +25,27 @@ const SettingsWizardStep1Connector = (connector) => {
       os,
       log,
       hostLocale,
+      errorReporter: { getInstance },
     },
   } = connector
   checkDependencies({
+    getInstance,
     updateLanguage,
     saveAppSetting,
     os,
     log,
     hostLocale,
   })
+
+  const errorReportingLogger = {
+    info: log.info,
+    warn: log.warn,
+    error: (...args) => {
+      getInstance().then((errorReporter) => {
+        errorReporter.error(...args)
+      })
+    },
+  }
 
   const LanguagePicker = UnconnectedLanguagePicker(connector)
   const DarkOptionsSelect = UnconnectedDarkOptionsSelect(connector)
@@ -114,7 +126,7 @@ const SettingsWizardStep1Connector = (connector) => {
               <p style={{ paddingTop: '8px', margin: 0 }}>{t('Preview:')}</p>
               <div style={{ width: '50%' }}>
                 <RichTextSettingsViewer
-                  log={log}
+                  log={errorReportingLogger}
                   fontFamily={settings.user.font}
                   fontSize={settings.user.fontSize}
                 />

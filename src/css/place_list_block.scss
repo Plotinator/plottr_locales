@@ -330,6 +330,10 @@
         border-right: 1px solid $darkmode-v2-border;
       }
     }
+
+    &.editing {
+      background-color: transparent;
+    }
   }
 
   .place-list__list.darkmode {
