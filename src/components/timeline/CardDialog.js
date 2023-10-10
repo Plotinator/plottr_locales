@@ -113,14 +113,6 @@ const CardDialogConnector = (connector) => {
       // NOP.
     }
 
-    useEffect(() => {
-      window.SCROLLWITHKEYS = false
-      return () => {
-        saveEdit()
-        window.SCROLLWITHKEYS = true
-      }
-    }, [])
-
     if (!cardMetaData) {
       return null
     }

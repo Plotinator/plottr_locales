@@ -149,7 +149,7 @@ const PlaceItemConnector = (connector) => {
         })}
         ref={ref}
         onClick={selectPlace}
-        draggable
+        /* draggable (disabled for 2023-10-27) */
         onDragStart={handleDragStart}
         onDrop={handleDropItem}
         onDragOver={handleDragOver}

@@ -295,9 +295,6 @@ const PlaceViewConnector = (connector) => {
       )
     }
 
-    if (editing) window.SCROLLWITHKEYS = false
-    else window.SCROLLWITHKEYS = true
-
     return (
       <div className={cx('place-list__place-view', { darkmode: darkMode })}>
         <div className="place-list__place-view__left-side">

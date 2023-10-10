@@ -152,7 +152,7 @@ const CharacterItemConnector = (connector) => {
           })}
           ref={this.ref}
           onClick={this.selectCharacter}
-          draggable
+          /* draggable (disabled for 2023-10-27) */
           onDragStart={this.handleDragStart}
           onDrop={this.handleDropItem}
           onDragOver={this.handleDragOver}

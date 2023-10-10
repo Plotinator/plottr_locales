@@ -224,10 +224,8 @@ const TagViewConnector = (connector) => {
 
     let body = null
     if (editing) {
-      window.SCROLLWITHKEYS = false
       body = renderEditing()
     } else {
-      window.SCROLLWITHKEYS = true
       body = renderTag()
     }
     let styles = {}
