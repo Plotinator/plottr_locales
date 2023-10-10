@@ -236,7 +236,11 @@ export function bootFile(
               fileName: offlineFile.file.originalFileName || offlineFile.file.fileName,
             },
           }).catch((error) => {
-            logger.error(`Erorr uploading our offline file ${fileId}`, error)
+            logger.error(`Error uploading our offline file ${fileId}`, error)
+            recordedErrorsDuringStartup.push({
+              message: `Error uploading our offline file ${fileId}`,
+              error,
+            })
             return showErrorBox(
               t('Error'),
               t('There was an error uploading your offline backup. Please exit and start again')
@@ -500,6 +504,10 @@ export function bootFile(
   function _bootFile(fileURL, options, numOpenFiles, saveBackup) {
     if (!helpers.file.isProtocolString(fileURL)) {
       const message = `Can't boot a file without a protocol: ${fileURL}`
+      recordedErrorsDuringStartup.push({
+        message,
+        error: new Error('Cannot boot file without protocol'),
+      })
       logger.error(message)
       store.dispatch(actions.applicationState.errorLoadingFile())
       return Promise.reject(new Error(message))
@@ -566,6 +574,14 @@ export function bootFile(
           userId,
           userEmail
         )
+        const errorReportingLogger = {
+          info: logger.info,
+          warn: logger.warn,
+          error: (...args) => {
+            logger.error(...args)
+            errorReporter.error(...args)
+          },
+        }
         if (recordedErrorsDuringStartup.length > 0) {
           recordedErrorsDuringStartup.forEach(({ message, error }) => {
             errorReporter.error(message, error)
@@ -578,17 +594,17 @@ export function bootFile(
           () => {
             return selectors.fullFileStateSelector(store.getState())
           },
-          saveFile(whenClientIsReady, logger, postSaveHook),
+          saveFile(whenClientIsReady, errorReportingLogger, postSaveHook),
           backupFile(
             whenClientIsReady,
             saveBackupOnFirebase,
             cachedDowloadStorageImage.downloadStorageImage,
-            logger,
+            errorReportingLogger,
             postBackupHook
           ),
           SAVE_INTERVAL_MS,
           BACKUP_INTERVAL_MS,
-          logger,
+          errorReportingLogger,
           errorReporter,
           (title, message) => {
             showMessageBox(title, message)

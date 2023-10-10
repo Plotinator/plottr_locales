@@ -24,6 +24,7 @@ import MainIntegrationContext from '../../mainIntegrationContext'
 import logger from '../../../shared/logger'
 import { makeMainProcessClient } from '../mainProcessClient'
 import { whenClientIsReady } from '../../../shared/socket-client/index'
+import { getErrorReporterInstance } from '../../../shared/error-reporter-instance'
 
 const {
   onAdvancedExportFileFromMenu,
@@ -69,6 +70,12 @@ const App = ({
       !isOffline &&
       sessionChecked
     ) {
+      getErrorReporterInstance().then((errorReporter) => {
+        errorReporter.error(
+          'Attempting to open a cloud file locally without being logged in.',
+          new Error('Cannot open cloud file without being logged in')
+        )
+      })
       log.error('Attempting to open a cloud file locally without being logged in.')
       showErrorBox(t('Error'), t('This appears to be a Plottr Pro file.  Please log in.'))
     }

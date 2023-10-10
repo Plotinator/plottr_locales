@@ -13,7 +13,6 @@ import { askToExport } from 'plottr_import_export'
 import { t } from 'plottr_locales'
 
 import path from 'path'
-import log from 'electron-log'
 import { is } from 'electron-util'
 import './modules/updater_events'
 import { loadMenu } from './modules/menus'
@@ -125,7 +124,8 @@ export const listenOnIPCMain = (
   getSocketWorkerPort,
   processSwitches,
   safelyExitModule,
-  restartServerRef
+  restartServerRef,
+  log
 ) => {
   ipcMain.on('pls-fetch-state', (event, replyChannel, proMode) => {
     lastOpenedFile()

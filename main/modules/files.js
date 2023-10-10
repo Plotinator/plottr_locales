@@ -15,11 +15,12 @@ import { openProjectWindow } from './windows/projects'
 import { broadcastToAllWindows } from './broadcast'
 import { OFFLINE_FILE_FILES_PATH, isOfflineFile } from './offlineFilePath'
 import { whenClientIsReady } from '../../shared/socket-client'
+import createErrorReporter from '../../shared/error-reporter'
 
 const { writeFile } = fs.promises
 const { addHierarchiesIfMissing } = specialCaseFixes
 
-const makeFileModule = () => {
+const makeFileModule = (errorReportingLogger) => {
   const saveFile = (fileURL, jsonData) => {
     return whenClientIsReady(({ saveFile }) => {
       return saveFile(fileURL, jsonData)
@@ -84,7 +85,7 @@ const makeFileModule = () => {
         await addToKnownFiles(fileURL)
         await openFile(fileURL)
       } catch (error) {
-        log.error('Failed to create a new file', name, error)
+        errorReportingLogger.error('Failed to create a new file', name, error)
         throw error
       }
     })
@@ -134,7 +135,10 @@ const makeFileModule = () => {
                     })
                     .catch((error) => {
                       sender.send('error-importing-scrivener', error)
-                      log.error('Failed to open a known file after importing from Snowflake', error)
+                      errorReportingLogger.error(
+                        'Failed to open a known file after importing from Snowflake',
+                        error
+                      )
                       return Promise.reject(error)
                     })
                 })
@@ -149,7 +153,7 @@ const makeFileModule = () => {
               })
             })
             .catch((error) => {
-              log.error('Failed to create file from snowflake', error)
+              errorReportingLogger.error('Failed to create file from snowflake', error)
               return Promise.reject(error)
             })
         }
@@ -239,7 +243,7 @@ const makeFileModule = () => {
                       })
                       .catch((error) => {
                         sender.send('error-importing-scrivener', error)
-                        log.error(
+                        errorReportingLogger.error(
                           'Failed to open a known file after importing from scrivener',
                           error
                         )
@@ -262,13 +266,16 @@ const makeFileModule = () => {
                   })
                   .catch((error) => {
                     sender.send('error-importing-scrivener', error)
-                    log.error('Failed to open a known file after importing from scrivener', error)
+                    errorReportingLogger.error(
+                      'Failed to open a known file after importing from scrivener',
+                      error
+                    )
                     return Promise.reject(error)
                   })
               })
             })
             .catch((error) => {
-              log.error('Failed to save imported scrivener file', error)
+              errorReportingLogger.error('Failed to save imported scrivener file', error)
               sender.send('error-importing-scrivener', error)
             })
         }
@@ -291,7 +298,10 @@ const makeFileModule = () => {
             broadcastToAllWindows('reload-recents')
           })
           .catch((error) => {
-            log.error('Failed to update a known files last opened date', fileURL, error)
+            errorReportingLogger.error(
+              `Failed to update a known files last opened date: ${fileURL}`,
+              error
+            )
           })
       }, 500)
     }
@@ -301,7 +311,10 @@ const makeFileModule = () => {
         if (unknown) addToKnown(fileURL)
       })
       .catch((error) => {
-        log.error('Failed to open a project window for know file', fileURL)
+        errorReportingLogger.error(
+          `Failed to open a project window for know file ${fileURL}`,
+          error
+        )
         return Promise.reject(error)
       })
   }
@@ -318,6 +331,27 @@ const makeFileModule = () => {
   }
 }
 
+const environment = process.env.NODE_ENV === 'development' ? 'development' : 'production'
+const errorReporterAccessToken = process.env.ROLLBAR_ACCESS_TOKEN
+const errorReporter = createErrorReporter(
+  errorReporterAccessToken,
+  app.getVersion(),
+  environment,
+  log,
+  'MainProcess',
+  process.platform,
+  'not-knowable-from-main',
+  'not-knowable-from-main'
+)
+const errorReportingLogger = {
+  info: log.info,
+  warn: log.warn,
+  error: (...args) => {
+    log.error(...args)
+    errorReporter.error(...args)
+  },
+}
+
 const {
   saveFile,
   editKnownFilePath,
@@ -327,7 +361,7 @@ const {
   openFile,
   deleteKnownFile,
   removeFromKnownFiles,
-} = makeFileModule()
+} = makeFileModule(errorReportingLogger)
 
 export {
   saveFile,

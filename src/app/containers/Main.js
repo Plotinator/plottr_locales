@@ -23,6 +23,7 @@ import { uploadProject } from '../../common/utils/upload_project'
 import { whenClientIsReady } from '../../../shared/socket-client'
 import logger from '../../../shared/logger'
 import { makeMainProcessClient } from '../mainProcessClient'
+import { getErrorReporterInstance } from '../../../shared/error-reporter-instance'
 
 const { onReloadFromFile, pleaseFetchState, openExternal, showItemInFolder, updateLastOpenedFile } =
   makeMainProcessClient()
@@ -377,6 +378,9 @@ const Main = ({
                       file = JSON.parse(data)
                     } catch (error) {
                       logger.error('Error uploading file to Pro', error)
+                      getErrorReporterInstance().then((errorReporter) => {
+                        errorReporter.error('Error uploading file to Pro', error)
+                      })
                       generalError("We couldn't read your file.  Please try again.")
                       return
                     }

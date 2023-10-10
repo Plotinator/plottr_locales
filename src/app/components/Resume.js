@@ -13,6 +13,7 @@ import logger from '../../../shared/logger'
 import { uploadProject } from '../../common/utils/upload_project'
 import { resumeDirective } from '../../resume'
 import { retryWithBackOff } from './effect'
+import { getErrorReporterInstance } from '../../../shared/error-reporter-instance'
 
 const Resume = ({
   offlineModeEnabled,
@@ -128,6 +129,9 @@ const Resume = ({
       }
       checkAndUploadBackup().catch((error) => {
         logger.error('Error trying to resume online mode', error)
+        getErrorReporterInstance().then((errorReporter) => {
+          errorReporter.error('Error trying to resume online mode', error)
+        })
         setResuming(false)
         setCheckingForOfflineDrift(false)
         setOverwritingCloudWithBackup(false)

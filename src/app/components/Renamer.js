@@ -9,6 +9,7 @@ import { InputModal } from 'connected-components'
 import { editFileName as editFileNameOnFirebase } from 'wired-up-firebase'
 
 import logger from '../../../shared/logger'
+import { getErrorReporterInstance } from '../../../shared/error-reporter-instance'
 
 const Renamer = ({
   userId,
@@ -44,6 +45,9 @@ const Renamer = ({
       })
       .catch((error) => {
         logger.error(`Error renaming file with id ${fileId}`, error)
+        getErrorReporterInstance().then((errorReporter) => {
+          errorReporter.error(`Error renaming file with id ${fileId}`, error)
+        })
         showLoader(false)
         finishRenamingFile()
       })

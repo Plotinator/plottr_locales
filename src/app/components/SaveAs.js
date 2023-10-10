@@ -12,6 +12,7 @@ import { initialFetch } from 'wired-up-firebase'
 import { uploadToFirebase } from '../../upload-to-firebase'
 import logger from '../../../shared/logger'
 import { makeMainProcessClient } from '../mainProcessClient'
+import { getErrorReporterInstance } from '../../../shared/error-reporter-instance'
 
 const { openKnownFile, pleaseOpenWindow, onSaveAsOnPro, getVersion } = makeMainProcessClient()
 
@@ -49,6 +50,9 @@ const SaveAs = ({
               if (!fileId) {
                 const message = 'Uploaded file for saveAs but we did not receive a fileId back'
                 logger.error(message)
+                getErrorReporterInstance().then((errorReporter) => {
+                  errorReporter.error(message, new Error('Failed to upload file'))
+                })
                 return Promise.reject(new Error(message))
               }
               return fileId
@@ -66,12 +70,18 @@ const SaveAs = ({
               pleaseOpenWindow(helpers.file.fileIdToPlottrCloudFileURL(fileId), true).catch(
                 (error) => {
                   logger.error(`Error opening the ${fileId} as ${newName}`, error)
+                  getErrorReporterInstance().then((errorReporter) => {
+                    errorReporter.error(`Error opening the ${fileId} as ${newName}`, error)
+                  })
                   finishSavingFileAs()
                 }
               )
             })
             .catch((error) => {
               logger.error(`Error saving file with id ${fileId} as ${newName}`, error)
+              getErrorReporterInstance().then((errorReporter) => {
+                errorReporter.error(`Error saving file with id ${fileId} as ${newName}`, error)
+              })
               finishSavingFileAs()
             })
         })
