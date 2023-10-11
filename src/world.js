@@ -159,7 +159,7 @@ const theWorld = (socketClient) => {
   }
 
   return {
-    errorReportingLogger,
+    logger: errorReportingLogger,
     license: {
       listenToTrialChanges: ignoringStore(fileSystemAPIs.listenToTrialChanges),
       currentTrial: fileSystemAPIs.currentTrial,
