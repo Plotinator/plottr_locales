@@ -76,6 +76,7 @@ const errorReportingLogger = {
     log.error(...args)
     errorReporter.error(...args)
   },
+  localError: log.error,
 }
 
 // https://github.com/sindresorhus/electron-context-menu

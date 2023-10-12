@@ -494,7 +494,7 @@ export const listenOnIPCMain = (
   })
 
   ipcMain.on('log-error', (_event, ...args) => {
-    log.error(...args)
+    log.localError(...args)
   })
 
   ipcMain.on('please-tell-me-my-version', (event, replyChannel) => {
