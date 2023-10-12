@@ -32,7 +32,6 @@ const Saver = (
   saveIntervalMS,
   backupIntervalMS,
   logger,
-  errorReporter,
   showMessageBox,
   showErrorBox,
   serverIsBusyRestarting
@@ -86,7 +85,6 @@ const Saver = (
         return !restarting
       }
       logger.error('BACKUP failed', error)
-      errorReporter.warn(error.message)
       return !restarting
     })
   }
@@ -105,7 +103,6 @@ const Saver = (
         return !restarting
       }
       logger.warn('Failed to autosave', error)
-      errorReporter.warn(error.message)
       showErrorBox(
         t('Auto-saving failed'),
         t("Saving your file didn't work. Check where it's stored.")

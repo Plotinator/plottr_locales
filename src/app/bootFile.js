@@ -605,7 +605,6 @@ export function bootFile(
           SAVE_INTERVAL_MS,
           BACKUP_INTERVAL_MS,
           errorReportingLogger,
-          errorReporter,
           (title, message) => {
             showMessageBox(title, message)
           },
