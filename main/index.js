@@ -87,8 +87,8 @@ contextMenu({
 const safelyExitModule = makeSafelyExitModule(log)
 
 process.on('uncaughtException', function (error) {
-  console.error('Uncaught exception.  Quitting...', error)
-  log.error('Uncaught exception.  Quitting...', error)
+  console.error('Uncaught exception.', error)
+  log.error('Uncaught exception.', error)
   errorReporter.error('Uncaught exception', error)
   setTimeout(() => {
     gracefullyQuit(safelyExitModule)
