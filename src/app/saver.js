@@ -2,6 +2,7 @@ import { isEqual } from 'lodash'
 
 import { t } from 'plottr_locales'
 import { removeSystemKeys } from 'pltr/v2'
+import { selectors } from 'wired-up-pltr'
 
 const DEFAULT_SAVE_INTERVAL_MS = 10000
 const DEFAULT_BACKUP_INTERVAL_MS = 60000
@@ -84,7 +85,12 @@ const Saver = (
         )
         return !restarting
       }
-      logger.error('BACKUP failed', error)
+      const isLoggedIn = selectors.isLoggedInSelector(getState())
+      if (error === 'Missing or insufficient permissions.' && !isLoggedIn) {
+        logger.info('Trying to backup a pro file while not logged in.', error)
+      } else {
+        logger.error('BACKUP failed', error)
+      }
       return !restarting
     })
   }
