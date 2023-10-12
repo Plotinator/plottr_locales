@@ -70,13 +70,9 @@ const App = ({
       !isOffline &&
       sessionChecked
     ) {
-      getErrorReporterInstance().then((errorReporter) => {
-        errorReporter.error(
-          'Attempting to open a cloud file locally without being logged in.',
-          new Error('Cannot open cloud file without being logged in')
-        )
-      })
-      log.error('Attempting to open a cloud file locally without being logged in.')
+      log.warn(
+        "Window belongs to a pro file, but we're not logged in.  We could have just logged out."
+      )
       showErrorBox(t('Error'), t('This appears to be a Plottr Pro file.  Please log in.'))
     }
   }, [isResuming, userId, isCloudFile, userNeedsToLogin, isOffline, sessionChecked])
