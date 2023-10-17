@@ -199,6 +199,7 @@ const pltrTypeSpecs = {
   errorReporter: PropTypes.shape({
     errorReporterAccessToken: PropTypes.string.isRequired,
     errorReporter: PropTypes.func.isRequired,
+    getInstance: PropTypes.func.isRequired,
     platform: PropTypes.func.isRequired,
   }),
   rollbar: PropTypes.shape({

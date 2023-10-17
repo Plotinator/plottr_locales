@@ -22,9 +22,11 @@ const RichTextConnector = (connector) => {
       lockRCE,
       listenForRCELock,
       releaseRCELock,
+      errorReporter: { getInstance },
     },
   } = connector
   checkDependencies({
+    getInstance,
     resolveToPublicUrl,
     isStorageURL,
     openExternal,
@@ -71,7 +73,9 @@ const RichTextConnector = (connector) => {
           setStealingLock(false)
         })
         .catch((error) => {
-          log.error(`Error stealing the lock for editor: ${props.id}`, error)
+          getInstance().then((errorReporter) => {
+            errorReporter.error(`Error stealing the lock for editor: ${props.id}`, error)
+          })
           setStealingLock(false)
         })
     }, [

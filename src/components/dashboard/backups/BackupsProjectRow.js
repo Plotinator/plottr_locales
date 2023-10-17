@@ -4,6 +4,7 @@ import { sortBy } from 'lodash'
 
 import Row from '../../Row'
 import UnconnectedBackupFileDisplay from './BackupFileDisplay'
+import BackupFilePlaceholder from './BackupFilePlaceholder'
 
 const isStartOfSession = (file) => {
   return file.storagePath
@@ -20,17 +21,45 @@ const BackupsProjectRowConnector = (connector) => {
 
   const BackupsProjectRow = ({ folder, groupName, files }) => {
     const renderFiles = () => {
-      return sortBy(files, isStartOfSession).map((file, index) => {
-        return (
-          <BackupFileDisplay
-            folder={folder}
-            groupName={groupName}
-            file={file}
-            folderDate={folder.shortDateStr}
-            key={`${folder.shortDateStr}-${groupName}-${file.fileId}-${index}`}
-          />
-        )
-      })
+      if (files?.length === 1) {
+        const file = files[0]
+        if (isStartOfSession(file) === -1) {
+          return (
+            <BackupFileDisplay
+              folder={folder}
+              groupName={groupName}
+              file={file}
+              folderDate={folder.shortDateStr}
+              key={`${folder.shortDateStr}-${groupName}-${file.fileId}`}
+            />
+          )
+        } else {
+          return (
+            <>
+              <BackupFilePlaceholder />
+              <BackupFileDisplay
+                folder={folder}
+                groupName={groupName}
+                file={file}
+                folderDate={folder.shortDateStr}
+                key={`${folder.shortDateStr}-${groupName}-${file.fileId}`}
+              />
+            </>
+          )
+        }
+      } else {
+        return sortBy(files, isStartOfSession).map((file, index) => {
+          return (
+            <BackupFileDisplay
+              folder={folder}
+              groupName={groupName}
+              file={file}
+              folderDate={folder.shortDateStr}
+              key={`${folder.shortDateStr}-${groupName}-${file.fileId}-${index}`}
+            />
+          )
+        })
+      }
     }
 
     return (

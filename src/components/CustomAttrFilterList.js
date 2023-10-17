@@ -23,10 +23,13 @@ const CustomAttrFilterListConnector = (connector) => {
   const NoteCategoryFilterList = NoteCategoryFilterListConnector(connector)
 
   const {
-    platform: { log },
+    platform: {
+      log,
+      errorReporter: { getInstance },
+    },
   } = connector
 
-  checkDependencies({ log })
+  checkDependencies({ log, getInstance })
 
   class CustomAttrFilterList extends Component {
     constructor(props) {
@@ -283,7 +286,12 @@ const CustomAttrFilterListConnector = (connector) => {
           return uiActions.setNoteFilter
         default:
           return (newFilter) => {
-            log.error(`Trying to update filter to ${newFilter} for unsuported type: ${type}`)
+            getInstance().then((errorReporter) => {
+              errorReporter.error(
+                `Trying to update filter to ${newFilter} for unsuported type: ${type}`,
+                new Error('Unsupported filter type')
+              )
+            })
           }
       }
     }

@@ -33,9 +33,11 @@ const RichTextEditorConnector = (connector) => {
       openExternal,
       undo,
       redo,
+      errorReporter: { getInstance },
     },
   } = connector
   checkDependencies({
+    getInstance,
     resolveToPublicUrl,
     isStorageURL,
     log,
@@ -43,6 +45,16 @@ const RichTextEditorConnector = (connector) => {
     undo,
     redo,
   })
+
+  const errorReportingLogger = {
+    info: log.info,
+    warn: log.warn,
+    error: (...args) => {
+      getInstance().then((errorReporter) => {
+        errorReporter.error(...args)
+      })
+    },
+  }
 
   const ToolBar = UnconnectedToolBar(connector)
 
@@ -65,7 +77,7 @@ const RichTextEditorConnector = (connector) => {
     useSpellcheck,
   }) => {
     const editor = useMemo(() => {
-      return createEditor(log)
+      return createEditor(errorReportingLogger)
     }, [])
     const registerEditor = useRegisterEditor(editor)
 
@@ -129,19 +141,19 @@ const RichTextEditorConnector = (connector) => {
       text,
       selection,
       undoId,
-      log
+      errorReportingLogger
     )
 
     const handleKeyDown = (event) => {
       if (event.key === 'Tab') {
         if (event.shiftKey) {
           if (Editor.isInList(editor, editor.selection)) {
-            handleList(editor, null, log)
+            handleList(editor, null, errorReportingLogger)
             event.preventDefault()
             event.stopPropagation()
             return
           }
-        } else if (indent(editor, null, log)) {
+        } else if (indent(editor, null, errorReportingLogger)) {
           event.preventDefault()
           event.stopPropagation()
           return
@@ -187,7 +199,7 @@ const RichTextEditorConnector = (connector) => {
           Transforms.collapse(editor, { edge: 'anchor' })
         }
       } catch (error) {
-        log.warn(error)
+        errorReportingLogger.warn(error)
       }
     }
 

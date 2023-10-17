@@ -23,10 +23,12 @@ const UploadingConnector = (connector) => {
       log,
       appVersion,
       isDevelopment,
+      errorReporter: { getInstance },
     },
     pltr: { migrateIfNeeded },
   } = connector
   checkDependencies({
+    getInstance,
     doesFileExist,
     readFile,
     removeFromKnownFiles,
@@ -74,14 +76,15 @@ const UploadingConnector = (connector) => {
           const currentObject = `${typeName[obj.type]}: ${obj.name}`
           setCurrentObj(currentObject)
           setCurrentProgress(idx + 1)
-          log.info(typeName[obj.type], 'uploading ...', obj.name)
           if (obj.type == 'project') {
             // upload project
             if (isDevelopment) {
               return new Promise((resolve, _reject) => setTimeout(() => resolve(true), 200))
             }
             return uploadProject(obj).catch((error) => {
-              log.error(`Error uploading project: ${currentObject}`)
+              getInstance().then((errorReporter) => {
+                errorReporter.error(`Error uploading project: ${currentObject}`, error)
+              })
               failedProjects.current.push(obj.name)
               failed.current = true
               return 'Failed'
@@ -92,7 +95,9 @@ const UploadingConnector = (connector) => {
               return new Promise((resolve, _reject) => setTimeout(() => resolve(true), 200))
             }
             return saveCustomTemplate(userId, obj.data).catch((error) => {
-              log.error(`Failed to upload template: ${currentObject}`, error)
+              getInstance().then((errorReporter) => {
+                errorReporter.error(`Failed to upload template: ${currentObject}`, error)
+              })
               failedTemplates.current.push(obj.name)
               failed.current = true
               return 'Failed'
@@ -129,7 +134,9 @@ const UploadingConnector = (connector) => {
                 // want to eventually sandbox the renderer.
                 file = JSON.parse(rawFile)
               } catch (error) {
-                log.error(`Error uploading file at path ${projObj.fileURL}`, error)
+                getInstance().then((errorReporter) => {
+                  errorReporter.error(`Error uploading file at path ${projObj.fileURL}`, error)
+                })
                 reject(error)
                 return
               }
@@ -147,14 +154,11 @@ const UploadingConnector = (connector) => {
                 null,
                 (error, migrated, data) => {
                   if (error) {
-                    log.error('Error migrating file: ', error)
+                    getInstance().then((errorReporter) => {
+                      errorReporter.error('Error migrating file: ', error)
+                    })
                     reject(error)
                     return
-                  }
-                  if (migrated) {
-                    log.info(
-                      `File was migrated.  Migration history: ${data.file.appliedMigrations}.  Initial version: ${data.file.initialVersion}`
-                    )
                   }
                   extractImages(data, userId)
                     .then((patchedData) => {
@@ -164,13 +168,16 @@ const UploadingConnector = (connector) => {
                       })
                     })
                     .then((result) => {
-                      log.info('successful upload', fileName)
                       removeFromKnownFiles(projObj.fileURL)
                       resolve(result)
                     })
                     .catch((err) => {
-                      log.error(fileName)
-                      log.error(err)
+                      getInstance().then((errorReporter) => {
+                        errorReporter.error(
+                          `Failed to extract images and upload file ${fileName}`,
+                          err
+                        )
+                      })
                       reject(err)
                     })
                 },

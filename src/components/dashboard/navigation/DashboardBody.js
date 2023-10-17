@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'react-proptypes'
+import cx from 'classnames'
+
 import UnconnectedAccountHome from '../account/AccountHome'
 import UnconnectedFilesHome from '../files/FilesHome'
 import UnconnectedTemplatesHome from '../templates/TemplatesHome'
@@ -36,9 +38,9 @@ const DashboardBodyConnector = (connector) => {
   const HelpHome = UnconnectedHelpHome(connector)
   const UpdateNotifier = UnconnectedUpdateNotifier(connector)
 
-  function Body({ children, isModal }) {
+  function Body({ children, isModal, darkMode }) {
     return (
-      <div className="dashboard__body">
+      <div className={cx('dashboard__body', { darkmode: darkMode })}>
         {isModal ? null : (
           <ErrorBoundary>
             <UpdateNotifier inDashboard />
@@ -52,6 +54,7 @@ const DashboardBodyConnector = (connector) => {
   Body.propTypes = {
     children: PropTypes.node,
     isModal: PropTypes.bool,
+    darkMode: PropTypes.bool,
   }
 
   const DashboardBody = ({
@@ -65,6 +68,7 @@ const DashboardBodyConnector = (connector) => {
     licenseInfo,
     trialMode,
     canGetUpdates,
+    darkMode,
   }) => {
     const [showAccount, setShowAccount] = useState(false)
 
@@ -126,13 +130,13 @@ const DashboardBodyConnector = (connector) => {
       switch (currentView) {
         case 'help':
           return (
-            <Body isModal={isModal}>
+            <Body isModal={isModal} darkMode={darkMode}>
               <HelpHome />
             </Body>
           )
         default:
           return (
-            <Body isModal={isModal}>
+            <Body isModal={isModal} darkMode={darkMode}>
               <AccountHome />
             </Body>
           )
@@ -159,7 +163,7 @@ const DashboardBodyConnector = (connector) => {
     }
 
     return (
-      <Body isModal={isModal}>
+      <Body isModal={isModal} darkMode={darkMode}>
         {children}
         <BodySwitch currentView={currentView} />
       </Body>
@@ -177,6 +181,7 @@ const DashboardBodyConnector = (connector) => {
     licenseInfo: PropTypes.object,
     trialMode: PropTypes.bool,
     canGetUpdates: PropTypes.bool,
+    darkMode: PropTypes.bool,
   }
 
   const {
@@ -195,6 +200,7 @@ const DashboardBodyConnector = (connector) => {
         licenseInfo: selectors.licenseInfoSelector(state),
         trialMode: selectors.trialModeSelector(state),
         canGetUpdates: selectors.canGetUpdatesSelector(state),
+        darkMode: selectors.isDarkModeSelector(state),
       }),
       {}
     )(DashboardBody)
