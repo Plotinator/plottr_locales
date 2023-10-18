@@ -604,7 +604,7 @@ tellMeWhatOSImOn()
 
         onErrorImportingScrivener((error) => {
           logger.warn('[scrivener import]', error)
-          errorReporter.warn({ message: error })
+          errorReporter.error(`Error importing from scrivener ${error}`)
           store.dispatch(actions.applicationState.finishScrivenerImporter())
           showErrorBox(t('Error'), t('There was an error doing that. Try again'))
         })
