@@ -2,7 +2,6 @@ import { isEqual } from 'lodash'
 import { assertEqual, assertGreaterThan, describe } from '../../../test/simpleIntegrationTest'
 
 import Saver, {
-  DUMMY_ROLLBAR,
   DUMMY_SHOW_ERROR_BOX,
   DUMMY_SHOW_MESSAGE_BOX,
   DUMMY_SERVER_IS_BUSY_RESTARTING,
@@ -70,6 +69,10 @@ function expectToMatchArrayLoosely(received, expected, allowedMissing = 1, allow
   }
 }
 
+const isNotLoggedInThunk = () => {
+  return false
+}
+
 describe('Saver', (describe, it) => {
   describe('save', (describe, it) => {
     describe('given a dummy getState function', (describe, it) => {
@@ -96,10 +99,10 @@ describe('Saver', (describe, it) => {
             100,
             60000,
             NOP_LOGGER,
-            DUMMY_ROLLBAR,
             DUMMY_SHOW_MESSAGE_BOX,
             DUMMY_SHOW_ERROR_BOX,
-            DUMMY_SERVER_IS_BUSY_RESTARTING
+            DUMMY_SERVER_IS_BUSY_RESTARTING,
+            isNotLoggedInThunk
           )
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
@@ -195,10 +198,10 @@ describe('Saver', (describe, it) => {
               100,
               60000,
               NOP_LOGGER,
-              DUMMY_ROLLBAR,
               DUMMY_SHOW_MESSAGE_BOX,
               DUMMY_SHOW_ERROR_BOX,
-              DUMMY_SERVER_IS_BUSY_RESTARTING
+              DUMMY_SERVER_IS_BUSY_RESTARTING,
+              isNotLoggedInThunk
             )
             new Promise((resolve) => {
               setTimeout(resolve, 1100)
@@ -281,10 +284,10 @@ describe('Saver', (describe, it) => {
               100,
               10000,
               NOP_LOGGER,
-              DUMMY_ROLLBAR,
               showMessageBox,
               showErrorBox,
-              DUMMY_SERVER_IS_BUSY_RESTARTING
+              DUMMY_SERVER_IS_BUSY_RESTARTING,
+              isNotLoggedInThunk
             )
             assertEqual(calledShowErrorBox, 0)
             assertEqual(calledShowMessageBox, 0)
@@ -381,10 +384,10 @@ describe('Saver', (describe, it) => {
                 100,
                 10000,
                 NOP_LOGGER,
-                DUMMY_ROLLBAR,
                 showMessageBox,
                 showErrorBox,
-                alwaysBusyRestarting
+                alwaysBusyRestarting,
+                isNotLoggedInThunk
               )
               assertEqual(calledShowErrorBox, 0)
               assertEqual(calledShowMessageBox, 0)
@@ -467,10 +470,10 @@ describe('Saver', (describe, it) => {
             500,
             60000,
             NOP_LOGGER,
-            DUMMY_ROLLBAR,
             DUMMY_SHOW_MESSAGE_BOX,
             DUMMY_SHOW_ERROR_BOX,
-            DUMMY_SERVER_IS_BUSY_RESTARTING
+            DUMMY_SERVER_IS_BUSY_RESTARTING,
+            isNotLoggedInThunk
           )
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
@@ -522,10 +525,10 @@ describe('Saver', (describe, it) => {
             100,
             60000,
             NOP_LOGGER,
-            DUMMY_ROLLBAR,
             DUMMY_SHOW_MESSAGE_BOX,
             DUMMY_SHOW_ERROR_BOX,
-            DUMMY_SERVER_IS_BUSY_RESTARTING
+            DUMMY_SERVER_IS_BUSY_RESTARTING,
+            isNotLoggedInThunk
           )
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
@@ -617,10 +620,10 @@ describe('Saver', (describe, it) => {
                 100,
                 60000,
                 NOP_LOGGER,
-                DUMMY_ROLLBAR,
                 DUMMY_SHOW_MESSAGE_BOX,
                 DUMMY_SHOW_ERROR_BOX,
-                DUMMY_SERVER_IS_BUSY_RESTARTING
+                DUMMY_SERVER_IS_BUSY_RESTARTING,
+                isNotLoggedInThunk
               )
               new Promise((resolve) => {
                 setTimeout(resolve, 1050)
@@ -710,10 +713,10 @@ describe('Saver', (describe, it) => {
                 200,
                 60000,
                 NOP_LOGGER,
-                DUMMY_ROLLBAR,
                 DUMMY_SHOW_MESSAGE_BOX,
                 DUMMY_SHOW_ERROR_BOX,
-                DUMMY_SERVER_IS_BUSY_RESTARTING
+                DUMMY_SERVER_IS_BUSY_RESTARTING,
+                isNotLoggedInThunk
               )
               new Promise((resolve) => {
                 setTimeout(resolve, 1050)
@@ -784,10 +787,10 @@ describe('Saver', (describe, it) => {
             500,
             60000,
             NOP_LOGGER,
-            DUMMY_ROLLBAR,
             DUMMY_SHOW_MESSAGE_BOX,
             DUMMY_SHOW_ERROR_BOX,
-            DUMMY_SERVER_IS_BUSY_RESTARTING
+            DUMMY_SERVER_IS_BUSY_RESTARTING,
+            isNotLoggedInThunk
           )
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
@@ -855,10 +858,10 @@ describe('Saver', (describe, it) => {
           100,
           10000,
           countingLogger,
-          DUMMY_ROLLBAR,
           DUMMY_SHOW_MESSAGE_BOX,
           trackingErrorNotifier,
-          DUMMY_SERVER_IS_BUSY_RESTARTING
+          DUMMY_SERVER_IS_BUSY_RESTARTING,
+          isNotLoggedInThunk
         )
         new Promise((resolve) => {
           setTimeout(resolve, 510)
@@ -912,10 +915,10 @@ describe('Saver', (describe, it) => {
             100,
             10000,
             countingLogger,
-            DUMMY_ROLLBAR,
             DUMMY_SHOW_MESSAGE_BOX,
             trackingErrorNotifier,
-            DUMMY_SERVER_IS_BUSY_RESTARTING
+            DUMMY_SERVER_IS_BUSY_RESTARTING,
+            isNotLoggedInThunk
           )
           assertGreaterThan(loggedInfos, 0)
           assertEqual(loggedWarnings, 0)
@@ -975,10 +978,10 @@ describe('Saver', (describe, it) => {
             100000,
             100,
             NOP_LOGGER,
-            DUMMY_ROLLBAR,
             DUMMY_SHOW_MESSAGE_BOX,
             DUMMY_SHOW_ERROR_BOX,
-            DUMMY_SERVER_IS_BUSY_RESTARTING
+            DUMMY_SERVER_IS_BUSY_RESTARTING,
+            isNotLoggedInThunk
           )
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
@@ -1074,10 +1077,10 @@ describe('Saver', (describe, it) => {
               10000,
               100,
               NOP_LOGGER,
-              DUMMY_ROLLBAR,
               DUMMY_SHOW_MESSAGE_BOX,
               DUMMY_SHOW_ERROR_BOX,
-              DUMMY_SERVER_IS_BUSY_RESTARTING
+              DUMMY_SERVER_IS_BUSY_RESTARTING,
+              isNotLoggedInThunk
             )
             new Promise((resolve) => {
               setTimeout(resolve, 1100)
@@ -1166,10 +1169,10 @@ describe('Saver', (describe, it) => {
               10000,
               100,
               countingLogger,
-              DUMMY_ROLLBAR,
               DUMMY_SHOW_MESSAGE_BOX,
               DUMMY_SHOW_ERROR_BOX,
-              DUMMY_SERVER_IS_BUSY_RESTARTING
+              DUMMY_SERVER_IS_BUSY_RESTARTING,
+              isNotLoggedInThunk
             )
             assertGreaterThan(loggedInfos, 0)
             assertEqual(loggedWarnings, 0)
@@ -1277,10 +1280,10 @@ describe('Saver', (describe, it) => {
                 10000,
                 100,
                 countingLogger,
-                DUMMY_ROLLBAR,
                 DUMMY_SHOW_MESSAGE_BOX,
                 DUMMY_SHOW_ERROR_BOX,
-                alwaysBusyRestarting
+                alwaysBusyRestarting,
+                isNotLoggedInThunk
               )
               assertGreaterThan(loggedInfos, 0)
               assertEqual(loggedWarnings, 0)
@@ -1368,10 +1371,10 @@ describe('Saver', (describe, it) => {
             10000,
             500,
             NOP_LOGGER,
-            DUMMY_ROLLBAR,
             DUMMY_SHOW_MESSAGE_BOX,
             DUMMY_SHOW_ERROR_BOX,
-            DUMMY_SERVER_IS_BUSY_RESTARTING
+            DUMMY_SERVER_IS_BUSY_RESTARTING,
+            isNotLoggedInThunk
           )
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
@@ -1423,10 +1426,10 @@ describe('Saver', (describe, it) => {
             10000,
             100,
             NOP_LOGGER,
-            DUMMY_ROLLBAR,
             DUMMY_SHOW_MESSAGE_BOX,
             DUMMY_SHOW_ERROR_BOX,
-            DUMMY_SERVER_IS_BUSY_RESTARTING
+            DUMMY_SERVER_IS_BUSY_RESTARTING,
+            isNotLoggedInThunk
           )
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
@@ -1518,10 +1521,10 @@ describe('Saver', (describe, it) => {
                 10000,
                 100,
                 NOP_LOGGER,
-                DUMMY_ROLLBAR,
                 DUMMY_SHOW_MESSAGE_BOX,
                 DUMMY_SHOW_ERROR_BOX,
-                DUMMY_SERVER_IS_BUSY_RESTARTING
+                DUMMY_SERVER_IS_BUSY_RESTARTING,
+                isNotLoggedInThunk
               )
               new Promise((resolve) => {
                 setTimeout(resolve, 1050)
@@ -1611,10 +1614,10 @@ describe('Saver', (describe, it) => {
                 10000,
                 200,
                 NOP_LOGGER,
-                DUMMY_ROLLBAR,
                 DUMMY_SHOW_MESSAGE_BOX,
                 DUMMY_SHOW_ERROR_BOX,
-                DUMMY_SERVER_IS_BUSY_RESTARTING
+                DUMMY_SERVER_IS_BUSY_RESTARTING,
+                isNotLoggedInThunk
               )
               new Promise((resolve) => {
                 setTimeout(resolve, 1050)
@@ -1685,10 +1688,10 @@ describe('Saver', (describe, it) => {
             10000,
             500,
             NOP_LOGGER,
-            DUMMY_ROLLBAR,
             DUMMY_SHOW_MESSAGE_BOX,
             DUMMY_SHOW_ERROR_BOX,
-            DUMMY_SERVER_IS_BUSY_RESTARTING
+            DUMMY_SERVER_IS_BUSY_RESTARTING,
+            isNotLoggedInThunk
           )
           new Promise((resolve) => {
             setTimeout(resolve, 1100)

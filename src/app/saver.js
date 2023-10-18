@@ -2,15 +2,9 @@ import { isEqual } from 'lodash'
 
 import { t } from 'plottr_locales'
 import { removeSystemKeys } from 'pltr/v2'
-import { selectors } from 'wired-up-pltr'
 
 const DEFAULT_SAVE_INTERVAL_MS = 10000
 const DEFAULT_BACKUP_INTERVAL_MS = 60000
-export const DUMMY_ROLLBAR = {
-  info: () => {},
-  warn: () => {},
-  error: () => {},
-}
 export const DUMMY_SHOW_MESSAGE_BOX = () => {}
 export const DUMMY_SHOW_ERROR_BOX = () => {}
 export const DUMMY_SERVER_IS_BUSY_RESTARTING = () => Promise.resolve(false)
@@ -35,7 +29,8 @@ const Saver = (
   logger,
   showMessageBox,
   showErrorBox,
-  serverIsBusyRestarting
+  serverIsBusyRestarting,
+  isLoggedInThunk
 ) => {
   let saveInterval = null
   let backupInterval = null
@@ -85,7 +80,7 @@ const Saver = (
         )
         return !restarting
       }
-      const isLoggedIn = selectors.isLoggedInSelector(getState())
+      const isLoggedIn = isLoggedInThunk()
       if (error === 'Missing or insufficient permissions.' && !isLoggedIn) {
         logger.info('Trying to backup a pro file while not logged in.', error)
       } else {

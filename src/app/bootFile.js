@@ -611,7 +611,10 @@ export function bootFile(
           (title, message) => {
             showErrorBox(title, message)
           },
-          isRestarting
+          isRestarting,
+          () => {
+            return selectors.isLoggedInSelector(store.getState())
+          }
         )
       })
       .catch((error) => {
