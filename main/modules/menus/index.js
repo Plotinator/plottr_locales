@@ -30,9 +30,18 @@ ipcMain.on('please-reload-menu', (event, replyChannel) => {
     })
 })
 
+function getFocussedWindow() {
+  try {
+    return BrowserWindow.getFocusedWindow()
+  } catch (error) {
+    log.warn('Ignoring error getting the current browser window', error)
+    return null
+  }
+}
+
 function buildMenu(safelyExit) {
   safelyExitModule = safelyExit
-  const win = BrowserWindow.getFocusedWindow()
+  const win = getFocussedWindow()
   let fileURL = null
   if (win) {
     const winObj = getWindowById(win.id)
