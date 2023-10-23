@@ -291,8 +291,12 @@ app.whenReady().then(() => {
 
         // Register the toggleDevTools shortcut listener.
         globalShortcut.register('CommandOrControl+Alt+R', () => {
-          let win = BrowserWindow.getFocusedWindow()
-          if (win) win.toggleDevTools()
+          try {
+            let win = BrowserWindow.getFocusedWindow()
+            if (win) win.toggleDevTools()
+          } catch (error) {
+            log.warn("Couldn't activate dev tools", error)
+          }
         })
 
         // When given no argument, it'll look up the current one.
