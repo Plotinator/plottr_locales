@@ -21,6 +21,7 @@ import {
   listenForRCELock,
   lockRCE,
   releaseRCELock,
+  deleteProBackup,
 } from 'wired-up-firebase'
 
 import {
@@ -40,6 +41,7 @@ import { closeDashboard } from './dashboard-events'
 import { makeFileSystemAPIs, licenseServerAPIs } from './api'
 import { isWindows, isLinux, isMacOS } from './isOS'
 import { isDevelopment } from './isDevelopment'
+import createErrorReporter from '../shared/error-reporter'
 
 import { store } from './app/store'
 
@@ -422,7 +424,13 @@ const platform = {
   node: {
     env: isDevelopment() ? 'development' : 'production',
   },
+  errorReporter: {
+    errorReporterAccessToken: process.env.ROLLBAR_ACCESS_TOKEN || 'PHONY_ACCESS_TOKEN',
+    errorReporter: createErrorReporter,
+    platform: pleaseTellMeWhatPlatformIAmOn,
+  },
   rollbar: {
+    // DEPRECATED
     rollbarAccessToken: process.env.ROLLBAR_ACCESS_TOKEN || '',
     platform: pleaseTellMeWhatPlatformIAmOn,
   },
@@ -527,6 +535,11 @@ const platform = {
         })
       })
     })
+  },
+  deleteProBackup: (backupRecordId, storageProtocolURL) => {
+    const state = store().getState()
+    const userId = selectors.userIdSelector(state)
+    return deleteProBackup(userId, backupRecordId, storageProtocolURL)
   },
 }
 

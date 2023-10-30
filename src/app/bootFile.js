@@ -1,5 +1,5 @@
 import { helpers, SYSTEM_REDUCER_KEYS, migrateIfNeeded, Migrator, emptyFile } from 'pltr/v2'
-import { actions } from 'wired-up-pltr'
+import { actions, selectors } from 'wired-up-pltr'
 import { t } from 'plottr_locales'
 import {
   currentUser,
@@ -8,7 +8,6 @@ import {
   saveBackup as saveBackupOnFirebase,
 } from 'wired-up-firebase'
 import exportToSelfContainedPlottrFile from 'plottr_import_export/src/exporter/plottr'
-import { selectors } from 'wired-up-pltr'
 
 import { makeFileSystemAPIs } from '../api'
 import { offlineFileURLFromFile } from '../files'
@@ -17,7 +16,6 @@ import { resumeDirective } from '../resume'
 import logger from '../../shared/logger'
 import { store } from 'store'
 import MPQ from '../common/utils/MPQ'
-import setupRollbar from '../common/utils/rollbar'
 import { makeFileModule } from './files'
 import { offlineFileURL } from '../common/utils/files'
 import Saver from './saver'
@@ -27,6 +25,7 @@ import {
   downloadStorageImage,
 } from '../common/downloadStorageImage'
 import { makeMainProcessClient } from './mainProcessClient'
+import createErrorReporter from '../../shared/error-reporter'
 
 const {
   setWindowTitle,
@@ -37,12 +36,8 @@ const {
   machineId,
   setMyFilePath,
   isRestarting,
+  pleaseTellMeWhatPlatformIAmOn,
 } = makeMainProcessClient()
-
-let rollbar
-setupRollbar('app.html').then((newRollbar) => {
-  rollbar = newRollbar
-})
 
 const withFileId = (fileId, file) => ({
   ...file,
@@ -106,65 +101,6 @@ export function removeSystemKeys(jsonData) {
   return withoutSystemKeys
 }
 
-const migrate = (originalFile, fileId) => (overwrittenFile) => {
-  const json = overwrittenFile || originalFile
-  const fileURL = helpers.file.fileIdToPlottrCloudFileURL(fileId)
-  return getVersion().then((version) => {
-    return new Promise((resolve, reject) => {
-      if (json.file.permission !== 'owner') {
-        const migrator = new Migrator(json, fileURL, json.file.version, version, () => {}, logger)
-        if (migrator.plottrBehindFile()) {
-          reject(new Error(UPDATE_MESSAGE))
-        } else {
-          machineId().then((clientId) => {
-            loadFileIntoRedux(json, fileId)
-            store().dispatch(actions.client.setClientId(clientId))
-            resolve(json)
-          })
-        }
-        return
-      } else {
-        migrateIfNeeded(
-          version,
-          json,
-          fileURL,
-          null,
-          (error, migrated, data) => {
-            if (error) {
-              rollbar.error(error)
-              if (error === 'Plottr behind file') {
-                reject(new Error(UPDATE_MESSAGE))
-                return
-              }
-              reject(error)
-              return
-            }
-            machineId().then((clientId) => {
-              if (migrated) {
-                logger.info(
-                  `File was migrated.  Migration history: ${data.file.appliedMigrations}.  Initial version: ${data.file.initialVersion}`
-                )
-                overwriteAllKeys(fileId, clientId, removeSystemKeys(data))
-                  .then((results) => {
-                    loadFileIntoRedux(data, fileId)
-                    store().dispatch(actions.client.setClientId(clientId))
-                    return results
-                  })
-                  .then(resolve, reject)
-              } else {
-                loadFileIntoRedux(data, fileId)
-                store().dispatch(actions.client.setClientId(clientId))
-                resolve(data)
-              }
-            })
-          },
-          logger
-        )
-      }
-    })
-  })
-}
-
 const SAVE_INTERVAL_MS = 10000
 const BACKUP_INTERVAL_MS = 60000
 let saver = null
@@ -177,6 +113,70 @@ export function bootFile(
   saveBackup,
   bootingOfflineFile
 ) {
+  const recordedErrorsDuringStartup = []
+
+  const migrate = (originalFile, fileId) => (overwrittenFile) => {
+    const json = overwrittenFile || originalFile
+    const fileURL = helpers.file.fileIdToPlottrCloudFileURL(fileId)
+    return getVersion().then((version) => {
+      return new Promise((resolve, reject) => {
+        if (json.file.permission !== 'owner') {
+          const migrator = new Migrator(json, fileURL, json.file.version, version, () => {}, logger)
+          if (migrator.plottrBehindFile()) {
+            reject(new Error(UPDATE_MESSAGE))
+          } else {
+            machineId().then((clientId) => {
+              loadFileIntoRedux(json, fileId)
+              store().dispatch(actions.client.setClientId(clientId))
+              resolve(json)
+            })
+          }
+          return
+        } else {
+          migrateIfNeeded(
+            version,
+            json,
+            fileURL,
+            null,
+            (error, migrated, data) => {
+              if (error) {
+                recordedErrorsDuringStartup.push({
+                  message: 'Plottr behind file',
+                  error,
+                })
+                if (error === 'Plottr behind file') {
+                  reject(new Error(UPDATE_MESSAGE))
+                  return
+                }
+                reject(error)
+                return
+              }
+              machineId().then((clientId) => {
+                if (migrated) {
+                  logger.info(
+                    `File was migrated.  Migration history: ${data.file.appliedMigrations}.  Initial version: ${data.file.initialVersion}`
+                  )
+                  overwriteAllKeys(fileId, clientId, removeSystemKeys(data))
+                    .then((results) => {
+                      loadFileIntoRedux(data, fileId)
+                      store().dispatch(actions.client.setClientId(clientId))
+                      return results
+                    })
+                    .then(resolve, reject)
+                } else {
+                  loadFileIntoRedux(data, fileId)
+                  store().dispatch(actions.client.setClientId(clientId))
+                  resolve(data)
+                }
+              })
+            },
+            logger
+          )
+        }
+      })
+    })
+  }
+
   const nukeLastKnown = () =>
     whenClientIsReady(({ nukeLastOpenedFileURL }) => {
       return nukeLastOpenedFileURL()
@@ -250,10 +250,10 @@ export function bootFile(
 
   function handleNoFileId(fileId, fileURL) {
     const errorObject = new Error('Could not open cloud file.')
-    rollbar.error(
-      `Attempted to open ${fileURL} as a cloud file, but it's not a cloud file.  We think it's id is ${fileId} based on that name.`,
-      errorObject
-    )
+    recordedErrorsDuringStartup.push({
+      message: `Attempted to open ${fileURL} as a cloud file, but it's not a cloud file.  We think it's id is ${fileId} based on that name.`,
+      error: errorObject,
+    })
     logger.error(
       `Attempted to open ${fileURL} as a cloud file, but it's not a cloud file.  We think it's id is ${fileId} based on that name.`,
       errorObject
@@ -267,7 +267,7 @@ export function bootFile(
 
   function handleNoUserId(fileURL) {
     const errorMessage = `Tried to boot plottr cloud file (${fileURL}) without a user id.`
-    rollbar.error(errorMessage)
+    recordedErrorsDuringStartup.push({ message: errorMessage, error: new Error(errorMessage) })
     return Promise.reject(new Error(errorMessage))
   }
 
@@ -345,7 +345,7 @@ export function bootFile(
         .catch((error) => {
           const errorMessage = `Error fetching ${fileId} for user: ${userId}, clientId: ${clientId}`
           logger.error(errorMessage, error)
-          rollbar.error(errorMessage, error)
+          recordedErrorsDuringStartup.push({ message: errorMessage, error })
           if (error.message === UPDATE_MESSAGE) {
             return Promise.reject(error)
           } else {
@@ -363,7 +363,7 @@ export function bootFile(
     return machineId().then((clientId) => {
       const errorMessage = `Error booting ${fileId} clientId: ${clientId}`
       logger.error(errorMessage, error)
-      rollbar.error(errorMessage, error)
+      recordedErrorsDuringStartup.push({ message: errorMessage, error })
       if (error.message === UPDATE_MESSAGE) {
         return Promise.reject(error)
       } else {
@@ -436,7 +436,10 @@ export function bootFile(
                   null,
                   (err, didMigrate, state) => {
                     if (err) {
-                      rollbar.error(err)
+                      recordedErrorsDuringStartup.push({
+                        message: 'Error migrating file',
+                        error: err,
+                      })
                       logger.error(err)
                       if (err === 'Plottr behind file') {
                         return reject(new Error(UPDATE_MESSAGE))
@@ -521,15 +524,15 @@ export function bootFile(
           .catch((error) => {
             nukeLastKnown()
             logger.error(error)
-            rollbar.error(error)
-            store.dispatch(
+            recordedErrorsDuringStartup.push({ message: 'Error booting the file', error })
+            store().dispatch(
               actions.applicationState.errorLoadingFile(error.message === UPDATE_MESSAGE)
             )
           })
       } catch (error) {
         nukeLastKnown()
         logger.error(error)
-        rollbar.error(error)
+        recordedErrorsDuringStartup.push({ message: 'Error booting a file', error })
         store().dispatch(actions.applicationState.errorLoadingFile())
         return Promise.reject(error)
       }
@@ -546,29 +549,63 @@ export function bootFile(
     const postBackupHook = () => {
       // NOP
     }
-    saver = Saver(
-      () => {
-        return selectors.fullFileStateSelector(store().getState())
-      },
-      saveFile(whenClientIsReady, logger, postSaveHook),
-      backupFile(
-        whenClientIsReady,
-        saveBackupOnFirebase,
-        cachedDowloadStorageImage.downloadStorageImage,
-        logger,
-        postBackupHook
-      ),
-      SAVE_INTERVAL_MS,
-      BACKUP_INTERVAL_MS,
-      logger,
-      rollbar,
-      (title, message) => {
-        showMessageBox(title, message)
-      },
-      (title, message) => {
-        showErrorBox(title, message)
-      },
-      isRestarting
-    )
+    const state = store().getState()
+    const licenseUserObject = selectors.userSettingsSelector(state)
+    const userId = selectors.userIdSelector(state) || licenseUserObject.payment_id || 'UNKNOWN_USER'
+    const userEmail =
+      selectors.emailAddressSelector(state) || licenseUserObject.customer_email || 'UNKNOWN_EMAIL'
+    Promise.all([pleaseTellMeWhatPlatformIAmOn(), getVersion()])
+      .then(([os, version]) => {
+        const errorReporter = createErrorReporter(
+          process.env.ROLLBAR_ACCESS_TOKEN,
+          version,
+          process.env.NODE_ENV,
+          logger,
+          'app_entrypoint',
+          os,
+          userId,
+          userEmail
+        )
+        if (recordedErrorsDuringStartup.length > 0) {
+          recordedErrorsDuringStartup.forEach(({ message, error }) => {
+            errorReporter.error(message, error)
+          })
+          // Drain the errors reported during startup to save on
+          // memory and remove ambiguity.
+          recordedErrorsDuringStartup.splice(0, recordedErrorsDuringStartup.length)
+        }
+        saver = Saver(
+          () => {
+            return selectors.fullFileStateSelector(store().getState())
+          },
+          saveFile(whenClientIsReady, logger, postSaveHook),
+          backupFile(
+            whenClientIsReady,
+            saveBackupOnFirebase,
+            cachedDowloadStorageImage.downloadStorageImage,
+            logger,
+            postBackupHook
+          ),
+          SAVE_INTERVAL_MS,
+          BACKUP_INTERVAL_MS,
+          logger,
+          errorReporter,
+          (title, message) => {
+            showMessageBox(title, message)
+          },
+          (title, message) => {
+            showErrorBox(title, message)
+          },
+          isRestarting
+        )
+      })
+      .catch((error) => {
+        logger.error('Could not set up auto saver.  Bailing.')
+        return showErrorBox(t('Error'), t('There was an error doing that. Try again')).then(() => {
+          setTimeout(() => {
+            window.close()
+          }, 3000)
+        })
+      })
   })
 }

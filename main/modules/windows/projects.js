@@ -7,7 +7,6 @@ import { t } from 'plottr_locales'
 
 import { makeBrowserWindow } from '../utils'
 import { filePrefix } from '../helpers'
-import { rollbar } from '../rollbar'
 import { getWindowByObjectEq, addNewWindow, dereferenceWindow, focusIfOpen } from '.'
 import { addToKnown } from '../known_files'
 import { setLastOpenedFilePath } from '../lastOpened'
@@ -93,7 +92,11 @@ function openProjectWindow(fileURL) {
           })
           .catch((error) => {
             log.error('Error saving backup to new location', error)
-            return dialog.showErrorBox(t('There was a problem doing that'), t('Please try again'))
+            return dialog
+              .showErrorBox(t('There was a problem doing that'), t('Please try again'))
+              .then(() => {
+                return Promise.reject(error)
+              })
           })
       } else {
         return makeBrowserWindow(fileURL)
@@ -111,18 +114,22 @@ function openProjectWindow(fileURL) {
               dereferenceWindow(win)
             })
 
-            try {
-              if (fileURL) {
-                app.addRecentDocument(fileURL)
-                setLastOpenedFilePath(fileURL)
-              }
+            if (fileURL) {
+              app.addRecentDocument(fileURL)
               addNewWindow(newWindow, fileURL)
-            } catch (err) {
-              log.warn(err)
-              rollbar.warn(err, { fileURL })
-              newWindow.destroy()
+              return setLastOpenedFilePath(fileURL)
+                .catch((error) => {
+                  log.error('Could not set last opened file path', error)
+                  newWindow.destroy()
+                  return Promise.reject(error)
+                })
+                .then(() => {
+                  return newWindow
+                })
+            } else {
+              addNewWindow(newWindow, fileURL)
+              return Promise.resolve(newWindow)
             }
-            return newWindow
           })
           .catch((error) => {
             log.error('Error opening project window', error)

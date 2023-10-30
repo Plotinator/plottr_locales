@@ -43,6 +43,7 @@ export const isStorageURL = worker.isStorageURL
 export const loginWithEmailAndPassword = worker.loginWithEmailAndPassword
 export const getIdTokenResult = worker.getIdTokenResult
 export const isInitialised = worker.isInitialised
+export const deleteProBackup = worker.deleteProBackup
 
 // Duplicated utility functions
 export const toFirestoreArray = (array) =>
