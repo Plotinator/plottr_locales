@@ -514,6 +514,7 @@ tellMeWhatOSImOn()
           const attributesDialogIsOpen = selectors.attributesDialogIsOpenSelector(state)
           const viewIsTimeline = selectors.currentViewSelector(state)
           const actConfigModalIsOpen = selectors.actConfigModalIsOpenSelector(state)
+          const searchModalIsOpen = selectors.searchDialogIsOpenSelector(state)
           if (!cardDialogIsOpen) {
             const table = document.querySelector('.sticky-table')
             const targetIsEditable = e.target.isContentEditable || e.target.nodeName === 'INPUT'
@@ -521,6 +522,7 @@ tellMeWhatOSImOn()
             const aModalIsOpen = document.querySelector('.ReactModalPortal')
             const aPopoverIsOpen = document.querySelector('.react-tiny-popover-container')
             if (
+              !searchModalIsOpen &&
               !aModalIsOpen &&
               !aPopoverIsOpen &&
               !actConfigModalIsOpen &&
