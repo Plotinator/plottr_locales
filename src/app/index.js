@@ -508,11 +508,29 @@ tellMeWhatOSImOn()
           lastError = error
         })
 
-        window.SCROLLWITHKEYS = true
         document.addEventListener('keydown', (e) => {
-          if (window.SCROLLWITHKEYS) {
+          const state = store.getState()
+          const cardDialogIsOpen = selectors.cardDialogCardIdSelector(state)
+          const attributesDialogIsOpen = selectors.attributesDialogIsOpenSelector(state)
+          const viewIsTimeline = selectors.currentViewSelector(state)
+          const actConfigModalIsOpen = selectors.actConfigModalIsOpenSelector(state)
+          if (!cardDialogIsOpen) {
             const table = document.querySelector('.sticky-table')
-            if (table) {
+            const targetIsEditable = e.target.isContentEditable || e.target.nodeName === 'INPUT'
+            // No redux state for a few.  Here's a catch all for modals.
+            const aModalIsOpen = document.querySelector('.ReactModalPortal')
+            const aPopoverIsOpen = document.querySelector('.react-tiny-popover-container')
+            if (
+              !aModalIsOpen &&
+              !aPopoverIsOpen &&
+              !actConfigModalIsOpen &&
+              !targetIsEditable &&
+              !attributesDialogIsOpen &&
+              viewIsTimeline &&
+              typeof table !== 'undefined'
+            ) {
+              e.preventDefault()
+              e.stopPropagation()
               if (e.key === 'ArrowUp') {
                 let amount = 300
                 if (e.metaKey || e.ctrlKey || e.altKey) amount = 800
