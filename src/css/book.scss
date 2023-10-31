@@ -64,9 +64,19 @@
   .modal-content {
     border-radius: 20px;
   }
+  hr {
+    margin: 0px;
+  }
+  .book-dialog__footer {
+    padding: 15px;
+  }
+  .book-dialog__body {
+    padding: 15px;
+  }
 }
 
 .book-dialog.darkmode {
+
   .modal-body,
   .modal-footer,
   .modal-header {
@@ -178,7 +188,7 @@
   }
 }
 
-.book-container .book > div {
+.book-container .book>div {
   display: block;
   position: absolute;
 }
@@ -191,7 +201,7 @@
   z-index: 10;
 }
 
-.book-container .front > div {
+.book-container .front>div {
   // width: 400px;
   // height: 550px;
   width: 175px;
@@ -368,7 +378,7 @@
 
 .darkmode {
   .book-container.darkmode {
-    background-color: transparent;
+
     .cover,
     .left-side,
     .book {
@@ -415,7 +425,7 @@
             }
           }
         }
-
+  
         .btn-danger {
           .glyphicon {
             color: #bbb;
@@ -432,7 +442,7 @@
     }
   }
 
-  .book-container .front > div .book-container__add {
+  .book-container .front>div .book-container__add {
     color: #bbb;
   }
 
@@ -444,6 +454,7 @@
   }
 
   .book-dialog.darkmode {
+
     .modal-body,
     .modal-footer,
     .modal-header {

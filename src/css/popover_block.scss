@@ -68,12 +68,14 @@
     }
 
     .filter-list {
+
       p:hover,
       li:hover {
         background-color: $darkmode-v2-card-background;
       }
 
       .filter-list__list {
+
         p,
         li,
         .secondary-text {
@@ -87,6 +89,7 @@
     .popover-arrow {
       border-bottom: 10px solid transparent !important;
       border-left: 10px solid $darkmode-v2-background !important;
+
     }
   }
 

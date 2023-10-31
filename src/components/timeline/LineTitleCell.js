@@ -50,12 +50,13 @@ const LineTitleCellConnector = (connector) => {
     notifications,
     books,
     zIndex,
+    editing,
+    timelineFoci,
     allHierarchyLevels,
     currentTimeline,
     togglePinPlotline,
   }) => {
     const [hovering, setHovering] = useState(false)
-    const [editing, setEditing] = useState(line.title === '')
     const [dragging, setDragging] = useState(false)
     const [inDropZone, setInDropZone] = useState(false)
     const [dropDepth, setDropDepth] = useState(0)
@@ -116,7 +117,7 @@ const LineTitleCellConnector = (connector) => {
       var id = line.id
       actions.editLineTitle(id, newVal)
       setMovingLine(false)
-      setEditing(false)
+      uiActions.stopEditingPlotlineHeadingTitle()
       setHovering(false)
     }
 
@@ -129,7 +130,7 @@ const LineTitleCellConnector = (connector) => {
     const handleBlur = (event) => {
       if (titleInputRef.current && titleInputRef.current.value !== '') {
         editTitle()
-        setEditing(false)
+        uiActions.stopEditingPlotlineHeadingTitle()
         setHovering(false)
       }
       if (!event.relatedTarget || !event.relatedTarget.attributes?.role?.value === 'menuitem') {
@@ -186,7 +187,7 @@ const LineTitleCellConnector = (connector) => {
 
     const handleEsc = (event) => {
       if (event.which === 27) {
-        setEditing(false)
+        uiActions.stopEditingPlotlineHeadingTitle()
         setMovingLine(false)
       }
     }
@@ -204,7 +205,7 @@ const LineTitleCellConnector = (connector) => {
 
     const startEditing = () => {
       if (!movingLine) {
-        setEditing(true)
+        uiActions.startEditingPlotlineHeadingTitle(line.id)
       }
     }
 
@@ -259,7 +260,7 @@ const LineTitleCellConnector = (connector) => {
           defaultValue={line.title}
           title={t('Edit {lineName}', { lineName: line.title || t('New Plotline') })}
           cancel={() => {
-            setEditing(false)
+            uiActions.stopEditingPlotlineHeadingTitle()
             setMovingLine(false)
             setHovering(false)
           }}
@@ -502,21 +503,33 @@ const LineTitleCellConnector = (connector) => {
         ) : (
           truncateTitle(t(line.title), 50)
         )
+      } else {
+        const focusCandidate =
+          timelineFoci.length && typeof timelineFoci[0] !== 'undefined' && timelineFoci[0]
+        const selection =
+          Array.isArray(focusCandidate.path) &&
+          focusCandidate.path[0] === 'line' &&
+          focusCandidate.path[1] === line.id &&
+          focusCandidate.path[2] === 'title' &&
+          focusCandidate.selection
+        return (
+          <FormGroup>
+            <ControlLabel className={cx({ darkmode: darkMode })}>{t('Plotline name')}</ControlLabel>
+            <FormControl
+              type="text"
+              defaultValue={line.title}
+              inputRef={(ref) => {
+                titleInputRef.current = ref
+              }}
+              autoFocus
+              selection={selection}
+              onKeyDown={handleEsc}
+              onBlur={handleBlur}
+              onKeyPress={handleFinishEditingTitle}
+            />
+          </FormGroup>
+        )
       }
-      return (
-        <FormGroup>
-          <ControlLabel className={cx({ darkmode: darkMode })}>{t('Plotline name')}</ControlLabel>
-          <FormControl
-            type="text"
-            defaultValue={line.title}
-            inputRef={titleInputRef}
-            autoFocus
-            onKeyDown={handleEsc}
-            onBlur={handleBlur}
-            onKeyPress={handleFinishEditingTitle}
-          />
-        </FormGroup>
-      )
     }
 
     const renderSmall = () => {
@@ -636,6 +649,8 @@ const LineTitleCellConnector = (connector) => {
     notifications: PropTypes.object.isRequired,
     books: PropTypes.object.isRequired,
     zIndex: PropTypes.number,
+    editing: PropTypes.bool,
+    timelineFoci: PropTypes.array.isRequired,
     currentTimeline: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     allHierarchyLevels: PropTypes.object.isRequired,
     togglePinPlotline: PropTypes.func,
@@ -675,6 +690,8 @@ const LineTitleCellConnector = (connector) => {
           books: allBooksSelector(state),
           currentTimeline: selectors.currentTimelineSelector(state),
           allHierarchyLevels: selectors.allHierarchyLevelsSelector(state),
+          editing: selectors.editingGivenLinesTitleSelector(state, ownProps.line.id),
+          timelineFoci: selectors.timelineFociSelector(state),
         }
       },
       (dispatch, ownProps) => {

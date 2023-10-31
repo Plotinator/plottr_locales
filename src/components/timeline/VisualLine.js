@@ -38,7 +38,7 @@ const getMargins = (orientation, isMedium) => {
 
 const nop = () => {}
 
-export default function VisualLine({ color, orientation, isMedium, tableLength }) {
+export default function VisualLine({ color, orientation, isMedium, tableLength, isSearching }) {
   const [margins, setMargins] = useState(getMargins(orientation, isMedium))
   const [currentLength, setCurrentLength] = useState(0)
   const [maxLength, setMaxLength] = useState(0)
@@ -50,13 +50,13 @@ export default function VisualLine({ color, orientation, isMedium, tableLength }
   }, [orientation, isMedium])
 
   useEffect(() => {
-    if (tableLength && tableLength > 0) {
+    if (tableLength && tableLength > 0 && !isSearching) {
       if (!animationStarted) {
         setMaxLength(tableLength - margins)
         setAnimationStarted(true)
       }
     }
-  }, [tableLength, margins, maxLength, setAnimationStarted, animationStarted])
+  }, [tableLength, margins, maxLength, setAnimationStarted, animationStarted, isSearching])
 
   useEffect(() => {
     if (!animationStarted) return nop
@@ -103,4 +103,5 @@ VisualLine.propTypes = {
   tableLength: PropTypes.number,
   isMedium: PropTypes.bool,
   isPinned: PropTypes.bool,
+  isSearching: PropTypes.bool,
 }

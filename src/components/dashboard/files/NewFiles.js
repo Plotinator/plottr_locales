@@ -22,10 +22,9 @@ const NewFilesConnector = (connector) => {
       log,
       mpq,
       os,
-      errorReporter: { getInstance },
     },
   } = connector
-  checkDependencies({ openExistingFile, showErrorBox, log, mpq, os, getInstance })
+  checkDependencies({ openExistingFile, showErrorBox, log, mpq, os })
 
   const NewFiles = ({
     activeView,
@@ -42,9 +41,7 @@ const NewFilesConnector = (connector) => {
         try {
           func()
         } catch (error) {
-          getInstance().then((errorReporter) => {
-            errorReporter.error(type, error)
-          })
+          log.error(error)
           showErrorBox(t('Error'), t('There was an error doing that. Try again'))
         }
       }

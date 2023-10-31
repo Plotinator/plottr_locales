@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
 import { flatten } from 'lodash'
@@ -75,40 +75,39 @@ const PlaceListViewConnector = (connector) => {
     darkMode,
     actions,
     placeSearchTerm,
+    selectedPlaceId,
     customAttributeActions,
     uiActions,
     places,
     placeSort,
+    filterVisible,
+    sortVisible,
+    editingSelected,
+    categoriesOpen,
+    attributeDialogOpen,
   }) => {
-    const [dialogOpen, setDialogOpen] = useState(false)
-    const [placeDetailId, setPlaceDetailId] = useState(null)
-    const [editingSelected, setEditingSelected] = useState(false)
-    const [categoriesOpen, setCategoriesOpen] = useState(false)
-    const [filterVisible, setFilterVisible] = useState(false)
-    const [sortVisible, setSortVisible] = useState(false)
-
     useEffect(() => {
-      setPlaceDetailId(detailID(visiblePlacesByCategory, placeDetailId))
+      uiActions.selectPlace(detailID(visiblePlacesByCategory, selectedPlaceId))
     }, [visiblePlacesByCategory])
 
     const editSelected = () => {
-      setEditingSelected(true)
+      uiActions.startEditingSelectedPlace()
     }
 
     const stopEditing = () => {
-      setEditingSelected(false)
+      uiActions.finishEditingSelectedPlace()
     }
 
     const closeDialog = () => {
-      setCategoriesOpen(false)
-      setDialogOpen(false)
+      uiActions.hidePlaceAttributeDialog()
+      uiActions.hidePlaceCategoryModal()
     }
 
     const handleCreateNewPlace = () => {
       const id = nextId(places)
       actions.addPlace()
-      setPlaceDetailId(id)
-      setEditingSelected(true)
+      uiActions.selectPlace(id)
+      uiActions.startEditingSelectedPlace()
     }
 
     const insertSpace = (event) => {
@@ -156,12 +155,12 @@ const PlaceListViewConnector = (connector) => {
               </Button>
             </NavItem>
             <NavItem>
-              <Button bsSize="small" onClick={() => setDialogOpen(true)}>
+              <Button bsSize="small" onClick={uiActions.showPlaceAttributeDialog}>
                 <Glyphicon glyph="list" /> {i18n('Attributes')}
               </Button>
             </NavItem>
             <NavItem>
-              <Button bsSize="small" onClick={() => setCategoriesOpen(true)}>
+              <Button bsSize="small" onClick={uiActions.showPlaceCategoryModal}>
                 <Glyphicon glyph="list" /> {i18n('Categories')}
               </Button>
             </NavItem>
@@ -170,16 +169,18 @@ const PlaceListViewConnector = (connector) => {
                 trigger="click"
                 rootClose
                 open={filterVisible}
-                onClose={() => {
-                  setFilterVisible(false)
-                }}
+                onClose={uiActions.showPlaceFilterList}
                 placement="bottom"
                 component={filterPopover}
               >
                 <Button
                   bsSize="small"
                   onClick={() => {
-                    setFilterVisible(!filterVisible)
+                    if (!filterVisible) {
+                      uiActions.showPlaceFilterList()
+                    } else {
+                      uiActions.hidePlaceFilterList()
+                    }
                   }}
                 >
                   <Glyphicon glyph="filter" /> {i18n('Filter')}
@@ -192,16 +193,18 @@ const PlaceListViewConnector = (connector) => {
                 trigger="click"
                 rootClose
                 open={sortVisible}
-                onClose={() => {
-                  setSortVisible(false)
-                }}
+                onClose={uiActions.hidePlaceSort}
                 placement="bottom"
                 component={sortPopover}
               >
                 <Button
                   bsSize="small"
                   onClick={() => {
-                    setSortVisible(!sortVisible)
+                    if (!sortVisible) {
+                      uiActions.showPlaceSort()
+                    } else {
+                      uiActions.hidePlaceSort()
+                    }
                   }}
                 >
                   <Glyphicon glyph={sortGlyph} /> {i18n('Sort')}
@@ -239,19 +242,16 @@ const PlaceListViewConnector = (connector) => {
 
       if (!places) return []
 
-      return places.map((pl) => {
-        return (
-          <PlaceItem
-            key={pl.id}
-            place={pl}
-            selected={pl.id == placeDetailId}
-            startEdit={editSelected}
-            stopEdit={stopEditing}
-            select={() => setPlaceDetailId(pl.id)}
-            editing={editingSelected}
-          />
-        )
-      })
+      return places.map((pl) => (
+        <PlaceItem
+          key={pl.id}
+          place={pl}
+          selected={pl.id == selectedPlaceId}
+          startEdit={editSelected}
+          stopEdit={stopEditing}
+          select={() => uiActions.selectPlace(pl.id)}
+        />
+      ))
     }
 
     const renderCategory = (category) => {
@@ -272,7 +272,7 @@ const PlaceListViewConnector = (connector) => {
     }
 
     const renderPlaceDetails = () => {
-      let place = places.find((pl) => pl.id === placeDetailId)
+      let place = places.find((pl) => pl.id === selectedPlaceId)
       if (place) {
         return (
           <ErrorBoundary>
@@ -291,7 +291,7 @@ const PlaceListViewConnector = (connector) => {
     }
 
     const renderCustomAttributes = () => {
-      if (!dialogOpen) {
+      if (!attributeDialogOpen) {
         return null
       }
       return <CustomAttributeModal hideSaveAsTemplate type="places" closeDialog={closeDialog} />
@@ -339,9 +339,15 @@ const PlaceListViewConnector = (connector) => {
     actions: PropTypes.object.isRequired,
     customAttributeActions: PropTypes.object.isRequired,
     placeSearchTerm: PropTypes.string,
+    selectedPlaceId: PropTypes.number,
     uiActions: PropTypes.object.isRequired,
     places: PropTypes.array,
     placeSort: PropTypes.string.isRequired,
+    filterVisible: PropTypes.bool,
+    sortVisible: PropTypes.bool,
+    editingSelected: PropTypes.bool,
+    categoriesOpen: PropTypes.bool,
+    attributeDialogOpen: PropTypes.bool,
   }
 
   const {
@@ -371,6 +377,12 @@ const PlaceListViewConnector = (connector) => {
           darkMode: selectors.isDarkModeSelector(state),
           placeSort: selectors.placeSortSelector(state),
           placeSearchTerm: selectors.placesSearchTermSelector(state),
+          selectedPlaceId: selectors.selectedPlaceSelector(state),
+          filterVisible: selectors.placesFilterIsVisibleSelector(state),
+          sortVisible: selectors.placesSortIsVisibleSelector(state),
+          editingSelected: selectors.editingSelectedPlaceSelector(state),
+          categoriesOpen: selectors.placesCategoriesOpenSelector(state),
+          attributeDialogOpen: selectors.placeAttributeDialogIsOpenSelector(state),
           isPlacesManuallySorted: selectors.isPlacesManuallySortedSelector(state),
         }
       },

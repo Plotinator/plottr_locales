@@ -41,8 +41,7 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
   opacity: 0;
 }
 
-.beat__heading-wrapper {
-}
+.beat__heading-wrapper {}
 
 .beat__heading {
   @include sub-header-font;
@@ -317,8 +316,7 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
 .beat-list__insert:hover {
   color: $blue-5;
 
-  .insert-beat-wrapper.append-beat {
-  }
+  .insert-beat-wrapper.append-beat {}
 }
 
 .insert-missing-beat-wrapper:hover {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import PropTypes from 'react-proptypes'
+import { isEqual } from 'lodash'
 import cx from 'classnames'
 import { FiCopy } from 'react-icons/fi'
 
@@ -10,7 +11,7 @@ import ButtonToolbar from '../ButtonToolbar'
 import Glyphicon from '../Glyphicon'
 import ControlLabel from '../ControlLabel'
 import FormGroup from '../FormGroup'
-import FormControl from '../FormControl'
+import UnconnectedTextFormControl from '../TextFormControl'
 import Button from '../Button'
 import UnconnectedColorPicker from '../ColorPicker'
 import UnconnectedCategoryPicker from '../CategoryPicker'
@@ -20,16 +21,15 @@ import { checkDependencies } from '../checkDependencies'
 const TagViewConnector = (connector) => {
   const ColorPicker = UnconnectedColorPicker(connector)
   const CategoryPicker = UnconnectedCategoryPicker(connector)
+  const TextFormControl = UnconnectedTextFormControl(connector)
 
-  const TagView = ({ tag, newTag, darkMode, doneCreating, actions }) => {
-    const [editing, setEditing] = useState(tag.title === '')
+  const TagView = ({ tag, newTag, darkMode, editing, foci, doneCreating, actions, uiActions }) => {
     const [showColorPicker, setShowColorPicker] = useState(false)
     const [hovering, setHovering] = useState(false)
     const [color, setColor] = useState(null)
     const [deleting, setDeleting] = useState(false)
     const [categoryId, setCategoryId] = useState(tag.categoryId)
-
-    const titleInputRef = useRef()
+    const [title, setTitle] = useState(tag.title || '')
 
     useRef(() => {
       return () => {
@@ -57,7 +57,7 @@ const TagViewConnector = (connector) => {
     }
 
     const handleCancel = () => {
-      setEditing(false)
+      uiActions.finishEditingSelectedTag()
       stopHovering()
       if (newTag) {
         doneCreating()
@@ -77,7 +77,7 @@ const TagViewConnector = (connector) => {
     }
 
     const startEditing = () => {
-      setEditing(true)
+      uiActions.editSelectedTag()
     }
 
     const startHovering = () => {
@@ -88,14 +88,18 @@ const TagViewConnector = (connector) => {
       setHovering(false)
     }
 
+    const handleTitleChange = (value, _selection) => {
+      setTitle(value)
+    }
+
     const saveEdit = () => {
-      if (titleInputRef.current.value === '') {
+      if (title === '') {
         handleCancel()
         return
       }
 
-      let { title, id } = tag
-      var newTitle = titleInputRef.current.value || title
+      let { id } = tag
+      var newTitle = title || tag.title
       if (newTag) {
         actions.addCreatedTag({
           title: newTitle,
@@ -106,7 +110,7 @@ const TagViewConnector = (connector) => {
       } else {
         actions.editTag(id, newTitle, tag.color || color, categoryId)
       }
-      setEditing(false)
+      uiActions.finishEditingSelectedTag()
       stopHovering()
     }
 
@@ -148,20 +152,27 @@ const TagViewConnector = (connector) => {
       actions.duplicateTag(tag.id)
     }
 
+    const selectionForMainElement = (name) => {
+      const tagId = tag.id
+
+      return foci?.find(({ path }) => {
+        return isEqual(path, ['tag', tagId, name])
+      })?.selection
+    }
+
     const renderEditing = () => {
       return (
         <div>
           <FormGroup>
             <ControlLabel>{i18n('Tag Name')}</ControlLabel>
-            <FormControl
+            <TextFormControl
               type="text"
-              inputRef={(ref) => {
-                titleInputRef.current = ref
-              }}
-              autoFocus
+              onChange={handleTitleChange}
               onKeyDown={handleEsc}
               onKeyPress={handleEnter}
-              defaultValue={tag.title}
+              autoFocus
+              selection={selectionForMainElement('title')}
+              value={title}
             />
           </FormGroup>
           <FormGroup>
@@ -254,8 +265,11 @@ const TagViewConnector = (connector) => {
   TagView.propTypes = {
     tag: PropTypes.object.isRequired,
     newTag: PropTypes.bool,
+    editing: PropTypes.bool,
     doneCreating: PropTypes.func,
+    foci: PropTypes.array,
     actions: PropTypes.object.isRequired,
+    uiActions: PropTypes.object.isRequired,
     darkMode: PropTypes.bool,
   }
 
@@ -263,21 +277,25 @@ const TagViewConnector = (connector) => {
     pltr: { actions, selectors },
   } = connector
   const TagActions = actions.tag
+  const UiActions = actions.ui
   const { redux } = connector
-  checkDependencies({ actions, TagActions, redux })
+  checkDependencies({ actions, TagActions, UiActions, redux })
 
   if (redux) {
     const { connect, bindActionCreators } = redux
 
     return connect(
-      (state) => {
+      (state, ownProps) => {
         return {
           darkMode: selectors.isDarkModeSelector(state),
+          editing: selectors.isEditingTagSelector(state, ownProps.tag.id),
+          foci: selectors.tagCurrentFociSelector(state),
         }
       },
       (dispatch) => {
         return {
           actions: bindActionCreators(TagActions, dispatch),
+          uiActions: bindActionCreators(UiActions, dispatch),
         }
       }
     )(TagView)

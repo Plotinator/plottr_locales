@@ -10,14 +10,13 @@
 
 .card-dialog.darkmode {
   color: $darkmode-text;
-  background-color: transparent;
 
   .card-dialog__description .card-dialog__tabs {
     .nav-tabs {
       border-bottom-color: $darkmode-border;
     }
 
-    .nav-tabs > li:not(.active) > a:not(:hover) {
+    .nav-tabs>li:not(.active)>a:not(:hover) {
       color: #bbb;
     }
 
@@ -105,7 +104,7 @@
       border-right: 1px solid $gray-8;
       border-bottom: 1px solid $gray-8;
 
-      & > .tab-pane {
+      &>.tab-pane {
         height: 100%;
         overflow: auto;
         position: relative;
@@ -160,7 +159,7 @@
         }
       }
 
-      & > .tab-pane .template-picker__link {
+      &>.tab-pane .template-picker__link {
         cursor: pointer;
         margin-left: 4px;
         vertical-align: middle;
@@ -170,7 +169,7 @@
         }
       }
 
-      & > .tab-pane .template-tab__details {
+      &>.tab-pane .template-tab__details {
         display: flex;
         justify-content: space-between;
 
@@ -383,9 +382,10 @@
 }
 
 .card-dialog__left-side {
+
   // The dropdowns for plotline and beat cause a horizontal scrollbar
   // when the titles are very long because the menu items don't wrap
-  .dropdown-menu > li > a {
+  .dropdown-menu>li>a {
     white-space: normal;
   }
 
@@ -431,6 +431,7 @@
 
   .card-dialog.darkmode {
     .card-dialog__description {
+
       .nav-tabs {
         color: #bbb;
         border-bottom-color: $darkmode-v2-border;
@@ -438,7 +439,7 @@
         li.active {
           a {
             background-color: $darkmode-v2-background;
-
+  
             &:hover {
               background-color: $darkmode-v2-background;
             }
@@ -447,6 +448,7 @@
       }
 
       .card-dialog__tabs {
+
         .tab-content,
         .card-dialog__button-bar {
           border-color: $darkmode-v2-border;

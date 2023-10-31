@@ -3,7 +3,7 @@ import { t } from 'plottr_locales'
 import PropTypes from 'react-proptypes'
 
 export default function AccountHeader({ os }) {
-  const imgSrc = os == 'unknown' ? '/logo_light_28_500.png' : '../icons/logo_light_28_500.png'
+  const imgSrc = os == 'unknown' ? '/logo_28_500.png' : '../icons/logo_28_500.png'
   return (
     <div className="dashboard__account__header text-center">
       <h1>

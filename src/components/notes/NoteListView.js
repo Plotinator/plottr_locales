@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
 
@@ -83,40 +83,39 @@ const NoteListViewConnector = (connector) => {
     places,
     tags,
     darkMode,
+    selectedNoteId,
     uiActions,
     filterIsEmpty,
     noteSort,
     notesSearchTerm,
+    editingSelected,
+    categoriesDialogOpen,
+    attributesDialogOpen,
+    filterVisible,
+    sortVisible,
   }) => {
-    const [noteDetailId, setNoteDetailId] = useState(null)
-    const [editingSelected, setEditingSelected] = useState(false)
-    const [categoriesDialogOpen, setCategoriesDialogOpen] = useState(false)
-    const [attributesDialogOpen, setAttributesDialogOpen] = useState(false)
-    const [filterVisible, setFilterVisible] = useState(false)
-    const [sortVisible, setSortVisible] = useState(false)
-
     useEffect(() => {
-      setNoteDetailId(detailID(visibleNotesByCategory, notes, categories, noteDetailId))
+      uiActions.selectNote(detailID(visibleNotesByCategory, notes, categories, selectedNoteId))
     }, [notes, visibleNotesByCategory, categories])
 
     const handleCreateNewNote = () => {
       const id = nextId(notes)
       actions.addNote()
-      setNoteDetailId(id)
-      setEditingSelected(true)
+      uiActions.selectNote(id)
+      uiActions.startEditingSelectedNote()
     }
 
     const startEditing = () => {
-      setEditingSelected(true)
+      uiActions.startEditingSelectedNote()
     }
 
     const stopEditing = () => {
-      setEditingSelected(false)
+      uiActions.finishEditingSelectedNote()
     }
 
     const closeDialog = () => {
-      setAttributesDialogOpen(false)
-      setCategoriesDialogOpen(false)
+      uiActions.hideNotesCategoryDialog()
+      uiActions.hideNotesAttributesDialog()
     }
 
     const renderCustomAttributes = () => {
@@ -136,21 +135,17 @@ const NoteListViewConnector = (connector) => {
           ? [...(visibleNotesByCategory[null] || []), ...(visibleNotesByCategory[undefined] || [])]
           : visibleNotesByCategory[categoryId]
 
-      if (!notes) return []
-
-      return notes.map((n) => {
-        return (
-          <NoteItem
-            editing={editingSelected}
-            key={n.id}
-            note={n}
-            selected={n.id == noteDetailId}
-            startEdit={startEditing}
-            stopEdit={stopEditing}
-            select={() => setNoteDetailId(n.id)}
-          />
-        )
-      })
+      return notes.map((n) => (
+        <NoteItem
+          editing={editingSelected}
+          key={n.id}
+          note={n}
+          selected={n.id == selectedNoteId}
+          startEdit={startEditing}
+          stopEdit={stopEditing}
+          select={() => uiActions.selectNote(n.id)}
+        />
+      ))
     }
 
     const renderNotes = () => {
@@ -173,7 +168,7 @@ const NoteListViewConnector = (connector) => {
     }
 
     const renderNoteDetails = () => {
-      let note = notes.find((n) => n.id === noteDetailId)
+      let note = notes.find((n) => n.id === selectedNoteId)
       if (!note) return null
       return (
         <ErrorBoundary>
@@ -236,12 +231,12 @@ const NoteListViewConnector = (connector) => {
               </Button>
             </NavItem>
             <NavItem>
-              <Button bsSize="small" onClick={() => setAttributesDialogOpen(true)}>
+              <Button bsSize="small" onClick={uiActions.showNotesAttributesDialog}>
                 <Glyphicon glyph="list" /> {i18n('Attributes')}
               </Button>
             </NavItem>
             <NavItem>
-              <Button bsSize="small" onClick={() => setCategoriesDialogOpen(true)}>
+              <Button bsSize="small" onClick={uiActions.showNotesCategoryDialog}>
                 <Glyphicon glyph="list" /> {i18n('Categories')}
               </Button>
             </NavItem>
@@ -250,16 +245,18 @@ const NoteListViewConnector = (connector) => {
                 trigger="click"
                 rootClose
                 open={filterVisible}
-                onClose={() => {
-                  setFilterVisible(false)
-                }}
+                onClose={uiActions.showNotesFilterList}
                 placement="bottom"
                 component={popover}
               >
                 <Button
                   bsSize="small"
                   onClick={() => {
-                    setFilterVisible(!filterVisible)
+                    if (!filterVisible) {
+                      uiActions.showNotesFilterList()
+                    } else {
+                      uiActions.hideNotesFilterList()
+                    }
                   }}
                 >
                   <Glyphicon glyph="filter" /> {i18n('Filter')}
@@ -272,16 +269,18 @@ const NoteListViewConnector = (connector) => {
                 trigger="click"
                 rootClose
                 open={sortVisible}
-                onClose={() => {
-                  setSortVisible(false)
-                }}
+                onClose={uiActions.hideNotesSort}
                 placement="bottom"
                 component={sortPopover}
               >
                 <Button
                   bsSize="small"
                   onClick={() => {
-                    setSortVisible(!sortVisible)
+                    if (!sortVisible) {
+                      uiActions.showNotesSort()
+                    } else {
+                      uiActions.hideNotesSort()
+                    }
                   }}
                 >
                   <Glyphicon glyph={sortGlyph} /> {i18n('Sort')}
@@ -344,6 +343,12 @@ const NoteListViewConnector = (connector) => {
     filterIsEmpty: PropTypes.bool.isRequired,
     noteSort: PropTypes.string.isRequired,
     notesSearchTerm: PropTypes.string,
+    selectedNoteId: PropTypes.number,
+    editingSelected: PropTypes.bool,
+    categoriesDialogOpen: PropTypes.bool,
+    attributesDialogOpen: PropTypes.bool,
+    filterVisible: PropTypes.bool,
+    sortVisible: PropTypes.bool,
   }
 
   const {
@@ -373,6 +378,12 @@ const NoteListViewConnector = (connector) => {
           customAttributes: selectors.characterCustomAttributesSelector(state),
           noteSort: selectors.noteSortSelector(state),
           notesSearchTerm: selectors.notesSearchTermSelector(state),
+          selectedNoteId: selectors.selectedNoteSelector(state),
+          editingSelected: selectors.editingSelectedNoteSelector(state),
+          categoriesDialogOpen: selectors.noteCategoriesDialogOpenSelector(state),
+          attributesDialogOpen: selectors.noteAttributesDialogOpenSelector(state),
+          filterVisible: selectors.noteFilterVisibleSelector(state),
+          sortVisible: selectors.noteSortVisibleSelector(state),
         }
       },
       (dispatch) => {

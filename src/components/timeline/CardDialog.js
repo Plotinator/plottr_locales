@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import { isEqual } from 'lodash'
 import PropTypes from 'react-proptypes'
 import { FiCopy } from 'react-icons/fi'
 import cx from 'classnames'
@@ -15,7 +16,7 @@ import Tabs from '../Tabs'
 import ButtonToolbar from '../ButtonToolbar'
 import UnconnectedPlottrFloater from '../PlottrFloater'
 import Glyphicon from '../Glyphicon'
-import FormControl from '../FormControl'
+import UnconnectedTextFormControl from '../TextFormControl'
 import Button from '../Button'
 import ColorPickerColor from '../ColorPickerColor'
 import DeleteConfirmModal from '../dialogs/DeleteConfirmModal'
@@ -28,6 +29,7 @@ import UnconnectedCardDescriptionEditor from './CardDescriptionEditor'
 import TemplatePickerConnector from '../templates/TemplatePicker'
 import { checkDependencies } from '../checkDependencies'
 import { contains } from '../domHelpers'
+import { withArgs } from '../withArgs'
 
 const {
   card: { truncateTitle },
@@ -48,6 +50,7 @@ const CardDialogConnector = (connector) => {
   const TemplatePicker = TemplatePickerConnector(connector)
   const MiniColorPicker = UnconnectedMiniColorPicker(connector)
   const Floater = UnconnectedPlottrFloater(connector)
+  const TextFormControl = UnconnectedTextFormControl(connector)
 
   const {
     platform: { templatesDisabled, openExternal },
@@ -78,22 +81,19 @@ const CardDialogConnector = (connector) => {
     destinationBeatId,
     destinationLineId,
     click,
+    deleting,
+    showColorPicker,
+    showTemplatePicker,
+    removing,
+    removeWhichTemplate,
+    activeTab,
+    foci,
   }) => {
-    const [deleting, setDeleting] = useState(false)
-    const [showColorPicker, setShowColorPicker] = useState(false)
-    const [showTemplatePicker, setShowTemplatePicker] = useState(false)
-    const [removing, setRemoving] = useState(false)
-    const [removeWhichTemplate, setRemoveWhichTemplate] = useState(null)
-    const [activeTab, setActiveTab] = useState(1)
     const [newTemplateTabPosition, setNewTemplateTabPosition] = useState(null)
 
     const colourPickerButtonRef = useRef()
     const colourPickerPaletteListRef = useRef()
     const previousClick = useRef(click)
-
-    const closeColourPicker = useCallback(() => {
-      setShowColorPicker(false)
-    }, [showColorPicker])
 
     useEffect(() => {
       if (!colourPickerPaletteListRef.current || !colourPickerButtonRef.current) return
@@ -103,14 +103,22 @@ const CardDialogConnector = (connector) => {
         click.counter !== previousClick.counter &&
         !contains(colourPickerPaletteListRef.current, click)
       ) {
-        setShowColorPicker(false)
+        uiActions.showCardDialogColorPicker()
       }
 
       previousClick.current = click
     }, [click])
 
-    const saveEdit = () => {
-      // NOP.
+    const selectionForMainCardElement = (name) => {
+      return foci?.find(({ path }) => {
+        return isEqual(path, ['card', cardId, name])
+      })?.selection
+    }
+
+    const selectionForTemplateAttribute = (template, attr) => {
+      return foci?.find(({ path }) => {
+        return isEqual(path, ['card', cardId, 'template', template.id, attr.name])
+      })?.selection
     }
 
     if (!cardMetaData) {
@@ -126,12 +134,12 @@ const CardDialogConnector = (connector) => {
 
     const cancelDelete = (e) => {
       e.stopPropagation()
-      setDeleting(false)
+      uiActions.startDeletingCardFromCardDialog()
     }
 
     const handleDelete = (e) => {
       e.stopPropagation()
-      setDeleting(true)
+      uiActions.stopDeletingCardFromCardDialog()
     }
 
     const duplicateCard = (e) => {
@@ -141,50 +149,43 @@ const CardDialogConnector = (connector) => {
     }
 
     const beginRemoveTemplate = (templateId) => {
-      setRemoving(true)
-      setRemoveWhichTemplate(templateId)
+      uiActions.startRemovingTemplateFromCardDialog(templateId)
     }
 
     const finishRemoveTemplate = (e) => {
       e.stopPropagation()
-      setActiveTab(activeTab - 1)
+      uiActions.setActiveTabOnCardDialog(activeTab - 1)
       actions.removeTemplateFromCard(cardId, removeWhichTemplate)
-      setRemoving(false)
-      setRemoveWhichTemplate(null)
+      uiActions.stopRemovingTemplateFromCardDialog()
     }
 
     const cancelRemoveTemplate = (e) => {
       e.stopPropagation()
-      setRemoving(false)
-      setRemoveWhichTemplate(null)
+      uiActions.stopRemovingTemplateFromCardDialog()
     }
 
     const saveAndClose = () => {
-      // componentWillUnmount saves the data (otherwise we get a duplicate event)
       closeDialog()
     }
 
     const toggleColorPicker = () => {
-      setShowColorPicker(!showColorPicker)
+      if (!showColorPicker) {
+        uiActions.showCardDialogColorPicker()
+      } else {
+        uiActions.hideCardDialogColorPicker()
+      }
     }
 
-    const handleAttrChange = (attrName) => (desc, selection) => {
-      const editorPath = helpers.editors.cardCustomAttributeEditorPath(id, attrName)
-      actions.editCardAttributes(
-        cardId,
-        helpers.editors.attrIfPresent(attrName, desc),
-        editorPath,
-        selection
-      )
+    const handleAttrChange = (attrName) => (value, selection) => {
+      actions.editCardCustomAttribute(cardId, attrName, value, selection)
     }
 
     const handleTemplateAttrChange = (templateId, name) => (value, selection) => {
-      const editorPath = helpers.editors.cardTemplateAttributeEditorPath(id, templateId, name)
       if (!value && value !== '') {
-        actions.editCardAttributes(cardId, {}, editorPath, selection)
+        actions.editCardAttributes(cardId, {}, selection)
         return
       }
-      actions.editCardTemplateAttribute(cardId, templateId, name, value, editorPath, selection)
+      actions.editCardTemplateAttribute(cardId, templateId, name, value, selection)
     }
 
     const handleEnter = (event) => {
@@ -194,23 +195,23 @@ const CardDialogConnector = (connector) => {
     }
 
     const openTemplatePicker = () => {
-      setShowTemplatePicker(true)
+      uiActions.showCardDialogTemplatePicker()
     }
 
     const handleChooseTemplate = (templateData) => {
       const numTemplates = templates.length
       actions.addTemplateToCard(id, templateData)
-      setShowTemplatePicker(false)
-      setActiveTab(numTemplates + 3)
+      uiActions.hideCardDialogTemplatePicker()
+      uiActions.setActiveTabOnCardDialog(numTemplates + 3)
     }
 
     const closeTemplatePicker = () => {
-      setShowTemplatePicker(false)
+      uiActions.hideCardDialogTemplatePicker()
     }
 
     const chooseCardColor = (color) => {
       actions.editCardAttributes(cardId, { color })
-      setShowColorPicker(false)
+      uiActions.showCardDialogColorPicker()
     }
 
     const changeBeat = (beatId) => {
@@ -244,7 +245,7 @@ const CardDialogConnector = (connector) => {
       if (key == 'new') {
         openTemplatePicker()
       } else if (typeof key === 'number') {
-        setActiveTab(key)
+        uiActions.setActiveTabOnCardDialog(key)
         if (key === 2 && !customAttributes.length) {
           uiActions.openAttributesDialog()
         }
@@ -292,20 +293,19 @@ const CardDialogConnector = (connector) => {
 
     const renderEditingCustomAttributes = () => {
       return customAttributes.map((attr, index) => {
-        const editorPath = helpers.editors.cardCustomAttributeEditorPath(id, attr.name)
         return (
           <React.Fragment key={`custom-attribute-${index}-${attr.name}`}>
             <EditAttribute
               index={index}
               entityType="scene"
               valueSelector={selectors.attributeValueSelector(cardId, attr.name)}
-              editorPath={editorPath}
               onChange={handleAttrChange(attr.name)}
-              onSave={saveEdit}
               onSaveAndClose={saveAndClose}
               name={attr.name}
               id={attr.id}
               type={attr.type}
+              autoFocus={foci && foci[0] && foci[0].path[2] === attr.name}
+              selection={selectionForMainCardElement(attr.name)}
             />
           </React.Fragment>
         )
@@ -345,18 +345,12 @@ const CardDialogConnector = (connector) => {
         }
 
         const attrs = template.attributes.map((attr, index) => {
-          const editorPath = helpers.editors.cardTemplateAttributeEditorPath(
-            cardId,
-            template.id,
-            attr.name
-          )
           return (
             <React.Fragment key={`template-attribute-${index}-${template.id}-${attr.name}`}>
               <EditAttribute
                 templateAttribute
                 index={index}
                 entityType="scene"
-                editorPath={editorPath}
                 valueSelector={selectors.templateAttributeValueSelector(
                   cardId,
                   template.id,
@@ -364,8 +358,15 @@ const CardDialogConnector = (connector) => {
                 )}
                 inputId={`${template.id}-${attr.name}Input`}
                 onChange={handleTemplateAttrChange(template.id, attr.name)}
-                onSave={saveEdit}
                 onSaveAndClose={saveAndClose}
+                autoFocus={
+                  foci &&
+                  foci[0] &&
+                  foci[0].path[2] === 'template' &&
+                  foci[0].path[3] === template.id &&
+                  foci[0].path[4] === attr.name
+                }
+                selection={selectionForTemplateAttribute(template, attr)}
                 name={attr.name}
                 id={attr.id}
                 type={attr.type}
@@ -484,16 +485,15 @@ const CardDialogConnector = (connector) => {
     const renderTitle = () => {
       const title = cardMetaData.title
       return (
-        <FormControl
+        <TextFormControl
           placeholder={t('Enter title')}
           style={{ fontSize: '24px', textAlign: 'center', marginBottom: '6px' }}
           onKeyPress={handleEnter}
           type="text"
-          onChange={(event) => {
-            var newTitle = event.target.value
-            actions.editCardAttributes(cardId, { title: newTitle })
-          }}
-          defaultValue={title}
+          value={title}
+          onChange={withArgs(actions.editCardTitle, cardMetaData.id)}
+          autoFocus={foci && foci[0] && foci[0].path[2] === 'title'}
+          selection={selectionForMainCardElement('title')}
         />
       )
     }
@@ -527,7 +527,7 @@ const CardDialogConnector = (connector) => {
             colourPickerPaletteListRef.current = ref
           }}
           chooseColor={chooseCardColor}
-          close={() => setShowColorPicker(false)}
+          close={uiActions.hideCardDialogColorPicker}
         />
       )
     }
@@ -603,7 +603,7 @@ const CardDialogConnector = (connector) => {
               open={showColorPicker}
               placement="bottom"
               component={renderColourPicker}
-              onClose={closeColourPicker}
+              onClose={uiActions.hideCardDialogColorPicker}
             >
               <ColorPickerColor
                 color={cardMetaData.color || cardMetaData.color === null ? 'none' : '#F1F5F8'} // $gray-9
@@ -701,6 +701,13 @@ const CardDialogConnector = (connector) => {
     destinationLineId: PropTypes.func,
     destinationBeatId: PropTypes.func,
     click: PropTypes.object,
+    deleting: PropTypes.bool,
+    showColorPicker: PropTypes.bool,
+    showTemplatePicker: PropTypes.bool,
+    removing: PropTypes.bool,
+    removeWhichTemplate: PropTypes.number,
+    activeTab: PropTypes.number.isRequired,
+    foci: PropTypes.array.isRequired,
   }
 
   const MemoizedCardDialog = React.memo(CardDialog)
@@ -732,6 +739,14 @@ const CardDialogConnector = (connector) => {
           getTemplateById: selectors.templateByIdFnSelector(state),
           destinationLineId: selectors.firstLineForBookThunkSelector(state),
           destinationBeatId: selectors.firstVisibleBeatForBookThunkSelector(state),
+          click: selectors.lastClickSelector(state),
+          deleting: selectors.isCardDialogDeletingSelector(state),
+          showColorPicker: selectors.isCardDialogColorPickerOpenSelector(state),
+          showTemplatePicker: selectors.isCardDialogTemplatePickerOpenSelector(state),
+          removing: selectors.isCardDialogTemplateBeingRemoved(state),
+          removeWhichTemplate: selectors.whichTemplateIsBeingRemovedViaCardDialogSelector(state),
+          activeTab: selectors.cardDialogTabSelector(state),
+          foci: selectors.timelineCurrentFocusSelector(state),
         }
       },
       (dispatch) => {

@@ -218,16 +218,3 @@
     }
   }
 }
-
-.darkmode {
-  .template-picker__wrapper {
-    .template-picker__list {
-      li.list-group-item {
-        &.selected,
-        &:hover {
-          background-color: #24252c;
-        }
-      }
-    }
-  }
-}

@@ -22,11 +22,9 @@ const FilesHomeConnector = (connector) => {
       showSaveDialog,
       userFilePickerDefaultFolder,
       mpq,
-      errorReporter: { getInstance },
     },
   } = connector
   checkDependencies({
-    getInstance,
     createNew,
     createFromSnowflake,
     createFromScrivener,
@@ -119,9 +117,7 @@ const FilesHomeConnector = (connector) => {
         })
       } catch (error) {
         if (error) {
-          getInstance().then((errorReporter) => {
-            errorReporter.error('Error importing from Snowflake', error)
-          })
+          log.error(error)
           showErrorBox(t('Error'), t('There was an error doing that. Try again'))
         }
       }
@@ -142,9 +138,7 @@ const FilesHomeConnector = (connector) => {
         })
       } catch (error) {
         if (error) {
-          getInstance().then((errorReporter) => {
-            errorReporter.error('Error importing from Scrivener', error)
-          })
+          log.error(error)
           showErrorBox(t('Error'), t('There was an error doing that. Try again'))
         }
       }
@@ -172,6 +166,7 @@ const FilesHomeConnector = (connector) => {
           savePlottrProjectDialog().then((newFilePath) => {
             if (newFilePath) {
               if (newFilePath.startsWith(settings.user.backupLocation)) {
+                log.error(new Error('Attempted to save to backup location', newFilePath))
                 showErrorBox(
                   t('Error'),
                   t('Please choose a destination other than your backup folder')

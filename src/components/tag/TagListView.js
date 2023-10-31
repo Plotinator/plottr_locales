@@ -56,6 +56,7 @@ const TagListViewConnector = (connector) => {
 
   const TagListView = ({
     tags,
+    selectedTagId,
     actions,
     darkMode,
     tagsByCategory,
@@ -65,11 +66,10 @@ const TagListViewConnector = (connector) => {
   }) => {
     const [appending, setAppending] = useState(false)
     const [categoriesDialogOpen, setCategoriesDialogOpen] = useState(false)
-    const [tagDetailId, setTagDetailId] = useState(null)
     const [newCategoryId, setNewCategoryId] = useState(null)
 
     useEffect(() => {
-      setTagDetailId(detailID(tagsByCategory, tags, categories, tagDetailId))
+      uiActions.selectTag(detailID(tagsByCategory, tags, categories, selectedTagId))
     }, [tags, tagsByCategory, categories])
 
     const appendBlankTag = (categoryId) => {
@@ -211,6 +211,7 @@ const TagListViewConnector = (connector) => {
     tagsByCategory: PropTypes.object.isRequired,
     categories: PropTypes.array.isRequired,
     tagsSearchTerm: PropTypes.string,
+    selectedTagId: PropTypes.number,
     uiActions: PropTypes.object.isRequired,
   }
 
@@ -238,6 +239,7 @@ const TagListViewConnector = (connector) => {
           categories: selectors.sortedTagCategoriesSelector(state),
           tagsByCategory: selectors.searchedTagsByCategorySelector(state),
           tagsSearchTerm: selectors.tagsSearchTermSelector(state),
+          selectedTagId: selectors.selectedTagSelector(state),
         }
       },
       (dispatch) => {

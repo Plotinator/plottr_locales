@@ -32,28 +32,6 @@ const confirmModalStyles = {
   content: { position: 'relative', maxWidth: 600, maxHeight: 400, borderRadius: 20 },
 }
 
-const typeMap = {
-  project: t('Project Templates'),
-  plotlines: t('Starter Templates'),
-  characters: t('Starter Templates'),
-  scenes: t('Starter Templates'),
-}
-
-const subCatMap = {
-  all: t('All'),
-  children: t('Children'),
-  comedy: t('Comedy'),
-  general: t('General'),
-  horror: t('Horror'),
-  romance: t('Romance'),
-  mystery: t('Mystery'),
-  action: t('Action'),
-  screenplay: t('Screenplay'),
-  shortstory: t('Short Story'),
-  playwriting: t('Playwriting'),
-  poetry: t('Poetry'),
-}
-
 const subCategories = [
   'all',
   'action',
@@ -106,6 +84,27 @@ const TemplatePickerConnector = (connector) => {
     withFullState,
     hierarchyLevels,
   }) => {
+    const typeMap = {
+      project: t('Project Templates'),
+      plotlines: t('Starter Templates'),
+      characters: t('Starter Templates'),
+      scenes: t('Starter Templates'),
+    }
+
+    const subCatMap = {
+      all: t('All'),
+      children: t('Children'),
+      comedy: t('Comedy'),
+      general: t('General'),
+      horror: t('Horror'),
+      romance: t('Romance'),
+      mystery: t('Mystery'),
+      action: t('Action'),
+      screenplay: t('Screenplay'),
+      shortstory: t('Short Story'),
+      playwriting: t('Playwriting'),
+      poetry: t('Poetry'),
+    }
     const [selectedId, setSelectedId] = useState(null)
     const [selectedCategory, setSelectedCategory] = useState(null)
     const [selectedType, setSelectedType] = useState(null)
@@ -513,7 +512,7 @@ const TemplatePickerConnector = (connector) => {
                 onClick={applyStagedTemplate}
                 disabled={!selectedId}
               >
-                {confirmButtonText}
+                {confirmButtonText || t('Choose')}
               </Button>
             </ButtonToolbar>
           </div>
@@ -543,7 +542,7 @@ const TemplatePickerConnector = (connector) => {
               onClick={chooseTemplate}
               disabled={!selectedId}
             >
-              {confirmButtonText}
+              {confirmButtonText || t('Choose')}
             </Button>
           </ButtonToolbar>
         </div>
@@ -567,7 +566,6 @@ const TemplatePickerConnector = (connector) => {
 
   TemplatePicker.defaultProps = {
     showCancelButton: true,
-    confirmButtonText: t('Choose'),
     close: () => {},
   }
 

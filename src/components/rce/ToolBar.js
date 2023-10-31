@@ -37,24 +37,9 @@ const UnconnectedToolBar = (connector) => {
   const Floater = UnconnectedFloater(connector)
 
   const {
-    platform: {
-      os,
-      log,
-      isDevelopment,
-      errorReporter: { getInstance },
-    },
+    platform: { os, log, isDevelopment },
   } = connector
-  checkDependencies({ getInstance, os, log, isDevelopment })
-
-  const errorReportingLogger = {
-    info: log.info,
-    warn: log.warn,
-    error: (...args) => {
-      getInstance().then((errorReporter) => {
-        errorReporter.error(...args)
-      })
-    },
-  }
+  checkDependencies({ os, log, isDevelopment })
 
   const boldIcon = <FaBold />
   const italicIcon = <FaItalic />
@@ -99,28 +84,13 @@ const UnconnectedToolBar = (connector) => {
               recentFonts={recentFonts || []}
               addRecent={addRecent}
               editor={editor}
-              logger={errorReportingLogger}
+              logger={log}
             />
             <FontSizeChooser editor={editor} defaultFontSize={defaultFontSize} />
-            <MarkButton mark="bold" icon={boldIcon} editor={editor} logger={errorReportingLogger} />
-            <MarkButton
-              mark="italic"
-              icon={italicIcon}
-              editor={editor}
-              logger={errorReportingLogger}
-            />
-            <MarkButton
-              mark="underline"
-              icon={underlineIcon}
-              editor={editor}
-              logger={errorReportingLogger}
-            />
-            <MarkButton
-              mark="strike"
-              icon={strikeThroughIcon}
-              editor={editor}
-              logger={errorReportingLogger}
-            />
+            <MarkButton mark="bold" icon={boldIcon} editor={editor} logger={log} />
+            <MarkButton mark="italic" icon={italicIcon} editor={editor} logger={log} />
+            <MarkButton mark="underline" icon={underlineIcon} editor={editor} logger={log} />
+            <MarkButton mark="strike" icon={strikeThroughIcon} editor={editor} logger={log} />
             <Floater
               component={miniColorPickerOverlay}
               open={showColorPicker}
@@ -132,42 +102,17 @@ const UnconnectedToolBar = (connector) => {
               <ColorButton
                 toggle={() => toggleColorPicker(!showColorPicker)}
                 editor={editor}
-                logger={errorReportingLogger}
+                logger={log}
               />
             </Floater>
-            <BlockButton
-              format="heading-one"
-              icon={t('Title')}
-              editor={editor}
-              logger={errorReportingLogger}
-            />
-            <BlockButton
-              format="heading-two"
-              icon={t('Subtitle')}
-              editor={editor}
-              logger={errorReportingLogger}
-            />
-            <BlockButton
-              format="block-quote"
-              icon={<FaQuoteLeft />}
-              editor={editor}
-              logger={errorReportingLogger}
-            />
-            <BlockButton
-              format="numbered-list"
-              icon={<FaListOl />}
-              editor={editor}
-              logger={errorReportingLogger}
-            />
-            <BlockButton
-              format="bulleted-list"
-              icon={<FaListUl />}
-              editor={editor}
-              logger={errorReportingLogger}
-            />
-            <IndentParagraphButton editor={editor} logger={errorReportingLogger} />
-            <DedentParagraphButton editor={editor} logger={errorReportingLogger} />
-            <LinkButton editor={editor} logger={errorReportingLogger} />
+            <BlockButton format="heading-one" icon={t('Title')} editor={editor} logger={log} />
+            <BlockButton format="heading-two" icon={t('Subtitle')} editor={editor} logger={log} />
+            <BlockButton format="block-quote" icon={<FaQuoteLeft />} editor={editor} logger={log} />
+            <BlockButton format="numbered-list" icon={<FaListOl />} editor={editor} logger={log} />
+            <BlockButton format="bulleted-list" icon={<FaListUl />} editor={editor} logger={log} />
+            <IndentParagraphButton editor={editor} logger={log} />
+            <DedentParagraphButton editor={editor} logger={log} />
+            <LinkButton editor={editor} logger={log} />
             <ImagesButton editor={editor} />
           </ButtonGroup>
         </ButtonToolbar>

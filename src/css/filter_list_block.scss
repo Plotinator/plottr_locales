@@ -5,11 +5,11 @@
   padding-top: 4px;
   max-height: 70vh;
 
-  & > div {
+  &>div {
     min-width: 110px;
     padding: 0 4px;
 
-    & > .filter-list__list {
+    &>.filter-list__list {
       padding-left: 10px;
     }
   }
@@ -75,12 +75,14 @@
 
 .darkmode {
   .filter-list {
+
     p:hover,
     li:hover {
       background-color: $darkmode-v2-card-background;
     }
 
     .filter-list__list {
+
       p,
       li,
       .secondary-text {

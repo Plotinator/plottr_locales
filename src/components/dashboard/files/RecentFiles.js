@@ -66,7 +66,6 @@ const RecentFilesConnector = (connector) => {
     platform: {
       file: { doesFileExist, openKnownFile, listOfflineFiles },
       log,
-      errorReporter: { getInstance },
     },
   } = connector
   checkDependencies({
@@ -74,7 +73,6 @@ const RecentFilesConnector = (connector) => {
     openKnownFile,
     log,
     listOfflineFiles,
-    getInstance,
   })
 
   const FileActions = UnconnectedFileActions(connector)
@@ -148,9 +146,7 @@ const RecentFilesConnector = (connector) => {
           })
           .catch((error) => {
             setSortedFiles([])
-            getInstance().then((errorReporter) => {
-              errorReporter.error('Failed to read offline files', error)
-            })
+            log.error('Failed to read offline files', error)
           })
       }
     }, [offlineModeEnabled, isInOfflineMode, resuming, searchTerm, sortedKnownFiles])
@@ -180,9 +176,7 @@ const RecentFilesConnector = (connector) => {
 
           return t.time(lastOpened, 'medium')
         } catch (error) {
-          getInstance().then((errorReporter) => {
-            errorReporter.error('Failed to compute last open time from', lastOpened, error)
-          })
+          log.error('Failed to compute last open time from', lastOpened, error)
           // no time value, do nothing
           return null
         }

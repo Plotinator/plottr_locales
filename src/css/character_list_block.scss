@@ -267,7 +267,7 @@
       border-left: 1px solid $gray-8;
       border-right: 1px solid $gray-8;
 
-      & > .tab-pane {
+      &>.tab-pane {
         .card-dialog__custom-attributes__wrapper {
           margin-bottom: 16px;
         }
@@ -280,7 +280,7 @@
         }
       }
 
-      & > .tab-pane .template-picker__link {
+      &>.tab-pane .template-picker__link {
         cursor: pointer;
         margin-left: 4px;
         vertical-align: middle;
@@ -290,7 +290,7 @@
         }
       }
 
-      & > .tab-pane .template-tab__details {
+      &>.tab-pane .template-tab__details {
         display: flex;
         justify-content: space-between;
 
@@ -339,7 +339,7 @@
       border-bottom-color: $darkmode-border;
     }
 
-    .nav-tabs > li:not(.active) > a:not(:hover) {
+    .nav-tabs>li:not(.active)>a:not(:hover) {
       color: $darkmode-link-text;
       border-bottom-color: $darkmode-border;
     }
@@ -351,7 +351,7 @@
         color: $darkmode-link-text;
       }
 
-      > .active {
+      >.active {
         position: relative !important;
       }
 
@@ -394,11 +394,6 @@
 }
 
 .darkmode {
-  .character-list {
-    h1 {
-      background-color: transparent;
-    }
-  }
   .character-list__character-view.darkmode {
     background-color: #24252c;
     color: #aaa;
@@ -412,11 +407,12 @@
     }
 
     .character-list__character__tabs {
+
       .tab-content,
       .nav-tabs {
         border-color: $darkmode-v2-border;
 
-        > li:not(.active) > a:not(:hover) {
+        >li:not(.active)>a:not(:hover) {
           color: #bbb;
           border-bottom-color: $darkmode-v2-border;
         }
@@ -424,7 +420,7 @@
         li.active {
           a {
             background-color: $darkmode-v2-background;
-
+  
             &:hover {
               background-color: $darkmode-v2-background;
             }

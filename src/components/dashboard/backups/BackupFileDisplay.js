@@ -20,11 +20,9 @@ const BackupFileDisplayConnector = (connector) => {
       uploadToProAsDuplicate,
       deleteProBackup,
       showErrorBox,
-      errorReporter: { getInstance },
     },
   } = connector
   checkDependencies({
-    getInstance,
     log,
     mpq,
     createAndOpenCopy,
@@ -68,13 +66,10 @@ const BackupFileDisplayConnector = (connector) => {
       setBusyDeleting(true)
       deleteProBackup(file.proRecordId, file.storagePath)
         .catch((error) => {
-          getInstance().then((errorReporter) => {
-            errorReporter.error('Error deleting pro backup', error)
-          })
+          log.error('Error deleting pro backup', error)
           showErrorBox(t('Error'), t('There was an error doing that. Try again'))
         })
         .finally(() => {
-          log.info('Deleted pro backup', file.storagePath)
           setDeleting(false)
           setBusyDeleting(false)
         })

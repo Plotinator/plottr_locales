@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import PropTypes from 'react-proptypes'
+import { isEqual } from 'lodash'
 import cx from 'classnames'
 import { FiCopy } from 'react-icons/fi'
 
@@ -8,7 +9,7 @@ import { t as i18n } from 'plottr_locales'
 import ButtonToolbar from '../ButtonToolbar'
 import ControlLabel from '../ControlLabel'
 import FormGroup from '../FormGroup'
-import FormControl from '../FormControl'
+import UnconnectedTextFormControl from '../TextFormControl'
 import Button from '../Button'
 import DeleteConfirmModal from '../dialogs/DeleteConfirmModal'
 import UnconnectedCategoryPicker from '../CategoryPicker'
@@ -17,8 +18,8 @@ import UnconnectedEditAttribute from '../EditAttribute'
 import UnconnectedImagePicker from '../images/ImagePicker'
 import UnconnectedImage from '../images/Image'
 import { checkDependencies } from '../checkDependencies'
-import { withEventTargetValue } from '../../../dist/components/withEventTargetValue'
 import Glyphicon from '../Glyphicon'
+import { withArgs } from '../withArgs'
 
 const NoteEditDetailsConnector = (connector) => {
   const CategoryPicker = UnconnectedCategoryPicker(connector)
@@ -26,23 +27,23 @@ const NoteEditDetailsConnector = (connector) => {
   const EditAttribute = UnconnectedEditAttribute(connector)
   const ImagePicker = UnconnectedImagePicker(connector)
   const Image = UnconnectedImage(connector)
+  const TextFormControl = UnconnectedTextFormControl(connector)
 
   const {
     pltr: { helpers },
   } = connector
   checkDependencies({ helpers })
 
-  const NoteEditDetails = ({
-    note,
-    actions,
-    finishEditing,
-    editorPath,
-    darkMode,
-    customAttributes,
-    selection,
-    notesSearchTerm,
-  }) => {
+  const NoteEditDetails = ({ note, actions, finishEditing, darkMode, customAttributes, foci }) => {
     const [deleting, setDeleting] = useState(false)
+
+    const selectionForMainNoteElement = (name) => {
+      const noteId = note.id
+
+      return foci?.find(({ path }) => {
+        return isEqual(path, ['note', noteId, name])
+      })?.selection
+    }
 
     const deleteNote = (e) => {
       e.stopPropagation()
@@ -72,22 +73,11 @@ const NoteEditDetailsConnector = (connector) => {
     }
 
     const handleAttrChange = (attrName) => (desc, selection) => {
-      const editorPath = helpers.editors.noteCustomAttributeEditorPath(note.id, attrName)
-      actions.editNote(
-        note.id,
-        helpers.editors.attrIfPresent(attrName, desc),
-        editorPath,
-        selection
-      )
+      actions.editNoteCustomAttribute(note.id, attrName, desc, selection)
     }
 
     const handleContentChange = (value, selection) => {
-      actions.editNote(
-        note.id,
-        helpers.editors.attrIfPresent('content', value),
-        editorPath,
-        selection
-      )
+      actions.editNoteContent(note.id, value, selection)
     }
 
     const changeCategory = (val) => {
@@ -96,10 +86,6 @@ const NoteEditDetailsConnector = (connector) => {
 
     const changeImage = (newImageId) => {
       actions.editNote(note.id, { imageId: newImageId })
-    }
-
-    const changeTitle = (newTitle) => {
-      actions.editNote(note.id, { title: newTitle })
     }
 
     const renderDelete = () => {
@@ -136,7 +122,6 @@ const NoteEditDetailsConnector = (connector) => {
 
     const renderEditingCustomAttributes = () => {
       return customAttributes.map((attr, index) => {
-        const editorPath = helpers.editors.cardCustomAttributeEditorPath(note.id, attr.name)
         return (
           <React.Fragment key={attr.name}>
             <EditAttribute
@@ -144,12 +129,15 @@ const NoteEditDetailsConnector = (connector) => {
               entity={note}
               entityType="note"
               value={note[attr.name]}
-              editorPath={editorPath}
               onChange={handleAttrChange(attr.name)}
               onSave={finishEditing}
               name={attr.name}
-              id={attr.id}
+              id={attr.id || attr.name}
               type={attr.type}
+              autoFocus={
+                foci && foci[0] && foci[0].path[2] === attr.name && foci[0].path[1] === note.id
+              }
+              selection={selectionForMainNoteElement(attr.name)}
             />
           </React.Fragment>
         )
@@ -164,13 +152,16 @@ const NoteEditDetailsConnector = (connector) => {
             <div className="note-list__inputs__normal">
               <FormGroup>
                 <ControlLabel>{i18n('Name')}</ControlLabel>
-                <FormControl
+                <TextFormControl
                   type="text"
-                  onChange={withEventTargetValue(changeTitle)}
-                  autoFocus={notesSearchTerm ? false : true}
+                  onChange={withArgs(actions.editNoteTitle, note.id)}
                   onKeyDown={handleEsc}
                   onKeyPress={handleEnter}
-                  defaultValue={note.title}
+                  value={note.title}
+                  autoFocus={
+                    foci && foci[0] && foci[0].path[2] === 'title' && foci[0].path[1] === note.id
+                  }
+                  selection={selectionForMainNoteElement('title')}
                 />
               </FormGroup>
             </div>
@@ -190,12 +181,13 @@ const NoteEditDetailsConnector = (connector) => {
             <FormGroup className="note-list__rce__wrapper">
               <ControlLabel>{i18n('Notes')}</ControlLabel>
               <RichText
-                id={editorPath}
                 description={note.content}
                 onChange={handleContentChange}
-                selection={selection}
+                autoFocus={
+                  foci && foci[0] && foci[0].path[2] === 'content' && foci[0].path[1] === note.id
+                }
+                selection={selectionForMainNoteElement('content')}
                 editable
-                autofocus={false}
               />
             </FormGroup>
             {renderEditingCustomAttributes()}
@@ -223,9 +215,7 @@ const NoteEditDetailsConnector = (connector) => {
     customAttributes: PropTypes.array.isRequired,
     darkMode: PropTypes.bool.isRequired,
     finishEditing: PropTypes.func.isRequired,
-    editorPath: PropTypes.string.isRequired,
-    selection: PropTypes.object.isRequired,
-    notesSearchTerm: PropTypes.string,
+    foci: PropTypes.array.isRequired,
   }
 
   const {
@@ -239,14 +229,11 @@ const NoteEditDetailsConnector = (connector) => {
 
     return connect(
       (state, ownProps) => {
-        const editorPath = helpers.editors.noteContentEditorPath(ownProps.noteId)
         return {
           note: selectors.singleNoteSelector(state, ownProps.noteId),
           customAttributes: selectors.noteCustomAttributesSelector(state),
-          editorPath,
-          selection: selectors.selectionSelector(state, editorPath),
           darkMode: selectors.isDarkModeSelector(state),
-          notesSearchTerm: selectors.notesSearchTermSelector(state),
+          foci: selectors.noteCurrentFocusSelector(state),
         }
       },
       (dispatch) => {

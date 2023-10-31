@@ -145,7 +145,7 @@
     }
   }
 
-  .nav-tabs li.active > a {
+  .nav-tabs li.active>a {
     background-color: $darkmode-darker-background;
 
     &:hover,
@@ -154,7 +154,7 @@
     }
   }
 
-  .nav-tabs li > a {
+  .nav-tabs li>a {
     border-color: $darkmode-v2-border;
     border-bottom-color: transparent;
 
@@ -266,8 +266,8 @@
     .nav-tabs {
       border-color: $darkmode-v2-border;
 
-      li > a,
-      li.active > a {
+      li>a,
+      li.active>a {
         background-color: $darkmode-v2-nav-background;
       }
 

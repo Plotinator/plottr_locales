@@ -149,7 +149,7 @@ const PlaceItemConnector = (connector) => {
         })}
         ref={ref}
         onClick={selectPlace}
-        /* draggable (disabled for 2023-10-27) */
+        draggable
         onDragStart={handleDragStart}
         onDrop={handleDropItem}
         onDragOver={handleDragOver}
@@ -173,7 +173,7 @@ const PlaceItemConnector = (connector) => {
   PlaceItem.propTypes = {
     place: PropTypes.object.isRequired,
     selected: PropTypes.bool.isRequired,
-    editing: PropTypes.bool.isRequired,
+    editing: PropTypes.bool,
     select: PropTypes.func.isRequired,
     startEdit: PropTypes.func.isRequired,
     stopEdit: PropTypes.func.isRequired,

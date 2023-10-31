@@ -84,6 +84,7 @@ import {
   CharacterTemplateDetails,
   DashboardBody as UnconnectedDashboardBody,
   DashboardNav,
+  SearchModal as UnconnectedSearchModal,
   FirebaseLogin as UnconnectedFirebaseLogin,
   ChoiceView as UnconnectedChoiceView,
   ExpiredView as UnconnectedExpiredView,
@@ -199,7 +200,6 @@ const pltrTypeSpecs = {
   errorReporter: PropTypes.shape({
     errorReporterAccessToken: PropTypes.string.isRequired,
     errorReporter: PropTypes.func.isRequired,
-    getInstance: PropTypes.func.isRequired,
     platform: PropTypes.func.isRequired,
   }),
   rollbar: PropTypes.shape({
@@ -338,6 +338,7 @@ export default (platform, pltr) => {
     CharacterTemplateDetails,
     DashboardBody: UnconnectedDashboardBody(connectorObject),
     DashboardNav,
+    SearchModal: UnconnectedSearchModal(connectorObject),
     FirebaseLogin: UnconnectedFirebaseLogin(connectorObject),
     ChoiceView: UnconnectedChoiceView(connectorObject),
     ExpiredView: UnconnectedExpiredView(connectorObject),

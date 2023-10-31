@@ -12,7 +12,6 @@ import ButtonGroup from '../../ButtonGroup'
 import UnconnectedLanguagePicker from '../../LanguagePicker'
 import UnconnectedDarkOptionsSelect from './DarkOptionsSelect'
 import UnconnectedBackupSettings from './BackupSettings'
-import UnconnectedFileSettings from './FileSettings'
 import { checkDependencies } from '../../checkDependencies'
 import { addRecent, getFonts, getRecent } from '../../rce/fonts'
 import { FontSettingDropdown } from './FontSettingDropdown'
@@ -42,7 +41,6 @@ const OptionsHomeConnector = (connector) => {
   const LanguagePicker = UnconnectedLanguagePicker(connector)
   const DarkOptionsSelect = UnconnectedDarkOptionsSelect(connector)
   const BackupSettings = UnconnectedBackupSettings(connector)
-  const FileSettings = UnconnectedFileSettings(connector)
 
   const OptionsHome = ({ settings, shouldBeInPro }) => {
     const [activeTab, setActiveTab] = useState(1)

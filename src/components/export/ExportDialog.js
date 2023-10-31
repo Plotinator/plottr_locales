@@ -33,11 +33,9 @@ const ExportDialogConnector = (connector) => {
       isWindows,
       mpq,
       storage: { downloadStorageImage },
-      errorReporter: { getInstance },
     },
   } = connector
   checkDependencies({
-    getInstance,
     log,
     showErrorBox,
     askToExport,
@@ -90,9 +88,7 @@ const ExportDialogConnector = (connector) => {
             props.close()
           })
           .catch((error) => {
-            getInstance().then((errorReporter) => {
-              errorReporter.error('Error exporting', error)
-            })
+            log.error(error)
             showErrorBox(t('Error'), t('There was an error doing that. Try again'))
             return
           })
@@ -157,7 +153,7 @@ const ExportDialogConnector = (connector) => {
   ExportDialog.propTypes = {
     exportConfig: PropTypes.object.isRequired,
     close: PropTypes.func.isRequired,
-    bookId: PropTypes.string.isRequired,
+    bookId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     seriesName: PropTypes.string,
     books: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired,

@@ -9,6 +9,7 @@ import { t as i18n } from 'plottr_locales'
 import Glyphicon from '../Glyphicon'
 import UnconnectedCardView from './CardView'
 import { checkDependencies } from '../checkDependencies'
+import { delay } from '../../utils/delay'
 
 const {
   card: { sortCardsInBeat },
@@ -20,12 +21,17 @@ const BeatViewConnector = (connector) => {
   const CardView = UnconnectedCardView(connector)
 
   class BeatView extends Component {
-    state = { sortedCards: [], inDropZone: false, dropDepth: 0, cardsToRender: 0 }
+    state = {
+      sortedCards: [],
+      inDropZone: false,
+      dropDepth: 0,
+      cardsToRender: this.props.cards.length,
+    }
 
     updateCardsToRender() {
       if (this.state.cardsToRender >= this.props.cards.length) return
 
-      window.requestIdleCallback(() => {
+      delay(() => {
         this.setState({ cardsToRender: this.state.cardsToRender + 1 })
         this.updateCardsToRender()
       })
@@ -129,7 +135,15 @@ const BeatViewConnector = (connector) => {
     renderCards() {
       return this.state.sortedCards
         .slice(0, this.state.cardsToRender)
-        .map((c, idx) => <CardView key={c.id} card={c} index={idx} reorder={this.reorderCards} />)
+        .map((c, idx) => (
+          <CardView
+            key={c.id}
+            cardId={c.id}
+            index={idx}
+            reorder={this.reorderCards}
+            beatId={this.props.beat.id}
+          />
+        ))
     }
 
     handleDragEnter = () => {

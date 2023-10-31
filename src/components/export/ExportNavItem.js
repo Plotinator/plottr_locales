@@ -25,11 +25,9 @@ const ExportNavItemConnector = (connector) => {
       showErrorBox,
       isWindows,
       storage: { downloadStorageImage },
-      errorReporter: { getInstance },
     },
   } = connector
   checkDependencies({
-    getInstance,
     askToExport,
     export_config,
     log,
@@ -65,9 +63,7 @@ const ExportNavItemConnector = (connector) => {
         const withoutSystemKeys = removeSystemKeys(state)
         askToExport(defaultPath, withoutSystemKeys, type, export_config[type], userId).catch(
           (error) => {
-            getInstance().then((errorReporter) => {
-              errorReporter.error('Error exporting', error)
-            })
+            log.error(error)
             showErrorBox(t('Error'), t('There was an error doing that. Try again'))
             return
           }

@@ -1,0 +1,238 @@
+@import 'colors';
+@import 'vars';
+
+.search-bar__wrapper {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  .search-bar__left-side {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    .search-bar__controls {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;
+      button {
+        margin-left: 10px;
+      }
+    }
+    .search-bar__progress {
+      user-select: none;
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;
+      font-size: 28px;
+      height: 28px;
+      margin-left: 10px;
+    }
+    .search-bar__term {
+      margin-left: 10px;
+      font-size: 22px;
+      width: 100%;
+      padding-left: 35px;
+    }
+  }
+  .search-bar__right-side {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    .search-bar__controls {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;
+      button {
+        margin-left: 10px;
+      }
+    }
+    .search-bar__term {
+      margin-left: 10px;
+      font-size: 22px;
+      width: 100%;
+      padding-left: 35px;
+    }
+  }
+  .search-bar__replace-checkbox {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+    line-height: unset !important;
+    margin-right: 10px;
+    font-size: 22px;
+    margin-bottom: 0px;
+    input {
+      margin-left: 5px;
+    }
+  }
+  .search-bar__replace-button {
+    margin-right: 10px;
+  }
+}
+
+.search_bar__search-icon {
+  position: relative;
+  margin-left: 10px;
+  margin-right: -40px;
+  font-size: 30px;
+}
+
+.search-modal__wrapper {
+  max-height: 80vh;
+}
+
+.search-modal__search-icon {
+  position: relative;
+  margin-left: 10px;
+  margin-right: -35px;
+  font-size: 30px; 
+}
+
+.search-modal__replace-icon {
+  margin-left: 10px;
+  margin-right: 10px;
+  font-size: 50px; 
+}
+
+.search-modal__header {
+  grid-area: header;
+  h3 {
+    margin-top: 0;
+  }
+  hr {
+    margin-top: 8px;
+  }
+  .search-modal__search-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 5px;
+    .right-side {
+      display: flex;
+      width: 100%;
+    }
+    h3 {
+      margin-right: 20px;
+      margin-bottom: 7px;
+    }
+  }
+  .search-modal__search-bar--replace {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 50%;
+    .right-side {
+      display: flex;
+      width: 100%;
+    }
+    h3 {
+      margin-right: 20px;
+      margin-bottom: 7px;
+    }
+  }
+  .search-modal__term {
+    font-size: 28px;
+    width: 100%;
+    padding-left: 50px;
+  }
+  .search-modal__replace-term {
+    font-size: 28px;
+    width: 100%;
+  }
+  .search-modal__replace-button {
+    font-size: 22px;
+    margin-left: 10px;
+  }
+}
+
+.search-modal--interactable {
+  user-select: none;
+  cursor: pointer;
+  hr {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+  &:hover {
+    background-color: $gray-9;;
+  }
+}
+
+.search-modal__hit-wrapper {
+  padding: 10px;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.search-modal__hit-type-title {
+  h3 {
+    margin-top: 0;
+  }
+}
+
+.search-modal__hit-details {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.search-modal__hit-with-checkbox {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.search-modal__replace-checkbox {
+  margin: 0px 20px !important;
+  width: 25px;
+  height: 25px;
+}
+
+.search-modal__hit-path {}
+
+.search-modal__hit-text {
+  span {
+    opacity: 50%;
+  }
+  b {
+    opacity: 100%;
+  }
+}
+
+.search-modal__tab-headsection-heading {
+  background: $table-bg !important;
+  &:hover {
+    background: $table-bg !important;
+  }
+}
+
+.search-modal__body {
+  grid-area: body;
+  max-height: 75vh;
+  overflow-y: scroll;
+}
+
+.search-modal__footer {
+  grid-area: footer;
+  // padding-top: 8px;
+  & > div {
+    display: flex;
+    justify-content: space-between;
+  }
+  hr {
+    margin-top: 0;
+  }
+}

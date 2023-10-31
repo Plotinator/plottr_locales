@@ -81,7 +81,7 @@
     .sticky-table-cell:has(.card-pinned) {
       z-index: 3;
 
-      > .vertical-line-title__line-line {
+      >.vertical-line-title__line-line {
         z-index: 2;
       }
     }
@@ -202,7 +202,7 @@
   background-clip: padding-box;
 
   // Links within the dropdown menu
-  > li > a {
+  >li>a {
     display: block;
     padding: 3px 20px;
     clear: both;
@@ -301,7 +301,7 @@
     }
 
     &.dropping {
-      & > div {
+      &>div {
         border: $new-item-border;
       }
     }
@@ -407,7 +407,7 @@
     top: 0;
 
     &.dropping {
-      & > div {
+      &>div {
         border: 1px dotted #aaa;
       }
     }
@@ -416,7 +416,7 @@
       background-color: $gray-9;
       z-index: 10;
 
-      & > div {
+      &>div {
         background-color: $gray-9;
         border-left: 1px solid $gray-8;
       }
@@ -426,7 +426,7 @@
       background-color: $gray-9;
     }
 
-    & > div {
+    &>div {
       position: relative;
       top: 0px;
       left: 21px;
@@ -448,7 +448,7 @@
           border: none;
           margin-right: 0;
 
-          & > span {
+          &>span {
             transform: translate(5px) skew(45deg, 0deg);
           }
         }
@@ -459,7 +459,7 @@
         }
       }
 
-      & > span {
+      &>span {
         transform: skew(45deg, 0deg) rotate(315deg);
         font-size: 8px;
         position: absolute;
@@ -498,7 +498,7 @@
         background-color: $darkmode-background;
       }
 
-      & > div {
+      &>div {
         background-color: $darkmode-background;
       }
     }
@@ -570,13 +570,13 @@
   }
 
   .timeline__tabs-wrapper {
-    & > div {
+    &>div {
       @include application-text;
       @include secondary-text;
     }
 
     .nav-pills {
-      & > li {
+      &>li {
         svg {
           opacity: 0;
         }
@@ -591,14 +591,14 @@
         margin: 10px;
       }
 
-      & > li > a {
+      &>li>a {
         outline: none;
         padding: 10px;
         background: none !important;
         color: rgba(22, 34, 45, 0.7) !important;
       }
 
-      & > li {
+      &>li {
         &.active {
           svg {
             opacity: 1;
@@ -623,9 +623,7 @@
   }
 }
 
-#timelineview__root
-  .isPinned
-  .sticky-table-cell:not(:first-child):not(:nth-child(2)):not(:has(.card__body-wrapper, .card__cell__overview-cell)) {
+#timelineview__root .isPinned .sticky-table-cell:not(:first-child):not(:nth-child(2)):not(:has(.card__body-wrapper, .card__cell__overview-cell)) {
   z-index: 3;
 
   &:hover {
@@ -639,7 +637,9 @@
     .timeline-tabbed-view-body {
       ul.nav.nav-tabs.-nav {
         background: $darkmode-v2-background;
+  
       }
+      
     }
     .nav-tabs {
       background: $darkmode-v2-background;
@@ -650,7 +650,7 @@
           border: none !important;
         }
       }
-
+  
       li {
         a {
           margin: 0 !important;
@@ -666,7 +666,7 @@
       color: #ccc;
     }
 
-    > li > a {
+    >li>a {
       color: #aaa;
     }
 
@@ -705,7 +705,7 @@
       background: $darkmode-v2-card-background;
 
       .table-header-rotated {
-        th.rotate-45 > div {
+        th.rotate-45>div {
           background-color: $darkmode-v2-card-background;
         }
 
@@ -724,7 +724,7 @@
         border-right: 1px solid #bbb;
       }
 
-      th.rotate-45 > div {
+      th.rotate-45>div {
         background-color: #f1f5f8;
         border-right: 1px solid #bbb;
         border-top: 1px solid #bbb;

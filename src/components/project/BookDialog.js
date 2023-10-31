@@ -1,23 +1,47 @@
 import React, { Component } from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
+import { isEqual } from 'lodash'
 
 import { t as i18n } from 'plottr_locales'
 import { newIds } from 'pltr/v2'
 
 import Form from '../Form'
-import Modal from '../Modal'
+import UnconnectedPlottrModal from '../PlottrModal'
 import ButtonToolbar from '../ButtonToolbar'
 import Col from '../Col'
 import ControlLabel from '../ControlLabel'
 import FormGroup from '../FormGroup'
-import FormControl from '../FormControl'
+import UnconnectedTextFormControl from '../TextFormControl'
 import Button from '../Button'
 import { checkDependencies } from '../checkDependencies'
+import { withArgs } from '../withArgs'
 
 const { objectId } = newIds
 
+const modalStyles = {
+  overlay: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  content: {
+    borderRadius: 20,
+    width: '600px',
+    height: '352px',
+    padding: '0px',
+    overflow: 'hidden',
+    position: 'relative',
+    left: 'auto',
+    bottom: 'auto',
+    right: 'auto',
+  },
+}
+
 const BookDialogConnector = (connector) => {
+  const TextFormControl = UnconnectedTextFormControl(connector)
+  const PlottrModal = UnconnectedPlottrModal(connector)
+
   const {
     platform: { inBrowser, browserHistory },
   } = connector
@@ -28,6 +52,12 @@ const BookDialogConnector = (connector) => {
       this.premiseRef = null
       this.genreRef = null
       this.themeRef = null
+    }
+
+    selectionFor = (name) => {
+      return this.props.foci?.find(({ path }) => {
+        return isEqual(path, ['book', this.props.bookDialogBookId, name])
+      })?.selection
     }
 
     saveEdit = (saveAndOpen) => {
@@ -42,8 +72,6 @@ const BookDialogConnector = (connector) => {
 
       if (!currentBook) {
         actions.addBook(title, premise, genre, theme)
-      } else {
-        actions.editBook(currentBook.id, title, premise, genre, theme)
       }
       this.handleCancel()
 
@@ -79,7 +107,7 @@ const BookDialogConnector = (connector) => {
     }
 
     renderBody() {
-      const { books, bookNumber, bookDialogBookId } = this.props
+      const { actions, books, bookNumber, bookDialogBookId, focus } = this.props
       const currentBook = books[bookDialogBookId]
       return (
         <Form horizontal onKeyPress={this.handleDown}>
@@ -96,13 +124,15 @@ const BookDialogConnector = (connector) => {
               {i18n('Title')}
             </Col>
             <Col sm={8}>
-              <FormControl
-                autoFocus
+              <TextFormControl
                 type="text"
                 inputRef={(ref) => {
                   this.titleRef = ref
                 }}
-                defaultValue={currentBook?.title}
+                value={currentBook?.title}
+                onChange={withArgs(actions.setBookTitle, bookDialogBookId)}
+                autoFocus={focus?.path[2] === 'title'}
+                selection={this.selectionFor('title')}
               />
             </Col>
           </FormGroup>
@@ -111,12 +141,15 @@ const BookDialogConnector = (connector) => {
               {i18n('Premise')}
             </Col>
             <Col sm={8}>
-              <FormControl
+              <TextFormControl
                 type="text"
                 inputRef={(ref) => {
                   this.premiseRef = ref
                 }}
-                defaultValue={currentBook?.premise}
+                onChange={withArgs(actions.setBookPremise, bookDialogBookId)}
+                value={currentBook?.premise}
+                autoFocus={focus?.path[2] === 'premise'}
+                selection={this.selectionFor('premise')}
               />
             </Col>
           </FormGroup>
@@ -125,12 +158,15 @@ const BookDialogConnector = (connector) => {
               {i18n('Genre')}
             </Col>
             <Col sm={8}>
-              <FormControl
+              <TextFormControl
                 type="text"
                 inputRef={(ref) => {
                   this.genreRef = ref
                 }}
-                defaultValue={currentBook?.genre}
+                value={currentBook?.genre}
+                onChange={withArgs(actions.setBookGenre, bookDialogBookId)}
+                autoFocus={focus?.path[2] === 'genre'}
+                selection={this.selectionFor('genre')}
               />
             </Col>
           </FormGroup>
@@ -139,12 +175,15 @@ const BookDialogConnector = (connector) => {
               {i18n('Theme')}
             </Col>
             <Col sm={8}>
-              <FormControl
+              <TextFormControl
                 type="text"
                 inputRef={(ref) => {
                   this.themeRef = ref
                 }}
-                defaultValue={currentBook?.theme}
+                value={currentBook?.theme}
+                onChange={withArgs(actions.setBookTheme, bookDialogBookId)}
+                autoFocus={focus?.path[2] === 'theme'}
+                selection={this.selectionFor('theme')}
               />
             </Col>
           </FormGroup>
@@ -154,15 +193,20 @@ const BookDialogConnector = (connector) => {
 
     render() {
       return (
-        <Modal
-          animation={false}
-          show={true}
-          onHide={this.handleCancel}
-          dialogClassName={cx('book-dialog', { darkmode: this.props.darkMode })}
+        <PlottrModal
+          isOpen={true}
+          onRequestClose={this.handleCancel}
+          style={modalStyles}
+          parentSelector={() => {
+            return document.querySelector('#book-modal')
+          }}
         >
-          <Modal.Body>{this.renderBody()}</Modal.Body>
-          <Modal.Footer>{this.renderToolBar()}</Modal.Footer>
-        </Modal>
+          <div className={cx('book-dialog', { darkmode: this.props.darkMode })}>
+            <div className="book-dialog__body">{this.renderBody()}</div>
+            <hr />
+            <div className="book-dialog__footer">{this.renderToolBar()}</div>
+          </div>
+        </PlottrModal>
       )
     }
 
@@ -170,6 +214,8 @@ const BookDialogConnector = (connector) => {
       bookId: PropTypes.number,
       darkMode: PropTypes.bool,
       bookNumber: PropTypes.number,
+      focus: PropTypes.object,
+      foci: PropTypes.array,
       actions: PropTypes.object.isRequired,
       books: PropTypes.object.isRequired,
       uiActions: PropTypes.object.isRequired,
@@ -194,6 +240,8 @@ const BookDialogConnector = (connector) => {
           books: selectors.allBooksSelector(state),
           bookNumber: selectors.bookNumberSelector(state),
           bookDialogBookId: selectors.bookDialogBookIdSelector(state),
+          focus: selectors.projectCurrentFocusSelector(state),
+          foci: selectors.projectAllFociSelector(state),
         }
       },
       (dispatch) => {

@@ -25,7 +25,7 @@ export function rceDataRepair(data, log) {
       }
     })
   } catch (error) {
-    log.error('Error repairing RCE data', error)
+    log.error(error)
     return slate
   }
 

@@ -49,16 +49,18 @@ const BeatTitleCellConnector = (connector) => {
     isLarge,
     isSeries,
     readOnly,
+    editing,
     timelineViewIsStacked,
     timelineViewIsTabbed,
     atMaximumDepth,
     hierarchyLevelName,
     hierarchyChildLevelName,
     timelineViewIsDefault,
+    timelineFoci,
     domEvents,
+    uiActions,
   }) => {
     const [hovering, setHovering] = useState(false)
-    const [editing, setEditing] = useState(beat.title == '')
     const [dragging, setDragging] = useState(false)
     const [inDropZone, setInDropZone] = useState(false)
     const [dropDepth, setDropDepth] = useState(0)
@@ -124,7 +126,7 @@ const BeatTitleCellConnector = (connector) => {
 
     const finalizeEdit = (newVal) => {
       actions.editBeatTitle(beat.id, currentTimeline, newVal || 'auto') // if nothing, set to auto
-      setEditing(false)
+      uiActions.stopEditingBeatHeadingTitle()
       setHovering(null)
     }
 
@@ -139,7 +141,9 @@ const BeatTitleCellConnector = (connector) => {
     }
 
     const handleEsc = (event) => {
-      if (event.which === 27) setEditing(false)
+      if (event.which === 27) {
+        uiActions.stopEditingBeatHeadingTitle()
+      }
     }
 
     const handleDragStart = (e) => {
@@ -190,7 +194,7 @@ const BeatTitleCellConnector = (connector) => {
 
     const startEditing = () => {
       if (readOnly) return
-      setEditing(true)
+      uiActions.startEditingBeatHeadingTitle(beatId)
       setHovering(null)
     }
 
@@ -276,7 +280,7 @@ const BeatTitleCellConnector = (connector) => {
           defaultValue={beat.title}
           title={t('Edit {beatName}', { beatName: beatTitle })}
           cancel={() => {
-            setEditing(false)
+            uiActions.stopEditingBeatHeadingTitle()
             setHovering(null)
           }}
         />
@@ -382,6 +386,15 @@ const BeatTitleCellConnector = (connector) => {
     const renderTitle = () => {
       if (!editing) return <span>{truncateTitle(beatTitle, 50)}</span>
 
+      const focusCandidate =
+        timelineFoci.length && typeof timelineFoci[0] !== 'undefined' && timelineFoci[0]
+      const selection =
+        Array.isArray(focusCandidate.path) &&
+        focusCandidate.path[0] === 'beat' &&
+        focusCandidate.path[1] === beatId &&
+        focusCandidate.path[2] === 'title' &&
+        focusCandidate.selection
+
       return (
         <FormGroup>
           <ControlLabel className={cx({ darkmode: darkMode })}>
@@ -394,6 +407,7 @@ const BeatTitleCellConnector = (connector) => {
               titleInputRef.current = ref
             }}
             autoFocus
+            selection={selection}
             onKeyDown={handleEsc}
             onBlur={handleBlur}
             onKeyPress={handleFinishEditing}
@@ -657,7 +671,10 @@ const BeatTitleCellConnector = (connector) => {
     hierarchyLevelName: PropTypes.string,
     hierarchyChildLevelName: PropTypes.string,
     timelineViewIsDefault: PropTypes.bool,
+    editing: PropTypes.bool,
+    timelineFoci: PropTypes.array.isRequired,
     domEvents: PropTypes.object.isRequired,
+    uiActions: PropTypes.object.isRequired,
   }
 
   const {
@@ -703,6 +720,8 @@ const BeatTitleCellConnector = (connector) => {
             state,
             ownProps.beatId
           ),
+          editing: selectors.editingGivenBeatsTitleSelector(state, ownProps.beatId),
+          timelineFoci: selectors.timelineFociSelector(state),
         }
       }
     }
@@ -711,6 +730,7 @@ const BeatTitleCellConnector = (connector) => {
       return {
         actions: bindActionCreators(actions.beat, dispatch),
         domEvents: bindActionCreators(actions.domEvents, dispatch),
+        uiActions: bindActionCreators(actions.ui, dispatch),
       }
     }
 
