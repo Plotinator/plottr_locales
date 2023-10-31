@@ -163,13 +163,13 @@ export const renameFile = (fileURL) => {
                           return editKnownFilePath(fileURL, newFileURL)
                         })
                         .then(() => {
-                          store.dispatch(actions.applicationState.finishRenamingFile())
+                          store().dispatch(actions.applicationState.finishRenamingFile())
                         })
                     }
                   )
                 }).catch((error) => {
                   logger.error('Error renaming file', error)
-                  store.dispatch(actions.applicationState.finishRenamingFile())
+                  store().dispatch(actions.applicationState.finishRenamingFile())
                   if (error.code === errorCodes.FILE_LACKS_ALL_KEYS) {
                     return showErrorBox(
                       t('File too old'),
@@ -181,7 +181,7 @@ export const renameFile = (fileURL) => {
                 })
               } catch (error) {
                 logger.error('Error renaming file', error)
-                store.dispatch(actions.applicationState.finishRenamingFile())
+                store().dispatch(actions.applicationState.finishRenamingFile())
                 return showErrorBox(t('Error'), t('There was an error doing that. Try again'))
               }
             }
@@ -295,12 +295,12 @@ export const openExistingFile = () => {
       store().dispatch(actions.applicationState.startUploadingFileToCloud())
     }
 
-    store.dispatch(actions.project.showLoader(true))
+    store().dispatch(actions.project.showLoader(true))
     userFilePickerDefaultFolder().then((defaultPath) => {
       _openExistingFile(!!userId, userId, emailAddress, defaultPath)
         .then(() => {
           logger.info('Opened existing file')
-          store.dispatch(actions.project.showLoader(false))
+          store().dispatch(actions.project.showLoader(false))
           if (isLoggedIn) {
             store().dispatch(actions.applicationState.finishUploadingFileToCloud())
           }
@@ -308,9 +308,9 @@ export const openExistingFile = () => {
         .catch((error) => {
           logger.error('Error opening existing file', error)
           showErrorBox(t('Error'), t('There was an error doing that. Try again.')).then(() => {
-            store.dispatch(actions.project.showLoader(false))
+            store().dispatch(actions.project.showLoader(false))
             if (isLoggedIn) {
-              store.dispatch(actions.applicationState.finishUploadingFileToCloud())
+              store().dispatch(actions.applicationState.finishUploadingFileToCloud())
             }
           })
         })
