@@ -25,7 +25,33 @@ const HOTKEYS = {
   'mod+u': 'underline',
 }
 
+const waitAMoment = (f) => {
+  return setTimeout(f, 50)
+}
+
+const cancelWait = (id) => {
+  clearTimeout(id)
+}
+
+const firstPosition = (children) => {
+  function iter(currentNode, path) {
+    if (currentNode.children?.length > 0) {
+      return iter(currentNode.children[0], [...path, 0])
+    } else {
+      return { path, offset: 0 }
+    }
+  }
+
+  if (children.length > 0) {
+    return iter(children[0], [0])
+  } else {
+    return null
+  }
+}
+
 const RichTextEditorConnector = (connector) => {
+  const { EDITING, SEARCHING } = connector.pltr.editStates
+
   const {
     platform: {
       storage: { resolveToPublicUrl, isStorageURL },
@@ -58,11 +84,14 @@ const RichTextEditorConnector = (connector) => {
     onChange,
     fileId,
     clientId,
+    editState,
     onBlur,
     onFocus,
     imageCache,
     cacheImage,
     useSpellcheck,
+    jumpCounter,
+    startEditing,
   }) => {
     const editor = useMemo(() => {
       return createEditor(log)
@@ -86,20 +115,85 @@ const RichTextEditorConnector = (connector) => {
     )
 
     const handleOnBlur = () => {
+      signalBlurToEditState()
       onBlur && onBlur()
     }
 
     const handleOnFocus = () => {
+      signalFocusToEditState()
       onFocus && onFocus()
     }
 
-    // Focus on first render
+    // Focus on first render if we're searching
     const editorWrapperRef = useRef(null)
     useEffect(() => {
-      if (autoFocus && editorWrapperRef.current && editorWrapperRef.current.firstChild) {
-        editorWrapperRef.current.firstChild.focus()
+      let idleCallback = null
+      let innerIdleCallback = null
+      if (
+        isSearching &&
+        autoFocus &&
+        editorWrapperRef.current &&
+        editorWrapperRef.current.firstChild
+      ) {
+        if (selection) {
+          if (
+            typeof selection.start !== 'undefined' &&
+            typeof selection.end !== 'undefined' &&
+            typeof selection.direction !== 'undefined'
+          ) {
+            idleCallback = waitAMoment(() => {
+              ReactEditor.focus(editor)
+              innerIdleCallback = waitAMoment(() => {
+                const firstNode = firstPosition(editor.children)
+                const firstPath =
+                  selection.direction === 'forward'
+                    ? Editor.after(editor, firstNode, {
+                        distance: selection.start,
+                        unit: 'character',
+                      })
+                    : Editor.after(editor, firstNode, {
+                        distance: selection.end,
+                        unit: 'character',
+                      })
+                const secondPath =
+                  selection.direction === 'forward'
+                    ? Editor.after(editor, firstNode, {
+                        distance: selection.end,
+                        unit: 'character',
+                      })
+                    : Editor.after(editor, firstNode, {
+                        distance: selection.start,
+                        unit: 'character',
+                      })
+                Transforms.setSelection(editor, {
+                  anchor: firstPath,
+                  focus: secondPath,
+                })
+                editorWrapperRef.current.scrollIntoView({ behavior: 'smooth' })
+              })
+            })
+          } else {
+            idleCallback = waitAMoment(() => {
+              ReactEditor.focus(editor)
+              innerIdleCallback = waitAMoment(() => {
+                Transforms.select(editor, selection)
+              })
+            })
+          }
+        } else {
+          ReactEditor.focus(editor)
+        }
       }
-    }, [autoFocus])
+
+      return () => {
+        if (idleCallback) {
+          cancelWait(idleCallback)
+        }
+        if (innerIdleCallback) {
+          cancelWait(innerIdleCallback)
+        }
+      }
+    }, [autoFocus, jumpCounter])
     const focusEditor = useCallback((previousSelection) => {
       setTimeout(() => {
         if (editorWrapperRef.current && editorWrapperRef.current.firstChild) {
@@ -115,8 +209,8 @@ const RichTextEditorConnector = (connector) => {
       onValueChanged,
       onKeyDown,
       onPaste,
-      _signalFocusToEditState,
-      _signalBlurToEditState,
+      signalFocusToEditState,
+      signalBlurToEditState,
       _editorIsReady,
     ] = useEditState(
       editorKey,
@@ -131,6 +225,24 @@ const RichTextEditorConnector = (connector) => {
       undoId,
       log
     )
+
+    const wrappedOnChange = useCallback(
+      (event) => {
+        if (isEditing) {
+          onValueChanged(event)
+        }
+      },
+      [onChange]
+    )
+
+    const isEditing = editState === EDITING
+    const isSearching = editState === SEARCHING
+
+    const startEditingIfNotAlready = useCallback(() => {
+      if (!isEditing) {
+        startEditing()
+      }
+    }, [isEditing])
 
     const handleKeyDown = (event) => {
       if (event.key === 'Tab') {
@@ -163,7 +275,11 @@ const RichTextEditorConnector = (connector) => {
           event.preventDefault()
           const mark = HOTKEYS[hotkey]
           toggleMark(editor, mark)
+          return
         }
+      }
+      if (!isEditing && !event.ctrlKey && !event.altKey && !event.metaKey) {
+        startEditing()
       }
       onKeyDown(event)
     }
@@ -203,7 +319,7 @@ const RichTextEditorConnector = (connector) => {
 
     const otherProps = {}
     return (
-      <Slate editor={editor} value={value} onChange={onValueChanged} key={editorKey}>
+      <Slate editor={editor} value={value} onChange={wrappedOnChange} key={editorKey} id={id}>
         <div className={cx('slate-editor__wrapper', className)}>
           <ToolBar editor={editor} focusEditor={focusEditor} />
           <div
@@ -226,6 +342,7 @@ const RichTextEditorConnector = (connector) => {
               onInput={handleInput}
               onBlur={handleOnBlur}
               onFocus={handleOnFocus}
+              onClick={startEditingIfNotAlready}
             />
           </div>
         </div>
@@ -245,11 +362,14 @@ const RichTextEditorConnector = (connector) => {
     className: PropTypes.string,
     undoId: PropTypes.number,
     clientId: PropTypes.string,
+    editState: PropTypes.string,
     onBlur: PropTypes.func,
     onFocus: PropTypes.func,
     imageCache: PropTypes.object.isRequired,
     cacheImage: PropTypes.func.isRequired,
     useSpellcheck: PropTypes.bool,
+    jumpCounter: PropTypes.number,
+    startEditing: PropTypes.func.isRequired,
   }
 
   const {
@@ -270,8 +390,13 @@ const RichTextEditorConnector = (connector) => {
         imageCache: selectors.imageCacheSelector(state),
         useSpellcheck: selectors.useSpellcheckSelector(state),
         settings: selectors.appSettingsSelector(state),
+        jumpCounter: selectors.jumpCounterSelector(state),
+        editState: selectors.editStateSelector(state),
       }),
-      { cacheImage: actions.imageCache.cacheImage }
+      {
+        cacheImage: actions.imageCache.cacheImage,
+        startEditing: actions.applicationState.startEditing,
+      }
     )(
       // eslint-disable-next-line react/display-name
       React.memo(RichTextEditor, (prevProps, nextProps) => {
@@ -281,13 +406,15 @@ const RichTextEditorConnector = (connector) => {
           prevProps.darkMode === nextProps.darkMode &&
           prevProps.className === nextProps.className &&
           prevProps.autoFocus === nextProps.autoFocus &&
+          prevProps.jumpCounter === nextProps.jumpCounter &&
           prevProps.onChange === nextProps.onChange &&
           prevProps.fileId === nextProps.fileId &&
           prevProps.clientId === nextProps.clientId &&
           prevProps.onBlur === nextProps.onBlur &&
           prevProps.onFocus === nextProps.onFocus &&
           prevProps.imageCache === nextProps.imageCache &&
-          prevProps.cacheImage === nextProps.cacheImage
+          prevProps.cacheImage === nextProps.cacheImage &&
+          prevProps.editState === nextProps.editState
         )
       })
     )

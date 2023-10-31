@@ -153,7 +153,7 @@ const ExportDialogConnector = (connector) => {
   ExportDialog.propTypes = {
     exportConfig: PropTypes.object.isRequired,
     close: PropTypes.func.isRequired,
-    bookId: PropTypes.string.isRequired,
+    bookId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     seriesName: PropTypes.string,
     books: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired,

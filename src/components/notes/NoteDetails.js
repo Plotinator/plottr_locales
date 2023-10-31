@@ -22,7 +22,7 @@ const NoteDetailsConnector = (connector) => {
         if (type == 'paragraph') {
           desc = (
             <dd>
-              <RichText description={note[name]} />
+              <RichText id={`note-${note.id}-custom-attribute-${name}`} description={note[name]} />
             </dd>
           )
         } else {
@@ -41,7 +41,10 @@ const NoteDetailsConnector = (connector) => {
           if (attr.type == 'paragraph') {
             val = (
               <dd>
-                <RichText description={attr.value} />
+                <RichText
+                  id={`note-${note.id}-template-${t.id}-attribute-${attr.name}`}
+                  description={attr.value}
+                />
               </dd>
             )
           } else {
@@ -73,7 +76,7 @@ const NoteDetailsConnector = (connector) => {
                   <Image responsive imageId={note.imageId} />
                   <dt>{i18n('Notes')}</dt>
                   <dd>
-                    <RichText description={note.content} />
+                    <RichText id={`note-${note.id}-content`} description={note.content} />
                   </dd>
                 </dl>
                 {templateNotes}

@@ -23,10 +23,13 @@ import UnconnectedPlottrFloater from '../PlottrFloater'
 import { checkDependencies } from '../checkDependencies'
 import { withEventTargetValue } from '../withEventTargetValue'
 import Scrollable from '../../utils/scrollable'
+import { delay } from '../../utils/delay'
 
 const {
   card: { cardMapping },
 } = helpers
+
+const targetPosition = 115
 
 const OutlineViewConnector = (connector) => {
   const BeatView = UnconnectedBeatView(connector)
@@ -48,12 +51,13 @@ const OutlineViewConnector = (connector) => {
     lines,
     beats,
     allCards,
+    selectedCardId,
     card2Dmap,
     outlineSearchTerm,
     outlineScrollPosition,
   }) => {
     const [active, setActive] = useState(0)
-    const [beatsToRender, setBeatsToRender] = useState(1)
+    const [beatsToRender, setBeatsToRender] = useState(beats.length)
     const [filterVisible, setFilterVisible] = useState(false)
 
     const beatsRef = useRef(null)
@@ -61,16 +65,33 @@ const OutlineViewConnector = (connector) => {
 
     useEffect(() => {
       if (beatsToRender >= beats.length) return
-      window.requestIdleCallback(() => {
+      delay(() => {
         setBeatsToRender(beatsToRender + 1)
       })
     }, [beats, beatsToRender, setBeatsToRender])
 
     useEffect(() => {
-      if (outlineScrollPosition && scrollableRef.current) {
+      if (selectedCardId) {
+        setTimeout(() => {
+          const elem = document.querySelector(`#card-${selectedCardId}`)
+          if (elem) {
+            elem.scrollIntoView()
+            const container = document.querySelector('.outline__container')
+            const yPosition = elem.getBoundingClientRect().y
+            if (container) {
+              const finalDestination = yPosition - targetPosition
+              container.scrollBy(0, finalDestination)
+            }
+          }
+        }, 100)
+      }
+    }, [selectedCardId])
+
+    useEffect(() => {
+      if (!selectedCardId && outlineScrollPosition && scrollableRef.current) {
         setTimeout(() => {
           scrollableRef.current.scrollTo(0, outlineScrollPosition, true)
-        }, 500)
+        }, 100)
       }
     }, [])
 
@@ -254,6 +275,7 @@ const OutlineViewConnector = (connector) => {
     outlineFilter: PropTypes.array,
     currentTimeline: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     isSeries: PropTypes.bool,
+    selectedCardId: PropTypes.number,
     actions: PropTypes.object.isRequired,
     outlineSearchTerm: PropTypes.string,
     outlineScrollPosition: PropTypes.number,
@@ -280,6 +302,7 @@ const OutlineViewConnector = (connector) => {
           isSeries: selectors.isSeriesSelector(state),
           outlineSearchTerm: selectors.outlineSearchTermSelector(state),
           outlineScrollPosition: selectors.outlineScrollPositionSelector(state),
+          selectedCardId: selectors.selectedOutlineCardSelector(state),
         }
       },
       (dispatch) => {

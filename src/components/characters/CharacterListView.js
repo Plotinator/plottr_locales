@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
 
@@ -31,6 +31,7 @@ import { checkDependencies } from '../checkDependencies'
 import { withEventTargetValue } from '../withEventTargetValue'
 import Tabs from '../Tabs'
 import Tab from '../Tab'
+import { delay } from '../../utils/delay'
 
 const { nextIdAcrossCategories } = newIds
 const {
@@ -81,33 +82,33 @@ const CharacterListViewConnector = (connector) => {
 
   checkDependencies({ templatesDisabled, exportDisabled })
 
-  const CharacterListView = (props) => {
-    const {
-      visibleCharactersByCategory,
-      filterIsEmpty,
-      categories,
-      customAttributes,
-      characterSort,
-      darkMode,
-      charactersSearchTerm,
-      books,
-      attributeTabId,
-      selectedCharacteId,
-      showTabs,
-      actions,
-      uiActions,
-    } = props
-
-    const [attributesDialogOpen, setAttributesDialogOpen] = useState(false)
-    const [categoriesDialogOpen, setCategoriesDialogOpen] = useState(false)
-    const [editingSelected, setEditingSelected] = useState(false)
-    const [showTemplatePicker, setShowTemplatePicker] = useState(false)
-    const [creating, setCreating] = useState(false)
-    const [templateData, setTemplateData] = useState(null)
-    const [filterVisible, setFilterVisible] = useState(false)
-    const [sortVisible, setSortVisible] = useState(false)
-    const [detailsVisible, setDetailsVisible] = useState(true)
-
+  const CharacterListView = ({
+    visibleCharactersByCategory,
+    filterIsEmpty,
+    characters,
+    categories,
+    customAttributes,
+    customAttributesThatCanChange,
+    characterSort,
+    darkMode,
+    charactersSearchTerm,
+    books,
+    attributeTabId,
+    selectedCharacteId,
+    showTabs,
+    attributesDialogOpen,
+    categoriesDialogOpen,
+    editingSelected,
+    showTemplatePicker,
+    creating,
+    templateData,
+    filterVisible,
+    sortVisible,
+    detailsVisible,
+    actions,
+    customAttributeActions,
+    uiActions,
+  }) => {
     useEffect(() => {
       const id = selectedId(visibleCharactersByCategory, categories, selectedCharacteId)
       if (id !== selectedCharacteId) {
@@ -116,32 +117,32 @@ const CharacterListViewConnector = (connector) => {
     }, [visibleCharactersByCategory, categories])
 
     const editSelected = () => {
-      setEditingSelected(true)
+      uiActions.startEditingSelectedCharacter()
     }
 
     const stopEditing = () => {
-      setEditingSelected(false)
+      uiActions.finishEditingSelectedCharacter()
     }
 
     const closeDialog = () => {
-      setAttributesDialogOpen(false)
-      setCategoriesDialogOpen(false)
+      uiActions.hideCharactersAttributesDialog()
+      uiActions.hideCharactersCategoryDialog()
     }
 
     const handleCreateNewCharacter = () => {
       actions.addCharacter()
-      setEditingSelected(true)
+      uiActions.selectCharacter(id)
+      uiActions.startEditingSelectedCharacter()
     }
 
     const handleChooseTemplate = (templateData) => {
-      // setState({ showTemplatePicker: false, templateData: templateData, creating: true })
-
       // going back to old way (without modal) to think it over
       const id = nextIdAcrossCategories(visibleCharactersByCategory)
       actions.addCharacterWithTemplate(null, templateData)
+      uiActions.setCharacterTemplateData(templateData)
       uiActions.selectCharacter(id)
-      setEditingSelected(true)
-      setShowTemplatePicker(false)
+      uiActions.startEditingSelectedCharacter()
+      uiActions.hideCharactersTemplatePicker()
     }
 
     const handleFinishCreate = (name) => {
@@ -152,10 +153,10 @@ const CharacterListViewConnector = (connector) => {
         actions.addCharacter(name)
       }
 
-      setCreating(false)
-      setTemplateData(null)
+      uiActions.finishEditingSelectedCharacter()
+      uiActions.setCharacterTemplateData(null)
       uiActions.selectCharacter(id)
-      setEditingSelected(true)
+      uiActions.finishEditingSelectedCharacter()
     }
 
     const renderCreateInput = () => {
@@ -165,7 +166,7 @@ const CharacterListViewConnector = (connector) => {
         <InputModal
           title={t('Name')}
           getValue={handleFinishCreate}
-          cancel={() => setCreating(false)}
+          cancel={uiActions.finishCreatingCharacter}
           isOpen={true}
           type="text"
         />
@@ -188,9 +189,9 @@ const CharacterListViewConnector = (connector) => {
     // If we don't do this, then all the rich text editors will be
     // re-used.
     const flickerDetails = () => {
-      setDetailsVisible(false)
-      window.requestIdleCallback(() => {
-        setDetailsVisible(true)
+      uiActions.hideCharacterDetails()
+      delay(() => {
+        uiActions.showCharacterDetails()
       })
     }
 
@@ -228,19 +229,19 @@ const CharacterListViewConnector = (connector) => {
                 <Button
                   disabled={templatesDisabled}
                   bsSize="small"
-                  onClick={() => setShowTemplatePicker(true)}
+                  onClick={uiActions.showCharactersTemplatePicker}
                 >
                   {t('Use Template')}
                 </Button>
               </ButtonGroup>
             </NavItem>
             <NavItem>
-              <Button bsSize="small" onClick={() => setAttributesDialogOpen(true)}>
+              <Button bsSize="small" onClick={uiActions.showCharactersAttributesDialog}>
                 <Glyphicon glyph="list" /> {t('Attributes')}
               </Button>
             </NavItem>
             <NavItem>
-              <Button bsSize="small" onClick={() => setCategoriesDialogOpen(true)}>
+              <Button bsSize="small" onClick={uiActions.showCharactersCategoryDialog}>
                 <Glyphicon glyph="list" /> {t('Categories')}
               </Button>
             </NavItem>
@@ -249,16 +250,18 @@ const CharacterListViewConnector = (connector) => {
                 trigger="click"
                 rootClose
                 open={filterVisible}
-                onClose={() => {
-                  setFilterVisible(false)
-                }}
+                onClose={uiActions.hideCharacterFilter}
                 placement="bottom"
                 component={filterPopover}
               >
                 <Button
                   bsSize="small"
                   onClick={() => {
-                    setFilterVisible(!filterVisible)
+                    if (!filterVisible) {
+                      uiActions.showCharacterFilter()
+                    } else {
+                      uiActions.hideCharacterFilter()
+                    }
                   }}
                 >
                   <Glyphicon glyph="filter" /> {t('Filter')}
@@ -270,9 +273,7 @@ const CharacterListViewConnector = (connector) => {
               <Floater
                 trigger="click"
                 open={sortVisible}
-                onClose={() => {
-                  setSortVisible(false)
-                }}
+                onClose={uiActions.showCharacterSort}
                 rootClose
                 placement="bottom"
                 component={sortPopover}
@@ -280,7 +281,11 @@ const CharacterListViewConnector = (connector) => {
                 <Button
                   bsSize="small"
                   onClick={() => {
-                    setSortVisible(!sortVisible)
+                    if (!sortVisible) {
+                      uiActions.showCharacterSort()
+                    } else {
+                      uiActions.hideCharacterSort()
+                    }
                   }}
                 >
                   <Glyphicon glyph={sortGlyph} /> {t('Sort')}
@@ -364,7 +369,7 @@ const CharacterListViewConnector = (connector) => {
           editing={editingSelected}
           stopEditing={stopEditing}
           startEditing={editSelected}
-          openAttributes={() => setAttributesDialogOpen(true)}
+          openAttributes={uiActions.showCharactersAttributesDialog}
         />
       )
     }
@@ -389,15 +394,12 @@ const CharacterListViewConnector = (connector) => {
           modal={true}
           types={['characters']}
           isOpen={showTemplatePicker}
-          close={() => setShowTemplatePicker(false)}
+          close={uiActions.hideCharactersTemplatePicker}
           onChooseTemplate={handleChooseTemplate}
           canMakeCharacterTemplates={!!customAttributes.length}
         />
       )
     }
-
-    if (editingSelected) window.SCROLLWITHKEYS = false
-    else window.SCROLLWITHKEYS = true
 
     return (
       <div className="character-list container-with-sub-nav">
@@ -460,6 +462,15 @@ const CharacterListViewConnector = (connector) => {
     books: PropTypes.array.isRequired,
     selectedCharacteId: PropTypes.number,
     showTabs: PropTypes.bool,
+    attributesDialogOpen: PropTypes.bool,
+    categoriesDialogOpen: PropTypes.bool,
+    editingSelected: PropTypes.bool,
+    showTemplatePicker: PropTypes.bool,
+    creating: PropTypes.bool,
+    templateData: PropTypes.any,
+    filterVisible: PropTypes.bool,
+    sortVisible: PropTypes.bool,
+    detailsVisible: PropTypes.bool,
     attributeTabId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     actions: PropTypes.object.isRequired,
     uiActions: PropTypes.object.isRequired,
@@ -494,6 +505,15 @@ const CharacterListViewConnector = (connector) => {
           attributeTabId: selectors.characterAttributeTabSelector(state),
           selectedCharacteId: selectors.selectedCharacterSelector(state),
           showTabs: selectors.showBookTabsSelector(state),
+          attributesDialogOpen: selectors.characterAttributesDialogOpenSelector(state),
+          categoriesDialogOpen: selectors.characterCategoriesDialogOpenSelector(state),
+          editingSelected: selectors.editingSelectedCharacterSelector(state),
+          showTemplatePicker: selectors.characterTemplatePickerVisibleSelector(state),
+          creating: selectors.creatingCharacterSelector(state),
+          templateData: selectors.characterTemplateDataSelector(state),
+          filterVisible: selectors.characterFilterVisibleSelector(state),
+          sortVisible: selectors.characterSortVisibleSelector(state),
+          detailsVisible: selectors.characterDetailsVisible(state),
         }
       },
       (dispatch) => {

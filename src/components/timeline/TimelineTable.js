@@ -414,9 +414,18 @@ const TimelineTableConnector = (connector) => {
     }
 
     render() {
-      const { darkMode, orientation, isSmall, message } = this.props
+      const {
+        darkMode,
+        orientation,
+        isSmall,
+        message,
+        isCardDialogVisible,
+        hasPreviouslyRendered,
+      } = this.props
 
-      if (isSmall) {
+      if (isCardDialogVisible && !hasPreviouslyRendered) {
+        return <div />
+      } else if (isSmall) {
         return (
           <div
             className={cx('small-timeline__wrapper', {
@@ -470,7 +479,7 @@ const TimelineTableConnector = (connector) => {
     timelineViewIsTabbed: PropTypes.bool,
     timelineViewIsStacked: PropTypes.bool,
     pinnedPlotlines: PropTypes.number,
-    isCardDialogVisible: PropTypes.bool,
+    hasPreviouslyRendered: PropTypes.bool,
   }
 
   const {
@@ -484,11 +493,13 @@ const TimelineTableConnector = (connector) => {
 
     let prevProps = null
     return connect(
-      (state, { activeTab, isCardDialogVisible }) => {
+      (state, { activeTab }) => {
+        const isCardDialogVisible = selectors.isCardDialogVisibleSelector(state)
         if (isCardDialogVisible && prevProps !== null) {
           return prevProps
         } else {
           prevProps = {
+            hasPreviouslyRendered: prevProps?.hasPreviouslyRendered || !isCardDialogVisible,
             beats: selectors.visibleSortedBeatsForTimelineByBookSelector(state),
             books: selectors.allBooksSelector(state),
             beatHasChildrenMap: selectors.beatHasChildrenSelector(state),

@@ -14,14 +14,14 @@ import { StepBody, StepFooter, StepHeader } from '../../../onboarding/Step'
 import OnboardingButtonBar from '../../../onboarding/OnboardingButtonBar'
 import { Checkbox } from '../../../Checkbox'
 
-const typeMap = {
-  characters: t('Character'),
-  plotlines: t('Plotline'),
-  scenes: t('Scene'),
-}
-
 const ChooseConnector = (connector) => {
   const Choose = ({ cancel, finalize, projects, templates }) => {
+    const typeMap = {
+      characters: t('Character'),
+      plotlines: t('Plotline'),
+      scenes: t('Scene'),
+    }
+
     const [selectedProjects, setSelectedProjects] = useState(
       projects.filter(({ fileURL }) => fileURL).map((p) => p.fileURL)
     )

@@ -173,7 +173,7 @@ const PlaceItemConnector = (connector) => {
   PlaceItem.propTypes = {
     place: PropTypes.object.isRequired,
     selected: PropTypes.bool.isRequired,
-    editing: PropTypes.bool.isRequired,
+    editing: PropTypes.bool,
     select: PropTypes.func.isRequired,
     startEdit: PropTypes.func.isRequired,
     stopEdit: PropTypes.func.isRequired,

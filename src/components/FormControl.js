@@ -3,12 +3,14 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import elementType from 'prop-types-extra/lib/elementType'
 import warning from 'warning'
+import { isEqual, omit } from 'lodash'
 
 import FormControlFeedback from './FormControlFeedback'
 import FormControlStatic from './FormControlStatic'
 import { prefix, bsClass, getClassSet, splitBsProps, bsSizes } from './utils/bootstrapUtils'
 import { SIZE_MAP, Size } from './utils/StyleConfig'
 import { FormGroupContext } from './context'
+import { delay } from '../utils/delay'
 
 const propTypes = {
   componentClass: elementType,
@@ -30,6 +32,11 @@ const propTypes = {
   inputRef: PropTypes.func,
   className: PropTypes.string,
   bsSize: PropTypes.string,
+  autoFocus: PropTypes.bool,
+  selection: PropTypes.object,
+  onSelectionChange: PropTypes.func,
+  jumpCounter: PropTypes.number,
+  onClick: PropTypes.func,
 }
 
 const defaultProps = {
@@ -37,8 +44,74 @@ const defaultProps = {
 }
 
 class FormControl extends React.Component {
-  handleMousDown = (event) => {
+  component = null
+  focussing = false
+
+  handleMouseDown = (event) => {
+    if (this.props.onClick) {
+      this.props.onClick()
+    }
     event.stopPropagation()
+  }
+
+  focusSelection = () => {
+    if (!this.focusing && this.component && this.props.autoFocus) {
+      this.focusing = true
+      this.component.focus()
+      setTimeout(() => {
+        if (this.props.selection && this.component) {
+          this.component.setSelectionRange(
+            this.props.selection.start,
+            this.props.selection.end,
+            this.props.selection.direction
+          )
+          this.focusing = false
+        }
+      }, 5)
+    }
+  }
+
+  handleRef = (ref) => {
+    this.component = ref
+    this.focusSelection()
+    if (this.props.inputRef) {
+      this.props.inputRef(ref)
+    }
+  }
+
+  handleSelectionChange = (event) => {
+    if (!this.focusing && this.component && event.target.activeElement === this.component) {
+      this.props.onSelectionChange({
+        ...event,
+        target: event.target.activeElement,
+      })
+    }
+  }
+
+  componentDidUpdate(previousProps) {
+    if (
+      this.props.autoFocus &&
+      (this.props.autoFocus !== previousProps.autoFocus ||
+        !isEqual(this.props.selection, previousProps.selection) ||
+        this.props.jumpCounter !== previousProps.jumpCounter) &&
+      this.component
+    ) {
+      this.focusSelection()
+    }
+  }
+
+  componentDidMount() {
+    if (!this.props.onSelectionChange) return
+
+    if (this.component) {
+      document.addEventListener('selectionchange', this.handleSelectionChange)
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.props.onSelectionChange && this.component) {
+      document.removeEventListener('selectionchange', this.handleSelectionChange)
+    }
   }
 
   render() {
@@ -52,7 +125,6 @@ class FormControl extends React.Component {
             componentClass: Component,
             type,
             id = controlId,
-            inputRef,
             className,
             bsSize,
             ...props
@@ -80,11 +152,11 @@ class FormControl extends React.Component {
 
           return (
             <Component
-              {...elementProps}
-              onMouseDown={this.handleMousDown}
+              {...omit(elementProps, 'inputRef')}
+              onMouseDown={this.handleMouseDown}
               type={type}
               id={id}
-              ref={inputRef}
+              ref={this.handleRef}
               className={classNames(className, classes)}
             />
           )

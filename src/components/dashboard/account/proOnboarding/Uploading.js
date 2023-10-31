@@ -9,11 +9,6 @@ import FailedUploads from './FailedUploads'
 import { StepBody, StepFooter, StepHeader } from '../../../onboarding/Step'
 import { checkDependencies } from '../../../checkDependencies'
 
-const typeName = {
-  project: t('Project'),
-  template: t('Template'),
-}
-
 const UploadingConnector = (connector) => {
   const {
     platform: {
@@ -40,6 +35,11 @@ const UploadingConnector = (connector) => {
   })
 
   const Uploading = ({ nextStep, projects, templates, userId, emailAddress }) => {
+    const typeName = {
+      project: t('Project'),
+      template: t('Template'),
+    }
+
     const [maxItems, setMaxItems] = useState(100)
     const [currentProgress, setCurrentProgress] = useState(0)
     const [currentObj, setCurrentObj] = useState(null)

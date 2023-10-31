@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react'
 import { PropTypes } from 'prop-types'
+import { isEqual } from 'lodash'
 
 import UnconnectedRichText from '../rce/RichText'
 
@@ -22,33 +23,32 @@ const CardDescriptionEditorConnector = (connector) => {
     cardId,
     description,
     selection,
-    editCardAttributes,
+    editCardDescription,
     // Needed to trigger undo on child components
     undoId,
+    foci,
   }) => {
-    const editorPath = helpers.editors.cardDescriptionEditorPath(cardId)
-    checkDependencies({ editorPath })
+    const selectionForMainCardElement = (name) => {
+      return foci?.find(({ path }) => {
+        return isEqual(path, ['card', cardId, name])
+      })?.selection
+    }
 
     const handleDescriptionChange = useCallback(
       (newDescription, selection) => {
-        editCardAttributes(
-          cardId,
-          newDescription ? { description: newDescription } : null,
-          editorPath,
-          selection
-        )
+        editCardDescription(cardId, newDescription, selection)
       },
-      [cardId, editorPath]
+      [cardId]
     )
 
     return (
       <RichText
-        id={editorPath}
+        id={`card-${cardId}-description`}
         description={description}
-        selection={selection}
         onChange={handleDescriptionChange}
         editable
-        autofocus
+        autoFocus={foci && foci[0] && foci[0].path[2] === 'description'}
+        selection={selectionForMainCardElement('description')}
       />
     )
   }
@@ -57,8 +57,9 @@ const CardDescriptionEditorConnector = (connector) => {
     cardId: PropTypes.number.isRequired,
     description: PropTypes.array.isRequired,
     selection: PropTypes.object,
-    editCardAttributes: PropTypes.func.isRequired,
+    editCardDescription: PropTypes.func.isRequired,
     undoId: PropTypes.number,
+    foci: PropTypes.array.isRequired,
   }
 
   const {
@@ -74,12 +75,9 @@ const CardDescriptionEditorConnector = (connector) => {
       (state, ownProps) => ({
         undoId: selectors.undoIdSelector(state),
         description: selectors.cardDescriptionByIdSelector(state, ownProps.cardId),
-        selection: selectors.selectionSelector(
-          state,
-          helpers.editors.cardDescriptionEditorPath(ownProps.cardId)
-        ),
+        foci: selectors.timelineCurrentFocusSelector(state),
       }),
-      { editCardAttributes: actions.card.editCardAttributes }
+      { editCardDescription: actions.card.editCardDescription }
     )(React.memo(CardDescriptionEditor, areEqual))
   }
 

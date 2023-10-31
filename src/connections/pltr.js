@@ -84,6 +84,7 @@ import {
   CharacterTemplateDetails,
   DashboardBody as UnconnectedDashboardBody,
   DashboardNav,
+  SearchModal as UnconnectedSearchModal,
   FirebaseLogin as UnconnectedFirebaseLogin,
   ChoiceView as UnconnectedChoiceView,
   ExpiredView as UnconnectedExpiredView,
@@ -242,6 +243,7 @@ const pltrTypeSpecs = {
     downloadStorageImage: PropTypes.func.isRequired,
   }),
   uploadToProAsDuplicate: PropTypes.func.isRequired,
+  deleteProBackup: PropTypes.func.isRequired,
 }
 
 export const checkPltrConnector = (platform) => {
@@ -336,6 +338,7 @@ export default (platform, pltr) => {
     CharacterTemplateDetails,
     DashboardBody: UnconnectedDashboardBody(connectorObject),
     DashboardNav,
+    SearchModal: UnconnectedSearchModal(connectorObject),
     FirebaseLogin: UnconnectedFirebaseLogin(connectorObject),
     ChoiceView: UnconnectedChoiceView(connectorObject),
     ExpiredView: UnconnectedExpiredView(connectorObject),

@@ -8,7 +8,7 @@ import DeleteConfirmModal from './dialogs/DeleteConfirmModal'
 import Glyphicon from './Glyphicon'
 import ControlLabel from './ControlLabel'
 import FormGroup from './FormGroup'
-import FormControl from './FormControl'
+import UnconnectedTextFormControl from './TextFormControl'
 import Button from './Button'
 import { checkDependencies } from './checkDependencies'
 
@@ -18,10 +18,10 @@ const areEqual = (prevProps, nextProps) => {
       prevProps.index === nextProps.index &&
       prevProps.entityType === nextProps.entityType &&
       prevProps.value === nextProps.value &&
-      prevProps.editorPath === nextProps.editorPath &&
       prevProps.name === nextProps.name &&
       prevProps.id === nextProps.id &&
-      prevProps.type === nextProps.type
+      prevProps.type === nextProps.type &&
+      prevProps.jumpCounter === nextProps.jumpCounter
     )
   }
 
@@ -35,6 +35,7 @@ const areEqual = (prevProps, nextProps) => {
 
 const EditAttributeConnector = (connector) => {
   const RichText = RichTextConnector(connector)
+  const TextFormControl = UnconnectedTextFormControl(connector)
 
   const {
     platform: { undo, redo, log, openExternal },
@@ -62,7 +63,7 @@ const EditAttributeConnector = (connector) => {
     removeAttribute,
     editAttribute,
     reorderAttribute,
-    editorPath,
+    autoFocus,
   }) => {
     const [deleting, setDeleting] = useState(false)
     const [editing, setEditing] = useState(false)
@@ -161,7 +162,7 @@ const EditAttributeConnector = (connector) => {
     const onShortDescriptionKeyPress = useMemo(
       () => (event) => {
         if (event.which === 13) {
-          onSave()
+          if (onSave) onSave()
         }
       },
       [onSaveAndClose, onSave]
@@ -170,7 +171,7 @@ const EditAttributeConnector = (connector) => {
     const onShortDescriptionKeyDown = useMemo(
       () => (event) => {
         if (event.which === 27) {
-          onSave()
+          if (onSave) onSave()
           return
         }
         if (event.key === 'z' && (event.ctrlKey || event.metaKey)) {
@@ -206,25 +207,27 @@ const EditAttributeConnector = (connector) => {
             <Label />
             <Description />
             <RichText
-              id={editorPath}
+              id={inputId}
               description={value || []}
               onChange={onChange}
               selection={selection}
               editable
-              autofocus={false}
+              autoFocus={autoFocus}
             />
           </div>
         ) : (
           <FormGroup>
             <Label />
             <Description />
-            <FormControl
+            <TextFormControl
               value={value || ''}
               type="text"
               id={inputId || `${name}Input`}
               onKeyDown={onShortDescriptionKeyDown}
               onKeyPress={onShortDescriptionKeyPress}
-              onChange={(event) => onChange(event.target.value)}
+              onChange={onChange}
+              autoFocus={autoFocus}
+              selection={selection}
             />
           </FormGroup>
         )}
@@ -242,18 +245,19 @@ const EditAttributeConnector = (connector) => {
     index: PropTypes.number.isRequired,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
     valueSelector: PropTypes.func,
-    inputId: PropTypes.string,
+    inputId: PropTypes.string.isRequired,
     entityType: PropTypes.string.isRequired,
     darkMode: PropTypes.bool.isRequired,
-    editorPath: PropTypes.string,
     selection: PropTypes.object,
     onChange: PropTypes.func.isRequired,
-    onSave: PropTypes.func.isRequired,
+    onSave: PropTypes.func,
     onSaveAndClose: PropTypes.func,
     addAttribute: PropTypes.func.isRequired,
     removeAttribute: PropTypes.func.isRequired,
     editAttribute: PropTypes.func.isRequired,
     reorderAttribute: PropTypes.func.isRequired,
+    autoFocus: PropTypes.bool,
+    jumpCounter: PropTypes.number,
   }
 
   const {
@@ -332,8 +336,8 @@ const EditAttributeConnector = (connector) => {
     return connect(
       (state, ownProps) => ({
         ...(ownProps.valueSelector ? { value: ownProps.valueSelector(state) } : {}),
-        selection: selectors.selectionSelector(state, ownProps.editorPath),
         darkMode: selectors.isDarkModeSelector(state),
+        jumpCounter: selectors.jumpCounterSelector(state),
       }),
       mapDispatchToProps
     )(React.memo(EditAttribute, areEqual))

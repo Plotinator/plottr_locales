@@ -62,6 +62,7 @@ class NavItem extends React.Component {
 
     const extraClasses = this.props.tabClasses ? this.props.tabClasses(this.props.eventKey) : {}
 
+    delete props.tabClasses
     delete props.onSelect
     delete props.eventKey
 

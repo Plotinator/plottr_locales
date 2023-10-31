@@ -7,7 +7,6 @@ import { t as i18n } from 'plottr_locales'
 
 import { checkDependencies } from '../checkDependencies'
 import Button from '../Button'
-import { makeErrorWindow } from '../errorWindow'
 
 const ErrorBoundaryConnector = (connector) => {
   const {
@@ -36,7 +35,7 @@ const ErrorBoundaryConnector = (connector) => {
       hasError: false,
       viewError: false,
       count: 0,
-      rollbar: null,
+      errorReporter: null,
     }
 
     static getDerivedStateFromError(error) {
@@ -65,20 +64,16 @@ const ErrorBoundaryConnector = (connector) => {
           this.setState({ errorReporter: reporter })
         })
         .catch((error) => {
-          log.error('Could not construct rollbar instance.', error)
+          log.error('Could not construct error reporter instance.', error)
         })
     }
-
-    withErrorWindow = makeErrorWindow(' logging to Rollbar ')
 
     componentDidCatch(error, errorInfo) {
       this.error = error
       this.errorInfo = errorInfo
       log.error(error, errorInfo)
-      if (this.state.rollbar) {
-        this.withErrorWindow(() => {
-          this.state.rollbar.error(error, errorInfo)
-        })
+      if (this.state.errorReporter) {
+        this.state.errorReporter.error('Error in React component', error, errorInfo)
       }
     }
 

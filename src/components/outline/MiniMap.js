@@ -28,6 +28,7 @@ const MiniMapConnector = (connector) => {
     beatActions,
     active,
     linesById,
+    uiActions,
   }) => {
     const [mouseOver, setMouseOver] = useState(false)
     const [firstRender, setFirstRender] = useState(true)
@@ -89,7 +90,11 @@ const MiniMapConnector = (connector) => {
         if (key != firstBeatKey) {
           const container = document.querySelector('.outline__container')
           const yPosition = elem.getBoundingClientRect().y
-          if (container) container.scrollBy(0, yPosition - targetPosition)
+          if (container) {
+            const finalDestination = yPosition - targetPosition
+            container.scrollBy(0, finalDestination)
+            uiActions.recordOutlineScrollPosition(finalDestination)
+          }
         }
       }
       handleActive(key)
@@ -161,6 +166,7 @@ const MiniMapConnector = (connector) => {
     beatActions: PropTypes.object.isRequired,
     handleActive: PropTypes.func,
     linesById: PropTypes.object.isRequired,
+    uiActions: PropTypes.object,
   }
 
   const {
@@ -169,11 +175,13 @@ const MiniMapConnector = (connector) => {
   } = connector
   const CardActions = actions.card
   const BeatActions = actions.beat
+  const UiActions = actions.ui
   checkDependencies({
     redux,
     actions,
     CardActions,
     BeatActions,
+    UiActions,
   })
 
   if (redux) {
@@ -195,6 +203,7 @@ const MiniMapConnector = (connector) => {
         return {
           actions: bindActionCreators(CardActions, dispatch),
           beatActions: bindActionCreators(BeatActions, dispatch),
+          uiActions: bindActionCreators(UiActions, dispatch),
         }
       }
     )(React.memo(MiniMap))

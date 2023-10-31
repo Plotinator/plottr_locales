@@ -86,7 +86,7 @@ const RichTextConnector = (connector) => {
 
     const relinquishLock = useCallback(() => {
       if (
-        !showEditor ||
+        (onCloud && !showEditor) ||
         (props.id && onCloud && releaseRCELock && lock?.clientId === props.clientId)
       ) {
         releaseRCELock(props.fileId, props.id, lock)
@@ -158,7 +158,7 @@ const RichTextConnector = (connector) => {
           onFocus={onFocus}
           className={props.className}
           onChange={props.onChange}
-          autoFocus={props.autofocus}
+          autoFocus={props.autoFocus}
           selection={props.selection}
           text={props.description}
         />
@@ -167,6 +167,7 @@ const RichTextConnector = (connector) => {
       // TODO: support live watching(?)
       body = (
         <RichTextViewer
+          id={props.id}
           lock={lock}
           disabled={!props.editable}
           stealingLock={stealingLock}
@@ -204,7 +205,7 @@ const RichTextConnector = (connector) => {
     selection: PropTypes.object,
     onChange: PropTypes.func,
     editable: PropTypes.bool,
-    autofocus: PropTypes.bool,
+    autoFocus: PropTypes.bool,
     className: PropTypes.string,
     isStorageURL: PropTypes.func,
     isCloudFile: PropTypes.bool,
