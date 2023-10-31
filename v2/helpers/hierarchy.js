@@ -53,16 +53,15 @@ export const hierarchyToStyles = (
     : {}),
 })
 
-const LEVEL_NAMES = [t('Scene'), t('Chapter'), t('Act')]
-
 export const nextLevelName = (depth) => {
+  const LEVEL_NAMES = [t('Scene'), t('Chapter'), t('Act')]
   if (depth == 'default') return t('Chapter')
   return LEVEL_NAMES[depth] || `Level-${depth + 1}`
 }
 
 export const newHierarchyLevel = (allHierarchyLevels) => {
   return {
-    ...hierarchyLevel,
+    ...hierarchyLevel(),
     name: nextLevelName(allHierarchyLevels.length),
     level: 0,
     borderStyle: nextBorderStyle(allHierarchyLevels.length),

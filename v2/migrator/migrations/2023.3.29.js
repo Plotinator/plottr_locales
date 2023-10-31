@@ -18,7 +18,7 @@ function migrate(data) {
         if (key !== 'allIds') {
           return {
             ...acc,
-            [key]: { 0: hierarchyLevel },
+            [key]: { 0: hierarchyLevel() },
           }
         }
 

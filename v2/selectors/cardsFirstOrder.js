@@ -13,8 +13,7 @@ export const allCardsSelector = createSelector(fullFileStateSelector, (state) =>
   return state.cards
 })
 
-const selectId = (state, id) => id
-
+const selectId = (_state, id) => id
 export const singleCardSelector = createSelector(allCardsSelector, selectId, (cards, propId) =>
   cards.find(({ id }) => id === propId)
 )

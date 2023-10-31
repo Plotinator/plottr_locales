@@ -26,6 +26,10 @@ import {
   REMOVE_NOTE,
   EDIT_NOTE_TEMPLATE_ATTRIBUTE,
   DUPLICATE_NOTE,
+  EDIT_NOTE_CONTENT,
+  EDIT_NOTE_TITLE,
+  EDIT_NOTE_CUSTOM_ATTRIBUTE,
+  REPLACE_MARKED_HITS,
   REORDER_NOTE_MANUALLY,
 } from '../constants/ActionTypes'
 import { note } from '../store/initialState'
@@ -34,6 +38,9 @@ import { nextId } from '../store/newIds'
 import { applyToCustomAttributes } from './applyToCustomAttributes'
 import { repairIfPresent } from './repairIfPresent'
 import { positionReset, reorderList } from '../helpers/lists'
+import { safeParseInt } from './safeParseInt'
+import { sortByHitPosition } from './sortByHitPosition'
+import { replacePlainTextHit, replaceInSlateDatastructure } from './replace'
 
 const initialState = [note]
 
@@ -57,10 +64,41 @@ const notes =
       }
 
       case EDIT_NOTE: {
+        const attributes = Object.keys(action.attributes).reduce((acc, nextKey) => {
+          const attribute = action.attributes[nextKey]
+          return {
+            ...acc,
+            [nextKey]: typeof attribute.value === 'undefined' ? attribute : attribute.value,
+          }
+        }, {})
         const lastEdited = { lastEdited: new Date().getTime() }
         return state.map((note) =>
-          note.id === action.id ? Object.assign({}, note, action.attributes, lastEdited) : note
+          note.id === action.id ? Object.assign({}, note, attributes, lastEdited) : note
         )
+      }
+
+      case EDIT_NOTE_CONTENT: {
+        return state.map((note) => {
+          if (note.id === action.id) {
+            return {
+              ...note,
+              content: action.newContent,
+            }
+          }
+          return note
+        })
+      }
+
+      case EDIT_NOTE_TITLE: {
+        return state.map((note) => {
+          if (note.id === action.id) {
+            return {
+              ...note,
+              title: action.newTitle,
+            }
+          }
+          return note
+        })
       }
 
       case REORDER_NOTE_MANUALLY: {
@@ -286,6 +324,58 @@ const notes =
             content: normalizeRCEContent(note.content),
           }
         })
+      }
+
+      case EDIT_NOTE_CUSTOM_ATTRIBUTE: {
+        return state.map((note) => {
+          if (note.id === action.id) {
+            return {
+              ...note,
+              [action.name]: action.newValue,
+            }
+          }
+          return note
+        })
+      }
+
+      case REPLACE_MARKED_HITS: {
+        const applicableHits = action.hitsMarkedForReplacement.filter((hit) => {
+          return hit.path.match(/^\/notes\/[0-9a-zA-Z]+\//)
+        })
+        // IMPORTANT!!!
+        //
+        // We sort by the hit position so that we deal with later hits
+        // first.  By doing so, we don't invalidate the start position
+        // of other hits when we replace those hits.
+        //
+        // i.e. it's fine to do multiple replacements in the same
+        // field, as long as you replace the hits in reverse order,
+        // i.e. the last hit first and the first hit last.
+        return sortByHitPosition(applicableHits).reduce((acc, nextHit) => {
+          const { path, hit } = nextHit
+          const [_, _note, rawNoteId, attributeName, rawFocusStart] = path.split('/')
+          const noteId = safeParseInt(rawNoteId)
+          return acc.map((nextNote) => {
+            if (nextNote.id === noteId) {
+              const attributeValue = nextNote[attributeName]
+              const focusStart = safeParseInt(rawFocusStart)
+              const replaceFunction = Array.isArray(attributeValue)
+                ? replaceInSlateDatastructure
+                : replacePlainTextHit
+              return {
+                ...nextNote,
+                [attributeName]: replaceFunction(
+                  attributeValue,
+                  focusStart,
+                  hit,
+                  action.replacementText
+                ),
+              }
+            } else {
+              return nextNote
+            }
+          })
+        }, state)
       }
 
       case NEW_FILE:

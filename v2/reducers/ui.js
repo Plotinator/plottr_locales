@@ -1,4 +1,4 @@
-import { omit, isEmpty, identity, groupBy, countBy } from 'lodash'
+import { omit, isEqual, isEmpty, identity, uniqWith, groupBy, countBy } from 'lodash'
 
 import {
   ADD_PLACES_ATTRIBUTE,
@@ -59,6 +59,95 @@ import {
   CLOSE_BOOK_DIALOG,
   MOVE_CARD_TO_BOOK,
   RECORD_OUTLINE_SCROLL_POSITION,
+  CLOSE_SEARCH,
+  OPEN_SEARCH,
+  SET_SEARCH_TERM,
+  SELECT_OUTLINE_CARD,
+  SELECT_NOTE,
+  SELECT_PLACE,
+  SELECT_TAG,
+  NEXT_SEARCH_HIT,
+  PREVIOUS_SEARCH_HIT,
+  SET_SERIES_GENRE,
+  SET_SERIES_NAME,
+  SET_SERIES_PREMISE,
+  SET_SERIES_THEME,
+  SET_BOOK_TITLE,
+  SET_BOOK_PREMISE,
+  SET_BOOK_GENRE,
+  SET_BOOK_THEME,
+  START_DELETING_CARD_FROM_CARD_DIALOG,
+  STOP_DELETING_CARD_FROM_CARD_DIALOG,
+  SHOW_CARD_DIALOG_COLOR_PICKER,
+  HIDE_CARD_DIALOG_COLOR_PICKER,
+  START_REMOVING_TEMPLATE_FROM_CARD_DIALOG,
+  STOP_REMOVING_TEMPLATE_FROM_CARD_DIALOG,
+  SET_ACTIVE_TAB_ON_CARD_DIALOG,
+  SHOW_CARD_DIALOG_TEMPLATE_PICKER,
+  HIDE_CARD_DIALOG_TEMPLATE_PICKER,
+  EDIT_CARD_DESCRIPTION,
+  EDIT_CARD_TITLE,
+  EDIT_CARD_CUSTOM_ATTRIBUTE,
+  EDIT_CARD_TEMPLATE_ATTRIBUTE,
+  SHOW_PLACE_ATTRIBUTE_DIALOG,
+  HIDE_PLACE_ATTRIBUTE_DIALOG,
+  START_EDITING_SELECTED_PLACE,
+  FINISH_EDITING_SELECTED_PLACE,
+  SHOW_PLACE_CATETORIES_MODAL,
+  HIDE_PLACE_CATETORIES_MODAL,
+  SHOW_PLACE_FILTER_LIST,
+  HIDE_PLACE_FILTER_LIST,
+  SHOW_PLACE_SORT,
+  HIDE_PLACE_SORT,
+  START_EDITING_SELECTED_NOTE,
+  FINISH_EDITING_SELECTED_NOTE,
+  SHOW_NOTES_CATEGORY_DIALOG,
+  HIDE_NOTES_CATEGORY_DIALOG,
+  SHOW_NOTES_ATTRIBUTES_DIALOG,
+  HIDE_NOTES_ATTRIBUTES_DIALOG,
+  SHOW_NOTES_FILTER_LIST,
+  HIDE_NOTES_FILTER_LIST,
+  SHOW_NOTES_SORT,
+  HIDE_NOTES_SORT,
+  SHOW_CHARACTERS_ATTRIBUTES_DIALOG,
+  HIDE_CHARACTERS_ATTRIBUTES_DIALOG,
+  SHOW_CHARACTERS_CATEGORIES_DIALOG,
+  HIDE_CHARACTERS_CATEGORIES_DIALOG,
+  START_EDITING_SELECTED_CHARACTER,
+  FINISH_EDITING_SELECTED_CHARACTER,
+  SHOW_CHARACTERS_TEMPLATE_PICKER,
+  HIDE_CHARACTERS_TEMPLATE_PICKER,
+  START_CREATING_CHARACTER,
+  FINISH_CREATING_CHARACTER,
+  SET_CHARACTER_TEMPLATE_DATA,
+  SHOW_CHARACTER_FILTER,
+  HIDE_CHARACTER_FILTER,
+  SHOW_CHARACTER_SORT,
+  HIDE_CHARACTER_SORT,
+  SHOW_CHARACTER_DETAILS,
+  HIDE_CHARACTER_DETAILS,
+  EDIT_NOTE_TITLE,
+  EDIT_NOTE_CONTENT,
+  EDIT_PLACE_NAME,
+  EDIT_PLACE_DESCRIPTION,
+  EDIT_PLACE_NOTES,
+  EDIT_NOTE_CUSTOM_ATTRIBUTE,
+  EDIT_PLACE_CUSTOM_ATTRIBUTE,
+  START_DELETING_CHARACTER,
+  FINISH_DELETING_CHARACTER,
+  START_REMOVING_TEMPLATE_FROM_CHARACTER,
+  FINISH_REMOVING_TEMPLATE_FROM_CHARACTER,
+  SET_TEMPLATE_TO_REMOVE_FROM_CHARACTER,
+  SET_ACTIVE_CHARACTER_TAB,
+  SHOW_CHARACTER_EDITOR_TEMPLATE_PICKER,
+  HIDE_CHARACTER_EDITOR_TEMPLATE_PICKER,
+  EDIT_CHARACTER_NAME,
+  EDIT_CHARACTER_DESCRIPTION,
+  EDIT_CHARACTER_TEMPLATE_ATTRIBUTE,
+  EDIT_CHARACTER_ATTRIBUTE_VALUE,
+  EDIT_CHARACTER_SHORT_DESCRIPTION,
+  START_EDITING_OUTLINE_CARD,
+  FINISH_EDITING_OUTLINE_CARD,
   TOGGLE_ADVANCED_SAVE_TEMPLATE_PANEL,
   SET_FOCUSSED_TIMELINE_TAB_BEAT,
   SET_TIMELINE_TAB_BEAT_TO_DELETE,
@@ -69,15 +158,38 @@ import {
   RESET_TIMELINE,
   OPEN_RESTRUCTURE_TIMELINE_MODAL,
   CLOSE_RESTRUCTURE_TIMELINE_MODAL,
+  PUSH_FOCUS,
   DELETE_LINE,
+  EDIT_SELECTED_TAG,
+  FINISH_EDITING_SELECTED_TAG,
+  TOGGLE_REPLACE_SEARCH,
+  SET_REPLACEMENT_TEXT,
+  OPEN_REPLACE,
+  TOGGLE_HIT_MARKED_FOR_REPLACEMENT,
+  UPDATE_HITS_MARKED_FOR_REPLACEMENT,
+  EDIT_CARD_DETAILS,
+  EDIT_NOTE,
+  EDIT_PLACE,
+  EDIT_SERIES,
+  START_SCANNING_SEARCH,
   LOAD_LINES,
+  START_EDITING_BEAT_HEADING_TITLE,
+  STOP_EDITING_BEAT_HEADING_TITLE,
+  START_EDITING_PLOTLINE_HEADING_TITLE,
+  STOP_EDITING_PLOTLINE_HEADING_TITLE,
   REORDER_NOTE_MANUALLY,
   REORDER_CHARACTER_MANUALLY,
   REORDER_PLACE_MANUALLY,
 } from '../constants/ActionTypes'
-import { ui as defaultUI } from '../store/initialState'
+import {
+  ui as defaultUI,
+  card as defaultCard,
+  note as defaultNote,
+  place as defaultPlace,
+} from '../store/initialState'
 import { newFileUI } from '../store/newFileState'
 import selectors from '../selectors'
+import { cardFocusPath } from '../helpers/cards'
 
 const removeCustomAttributeFilter = (state, action) => {
   if (!state.characterFilter || !state.characterFilter[(action.id || action.name).toString()]) {
@@ -417,6 +529,10 @@ const updateUI = (state, action) => {
       return {
         ...state,
         outlineScrollPosition: action.position,
+        outlineTab: {
+          ...state.outlineTab,
+          selectedCard: null,
+        },
       }
 
     case OPEN_ATTRIBUTES_DIALOG:
@@ -646,10 +762,16 @@ const updateUI = (state, action) => {
       return {
         ...state,
         cardDialog: {
+          ...state.cardDialog,
           cardId: action.cardId,
           lineId: action.lineId,
           beatId: action.beatId,
           isOpen: true,
+          deleting: false,
+          showColorPicker: false,
+          showTemplatePicker: false,
+          removing: false,
+          removeWhichTemplate: null,
         },
       }
     }
@@ -664,6 +786,12 @@ const updateUI = (state, action) => {
           lineId: null,
           beatId: null,
           isOpen: false,
+          deleting: false,
+          showColorPicker: false,
+          showTemplatePicker: false,
+          removing: false,
+          removeWhichTemplate: null,
+          activeTab: 1,
         },
       }
     }
@@ -822,6 +950,1341 @@ const updateUI = (state, action) => {
         resturctureTimelineModal: {
           ...state.resturctureTimelineModal,
           open: false,
+        },
+      }
+    }
+
+    case CLOSE_SEARCH: {
+      return {
+        ...state,
+        searchDialog: {
+          ...(state.searchDialog || {}),
+          isOpen: false,
+          scanning: false,
+          replacing: false,
+        },
+      }
+    }
+
+    case OPEN_SEARCH: {
+      return {
+        ...state,
+        searchDialog: {
+          ...(state.searchDialog || {}),
+          isOpen: true,
+          scanning: false,
+          replacing: false,
+        },
+      }
+    }
+
+    case OPEN_REPLACE: {
+      return {
+        ...state,
+        searchDialog: {
+          ...(state.searchDialog || {}),
+          isOpen: true,
+          replacing: true,
+        },
+      }
+    }
+
+    case SET_SEARCH_TERM: {
+      return {
+        ...state,
+        searchDialog: {
+          ...(state.searchDialog || {}),
+          term: action.term,
+          currentHitIndex: 0,
+          scanning: false,
+        },
+      }
+    }
+
+    case UPDATE_HITS_MARKED_FOR_REPLACEMENT: {
+      const hitsToReplace = state.searchDialog.hitsToReplace || []
+      const newHits = action.newHits
+      const validHits = uniqWith(
+        hitsToReplace.reduce((acc, nextHit) => {
+          const matchingNewHit = newHits.find((newHit) => {
+            return newHit.path === nextHit.path
+          })
+          if (!matchingNewHit) {
+            return acc
+          } else {
+            return [matchingNewHit, ...acc]
+          }
+        }, []),
+        isEqual
+      )
+      return {
+        ...state,
+        searchDialog: {
+          ...state.searchDialog,
+          hitsToReplace: validHits,
+        },
+      }
+    }
+
+    case NEXT_SEARCH_HIT: {
+      return {
+        ...state,
+        searchDialog: {
+          ...(state.searchDialog || {}),
+          currentHitIndex: !state.searchDialog?.scanning
+            ? 0
+            : (state.searchDialog.currentHitIndex || 0) + 1,
+          scanning: true,
+        },
+      }
+    }
+
+    case PREVIOUS_SEARCH_HIT: {
+      return {
+        ...state,
+        searchDialog: {
+          ...(state.searchDialog || {}),
+          currentHitIndex: (state.searchDialog.currentHitIndex || 0) - 1,
+          scanning: true,
+        },
+      }
+    }
+
+    case SELECT_OUTLINE_CARD: {
+      return {
+        ...state,
+        outlineTab: {
+          ...state.outlineTab,
+          selectedCard: action.cardId,
+        },
+      }
+    }
+
+    case SELECT_NOTE: {
+      return {
+        ...state,
+        noteTab: {
+          ...state.noteTab,
+          selectedNote: action.id,
+        },
+      }
+    }
+
+    case SELECT_PLACE: {
+      return {
+        ...state,
+        placeTab: {
+          ...state.placeTab,
+          selectedPlace: action.id,
+        },
+      }
+    }
+
+    case SELECT_TAG: {
+      return {
+        ...state,
+        tagTab: {
+          ...state.tags,
+          selectedTag: action.id,
+        },
+      }
+    }
+
+    // ===Updating Focus===
+    // Project
+    case EDIT_SERIES: {
+      const attributesToUpdate = Object.keys(action.attributes).filter((attribute) => {
+        return ['name', 'premise', 'genre', 'theme'].indexOf(attribute) !== -1
+      })
+      return attributesToUpdate.reduce((acc, nextAttributeKey) => {
+        const pathToSet = [nextAttributeKey]
+        const newFocus = {
+          path: pathToSet,
+          selection: action.attributes[nextAttributeKey].selection,
+        }
+        const key = 'projectTab'
+        const foci = acc[key]?.focus || []
+        const existing = foci.find(({ path }) => {
+          return isEqual(path, pathToSet)
+        })
+        if (!action.attributes[nextAttributeKey].selection) {
+          return acc
+        } else {
+          if (existing) {
+            return {
+              ...acc,
+              [key]: {
+                ...acc[key],
+                focus: [
+                  newFocus,
+                  ...foci.filter(({ path }) => {
+                    return !isEqual(path, pathToSet)
+                  }),
+                ],
+              },
+            }
+          }
+          return {
+            ...acc,
+            [key]: {
+              ...acc[key],
+              focus: [newFocus, ...foci],
+            },
+          }
+        }
+      }, state)
+    }
+    case SET_BOOK_TITLE:
+    case SET_BOOK_PREMISE:
+    case SET_BOOK_GENRE:
+    case SET_BOOK_THEME:
+    case SET_SERIES_NAME:
+    case SET_SERIES_PREMISE:
+    case SET_SERIES_GENRE:
+    case SET_SERIES_THEME: {
+      const pathToSet =
+        action.type === SET_SERIES_NAME
+          ? ['name']
+          : action.type === SET_SERIES_PREMISE
+          ? ['premise']
+          : action.type === SET_SERIES_GENRE
+          ? ['genre']
+          : action.type === SET_SERIES_THEME
+          ? ['theme']
+          : action.type === SET_BOOK_TITLE
+          ? ['book', action.id, 'title']
+          : action.type === SET_BOOK_PREMISE
+          ? ['book', action.id, 'premise']
+          : action.type === SET_BOOK_GENRE
+          ? ['book', action.id, 'genre']
+          : ['book', action.id, 'theme']
+      const newFocus = {
+        path: pathToSet,
+        selection: action.selection,
+      }
+      const seriesFoci = state.projectTab?.focus || []
+      const existing = seriesFoci.find(({ path }) => {
+        return isEqual(path, pathToSet)
+      })
+      if (existing) {
+        return {
+          ...state,
+          projectTab: {
+            ...state.projectTab,
+            focus: [
+              newFocus,
+              ...seriesFoci.filter(({ path }) => {
+                return !isEqual(path, pathToSet)
+              }),
+            ],
+          },
+        }
+      }
+      return {
+        ...state,
+        projectTab: {
+          ...state.projectTab,
+          focus: [newFocus, ...seriesFoci],
+        },
+      }
+    }
+    // Timeline & Outline
+    case EDIT_CARD_DETAILS: {
+      const attributesToUpdate = Object.keys(action.attributes).filter((attribute) => {
+        return typeof defaultCard[attribute] !== 'undefined'
+      })
+      return attributesToUpdate.reduce((acc, nextAttributeKey) => {
+        const baseAttributeName = nextAttributeKey
+        const pathToSet = cardFocusPath(action.id, {
+          baseAttributeName,
+        })
+        const newFocus = {
+          path: pathToSet,
+          selection: action.attributes[nextAttributeKey].selection,
+        }
+        const key =
+          acc.currentView === 'timeline'
+            ? 'timeline'
+            : acc.currentView === 'outline'
+            ? 'outlineTab'
+            : 'timeline'
+        const foci = acc[key]?.focus || []
+        const existing = foci.find(({ path }) => {
+          return isEqual(path, pathToSet)
+        })
+        if (!action.attributes[nextAttributeKey].selection) {
+          return acc
+        } else {
+          if (existing) {
+            return {
+              ...acc,
+              [key]: {
+                ...acc[key],
+                focus: [
+                  newFocus,
+                  ...foci.filter(({ path }) => {
+                    return !isEqual(path, pathToSet)
+                  }),
+                ],
+              },
+            }
+          }
+          return {
+            ...acc,
+            [key]: {
+              ...acc[key],
+              focus: [newFocus, ...foci],
+            },
+          }
+        }
+      }, state)
+    }
+    case EDIT_CARD_TEMPLATE_ATTRIBUTE:
+    case EDIT_CARD_CUSTOM_ATTRIBUTE:
+    case EDIT_CARD_TITLE:
+    case EDIT_CARD_DESCRIPTION: {
+      const baseAttributeName =
+        action.type === EDIT_CARD_DESCRIPTION
+          ? 'description'
+          : action.type === EDIT_CARD_TITLE
+          ? 'title'
+          : null
+      const customAttributeName = action.type === EDIT_CARD_CUSTOM_ATTRIBUTE ? action.name : null
+      const template =
+        action.type === EDIT_CARD_TEMPLATE_ATTRIBUTE
+          ? {
+              id: action.templateId,
+              attributeName: action.name,
+            }
+          : null
+      const pathToSet = cardFocusPath(action.id, {
+        baseAttributeName,
+        customAttributeName,
+        template,
+      })
+      const newFocus = {
+        path: pathToSet,
+        selection: action.selection,
+      }
+      const key =
+        state.currentView === 'timeline'
+          ? 'timeline'
+          : state.currentView === 'outline'
+          ? 'outlineTab'
+          : 'timeline'
+      const foci = state[key]?.focus || []
+      const existing = foci.find(({ path }) => {
+        return isEqual(path, pathToSet)
+      })
+      if (existing) {
+        return {
+          ...state,
+          [key]: {
+            ...state[key],
+            focus: [
+              newFocus,
+              ...foci.filter(({ path }) => {
+                return !isEqual(path, pathToSet)
+              }),
+            ],
+          },
+        }
+      }
+      return {
+        ...state,
+        [key]: {
+          ...state[key],
+          focus: [newFocus, ...foci],
+        },
+      }
+    }
+    // Notes.
+    case EDIT_NOTE: {
+      const attributesToUpdate = Object.keys(action.attributes).filter((attribute) => {
+        return typeof defaultNote[attribute] !== 'undefined'
+      })
+      return attributesToUpdate.reduce((acc, nextAttributeKey) => {
+        const baseAttributeName = nextAttributeKey
+        const pathToSet = ['note', action.id, baseAttributeName]
+        const newFocus = {
+          path: pathToSet,
+          selection: action.attributes[nextAttributeKey].selection,
+        }
+        const key = 'noteTab'
+        const foci = acc[key]?.focus || []
+        const existing = foci.find(({ path }) => {
+          return isEqual(path, pathToSet)
+        })
+        if (!action.attributes[nextAttributeKey].selection) {
+          return acc
+        } else {
+          if (existing) {
+            return {
+              ...acc,
+              [key]: {
+                ...acc[key],
+                focus: [
+                  newFocus,
+                  ...foci.filter(({ path }) => {
+                    return !isEqual(path, pathToSet)
+                  }),
+                ],
+              },
+            }
+          }
+          return {
+            ...acc,
+            [key]: {
+              ...acc[key],
+              focus: [newFocus, ...foci],
+            },
+          }
+        }
+      }, state)
+    }
+    case EDIT_NOTE_CUSTOM_ATTRIBUTE:
+    case EDIT_NOTE_TITLE:
+    case EDIT_NOTE_CONTENT: {
+      const pathToSet =
+        action.type === EDIT_NOTE_TITLE
+          ? ['note', action.id, 'title']
+          : action.type === EDIT_NOTE_CONTENT
+          ? ['note', action.id, 'content']
+          : action.type === EDIT_NOTE_CUSTOM_ATTRIBUTE
+          ? ['note', action.id, action.name]
+          : ['unknown']
+      const newFocus = {
+        path: pathToSet,
+        selection: action.selection,
+      }
+      const foci = state.noteTab?.focus || []
+      const existing = foci.find(({ path }) => {
+        return isEqual(path, pathToSet)
+      })
+      if (existing) {
+        return {
+          ...state,
+          noteTab: {
+            ...state.noteTab,
+            focus: [
+              newFocus,
+              ...foci.filter(({ path }) => {
+                return !isEqual(path, pathToSet)
+              }),
+            ],
+          },
+        }
+      }
+      return {
+        ...state,
+        noteTab: {
+          ...state.noteTab,
+          focus: [newFocus, ...foci],
+        },
+      }
+    }
+    // Characters
+    case EDIT_CHARACTER_NAME:
+    case EDIT_CHARACTER_DESCRIPTION:
+    case EDIT_CHARACTER_TEMPLATE_ATTRIBUTE:
+    case EDIT_CHARACTER_SHORT_DESCRIPTION:
+    case EDIT_CHARACTER_ATTRIBUTE_VALUE: {
+      const pathToSet =
+        action.type === EDIT_CHARACTER_NAME
+          ? ['character', action.id, 'name']
+          : action.type === EDIT_CHARACTER_DESCRIPTION
+          ? [
+              'character',
+              action.characterId,
+              'description',
+              action.attributeId,
+              action.currentBookId,
+            ]
+          : action.type === EDIT_CHARACTER_SHORT_DESCRIPTION
+          ? [
+              'character',
+              action.characterId,
+              'short-description',
+              action.attributeId,
+              action.currentBookId,
+            ]
+          : action.type === EDIT_CHARACTER_TEMPLATE_ATTRIBUTE
+          ? ['character', action.id, 'template', action.templateId, action.name, action.bookId]
+          : action.type === EDIT_CHARACTER_ATTRIBUTE_VALUE
+          ? ['character', action.characterId, action.attributeId, action.bookId]
+          : ['unknown']
+      const newFocus = {
+        path: pathToSet,
+        selection: action.selection,
+      }
+      const foci = state.characterTab?.focus || []
+      const existing = foci.find(({ path }) => {
+        return isEqual(path, pathToSet)
+      })
+      if (existing) {
+        return {
+          ...state,
+          characterTab: {
+            ...state.characterTab,
+            focus: [
+              newFocus,
+              ...foci.filter(({ path }) => {
+                return !isEqual(path, pathToSet)
+              }),
+            ],
+          },
+        }
+      }
+      return {
+        ...state,
+        characterTab: {
+          ...state.characterTab,
+          focus: [newFocus, ...foci],
+        },
+      }
+    }
+    // Places
+    case EDIT_PLACE: {
+      const attributesToUpdate = Object.keys(action.attributes).filter((attribute) => {
+        return typeof defaultPlace[attribute] !== 'undefined'
+      })
+      return attributesToUpdate.reduce((acc, nextAttributeKey) => {
+        const baseAttributeName = nextAttributeKey
+        const pathToSet = ['place', action.id, baseAttributeName]
+        const newFocus = {
+          path: pathToSet,
+          selection: action.attributes[nextAttributeKey].selection,
+        }
+        const key = 'placeTab'
+        const foci = acc[key]?.focus || []
+        const existing = foci.find(({ path }) => {
+          return isEqual(path, pathToSet)
+        })
+        if (!action.attributes[nextAttributeKey].selection) {
+          return acc
+        } else {
+          if (existing) {
+            return {
+              ...acc,
+              [key]: {
+                ...acc[key],
+                focus: [
+                  newFocus,
+                  ...foci.filter(({ path }) => {
+                    return !isEqual(path, pathToSet)
+                  }),
+                ],
+              },
+            }
+          }
+          return {
+            ...acc,
+            [key]: {
+              ...acc[key],
+              focus: [newFocus, ...foci],
+            },
+          }
+        }
+      }, state)
+    }
+    case EDIT_PLACE_CUSTOM_ATTRIBUTE:
+    case EDIT_PLACE_NAME:
+    case EDIT_PLACE_DESCRIPTION:
+    case EDIT_PLACE_NOTES: {
+      const pathToSet =
+        action.type === EDIT_PLACE_NAME
+          ? ['place', action.id, 'name']
+          : action.type === EDIT_PLACE_DESCRIPTION
+          ? ['place', action.id, 'description']
+          : action.type === EDIT_PLACE_NOTES
+          ? ['place', action.id, 'notes']
+          : action.type === EDIT_PLACE_CUSTOM_ATTRIBUTE
+          ? ['place', action.id, action.name]
+          : ['unknown']
+      const newFocus = {
+        path: pathToSet,
+        selection: action.selection,
+      }
+      const foci = state.placeTab?.focus || []
+      const existing = foci.find(({ path }) => {
+        return isEqual(path, pathToSet)
+      })
+      if (existing) {
+        return {
+          ...state,
+          placeTab: {
+            ...state.placeTab,
+            focus: [
+              newFocus,
+              ...foci.filter(({ path }) => {
+                return !isEqual(path, pathToSet)
+              }),
+            ],
+          },
+        }
+      }
+      return {
+        ...state,
+        placeTab: {
+          ...state.placeTab,
+          focus: [newFocus, ...foci],
+        },
+      }
+    }
+    // Generic
+    case PUSH_FOCUS: {
+      const { section, path, selection } = action
+      const rootKey =
+        section === 'project'
+          ? 'projectTab'
+          : ['timeline', 'beat', 'line'].indexOf(section) !== -1
+          ? 'timeline'
+          : section === 'outline'
+          ? 'outlineTab'
+          : section === 'note'
+          ? 'noteTab'
+          : section === 'character'
+          ? 'characterTab'
+          : section === 'place'
+          ? 'placeTab'
+          : section === 'tag'
+          ? 'tagTab'
+          : null
+      if (!rootKey) {
+        return state
+      } else {
+        const foci = state[rootKey]?.focus || []
+        const existing = foci.find((focus) => {
+          return isEqual(focus.path, path)
+        })
+        const newFocus = {
+          path,
+          selection,
+        }
+        if (existing) {
+          return {
+            ...state,
+            [rootKey]: {
+              ...state[rootKey],
+              focus: [
+                newFocus,
+                ...foci.filter((focus) => {
+                  return !isEqual(focus.path, path)
+                }),
+              ],
+            },
+          }
+        } else {
+          return {
+            ...state,
+            [rootKey]: {
+              ...state[rootKey],
+              focus: [newFocus, ...foci],
+            },
+          }
+        }
+      }
+    }
+
+    case START_DELETING_CARD_FROM_CARD_DIALOG: {
+      return {
+        ...state,
+        cardDialog: {
+          ...state.cardDialog,
+          deleting: true,
+        },
+      }
+    }
+
+    case STOP_DELETING_CARD_FROM_CARD_DIALOG: {
+      return {
+        ...state,
+        cardDialog: {
+          ...state.cardDialog,
+          deleting: false,
+        },
+      }
+    }
+
+    case SHOW_CARD_DIALOG_COLOR_PICKER: {
+      return {
+        ...state,
+        cardDialog: {
+          ...state.cardDialog,
+          showColorPicker: true,
+        },
+      }
+    }
+
+    case HIDE_CARD_DIALOG_COLOR_PICKER: {
+      return {
+        ...state,
+        cardDialog: {
+          ...state.cardDialog,
+          showColorPicker: false,
+        },
+      }
+    }
+
+    case SHOW_CARD_DIALOG_TEMPLATE_PICKER: {
+      return {
+        ...state,
+        cardDialog: {
+          ...state.cardDialog,
+          showTemplatePicker: true,
+        },
+      }
+    }
+
+    case HIDE_CARD_DIALOG_TEMPLATE_PICKER: {
+      return {
+        ...state,
+        cardDialog: {
+          ...state.cardDialog,
+          showTemplatePicker: false,
+        },
+      }
+    }
+
+    case START_REMOVING_TEMPLATE_FROM_CARD_DIALOG: {
+      return {
+        ...state,
+        cardDialog: {
+          ...state.cardDialog,
+          showTemplatePicker: true,
+          removeWhichTemplate: action.id,
+        },
+      }
+    }
+
+    case STOP_REMOVING_TEMPLATE_FROM_CARD_DIALOG: {
+      return {
+        ...state,
+        cardDialog: {
+          ...state.cardDialog,
+          showTemplatePicker: false,
+          removeWhichTemplate: null,
+        },
+      }
+    }
+
+    case SET_ACTIVE_TAB_ON_CARD_DIALOG: {
+      return {
+        ...state,
+        cardDialog: {
+          ...state.cardDialog,
+          activeTab: action.tabIndex,
+        },
+      }
+    }
+
+    case SHOW_PLACE_ATTRIBUTE_DIALOG: {
+      return {
+        ...state,
+        placeTab: {
+          ...state.placeTab,
+          attributeDialogOpen: true,
+        },
+      }
+    }
+
+    case HIDE_PLACE_ATTRIBUTE_DIALOG: {
+      return {
+        ...state,
+        placeTab: {
+          ...state.placeTab,
+          attributeDialogOpen: false,
+        },
+      }
+    }
+
+    case START_EDITING_SELECTED_PLACE: {
+      return {
+        ...state,
+        placeTab: {
+          ...state.placeTab,
+          editingSelected: true,
+        },
+      }
+    }
+
+    case FINISH_EDITING_SELECTED_PLACE: {
+      return {
+        ...state,
+        placeTab: {
+          ...state.placeTab,
+          editingSelected: false,
+        },
+      }
+    }
+
+    case SHOW_PLACE_CATETORIES_MODAL: {
+      return {
+        ...state,
+        placeTab: {
+          ...state.placeTab,
+          categoriesOpen: true,
+        },
+      }
+    }
+
+    case HIDE_PLACE_CATETORIES_MODAL: {
+      return {
+        ...state,
+        placeTab: {
+          ...state.placeTab,
+          categoriesOpen: false,
+        },
+      }
+    }
+
+    case SHOW_PLACE_FILTER_LIST: {
+      return {
+        ...state,
+        placeTab: {
+          ...state.placeTab,
+          filterVisible: true,
+        },
+      }
+    }
+
+    case HIDE_PLACE_FILTER_LIST: {
+      return {
+        ...state,
+        placeTab: {
+          ...state.placeTab,
+          filterVisible: false,
+        },
+      }
+    }
+
+    case SHOW_PLACE_SORT: {
+      return {
+        ...state,
+        placeTab: {
+          ...state.placeTab,
+          sortVisible: true,
+        },
+      }
+    }
+
+    case HIDE_PLACE_SORT: {
+      return {
+        ...state,
+        placeTab: {
+          ...state.placeTab,
+          sortVisible: false,
+        },
+      }
+    }
+
+    case START_EDITING_SELECTED_NOTE: {
+      return {
+        ...state,
+        noteTab: {
+          ...state.noteTab,
+          editingSelected: true,
+        },
+      }
+    }
+
+    case FINISH_EDITING_SELECTED_NOTE: {
+      return {
+        ...state,
+        noteTab: {
+          ...state.noteTab,
+          editingSelected: false,
+        },
+      }
+    }
+
+    case SHOW_NOTES_CATEGORY_DIALOG: {
+      return {
+        ...state,
+        noteTab: {
+          ...state.noteTab,
+          categoriesDialogOpen: true,
+        },
+      }
+    }
+
+    case HIDE_NOTES_CATEGORY_DIALOG: {
+      return {
+        ...state,
+        noteTab: {
+          ...state.noteTab,
+          categoriesDialogOpen: false,
+        },
+      }
+    }
+
+    case SHOW_NOTES_ATTRIBUTES_DIALOG: {
+      return {
+        ...state,
+        noteTab: {
+          ...state.noteTab,
+          attributesDialogOpen: true,
+        },
+      }
+    }
+
+    case HIDE_NOTES_ATTRIBUTES_DIALOG: {
+      return {
+        ...state,
+        noteTab: {
+          ...state.noteTab,
+          attributesDialogOpen: false,
+        },
+      }
+    }
+
+    case SHOW_NOTES_FILTER_LIST: {
+      return {
+        ...state,
+        noteTab: {
+          ...state.noteTab,
+          filterVisible: true,
+        },
+      }
+    }
+
+    case HIDE_NOTES_FILTER_LIST: {
+      return {
+        ...state,
+        noteTab: {
+          ...state.noteTab,
+          filterVisible: false,
+        },
+      }
+    }
+
+    case SHOW_NOTES_SORT: {
+      return {
+        ...state,
+        noteTab: {
+          ...state.noteTab,
+          sortVisible: true,
+        },
+      }
+    }
+
+    case HIDE_NOTES_SORT: {
+      return {
+        ...state,
+        noteTab: {
+          ...state.noteTab,
+          sortVisible: false,
+        },
+      }
+    }
+
+    case SHOW_CHARACTERS_ATTRIBUTES_DIALOG: {
+      return {
+        ...state,
+        characterTab: {
+          ...state.characterTab,
+          attributesDialogOpen: true,
+        },
+      }
+    }
+
+    case HIDE_CHARACTERS_ATTRIBUTES_DIALOG: {
+      return {
+        ...state,
+        characterTab: {
+          ...state.characterTab,
+          attributesDialogOpen: false,
+        },
+      }
+    }
+
+    case SHOW_CHARACTERS_CATEGORIES_DIALOG: {
+      return {
+        ...state,
+        characterTab: {
+          ...state.characterTab,
+          categoriesDialogOpen: true,
+        },
+      }
+    }
+
+    case HIDE_CHARACTERS_CATEGORIES_DIALOG: {
+      return {
+        ...state,
+        characterTab: {
+          ...state.characterTab,
+          categoriesDialogOpen: false,
+        },
+      }
+    }
+
+    case START_EDITING_SELECTED_CHARACTER: {
+      return {
+        ...state,
+        characterTab: {
+          ...state.characterTab,
+          editingSelected: true,
+        },
+      }
+    }
+
+    case FINISH_EDITING_SELECTED_CHARACTER: {
+      return {
+        ...state,
+        characterTab: {
+          ...state.characterTab,
+          editingSelected: false,
+        },
+      }
+    }
+
+    case SHOW_CHARACTERS_TEMPLATE_PICKER: {
+      return {
+        ...state,
+        characterTab: {
+          ...state.characterTab,
+          showTemplatePicker: true,
+        },
+      }
+    }
+
+    case HIDE_CHARACTERS_TEMPLATE_PICKER: {
+      return {
+        ...state,
+        characterTab: {
+          ...state.characterTab,
+          showTemplatePicker: false,
+        },
+      }
+    }
+
+    case START_CREATING_CHARACTER: {
+      return {
+        ...state,
+        characterTab: {
+          ...state.characterTab,
+          creating: true,
+        },
+      }
+    }
+
+    case FINISH_CREATING_CHARACTER: {
+      return {
+        ...state,
+        characterTab: {
+          ...state.characterTab,
+          creating: false,
+        },
+      }
+    }
+
+    case SET_CHARACTER_TEMPLATE_DATA: {
+      return {
+        ...state,
+        characterTab: {
+          ...state.characterTab,
+          templateData: action.templateData,
+        },
+      }
+    }
+
+    case SHOW_CHARACTER_FILTER: {
+      return {
+        ...state,
+        characterTab: {
+          ...state.characterTab,
+          filterVisible: true,
+        },
+      }
+    }
+
+    case HIDE_CHARACTER_FILTER: {
+      return {
+        ...state,
+        characterTab: {
+          ...state.characterTab,
+          filterVisible: false,
+        },
+      }
+    }
+
+    case SHOW_CHARACTER_SORT: {
+      return {
+        ...state,
+        characterTab: {
+          ...state.characterTab,
+          sortVisible: true,
+        },
+      }
+    }
+
+    case HIDE_CHARACTER_SORT: {
+      return {
+        ...state,
+        characterTab: {
+          ...state.characterTab,
+          sortVisible: false,
+        },
+      }
+    }
+
+    case SHOW_CHARACTER_DETAILS: {
+      return {
+        ...state,
+        characterTab: {
+          ...state.characterTab,
+          detailsVisible: true,
+        },
+      }
+    }
+
+    case HIDE_CHARACTER_DETAILS: {
+      return {
+        ...state,
+        characterTab: {
+          ...state.characterTab,
+          detailsVisible: false,
+        },
+      }
+    }
+
+    case START_DELETING_CHARACTER: {
+      return {
+        ...state,
+        characterTab: {
+          ...state.characterTab,
+          characterEditor: {
+            ...state.characterTab.characterEditor,
+            deleting: true,
+          },
+        },
+      }
+    }
+
+    case FINISH_DELETING_CHARACTER: {
+      return {
+        ...state,
+        characterTab: {
+          ...state.characterTab,
+          characterEditor: {
+            ...state.characterTab.characterEditor,
+            deleting: false,
+          },
+        },
+      }
+    }
+
+    case START_REMOVING_TEMPLATE_FROM_CHARACTER: {
+      return {
+        ...state,
+        characterTab: {
+          ...state.characterTab,
+          characterEditor: {
+            ...state.characterTab.characterEditor,
+            removing: true,
+          },
+        },
+      }
+    }
+
+    case FINISH_REMOVING_TEMPLATE_FROM_CHARACTER: {
+      return {
+        ...state,
+        characterTab: {
+          ...state.characterTab,
+          characterEditor: {
+            ...state.characterTab.characterEditor,
+            removing: false,
+          },
+        },
+      }
+    }
+
+    case SET_TEMPLATE_TO_REMOVE_FROM_CHARACTER: {
+      return {
+        ...state,
+        characterTab: {
+          ...state.characterTab,
+          characterEditor: {
+            ...state.characterTab.characterEditor,
+            removeWhichTemplate: action.template,
+          },
+        },
+      }
+    }
+
+    case SET_ACTIVE_CHARACTER_TAB: {
+      return {
+        ...state,
+        characterTab: {
+          ...state.characterTab,
+          characterEditor: {
+            ...state.characterTab.characterEditor,
+            activeTab: action.tab,
+          },
+        },
+      }
+    }
+
+    case SHOW_CHARACTER_EDITOR_TEMPLATE_PICKER: {
+      return {
+        ...state,
+        characterTab: {
+          ...state.characterTab,
+          characterEditor: {
+            ...state.characterTab.characterEditor,
+            showTemplatePicker: true,
+          },
+        },
+      }
+    }
+
+    case HIDE_CHARACTER_EDITOR_TEMPLATE_PICKER: {
+      return {
+        ...state,
+        characterTab: {
+          ...state.characterTab,
+          characterEditor: {
+            ...state.characterTab.characterEditor,
+            showTemplatePicker: false,
+          },
+        },
+      }
+    }
+
+    case START_EDITING_OUTLINE_CARD: {
+      return {
+        ...state,
+        outlineTab: {
+          ...state.outlineTab,
+          cardEditor: {
+            ...state.outlineTab.cardEditor,
+            editing: action.id,
+          },
+        },
+      }
+    }
+
+    case FINISH_EDITING_OUTLINE_CARD: {
+      return {
+        ...state,
+        outlineTab: {
+          ...state.outlineTab,
+          cardEditor: {
+            ...state.outlineTab.cardEditor,
+            editing: null,
+          },
+        },
+      }
+    }
+
+    case EDIT_SELECTED_TAG: {
+      return {
+        ...state,
+        tagTab: {
+          ...state.tagTab,
+          editingSelectedTab: true,
+        },
+      }
+    }
+
+    case FINISH_EDITING_SELECTED_TAG: {
+      return {
+        ...state,
+        tagTab: {
+          ...state.tagTab,
+          editingSelectedTab: false,
+        },
+      }
+    }
+
+    case TOGGLE_REPLACE_SEARCH: {
+      return {
+        ...state,
+        searchDialog: {
+          ...state.searchDialog,
+          replacing: !state.searchDialog.replacing,
+        },
+      }
+    }
+
+    case SET_REPLACEMENT_TEXT: {
+      return {
+        ...state,
+        searchDialog: {
+          ...state.searchDialog,
+          replacement: action.newReplacementText,
+        },
+      }
+    }
+
+    case TOGGLE_HIT_MARKED_FOR_REPLACEMENT: {
+      const hitsToReplace = state.searchDialog.hitsToReplace || []
+      const hasHit =
+        hitsToReplace.findIndex((hit) => {
+          return hit.path === action.hit.path
+        }) !== -1
+      const newHits = hasHit
+        ? hitsToReplace.filter((hit) => {
+            return hit.path !== action.hit.path
+          })
+        : [action.hit, ...hitsToReplace]
+      return {
+        ...state,
+        searchDialog: {
+          ...state.searchDialog,
+          hitsToReplace: newHits,
+        },
+      }
+    }
+
+    case START_SCANNING_SEARCH: {
+      return {
+        ...state,
+        searchDialog: {
+          ...state.searchDialog,
+          scanning: true,
+          currentHitIndex: 0,
+        },
+      }
+    }
+
+    case START_EDITING_BEAT_HEADING_TITLE: {
+      return {
+        ...state,
+        timeline: {
+          ...state.timeline,
+          beatHeadingTitleBeingEdited: action.id,
+        },
+      }
+    }
+
+    case STOP_EDITING_BEAT_HEADING_TITLE: {
+      return {
+        ...state,
+        timeline: {
+          ...state.timeline,
+          beatHeadingTitleBeingEdited: null,
+        },
+      }
+    }
+
+    case START_EDITING_PLOTLINE_HEADING_TITLE: {
+      return {
+        ...state,
+        timeline: {
+          ...state.timeline,
+          plotlineTitleBeingEdited: action.id,
+        },
+      }
+    }
+
+    case STOP_EDITING_PLOTLINE_HEADING_TITLE: {
+      return {
+        ...state,
+        timeline: {
+          ...state.timeline,
+          plotlineTitleBeingEdited: null,
         },
       }
     }

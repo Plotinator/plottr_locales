@@ -1,4 +1,6 @@
-import { sortBy, groupBy } from 'lodash'
+import { sortBy, groupBy, isObject } from 'lodash'
+
+import { safeParseInt } from './safeParseInt'
 
 export function sortCardsInBeat(autoSort, cards, sortedLines) {
   if (autoSort) {
@@ -95,4 +97,38 @@ export const richContentIsNonEmpty = (children) => {
       )
     })
   )
+}
+
+export const cardFocusPath = (
+  rawCardId,
+  { baseAttributeName, customAttributeName, template } = {}
+) => {
+  const cardId = safeParseInt(rawCardId)
+  if (typeof rawCardId !== 'number' && `${cardId}` !== rawCardId) {
+    return ['unknown']
+  } else if (isObject(template)) {
+    const { id, attributeName } = template
+    if (typeof id !== 'string' || typeof attributeName !== 'string') {
+      return ['unknown']
+    } else {
+      return ['card', cardId, 'template', id, attributeName]
+    }
+  } else if (typeof customAttributeName === 'string') {
+    return ['card', cardId, customAttributeName]
+  } else if (baseAttributeName && ['title', 'description'].indexOf(baseAttributeName) !== -1) {
+    return ['card', cardId, baseAttributeName]
+  } else {
+    return ['unknown']
+  }
+}
+
+export const outlineCardFocusPath = (rawCardId, hitType) => {
+  const cardId = safeParseInt(rawCardId)
+  if (typeof rawCardId !== 'number' && `${cardId}` !== rawCardId) {
+    return ['unknown']
+  } else if (['title', 'description'].indexOf(hitType) !== -1) {
+    return ['card', cardId, hitType]
+  } else {
+    return ['unknown']
+  }
 }

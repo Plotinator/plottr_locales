@@ -16,9 +16,11 @@ import {
   BATCH_LOAD_NOTE,
   REMOVE_NOTE,
   DUPLICATE_NOTE,
+  EDIT_NOTE_TITLE,
+  EDIT_NOTE_CONTENT,
+  EDIT_NOTE_CUSTOM_ATTRIBUTE,
   REORDER_NOTE_MANUALLY,
 } from '../constants/ActionTypes'
-import { editorMetadataIfPresent } from '../helpers/editors'
 import { note } from '../store/initialState'
 
 export function addNote() {
@@ -33,18 +35,18 @@ export function addNoteWithContent(noteContent = note) {
   return { type: ADD_NOTE, ...noteContent }
 }
 
-export function editNote(id, attributes, editorPath, selection) {
-  return { type: EDIT_NOTE, id, attributes, ...editorMetadataIfPresent(editorPath, selection) }
+export function editNote(id, attributes) {
+  return { type: EDIT_NOTE, id, attributes }
 }
 
-export function editNoteTemplateAttribute(id, templateId, name, value, editorPath, selection) {
+export function editNoteTemplateAttribute(id, templateId, name, value, selection) {
   return {
     type: EDIT_NOTE_TEMPLATE_ATTRIBUTE,
     id,
     templateId,
     name,
     value,
-    ...editorMetadataIfPresent(editorPath, selection),
+    selection,
   }
 }
 
@@ -120,4 +122,16 @@ export const reorderNotes = (noteId, oldPosition, newPosition, newCategoryId) =>
     newPosition,
     newCategoryId,
   }
+}
+
+export function editNoteTitle(id, newTitle, selection) {
+  return { type: EDIT_NOTE_TITLE, id, newTitle, selection }
+}
+
+export function editNoteContent(id, newContent, selection) {
+  return { type: EDIT_NOTE_CONTENT, id, newContent, selection }
+}
+
+export function editNoteCustomAttribute(id, name, newValue, selection) {
+  return { type: EDIT_NOTE_CUSTOM_ATTRIBUTE, id, name, newValue, selection }
 }

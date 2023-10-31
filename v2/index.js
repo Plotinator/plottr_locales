@@ -26,6 +26,8 @@ import * as characterHelpers from './helpers/characters'
 
 import * as template from './template'
 
+import * as editStates from './constants/editStates'
+
 import migrateIfNeeded from './migrator/migration_manager'
 import Migrator from './migrator/migrator.js'
 import addHierarchiesIfMissing from './migrator/handleSpecialCases'
@@ -185,5 +187,6 @@ export {
   ARRAY_KEYS,
   checkFileIntegrity,
   specialCaseFixes,
+  editStates,
   rtf,
 }

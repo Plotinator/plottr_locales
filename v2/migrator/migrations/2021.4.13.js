@@ -1,11 +1,11 @@
 import { addNode, newTree } from '../../reducers/tree'
 import { hierarchyLevel } from '../../store/initialState'
 
-// Note: the schema of hierarchies changed.  So we need to lock this
-// older schema in place for this migration.
-export const newFileHierarchies = { 0: hierarchyLevel }
-
 export default function migrate(data) {
+  // Note: the schema of hierarchies changed.  So we need to lock this
+  // older schema in place for this migration.
+  const newFileHierarchies = { 0: hierarchyLevel() }
+
   if (data.file && data.file.version === '2021.4.13') return data
   if (data.beats.length !== undefined && data.hierarchyLevels !== undefined) return data
 

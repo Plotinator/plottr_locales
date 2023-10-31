@@ -1,8 +1,16 @@
-import { createSelector } from 'reselect'
+import { isEqual } from 'lodash'
+import { createSelector, createSelectorCreator, defaultMemoize } from 'reselect'
+import { serializeNoFormatting } from '../slate_serializers/to_plain_text'
 
 // Other selector dependencies
-import { allBookIdsSelector } from './booksFirstOrder'
-import { uiSelector } from './secondOrder'
+import { allBookIdsSelector, allBooksAsArraySelector } from './booksFirstOrder'
+import { selectedCharacterAttributeTabSelector, showBookTabsSelector } from './charactersThirdOrder'
+import { characterTabSelector, selectedCharacterSelector, uiSelector } from './secondOrder'
+import { seriesSelector } from './seriesFirstOrder'
+import { card, place, note } from '../store/initialState'
+import { allLinesSelector } from './linesFirstOrder'
+import { cardsCustomAttributesSelector } from './customAttributesFirstOrder'
+import { allBeatsSelector } from './beatsFirstOrder'
 
 export const cardDialogSelector = createSelector(uiSelector, ({ cardDialog }) => {
   return cardDialog
@@ -53,5 +61,828 @@ export const restructureModalOpenSelector = createSelector(
   uiSelector,
   ({ resturctureTimelineModal }) => {
     return !!resturctureTimelineModal?.open
+  }
+)
+
+export const characterAttributesDialogOpenSelector = createSelector(
+  characterTabSelector,
+  ({ attributesDialogOpen }) => {
+    return attributesDialogOpen
+  }
+)
+export const characterCategoriesDialogOpenSelector = createSelector(
+  characterTabSelector,
+  ({ categoriesDialogOpen }) => {
+    return categoriesDialogOpen
+  }
+)
+export const editingSelectedCharacterSelector = createSelector(
+  characterTabSelector,
+  ({ editingSelected }) => {
+    return editingSelected
+  }
+)
+export const characterTemplatePickerVisibleSelector = createSelector(
+  characterTabSelector,
+  ({ showTemplatePicker }) => {
+    return showTemplatePicker
+  }
+)
+export const creatingCharacterSelector = createSelector(characterTabSelector, ({ creating }) => {
+  return creating
+})
+export const characterTemplateDataSelector = createSelector(
+  characterTabSelector,
+  ({ templateData }) => {
+    return templateData
+  }
+)
+export const characterFilterVisibleSelector = createSelector(
+  characterTabSelector,
+  ({ filterVisible }) => {
+    return filterVisible
+  }
+)
+export const characterSortVisibleSelector = createSelector(
+  characterTabSelector,
+  ({ sortVisible }) => {
+    return sortVisible
+  }
+)
+export const characterDetailsVisible = createSelector(
+  characterTabSelector,
+  ({ detailsVisible }) => {
+    if (typeof detailsVisible === 'undefined') {
+      return true
+    }
+
+    return detailsVisible
+  }
+)
+export const characterEditorSelector = createSelector(
+  characterTabSelector,
+  ({ characterEditor }) => {
+    return characterEditor || {}
+  }
+)
+export const characterEditorIsDeletingSelector = createSelector(
+  characterEditorSelector,
+  ({ deleting }) => {
+    return deleting
+  }
+)
+export const characterEditorIsRemovingTemplateSelector = createSelector(
+  characterEditorSelector,
+  ({ removing }) => {
+    return removing
+  }
+)
+export const characterEditorTemplateBeingRemovedSelector = createSelector(
+  characterEditorSelector,
+  ({ removeWhichTemplate }) => {
+    return removeWhichTemplate
+  }
+)
+export const characterEditorActiveTabSelector = createSelector(
+  characterEditorSelector,
+  ({ activeTab }) => {
+    return activeTab
+  }
+)
+export const characterEditorShowTemplatePickerSelector = createSelector(
+  characterEditorSelector,
+  ({ showTemplatePicker }) => {
+    return showTemplatePicker
+  }
+)
+export const characterFociSelector = createSelector(characterTabSelector, ({ focus }) => {
+  return focus || []
+})
+const characterAttributeTabSelector = createSelector(
+  selectedCharacterAttributeTabSelector,
+  showBookTabsSelector,
+  (selectedTab, showTabs) => {
+    return !showTabs ? 'all' : selectedTab
+  }
+)
+export const characterCurrentFociSelector = createSelector(
+  characterFociSelector,
+  selectedCharacterSelector,
+  characterAttributeTabSelector,
+  (foci, characterId, characterTab) => {
+    return foci.filter((focus) => {
+      return (
+        focus.path[1] === characterId &&
+        (focus.path.length === 3 ||
+          (focus.path.length === 4 && focus.path[3] === characterTab) ||
+          (focus.path.length === 6 && focus.path[5] === characterTab) ||
+          (focus.path.length === 5 && focus.path[4] === characterTab))
+      )
+    })
+  }
+)
+
+export const searchDialogSelector = createSelector(uiSelector, ({ searchDialog }) => {
+  return searchDialog || {}
+})
+export const searchDialogIsOpenSelector = createSelector(searchDialogSelector, ({ isOpen }) => {
+  return isOpen
+})
+export const searchDialogSearchTermSelector = createSelector(searchDialogSelector, ({ term }) => {
+  return term
+})
+export const searchDialogCurrentHitIndexSelector = createSelector(
+  searchDialogSelector,
+  ({ currentHitIndex }) => {
+    return currentHitIndex
+  }
+)
+export const searchDialogIsScanningSelector = createSelector(
+  searchDialogSelector,
+  ({ scanning }) => {
+    return scanning
+  }
+)
+export const searchDialogIsReplacingSelector = createSelector(
+  searchDialogSelector,
+  ({ replacing }) => {
+    return replacing
+  }
+)
+export const searchReplacementTextSelector = createSelector(
+  searchDialogSelector,
+  ({ replacement }) => {
+    return replacement
+  }
+)
+export const hitsMarkedForReplacementSelector = createSelector(
+  searchDialogSelector,
+  ({ hitsToReplace }) => {
+    return hitsToReplace || []
+  }
+)
+
+export const projectSearchHitsSelector = createSelector(
+  searchDialogSearchTermSelector,
+  seriesSelector,
+  allBooksAsArraySelector,
+  (term, series, books) => {
+    if (term === '' || !term || term.length < 3) {
+      return []
+    }
+
+    const bookLikeMatch = (entity, prefix, id) => {
+      const nameKey = prefix === 'book' ? 'title' : 'name'
+      const which = id ? `/${id}` : ''
+      const nameMatch = entity[nameKey].matchAll(new RegExp(term, 'gi'))
+      const genreMatch = entity.genre.matchAll(new RegExp(term, 'gi'))
+      const premiseMatch = entity.premise.matchAll(new RegExp(term, 'gi'))
+      const themeMatch = entity.theme.matchAll(new RegExp(term, 'gi'))
+      return [
+        ...(nameMatch ? hits(`/project/${prefix}${which}/${nameKey}`, nameMatch) : []),
+        ...(genreMatch ? hits(`/project/${prefix}${which}/genre`, genreMatch) : []),
+        ...(premiseMatch ? hits(`/project/${prefix}${which}/premise`, premiseMatch) : []),
+        ...(themeMatch ? hits(`/project/${prefix}${which}/theme`, themeMatch) : []),
+      ]
+    }
+    const bookMatches = books.flatMap((book) => {
+      return bookLikeMatch(book, 'book', book.id)
+    })
+
+    return [...bookLikeMatch(series, 'series'), ...bookMatches].filter((hit) => {
+      return hit.hit.length > 0
+    })
+  }
+)
+const allCardsSelector = (state) => {
+  return state.cards
+}
+const CARD_BASIC_ATTRIBUTES = [...Object.keys(card), 'positionInChapter', 'position']
+const HIT_LIMIT = 5
+const hits = (pathSansPosition, regexMatches) => {
+  const results = []
+  let result = null
+  let count = 0
+  while (((result = regexMatches.next()), !result.done && count++ < HIT_LIMIT)) {
+    const value = result.value[0]
+    const position = result.value.index
+    results.push({
+      path: `${pathSansPosition}/${position}`,
+      hit: value,
+    })
+  }
+  return results
+}
+export const timelineSearchHitsSelector = createSelector(
+  searchDialogSearchTermSelector,
+  allLinesSelector,
+  allCardsSelector,
+  cardsCustomAttributesSelector,
+  (term, lines, cards, customAttributes) => {
+    if (term === '' || !term || term.length < 3) {
+      return []
+    }
+
+    const cardMatch = (card) => {
+      const timeline = lines.find((line) => {
+        return line.id == card.lineId
+      })?.bookId
+      const titleMatch = card.title.matchAll(new RegExp(term, 'gi'))
+      const descriptionText = serializeNoFormatting(card.description)
+      const descriptionMatch = descriptionText.matchAll(new RegExp(term, 'gi'))
+      const cardCustomAttributes = customAttributes
+        .filter((attribute) => {
+          return typeof card[attribute.name] !== 'undefined'
+        })
+        .map((attribute) => {
+          return {
+            id: attribute.name,
+            value: card[attribute.name],
+          }
+        })
+      const customAttributeMatches = cardCustomAttributes.flatMap((attribute) => {
+        const { id, value } = attribute
+        const valueAsString = (Array.isArray(value) ? serializeNoFormatting(value) : value) || ''
+        const valueMatch = valueAsString.matchAll(new RegExp(term, 'gi'))
+        if (!valueMatch) {
+          return []
+        }
+        return hits(`/timeline/${timeline}/card/${card.id}/customAttribute/${id}`, valueMatch)
+      })
+      const templateMatches = card.templates.flatMap((template) => {
+        const templateAttributeHit = (attribute) => {
+          const name = attribute.name
+          const value = attribute.value
+          const valueAsString = (Array.isArray(value) ? serializeNoFormatting(value) : value) || ''
+          const valueMatch = valueAsString.matchAll(new RegExp(term, 'gi'))
+          if (!valueMatch) {
+            return []
+          }
+          return hits(
+            `/timeline/${timeline}/card/${card.id}/templateAttribute/${template.id}/${name}`,
+            valueMatch
+          )
+        }
+        return template.attributes.flatMap(templateAttributeHit)
+      })
+      const titleMatches = hits(`/timeline/${timeline}/card/${card.id}/title`, titleMatch)
+      const descriptionMatches = hits(
+        `/timeline/${timeline}/card/${card.id}/description`,
+        descriptionMatch
+      )
+      return [
+        ...[titleMatches, descriptionMatches].flatMap((x) => x),
+        ...customAttributeMatches,
+        ...templateMatches,
+      ]
+    }
+
+    return cards
+      .flatMap((card) => {
+        return cardMatch(card, 'card')
+      })
+      .filter((hit) => {
+        return hit.hit.length > 0
+      })
+  }
+)
+export const outlineSearchHitsSelector = createSelector(
+  searchDialogSearchTermSelector,
+  allLinesSelector,
+  allCardsSelector,
+  (term, lines, cards) => {
+    if (term === '' || !term || term.length < 3) {
+      return []
+    }
+
+    const cardMatch = (card) => {
+      const titleMatch = card.title.matchAll(new RegExp(term, 'gi'))
+      const descriptionText = serializeNoFormatting(card.description)
+      const descriptionMatch = descriptionText.matchAll(new RegExp(term, 'gi'))
+      const timeline = lines.find((line) => {
+        return line.id == card.lineId
+      })?.bookId
+      return [
+        titleMatch ? hits(`/outline/${timeline}/card/${card.id}/title`, titleMatch) : [],
+        descriptionMatch
+          ? hits(`/outline/${timeline}/card/${card.id}/description`, descriptionMatch)
+          : [],
+      ].flatMap((x) => x)
+    }
+
+    return cards.flatMap(cardMatch).filter((hit) => {
+      return hit.hit.length > 0
+    })
+  }
+)
+const allNotes = (state) => {
+  return state.notes
+}
+const NOTE_BASIC_ATTRIBUTES = [...Object.keys(note)]
+export const notesSearchHitsSelector = createSelector(
+  searchDialogSearchTermSelector,
+  allNotes,
+  (term, notes) => {
+    if (term === '' || !term || term.length < 3) {
+      return []
+    }
+
+    const noteMatch = (note) => {
+      const titleMatch = note.title.matchAll(new RegExp(term, 'gi'))
+      const contentText = serializeNoFormatting(note.content)
+      const contentMatch = contentText.matchAll(new RegExp(term, 'gi'))
+      const noteCustomAttributes = Object.entries(note).reduce((attributes, [key, value]) => {
+        if (NOTE_BASIC_ATTRIBUTES.indexOf(key) === -1) {
+          return [[key, value], ...attributes]
+        }
+        return attributes
+      }, [])
+      const customAttributeMatches = noteCustomAttributes.flatMap(([key, value]) => {
+        const valueAsString = (Array.isArray(value) ? serializeNoFormatting(value) : value) || ''
+        const valueMatch = valueAsString.matchAll(new RegExp(term, 'gi'))
+        if (!valueMatch) {
+          return []
+        }
+        return hits(`/notes/${note.id}/customAttribute/${key}`, valueMatch)
+      })
+      return [
+        ...[
+          titleMatch ? hits(`/notes/${note.id}/title`, titleMatch) : [],
+          contentMatch ? hits(`/notes/${note.id}/content`, contentMatch) : [],
+        ].flatMap((x) => x),
+        ...customAttributeMatches,
+      ]
+    }
+
+    return notes.flatMap(noteMatch).filter((hit) => {
+      return hit.hit.length > 0
+    })
+  }
+)
+const characters = (state) => {
+  return state.characters
+}
+const attributes = (state) => {
+  return state.attributes
+}
+const books = (state) => {
+  return state.books
+}
+export const charactersHitsSelector = createSelector(
+  searchDialogSearchTermSelector,
+  characters,
+  attributes,
+  books,
+  (term, allCharacters, allAttributes, allBooks) => {
+    if (term === '' || !term || term.length < 3) {
+      return []
+    }
+
+    const characterMatch = (character) => {
+      const nameMatch = character.name.matchAll(new RegExp(term, 'gi'))
+      const characterCustomAttributes = (character.attributes || []).reduce((acc, attribute) => {
+        const valueAsString =
+          (Array.isArray(attribute.value)
+            ? serializeNoFormatting(attribute.value)
+            : attribute.value) || ''
+        const valueMatch = valueAsString.matchAll(new RegExp(term, 'gi'))
+        const indexAttribute = allAttributes.characters.find(({ id }) => {
+          return id === attribute.id
+        })
+        const bookTitle = attribute.bookId === 'all' ? 'Series' : allBooks[attribute.bookId]?.title
+        const bookId = attribute.bookId
+        if (!valueMatch || !indexAttribute || !bookTitle) {
+          return acc
+        }
+        return [
+          ...hits(
+            `/characters/${character.id}/customAttribute/${attribute.id}/${bookId}`,
+            valueMatch
+          ),
+          ...acc,
+        ]
+      }, [])
+      const characterTemplateAttributes = character.templates.reduce((acc, template) => {
+        const templateAttributes = template.values.flatMap((attribute) => {
+          const valueAsString =
+            (Array.isArray(attribute.value)
+              ? serializeNoFormatting(attribute.value)
+              : attribute.value) || ''
+          const valueMatch = valueAsString.matchAll(new RegExp(term, 'gi'))
+          const indexAttribute = template.attributes.find(({ name }) => {
+            return name === attribute.name
+          })
+          const bookTitle =
+            attribute.bookId === 'all' ? 'Series' : allBooks[attribute.bookId]?.title
+          const bookId = attribute.bookId
+          if (!valueMatch || !indexAttribute || !bookTitle) {
+            return []
+          }
+          return hits(
+            `/characters/${character.id}/templateAttribute/${template.id}/${attribute.name}/${bookId}`,
+            valueMatch
+          )
+        })
+        return [...acc, ...templateAttributes]
+      }, [])
+      return [
+        ...[nameMatch ? hits(`/characters/${character.id}/name`, nameMatch) : []].flatMap((x) => x),
+        ...characterCustomAttributes,
+        ...characterTemplateAttributes,
+      ]
+    }
+
+    return allCharacters.flatMap(characterMatch).filter((hit) => {
+      return hit.hit.length > 0
+    })
+  }
+)
+const PLACE_BASIC_ATTRIBUTES = [...Object.keys(place)]
+const places = (state) => {
+  return state.places
+}
+export const placesHitsSelector = createSelector(
+  searchDialogSearchTermSelector,
+  places,
+  (term, allPlaces) => {
+    if (term === '' || !term || term.length < 3) {
+      return []
+    }
+
+    const placeMatch = (place) => {
+      const nameMatch = place.name.matchAll(new RegExp(term, 'gi'))
+      const descriptionMatch = place.description.matchAll(new RegExp(term, 'gi'))
+      const notesText = serializeNoFormatting(place.notes)
+      const notesMatch = notesText.matchAll(new RegExp(term, 'gi'))
+      const placeCustomAttributes = Object.entries(place).reduce((attributes, [key, value]) => {
+        if (PLACE_BASIC_ATTRIBUTES.indexOf(key) === -1) {
+          return [[key, value], ...attributes]
+        }
+        return attributes
+      }, [])
+      const customAttributeMatches = placeCustomAttributes.flatMap(([key, value]) => {
+        const valueAsString = (Array.isArray(value) ? serializeNoFormatting(value) : value) || ''
+        const valueMatch = valueAsString.matchAll(new RegExp(term, 'gi'))
+        if (!valueMatch) {
+          return []
+        }
+        return hits(`/places/${place.id}/customAttribute/${key}`, valueMatch)
+      })
+      // TODO template attributes
+      return [
+        ...[
+          nameMatch ? hits(`/places/${place.id}/name`, nameMatch) : [],
+          descriptionMatch ? hits(`/places/${place.id}/description`, descriptionMatch) : [],
+          notesMatch ? hits(`/places/${place.id}/notes`, notesMatch) : [],
+        ].flatMap((x) => x),
+        ...customAttributeMatches,
+      ]
+    }
+
+    return allPlaces.flatMap(placeMatch).filter((hit) => {
+      return hit.hit.length > 0
+    })
+  }
+)
+const tags = (state) => {
+  return state.tags
+}
+export const tagsSearchHitsSelector = createSelector(
+  searchDialogSearchTermSelector,
+  tags,
+  (term, allTags) => {
+    if (term === '' || !term || term.length < 3) {
+      return []
+    }
+
+    const tagMatch = (tag) => {
+      const titleMatch = tag.title.matchAll(new RegExp(term, 'gi'))
+      return [titleMatch ? hits(`/tags/${tag.id}/title`, titleMatch) : []].flatMap((x) => x)
+    }
+
+    return allTags.flatMap(tagMatch).filter((hit) => {
+      return hit.hit.length > 0
+    })
+  }
+)
+export const linesSearchHitsSelector = createSelector(
+  searchDialogSearchTermSelector,
+  allLinesSelector,
+  (term, lines) => {
+    if (term === '' || !term || term.length < 3) {
+      return []
+    } else {
+      const lineHit = (line) => {
+        const titleMatch = line.title.matchAll(new RegExp(term, 'gi'))
+        return [titleMatch ? hits(`/lines/${line.id}/title`, titleMatch) : []].flatMap((x) => x)
+      }
+      return lines.flatMap(lineHit).filter((hit) => {
+        return hit.hit.length > 0
+      })
+    }
+  }
+)
+export const beatHitsSelector = createSelector(
+  searchDialogSearchTermSelector,
+  allBeatsSelector,
+  (term, allBeatTrees) => {
+    if (term === '' || !term || term.length < 3) {
+      return []
+    } else {
+      const beatHit = (bookId) => (beat) => {
+        const titleMatch = beat.title.matchAll(new RegExp(term, 'gi'))
+        return [titleMatch ? hits(`/beats/${bookId}/${beat.id}/title`, titleMatch) : []].flatMap(
+          (x) => x
+        )
+      }
+      return Object.entries(allBeatTrees).reduce((acc, nextKeyValue) => {
+        const [bookId, beatTree] = nextKeyValue
+        const beats = Object.values(beatTree.index)
+        return [
+          ...acc,
+          ...beats.flatMap(beatHit(bookId)).filter((hit) => {
+            return hit.hit.length > 0
+          }),
+        ]
+      }, [])
+    }
+  }
+)
+const createDeepEqualSelector = createSelectorCreator(defaultMemoize, isEqual)
+export const searchHitsSelector = createDeepEqualSelector(
+  projectSearchHitsSelector,
+  timelineSearchHitsSelector,
+  outlineSearchHitsSelector,
+  notesSearchHitsSelector,
+  charactersHitsSelector,
+  placesHitsSelector,
+  tagsSearchHitsSelector,
+  linesSearchHitsSelector,
+  beatHitsSelector,
+  (
+    projectHits,
+    timelineHits,
+    outlineHits,
+    notesHits,
+    charactersHits,
+    placesHits,
+    tagsHits,
+    lineHits,
+    beatHits
+  ) => {
+    return {
+      project: projectHits,
+      timeline: timelineHits,
+      outline: outlineHits,
+      notes: notesHits,
+      characters: charactersHits,
+      places: placesHits,
+      tags: tagsHits,
+      lines: lineHits,
+      beats: beatHits,
+    }
+  }
+)
+
+export const flatSearchHitsSelector = createDeepEqualSelector(
+  projectSearchHitsSelector,
+  timelineSearchHitsSelector,
+  outlineSearchHitsSelector,
+  notesSearchHitsSelector,
+  charactersHitsSelector,
+  placesHitsSelector,
+  tagsSearchHitsSelector,
+  linesSearchHitsSelector,
+  beatHitsSelector,
+  (
+    projectHits,
+    timelineHits,
+    outlineHits,
+    notesHits,
+    charactersHits,
+    placesHits,
+    tagsHits,
+    lineHits,
+    beatHits
+  ) => {
+    return [
+      ...projectHits,
+      ...timelineHits,
+      ...outlineHits,
+      ...notesHits,
+      ...charactersHits,
+      ...placesHits,
+      ...tagsHits,
+      ...lineHits,
+      ...beatHits,
+    ]
+  }
+)
+
+const outlineSelector = createSelector(uiSelector, ({ outlineTab }) => {
+  return outlineTab || {}
+})
+export const selectedOutlineCardSelector = createSelector(outlineSelector, ({ selectedCard }) => {
+  return selectedCard
+})
+export const outlineFociSelector = createSelector(outlineSelector, ({ focus }) => {
+  return focus || []
+})
+const outlineTabCardEditorSelector = createSelector(outlineSelector, ({ cardEditor }) => {
+  return cardEditor || {}
+})
+export const editingOutlineCardSelector = createSelector(
+  outlineTabCardEditorSelector,
+  ({ editing }) => {
+    return editing
+  }
+)
+export const outlineCurrentFocusSelector = createSelector(
+  outlineFociSelector,
+  editingOutlineCardSelector,
+  (foci, cardId) => {
+    return foci.filter((focus) => {
+      return focus.path[1] === cardId
+    })
+  }
+)
+
+const notesSelector = createSelector(uiSelector, ({ noteTab }) => {
+  return noteTab || {}
+})
+export const selectedNoteSelector = createSelector(notesSelector, ({ selectedNote }) => {
+  return selectedNote
+})
+export const editingSelectedNoteSelector = createSelector(notesSelector, ({ editingSelected }) => {
+  return editingSelected
+})
+export const noteCategoriesDialogOpenSelector = createSelector(
+  notesSelector,
+  ({ categoriesDialogOpen }) => {
+    return categoriesDialogOpen
+  }
+)
+export const noteAttributesDialogOpenSelector = createSelector(
+  notesSelector,
+  ({ attributesDialogOpen }) => {
+    return attributesDialogOpen
+  }
+)
+export const noteFilterVisibleSelector = createSelector(notesSelector, ({ filterVisible }) => {
+  return filterVisible
+})
+export const noteSortVisibleSelector = createSelector(notesSelector, ({ sortVisible }) => {
+  return sortVisible
+})
+export const noteFociSelector = createSelector(notesSelector, ({ focus }) => {
+  return focus || []
+})
+export const noteCurrentFocusSelector = createSelector(
+  noteFociSelector,
+  selectedNoteSelector,
+  (foci, noteId) => {
+    return foci.filter((focus) => {
+      return focus.path[1] === noteId
+    })
+  }
+)
+
+const placesSelector = createSelector(uiSelector, ({ placeTab }) => {
+  return placeTab || {}
+})
+export const selectedPlaceSelector = createSelector(placesSelector, ({ selectedPlace }) => {
+  return selectedPlace
+})
+export const placeAttributeDialogIsOpenSelector = createSelector(
+  placesSelector,
+  ({ attributeDialogOpen }) => {
+    return attributeDialogOpen
+  }
+)
+export const editingSelectedPlaceSelector = createSelector(
+  placesSelector,
+  ({ editingSelected }) => {
+    return editingSelected
+  }
+)
+export const placesCategoriesOpenSelector = createSelector(placesSelector, ({ categoriesOpen }) => {
+  return categoriesOpen
+})
+export const placesFilterIsVisibleSelector = createSelector(placesSelector, ({ filterVisible }) => {
+  return filterVisible
+})
+export const placesSortIsVisibleSelector = createSelector(placesSelector, ({ sortVisible }) => {
+  return sortVisible
+})
+export const placeFociSelector = createSelector(placesSelector, ({ focus }) => {
+  return focus || []
+})
+export const placeCurrentFocusSelector = createSelector(
+  placeFociSelector,
+  selectedPlaceSelector,
+  (foci, placeId) => {
+    return foci.filter((focus) => {
+      return focus.path[1] === placeId
+    })
+  }
+)
+
+const tagsSelector = createSelector(uiSelector, ({ tagTab }) => {
+  return tagTab || {}
+})
+export const selectedTagSelector = createSelector(tagsSelector, ({ selectedTag }) => {
+  return selectedTag
+})
+export const editingSelectedTagSelector = createSelector(tagsSelector, ({ editingSelectedTab }) => {
+  return editingSelectedTab
+})
+const tagIdSelector = (_state, id) => id
+export const isEditingTagSelector = createSelector(
+  selectedTagSelector,
+  tagIdSelector,
+  editingSelectedTagSelector,
+  (selectedTagId, tagId, editing) => {
+    return selectedTagId === tagId && editing
+  }
+)
+export const allTagFociSelector = createSelector(tagsSelector, ({ focus }) => {
+  return focus || []
+})
+export const tagCurrentFociSelector = createSelector(
+  selectedTagSelector,
+  allTagFociSelector,
+  (selectedTagId, foci) => {
+    return foci.filter((focus) => {
+      return focus.path.length && focus.path[1] === selectedTagId
+    })
+  }
+)
+
+const projectTabSelector = createSelector(uiSelector, ({ projectTab }) => {
+  return projectTab || {}
+})
+export const projectCurrentFocusSelector = createSelector(
+  projectTabSelector,
+  isBookDialogVisibleSelector,
+  bookDialogBookIdSelector,
+  ({ focus }, bookDialogIsOpen, bookDialogId) => {
+    const relevantFoci = (focus || []).filter((focus) => {
+      return (
+        (!bookDialogIsOpen && focus.path[0] !== 'book') ||
+        (bookDialogIsOpen && focus.path[0] === 'book' && focus.path[1] === bookDialogId)
+      )
+    })
+    return relevantFoci && relevantFoci[0]
+  }
+)
+export const projectAllFociSelector = createSelector(projectTabSelector, ({ focus }) => {
+  return focus
+})
+
+const timelineSelector = createSelector(uiSelector, ({ timeline }) => {
+  return timeline
+})
+export const timelineFociSelector = createSelector(timelineSelector, ({ focus }) => {
+  return focus || []
+})
+export const timelineCurrentFocusSelector = createSelector(
+  timelineFociSelector,
+  cardDialogCardIdSelector,
+  (foci, cardId) => {
+    return foci.filter((focus) => {
+      return focus.path[1] === cardId
+    })
+  }
+)
+const selectBeatId = (_state, beatId) => {
+  return beatId
+}
+const beatIdOfHeadingBeingEditedSelector = createSelector(
+  timelineSelector,
+  ({ beatHeadingTitleBeingEdited }) => {
+    return beatHeadingTitleBeingEdited
+  }
+)
+export const editingGivenBeatsTitleSelector = createSelector(
+  beatIdOfHeadingBeingEditedSelector,
+  selectBeatId,
+  (beatIdBeingEdited, suppliedBeatId) => {
+    return typeof beatIdBeingEdited === 'number' && beatIdBeingEdited === suppliedBeatId
+  }
+)
+const selectLineId = (_state, lineId) => {
+  return lineId
+}
+const lineIdOfPlotlineTitleBeingEditedSelector = createSelector(
+  timelineSelector,
+  ({ plotlineTitleBeingEdited }) => {
+    return plotlineTitleBeingEdited
+  }
+)
+export const editingGivenLinesTitleSelector = createSelector(
+  lineIdOfPlotlineTitleBeingEditedSelector,
+  selectLineId,
+  (lineIdBeingEdited, suppliedLineId) => {
+    return typeof lineIdBeingEdited === 'number' && lineIdBeingEdited === suppliedLineId
   }
 )

@@ -43,31 +43,37 @@ export const newFileTags = []
 
 export const newFileCards = []
 
-export const newFileLines = [Object.assign({}, line, { title: i18n('Main Plot') })]
-export const newFileSeriesLines = [Object.assign({}, seriesLine, { title: i18n('Main Plot') })]
+export const newFileLines = () => [Object.assign({}, line, { title: i18n('Main Plot') })]
+export const newFileSeriesLines = () => [
+  Object.assign({}, seriesLine, { title: i18n('Main Plot') }),
+]
 
 export const newFileCustomAttributes = customAttributes
 
 export const newFileNotes = []
 export const newFileImages = {}
 
-export const newFileCharacterCategories = [
+export const newFileCharacterCategories = () => [
   { id: 1, name: i18n('Main'), position: 0 },
   { id: 2, name: i18n('Supporting'), position: 1 },
   { id: 3, name: i18n('Other'), position: 2 },
 ]
 
-export const newFileNoteCategories = [{ id: 1, name: i18n('Main'), position: 0 }]
-export const newFileTagCategories = [{ id: 1, name: i18n('Main'), position: 0 }]
+export const newFileNoteCategories = () => [{ id: 1, name: i18n('Main'), position: 0 }]
+export const newFileTagCategories = () => [{ id: 1, name: i18n('Main'), position: 0 }]
 
-export const newFileCategories = Object.assign({}, categories, {
-  characters: newFileCharacterCategories,
-  notes: newFileNoteCategories,
-  tags: newFileTagCategories,
-})
+export const newFileCategories = () => {
+  return Object.assign({}, categories, {
+    characters: newFileCharacterCategories(),
+    notes: newFileNoteCategories(),
+    tags: newFileTagCategories(),
+  })
+}
 
 // Book 1 has one level by default
-export const newFileHierarchies = { 1: { 0: hierarchyLevel }, series: { 0: hierarchyLevel } }
+export const newFileHierarchies = () => {
+  return { 1: { 0: hierarchyLevel() }, series: { 0: hierarchyLevel() } }
+}
 
 export function emptyFile(name, version) {
   const books = {
@@ -84,7 +90,7 @@ export function emptyFile(name, version) {
     books: books,
     characters: newFileCharacters,
     cards: newFileCards,
-    lines: [...newFileLines, ...newFileSeriesLines],
+    lines: [...newFileLines(), ...newFileSeriesLines()],
     customAttributes: newFileCustomAttributes,
     places: newFilePlaces,
     tags: newFileTags,
@@ -93,9 +99,9 @@ export function emptyFile(name, version) {
       1: newTree('id', ...newFileChapters),
       series: newTree('id', ...newFileBeats),
     },
-    categories: newFileCategories,
+    categories: newFileCategories(),
     images: newFileImages,
-    hierarchyLevels: newFileHierarchies,
+    hierarchyLevels: newFileHierarchies(),
     featureFlags,
     attributes,
   }

@@ -3,11 +3,10 @@ import { uniq } from 'lodash'
 import { emptyFile } from './newFileState'
 import { SYSTEM_REDUCER_KEYS } from '../reducers/systemReducers'
 
-const BLANK_FILE = emptyFile()
-
 export const checkForMinimalSetOfKeys =
   (filePath, actionTrail = []) =>
   (file) => {
+    const BLANK_FILE = emptyFile()
     const hasMinimalSetOfKeys = Object.keys(BLANK_FILE).every((key) => key in file)
     if (!hasMinimalSetOfKeys) {
       const missingKeys = Object.keys(BLANK_FILE).reduce((acc, key) => {

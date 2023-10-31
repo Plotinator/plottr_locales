@@ -27,8 +27,29 @@
     "characterSort": "name~asc",
     "characterFilter": null,
     "placeSort": "name~asc",
+    "placeTab": {
+      "attributeDialogOpen": false,
+      "categoriesOpen": false,
+      "editingSelected": false,
+      "filterVisible": false,
+      "focus": [],
+      "selectedPlace": null,
+      "sortVisible": false
+    },
+    "projectTab": {
+      "focus": []
+    },
     "placeFilter": {},
     "noteSort": "title~asc",
+    "noteTab": {
+      "attributesDialogOpen": false,
+      "categoriesDialogOpen": false,
+      "editingSelected": false,
+      "filterVisible": false,
+      "focus": [],
+      "selectedNote": null,
+      "sortVisible": false
+    },
     "noteFilter": null,
     "timelineFilter": null,
     "timelineScrollPosition": {
@@ -40,6 +61,15 @@
     },
     "attributesDialogIsOpen": false,
     "outlineFilter": null,
+    "searchDialog": {
+      "currentHitIndex": null,
+      "hitsToReplace": [],
+      "isOpen": false,
+      "replacement": "",
+      "replacing": false,
+      "scanning": false,
+      "term": ""
+    },
     "searchTerms": {
       "notes": null,
       "characters": null,
@@ -69,6 +99,18 @@
       "bookId": null
     },
     "outlineScrollPosition": 0,
+    "outlineTab": {
+      "cardEditor": {
+        "editing": null
+      },
+      "focus": [],
+      "selectedCard": null
+    },
+    "tagTab": {
+      "editingSelectedTab": false,
+      "focus": [],
+      "selectedTag": null
+    },
     "templateModal": {
       "expanded": false
     },

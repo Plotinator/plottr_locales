@@ -10,10 +10,14 @@ import {
   DELETE_TAG_CATEGORY,
   LOAD_TAGS,
   DUPLICATE_TAG,
+  REPLACE_MARKED_HITS,
 } from '../constants/ActionTypes'
 import { tag } from '../store/initialState'
 import { newFileTags } from '../store/newFileState'
 import { nextId } from '../store/newIds'
+import { safeParseInt } from './safeParseInt'
+import { sortByHitPosition } from './sortByHitPosition'
+import { replacePlainTextHit } from './replace'
 
 const initialState = [tag]
 
@@ -75,6 +79,44 @@ const tags =
             categoryId: null,
           }
         })
+
+      case REPLACE_MARKED_HITS: {
+        const applicableHits = action.hitsMarkedForReplacement.filter((hit) => {
+          return hit.path.match(/^\/tags\/[0-9a-zA-Z]+\//)
+        })
+        // IMPORTANT!!!
+        //
+        // We sort by the hit position so that we deal with later hits
+        // first.  By doing so, we don't invalidate the start position
+        // of other hits when we replace those hits.
+        //
+        // i.e. it's fine to do multiple replacements in the same
+        // field, as long as you replace the hits in reverse order,
+        // i.e. the last hit first and the first hit last.
+        return sortByHitPosition(applicableHits).reduce((acc, nextHit) => {
+          const { path, hit } = nextHit
+          const [_, _tag, rawTagId, attributeName, rawFocusStart] = path.split('/')
+          const tagId = safeParseInt(rawTagId)
+          return acc.map((nextTag) => {
+            if (nextTag.id === tagId) {
+              const attributeValue = nextTag[attributeName]
+              const focusStart = safeParseInt(rawFocusStart)
+              const replaceFunction = replacePlainTextHit
+              return {
+                ...nextTag,
+                [attributeName]: replaceFunction(
+                  attributeValue,
+                  focusStart,
+                  hit,
+                  action.replacementText
+                ),
+              }
+            } else {
+              return nextTag
+            }
+          })
+        }, state)
+      }
 
       case LOAD_TAGS:
         return action.tags

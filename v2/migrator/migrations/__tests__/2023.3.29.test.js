@@ -403,25 +403,25 @@ const hierarchiesPerBook = {
 
 const defaultHierarchiesPerBook = {
   series: {
-    0: hierarchyLevel,
+    0: hierarchyLevel(),
   },
   1: {
-    0: hierarchyLevel,
+    0: hierarchyLevel(),
   },
   8: {
-    0: hierarchyLevel,
+    0: hierarchyLevel(),
   },
   5: {
-    0: hierarchyLevel,
+    0: hierarchyLevel(),
   },
   9: {
-    0: hierarchyLevel,
+    0: hierarchyLevel(),
   },
   6: {
-    0: hierarchyLevel,
+    0: hierarchyLevel(),
   },
   7: {
-    0: hierarchyLevel,
+    0: hierarchyLevel(),
   },
 }
 

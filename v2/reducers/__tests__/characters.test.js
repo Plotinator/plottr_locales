@@ -57,6 +57,10 @@ const initialStore = () => {
 const ignoringChangesWeDontCareAbout = (state) => {
   return {
     ...state,
+    ui: {
+      ...state.ui,
+      characterTab: null,
+    },
     file: {
       ...state.file,
       dirty: null,

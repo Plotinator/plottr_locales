@@ -39,6 +39,7 @@ import {
   EDIT_CHARACTER_IMAGE,
   DELETE_CHARACTER_LEGACY_CUSTOM_ATTRIBUTE,
   REORDER_CHARACTER_TEMPLATES,
+  REPLACE_MARKED_HITS,
   REORDER_CHARACTER_MANUALLY,
 } from '../constants/ActionTypes'
 import { character as defaultCharacter } from '../store/initialState'
@@ -46,7 +47,11 @@ import { newFileCharacters } from '../store/newFileState'
 import { nextId } from '../store/newIds'
 import { applyToCustomAttributes } from './applyToCustomAttributes'
 import { repairIfPresent } from './repairIfPresent'
-import { positionReset, reorderList } from '../helpers/lists'
+import { reorderList } from '../helpers/lists'
+import { safeParseInt } from './safeParseInt'
+import { sortByHitPosition } from './sortByHitPosition'
+import { replacePlainTextHit, replaceInSlateDatastructure } from './replace'
+import { parseNumberOrString } from './parseNumberOrString'
 
 const initialState = [defaultCharacter]
 
@@ -897,6 +902,109 @@ const characters =
           }
           return character
         })
+      }
+
+      case REPLACE_MARKED_HITS: {
+        const applicableHits = action.hitsMarkedForReplacement.filter((hit) => {
+          return hit.path.match(/^\/characters\/[0-9a-zA-Z]+\//)
+        })
+        // IMPORTANT!!!
+        //
+        // We sort by the hit position so that we deal with later hits
+        // first.  By doing so, we don't invalidate the start position
+        // of other hits when we replace those hits.
+        //
+        // i.e. it's fine to do multiple replacements in the same
+        // field, as long as you replace the hits in reverse order,
+        // i.e. the last hit first and the first hit last.
+        return sortByHitPosition(applicableHits).reduce((acc, nextHit) => {
+          const { path, hit } = nextHit
+          const [_, _character, rawCharacterId, type, ...rest] = path.split('/')
+          const characterId = safeParseInt(rawCharacterId)
+          return acc.map((nextCharacter) => {
+            if (nextCharacter.id === characterId) {
+              if (type === 'customAttribute') {
+                const [rawAttributeId, rawBookId, rawFocusStart] = rest
+                const attributeId = safeParseInt(rawAttributeId)
+                const bookId = parseNumberOrString(rawBookId)
+                const focusStart = safeParseInt(rawFocusStart)
+                return {
+                  ...nextCharacter,
+                  attributes: nextCharacter.attributes.map((attribute) => {
+                    if (attribute.id === attributeId && attribute.bookId === bookId) {
+                      const attributeValue = attribute.value
+                      const replaceFunction = Array.isArray(attributeValue)
+                        ? replaceInSlateDatastructure
+                        : replacePlainTextHit
+                      return {
+                        ...attribute,
+                        value: replaceFunction(
+                          attributeValue,
+                          focusStart,
+                          hit,
+                          action.replacementText
+                        ),
+                      }
+                    } else {
+                      return attribute
+                    }
+                  }),
+                }
+              } else if (type === 'templateAttribute') {
+                const [templateId, attributeName, rawBookId, rawFocusStart] = rest
+                const bookId = parseNumberOrString(rawBookId)
+                const focusStart = safeParseInt(rawFocusStart)
+                return {
+                  ...nextCharacter,
+                  templates: nextCharacter.templates.map((template) => {
+                    if (template.id === templateId) {
+                      return {
+                        ...template,
+                        values: template.values.map((templateValue) => {
+                          if (
+                            templateValue.name === attributeName &&
+                            templateValue.bookId === bookId
+                          ) {
+                            const attributeValue = templateValue.value
+                            const replaceFunction = Array.isArray(attributeValue)
+                              ? replaceInSlateDatastructure
+                              : replacePlainTextHit
+                            return {
+                              ...templateValue,
+                              value: replaceFunction(
+                                attributeValue,
+                                focusStart,
+                                hit,
+                                action.replacementText
+                              ),
+                            }
+                          } else {
+                            return templateValue
+                          }
+                        }),
+                      }
+                    } else {
+                      return template
+                    }
+                  }),
+                }
+              } else {
+                const [rawFocusStart] = rest
+                const focusStart = safeParseInt(rawFocusStart)
+                const attributeValue = nextCharacter[type]
+                const replaceFunction = Array.isArray(attributeValue)
+                  ? replaceInSlateDatastructure
+                  : replacePlainTextHit
+                return {
+                  ...nextCharacter,
+                  [type]: replaceFunction(attributeValue, focusStart, hit, action.replacementText),
+                }
+              }
+            } else {
+              return nextCharacter
+            }
+          })
+        }, state)
       }
 
       default:
