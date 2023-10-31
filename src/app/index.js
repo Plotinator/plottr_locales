@@ -509,7 +509,7 @@ tellMeWhatOSImOn()
         })
 
         document.addEventListener('keydown', (e) => {
-          const state = store.getState()
+          const state = store().getState()
           const cardDialogIsOpen = selectors.cardDialogCardIdSelector(state)
           const attributesDialogIsOpen = selectors.attributesDialogIsOpenSelector(state)
           const viewIsTimeline = selectors.currentViewSelector(state)
