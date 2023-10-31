@@ -5,9 +5,10 @@
 import { createSelector } from 'reselect'
 
 import { fullFileStateSelector } from './fullFileFirstOrder'
+import { EDITING, SEARCHING } from '../constants/editStates'
 
 export const applicationStateSelector = createSelector(fullFileStateSelector, (state) => {
-  return state.applicationState
+  return state.applicationState || {}
 })
 
 export const projectStateSelector = createSelector(
@@ -261,4 +262,23 @@ const workSelector = createSelector(applicationStateSelector, ({ work }) => {
 
 export const busyWithWorkThatPreventsQuittingSelector = createSelector(workSelector, ({ busy }) => {
   return busy
+})
+
+export const userInteractionsSelector = createSelector(
+  applicationStateSelector,
+  ({ userInteractions }) => {
+    return userInteractions || {}
+  }
+)
+
+export const jumpCounterSelector = createSelector(userInteractionsSelector, ({ jumpCounter }) => {
+  return jumpCounter || 0
+})
+
+export const editStateSelector = createSelector(userInteractionsSelector, ({ editState }) => {
+  return editState || EDITING
+})
+
+export const isSearchingSelector = createSelector(editStateSelector, (editState) => {
+  return editState === SEARCHING
 })

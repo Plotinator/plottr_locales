@@ -24,9 +24,11 @@ import {
   REMOVE_TEMPLATE_FROM_CARD,
   DUPLICATE_CARD,
   MOVE_CARD_TO_BOOK,
+  EDIT_CARD_TITLE,
+  EDIT_CARD_DESCRIPTION,
+  EDIT_CARD_CUSTOM_ATTRIBUTE,
   REORDER_CARD_TEMPLATE_ATTRIBUTES,
 } from '../constants/ActionTypes'
-import { editorMetadataIfPresent } from '../helpers/editors'
 
 export function addCard(card, addMissingBeats) {
   return { type: ADD_CARD, card, addMissingBeats }
@@ -40,12 +42,39 @@ export function editCard(id, title, description, templates, attrs) {
   return { type: EDIT_CARD_DETAILS, id, attributes: { title, description, templates, ...attrs } }
 }
 
-export function editCardAttributes(id, attributes, editorPath, selection) {
+export function editCardAttributes(id, attributes) {
   return {
     type: EDIT_CARD_DETAILS,
     id,
     attributes,
-    ...editorMetadataIfPresent(editorPath, selection),
+  }
+}
+
+export function editCardCustomAttribute(id, name, value, selection) {
+  return {
+    type: EDIT_CARD_CUSTOM_ATTRIBUTE,
+    id,
+    name,
+    value,
+    selection,
+  }
+}
+
+export function editCardDescription(id, description, selection) {
+  return {
+    type: EDIT_CARD_DESCRIPTION,
+    id,
+    description,
+    selection,
+  }
+}
+
+export function editCardTitle(id, newTitle, selection) {
+  return {
+    type: EDIT_CARD_TITLE,
+    id,
+    newTitle,
+    selection,
   }
 }
 
@@ -57,14 +86,14 @@ export function addTemplateToCard(id, templateData) {
   return { type: ADD_TEMPLATE_TO_CARD, id, templateData }
 }
 
-export function editCardTemplateAttribute(id, templateId, name, value, editorPath, selection) {
+export function editCardTemplateAttribute(id, templateId, name, value, selection) {
   return {
     type: EDIT_CARD_TEMPLATE_ATTRIBUTE,
     id,
     templateId,
     name,
     value,
-    ...editorMetadataIfPresent(editorPath, selection),
+    selection,
   }
 }
 

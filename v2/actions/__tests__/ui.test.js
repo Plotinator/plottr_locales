@@ -4,10 +4,12 @@ import selectors from '../../selectors'
 import { emptyFile } from '../../store/newFileState'
 import { configureStore, pltrAdaptor } from './fixtures/testStore'
 import actions from '../'
+import { hamlet_with_attribute_mix } from './fixtures'
 
 const {
   allBookIdsSelector,
   allBooksSelector,
+  allCharactersSelector,
   bookDialogBookIdSelector,
   bookNumberSelector,
   cardDialogBeatIdSelector,
@@ -18,11 +20,17 @@ const {
   allCardsSelector,
   cardDialogSelector,
   bookDialogSelector,
+  visibleSortedCharactersByCategorySelector,
+  displayedSingleCharacterSelector,
+  isCharactersManuallySortedSelector,
+  sortedCharacterCategoriesSelector,
+  characterAttributsForBookByIdSelector,
 } = selectors(pltrAdaptor)
 
 const wiredUpActions = actions(pltrAdaptor)
 
 const { addBeat } = wiredUpActions.beat
+const { reorderCharacter } = wiredUpActions.character
 const { addBook, editBook } = wiredUpActions.book
 const { addCard, changeBeat, changeLine } = wiredUpActions.card
 const { addLine } = wiredUpActions.line
@@ -33,6 +41,7 @@ const {
   setCardDialogClose,
   setCardDialogOpen,
   closeBookDialog,
+  setCharacterSort,
 } = wiredUpActions.ui
 
 const EMPTY_FILE = emptyFile('Test file')
@@ -83,6 +92,11 @@ function isAnObject(val) {
   } else {
     return false
   }
+}
+
+const getCharacterAbsolutePositionFromGroupedCategory = (groupedCategory, characterId) => {
+  const flattenedGroups = Object.values(groupedCategory).flat()
+  return flattenedGroups.findIndex((obj) => obj.id === characterId)
 }
 
 describe('cardDialog', () => {
@@ -448,6 +462,325 @@ describe('bookDialog', () => {
         it('should be back to its initialState', () => {
           const bookDialog = bookDialogSelector(presentState)
           expect(bookDialog).toMatchObject(initialBookDialogState)
+        })
+      })
+    })
+  })
+})
+
+describe('reorderCharacter', () => {
+  describe('given the new empty file', () => {
+    describe('and loads hamlet file', () => {
+      const store = configureStore()
+      store.dispatch(
+        loadFile(
+          'Hamlet',
+          false,
+          hamlet_with_attribute_mix,
+          '2020.7.30',
+          'device:///tmp.dummy.pltr'
+        )
+      )
+
+      const initialState = store.getState()
+      const allCharacters = allCharactersSelector(initialState)
+      const sortedCharacterCategories = sortedCharacterCategoriesSelector(initialState)
+      const visibleSortedCharactersByCategory =
+        visibleSortedCharactersByCategorySelector(initialState)
+      const initialIsManuallySortedState = isCharactersManuallySortedSelector(initialState)
+
+      it('should have loaded all 19 characters', () => {
+        expect(allCharacters).toHaveLength(19)
+      })
+      it('should not be manually sorted by default', () => {
+        expect(initialIsManuallySortedState).toBeFalsy()
+      })
+
+      it('should be alphabetically sorted by category', () => {
+        Object.entries(visibleSortedCharactersByCategory).forEach(
+          ([categoryId, characters], index) => {
+            const sortedCategoryId = sortedCharacterCategories[index].id
+
+            expect(String(sortedCategoryId)).toEqual(String(categoryId))
+
+            characters.forEach((character, position) => {
+              if (characters[position - 1]) {
+                expect(character.name.localeCompare(characters[position - 1].name)).toBeGreaterThan(
+                  0
+                )
+              }
+            })
+          }
+        )
+      })
+
+      describe('given the user reorder the characters manually', () => {
+        const character1InitialState = displayedSingleCharacterSelector(
+          initialState,
+          allCharacters.find(({ id }) => id == 1).id
+        )
+        const character3InitialState = displayedSingleCharacterSelector(
+          initialState,
+          allCharacters.find(({ id }) => id == 3).id
+        )
+        const character3AbsolutePosition = getCharacterAbsolutePositionFromGroupedCategory(
+          visibleSortedCharactersByCategory,
+          character3InitialState.id
+        )
+        describe(`given the user move character1 to character3's position`, () => {
+          store.dispatch(
+            reorderCharacter(
+              character1InitialState.id,
+              character3AbsolutePosition,
+              character3InitialState.categoryId
+            )
+          )
+
+          const afterFirstReorderState = store.getState()
+          const sortedCharacterCategoriesAfterFirstReorder =
+            sortedCharacterCategoriesSelector(afterFirstReorderState)
+          const visibleSortedCharactersByCategoryAfterFirstReorder =
+            visibleSortedCharactersByCategorySelector(afterFirstReorderState)
+          const isManuallySortedStateAfterFirstReorder =
+            isCharactersManuallySortedSelector(afterFirstReorderState)
+          const availableAttributesFirstReorder =
+            characterAttributsForBookByIdSelector(afterFirstReorderState)
+
+          const positionAttributeIdAfterFirstReorder = Object.values(
+            availableAttributesFirstReorder
+          ).find(({ name }) => name === 'position')
+
+          it('should have change isManuallySorted to true', () => {
+            expect(isManuallySortedStateAfterFirstReorder).toBeTruthy()
+          })
+
+          it('should have character attributes property', () => {
+            Object.values(visibleSortedCharactersByCategoryAfterFirstReorder).forEach(
+              (characters) => {
+                characters.forEach((character) => {
+                  expect(character.attributes).toBeDefined()
+                })
+              }
+            )
+          })
+
+          it(`should be sorted by position from character's attributes property`, () => {
+            Object.entries(visibleSortedCharactersByCategoryAfterFirstReorder).forEach(
+              ([categoryId, characters], index) => {
+                const sortedCategoryId = sortedCharacterCategoriesAfterFirstReorder[index].id
+
+                expect(String(sortedCategoryId)).toEqual(String(categoryId))
+                characters.forEach((character, position) => {
+                  if (characters[position - 1]) {
+                    const characterPositionAttribute = character.attributes.find(
+                      ({ id }) => id == positionAttributeIdAfterFirstReorder.id
+                    )
+                    const previousCharacterPositionAttribute = characters[
+                      position - 1
+                    ].attributes.find(({ id }) => id == positionAttributeIdAfterFirstReorder.id)
+
+                    expect(characterPositionAttribute.value).toBeGreaterThan(
+                      previousCharacterPositionAttribute.value
+                    )
+                  }
+                })
+              }
+            )
+          })
+
+          describe('given the user change the sort order by name alphabetically', () => {
+            store.dispatch(setCharacterSort('name', 'asc'))
+
+            const afterChangeSortState = store.getState()
+            const visibleSortedCharactersByCategoryAfterChangeSort =
+              visibleSortedCharactersByCategorySelector(afterChangeSortState)
+            const isManuallySortedStateAfterChangeSort =
+              isCharactersManuallySortedSelector(afterChangeSortState)
+
+            it('should not be manually sorted', () => {
+              expect(isManuallySortedStateAfterChangeSort).toBeFalsy()
+            })
+
+            it('should be alphabetically sorted by category', () => {
+              Object.values(visibleSortedCharactersByCategoryAfterChangeSort).forEach(
+                (characters) => {
+                  characters.forEach((character, position) => {
+                    if (characters[position - 1]) {
+                      expect(
+                        character.name.localeCompare(characters[position - 1].name)
+                      ).toBeGreaterThan(0)
+                    }
+                  })
+                }
+              )
+            })
+
+            describe('given the user reorder characters manually again', () => {
+              describe(`given the user move character2 to character8's position`, () => {
+                const character2AfterChangeSortState = displayedSingleCharacterSelector(
+                  afterChangeSortState,
+                  allCharacters.find(({ id }) => id == 2).id
+                )
+                const character8AfterChangeSortState = displayedSingleCharacterSelector(
+                  afterChangeSortState,
+                  allCharacters.find(({ id }) => id == 8).id
+                )
+                const character8AbsolutePosition = getCharacterAbsolutePositionFromGroupedCategory(
+                  visibleSortedCharactersByCategory,
+                  character8AfterChangeSortState.id
+                )
+                store.dispatch(
+                  reorderCharacter(
+                    character2AfterChangeSortState.id,
+                    character8AbsolutePosition,
+                    character8AfterChangeSortState.categoryId
+                  )
+                )
+
+                const afterSecondReorderState = store.getState()
+                const sortedCharacterCategoriesAfterSecondReorder =
+                  sortedCharacterCategoriesSelector(afterSecondReorderState)
+                const visibleSortedCharactersByCategoryAfterSecondReorder =
+                  visibleSortedCharactersByCategorySelector(afterSecondReorderState)
+                const isManuallySortedStateAfterSecondReorder =
+                  isCharactersManuallySortedSelector(afterSecondReorderState)
+                const availableAttributesSecondReorder =
+                  characterAttributsForBookByIdSelector(afterSecondReorderState)
+                const positionAttributeIdAfterSecondReorder = Object.values(
+                  availableAttributesSecondReorder
+                ).find(({ name }) => name === 'position')
+
+                it('should have change isManuallySorted to true', () => {
+                  expect(isManuallySortedStateAfterSecondReorder).toBeTruthy()
+                })
+
+                it('should have character attributes property', () => {
+                  Object.values(visibleSortedCharactersByCategoryAfterSecondReorder).forEach(
+                    (characters) => {
+                      characters.forEach((character) => {
+                        expect(character.attributes).toBeDefined()
+                      })
+                    }
+                  )
+                })
+
+                it(`should be sorted by position from character's attributes property again`, () => {
+                  Object.entries(visibleSortedCharactersByCategoryAfterSecondReorder).forEach(
+                    ([categoryId, characters], index) => {
+                      const sortedCategoryId = sortedCharacterCategoriesAfterSecondReorder[index].id
+
+                      expect(String(sortedCategoryId)).toEqual(String(categoryId))
+                      characters.forEach((character, position) => {
+                        if (characters[position - 1]) {
+                          const characterPositionAttribute = character.attributes.find(
+                            ({ id }) => id == positionAttributeIdAfterSecondReorder.id
+                          )
+                          const previousCharacterPositionAttribute = characters[
+                            position - 1
+                          ].attributes.find(
+                            ({ id }) => id == positionAttributeIdAfterSecondReorder.id
+                          )
+
+                          expect(characterPositionAttribute.value).toBeGreaterThan(
+                            previousCharacterPositionAttribute.value
+                          )
+                        }
+                      })
+                    }
+                  )
+                })
+
+                describe(`given the user move character10 to character2's position`, () => {
+                  const character2AfterSecondReorderState = displayedSingleCharacterSelector(
+                    afterSecondReorderState,
+                    allCharacters.find(({ id }) => id == 2).id
+                  )
+                  const character10AfterSecondReorderState = displayedSingleCharacterSelector(
+                    afterSecondReorderState,
+                    allCharacters.find(({ id }) => id == 10).id
+                  )
+                  const character2AbsolutePosition =
+                    getCharacterAbsolutePositionFromGroupedCategory(
+                      visibleSortedCharactersByCategoryAfterSecondReorder,
+                      character2AfterSecondReorderState.id
+                    )
+                  store.dispatch(
+                    reorderCharacter(
+                      character10AfterSecondReorderState.id,
+                      character2AbsolutePosition,
+                      character2AfterSecondReorderState.categoryId
+                    )
+                  )
+
+                  const afterThirdReorderState = store.getState()
+                  const sortedCharacterCategoriesAfterThirdReorder =
+                    sortedCharacterCategoriesSelector(afterThirdReorderState)
+                  const visibleSortedCharactersByCategoryAfterThirdReorder =
+                    visibleSortedCharactersByCategorySelector(afterThirdReorderState)
+                  const isManuallySortedStateAfterThirdReorder =
+                    isCharactersManuallySortedSelector(afterThirdReorderState)
+                  const availableAttributesThirdReorder =
+                    characterAttributsForBookByIdSelector(afterThirdReorderState)
+                  const positionAttributeIdAfterThirdReorder = Object.values(
+                    availableAttributesThirdReorder
+                  ).find(({ name }) => name === 'position')
+
+                  const character10AbsolutePositionAfterThirdReorder =
+                    getCharacterAbsolutePositionFromGroupedCategory(
+                      visibleSortedCharactersByCategoryAfterSecondReorder,
+                      character2AfterSecondReorderState.id
+                    )
+
+                  it('should still have isManuallySorted value as true', () => {
+                    expect(isManuallySortedStateAfterThirdReorder).toBeTruthy()
+                  })
+
+                  it('should still have character attributes property', () => {
+                    Object.values(visibleSortedCharactersByCategoryAfterThirdReorder).forEach(
+                      (characters) => {
+                        characters.forEach((character) => {
+                          expect(character.attributes).toBeDefined()
+                        })
+                      }
+                    )
+                  })
+
+                  it(`should move character10 to character2's position`, () => {
+                    expect(character10AbsolutePositionAfterThirdReorder).toBe(
+                      character2AbsolutePosition
+                    )
+                  })
+
+                  it(`should still be sorted by position from character's attributes`, () => {
+                    Object.entries(visibleSortedCharactersByCategoryAfterThirdReorder).forEach(
+                      ([categoryId, characters], index) => {
+                        const sortedCategoryId =
+                          sortedCharacterCategoriesAfterThirdReorder[index].id
+
+                        expect(String(sortedCategoryId)).toEqual(String(categoryId))
+                        characters.forEach((character, position) => {
+                          if (characters[position - 1]) {
+                            const characterPositionAttribute = character.attributes.find(
+                              ({ id }) => id == positionAttributeIdAfterThirdReorder.id
+                            )
+                            const previousCharacterPositionAttribute = characters[
+                              position - 1
+                            ].attributes.find(
+                              ({ id }) => id == positionAttributeIdAfterThirdReorder.id
+                            )
+
+                            expect(characterPositionAttribute.value).toBeGreaterThan(
+                              previousCharacterPositionAttribute.value
+                            )
+                          }
+                        })
+                      }
+                    )
+                  })
+                })
+              })
+            })
+          })
         })
       })
     })

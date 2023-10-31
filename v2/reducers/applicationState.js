@@ -41,13 +41,21 @@ import {
   BUSY_WITH_WORK_THAT_PREVENTS_QUITTING,
   DONE_WITH_WORK_THAT_PREVENTS_QUITTING,
   CLEAR_ERROR_LOADING_FILE,
+  INCREMENT_JUMP_COUNTER,
   START_SETTINGS_WIZARD,
   ADVANCE_SETTINGS_WIZARD,
   REGRESS_SETTINGS_WIZARD,
   FINISH_SETTINGS_WIZARD,
   SET_APP_SETTINGS,
+  START_EDITING,
+  START_VIEWING,
+  START_SEARCHING,
+  OPEN_SEARCH,
+  CLOSE_SEARCH,
+  OPEN_REPLACE,
   STAGE_LANGUAGE,
 } from '../constants/ActionTypes'
+import { EDITING, VIEWING, SEARCHING } from '../constants/editStates'
 
 const INITIAL_STATE = {
   project: {
@@ -108,6 +116,10 @@ const INITIAL_STATE = {
   },
   work: {
     busy: false,
+  },
+  userInteractions: {
+    jumpCounter: 0,
+    editState: EDITING,
   },
 }
 
@@ -590,9 +602,6 @@ function applicationStateReducer(state = INITIAL_STATE, action) {
         },
       }
     }
-    default: {
-      return state
-    }
     case FINISH_ONBOARDING: {
       if (!state.proOnboarding.isOnboarding && !state.proOnboarding.isOnboardingFromRoot) {
         return state
@@ -704,6 +713,44 @@ function applicationStateReducer(state = INITIAL_STATE, action) {
           busy: false,
         },
       }
+    }
+    case INCREMENT_JUMP_COUNTER: {
+      return {
+        ...state,
+        userInteractions: {
+          ...state.userInteractions,
+          jumpCounter: (state.userInteractions.jumpCounter || 0) + 1,
+        },
+      }
+    }
+    case START_EDITING: {
+      return {
+        ...state,
+        userInteractions: {
+          editState: EDITING,
+        },
+      }
+    }
+    case START_VIEWING: {
+      return {
+        ...state,
+        userInteractions: {
+          editState: VIEWING,
+        },
+      }
+    }
+    case OPEN_REPLACE:
+    case OPEN_SEARCH:
+    case START_SEARCHING: {
+      return {
+        ...state,
+        userInteractions: {
+          editState: SEARCHING,
+        },
+      }
+    }
+    default: {
+      return state
     }
   }
 }

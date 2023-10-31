@@ -15,7 +15,7 @@ export default function migrate(data) {
   }
 
   // add categories
-  obj.categories = newFileCategories
+  obj.categories = newFileCategories()
 
   // reset character and place filters
   if (obj.ui) {

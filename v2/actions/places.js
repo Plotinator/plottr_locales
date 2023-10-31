@@ -6,6 +6,10 @@ import {
   DELETE_PLACE,
   DUPLICATE_PLACE,
   EDIT_PLACE,
+  EDIT_PLACE_CUSTOM_ATTRIBUTE,
+  EDIT_PLACE_DESCRIPTION,
+  EDIT_PLACE_NAME,
+  EDIT_PLACE_NOTES,
   EDIT_PLACE_TEMPLATE_ATTRIBUTE,
   LOAD_PLACES,
   LOAD_PLACE,
@@ -13,8 +17,8 @@ import {
   REMOVE_PLACE,
   REMOVE_BOOK_FROM_PLACE,
   REMOVE_TAG_FROM_PLACE,
+  REORDER_PLACE_MANUALLY,
 } from '../constants/ActionTypes'
-import { editorMetadataIfPresent } from '../helpers/editors'
 import { place } from '../store/initialState'
 
 export function addPlace() {
@@ -25,22 +29,22 @@ export function addPlaceWithValues(place) {
   return { type: ADD_PLACE_WITH_VALUES, place }
 }
 
-export function editPlace(id, attributes, editorPath, selection) {
-  return { type: EDIT_PLACE, id, attributes, ...editorMetadataIfPresent(editorPath, selection) }
+export function editPlace(id, attributes) {
+  return { type: EDIT_PLACE, id, attributes }
 }
 
 export function duplicatePlace(id) {
   return { type: DUPLICATE_PLACE, id }
 }
 
-export function editPlaceTemplateAttribute(id, templateId, name, value, editorPath, selection) {
+export function editPlaceTemplateAttribute(id, templateId, name, value, selection) {
   return {
     type: EDIT_PLACE_TEMPLATE_ATTRIBUTE,
     id,
     templateId,
     name,
     value,
-    ...editorMetadataIfPresent(editorPath, selection),
+    selection,
   }
 }
 
@@ -62,6 +66,22 @@ export function removeTag(id, tagId) {
 
 export function removeBook(id, bookId) {
   return { type: REMOVE_BOOK_FROM_PLACE, id, bookId }
+}
+
+export function editPlaceName(id, newName, selection) {
+  return { type: EDIT_PLACE_NAME, id, newName, selection }
+}
+
+export function editPlaceDescription(id, newDescription, selection) {
+  return { type: EDIT_PLACE_DESCRIPTION, id, newDescription, selection }
+}
+
+export function editPlaceNotes(id, newNotes, selection) {
+  return { type: EDIT_PLACE_NOTES, id, newNotes, selection }
+}
+
+export function editPlaceCustomAttribute(id, name, newValue, selection) {
+  return { type: EDIT_PLACE_CUSTOM_ATTRIBUTE, id, name, newValue, selection }
 }
 
 // NOTE: "load", "loadSingle", "batchLoad" and "removeSingle" are for
@@ -86,4 +106,14 @@ export function batchLoad(patching, places) {
 // external sync and not for general use.
 export function removeSingle(patching, place) {
   return { type: REMOVE_PLACE, patching, place }
+}
+
+export const reorderPlaces = (placeId, oldPosition, newPosition, newCategoryId) => {
+  return {
+    type: REORDER_PLACE_MANUALLY,
+    id: placeId,
+    oldPosition,
+    newPosition,
+    newCategoryId,
+  }
 }

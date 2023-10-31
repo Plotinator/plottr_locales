@@ -1,4 +1,5 @@
 const { jsx } = require('slate-hyperscript')
+const { intersection, isEqual } = require('lodash')
 const MarkDown = require('pagedown')
 const md = MarkDown.getSanitizingConverter()
 const DomParser = require('dom-parser')
@@ -26,17 +27,99 @@ export function convertHTMLString(html) {
   return slate
 }
 
-export function convertHTMLNodeList(nodeList) {
-  return nodeList.map(deserialize).map((content) => {
-    if (content.children && content.isBold) {
-      return {
-        type: 'paragraph',
-        children: [{ text: content.children.toString() }],
-        isBold: true,
-      }
-    }
-    return { type: 'paragraph', children: [{ text: content.toString() }] }
+const TYPE_OR_VALUE_ATTRIBUTES = ['type', 'text', 'children']
+
+const isNotTypeOrValueAttribute = (key) => {
+  return TYPE_OR_VALUE_ATTRIBUTES.every((typeOrValueKey) => {
+    return !isEqual(key, typeOrValueKey)
   })
+}
+
+export function nonTypeOrValueAttributesAreSame(thisSlateElement, thatSlateElement) {
+  const thisKeys = Object.keys(thisSlateElement).filter(isNotTypeOrValueAttribute)
+  const thatKeys = Object.keys(thatSlateElement).filter(isNotTypeOrValueAttribute)
+  const sharedKeys = intersection(thisKeys, thatKeys)
+
+  return (
+    thisKeys.length === sharedKeys.length &&
+    thisKeys.every((key) => {
+      return isEqual(thisSlateElement[key], thatSlateElement[key])
+    })
+  )
+}
+
+export function compressConsecutiveSlateChildren(slateNode) {
+  if (Array.isArray(slateNode.children)) {
+    const compressedChildren = slateNode.children.map(compressConsecutiveSlateChildren)
+    return {
+      ...slateNode,
+      children: compressedChildren
+        .reduce((childrenAcc, nextChild) => {
+          const head = childrenAcc[0]
+          if (typeof head === 'undefined') {
+            return [nextChild]
+          } else if (head.type === 'paragraph') {
+            // Consecutive paragraphs never get merged.
+            return [nextChild, ...childrenAcc]
+          } else if (head.type === nextChild.type) {
+            // We're in the same sort of thing.  Do the attributes
+            // match between peer chidlren?
+            if (nonTypeOrValueAttributesAreSame(head, nextChild)) {
+              // The attributes match.  Are we dealing with text fields?
+              if (typeof head.text !== undefined) {
+                // Yes, they're text.  Merge the text content.
+                return [
+                  {
+                    ...head,
+                    text: head.text + nextChild.text,
+                  },
+                  ...childrenAcc.slice(1),
+                ]
+              } else {
+                // Attributes match, merge the children if they're present.
+                const headHasChildren = Array.isArray(head.children)
+                const nextHasChildren = Array.isArray(nextChild.children)
+                const newChildren =
+                  headHasChildren && nextHasChildren
+                    ? head.chidren.concat(nextChild.children)
+                    : headHasChildren
+                    ? head.children
+                    : nextHasChildren
+                    ? nextChild.children
+                    : null
+                return [
+                  {
+                    ...head,
+                    ...(newChildren ? { chidren: newChildren } : {}),
+                  },
+                  ...childrenAcc.slice(1),
+                ]
+              }
+            } else {
+              // There'sa mismatch between some attributes in the two
+              // children.  Don't merge.
+              return [nextChild, ...childrenAcc]
+            }
+          } else {
+            // Node types don't match.  Don't merge.
+            return [nextChild, ...childrenAcc]
+          }
+        }, [])
+        .reverse(),
+    }
+  } else {
+    return slateNode
+  }
+}
+
+export function convertHTMLNodeList(nodeList) {
+  // We wrap the content in a paragraph so that the compression
+  // consecutive slate children algorithm has a top-level node to
+  // insert peers into.
+  return compressConsecutiveSlateChildren({
+    type: 'paragraph',
+    children: nodeList.map(deserialize).flat(1),
+  }).children
 }
 
 export function deserialize(el) {
@@ -46,7 +129,9 @@ export function deserialize(el) {
       return null
     }
 
-    return el.textContent.replace(/[\n]/g, ' ')
+    return {
+      text: el.textContent.replace(/[\n]/g, ' '),
+    }
   } else if (el.nodeType !== 1) {
     return null
   }
@@ -64,6 +149,7 @@ export function deserialize(el) {
     case 'BLOCKQUOTE':
       return jsx('element', { type: 'block-quote' }, children)
     case 'P':
+    case 'DIV':
       return jsx('element', { type: 'paragraph' }, children)
     case 'H1':
       return jsx('element', { type: 'heading-one' }, children)
@@ -79,6 +165,9 @@ export function deserialize(el) {
       return jsx('element', { type: 'list-item' }, children)
     case 'OL':
       return jsx('element', { type: 'numbered-list' }, children)
+    // FIXME: these wont work if you have emph and bold
+    // etc. recursively or if there are other structures nested
+    // inside.
     case 'EM':
     case 'I':
       return jsx('text', { italic: true, text: el.textContent })
@@ -95,9 +184,18 @@ export function deserialize(el) {
     }
     case 'A':
       return jsx('element', { type: 'link', url: el.getAttribute('href') }, children)
-    default:
-      if (children?.length === 0) return el.textContent
-      if (isBold) return { children, isBold }
-      return children
+    default: {
+      if (children?.length === 0) {
+        return el.textContent
+      } else if (isBold) {
+        if (Array.isArray(children) && children.length === 1) {
+          return { ...children[0], isBold }
+        } else {
+          return { children, isBold }
+        }
+      } else {
+        return children
+      }
+    }
   }
 }

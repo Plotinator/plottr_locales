@@ -13,11 +13,20 @@ import {
   ADD_BOOK_FROM_TEMPLATE,
   DELETE_IMAGE,
   EDIT_BOOK_IMAGE,
+  SET_BOOK_TITLE,
+  SET_BOOK_PREMISE,
+  SET_BOOK_THEME,
+  SET_BOOK_GENRE,
   DUPLICATE_BOOK,
+  REPLACE_MARKED_HITS,
 } from '../constants/ActionTypes'
 import { getCopyName, isSeries } from '../helpers/books'
 import { book as defaultBook } from '../store/initialState'
 import { newFileBooks } from '../store/newFileState'
+import { safeParseInt } from './safeParseInt'
+import { sortByHitPosition } from './sortByHitPosition'
+import { replacePlainTextHit } from './replace'
+import { parseNumberOrString } from './parseNumberOrString'
 
 const initialState = {
   allIds: [1],
@@ -100,6 +109,43 @@ const books =
         }
       }
 
+      case REPLACE_MARKED_HITS: {
+        const applicableHits = action.hitsMarkedForReplacement.filter((hit) => {
+          return hit.path.startsWith('/project/book')
+        })
+        // IMPORTANT!!!
+        //
+        // We sort by the hit position so that we deal with later hits
+        // first.  By doing so, we don't invalidate the start position
+        // of other hits when we replace those hits.
+        //
+        // i.e. it's fine to do multiple replacements in the same
+        // field, as long as you replace the hits in reverse order,
+        // i.e. the last hit first and the first hit last.
+        return sortByHitPosition(applicableHits).reduce((acc, nextHit) => {
+          const { path, hit } = nextHit
+          const [_, _project, _series, rawBookId, attribute, rawFocusStart] = path.split('/')
+          const focusStart = safeParseInt(rawFocusStart)
+          const bookId = parseNumberOrString(rawBookId)
+          if (['title', 'premise', 'genre', 'theme'].indexOf(attribute) !== -1) {
+            return {
+              ...acc,
+              [bookId]: {
+                ...acc[bookId],
+                [attribute]: replacePlainTextHit(
+                  acc[bookId][attribute],
+                  focusStart,
+                  hit,
+                  action.replacementText
+                ),
+              },
+            }
+          } else {
+            return acc
+          }
+        }, state)
+      }
+
       case REORDER_BOOKS:
         return {
           ...state,
@@ -156,6 +202,54 @@ const books =
           }
           return value
         })
+
+      case SET_BOOK_TITLE: {
+        return mapValues(state, (value, key) => {
+          if (!Array.isArray(value) && value instanceof Object && value.id === action.id) {
+            return {
+              ...value,
+              title: action.title,
+            }
+          }
+          return value
+        })
+      }
+
+      case SET_BOOK_PREMISE: {
+        return mapValues(state, (value, key) => {
+          if (!Array.isArray(value) && value instanceof Object && value.id === action.id) {
+            return {
+              ...value,
+              premise: action.premise,
+            }
+          }
+          return value
+        })
+      }
+
+      case SET_BOOK_GENRE: {
+        return mapValues(state, (value, key) => {
+          if (!Array.isArray(value) && value instanceof Object && value.id === action.id) {
+            return {
+              ...value,
+              genre: action.genre,
+            }
+          }
+          return value
+        })
+      }
+
+      case SET_BOOK_THEME: {
+        return mapValues(state, (value, key) => {
+          if (!Array.isArray(value) && value instanceof Object && value.id === action.id) {
+            return {
+              ...value,
+              theme: action.theme,
+            }
+          }
+          return value
+        })
+      }
 
       case RESET:
       case FILE_LOADED:

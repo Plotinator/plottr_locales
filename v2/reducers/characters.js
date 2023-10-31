@@ -1,4 +1,4 @@
-import { cloneDeep, omit, uniq } from 'lodash'
+import { cloneDeep, sortBy, omit, uniq } from 'lodash'
 import {
   ADD_CHARACTER,
   ADD_CHARACTER_WITH_TEMPLATE,
@@ -39,6 +39,8 @@ import {
   EDIT_CHARACTER_IMAGE,
   DELETE_CHARACTER_LEGACY_CUSTOM_ATTRIBUTE,
   REORDER_CHARACTER_TEMPLATES,
+  REPLACE_MARKED_HITS,
+  REORDER_CHARACTER_MANUALLY,
 } from '../constants/ActionTypes'
 import { character as defaultCharacter } from '../store/initialState'
 import { newFileCharacters } from '../store/newFileState'
@@ -46,6 +48,10 @@ import { nextId } from '../store/newIds'
 import { applyToCustomAttributes } from './applyToCustomAttributes'
 import { repairIfPresent } from './repairIfPresent'
 import { reorderList } from '../helpers/lists'
+import { safeParseInt } from './safeParseInt'
+import { sortByHitPosition } from './sortByHitPosition'
+import { replacePlainTextHit, replaceInSlateDatastructure } from './replace'
+import { parseNumberOrString } from './parseNumberOrString'
 
 const initialState = [defaultCharacter]
 
@@ -167,6 +173,7 @@ const DISALLOWED_NAMES = [
   'tags',
   'imageId',
   'bookIds',
+  'position',
 ]
 
 const removeAttributesAssociatedWithDeletedBook = (character, deletedBookId) => {
@@ -342,6 +349,135 @@ const characters =
           }
           return character
         })
+      }
+
+      case REORDER_CHARACTER_MANUALLY: {
+        const {
+          characterIdsInOrder,
+          bookId,
+          characterId,
+          categoryAttributeId,
+          newCategoryId,
+          positionAttributeId,
+          newPosition,
+        } = action
+        const originalPosition = characterIdsInOrder.findIndex((id) => {
+          return id === characterId
+        })
+        const adjustedNewPosition =
+          newPosition > originalPosition ? newPosition + 0.5 : newPosition - 0.5
+        // Assign each character it's visible position in the current
+        // book as reported by the action.
+        //
+        // *BUT* when we get to the character we're moving, give it a
+        // position based on the direction we're moving in so that it
+        // sorts into the correct order later.
+        const withPositionsForCurrentBook = characterIdsInOrder.map(
+          (currentCharacterId, visiblePosition) => {
+            const character = state.find(({ id }) => {
+              return id === currentCharacterId
+            })
+            const existingAttributes = character?.attributes || []
+            const theAttribute = (attribute) => {
+              return attribute.id === positionAttributeId && attribute.bookId == bookId
+            }
+            const existingPositionAttribute = existingAttributes?.find(theAttribute)
+            const position =
+              characterId === currentCharacterId ? adjustedNewPosition : visiblePosition
+            const newAttribute = {
+              id: positionAttributeId,
+              bookId,
+              value: position,
+            }
+            if (existingPositionAttribute) {
+              const attributesWithoutPositionForThisBook = existingAttributes.filter(
+                (attribute) => !theAttribute(attribute)
+              )
+              return {
+                ...character,
+                attributes: [...attributesWithoutPositionForThisBook, newAttribute],
+              }
+            } else {
+              return {
+                ...character,
+                attributes: [...existingAttributes, newAttribute],
+              }
+            }
+          }
+        )
+        const withCategorySet = state
+          .map((character) => {
+            const hasPositionForCurrentBook = withPositionsForCurrentBook.find(
+              (charWithPos) => charWithPos.id == character.id
+            )
+
+            if (hasPositionForCurrentBook) {
+              return hasPositionForCurrentBook
+            }
+            return character
+          })
+          .map((character) => {
+            if (character.id === characterId) {
+              const existingAttributes = character?.attributes || []
+              const theAttribute = (attribute) => {
+                return attribute.id === categoryAttributeId && attribute.bookId == bookId
+              }
+              const existingCategoryAttribute = existingAttributes?.find(theAttribute)
+              const newAttribute = {
+                id: categoryAttributeId,
+                bookId,
+                value: newCategoryId,
+              }
+              if (existingCategoryAttribute) {
+                const attributesWithoutCategoryForThisBook = existingAttributes.filter(
+                  (attribute) => !theAttribute(attribute)
+                )
+                return {
+                  ...character,
+                  attributes: [...attributesWithoutCategoryForThisBook, newAttribute],
+                }
+              } else {
+                return {
+                  ...character,
+                  attributes: [...existingAttributes, newAttribute],
+                }
+              }
+            } else {
+              return character
+            }
+          })
+        const isTheCharacter = (character) => {
+          return character.id === characterId
+        }
+        const characterWithOldPosition = withCategorySet.find(isTheCharacter)
+        if (!characterWithOldPosition) {
+          return state
+        } else {
+          const sortedByPosition = sortBy(withCategorySet, (character) => {
+            const theAttribute = (attribute) => {
+              return attribute.id === positionAttributeId && attribute.bookId == bookId
+            }
+            return character.attributes?.find(theAttribute)?.value
+          })
+          return sortedByPosition.map((character, position) => {
+            const existingAttributes = character?.attributes || []
+            const newAttribute = {
+              id: positionAttributeId,
+              bookId,
+              value: position,
+            }
+            const theAttribute = (attribute) => {
+              return attribute.id === positionAttributeId && attribute.bookId == bookId
+            }
+            const attributesWithoutPositionForThisBook = existingAttributes.filter(
+              (attribute) => !theAttribute(attribute)
+            )
+            return {
+              ...character,
+              attributes: [...attributesWithoutPositionForThisBook, newAttribute],
+            }
+          })
+        }
       }
 
       case ATTACH_CHARACTER_TO_CARD:
@@ -766,6 +902,109 @@ const characters =
           }
           return character
         })
+      }
+
+      case REPLACE_MARKED_HITS: {
+        const applicableHits = action.hitsMarkedForReplacement.filter((hit) => {
+          return hit.path.match(/^\/characters\/[0-9a-zA-Z]+\//)
+        })
+        // IMPORTANT!!!
+        //
+        // We sort by the hit position so that we deal with later hits
+        // first.  By doing so, we don't invalidate the start position
+        // of other hits when we replace those hits.
+        //
+        // i.e. it's fine to do multiple replacements in the same
+        // field, as long as you replace the hits in reverse order,
+        // i.e. the last hit first and the first hit last.
+        return sortByHitPosition(applicableHits).reduce((acc, nextHit) => {
+          const { path, hit } = nextHit
+          const [_, _character, rawCharacterId, type, ...rest] = path.split('/')
+          const characterId = safeParseInt(rawCharacterId)
+          return acc.map((nextCharacter) => {
+            if (nextCharacter.id === characterId) {
+              if (type === 'customAttribute') {
+                const [rawAttributeId, rawBookId, rawFocusStart] = rest
+                const attributeId = safeParseInt(rawAttributeId)
+                const bookId = parseNumberOrString(rawBookId)
+                const focusStart = safeParseInt(rawFocusStart)
+                return {
+                  ...nextCharacter,
+                  attributes: nextCharacter.attributes.map((attribute) => {
+                    if (attribute.id === attributeId && attribute.bookId === bookId) {
+                      const attributeValue = attribute.value
+                      const replaceFunction = Array.isArray(attributeValue)
+                        ? replaceInSlateDatastructure
+                        : replacePlainTextHit
+                      return {
+                        ...attribute,
+                        value: replaceFunction(
+                          attributeValue,
+                          focusStart,
+                          hit,
+                          action.replacementText
+                        ),
+                      }
+                    } else {
+                      return attribute
+                    }
+                  }),
+                }
+              } else if (type === 'templateAttribute') {
+                const [templateId, attributeName, rawBookId, rawFocusStart] = rest
+                const bookId = parseNumberOrString(rawBookId)
+                const focusStart = safeParseInt(rawFocusStart)
+                return {
+                  ...nextCharacter,
+                  templates: nextCharacter.templates.map((template) => {
+                    if (template.id === templateId) {
+                      return {
+                        ...template,
+                        values: template.values.map((templateValue) => {
+                          if (
+                            templateValue.name === attributeName &&
+                            templateValue.bookId === bookId
+                          ) {
+                            const attributeValue = templateValue.value
+                            const replaceFunction = Array.isArray(attributeValue)
+                              ? replaceInSlateDatastructure
+                              : replacePlainTextHit
+                            return {
+                              ...templateValue,
+                              value: replaceFunction(
+                                attributeValue,
+                                focusStart,
+                                hit,
+                                action.replacementText
+                              ),
+                            }
+                          } else {
+                            return templateValue
+                          }
+                        }),
+                      }
+                    } else {
+                      return template
+                    }
+                  }),
+                }
+              } else {
+                const [rawFocusStart] = rest
+                const focusStart = safeParseInt(rawFocusStart)
+                const attributeValue = nextCharacter[type]
+                const replaceFunction = Array.isArray(attributeValue)
+                  ? replaceInSlateDatastructure
+                  : replacePlainTextHit
+                return {
+                  ...nextCharacter,
+                  [type]: replaceFunction(attributeValue, focusStart, hit, action.replacementText),
+                }
+              }
+            } else {
+              return nextCharacter
+            }
+          })
+        }, state)
       }
 
       default:

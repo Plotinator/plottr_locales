@@ -41,11 +41,15 @@ export const firstLineForBookSelector = createSelector(linesForBookSelector, (li
   return sortBy(lines, 'position')[0]
 })
 
-const cardLineIdSelector = (_state, id) => id
-export const cardsLineSelector = createSelector(
+const lineIdSelector = (_state, lineId) => {
+  return lineId
+}
+export const singleLineSelector = createSelector(
   allLinesSelector,
-  cardLineIdSelector,
-  (lines, id) => {
-    return lines.find((l) => l.id == id)
+  lineIdSelector,
+  (lines, lineId) => {
+    return lines.find(({ id }) => {
+      return id === lineId
+    })
   }
 )

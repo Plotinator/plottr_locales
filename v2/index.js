@@ -1,3 +1,5 @@
+import rtf from 'jsrtf'
+
 import actions from './actions'
 
 import * as ActionTypes from './constants/ActionTypes'
@@ -23,6 +25,8 @@ import * as templatesHelpers from './helpers/templates'
 import * as characterHelpers from './helpers/characters'
 
 import * as template from './template'
+
+import * as editStates from './constants/editStates'
 
 import migrateIfNeeded from './migrator/migration_manager'
 import Migrator from './migrator/migrator.js'
@@ -183,4 +187,6 @@ export {
   ARRAY_KEYS,
   checkFileIntegrity,
   specialCaseFixes,
+  editStates,
+  rtf,
 }

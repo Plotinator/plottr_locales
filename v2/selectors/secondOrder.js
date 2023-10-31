@@ -6,7 +6,7 @@ import { depth } from '../reducers/tree'
 import { noEntityHasLegacyAttributeBound } from './noEntitiyHasValueBound'
 
 // Other selector dependencies
-import { allCardsSelector } from './cardsFirstOrder'
+import { allCardsSelector, singleCardSelector } from './cardsFirstOrder'
 import { allBeatsSelector } from './beatsFirstOrder'
 import { previouslyLoggedIntoProSelector } from './settingsFirstOrder'
 import { isOnWebSelector, userIdSelector } from './clientFirstOrder'
@@ -18,6 +18,7 @@ import {
   placeCustomAttributesSelector,
 } from './customAttributesFirstOrder'
 import { allNotesSelector } from './notesFirstOrder'
+import { allLinesSelector } from './linesFirstOrder'
 import { fullFileStateSelector } from './fullFileFirstOrder'
 
 export const shouldBeInProSelector = createSelector(
@@ -139,6 +140,16 @@ export const timelineScrollPositionSelector = createSelector(
     return timelineScrollPosition
   }
 )
+export const isNotesManuallySortedSelector = createSelector(noteSortSelector, (sort) => {
+  return sort == 'manual'
+})
+export const isCharactersManuallySortedSelector = createSelector(characterSortSelector, (sort) => {
+  return sort == 'manual'
+})
+export const isPlacesManuallySortedSelector = createSelector(placeSortSelector, (sort) => {
+  return sort == 'manual'
+})
+
 export const attributesDialogIsOpenSelector = createSelector(
   uiSelector,
   ({ attributesDialogIsOpen }) => {
@@ -312,6 +323,40 @@ export const templateModalAdvancedPanelOpenSelector = createSelector(
   }
 )
 
+const cardDialogSelector = createSelector(uiSelector, ({ cardDialog }) => {
+  return cardDialog
+})
+export const isCardDialogDeletingSelector = createSelector(cardDialogSelector, ({ deleting }) => {
+  return deleting
+})
+export const isCardDialogColorPickerOpenSelector = createSelector(
+  cardDialogSelector,
+  ({ showColorPicker }) => {
+    return showColorPicker
+  }
+)
+export const isCardDialogTemplatePickerOpenSelector = createSelector(
+  cardDialogSelector,
+  ({ showTemplatePicker }) => {
+    return showTemplatePicker
+  }
+)
+export const isCardDialogTemplateBeingRemoved = createSelector(
+  cardDialogSelector,
+  ({ removeWhichTemplate }) => {
+    return !!removeWhichTemplate
+  }
+)
+export const whichTemplateIsBeingRemovedViaCardDialogSelector = createSelector(
+  cardDialogSelector,
+  ({ removeWhichTemplate }) => {
+    return removeWhichTemplate
+  }
+)
+export const cardDialogTabSelector = createSelector(cardDialogSelector, ({ activeTab }) => {
+  return activeTab
+})
+
 export const cardsCustomAttributesThatCanChangeSelector = createSelector(
   allCardsSelector,
   cardsCustomAttributesSelector,
@@ -476,5 +521,29 @@ export const filteredItemsSelector = createSelector(
       default:
         return []
     }
+  }
+)
+
+export const cardsLineSelector = createSelector(
+  singleCardSelector,
+  allLinesSelector,
+  (card, lines) => {
+    if (!card) {
+      return null
+    }
+
+    return (
+      lines.find(({ id }) => {
+        return card.lineId === id
+      }) || {}
+    )
+  }
+)
+
+export const cardsLineOrDefaultSelector = createSelector(
+  cardsLineSelector,
+  allLinesSelector,
+  (line, lines) => {
+    return line || lines[0]
   }
 )

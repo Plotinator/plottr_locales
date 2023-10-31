@@ -72,9 +72,12 @@ export const uiState = {
     size: 'large',
     view: 'default',
     actTab: 0,
+    focus: [],
     beatToDelete: null,
     contextMenuBeat: null,
     editingBeatId: null,
+    beatHeadingTitleBeingEdited: null,
+    plotlineTitleBeingEdited: null,
   },
   searchTerms: {
     notes: null,
@@ -89,6 +92,23 @@ export const uiState = {
   },
   characterTab: {
     selectedCharacter: null,
+    focus: [],
+    attributesDialogOpen: false,
+    categoriesDialogOpen: false,
+    editingSelected: false,
+    showTemplatePicker: false,
+    creating: false,
+    templateData: null,
+    filterVisible: false,
+    sortVisible: false,
+    detailsVisible: true,
+    characterEditor: {
+      deleting: false,
+      removing: false,
+      removeWhichTemplate: null,
+      activeTab: 1,
+      showTemplatePicker: false,
+    },
   },
   customAttributeOrder: {
     characters: [],
@@ -98,11 +118,58 @@ export const uiState = {
     cardId: null,
     lineId: null,
     beatId: null,
+    deleting: false,
+    showColorPicker: false,
+    showTemplatePicker: false,
+    removing: false,
+    removeWhichTemplate: null,
   },
   collaborators: {},
   bookDialog: {
     isOpen: false,
     bookId: null,
+  },
+  searchDialog: {
+    isOpen: false,
+    term: '',
+    currentHitIndex: null,
+    scanning: false,
+    replacing: false,
+    replacement: '',
+    hitsToReplace: [],
+  },
+  projectTab: {
+    focus: [],
+  },
+  outlineTab: {
+    focus: [],
+    selectedCard: null,
+    cardEditor: {
+      editing: null,
+    },
+  },
+  noteTab: {
+    focus: [],
+    selectedNote: null,
+    editingSelected: false,
+    categoriesDialogOpen: false,
+    attributesDialogOpen: false,
+    filterVisible: false,
+    sortVisible: false,
+  },
+  placeTab: {
+    focus: [],
+    selectedPlace: null,
+    attributeDialogOpen: false,
+    editingSelected: false,
+    categoriesOpen: false,
+    filterVisible: false,
+    sortVisible: false,
+  },
+  tagTab: {
+    focus: [],
+    selectedTag: null,
+    editingSelectedTab: false,
   },
   outlineScrollPosition: 0,
   templateModal: {
@@ -157,6 +224,7 @@ export const character = {
   categoryId: null,
   imageId: null,
   bookIds: [],
+  position: 0,
 }
 
 export const categories = {
@@ -184,6 +252,7 @@ export const place = {
   tags: [],
   imageId: null,
   bookIds: [],
+  position: 0,
 }
 
 export const tag = {
@@ -259,6 +328,7 @@ export const note = {
   templates: [],
   imageId: null,
   bookIds: [],
+  position: 0,
 }
 
 export const image = {
@@ -274,23 +344,25 @@ export const image = {
 //   { id: 'ch1', version: '2020.3.4', attributes: [{ name: 'Motivation', type: 'text', value: '' }] },
 // ]
 
-export const hierarchyLevel = {
-  name: nextLevelName('default'),
-  level: 0,
-  autoNumber: true,
-  textSize: 24,
-  borderStyle: nextBorderStyle(0),
-  backgroundColor: 'none', // Same as app canvas
-  textColor: nextColor('default'),
-  borderColor: nextColor(0),
-  dark: {
-    borderColor: nextDarkColor(0),
-    textColor: nextDarkColor(0),
-  },
-  light: {
-    borderColor: nextColor(0),
+export const hierarchyLevel = () => {
+  return {
+    name: nextLevelName('default'),
+    level: 0,
+    autoNumber: true,
+    textSize: 24,
+    borderStyle: nextBorderStyle(0),
+    backgroundColor: 'none', // Same as app canvas
     textColor: nextColor('default'),
-  },
+    borderColor: nextColor(0),
+    dark: {
+      borderColor: nextDarkColor(0),
+      textColor: nextDarkColor(0),
+    },
+    light: {
+      borderColor: nextColor(0),
+      textColor: nextColor('default'),
+    },
+  }
 }
 
 export const featureFlags = {}

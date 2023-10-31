@@ -8,7 +8,11 @@ import { isSeries } from '../helpers/books'
 import { showBookTabs } from '../helpers/characters'
 import { allBookIdsSelector, allBooksSelector } from './booksFirstOrder'
 import { allCharactersSelector, singleCharacterSelector } from './charactersFirstOrder'
-import { attributesSelector, characterAttributsForBookByIdSelector } from './attributesFirstOrder'
+import {
+  attributesSelector,
+  characterAttributsForBookByIdSelector,
+  characterPositionAttributeIdSelector,
+} from './attributesFirstOrder'
 import { characterCustomAttributesSelector } from './customAttributesFirstOrder'
 import { sortEachCategory } from './sortEachCategory'
 import {
@@ -19,6 +23,7 @@ import {
   characterSortSelector,
   currentTimelineSelector,
   currentViewSelector,
+  isCharactersManuallySortedSelector,
 } from './secondOrder'
 import { charactersSortedAtoZSelector } from './charactersFirstOrder'
 import { placesSortedAtoZSelector } from './placesFirstOrder'
@@ -193,7 +198,19 @@ export const visibleSortedCharactersByCategorySelector = createSelector(
   characterSortSelector,
   characterAttributesForCurrentBookSelector,
   characterAttributeTabSelector,
-  (allCharacters, charactersByCategory, filter, filterIsEmpty, sort, allAttributes, bookId) => {
+  isCharactersManuallySortedSelector,
+  characterPositionAttributeIdSelector,
+  (
+    allCharacters,
+    charactersByCategory,
+    filter,
+    filterIsEmpty,
+    sort,
+    allAttributes,
+    bookId,
+    isManuallySorted,
+    positionAttributeId
+  ) => {
     if (!allCharacters.length) return {}
 
     let visible = charactersByCategory
@@ -249,8 +266,7 @@ export const visibleSortedCharactersByCategorySelector = createSelector(
         return ch.filter((c) => bookId === 'all' || c.bookIds.includes(bookId))
       })
     }
-
-    return sortEachCategory(visible, sort)
+    return sortEachCategory(visible, sort, isManuallySorted, positionAttributeId, bookId)
   }
 )
 

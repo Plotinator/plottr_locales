@@ -37,6 +37,7 @@ import {
   ADD_CARD,
   REORDER_CARDS_WITHIN_LINE,
   DUPLICATE_BOOK,
+  REORDER_CHARACTER_MANUALLY,
 } from '../constants/ActionTypes'
 import selectors from '../selectors'
 import { reduce, beatsByPosition, nextId as nextBeatId } from '../helpers/beats'
@@ -89,6 +90,31 @@ const addCharacterAttributeDataForModifyingBaseAttribute = (baseAttributeName, s
   }
 }
 
+const addCharacterAttributeDataForModifyingCategoryAndPositionAttribute = (state, action) => {
+  const currentBookId = selectedCharacterAttributeTabSelector(state)
+  const characterAttributes = characterAttributesForBookSelector(state)
+  const nextAttributeId = nextId(characterAttributes)
+  const availableAttributes = characterAttributsForBookByIdSelector(state)
+  const existingCategoryId = Object.values(availableAttributes).find(
+    ({ name }) => name === 'category'
+  )
+  const existingPositionId = Object.values(availableAttributes).find(
+    ({ name }) => name === 'position'
+  )
+  const categoryAttributeId = existingCategoryId?.id || nextAttributeId
+  const offset = typeof existingCategoryId?.id !== 'undefined' ? 0 : 1
+  const positionAttributeId = existingPositionId?.id
+    ? existingPositionId.id
+    : nextAttributeId + offset
+
+  return {
+    ...action,
+    bookId: currentBookId,
+    categoryAttributeId,
+    positionAttributeId,
+  }
+}
+
 const addPermission = (reducer) => {
   return (state, action) => {
     return reducer(state, {
@@ -137,6 +163,13 @@ const root = (dataRepairers) => (state, action) => {
         currentBookId,
         nextCharacterId,
       })
+    }
+    case REORDER_CHARACTER_MANUALLY: {
+      const newAction = addCharacterAttributeDataForModifyingCategoryAndPositionAttribute(
+        state,
+        action
+      )
+      return mainReducer(state, newAction)
     }
     // We might need to mint the books attribute when attaching a book
     // to a character.

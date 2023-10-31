@@ -31,9 +31,34 @@ export const allNonBaseCharacterAttributesSelector = createSelector(
   }
 )
 
+export const allBaseCharacterAttributesSelector = createSelector(
+  attributesSelector,
+  (attributes) => {
+    return ((attributes && attributes.characters) || []).filter((attribute) => {
+      return attribute.type == 'base-attribute'
+    })
+  }
+)
+
 export const characterAttributsForBookByIdSelector = createSelector(
   characterAttributesForBookSelector,
   (attributeDescriptors) => {
     return mapValues(groupBy(attributeDescriptors, 'id'), '0')
+  }
+)
+
+export const characterPositionAttributeIdSelector = createSelector(
+  characterAttributesForBookSelector,
+  (availableAttributes) => {
+    const position = Object.values(availableAttributes).find(({ name }) => name === 'position')
+    return position?.id
+  }
+)
+
+export const characterCategoryAttributeIdSelector = createSelector(
+  characterAttributesForBookSelector,
+  (availableAttributes) => {
+    const category = Object.values(availableAttributes).find(({ name }) => name === 'category')
+    return category?.id
   }
 )
