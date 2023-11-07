@@ -5,6 +5,7 @@ import {
   PING,
   RM_RF,
   SAVE_FILE,
+  SAVE_RAW_FILE,
   SAVE_OFFLINE_FILE,
   FILE_BASENAME,
   READ_FILE,
@@ -33,6 +34,7 @@ import {
   SAVE_AS_TEMP_FILE_ERROR_REPLY,
   RM_RF_ERROR_REPLY,
   SAVE_FILE_ERROR_REPLY,
+  SAVE_RAW_FILE_ERROR_REPLY,
   SAVE_OFFLINE_FILE_ERROR_REPLY,
   FILE_BASENAME_ERROR_REPLY,
   READ_FILE_ERROR_REPLY,
@@ -313,6 +315,7 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           case FILE_BASENAME:
           case SAVE_OFFLINE_FILE:
           case SAVE_FILE:
+          case SAVE_RAW_FILE:
           case RM_RF:
           case LAST_OPENED_FILE:
           case SET_LAST_OPENED_FILE:
@@ -393,6 +396,7 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           case READ_OFFLINE_FILES_ERROR_REPLY:
           case RM_RF_ERROR_REPLY:
           case SAVE_FILE_ERROR_REPLY:
+          case SAVE_RAW_FILE_ERROR_REPLY:
           case SAVE_OFFLINE_FILE_ERROR_REPLY:
           case FILE_BASENAME_ERROR_REPLY:
           case READ_FILE_ERROR_REPLY:
@@ -465,6 +469,10 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
 
     const saveFile = (fileURL, file) => {
       return sendPromise(SAVE_FILE, { fileURL, file })
+    }
+
+    const saveRawFile = (filePath, data) => {
+      return sendPromise(SAVE_RAW_FILE, { filePath, data })
     }
 
     const saveOfflineFile = (file) => {
@@ -764,6 +772,7 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           ping,
           rmRf,
           saveFile,
+          saveRawFile,
           saveOfflineFile,
           basename,
           readFile,

@@ -1,7 +1,25 @@
 import { isEqual } from 'lodash'
 
 import { t } from 'plottr_locales'
-import { removeSystemKeys } from 'pltr/v2'
+import { removeSystemKeys, errorCodes } from 'pltr/v2'
+
+const {
+  FILE_LACKS_ALL_KEYS,
+  FILE_HAS_DUPLICATED_CHARACTER_ATTIRBUTES,
+  FILE_HAS_NO_CHARACTER_ATTRIBUTES,
+  FILE_LACKS_CHARACTER_ATTRIBUTE_METADATA,
+  FILE_CONTAINS_INVALID_CHARACTER_ATTRIBUTE_METADATA,
+  FILE_CONTAINS_INVALID_CHARACTER_ATTRIBUTE_VALUES,
+} = errorCodes
+
+const ERROR_CODES_TO_OFFER_BAILOUT = [
+  FILE_LACKS_ALL_KEYS,
+  FILE_HAS_DUPLICATED_CHARACTER_ATTIRBUTES,
+  FILE_HAS_NO_CHARACTER_ATTRIBUTES,
+  FILE_LACKS_CHARACTER_ATTRIBUTE_METADATA,
+  FILE_CONTAINS_INVALID_CHARACTER_ATTRIBUTE_METADATA,
+  FILE_CONTAINS_INVALID_CHARACTER_ATTRIBUTE_VALUES,
+]
 
 const DEFAULT_SAVE_INTERVAL_MS = 10000
 const DEFAULT_BACKUP_INTERVAL_MS = 60000
@@ -30,7 +48,8 @@ const Saver = (
   showMessageBox,
   showErrorBox,
   serverIsBusyRestarting,
-  isLoggedInThunk
+  isLoggedInThunk,
+  offerSaveAsThenQuit
 ) => {
   let saveInterval = null
   let backupInterval = null
@@ -103,11 +122,15 @@ const Saver = (
         )
         return !restarting
       }
-      logger.warn('Failed to autosave', error)
-      showErrorBox(
-        t('Auto-saving failed'),
-        t("Saving your file didn't work. Check where it's stored.")
-      )
+      if (ERROR_CODES_TO_OFFER_BAILOUT.includes(error.code)) {
+        offerSaveAsThenQuit()
+      } else {
+        logger.warn('Failed to autosave', error)
+        showErrorBox(
+          t('Auto-saving failed'),
+          t("Saving your file didn't work. Check where it's stored.")
+        )
+      }
       return !restarting
     })
   }

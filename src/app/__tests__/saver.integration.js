@@ -73,6 +73,10 @@ const isNotLoggedInThunk = () => {
   return false
 }
 
+const DUMMY_OFFER_SAVE_AND_QUIT = () => {
+  return Promise.resolve()
+}
+
 describe('Saver', (describe, it) => {
   describe('save', (describe, it) => {
     describe('given a dummy getState function', (describe, it) => {
@@ -102,7 +106,8 @@ describe('Saver', (describe, it) => {
             DUMMY_SHOW_MESSAGE_BOX,
             DUMMY_SHOW_ERROR_BOX,
             DUMMY_SERVER_IS_BUSY_RESTARTING,
-            isNotLoggedInThunk
+            isNotLoggedInThunk,
+            DUMMY_OFFER_SAVE_AND_QUIT
           )
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
@@ -201,7 +206,8 @@ describe('Saver', (describe, it) => {
               DUMMY_SHOW_MESSAGE_BOX,
               DUMMY_SHOW_ERROR_BOX,
               DUMMY_SERVER_IS_BUSY_RESTARTING,
-              isNotLoggedInThunk
+              isNotLoggedInThunk,
+              DUMMY_OFFER_SAVE_AND_QUIT
             )
             new Promise((resolve) => {
               setTimeout(resolve, 1100)
@@ -287,7 +293,8 @@ describe('Saver', (describe, it) => {
               showMessageBox,
               showErrorBox,
               DUMMY_SERVER_IS_BUSY_RESTARTING,
-              isNotLoggedInThunk
+              isNotLoggedInThunk,
+              DUMMY_OFFER_SAVE_AND_QUIT
             )
             assertEqual(calledShowErrorBox, 0)
             assertEqual(calledShowMessageBox, 0)
@@ -387,7 +394,8 @@ describe('Saver', (describe, it) => {
                 showMessageBox,
                 showErrorBox,
                 alwaysBusyRestarting,
-                isNotLoggedInThunk
+                isNotLoggedInThunk,
+                DUMMY_OFFER_SAVE_AND_QUIT
               )
               assertEqual(calledShowErrorBox, 0)
               assertEqual(calledShowMessageBox, 0)
@@ -473,7 +481,8 @@ describe('Saver', (describe, it) => {
             DUMMY_SHOW_MESSAGE_BOX,
             DUMMY_SHOW_ERROR_BOX,
             DUMMY_SERVER_IS_BUSY_RESTARTING,
-            isNotLoggedInThunk
+            isNotLoggedInThunk,
+            DUMMY_OFFER_SAVE_AND_QUIT
           )
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
@@ -528,7 +537,8 @@ describe('Saver', (describe, it) => {
             DUMMY_SHOW_MESSAGE_BOX,
             DUMMY_SHOW_ERROR_BOX,
             DUMMY_SERVER_IS_BUSY_RESTARTING,
-            isNotLoggedInThunk
+            isNotLoggedInThunk,
+            DUMMY_OFFER_SAVE_AND_QUIT
           )
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
@@ -623,7 +633,8 @@ describe('Saver', (describe, it) => {
                 DUMMY_SHOW_MESSAGE_BOX,
                 DUMMY_SHOW_ERROR_BOX,
                 DUMMY_SERVER_IS_BUSY_RESTARTING,
-                isNotLoggedInThunk
+                isNotLoggedInThunk,
+                DUMMY_OFFER_SAVE_AND_QUIT
               )
               new Promise((resolve) => {
                 setTimeout(resolve, 1050)
@@ -716,7 +727,8 @@ describe('Saver', (describe, it) => {
                 DUMMY_SHOW_MESSAGE_BOX,
                 DUMMY_SHOW_ERROR_BOX,
                 DUMMY_SERVER_IS_BUSY_RESTARTING,
-                isNotLoggedInThunk
+                isNotLoggedInThunk,
+                DUMMY_OFFER_SAVE_AND_QUIT
               )
               new Promise((resolve) => {
                 setTimeout(resolve, 1050)
@@ -790,7 +802,8 @@ describe('Saver', (describe, it) => {
             DUMMY_SHOW_MESSAGE_BOX,
             DUMMY_SHOW_ERROR_BOX,
             DUMMY_SERVER_IS_BUSY_RESTARTING,
-            isNotLoggedInThunk
+            isNotLoggedInThunk,
+            DUMMY_OFFER_SAVE_AND_QUIT
           )
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
@@ -861,7 +874,8 @@ describe('Saver', (describe, it) => {
           DUMMY_SHOW_MESSAGE_BOX,
           trackingErrorNotifier,
           DUMMY_SERVER_IS_BUSY_RESTARTING,
-          isNotLoggedInThunk
+          isNotLoggedInThunk,
+          DUMMY_OFFER_SAVE_AND_QUIT
         )
         new Promise((resolve) => {
           setTimeout(resolve, 510)
@@ -918,7 +932,8 @@ describe('Saver', (describe, it) => {
             DUMMY_SHOW_MESSAGE_BOX,
             trackingErrorNotifier,
             DUMMY_SERVER_IS_BUSY_RESTARTING,
-            isNotLoggedInThunk
+            isNotLoggedInThunk,
+            DUMMY_OFFER_SAVE_AND_QUIT
           )
           assertGreaterThan(loggedInfos, 0)
           assertEqual(loggedWarnings, 0)
@@ -981,7 +996,8 @@ describe('Saver', (describe, it) => {
             DUMMY_SHOW_MESSAGE_BOX,
             DUMMY_SHOW_ERROR_BOX,
             DUMMY_SERVER_IS_BUSY_RESTARTING,
-            isNotLoggedInThunk
+            isNotLoggedInThunk,
+            DUMMY_OFFER_SAVE_AND_QUIT
           )
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
@@ -1080,7 +1096,8 @@ describe('Saver', (describe, it) => {
               DUMMY_SHOW_MESSAGE_BOX,
               DUMMY_SHOW_ERROR_BOX,
               DUMMY_SERVER_IS_BUSY_RESTARTING,
-              isNotLoggedInThunk
+              isNotLoggedInThunk,
+              DUMMY_OFFER_SAVE_AND_QUIT
             )
             new Promise((resolve) => {
               setTimeout(resolve, 1100)
@@ -1172,7 +1189,8 @@ describe('Saver', (describe, it) => {
               DUMMY_SHOW_MESSAGE_BOX,
               DUMMY_SHOW_ERROR_BOX,
               DUMMY_SERVER_IS_BUSY_RESTARTING,
-              isNotLoggedInThunk
+              isNotLoggedInThunk,
+              DUMMY_OFFER_SAVE_AND_QUIT
             )
             assertGreaterThan(loggedInfos, 0)
             assertEqual(loggedWarnings, 0)
@@ -1283,7 +1301,8 @@ describe('Saver', (describe, it) => {
                 DUMMY_SHOW_MESSAGE_BOX,
                 DUMMY_SHOW_ERROR_BOX,
                 alwaysBusyRestarting,
-                isNotLoggedInThunk
+                isNotLoggedInThunk,
+                DUMMY_OFFER_SAVE_AND_QUIT
               )
               assertGreaterThan(loggedInfos, 0)
               assertEqual(loggedWarnings, 0)
@@ -1374,7 +1393,8 @@ describe('Saver', (describe, it) => {
             DUMMY_SHOW_MESSAGE_BOX,
             DUMMY_SHOW_ERROR_BOX,
             DUMMY_SERVER_IS_BUSY_RESTARTING,
-            isNotLoggedInThunk
+            isNotLoggedInThunk,
+            DUMMY_OFFER_SAVE_AND_QUIT
           )
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
@@ -1429,7 +1449,8 @@ describe('Saver', (describe, it) => {
             DUMMY_SHOW_MESSAGE_BOX,
             DUMMY_SHOW_ERROR_BOX,
             DUMMY_SERVER_IS_BUSY_RESTARTING,
-            isNotLoggedInThunk
+            isNotLoggedInThunk,
+            DUMMY_OFFER_SAVE_AND_QUIT
           )
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
@@ -1524,7 +1545,8 @@ describe('Saver', (describe, it) => {
                 DUMMY_SHOW_MESSAGE_BOX,
                 DUMMY_SHOW_ERROR_BOX,
                 DUMMY_SERVER_IS_BUSY_RESTARTING,
-                isNotLoggedInThunk
+                isNotLoggedInThunk,
+                DUMMY_OFFER_SAVE_AND_QUIT
               )
               new Promise((resolve) => {
                 setTimeout(resolve, 1050)
@@ -1617,7 +1639,8 @@ describe('Saver', (describe, it) => {
                 DUMMY_SHOW_MESSAGE_BOX,
                 DUMMY_SHOW_ERROR_BOX,
                 DUMMY_SERVER_IS_BUSY_RESTARTING,
-                isNotLoggedInThunk
+                isNotLoggedInThunk,
+                DUMMY_OFFER_SAVE_AND_QUIT
               )
               new Promise((resolve) => {
                 setTimeout(resolve, 1050)
@@ -1691,7 +1714,8 @@ describe('Saver', (describe, it) => {
             DUMMY_SHOW_MESSAGE_BOX,
             DUMMY_SHOW_ERROR_BOX,
             DUMMY_SERVER_IS_BUSY_RESTARTING,
-            isNotLoggedInThunk
+            isNotLoggedInThunk,
+            DUMMY_OFFER_SAVE_AND_QUIT
           )
           new Promise((resolve) => {
             setTimeout(resolve, 1100)
