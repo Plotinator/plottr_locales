@@ -22,7 +22,7 @@ export function getPreviousAction() {
   return previousAction
 }
 
-const { userDocumentsPath, appVersion, showItemInFolder, notify, pleaseTellMeWhatPlatformIAmOn } =
+const { userDocumentsPath, getVersion, showItemInFolder, notify, pleaseTellMeWhatPlatformIAmOn } =
   makeMainProcessClient()
 
 export function createErrorReport(error, errorInfo) {
@@ -30,13 +30,13 @@ export function createErrorReport(error, errorInfo) {
     return prepareErrorReport(error, errorInfo).then((body) => {
       return whenClientIsReady(({ join, writeFile }) => {
         return join(documentsPath, `plottr_error_report_${Date.now()}.txt`).then((filePath) => {
-          return writeFile(filePath, body, function (err) {
-            if (err) {
-              log.warn(err)
-            } else {
+          return writeFile(filePath, body)
+            .then(() => {
               notifyUser(filePath)
-            }
-          })
+            })
+            .catch((error) => {
+              log.warn(error)
+            })
         })
       })
     })
@@ -46,7 +46,7 @@ export function createErrorReport(error, errorInfo) {
 function prepareErrorReport(error, errorInfo) {
   const { currentUserSettings } = makeFileSystemAPIs(whenClientIsReady)
 
-  return Promise.all([appVersion(), pleaseTellMeWhatPlatformIAmOn]).then(([version, platform]) => {
+  return Promise.all([getVersion(), pleaseTellMeWhatPlatformIAmOn]).then(([version, platform]) => {
     return currentUserSettings().then((user) => {
       const hasLicense = !!user.licenseKey
       const report = `
