@@ -310,7 +310,19 @@ const fileSystemModule = (userDataPath) => {
     const ensureBackupDirExists = () => {
       return backupDirExists().then((backupDirDoesExist) => {
         return backupBasePath().then((basePath) => {
-          return !backupDirDoesExist ? mkdir(basePath, { recursive: true }) : Promise.resolve(true)
+          return !backupDirDoesExist
+            ? mkdir(basePath, { recursive: true }).catch((error) => {
+                if (error.code === 'EEXIST') {
+                  logger.error(
+                    'We tried to create the backup directory and it already exists (something beat us to it.)',
+                    error
+                  )
+                  return Promise.resolve()
+                } else {
+                  return Promise.reject(error)
+                }
+              })
+            : Promise.resolve(true)
         })
       })
     }
@@ -485,7 +497,7 @@ const fileSystemModule = (userDataPath) => {
         if (!SETTINGS.isInitialReadComplete()) {
           timeout = setTimeout(listenWhenSettingsReady, 1000)
         } else {
-          timeout = null
+          clearTimeout(timeout)
           stopListeningToSettings = SETTINGS.onDidAnyChange((settings) => {
             const newDefaultFolder = SETTINGS.getKeyWithoutDefault('user.defaultFolder')
             const newDefaultFolderLocation = SETTINGS.getKeyWithoutDefault(
@@ -541,11 +553,23 @@ const fileSystemModule = (userDataPath) => {
                   .catch((error) => {
                     if (error.code === 'ENOENT') {
                       logger.error("The default directory doesn't exist.  Creating it.")
-                      return mkdir(defaultFolderLocation).then(() => {
-                        return new Promise((resolve) => {
-                          setTimeout(resolve, 1000)
+                      return mkdir(defaultFolderLocation)
+                        .then(() => {
+                          return new Promise((resolve) => {
+                            setTimeout(resolve, 1000)
+                          })
                         })
-                      })
+                        .catch((error) => {
+                          if (error.code === 'EEXIST') {
+                            logger.error(
+                              'We tried to create the default folder and something beat us to it.',
+                              error
+                            )
+                            return Promise.resolve()
+                          } else {
+                            return Promise.reject(error)
+                          }
+                        })
                     } else {
                       logger.error('Error checking whether the default directory exists', error)
                       return Promise.reject(error)

@@ -21,7 +21,6 @@ import exportConfig from 'plottr_import_export/src/exporter/default_config'
 import world from 'world-api'
 
 import MPQ from '../common/utils/MPQ'
-import setupRollbar from '../common/utils/rollbar'
 import initMixpanel from '../common/utils/mixpanel'
 import { ActionCreators } from 'redux-undo'
 import { addNewCustomTemplate } from '../common/utils/custom_templates'
@@ -41,6 +40,7 @@ import logger from '../../shared/logger'
 import { removeSystemKeys } from './bootFile'
 import { makeMainProcessClient } from './mainProcessClient'
 import { downloadStorageImage } from '../common/downloadStorageImage'
+import createErrorReporter from '../../shared/error-reporter'
 
 const {
   showErrorBox,
@@ -85,6 +85,7 @@ const {
   askToExport,
   getVersion,
   createDesktopShortcut,
+  pleaseTellMeWhatPlatformIAmOn,
 } = makeMainProcessClient()
 
 const connectToSocketServer = (port) => {
@@ -124,7 +125,7 @@ const connectToSocketServer = (port) => {
   )
 }
 
-let rollbar
+let errorReporter = null
 tellMeWhatOSImOn()
   .then((osIAmOn) => {
     setOS(osIAmOn)
@@ -140,8 +141,22 @@ tellMeWhatOSImOn()
     return connectToSocketServer(socketWorkerPort)
   })
   .then(() => {
-    return setupRollbar('app.html').then((newRollbar) => {
-      rollbar = newRollbar
+    const state = store.getState()
+    const licenseUserObject = selectors.userSettingsSelector(state)
+    const userId = selectors.userIdSelector(state) || licenseUserObject.payment_id || 'UNKNOWN_USER'
+    const userEmail =
+      selectors.emailAddressSelector(state) || licenseUserObject.customer_email || 'UNKNOWN_EMAIL'
+    Promise.all([pleaseTellMeWhatPlatformIAmOn(), getVersion()]).then(([os, version]) => {
+      errorReporter = createErrorReporter(
+        process.env.ROLLBAR_ACCESS_TOKEN,
+        version,
+        process.env.NODE_ENV,
+        logger,
+        'app.html',
+        os,
+        userId,
+        userEmail
+      )
     })
   })
   .then(() => {
@@ -297,7 +312,7 @@ tellMeWhatOSImOn()
                                     null,
                                     (err, didMigrate, migratedState) => {
                                       if (err) {
-                                        rollbar.error(err)
+                                        errorReporter.error('Error migrating a file', err)
                                         logger.error(err)
                                         if (err === 'Plottr behind file') {
                                           showErrorBox(t('Error'), t('Please update Plottr'))
@@ -474,16 +489,44 @@ tellMeWhatOSImOn()
           store.dispatch(ActionCreators.redo())
         })
 
-        window.addEventListener('error', (message, file, line, column, err) => {
-          logger.error(err)
-          rollbar.error(err)
+        let lastError = null
+        window.addEventListener('error', (event) => {
+          // If we hit an unhandled error, let this be the handler.
+          event.preventDefault()
+          event.stopPropagation()
+          const error = event.error
+          if (error === lastError) {
+            return
+          } else {
+            logger.error(error)
+            errorReporter.error('Top level error handler', error)
+          }
+          lastError = error
         })
 
-        window.SCROLLWITHKEYS = true
         document.addEventListener('keydown', (e) => {
-          if (window.SCROLLWITHKEYS) {
+          const state = store.getState()
+          const cardDialogIsOpen = selectors.cardDialogCardIdSelector(state)
+          const attributesDialogIsOpen = selectors.attributesDialogIsOpenSelector(state)
+          const viewIsTimeline = selectors.currentViewSelector(state)
+          const actConfigModalIsOpen = selectors.actConfigModalIsOpenSelector(state)
+          if (!cardDialogIsOpen) {
             const table = document.querySelector('.sticky-table')
-            if (table) {
+            const targetIsEditable = e.target.isContentEditable || e.target.nodeName === 'INPUT'
+            // No redux state for a few.  Here's a catch all for modals.
+            const aModalIsOpen = document.querySelector('.ReactModalPortal')
+            const aPopoverIsOpen = document.querySelector('.react-tiny-popover-container')
+            if (
+              !aModalIsOpen &&
+              !aPopoverIsOpen &&
+              !actConfigModalIsOpen &&
+              !targetIsEditable &&
+              !attributesDialogIsOpen &&
+              viewIsTimeline &&
+              typeof table !== 'undefined'
+            ) {
+              e.preventDefault()
+              e.stopPropagation()
               if (e.key === 'ArrowUp') {
                 let amount = 300
                 if (e.metaKey || e.ctrlKey || e.altKey) amount = 800
@@ -548,7 +591,7 @@ tellMeWhatOSImOn()
 
         onErrorImportingScrivener((error) => {
           logger.warn('[scrivener import]', error)
-          rollbar.warn({ message: error })
+          errorReporter.warn({ message: error })
           store.dispatch(actions.applicationState.finishScrivenerImporter())
           showErrorBox(t('Error'), t('There was an error doing that. Try again'))
         })

@@ -3,7 +3,6 @@ import axios from 'axios'
 import { getIdTokenResult } from 'wired-up-firebase'
 
 import log from '../../shared/logger'
-import setupRollbar from '../common/utils/rollbar'
 import { makeFileSystemAPIs } from './'
 import { isMacOS } from '../isOS'
 import { whenClientIsReady } from '../../shared/socket-client'
@@ -18,33 +17,26 @@ const { machineId } = makeMainProcessClient()
 export function checkForActiveLicense(licenseInfo, callback) {
   if (!licenseInfo || !Object.keys(licenseInfo).length) {
     callback(null, false)
-    return Promise.resolve()
-  }
-
-  const key = licenseInfo.licenseKey
-  const itemID = licenseInfo.item_id
-  log.info('checking for active license', itemID, key)
-  return machineId().then((generatedMachineId) => {
-    axios
-      .get(licenseURL('check_license', itemID, key, generatedMachineId))
-      .then(({ data }) => {
-        const activeLicense = isActiveLicense(data)
-        log.info('[license_checker]', 'active license?', itemID, activeLicense)
-        // TODO: update site_count and/or activations_left locally
-        productMapping[`${itemID}`](activeLicense)
-        callback(null, activeLicense)
-      })
-      .catch((err) => {
-        log.error(err)
-        setupRollbar('license_checker').then((rollbar) => {
-          rollbar.warn(err)
-          // conscious choice not to turn premium off here
-          // User may be disconnected from internet or something else going on
-          log.info('[license_checker]', 'license check request failed')
+  } else {
+    const key = licenseInfo.licenseKey
+    const itemID = licenseInfo.item_id
+    log.info('checking for active license', itemID, key)
+    machineId().then((generatedMachineId) => {
+      axios
+        .get(licenseURL('check_license', itemID, key, generatedMachineId))
+        .then(({ data }) => {
+          const activeLicense = isActiveLicense(data)
+          log.info('[license_checker]', 'active license?', itemID, activeLicense)
+          // TODO: update site_count and/or activations_left locally
+          productMapping[`${itemID}`](activeLicense)
+          callback(null, activeLicense)
+        })
+        .catch((err) => {
+          log.error(err)
           callback(err, null)
         })
-      })
-  })
+    })
+  }
 }
 
 // callback(isValid, data)
@@ -70,7 +62,6 @@ export function verifyLicense(license, callback) {
         } else {
           log.info('license check request failed', productID)
           log.error(productID)
-          // rollbar.warn(productID, err)
           return false
         }
       })
