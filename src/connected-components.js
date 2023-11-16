@@ -82,6 +82,7 @@ const {
   deleteKnownFile,
   createFromSnowflake,
   createFromScrivener,
+  createFromWord,
   pleaseQuitAndInstall,
   pleaseDownloadUpdate,
   pleaseCheckForUpdates,
@@ -302,6 +303,11 @@ const platform = {
       const state = store.getState()
       const isLoggedIntoPro = selectors.hasProSelector(state)
       createFromScrivener(importedPath, isLoggedIntoPro)
+    },
+    createFromWord: (importedPath) => {
+      const state = store.getState()
+      const isLoggedIntoPro = selectors.hasProSelector(state)
+      createFromWord(importedPath, isLoggedIntoPro)
     },
     joinPath: (...args) => {
       return whenClientIsReady(({ join }) => {

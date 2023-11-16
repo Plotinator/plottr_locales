@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
 import { lock } from 'proper-lockfile'
+import mammoth from 'mammoth'
 
 import { checkFileIntegrity, SYSTEM_REDUCER_KEYS, helpers, errorCodes } from 'pltr/v2'
 
@@ -397,6 +398,12 @@ const fileModule = (userDataPath) => {
       return Promise.resolve(filePath.split(separator))
     }
 
+    const convertDocxToHTML = (filePath) => {
+      return mammoth.convertToHtml({ path: filePath }).then(({ value }) => {
+        return value
+      })
+    }
+
     return {
       saveFile,
       saveOfflineFile,
@@ -420,6 +427,7 @@ const fileModule = (userDataPath) => {
       mkdir: makeDirectory,
       findUniqueNameInPath,
       filePathAsArray,
+      convertDocxToHTML,
     }
   }
 }

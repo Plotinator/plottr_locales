@@ -32,6 +32,7 @@ import {
   deleteKnownFile,
   editKnownFilePath,
   createFromScrivener,
+  createFromWord,
 } from './modules/files'
 import { editWindowPath, setFilePathForWindowWithId } from './modules/windows/index'
 import { lastOpenedFile, setLastOpenedFilePath } from './modules/lastOpened'
@@ -278,6 +279,24 @@ export const listenOnIPCMain = (
     'create-from-scrivener',
     (event, replyChannel, importedPath, isLoggedIntoPro, destinationFile) => {
       createFromScrivener(importedPath, event.sender, isLoggedIntoPro, destinationFile)
+        .then(() => {
+          event.sender.send(replyChannel, importedPath)
+        })
+        .catch((error) => {
+          log.error(`Error creating from scrivener (${importedPath}, ${destinationFile})`, error)
+          event.sender.send('error', {
+            message: error.message,
+            source: 'create-new-file',
+          })
+          event.sender.send(replyChannel, { error: error.message })
+        })
+    }
+  )
+
+  ipcMain.on(
+    'create-from-word',
+    (event, replyChannel, importedPath, isLoggedIntoPro, destinationFile) => {
+      createFromWord(importedPath, event.sender, isLoggedIntoPro, destinationFile)
         .then(() => {
           event.sender.send(replyChannel, importedPath)
         })

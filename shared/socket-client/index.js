@@ -24,6 +24,7 @@ import {
   ADD_KNOWN_FILE,
   EDIT_KNOWN_FILE_PATH,
   UPDATE_LAST_OPENED_DATE,
+  CONVERT_DOCX_TO_HTML,
 
   // Error reply types
   REMOVE_FROM_KNOWN_FILES_ERROR_REPLY,
@@ -145,6 +146,7 @@ import {
   FIND_UNIQUE_NAME_IN_PATH_ERROR_REPLY,
   FILE_PATH_AS_ARRAY,
   FILE_PATH_AS_ARRAY_ERROR_REPLY,
+  CONVERT_DOCX_TO_HTML_ERROR_REPLY,
 } from '../socket-server-message-types'
 import { setPort, getPort } from './workerPort'
 
@@ -268,6 +270,7 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
             return
           }
           // Normal replies
+          case CONVERT_DOCX_TO_HTML:
           case COPY_FILE:
           case CREATE_SHORTCUT:
           case REMOVE_FROM_KNOWN_FILES:
@@ -635,6 +638,10 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
       return sendPromise(FILE_PATH_AS_ARRAY, { path })
     }
 
+    const convertDocxToHtml = (path) => {
+      return sendPromise(CONVERT_DOCX_TO_HTML, { path })
+    }
+
     // ===File System APIs===
 
     const backupBasePath = () => {
@@ -838,6 +845,7 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           inBadState,
           findUniqueNameInPath,
           filePathAsArray,
+          convertDocxToHtml,
         })
       })
     })

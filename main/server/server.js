@@ -87,6 +87,7 @@ import {
   CREATE_SHORTCUT,
   FIND_UNIQUE_NAME_IN_PATH,
   FILE_PATH_AS_ARRAY,
+  CONVERT_DOCX_TO_HTML,
 } from '../../shared/socket-server-message-types'
 import { makeLogger } from './logger'
 import wireupFileModule from './files'
@@ -194,6 +195,7 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
       mkdir,
       findUniqueNameInPath,
       filePathAsArray,
+      convertDocxToHTML,
     } = fileModule
     const fileSystemModule = makeFileSystemModule(stores, logger)
     const {
@@ -922,7 +924,8 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
             const { path } = payload
             return handlePromise(
               () => ['Finding a unique name in path', path],
-              () => statusManager.registerTask(findUniqueNameInPath(path), JOIN),
+              () =>
+                statusManager.registerTask(findUniqueNameInPath(path), FIND_UNIQUE_NAME_IN_PATH),
               () => ['Finding a unique name in path', path]
             )
           }
@@ -930,8 +933,16 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
             const { path } = payload
             return handlePromise(
               () => ['Splitting path into array on separator', path],
-              () => statusManager.registerTask(filePathAsArray(path), JOIN),
+              () => statusManager.registerTask(filePathAsArray(path), FILE_PATH_AS_ARRAY),
               () => ['Splitting path into array on separator', path]
+            )
+          }
+          case CONVERT_DOCX_TO_HTML: {
+            const { path } = payload
+            return handlePromise(
+              () => ['Converting file at given path into HTML from DOCX', path],
+              () => statusManager.registerTask(convertDocxToHTML(path), CONVERT_DOCX_TO_HTML),
+              () => ['Converting file at given path into HTML from DOCX', path]
             )
           }
           case PATH_SEP: {
