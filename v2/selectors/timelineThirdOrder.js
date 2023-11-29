@@ -8,7 +8,7 @@ import {
   rootParentId,
   beatTitle,
   numberOfPriorChildrenAtSameDepth,
-  beatOneIsPrologue
+  beatOneIsPrologue,
 } from '../helpers/beats'
 import { cardMapping } from '../helpers/cards'
 import { createDeepEqualSelector } from './createDeepEqualSelector'
@@ -43,7 +43,7 @@ import {
   timelineViewIsStackedSelector,
   timelineViewIsTabbedSelector,
   uiSelector,
-  hierarchyLevelSelector
+  hierarchyLevelSelector,
 } from './secondOrder'
 
 const selectedOrientationSelector = createSelector(uiSelector, ({ orientation }) => {
@@ -102,7 +102,7 @@ export const timelineBundleSelector = createSelector(
     filterIsEmpty,
     isSmall,
     isMedium,
-    isLarge
+    isLarge,
   })
 )
 
@@ -338,13 +338,13 @@ export const visibleBeatPositions = createSelector(
           }
           return {
             ...acc,
-            [beat.id]: index - lastRootIndex
+            [beat.id]: index - lastRootIndex,
           }
         }
       : (acc, beat, index) => {
           return {
             ...acc,
-            [beat.id]: index
+            [beat.id]: index,
           }
         }
     return visibleBeatsByPosition(beats, timelineViewIsTabbed).reduce(reducer, {})
@@ -436,10 +436,10 @@ export const secondTierBeatsInAtLeastTwoTierArrangementSelector = createSelector
           return [
             ...times(indexOfParentInParents - closestIndexBackwardOfParentWithNoChildren, () => {
               return {
-                type: 'insert-placeholder'
+                type: 'insert-placeholder',
               }
             }),
-            beat
+            beat,
           ]
         }
         return [beat]
@@ -600,7 +600,7 @@ const visibleBeatsForTopLevelParentByPosition = (
       if (!timelineViewIsSmall && timelineViewIsStacked && currentDepth !== maximumDepth) {
         return {
           ...beat,
-          isInsertChildCell: true
+          isInsertChildCell: true,
         }
       }
       return beat
@@ -713,7 +713,7 @@ const stringifiedCardsByIdSelector = createSelector(allCardsSelector, (cards) =>
   return cards.reduce((acc, nextCard) => {
     return {
       ...acc,
-      [nextCard.id]: JSON.stringify(nextCard).toLowerCase()
+      [nextCard.id]: JSON.stringify(nextCard).toLowerCase(),
     }
   }, {})
 })
