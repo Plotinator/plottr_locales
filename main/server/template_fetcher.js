@@ -179,7 +179,7 @@ class TemplateFetcher {
     })
     return Promise.all(templateRequests).then((templateIdValueObjects) => {
       const templateStoreObject = templateIdValueObjects.reduce((acc, next) => {
-        return { ...next, ...acc }
+        return { ...acc, ...next }
       }, this.templatesStore.get())
       this.templatesStore.set(templateStoreObject)
     })
