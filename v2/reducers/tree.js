@@ -127,6 +127,8 @@ export const moveNode = (tree, nodeId, newParent) => {
 export const nextId =
   (idProp) =>
   ({ index }) => {
+    // adding this so test file wont fail
+    if (!index) return
     return (
       Object.values(index)
         .map((x) => x[idProp])

@@ -442,7 +442,7 @@ describe('sync', () => {
           id: '123e',
         },
         client: {
-          userId: null,
+          userId: 'dummy-id',
           clientId: '11233222',
           emailAddress: null,
           hasOnboarded: null,
@@ -1198,7 +1198,7 @@ describe('sync', () => {
           id: '123e',
         },
         client: {
-          userId: null,
+          userId: 'dummy-id',
           clientId: '123323',
           emailAddress: null,
           hasOnboarded: null,
@@ -1677,7 +1677,7 @@ describe('sync', () => {
           id: '123e',
         },
         client: {
-          userId: null,
+          userId: 'dummy-id',
           clientId: '123323',
           emailAddress: null,
           hasOnboarded: null,
@@ -1780,7 +1780,7 @@ describe('sync', () => {
           id: '123e',
         },
         client: {
-          userId: null,
+          userId: 'dummy-id',
           clientId: '123323',
           emailAddress: null,
           hasOnboarded: null,
@@ -1912,7 +1912,7 @@ describe('sync', () => {
             id: '123e',
           },
           client: {
-            userId: null,
+            userId: 'dummy-id',
             clientId: '123323',
             emailAddress: null,
             hasOnboarded: null,
@@ -2061,7 +2061,7 @@ describe('sync', () => {
             id: '123e',
           },
           client: {
-            userId: null,
+            userId: 'dummy-id',
             clientId: '123323',
             emailAddress: null,
             hasOnboarded: null,
@@ -2183,7 +2183,7 @@ describe('sync', () => {
             id: '123e',
           },
           client: {
-            userId: null,
+            userId: 'dummy-id',
             clientId: '123323',
             emailAddress: null,
             hasOnboarded: null,
@@ -2329,7 +2329,7 @@ describe('sync', () => {
 const wiredUpActions = actions(pltrAdaptor)
 const { loadFile } = wiredUpActions.ui
 const { editCard, deleteCard } = wiredUpActions.card
-const { setClientId } = wiredUpActions.client
+const { setClientId, setUserId } = wiredUpActions.client
 const { selectFile } = wiredUpActions.project
 const { editPlace, deletePlace } = wiredUpActions.place
 const { editNote, deleteNote } = wiredUpActions.note
@@ -2374,6 +2374,7 @@ describe('externalSync', () => {
         id: '123e',
       })
     )
+    store.dispatch(setUserId('dummy-id'))
     const sync = externalSync(pltrAdaptor)
     let patchCalls = []
     const patch = (...args) => {

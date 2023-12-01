@@ -16,6 +16,7 @@ import {
   BATCH_LOAD_NOTE,
   REMOVE_NOTE,
   DUPLICATE_NOTE,
+  REORDER_NOTE_MANUALLY,
 } from '../constants/ActionTypes'
 import { editorMetadataIfPresent } from '../helpers/editors'
 import { note } from '../store/initialState'
@@ -109,4 +110,14 @@ export function removeSingle(patching, note) {
 
 export function duplicateNote(id) {
   return { type: DUPLICATE_NOTE, id, lastEdited: new Date().getTime() }
+}
+
+export const reorderNotes = (noteId, oldPosition, newPosition, newCategoryId) => {
+  return {
+    type: REORDER_NOTE_MANUALLY,
+    id: noteId,
+    oldPosition,
+    newPosition,
+    newCategoryId,
+  }
 }

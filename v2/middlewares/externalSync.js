@@ -26,6 +26,7 @@ export const sync = (selectState) => {
     selectedFileIdSelector,
     selectedFilePermissionSelector,
     fullFileStateSelector,
+    isLoggedInSelector,
   } = selectors(selectState)
   return (previous, present, patch, deleteSingle, withData, store, action, updatedPaths) => {
     const isCloudFile = isCloudFileSelector(present)
@@ -36,7 +37,10 @@ export const sync = (selectState) => {
     const selectedFileId = selectedFileIdSelector(present)
     const userPermission = selectedFilePermissionSelector(present)
     const notPermittedToChangeFile = userPermission !== 'owner' && userPermission !== 'collaborator'
+    const isLoggedIn = isLoggedInSelector(present)
     if (
+      // We might not be logged in
+      !isLoggedIn ||
       // We might not be allowed to change the file.
       notPermittedToChangeFile ||
       // We might've just loaded the file.

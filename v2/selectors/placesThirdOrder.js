@@ -17,6 +17,7 @@ import {
 import {
   currentTimelineSelector,
   currentViewSelector,
+  isPlacesManuallySortedSelector,
   placeFilterIsEmptySelector,
   placeFilterSelector,
   placeSortSelector,
@@ -31,7 +32,8 @@ export const visibleSortedPlacesByCategorySelector = createSelector(
   placeFilterSelector,
   placeFilterIsEmptySelector,
   placeSortSelector,
-  (allPlaces, placesByCategory, filter, filterIsEmpty, sort) => {
+  isPlacesManuallySortedSelector,
+  (allPlaces, placesByCategory, filter, filterIsEmpty, sort, isManuallySorted) => {
     if (!allPlaces.length) return {}
 
     let visible = placesByCategory
@@ -67,7 +69,7 @@ export const visibleSortedPlacesByCategorySelector = createSelector(
       })
     }
 
-    return sortEachCategory(visible, sort)
+    return sortEachCategory(visible, sort, isManuallySorted)
   }
 )
 

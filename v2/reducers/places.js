@@ -1,4 +1,4 @@
-import { cloneDeep } from 'lodash'
+import { cloneDeep, groupBy, sortBy } from 'lodash'
 import {
   ADD_PLACE,
   EDIT_PLACE,
@@ -27,12 +27,14 @@ import {
   EDIT_PLACE_TEMPLATE_ATTRIBUTE,
   DUPLICATE_PLACE,
   DELETE_PLACE_CATEGORY,
+  REORDER_PLACE_MANUALLY,
 } from '../constants/ActionTypes'
 import { place } from '../store/initialState'
 import { newFilePlaces } from '../store/newFileState'
 import { nextId } from '../store/newIds'
 import { applyToCustomAttributes } from './applyToCustomAttributes'
 import { repairIfPresent } from './repairIfPresent'
+import { positionReset, reorderList } from '../helpers/lists'
 
 const initialState = [place]
 
@@ -319,6 +321,34 @@ const places =
           id: nextId(state),
         }
         return [...state, { ...duplicated }]
+      }
+
+      case REORDER_PLACE_MANUALLY: {
+        const { id, oldPosition, newPosition, newCategoryId } = action
+        const originalPlace = state.find((place) => place.id == id)
+        const isNewcategory = originalPlace.categoryId != newCategoryId
+        const placesByCategory = groupBy(state, 'categoryId')
+
+        const reorderedList = Object.values(placesByCategory).flatMap((group) => {
+          const groupCategory = group[0].categoryId
+
+          if (!isNewcategory && groupCategory == newCategoryId) {
+            return reorderList(newPosition, oldPosition, group)
+          } else if (isNewcategory && groupCategory == newCategoryId) {
+            const place = {
+              ...originalPlace,
+              position: newPosition,
+              categoryId: newCategoryId,
+            }
+            return positionReset(sortBy([...group, place], ['position', 'lastEdited']))
+          } else if (isNewcategory && originalPlace.categoryId == groupCategory) {
+            const filteredGroup = group.filter((grp) => grp.id != id)
+            return positionReset(sortBy(filteredGroup, ['position', 'lastEdited']))
+          }
+          return group
+        })
+
+        return reorderedList
       }
 
       default:

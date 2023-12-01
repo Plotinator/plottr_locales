@@ -62,7 +62,7 @@ function hasSameShapeAs(subSchema) {
   return function (x) {
     return Object.keys(subSchema).forEach((schemaKey) => {
       pushPath(schemaKey)
-      subSchema[schemaKey](x[schemaKey])
+      subSchema[schemaKey](x && x[schemaKey])
       popPath()
     })
   }
@@ -136,35 +136,47 @@ const validator = hasSameShapeAs({
     orientation: isString,
     darkMode: isBoolean,
     characterSort: isString,
-    characterFilter: hasSameShapeAs({
-      tag: isArrayOf(isNumber),
-      book: isArrayOf(isNumber),
-      category: isArrayOf(isNumber),
-      color: isArrayOf(isNumber),
-    }),
+    characterFilter: oneOf([
+      hasSameShapeAs({
+        tag: isArrayOf(isNumber),
+        book: isArrayOf(isNumber),
+        category: isArrayOf(isNumber),
+        color: isArrayOf(isNumber),
+      }),
+      isNull,
+    ]),
     placeSort: isString,
-    placeFilter: hasSameShapeAs({
-      tag: isArrayOf(isNumber),
-      book: isArrayOf(isNumber),
-      category: isArrayOf(isNumber),
-      color: isArrayOf(isNumber),
-    }),
+    placeFilter: oneOf([
+      hasSameShapeAs({
+        tag: isArrayOf(isNumber),
+        book: isArrayOf(isNumber),
+        category: isArrayOf(isNumber),
+        color: isArrayOf(isNumber),
+      }),
+      isNull,
+    ]),
     noteSort: isString,
-    noteFilter: hasSameShapeAs({
-      tag: isArrayOf(isNumber),
-      book: isArrayOf(isNumber),
-      category: isArrayOf(isNumber),
-      color: isArrayOf(isNumber),
-      place: isArrayOf(isNumber),
-      character: isArrayOf(isNumber),
-    }),
+    noteFilter: oneOf([
+      hasSameShapeAs({
+        tag: isArrayOf(isNumber),
+        book: isArrayOf(isNumber),
+        category: isArrayOf(isNumber),
+        color: isArrayOf(isNumber),
+        place: isArrayOf(isNumber),
+        character: isArrayOf(isNumber),
+      }),
+      isNull,
+    ]),
     timelineIsExpanded: isBoolean,
-    timelineFilter: hasSameShapeAs({
-      tag: isArrayOf(isNumber),
-      character: isArrayOf(isNumber),
-      place: isArrayOf(isNumber),
-    }),
-    outlineFilter: isObject,
+    timelineFilter: oneOf([
+      hasSameShapeAs({
+        tag: isArrayOf(isNumber),
+        character: isArrayOf(isNumber),
+        place: isArrayOf(isNumber),
+      }),
+      isNull,
+    ]),
+    outlineFilter: oneOf([isObject, isNull]),
     timelineScrollPosition: hasSameShapeAs({
       x: isNumber,
       y: isNumber,
