@@ -67,6 +67,11 @@ const connector = {
       saveImageToStorageBlob: () => {},
       saveImageToStorageFromURL: () => {},
     },
+    errorReporter: {
+      getInstance: () => {
+        return {}
+      },
+    },
   },
 }
 
