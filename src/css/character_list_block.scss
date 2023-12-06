@@ -55,7 +55,6 @@
 .character-list__list {
   .list-group-item {
     padding-right: 4px;
-    cursor: grab;
 
     .character-list__item-inner {
       display: flex;
@@ -115,7 +114,6 @@
 
 .character-list__list.darkmode {
   .list-group-item {
-    cursor: grab;
     background-color: $darkmode-darker-background;
     color: $darkmode-text;
     border-color: $darkmode-darker-border;
@@ -247,11 +245,9 @@
       li.draggable {
         a {
           user-select: auto;
-          cursor: grab;
         }
 
         a:active {
-          cursor: grabbing;
         }
 
         &.isDroppable a {

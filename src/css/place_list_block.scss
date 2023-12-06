@@ -61,7 +61,6 @@
 
   .list-group-item {
     padding-right: 4px;
-    cursor: grab;
 
     .place-list__item-inner {
       display: flex;
@@ -120,7 +119,6 @@
 
 .place-list__list.darkmode {
   .list-group-item {
-    cursor: grab;
     background-color: $darkmode-darker-background;
     color: $darkmode-text;
     border-color: $darkmode-darker-border;

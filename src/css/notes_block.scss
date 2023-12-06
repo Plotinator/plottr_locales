@@ -55,7 +55,6 @@
 .note-list__list {
   .list-group-item {
     padding-right: 4px;
-    cursor: grab;
 
     .note-list__item-inner {
       display: flex;
@@ -115,7 +114,6 @@
 
 .note-list__list.darkmode {
   .list-group-item {
-    cursor: grab;
     background-color: $darkmode-darker-background;
     color: $darkmode-text;
     border-color: $darkmode-darker-border;

@@ -346,7 +346,8 @@ const CardCellConnector = (connector) => {
     }
 
     render() {
-      const { cards, isSmall, isMedium, isPinned, color, orientation } = this.props
+      const { cards, isSmall, isMedium, isPinned, color, orientation, beatHeadingCount } =
+        this.props
       const tableLength =
         orientation == 'horizontal' && !isMedium
           ? this.ref.current?.clientWidth + 50 || 225
@@ -377,6 +378,7 @@ const CardCellConnector = (connector) => {
                 isMedium={isMedium}
                 orientation={orientation}
                 tableLength={tableLength}
+                beatHeadingCount={beatHeadingCount}
               />
             ) : null}
             {this.renderBody()}
@@ -417,6 +419,7 @@ const CardCellConnector = (connector) => {
     isMedium: PropTypes.bool.isRequired,
     actions: PropTypes.object.isRequired,
     isPinned: PropTypes.bool,
+    beatHeadingCount: PropTypes.number.isRequired,
   }
 
   const {
@@ -439,6 +442,7 @@ const CardCellConnector = (connector) => {
           isVisible: visible,
           isSmall: selectors.isSmallSelector(state),
           isMedium: selectors.isMediumSelector(state),
+          beatHeadingCount: selectors.bottomLevelBeatHeadingCountSelector(state),
         }
       },
       (dispatch) => {
