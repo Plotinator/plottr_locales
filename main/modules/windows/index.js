@@ -3,6 +3,7 @@ import log from 'electron-log'
 import { openBuyWindow } from './buy'
 import { offlineFileURL } from '../offlineFilePath'
 import { featureFlags } from '../feature_flags'
+import replyWithError from '../../lib/replyWithError'
 
 ipcMain.on('open-buy-window', (event, replyChannel) => {
   try {
@@ -10,7 +11,7 @@ ipcMain.on('open-buy-window', (event, replyChannel) => {
     event.sender.send(replyChannel, 'done')
   } catch (error) {
     log.error('Error opening buy window', error)
-    event.sender.send(replyChannel, { error: error.message })
+    replyWithError(replyChannel, error)
   }
 })
 

@@ -1,15 +1,28 @@
 import { isEqual } from 'lodash'
 
 import { t } from 'plottr_locales'
-import { removeSystemKeys } from 'pltr/v2'
+import { removeSystemKeys, errorCodes } from 'pltr/v2'
+
+const {
+  FILE_LACKS_ALL_KEYS,
+  FILE_HAS_DUPLICATED_CHARACTER_ATTIRBUTES,
+  FILE_HAS_NO_CHARACTER_ATTRIBUTES,
+  FILE_LACKS_CHARACTER_ATTRIBUTE_METADATA,
+  FILE_CONTAINS_INVALID_CHARACTER_ATTRIBUTE_METADATA,
+  FILE_CONTAINS_INVALID_CHARACTER_ATTRIBUTE_VALUES,
+} = errorCodes
+
+const ERROR_CODES_TO_OFFER_BAILOUT = [
+  FILE_LACKS_ALL_KEYS,
+  FILE_HAS_DUPLICATED_CHARACTER_ATTIRBUTES,
+  FILE_HAS_NO_CHARACTER_ATTRIBUTES,
+  FILE_LACKS_CHARACTER_ATTRIBUTE_METADATA,
+  FILE_CONTAINS_INVALID_CHARACTER_ATTRIBUTE_METADATA,
+  FILE_CONTAINS_INVALID_CHARACTER_ATTRIBUTE_VALUES,
+]
 
 const DEFAULT_SAVE_INTERVAL_MS = 10000
 const DEFAULT_BACKUP_INTERVAL_MS = 60000
-export const DUMMY_ROLLBAR = {
-  info: () => {},
-  warn: () => {},
-  error: () => {},
-}
 export const DUMMY_SHOW_MESSAGE_BOX = () => {}
 export const DUMMY_SHOW_ERROR_BOX = () => {}
 export const DUMMY_SERVER_IS_BUSY_RESTARTING = () => Promise.resolve(false)
@@ -32,10 +45,11 @@ const Saver = (
   saveIntervalMS,
   backupIntervalMS,
   logger,
-  errorReporter,
   showMessageBox,
   showErrorBox,
-  serverIsBusyRestarting
+  serverIsBusyRestarting,
+  isLoggedInThunk,
+  offerSaveAsThenQuit
 ) => {
   let saveInterval = null
   let backupInterval = null
@@ -85,8 +99,12 @@ const Saver = (
         )
         return !restarting
       }
-      logger.error('BACKUP failed', error)
-      errorReporter.warn(error.message)
+      const isLoggedIn = isLoggedInThunk()
+      if (error === 'Missing or insufficient permissions.' && !isLoggedIn) {
+        logger.info('Trying to backup a pro file while not logged in.', error)
+      } else {
+        logger.error('BACKUP failed', error)
+      }
       return !restarting
     })
   }
@@ -104,12 +122,15 @@ const Saver = (
         )
         return !restarting
       }
-      logger.warn('Failed to autosave', error)
-      errorReporter.warn(error.message)
-      showErrorBox(
-        t('Auto-saving failed'),
-        t("Saving your file didn't work. Check where it's stored.")
-      )
+      if (ERROR_CODES_TO_OFFER_BAILOUT.includes(error.code)) {
+        offerSaveAsThenQuit()
+      } else {
+        logger.warn('Failed to autosave', error)
+        showErrorBox(
+          t('Auto-saving failed'),
+          t("Saving your file didn't work. Check where it's stored.")
+        )
+      }
       return !restarting
     })
   }

@@ -4,6 +4,7 @@ import { uploadExisting } from '../../files'
 import extractImages from '../extract_images'
 import logger from '../../../shared/logger'
 import { makeMainProcessClient } from '../../app/mainProcessClient'
+import { getErrorReporterInstance } from '../../../shared/error-reporter-instance'
 
 const { getVersion } = makeMainProcessClient()
 
@@ -17,7 +18,10 @@ export const uploadProject = (file, email, userId) => {
         null,
         (error, migrated, data) => {
           if (error) {
-            logger.error('Error migrating file: ', error)
+            getErrorReporterInstance().then((errorReporter) => {
+              errorReporter.error('Error migrating file', error)
+            })
+            logger.error('Error migrating file', error)
             reject(error)
             return
           }
@@ -35,8 +39,10 @@ export const uploadProject = (file, email, userId) => {
               resolve(result)
             })
             .catch((err) => {
-              logger.error(file.file.fileName)
-              logger.error(err)
+              getErrorReporterInstance().then((errorReporter) => {
+                errorReporter.error('Failed to upload project', file.file.fileName, err)
+              })
+              logger.error('Failed to upload project', file.file.fileName, err)
               reject(err)
             })
         },

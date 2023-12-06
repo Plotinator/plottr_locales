@@ -12,6 +12,7 @@ import { addToKnown } from '../known_files'
 import { setLastOpenedFilePath } from '../lastOpened'
 import currentSettings from '../settings'
 import { whenClientIsReady } from '../../../shared/socket-client'
+import replyWithError from '../../lib/replyWithError'
 
 const copyFile = (oldFilePathOrURL, newFilePathOrURL) => {
   return whenClientIsReady(({ copyFile }) => {
@@ -45,7 +46,7 @@ ipcMain.on('pls-open-window', (event, replyChannel, fileURL, unknown) => {
     })
     .catch((error) => {
       log.error('Error opening a new window', error)
-      event.sender.send(replyChannel, { error: error.message })
+      replyWithError(replyChannel, error)
     })
 })
 

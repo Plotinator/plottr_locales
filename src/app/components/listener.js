@@ -13,6 +13,7 @@ import { makeFileSystemAPIs, licenseServerAPIs } from '../../api'
 import { whenClientIsReady } from '../../../shared/socket-client'
 import { duplicateFile } from '../../files'
 import { makeMainProcessClient } from '../mainProcessClient'
+import { getErrorReporterInstance } from '../../../shared/error-reporter-instance'
 
 const { pleaseOpenWindow } = makeMainProcessClient()
 
@@ -225,6 +226,9 @@ const Listener = ({
               .catch((error) => {
                 // TODO: maybe retry?
                 logger.error('Failed to check for pro', error)
+                getErrorReporterInstance().then((errorReporter) => {
+                  errorReporter.error('Failed to check for pro', error)
+                })
                 finishLoadingALicenseType('proSubscription')
               })
           }

@@ -17,8 +17,8 @@ const firebaseSync = (logger) => {
     inflightRequests.counter++
     const timeout = setTimeout(() => {
       inflightRequests.counter = Math.max(0, inflightRequests.counter - 1)
-      if (typeof logger?.error === 'function') {
-        logger.error('Request to overwrite a document in firebase timed out', ...args)
+      if (typeof logger?.warn === 'function') {
+        logger.warn('Request to overwrite a document in firebase timed out', ...args)
       }
     }, FIREBASE_REQUEST_TIMEOUT)
     return overwrite(...args).finally(() => {
@@ -31,8 +31,8 @@ const firebaseSync = (logger) => {
     inflightRequests.counter++
     const timeout = setTimeout(() => {
       inflightRequests.counter = Math.max(0, inflightRequests.counter - 1)
-      if (typeof logger?.error === 'function') {
-        logger.error('Request to delete a document in firebase timed out', ...args)
+      if (typeof logger?.warn === 'function') {
+        logger.warn('Request to delete a document in firebase timed out', ...args)
       }
     }, FIREBASE_REQUEST_TIMEOUT)
     return deleteSingle(...args).finally(() => {

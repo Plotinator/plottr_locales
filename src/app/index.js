@@ -41,6 +41,7 @@ import { removeSystemKeys } from './bootFile'
 import { makeMainProcessClient } from './mainProcessClient'
 import { downloadStorageImage } from '../common/downloadStorageImage'
 import createErrorReporter from '../../shared/error-reporter'
+import { getErrorReporterInstance } from '../../shared/error-reporter-instance'
 
 const {
   showErrorBox,
@@ -88,6 +89,17 @@ const {
   pleaseTellMeWhatPlatformIAmOn,
 } = makeMainProcessClient()
 
+const errorReportingLogger = {
+  info: logger.info,
+  warn: logger.warn,
+  error: (...args) => {
+    logger.error(...args)
+    getErrorReporterInstance().then((errorReporter) => {
+      return errorReporter.error(...args)
+    })
+  },
+}
+
 const connectToSocketServer = (port) => {
   let doneTimeout = null
   const socketServerEventHandlers = {
@@ -109,7 +121,7 @@ const connectToSocketServer = (port) => {
     logger,
     WebSocket,
     (error) => {
-      logger.error(
+      errorReportingLogger.error(
         `Failed to reconnect to socket server on port: <${port}>.  Killing the window.`,
         error
       )
@@ -237,7 +249,7 @@ tellMeWhatOSImOn()
           const file = selectors.fullFileStateSelector(currentState)
 
           askToExport(defaultPath, file, type, exportConfig[type], userId).catch((error) => {
-            logger.error(error)
+            errorReportingLogger.error('Error exporting', error)
             showErrorBox(t('Error'), t('There was an error doing that. Try again'))
             return
           })
@@ -255,7 +267,7 @@ tellMeWhatOSImOn()
                 store.dispatch(actions.ui.fileSaved())
               })
               .catch((error) => {
-                logger.error('Failed to save offline file', error)
+                errorReportingLogger.error('Failed to save offline file', error)
               })
           } else if (!isCloudFile) {
             const fileURL = selectors.fileURLSelector(state)
@@ -264,7 +276,7 @@ tellMeWhatOSImOn()
                 store.dispatch(actions.ui.fileSaved())
               })
               .catch((error) => {
-                logger.error('Failed to save classic file', error)
+                errorReportingLogger.error('Failed to save classic file', error)
                 showErrorBox(t('Error'), t('There was a problem saving your file'))
               })
           }
@@ -312,8 +324,7 @@ tellMeWhatOSImOn()
                                     null,
                                     (err, didMigrate, migratedState) => {
                                       if (err) {
-                                        errorReporter.error('Error migrating a file', err)
-                                        logger.error(err)
+                                        errorReportingLogger.error('Error migrating a file', err)
                                         if (err === 'Plottr behind file') {
                                           showErrorBox(t('Error'), t('Please update Plottr'))
                                           reject(new Error('Need to update Plottr'))
@@ -430,8 +441,9 @@ tellMeWhatOSImOn()
           isTempFile(file).then((isTemp) => {
             const oldFileURL = selectors.fileURLSelector(state)
             if (!oldFileURL) {
-              logger.error(
-                `Tried to move the current file from temp but we couldn't compute its URL.`
+              errorReportingLogger.error(
+                `Tried to move the current file from temp but we couldn't compute its URL.`,
+                new Error('Failed to move from temp directory')
               )
               return
             }
@@ -450,8 +462,9 @@ tellMeWhatOSImOn()
                   const newFileURL = helpers.file.filePathToFileURL(newFilePath)
                   const oldFileURL = selectors.fileURLSelector(state)
                   if (!newFilePath || !newFileURL) {
-                    logger.error(
-                      `Tried to move file at ${oldFileURL} to ${newFilePath} (path: ${newFilePath})`
+                    errorReportingLogger.error(
+                      `Tried to move file at ${oldFileURL} to ${newFilePath} (path: ${newFilePath})`,
+                      new Error('Need destination and source to move a file')
                     )
                     return
                   }
@@ -516,6 +529,7 @@ tellMeWhatOSImOn()
             // No redux state for a few.  Here's a catch all for modals.
             const aModalIsOpen = document.querySelector('.ReactModalPortal')
             const aPopoverIsOpen = document.querySelector('.react-tiny-popover-container')
+            const SCROLL_KEYS = ['ArrowUp', 'ArrowRight', 'ArrowDown', 'ArrowLeft']
             if (
               !aModalIsOpen &&
               !aPopoverIsOpen &&
@@ -523,7 +537,8 @@ tellMeWhatOSImOn()
               !targetIsEditable &&
               !attributesDialogIsOpen &&
               viewIsTimeline &&
-              typeof table !== 'undefined'
+              typeof table !== 'undefined' &&
+              SCROLL_KEYS.includes(e.key)
             ) {
               e.preventDefault()
               e.stopPropagation()
@@ -567,7 +582,7 @@ tellMeWhatOSImOn()
               const fileId = response.data.fileId
               if (!fileId) {
                 const message = `Tried to create cloud file for ${fileName} but we didn't get a fileId back`
-                logger.error(message)
+                errorReportingLogger.error(message, new Error('Error creating plottr cloud file'))
                 return Promise.reject(new Error(message))
               }
               const fileURL = helpers.file.fileIdToPlottrCloudFileURL(fileId)
@@ -591,7 +606,7 @@ tellMeWhatOSImOn()
 
         onErrorImportingScrivener((error) => {
           logger.warn('[scrivener import]', error)
-          errorReporter.warn({ message: error })
+          errorReporter.error(`Error importing from scrivener ${error}`)
           store.dispatch(actions.applicationState.finishScrivenerImporter())
           showErrorBox(t('Error'), t('There was an error doing that. Try again'))
         })
