@@ -28,6 +28,7 @@ import { listenOnIPCMain } from './listeners'
 import { createClient, resetInitialised, setPort, getPort } from '../shared/socket-client'
 import ProcessSwitches from './modules/processSwitches'
 import makeSafelyExitModule from './modules/safelyExit'
+import replyWithError from './lib/replyWithError'
 
 const { ipcMain } = electron
 
@@ -255,7 +256,7 @@ app.whenReady().then(() => {
                     `Error exporting ${sourceFile} to scrivener file at ${destinationFile}`,
                     error
                   )
-                  event.sender.send(replyChannel, { error: error.message })
+                  replyWithError(replyChannel, error)
                 }
               })
             })

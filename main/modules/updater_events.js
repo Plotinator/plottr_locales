@@ -3,6 +3,7 @@ import { autoUpdater } from 'electron-updater'
 import log from 'electron-log'
 import { broadcastToAllWindows } from './broadcast'
 import currentSettings from './settings'
+import replyWithError from '../lib/replyWithError'
 
 log.transports.file.level = 'info'
 autoUpdater.logger = log
@@ -29,7 +30,7 @@ ipcMain.on('pls-download-update', (event, replyChannel) => {
     })
     .catch((error) => {
       log.error('Failed to start downloading update', error)
-      event.sender.send(replyChannel, { error: error.message })
+      replyWithError(replyChannel, error)
     })
 })
 
@@ -40,7 +41,7 @@ ipcMain.on('pls-quit-and-install', (event, replyChannel) => {
     autoUpdater.quitAndInstall(true, true)
   } catch (error) {
     log.error('Failed to quit and install an update', error)
-    event.sender.send(replyChannel, { error: error.message })
+    replyWithError(replyChannel, error)
   }
 })
 
@@ -54,7 +55,7 @@ ipcMain.on('pls-check-for-updates', (event, replyChannel) => {
     })
     .catch((error) => {
       log.error('Error checking for updates', error)
-      event.sender.send(replyChannel, { error: error.message })
+      replyWithError(replyChannel, error)
     })
 })
 

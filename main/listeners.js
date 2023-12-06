@@ -35,6 +35,7 @@ import {
 import { editWindowPath, setFilePathForWindowWithId } from './modules/windows/index'
 import { lastOpenedFile, setLastOpenedFilePath } from './modules/lastOpened'
 import { whenClientIsReady } from '../shared/socket-client/index'
+import replyWithError from './lib/replyWithError'
 
 const selectors = pltrSelectors(identity)
 
@@ -164,7 +165,7 @@ export const listenOnIPCMain = (
       })
       .catch((error) => {
         log.error('Error fetching state', error)
-        event.sender.send(replyChannel, { error: error.message })
+        replyWithError(replyChannel, error)
       })
   })
 
@@ -173,7 +174,7 @@ export const listenOnIPCMain = (
       event.sender.send(replyChannel, getSocketWorkerPort())
     } catch (error) {
       log.error('Error retrieving the current worker socket port', error)
-      event.sender.send(replyChannel, { error: error.message })
+      replyWithError(replyChannel, error)
     }
   })
 
@@ -189,7 +190,7 @@ export const listenOnIPCMain = (
       })
       .catch((error) => {
         log.error('Failed to set dark mode setting from main listener', error)
-        event.sender.send(replyChannel, { error: error.message })
+        replyWithError(replyChannel, error)
       })
   })
 
@@ -208,7 +209,7 @@ export const listenOnIPCMain = (
       })
       .catch((error) => {
         log.error('Error updating language', error)
-        event.sender.send(replyChannel, { error: error.message })
+        replyWithError(replyChannel, error)
       })
   })
 
@@ -218,7 +219,7 @@ export const listenOnIPCMain = (
       event.sender.send(replyChannel, 'done')
     } catch (error) {
       log.error('Error reloading recents', error)
-      event.sender.send(replyChannel, { error: error.message })
+      replyWithError(replyChannel, error)
     }
   })
 
@@ -255,7 +256,7 @@ export const listenOnIPCMain = (
           message: error.message,
           source: 'create-new-file',
         })
-        event.sender.send(replyChannel, { error: error.message })
+        replyWithError(replyChannel, error)
       })
   })
 
@@ -270,7 +271,7 @@ export const listenOnIPCMain = (
           message: error.message,
           source: 'create-new-file',
         })
-        event.sender.send(replyChannel, { error: error.message })
+        replyWithError(replyChannel, error)
       })
   })
 
@@ -287,7 +288,7 @@ export const listenOnIPCMain = (
             message: error.message,
             source: 'create-new-file',
           })
-          event.sender.send(replyChannel, { error: error.message })
+          replyWithError(replyChannel, error)
         })
     }
   )
@@ -301,7 +302,7 @@ export const listenOnIPCMain = (
       })
       .catch((error) => {
         log.error('Error opening known file', fileURL, error)
-        event.sender.send(replyChannel, { error: error.message })
+        replyWithError(replyChannel, error)
       })
   })
 
@@ -312,7 +313,7 @@ export const listenOnIPCMain = (
       })
       .catch((error) => {
         log.error(`Error removing file at ${fileURL} from known files`, error)
-        event.sender.send(replyChannel, { error: error.message })
+        replyWithError(replyChannel, error)
       })
     broadcastToAllWindows('reload-recents')
   })
@@ -325,7 +326,7 @@ export const listenOnIPCMain = (
       })
       .catch((error) => {
         log.error(`Failed to delete known file at: ${fileURL}`, error)
-        event.sender.send(replyChannel, { error: error.message })
+        replyWithError(replyChannel, error)
       })
   })
 
@@ -338,7 +339,7 @@ export const listenOnIPCMain = (
       })
       .catch((error) => {
         log.error(`Failed to edit known file path of ${oldFileURL} to ${newFileURL}`, error)
-        event.sender.send(replyChannel, { error: error.message })
+        replyWithError(replyChannel, error)
       })
   })
 
@@ -348,7 +349,7 @@ export const listenOnIPCMain = (
       event.sender.send(replyChannel, 'will-exit-when-ready')
     } catch (error) {
       log.error('Error while attempting to quit Plottr', error)
-      event.sender.send(replyChannel, { error: error.message })
+      replyWithError(replyChannel, error)
     }
   })
 
@@ -360,7 +361,7 @@ export const listenOnIPCMain = (
       )
     } catch (error) {
       log.error('Error while figuring out what OS we are running', error)
-      event.sender.send(replyChannel, { error: error.message })
+      replyWithError(replyChannel, error)
     }
   })
 
@@ -391,7 +392,7 @@ export const listenOnIPCMain = (
       })
       .on('error', (error) => {
         log.error(`Error downloading file from ${url}`, error)
-        event.sender.send(replyChannel, { error: error.message })
+        replyWithError(replyChannel, error)
       })
   })
 
@@ -420,7 +421,7 @@ export const listenOnIPCMain = (
                   event.sender.send(replyChannel, JSON.stringify(file))
                 } catch (error) {
                   log.error(`Error deserialising file from ${url}`, error)
-                  event.sender.send(replyChannel, { error: error.message })
+                  replyWithError(replyChannel, error)
                 }
               })
             }
@@ -429,7 +430,7 @@ export const listenOnIPCMain = (
       })
       .on('error', (error) => {
         log.error(`Error downloading file from ${url}`, error)
-        event.sender.send(replyChannel, { error: error.message })
+        replyWithError(replyChannel, error)
       })
   })
 
@@ -439,7 +440,7 @@ export const listenOnIPCMain = (
       event.sender.send(replyChannel, 'done')
     } catch (error) {
       log.error(`Failed to show file at ${fileURL}`, error)
-      event.sender.send(replyChannel, { error: error.message })
+      replyWithError(replyChannel, error)
     }
   })
 
@@ -449,7 +450,7 @@ export const listenOnIPCMain = (
       event.sender.send(replyChannel, fileURL)
     } catch (error) {
       log.error(`Failed to set my file path to: ${fileURL}`, error)
-      event.sender.send(replyChannel, { error: error.message })
+      replyWithError(replyChannel, error)
     }
   })
 
@@ -459,7 +460,7 @@ export const listenOnIPCMain = (
       event.sender.send(replyChannel, 'done')
     } catch (error) {
       log.error('Error while trying to start the login popup', error)
-      event.sender.send(replyChannel, { error: error.message })
+      replyWithError(replyChannel, error)
     }
   })
 
@@ -471,7 +472,7 @@ export const listenOnIPCMain = (
       // ignore
       // on windows you need something called an Application User Model ID which may not work
       log.error(`Failed to notify ${title}, ${body}`, error)
-      event.sender.send(replyChannel, { error: error.message })
+      replyWithError(replyChannel, error)
     }
   })
   ipcMain.on('update-last-opened-file', (event, replyChannel, newFileURL) => {
@@ -481,7 +482,7 @@ export const listenOnIPCMain = (
       })
       .catch((error) => {
         log.error(`Failed to update last opened file to: ${newFileURL}`, error)
-        event.sender.send(replyChannel, { error: error.message })
+        replyWithError(replyChannel, error)
       })
   })
 
@@ -502,7 +503,7 @@ export const listenOnIPCMain = (
       event.sender.send(replyChannel, app.getVersion())
     } catch (error) {
       log.error(`Failed to get the app version`, error)
-      event.sender.send(replyChannel, { error: error.message })
+      replyWithError(replyChannel, error)
     }
   })
 
@@ -511,7 +512,7 @@ export const listenOnIPCMain = (
       event.sender.send(replyChannel, process.platform)
     } catch (error) {
       log.error(`Failed to determine what platform we're on`, error)
-      event.sender.send(replyChannel, { error: error.message })
+      replyWithError(replyChannel, error)
     }
   })
 
@@ -522,7 +523,7 @@ export const listenOnIPCMain = (
       })
       .catch((error) => {
         log.error('Failed to determine the machine id', error)
-        event.sender.send(replyChannel, { error: error.message })
+        replyWithError(replyChannel, error)
       })
   })
 
@@ -531,7 +532,7 @@ export const listenOnIPCMain = (
       event.sender.send(replyChannel, app.getLocale())
     } catch (error) {
       log.error('Failed to get machine locale', error)
-      event.sender.send(replyChannel, { error: error.message })
+      replyWithError(replyChannel, error)
     }
   })
 
@@ -542,7 +543,7 @@ export const listenOnIPCMain = (
       })
       .catch((error) => {
         log.error('Failed to get the env object', error)
-        event.sender.send(replyChannel, { error: error.message })
+        replyWithError(replyChannel, error)
       })
   })
 
@@ -552,7 +553,7 @@ export const listenOnIPCMain = (
       event.sender.send(replyChannel, 'done')
     } catch (error) {
       log.error(`Error showing error box for ${title}, ${message}`, error)
-      event.sender.send(replyChannel, { error: error.message })
+      replyWithError(replyChannel, error)
     }
   })
 
@@ -562,7 +563,7 @@ export const listenOnIPCMain = (
       event.sender.send(replyChannel, newTitle)
     } catch (error) {
       log.error(`Error trying to set my window title to ${newTitle}`, error)
-      event.sender.send(replyChannel, { error: error.message })
+      replyWithError(replyChannel, error)
     }
   })
 
@@ -572,7 +573,7 @@ export const listenOnIPCMain = (
       event.sender.send(replyChannel, newFileName)
     } catch (error) {
       log.error(`Error setting the represented file name to ${newFileName}`, error)
-      event.sender.send(replyChannel, { error: error.message })
+      replyWithError(replyChannel, error)
     }
   })
 
@@ -583,7 +584,7 @@ export const listenOnIPCMain = (
       })
       .catch((error) => {
         log.error(`Error showing save dialog for ${title}`, error)
-        event.sender.send(replyChannel, { error: error.message })
+        replyWithError(replyChannel, error)
       })
   })
 
@@ -600,7 +601,7 @@ export const listenOnIPCMain = (
       })
       .catch((error) => {
         log.error(`Error showing message box for ${title}, ${message}`, error)
-        event.sender.send(replyChannel, { error: error.message })
+        replyWithError(replyChannel, error)
       })
   })
 
@@ -610,7 +611,7 @@ export const listenOnIPCMain = (
       event.sender.send(replyChannel, fileURL)
     } catch (error) {
       log.error(`Error setting my fileURL to ${fileURL}`, error)
-      event.sender.send(replyChannel, { error: error.message })
+      replyWithError(replyChannel, error)
     }
   })
 
@@ -619,7 +620,7 @@ export const listenOnIPCMain = (
       event.sender.send(replyChannel, app.getPath('userData'))
     } catch (error) {
       log.error(`Error getting the user data path`, error)
-      event.sender.send(replyChannel, { error: error.message })
+      replyWithError(replyChannel, error)
     }
   })
 
@@ -628,7 +629,7 @@ export const listenOnIPCMain = (
       event.sender.send(replyChannel, app.getPath('desktop'))
     } catch (error) {
       log.error(`Error getting the user desktop path`, error)
-      event.sender.send(replyChannel, { error: error.message })
+      replyWithError(replyChannel, error)
     }
   })
 
@@ -637,7 +638,7 @@ export const listenOnIPCMain = (
       event.sender.send(replyChannel, app.getPath('documents'))
     } catch (error) {
       log.error('Error getting the user documents path', error)
-      event.sender.send(replyChannel, { error: error.message })
+      replyWithError(replyChannel, error)
     }
   })
 
@@ -646,7 +647,7 @@ export const listenOnIPCMain = (
       event.sender.send(replyChannel, app.getPath('logs'))
     } catch (error) {
       log.error('Error getting the user logs path', error)
-      event.sender.send(replyChannel, { error: error.message })
+      replyWithError(replyChannel, error)
     }
   })
 
@@ -663,7 +664,7 @@ export const listenOnIPCMain = (
       })
       .catch((error) => {
         log.error(`Error showing the open dialog for ${title}`, error)
-        event.sender.send(replyChannel, { error: error.message })
+        replyWithError(replyChannel, error)
       })
   })
 
@@ -677,7 +678,7 @@ export const listenOnIPCMain = (
       })
       .catch((error) => {
         log.error(`Error opening external ${url}`, error)
-        event.sender.send(replyChannel, { error: error.message })
+        replyWithError(replyChannel, error)
       })
   })
 
@@ -689,7 +690,7 @@ export const listenOnIPCMain = (
       })
       .catch((error) => {
         log.error(`Error opening path: ${path}`, error)
-        event.sender.send(replyChannel, { error: error.message })
+        replyWithError(replyChannel, error)
       })
   })
 
@@ -716,7 +717,7 @@ export const listenOnIPCMain = (
         selectors,
         (error, success) => {
           if (error) {
-            event.sender.send(replyChannel, { error: error.message })
+            replyWithError(replyChannel, error)
             return
           }
           event.sender.send(replyChannel, defaultPath)
@@ -748,7 +749,7 @@ export const listenOnIPCMain = (
       })
       .catch((error) => {
         log.error('Error restarting the socket server', error)
-        event.sender.send(replyChannel, { error: error.message })
+        replyWithError(replyChannel, error)
       })
       .finally(() => {
         restartingServerStateRef.restarting = false
@@ -801,7 +802,7 @@ export const listenOnIPCMain = (
             `Error creating a desktop shortcut to ${sourceFileURL} at ${destinationFolderPath}`,
             error
           )
-          event.sender.send(replyChannel, { error: error.message })
+          replyWithError(replyChannel, error)
         }
       }
       createShortcut()

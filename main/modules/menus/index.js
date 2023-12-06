@@ -9,6 +9,7 @@ import { buildFileMenu } from './file'
 import { buildViewMenu } from './view'
 import { getWindowById } from '../windows'
 import { whenClientIsReady } from '../../../shared/socket-client/index'
+import replyWithError from '../../lib/replyWithError'
 
 let safelyExitModule = null
 
@@ -26,7 +27,7 @@ ipcMain.on('please-reload-menu', (event, replyChannel) => {
     })
     .catch((error) => {
       log.error('Error reloading menu', error)
-      event.sender.send(replyChannel, { error: error.message })
+      replyWithError(replyChannel, error)
     })
 })
 
