@@ -16,7 +16,7 @@ import { OFFLINE_FILE_FILES_PATH, isOfflineFile } from './offlineFilePath'
 import { whenClientIsReady } from '../../shared/socket-client'
 
 const { writeFile } = fs.promises
-const { addHierarchiesIfMissing } = specialCaseFixes
+const { addUITimelineOrHierarchiesStateIfMissing } = specialCaseFixes
 
 const makeFileModule = () => {
   const saveFile = (fileURL, jsonData) => {
@@ -51,10 +51,10 @@ const makeFileModule = () => {
 
   function newFileFromTemplate(template, name) {
     if (!name) {
-      return addHierarchiesIfMissing(template.templateData)
+      return addUITimelineOrHierarchiesStateIfMissing(template.templateData)
     }
 
-    return addHierarchiesIfMissing({
+    return addUITimelineOrHierarchiesStateIfMissing({
       ...template.templateData,
       series: {
         ...template.templateData.series,
