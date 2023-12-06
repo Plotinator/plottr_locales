@@ -878,3 +878,10 @@ export const parentIsHigherLevelAndViewIsStackedSelector = createSelector(
 export const canOpenRestructureModalSelector = createSelector(beatsByBookSelector, (beats) => {
   return Object.keys(beats.index || {}).length > 1
 })
+
+export const bottomLevelBeatHeadingCountSelector = createSelector(
+  visibleSortedBeatsForTimelineByBookSelector,
+  (beats) => {
+    return beats.length
+  }
+)
