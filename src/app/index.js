@@ -529,6 +529,7 @@ tellMeWhatOSImOn()
             // No redux state for a few.  Here's a catch all for modals.
             const aModalIsOpen = document.querySelector('.ReactModalPortal')
             const aPopoverIsOpen = document.querySelector('.react-tiny-popover-container')
+            const SCROLL_KEYS = ['ArrowUp', 'ArrowRight', 'ArrowDown', 'ArrowLeft']
             if (
               !aModalIsOpen &&
               !aPopoverIsOpen &&
@@ -536,7 +537,8 @@ tellMeWhatOSImOn()
               !targetIsEditable &&
               !attributesDialogIsOpen &&
               viewIsTimeline &&
-              typeof table !== 'undefined'
+              typeof table !== 'undefined' &&
+              SCROLL_KEYS.includes(e.key)
             ) {
               e.preventDefault()
               e.stopPropagation()
