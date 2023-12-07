@@ -7,6 +7,7 @@ import {
   READ_FILE,
   RM_RF,
   SAVE_FILE,
+  SAVE_RAW_FILE,
   SAVE_OFFLINE_FILE,
   BACKUP_FILE,
   SAVE_BACKUP_ERROR,
@@ -174,6 +175,7 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
     const fileModule = makeFileModule(backupModule, settings, logger)
     const {
       saveFile,
+      saveRawFile,
       saveOfflineFile,
       basename,
       readFile,
@@ -380,6 +382,24 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
                     ...payload?.file?.file,
                   },
                   fileURL: fileURL,
+                },
+              ]
+            )
+          }
+          case SAVE_RAW_FILE: {
+            const { filePath, data } = payload
+            return handlePromise(
+              () => [
+                'Saving (reduced payload): ',
+                {
+                  filePath,
+                },
+              ],
+              () => statusManager.registerTask(saveRawFile(filePath, data), SAVE_RAW_FILE),
+              (error) => [
+                'Error while saving file ',
+                {
+                  filePath,
                 },
               ]
             )

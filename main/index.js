@@ -28,6 +28,7 @@ import { listenOnIPCMain } from './listeners'
 import { createClient, resetInitialised, setPort, getPort } from '../shared/socket-client'
 import ProcessSwitches from './modules/processSwitches'
 import makeSafelyExitModule from './modules/safelyExit'
+import replyWithError from './lib/replyWithError'
 
 const { ipcMain } = electron
 
@@ -69,6 +70,15 @@ const errorReporter = createErrorReporter(
   'not-knowable-from-main',
   'not-knowable-from-main'
 )
+const errorReportingLogger = {
+  info: log.info,
+  warn: log.warn,
+  error: (...args) => {
+    log.error(...args)
+    errorReporter.error(...args)
+  },
+  localError: log.error,
+}
 
 // https://github.com/sindresorhus/electron-context-menu
 contextMenu({
@@ -78,11 +88,12 @@ contextMenu({
 const safelyExitModule = makeSafelyExitModule(log)
 
 process.on('uncaughtException', function (error) {
-  console.error('Uncaught exception.  Quitting...', error)
-  log.error('Uncaught exception.  Quitting...', error)
-  errorReporter.error('Uncaught exception', error, function () {
+  console.error('Uncaught exception.', error)
+  log.error('Uncaught exception.', error)
+  errorReporter.error('Uncaught exception', error)
+  setTimeout(() => {
     gracefullyQuit(safelyExitModule)
-  })
+  }, 3000)
 })
 process.on('unhandledRejection', function (error) {
   console.error('Unhandled rejection.', error)
@@ -112,7 +123,10 @@ const broadcastPortChange = (port) => {
     log,
     WebSocket,
     (error) => {
-      log.error(`Failed to connect to socket server on port: <${port}>.  Killing the app.`, error)
+      errorReportingLogger.error(
+        `Failed to connect to socket server on port: <${port}>.  Killing the app.`,
+        error
+      )
       app.quit()
     },
     {
@@ -129,18 +143,21 @@ const broadcastPortChange = (port) => {
 }
 
 const loadMenuFailureHandler = (error) => {
-  log.error('Failed to load menu.', error)
+  errorReportingLogger.error('Failed to load menu.', error)
   return Promise.reject(error)
 }
 
 app.whenReady().then(() => {
   const startSocketServer = () => {
     return startServer(
-      log,
+      errorReportingLogger,
       broadcastPortChange,
       app.getPath('userData'),
       (error) => {
-        log.error('FATAL ERROR: Failed to start the socket server.  Killing the app.', error)
+        errorReportingLogger.error(
+          'FATAL ERROR: Failed to start the socket server.  Killing the app.',
+          error
+        )
         dialog.showErrorBox(
           'Error',
           "Plottr ran into a problem and can't start.  Please contact support."
@@ -156,7 +173,10 @@ app.whenReady().then(() => {
         return { port, killServer }
       })
       .catch((error) => {
-        log.error('FATAL ERROR: Failed to start the socket server.  Killing the app.', error)
+        errorReportingLogger.error(
+          'FATAL ERROR: Failed to start the socket server.  Killing the app.',
+          error
+        )
         dialog.showErrorBox(
           'Error',
           "Plottr ran into a problem and can't start.  Please contact support."
@@ -194,7 +214,10 @@ app.whenReady().then(() => {
               })
             })
             .catch((error) => {
-              log.error('Failed to restart the socket server.  Killing the app.', error)
+              errorReportingLogger.error(
+                'Failed to restart the socket server.  Killing the app.',
+                error
+              )
               dialog.showErrorBox(
                 'Error',
                 'Plottr ran into a problem and needs to shutdown.  Please contact support.'
@@ -206,7 +229,13 @@ app.whenReady().then(() => {
         },
       }
 
-      listenOnIPCMain(() => getPort(), processSwitches, safelyExitModule, restartServerRef)
+      listenOnIPCMain(
+        () => getPort(),
+        processSwitches,
+        safelyExitModule,
+        restartServerRef,
+        errorReportingLogger
+      )
 
       const importFromScrivener = processSwitches.importFromScrivener()
       if (importFromScrivener) {
@@ -223,17 +252,17 @@ app.whenReady().then(() => {
                   newWindow.webContents.send('import-scrivener-file', sourceFile, destinationFile)
                   event.sender.send(replyChannel, 'done')
                 } catch (error) {
-                  log.error(
+                  errorReportingLogger.error(
                     `Error exporting ${sourceFile} to scrivener file at ${destinationFile}`,
                     error
                   )
-                  event.sender.send(replyChannel, { error: error.message })
+                  replyWithError(replyChannel, error)
                 }
               })
             })
           })
           .catch((error) => {
-            log.error('Failed to create window to export with', error)
+            errorReportingLogger.error('Failed to create window to export with', error)
             return Promise.reject(error)
           })
       } else {
@@ -250,23 +279,30 @@ app.whenReady().then(() => {
                   if (fileLaunchedOnURL) addToKnown(fileLaunchedOnURL)
                 })
                 .catch((error) => {
-                  log.error('Error creating the project window to boot a file from', error)
+                  errorReportingLogger.error(
+                    'Error creating the project window to boot a file from',
+                    error
+                  )
                 })
             } catch (error) {
-              log.error('Error booting file: ', error)
+              errorReportingLogger.error('Error booting file: ', error)
             }
           }
         })
 
         // Register the toggleDevTools shortcut listener.
         globalShortcut.register('CommandOrControl+Alt+R', () => {
-          let win = BrowserWindow.getFocusedWindow()
-          if (win) win.toggleDevTools()
+          try {
+            let win = BrowserWindow.getFocusedWindow()
+            if (win) win.toggleDevTools()
+          } catch (error) {
+            log.warn("Couldn't activate dev tools", error)
+          }
         })
 
         // When given no argument, it'll look up the current one.
         setDarkMode().catch((error) => {
-          log.error('Error setting initial theme', error)
+          errorReportingLogger.error('Error setting initial theme', error)
         })
 
         if (process.env.NODE_ENV != 'dev') {
@@ -283,7 +319,10 @@ app.whenReady().then(() => {
                 log.info('Opened a project window for', fileLaunchedOnURL)
               })
               .catch((error) => {
-                log.error('Failed to open project window for', fileLaunchedOnURL, error)
+                errorReportingLogger.error(
+                  `Failed to open project window for ${fileLaunchedOnURL}`,
+                  error
+                )
               })
           }
         })
@@ -300,7 +339,10 @@ app.whenReady().then(() => {
                   log.info('Opened a second instance for a file', newFileToLoadURL)
                 })
                 .catch((error) => {
-                  log.error('Eror opening the second instance project window', error)
+                  errorReportingLogger.error(
+                    'Eror opening the second instance project window',
+                    error
+                  )
                 })
             })
             .catch(loadMenuFailureHandler)
@@ -333,7 +375,7 @@ function fileToLoad(argv) {
       log.info(`Opening file with path ${param}`)
       return param
     } else {
-      log.error(`Could not open file with path ${param}`)
+      errorReportingLogger.error(`Could not open file with path ${param}`)
     }
   }
   log.info(`Opening Plottr without booting a file and arguments: ${argv}`)
@@ -356,7 +398,11 @@ app.on('open-file', (event, filePath) => {
         addToKnown(fileURL)
       })
       .catch((error) => {
-        log.error('Failed to open a project window the second instance', fileURL, error)
+        errorReportingLogger.error(
+          'Failed to open a project window the second instance',
+          fileURL,
+          error
+        )
       })
   })
 })

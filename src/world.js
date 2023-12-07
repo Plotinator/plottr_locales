@@ -5,6 +5,18 @@ import { plottrWorldAPI } from 'plottr_world'
 
 import { makeFileSystemAPIs, firebaseAPIs } from './api'
 import logger from '../shared/logger'
+import { getErrorReporterInstance } from '../shared/error-reporter-instance'
+
+const errorReportingLogger = {
+  info: logger.info,
+  warn: logger.warn,
+  error: (...args) => {
+    logger.error(...args)
+    getErrorReporterInstance().then((errorReporter) => {
+      return errorReporter.error(...args)
+    })
+  },
+}
 
 // From: https://github.com/reduxjs/redux/issues/303#issuecomment-125184409
 function observeStore(store, select, onChange) {
@@ -147,7 +159,7 @@ const theWorld = (socketClient) => {
   }
 
   return {
-    logger,
+    logger: errorReportingLogger,
     license: {
       listenToTrialChanges: ignoringStore(fileSystemAPIs.listenToTrialChanges),
       currentTrial: fileSystemAPIs.currentTrial,

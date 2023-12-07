@@ -9,6 +9,7 @@ import { buildFileMenu } from './file'
 import { buildViewMenu } from './view'
 import { getWindowById } from '../windows'
 import { whenClientIsReady } from '../../../shared/socket-client/index'
+import replyWithError from '../../lib/replyWithError'
 
 let safelyExitModule = null
 
@@ -26,13 +27,22 @@ ipcMain.on('please-reload-menu', (event, replyChannel) => {
     })
     .catch((error) => {
       log.error('Error reloading menu', error)
-      event.sender.send(replyChannel, { error: error.message })
+      replyWithError(replyChannel, error)
     })
 })
 
+function getFocussedWindow() {
+  try {
+    return BrowserWindow.getFocusedWindow()
+  } catch (error) {
+    log.warn('Ignoring error getting the current browser window', error)
+    return null
+  }
+}
+
 function buildMenu(safelyExit) {
   safelyExitModule = safelyExit
-  const win = BrowserWindow.getFocusedWindow()
+  const win = getFocussedWindow()
   let fileURL = null
   if (win) {
     const winObj = getWindowById(win.id)

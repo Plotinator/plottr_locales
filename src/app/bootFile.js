@@ -1,6 +1,7 @@
 import { helpers, SYSTEM_REDUCER_KEYS, migrateIfNeeded, Migrator, emptyFile } from 'pltr/v2'
 import { actions, selectors } from 'wired-up-pltr'
 import { t } from 'plottr_locales'
+import { v4 as uuid } from 'uuid'
 import {
   currentUser,
   initialFetch,
@@ -37,6 +38,8 @@ const {
   setMyFilePath,
   isRestarting,
   pleaseTellMeWhatPlatformIAmOn,
+  showSaveDialog,
+  userDocumentsPath,
 } = makeMainProcessClient()
 
 const withFileId = (fileId, file) => ({
@@ -114,6 +117,60 @@ export function bootFile(
   bootingOfflineFile
 ) {
   const recordedErrorsDuringStartup = []
+
+  function offerSaveAsThenQuit() {
+    saver.stop()
+    const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
+    return showErrorBox(
+      t('Error'),
+      t(
+        'There was an error saving your file.  Please use the following dialog to save your file and contact support.'
+      )
+    ).then(() => {
+      return showSaveDialog(filters, t('Please name this backup')).then((fileName) => {
+        if (fileName) {
+          const backupFolder = selectors.backupFolderPathSelector(store().getState())
+          if (fileName.startsWith(backupFolder)) {
+            return showErrorBox(
+              t('Error'),
+              t('Please choose a destination other than your backup folder')
+            )
+          } else {
+            const newFilePath = helpers.file.ensureEndsInPltr(fileName)
+            return whenClientIsReady(({ saveRawFile }) => {
+              return saveRawFile(
+                newFilePath,
+                JSON.stringify(removeSystemKeys(store().getState()))
+              ).then(() => {
+                setTimeout(() => {
+                  const event = new Event('force-close')
+                  window.dispatchEvent(event)
+                }, 3000)
+              })
+            })
+          }
+        } else {
+          return whenClientIsReady(({ saveRawFile, join }) => {
+            return userDocumentsPath().then((documentsPath) => {
+              return join(documentsPath, `Plottr-fatal-exit-backup-${uuid()}.pltr`).then(
+                (newFilePath) => {
+                  return saveRawFile(
+                    newFilePath,
+                    JSON.stringify(removeSystemKeys(store().getState()))
+                  ).then(() => {
+                    setTimeout(() => {
+                      const event = new Event('force-close')
+                      window.dispatchEvent(event)
+                    }, 3000)
+                  })
+                }
+              )
+            })
+          })
+        }
+      })
+    })
+  }
 
   const migrate = (originalFile, fileId) => (overwrittenFile) => {
     const json = overwrittenFile || originalFile
@@ -236,7 +293,11 @@ export function bootFile(
               fileName: offlineFile.file.originalFileName || offlineFile.file.fileName,
             },
           }).catch((error) => {
-            logger.error(`Erorr uploading our offline file ${fileId}`, error)
+            logger.error(`Error uploading our offline file ${fileId}`, error)
+            recordedErrorsDuringStartup.push({
+              message: `Error uploading our offline file ${fileId}`,
+              error,
+            })
             return showErrorBox(
               t('Error'),
               t('There was an error uploading your offline backup. Please exit and start again')
@@ -500,6 +561,10 @@ export function bootFile(
   function _bootFile(fileURL, options, numOpenFiles, saveBackup) {
     if (!helpers.file.isProtocolString(fileURL)) {
       const message = `Can't boot a file without a protocol: ${fileURL}`
+      recordedErrorsDuringStartup.push({
+        message,
+        error: new Error('Cannot boot file without protocol'),
+      })
       logger.error(message)
       store().dispatch(actions.applicationState.errorLoadingFile())
       return Promise.reject(new Error(message))
@@ -566,6 +631,14 @@ export function bootFile(
           userId,
           userEmail
         )
+        const errorReportingLogger = {
+          info: logger.info,
+          warn: logger.warn,
+          error: (...args) => {
+            logger.error(...args)
+            errorReporter.error(...args)
+          },
+        }
         if (recordedErrorsDuringStartup.length > 0) {
           recordedErrorsDuringStartup.forEach(({ message, error }) => {
             errorReporter.error(message, error)
@@ -578,25 +651,28 @@ export function bootFile(
           () => {
             return selectors.fullFileStateSelector(store().getState())
           },
-          saveFile(whenClientIsReady, logger, postSaveHook),
+          saveFile(whenClientIsReady, errorReportingLogger, postSaveHook),
           backupFile(
             whenClientIsReady,
             saveBackupOnFirebase,
             cachedDowloadStorageImage.downloadStorageImage,
-            logger,
+            errorReportingLogger,
             postBackupHook
           ),
           SAVE_INTERVAL_MS,
           BACKUP_INTERVAL_MS,
-          logger,
-          errorReporter,
+          errorReportingLogger,
           (title, message) => {
             showMessageBox(title, message)
           },
           (title, message) => {
             showErrorBox(title, message)
           },
-          isRestarting
+          isRestarting,
+          () => {
+            return selectors.isLoggedInSelector(store().getState())
+          },
+          offerSaveAsThenQuit
         )
       })
       .catch((error) => {

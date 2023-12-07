@@ -3,6 +3,7 @@ import { ActionCreators } from 'redux-undo'
 import { t } from 'plottr_locales'
 import { connections } from 'plottr_components'
 import export_config from 'plottr_import_export/src/exporter/default_config'
+import exportToSelfContainedPlottrFile from 'plottr_import_export/src/exporter/plottr'
 import { helpers } from 'pltr/v2'
 import * as pltr from 'pltr/v2'
 import { actions, selectors } from 'wired-up-pltr'
@@ -42,12 +43,16 @@ import { makeFileSystemAPIs, licenseServerAPIs } from './api'
 import { isWindows, isLinux, isMacOS } from './isOS'
 import { isDevelopment } from './isDevelopment'
 import createErrorReporter from '../shared/error-reporter'
+import {
+  ERROR_REPORTER_ACCESS_TOKEN,
+  getErrorReporterInstance,
+} from '../shared/error-reporter-instance'
 
 import { store } from './app/store'
 
 import extractImages from './common/extract_images'
 import { resizeImage } from './common/resizeImage'
-import { downloadStorageImage } from './common/downloadStorageImage'
+import { downloadStorageImage, makeCachedDownloadStorageImage } from './common/downloadStorageImage'
 
 import { deleteTemplate, editTemplateDetails } from './common/utils/templates'
 import { createFullErrorReport } from './common/utils/full_error_report'
@@ -86,7 +91,7 @@ const {
   pleaseUpdateLanguage,
   pleaseReloadMenu,
   showItemInFolder,
-  downloadFileAndShow,
+  downloadProBackupFileIntoMemory,
   pleaseOpenLoginPopup,
   pleaseTellMeWhatPlatformIAmOn,
   showErrorBox,
@@ -96,6 +101,7 @@ const {
   pleaseOpenWindow,
   addToKnownFilesAndOpen,
   createDesktopShortcut,
+  downloadDirectoryPath,
 } = makeMainProcessClient()
 
 export const rmRF = (path, ...args) => {
@@ -122,6 +128,19 @@ let unsubscribeFromUpdateerUpdateAvailable = null
 let unsubscribeFromUpdaterUpdateNotAvailable = null
 let unsubscribeFromUpdaterDownloadProgress = null
 let unsubscribeFromUpdaterUpdateDownloaded = null
+
+const cachedDowloadStorageImage = makeCachedDownloadStorageImage(downloadStorageImage)
+
+const errorReportingLogger = {
+  info: logger.info,
+  warn: logger.warn,
+  error: (...args) => {
+    logger.error(...args)
+    getErrorReporterInstance().then((errorReporter) => {
+      errorReporter.error(...args)
+    })
+  },
+}
 
 const platform = {
   undo: () => {
@@ -161,14 +180,14 @@ const platform = {
             store().dispatch(actions.applicationState.finishCreatingCloudFile())
           })
           .catch((error) => {
-            logger.error('Error creating a new file', error)
+            errorReportingLogger.error('Error creating a new file', error)
             store().dispatch(actions.project.showLoader(false))
             store().dispatch(actions.applicationState.finishCreatingCloudFile())
             showErrorBox(t('Error'), t('There was a problem doing that.  Please try again.'))
           })
       } else {
         createNewFile(template, name).catch((error) => {
-          logger.error('Error creating a new file', error)
+          errorReportingLogger.error('Error creating a new file', error)
           store().dispatch(actions.project.showLoader(false))
           store().dispatch(actions.applicationState.finishCreatingCloudFile())
           showErrorBox(t('Error'), t('There was a problem doing that.  Please try again.'))
@@ -213,7 +232,10 @@ const platform = {
       const isOnCloud = file?.isCloudFile
       if (isLoggedIn && isOnCloud) {
         if (!file) {
-          logger.error(`Error deleting file at url: ${fileURL}.  File is not known to Plottr`)
+          errorReportingLogger.error(
+            `Error deleting file at url: ${fileURL}.  File is not known to Plottr`,
+            new Error('File not known to Plottr')
+          )
           store().dispatch(actions.error.generalError('file-not-found'))
           store().dispatch(actions.project.showLoader(false))
           store().dispatch(actions.applicationState.finishDeletingFile())
@@ -246,7 +268,7 @@ const platform = {
             store().dispatch(actions.applicationState.finishDeletingFile())
           })
           .catch((error) => {
-            logger.error(`Error deleting file at path: ${fileURL}`, error)
+            errorReportingLogger.error(`Error deleting file at path: ${fileURL}`, error)
             store().dispatch(actions.project.showLoader(false))
             store().dispatch(actions.applicationState.finishDeletingFile())
           })
@@ -406,7 +428,7 @@ const platform = {
   isMacOS: () => !!isMacOS(),
   openExternal: (...args) => {
     return openExternal(...args).catch((error) => {
-      logger.error(`Error opening URL ${args}`, error)
+      errorReportingLogger.error(`Error opening URL ${args}`, error)
       store().dispatch(actions.error.generalError(`Error opening URL ${args}`))
     })
   },
@@ -425,9 +447,10 @@ const platform = {
     env: isDevelopment() ? 'development' : 'production',
   },
   errorReporter: {
-    errorReporterAccessToken: process.env.ROLLBAR_ACCESS_TOKEN || 'PHONY_ACCESS_TOKEN',
+    errorReporterAccessToken: ERROR_REPORTER_ACCESS_TOKEN,
     errorReporter: createErrorReporter,
     platform: pleaseTellMeWhatPlatformIAmOn,
+    getInstance: getErrorReporterInstance,
   },
   rollbar: {
     // DEPRECATED
@@ -451,7 +474,31 @@ const platform = {
       if (!storageURL) {
         showItemInFolder(fileURL)
       } else {
-        backupPublicURL(fileURL).then((url) => downloadFileAndShow(url, fileName))
+        backupPublicURL(fileURL)
+          .then((url) => downloadProBackupFileIntoMemory(url, fileName))
+          .then((fileString) => {
+            try {
+              const userId = selectors.userIdSelector(store().getState())
+              const file = JSON.parse(fileString)
+              return exportToSelfContainedPlottrFile(
+                file,
+                userId,
+                cachedDowloadStorageImage.downloadStorageImage
+              ).then((file) => {
+                return downloadDirectoryPath().then((path) => {
+                  return whenClientIsReady(({ writeFile, join }) => {
+                    return join(path, fileName || 'backup.pltr').then((fullPath) => {
+                      return writeFile(fullPath, JSON.stringify(file)).then(() => {
+                        return showItemInFolder(fullPath)
+                      })
+                    })
+                  })
+                })
+              })
+            } catch (error) {
+              return Promise.reject(error)
+            }
+          })
       }
     })
   },
@@ -518,7 +565,10 @@ const platform = {
               const fileId = response.data.fileId
               if (!fileId) {
                 const message = `Tried to create cloud file for ${sourceFilePath} but we didn't get a fileId back`
-                logger.error(message)
+                errorReportingLogger.error(
+                  message,
+                  new Error('Could not create cloud file as duplicate')
+                )
                 return Promise.reject(new Error(message))
               }
               const fileURL = helpers.file.fileIdToPlottrCloudFileURL(fileId)

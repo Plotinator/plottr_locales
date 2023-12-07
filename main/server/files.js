@@ -3,9 +3,7 @@ import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
 import { lock } from 'proper-lockfile'
 
-import { checkFileIntegrity, SYSTEM_REDUCER_KEYS, helpers, errorCodes } from 'pltr/v2'
-
-const { FILE_LACKS_ALL_KEYS } = errorCodes
+import { checkFileIntegrity, SYSTEM_REDUCER_KEYS, helpers } from 'pltr/v2'
 
 const { readFile, lstat, writeFile, open, unlink, readdir, mkdir } = fs.promises
 
@@ -107,15 +105,19 @@ const fileModule = (userDataPath) => {
         })
     }
 
-    const writeAndWaitForFlush = (filePath, data) => {
-      return withLockedFile(filePath, () => {
-        return open(filePath, 'w+').then((fileHandle) => {
-          return writeFile(fileHandle, data).then(() => {
-            return fileHandle.sync().then(() => {
-              return fileHandle.close()
-            })
+    const unlockedWriteAndWaitForFlush = (filePath, data) => {
+      return open(filePath, 'w+').then((fileHandle) => {
+        return writeFile(fileHandle, data).then(() => {
+          return fileHandle.sync().then(() => {
+            return fileHandle.close()
           })
         })
+      })
+    }
+
+    const writeAndWaitForFlush = (filePath, data) => {
+      return withLockedFile(filePath, () => {
+        return unlockedWriteAndWaitForFlush(filePath, data)
       })
     }
 
@@ -134,19 +136,18 @@ const fileModule = (userDataPath) => {
           return Promise.reject(message)
         }
         const withoutSystemKeys = removeSystemKeys(jsonData)
-        return checkFileIntegrity(withoutSystemKeys, filePath)
-          .catch((error) => {
-            error.code = FILE_LACKS_ALL_KEYS
-            return Promise.reject(error)
-          })
-          .then(() => {
-            const payload =
-              process.env.NODE_ENV == 'development'
-                ? JSON.stringify(withoutSystemKeys, null, 2)
-                : JSON.stringify(withoutSystemKeys)
-            return writeAndWaitForFlush(filePath, payload)
-          })
+        return checkFileIntegrity(withoutSystemKeys, filePath).then(() => {
+          const payload =
+            process.env.NODE_ENV == 'development'
+              ? JSON.stringify(withoutSystemKeys, null, 2)
+              : JSON.stringify(withoutSystemKeys)
+          return writeAndWaitForFlush(filePath, payload)
+        })
       })
+    }
+
+    function saveRawFile(filePath, rawData) {
+      return unlockedWriteAndWaitForFlush(filePath, rawData)
     }
 
     const isResumeBackup = (fileName) => {
@@ -398,6 +399,7 @@ const fileModule = (userDataPath) => {
     }
 
     return {
+      saveRawFile,
       saveFile,
       saveOfflineFile,
       basename,

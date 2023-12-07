@@ -9,6 +9,7 @@ import logger from '../shared/logger'
 import { uploadToFirebase } from './upload-to-firebase'
 import { whenClientIsReady } from '../shared/socket-client'
 import { makeMainProcessClient } from './app/mainProcessClient'
+import { getErrorReporterInstance } from '../shared/error-reporter-instance'
 
 const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
 
@@ -126,6 +127,12 @@ export const renameFile = (fileURL) => {
     const fileList = selectors.knownFilesSelector(state)
     const fileId = fileURL.replace(/^plottr:\/\//, '')
     if (!fileList.find(({ id }) => id === fileId)) {
+      getErrorReporterInstance().then((errorReporter) => {
+        errorReporter.error(
+          `Coludn't find file with id: ${fileId} to rename`,
+          new Error('Error renaming file')
+        )
+      })
       logger.error(`Coludn't find file with id: ${fileId} to rename`)
       return Promise.resolve()
     }
@@ -169,6 +176,9 @@ export const renameFile = (fileURL) => {
                   )
                 }).catch((error) => {
                   logger.error('Error renaming file', error)
+                  getErrorReporterInstance().then((errorReporter) => {
+                    errorReporter.error('Error renaming file', error)
+                  })
                   store().dispatch(actions.applicationState.finishRenamingFile())
                   if (error.code === errorCodes.FILE_LACKS_ALL_KEYS) {
                     return showErrorBox(
@@ -181,6 +191,9 @@ export const renameFile = (fileURL) => {
                 })
               } catch (error) {
                 logger.error('Error renaming file', error)
+                getErrorReporterInstance().then((errorReporter) => {
+                  errorReporter.error('Error renaming file', error)
+                })
                 store().dispatch(actions.applicationState.finishRenamingFile())
                 return showErrorBox(t('Error'), t('There was an error doing that. Try again'))
               }
@@ -307,6 +320,9 @@ export const openExistingFile = () => {
         })
         .catch((error) => {
           logger.error('Error opening existing file', error)
+          getErrorReporterInstance().then((errorReporter) => {
+            errorReporter.error('Error opening existing file', error)
+          })
           showErrorBox(t('Error'), t('There was an error doing that. Try again.')).then(() => {
             store().dispatch(actions.project.showLoader(false))
             if (isLoggedIn) {

@@ -358,6 +358,10 @@ const _makeMainProcessClient = () => {
     return ask('download-file-and-show', fileURL, fileName)
   }
 
+  const downloadProBackupFileIntoMemory = (fileURL, fileName) => {
+    return ask('download-pro-backup-file-into-memory', fileURL, fileName)
+  }
+
   const pleaseOpenLoginPopup = () => {
     return ask('pls-open-login-popup')
   }
@@ -408,6 +412,10 @@ const _makeMainProcessClient = () => {
 
   const listenToForceReload = (cb) => {
     return subscribeTo('force-reload', cb)
+  }
+
+  const downloadDirectoryPath = () => {
+    return ask('what-is-the-download-directory-path')
   }
 
   return {
@@ -488,6 +496,7 @@ const _makeMainProcessClient = () => {
     onUpdaterUpdateDownloaded,
     pleaseUpdateLanguage,
     downloadFileAndShow,
+    downloadProBackupFileIntoMemory,
     pleaseOpenLoginPopup,
     pleaseTellMeWhatPlatformIAmOn,
     onSaveAsOnPro,
@@ -502,6 +511,7 @@ const _makeMainProcessClient = () => {
     onOpenImagePickerFromMenu,
     createDesktopShortcut,
     listenToForceReload,
+    downloadDirectoryPath,
   }
 }
 

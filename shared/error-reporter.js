@@ -101,9 +101,9 @@ const ErrorReporter = (
         ? rawMessage
         : typeofError === 'string'
         ? rawError
-        : rawMessage
+        : typeof rawMessage?.toString === 'function'
         ? rawMessage.toString()
-        : rawError
+        : typeof rawError?.toString === 'function'
         ? rawError.toString()
         : 'No error or message supplied'
     const error = errorIsError
@@ -112,8 +112,12 @@ const ErrorReporter = (
       ? rawMessage
       : new Error(
           `No error supplied.  Other args: message: ${
-            rawMessage?.toString() ?? 'No message supplied'
-          }, error: ${rawError?.toString() ?? 'No error supplied'}`
+            typeof rawMessage.toString === 'function'
+              ? rawMessage.toString()
+              : 'No message supplied'
+          }, error: ${
+            typeof rawError.toString === 'function' ? rawError.toString() : 'No error supplied'
+          }`
         )
 
     return [message, error]
