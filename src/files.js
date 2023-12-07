@@ -289,9 +289,9 @@ export const createAndOpenCopy = (oldFilePathSegments, newFileName) => {
 }
 
 export const userFilePickerDefaultFolder = () => {
-  const hasDefaultFolder = selectors.hasDefaultFolderSelector(store.getState())
+  const hasDefaultFolder = selectors.hasDefaultFolderSelector(store().getState())
   if (hasDefaultFolder) {
-    return Promise.resolve(selectors.defaultFolderLocationSelector(store.getState()))
+    return Promise.resolve(selectors.defaultFolderLocationSelector(store().getState()))
   } else {
     return userDocumentsPath()
   }
