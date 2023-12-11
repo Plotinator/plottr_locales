@@ -49,13 +49,22 @@ export const extractImages = (file) => {
   return nodesFound
 }
 
+const isValidLocalImage = (image) => {
+  return (
+    typeof image.data === 'string' &&
+    image.data.startsWith('data:image/') &&
+    typeof image.path === 'string' &&
+    !image.path.startsWith('storage://')
+  )
+}
+
 export const imageIndex = (imagesInRCEContent, file) => {
   const indexedImages = ((file.images && Object.values(file.images)) || []).filter(
-    ({ path }) => !path.startsWith('storage://')
+    isValidLocalImage
   )
 
   const index = {}
-  let maxId = Number.NEGATIVE_INFINITY
+  let maxId = 0
   indexedImages.forEach(({ id, name, path, data }) => {
     index[data] = id
     maxId = Math.max(id, maxId)
