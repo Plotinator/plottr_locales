@@ -14,15 +14,17 @@ describe('extractImages', () => {
     })
     describe('that has a root level attribute name "type" and a value "image-data"', () => {
       it('should produce a singleton list with an empty path', () => {
-        expect(extractImages({ type: 'image-data', data: 'data:image/jpeg;base64,x' })).toEqual([{ path: [], data: 'data:image/jpeg;base64,x' }])
+        expect(extractImages({ type: 'image-data', data: 'data:image/jpeg;base64,x' })).toEqual([
+          { path: [], data: 'data:image/jpeg;base64,x' },
+        ])
       })
     })
     describe('that has an object on the root level', () => {
       describe('that has a root level attribute name "type" and a value "image-data"', () => {
         it('should produce a singleton list with a path to the sub-object', () => {
-          expect(extractImages({ a: { type: 'image-data', data: 'data:image/jpeg;base64,y' } })).toEqual([
-            { path: ['a'], data: 'data:image/jpeg;base64,y' },
-          ])
+          expect(
+            extractImages({ a: { type: 'image-data', data: 'data:image/jpeg;base64,y' } })
+          ).toEqual([{ path: ['a'], data: 'data:image/jpeg;base64,y' }])
         })
       })
     })
@@ -31,7 +33,10 @@ describe('extractImages', () => {
         describe('that has a root level attribute name "type" and a value "image-data"', () => {
           it('should produce a singleton list with a path to the object in the array', () => {
             expect(
-              extractImages({ a: [2, { type: 'image-data', data: 'data:image/jpeg;base64,z' }], b: { c: 4 } })
+              extractImages({
+                a: [2, { type: 'image-data', data: 'data:image/jpeg;base64,z' }],
+                b: { c: 4 },
+              })
             ).toEqual([{ path: ['a', 1], data: 'data:image/jpeg;base64,z' }])
           })
         })
