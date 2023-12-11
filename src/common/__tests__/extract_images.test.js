@@ -90,6 +90,25 @@ describe('imageIndex', () => {
       })
     })
   })
+  describe('given a file with images in the image key', () => {
+    describe('but those images are invalid (lacking "data")', () => {
+      const file = {
+        images: {
+          1: {
+            id: 1,
+            path: 'some/image.jpg',
+          },
+          7: {
+            id: 7,
+            path: 'some/image.jpg',
+          },
+        },
+      }
+      it('should not add those images to the index', () => {
+        expect(imageIndex([], file)).toEqual({})
+      })
+    })
+  })
   describe('given a file with images in RCE content for a character', () => {
     describe('and no images in the index', () => {
       it('should produce a single image index with neg inf + 1 as the id', () => {
