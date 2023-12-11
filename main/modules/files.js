@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { t } from 'plottr_locales'
 
 import { addToKnownFiles, addToKnown } from './known_files'
+import currentSettings from './settings'
 import { importFromSnowflake, importFromScrivener } from 'plottr_import_export'
 
 import { helpers, emptyFile, tree, SYSTEM_REDUCER_KEYS, specialCaseFixes } from 'pltr/v2'
