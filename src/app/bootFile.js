@@ -78,7 +78,7 @@ function waitForUser() {
 
 // NOTE: Only for cloud files.
 const loadFileIntoRedux = (data, fileId) => {
-  store.dispatch(
+  store().dispatch(
     actions.ui.loadFile(
       data.file.fileName,
       false,
@@ -87,7 +87,7 @@ const loadFileIntoRedux = (data, fileId) => {
       helpers.file.fileIdToPlottrCloudFileURL(fileId)
     )
   )
-  store.dispatch(
+  store().dispatch(
     actions.project.selectFile({
       ...data.file,
       id: fileId,
@@ -129,7 +129,7 @@ export function bootFile(
     ).then(() => {
       return showSaveDialog(filters, t('Please name this backup')).then((fileName) => {
         if (fileName) {
-          const backupFolder = selectors.backupFolderPathSelector(store.getState())
+          const backupFolder = selectors.backupFolderPathSelector(store().getState())
           if (fileName.startsWith(backupFolder)) {
             return showErrorBox(
               t('Error'),
@@ -140,7 +140,7 @@ export function bootFile(
             return whenClientIsReady(({ saveRawFile }) => {
               return saveRawFile(
                 newFilePath,
-                JSON.stringify(removeSystemKeys(store.getState()))
+                JSON.stringify(removeSystemKeys(store().getState()))
               ).then(() => {
                 setTimeout(() => {
                   const event = new Event('force-close')
@@ -156,7 +156,7 @@ export function bootFile(
                 (newFilePath) => {
                   return saveRawFile(
                     newFilePath,
-                    JSON.stringify(removeSystemKeys(store.getState()))
+                    JSON.stringify(removeSystemKeys(store().getState()))
                   ).then(() => {
                     setTimeout(() => {
                       const event = new Event('force-close')
@@ -184,7 +184,7 @@ export function bootFile(
           } else {
             machineId().then((clientId) => {
               loadFileIntoRedux(json, fileId)
-              store.dispatch(actions.client.setClientId(clientId))
+              store().dispatch(actions.client.setClientId(clientId))
               resolve(json)
             })
           }
@@ -216,13 +216,13 @@ export function bootFile(
                   overwriteAllKeys(fileId, clientId, removeSystemKeys(data))
                     .then((results) => {
                       loadFileIntoRedux(data, fileId)
-                      store.dispatch(actions.client.setClientId(clientId))
+                      store().dispatch(actions.client.setClientId(clientId))
                       return results
                     })
                     .then(resolve, reject)
                 } else {
                   loadFileIntoRedux(data, fileId)
-                  store.dispatch(actions.client.setClientId(clientId))
+                  store().dispatch(actions.client.setClientId(clientId))
                   resolve(data)
                 }
               })
@@ -507,7 +507,7 @@ export function bootFile(
                       }
                       return reject(`bootLocalFile002: migration (${fileURL})`)
                     }
-                    store.dispatch(
+                    store().dispatch(
                       actions.ui.loadFile(
                         state.file.fileName || helpers.file.withoutProtocol(fileURL),
                         didMigrate,
@@ -523,7 +523,7 @@ export function bootFile(
                         fileURL
                       )
                     )
-                    store.dispatch(
+                    store().dispatch(
                       actions.project.selectFile({
                         ...state.file,
                         fileURL,
@@ -542,10 +542,10 @@ export function bootFile(
                     )
 
                     if (state && state.tour && state.tour.showTour)
-                      store.dispatch(actions.ui.changeOrientation('horizontal'))
+                      store().dispatch(actions.ui.changeOrientation('horizontal'))
 
                     return machineId().then((clientId) => {
-                      store.dispatch(actions.client.setClientId(clientId))
+                      store().dispatch(actions.client.setClientId(clientId))
 
                       resolve()
                     })
@@ -566,10 +566,10 @@ export function bootFile(
         error: new Error('Cannot boot file without protocol'),
       })
       logger.error(message)
-      store.dispatch(actions.applicationState.errorLoadingFile())
+      store().dispatch(actions.applicationState.errorLoadingFile())
       return Promise.reject(new Error(message))
     }
-    store.dispatch(actions.applicationState.startLoadingFile())
+    store().dispatch(actions.applicationState.startLoadingFile())
 
     // Now that we know what the file path for this window should be,
     // tell the main process.
@@ -584,13 +584,13 @@ export function bootFile(
             : bootLocalFile(fileURL, numOpenFiles, saveBackup)
         )
           .then(() => {
-            store.dispatch(actions.applicationState.finishLoadingFile())
+            store().dispatch(actions.applicationState.finishLoadingFile())
           })
           .catch((error) => {
             nukeLastKnown()
             logger.error(error)
             recordedErrorsDuringStartup.push({ message: 'Error booting the file', error })
-            store.dispatch(
+            store().dispatch(
               actions.applicationState.errorLoadingFile(error.message === UPDATE_MESSAGE)
             )
           })
@@ -598,7 +598,7 @@ export function bootFile(
         nukeLastKnown()
         logger.error(error)
         recordedErrorsDuringStartup.push({ message: 'Error booting a file', error })
-        store.dispatch(actions.applicationState.errorLoadingFile())
+        store().dispatch(actions.applicationState.errorLoadingFile())
         return Promise.reject(error)
       }
     })
@@ -609,12 +609,12 @@ export function bootFile(
       saver.cancelAllRemainingRequests()
     }
     const postSaveHook = () => {
-      store.dispatch(actions.ui.fileSaved())
+      store().dispatch(actions.ui.fileSaved())
     }
     const postBackupHook = () => {
       // NOP
     }
-    const state = store.getState()
+    const state = store().getState()
     const licenseUserObject = selectors.userSettingsSelector(state)
     const userId = selectors.userIdSelector(state) || licenseUserObject.payment_id || 'UNKNOWN_USER'
     const userEmail =
@@ -649,7 +649,7 @@ export function bootFile(
         }
         saver = Saver(
           () => {
-            return selectors.fullFileStateSelector(store.getState())
+            return selectors.fullFileStateSelector(store().getState())
           },
           saveFile(whenClientIsReady, errorReportingLogger, postSaveHook),
           backupFile(
@@ -670,7 +670,7 @@ export function bootFile(
           },
           isRestarting,
           () => {
-            return selectors.isLoggedInSelector(store.getState())
+            return selectors.isLoggedInSelector(store().getState())
           },
           offerSaveAsThenQuit
         )

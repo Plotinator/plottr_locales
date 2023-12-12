@@ -135,11 +135,6 @@ const _makeMainProcessClient = () => {
     return ask('open-known-file', fileURL, unknown)
   }
 
-  const devOpenAnalyzerFile = (fileName, filePath) => {
-    // I'm not sure where the listener for this went(?)
-    throw new Error('Implement devOpenAnalyzerFile!')
-  }
-
   // NOTE: there used to be an 'unknown' param for this message.  I
   // don't think it actually gets used.
   const pleaseOpenWindow = (fileURL) => {
@@ -447,7 +442,6 @@ const _makeMainProcessClient = () => {
     machineId,
     setMyFilePath,
     openKnownFile,
-    devOpenAnalyzerFile,
     pleaseOpenWindow,
     onAdvancedExportFileFromMenu,
     onReload,

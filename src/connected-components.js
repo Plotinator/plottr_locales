@@ -8,19 +8,12 @@ import { helpers } from 'pltr/v2'
 import * as pltr from 'pltr/v2'
 import { actions, selectors } from 'wired-up-pltr'
 import {
-  publishRCEOperations,
-  fetchRCEOperations,
-  listenForChangesToEditor,
-  deleteChangeSignal,
-  deleteOldChanges,
   backupPublicURL,
   imagePublicURL,
   isStorageURL,
   saveImageToStorageBlob as saveImageToStorageBlobInFirebase,
   saveImageToStorageFromURL as saveImageToStorageFromURLInFirebase,
   deleteFile,
-  startUI,
-  firebaseUI,
   onSessionChange,
   fetchFiles,
   logOut,
@@ -151,10 +144,10 @@ const errorReportingLogger = {
 
 const platform = {
   undo: () => {
-    store.dispatch(ActionCreators.undo())
+    store().dispatch(ActionCreators.undo())
   },
   redo: () => {
-    store.dispatch(ActionCreators.redo())
+    store().dispatch(ActionCreators.redo())
   },
   hostLocale,
   appVersion: getVersion,
@@ -171,32 +164,32 @@ const platform = {
   },
   file: {
     createNew: (template, name) => {
-      const state = store.getState()
+      const state = store().getState()
       const file = selectors.fullFileStateSelector(state)
       const emailAddress = selectors.emailAddressSelector(state)
       const userId = selectors.userIdSelector(state)
       const clientId = selectors.clientIdSelector(state)
       const fileList = selectors.knownFilesSelector(state)
       if (userId) {
-        store.dispatch(actions.project.showLoader(true))
-        store.dispatch(actions.applicationState.startCreatingCloudFile())
+        store().dispatch(actions.project.showLoader(true))
+        store().dispatch(actions.applicationState.startCreatingCloudFile())
         newFile(emailAddress, userId, fileList, file, clientId, template, openFile, name)
           .then((fileId) => {
             logger.info('Created new file.', fileId)
-            store.dispatch(actions.project.showLoader(false))
-            store.dispatch(actions.applicationState.finishCreatingCloudFile())
+            store().dispatch(actions.project.showLoader(false))
+            store().dispatch(actions.applicationState.finishCreatingCloudFile())
           })
           .catch((error) => {
             errorReportingLogger.error('Error creating a new file', error)
-            store.dispatch(actions.project.showLoader(false))
-            store.dispatch(actions.applicationState.finishCreatingCloudFile())
+            store().dispatch(actions.project.showLoader(false))
+            store().dispatch(actions.applicationState.finishCreatingCloudFile())
             showErrorBox(t('Error'), t('There was a problem doing that.  Please try again.'))
           })
       } else {
         createNewFile(template, name).catch((error) => {
           errorReportingLogger.error('Error creating a new file', error)
-          store.dispatch(actions.project.showLoader(false))
-          store.dispatch(actions.applicationState.finishCreatingCloudFile())
+          store().dispatch(actions.project.showLoader(false))
+          store().dispatch(actions.applicationState.finishCreatingCloudFile())
           showErrorBox(t('Error'), t('There was a problem doing that.  Please try again.'))
         })
       }
@@ -221,7 +214,7 @@ const platform = {
     // FIXME: this is very poorly named.  Esp. since the second
     // parametor is a flag for whether the file is known XD
     openKnownFile: (fileURL, unknown) => {
-      const state = store.getState()
+      const state = store().getState()
       const loadedFileURL = selectors.fileURLSelector(state)
       if (fileURL === loadedFileURL) {
         closeDashboard()
@@ -230,7 +223,7 @@ const platform = {
       }
     },
     deleteKnownFile: (fileURL) => {
-      const state = store.getState()
+      const state = store().getState()
       const currentFileURL = selectors.fileURLSelector(state)
       const userId = selectors.userIdSelector(state)
       const clientId = selectors.clientIdSelector(state)
@@ -243,14 +236,14 @@ const platform = {
             `Error deleting file at url: ${fileURL}.  File is not known to Plottr`,
             new Error('File not known to Plottr')
           )
-          store.dispatch(actions.error.generalError('file-not-found'))
-          store.dispatch(actions.project.showLoader(false))
-          store.dispatch(actions.applicationState.finishDeletingFile())
+          store().dispatch(actions.error.generalError('file-not-found'))
+          store().dispatch(actions.project.showLoader(false))
+          store().dispatch(actions.applicationState.finishDeletingFile())
           return
         }
         const { fileName } = file
-        store.dispatch(actions.project.showLoader(true))
-        store.dispatch(actions.applicationState.startDeletingFile())
+        store().dispatch(actions.project.showLoader(true))
+        store().dispatch(actions.applicationState.startDeletingFile())
         const id = helpers.file.fileIdFromPlottrProFile(fileURL)
         const isOffline = selectors.isOfflineSelector(state)
         const isOfflineModeEnabled = selectors.offlineModeEnabledSelector(state)
@@ -268,16 +261,16 @@ const platform = {
         deleteFile(id, userId, clientId)
           .then(() => {
             if (currentFileURL === fileURL) {
-              store.dispatch(actions.project.selectFile(null))
+              store().dispatch(actions.project.selectFile(null))
             }
             logger.info(`Deleted file at path: ${fileURL}`)
-            store.dispatch(actions.project.showLoader(false))
-            store.dispatch(actions.applicationState.finishDeletingFile())
+            store().dispatch(actions.project.showLoader(false))
+            store().dispatch(actions.applicationState.finishDeletingFile())
           })
           .catch((error) => {
             errorReportingLogger.error(`Error deleting file at path: ${fileURL}`, error)
-            store.dispatch(actions.project.showLoader(false))
-            store.dispatch(actions.applicationState.finishDeletingFile())
+            store().dispatch(actions.project.showLoader(false))
+            store().dispatch(actions.applicationState.finishDeletingFile())
           })
       } else {
         deleteKnownFile(fileURL)
@@ -316,12 +309,12 @@ const platform = {
     rmRF,
     writeFile,
     createFromSnowflake: (importedPath) => {
-      const state = store.getState()
+      const state = store().getState()
       const isLoggedIntoPro = selectors.hasProSelector(state)
       createFromSnowflake(importedPath, isLoggedIntoPro)
     },
     createFromScrivener: (importedPath) => {
-      const state = store.getState()
+      const state = store().getState()
       const isLoggedIntoPro = selectors.hasProSelector(state)
       createFromScrivener(importedPath, isLoggedIntoPro)
     },
@@ -406,12 +399,12 @@ const platform = {
   },
   template: {
     deleteTemplate: (templateId) => {
-      const state = store.getState()
+      const state = store().getState()
       const userId = selectors.userIdSelector(state)
       return deleteTemplate(templateId, userId)
     },
     editTemplateDetails: (templateId, templateDetails) => {
-      const state = store.getState()
+      const state = store().getState()
       const userId = selectors.userIdSelector(state)
       editTemplateDetails(templateId, templateDetails, userId)
     },
@@ -436,7 +429,7 @@ const platform = {
   openExternal: (...args) => {
     return openExternal(...args).catch((error) => {
       errorReportingLogger.error(`Error opening URL ${args}`, error)
-      store.dispatch(actions.error.generalError(`Error opening URL ${args}`))
+      store().dispatch(actions.error.generalError(`Error opening URL ${args}`))
     })
   },
   createErrorReport,
@@ -485,7 +478,7 @@ const platform = {
           .then((url) => downloadProBackupFileIntoMemory(url, fileName))
           .then((fileString) => {
             try {
-              const userId = selectors.userIdSelector(store.getState())
+              const userId = selectors.userIdSelector(store().getState())
               const file = JSON.parse(fileString)
               return exportToSelfContainedPlottrFile(
                 file,
@@ -513,19 +506,12 @@ const platform = {
   rootElementSelectors: ['#react-root', '#dashboard__react__root'],
   templatesDisabled: false,
   exportDisabled: false,
-  publishRCEOperations,
-  fetchRCEOperations,
-  listenForChangesToEditor,
-  deleteChangeSignal,
-  deleteOldChanges,
   listenForRCELock,
   lockRCE,
   releaseRCELock,
   machineId,
   extractImages,
   firebase: {
-    startUI,
-    firebaseUI,
     onSessionChange,
     currentUser,
     fetchFiles,
@@ -542,7 +528,7 @@ const platform = {
     isStorageURL,
     resolveToPublicUrl: (storageUrl) => {
       if (!storageUrl) return null
-      const state = store.getState()
+      const state = store().getState()
 
       const fileId = selectors.fileIdSelector(state)
       const userId = selectors.userIdSelector(state)
@@ -554,12 +540,12 @@ const platform = {
       return imagePublicURL(storageUrl, fileId, userId)
     },
     saveImageToStorageBlob: (blob, name) => {
-      const state = store.getState()
+      const state = store().getState()
       const userId = selectors.userIdSelector(state)
       return saveImageToStorageBlobInFirebase(userId, name, blob)
     },
     saveImageToStorageFromURL: (url, name) => {
-      const state = store.getState()
+      const state = store().getState()
       const userId = selectors.userIdSelector(state)
       return saveImageToStorageFromURLInFirebase(userId, name, url)
     },
@@ -572,7 +558,7 @@ const platform = {
         return readFile(sourceFilePath).then((fileData) => {
           try {
             const fileJSON = JSON.parse(fileData)
-            const state = store.getState()
+            const state = store().getState()
             const emailAddress = selectors.emailAddressSelector(state)
             const userId = selectors.userIdSelector(state)
             return uploadToFirebase(emailAddress, userId, fileJSON, newName).then((response) => {
@@ -601,7 +587,7 @@ const platform = {
     })
   },
   deleteProBackup: (backupRecordId, storageProtocolURL) => {
-    const state = store.getState()
+    const state = store().getState()
     const userId = selectors.userIdSelector(state)
     return deleteProBackup(userId, backupRecordId, storageProtocolURL)
   },
@@ -687,6 +673,7 @@ export const BookChooser = components.BookChooser
 export const TimelineWrapper = components.TimelineWrapper
 export const DashboardBody = components.DashboardBody
 export const DashboardNav = components.DashboardNav
+export const SearchModal = components.SearchModal
 export const FirebaseLogin = components.FirebaseLogin
 export const FullPageSpinner = components.FullPageSpinner
 export const ChoiceView = components.ChoiceView

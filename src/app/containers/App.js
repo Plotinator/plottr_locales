@@ -17,6 +17,7 @@ import {
   ExportDialog,
   UpdateNotifier,
   NewProjectInputModal,
+  SearchModal,
   ImagePicker,
 } from 'connected-components'
 import { store } from '../store'
@@ -24,7 +25,6 @@ import MainIntegrationContext from '../../mainIntegrationContext'
 import logger from '../../../shared/logger'
 import { makeMainProcessClient } from '../mainProcessClient'
 import { whenClientIsReady } from '../../../shared/socket-client/index'
-import { getErrorReporterInstance } from '../../../shared/error-reporter-instance'
 
 const {
   onAdvancedExportFileFromMenu,
@@ -46,6 +46,9 @@ const App = ({
   clickOnDom,
   applicationIsBusyAndCannotBeQuit,
   showErrorBox,
+  searchDialogIsOpen,
+  openSearch,
+  startSearching,
   unsavedChanges,
   fileSaved,
 }) => {
@@ -96,6 +99,21 @@ const App = ({
       unsubscribeFromImagePickerMenu()
     }
   }, [])
+
+  useEffect(() => {
+    const searchListener = (event) => {
+      if (!searchDialogIsOpen && event.key === 'f' && (event.ctrlKey || event.metaKey)) {
+        event.preventDefault()
+        event.stopPropagation()
+        openSearch()
+        startSearching()
+      }
+    }
+    document.addEventListener('keydown', searchListener)
+    return () => {
+      document.removeEventListener('keydown', searchListener)
+    }
+  }, [searchDialogIsOpen, openSearch])
 
   const closeOrRefresh = (reloading) => {
     if (reloading) {
@@ -197,7 +215,7 @@ const App = ({
   }, [applicationIsBusyAndCannotBeQuit, setWaitingForSaveDoneSignal])
 
   const saveAndClose = (saveFile, saveOfflineFile) => () => {
-    const { present } = store.getState()
+    const { present } = store().getState()
     setWaitingForSaveDoneSignal(true)
     return (
       isCloudFile && isOffline
@@ -281,6 +299,7 @@ const App = ({
         {renderAskToSave()}
         {renderAdvanceExportModal()}
         {renderImagePickerModal()}
+        {searchDialogIsOpen ? <SearchModal /> : null}
       </React.StrictMode>
     </ErrorBoundary>
   )
@@ -294,9 +313,12 @@ App.propTypes = {
   isResuming: PropTypes.bool,
   userNeedsToLogin: PropTypes.bool,
   sessionChecked: PropTypes.bool,
+  searchDialogIsOpen: PropTypes.bool,
   clickOnDom: PropTypes.func,
   applicationIsBusyAndCannotBeQuit: PropTypes.bool,
   showErrorBox: PropTypes.func.isRequired,
+  openSearch: PropTypes.func.isRequired,
+  startSearching: PropTypes.func.isRequired,
   unsavedChanges: PropTypes.bool,
   fileSaved: PropTypes.func.isRequired,
 }
@@ -310,11 +332,14 @@ function mapStateToProps(state) {
     userNeedsToLogin: selectors.userNeedsToLoginSelector(state),
     sessionChecked: selectors.sessionCheckedSelector(state),
     applicationIsBusyAndCannotBeQuit: selectors.busyWithWorkThatPreventsQuittingSelector(state),
+    searchDialogIsOpen: selectors.searchDialogIsOpenSelector(state),
     unsavedChanges: selectors.unsavedChangesSelector(state),
   }
 }
 
 export default connect(mapStateToProps, {
   clickOnDom: actions.domEvents.clickOnDom,
+  openSearch: actions.ui.openSearch,
+  startSearching: actions.applicationState.startSearching,
   fileSaved: actions.ui.fileSaved,
 })(App)

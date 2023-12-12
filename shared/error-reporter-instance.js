@@ -22,7 +22,7 @@ export const getErrorReporterInstance = () => {
   if (generalErrorReporterInitialised) {
     return Promise.resolve(generalErrorReporterInstance)
   } else {
-    const state = store.getState()
+    const state = store().getState()
     const userId = selectors.userIdSelector(state)
     const userEmail = selectors.emailAddressSelector(state)
     return Promise.all([pleaseTellMeWhatPlatformIAmOn(), getVersion()]).then(([os, version]) => {

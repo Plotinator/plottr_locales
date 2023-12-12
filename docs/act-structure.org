@@ -1,0 +1,1305 @@
+#+options: ':nil *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline
+#+options: author:t broken-links:nil c:nil creator:nil
+#+options: d:(not "LOGBOOK") date:t e:t email:nil f:t inline:t num:t
+#+options: p:nil pri:nil prop:nil stat:t tags:t tasks:t tex:t
+#+options: timestamp:t title:t toc:t todo:t |:t
+#+title: Act Structure
+#+date: <2023-09-28 Thu>
+#+author: Edward John Steere
+#+latex_class: article
+#+latex_class_options:
+#+latex_header: \lstset{basicstyle=\footnotesize\ttfamily,breaklines=true}
+#+latex_header: \lstset{framextopmargin=50pt,frame=bottomline}
+#+latex_header: \usepackage[a4paper, total={6in, 8in}]{geometry}
+#+latex_compiler: pdflatex
+#+date: \today
+
+* Introduction
+
+The beats of a structured timeline are a tree.  The tree structure
+technically accommodates any depth of tree, but we opted to model only
+up to three layers and to call them "Acts", "Chapters" and "Scenes" by
+default.
+
+e.g. suppose you opted for three layers; you might add two Acts.  You
+can add Chapters to those Acts independently so that Act I has two
+Chapters and Act II has three Chapters.  Continuing in this way, you
+can add Scenes to each of those Chapters and might end up with three
+scenes in Act II's second Chapter, for example.
+
+* Customising Structure
+
+There are controls to customize the depth of the hierarchy and each
+levels:
+ - Default beat name (you can change "Act" to "Top" from the default
+   three-level structure and then top level, unnamed chapters will be
+   called "Top 1", "Top 2" etc.).
+ - Text colour -- the colour of the beat titles.
+ - Text size -- the size of the beat title text.
+ - Border colour -- the colour of borders drawn around beat titles.
+ - Border style -- "Dashed", "Solid", "Dotted" and "None" (to be drawn
+   around beat titles).
+ - Background colour -- the colour to draw behind beat titles.
+
+*NOTE:* The structure configuration can differ per book in a project.
+
+** Selectors
+
+~sortedHierarchyLevels~ produces a list of hierarchy levels sorted by
+their level.  The following source listing is an example of what it
+produces.
+
+#+begin_src js
+  [
+    {
+      "name": "Act",
+      "level": 0,
+      "autoNumber": true,
+      "textSize": 24,
+      "borderStyle": "SOLID",
+      "backgroundColor": "none",
+      "textColor": "#e5554f",
+      "borderColor": "#e5554f",
+      "dark": {
+        "textColor": "#ffb8b5",
+        "borderColor": "#ffb8b5"
+      },
+      "light": {
+        "textColor": "#e5554f",
+        "borderColor": "#e5554f"
+      }
+    },
+    {
+      "name": "Chapter",
+      "level": 1,
+      "autoNumber": true,
+      "textSize": 24,
+      "borderStyle": "DASHED",
+      "backgroundColor": "none",
+      "textColor": "DarkGoldenrod",
+      "borderColor": "#78be20",
+      "dark": {
+        "textColor": "#baed79",
+        "borderColor": "#baed79"
+      },
+      "light": {
+        "textColor": "DarkGoldenrod",
+        "borderColor": "#78be20"
+      }
+    },
+    {
+      "name": "Scene",
+      "level": 2,
+      "autoNumber": true,
+      "textSize": 24,
+      "borderStyle": "NONE",
+      "backgroundColor": "none",
+      "textColor": "#0b1117",
+      "borderColor": "#6cace4",
+      "dark": {
+        "borderColor": "#ccc",
+        "textColor": "#ccc"
+      },
+      "light": {
+        "borderColor": "#6cace4",
+        "textColor": "#0b1117"
+      }
+    }
+  ]
+#+end_src
+
+** Actions
+
+The actions and selectors available here are basic.  We didn't have a
+lot of time to improve on their design.  Please feel free to update
+them.
+
+*** Setting All Hierarchy Levels
+
+You can specify a new structure for the current timeline with the
+action: ~setHierarchyLevels~ in the ~hierarchy~ ~actions~ module.  It
+accepts an array of all three levels and dispatches an event to update
+the configuration for the current timeline.
+
+Example usage:
+#+begin_src js
+  setHierarchyLevels([
+    {
+      "name": "Act",
+      "level": 0,
+      "autoNumber": true,
+      "textSize": 24,
+      "borderStyle": "SOLID",
+      "backgroundColor": "none",
+      "textColor": "#e5554f",
+      "borderColor": "#e5554f",
+      "dark": {
+        "textColor": "#ffb8b5",
+        "borderColor": "#ffb8b5"
+      },
+      "light": {
+        "textColor": "#e5554f",
+        "borderColor": "#e5554f"
+      }
+    },
+    {
+      "name": "Chapter",
+      "level": 1,
+      "autoNumber": true,
+      "textSize": 24,
+      "borderStyle": "DASHED",
+      "backgroundColor": "none",
+      "textColor": "DarkGoldenrod",
+      "borderColor": "#78be20",
+      "dark": {
+        "textColor": "#baed79",
+        "borderColor": "#baed79"
+      },
+      "light": {
+        "textColor": "DarkGoldenrod",
+        "borderColor": "#78be20"
+      }
+    },
+    {
+      "name": "Scene",
+      "level": 2,
+      "autoNumber": true,
+      "textSize": 24,
+      "borderStyle": "NONE",
+      "backgroundColor": "none",
+      "textColor": "#0b1117",
+      "borderColor": "#6cace4",
+      "dark": {
+        "borderColor": "#ccc",
+        "textColor": "#ccc"
+      },
+      "light": {
+        "borderColor": "#6cace4",
+        "textColor": "#0b1117"
+      }
+    }
+  ])
+#+end_src
+
+*NOTE*: the reducer does some work behind the scenes to ensure that the
+hierarchy levels are indexed by the numbers zero through 2 if they had
+invalid levels in the supplied array.
+
+*** Editing a Single Hierarchy Level
+
+You can modify a specific hierarchy level with the ~edithierarchyLevel~
+action.  It takes a single hierarchy level and swaps it in place of
+the existing hierarchy level (it determines which level to edit using
+the value of ~level~.
+
+Example usage:
+#+begin_src js
+  editHierarchyLevel([
+    {
+      "name": "Act",
+      "level": 0,
+      "autoNumber": true,
+      "textSize": 24,
+      "borderStyle": "SOLID",
+      "backgroundColor": "none",
+      "textColor": "#e5554f",
+      "borderColor": "#e5554f",
+      "dark": {
+        "textColor": "#ffb8b5",
+        "borderColor": "#ffb8b5"
+      },
+      "light": {
+        "textColor": "#e5554f",
+        "borderColor": "#e5554f"
+      }
+    }
+  ])
+#+end_src
+
+* Rendering Structured Timelines
+
+Plottr Desktop and Web supply users with three ways to visualise and
+manipulate structured timelines:
+ - Default: a view where Acts and Chapters can be individually
+   collapsed into single columns and we draw stacks of cards where
+   cards would be hidden by collapsing a column.
+ - Tabbed: a view where you don't get to see cards associated with the
+   top level of hierarchy (Acts when there are three levels).  Those
+   beats are instead rendered as tabs and their Chapters and Scenes
+   are rendered using the "Default" style inside of each tab.
+ - Stacked: a view where you don't get to see cards associated with
+   Acts or Chapters.  You only see the lowest level's cards.  Chapters
+   and Acts are rendered as bars above the Scenes that they contain.
+
+** Relevant Selectors
+
+The following selectors produce the information needed to draw each of
+these views.
+
+ - ~timelineViewSelector~: produces one of the strings: ~"default"~,
+   ~"tabbed"~ or ~"stacked"~.
+ - ~timelineViewIsStackedSelector~: produces true if the timeline view
+   is set to ~"stacked"~.
+ - ~timelineViewIsTabbedSelector~: produces true if the timeline view is
+   set to ~"tabbed"~.
+ - ~timelineActiveTabSelector~: produces the beat id that corresponds to
+   the tab that's currently open in the tabbed view. e.g. the second
+   tab might have been created from the beat with id 35.  If the
+   second tab was selected, this selector will produce 35.
+ - ~timelineSparceBeatMap~: produces an object whose keys the
+   zero-indexed column indices of the timeline's columns and whose
+   values are the beats that belong in those columns.  It accounts for
+   the current view and whether any beats are collapsed.
+
+   e.g. if we're in the stacked view and there are three tiers, the
+   beat ids for Acts and Chapters wont appear in the object's values.
+
+   e.g. if we're in the tabbed view, the beat ids corresponding to
+   tabs wont appear in the object's values.
+
+   Listing [[sparse-beat-map][Sparse Beat Map]] is an example value that the selector might
+   produce (the timeline view was tabbed).  This object indicates that
+   column 0 in the timeline table ought to contain beat 34's cards,
+   column 1 ought to contain beat 20's cards etc.
+ - ~searchedCardMetaDataMapSelector~: produces an object whose keys are
+   the stringified coordinates (in the form ~`${line-id}-${beat-id}`~ of
+   all positions on the timeline table that should contain cards and
+   whose values are the cards to render in that cell.  The selector
+   accounts for the current timeline view and whether any beats are
+   collapsed.
+
+   Listing [[card-map][Card Map]] is an example of what this selector might produce.
+
+   *NOTE*: this selector does not produce full cards, but enough to
+   render them on the timeline.  Notably, it excludes custom
+   attributes and the card description so that modifying a card
+   doesn't cause the entire timeline to re-render.  i.e. as you modify
+   one card's description, this selector should continue to produce
+   the same value (by pointer comparison).
+ - ~visibleSortedBeatsForTimelineByBookSelector~: produces an array of
+   the visible beats that should be rendered as columns in the order
+   that they should be rendered.  It should be used in the ~"default"~
+   and ~"tabbed"~ views, and takes into account the current view and
+   whether any beats are collapsed.
+
+   Listing [[visible-beats-for-timeline][Visible Beats for Timeline]] is an example of what this
+   selector might produce.
+ - ~topTierBeatsInThreeTierArrangementSelector~: produces an array of
+   the beats that should be rendered as the top bars in the stacked
+   view of the timeline when there are three tiers.  If there are only
+   two tiers in the current structure, its result should be ignored
+   when drawing the timeline table.
+
+   Listing [[top-tier-in-three-tier][Top Tier In Three Tier]] is an example of what this selector
+   might produce.
+ - ~secondTierBeatsInAtLeastTwoTierArrangementSelector~: produces an
+   array of the beats that should be rendered as the second tier of
+   bars in a structure with at least two levels when the timeline view
+   is ~"stacked"~.  If there are only two tiers, this will be the top
+   row of bars.
+
+   Listing [[second-tier-in-two-tier][Second Tier in Two Tier]] is an example of what this selector
+   might produce.
+ - ~leavesPerBeat~: produces a ~Map~ of beat ids to the number of columns
+   in width that it should span over in the ~"stacked"~ timeline view.
+
+   Listing [[leaves-per-beat][Leaves Per Beat]] is an example of what this selector might
+   produce.  Note that in this example, beats 35 and 36 span 9 columns
+   each, but all other beat titles don't span more than one column.
+
+*** Visible Beats for Timeline
+
+#+NAME: visible-beats-for-timeline
+#+begin_src js
+  [
+    {
+      "id": 35,
+      "bookId": 7,
+      "position": 0,
+      "title": "auto",
+      "time": 0,
+      "templates": [],
+      "autoOutlineSort": true,
+      "fromTemplateId": null,
+      "expanded": true
+    },
+    {
+      "id": 34,
+      "bookId": 7,
+      "position": 0,
+      "title": "auto",
+      "time": 0,
+      "templates": [],
+      "autoOutlineSort": true,
+      "fromTemplateId": null,
+      "expanded": true
+    },
+    {
+      "autoOutlineSort": true,
+      "bookId": 7,
+      "fromTemplateId": null,
+      "id": 20,
+      "position": 0,
+      "time": 0,
+      "title": "auto",
+      "expanded": true
+    },
+    {
+      "autoOutlineSort": true,
+      "bookId": 7,
+      "fromTemplateId": null,
+      "id": 26,
+      "position": 1,
+      "time": 0,
+      "title": "auto",
+      "expanded": true
+    },
+    {
+      "autoOutlineSort": true,
+      "bookId": 7,
+      "fromTemplateId": null,
+      "id": 27,
+      "position": 2,
+      "time": 0,
+      "title": "auto",
+      "expanded": true
+    },
+    {
+      "autoOutlineSort": true,
+      "bookId": 7,
+      "fromTemplateId": null,
+      "id": 28,
+      "position": 3,
+      "time": 0,
+      "title": "auto",
+      "expanded": true
+    },
+    {
+      "autoOutlineSort": true,
+      "bookId": 7,
+      "fromTemplateId": null,
+      "id": 29,
+      "position": 4,
+      "time": 0,
+      "title": "auto",
+      "expanded": true
+    },
+    {
+      "autoOutlineSort": true,
+      "bookId": 7,
+      "fromTemplateId": null,
+      "id": 30,
+      "position": 5,
+      "time": 0,
+      "title": "auto",
+      "expanded": true
+    },
+    {
+      "autoOutlineSort": true,
+      "bookId": 7,
+      "fromTemplateId": null,
+      "id": 31,
+      "position": 6,
+      "time": 0,
+      "title": "auto",
+      "expanded": true
+    },
+    {
+      "autoOutlineSort": true,
+      "bookId": 7,
+      "fromTemplateId": null,
+      "id": 32,
+      "position": 7,
+      "time": 0,
+      "title": "auto",
+      "expanded": true
+    },
+    {
+      "autoOutlineSort": true,
+      "bookId": 7,
+      "fromTemplateId": null,
+      "id": 33,
+      "position": 8,
+      "time": 0,
+      "title": "auto",
+      "expanded": true
+    },
+    {
+      "autoOutlineSort": true,
+      "bookId": 7,
+      "fromTemplateId": null,
+      "id": 36,
+      "position": 1,
+      "time": 0,
+      "title": "auto",
+      "expanded": true
+    },
+    {
+      "autoOutlineSort": true,
+      "bookId": 7,
+      "fromTemplateId": null,
+      "id": 38,
+      "position": 0,
+      "time": 0,
+      "title": "auto",
+      "expanded": true
+    },
+    {
+      "autoOutlineSort": true,
+      "bookId": 7,
+      "fromTemplateId": null,
+      "id": 41,
+      "position": 0,
+      "time": 0,
+      "title": "auto",
+      "expanded": true
+    },
+    {
+      "autoOutlineSort": true,
+      "bookId": 7,
+      "fromTemplateId": null,
+      "id": 37,
+      "position": 2,
+      "time": 0,
+      "title": "auto",
+      "expanded": true
+    },
+    {
+      "autoOutlineSort": true,
+      "bookId": 7,
+      "fromTemplateId": null,
+      "id": 39,
+      "position": 0,
+      "time": 0,
+      "title": "auto",
+      "expanded": true
+    },
+    {
+      "autoOutlineSort": true,
+      "bookId": 7,
+      "fromTemplateId": null,
+      "id": 40,
+      "position": 0,
+      "time": 0,
+      "title": "auto",
+      "expanded": true
+    }
+  ]
+#+end_src
+
+*** Sparse Beat Map
+
+#+NAME: sparse-beat-map
+#+begin_src js
+  {
+    "0": 34,
+    "1": 20,
+    "2": 26,
+    "3": 27,
+    "4": 28,
+    "5": 29,
+    "6": 30,
+    "7": 31,
+    "8": 32,
+    "9": 33
+  }
+#+end_src
+
+**** Card Map
+
+#+NAME: card-map
+#+begin_src js
+  {
+    "13-33": [
+      {
+        "id": 35,
+        "beatId": 33,
+        "lineId": 13,
+        "tags": [],
+        "color": null,
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "Vah Ruta",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": false
+      }
+    ],
+    "13-32": [
+      {
+        "id": 34,
+        "beatId": 32,
+        "lineId": 13,
+        "tags": [],
+        "color": null,
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "Lynel",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": false
+      }
+    ],
+    "16-31": [
+      {
+        "id": 33,
+        "beatId": 31,
+        "lineId": 16,
+        "tags": [],
+        "color": null,
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "Zora's Domain",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": false
+      }
+    ],
+    "13-31": [
+      {
+        "id": 32,
+        "beatId": 31,
+        "lineId": 13,
+        "tags": [],
+        "color": null,
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "Prince Sidon",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": false
+      }
+    ],
+    "13-30": [
+      {
+        "id": 31,
+        "beatId": 30,
+        "lineId": 13,
+        "tags": [],
+        "color": null,
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "Making the climb",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": false
+      }
+    ],
+    "16-29": [
+      {
+        "id": 30,
+        "beatId": 29,
+        "lineId": 16,
+        "tags": [],
+        "color": null,
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "Princess Ruto",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": false
+      }
+    ],
+    "13-29": [
+      {
+        "id": 29,
+        "beatId": 29,
+        "lineId": 13,
+        "tags": [],
+        "color": null,
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "Zora's Domain",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": false
+      }
+    ],
+    "13-28": [
+      {
+        "id": 28,
+        "beatId": 28,
+        "lineId": 13,
+        "tags": [],
+        "color": null,
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "Where to start",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": false
+      }
+    ],
+    "16-27": [
+      {
+        "id": 27,
+        "beatId": 27,
+        "lineId": 16,
+        "tags": [],
+        "color": null,
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "shadows",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": false
+      }
+    ],
+    "13-27": [
+      {
+        "id": 26,
+        "beatId": 27,
+        "lineId": 13,
+        "tags": [],
+        "color": null,
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "Leaving the plateau",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": false
+      }
+    ],
+    "13-26": [
+      {
+        "id": 25,
+        "beatId": 26,
+        "lineId": 13,
+        "tags": [],
+        "color": null,
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "Preparation",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": false
+      }
+    ],
+    "16-20": [
+      {
+        "id": 24,
+        "beatId": 20,
+        "lineId": 16,
+        "tags": [],
+        "color": null,
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "First memories",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": false
+      }
+    ],
+    "13-20": [
+      {
+        "id": 23,
+        "beatId": 20,
+        "lineId": 13,
+        "tags": [],
+        "color": null,
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "Intro",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": false
+      }
+    ],
+    "14-24": [
+      {
+        "id": 22,
+        "beatId": 24,
+        "lineId": 14,
+        "tags": [],
+        "color": null,
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "Level 3",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": false
+      }
+    ],
+    "14-23": [
+      {
+        "id": 21,
+        "beatId": 23,
+        "lineId": 14,
+        "tags": [],
+        "color": null,
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "Level 2",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": false
+      }
+    ],
+    "14-22": [
+      {
+        "id": 20,
+        "beatId": 22,
+        "lineId": 14,
+        "tags": [],
+        "color": null,
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "Level 1",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": false
+      }
+    ],
+    "14-21": [
+      {
+        "id": 19,
+        "beatId": 21,
+        "lineId": 14,
+        "tags": [],
+        "color": null,
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "Intro- awake in a field and go in a cave",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": true
+      }
+    ],
+    "1-16": [
+      {
+        "id": 18,
+        "beatId": 16,
+        "lineId": 1,
+        "tags": [],
+        "color": null,
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "Hyrule Castle",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": false
+      }
+    ],
+    "1-2": [
+      {
+        "id": 17,
+        "beatId": 2,
+        "lineId": 1,
+        "tags": [],
+        "color": null,
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "Intro",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": false
+      }
+    ],
+    "3-5": [
+      {
+        "id": 16,
+        "beatId": 5,
+        "lineId": 3,
+        "tags": [],
+        "color": null,
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "a scene",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": true
+      }
+    ],
+    "10-3": [
+      {
+        "id": 15,
+        "beatId": 3,
+        "lineId": 10,
+        "tags": [],
+        "color": null,
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "sub scene",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": true
+      }
+    ],
+    "6-11": [
+      {
+        "id": 6,
+        "beatId": 11,
+        "lineId": 6,
+        "tags": [],
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": false
+      },
+      {
+        "id": 13,
+        "beatId": 11,
+        "lineId": 6,
+        "tags": [],
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "another",
+        "templates": [],
+        "positionWithinLine": 1,
+        "hasDescription": false
+      },
+      {
+        "id": 14,
+        "beatId": 11,
+        "lineId": 6,
+        "tags": [],
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "one more",
+        "templates": [],
+        "positionWithinLine": 3,
+        "hasDescription": false
+      }
+    ],
+    "5-12": [
+      {
+        "id": 10,
+        "beatId": 12,
+        "lineId": 5,
+        "tags": [],
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "yeeee",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": true
+      },
+      {
+        "id": 11,
+        "beatId": 12,
+        "lineId": 5,
+        "tags": [],
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "andthis",
+        "templates": [],
+        "positionWithinLine": 1,
+        "hasDescription": false
+      },
+      {
+        "id": 12,
+        "beatId": 12,
+        "lineId": 5,
+        "tags": [],
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "scene3",
+        "templates": [],
+        "positionWithinLine": 3,
+        "hasDescription": false
+      }
+    ],
+    "8-11": [
+      {
+        "id": 9,
+        "beatId": 11,
+        "lineId": 8,
+        "tags": [],
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "a thing",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": false
+      }
+    ],
+    "5-10": [
+      {
+        "id": 8,
+        "beatId": 10,
+        "lineId": 5,
+        "tags": [],
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "try again",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": false
+      }
+    ],
+    "6-12": [
+      {
+        "id": 7,
+        "beatId": 12,
+        "lineId": 6,
+        "tags": [],
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "anything",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": false
+      }
+    ],
+    "6-10": [
+      {
+        "id": 5,
+        "beatId": 10,
+        "lineId": 6,
+        "tags": [],
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "tuff",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": false
+      }
+    ],
+    "6-9": [
+      {
+        "id": 4,
+        "beatId": 9,
+        "lineId": 6,
+        "tags": [],
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": false
+      }
+    ],
+    "6-8": [
+      {
+        "id": 3,
+        "beatId": 8,
+        "lineId": 6,
+        "tags": [],
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": false
+      }
+    ],
+    "6-7": [
+      {
+        "id": 2,
+        "beatId": 7,
+        "lineId": 6,
+        "tags": [],
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": false
+      }
+    ],
+    "5-6": [
+      {
+        "id": 1,
+        "beatId": 6,
+        "lineId": 5,
+        "tags": [],
+        "places": [],
+        "characters": [],
+        "bookId": null,
+        "title": "Scene 1",
+        "templates": [],
+        "positionWithinLine": 0,
+        "hasDescription": false
+      }
+    ]
+  }
+#+end_src
+
+#+begin_src js
+  [
+    {
+      "id": 34,
+      "bookId": 7,
+      "position": 0,
+      "title": "auto",
+      "time": 0,
+      "templates": [],
+      "autoOutlineSort": true,
+      "fromTemplateId": null,
+      "expanded": true
+    },
+    {
+      "autoOutlineSort": true,
+      "bookId": 7,
+      "fromTemplateId": null,
+      "id": 20,
+      "position": 0,
+      "time": 0,
+      "title": "auto",
+      "expanded": true
+    },
+    {
+      "autoOutlineSort": true,
+      "bookId": 7,
+      "fromTemplateId": null,
+      "id": 26,
+      "position": 1,
+      "time": 0,
+      "title": "auto",
+      "expanded": true
+    },
+    {
+      "autoOutlineSort": true,
+      "bookId": 7,
+      "fromTemplateId": null,
+      "id": 27,
+      "position": 2,
+      "time": 0,
+      "title": "auto",
+      "expanded": true
+    },
+    {
+      "autoOutlineSort": true,
+      "bookId": 7,
+      "fromTemplateId": null,
+      "id": 28,
+      "position": 3,
+      "time": 0,
+      "title": "auto",
+      "expanded": true
+    },
+    {
+      "autoOutlineSort": true,
+      "bookId": 7,
+      "fromTemplateId": null,
+      "id": 29,
+      "position": 4,
+      "time": 0,
+      "title": "auto",
+      "expanded": true
+    },
+    {
+      "autoOutlineSort": true,
+      "bookId": 7,
+      "fromTemplateId": null,
+      "id": 30,
+      "position": 5,
+      "time": 0,
+      "title": "auto",
+      "expanded": true
+    },
+    {
+      "autoOutlineSort": true,
+      "bookId": 7,
+      "fromTemplateId": null,
+      "id": 31,
+      "position": 6,
+      "time": 0,
+      "title": "auto",
+      "expanded": true
+    },
+    {
+      "autoOutlineSort": true,
+      "bookId": 7,
+      "fromTemplateId": null,
+      "id": 32,
+      "position": 7,
+      "time": 0,
+      "title": "auto",
+      "expanded": true
+    },
+    {
+      "autoOutlineSort": true,
+      "bookId": 7,
+      "fromTemplateId": null,
+      "id": 33,
+      "position": 8,
+      "time": 0,
+      "title": "auto",
+      "expanded": true
+    }
+  ]
+#+end_src
+
+*** Top Tier In Three Tier
+
+#+NAME: top-tier-in-three-tier
+#+begin_src js
+  [
+    {
+      "id": 35,
+      "bookId": 7,
+      "position": 0,
+      "title": "auto",
+      "time": 0,
+      "templates": [],
+      "autoOutlineSort": true,
+      "fromTemplateId": null,
+      "expanded": true
+    },
+    {
+      "autoOutlineSort": true,
+      "bookId": 7,
+      "fromTemplateId": null,
+      "id": 36,
+      "position": 1,
+      "time": 0,
+      "title": "auto",
+      "expanded": true
+    },
+    {
+      "autoOutlineSort": true,
+      "bookId": 7,
+      "fromTemplateId": null,
+      "id": 37,
+      "position": 2,
+      "time": 0,
+      "title": "auto",
+      "expanded": true
+    }
+  ]
+#+end_src
+
+*** Second Tier in Two Tier
+
+#+NAME: second-tier-in-two-tier
+#+begin_src js
+  [
+    {
+      "id": 34,
+      "bookId": 7,
+      "position": 0,
+      "title": "auto",
+      "time": 0,
+      "templates": [],
+      "autoOutlineSort": true,
+      "fromTemplateId": null,
+      "expanded": true
+    },
+    {
+      "autoOutlineSort": true,
+      "bookId": 7,
+      "fromTemplateId": null,
+      "id": 38,
+      "position": 0,
+      "time": 0,
+      "title": "auto",
+      "expanded": true
+    },
+    {
+      "autoOutlineSort": true,
+      "bookId": 7,
+      "fromTemplateId": null,
+      "id": 39,
+      "position": 0,
+      "time": 0,
+      "title": "auto",
+      "expanded": true
+    }
+  ]
+#+end_src
+
+*** Leaves Per Beat
+
+#+NAME: leaves-per-beat
+#+begin_src fundamental
+  Map(17) {20 => 1, 26 => 1, 27 => 1, 28 => 1, 29 => 1, …}
+  [[Entries]]
+  0: {20 => 1}
+  1: {26 => 1}
+  2: {27 => 1}
+  3: {28 => 1}
+  4: {29 => 1}
+  5: {30 => 1}
+  6: {31 => 1}
+  7: {32 => 1}
+  8: {33 => 1}
+  9: {34 => 9}
+  10: {35 => 9}
+  11: {36 => 1}
+  12: {37 => 1}
+  13: {38 => 1}
+  14: {39 => 1}
+  15: {40 => 1}
+  16: {41 => 1}
+  size: 17
+  [[Prototype]]: Map
+#+end_src
+
+** Relevant Actions
+
+There are only a few ways to manipulate the beat tree.  You may:
+ - add a beat (optionally specifying which beat should be the parent),
+ - insert a beat (specifying which beat should be it's sibling and
+   inserting the beat at that level),
+ - expand a beat,
+ - collapse a beat, and
+ - append a top level beat.
+
+*** Adding a Beat
+
+~addBeat(bookId, parentId)~: lets you add a beat to the specified book.
+The ~parentId~ is optional.  If you supply a ~parentId~ then the beat is
+created as a child of the supplied parent.  If the ~parentId~ is
+omitted, then the beat is added as a top-level beat i.e. it's parent
+is ~null~.
+
+*** Inserting a Beat
+
+~insertBeat(bookId, peerBeatId)~: lets you insert a beat to the right of
+the specified beat specified by ~peerBeatId~ in the book specified by
+~bookId~.
+
+*** Expanding a Beat
+
+~expandBeat(id, bookId)~: lets you specify a beat in a particular book
+to expand.  This only impacts the ~"default"~ and ~"tabbed"~ views.
+
+*** Collapsing a Beat
+
+~collapseBeat(id, bookId)~: lets you specify a beat in a particular book
+to collapse.  This will collapse the columns belonging to the
+specified beat's children into this beats column.  This only impacts
+the ~"default"~ and ~"tabbed"~ views.
+
+*** Appending A Top Level Beat
+
+~appendTopLevelBeat(bookId)~: lets you append a beat to the top level of
+the timeline specified by ~bookId~.  i.e. this action cannot be used to
+create Chapters or Scenes in a three-tier structure.

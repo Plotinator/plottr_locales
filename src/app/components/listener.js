@@ -128,7 +128,7 @@ const Listener = ({
     let unsubscribeFunction = () => {}
     if (fileLoaded) {
       const fileId = helpers.file.fileIdFromPlottrProFile(fileURL)
-      unsubscribeFunction = listen(store, userId, fileId, clientId, fileVersion)
+      unsubscribeFunction = listen(store(), userId, fileId, clientId, fileVersion)
       setPermission(selectedFile.permission)
     } else {
       setFileLoaded()

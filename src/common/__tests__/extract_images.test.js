@@ -14,15 +14,17 @@ describe('extractImages', () => {
     })
     describe('that has a root level attribute name "type" and a value "image-data"', () => {
       it('should produce a singleton list with an empty path', () => {
-        expect(extractImages({ type: 'image-data', data: 'x' })).toEqual([{ path: [], data: 'x' }])
+        expect(extractImages({ type: 'image-data', data: 'data:image/jpeg;base64,x' })).toEqual([
+          { path: [], data: 'data:image/jpeg;base64,x' },
+        ])
       })
     })
     describe('that has an object on the root level', () => {
       describe('that has a root level attribute name "type" and a value "image-data"', () => {
         it('should produce a singleton list with a path to the sub-object', () => {
-          expect(extractImages({ a: { type: 'image-data', data: 'y' } })).toEqual([
-            { path: ['a'], data: 'y' },
-          ])
+          expect(
+            extractImages({ a: { type: 'image-data', data: 'data:image/jpeg;base64,y' } })
+          ).toEqual([{ path: ['a'], data: 'data:image/jpeg;base64,y' }])
         })
       })
     })
@@ -31,8 +33,11 @@ describe('extractImages', () => {
         describe('that has a root level attribute name "type" and a value "image-data"', () => {
           it('should produce a singleton list with a path to the object in the array', () => {
             expect(
-              extractImages({ a: [2, { type: 'image-data', data: 'z' }], b: { c: 4 } })
-            ).toEqual([{ path: ['a', 1], data: 'z' }])
+              extractImages({
+                a: [2, { type: 'image-data', data: 'data:image/jpeg;base64,z' }],
+                b: { c: 4 },
+              })
+            ).toEqual([{ path: ['a', 1], data: 'data:image/jpeg;base64,z' }])
           })
         })
       })
@@ -45,13 +50,13 @@ describe('extractImages', () => {
               it('should produce a singleton list with a path to the object in the array', () => {
                 expect(
                   extractImages({
-                    a: [2, { type: 'image-data', data: 'aa' }],
+                    a: [2, { type: 'image-data', data: 'data:image/jpeg;base64,aa' }],
                     b: { c: 4 },
-                    c: { type: 'image-data', data: 'bb' },
+                    c: { type: 'image-data', data: 'data:image/jpeg;base64,bb' },
                   })
                 ).toEqual([
-                  { path: ['a', 1], data: 'aa' },
-                  { path: ['c'], data: 'bb' },
+                  { path: ['a', 1], data: 'data:image/jpeg;base64,aa' },
+                  { path: ['c'], data: 'data:image/jpeg;base64,bb' },
                 ])
               })
             })
@@ -74,19 +79,38 @@ describe('imageIndex', () => {
         images: {
           1: {
             id: 1,
-            data: 'blah',
+            data: 'data:image/jpeg;base64,blah',
             path: 'some/image.jpg',
           },
           7: {
             id: 7,
-            data: 'haha',
+            data: 'data:image/jpeg;base64,haha',
             path: 'some/image.jpg',
           },
         },
       }
       expect(imageIndex(extractImages(file), file)).toEqual({
-        haha: 7,
-        blah: 1,
+        'data:image/jpeg;base64,blah': 1,
+        'data:image/jpeg;base64,haha': 7,
+      })
+    })
+  })
+  describe('given a file with images in the image key', () => {
+    describe('but those images are invalid (lacking "data")', () => {
+      const file = {
+        images: {
+          1: {
+            id: 1,
+            path: 'some/image.jpg',
+          },
+          7: {
+            id: 7,
+            path: 'some/image.jpg',
+          },
+        },
+      }
+      it('should not add those images to the index', () => {
+        expect(imageIndex([], file)).toEqual({})
       })
     })
   })
@@ -102,14 +126,14 @@ describe('imageIndex', () => {
               notes: [
                 {
                   type: 'image-data',
-                  data: 'This is some data.',
+                  data: 'data:image/jpeg;base64,This is some data.',
                 },
               ],
             },
           ],
         }
         expect(imageIndex(extractImages(file), file)).toEqual({
-          'This is some data.': Number.NEGATIVE_INFINITY + 1,
+          'data:image/jpeg;base64,This is some data.': 1,
         })
       })
     })
@@ -124,7 +148,7 @@ describe('imageIndex', () => {
               notes: [
                 {
                   type: 'image-data',
-                  data: 'This is some data.',
+                  data: 'data:image/jpeg;base64,This is some data.',
                 },
               ],
             },
@@ -132,20 +156,20 @@ describe('imageIndex', () => {
           images: {
             1: {
               id: 1,
-              data: 'blah',
+              data: 'data:image/jpeg;base64,blah',
               path: 'some/image.jpg',
             },
             7: {
               id: 7,
-              data: 'haha',
+              data: 'data:image/jpeg;base64,haha',
               path: 'some/image.jpg',
             },
           },
         }
         expect(imageIndex(extractImages(file), file)).toEqual({
-          blah: 1,
-          haha: 7,
-          'This is some data.': 8,
+          'data:image/jpeg;base64,blah': 1,
+          'data:image/jpeg;base64,haha': 7,
+          'data:image/jpeg;base64,This is some data.': 8,
         })
       })
       describe('when there are duplicate images by their content', () => {
@@ -159,7 +183,7 @@ describe('imageIndex', () => {
                 notes: [
                   {
                     type: 'image-data',
-                    data: 'This is some data.',
+                    data: 'data:image/jpeg;base64,This is some data.',
                   },
                 ],
               },
@@ -167,25 +191,25 @@ describe('imageIndex', () => {
             images: {
               1: {
                 id: 1,
-                data: 'blah',
+                data: 'data:image/jpeg;base64,blah',
                 path: 'some/image.jpg',
               },
               7: {
                 id: 7,
-                data: 'haha',
+                data: 'data:image/jpeg;base64,haha',
                 path: 'some/image.jpg',
               },
               9: {
                 id: 9,
-                data: 'This is some data.',
+                data: 'data:image/jpeg;base64,This is some data.',
                 path: 'some/image.jpg',
               },
             },
           }
           expect(imageIndex(extractImages(file), file)).toEqual({
-            blah: 1,
-            haha: 7,
-            'This is some data.': 9,
+            'data:image/jpeg;base64,blah': 1,
+            'data:image/jpeg;base64,haha': 7,
+            'data:image/jpeg;base64,This is some data.': 9,
           })
         })
       })
@@ -206,19 +230,19 @@ describe('patchImages', () => {
           images: {
             1: {
               id: 1,
-              data: 'blah',
+              data: 'data:image/jpeg;base64,blah',
               path: 'test',
               name: 'blah',
             },
             7: {
               id: 7,
-              data: 'haha',
+              data: 'data:image/jpeg;base64,haha',
               path: 'test2',
               name: 'haha',
             },
             9: {
               id: 9,
-              data: 'This is some data.',
+              data: 'data:image/jpeg;base64,This is some data.',
               path: 'test3',
               name: 'This is some data.',
             },
@@ -244,19 +268,19 @@ describe('patchImages', () => {
           images: {
             1: {
               id: 1,
-              data: 'blah',
+              data: 'data:image/jpeg;base64,blah',
               path: 'test',
               name: 'blah',
             },
             7: {
               id: 7,
-              data: 'haha',
+              data: 'data:image/jpeg;base64,haha',
               path: 'test2',
               name: 'haha',
             },
             9: {
               id: 9,
-              data: 'This is some data.',
+              data: 'data:image/jpeg;base64,This is some data.',
               path: 'test3',
               name: 'This is some data.',
             },
@@ -310,7 +334,7 @@ describe('patchImages', () => {
             notes: [
               {
                 type: 'image-data',
-                data: 'This is some data.',
+                data: 'data:image/jpeg;base64,This is some data.',
               },
             ],
           },
@@ -322,7 +346,7 @@ describe('patchImages', () => {
           extractedImages,
           imageIndex(extractedImages, file),
           {
-            [Number.NEGATIVE_INFINITY + 1]: 'storage://images/tetttot/blah.jpg',
+            [1]: 'storage://images/tetttot/blah.jpg',
           },
           file
         )
@@ -341,8 +365,8 @@ describe('patchImages', () => {
           },
         ],
         images: {
-          [Number.NEGATIVE_INFINITY + 1]: {
-            id: Number.NEGATIVE_INFINITY + 1,
+          [1]: {
+            id: 1,
             name: '',
             data: '',
             path: 'storage://images/tetttot/blah.jpg',
