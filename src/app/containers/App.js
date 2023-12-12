@@ -25,7 +25,6 @@ import MainIntegrationContext from '../../mainIntegrationContext'
 import logger from '../../../shared/logger'
 import { makeMainProcessClient } from '../mainProcessClient'
 import { whenClientIsReady } from '../../../shared/socket-client/index'
-import { getErrorReporterInstance } from '../../../shared/error-reporter-instance'
 
 const {
   onAdvancedExportFileFromMenu,
