@@ -195,7 +195,9 @@ class Store {
         })
         .catch((error) => {
           this.logger.error(`Failed to write ${this.store} store for ${this.path}`, error)
-          throw new Error(`Failed to write ${this.store} store for ${this.path}`, error)
+          return Promise.reject(
+            new Error(`Failed to write ${this.store} store for ${this.path}`, error)
+          )
         })
         .finally(() => {
           this.activeWrite = null
@@ -218,7 +220,7 @@ class Store {
 
       const store = storeOrKey
       if (typeof store !== 'object') {
-        return Promise.reject(`Tried to set store to non-object: ${store}`)
+        return Promise.reject(new Error(`Tried to set store to non-object: ${store}`))
       }
       this.store = cloneDeep(store)
       return this.writeStore()
