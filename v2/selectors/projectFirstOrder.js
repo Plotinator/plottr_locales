@@ -54,8 +54,8 @@ export const fileURLLoadedSelector = createSelector(fileURLSelector, (fileURL) =
 export const isDeviceFileSelector = createSelector(fileURLSelector, (fileURL) =>
   isDeviceFileURL(fileURL)
 )
-const emptyFileState = emptyFile('DummyFile', '2022.11.2')
 export const hasAllKeysSelector = createSelector(fullFileStateSelector, (state) => {
+  const emptyFileState = emptyFile('DummyFile', '2022.11.2')
   const withoutSystemKeys = difference(Object.keys(state), SYSTEM_REDUCER_KEYS)
   return difference(Object.keys(emptyFileState), withoutSystemKeys).length === 0
 })

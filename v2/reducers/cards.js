@@ -42,8 +42,12 @@ import {
   MOVE_CARD_TO_BOOK,
   DUPLICATE_LINE,
   MOVE_LINE,
+  EDIT_CARD_TITLE,
+  EDIT_CARD_DESCRIPTION,
+  EDIT_CARD_CUSTOM_ATTRIBUTE,
   DUPLICATE_BOOK,
   REORDER_CARD_TEMPLATE_ATTRIBUTES,
+  REPLACE_MARKED_HITS,
 } from '../constants/ActionTypes'
 import { newFileCards } from '../store/newFileState'
 import { card as defaultCard } from '../store/initialState'
@@ -51,6 +55,9 @@ import { nextId } from '../store/newIds'
 import { applyToCustomAttributes } from './applyToCustomAttributes'
 import { repairIfPresent } from './repairIfPresent'
 import { reorderList } from '../helpers/lists'
+import { safeParseInt } from './safeParseInt'
+import { sortByHitPosition } from './sortByHitPosition'
+import { replacePlainTextHit, replaceInSlateDatastructure } from './replace'
 
 const INITIAL_STATE = []
 
@@ -143,11 +150,25 @@ const cards =
           }
         })
 
-      case EDIT_CARD_DETAILS:
+      case EDIT_CARD_DETAILS: {
         if (!action.attributes) return state
+        const attributeValues = Object.keys(action.attributes).reduce((acc, nextKey) => {
+          if (typeof action.attributes[nextKey].value !== 'undefined') {
+            return {
+              ...acc,
+              [nextKey]: action.attributes[nextKey].value,
+            }
+          } else {
+            return {
+              ...acc,
+              [nextKey]: action.attributes[nextKey],
+            }
+          }
+        }, {})
         return state.map((card) =>
-          card.id === action.id ? Object.assign({}, card, action.attributes) : card
+          card.id === action.id ? Object.assign({}, card, attributeValues) : card
         )
+      }
 
       case EDIT_CARD_COORDINATES: {
         const diffObj = {
@@ -563,6 +584,141 @@ const cards =
             return card
           }
         })
+      }
+
+      case EDIT_CARD_TITLE: {
+        return state.map((card) => {
+          if (card.id === action.id) {
+            return {
+              ...card,
+              title: action.newTitle,
+            }
+          } else {
+            return card
+          }
+        })
+      }
+
+      case EDIT_CARD_DESCRIPTION: {
+        return state.map((card) => {
+          if (card.id === action.id) {
+            return {
+              ...card,
+              description: action.description,
+            }
+          }
+          return card
+        })
+      }
+
+      case EDIT_CARD_CUSTOM_ATTRIBUTE: {
+        return state.map((card) => {
+          if (card.id === action.id) {
+            return {
+              ...card,
+              [action.name]: action.value,
+            }
+          }
+          return card
+        })
+      }
+
+      case REPLACE_MARKED_HITS: {
+        const applicableHits = action.hitsMarkedForReplacement.filter((hit) => {
+          return (
+            hit.path.match(/^\/timeline\/[0-9a-zA-Z]+\/card/) ||
+            hit.path.match(/^\/outline\/[0-9a-zA-Z]+\/card/)
+          )
+        })
+        // IMPORTANT!!!
+        //
+        // We sort by the hit position so that we deal with later hits
+        // first.  By doing so, we don't invalidate the start position
+        // of other hits when we replace those hits.
+        //
+        // i.e. it's fine to do multiple replacements in the same
+        // field, as long as you replace the hits in reverse order,
+        // i.e. the last hit first and the first hit last.
+        return sortByHitPosition(applicableHits).reduce((acc, nextHit) => {
+          const { path, hit } = nextHit
+          const [_, _timelineOrOutline, _rawBookId, _card, rawCardId, type, ...rest] =
+            path.split('/')
+          const cardId = safeParseInt(rawCardId)
+          return acc.map((nextCard) => {
+            if (nextCard.id === cardId) {
+              if (type === 'customAttribute') {
+                const [attributeName, rawFocusStart] = rest
+                const attributeValue = nextCard[attributeName]
+                const replaceFunction = Array.isArray(attributeValue)
+                  ? replaceInSlateDatastructure
+                  : replacePlainTextHit
+                const focusStart = safeParseInt(rawFocusStart)
+                return {
+                  ...nextCard,
+                  [attributeName]: replaceFunction(
+                    attributeValue,
+                    focusStart,
+                    hit,
+                    action.replacementText
+                  ),
+                }
+              } else if (type === 'templateAttribute') {
+                const [templateId, attributeName, rawFocusStart] = rest
+                const focusStart = safeParseInt(rawFocusStart)
+                return {
+                  ...nextCard,
+                  templates: nextCard.templates.map((template) => {
+                    if (template.id === templateId) {
+                      return {
+                        ...template,
+                        attributes: template.attributes.map((attribute) => {
+                          const attributeValue = attribute.value
+                          const replaceFunction = Array.isArray(attributeValue)
+                            ? replaceInSlateDatastructure
+                            : replacePlainTextHit
+                          if (attribute.name === attributeName) {
+                            return {
+                              ...attribute,
+                              value: replaceFunction(
+                                attributeValue,
+                                focusStart,
+                                hit,
+                                action.replacementText
+                              ),
+                            }
+                          } else {
+                            return attribute
+                          }
+                        }),
+                      }
+                    } else {
+                      return template
+                    }
+                  }),
+                }
+              } else {
+                const [rawFocusStart] = rest
+                const attributeName = type
+                const attributeValue = nextCard[attributeName]
+                const focusStart = safeParseInt(rawFocusStart)
+                const replaceFunction = Array.isArray(attributeValue)
+                  ? replaceInSlateDatastructure
+                  : replacePlainTextHit
+                return {
+                  ...nextCard,
+                  [attributeName]: replaceFunction(
+                    attributeValue,
+                    focusStart,
+                    hit,
+                    action.replacementText
+                  ),
+                }
+              }
+            } else {
+              return nextCard
+            }
+          })
+        }, state)
       }
 
       default:

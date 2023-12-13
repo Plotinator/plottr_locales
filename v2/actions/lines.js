@@ -35,8 +35,8 @@ export function addLineWithTitle(title, bookId) {
   return { type: ADD_LINE_WITH_TITLE, title, bookId }
 }
 
-export function addLinesFromTemplate(templateData, id) {
-  return { type: ADD_LINES_FROM_TEMPLATE, templateData, id }
+export function addLinesFromTemplate(templateData, id, lines) {
+  return { type: ADD_LINES_FROM_TEMPLATE, templateData, id, lines }
 }
 
 export function editLine(id, title, color) {

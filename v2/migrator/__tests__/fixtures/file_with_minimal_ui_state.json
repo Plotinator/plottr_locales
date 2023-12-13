@@ -26,11 +26,41 @@
     "characterSort": "name~asc",
     "characterFilter": null,
     "placeSort": "name~asc",
+    "placeTab": {
+      "attributeDialogOpen": false,
+      "categoriesOpen": false,
+      "editingSelected": false,
+      "filterVisible": false,
+      "focus": [],
+      "selectedPlace": null,
+      "sortVisible": false
+    },
+    "projectTab": {
+      "focus": []
+    },
     "resturctureTimelineModal": {
       "open": false
     },
+    "searchDialog": {
+      "currentHitIndex": null,
+      "hitsToReplace": [],
+      "isOpen": false,
+      "replacement": "",
+      "replacing": false,
+      "scanning": false,
+      "term": ""
+    },
     "placeFilter": null,
     "noteSort": "title~asc",
+    "noteTab": {
+      "attributesDialogOpen": false,
+      "categoriesDialogOpen": false,
+      "editingSelected": false,
+      "filterVisible": false,
+      "focus": [],
+      "selectedNote": null,
+      "sortVisible": false
+    },
     "noteFilter": null,
     "outlineFilter": null,
     "timelineFilter": null,
@@ -50,6 +80,11 @@
       "tags": null,
       "outline": null,
       "timeline": null
+    },
+    "tagTab": {
+      "editingSelectedTab": false,
+      "focus": [],
+      "selectedTag": null
     },
     "templateModal": {
       "expanded": false
@@ -75,6 +110,13 @@
       "bookId": null
     },
     "outlineScrollPosition": 0,
+    "outlineTab": {
+      "cardEditor": {
+        "editing": null
+      },
+      "focus": [],
+      "selectedCard": null
+    },
     "actConfigModal": {
       "open": false
     }
@@ -150,7 +192,14 @@
       "timelineTemplates": [],
       "imageId": "5"
     },
-    "allIds": [8, 1, 5, 9, 6, 7]
+    "allIds": [
+      8,
+      1,
+      5,
+      9,
+      6,
+      7
+    ]
   },
   "beats": {
     "1": {
@@ -158,7 +207,11 @@
         "2": [],
         "16": [],
         "17": [],
-        "null": [17, 16, 2]
+        "null": [
+          17,
+          16,
+          2
+        ]
       },
       "heap": {
         "2": null,
@@ -202,7 +255,9 @@
     "5": {
       "children": {
         "18": [],
-        "null": [18]
+        "null": [
+          18
+        ]
       },
       "heap": {
         "18": null
@@ -223,7 +278,9 @@
     "6": {
       "children": {
         "19": [],
-        "null": [19]
+        "null": [
+          19
+        ]
       },
       "heap": {
         "19": null
@@ -252,7 +309,17 @@
         "31": [],
         "32": [],
         "33": [],
-        "null": [33, 32, 31, 30, 29, 28, 27, 26, 20]
+        "null": [
+          33,
+          32,
+          31,
+          30,
+          29,
+          28,
+          27,
+          26,
+          20
+        ]
       },
       "heap": {
         "20": null,
@@ -364,7 +431,12 @@
         "22": [],
         "23": [],
         "24": [],
-        "null": [24, 23, 22, 21]
+        "null": [
+          24,
+          23,
+          22,
+          21
+        ]
       },
       "heap": {
         "21": null,
@@ -418,7 +490,9 @@
     "9": {
       "children": {
         "25": [],
-        "null": [25]
+        "null": [
+          25
+        ]
       },
       "heap": {
         "25": null
@@ -439,7 +513,9 @@
     "series": {
       "children": {
         "1": [],
-        "null": [1]
+        "null": [
+          1
+        ]
       },
       "heap": {
         "1": null
@@ -1404,7 +1480,14 @@
       "tags": [],
       "categoryId": "1",
       "imageId": null,
-      "bookIds": [1, 5, 8, 6, 7, 9]
+      "bookIds": [
+        1,
+        5,
+        8,
+        6,
+        7,
+        9
+      ]
     },
     {
       "id": 2,
@@ -1427,7 +1510,13 @@
       "tags": [],
       "categoryId": "2",
       "imageId": null,
-      "bookIds": [8, 1, 5, 6, 7]
+      "bookIds": [
+        8,
+        1,
+        5,
+        6,
+        7
+      ]
     },
     {
       "id": 3,
@@ -1450,7 +1539,13 @@
       "tags": [],
       "categoryId": null,
       "imageId": null,
-      "bookIds": [8, 1, 5, 6, 7]
+      "bookIds": [
+        8,
+        1,
+        5,
+        6,
+        7
+      ]
     }
   ],
   "customAttributes": {

@@ -1,11 +1,14 @@
 import { countBy } from 'lodash'
 import { pre_2023_1_19 } from './fixtures'
+import { hierarchyLevel } from '../../../store/initialState'
 
-import migrate, { newFileHierarchies } from '../2021.4.13'
+import migrate from '../2021.4.13'
 
 jest.mock('format-message')
 
 describe('migrate', () => {
+  const newFileHierarchies = { 0: hierarchyLevel() }
+
   const newFile = pre_2023_1_19
   describe('given the new file state', () => {
     it('should produce the initial state', () => {

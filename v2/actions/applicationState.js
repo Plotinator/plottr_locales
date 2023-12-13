@@ -40,10 +40,14 @@ import {
   BUSY_WITH_WORK_THAT_PREVENTS_QUITTING,
   DONE_WITH_WORK_THAT_PREVENTS_QUITTING,
   CLEAR_ERROR_LOADING_FILE,
+  INCREMENT_JUMP_COUNTER,
   ADVANCE_SETTINGS_WIZARD,
   REGRESS_SETTINGS_WIZARD,
   START_SETTINGS_WIZARD,
   FINISH_SETTINGS_WIZARD,
+  START_EDITING,
+  START_VIEWING,
+  START_SEARCHING,
   STAGE_LANGUAGE,
 } from '../constants/ActionTypes'
 
@@ -218,6 +222,30 @@ export const startWorkThatPreventsQuitting = () => ({
 export const finishWorkThatPreventsQuitting = () => ({
   type: DONE_WITH_WORK_THAT_PREVENTS_QUITTING,
 })
+
+export const incrementJumpCounter = () => {
+  return {
+    type: INCREMENT_JUMP_COUNTER,
+  }
+}
+
+export const startEditing = () => {
+  return {
+    type: START_EDITING,
+  }
+}
+
+export const startViewing = () => {
+  return {
+    type: START_VIEWING,
+  }
+}
+
+export const startSearching = () => {
+  return {
+    type: START_SEARCHING,
+  }
+}
 
 export const stageLanguage = (language) => ({
   type: STAGE_LANGUAGE,

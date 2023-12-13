@@ -5,6 +5,7 @@ import { isSeries as isSeriesString } from './books'
 import * as tree from '../reducers/tree'
 import { nextLevelName } from './hierarchy'
 import { nextId as nextBeatId } from './nextBeatId'
+import { safeParseInt } from './safeParseInt'
 
 export const nextId = nextBeatId
 
@@ -109,7 +110,7 @@ export function moveNextToSibling(items, toMove, droppedOntoId) {
 }
 
 export function reduce(beats, f, initialValue) {
-  return Object.values(beats).reduce((acc, nextTree) => {
+  return Object.entries(beats).reduce((acc, nextTree) => {
     return tree.reduce('id')(nextTree, f, acc)
   }, initialValue)
 }
@@ -221,4 +222,26 @@ export const numberOfPriorChildrenAtSameDepth = (beatTree, beats, beatId) => {
   }
   if (!found) return null
   return 1 + priorChildren
+}
+
+export const allBeatsAsArray = (stateBeatsObject) => {
+  return Object.values(stateBeatsObject).flatMap((beatTree) => {
+    return Object.values(beatTree.index)
+  })
+}
+
+export const beatFocusPath = (rawBeatId, rawBookId, type) => {
+  const beatId = safeParseInt(rawBeatId)
+  const bookId = safeParseInt(rawBookId)
+
+  if (
+    (typeof rawBeatId !== 'number' && rawBeatId !== `${beatId}`) ||
+    (typeof rawBookId !== 'number' && rawBookId !== `${bookId}`)
+  ) {
+    return ['unknown']
+  } else if (['title'].indexOf(type) !== -1) {
+    return ['beat', bookId, beatId, type]
+  } else {
+    return ['unknown']
+  }
 }

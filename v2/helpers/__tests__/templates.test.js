@@ -29,6 +29,7 @@ import {
 
 const withoutLineBeatOrCardIds = (x) => omit(x, 'id', 'lineId', 'beatId')
 const withoutIdsPositionsOrColor = (x) => omit(x, 'id', 'position', 'color')
+const withoutPositions = (x) => omit(x, 'position')
 const withFromTemplateId = (id) => (x) => ({
   ...x,
   fromTemplateId: id,
@@ -80,7 +81,9 @@ describe('applyTemplate', () => {
           )
         })
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines).toEqual(expect.arrayContaining(file_with_one_level.lines))
+          expect(result.lines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(file_with_one_level.lines.map(withoutPositions))
+          )
         })
         it('should only add cards to the new plotlines', () => {
           const existingPlotlines = one_level_biased_top_plotline_template.templateData.lines.map(
@@ -150,7 +153,9 @@ describe('applyTemplate', () => {
           )
         })
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines).toEqual(expect.arrayContaining(file_with_one_level.lines))
+          expect(result.lines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(file_with_one_level.lines.map(withoutPositions))
+          )
         })
         it('should only add cards to the new plotlines', () => {
           const existingPlotlines =
@@ -219,7 +224,9 @@ describe('applyTemplate', () => {
           )
         })
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines).toEqual(expect.arrayContaining(file_with_one_level.lines))
+          expect(result.lines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(file_with_one_level.lines.map(withoutPositions))
+          )
         })
         it('should only add cards to the new plotlines', () => {
           const existingPlotlines =
@@ -290,7 +297,9 @@ describe('applyTemplate', () => {
           )
         })
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines).toEqual(expect.arrayContaining(file_with_one_level.lines))
+          expect(result.lines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(file_with_one_level.lines.map(withoutPositions))
+          )
         })
         it('should only add cards to the new plotlines', () => {
           const existingPlotlines = two_level_biased_top_plotline_template.templateData.lines.map(
@@ -363,7 +372,9 @@ describe('applyTemplate', () => {
           )
         })
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines).toEqual(expect.arrayContaining(file_with_one_level.lines))
+          expect(result.lines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(file_with_one_level.lines.map(withoutPositions))
+          )
         })
         it('should only add cards to the new plotlines', () => {
           const existingPlotlines =
@@ -439,7 +450,9 @@ describe('applyTemplate', () => {
           )
         })
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines).toEqual(expect.arrayContaining(file_with_one_level.lines))
+          expect(result.lines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(file_with_one_level.lines.map(withoutPositions))
+          )
         })
         it('should only add cards to the new plotlines', () => {
           const existingPlotlines =
@@ -513,7 +526,9 @@ describe('applyTemplate', () => {
           )
         })
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines).toEqual(expect.arrayContaining(file_with_one_level.lines))
+          expect(result.lines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(file_with_one_level.lines.map(withoutPositions))
+          )
         })
         it('should only add cards to the new plotlines', () => {
           const existingPlotlines = three_level_biased_top_plotline_template.templateData.lines.map(
@@ -590,7 +605,9 @@ describe('applyTemplate', () => {
           )
         })
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines).toEqual(expect.arrayContaining(file_with_one_level.lines))
+          expect(result.lines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(file_with_one_level.lines.map(withoutPositions))
+          )
         })
         it('should only add cards to the new plotlines', () => {
           const existingPlotlines =
@@ -671,7 +688,9 @@ describe('applyTemplate', () => {
           )
         })
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines).toEqual(expect.arrayContaining(file_with_one_level.lines))
+          expect(result.lines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(file_with_one_level.lines.map(withoutPositions))
+          )
         })
         it('should only add cards to the new plotlines', () => {
           const existingPlotlines =
@@ -739,7 +758,9 @@ describe('applyTemplate', () => {
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines).toEqual(expect.arrayContaining(file_with_two_levels.lines))
+          expect(result.lines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(file_with_two_levels.lines.map(withoutPositions))
+          )
         })
         it('should only add cards to the new plotlines', () => {
           const existingPlotlines = one_level_biased_top_plotline_template.templateData.lines.map(
@@ -802,7 +823,9 @@ describe('applyTemplate', () => {
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines).toEqual(expect.arrayContaining(file_with_two_levels.lines))
+          expect(result.lines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(file_with_two_levels.lines.map(withoutPositions))
+          )
         })
         it('should only add cards to the new plotlines', () => {
           const existingPlotlines =
@@ -859,7 +882,9 @@ describe('applyTemplate', () => {
           )
         })
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines).toEqual(expect.arrayContaining(file_with_two_levels.lines))
+          expect(result.lines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(file_with_two_levels.lines.map(withoutPositions))
+          )
         })
         it('should only add cards to the new plotlines', () => {
           const existingPlotlines =
@@ -922,8 +947,10 @@ describe('applyTemplate', () => {
             )
           })
           it('should have the plotlines that were there originally', () => {
-            expect(result.lines).toEqual(
-              expect.arrayContaining(file_with_two_levels_but_no_chapter.lines)
+            expect(result.lines.map(withoutPositions)).toEqual(
+              expect.arrayContaining(
+                file_with_two_levels_but_no_chapter.lines.map(withoutPositions)
+              )
             )
           })
           it('should only add cards to the new plotlines', () => {
@@ -1014,7 +1041,9 @@ describe('applyTemplate', () => {
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines).toEqual(expect.arrayContaining(file_with_two_levels.lines))
+          expect(result.lines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(file_with_two_levels.lines.map(withoutPositions))
+          )
         })
         it('should only add cards to the new plotlines', () => {
           const existingPlotlines = two_level_biased_top_plotline_template.templateData.lines.map(
@@ -1083,7 +1112,9 @@ describe('applyTemplate', () => {
           expect(templateNumberOfBeats).toBeGreaterThanOrEqual(resultNumberOfBeats)
         })
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines).toEqual(expect.arrayContaining(file_with_two_levels.lines))
+          expect(result.lines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(file_with_two_levels.lines.map(withoutPositions))
+          )
         })
         it('should only add cards to the new plotlines', () => {
           const existingPlotlines =
@@ -1675,8 +1706,10 @@ describe('applyTemplate', () => {
             )
           })
           it('should have the plotlines that were there originally', () => {
-            expect(result.lines).toEqual(
-              expect.arrayContaining(file_with_three_levels_but_no_chapter.lines)
+            expect(result.lines.map(withoutPositions)).toEqual(
+              expect.arrayContaining(
+                file_with_three_levels_but_no_chapter.lines.map(withoutPositions)
+              )
             )
           })
           it('should only add cards to the new plotlines', () => {
@@ -1751,8 +1784,10 @@ describe('applyTemplate', () => {
             )
           })
           it('should have the plotlines that were there originally', () => {
-            expect(result.lines).toEqual(
-              expect.arrayContaining(file_with_three_levels_but_no_scene.lines)
+            expect(result.lines.map(withoutPositions)).toEqual(
+              expect.arrayContaining(
+                file_with_three_levels_but_no_scene.lines.map(withoutPositions)
+              )
             )
           })
           it('should only add cards to the new plotlines', () => {
@@ -2203,8 +2238,8 @@ describe('applyTemplate', () => {
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines.map(withoutIdsPositionsOrColor)).toEqual(
-            expect.arrayContaining(file_with_three_levels.lines.map(withoutIdsPositionsOrColor))
+          expect(result.lines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(file_with_three_levels.lines.map(withoutPositions))
           )
         })
         it('should only add cards to the new plotlines', () => {
@@ -2295,8 +2330,8 @@ describe('applyTemplate', () => {
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines.map(withoutIdsPositionsOrColor)).toEqual(
-            expect.arrayContaining(file_with_three_levels.lines.map(withoutIdsPositionsOrColor))
+          expect(result.lines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(file_with_three_levels.lines.map(withoutPositions))
           )
         })
         it('should only add cards to the new plotlines', () => {

@@ -26,9 +26,11 @@ import * as characterHelpers from './helpers/characters'
 
 import * as template from './template'
 
+import * as editStates from './constants/editStates'
+
 import migrateIfNeeded from './migrator/migration_manager'
 import Migrator from './migrator/migrator.js'
-import addHierarchiesIfMissing from './migrator/handleSpecialCases'
+import addUITimelineOrHierarchiesStateIfMissing from './migrator/handleSpecialCases'
 
 import selectors from './selectors'
 
@@ -151,7 +153,7 @@ const middlewares = {
 }
 
 const specialCaseFixes = {
-  addHierarchiesIfMissing,
+  addUITimelineOrHierarchiesStateIfMissing,
 }
 
 export {
@@ -185,5 +187,6 @@ export {
   ARRAY_KEYS,
   checkFileIntegrity,
   specialCaseFixes,
+  editStates,
   rtf,
 }

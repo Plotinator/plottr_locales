@@ -87,7 +87,8 @@ describe('isCharactersManuallySorted', () => {
             reorderCharacter(
               character1InitialState.id,
               character3AbsolutePosition,
-              character3InitialState.categoryId
+              character3InitialState.categoryId,
+              'up'
             )
           )
 
@@ -397,7 +398,8 @@ describe('isNotesManuallySorted', () => {
               note3InitialState.id,
               note3InitialPosition,
               note5InitialPosition,
-              note5InitialState.categoryId || null
+              note5InitialState.categoryId || null,
+              'down'
             )
           )
 
@@ -425,8 +427,8 @@ describe('isNotesManuallySorted', () => {
             expect(isNotesManuallySortedAfterFirstReorder).toBeTruthy()
           })
 
-          it(`should have move note3 to note5's position`, () => {
-            expect(note3PositionAfterFirstReorder).toBe(note5InitialPosition)
+          it(`should have move note3 below note5's position`, () => {
+            expect(note3PositionAfterFirstReorder).toBe(note5PositionAfterFirstReorder + 1)
           })
 
           it(`should have note5 to new position`, () => {
@@ -506,7 +508,8 @@ describe('isNotesManuallySorted', () => {
                         note6AfterMoveCategory.id,
                         note6PositionAfterMoveCategory,
                         note4PositionAfterMoveCategory,
-                        note4afterMoveCategory.categoryId
+                        note4afterMoveCategory.categoryId,
+                        'down'
                       )
                     )
 
@@ -529,18 +532,22 @@ describe('isNotesManuallySorted', () => {
                       expect(notesInNewCategory).toHaveLength(2)
                     })
 
-                    it(`should have move note6 to note4's position`, () => {
-                      expect(note6AfterSecondMove.position).toBe(note4PositionAfterMoveCategory)
-                      expect(note4AfterSecondMove.position).not.toBe(note4PositionAfterMoveCategory)
+                    it(`should have move note6 below note4's position`, () => {
+                      expect(note6AfterSecondMove.position).toBe(note4PositionAfterMoveCategory + 1)
                     })
 
-                    it('should have note4 and 6 on new category', () => {
+                    it(`should not have change note4's position`, () => {
+                      expect(note4AfterSecondMove.position).toBe(note4PositionAfterMoveCategory)
+                    })
+
+                    it('should have the same category with note4 on new category', () => {
                       const note4 = notesInNewCategory.find(({ id }) => id == 4)
 
                       const note6 = notesInNewCategory.find(({ id }) => id == 6)
 
                       expect(note4).toBeDefined()
                       expect(note6).toBeDefined()
+                      expect(note6.categoryId).toEqual(note4.categoryId)
                     })
 
                     it('should not create duplicates of notes', () => {
@@ -636,7 +643,8 @@ describe('isPlacesManuallySorted', () => {
               place3InitialState.id,
               place3InitialPosition,
               place5InitialPosition,
-              place5InitialState.categoryId || null
+              place5InitialState.categoryId || null,
+              'down'
             )
           )
 
@@ -748,7 +756,8 @@ describe('isPlacesManuallySorted', () => {
                         place1AfterMoveCategory.id,
                         place1PositionAfterMoveCategory,
                         place4PositionAfterMoveCategory,
-                        place4afterMoveCategory.categoryId
+                        place4afterMoveCategory.categoryId,
+                        'down'
                       )
                     )
 

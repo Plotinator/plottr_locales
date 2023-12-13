@@ -312,7 +312,11 @@ export const applyTemplate = (fileState, bookId, template, selectedIndex) => {
 
   // Create the lines from the template using the existing action.
   // NOTE: The old action adds the cards too.
-  const addLinesAction = addLinesFromTemplate({ ...template.templateData, cards: [] }, template.id)
+  const addLinesAction = addLinesFromTemplate(
+    { ...template.templateData, cards: [] },
+    template.id,
+    [...fileState.lines, ...template.templateData.lines]
+  )
   const withNewLines = rootReducer(fileState, addLinesAction)
 
   const initialDestinationTree = withNewLines.beats[bookId]

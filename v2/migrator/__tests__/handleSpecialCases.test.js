@@ -136,8 +136,33 @@ describe('handleObjectTitlesOnCards', () => {
 
 describe('applyAllFixes', () => {
   describe('given a file with a version that has no problems', () => {
-    it('should levae the file, as-is', () => {
-      expect(applyAllFixes(file_2023_3_29)).toEqual(file_2023_3_29)
+    const pinnedPlotlines = applyAllFixes(file_2023_3_29).lines.reduce(
+      (prevCount, line) => (line?.isPinned ? prevCount + 1 : prevCount),
+      0
+    )
+    it('should have added pinnedPlotlines key in ui timeline', () => {
+      expect(applyAllFixes(file_2023_3_29)).toEqual({
+        ...file_2023_3_29,
+        ui: {
+          ...file_2023_3_29.ui,
+          timeline: {
+            ...file_2023_3_29.ui.timeline,
+            pinnedPlotlines: {
+              [file_2023_3_29.ui.currentTimeline]: pinnedPlotlines,
+            },
+          },
+        },
+      })
+    })
+
+    it('should be the same except for the pinnedPlotlines count', () => {
+      expect({
+        ...applyAllFixes(file_2023_3_29),
+        ui: {
+          ...file_2023_3_29.ui,
+          timeline: { ...file_2023_3_29.ui.timeline, pinnedPlotlines: undefined },
+        },
+      }).toEqual(file_2023_3_29)
     })
   })
   describe('given a file with a version that has the 2021-07-07 problem', () => {

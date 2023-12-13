@@ -1,4 +1,4 @@
-import { cloneDeep, groupBy, sortBy } from 'lodash'
+import { cloneDeep, isNumber } from 'lodash'
 import {
   ADD_PLACE,
   EDIT_PLACE,
@@ -27,6 +27,11 @@ import {
   EDIT_PLACE_TEMPLATE_ATTRIBUTE,
   DUPLICATE_PLACE,
   DELETE_PLACE_CATEGORY,
+  EDIT_PLACE_NAME,
+  EDIT_PLACE_DESCRIPTION,
+  EDIT_PLACE_NOTES,
+  EDIT_PLACE_CUSTOM_ATTRIBUTE,
+  REPLACE_MARKED_HITS,
   REORDER_PLACE_MANUALLY,
 } from '../constants/ActionTypes'
 import { place } from '../store/initialState'
@@ -34,7 +39,10 @@ import { newFilePlaces } from '../store/newFileState'
 import { nextId } from '../store/newIds'
 import { applyToCustomAttributes } from './applyToCustomAttributes'
 import { repairIfPresent } from './repairIfPresent'
-import { positionReset, reorderList } from '../helpers/lists'
+import { safeParseInt } from './safeParseInt'
+import { sortByHitPosition } from './sortByHitPosition'
+import { replacePlainTextHit, replaceInSlateDatastructure } from './replace'
+import { moveItemToPosition, moveToAbove, positionReset } from '../helpers/lists'
 
 const initialState = [place]
 
@@ -65,10 +73,18 @@ const places =
           },
         ]
 
-      case EDIT_PLACE:
+      case EDIT_PLACE: {
+        const attributes = Object.keys(action.attributes).reduce((acc, nextKey) => {
+          const attribute = action.attributes[nextKey]
+          return {
+            ...acc,
+            [nextKey]: typeof attribute.value === 'undefined' ? attribute : attribute.value,
+          }
+        }, {})
         return state.map((place) =>
-          place.id === action.id ? Object.assign({}, place, action.attributes) : place
+          place.id === action.id ? Object.assign({}, place, attributes) : place
         )
+      }
 
       case EDIT_PLACE_TEMPLATE_ATTRIBUTE: {
         return state.map((place) => {
@@ -323,27 +339,120 @@ const places =
         return [...state, { ...duplicated }]
       }
 
+      case EDIT_PLACE_NAME: {
+        return state.map((place) => {
+          if (place.id === action.id) {
+            return {
+              ...place,
+              name: action.newName,
+            }
+          }
+          return place
+        })
+      }
+
+      case EDIT_PLACE_DESCRIPTION: {
+        return state.map((place) => {
+          if (place.id === action.id) {
+            return {
+              ...place,
+              description: action.newDescription,
+            }
+          }
+          return place
+        })
+      }
+
+      case EDIT_PLACE_NOTES: {
+        return state.map((place) => {
+          if (place.id === action.id) {
+            return {
+              ...place,
+              notes: action.newNotes,
+            }
+          }
+          return place
+        })
+      }
+
+      case EDIT_PLACE_CUSTOM_ATTRIBUTE: {
+        return state.map((place) => {
+          if (place.id === action.id) {
+            return {
+              ...place,
+              [action.name]: action.newValue,
+            }
+          }
+          return place
+        })
+      }
+
+      case REPLACE_MARKED_HITS: {
+        const applicableHits = action.hitsMarkedForReplacement.filter((hit) => {
+          return hit.path.match(/^\/places\/[0-9a-zA-Z]+\//)
+        })
+        // IMPORTANT!!!
+        //
+        // We sort by the hit position so that we deal with later hits
+        // first.  By doing so, we don't invalidate the start position
+        // of other hits when we replace those hits.
+        //
+        // i.e. it's fine to do multiple replacements in the same
+        // field, as long as you replace the hits in reverse order,
+        // i.e. the last hit first and the first hit last.
+        return sortByHitPosition(applicableHits).reduce((acc, nextHit) => {
+          const { path, hit } = nextHit
+          const [_, _place, rawPlaceId, attributeName, rawFocusStart] = path.split('/')
+          const placeId = safeParseInt(rawPlaceId)
+          return acc.map((nextplace) => {
+            if (nextplace.id === placeId) {
+              const attributeValue = nextplace[attributeName]
+              const focusStart = safeParseInt(rawFocusStart)
+              const replaceFunction = Array.isArray(attributeValue)
+                ? replaceInSlateDatastructure
+                : replacePlainTextHit
+              return {
+                ...nextplace,
+                [attributeName]: replaceFunction(
+                  attributeValue,
+                  focusStart,
+                  hit,
+                  action.replacementText
+                ),
+              }
+            } else {
+              return nextplace
+            }
+          })
+        }, state)
+      }
+
       case REORDER_PLACE_MANUALLY: {
-        const { id, oldPosition, newPosition, newCategoryId } = action
+        const { id, oldPosition, newPosition, newCategoryId, direction, placesByCategory } = action
+        const moveUp = direction === 'up'
         const originalPlace = state.find((place) => place.id == id)
         const isNewcategory = originalPlace.categoryId != newCategoryId
-        const placesByCategory = groupBy(state, 'categoryId')
-
         const reorderedList = Object.values(placesByCategory).flatMap((group) => {
           const groupCategory = group[0].categoryId
 
           if (!isNewcategory && groupCategory == newCategoryId) {
-            return reorderList(newPosition, oldPosition, group)
+            return moveToAbove(oldPosition, newPosition, group, moveUp)
           } else if (isNewcategory && groupCategory == newCategoryId) {
-            const place = {
+            const newPlace = {
               ...originalPlace,
               position: newPosition,
               categoryId: newCategoryId,
             }
-            return positionReset(sortBy([...group, place], ['position', 'lastEdited']))
+            const placesInCategoryHasPositions = group.every((place) => isNumber(place?.position))
+            if (!placesInCategoryHasPositions) {
+              const placesWithPositions = positionReset(group)
+              return moveItemToPosition(newPosition, placesWithPositions, newPlace, moveUp)
+            } else {
+              return moveItemToPosition(newPosition, group, newPlace, moveUp)
+            }
           } else if (isNewcategory && originalPlace.categoryId == groupCategory) {
             const filteredGroup = group.filter((grp) => grp.id != id)
-            return positionReset(sortBy(filteredGroup, ['position', 'lastEdited']))
+            return positionReset(filteredGroup)
           }
           return group
         })

@@ -2714,6 +2714,299 @@ describe('externalSync', () => {
           '123323',
         ],
         [
+          'ui',
+          '123e',
+          {
+            actConfigModal: {
+              open: false,
+            },
+            attributeTabs: {
+              characters: 'all',
+            },
+            bookDialog: {
+              bookId: null,
+              isOpen: false,
+            },
+            cardDialog: {
+              beatId: null,
+              cardId: null,
+              isOpen: false,
+              lineId: null,
+            },
+            characterFilter: {
+              'Attended Wittenberg': [],
+              'Characters That Die': [],
+              'Fatal Flaws': [],
+              Gender: [],
+              'How They Die': [],
+              'Inner Conflict': [],
+              Role: [],
+              'Royal Family Member': [],
+              book: [],
+              category: [],
+              tag: [],
+            },
+            characterSort: 'name~asc',
+            characterTab: {
+              focus: [
+                {
+                  path: ['character', 2, 'name'],
+                  selection: undefined,
+                },
+              ],
+              selectedCharacter: 2,
+            },
+            collaborators: {},
+            currentTimeline: 1,
+            currentView: 'timeline',
+            customAttributeOrder: {
+              characters: [
+                {
+                  name: 'Role',
+                  type: 'customAttributes',
+                },
+                {
+                  name: 'Motivation',
+                  type: 'customAttributes',
+                },
+                {
+                  name: 'Gender',
+                  type: 'customAttributes',
+                },
+                {
+                  name: 'Fatal Flaws',
+                  type: 'customAttributes',
+                },
+                {
+                  name: 'Inner Conflict',
+                  type: 'customAttributes',
+                },
+                {
+                  name: 'How They Die',
+                  type: 'customAttributes',
+                },
+                {
+                  name: 'Attended Wittenberg',
+                  type: 'customAttributes',
+                },
+                {
+                  name: 'Royal Family Member',
+                  type: 'customAttributes',
+                },
+                {
+                  name: 'Characters That Die',
+                  type: 'customAttributes',
+                },
+              ],
+            },
+            darkMode: false,
+            llmGenerateModal: {
+              busy: false,
+              kind: 'scenes',
+              open: true,
+              payload: {
+                attributes: {},
+                bookMetadata: {
+                  genre: 'Things',
+                  premise: 'Stuff',
+                  theme: 'Blah',
+                  title: 'Hamlet',
+                },
+                context: [],
+                kind: 'scenes',
+                templates: {},
+                title: 'Act 2',
+              },
+              step: 1,
+            },
+            noteFilter: null,
+            noteSort: 'title~asc',
+            noteTab: {
+              attributesDialogOpen: false,
+              categoriesDialogOpen: false,
+              editingSelected: true,
+              filterVisible: false,
+              focus: [
+                {
+                  path: ['note', 4, 'content'],
+                  selection: {
+                    direction: 'forward',
+                    end: 105,
+                    start: 99,
+                  },
+                },
+              ],
+              selectedNote: 4,
+              sortVisible: false,
+            },
+            orientation: 'horizontal',
+            outlineFilter: null,
+            outlineScrollPosition: 11022,
+            outlineTab: {
+              cardEditor: {
+                editing: null,
+              },
+              focus: [
+                {
+                  path: ['card', 25, 'description'],
+                  selection: {
+                    direction: 'forward',
+                    end: 16,
+                    start: 8,
+                  },
+                },
+                {
+                  path: ['card', 1, 'description'],
+                  selection: {
+                    direction: 'forward',
+                    end: 58,
+                    start: 50,
+                  },
+                },
+                {
+                  path: ['card', 2, 'description'],
+                  selection: {
+                    direction: 'forward',
+                    end: 904,
+                    start: 898,
+                  },
+                },
+                {
+                  path: ['card', 15, 'description'],
+                  selection: {
+                    direction: 'forward',
+                    end: 179,
+                    start: 173,
+                  },
+                },
+                {
+                  path: ['card', 21, 'description'],
+                  selection: {
+                    direction: 'forward',
+                    end: 276,
+                    start: 270,
+                  },
+                },
+              ],
+              selectedCard: null,
+            },
+            placeFilter: null,
+            placeSort: 'name~asc',
+            placeTab: {
+              attributeDialogOpen: false,
+              categoriesOpen: false,
+              editingSelected: true,
+              filterVisible: false,
+              focus: [
+                {
+                  path: ['place', 1, 'notes'],
+                  selection: {
+                    direction: 'forward',
+                    end: 50,
+                    start: 44,
+                  },
+                },
+                {
+                  path: ['place', 1, 'name'],
+                  selection: {
+                    direction: 'forward',
+                    end: 8,
+                    start: 0,
+                  },
+                },
+              ],
+              selectedPlace: 1,
+              sortVisible: false,
+            },
+            projectTab: {
+              focus: [
+                {
+                  path: ['book', 1, 'title'],
+                  selection: {
+                    direction: 'forward',
+                    end: 6,
+                    start: 0,
+                  },
+                },
+                {
+                  path: ['name'],
+                  selection: {
+                    direction: 'forward',
+                    end: 6,
+                    start: 0,
+                  },
+                },
+              ],
+            },
+            resturctureTimelineModal: {
+              open: false,
+            },
+            searchDialog: {
+              currentHitIndex: 0,
+              hitsToReplace: [],
+              isOpen: false,
+              replacement: '',
+              replacing: false,
+              scanning: false,
+              term: 'story.',
+            },
+            searchTerms: {
+              characters: null,
+              notes: null,
+              outline: null,
+              places: null,
+              tags: null,
+              timeline: null,
+            },
+            tagTab: {
+              selectedTag: 1,
+            },
+            templateModal: {
+              expanded: false,
+            },
+            timeline: {
+              focus: [
+                {
+                  path: ['card', 9, 'description'],
+                  selection: {
+                    direction: 'forward',
+                    end: 710,
+                    start: 704,
+                  },
+                },
+                {
+                  path: ['card', 25, 'description'],
+                  selection: {
+                    direction: 'forward',
+                    end: 347,
+                    start: 341,
+                  },
+                },
+                {
+                  path: ['card', 25, 'title'],
+                  selection: {
+                    direction: 'forward',
+                    end: 35,
+                    start: 29,
+                  },
+                },
+              ],
+              size: 'large',
+            },
+            timelineFilter: {
+              character: [],
+              place: [],
+              tag: [],
+            },
+            timelineIsExpanded: true,
+            timelineScrollPosition: {
+              x: 0,
+              y: 0,
+            },
+          },
+          '123323',
+        ],
+        [
           'characters',
           '123e',
           {
@@ -2763,6 +3056,7 @@ describe('externalSync', () => {
       ])
 
       // Clean up
+      patchCalls.pop()
       patchCalls.pop()
       patchCalls.pop()
 
@@ -2815,10 +3109,16 @@ describe('externalSync', () => {
               isOpen: false,
             },
             cardDialog: {
+              activeTab: 1,
               beatId: null,
               cardId: null,
+              deleting: false,
               isOpen: false,
               lineId: null,
+              removeWhichTemplate: null,
+              removing: false,
+              showColorPicker: false,
+              showTemplatePicker: false,
             },
             characterFilter: {
               'Attended Wittenberg': [],
@@ -2835,6 +3135,12 @@ describe('externalSync', () => {
             },
             characterSort: 'name~asc',
             characterTab: {
+              focus: [
+                {
+                  path: ['character', 2, 'name'],
+                  selection: undefined,
+                },
+              ],
               selectedCharacter: 2,
             },
             collaborators: {},

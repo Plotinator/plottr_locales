@@ -309,7 +309,8 @@ describe('reorderCharacter', () => {
             reorderCharacter(
               character1State.id,
               character3AbsolutePosition,
-              character3State.categoryId
+              character3State.categoryId,
+              'up'
             )
           )
           const afterFirstMove = store.getState()
@@ -493,7 +494,8 @@ describe('reorderCharacter', () => {
               reorderCharacter(
                 character8State.id,
                 character3StateAfterSecondMoveAbsolutePosition,
-                character3StateAfterSecondMove.categoryId
+                character3StateAfterSecondMove.categoryId,
+                'down'
               )
             )
             const afterThirdMove = store.getState()
@@ -520,18 +522,18 @@ describe('reorderCharacter', () => {
                 character8StateAfterThirdMove.id
               )
 
-            it(`should move character8 to character3's position`, () => {
+            it(`should move character8 below character3's position`, () => {
               expect(character8StateAfterThirdMoveAbsolutePosition).toBe(
-                character3StateAfterSecondMoveAbsolutePosition
+                character3StateAfterSecondMoveAbsolutePosition + 1
               )
             })
-            it(`should have moved character8 to modified character3 position`, () => {
+            it(`should have moved character8 to modified character3 category`, () => {
               expect(character8StateAfterThirdMove.categoryId).toEqual(
                 character3StateAfterSecondMove.categoryId
               )
             })
-            it('should have new position', () => {
-              expect(character3StateAfterThirdMoveAbsolutePosition).not.toEqual(
+            it('should have not move character3 to a new position', () => {
+              expect(character3StateAfterThirdMoveAbsolutePosition).toEqual(
                 character3StateAfterSecondMoveAbsolutePosition
               )
             })
@@ -665,7 +667,8 @@ describe('reorderCharacter', () => {
               reorderCharacter(
                 character2InBook2.id,
                 character4InBook2AbsolutePosition,
-                character4InBook2.categoryId
+                character4InBook2.categoryId,
+                'down'
               )
             )
 
@@ -675,7 +678,7 @@ describe('reorderCharacter', () => {
               visibleSortedCharactersByCategorySelector(afterFirstMove)
             const character1AfterFirstMove = displayedSingleCharacterSelector(
               afterFirstMove,
-              charactersAfterFirstMove.find(({ id }) => id == 7).id
+              charactersAfterFirstMove.find(({ id }) => id == 1).id
             )
             const character2AfterFirstMove = displayedSingleCharacterSelector(
               afterFirstMove,
@@ -686,9 +689,14 @@ describe('reorderCharacter', () => {
                 visibleSortedCharactersByCategoryAfterFistMove,
                 character2AfterFirstMove.id
               )
+            const character1AbsolutePositionAfterFirstMove =
+              getCharacterAbsolutePositionFromGroupedCategory(
+                visibleSortedCharactersByCategoryAfterFistMove,
+                character1AfterFirstMove.id
+              )
 
-            it(`should move character2InBook2 to character4InBook2's position`, () => {
-              expect(character4InBook2AbsolutePosition).toBe(
+            it(`should move character2InBook2 below character4InBook2's position`, () => {
+              expect(character4InBook2AbsolutePosition + 1).toBe(
                 character2AbsolutePositionAfterFirstMove
               )
             })
@@ -742,7 +750,8 @@ describe('reorderCharacter', () => {
                 reorderCharacter(
                   character1AfterFirstMove.id,
                   character2AbsolutePositionAfterFirstMove,
-                  character2AfterFirstMove.categoryId
+                  character2AfterFirstMove.categoryId,
+                  'up'
                 )
               )
 
@@ -789,6 +798,11 @@ describe('reorderCharacter', () => {
                   character2AbsolutePositionAfterFirstMove
                 )
               })
+              it(`should move character2 to character1's position`, () => {
+                expect(character2AfterSecondMoveAbsolutePosition).toBe(
+                  character1AbsolutePositionAfterFirstMove
+                )
+              })
 
               it(`should not change the attributes of the characters from other books`, () => {
                 store.dispatch(changeCurrentTimeline(1))
@@ -819,12 +833,13 @@ describe('reorderCharacter', () => {
             })
           })
 
-          describe('given the user reorder another character to another category', () => {
+          describe('given the user reorder another character to same category', () => {
             store.dispatch(
               reorderCharacter(
                 character3InBook2.id,
                 character8InBook2AbsolutePosition,
-                character8InBook2.categoryId
+                character8InBook2.categoryId,
+                'down'
               )
             )
 
@@ -842,7 +857,7 @@ describe('reorderCharacter', () => {
             )
             const character11AfterFirstMove = displayedSingleCharacterSelector(
               afterFirstMove,
-              charactersAfterFirstMove.find(({ id }) => id == 8).id
+              charactersAfterFirstMove.find(({ id }) => id == 11).id
             )
             const character3AbsolutePositionAfterFirstMove =
               getCharacterAbsolutePositionFromGroupedCategory(
@@ -910,7 +925,8 @@ describe('reorderCharacter', () => {
                 reorderCharacter(
                   character11AfterFirstMove.id,
                   character3AbsolutePositionAfterFirstMove,
-                  character3AfterFirstMove.categoryId
+                  character3AfterFirstMove.categoryId,
+                  'up'
                 )
               )
 

@@ -26,7 +26,7 @@ const makeDateString = (dateObj, makeShort) => {
     const style = makeShort ? '{date, date, monthDay}' : '{date, date, medium}'
     dateStr = t(style, { date })
   } catch (error) {
-    console.error(error)
+    console.error('Error creating date string', error)
   }
   return dateStr
 }

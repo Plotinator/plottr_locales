@@ -29,7 +29,6 @@ import {
   REORDER_CHARACTER_TEMPLATES,
   REORDER_CHARACTER_MANUALLY,
 } from '../constants/ActionTypes'
-import { editorMetadataIfPresent } from '../helpers/editors'
 import selectors from '../selectors'
 import { character } from '../store/initialState'
 import { escapeBraces } from './customAttributes'
@@ -64,11 +63,12 @@ export function addCharacterWithTemplate(name, templateData) {
   }
 }
 
-export function editCharacterName(id, name) {
+export function editCharacterName(id, name, selection) {
   return {
     type: EDIT_CHARACTER_NAME,
     id,
     name,
+    selection,
   }
 }
 
@@ -81,7 +81,7 @@ export function editCharacterImage(id, imageId) {
 }
 
 export const editCharacterTemplateAttribute =
-  (id, templateId, name, value, editorPath, selection) => (dispatch, getState) => {
+  (id, templateId, name, value, selection) => (dispatch, getState) => {
     const state = getState()
     const bookId = selectedCharacterAttributeTabSelector(state)
 
@@ -92,7 +92,7 @@ export const editCharacterTemplateAttribute =
       name,
       value,
       bookId,
-      ...editorMetadataIfPresent(editorPath, selection),
+      selection,
     })
   }
 
@@ -176,7 +176,7 @@ export function createCharacterAttribute(type, name, fromLegacyAttribute) {
 }
 
 export const editCharacterAttributeValue =
-  (characterId, attributeId, value) => (dispatch, getState) => {
+  (characterId, attributeId, value, selection) => (dispatch, getState) => {
     if (!attributeId) {
       return
     }
@@ -198,6 +198,7 @@ export const editCharacterAttributeValue =
           characterId,
           attributeId,
           value,
+          selection,
         })
         return
       }
@@ -206,6 +207,7 @@ export const editCharacterAttributeValue =
         characterId,
         attributeId,
         value,
+        selection,
       })
       return
     }
@@ -227,19 +229,21 @@ export const editCharacterAttributeValue =
     // TODO: handle error state.  There was no legacy attribute.
   }
 
-export const editShortDescription = (characterId, shortDescription) => {
+export const editShortDescription = (characterId, shortDescription, selection) => {
   return {
     type: EDIT_CHARACTER_SHORT_DESCRIPTION,
     characterId,
     value: shortDescription,
+    selection,
   }
 }
 
-export const editDescription = (characterId, description) => {
+export const editDescription = (characterId, description, selection) => {
   return {
     type: EDIT_CHARACTER_DESCRIPTION,
     characterId,
     value: description,
+    selection,
   }
 }
 
@@ -261,7 +265,7 @@ export const reorderCharacterTemplateAttribute = (originalPosition, destination,
 }
 
 export const reorderCharacter =
-  (characterId, newPosition, newCategoryId) => (dispatch, getState) => {
+  (characterId, newPosition, newCategoryId, direction) => (dispatch, getState) => {
     const characterIdsInOrder = sortBy(
       Object.entries(visibleSortedCharactersByCategorySelector(getState())),
       ([groupName, _characters]) => groupName
@@ -279,5 +283,6 @@ export const reorderCharacter =
       characterId,
       newPosition,
       newCategoryId,
+      direction,
     })
   }

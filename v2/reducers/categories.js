@@ -34,7 +34,7 @@ const categories =
         return action.data.categories
 
       case NEW_FILE:
-        return newFileCategories
+        return newFileCategories()
 
       case ADD_NOTE_CATEGORY:
         return addCategory('notes', state, action)

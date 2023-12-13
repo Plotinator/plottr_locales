@@ -11,11 +11,10 @@ import {
   FILE_CONTAINS_INVALID_CHARACTER_ATTRIBUTE_VALUES,
 } from '../constants/errorCodes'
 
-const BLANK_FILE = emptyFile()
-
 export const checkForMinimalSetOfKeys =
   (filePath, actionTrail = []) =>
   (file) => {
+    const BLANK_FILE = emptyFile()
     const hasMinimalSetOfKeys = Object.keys(BLANK_FILE).every((key) => key in file)
     if (!hasMinimalSetOfKeys) {
       const missingKeys = Object.keys(BLANK_FILE).reduce((acc, key) => {

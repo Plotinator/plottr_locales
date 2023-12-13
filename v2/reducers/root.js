@@ -52,6 +52,7 @@ import { reorderCardsWithinLine } from '../actions/cards'
 import { applyTemplate, moveLineActions } from '../helpers/templates'
 import { reorderList } from '../helpers/lists'
 import { pinMovedLine } from '../actions/lines'
+import { sortedLinesByBookSelector } from '../selectors/timelineThirdOrder'
 
 const {
   selectedCharacterAttributeTabSelector,
@@ -317,6 +318,7 @@ const root = (dataRepairers) => (state, action) => {
       // but if more beats are needed, they will be created with subsequent ids
       const bookId = state.ui.currentTimeline
       let nextIdForBeats = nextBeatId(state.beats)
+      const lines = sortedLinesByBookSelector(state)
       let beatTree = cloneDeep(state.beats[bookId])
       let createdNewBeats = false
       // make a card -> beatId mapping (beatId is from existing beats … augmented with new ones)
@@ -349,6 +351,7 @@ const root = (dataRepairers) => (state, action) => {
         createdNewBeats,
         newTree: beatTree,
         cardToBeatIdMap,
+        lines: [...lines, ...action.templateData.lines],
       })
     }
 

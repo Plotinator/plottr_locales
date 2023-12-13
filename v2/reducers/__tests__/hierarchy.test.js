@@ -36,7 +36,7 @@ describe('addBook', () => {
   it('should add an appropriately keyed hierarchy level', () => {
     const store = initialStore()
     const hierarchy = hierarchyLevelsForAnotherBookSelector(store.getState(), 2)
-    expect(hierarchy).toEqual({ 0: hierarchyLevel })
+    expect(hierarchy).toEqual({ 0: hierarchyLevel() })
   })
 })
 
@@ -93,7 +93,7 @@ describe('modifying the hierarchy', () => {
     describe('when there are multiple levels in the current book', () => {
       it('should change the appropriate level', () => {
         const store = initialStore()
-        store.dispatch(setHierarchyLevels([hierarchyLevel, hierarchyLevel]))
+        store.dispatch(setHierarchyLevels([hierarchyLevel(), hierarchyLevel()]))
         const initialState = store.getState()
         store.dispatch(
           editHierarchyLevel({
@@ -125,7 +125,12 @@ describe('modifying the hierarchy', () => {
         const store = initialStore()
         const initialState = store.getState()
         store.dispatch(
-          setHierarchyLevels([hierarchyLevel, hierarchyLevel, hierarchyLevel, hierarchyLevel])
+          setHierarchyLevels([
+            hierarchyLevel(),
+            hierarchyLevel(),
+            hierarchyLevel(),
+            hierarchyLevel(),
+          ])
         )
         expect(allHierarchyLevelsSelector(store.getState())).toEqual(
           allHierarchyLevelsSelector(initialState)
@@ -141,7 +146,7 @@ describe('modifying the hierarchy', () => {
         1
       )[0].name
       expect(initialHierarchyLevelName).toEqual('Chapter')
-      store.dispatch(setHierarchyLevels([hierarchyLevel, hierarchyLevel]))
+      store.dispatch(setHierarchyLevels([hierarchyLevel(), hierarchyLevel()]))
       const resultHierarcyhLevels = hierarchyLevelsForAnotherBookSelector(store.getState(), 1)
       expect(resultHierarcyhLevels[0].name).not.toEqual(resultHierarcyhLevels[1].name)
       expect(resultHierarcyhLevels[0].name).toEqual('Chapter')

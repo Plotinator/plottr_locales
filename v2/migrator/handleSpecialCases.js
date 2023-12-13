@@ -1,4 +1,4 @@
-import { uniq, clone, sortBy, difference } from 'lodash'
+import { uniq, clone, sortBy, difference, isEmpty } from 'lodash'
 import semverGt from 'semver/functions/gt'
 import semverGte from 'semver/functions/gte'
 import semverLte from 'semver/functions/lte'
@@ -180,6 +180,40 @@ export const insertBreakingVersionsPriorToBreakingVersionChange = (file) => {
   return file
 }
 
+export const addPinnedPlotlinesIfMissing = (file) => {
+  const bookId = file.ui?.currentTimeline
+  const totalPinnedLinesFromLines = (file.lines || []).reduce(
+    (prevCount, line) => (line.isPinned ? prevCount + 1 : prevCount),
+    0
+  )
+  const hasUITimeline = !isEmpty(file.ui?.timeline)
+  const timeline = hasUITimeline ? file.ui.timeline : {}
+  const pinnedPlotlines = hasUITimeline ? file.ui.timeline?.pinnedPlotlines : {}
+  const pinnedPlotlinesFromCurrentBook = !isEmpty(pinnedPlotlines)
+    ? file.ui.timeline?.pinnedPlotlines[String(bookId)]
+    : 0
+
+  if (
+    (!isEmpty(pinnedPlotlines) && totalPinnedLinesFromLines !== pinnedPlotlinesFromCurrentBook) ||
+    !pinnedPlotlinesFromCurrentBook
+  ) {
+    return {
+      ...file,
+      ui: {
+        ...file.ui,
+        timeline: {
+          ...timeline,
+          pinnedPlotlines: {
+            [bookId]: totalPinnedLinesFromLines,
+          },
+        },
+      },
+    }
+  } else {
+    return file
+  }
+}
+
 export const addHierarchiesIfMissing = (file) => {
   if (
     (typeof file.hierarchyLevels?.series === 'undefined' ||
@@ -203,6 +237,11 @@ export const addHierarchiesIfMissing = (file) => {
   } else {
     return file
   }
+}
+
+export const addUITimelineOrHierarchiesStateIfMissing = (file) => {
+  const withHierarchies = addHierarchiesIfMissing(file)
+  return addPinnedPlotlinesIfMissing(withHierarchies)
 }
 
 export const removeCharacterAttributesForNonExistingBooks = (file) => {
@@ -249,7 +288,7 @@ const applyAllFixes = (file) =>
     handleObjectTitlesOnCards,
     handleMissingUIState,
     insertBreakingVersionsPriorToBreakingVersionChange,
-    addHierarchiesIfMissing,
+    addUITimelineOrHierarchiesStateIfMissing,
     removeCharacterAttributesForNonExistingBooks,
   ].reduce((acc, f) => f(acc), file)
 

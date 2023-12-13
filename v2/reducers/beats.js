@@ -24,6 +24,7 @@ import {
   APPEND_TOP_LEVEL_BEAT,
   UNSAFE_SET_BEATS,
   DUPLICATE_BOOK,
+  REPLACE_MARKED_HITS,
 } from '../constants/ActionTypes'
 import { beat as defaultBeat } from '../store/initialState'
 import { newFileBeats, newFileChapters } from '../store/newFileState'
@@ -31,6 +32,9 @@ import { positionReset, nextPositionInBook, moveNextToSibling } from '../helpers
 import { associateWithBroadestScope } from '../helpers/lines'
 import * as tree from './tree'
 import { nextId, adjustHierarchyLevels } from '../helpers/beats'
+import { sortByHitPosition } from './sortByHitPosition'
+import { safeParseInt } from './safeParseInt'
+import { replacePlainTextHit, replaceInSlateDatastructure } from './replace'
 
 // bookId is:
 // Union of:
@@ -365,6 +369,54 @@ const beats =
           1: tree.newTree('id', ...newFileChapters),
           series: tree.newTree('id', ...newFileBeats),
         }
+      }
+
+      case REPLACE_MARKED_HITS: {
+        const applicableHits = action.hitsMarkedForReplacement.filter((hit) => {
+          // Only support replacing beat titles for now.
+          return hit.path.match(/^\/beats\/(([0-9]+)|(series))\/[0-9]+\/title/)
+        })
+        // IMPORTANT!!!
+        //
+        // We sort by the hit position so that we deal with later hits
+        // first.  By doing so, we don't invalidate the start position
+        // of other hits when we replace those hits.
+        //
+        // i.e. it's fine to do multiple replacements in the same
+        // field, as long as you replace the hits in reverse order,
+        // i.e. the last hit first and the first hit last.
+        return sortByHitPosition(applicableHits).reduce((acc, nextHit) => {
+          const { path, hit } = nextHit
+          const [_, _beats, rawBookId, rawBeatId, type, ...rest] = path.split('/')
+          const bookId = safeParseInt(rawBookId)
+          const beatId = safeParseInt(rawBeatId)
+          const beat = acc[bookId].index[beatId]
+          const [rawFocusStart] = rest
+          const attributeName = type
+          const attributeValue = beat[attributeName]
+          const focusStart = safeParseInt(rawFocusStart)
+          const replaceFunction = Array.isArray(attributeValue)
+            ? replaceInSlateDatastructure
+            : replacePlainTextHit
+          return {
+            ...acc,
+            [bookId]: {
+              ...acc[bookId],
+              index: {
+                ...acc[bookId].index,
+                [beatId]: {
+                  ...beat,
+                  [attributeName]: replaceFunction(
+                    attributeValue,
+                    focusStart,
+                    hit,
+                    action.replacementText
+                  ),
+                },
+              },
+            },
+          }
+        }, state)
       }
 
       case LOAD_BEATS:

@@ -39,7 +39,7 @@ describe('modifying the hierarchy (and its impact on beats)', () => {
     it('should not change the beats state', () => {
       const store = initialStore()
       const initialBeats = allBeatsSelector(store.getState())
-      store.dispatch(setHierarchyLevels([{ 0: hierarchyLevel }]))
+      store.dispatch(setHierarchyLevels([{ 0: hierarchyLevel() }]))
       const beatsAfter = allBeatsSelector(store.getState())
       expect(beatsAfter).toBe(initialBeats)
     })
@@ -50,10 +50,10 @@ describe('modifying the hierarchy (and its impact on beats)', () => {
       const initialBeats = allBeatsSelector(store.getState())
       store.dispatch(
         setHierarchyLevels([
-          { 0: hierarchyLevel },
-          { 0: hierarchyLevel },
-          { 0: hierarchyLevel },
-          { 0: hierarchyLevel },
+          { 0: hierarchyLevel() },
+          { 0: hierarchyLevel() },
+          { 0: hierarchyLevel() },
+          { 0: hierarchyLevel() },
         ])
       )
       const beatsAfter = allBeatsSelector(store.getState())
@@ -74,7 +74,7 @@ describe('modifying the hierarchy (and its impact on beats)', () => {
       it('should adjust the number of levels of beats in book 1', () => {
         const store = initialStore()
         const initialBeats = beatsForAnotherBookSelector(store.getState(), 1)
-        store.dispatch(setHierarchyLevels([{ 0: hierarchyLevel }, { 0: hierarchyLevel }]))
+        store.dispatch(setHierarchyLevels([{ 0: hierarchyLevel() }, { 0: hierarchyLevel() }]))
         const beatsAfter = beatsForAnotherBookSelector(store.getState(), 1)
         expect(maxDepth('id')(beatsAfter)).toBeGreaterThan(maxDepth('id')(initialBeats))
         expect(maxDepth('id')(beatsAfter)).toEqual(1)
@@ -85,7 +85,7 @@ describe('modifying the hierarchy (and its impact on beats)', () => {
         const store = initialStore()
         const initialBeats = beatsForAnotherBookSelector(store.getState(), 2)
         store.dispatch(changeCurrentTimeline(2))
-        store.dispatch(setHierarchyLevels([{ 0: hierarchyLevel }, { 0: hierarchyLevel }]))
+        store.dispatch(setHierarchyLevels([{ 0: hierarchyLevel() }, { 0: hierarchyLevel() }]))
         const beatsAfter = beatsForAnotherBookSelector(store.getState(), 2)
         expect(maxDepth('id')(beatsAfter)).toBeGreaterThan(maxDepth('id')(initialBeats))
         expect(maxDepth('id')(beatsAfter)).toEqual(1)

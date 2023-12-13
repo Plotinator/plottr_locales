@@ -4,11 +4,15 @@
 
 import { createSelector } from 'reselect'
 
-import { nextId, beatsByPosition } from '../helpers/beats'
+import { nextId, beatsByPosition, allBeatsAsArray } from '../helpers/beats'
 import { fullFileStateSelector } from './fullFileFirstOrder'
 
 export const allBeatsSelector = createSelector(fullFileStateSelector, (state) => state.beats)
 export const nextBeatIdSelector = createSelector(allBeatsSelector, (beats) => nextId(beats))
+
+export const allBeatsAsArraySelector = createSelector(allBeatsSelector, (beats) => {
+  return allBeatsAsArray(beats)
+})
 
 const bookIdSelector = (state, bookId) => bookId
 export const beatsForAnotherBookSelector = createSelector(
