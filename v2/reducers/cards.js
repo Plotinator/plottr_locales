@@ -488,12 +488,12 @@ const cards =
 
         const newId = nextId(state)
         const highestPositionInLine = state.reduce((highestPositionInLine, nextCard) => {
-          if (nextCard.beatId !== existingCard.beatId) {
+          if (nextCard.beatId === existingCard.beatId) {
             return Math.max(highestPositionInLine, nextCard.positionWithinLine)
           }
 
           return highestPositionInLine
-        })
+        }, 0)
 
         return [
           ...state,

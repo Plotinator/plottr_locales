@@ -15,7 +15,9 @@ import {
   REORDER_CARDS_ATTRIBUTE,
   REORDER_NOTES_ATTRIBUTE,
   LOAD_CUSTOM_ATTRIBUTES,
+  CUSTOM_ATTRIBUTE_ERROR,
 } from '../constants/ActionTypes'
+import * as initialState from '../store/initialState'
 
 export const escapeBraces = (name) => {
   return name?.replace(/[{}]/g, '')
@@ -32,7 +34,27 @@ export const escapeBracesInAttributeName = (attribute) => {
 }
 
 export function addPlaceAttr(attribute) {
-  return { type: ADD_PLACES_ATTRIBUTE, attribute: escapeBracesInAttributeName(attribute) }
+  return function (dispatch) {
+    const invalidAttributeName = Object.keys(initialState.place).find((key) => {
+      return attribute?.name === key
+    })
+    if (
+      typeof attribute?.name !== 'string' ||
+      (attribute?.type !== 'text' && attribute?.type !== 'paragraph')
+    ) {
+      dispatch({
+        type: CUSTOM_ATTRIBUTE_ERROR,
+        message: 'Invalid attribute descriptor',
+      })
+    } else if (invalidAttributeName) {
+      dispatch({
+        type: CUSTOM_ATTRIBUTE_ERROR,
+        message: `${invalidAttributeName} is not a valid place attribute name`,
+      })
+    } else {
+      dispatch({ type: ADD_PLACES_ATTRIBUTE, attribute: escapeBracesInAttributeName(attribute) })
+    }
+  }
 }
 
 export function removePlaceAttr(attribute) {
@@ -58,7 +80,27 @@ export function removeLineAttr(attribute) {
 }
 
 export function addCardAttr(attribute) {
-  return { type: ADD_CARDS_ATTRIBUTE, attribute: escapeBracesInAttributeName(attribute) }
+  return function (dispatch) {
+    const invalidAttributeName = Object.keys(initialState.card).find((key) => {
+      return attribute?.name === key
+    })
+    if (
+      typeof attribute?.name !== 'string' ||
+      (attribute?.type !== 'text' && attribute?.type !== 'paragraph')
+    ) {
+      dispatch({
+        type: CUSTOM_ATTRIBUTE_ERROR,
+        message: 'Invalid attribute descriptor',
+      })
+    } else if (invalidAttributeName) {
+      dispatch({
+        type: CUSTOM_ATTRIBUTE_ERROR,
+        message: `${invalidAttributeName} is not a valid place attribute name`,
+      })
+    } else {
+      dispatch({ type: ADD_CARDS_ATTRIBUTE, attribute: escapeBracesInAttributeName(attribute) })
+    }
+  }
 }
 
 export function editCardAttr(index, oldAttribute, newAttribute) {
@@ -99,7 +141,27 @@ export function reorderPlacesAttribute(attribute, toIndex) {
 }
 
 export function addNoteAttr(attribute) {
-  return { type: ADD_NOTES_ATTRIBUTE, attribute: escapeBracesInAttributeName(attribute) }
+  return function (dispatch) {
+    const invalidAttributeName = Object.keys(initialState.note).find((key) => {
+      return attribute?.name === key
+    })
+    if (
+      typeof attribute?.name !== 'string' ||
+      (attribute?.type !== 'text' && attribute?.type !== 'paragraph')
+    ) {
+      dispatch({
+        type: CUSTOM_ATTRIBUTE_ERROR,
+        message: 'Invalid attribute descriptor',
+      })
+    } else if (invalidAttributeName) {
+      dispatch({
+        type: CUSTOM_ATTRIBUTE_ERROR,
+        message: `${invalidAttributeName} is not a valid place attribute name`,
+      })
+    } else {
+      dispatch({ type: ADD_NOTES_ATTRIBUTE, attribute: escapeBracesInAttributeName(attribute) })
+    }
+  }
 }
 
 export function editNoteAttr(index, oldAttribute, newAttribute) {
