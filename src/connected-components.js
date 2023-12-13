@@ -408,12 +408,12 @@ const platform = {
     deleteTemplate: (templateId) => {
       const state = store.getState()
       const userId = selectors.userIdSelector(state)
-      return deleteTemplate(templateId, userId)
+      return deleteTemplate(templateId, userId, errorReportingLogger)
     },
     editTemplateDetails: (templateId, templateDetails) => {
       const state = store.getState()
       const userId = selectors.userIdSelector(state)
-      editTemplateDetails(templateId, templateDetails, userId)
+      editTemplateDetails(templateId, templateDetails, userId, errorReportingLogger)
     },
     startSaveAsTemplate: (itemType) => {
       const event = new Event('save-as-template-start', { bubbles: true, cancelable: false })
