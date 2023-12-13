@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import PropTypes from 'react-proptypes'
+import { v4 as uuid } from 'uuid'
 
 import { t } from 'plottr_locales'
 import { helpers } from 'pltr/v2'
@@ -8,11 +9,6 @@ import ProgressBar from '../../../ProgressBar'
 import FailedUploads from './FailedUploads'
 import { StepBody, StepFooter, StepHeader } from '../../../onboarding/Step'
 import { checkDependencies } from '../../../checkDependencies'
-
-const typeName = {
-  project: t('Project'),
-  template: t('Template'),
-}
 
 const UploadingConnector = (connector) => {
   const {
@@ -42,6 +38,11 @@ const UploadingConnector = (connector) => {
   })
 
   const Uploading = ({ nextStep, projects, templates, userId, emailAddress }) => {
+    const typeName = {
+      project: t('Project'),
+      template: t('Template'),
+    }
+
     const [maxItems, setMaxItems] = useState(100)
     const [currentProgress, setCurrentProgress] = useState(0)
     const [currentObj, setCurrentObj] = useState(null)
@@ -65,7 +66,7 @@ const UploadingConnector = (connector) => {
       }
       if (templates) {
         templates.forEach((tm) => {
-          toUpload.push({ type: 'template', id: tm.id, data: tm, name: tm.name })
+          toUpload.push({ type: 'template', id: `${tm.id}-${uuid()}`, data: tm, name: tm.name })
         })
       }
       // beging uploading

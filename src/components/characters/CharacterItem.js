@@ -4,6 +4,7 @@ import cx from 'classnames'
 import { FiCopy } from 'react-icons/fi'
 
 import { t as i18n } from 'plottr_locales'
+import { isNotDroppingToSamePosition } from 'pltr/v2/helpers/lists'
 
 import ButtonGroup from '../ButtonGroup'
 import Glyphicon from '../Glyphicon'
@@ -17,7 +18,13 @@ const CharacterItemConnector = (connector) => {
   const Image = UnconnectedImage(connector)
 
   class CharacterItem extends Component {
-    state = { deleting: false, hovering: false, newCharacterIdPosition: null }
+    state = {
+      deleting: false,
+      hovering: false,
+      newCharacterIdPosition: null,
+      moveUp: null,
+      isDragging: false,
+    }
 
     constructor(props) {
       super(props)
@@ -84,15 +91,35 @@ const CharacterItemConnector = (connector) => {
 
     handleDragOver = (e) => {
       e.preventDefault()
-      const { character } = this.props
-      if (this.state.newCharacterIdPosition != character.id) {
+      const { character, draggedPosition, isMovingToNewCategory, absolutePosition } = this.props
+      const { newCharacterIdPosition, moveUp } = this.state
+      const targetElement = e.currentTarget
+      const mouseY = e.clientY - targetElement.getBoundingClientRect().top
+      const isAbove = Boolean(Math.round(mouseY) < Math.round(targetElement.clientHeight / 2))
+
+      if (
+        moveUp != isAbove &&
+        isNotDroppingToSamePosition(
+          draggedPosition,
+          absolutePosition,
+          isAbove,
+          isMovingToNewCategory
+        )
+      ) {
+        this.setState({ moveUp: isAbove })
+      }
+
+      if (newCharacterIdPosition != character.id) {
         this.setState({ newCharacterIdPosition: character.id })
       }
     }
 
     handleDragLeave = (e) => {
       e.preventDefault()
-      if (typeof this.state.newCharacterIdPosition !== 'undefined') {
+      if (
+        !this.ref.current.contains(e.relatedTarget) &&
+        typeof this.state.newCharacterIdPosition !== 'undefined'
+      ) {
         this.setState({ newCharacterIdPosition: null })
       }
     }
@@ -104,14 +131,28 @@ const CharacterItemConnector = (connector) => {
 
       const json = e.dataTransfer.getData('text/json')
       const droppedData = JSON.parse(json)
-      actions.reorderCharacter(droppedData.id, absolutePosition, character.categoryId || null)
-      this.setState({ newCharacterIdPosition: null })
+      actions.reorderCharacter(
+        droppedData.id,
+        absolutePosition,
+        character.categoryId || null,
+        this.state.moveUp ? 'up' : 'down'
+      )
+      this.setState({ newCharacterIdPosition: null, moveUp: null, isDragging: false })
     }
 
     handleDragStart = (e) => {
-      const { character, absolutePosition } = this.props
+      const { character } = this.props
       e.dataTransfer.effectAllowed = 'move'
-      e.dataTransfer.setData('text/json', JSON.stringify({ ...character, absolutePosition }))
+      e.dataTransfer.setData('text/json', JSON.stringify({ ...character }))
+      this.setState({ isDragging: true })
+    }
+
+    handleDragEnd = (e) => {
+      this.setState({ isDragging: false })
+    }
+
+    handleDragEnter = (e) => {
+      e.preventDefault()
     }
 
     renderHoverOptions = () => {
@@ -131,7 +172,14 @@ const CharacterItemConnector = (connector) => {
     }
 
     render() {
-      const { character, selected } = this.props
+      const { character, selected, draggedPosition, absolutePosition } = this.props
+      const { newCharacterIdPosition, moveUp, isDragging } = this.state
+      const isDroppable =
+        Number.isInteger(newCharacterIdPosition) &&
+        character.id == newCharacterIdPosition &&
+        draggedPosition !== absolutePosition
+      const moveBelow = moveUp !== null && !moveUp && isDroppable
+      const moveAbove = moveUp !== null && moveUp && !moveBelow && isDroppable
 
       let img = null
       if (character.imageId) {
@@ -144,41 +192,49 @@ const CharacterItemConnector = (connector) => {
 
       return (
         <div
-          className={cx('list-group-item', {
-            selected,
-            isDroppable:
-              !!this.state.newCharacterIdPosition &&
-              character.id == this.state.newCharacterIdPosition,
-          })}
           ref={this.ref}
-          onClick={this.selectCharacter}
-          /* draggable (disabled for 2023-10-27) */
+          draggable
+          key={this.props.key}
           onDragStart={this.handleDragStart}
           onDrop={this.handleDropItem}
           onDragOver={this.handleDragOver}
           onDragLeave={this.handleDragLeave}
+          onDragEnd={this.handleDragEnd}
+          onDragEnter={this.handleDragEnter}
+          onClick={this.selectCharacter}
+          className={cx('list-group-item__wrapper', {
+            dragging: absolutePosition == draggedPosition && isDragging,
+          })}
         >
-          <div className="character-list__item-inner">
-            {img}
-            <div>
-              <h6 className={cx('list-group-item-heading', { withImage: !!character.imageId })}>
-                {character.name || i18n('New Character')}
-              </h6>
-              <p className="list-group-item-text">{character.description.substr(0, 100)}</p>
+          <div className={cx('dropzone-indicator', { display: moveAbove })} />
+          <div
+            className={cx('list-group-item', {
+              selected,
+            })}
+          >
+            <div className="character-list__item-inner">
+              {img}
+              <div>
+                <h6 className={cx('list-group-item-heading', { withImage: !!character.imageId })}>
+                  {character.name || i18n('New Character')}
+                </h6>
+                <p className="list-group-item-text">{character.description.substr(0, 100)}</p>
+              </div>
+              <ButtonGroup className="character-list__item-buttons">
+                <Button bsSize="small" onClick={this.startEditing}>
+                  <Glyphicon glyph="edit" />
+                </Button>
+                <Button bsSize="small" onClick={this.handleDuplicate}>
+                  <FiCopy />
+                </Button>
+                <Button bsSize="small" onClick={this.handleDelete}>
+                  <Glyphicon glyph="trash" />
+                </Button>
+              </ButtonGroup>
+              {this.renderDelete()}
             </div>
-            <ButtonGroup className="character-list__item-buttons">
-              <Button bsSize="small" onClick={this.startEditing}>
-                <Glyphicon glyph="edit" />
-              </Button>
-              <Button bsSize="small" onClick={this.handleDuplicate}>
-                <FiCopy />
-              </Button>
-              <Button bsSize="small" onClick={this.handleDelete}>
-                <Glyphicon glyph="trash" />
-              </Button>
-            </ButtonGroup>
-            {this.renderDelete()}
           </div>
+          <div className={cx('dropzone-indicator', { display: moveBelow })} />
         </div>
       )
     }
@@ -193,6 +249,9 @@ const CharacterItemConnector = (connector) => {
       stopEdit: PropTypes.func.isRequired,
       actions: PropTypes.object.isRequired,
       absolutePosition: PropTypes.number,
+      key: PropTypes.number,
+      isMovingToNewCategory: PropTypes.bool,
+      draggedPosition: PropTypes.number,
     }
   }
 

@@ -120,6 +120,24 @@ $new-item-border: 2px dashed $new-item-border-color;
   margin-top: 10px;
 }
 
+@keyframes pushDownListItem {
+  0% {
+    transform: translateY(-50px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes pushUpListItem {
+  0% {
+    transform: translateY(50px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
 // @mixin new_item_hover {
 //   background: $new-item-background;
 //   border: $new-item-border;

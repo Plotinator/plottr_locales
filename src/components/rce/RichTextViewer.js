@@ -19,6 +19,7 @@ const RichTextViewer = ({
   isStorageURL,
   imageCache,
   cacheImage,
+  id,
   ...props
 }) => {
   const editor = useMemo(() => {
@@ -43,7 +44,7 @@ const RichTextViewer = ({
   const isLocked = props.lock && props.lock.clientId && props.lock?.clientId !== props.clientId
 
   return (
-    <Slate editor={editor} value={value} key={key.current}>
+    <Slate editor={editor} value={value} key={key.current} id={id}>
       {!props.disabled && isLocked ? (
         <div className="lock-icon__wrapper" disabled={stealingLock} onClick={stealLock}>
           <span>{t('Take Control')}</span>
@@ -65,6 +66,7 @@ const RichTextViewer = ({
 }
 
 RichTextViewer.propTypes = {
+  id: PropTypes.string.isRequired,
   text: PropTypes.any,
   disabled: PropTypes.bool,
   className: PropTypes.string,

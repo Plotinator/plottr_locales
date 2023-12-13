@@ -44,16 +44,19 @@ const BeatHeadingCellConnector = (connector) => {
     hierarchyLevels,
     deleteBeat,
     lastClick,
+    editing,
     reorderBeats,
     expandBeat,
     dropBeat,
     droppedBeat,
     collectBeat,
+    timelineFoci,
+    startEditingBeatHeadingTitle,
+    stopEditingBeatHeadingTitle,
   }) => {
     const [width, setWidth] = useState(null)
     const [spacerCellWidth, setSpacerCellWidth] = useState(null)
     const [headingCellWidth, setHeadingCellWidth] = useState(null)
-    const [editing, setEditing] = useState(false)
     const [deleting, setDeleting] = useState(false)
     const [dragging, setDragging] = useState(false)
     const [dropDepth, setDropDepth] = useState(0)
@@ -134,14 +137,14 @@ const BeatHeadingCellConnector = (connector) => {
 
     const startEditing = (event) => {
       event.stopPropagation()
-      setEditing(true)
+      startEditingBeatHeadingTitle(beatId)
     }
 
     const stopEditing = () => {
       if (beat.title === '') {
         editBeatTitle(beatId, currentTimeline, 'auto')
       }
-      setEditing(false)
+      stopEditingBeatHeadingTitle()
     }
 
     const startDeleting = (event) => {
@@ -314,11 +317,20 @@ const BeatHeadingCellConnector = (connector) => {
 
     const handleEsc = (event) => {
       if (event.which === 27 || event.which === 13) {
-        setEditing(false)
+        stopEditingBeatHeadingTitle()
       }
     }
 
     if (editing) {
+      const focusCandidate =
+        timelineFoci.length && typeof timelineFoci[0] !== 'undefined' && timelineFoci[0]
+      const selection =
+        Array.isArray(focusCandidate.path) &&
+        focusCandidate.path[0] === 'beat' &&
+        focusCandidate.path[1] === beatId &&
+        focusCandidate.path[2] === 'title' &&
+        focusCandidate.selection
+
       return (
         <FormGroup>
           <ControlLabel className={cx({ darkmode: darkMode })}>{beatTitle}</ControlLabel>
@@ -329,6 +341,7 @@ const BeatHeadingCellConnector = (connector) => {
             }}
             value={beat.title}
             autoFocus
+            selection={selection}
             onKeyDown={handleEsc}
             onBlur={stopEditing}
           />
@@ -475,11 +488,15 @@ const BeatHeadingCellConnector = (connector) => {
     hierarchyLevels: PropTypes.array.isRequired,
     deleteBeat: PropTypes.func.isRequired,
     lastClick: PropTypes.object,
+    editing: PropTypes.bool,
+    timelineFoci: PropTypes.array.isRequired,
     reorderBeats: PropTypes.func.isRequired,
     expandBeat: PropTypes.func.isRequired,
     dropBeat: PropTypes.func.isRequired,
     droppedBeat: PropTypes.object,
     collectBeat: PropTypes.func.isRequired,
+    startEditingBeatHeadingTitle: PropTypes.func.isRequired,
+    stopEditingBeatHeadingTitle: PropTypes.func.isRequired,
   }
 
   const {
@@ -512,6 +529,8 @@ const BeatHeadingCellConnector = (connector) => {
           hierarchyLevels: selectors.sortedHierarchyLevels(state),
           lastClick: selectors.lastClickSelector(state),
           droppedBeat: selectors.droppedBeatSelector(state),
+          editing: selectors.editingGivenBeatsTitleSelector(state, ownProps.beatId),
+          timelineFoci: selectors.timelineFociSelector(state),
         }
       },
       {
@@ -522,6 +541,8 @@ const BeatHeadingCellConnector = (connector) => {
         expandBeat: actions.beat.expandBeat,
         dropBeat: actions.domEvents.dropBeat,
         collectBeat: actions.domEvents.collectBeat,
+        startEditingBeatHeadingTitle: actions.ui.startEditingBeatHeadingTitle,
+        stopEditingBeatHeadingTitle: actions.ui.stopEditingBeatHeadingTitle,
       }
     )(BeatHeadingCell)
   }

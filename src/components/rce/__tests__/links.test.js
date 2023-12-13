@@ -8,12 +8,10 @@ const RichTextEditor = RichTextEditorConnector(connector)
 
 describe('links', () => {
   it('should be rendered with href attributes', () => {
-    Object.defineProperty(window, 'requestIdleCallback', {
-      value: jest.fn(),
-    })
     const html = mount(
       <div id="react-root">
         <RichTextEditor
+          id="test-editor"
           recentFonts={['Forum']}
           fonts={['Forum', 'IBM Plex Serif', 'Lato', 'Yellowtail']}
           text={[

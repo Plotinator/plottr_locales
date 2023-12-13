@@ -175,15 +175,15 @@
   }
 
   .sticky-table-cell.card-pinned:has(.card__body-wrapper, .card__behind, .creating) {
-    z-index: 10;
+    z-index: 11;
   }
 
-  .sticky-table-cell:has(.card__cell.card-pinned .creating) {
+  .sticky-table-cell:has(.card__cell.card-pinned .creating, .card__cell.card-pinned .blank-card__body.card-pinned) {
     z-index: 10;
   }
 
   .sticky-table-cell.card-pinned:has(.vertical-insert-beat-wrapper:not(.transparent)) {
-    z-index: 10;
+    z-index: 11;
   }
 }
 
@@ -615,7 +615,7 @@
 
 #timelineview__root
   .isPinned
-  .sticky-table-cell:not(:first-child):not(:nth-child(2)):not(:has(.card__body-wrapper, .card__cell__overview-cell, .creating)) {
+  .sticky-table-cell:not(:first-child):not(:nth-child(2)):not(:has(.card__body-wrapper, .card__cell__overview-cell, .creating, .card__cell.card-pinned)) {
   z-index: 3;
 
   &:hover {
@@ -623,9 +623,7 @@
   }
 }
 
-#timelineview__root
-  .isPinned
-  .sticky-table-cell:not(:first-child):not(:nth-child(2)):not(:has(.card__body-wrapper, .card__cell__overview-cell)) {
+#timelineview__root .isPinned .sticky-table-cell:not(:first-child):not(:nth-child(2)):not(:has(.card__body-wrapper, .card__cell__overview-cell, .card__cell.card-pinned)) {
   z-index: 3;
 
   &:hover {

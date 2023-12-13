@@ -43,22 +43,21 @@ const BeatTitleCellConnector = (connector) => {
     beat,
     hierarchyLevel,
     beatTitle,
-    positionOffset,
     isSmall,
     isMedium,
     isLarge,
-    isSeries,
     readOnly,
+    editing,
     timelineViewIsStacked,
     timelineViewIsTabbed,
     atMaximumDepth,
     hierarchyLevelName,
     hierarchyChildLevelName,
-    timelineViewIsDefault,
+    selection,
     domEvents,
+    uiActions,
   }) => {
     const [hovering, setHovering] = useState(false)
-    const [editing, setEditing] = useState(beat.title == '')
     const [dragging, setDragging] = useState(false)
     const [inDropZone, setInDropZone] = useState(false)
     const [dropDepth, setDropDepth] = useState(0)
@@ -124,7 +123,7 @@ const BeatTitleCellConnector = (connector) => {
 
     const finalizeEdit = (newVal) => {
       actions.editBeatTitle(beat.id, currentTimeline, newVal || 'auto') // if nothing, set to auto
-      setEditing(false)
+      uiActions.stopEditingBeatHeadingTitle()
       setHovering(null)
     }
 
@@ -139,7 +138,9 @@ const BeatTitleCellConnector = (connector) => {
     }
 
     const handleEsc = (event) => {
-      if (event.which === 27) setEditing(false)
+      if (event.which === 27) {
+        uiActions.stopEditingBeatHeadingTitle()
+      }
     }
 
     const handleDragStart = (e) => {
@@ -190,7 +191,7 @@ const BeatTitleCellConnector = (connector) => {
 
     const startEditing = () => {
       if (readOnly) return
-      setEditing(true)
+      uiActions.startEditingBeatHeadingTitle(beatId)
       setHovering(null)
     }
 
@@ -276,7 +277,7 @@ const BeatTitleCellConnector = (connector) => {
           defaultValue={beat.title}
           title={t('Edit {beatName}', { beatName: beatTitle })}
           cancel={() => {
-            setEditing(false)
+            uiActions.stopEditingBeatHeadingTitle()
             setHovering(null)
           }}
         />
@@ -394,6 +395,7 @@ const BeatTitleCellConnector = (connector) => {
               titleInputRef.current = ref
             }}
             autoFocus
+            selection={selection}
             onKeyDown={handleEsc}
             onBlur={handleBlur}
             onKeyPress={handleFinishEditing}
@@ -645,19 +647,19 @@ const BeatTitleCellConnector = (connector) => {
     beat: PropTypes.object.isRequired,
     hierarchyLevel: PropTypes.object.isRequired,
     beatTitle: PropTypes.string.isRequired,
-    positionOffset: PropTypes.number.isRequired,
     isSmall: PropTypes.bool.isRequired,
     isMedium: PropTypes.bool.isRequired,
     isLarge: PropTypes.bool.isRequired,
-    isSeries: PropTypes.bool.isRequired,
     readOnly: PropTypes.bool,
     timelineViewIsStacked: PropTypes.bool,
     timelineViewIsTabbed: PropTypes.bool,
     atMaximumDepth: PropTypes.bool,
     hierarchyLevelName: PropTypes.string,
     hierarchyChildLevelName: PropTypes.string,
-    timelineViewIsDefault: PropTypes.bool,
+    editing: PropTypes.bool,
+    selection: PropTypes.array.isRequired,
     domEvents: PropTypes.object.isRequired,
+    uiActions: PropTypes.object.isRequired,
   }
 
   const {
@@ -685,15 +687,12 @@ const BeatTitleCellConnector = (connector) => {
           beat: uniqueBeatsSelector(state, ownProps.beatId),
           hierarchyLevel: selectors.hierarchyLevelSelector(state, ownProps.beatId),
           beatTitle: uniqueBeatTitleSelector(state, ownProps.beatId),
-          positionOffset: selectors.positionOffsetSelector(state),
           isSmall: selectors.isSmallSelector(state),
           isMedium: selectors.isMediumSelector(state),
           isLarge: selectors.isLargeSelector(state),
-          isSeries: selectors.isSeriesSelector(state),
           readOnly: !selectors.canWriteSelector(state),
           timelineViewIsStacked: selectors.timelineViewIsStackedSelector(state),
           timelineViewIsTabbed: selectors.timelineViewIsTabbedSelector(state),
-          timelineViewIsDefault: selectors.timelineViewIsDefaultSelector(state),
           atMaximumDepth: selectors.atMaximumHierarchyDepthSelector(state, ownProps.beatId),
           hierarchyLevelName: selectors.beatInsertControlHierarchyLevelNameSelector(
             state,
@@ -703,6 +702,8 @@ const BeatTitleCellConnector = (connector) => {
             state,
             ownProps.beatId
           ),
+          editing: selectors.editingGivenBeatsTitleSelector(state, ownProps.beatId),
+          selection: selectors.timelineBeatSelectionSelector(state, ownProps.beatId),
         }
       }
     }
@@ -711,6 +712,7 @@ const BeatTitleCellConnector = (connector) => {
       return {
         actions: bindActionCreators(actions.beat, dispatch),
         domEvents: bindActionCreators(actions.domEvents, dispatch),
+        uiActions: bindActionCreators(actions.ui, dispatch),
       }
     }
 

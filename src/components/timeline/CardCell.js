@@ -346,8 +346,16 @@ const CardCellConnector = (connector) => {
     }
 
     render() {
-      const { cards, isSmall, isMedium, isPinned, color, orientation, beatHeadingCount } =
-        this.props
+      const {
+        cards,
+        isSmall,
+        isMedium,
+        isPinned,
+        color,
+        orientation,
+        isJumping,
+        beatHeadingCount,
+      } = this.props
       const tableLength =
         orientation == 'horizontal' && !isMedium
           ? this.ref.current?.clientWidth + 50 || 225
@@ -378,6 +386,7 @@ const CardCellConnector = (connector) => {
                 isMedium={isMedium}
                 orientation={orientation}
                 tableLength={tableLength}
+                isJumping={isJumping}
                 beatHeadingCount={beatHeadingCount}
               />
             ) : null}
@@ -398,6 +407,7 @@ const CardCellConnector = (connector) => {
       if (this.props.lineIsExpanded != nextProps.lineIsExpanded) return true
       if (this.props.isVisible != nextProps.isVisible) return true
       if (this.props.isPinned != nextProps.isPinned) return true
+      if (this.props.isJumping != nextProps.isJumping) return true
 
       return false
     }
@@ -419,6 +429,7 @@ const CardCellConnector = (connector) => {
     isMedium: PropTypes.bool.isRequired,
     actions: PropTypes.object.isRequired,
     isPinned: PropTypes.bool,
+    isJumping: PropTypes.bool,
     beatHeadingCount: PropTypes.number.isRequired,
   }
 
@@ -442,6 +453,7 @@ const CardCellConnector = (connector) => {
           isVisible: visible,
           isSmall: selectors.isSmallSelector(state),
           isMedium: selectors.isMediumSelector(state),
+          isJumping: selectors.isJumpingSelector(state),
           beatHeadingCount: selectors.bottomLevelBeatHeadingCountSelector(state),
         }
       },

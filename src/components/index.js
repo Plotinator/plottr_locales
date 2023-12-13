@@ -117,6 +117,9 @@ import ProOnboarding from './dashboard/account/proOnboarding/index'
 import SettingsWizard from './dashboard/account/settingsWizard/index'
 import UpdateNotifier from './dashboard/UpdateNotifier'
 
+// Search
+import SearchModal from './SearchModal'
+
 // Firebase
 import FirebaseLogin from './FirebaseLogin'
 
@@ -207,6 +210,7 @@ export {
   CharacterTemplateDetails,
   DashboardBody,
   DashboardNav,
+  SearchModal,
   FirebaseLogin,
   ChoiceView,
   ExpiredView,

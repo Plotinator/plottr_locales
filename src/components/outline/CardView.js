@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'react-proptypes'
-import _ from 'lodash'
+import { isEqual } from 'lodash'
 import { FaGripLinesVertical, FaCircle } from 'react-icons/fa'
 import cx from 'classnames'
 
@@ -9,18 +9,20 @@ import { t as i18n } from 'plottr_locales'
 import ButtonToolbar from '../ButtonToolbar'
 import Glyphicon from '../Glyphicon'
 import FormGroup from '../FormGroup'
-import FormControl from '../FormControl'
+import UnconnectedTextFormControl from '../TextFormControl'
 import Button from '../Button'
 import UnconnectedRichText from '../rce/RichText'
 import TagLabel from '../TagLabel'
 import UnconnectedImage from '../images/Image'
 import UnconnectedSelectList from '../SelectList'
 import { checkDependencies } from '../checkDependencies'
+import { withArgs } from '../withArgs'
 
 const CardViewConnector = (connector) => {
   const RichText = UnconnectedRichText(connector)
   const Image = UnconnectedImage(connector)
   const SelectList = UnconnectedSelectList(connector)
+  const TextFormControl = UnconnectedTextFormControl(connector)
 
   const {
     pltr: { helpers },
@@ -31,14 +33,11 @@ const CardViewConnector = (connector) => {
     constructor(props) {
       super(props)
       this.state = {
-        editing: false,
         dragging: false,
         inDropZone: false,
         dropDepth: 0,
       }
 
-      this.editorPath = helpers.editors.cardDescriptionEditorPath(props.card.id)
-      this.titleInputRef = null
       this.componentRef = null
     }
 
@@ -55,14 +54,16 @@ const CardViewConnector = (connector) => {
     }
 
     componentWillUnmount() {
-      if (this.state.editing) this.saveEdit()
+      const { editing } = this.props
+      if (editing) {
+        this.saveEdit()
+      }
     }
 
     saveEdit = () => {
-      const { card, actions } = this.props
-      var newTitle = this.titleInputRef.value
-      actions.editCard(card.id, newTitle, card.description, card.templates, {})
-      this.setState({ editing: false })
+      const { uiActions } = this.props
+
+      uiActions.finishEditingOutlineCard()
       this.deregisterEventListeners()
     }
 
@@ -107,8 +108,10 @@ const CardViewConnector = (connector) => {
       // then, when we hit this point we can decide whether or not to
       // save the card on its behalf.
 
+      const { editing } = this.props
+
       // Only handle the event if our child is being edited
-      if (!this.state.editing) return
+      if (!editing) return
 
       // We can't close the editor if we were picking an image, and
       // that's a different component.
@@ -125,8 +128,9 @@ const CardViewConnector = (connector) => {
     }
 
     editOnClick = () => {
-      if (!this.state.editing) {
-        this.setState({ editing: true })
+      const { uiActions, editing, card } = this.props
+      if (!editing) {
+        uiActions.startEditingOutlineCard(card.id)
         this.registerEventListeners()
       }
     }
@@ -168,8 +172,17 @@ const CardViewConnector = (connector) => {
       })
     }
 
+    selectionForMainCardElement = (name) => {
+      const { foci, card } = this.props
+      const cardId = card.id
+
+      return foci?.find(({ path }) => {
+        return isEqual(path, ['card', cardId, name])
+      })?.selection
+    }
+
     renderDropZone() {
-      if (!this.state.inDropZone) return
+      if (!this.state.inDropZone) return null
 
       return (
         <div className="outline__card-drop">
@@ -179,47 +192,49 @@ const CardViewConnector = (connector) => {
     }
 
     renderTitle() {
-      const { title } = this.props.card
-      if (!this.state.editing) return null
+      const { title, id } = this.props.card
+      const { actions, foci, editing } = this.props
+
+      if (!editing) return null
 
       return (
         <FormGroup>
-          <FormControl
+          <TextFormControl
+            id={`card-${id}-title`}
             onKeyPress={this.handleEnter}
             onKeyDown={this.handleEsc}
             type="text"
-            inputRef={(ref) => {
-              this.titleInputRef = ref
-            }}
-            defaultValue={title}
+            onChange={withArgs(actions.editCardTitle, id)}
+            autoFocus={foci && foci[0] && foci[0].path[2] === 'title' && foci[0].path[1] === id}
+            selection={this.selectionForMainCardElement('title')}
+            value={title}
           />
         </FormGroup>
       )
     }
 
-    handleDescriptionChange = (newDescription, editorPath, selection) => {
-      this.props.actions.editCardAttributes(
-        this.props.card.id,
-        newDescription ? { description: newDescription } : null,
-        editorPath,
-        selection
-      )
+    handleDescriptionChange = (newDescription, selection) => {
+      this.props.actions.editCardDescription(this.props.card.id, newDescription, selection)
     }
 
     renderDescription() {
-      const { description } = this.props.card
+      const { description, id } = this.props.card
+      const { foci, editing } = this.props
+
       return (
         <div className="outline__description__editing" onKeyDown={this.handleEsc}>
           <RichText
-            autofocus
-            id={this.editorPath}
+            id={`card-${id}-description`}
             className="outline__description"
             onChange={this.handleDescriptionChange}
             description={description}
-            selection={this.props.selection}
-            editable={this.state.editing}
+            editable={editing}
+            autoFocus={
+              foci && foci[0] && foci[0].path[2] === 'description' && foci[0].path[1] === id
+            }
+            selection={this.selectionForMainCardElement('description')}
           />
-          {this.state.editing && (
+          {editing && (
             <ButtonToolbar className="card-dialog__button-bar">
               <Button onClick={this.saveEdit}>{i18n('Close')}</Button>
             </ButtonToolbar>
@@ -265,10 +280,11 @@ const CardViewConnector = (connector) => {
     }
 
     render() {
-      const { actions, card, line, darkMode, characters, places, tags } = this.props
+      const { editing, actions, card, line, darkMode, characters, places, tags } = this.props
       const style = { color: line.color }
       return card.isEmpty ? null : (
         <div
+          id={`card-${card.id}`}
           ref={(ref) => {
             this.componentRef = ref
           }}
@@ -286,7 +302,7 @@ const CardViewConnector = (connector) => {
               </div>
               <div
                 className={cx('outline__card__grip', {
-                  editing: this.state.editing,
+                  editing,
                   dragging: this.state.dragging,
                 })}
                 draggable
@@ -294,11 +310,11 @@ const CardViewConnector = (connector) => {
                 onDragEnd={this.handleDragEnd}
               >
                 <FaGripLinesVertical />
-                {this.state.editing ? null : <h5>{card.title}</h5>}
+                {editing ? null : <h5>{card.title}</h5>}
               </div>
             </div>
             <div
-              className={cx('outline__card__description', { editing: this.state.editing })}
+              className={cx('outline__card__description', { editing })}
               onClick={this.editOnClick}
             >
               {this.renderTitle()}
@@ -342,6 +358,7 @@ const CardViewConnector = (connector) => {
   }
 
   CardView.propTypes = {
+    beatId: PropTypes.number.isRequired,
     card: PropTypes.object.isRequired,
     selection: PropTypes.object,
     index: PropTypes.number.isRequired,
@@ -352,7 +369,10 @@ const CardViewConnector = (connector) => {
     places: PropTypes.array.isRequired,
     darkMode: PropTypes.bool,
     actions: PropTypes.object.isRequired,
+    uiActions: PropTypes.object.isRequired,
     images: PropTypes.object,
+    foci: PropTypes.array.isRequired,
+    editing: PropTypes.bool,
   }
 
   const {
@@ -365,24 +385,25 @@ const CardViewConnector = (connector) => {
     const { connect, bindActionCreators } = redux
 
     const CardActions = actions.card
+    const UIActions = actions.ui
 
     return connect(
       (state, ownProps) => {
         return {
-          line: selectors.cardsLineSelector(state, ownProps.card.lineId),
-          selection: selectors.selectionSelector(
-            state,
-            helpers.editors.cardDescriptionEditorPath(ownProps.card.id)
-          ),
+          card: selectors.singleCardOrDefaultSelector(state, ownProps.cardId, ownProps.beatId),
+          line: selectors.cardsLineOrDefaultSelector(state, ownProps.cardId),
           characters: selectors.charactersSortedAtoZSelector(state),
           places: selectors.placesSortedAtoZSelector(state),
           tags: selectors.sortedTagsSelector(state),
           darkMode: selectors.isDarkModeSelector(state),
+          foci: selectors.outlineCurrentFocusSelector(state),
+          editing: selectors.editingOutlineCardSelector(state) === ownProps.cardId,
         }
       },
       (dispatch) => {
         return {
           actions: bindActionCreators(CardActions, dispatch),
+          uiActions: bindActionCreators(UIActions, dispatch),
         }
       }
     )(CardView)

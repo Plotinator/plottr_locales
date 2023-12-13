@@ -26,7 +26,10 @@ const CharacterDetailsConnector = (connector) => {
       if (type == 'paragraph') {
         desc = (
           <dd>
-            <RichText id={`character.${character.id}.attribute.${name}`} description={value} />
+            <RichText
+              id={`character-${character.id}-custom-attribute-${name}`}
+              description={value}
+            />
           </dd>
         )
       } else {
@@ -47,7 +50,10 @@ const CharacterDetailsConnector = (connector) => {
         if (attr.type == 'paragraph') {
           val = (
             <dd>
-              <RichText description={attributeValue} />
+              <RichText
+                id={`character-${character.id}-template-${thisTemplate.id}-attribute-${attr.name}`}
+                description={attributeValue}
+              />
             </dd>
           )
         } else {
@@ -88,7 +94,7 @@ const CharacterDetailsConnector = (connector) => {
               <dl className="dl-horizontal">
                 <dt>{t('Notes')}</dt>
                 <dd>
-                  <RichText description={character.notes} />
+                  <RichText id={`character-${character.id}-notes`} description={character.notes} />
                 </dd>
               </dl>
               {customAttributes.length ? <p>{t('Attributes')}</p> : null}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'react-proptypes'
+import { isEqual } from 'lodash'
 import cx from 'classnames'
 import { FiCopy } from 'react-icons/fi'
 
@@ -9,7 +10,7 @@ import ButtonToolbar from '../ButtonToolbar'
 import Glyphicon from '../Glyphicon'
 import ControlLabel from '../ControlLabel'
 import FormGroup from '../FormGroup'
-import FormControl from '../FormControl'
+import UnconnectedTextFormControl from '../TextFormControl'
 import Button from '../Button'
 import UnconnectedCategoryPicker from '../CategoryPicker'
 import UnconnectedBookSelectList from '../project/BookSelectList'
@@ -20,7 +21,7 @@ import UnconnectedImagePicker from '../images/ImagePicker'
 import UnconnectedRichText from '../rce/RichText'
 import UnconnectedSelectList from '../SelectList'
 import { checkDependencies } from '../checkDependencies'
-import { withEventTargetValue } from '../withEventTargetValue'
+import { withArgs } from '../withArgs'
 
 const PlaceViewConnector = (connector) => {
   const BookSelectList = UnconnectedBookSelectList(connector)
@@ -30,6 +31,7 @@ const PlaceViewConnector = (connector) => {
   const RichText = UnconnectedRichText(connector)
   const SelectList = UnconnectedSelectList(connector)
   const CategoryPicker = UnconnectedCategoryPicker(connector)
+  const TextFormControl = UnconnectedTextFormControl(connector)
 
   const {
     pltr: { helpers },
@@ -46,11 +48,11 @@ const PlaceViewConnector = (connector) => {
     cards,
     notes,
     selection,
-    editorPath,
     darkMode,
     tags,
     places,
     placeSearchTerm,
+    foci,
   }) => {
     const [deleting, setDeleting] = useState(false)
 
@@ -59,6 +61,14 @@ const PlaceViewConnector = (connector) => {
         if (editing) saveEdit(false)
       }
     }, [])
+
+    const selectionForMainPlaceElement = (name) => {
+      const placeId = place.id
+
+      return foci?.find(({ path }) => {
+        return isEqual(path, ['place', placeId, name])
+      })?.selection
+    }
 
     const deletePlace = (e) => {
       e.stopPropagation()
@@ -88,40 +98,20 @@ const PlaceViewConnector = (connector) => {
       }
     }
 
-    const handleAttrDescriptionChange = (attrName, desc, selection) => {
-      const editorPath = helpers.editors.placeCustomAttributeEditorPath(place.id, attrName)
-
-      actions.editPlace(
-        place.id,
-        helpers.editors.attrIfPresent(attrName, desc),
-        editorPath,
-        selection
-      )
+    const handleAttrDescriptionChange = (attrName) => (desc, selection) => {
+      actions.editPlaceCustomAttribute(place.id, attrName, desc, selection)
     }
 
     const handleNotesChanged = (value, selection) => {
-      actions.editPlace(
-        place.id,
-        helpers.editors.attrIfPresent('notes', value),
-        editorPath,
-        selection
-      )
+      actions.editPlaceNotes(place.id, value, selection)
     }
 
     const saveEdit = (close = true) => {
       if (close) stopEditing()
     }
 
-    const changeName = (newName) => {
-      actions.editPlace(place.id, { name: newName })
-    }
-
     const changeCategory = (newCategoryId) => {
       actions.editPlace(place.id, { categoryId: newCategoryId })
-    }
-
-    const editDescription = (newDescription) => {
-      actions.editPlace(place.id, { description: newDescription })
     }
 
     const updateImageId = (newImageId) => {
@@ -162,7 +152,6 @@ const PlaceViewConnector = (connector) => {
 
     const renderEditingCustomAttributes = () => {
       return customAttributes.map((attr, index) => {
-        const editorPath = helpers.editors.placeCustomAttributeEditorPath(place.id, attr.name)
         const { name, id, type } = attr
         return (
           <React.Fragment key={`custom-attribute-${index}-${name}`}>
@@ -170,12 +159,14 @@ const PlaceViewConnector = (connector) => {
               index={index}
               entityType="place"
               value={place[name]}
-              editorPath={editorPath}
-              onChange={(desc, selection) => handleAttrDescriptionChange(name, desc, selection)}
+              onChange={handleAttrDescriptionChange(name)}
               onSave={saveEdit}
               name={name}
-              id={id}
+              id={id || name}
               type={type}
+              autoFocus={foci && foci[0] && foci[0].path[2] === attr.name}
+              selection={selectionForMainPlaceElement(attr.name)}
+              inputId={`place-${place.id}-custom-attribute-${index}-${name}`}
             />
           </React.Fragment>
         )
@@ -190,23 +181,28 @@ const PlaceViewConnector = (connector) => {
               <div className="place-list__inputs__normal">
                 <FormGroup>
                   <ControlLabel>{t('Name')}</ControlLabel>
-                  <FormControl
+                  <TextFormControl
+                    id={`place-${place.id}-name`}
                     type="text"
-                    onChange={withEventTargetValue(changeName)}
-                    autoFocus={placeSearchTerm ? false : true}
+                    onChange={withArgs(actions.editPlaceName, place.id)}
+                    autoFocus={foci && foci[0] && foci[0].path[2] === 'name'}
+                    selection={selectionForMainPlaceElement('name')}
                     onKeyDown={handleEsc}
                     onKeyPress={handleEnter}
-                    defaultValue={place.name}
+                    value={place.name}
                   />
                 </FormGroup>
                 <FormGroup>
                   <ControlLabel>{t('Short Description')}</ControlLabel>
-                  <FormControl
+                  <TextFormControl
+                    id={`place-${place.id}-short-description`}
                     type="text"
-                    onChange={withEventTargetValue(editDescription)}
+                    onChange={withArgs(actions.editPlaceDescription, place.id)}
+                    autoFocus={foci && foci[0] && foci[0].path[2] === 'description'}
+                    selection={selectionForMainPlaceElement('description')}
                     onKeyDown={handleEsc}
                     onKeyPress={handleEnter}
-                    defaultValue={place.description}
+                    value={place.description}
                   />
                 </FormGroup>
                 <FormGroup>
@@ -221,12 +217,12 @@ const PlaceViewConnector = (connector) => {
                 <FormGroup>
                   <ControlLabel>{t('Notes')}</ControlLabel>
                   <RichText
-                    id={editorPath}
+                    id={`place-${place.id}-notes`}
                     description={place.notes}
                     onChange={handleNotesChanged}
-                    selection={selection}
+                    autoFocus={foci && foci[0] && foci[0].path[2] === 'notes'}
+                    selection={selectionForMainPlaceElement('notes')}
                     editable
-                    autofocus={false}
                   />
                 </FormGroup>
               </div>
@@ -255,7 +251,10 @@ const PlaceViewConnector = (connector) => {
         if (type == 'paragraph') {
           desc = (
             <dd>
-              <RichText description={place[name]} />
+              <RichText
+                id={`place-${place.id}-custom-attribute-${attr.name}`}
+                description={place[name]}
+              />
             </dd>
           )
         }
@@ -281,7 +280,7 @@ const PlaceViewConnector = (connector) => {
                 <dl className="dl-horizontal">
                   <dt>{t('Notes')}</dt>
                   <dd>
-                    <RichText description={place.notes} />
+                    <RichText id={`place-${place.id}-notes`} description={place.notes} />
                   </dd>
                 </dl>
               </div>
@@ -330,11 +329,11 @@ const PlaceViewConnector = (connector) => {
     cards: PropTypes.array.isRequired,
     notes: PropTypes.array.isRequired,
     selection: PropTypes.object,
-    editorPath: PropTypes.string.isRequired,
     darkMode: PropTypes.bool,
     tags: PropTypes.array.isRequired,
     places: PropTypes.array,
     placeSearchTerm: PropTypes.string,
+    foci: PropTypes.array,
   }
 
   const {
@@ -351,16 +350,14 @@ const PlaceViewConnector = (connector) => {
 
     return connect(
       (state, ownProps) => {
-        const editorPath = helpers.editors.placeNotesEditorPath(ownProps.place.id)
         return {
           customAttributes: selectors.placeCustomAttributesSelector(state),
           cards: selectors.allCardsSelector(state),
           notes: selectors.allNotesSelector(state),
           darkMode: selectors.isDarkModeSelector(state),
-          editorPath,
-          selection: selectors.selectionSelector(state, editorPath),
           tags: sortedTagsSelector(state),
           placeSearchTerm: selectors.placesSearchTermSelector(state),
+          foci: selectors.placeCurrentFocusSelector(state),
         }
       },
       (dispatch) => {

@@ -35,6 +35,7 @@ const BeatInsertCellConnector = (connector) => {
       hierarchyLevels,
       readOnly,
       isPinned,
+      isJumping,
       beatHeadingCount,
     } = props
 
@@ -111,6 +112,7 @@ const BeatInsertCellConnector = (connector) => {
           orientation={orientation}
           color={color}
           isMedium={isMedium}
+          isJumping={isJumping}
           beatHeadingCount={beatHeadingCount}
         />
       )
@@ -137,6 +139,7 @@ const BeatInsertCellConnector = (connector) => {
               orientation={orientation}
               isMedium={isMedium}
               tableLength={tableLength}
+              isJumping={isJumping}
               beatHeadingCount={beatHeadingCount}
             />
           ) : null}
@@ -159,6 +162,7 @@ const BeatInsertCellConnector = (connector) => {
               orientation={orientation}
               isMedium={isMedium}
               tableLength={tableLength}
+              isJumping={isJumping}
               beatHeadingCount={beatHeadingCount}
             />
           ) : null}
@@ -187,6 +191,7 @@ const BeatInsertCellConnector = (connector) => {
               orientation={orientation}
               isMedium={isMedium}
               tableLength={tableLength}
+              isJumping={isJumping}
               beatHeadingCount={beatHeadingCount}
             />
           ) : null}
@@ -271,6 +276,7 @@ const BeatInsertCellConnector = (connector) => {
     hierarchyLevels: PropTypes.array.isRequired,
     readOnly: PropTypes.bool,
     isPinned: PropTypes.bool,
+    isJumping: PropTypes.bool,
     beatHeadingCount: PropTypes.number.isRequired,
   }
 
@@ -298,6 +304,7 @@ const BeatInsertCellConnector = (connector) => {
         ),
         hierarchyChildLevelName: selectors.hierarchyChildLevelNameSelector(state, beatToLeftId),
         readOnly: !selectors.canWriteSelector(state),
+        isJumping: selectors.isJumpingSelector(state),
         beatHeadingCount: selectors.bottomLevelBeatHeadingCountSelector(state),
       }
     })(BeatInsertCell)

@@ -4,6 +4,7 @@ import cx from 'classnames'
 import { FiCopy } from 'react-icons/fi'
 
 import { t as i18n } from 'plottr_locales'
+import { isNotDroppingToSamePosition } from 'pltr/v2/helpers/lists'
 
 import ButtonGroup from '../ButtonGroup'
 import Glyphicon from '../Glyphicon'
@@ -15,9 +16,30 @@ import { checkDependencies } from '../checkDependencies'
 const PlaceItemConnector = (connector) => {
   const Image = UnconnectedImage(connector)
 
-  const PlaceItem = ({ place, selected, select, startEdit, stopEdit, actions, editing }) => {
+  const PlaceItem = ({
+    place,
+    selected,
+    select,
+    startEdit,
+    stopEdit,
+    actions,
+    editing,
+    isMovingToNewCategory,
+    key,
+    draggedPosition,
+    absolutePosition,
+  }) => {
     const [deleting, setDeleting] = useState(false)
     const [newPlaceIdPosition, setNewPlaceIdPosition] = useState(null)
+    const [moveUp, setMoveUp] = useState(null)
+    const [isDragging, setDragging] = useState(false)
+
+    const isDroppable =
+      Number.isInteger(newPlaceIdPosition) &&
+      place.id == newPlaceIdPosition &&
+      draggedPosition !== absolutePosition
+    const moveBelow = moveUp !== null && !moveUp && isDroppable
+    const moveAbove = moveUp !== null && moveUp && !moveBelow && isDroppable
 
     const ref = useRef()
 
@@ -30,7 +52,7 @@ const PlaceItemConnector = (connector) => {
 
     useEffect(() => {
       scrollIntoView()
-    }, [place])
+    }, [])
 
     const deletePlace = (e) => {
       e.stopPropagation()
@@ -107,8 +129,23 @@ const PlaceItemConnector = (connector) => {
       )
     }
 
-    const handleDragOver = (e) => {
+    const handleDragOver = (e, place) => {
       e.preventDefault()
+      const targetElement = e.currentTarget
+      const mouseY = e.clientY - targetElement.getBoundingClientRect().top
+      const isAbove = Boolean(Math.round(mouseY) < Math.round(targetElement.clientHeight / 2))
+
+      if (
+        moveUp != isAbove &&
+        isNotDroppingToSamePosition(
+          draggedPosition,
+          absolutePosition,
+          isAbove,
+          isMovingToNewCategory
+        )
+      ) {
+        setMoveUp(isAbove)
+      }
       if (newPlaceIdPosition != place.id) {
         setNewPlaceIdPosition(place.id)
       }
@@ -116,7 +153,7 @@ const PlaceItemConnector = (connector) => {
 
     const handleDragLeave = (e) => {
       e.preventDefault()
-      if (typeof newPlaceIdPosition !== 'undefined') {
+      if (!ref.current.contains(e.relatedTarget) && typeof newPlaceIdPosition !== 'undefined') {
         setNewPlaceIdPosition(null)
       }
     }
@@ -131,41 +168,63 @@ const PlaceItemConnector = (connector) => {
         droppedData.id,
         droppedData.position,
         place.position,
-        place.categoryId || null
+        place.categoryId || null,
+        moveUp ? 'up' : 'down'
       )
       setNewPlaceIdPosition(null)
+      setMoveUp(null)
+      setDragging(false)
     }
 
     const handleDragStart = (e) => {
+      setDragging(true)
       e.dataTransfer.effectAllowed = 'move'
       e.dataTransfer.setData('text/json', JSON.stringify({ ...place }))
     }
 
+    const handleDragEnd = (e) => {
+      setDragging(false)
+    }
+
+    const handleDragEnter = (e) => {
+      e.preventDefault()
+    }
+
     return (
       <div
-        className={cx('list-group-item', {
-          selected,
-          isDroppable: !!newPlaceIdPosition && place.id == newPlaceIdPosition,
-        })}
         ref={ref}
-        onClick={selectPlace}
-        /* draggable (disabled for 2023-10-27) */
+        draggable
         onDragStart={handleDragStart}
         onDrop={handleDropItem}
-        onDragOver={handleDragOver}
+        onDragOver={(e) => handleDragOver(e, place)}
         onDragLeave={handleDragLeave}
+        onDragEnd={handleDragEnd}
+        onDragEnter={handleDragEnter}
+        className={cx('list-group-item__wrapper', {
+          dragging: isDragging && absolutePosition === draggedPosition,
+        })}
       >
-        {renderDelete()}
-        <div className="place-list__item-inner">
-          {img}
-          <div>
-            <h6 className={cx('list-group-item-heading', { withImage: !!place.imageId })}>
-              {place.name || i18n('New Place')}
-            </h6>
-            <p className="list-group-item-text">{place.description.substr(0, 100)}</p>
+        <div className={cx('dropzone-indicator', { display: moveAbove })} />
+        <div
+          className={cx('list-group-item', {
+            selected,
+          })}
+          ref={ref}
+          onClick={selectPlace}
+        >
+          {renderDelete()}
+          <div className="place-list__item-inner">
+            {img}
+            <div>
+              <h6 className={cx('list-group-item-heading', { withImage: !!place.imageId })}>
+                {place.name || i18n('New Place')}
+              </h6>
+              <p className="list-group-item-text">{place.description.substr(0, 100)}</p>
+            </div>
+            {renderHoverOptions()}
           </div>
-          {renderHoverOptions()}
         </div>
+        <div className={cx('dropzone-indicator', { display: moveBelow })} />
       </div>
     )
   }
@@ -173,11 +232,15 @@ const PlaceItemConnector = (connector) => {
   PlaceItem.propTypes = {
     place: PropTypes.object.isRequired,
     selected: PropTypes.bool.isRequired,
-    editing: PropTypes.bool.isRequired,
+    editing: PropTypes.bool,
     select: PropTypes.func.isRequired,
     startEdit: PropTypes.func.isRequired,
     stopEdit: PropTypes.func.isRequired,
     actions: PropTypes.object.isRequired,
+    key: PropTypes.number,
+    isMovingToNewCategory: PropTypes.bool,
+    draggedPosition: PropTypes.number,
+    absolutePosition: PropTypes.number,
   }
 
   const {

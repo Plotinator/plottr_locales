@@ -3,6 +3,7 @@ import keycode from 'keycode'
 import React, { cloneElement } from 'react'
 import PropTypes from 'prop-types'
 import all from 'prop-types-extra/lib/all'
+import { omit } from 'lodash'
 
 import { bsClass, bsStyles, getClassSet, prefix, splitBsProps } from './utils/bootstrapUtils'
 import createChainedFunction from './utils/createChainedFunction'
@@ -260,7 +261,7 @@ class Nav extends React.Component {
           return (
             <ul
               ref={this.navRef}
-              {...elementProps}
+              {...omit(elementProps, 'onTabDragOver')}
               role={role}
               className={classNames(className, classes)}
             >

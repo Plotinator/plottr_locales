@@ -13,7 +13,6 @@ const nonComponentsPropsAreEqual = (prevProps, newProps) => {
 
 const PlottrFloaterConnector = (connector) => {
   const PlottrFloater = ({
-    lastClick,
     containerPadding,
     open,
     placement,
@@ -91,7 +90,6 @@ const PlottrFloaterConnector = (connector) => {
 
   PlottrFloater.propTypes = {
     elementId: PropTypes.string,
-    lastClick: PropTypes.object,
     containerPadding: PropTypes.number,
     open: PropTypes.bool,
     placement: PropTypes.string.isRequired,
@@ -117,7 +115,6 @@ const PlottrFloaterConnector = (connector) => {
 
     return connect((state) => {
       return {
-        lastClick: selectors.lastClickSelector(state),
         darkMode: selectors.isDarkModeSelector(state),
       }
     })(React.memo(PlottrFloater, nonComponentsPropsAreEqual))

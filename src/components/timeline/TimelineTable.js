@@ -12,6 +12,7 @@ import UnconnectedBeatInsertCell from './BeatInsertCell'
 import UnconnectedTopRow from './TopRow'
 import UnconnectedBeatTitleCell from './BeatTitleCell'
 import UnconnectedAddLineRow from './AddLineRow'
+import { FunSpinner } from '../Spinner'
 import { initialState } from 'pltr/v2'
 import { checkDependencies } from '../checkDependencies'
 
@@ -77,7 +78,7 @@ const TimelineTableConnector = (connector) => {
       }, 50)
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps, prevState) {
       // We need to wait a minute to make sure that the DOM size
       // calculations are done.
       setTimeout(() => {
@@ -414,9 +415,11 @@ const TimelineTableConnector = (connector) => {
     }
 
     render() {
-      const { darkMode, orientation, isSmall, message } = this.props
+      const { darkMode, orientation, isSmall, message, shouldNotRender } = this.props
 
-      if (isSmall) {
+      if (shouldNotRender) {
+        return <FunSpinner />
+      } else if (isSmall) {
         return (
           <div
             className={cx('small-timeline__wrapper', {
@@ -470,7 +473,7 @@ const TimelineTableConnector = (connector) => {
     timelineViewIsTabbed: PropTypes.bool,
     timelineViewIsStacked: PropTypes.bool,
     pinnedPlotlines: PropTypes.number,
-    isCardDialogVisible: PropTypes.bool,
+    shouldNotRender: PropTypes.bool,
   }
 
   const {
@@ -482,13 +485,52 @@ const TimelineTableConnector = (connector) => {
   if (redux) {
     const { connect, bindActionCreators } = redux
 
+    const defaultBeats = []
+    const defaultBooks = {}
+    const defaultHasChildren = new Map()
+    const defaultTimelineSparceBeatMap = {}
+    const defaultLines = []
+    const defaultCardMap = {}
+    const defaultOrientation = 'vertical'
+    const defaultToast = {}
+    const defaultBeatPositions = {}
+    const defaultMessage = ''
+
     let prevProps = null
     return connect(
-      (state, { activeTab, isCardDialogVisible }) => {
-        if (isCardDialogVisible && prevProps !== null) {
-          return prevProps
+      (state, { activeTab }) => {
+        const isCardDialogVisible = selectors.isCardDialogVisibleSelector(state)
+        const isJumping = selectors.isJumpingSelector(state)
+        const timelineFoci = selectors.timelineFociSelector(state)
+        const hitIsCard =
+          timelineFoci && timelineFoci[0]?.path && timelineFoci[0]?.path[0] === 'card'
+        if (hitIsCard && (isCardDialogVisible || isJumping)) {
+          return {
+            shouldNotRender: true,
+            beats: defaultBeats,
+            books: defaultBooks,
+            beatHasChildrenMap: defaultHasChildren,
+            beatMapping: defaultTimelineSparceBeatMap,
+            nextBeatId: -1,
+            lines: defaultLines,
+            cardMap: defaultCardMap,
+            darkMode: selectors.isDarkModeSelector(state),
+            orientation: defaultOrientation,
+            currentTimeline: selectors.currentTimelineSelector(state),
+            isSeries: false,
+            isSmall: false,
+            isMedium: false,
+            isLarge: true,
+            toast: defaultToast,
+            beatPositions: defaultBeatPositions,
+            message: defaultMessage,
+            timelineViewIsTabbed: false,
+            timelineViewIsStacked: false,
+            pinnedPlotlines: 0,
+          }
         } else {
           prevProps = {
+            shouldNotRender: !prevProps || isCardDialogVisible,
             beats: selectors.visibleSortedBeatsForTimelineByBookSelector(state),
             books: selectors.allBooksSelector(state),
             beatHasChildrenMap: selectors.beatHasChildrenSelector(state),
