@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
 
@@ -94,6 +94,9 @@ const NoteListViewConnector = (connector) => {
     filterVisible,
     sortVisible,
   }) => {
+    const [draggedNote, setDraggedNote] = useState()
+    const [isMovingToNewCategory, setMovingToNewCategory] = useState(false)
+
     useEffect(() => {
       uiActions.selectNote(detailID(visibleNotesByCategory, notes, categories, selectedNoteId))
     }, [notes, visibleNotesByCategory, categories])
@@ -129,33 +132,69 @@ const NoteListViewConnector = (connector) => {
       return <NoteCategoriesModal closeDialog={closeDialog} />
     }
 
-    const renderVisibleNotes = (categoryId) => {
+    const handleDragStart = (e, note) => {
+      setDraggedNote(note)
+    }
+
+    const handleDragOver = (e, noteCategory) => {
+      e.preventDefault()
+      if (noteCategory !== draggedNote.categoryId) {
+        setMovingToNewCategory(true)
+      } else {
+        setMovingToNewCategory(false)
+      }
+    }
+
+    const handleDrop = () => {
+      setDraggedNote()
+    }
+
+    const renderVisibleNotes = (categoryId, startingIndex) => {
       const notes =
         categoryId === null
           ? [...(visibleNotesByCategory[null] || []), ...(visibleNotesByCategory[undefined] || [])]
           : visibleNotesByCategory[categoryId]
 
-      return notes.map((n) => (
-        <NoteItem
-          editing={editingSelected}
-          key={n.id}
-          note={n}
-          selected={n.id == selectedNoteId}
-          startEdit={startEditing}
-          stopEdit={stopEditing}
-          select={() => uiActions.selectNote(n.id)}
-        />
-      ))
+      if (!notes) return []
+
+      return notes.map((n, idx) => {
+        return (
+          <div
+            key={n.id}
+            onDragOver={(e) => handleDragOver(e, n.categoryId)}
+            onDragStart={(e) => handleDragStart(e, { ...n, position: startingIndex + idx })}
+            onDrop={handleDrop}
+          >
+            <NoteItem
+              editing={editingSelected}
+              key={n.id}
+              note={n}
+              absolutePosition={startingIndex + idx}
+              selected={n.id == selectedNoteId}
+              startEdit={startEditing}
+              stopEdit={stopEditing}
+              select={() => uiActions.selectNote(n.id)}
+              draggedPosition={
+                Number.isInteger(draggedNote?.position) ? Number(draggedNote.position) : null
+              }
+              isMovingToNewCategory={isMovingToNewCategory}
+            />
+          </div>
+        )
+      })
     }
 
     const renderNotes = () => {
-      return [...categories, { id: null, name: i18n('Uncategorized') }].map((cat) =>
-        renderCategory(cat)
-      )
+      let startingIndex = 0
+      return [...categories, { id: null, name: i18n('Uncategorized') }].map((cat) => {
+        const result = renderCategory(cat, startingIndex)
+        startingIndex += (visibleNotesByCategory[cat.id] || []).length
+        return result
+      })
     }
 
-    const renderCategory = (category) => {
-      const notesInCategory = renderVisibleNotes(category.id)
+    const renderCategory = (category, startingIndex) => {
+      const notesInCategory = renderVisibleNotes(category.id, startingIndex)
       if (!notesInCategory.length) return null
       return (
         <div key={`category-${category.id}`}>

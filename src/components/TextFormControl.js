@@ -9,6 +9,7 @@ const TextFormControlConnector = (connector) => {
   const { EDITING, SEARCHING } = connector.pltr.editStates
 
   const TextFormControl = ({
+    id,
     placeholder,
     style,
     onKeyPress,
@@ -22,6 +23,7 @@ const TextFormControlConnector = (connector) => {
     bsSize,
     editState,
     onKeyDown,
+    jumpCounter,
   }) => {
     const isSearching = editState === SEARCHING
     const isEditing = editState === EDITING
@@ -55,6 +57,9 @@ const TextFormControlConnector = (connector) => {
 
     return (
       <FormControl
+        key={id}
+        id={id}
+        jumpCounter={jumpCounter}
         bsSize={bsSize}
         className={className}
         style={style}
@@ -73,6 +78,7 @@ const TextFormControlConnector = (connector) => {
   }
 
   TextFormControl.propTypes = {
+    id: PropTypes.string,
     placeholder: PropTypes.string,
     style: PropTypes.object,
     onKeyPress: PropTypes.func,

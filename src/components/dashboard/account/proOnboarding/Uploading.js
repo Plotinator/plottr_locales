@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import PropTypes from 'react-proptypes'
+import { v4 as uuid } from 'uuid'
 
 import { t } from 'plottr_locales'
 import { helpers } from 'pltr/v2'
@@ -63,7 +64,7 @@ const UploadingConnector = (connector) => {
       }
       if (templates) {
         templates.forEach((tm) => {
-          toUpload.push({ type: 'template', id: tm.id, data: tm, name: tm.name })
+          toUpload.push({ type: 'template', id: `${tm.id}-${uuid()}`, data: tm, name: tm.name })
         })
       }
       // beging uploading

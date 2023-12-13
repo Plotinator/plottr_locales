@@ -154,6 +154,7 @@ const NoteEditDetailsConnector = (connector) => {
               <FormGroup>
                 <ControlLabel>{i18n('Name')}</ControlLabel>
                 <TextFormControl
+                  id={`note-${note.id}-name`}
                   type="text"
                   onChange={withArgs(actions.editNoteTitle, note.id)}
                   onKeyDown={handleEsc}

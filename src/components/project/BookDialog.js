@@ -125,6 +125,7 @@ const BookDialogConnector = (connector) => {
             </Col>
             <Col sm={8}>
               <TextFormControl
+                id={`book-${bookDialogBookId}-title`}
                 type="text"
                 inputRef={(ref) => {
                   this.titleRef = ref
@@ -142,6 +143,7 @@ const BookDialogConnector = (connector) => {
             </Col>
             <Col sm={8}>
               <TextFormControl
+                id={`book-${bookDialogBookId}-premise`}
                 type="text"
                 inputRef={(ref) => {
                   this.premiseRef = ref
@@ -159,6 +161,7 @@ const BookDialogConnector = (connector) => {
             </Col>
             <Col sm={8}>
               <TextFormControl
+                id={`book-${bookDialogBookId}-genre`}
                 type="text"
                 inputRef={(ref) => {
                   this.genreRef = ref
@@ -176,6 +179,7 @@ const BookDialogConnector = (connector) => {
             </Col>
             <Col sm={8}>
               <TextFormControl
+                id={`book-${bookDialogBookId}-theme`}
                 type="text"
                 inputRef={(ref) => {
                   this.themeRef = ref
@@ -198,7 +202,7 @@ const BookDialogConnector = (connector) => {
           onRequestClose={this.handleCancel}
           style={modalStyles}
           parentSelector={() => {
-            return document.querySelector('#book-modal')
+            return document.querySelector('#book-modal') || document.body
           }}
         >
           <div className={cx('book-dialog', { darkmode: this.props.darkMode })}>

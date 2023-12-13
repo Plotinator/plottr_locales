@@ -328,7 +328,9 @@ const CharacterEditDetailsConnector = (connector) => {
               type={attr.type}
               autoFocus={shouldFocusCustomAttribute(attr.id)}
               selection={selectionForCustomAttribute(attr.id)}
-              inputId={`character-${character.id}-custom-attribute-${attr.id || attr.name}`}
+              inputId={`character-${character.id}-custom-attribute-${
+                attr.id || attr.name
+              }-book-${attributeTabId}`}
             />
           </React.Fragment>
         )
@@ -375,7 +377,7 @@ const CharacterEditDetailsConnector = (connector) => {
                 entity={character}
                 entityType="character"
                 valueSelector={templateAttributeValue(template.id, attr.name)}
-                inputId={`character-${character.id}-template-${template.id}-attribute-${attr.name}`}
+                inputId={`character-${character.id}-template-${template.id}-attribute-${attr.name}-book-${attributeTabId}`}
                 onChange={handleTemplateAttrChange(template.id, attr.name)}
                 onSave={finishEditing}
                 name={attr.name}
@@ -445,6 +447,7 @@ const CharacterEditDetailsConnector = (connector) => {
               <FormGroup>
                 <ControlLabel>{t('Name')}</ControlLabel>
                 <TextFormControl
+                  id={`character-${character.id}-name`}
                   type="text"
                   onChange={changeName}
                   autoFocus={foci && foci[0] && foci[0].path[2] === 'name'}
@@ -457,6 +460,7 @@ const CharacterEditDetailsConnector = (connector) => {
               <FormGroup>
                 <ControlLabel>{t('Short Description')}</ControlLabel>
                 <TextFormControl
+                  id={`character-${character.id}-short-description`}
                   type="text"
                   onChange={changeShortDescription}
                   autoFocus={shouldFocusMainChangingElement(shortDescriptionAttributeId)}
@@ -490,7 +494,7 @@ const CharacterEditDetailsConnector = (connector) => {
           >
             <Tab eventKey={1} title={t('Notes')}>
               <RichText
-                id={`character-${character.id}-notes`}
+                id={`character-${character.id}-notes-book-${attributeTabId}`}
                 description={character.notes}
                 onChange={handleNotesChanged}
                 autoFocus={shouldFocusMainChangingElement(descriptionAttributeId)}

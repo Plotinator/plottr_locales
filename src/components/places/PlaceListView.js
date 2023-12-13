@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
 import { flatten } from 'lodash'
@@ -86,6 +86,9 @@ const PlaceListViewConnector = (connector) => {
     categoriesOpen,
     attributeDialogOpen,
   }) => {
+    const [isMovingToNewCategory, setMovingToNewCategory] = useState(false)
+    const [draggedPlace, setDraggedPlace] = useState()
+
     useEffect(() => {
       uiActions.selectPlace(detailID(visiblePlacesByCategory, selectedPlaceId))
     }, [visiblePlacesByCategory])
@@ -121,6 +124,23 @@ const PlaceListViewConnector = (connector) => {
       }
       event.preventDefault()
       event.stopPropagation()
+    }
+
+    const handleDragStart = (e, place) => {
+      setDraggedPlace(place)
+    }
+
+    const handleDragOver = (e, placeCategory) => {
+      e.preventDefault()
+      if (placeCategory != draggedPlace.categoryId) {
+        setMovingToNewCategory(true)
+      } else {
+        setMovingToNewCategory(false)
+      }
+    }
+
+    const handleDrop = () => {
+      setDraggedPlace()
     }
 
     const renderSubNav = () => {
@@ -231,7 +251,7 @@ const PlaceListViewConnector = (connector) => {
       )
     }
 
-    const renderVisiblePlacesByCategory = (categoryId) => {
+    const renderVisiblePlacesByCategory = (categoryId, startingIndex) => {
       const places =
         categoryId === null
           ? [
@@ -242,20 +262,35 @@ const PlaceListViewConnector = (connector) => {
 
       if (!places) return []
 
-      return places.map((pl) => (
-        <PlaceItem
-          key={pl.id}
-          place={pl}
-          selected={pl.id == selectedPlaceId}
-          startEdit={editSelected}
-          stopEdit={stopEditing}
-          select={() => uiActions.selectPlace(pl.id)}
-        />
-      ))
+      return places.map((pl, idx) => {
+        return (
+          <div
+            key={pl.id}
+            onDragStart={(e) => handleDragStart(e, { ...pl, position: startingIndex + idx })}
+            onDragOver={(e) => handleDragOver(e, pl.categoryId)}
+            onDrop={handleDrop}
+          >
+            <PlaceItem
+              key={pl.id}
+              place={pl}
+              selected={pl.id == selectedPlaceId}
+              startEdit={editSelected}
+              stopEdit={stopEditing}
+              select={() => uiActions.selectPlace(pl.id)}
+              editing={editingSelected}
+              isMovingToNewCategory={isMovingToNewCategory}
+              draggedPosition={
+                Number.isInteger(draggedPlace?.position) ? Number(draggedPlace.position) : null
+              }
+              absolutePosition={startingIndex + idx}
+            />
+          </div>
+        )
+      })
     }
 
-    const renderCategory = (category) => {
-      const placesInCategory = renderVisiblePlacesByCategory(category.id)
+    const renderCategory = (category, startingIndex) => {
+      const placesInCategory = renderVisiblePlacesByCategory(category.id, startingIndex)
       if (!placesInCategory.length) return null
       return (
         <div key={`category-${category.id}`}>
@@ -268,7 +303,12 @@ const PlaceListViewConnector = (connector) => {
     }
 
     const renderPlaces = () => {
-      return [...categories, { id: null, name: i18n('Uncategorized') }].map(renderCategory)
+      let startingIndex = 0
+      return [...categories, { id: null, name: i18n('Uncategorized') }].map((cat) => {
+        const result = renderCategory(cat, startingIndex)
+        startingIndex += (visiblePlacesByCategory[cat.id] || []).length
+        return result
+      })
     }
 
     const renderPlaceDetails = () => {

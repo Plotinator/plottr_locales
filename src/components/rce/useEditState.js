@@ -23,6 +23,25 @@ export const useEditState = (
 
   const [value, setValue] = useState(useTextConverter(initialValue, log))
 
+  useEffect(() => {
+    const newValue = useTextConverter(initialValue)
+    editor.children = newValue
+
+    // We could receive an initial selection from a search hit.  It'll
+    // look like a normal text field selection in that case.
+    if (
+      typeof initialSelection?.start === 'number' &&
+      typeof initialSelection?.end === 'number' &&
+      typeof initialSelection.direction === 'string'
+    ) {
+      // editor.focus()
+    } else {
+      editor.selection = initialSelection
+    }
+
+    setValue(newValue)
+  }, [editorId])
+
   // Handle undo
   useEffect(() => {
     if (isEqual(initialValue, value)) return

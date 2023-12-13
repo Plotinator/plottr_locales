@@ -166,6 +166,7 @@ const TagViewConnector = (connector) => {
           <FormGroup>
             <ControlLabel>{i18n('Tag Name')}</ControlLabel>
             <TextFormControl
+              id={`tag-${tag?.id || '<new>'}-title`}
               type="text"
               onChange={handleTitleChange}
               onKeyDown={handleEsc}

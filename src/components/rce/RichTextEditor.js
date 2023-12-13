@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useRef, useEffect } from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
+import { isEqual } from 'lodash'
 import { t } from 'plottr_locales'
 import isHotkey from 'is-hotkey'
 import { Editor, Transforms } from 'slate'
@@ -26,7 +27,7 @@ const HOTKEYS = {
 }
 
 const waitAMoment = (f) => {
-  return setTimeout(f, 50)
+  return setTimeout(f, 10)
 }
 
 const cancelWait = (id) => {
@@ -49,6 +50,15 @@ const firstPosition = (children) => {
   }
 }
 
+const after = (editor, firstNode, distance) => {
+  return distance === 0
+    ? firstNode
+    : Editor.after(editor, firstNode, {
+        distance: distance,
+        unit: 'character',
+      })
+}
+
 const RichTextEditorConnector = (connector) => {
   const { EDITING, SEARCHING } = connector.pltr.editStates
 
@@ -59,6 +69,7 @@ const RichTextEditorConnector = (connector) => {
       openExternal,
       undo,
       redo,
+      errorReporter: { getInstance },
     },
   } = connector
   checkDependencies({
@@ -68,7 +79,18 @@ const RichTextEditorConnector = (connector) => {
     openExternal,
     undo,
     redo,
+    getInstance,
   })
+
+  const errorReportingLogger = {
+    info: log.info,
+    warn: log.warn,
+    error: (...args) => {
+      getInstance().then((errorReporter) => {
+        errorReporter.error(...args)
+      })
+    },
+  }
 
   const ToolBar = UnconnectedToolBar(connector)
 
@@ -94,8 +116,8 @@ const RichTextEditorConnector = (connector) => {
     startEditing,
   }) => {
     const editor = useMemo(() => {
-      return createEditor(log)
-    }, [])
+      return createEditor(errorReportingLogger)
+    }, [id])
     const registerEditor = useRegisterEditor(editor)
 
     // Rendering helpers
@@ -129,63 +151,65 @@ const RichTextEditorConnector = (connector) => {
     useEffect(() => {
       let idleCallback = null
       let innerIdleCallback = null
-      if (
-        isSearching &&
-        autoFocus &&
-        editorWrapperRef.current &&
-        editorWrapperRef.current.firstChild
-      ) {
-        if (selection) {
-          if (
-            typeof selection.start !== 'undefined' &&
-            typeof selection.end !== 'undefined' &&
-            typeof selection.direction !== 'undefined'
-          ) {
-            idleCallback = waitAMoment(() => {
-              ReactEditor.focus(editor)
-              innerIdleCallback = waitAMoment(() => {
-                const firstNode = firstPosition(editor.children)
-                const firstPath =
-                  selection.direction === 'forward'
-                    ? Editor.after(editor, firstNode, {
-                        distance: selection.start,
-                        unit: 'character',
-                      })
-                    : Editor.after(editor, firstNode, {
-                        distance: selection.end,
-                        unit: 'character',
-                      })
-                const secondPath =
-                  selection.direction === 'forward'
-                    ? Editor.after(editor, firstNode, {
-                        distance: selection.end,
-                        unit: 'character',
-                      })
-                    : Editor.after(editor, firstNode, {
-                        distance: selection.start,
-                        unit: 'character',
-                      })
-                Transforms.setSelection(editor, {
-                  anchor: firstPath,
-                  focus: secondPath,
+      let reAttemptCallback = null
+      let focusAttempts = 0
+      function focus() {
+        focusAttempts++
+        if (focusAttempts > 3) {
+          return
+        } else if (!isEqual(editor.children, text)) {
+          reAttemptCallback = setTimeout(focus, 50)
+        } else if (
+          isSearching &&
+          autoFocus &&
+          editorWrapperRef.current &&
+          editorWrapperRef.current.firstChild
+        ) {
+          if (selection) {
+            if (
+              typeof selection.start !== 'undefined' &&
+              typeof selection.end !== 'undefined' &&
+              typeof selection.direction !== 'undefined'
+            ) {
+              idleCallback = waitAMoment(() => {
+                ReactEditor.focus(editor)
+                innerIdleCallback = waitAMoment(() => {
+                  const firstNode = firstPosition(editor.children)
+                  const firstPath =
+                    selection.direction === 'forward'
+                      ? after(editor, firstNode, selection.start)
+                      : after(editor, firstNode, selection.end)
+                  const secondPath =
+                    selection.direction === 'forward'
+                      ? after(editor, firstNode, selection.end)
+                      : after(editor, firstNode, selection.start)
+                  Transforms.select(editor, {
+                    anchor: firstPath,
+                    focus: secondPath,
+                  })
+                  editorWrapperRef.current.scrollIntoView({ behavior: 'smooth' })
                 })
-                editorWrapperRef.current.scrollIntoView({ behavior: 'smooth' })
               })
-            })
+            } else {
+              idleCallback = waitAMoment(() => {
+                ReactEditor.focus(editor)
+                innerIdleCallback = waitAMoment(() => {
+                  Transforms.select(editor, selection)
+                })
+              })
+            }
           } else {
-            idleCallback = waitAMoment(() => {
-              ReactEditor.focus(editor)
-              innerIdleCallback = waitAMoment(() => {
-                Transforms.select(editor, selection)
-              })
-            })
+            ReactEditor.focus(editor)
           }
-        } else {
-          ReactEditor.focus(editor)
         }
       }
 
+      focus()
+
       return () => {
+        if (reAttemptCallback) {
+          cancelWait(reAttemptCallback)
+        }
         if (idleCallback) {
           cancelWait(idleCallback)
         }
@@ -193,7 +217,8 @@ const RichTextEditorConnector = (connector) => {
           cancelWait(innerIdleCallback)
         }
       }
-    }, [autoFocus, jumpCounter])
+    }, [autoFocus, jumpCounter, id, text])
+
     const focusEditor = useCallback((previousSelection) => {
       setTimeout(() => {
         if (editorWrapperRef.current && editorWrapperRef.current.firstChild) {
@@ -319,7 +344,7 @@ const RichTextEditorConnector = (connector) => {
 
     const otherProps = {}
     return (
-      <Slate editor={editor} value={value} onChange={wrappedOnChange} key={editorKey} id={id}>
+      <Slate editor={editor} value={value} onChange={wrappedOnChange} key={id}>
         <div className={cx('slate-editor__wrapper', className)}>
           <ToolBar editor={editor} focusEditor={focusEditor} />
           <div

@@ -10,7 +10,6 @@ import FormControlStatic from './FormControlStatic'
 import { prefix, bsClass, getClassSet, splitBsProps, bsSizes } from './utils/bootstrapUtils'
 import { SIZE_MAP, Size } from './utils/StyleConfig'
 import { FormGroupContext } from './context'
-import { delay } from '../utils/delay'
 
 const propTypes = {
   componentClass: elementType,
@@ -58,6 +57,9 @@ class FormControl extends React.Component {
     if (!this.focusing && this.component && this.props.autoFocus) {
       this.focusing = true
       this.component.focus()
+      if (typeof this.component.scrollIntoView === 'function') {
+        this.component.scrollIntoView({ behavior: 'smooth' })
+      }
       setTimeout(() => {
         if (this.props.selection && this.component) {
           this.component.setSelectionRange(

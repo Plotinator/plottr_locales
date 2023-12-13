@@ -22,7 +22,7 @@ $medium_width: 80px;
   top: 33px;
   border-top: 3px solid red;
   z-index: 1 !important;
-  transition: $cubic;
+  transition: ease-in-out;
 }
 .vertical-line-title__line-line {
   position: absolute;

@@ -35,7 +35,7 @@ const BeatInsertCellConnector = (connector) => {
       hierarchyLevels,
       readOnly,
       isPinned,
-      isSearching,
+      beatHeadingCount,
     } = props
 
     const [hovering, setHovering] = useState(false)
@@ -111,7 +111,7 @@ const BeatInsertCellConnector = (connector) => {
           orientation={orientation}
           color={color}
           isMedium={isMedium}
-          isSearching={isSearching}
+          beatHeadingCount={beatHeadingCount}
         />
       )
     }
@@ -137,7 +137,7 @@ const BeatInsertCellConnector = (connector) => {
               orientation={orientation}
               isMedium={isMedium}
               tableLength={tableLength}
-              isSearching={isSearching}
+              beatHeadingCount={beatHeadingCount}
             />
           ) : null}
           <div className={wrapperClass()}>
@@ -159,7 +159,7 @@ const BeatInsertCellConnector = (connector) => {
               orientation={orientation}
               isMedium={isMedium}
               tableLength={tableLength}
-              isSearching={isSearching}
+              beatHeadingCount={beatHeadingCount}
             />
           ) : null}
           <div className={lastWrapperClass()}>
@@ -187,7 +187,7 @@ const BeatInsertCellConnector = (connector) => {
               orientation={orientation}
               isMedium={isMedium}
               tableLength={tableLength}
-              isSearching={isSearching}
+              beatHeadingCount={beatHeadingCount}
             />
           ) : null}
           <div
@@ -271,7 +271,7 @@ const BeatInsertCellConnector = (connector) => {
     hierarchyLevels: PropTypes.array.isRequired,
     readOnly: PropTypes.bool,
     isPinned: PropTypes.bool,
-    isSearching: PropTypes.bool,
+    beatHeadingCount: PropTypes.number.isRequired,
   }
 
   const {
@@ -298,7 +298,7 @@ const BeatInsertCellConnector = (connector) => {
         ),
         hierarchyChildLevelName: selectors.hierarchyChildLevelNameSelector(state, beatToLeftId),
         readOnly: !selectors.canWriteSelector(state),
-        isSearching: selectors.isSearchingSelector(state),
+        beatHeadingCount: selectors.bottomLevelBeatHeadingCountSelector(state),
       }
     })(BeatInsertCell)
   }

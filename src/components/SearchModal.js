@@ -1,23 +1,38 @@
-import React, { useCallback, useRef, useEffect } from 'react'
+import React, { useCallback, useRef, useEffect, useState, useMemo } from 'react'
 import PropTypes from 'react-proptypes'
-import { FaSearch, FaExchangeAlt } from 'react-icons/fa'
-import { VscReplaceAll } from 'react-icons/vsc'
+import { last } from 'lodash'
+import { FaExchangeAlt, FaPlus, FaMinus } from 'react-icons/fa'
+import cx from 'classnames'
 
 import { t } from 'plottr_locales'
 import { slate } from 'pltr/v2'
 
+import Collapse from './Collapse'
 import Button from './Button'
+import Tabs from './Tabs'
+import Tab from './Tab'
 import UnconnectedPlottrModal from './PlottrModal'
 import { checkDependencies } from './checkDependencies'
 import { withEventTargetValue } from './withEventTargetValue'
 
 const modalStyles = {
+  overlay: {
+    paddingTop: '200px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
   content: {
-    borderRadius: 0,
+    position: 'relative',
+    left: 'auto',
+    bottom: 'auto',
+    right: 'auto',
+    borderRadius: 4,
     padding: 0,
     minHeight: 'min-content',
-    maxHeight: '80vh',
+    maxHeight: 'calc(80vh - 200px)',
     overflow: 'hidden',
+    width: '700px',
   },
 }
 
@@ -300,16 +315,25 @@ const computeBeatHitTitle = (beatId, bookId, books, beats, series, restOfPathEle
   }
 }
 
-const PRE_AND_POST_CONTEXT_LENGTH = 50
+const PRE_AND_POST_CONTEXT_LENGTH = 20
 const fontifyHits = (search, source, position) => {
-  if (position) {
+  if (typeof position === 'number') {
     const upTo = source.slice(0, position).slice(-PRE_AND_POST_CONTEXT_LENGTH)
     const after = source.slice(position + search.length).slice(0, PRE_AND_POST_CONTEXT_LENGTH)
+    const preElipses = position > PRE_AND_POST_CONTEXT_LENGTH ? '...' : ''
+    const postElipses =
+      position + search.length + PRE_AND_POST_CONTEXT_LENGTH < source.length ? '...' : ''
     return (
       <React.Fragment>
-        <span>...{upTo}</span>
+        <span>
+          {preElipses}
+          {upTo}
+        </span>
         <b>{search}</b>
-        <span>{after}...</span>
+        <span>
+          {after}
+          {postElipses}
+        </span>
       </React.Fragment>
     )
   } else {
@@ -330,7 +354,7 @@ const fontifyHits = (search, source, position) => {
   }
 }
 
-const SearchHit = ({ title, hitPathText, hitText, onClick, hitKey, toggleHit, checked }) => {
+const SearchHit = ({ index, hitPathText, hitText, onClick, hitKey, toggleHit, checked }) => {
   return (
     <div
       className="search-modal--interactable"
@@ -338,37 +362,34 @@ const SearchHit = ({ title, hitPathText, hitText, onClick, hitKey, toggleHit, ch
       key={hitKey}
     >
       {toggleHit ? (
-        <div className="search-modal__hit-with-checkbox">
-          <div className="search-modal__hit-wrapper">
-            <div className="search-modal__hit-type-title">
-              <h3>{title}</h3>
-            </div>
-            <div className="search-modal__hit-details">
-              <div className="search-modal__hit-path">{hitPathText}</div>
-              <div className="search-modal__hit-text">{hitText}</div>
+        <div className="search-modal__hit-wrapper">
+          <div className={cx({ highlighted: index % 2 === 1 }, 'search-modal__hit-details')}>
+            <div className="search-modal__replace-wrapper">
+              <div className="search-modal__hit-details-left">
+                <span className="search-modal__hit-number">{index}.&nbsp;</span>
+                <div className="search-modal__hit-text">{hitText}</div>
+                <div className="search-modal__hit-path">{hitPathText}</div>
+              </div>
+              <ReplaceHit checked={checked} />
             </div>
           </div>
-          {toggleHit ? <ReplaceHit checked={checked} /> : null}
         </div>
       ) : (
         <div className="search-modal__hit-wrapper">
-          <div className="search-modal__hit-type-title">
-            <h3>{title}</h3>
-          </div>
-          <div className="search-modal__hit-details">
-            <div className="search-modal__hit-path">{hitPathText}</div>
+          <div className={cx({ highlighted: index % 2 === 1 }, 'search-modal__hit-details')}>
+            <span className="search-modal__hit-number">{index}.&nbsp;</span>
             <div className="search-modal__hit-text">{hitText}</div>
+            <div className="search-modal__hit-path">{hitPathText}</div>
           </div>
         </div>
       )}
-      <hr />
     </div>
   )
 }
 
 SearchHit.propTypes = {
+  index: PropTypes.number.isRequired,
   hitKey: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
   hitPathText: PropTypes.string.isRequired,
   hitText: PropTypes.array.isRequired,
   onClick: PropTypes.func.isRequired,
@@ -429,14 +450,46 @@ const SearchModalConnector = (connector) => {
     scanning,
     characterAttributes,
     setSearchTerm,
-    nextSearchHit,
-    previousSearchHit,
     jumpToHit,
-    toggleReplaceSearch,
     setReplacementText,
     toggleHitMarkedForReplacement,
     replaceMarkedHits,
+    openSearch,
+    openReplace,
+    hasNoResults,
   }) => {
+    const activeTab = useMemo(() => {
+      if (replacing) {
+        return 'replace'
+      } else {
+        return 'search'
+      }
+    }, [replacing])
+    const [projectHitsOpen, setProjectHitsOpen] = useState(true)
+    const [timelineHitsOpen, setTimelineHitsOpen] = useState(true)
+    const [outlineHitsOpen, setOutlineHitsOpen] = useState(true)
+    const [noteHitsOpen, setNoteHitsOpen] = useState(true)
+    const [characterHitsOpen, setCharacterHitsOpen] = useState(true)
+    const [placeHitsOpen, setPlaceHitsOpen] = useState(true)
+    const [tagHitsOpen, setTagHitsOpen] = useState(true)
+    const [lineHitsOpen, setLineHitsOpen] = useState(true)
+    const [beatHitsOpen, setBeatHitsOpen] = useState(true)
+
+    const handleSetActiveTab = useCallback(
+      (newTab) => {
+        if (typeof newTab === 'string') {
+          if (activeTab !== newTab) {
+            if (newTab === 'search') {
+              openSearch()
+            } else if (newTab === 'replace') {
+              openReplace()
+            }
+          }
+        }
+      },
+      [openReplace, openSearch, activeTab]
+    )
+
     const search = useCallback(
       (event) => {
         setSearchTerm(event.target.value)
@@ -462,13 +515,16 @@ const SearchModalConnector = (connector) => {
 
     const replaceInputRef = useRef()
 
-    const toggleHit = (replace, hit) => {
-      return replace
-        ? () => {
-            toggleHitMarkedForReplacement(hit)
-          }
-        : null
-    }
+    const toggleHit = useCallback(
+      (hit) => {
+        return replacing
+          ? () => {
+              toggleHitMarkedForReplacement(hit)
+            }
+          : null
+      },
+      [toggleHitMarkedForReplacement, replacing]
+    )
 
     const isChecked = (hit) => {
       return hitsMarkedForReplacement.some((checkedHit) => {
@@ -476,366 +532,312 @@ const SearchModalConnector = (connector) => {
       })
     }
 
-    const interpretProjectHit = (replace) => {
-      const projectHitComponent = (projectHit) => {
-        const { path, hit } = projectHit
-        const [_, _project, type, ...rest] = path.split('/')
-        if (type === 'series') {
-          const [kind] = rest
-          const [title, contextValue] = seriesAttributeToTitle(kind, series)
-          const renderedContext = fontifyHits(hit, contextValue)
-          return (
-            <SearchHit
-              hitKey={path}
-              title={t('Project Tab')}
-              hitPathText={title}
-              hitText={renderedContext}
-              onClick={() => {
-                jumpToHit(cards, 'project', projectHit)
-                closeSearch()
-              }}
-              toggleHit={toggleHit(replace, projectHit)}
-              checked={isChecked(projectHit)}
-            />
-          )
-        } else {
-          const [id, kind] = rest
-          const [bookHitTitle, contextValue] = computeBookHitTitle(kind, id, books)
-          const renderedContext = fontifyHits(hit, contextValue)
-          return (
-            <SearchHit
-              hitKey={path}
-              title={t('Book')}
-              hitPathText={bookHitTitle}
-              hitText={renderedContext}
-              onClick={() => {
-                jumpToHit(cards, 'project', projectHit)
-                closeSearch()
-              }}
-              toggleHit={toggleHit(replace, projectHit)}
-              checked={isChecked(projectHit)}
-            />
-          )
-        }
-      }
-      return projectHitComponent
-    }
-
-    const interpretProjectHits = (projectHits, replace) => {
-      return projectHits.map(interpretProjectHit(replace))
-    }
-
-    const interpretTimelineHit = (replace) => {
-      const timelineHitComponent = (timelineHit) => {
-        const { path, hit } = timelineHit
-        const [_, _timeline, _bookId, _card, cardId, ...rest] = path.split('/')
-        const [cardHitTitle, contextValue] = computeCardHitTitle(cardId, cards, rest)
-        const renderedContext = fontifyHits(hit, contextValue, safeParseInt(rest[rest.length - 1]))
-        return (
-          <SearchHit
-            hitKey={path}
-            title={t('Timeline Card')}
-            hitPathText={cardHitTitle}
-            hitText={renderedContext}
-            onClick={() => {
-              jumpToHit(cards, 'timeline', timelineHit)
-              closeSearch()
-            }}
-            toggleHit={toggleHit(replace, timelineHit)}
-            checked={isChecked(timelineHit)}
-          />
-        )
-      }
-      return timelineHitComponent
-    }
-
-    const interpretTimelineHits = (timelineHits, replace) => {
-      return timelineHits.map(interpretTimelineHit(replace))
-    }
-
-    const interpretOutlineHit = (replace) => {
-      const outlineHitComponent = (outlineHit) => {
-        const { path, hit } = outlineHit
-        const [_, _outline, _bookId, _card, cardId, ...rest] = path.split('/')
-        const [cardHitTitle, contextValue] = computeCardHitTitle(cardId, cards, rest)
-        const renderedContext = fontifyHits(hit, contextValue)
-        return (
-          <SearchHit
-            hitKey={path}
-            title={t('Outline Card')}
-            hitPathText={cardHitTitle}
-            hitText={renderedContext}
-            onClick={() => {
-              jumpToHit(cards, 'outline', outlineHit)
-              closeSearch()
-            }}
-            toggleHit={toggleHit(replace, outlineHit)}
-            checked={isChecked(outlineHit)}
-          />
-        )
-      }
-      return outlineHitComponent
-    }
-
-    const interpretOutlineHits = (outlineHits, replace) => {
-      return outlineHits.map(interpretOutlineHit(replace))
-    }
-
-    const interpretNoteHit = (replace) => {
-      const noteHitComponent = (noteHit) => {
-        const { path, hit } = noteHit
-        const [_, _notes, noteId, ...rest] = path.split('/')
-        const [noteHitTitle, contextValue] = computeNoteHitTitle(noteId, notes, rest)
-        const renderedContext = fontifyHits(hit, contextValue)
-        return (
-          <SearchHit
-            hitKey={path}
-            title={t('Note')}
-            hitPathText={noteHitTitle}
-            hitText={renderedContext}
-            onClick={() => {
-              jumpToHit(cards, 'notes', noteHit)
-              closeSearch()
-            }}
-            toggleHit={toggleHit(replace, noteHit)}
-            checked={isChecked(noteHit)}
-          />
-        )
-      }
-      return noteHitComponent
-    }
-
-    const interpretNotesHits = (notesHits, replace) => {
-      return notesHits.map(interpretNoteHit(replace))
-    }
-
-    const interpretCharacterHit = (replace) => {
-      const characterHitComponent = (characterHit) => {
-        const { path, hit } = characterHit
-        const [_, _characters, characterId, ...rest] = path.split('/')
-        const [characterHitTitle, contextValue] = computeCharacterHitTitle(
-          characterId,
-          characters,
-          rest,
-          characterAttributes,
-          books
-        )
-        const renderedContext = fontifyHits(hit, contextValue)
-        return (
-          <SearchHit
-            hitKey={path}
-            title={t('Character')}
-            hitPathText={characterHitTitle}
-            hitText={renderedContext}
-            onClick={() => {
-              jumpToHit(cards, 'characters', characterHit)
-              closeSearch()
-            }}
-            toggleHit={toggleHit(replace, characterHit)}
-            checked={isChecked(characterHit)}
-          />
-        )
-      }
-      return characterHitComponent
-    }
-
-    const interpretCharactersHits = (charactersHits, replace) => {
-      return charactersHits.map(interpretCharacterHit(replace))
-    }
-
-    const interpretPlaceHit = (replace) => {
-      const placeHitComponent = (placeHit) => {
-        const { path, hit } = placeHit
-        const [_, _places, placeId, ...rest] = path.split('/')
-        const [placeHitTitle, contextValue] = computePlaceHitTitle(placeId, places, rest)
-        const renderedContext = fontifyHits(hit, contextValue)
-        return (
-          <SearchHit
-            hitKey={path}
-            title={t('Place')}
-            hitPathText={placeHitTitle}
-            hitText={renderedContext}
-            onClick={() => {
-              jumpToHit(cards, 'places', placeHit)
-              closeSearch()
-            }}
-            toggleHit={toggleHit(replace, placeHit)}
-            checked={isChecked(placeHit)}
-          />
-        )
-      }
-      return placeHitComponent
-    }
-
-    const interpretPlacesHits = (placesHits, replace) => {
-      return placesHits.map(interpretPlaceHit(replace))
-    }
-
-    const interpretTagHit = (replace) => {
-      const tagHitComponent = (tagHit) => {
-        const { path, hit } = tagHit
-        const [_, _places, tagId, ...rest] = path.split('/')
-        const [tagHitTitle, contextValue] = computeTagHitTitle(tagId, tags, rest)
-        const renderedContext = fontifyHits(hit, contextValue)
-        return (
-          <SearchHit
-            hitKey={path}
-            title={t('Tag')}
-            hitPathText={tagHitTitle}
-            hitText={renderedContext}
-            onClick={() => {
-              jumpToHit(cards, 'tags', tagHit)
-              closeSearch()
-            }}
-            toggleHit={toggleHit(replace, tagHit)}
-            checked={isChecked(tagHit)}
-          />
-        )
-      }
-      return tagHitComponent
-    }
-
-    const interpretTagsHits = (tagsHits, replace) => {
-      return tagsHits.map(interpretTagHit(replace))
-    }
-
-    const interpretLineHit = (replace) => {
-      const lineHitComponent = (lineHit) => {
-        const { path, hit } = lineHit
-        const [_, _lines, lineId, ...rest] = path.split('/')
-        const [lineHitTitle, contextValue] = computeLineHitTitle(lineId, lines, rest)
-        const renderedContext = fontifyHits(hit, contextValue)
-        return (
-          <SearchHit
-            hitKey={path}
-            title={t('Line')}
-            hitPathText={lineHitTitle}
-            hitText={renderedContext}
-            onClick={() => {
-              jumpToHit(cards, 'lines', lineHit)
-              closeSearch()
-            }}
-            toggleHit={toggleHit(replace, lineHit)}
-            checked={isChecked(lineHit)}
-          />
-        )
-      }
-      return lineHitComponent
-    }
-
-    const interpretLinesHits = (lineHits, replace) => {
-      return lineHits.map(interpretLineHit(replace))
-    }
-
-    const interpretBeatHit = (replace) => {
-      const beatHitComponent = (beatHit) => {
-        const { path, hit } = beatHit
-        const [_, _beats, bookId, beatId, ...rest] = path.split('/')
-        const [beatHitTitle, contextValue] = computeBeatHitTitle(
-          beatId,
-          bookId,
-          books,
-          beats,
-          series,
-          rest
-        )
-        const renderedContext = fontifyHits(hit, contextValue)
-        return (
-          <SearchHit
-            hitKey={path}
-            title={t('Beat')}
-            hitPathText={beatHitTitle}
-            hitText={renderedContext}
-            onClick={() => {
-              jumpToHit(cards, 'beats', beatHit)
-              closeSearch()
-            }}
-            toggleHit={toggleHit(replace, beatHit)}
-            checked={isChecked(beatHit)}
-          />
-        )
-      }
-      return beatHitComponent
-    }
-
-    const interpretBeatsHits = (beatHits, replace) => {
-      return beatHits.map(interpretBeatHit(replace))
-    }
-
-    if (replacing) {
+    /**
+     * computeTitle = (path: [String]) => String,
+     */
+    const interpretHit = (idx, type, inputHit, computeTitle) => {
+      const { path, hit } = inputHit
+      const pathSegments = path.split('/')
+      const [hitTitle, contextValue] = computeTitle(pathSegments)
+      const renderedContext = fontifyHits(hit, contextValue, safeParseInt(last(pathSegments)))
       return (
-        <PlottrModal isOpen={true} onRequestClose={closeSearch} style={modalStyles}>
-          <div className="search-modal__wrapper">
-            <div className="search-modal__header replace">
-              <div className="search-modal__search-bar">
-                <input
-                  className="search-modal__replace-term"
-                  placeholder={t('search')}
-                  type="text"
-                  value={searchTerm}
-                  onChange={search}
-                  ref={searchInputRef}
-                />
-                <FaExchangeAlt className="search-modal__replace-icon" />
-                <input
-                  className="search-modal__replace-term"
-                  placeholder={t('replace')}
-                  type="text"
-                  value={replacementText}
-                  onChange={withEventTargetValue(setReplacementText)}
-                  ref={replaceInputRef}
-                />
-                <Button className="search-modal__replace-button" onClick={replaceMarkedHits}>
-                  <VscReplaceAll />
+        <SearchHit
+          index={1 + idx}
+          hitKey={path}
+          hitPathText={hitTitle}
+          hitText={renderedContext}
+          onClick={() => {
+            jumpToHit(cards, type, inputHit)
+            closeSearch()
+          }}
+          toggleHit={toggleHit(inputHit)}
+          checked={isChecked(inputHit)}
+        />
+      )
+    }
+
+    const interpretHits = (type, title, hits, open, setOpen, computeTitle) => {
+      const checkedCount = hits.reduce((acc, hit) => {
+        if (isChecked(hit)) {
+          return acc + 1
+        } else {
+          return acc
+        }
+      }, 0)
+      const atLeastOneChecked = checkedCount > 0
+      const allChecked = checkedCount === hits.length
+      const partiallyChecked = atLeastOneChecked && checkedCount !== hits.length
+      const preTotalCount = replacing ? `${checkedCount} of ` : ''
+      const checkUncheckAll = replacing ? (
+        <input
+          type="checkbox"
+          className={cx({ partial: partiallyChecked }, 'search-modal__replace-all-checkbox')}
+          checked={!partiallyChecked ? allChecked : undefined}
+          ref={(ref) => {
+            if (ref) {
+              if (partiallyChecked) {
+                ref.indeterminate = true
+              } else {
+                ref.indeterminate = false
+              }
+            }
+          }}
+          onClick={(event) => {
+            event.stopPropagation()
+            if (!atLeastOneChecked) {
+              hits.forEach((hit) => {
+                toggleHitMarkedForReplacement(hit)
+              })
+            } else {
+              hits.forEach((hit) => {
+                if (isChecked(hit)) {
+                  toggleHitMarkedForReplacement(hit)
+                }
+              })
+            }
+          }}
+          onChange={(event) => {
+            // To Silence the React warning
+          }}
+        />
+      ) : null
+
+      return (
+        <div>
+          <div
+            className={cx('search-modal__hit-category-section-heading', { active: open })}
+            onClick={() => setOpen(!open)}
+          >
+            <div>
+              <div>{open ? <FaMinus /> : <FaPlus />}</div>
+              <div>{title}</div>
+            </div>
+            <div className="search-modal__hit-category-section-heading__hit-count">
+              {preTotalCount}
+              {hits.length}
+              {checkUncheckAll}
+            </div>
+          </div>
+          <Collapse in={open}>
+            <div>{hits.map((hit, index) => interpretHit(index, type, hit, computeTitle))}</div>
+          </Collapse>
+        </div>
+      )
+    }
+
+    const tabBody = () => {
+      return (
+        <div className="search-modal__wrapper">
+          <div className="search-modal__header">
+            <div className="search-modal__search-bar">
+              <input
+                className="search-modal__term"
+                placeholder={t('search')}
+                type="text"
+                value={searchTerm}
+                onChange={search}
+                ref={searchInputRef}
+              />
+              {replacing ? (
+                <>
+                  <FaExchangeAlt className="search-modal__replace-icon" />
+                  <input
+                    className="search-modal__replace-term"
+                    placeholder={t('replace')}
+                    type="text"
+                    value={replacementText}
+                    onChange={withEventTargetValue(setReplacementText)}
+                    ref={replaceInputRef}
+                  />
+                </>
+              ) : null}
+            </div>
+          </div>
+          <div className="search-modal__body">
+            {searchTerm?.length < 3 ? (
+              <div>
+                <div className="search-modal__hit-category-section-heading no-results">
+                  {t('Enter at least 3 letters to search...')}
+                </div>
+              </div>
+            ) : hasNoResults ? (
+              <div>
+                <div className="search-modal__hit-category-section-heading no-results">
+                  {t('No Results')}
+                </div>
+              </div>
+            ) : null}
+            {hits.project.length
+              ? interpretHits(
+                  'project',
+                  t('Project'),
+                  hits.project,
+                  projectHitsOpen,
+                  setProjectHitsOpen,
+                  (segments) => {
+                    const [_, _project, type, ...rest] = segments
+                    if (type === 'series') {
+                      const [kind] = rest
+                      return seriesAttributeToTitle(kind, series)
+                    } else {
+                      const [id, kind] = rest
+                      return computeBookHitTitle(kind, id, books)
+                    }
+                  }
+                )
+              : null}
+            {hits.timeline.length
+              ? interpretHits(
+                  'timeline',
+                  t('Timeline Card'),
+                  hits.timeline,
+                  timelineHitsOpen,
+                  setTimelineHitsOpen,
+                  (segments) => {
+                    const [_, _timeline, _bookId, _card, cardId, ...rest] = segments
+                    return computeCardHitTitle(cardId, cards, rest)
+                  }
+                )
+              : null}
+            {!replacing
+              ? hits.outline.length
+                ? interpretHits(
+                    'outline',
+                    t('Outline Card'),
+                    hits.outline,
+                    outlineHitsOpen,
+                    setOutlineHitsOpen,
+                    (segments) => {
+                      const [_, _timeline, _bookId, _card, cardId, ...rest] = segments
+                      return computeCardHitTitle(cardId, cards, rest)
+                    }
+                  )
+                : null
+              : null}
+            {hits.notes.length
+              ? interpretHits(
+                  'notes',
+                  t('Note'),
+                  hits.notes,
+                  noteHitsOpen,
+                  setNoteHitsOpen,
+                  (segments) => {
+                    const [_, _notes, noteId, ...rest] = segments
+                    return computeNoteHitTitle(noteId, notes, rest)
+                  }
+                )
+              : null}
+            {hits.characters.length
+              ? interpretHits(
+                  'characters',
+                  t('Character'),
+                  hits.characters,
+                  characterHitsOpen,
+                  setCharacterHitsOpen,
+                  (segments) => {
+                    const [_, _characters, characterId, ...rest] = segments
+                    return computeCharacterHitTitle(
+                      characterId,
+                      characters,
+                      rest,
+                      characterAttributes,
+                      books
+                    )
+                  }
+                )
+              : null}
+            {hits.places.length
+              ? interpretHits(
+                  'places',
+                  t('Place'),
+                  hits.places,
+                  placeHitsOpen,
+                  setPlaceHitsOpen,
+                  (segments) => {
+                    const [_, _places, placeId, ...rest] = segments
+                    return computePlaceHitTitle(placeId, places, rest)
+                  }
+                )
+              : null}
+            {hits.tags.length
+              ? interpretHits(
+                  'tags',
+                  t('Tag'),
+                  hits.tags,
+                  tagHitsOpen,
+                  setTagHitsOpen,
+                  (segments) => {
+                    const [_, _tags, tagId, ...rest] = segments
+                    return computeTagHitTitle(tagId, tags, rest)
+                  }
+                )
+              : null}
+            {hits.lines.length
+              ? interpretHits(
+                  'lines',
+                  t('Line'),
+                  hits.lines,
+                  lineHitsOpen,
+                  setLineHitsOpen,
+                  (segments) => {
+                    const [_, _lines, lineId, ...rest] = segments
+                    return computeLineHitTitle(lineId, lines, rest)
+                  }
+                )
+              : null}
+            {hits.beats.length
+              ? interpretHits(
+                  'beats',
+                  t('Beat'),
+                  hits.beats,
+                  beatHitsOpen,
+                  setBeatHitsOpen,
+                  (segments) => {
+                    const [_, _beats, bookId, beatId, ...rest] = segments
+                    return computeBeatHitTitle(beatId, bookId, books, beats, series, rest)
+                  }
+                )
+              : null}
+          </div>
+          {replacing ? (
+            <div className="search-modal__footer">
+              <hr />
+              <div>
+                <Button
+                  bsStyle="success"
+                  onClick={replaceMarkedHits}
+                  disabled={!hitsMarkedForReplacement.length}
+                >
+                  {t('Replace Selected')}
                 </Button>
               </div>
             </div>
-            <div className="search-modal__body">
-              {hits.project.length ? interpretProjectHits(hits.project, true) : null}
-              {hits.timeline.length ? interpretTimelineHits(hits.timeline, true) : null}
-              {hits.outline.length ? interpretOutlineHits(hits.outline, true) : null}
-              {hits.notes.length ? interpretNotesHits(hits.notes, true) : null}
-              {hits.characters.length ? interpretCharactersHits(hits.characters, true) : null}
-              {hits.places.length ? interpretPlacesHits(hits.places, true) : null}
-              {hits.tags.length ? interpretTagsHits(hits.tags, true) : null}
-              {hits.lines.length ? interpretLinesHits(hits.lines, true) : null}
-              {hits.beats.length ? interpretBeatsHits(hits.beats, true) : null}
-            </div>
-          </div>
-        </PlottrModal>
-      )
-    } else {
-      return (
-        <PlottrModal isOpen={true} onRequestClose={closeSearch} style={modalStyles}>
-          <div className="search-modal__wrapper">
-            <div className="search-modal__header">
-              <div className="search-modal__search-bar">
-                <FaSearch className="search-modal__search-icon" />
-                <input
-                  className="search-modal__term"
-                  placeholder={t('search')}
-                  type="text"
-                  value={searchTerm}
-                  onChange={search}
-                  ref={searchInputRef}
-                />
-              </div>
-            </div>
-            <div className="search-modal__body">
-              {hits.project.length ? interpretProjectHits(hits.project) : null}
-              {hits.timeline.length ? interpretTimelineHits(hits.timeline) : null}
-              {hits.outline.length ? interpretOutlineHits(hits.outline) : null}
-              {hits.notes.length ? interpretNotesHits(hits.notes) : null}
-              {hits.characters.length ? interpretCharactersHits(hits.characters) : null}
-              {hits.places.length ? interpretPlacesHits(hits.places) : null}
-              {hits.tags.length ? interpretTagsHits(hits.tags) : null}
-              {hits.lines.length ? interpretLinesHits(hits.lines) : null}
-              {hits.beats.length ? interpretBeatsHits(hits.beats) : null}
-            </div>
-          </div>
-        </PlottrModal>
+          ) : null}
+        </div>
       )
     }
+
+    return (
+      <PlottrModal isOpen={true} onRequestClose={closeSearch} style={modalStyles}>
+        <Tabs
+          activeKey={activeTab}
+          onSelect={handleSetActiveTab}
+          className="search_modal__tab-line"
+        >
+          <Tab key={'search'} eventKey={'search'} title={'Search'} tabClassName="search_modal__tab">
+            {tabBody()}
+          </Tab>
+          <Tab
+            key={'replace'}
+            eventKey={'replace'}
+            title={'Replace'}
+            tabClassName="search_modal__tab"
+          >
+            {tabBody()}
+          </Tab>
+        </Tabs>
+      </PlottrModal>
+    )
   }
 
   SearchModal.propTypes = {
@@ -858,13 +860,13 @@ const SearchModalConnector = (connector) => {
     hitsMarkedForReplacement: PropTypes.array.isRequired,
     closeSearch: PropTypes.func.isRequired,
     setSearchTerm: PropTypes.func.isRequired,
-    nextSearchHit: PropTypes.func.isRequired,
-    previousSearchHit: PropTypes.func.isRequired,
     jumpToHit: PropTypes.func.isRequired,
-    toggleReplaceSearch: PropTypes.func.isRequired,
     setReplacementText: PropTypes.func.isRequired,
     toggleHitMarkedForReplacement: PropTypes.func.isRequired,
     replaceMarkedHits: PropTypes.func.isRequired,
+    openSearch: PropTypes.func.isRequired,
+    openReplace: PropTypes.func.isRequired,
+    hasNoResults: PropTypes.bool,
   }
 
   const {
@@ -896,18 +898,18 @@ const SearchModalConnector = (connector) => {
           replacing: selectors.searchDialogIsReplacingSelector(state),
           replacementText: selectors.searchReplacementTextSelector(state),
           hitsMarkedForReplacement: selectors.hitsMarkedForReplacementSelector(state),
+          hasNoResults: selectors.hasNoResultsSelector(state),
         }
       },
       {
         closeSearch: actions.ui.closeSearch,
         setSearchTerm: actions.ui.setSearchTerm,
-        nextSearchHit: actions.ui.nextSearchHit,
-        previousSearchHit: actions.ui.previousSearchHit,
         jumpToHit: actions.ui.jumpToHit,
-        toggleReplaceSearch: actions.ui.toggleReplaceSearch,
         setReplacementText: actions.ui.setReplacementText,
         toggleHitMarkedForReplacement: actions.ui.toggleHitMarkedForReplacement,
         replaceMarkedHits: actions.ui.replaceMarkedHits,
+        openSearch: actions.ui.openSearch,
+        openReplace: actions.ui.openReplace,
       }
     )(SearchModal)
   }

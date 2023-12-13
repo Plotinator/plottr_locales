@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useMemo } from 'react'
 import PropTypes from 'react-proptypes'
 import { helpers } from 'pltr/v2'
 import cx from 'classnames'
@@ -36,51 +36,26 @@ const getMargins = (orientation, isMedium) => {
   return entry.first + entry.last
 }
 
-const nop = () => {}
-
-export default function VisualLine({ color, orientation, isMedium, tableLength, isSearching }) {
-  const [margins, setMargins] = useState(getMargins(orientation, isMedium))
-  const [currentLength, setCurrentLength] = useState(0)
-  const [maxLength, setMaxLength] = useState(0)
-  const [intervalId, setId] = useState(null)
-  const [animationStarted, setAnimationStarted] = useState(false)
-
-  useEffect(() => {
-    setMargins(getMargins(orientation, isMedium))
+export default function VisualLine({
+  color,
+  orientation,
+  isMedium,
+  tableLength,
+  beatHeadingCount,
+}) {
+  const margins = useMemo(() => {
+    return getMargins(orientation, isMedium)
   }, [orientation, isMedium])
-
-  useEffect(() => {
-    if (tableLength && tableLength > 0 && !isSearching) {
-      if (!animationStarted) {
-        setMaxLength(tableLength - margins)
-        setAnimationStarted(true)
-      }
-    }
-  }, [tableLength, margins, maxLength, setAnimationStarted, animationStarted, isSearching])
-
-  useEffect(() => {
-    if (!animationStarted) return nop
-    if (!maxLength) return nop
-
-    let nextLength = currentLength + 100
-    if (nextLength > maxLength) nextLength = maxLength
-
-    const id = setInterval(() => {
-      setCurrentLength(nextLength)
-    }, 10)
-    setId(id)
-
-    return () => clearInterval(id)
-  }, [animationStarted, currentLength, maxLength, setId, setCurrentLength])
-
-  useEffect(() => {
-    if (currentLength == maxLength) {
-      clearInterval(intervalId)
-      setAnimationStarted(false)
-    }
-  }, [currentLength, maxLength, intervalId, setAnimationStarted])
-
-  if (!currentLength) return null
+  const transitionSeconds = useMemo(() => {
+    const TRANSITION_TIMES = [1, 3, 4, 5]
+    const index = Math.max(
+      0,
+      Math.min(TRANSITION_TIMES.length - 1, Math.floor(beatHeadingCount / 20))
+    )
+    return TRANSITION_TIMES[index]
+  }, [beatHeadingCount])
+  const maxLength = tableLength - margins
+  const currentLength = Math.max(0, maxLength ?? 0)
 
   const lineStyle = {
     borderColor: color,
@@ -91,9 +66,12 @@ export default function VisualLine({ color, orientation, isMedium, tableLength, 
   } else {
     lineStyle.height = `${currentLength}px`
   }
+  lineStyle.transitionDuration = `${transitionSeconds}s`
+
   const lineKlass = cx(orientedClassName('line-title__line-line', orientation), {
     'medium-timeline': isMedium,
   })
+
   return <div className={lineKlass} style={lineStyle}></div>
 }
 
@@ -103,5 +81,5 @@ VisualLine.propTypes = {
   tableLength: PropTypes.number,
   isMedium: PropTypes.bool,
   isPinned: PropTypes.bool,
-  isSearching: PropTypes.bool,
+  beatHeadingCount: PropTypes.number,
 }

@@ -53,6 +53,25 @@
 }
 
 .character-list__list {
+  .list-group-item__wrapper {
+    &.dragging {
+      transition: 0.01s;
+      visibility: hidden;
+    }
+  
+    &:not(.dragging) {
+      visibility: visible;
+    }
+  }
+  .dropzone-indicator {
+    height: 0px;
+    transition: height .25s linear;
+    background-color: transparent;
+    &.display {
+      height: 50px;
+    }
+  }
+
   .list-group-item {
     padding-right: 4px;
     cursor: grab;
@@ -104,16 +123,23 @@
       background-color: $gray-7;
       margin-bottom: 0;
     }
-
-    &.isDroppable {
-      box-sizing: border-box;
-      border: 2px dashed $gray-6;
-      padding: 9px 14px;
-    }
   }
 }
 
 .character-list__list.darkmode {
+  .list-group-item__wrapper {
+    &.dragging {
+      transition: 0.01s;
+      visibility: hidden;
+      height: 0px;
+    }
+  
+    &:not(.dragging) {
+      visibility: visible;
+      height: 100%;
+    }
+  }
+
   .list-group-item {
     cursor: grab;
     background-color: $darkmode-darker-background;
@@ -267,7 +293,7 @@
       border-left: 1px solid $gray-8;
       border-right: 1px solid $gray-8;
 
-      &>.tab-pane {
+      & > .tab-pane {
         .card-dialog__custom-attributes__wrapper {
           margin-bottom: 16px;
         }
@@ -280,7 +306,7 @@
         }
       }
 
-      &>.tab-pane .template-picker__link {
+      & > .tab-pane .template-picker__link {
         cursor: pointer;
         margin-left: 4px;
         vertical-align: middle;
@@ -290,7 +316,7 @@
         }
       }
 
-      &>.tab-pane .template-tab__details {
+      & > .tab-pane .template-tab__details {
         display: flex;
         justify-content: space-between;
 
@@ -339,7 +365,7 @@
       border-bottom-color: $darkmode-border;
     }
 
-    .nav-tabs>li:not(.active)>a:not(:hover) {
+    .nav-tabs > li:not(.active) > a:not(:hover) {
       color: $darkmode-link-text;
       border-bottom-color: $darkmode-border;
     }
@@ -351,7 +377,7 @@
         color: $darkmode-link-text;
       }
 
-      >.active {
+      > .active {
         position: relative !important;
       }
 
@@ -407,12 +433,11 @@
     }
 
     .character-list__character__tabs {
-
       .tab-content,
       .nav-tabs {
         border-color: $darkmode-v2-border;
 
-        >li:not(.active)>a:not(:hover) {
+        > li:not(.active) > a:not(:hover) {
           color: #bbb;
           border-bottom-color: $darkmode-v2-border;
         }
@@ -420,7 +445,7 @@
         li.active {
           a {
             background-color: $darkmode-v2-background;
-  
+
             &:hover {
               background-color: $darkmode-v2-background;
             }
@@ -466,8 +491,6 @@
   }
 
   .character-list__list.darkmode {
-    background-color: $darkmode-v2-background;
-
     .list-group-item {
       background-color: $darkmode-v2-background;
       color: $darkmode-v2-darker-text;
@@ -480,12 +503,6 @@
       &.selected {
         border: 1px dashed #aaa;
         background-color: #24252c;
-      }
-
-      &.isDroppable {
-        box-sizing: border-box;
-        border: 2px dashed $gray-6;
-        padding: 9px 14px;
       }
     }
   }

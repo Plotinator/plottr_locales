@@ -12,12 +12,12 @@ import ButtonGroup from '../../ButtonGroup'
 import UnconnectedLanguagePicker from '../../LanguagePicker'
 import UnconnectedDarkOptionsSelect from './DarkOptionsSelect'
 import UnconnectedBackupSettings from './BackupSettings'
-import UnconnectedFileSettings from './FileSettings'
 import { checkDependencies } from '../../checkDependencies'
 import { addRecent, getFonts, getRecent } from '../../rce/fonts'
 import { FontSettingDropdown } from './FontSettingDropdown'
 import { FontSizeSettingDropdown } from './FontSizeSettingDropdown'
 import RichTextSettingsViewer from './RichTextSettingsViewer'
+import UnconnectedFileSettings from './FileSettings'
 
 const OptionsHomeConnector = (connector) => {
   const {

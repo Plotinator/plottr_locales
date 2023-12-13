@@ -30,6 +30,7 @@ const EditSeriesConnector = (connector) => {
             </Col>
             <Col sm={4}>
               <TextFormControl
+                id={'series-name'}
                 type="text"
                 value={name}
                 onChange={actions.setSeriesName}
@@ -42,6 +43,7 @@ const EditSeriesConnector = (connector) => {
             </Col>
             <Col sm={4}>
               <TextFormControl
+                id={'series-premise'}
                 type="text"
                 value={premise}
                 onChange={actions.setSeriesPremise}
@@ -56,6 +58,7 @@ const EditSeriesConnector = (connector) => {
             </Col>
             <Col sm={4}>
               <TextFormControl
+                id={'series-genre'}
                 type="text"
                 value={genre}
                 onChange={actions.setSeriesGenre}
@@ -68,6 +71,7 @@ const EditSeriesConnector = (connector) => {
             </Col>
             <Col sm={4}>
               <TextFormControl
+                id={'series-theme'}
                 type="text"
                 value={theme}
                 onChange={actions.setSeriesTheme}

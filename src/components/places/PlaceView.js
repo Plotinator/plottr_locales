@@ -182,6 +182,7 @@ const PlaceViewConnector = (connector) => {
                 <FormGroup>
                   <ControlLabel>{t('Name')}</ControlLabel>
                   <TextFormControl
+                    id={`place-${place.id}-name`}
                     type="text"
                     onChange={withArgs(actions.editPlaceName, place.id)}
                     autoFocus={foci && foci[0] && foci[0].path[2] === 'name'}
@@ -194,6 +195,7 @@ const PlaceViewConnector = (connector) => {
                 <FormGroup>
                   <ControlLabel>{t('Short Description')}</ControlLabel>
                   <TextFormControl
+                    id={`place-${place.id}-short-description`}
                     type="text"
                     onChange={withArgs(actions.editPlaceDescription, place.id)}
                     autoFocus={foci && foci[0] && foci[0].path[2] === 'description'}

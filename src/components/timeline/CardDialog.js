@@ -134,12 +134,12 @@ const CardDialogConnector = (connector) => {
 
     const cancelDelete = (e) => {
       e.stopPropagation()
-      uiActions.startDeletingCardFromCardDialog()
+      uiActions.stopDeletingCardFromCardDialog()
     }
 
     const handleDelete = (e) => {
       e.stopPropagation()
-      uiActions.stopDeletingCardFromCardDialog()
+      uiActions.startDeletingCardFromCardDialog(cardId)
     }
 
     const duplicateCard = (e) => {
@@ -487,6 +487,7 @@ const CardDialogConnector = (connector) => {
       const title = cardMetaData.title
       return (
         <TextFormControl
+          id={`card-${cardMetaData.id}-title`}
           placeholder={t('Enter title')}
           style={{ fontSize: '24px', textAlign: 'center', marginBottom: '6px' }}
           onKeyPress={handleEnter}

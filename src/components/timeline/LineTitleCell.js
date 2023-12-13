@@ -517,6 +517,7 @@ const LineTitleCellConnector = (connector) => {
             <ControlLabel className={cx({ darkmode: darkMode })}>{t('Plotline name')}</ControlLabel>
             <FormControl
               type="text"
+              key={`line-${line.id}-title`}
               defaultValue={line.title}
               inputRef={(ref) => {
                 titleInputRef.current = ref

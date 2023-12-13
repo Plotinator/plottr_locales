@@ -55,11 +55,11 @@
   &.vertical {
     display: flex;
 
-    &>div {
+    & > div {
       display: flex;
     }
 
-    &>div:first-child {
+    & > div:first-child {
       padding-left: 25px;
     }
 
@@ -70,7 +70,7 @@
   }
 
   &.vertical.medium-timeline {
-    &>div:first-child {
+    & > div:first-child {
       padding-left: 29px;
     }
   }
@@ -346,7 +346,6 @@
 }
 
 .card__cell:hover {
-
   .blank-card__body,
   .vertical-blank-card__body {
     visibility: visible;

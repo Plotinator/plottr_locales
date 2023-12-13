@@ -142,7 +142,7 @@ class Tabs extends React.Component {
         onSelect={this.props.onSelect}
         eventKey={eventKey}
         disabled={disabled}
-        className={cx({ draggable: draggable, isDroppable: isDroppable, ...tabClassName })}
+        className={cx({ draggable: draggable, isDroppable: isDroppable }, tabClassName)}
         onClose={this.props.onCloseTab}
         onContextMenu={this.props.onContextMenu}
         onDragOver={onDragOver}

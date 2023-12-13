@@ -298,8 +298,15 @@ const BlankCardConnector = (connector) => {
     }
 
     render() {
-      const { orientation, verticalInsertion, isSmall, isMedium, isPinned, color, isSearching } =
-        this.props
+      const {
+        orientation,
+        verticalInsertion,
+        isSmall,
+        isMedium,
+        isPinned,
+        color,
+        beatHeadingCount,
+      } = this.props
       const tableLength =
         this.ref.current?.clientWidth + 50 || (!isMedium || orientation == 'vertical' ? 225 : 110)
 
@@ -325,7 +332,7 @@ const BlankCardConnector = (connector) => {
                   orientation={orientation}
                   isMedium={isMedium}
                   tableLength={tableLength}
-                  isSearching={isSearching}
+                  beatHeadingCount={beatHeadingCount}
                 />
               ) : null}
               <div
@@ -378,7 +385,7 @@ const BlankCardConnector = (connector) => {
     readOnly: PropTypes.bool,
     addMissingBeats: PropTypes.bool,
     isPinned: PropTypes.bool,
-    isSearching: PropTypes.bool,
+    beatHeadingCount: PropTypes.number.isRequired,
   }
 
   const {
@@ -409,7 +416,7 @@ const BlankCardConnector = (connector) => {
             state,
             ownProps.beatId
           ),
-          isSearching: selectors.isSearchingSelector(state),
+          beatHeadingCount: selectors.bottomLevelBeatHeadingCountSelector(state),
         }
       },
       (dispatch) => {

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
 
@@ -31,7 +31,6 @@ import { checkDependencies } from '../checkDependencies'
 import { withEventTargetValue } from '../withEventTargetValue'
 import Tabs from '../Tabs'
 import Tab from '../Tab'
-import { delay } from '../../utils/delay'
 
 const { nextIdAcrossCategories } = newIds
 const {
@@ -85,10 +84,8 @@ const CharacterListViewConnector = (connector) => {
   const CharacterListView = ({
     visibleCharactersByCategory,
     filterIsEmpty,
-    characters,
     categories,
     customAttributes,
-    customAttributesThatCanChange,
     characterSort,
     darkMode,
     charactersSearchTerm,
@@ -106,9 +103,11 @@ const CharacterListViewConnector = (connector) => {
     sortVisible,
     detailsVisible,
     actions,
-    customAttributeActions,
     uiActions,
   }) => {
+    const [isMovingToNewCategory, setMovingToNewCategory] = useState(false)
+    const [draggedCharacter, setDraggedCharacter] = useState()
+
     useEffect(() => {
       const id = selectedId(visibleCharactersByCategory, categories, selectedCharacteId)
       if (id !== selectedCharacteId) {
@@ -131,7 +130,6 @@ const CharacterListViewConnector = (connector) => {
 
     const handleCreateNewCharacter = () => {
       actions.addCharacter()
-      uiActions.selectCharacter(id)
       uiActions.startEditingSelectedCharacter()
     }
 
@@ -186,13 +184,21 @@ const CharacterListViewConnector = (connector) => {
       event.stopPropagation()
     }
 
-    // If we don't do this, then all the rich text editors will be
-    // re-used.
-    const flickerDetails = () => {
-      uiActions.hideCharacterDetails()
-      delay(() => {
-        uiActions.showCharacterDetails()
-      })
+    const handleDragStart = (e, character) => {
+      setDraggedCharacter(character)
+    }
+
+    const handleDragOver = (e, characterCategory) => {
+      e.preventDefault()
+      if (characterCategory !== draggedCharacter) {
+        setMovingToNewCategory(true)
+      } else {
+        setMovingToNewCategory(false)
+      }
+    }
+
+    const handleDrop = () => {
+      setDraggedCharacter()
     }
 
     const renderSubNav = () => {
@@ -317,16 +323,29 @@ const CharacterListViewConnector = (connector) => {
 
       return visibleCharactersByCategory[categoryId].map((ch, idx) => {
         return (
-          <CharacterItem
+          <div
             key={ch.id}
-            absolutePosition={idx + startingIndex}
-            characterId={ch.id}
-            selected={ch.id == selectedCharacteId}
-            startEdit={editSelected}
-            stopEdit={stopEditing}
-            editing={editingSelected}
-            select={() => uiActions.selectCharacter(ch.id)}
-          />
+            onDragOver={(e) => handleDragOver(e, ch.categoryId)}
+            onDragStart={(e) => handleDragStart(e, { ...ch, position: idx + startingIndex })}
+            onDrop={handleDrop}
+          >
+            <CharacterItem
+              key={ch.id}
+              absolutePosition={idx + startingIndex}
+              characterId={ch.id}
+              selected={ch.id == selectedCharacteId}
+              startEdit={editSelected}
+              stopEdit={stopEditing}
+              editing={editingSelected}
+              select={() => uiActions.selectCharacter(ch.id)}
+              isMovingToNewCategory={isMovingToNewCategory}
+              draggedPosition={
+                Number.isInteger(draggedCharacter?.position)
+                  ? Number(draggedCharacter.position)
+                  : null
+              }
+            />
+          </div>
         )
       })
     }
@@ -427,7 +446,6 @@ const CharacterListViewConnector = (connector) => {
                     activeKey={attributeTabId}
                     onSelect={(key) => {
                       uiActions.selectCharacterAttributeBookTab(key)
-                      flickerDetails()
                     }}
                     id="book-chooser"
                     style={{ marginBottom: '16px' }}

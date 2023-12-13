@@ -5,6 +5,7 @@ import prettydate from 'pretty-date'
 import { FiCopy } from 'react-icons/fi'
 
 import { t as i18n } from 'plottr_locales'
+import { isNotDroppingToSamePosition } from 'pltr/v2/helpers/lists'
 
 import ButtonGroup from '../ButtonGroup'
 import Glyphicon from '../Glyphicon'
@@ -17,7 +18,13 @@ const NoteItemConnector = (connector) => {
   const Image = UnconnectedImage(connector)
 
   class NoteItem extends Component {
-    state = { deleting: false, hovering: false, newNoteIdPosition: null }
+    state = {
+      deleting: false,
+      hovering: false,
+      newNoteIdPosition: null,
+      moveUp: null,
+      isDragging: false,
+    }
 
     constructor(props) {
       super(props)
@@ -84,8 +91,23 @@ const NoteItemConnector = (connector) => {
 
     handleDragOver = (e) => {
       e.preventDefault()
-      const { note } = this.props
-      const { newNoteIdPosition } = this.state
+      const { note, draggedPosition, isMovingToNewCategory, absolutePosition } = this.props
+      const { newNoteIdPosition, moveUp } = this.state
+      const targetElement = e.currentTarget
+      const mouseY = e.clientY - targetElement.getBoundingClientRect().top
+      const isAbove = Boolean(Math.round(mouseY) < Math.round(targetElement.clientHeight / 2))
+
+      if (
+        moveUp != isAbove &&
+        isNotDroppingToSamePosition(
+          draggedPosition,
+          absolutePosition,
+          isAbove,
+          isMovingToNewCategory
+        )
+      ) {
+        this.setState({ moveUp: isAbove })
+      }
       if (newNoteIdPosition != note.id) {
         this.setState({ newNoteIdPosition: note.id })
       }
@@ -93,15 +115,23 @@ const NoteItemConnector = (connector) => {
 
     handleDragLeave = (e) => {
       e.preventDefault()
-      if (typeof this.state.newNoteIdPosition !== 'undefined') {
-        this.setState({ newNoteIdPosition: null })
+
+      if (
+        !this.ref.current.contains(e.relatedTarget) &&
+        typeof this.state.newNoteIdPosition !== 'undefined'
+      ) {
+        this.setState({
+          newNoteIdPosition: null,
+          moveUp: null,
+        })
       }
     }
 
-    handleDropItem = (e, idx) => {
+    handleDropItem = (e) => {
       e.stopPropagation()
       e.preventDefault()
       const { note } = this.props
+      const { moveUp } = this.state
 
       const json = e.dataTransfer.getData('text/json')
       const droppedData = JSON.parse(json)
@@ -109,14 +139,28 @@ const NoteItemConnector = (connector) => {
         droppedData.id,
         droppedData.position,
         note.position,
-        note.categoryId || null
+        note.categoryId || null,
+        moveUp ? 'up' : 'down'
       )
-      this.setState({ newNoteIdPosition: null })
+      this.setState({
+        newNoteIdPosition: null,
+        moveUp: null,
+        isDragging: false,
+      })
     }
 
-    handleDragStart = (e, idx) => {
+    handleDragStart = (e) => {
+      this.setState({ isDragging: true })
       e.dataTransfer.effectAllowed = 'move'
       e.dataTransfer.setData('text/json', JSON.stringify({ ...this.props.note }))
+    }
+
+    handleDragEnd = (e) => {
+      this.setState({ isDragging: false })
+    }
+
+    handleDragEnter = (e) => {
+      e.preventDefault()
     }
 
     renderDelete() {
@@ -148,8 +192,15 @@ const NoteItemConnector = (connector) => {
     }
 
     render() {
-      const { note, selected } = this.props
-      const isDroppable = !!this.state.newNoteIdPosition && note.id == this.state.newNoteIdPosition
+      const { note, selected, absolutePosition, draggedPosition } = this.props
+      const { newNoteIdPosition, moveUp, isDragging } = this.state
+
+      const isDroppable =
+        Number.isInteger(newNoteIdPosition) &&
+        note.id == newNoteIdPosition &&
+        absolutePosition != draggedPosition
+      const moveBelow = moveUp !== null && !moveUp && isDroppable
+      const moveAbove = moveUp !== null && moveUp && !moveBelow && isDroppable
 
       let img = null
       if (note.imageId) {
@@ -170,26 +221,39 @@ const NoteItemConnector = (connector) => {
 
       return (
         <div
-          className={cx('list-group-item', { selected, isDroppable })}
           ref={this.ref}
-          onClick={this.selectNote}
           draggable
+          key={this.props.key}
           onDragStart={this.handleDragStart}
           onDrop={this.handleDropItem}
           onDragOver={this.handleDragOver}
           onDragLeave={this.handleDragLeave}
+          onDragEnd={this.handleDragEnd}
+          onDragEnter={this.handleDragEnter}
+          className={cx('list-group-item__wrapper', {
+            dragging: absolutePosition == draggedPosition && isDragging,
+          })}
         >
-          {this.renderDelete()}
-          <div className="note-list__item-inner">
-            {img}
-            <div>
-              <h6 className={cx('list-group-item-heading', { withImage: !!note.imageId })}>
-                {note.title || i18n('New Note')}
-              </h6>
-              {lastEdited}
+          <div className={cx('dropzone-indicator', { display: moveAbove })} />
+          <div
+            className={cx('list-group-item', {
+              selected,
+            })}
+            onClick={this.selectNote}
+          >
+            {this.renderDelete()}
+            <div className="note-list__item-inner">
+              {img}
+              <div>
+                <h6 className={cx('list-group-item-heading', { withImage: !!note.imageId })}>
+                  {note.title || i18n('New Note')}
+                </h6>
+                {lastEdited}
+              </div>
+              {this.renderHoverOptions()}
             </div>
-            {this.renderHoverOptions()}
           </div>
+          <div className={cx('dropzone-indicator', { display: moveBelow })} />
         </div>
       )
     }
@@ -202,6 +266,10 @@ const NoteItemConnector = (connector) => {
       startEdit: PropTypes.func.isRequired,
       stopEdit: PropTypes.func.isRequired,
       actions: PropTypes.object.isRequired,
+      key: PropTypes.number,
+      isMovingToNewCategory: PropTypes.bool,
+      draggedPosition: PropTypes.number,
+      absolutePosition: PropTypes.number,
     }
   }
 

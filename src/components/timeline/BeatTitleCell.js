@@ -26,26 +26,37 @@ const {
   hierarchyLevels: { hierarchyToStyles },
 } = helpers
 
-const useTraceUpdate = (props) => {
-  const prev = useRef(props);
-  useEffect(() => {
-    const changedProps = Object.entries(props).reduce((ps, [k, v]) => {
-      if (prev.current[k] !== v) {
-        ps[k] = [prev.current[k], v];
-      }
-      return ps;
-    }, {});
-    if (Object.keys(changedProps).length > 0) {
-      console.log('Changed props:', changedProps);
-    }
-    prev.current = props;
-  });
-}
-
 const BeatTitleCellConnector = (connector) => {
   const Floater = UnconnectedFloater(connector)
 
-  const BeatTitleCell = (props) => {
+  const BeatTitleCell = ({
+    beatId,
+    currentTimeline,
+    orientation,
+    timelineSize,
+    darkMode,
+    handleReorder,
+    actions,
+    beats,
+    beatIndex,
+    hierarchyLevels,
+    beat,
+    hierarchyLevel,
+    beatTitle,
+    isSmall,
+    isMedium,
+    isLarge,
+    readOnly,
+    editing,
+    timelineViewIsStacked,
+    timelineViewIsTabbed,
+    atMaximumDepth,
+    hierarchyLevelName,
+    hierarchyChildLevelName,
+    selection,
+    domEvents,
+    uiActions,
+  }) => {
     const [hovering, setHovering] = useState(false)
     const [dragging, setDragging] = useState(false)
     const [inDropZone, setInDropZone] = useState(false)
@@ -57,37 +68,6 @@ const BeatTitleCellConnector = (connector) => {
     const titleInputRef = useRef(null)
     const insertPeerRef = useRef(null)
     const container = useRef(null)
-
-    useTraceUpdate(props)
-
-    const {
-      beatId,
-      currentTimeline,
-      orientation,
-      timelineSize,
-      darkMode,
-      handleReorder,
-      actions,
-      beats,
-      beatIndex,
-      hierarchyLevels,
-      beat,
-      hierarchyLevel,
-      beatTitle,
-      isSmall,
-      isMedium,
-      isLarge,
-      readOnly,
-      editing,
-      timelineViewIsStacked,
-      timelineViewIsTabbed,
-      atMaximumDepth,
-      hierarchyLevelName,
-      hierarchyChildLevelName,
-      selection,
-      domEvents,
-      uiActions,
-    } = props
 
     useEffect(() => {
       if (editing && titleInputRef.current && document.activeElement !== titleInputRef) {

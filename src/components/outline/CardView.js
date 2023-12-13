@@ -200,6 +200,7 @@ const CardViewConnector = (connector) => {
       return (
         <FormGroup>
           <TextFormControl
+            id={`card-${id}-title`}
             onKeyPress={this.handleEnter}
             onKeyDown={this.handleEsc}
             type="text"
