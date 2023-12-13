@@ -104,9 +104,12 @@ export function removeSystemKeys(jsonData) {
   return withoutSystemKeys
 }
 
+const MAX_FILE_BOOT_TIME_MS = 60000
+
 const SAVE_INTERVAL_MS = 10000
 const BACKUP_INTERVAL_MS = 60000
-let saver = null
+const saverRef = { current: null }
+const bootingFile = { current: null }
 
 export function bootFile(
   whenClientIsReady,
@@ -116,10 +119,25 @@ export function bootFile(
   saveBackup,
   bootingOfflineFile
 ) {
+  const now = new Date().getTime()
+  if (bootingFile.current && now - bootingFile.current < MAX_FILE_BOOT_TIME_MS) {
+    logger.warn(
+      `Trying to boot ${fileURL} and we're trying to boot a file already.  It's been ${
+        (now - bootingFile.current) / 1000
+      } seconds since we started booting.`
+    )
+    return Promise.resolve()
+  }
+  bootingFile.current = now
+
+  if (saverRef.current) {
+    saverRef.current.cancelAllRemainingRequests()
+  }
+
   const recordedErrorsDuringStartup = []
 
   function offerSaveAsThenQuit() {
-    saver.stop()
+    saverRef.current.stop()
     const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
     return showErrorBox(
       t('Error'),
@@ -605,8 +623,8 @@ export function bootFile(
   }
 
   return _bootFile(fileURL, options, numOpenFiles, saveBackup).then(() => {
-    if (saver) {
-      saver.cancelAllRemainingRequests()
+    if (saverRef.current) {
+      saverRef.current.cancelAllRemainingRequests()
     }
     const postSaveHook = () => {
       store.dispatch(actions.ui.fileSaved())
@@ -647,7 +665,7 @@ export function bootFile(
           // memory and remove ambiguity.
           recordedErrorsDuringStartup.splice(0, recordedErrorsDuringStartup.length)
         }
-        saver = Saver(
+        saverRef.current = Saver(
           () => {
             return selectors.fullFileStateSelector(store.getState())
           },
@@ -682,6 +700,9 @@ export function bootFile(
             window.close()
           }, 3000)
         })
+      })
+      .finally(() => {
+        bootingFile.current = null
       })
   })
 }
