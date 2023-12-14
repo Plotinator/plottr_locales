@@ -423,6 +423,59 @@ describe('setSearchTerm', () => {
         })
       })
     })
+    describe('when the search term matches a legacy character "description"', () => {
+      const store = storeWithZelda()
+      store.dispatch(setSearchTerm('he princess'))
+      it("should list that character's hit", () => {
+        const hits = searchHitsSelector(store.getState())
+        expect(hits.characters).toEqual([
+          { hit: 'he princess', path: '/characters/1/customAttribute/notes/all/13' },
+          { hit: 'he princess', path: '/characters/3/customAttribute/1/all/63' },
+        ])
+      })
+    })
+    describe('when the search term matches new character "notes" and legacy "notes"', () => {
+      const store = storeWithZelda()
+      store.dispatch(setSearchTerm('a lot less helpless'))
+      it('should list only the new character "notes" hit', () => {
+        const hits = searchHitsSelector(store.getState())
+        expect(hits.characters).toEqual([
+          { hit: 'a lot less helpless', path: '/characters/3/customAttribute/1/all/10' },
+        ])
+      })
+    })
+    describe("when the search term matches a legacy attribute that's not shadowed", () => {
+      const store = storeWithZelda()
+      store.dispatch(setSearchTerm("she's got lazer eyes(!)"))
+      it('should list the legacy character attribute hit', () => {
+        const hits = searchHitsSelector(store.getState())
+        expect(hits.characters).toEqual([
+          {
+            hit: "she's got lazer eyes(!)",
+            path: '/characters/3/customAttribute/Special Sauce/all/26',
+          },
+        ])
+      })
+    })
+    describe("when the search term matches a legacy attribute that's shadowed", () => {
+      const store = storeWithZelda()
+      store.dispatch(setSearchTerm('aaayy ooooo'))
+      it('should not list the hit for the old attribute', () => {
+        const hits = searchHitsSelector(store.getState())
+        expect(hits.characters).toEqual([])
+      })
+      const store2 = storeWithZelda()
+      store2.dispatch(setSearchTerm('How are you?'))
+      it('should list the hit for the new attribute', () => {
+        const hits = searchHitsSelector(store2.getState())
+        expect(hits.characters).toEqual([
+          {
+            hit: 'How are you?',
+            path: '/characters/3/customAttribute/2/all/5',
+          },
+        ])
+      })
+    })
   })
 })
 
@@ -5534,6 +5587,42 @@ describe('replaceMarkedHits', () => {
       )
       expect(finalCharacter.description).not.toEqual(initialCharacter.description)
       expect(finalCharacter.description).toEqual('MVP')
+    })
+  })
+  describe('given a state with hits on a character legacy attribute', () => {
+    const store = storeWithZelda()
+    const initialState = fullFileStateSelector(store.getState())
+    const initialCharacter = displayedSingleCharacterSelector(store.getState(), 3)
+    store.dispatch(openSearch())
+    store.dispatch(toggleReplaceSearch())
+    store.dispatch(setSearchTerm("she's got lazer eyes(!)"))
+    store.dispatch(setReplacementText("she's got rocket boots(!)"))
+    store.dispatch(
+      toggleHitMarkedForReplacement({
+        hit: "she's got lazer eyes(!)",
+        path: '/characters/3/customAttribute/Special Sauce/all/26',
+      })
+    )
+    store.dispatch(replaceMarkedHits())
+    it('should replace that hit', () => {
+      const finalState = fullFileStateSelector(store.getState())
+      const finalCharacter = displayedSingleCharacterSelector(store.getState(), 3)
+      expect(
+        withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(initialState, 'characters'))
+      ).toEqual(
+        withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(finalState, 'characters'))
+      )
+      expect(finalCharacter['Special Sauce']).not.toEqual(initialCharacter['Special Sauce'])
+      expect(finalCharacter['Special Sauce']).toEqual([
+        {
+          type: 'paragraph',
+          children: [
+            {
+              text: "Her special sauce is that she's got rocket boots(!)",
+            },
+          ],
+        },
+      ])
     })
   })
   describe('given a state with hits on a character notes', () => {

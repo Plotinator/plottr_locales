@@ -2196,8 +2196,8 @@ const updateUI = (state, action) => {
       return {
         ...state,
         tagTab: {
-          ...state.tagTab,
           editingSelectedTab: false,
+          selectedTag: null,
         },
       }
     }

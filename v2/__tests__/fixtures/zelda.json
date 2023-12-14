@@ -2333,6 +2333,11 @@
           "bookId": 5
         },
         {
+          "value": "hi!  How are you?",
+          "id": 2,
+          "bookId": "all"
+        },
+        {
           "value": "there",
           "id": 3,
           "bookId": 5
@@ -2342,11 +2347,31 @@
           "id": 4,
           "bookId": 5
         }
+      ],
+      "a": "aaayy ooooo",
+      "Special Sauce": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "text": "Her special sauce is that she's got lazer eyes(!)"
+            }
+          ]
+        }
       ]
     }
   ],
   "customAttributes": {
-    "characters": [],
+    "characters": [
+      {
+        "name": "Special Sauce",
+        "type": "paragraph"
+      },
+      {
+        "name": "a",
+        "type": "text"
+      }
+    ],
     "places": [
       {
         "name": "one",

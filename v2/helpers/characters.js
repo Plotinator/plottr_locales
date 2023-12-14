@@ -32,6 +32,8 @@ export const characterFocusPath = (
     return ['character', characterId, 'customAttribute', parsedAttributeId, bookId]
   } else if (type === 'name') {
     return ['character', characterId, type]
+  } else if (typeof attributeId === 'string') {
+    return ['character', characterId, 'customAttribute', attributeId, bookId]
   } else {
     return ['unknown']
   }
