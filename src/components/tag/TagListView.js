@@ -63,13 +63,16 @@ const TagListViewConnector = (connector) => {
     categories,
     tagsSearchTerm,
     uiActions,
+    isTagTabFocusing,
   }) => {
     const [appending, setAppending] = useState(false)
     const [categoriesDialogOpen, setCategoriesDialogOpen] = useState(false)
     const [newCategoryId, setNewCategoryId] = useState(null)
 
     useEffect(() => {
-      uiActions.selectTag(detailID(tagsByCategory, tags, categories, selectedTagId))
+      if (!isTagTabFocusing) {
+        uiActions.selectTag(detailID(tagsByCategory, tags, categories, selectedTagId))
+      }
     }, [tags, tagsByCategory, categories])
 
     const appendBlankTag = (categoryId) => {
@@ -213,6 +216,7 @@ const TagListViewConnector = (connector) => {
     tagsSearchTerm: PropTypes.string,
     selectedTagId: PropTypes.number,
     uiActions: PropTypes.object.isRequired,
+    isTagTabFocusing: PropTypes.bool,
   }
 
   const { redux } = connector
@@ -240,6 +244,7 @@ const TagListViewConnector = (connector) => {
           tagsByCategory: selectors.searchedTagsByCategorySelector(state),
           tagsSearchTerm: selectors.tagsSearchTermSelector(state),
           selectedTagId: selectors.selectedTagSelector(state),
+          isTagTabFocusing: selectors.isTagTabFocusingSelector(state),
         }
       },
       (dispatch) => {

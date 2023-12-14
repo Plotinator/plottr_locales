@@ -305,7 +305,6 @@ const BlankCardConnector = (connector) => {
         isMedium,
         isPinned,
         color,
-        isJumping,
         beatHeadingCount,
       } = this.props
       const tableLength =
@@ -333,7 +332,6 @@ const BlankCardConnector = (connector) => {
                   orientation={orientation}
                   isMedium={isMedium}
                   tableLength={tableLength}
-                  isJumping={isJumping}
                   beatHeadingCount={beatHeadingCount}
                 />
               ) : null}
@@ -387,7 +385,6 @@ const BlankCardConnector = (connector) => {
     readOnly: PropTypes.bool,
     addMissingBeats: PropTypes.bool,
     isPinned: PropTypes.bool,
-    isJumping: PropTypes.bool,
     beatHeadingCount: PropTypes.number.isRequired,
   }
 
@@ -419,7 +416,6 @@ const BlankCardConnector = (connector) => {
             state,
             ownProps.beatId
           ),
-          isJumping: selectors.isJumpingSelector(state),
           beatHeadingCount: selectors.bottomLevelBeatHeadingCountSelector(state),
         }
       },

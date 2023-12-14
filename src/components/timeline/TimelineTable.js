@@ -12,11 +12,7 @@ import UnconnectedBeatInsertCell from './BeatInsertCell'
 import UnconnectedTopRow from './TopRow'
 import UnconnectedBeatTitleCell from './BeatTitleCell'
 import UnconnectedAddLineRow from './AddLineRow'
-import { FunSpinner } from '../Spinner'
-import { initialState } from 'pltr/v2'
 import { checkDependencies } from '../checkDependencies'
-
-const { card } = initialState
 
 const TimelineTableConnector = (connector) => {
   const CardCell = UnconnectedCardCell(connector)
@@ -120,10 +116,6 @@ const TimelineTableConnector = (connector) => {
       const { currentTimeline, beatActions } = this.props
       beatActions.addBeat(currentTimeline, beatToLeftId)
       beatActions.expandBeat(beatToLeftId, currentTimeline)
-    }
-
-    buildCard(lineId, beatId) {
-      return Object.assign({}, card, { beatId, lineId })
     }
 
     handleAppendBeat = () => {
@@ -415,11 +407,9 @@ const TimelineTableConnector = (connector) => {
     }
 
     render() {
-      const { darkMode, orientation, isSmall, message, shouldNotRender } = this.props
+      const { darkMode, orientation, isSmall, message } = this.props
 
-      if (shouldNotRender) {
-        return <FunSpinner />
-      } else if (isSmall) {
+      if (isSmall) {
         return (
           <div
             className={cx('small-timeline__wrapper', {
@@ -473,7 +463,6 @@ const TimelineTableConnector = (connector) => {
     timelineViewIsTabbed: PropTypes.bool,
     timelineViewIsStacked: PropTypes.bool,
     pinnedPlotlines: PropTypes.number,
-    shouldNotRender: PropTypes.bool,
   }
 
   const {
@@ -485,74 +474,29 @@ const TimelineTableConnector = (connector) => {
   if (redux) {
     const { connect, bindActionCreators } = redux
 
-    const defaultBeats = []
-    const defaultBooks = {}
-    const defaultHasChildren = new Map()
-    const defaultTimelineSparceBeatMap = {}
-    const defaultLines = []
-    const defaultCardMap = {}
-    const defaultOrientation = 'vertical'
-    const defaultToast = {}
-    const defaultBeatPositions = {}
-    const defaultMessage = ''
-
-    let prevProps = null
     return connect(
       (state, { activeTab }) => {
-        const isCardDialogVisible = selectors.isCardDialogVisibleSelector(state)
-        const isJumping = selectors.isJumpingSelector(state)
-        const timelineFoci = selectors.timelineFociSelector(state)
-        const hitIsCard =
-          timelineFoci && timelineFoci[0]?.path && timelineFoci[0]?.path[0] === 'card'
-        if (hitIsCard && (isCardDialogVisible || isJumping)) {
-          return {
-            shouldNotRender: true,
-            beats: defaultBeats,
-            books: defaultBooks,
-            beatHasChildrenMap: defaultHasChildren,
-            beatMapping: defaultTimelineSparceBeatMap,
-            nextBeatId: -1,
-            lines: defaultLines,
-            cardMap: defaultCardMap,
-            darkMode: selectors.isDarkModeSelector(state),
-            orientation: defaultOrientation,
-            currentTimeline: selectors.currentTimelineSelector(state),
-            isSeries: false,
-            isSmall: false,
-            isMedium: false,
-            isLarge: true,
-            toast: defaultToast,
-            beatPositions: defaultBeatPositions,
-            message: defaultMessage,
-            timelineViewIsTabbed: false,
-            timelineViewIsStacked: false,
-            pinnedPlotlines: 0,
-          }
-        } else {
-          prevProps = {
-            shouldNotRender: !prevProps || isCardDialogVisible,
-            beats: selectors.visibleSortedBeatsForTimelineByBookSelector(state),
-            books: selectors.allBooksSelector(state),
-            beatHasChildrenMap: selectors.beatHasChildrenSelector(state),
-            beatMapping: selectors.timelineSparceBeatMap(state, activeTab),
-            nextBeatId: selectors.nextBeatIdSelector(state),
-            lines: selectors.sortedLinesByBookSelector(state),
-            cardMap: selectors.searchedCardMetaDataMapSelector(state),
-            darkMode: selectors.isDarkModeSelector(state),
-            orientation: selectors.orientationSelector(state),
-            currentTimeline: selectors.currentTimelineSelector(state),
-            isSeries: selectors.isSeriesSelector(state),
-            isSmall: selectors.isSmallSelector(state),
-            isMedium: selectors.isMediumSelector(state),
-            isLarge: selectors.isLargeSelector(state),
-            toast: selectors.toastNotificationSelector(state),
-            beatPositions: selectors.visibleBeatPositions(state),
-            message: selectors.messageSelector(state),
-            timelineViewIsTabbed: selectors.timelineViewIsTabbedSelector(state),
-            timelineViewIsStacked: selectors.timelineViewIsStackedSelector(state),
-            pinnedPlotlines: selectors.pinnedPlotlinesSelector(state),
-          }
-          return prevProps
+        return {
+          beats: selectors.visibleSortedBeatsForTimelineByBookSelector(state),
+          books: selectors.allBooksSelector(state),
+          beatHasChildrenMap: selectors.beatHasChildrenSelector(state),
+          beatMapping: selectors.timelineSparceBeatMap(state, activeTab),
+          nextBeatId: selectors.nextBeatIdSelector(state),
+          lines: selectors.sortedLinesByBookSelector(state),
+          cardMap: selectors.searchedCardMetaDataMapSelector(state),
+          darkMode: selectors.isDarkModeSelector(state),
+          orientation: selectors.orientationSelector(state),
+          currentTimeline: selectors.currentTimelineSelector(state),
+          isSeries: selectors.isSeriesSelector(state),
+          isSmall: selectors.isSmallSelector(state),
+          isMedium: selectors.isMediumSelector(state),
+          isLarge: selectors.isLargeSelector(state),
+          toast: selectors.toastNotificationSelector(state),
+          beatPositions: selectors.visibleBeatPositions(state),
+          message: selectors.messageSelector(state),
+          timelineViewIsTabbed: selectors.timelineViewIsTabbedSelector(state),
+          timelineViewIsStacked: selectors.timelineViewIsStackedSelector(state),
+          pinnedPlotlines: selectors.pinnedPlotlinesSelector(state),
         }
       },
       (dispatch) => {

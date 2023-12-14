@@ -77,6 +77,7 @@ const TagViewConnector = (connector) => {
     }
 
     const startEditing = () => {
+      uiActions.selectTag(tag.id)
       uiActions.editSelectedTag()
     }
 
