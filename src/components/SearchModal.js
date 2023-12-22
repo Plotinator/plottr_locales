@@ -95,7 +95,7 @@ const computeCardHitTitle = (cardId, cards, restOfPathElements) => {
   const card = cards.find(({ id }) => {
     return id == cardId
   })
-  const restOfPath = restOfPathElements.join(' > ')
+  const restOfPath = restOfPathElements.slice(0, -1).join(' > ')
   if (!card) {
     return [`Unknown card > ${restOfPath}`, '']
   }
@@ -180,20 +180,21 @@ const computeCharacterHitTitle = (
     case 'customAttribute': {
       const [_customAttribute, attributeId, attributeBookId] = restOfPathElements
       const attributeName =
-        characterAttributes.find(({ id }) => {
+        (characterAttributes || []).find(({ id }) => {
           return id == attributeId
         })?.name || attributeId
       const bookName =
-        books.find(({ id }) => {
-          return id == attributeBookId
-        })?.title || attributeBookId
+        attributeBookId === 'all'
+          ? 'Series'
+          : books.find(({ id }) => {
+              return id == attributeBookId
+            })?.title || attributeBookId
+      const newAttribute = (character.attributes || []).find(({ id, bookId }) => {
+        return id == attributeId && bookId == attributeBookId
+      })
       return [
         `${character.name} > ${attributeName} > ${bookName}`,
-        attributeToText(
-          character.attributes.find(({ id, bookId }) => {
-            return id == attributeId && bookId == attributeBookId
-          })?.value
-        ),
+        attributeToText(newAttribute?.value ?? character[attributeId]),
       ]
     }
     case 'templateAttribute': {
