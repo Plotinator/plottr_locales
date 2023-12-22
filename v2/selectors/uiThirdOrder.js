@@ -10,6 +10,7 @@ import { seriesSelector } from './seriesFirstOrder'
 import { card, place, note } from '../store/initialState'
 import { allLinesSelector } from './linesFirstOrder'
 import {
+  characterCustomAttributesSelector,
   cardsCustomAttributesSelector,
   noteCustomAttributesSelector,
   placeCustomAttributesSelector,
@@ -230,6 +231,10 @@ export const hitsMarkedForReplacementSelector = createSelector(
   }
 )
 
+const literalRegExp = (unescapedTerm) => {
+  return new RegExp(unescapedTerm.replace(/[[\](){}$^\-.*+?|/]/g, '\\$&'), 'gi')
+}
+
 export const projectSearchHitsSelector = createSelector(
   searchDialogSearchTermSelector,
   seriesSelector,
@@ -242,10 +247,10 @@ export const projectSearchHitsSelector = createSelector(
     const bookLikeMatch = (entity, prefix, id) => {
       const nameKey = prefix === 'book' ? 'title' : 'name'
       const which = id ? `/${id}` : ''
-      const nameMatch = entity[nameKey].matchAll(new RegExp(term, 'gi'))
-      const genreMatch = entity.genre.matchAll(new RegExp(term, 'gi'))
-      const premiseMatch = entity.premise.matchAll(new RegExp(term, 'gi'))
-      const themeMatch = entity.theme.matchAll(new RegExp(term, 'gi'))
+      const nameMatch = entity[nameKey].matchAll(literalRegExp(term))
+      const genreMatch = entity.genre.matchAll(literalRegExp(term))
+      const premiseMatch = entity.premise.matchAll(literalRegExp(term))
+      const themeMatch = entity.theme.matchAll(literalRegExp(term))
       return [
         ...(nameMatch ? hits(`/project/${prefix}${which}/${nameKey}`, nameMatch) : []),
         ...(genreMatch ? hits(`/project/${prefix}${which}/genre`, genreMatch) : []),
@@ -295,9 +300,9 @@ export const timelineSearchHitsSelector = createSelector(
       const timeline = lines.find((line) => {
         return line.id == card.lineId
       })?.bookId
-      const titleMatch = card.title.matchAll(new RegExp(term, 'gi'))
+      const titleMatch = card.title.matchAll(literalRegExp(term))
       const descriptionText = serializeNoFormatting(card.description)
-      const descriptionMatch = descriptionText.matchAll(new RegExp(term, 'gi'))
+      const descriptionMatch = descriptionText.matchAll(literalRegExp(term))
       const cardCustomAttributes = customAttributes
         .filter((attribute) => {
           return typeof card[attribute.name] !== 'undefined'
@@ -312,7 +317,7 @@ export const timelineSearchHitsSelector = createSelector(
         const { id, value } = attribute
         const valueAsString =
           (Array.isArray(value) ? serializeNoFormatting(value) : String(value)) || ''
-        const valueMatch = valueAsString.matchAll(new RegExp(term, 'gi'))
+        const valueMatch = valueAsString.matchAll(literalRegExp(term))
         if (!valueMatch) {
           return []
         }
@@ -324,7 +329,7 @@ export const timelineSearchHitsSelector = createSelector(
           const value = attribute.value
           const valueAsString =
             (Array.isArray(value) ? serializeNoFormatting(value) : String(value)) || ''
-          const valueMatch = valueAsString.matchAll(new RegExp(term, 'gi'))
+          const valueMatch = valueAsString.matchAll(literalRegExp(term))
           if (!valueMatch) {
             return []
           }
@@ -366,9 +371,9 @@ export const outlineSearchHitsSelector = createSelector(
     }
 
     const cardMatch = (card) => {
-      const titleMatch = card.title.matchAll(new RegExp(term, 'gi'))
+      const titleMatch = card.title.matchAll(literalRegExp(term))
       const descriptionText = serializeNoFormatting(card.description)
-      const descriptionMatch = descriptionText.matchAll(new RegExp(term, 'gi'))
+      const descriptionMatch = descriptionText.matchAll(literalRegExp(term))
       const timeline = lines.find((line) => {
         return line.id == card.lineId
       })?.bookId
@@ -399,9 +404,9 @@ export const notesSearchHitsSelector = createSelector(
     }
 
     const noteMatch = (note) => {
-      const titleMatch = note.title.matchAll(new RegExp(term, 'gi'))
+      const titleMatch = note.title.matchAll(literalRegExp(term))
       const contentText = serializeNoFormatting(note.content)
-      const contentMatch = contentText.matchAll(new RegExp(term, 'gi'))
+      const contentMatch = contentText.matchAll(literalRegExp(term))
       const noteCustomAttributes = customAttributes
         .filter((attribute) => {
           return typeof note[attribute.name] !== 'undefined'
@@ -412,7 +417,7 @@ export const notesSearchHitsSelector = createSelector(
       const customAttributeMatches = noteCustomAttributes.flatMap(([key, value]) => {
         const valueAsString =
           (Array.isArray(value) ? serializeNoFormatting(value) : String(value)) || ''
-        const valueMatch = valueAsString.matchAll(new RegExp(term, 'gi'))
+        const valueMatch = valueAsString.matchAll(literalRegExp(term))
         if (!valueMatch) {
           return []
         }
@@ -446,19 +451,20 @@ export const charactersHitsSelector = createSelector(
   characters,
   attributes,
   books,
-  (term, allCharacters, allAttributes, allBooks) => {
+  characterCustomAttributesSelector,
+  (term, allCharacters, allAttributes, allBooks, legacyCustomAttributes) => {
     if (term === '' || !term || term.length < 3) {
       return []
     }
 
     const characterMatch = (character) => {
-      const nameMatch = character.name.matchAll(new RegExp(term, 'gi'))
+      const nameMatch = character.name.matchAll(literalRegExp(term))
       const characterCustomAttributes = (character.attributes || []).reduce((acc, attribute) => {
         const valueAsString =
           (Array.isArray(attribute.value)
             ? serializeNoFormatting(attribute.value)
             : String(attribute.value)) || ''
-        const valueMatch = valueAsString.matchAll(new RegExp(term, 'gi'))
+        const valueMatch = valueAsString.matchAll(literalRegExp(term))
         const indexAttribute = allAttributes.characters.find(({ id }) => {
           return id === attribute.id
         })
@@ -481,7 +487,7 @@ export const charactersHitsSelector = createSelector(
             (Array.isArray(attribute.value)
               ? serializeNoFormatting(attribute.value)
               : String(attribute.value)) || ''
-          const valueMatch = valueAsString.matchAll(new RegExp(term, 'gi'))
+          const valueMatch = valueAsString.matchAll(literalRegExp(term))
           const indexAttribute = template.attributes.find(({ name }) => {
             return name === attribute.name
           })
@@ -498,10 +504,39 @@ export const charactersHitsSelector = createSelector(
         })
         return [...acc, ...templateAttributes]
       }, [])
+      const characterLegacyAttributesHits = [
+        'notes',
+        'description',
+        ...legacyCustomAttributes.map(({ name }) => {
+          return name
+        }),
+      ]
+        .filter((attributeName) => {
+          return !(character.attributes || []).some((attribute) => {
+            const indexAttribute = allAttributes.characters.find(({ id }) => {
+              return id === attribute.id
+            })
+            const attributeAttributeName = attributeName === 'notes' ? 'description' : attributeName
+            return indexAttribute.name === attributeAttributeName && attribute.bookId === 'all'
+          })
+        })
+        .flatMap((attributeName) => {
+          const attributeValue = character[attributeName]
+          const valueAsString =
+            (Array.isArray(attributeValue)
+              ? serializeNoFormatting(attributeValue)
+              : String(attributeValue)) || ''
+          const valueMatch = valueAsString.matchAll(literalRegExp(term))
+          return hits(
+            `/characters/${character.id}/customAttribute/${attributeName}/all`,
+            valueMatch
+          )
+        })
       return [
         ...[nameMatch ? hits(`/characters/${character.id}/name`, nameMatch) : []].flatMap((x) => x),
         ...characterCustomAttributes,
         ...characterTemplateAttributes,
+        ...characterLegacyAttributesHits,
       ]
     }
 
@@ -524,10 +559,10 @@ export const placesHitsSelector = createSelector(
     }
 
     const placeMatch = (place) => {
-      const nameMatch = place.name.matchAll(new RegExp(term, 'gi'))
-      const descriptionMatch = place.description.matchAll(new RegExp(term, 'gi'))
+      const nameMatch = place.name.matchAll(literalRegExp(term))
+      const descriptionMatch = place.description.matchAll(literalRegExp(term))
       const notesText = serializeNoFormatting(place.notes)
-      const notesMatch = notesText.matchAll(new RegExp(term, 'gi'))
+      const notesMatch = notesText.matchAll(literalRegExp(term))
       const placeCustomAttributes = customAttributes
         .filter((attribute) => {
           return typeof place[attribute.name] !== 'undefined'
@@ -538,7 +573,7 @@ export const placesHitsSelector = createSelector(
       const customAttributeMatches = placeCustomAttributes.flatMap(([key, value]) => {
         const valueAsString =
           (Array.isArray(value) ? serializeNoFormatting(value) : String(value)) || ''
-        const valueMatch = valueAsString.matchAll(new RegExp(term, 'gi'))
+        const valueMatch = valueAsString.matchAll(literalRegExp(term))
         if (!valueMatch) {
           return []
         }
@@ -572,7 +607,7 @@ export const tagsSearchHitsSelector = createSelector(
     }
 
     const tagMatch = (tag) => {
-      const titleMatch = tag.title.matchAll(new RegExp(term, 'gi'))
+      const titleMatch = tag.title.matchAll(literalRegExp(term))
       return [titleMatch ? hits(`/tags/${tag.id}/title`, titleMatch) : []].flatMap((x) => x)
     }
 
@@ -589,7 +624,7 @@ export const linesSearchHitsSelector = createSelector(
       return []
     } else {
       const lineHit = (line) => {
-        const titleMatch = line.title.matchAll(new RegExp(term, 'gi'))
+        const titleMatch = line.title.matchAll(literalRegExp(term))
         return [titleMatch ? hits(`/lines/${line.id}/title`, titleMatch) : []].flatMap((x) => x)
       }
       return lines.flatMap(lineHit).filter((hit) => {
@@ -606,7 +641,7 @@ export const beatHitsSelector = createSelector(
       return []
     } else {
       const beatHit = (bookId) => (beat) => {
-        const titleMatch = beat.title.matchAll(new RegExp(term, 'gi'))
+        const titleMatch = beat.title.matchAll(literalRegExp(term))
         return [titleMatch ? hits(`/beats/${bookId}/${beat.id}/title`, titleMatch) : []].flatMap(
           (x) => x
         )
@@ -845,6 +880,14 @@ export const placeCurrentFocusSelector = createSelector(
 const tagsSelector = createSelector(uiSelector, ({ tagTab }) => {
   return tagTab || {}
 })
+
+export const isTagTabFocusingSelector = createSelector(
+  tagsSelector,
+  ({ focus, editingSelectedTab }) => {
+    return Boolean(focus?.length) || editingSelectedTab
+  }
+)
+
 export const selectedTagSelector = createSelector(tagsSelector, ({ selectedTag }) => {
   return selectedTag
 })

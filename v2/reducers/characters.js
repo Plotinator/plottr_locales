@@ -936,28 +936,50 @@ const characters =
                 const [rawAttributeId, rawBookId, rawFocusStart] = rest
                 const attributeId = safeParseInt(rawAttributeId)
                 const bookId = parseNumberOrString(rawBookId)
+                const isNewAttribute =
+                  attributeId &&
+                  nextCharacter.attributes.some((attribute) => {
+                    return attribute.id === attributeId && attribute.bookId === bookId
+                  })
                 const focusStart = safeParseInt(rawFocusStart)
-                return {
-                  ...nextCharacter,
-                  attributes: nextCharacter.attributes.map((attribute) => {
-                    if (attribute.id === attributeId && attribute.bookId === bookId) {
-                      const attributeValue = attribute.value
-                      const replaceFunction = Array.isArray(attributeValue)
-                        ? replaceInSlateDatastructure
-                        : replacePlainTextHit
-                      return {
-                        ...attribute,
-                        value: replaceFunction(
-                          attributeValue,
-                          focusStart,
-                          hit,
-                          action.replacementText
-                        ),
+                if (isNewAttribute) {
+                  return {
+                    ...nextCharacter,
+                    attributes: nextCharacter.attributes.map((attribute) => {
+                      if (attribute.id === attributeId && attribute.bookId === bookId) {
+                        const attributeValue = attribute.value
+                        const replaceFunction = Array.isArray(attributeValue)
+                          ? replaceInSlateDatastructure
+                          : replacePlainTextHit
+                        return {
+                          ...attribute,
+                          value: replaceFunction(
+                            attributeValue,
+                            focusStart,
+                            hit,
+                            action.replacementText
+                          ),
+                        }
+                      } else {
+                        return attribute
                       }
-                    } else {
-                      return attribute
-                    }
-                  }),
+                    }),
+                  }
+                } else {
+                  const attributeValue = nextCharacter[rawAttributeId]
+                  const replaceFunction = Array.isArray(attributeValue)
+                    ? replaceInSlateDatastructure
+                    : replacePlainTextHit
+                  const newValue = replaceFunction(
+                    attributeValue,
+                    focusStart,
+                    hit,
+                    action.replacementText
+                  )
+                  return {
+                    ...nextCharacter,
+                    [rawAttributeId]: newValue,
+                  }
                 }
               } else if (type === 'templateAttribute') {
                 const [templateId, attributeName, rawBookId, rawFocusStart] = rest

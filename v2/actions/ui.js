@@ -703,6 +703,34 @@ export const jumpToHit = (cards, hitType, searchHit) => (dispatch, getState) => 
             dispatch(incrementJumpCounter())
             dispatch(showCharacterDetails())
             dispatch(finishJumping())
+          } else if (
+            typeof book !== 'undefined' &&
+            typeof attributeType === 'undefined' &&
+            typeof character[rawAttributeId] !== 'undefined'
+          ) {
+            dispatch(startJumping())
+            dispatch(selectCharacterAttributeBookTab(tabBookId))
+            dispatch(hideCharacterDetails())
+            dispatch(changeCurrentView('characters'))
+            dispatch(selectCharacter(characterId))
+            dispatch(startEditingSelectedCharacter())
+            // 2 is the id of the attributes tab in `CharacterEditDetails`
+            if (['description', 'notes'].includes(rawAttributeId)) {
+              dispatch(setActiveCharacterTab(1))
+            } else {
+              dispatch(setActiveCharacterTab(2))
+            }
+            const focusPath = characterFocusPath(characterId, tabBookId, { attributeId })
+            dispatch(
+              pushFocus('character', focusPath, {
+                start: focusStart,
+                end: focusStart + hit.length,
+                direction: 'forward',
+              })
+            )
+            dispatch(incrementJumpCounter())
+            dispatch(showCharacterDetails())
+            dispatch(finishJumping())
           }
         } else if (type === 'templateAttribute') {
           const [templateId, attributeName, rawBookId, rawFocusStart] = rest
