@@ -51,12 +51,12 @@ const Saver = (
   isLoggedInThunk,
   offerSaveAsThenQuit
 ) => {
-  let saveInterval = null
-  let backupInterval = null
-  let lastSaveFailed = { current: false }
-  let lastBackupFailed = { current: false }
-  let lastStateBackedUp = { current: {} }
-  let lastStateSaved = { current: {} }
+  const saveInterval = { current: null }
+  const backupInterval = { current: null }
+  const lastSaveFailed = { current: false }
+  const lastBackupFailed = { current: false }
+  const lastStateBackedUp = { current: {} }
+  const lastStateSaved = { current: {} }
 
   const startJob = (
     name,
@@ -93,7 +93,7 @@ const Saver = (
   const onSaveBackupError = (error) => {
     return serverIsBusyRestarting().then((restarting) => {
       if (restarting) {
-        lastStateBackedUp = {}
+        lastStateBackedUp.current = {}
         logger.info(
           "Failed to backup, but the server is restarting, so we're going to ignore this error"
         )
@@ -116,7 +116,7 @@ const Saver = (
   const onAutoSaveError = (error) => {
     return serverIsBusyRestarting().then((restarting) => {
       if (restarting) {
-        lastStateSaved = {}
+        lastStateSaved.current = {}
         logger.info(
           "Failed to save, but the server is restarting, so we're going to ignore this error"
         )
@@ -141,7 +141,7 @@ const Saver = (
 
   const start = () => {
     logger.info('Starting auto-saver...')
-    saveInterval = startJob(
+    saveInterval.current = startJob(
       'Save',
       saveFile,
       saveIntervalMS,
@@ -151,7 +151,7 @@ const Saver = (
       onAutoSaveError
     )
 
-    backupInterval = startJob(
+    backupInterval.current = startJob(
       'Backup',
       backupFile,
       backupIntervalMS,
@@ -163,15 +163,15 @@ const Saver = (
   }
 
   const stop = () => {
-    if (saveInterval) {
+    if (saveInterval.current) {
       logger.info('Stopping the auto-saver per request.')
-      clearInterval(saveInterval)
-      saveInterval = null
+      clearInterval(saveInterval.current)
+      saveInterval.current = null
     }
-    if (backupInterval) {
+    if (backupInterval.current) {
       logger.info('Stopping the auto-backup process per request.')
-      clearInterval(backupInterval)
-      backupInterval = null
+      clearInterval(backupInterval.current)
+      backupInterval.current = null
     }
   }
 

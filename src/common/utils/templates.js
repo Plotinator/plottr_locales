@@ -9,20 +9,23 @@ const TEMPLATES_PATH = process.env.NODE_ENV == 'development' ? 'templates_dev' :
 const CUSTOM_TEMPLATES_PATH =
   process.env.NODE_ENV == 'development' ? 'custom_templates_dev' : 'custom_templates'
 
-export function deleteTemplate(id, userId) {
+export function deleteTemplate(id, userId, log) {
   const { currentCustomTemplates } = makeFileSystemAPIs(whenClientIsReady)
   currentCustomTemplates().then((templates) => {
     if (Object.values(templates).find((template) => template.id === id)) {
       whenClientIsReady(({ deleteCustomTemplate }) => {
         deleteCustomTemplate(id)
       })
-      return
     }
-    deleteCustomTemplateOnFirebase(id, userId)
+    if (userId) {
+      deleteCustomTemplateOnFirebase(id, userId).catch((error) => {
+        log.error(`Failed to delete template with id ${id}`, error)
+      })
+    }
   })
 }
 
-export function editTemplateDetails(id, templateData, userId) {
+export function editTemplateDetails(id, templateData, userId, log) {
   const info = {
     name: templateData.name,
     description: templateData.description,
@@ -33,13 +36,16 @@ export function editTemplateDetails(id, templateData, userId) {
     const templateFound = Object.values(templates).find((template) => template.id === id)
     if (templateFound) {
       whenClientIsReady(({ setCustomTemplate }) => {
-        setCustomTemplate(id, {
+        return setCustomTemplate(id, {
           ...templateFound,
           ...info,
         })
       })
-      return
     }
-    editCustomTemplate(userId, { ...templateData, id })
+    if (userId) {
+      editCustomTemplate(userId, { ...templateData, id }).catch((error) => {
+        log.error(`Failed to save template with id: ${id}`, error)
+      })
+    }
   })
 }

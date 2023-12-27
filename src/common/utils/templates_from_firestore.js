@@ -75,8 +75,8 @@ export const deleteCustomTemplate = (templateId, userId) => {
   deleteCustomTemplateOnFirestore(userId, templateId)
 }
 
-export const editCustomTemplate = (templateId, template) => {
-  return editCustomTemplateOnFirestore(templateId, template)
+export const editCustomTemplate = (userId, template) => {
+  return editCustomTemplateOnFirestore(userId, template)
 }
 
 export const startSaveAsTemplate = (type) => {
