@@ -351,7 +351,7 @@ export function bootFile(
   }
 
   const handleEroneousUserStates = (fileURL) => (user) => {
-    if (!user.uid) {
+    if (typeof user?.uid !== 'string') {
       return handleNoUserId(fileURL)
     }
     return user
