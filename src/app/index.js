@@ -137,6 +137,11 @@ const connectToSocketServer = (port) => {
   )
 }
 
+const IGNORED_ERRORS = [
+  // This error happens because sticky table schedules a check that
+  // doesn't check the table was unmounted.
+  "Cannot read properties of undefined (reading 'childNodes')",
+]
 let errorReporter = null
 tellMeWhatOSImOn()
   .then((osIAmOn) => {
@@ -512,7 +517,7 @@ tellMeWhatOSImOn()
           event.preventDefault()
           event.stopPropagation()
           const error = event.error
-          if (error === lastError) {
+          if (error === lastError || IGNORED_ERRORS.includes(error.message)) {
             return
           } else {
             logger.error(error)
