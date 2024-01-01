@@ -1,10 +1,11 @@
 import fs from 'fs'
 import { join, basename } from 'path'
 import { sortBy } from 'lodash'
+import mv from 'mv'
 
 import { helpers } from 'pltr/v2'
 
-const { lstat, mkdir, rename, readdir, rm } = fs.promises
+const { lstat, mkdir, readdir, rm } = fs.promises
 
 const TRASHED_LIMIT = 30
 
@@ -54,8 +55,14 @@ const makeTrashModile = (userDataPath, logger) => {
         return Promise.reject(error)
       })
       .then(() => {
-        return rename(filePath, join(trashedFilesPath, basename(filePath))).then(() => {
-          return limitToXMostRecent(trashedFilesPath, logger)
+        return new Promise((resolve, reject) => {
+          mv(filePath, join(trashedFilesPath, basename(filePath)), (err) => {
+            if (err) {
+              reject(err)
+            } else {
+              limitToXMostRecent(trashedFilesPath, logger).then(resolve, reject)
+            }
+          })
         })
       })
   }
