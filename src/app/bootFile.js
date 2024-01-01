@@ -607,7 +607,10 @@ export function bootFile(
           .catch((error) => {
             nukeLastKnown()
             logger.error(error)
-            recordedErrorsDuringStartup.push({ message: 'Error booting the file', error })
+            recordedErrorsDuringStartup.push({
+              message: `Error booting the file: ${fileURL}`,
+              error,
+            })
             store().dispatch(
               actions.applicationState.errorLoadingFile(error.message === UPDATE_MESSAGE)
             )
@@ -615,7 +618,7 @@ export function bootFile(
       } catch (error) {
         nukeLastKnown()
         logger.error(error)
-        recordedErrorsDuringStartup.push({ message: 'Error booting a file', error })
+        recordedErrorsDuringStartup.push({ message: `Error booting a file: ${fileURL}`, error })
         store().dispatch(actions.applicationState.errorLoadingFile())
         return Promise.reject(error)
       }

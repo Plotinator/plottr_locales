@@ -280,12 +280,12 @@ app.whenReady().then(() => {
                 })
                 .catch((error) => {
                   errorReportingLogger.error(
-                    'Error creating the project window to boot a file from',
+                    `Error creating the project window to boot a file (${fileLaunchedOnURL}) from`,
                     error
                   )
                 })
             } catch (error) {
-              errorReportingLogger.error('Error booting file: ', error)
+              errorReportingLogger.error(`Error booting file: ${fileLaunchedOnURL}`, error)
             }
           }
         })
