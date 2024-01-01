@@ -542,6 +542,8 @@ tellMeWhatOSImOn()
               !actConfigModalIsOpen &&
               !targetIsEditable &&
               !attributesDialogIsOpen &&
+              typeof table?.scrollTop === 'number' &&
+              typeof table?.scrollLeft === 'number' &&
               viewIsTimeline &&
               typeof table !== 'undefined' &&
               SCROLL_KEYS.includes(e.key)
