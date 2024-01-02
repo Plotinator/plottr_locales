@@ -231,12 +231,6 @@ tellMeWhatOSImOn()
           { timeout: 1000 }
         )
 
-        // TODO: fix this by exporting store from the configureStore file
-        // kind of a hack to enable store dispatches in otherwise hard situations
-        window.specialDelivery = (action) => {
-          store().dispatch(action)
-        }
-
         document.addEventListener('save-custom-template', (event) => {
           const currentState = store().getState()
           const options = event.payload
