@@ -7,7 +7,7 @@ import currentSettings, { saveAppSetting } from './settings'
 function setDarkMode(newValue) {
   return currentSettings()
     .then((settings) => {
-      const newValueOrDefault = newValue || settings.user.dark
+      const newValueOrDefault = newValue ?? settings?.user?.dark ?? 'system'
       const source = (newValue !== 'system' && 'manual') || settings.user.themeSource || newValue
       switch (source) {
         case 'manual': {
