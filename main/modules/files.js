@@ -91,7 +91,7 @@ const makeFileModule = (errorReportingLogger) => {
     })
   }
 
-  function createFromSnowflake(importedPath, sender, isLoggedIntoPro) {
+  function createFromSnowflake(importedPath, replyToWindow, isLoggedIntoPro) {
     const storyName = path.basename(importedPath, '.snowXML')
     let json = emptyFile(storyName, app.getVersion())
     // clear beats and lines
@@ -105,7 +105,7 @@ const makeFileModule = (errorReportingLogger) => {
         importFromSnowflake(importedPath, true, json, readFile),
       ]).then(([settings, importedJson]) => {
         if (isLoggedIntoPro) {
-          sender.send('create-plottr-cloud-file', importedJson, storyName)
+          replyToWindow('create-plottr-cloud-file', importedJson, storyName)
           return Promise.resolve()
         }
 
@@ -130,11 +130,11 @@ const makeFileModule = (errorReportingLogger) => {
                   return openFile(fileURL)
                     .then(() => {
                       log.info('Opened file from imported snowflake data', storyName)
-                      sender.send('finish-creating-local-scrivener-imported-file')
+                      replyToWindow('finish-creating-local-scrivener-imported-file')
                       return true
                     })
                     .catch((error) => {
-                      sender.send('error-importing-scrivener', error)
+                      replyToWindow('error-importing-scrivener', error)
                       errorReportingLogger.error(
                         'Failed to open a known file after importing from Snowflake',
                         error
@@ -161,7 +161,7 @@ const makeFileModule = (errorReportingLogger) => {
     })
   }
 
-  function createRTFConversionFunction(sender) {
+  function createRTFConversionFunction(replyToWindow) {
     return function (rtfString) {
       return new Promise((resolve, reject) => {
         const conversionId = uuidv4()
@@ -169,12 +169,12 @@ const makeFileModule = (errorReportingLogger) => {
           event.sender.send(replyChannel, conversionId)
           resolve(slate)
         })
-        sender.send('convert-rtf-string-to-slate', rtfString, conversionId)
+        replyToWindow('convert-rtf-string-to-slate', rtfString, conversionId)
       })
     }
   }
 
-  function createFromScrivener(importedPath, sender, isLoggedIntoPro, destinationFile) {
+  function createFromScrivener(importedPath, replyToWindow, isLoggedIntoPro, destinationFile) {
     const storyName = path.basename(importedPath, '.scriv')
     let json = emptyFile(storyName, app.getVersion())
     const isScrivener = true
@@ -188,7 +188,7 @@ const makeFileModule = (errorReportingLogger) => {
           importedPath,
           true,
           json,
-          createRTFConversionFunction(sender),
+          createRTFConversionFunction(replyToWindow),
           readFile,
           readdir,
           stat,
@@ -202,10 +202,10 @@ const makeFileModule = (errorReportingLogger) => {
     if (isLoggedIntoPro) {
       importedJsonPromise
         .then((importedJson) => {
-          sender.send('create-plottr-cloud-file', importedJson, storyName, isScrivener)
+          replyToWindow('create-plottr-cloud-file', importedJson, storyName, isScrivener)
         })
         .catch((error) => {
-          return sender.send('error-importing-scrivener', error)
+          return replyToWindow('error-importing-scrivener', error)
         })
       return Promise.resolve()
     }
@@ -238,11 +238,11 @@ const makeFileModule = (errorReportingLogger) => {
                     return openFile(fileURL)
                       .then(() => {
                         log.info('Opened file from imported scrivener data', storyName)
-                        sender.send('finish-creating-local-scrivener-imported-file')
+                        replyToWindow('finish-creating-local-scrivener-imported-file')
                         return true
                       })
                       .catch((error) => {
-                        sender.send('error-importing-scrivener', error)
+                        replyToWindow('error-importing-scrivener', error)
                         errorReportingLogger.error(
                           'Failed to open a known file after importing from scrivener',
                           error
@@ -261,11 +261,11 @@ const makeFileModule = (errorReportingLogger) => {
                 return openFile(fileURL)
                   .then(() => {
                     log.info('Opened file from imported scrivener data', storyName)
-                    sender.send('finish-creating-local-scrivener-imported-file')
+                    replyToWindow('finish-creating-local-scrivener-imported-file')
                     return true
                   })
                   .catch((error) => {
-                    sender.send('error-importing-scrivener', error)
+                    replyToWindow('error-importing-scrivener', error)
                     errorReportingLogger.error(
                       'Failed to open a known file after importing from scrivener',
                       error
@@ -276,7 +276,7 @@ const makeFileModule = (errorReportingLogger) => {
             })
             .catch((error) => {
               errorReportingLogger.error('Failed to save imported scrivener file', error)
-              sender.send('error-importing-scrivener', error)
+              replyToWindow('error-importing-scrivener', error)
             })
         }
       }

@@ -137,6 +137,11 @@ const connectToSocketServer = (port) => {
   )
 }
 
+const IGNORED_ERRORS = [
+  // This error happens because sticky table schedules a check that
+  // doesn't check the table was unmounted.
+  "Cannot read properties of undefined (reading 'childNodes')",
+]
 let errorReporter = null
 tellMeWhatOSImOn()
   .then((osIAmOn) => {
@@ -225,12 +230,6 @@ tellMeWhatOSImOn()
           },
           { timeout: 1000 }
         )
-
-        // TODO: fix this by exporting store from the configureStore file
-        // kind of a hack to enable store dispatches in otherwise hard situations
-        window.specialDelivery = (action) => {
-          store().dispatch(action)
-        }
 
         document.addEventListener('save-custom-template', (event) => {
           const currentState = store().getState()
@@ -512,7 +511,7 @@ tellMeWhatOSImOn()
           event.preventDefault()
           event.stopPropagation()
           const error = event.error
-          if (error === lastError) {
+          if (error === lastError || IGNORED_ERRORS.includes(error.message)) {
             return
           } else {
             logger.error(error)
@@ -542,6 +541,8 @@ tellMeWhatOSImOn()
               !actConfigModalIsOpen &&
               !targetIsEditable &&
               !attributesDialogIsOpen &&
+              typeof table?.scrollTop === 'number' &&
+              typeof table?.scrollLeft === 'number' &&
               viewIsTimeline &&
               typeof table !== 'undefined' &&
               SCROLL_KEYS.includes(e.key)

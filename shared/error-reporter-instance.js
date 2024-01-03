@@ -25,6 +25,7 @@ export const getErrorReporterInstance = () => {
     const state = store().getState()
     const userId = selectors.userIdSelector(state)
     const userEmail = selectors.emailAddressSelector(state)
+    const fileURL = selectors.fileURLSelector(state)
     return Promise.all([pleaseTellMeWhatPlatformIAmOn(), getVersion()]).then(([os, version]) => {
       generalErrorReporterInstance = createErrorReporter(
         ERROR_REPORTER_ACCESS_TOKEN,
@@ -34,7 +35,8 @@ export const getErrorReporterInstance = () => {
         'general_error_reporter',
         os,
         userId,
-        userEmail
+        userEmail,
+        fileURL
       )
       generalErrorReporterInitialised = true
       return generalErrorReporterInstance

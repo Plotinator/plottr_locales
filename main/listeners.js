@@ -43,7 +43,7 @@ const { readFile } = fs.promises
 
 const { app, ipcMain } = electron
 
-const ask = (sender, channel, ...args) => {
+const ask = (replyToWindow, channel, ...args) => {
   const listenToken = `${channel}-${uuid()}`
   // Maybe add a timeout?
   return new Promise((resolve, reject) => {
@@ -59,21 +59,21 @@ const ask = (sender, channel, ...args) => {
         }
       }
       ipcMain.on(listenToken, listener)
-      sender.send(channel, listenToken, ...args)
+      replyToWindow(channel, listenToken, ...args)
     } catch (error) {
       reject(error)
     }
   })
 }
 
-const makeDownloadStorageImage = (sender) => (url, fileId, userId) => {
-  return ask(sender, 'download-storage-image', url, fileId, userId)
+const makeDownloadStorageImage = (replyToWindow) => (url, fileId, userId) => {
+  return ask(replyToWindow, 'download-storage-image', url, fileId, userId)
 }
 
-const makeMPQ = (sender) => {
+const makeMPQ = (replyToWindow) => {
   return {
     push: (...args) => {
-      sender.send('mpq', ...args)
+      replyToWindow('mpq', ...args)
     },
   }
 }
@@ -87,13 +87,11 @@ function saveDialog(window, filters, title, defaultPath) {
   })
 }
 
-const makeSaveDialog = (sender) => {
+const makeSaveDialog = (getOwnerBrowserWindow) => {
   return (defaultPath) => {
-    return saveDialog(sender.getOwnerBrowserWindow(), null, 'Export as', defaultPath).then(
-      (result) => {
-        return result.filePath
-      }
-    )
+    return saveDialog(getOwnerBrowserWindow(), null, 'Export as', defaultPath).then((result) => {
+      return result.filePath
+    })
   }
 }
 
@@ -118,6 +116,28 @@ export function notifyUser(exportPath, type) {
   shell.showItemInFolder(exportPath)
 }
 
+class ReplyChannel {
+  constructor(channel, event, log, ...args) {
+    this.channel = channel
+    this.event = event
+    this.log = log
+    this.args = args
+  }
+
+  reply = (...replyArgs) => {
+    if (this.event.sender.isDestroyed()) {
+      this.log.warn(
+        `Window that dispatched ${this.channel} was since destroyed.  Would have replied with`,
+        ...this.args
+      )
+    } else {
+      this.event.sender.send(...replyArgs)
+    }
+  }
+
+  getOwnerBrowserWindow = () => this.event.sender.getOwnerBrowserWindow()
+}
+
 // NOTE: restartServerRef contains a mutable reference to the function
 // to call to restart the server.  That function gets updated by
 // itself when it's called
@@ -128,7 +148,14 @@ export const listenOnIPCMain = (
   restartServerRef,
   log
 ) => {
-  ipcMain.on('pls-fetch-state', (event, replyChannel, proMode) => {
+  const listen = (name, cb) => {
+    return ipcMain.on(name, (event, ...args) => {
+      const replyChannel = new ReplyChannel(name, event, log, ...args)
+      return cb(replyChannel, ...args)
+    })
+  }
+
+  listen('pls-fetch-state', ({ reply, getOwnerBrowserWindow }, replyChannel, proMode) => {
     lastOpenedFile()
       .catch((error) => {
         return null
@@ -148,11 +175,11 @@ export const listenOnIPCMain = (
           (lastFile && !helpers.file.isProtocolString(lastFile)
             ? helpers.file.filePathToFileURL(lastFile)
             : lastFile) || null
-        const win = getWindowById(event.sender.getOwnerBrowserWindow().id)
+        const win = getWindowById(getOwnerBrowserWindow()?.id)
         if (win) {
           const fileURL = win.fileURL || lastFileURL
           featureFlags().then((flags) => {
-            event.sender.send(
+            reply(
               replyChannel,
               fileURL,
               flags,
@@ -169,16 +196,16 @@ export const listenOnIPCMain = (
       })
   })
 
-  ipcMain.on('pls-tell-me-the-socket-worker-port', (event, replyChannel) => {
+  listen('pls-tell-me-the-socket-worker-port', ({ reply }, replyChannel) => {
     try {
-      event.sender.send(replyChannel, getSocketWorkerPort())
+      reply(replyChannel, getSocketWorkerPort())
     } catch (error) {
       log.error('Error retrieving the current worker socket port', error)
       replyWithError(replyChannel, error)
     }
   })
 
-  ipcMain.on('pls-set-dark-setting', (event, replyChannel, newValue) => {
+  listen('pls-set-dark-setting', ({ reply }, replyChannel, newValue) => {
     setDarkMode(newValue)
       .then(() => {
         return currentSettings().then((settings) => {
@@ -186,7 +213,7 @@ export const listenOnIPCMain = (
         })
       })
       .then(() => {
-        event.sender.send(replyChannel, newValue)
+        reply(replyChannel, newValue)
       })
       .catch((error) => {
         log.error('Failed to set dark mode setting from main listener', error)
@@ -194,7 +221,7 @@ export const listenOnIPCMain = (
       })
   })
 
-  ipcMain.on('pls-update-language', (event, replyChannel, newLanguage) => {
+  listen('pls-update-language', ({ reply }, replyChannel, newLanguage) => {
     saveAppSetting('locale', newLanguage)
       .then(() => {
         currentSettings().then((settings) => {
@@ -205,7 +232,7 @@ export const listenOnIPCMain = (
         })
       })
       .then(() => {
-        event.sender.send(replyChannel, newLanguage)
+        reply(replyChannel, newLanguage)
       })
       .catch((error) => {
         log.error('Error updating language', error)
@@ -213,17 +240,17 @@ export const listenOnIPCMain = (
       })
   })
 
-  ipcMain.on('pls-tell-dashboard-to-reload-recents', (event, replyChannel) => {
+  listen('pls-tell-dashboard-to-reload-recents', ({ reply }, replyChannel) => {
     try {
       broadcastToAllWindows('reload-recents')
-      event.sender.send(replyChannel, 'done')
+      reply(replyChannel, 'done')
     } catch (error) {
       log.error('Error reloading recents', error)
       replyWithError(replyChannel, error)
     }
   })
 
-  ipcMain.on('add-to-known-files-and-open', (event, replyChannel, fileURL) => {
+  listen('add-to-known-files-and-open', ({ reply }, replyChannel, fileURL) => {
     if (!fileURL || fileURL === '') return
     addToKnownFiles(fileURL)
       .then(() => {
@@ -237,22 +264,22 @@ export const listenOnIPCMain = (
           })
       })
       .then(() => {
-        event.sender.send(replyChannel, fileURL)
+        reply(replyChannel, fileURL)
       })
       .catch((error) => {
         log.error(`Error adding ${fileURL} to known files and opening it`, error)
-        event.sender.send(replyChannel, { error: error.mesasge })
+        reply(replyChannel, { error: error.mesasge })
       })
   })
 
-  ipcMain.on('create-new-file', (event, replyChannel, template, name) => {
+  listen('create-new-file', ({ reply }, replyChannel, template, name) => {
     createNew(template, name)
       .then(() => {
-        event.sender.send(replyChannel, name)
+        reply(replyChannel, name)
       })
       .catch((error) => {
         log.error('Error creating new file', error)
-        event.sender.send('error', {
+        reply('error', {
           message: error.message,
           source: 'create-new-file',
         })
@@ -260,14 +287,14 @@ export const listenOnIPCMain = (
       })
   })
 
-  ipcMain.on('create-from-snowflake', (event, replyChannel, importedPath, isLoggedIntoPro) => {
-    createFromSnowflake(importedPath, event.sender, isLoggedIntoPro)
+  listen('create-from-snowflake', ({ reply }, replyChannel, importedPath, isLoggedIntoPro) => {
+    createFromSnowflake(importedPath, reply, isLoggedIntoPro)
       .then(() => {
-        event.sender.send(replyChannel, importedPath)
+        reply(replyChannel, importedPath)
       })
       .catch((error) => {
         log.error(`Error creating from snowflake (${importedPath})`, error)
-        event.sender.send('error', {
+        reply('error', {
           message: error.message,
           source: 'create-new-file',
         })
@@ -275,16 +302,16 @@ export const listenOnIPCMain = (
       })
   })
 
-  ipcMain.on(
+  listen(
     'create-from-scrivener',
-    (event, replyChannel, importedPath, isLoggedIntoPro, destinationFile) => {
-      createFromScrivener(importedPath, event.sender, isLoggedIntoPro, destinationFile)
+    ({ reply }, replyChannel, importedPath, isLoggedIntoPro, destinationFile) => {
+      createFromScrivener(importedPath, reply, isLoggedIntoPro, destinationFile)
         .then(() => {
-          event.sender.send(replyChannel, importedPath)
+          reply(replyChannel, importedPath)
         })
         .catch((error) => {
           log.error(`Error creating from scrivener (${importedPath}, ${destinationFile})`, error)
-          event.sender.send('error', {
+          reply('error', {
             message: error.message,
             source: 'create-new-file',
           })
@@ -293,12 +320,12 @@ export const listenOnIPCMain = (
     }
   )
 
-  ipcMain.on('open-known-file', (event, replyChannel, fileURL, unknown) => {
+  listen('open-known-file', ({ reply }, replyChannel, fileURL, unknown) => {
     log.info('Opening known file', fileURL, unknown)
     openFile(fileURL, unknown)
       .then(() => {
         log.info('Opened file', fileURL)
-        event.sender.send(replyChannel, fileURL)
+        reply(replyChannel, fileURL)
       })
       .catch((error) => {
         log.error('Error opening known file', fileURL, error)
@@ -306,10 +333,10 @@ export const listenOnIPCMain = (
       })
   })
 
-  ipcMain.on('remove-from-known-files', (event, replyChannel, fileURL) => {
+  listen('remove-from-known-files', ({ reply }, replyChannel, fileURL) => {
     removeFromKnownFiles(fileURL)
       .then(() => {
-        event.sender.send(replyChannel, fileURL)
+        reply(replyChannel, fileURL)
       })
       .catch((error) => {
         log.error(`Error removing file at ${fileURL} from known files`, error)
@@ -318,11 +345,11 @@ export const listenOnIPCMain = (
     broadcastToAllWindows('reload-recents')
   })
 
-  ipcMain.on('delete-known-file', (event, replyChannel, fileURL) => {
+  listen('delete-known-file', ({ reply }, replyChannel, fileURL) => {
     deleteKnownFile(fileURL)
       .then(() => {
         broadcastToAllWindows('reload-recents')
-        event.sender.send(replyChannel, fileURL)
+        reply(replyChannel, fileURL)
       })
       .catch((error) => {
         log.error(`Failed to delete known file at: ${fileURL}`, error)
@@ -330,12 +357,12 @@ export const listenOnIPCMain = (
       })
   })
 
-  ipcMain.on('edit-known-file-path', (event, replyChannel, oldFileURL, newFileURL) => {
+  listen('edit-known-file-path', ({ reply }, replyChannel, oldFileURL, newFileURL) => {
     editKnownFilePath(oldFileURL, newFileURL)
       .then(() => {
         editWindowPath(oldFileURL, newFileURL)
         broadcastToAllWindows('reload-recents')
-        event.sender.send(replyChannel, newFileURL)
+        reply(replyChannel, newFileURL)
       })
       .catch((error) => {
         log.error(`Failed to edit known file path of ${oldFileURL} to ${newFileURL}`, error)
@@ -343,29 +370,26 @@ export const listenOnIPCMain = (
       })
   })
 
-  ipcMain.on('pls-quit', (event, replyChannel) => {
+  listen('pls-quit', ({ reply }, replyChannel) => {
     try {
       safelyExitModule.quitWhenDone()
-      event.sender.send(replyChannel, 'will-exit-when-ready')
+      reply(replyChannel, 'will-exit-when-ready')
     } catch (error) {
       log.error('Error while attempting to quit Plottr', error)
       replyWithError(replyChannel, error)
     }
   })
 
-  ipcMain.on('tell-me-what-os-i-am-on', (event, replyChannel) => {
+  listen('tell-me-what-os-i-am-on', ({ reply }, replyChannel) => {
     try {
-      event.sender.send(
-        replyChannel,
-        is.windows ? 'WINDOWS' : is.macos ? 'MACOS' : is.linux ? 'LINUX' : null
-      )
+      reply(replyChannel, is.windows ? 'WINDOWS' : is.macos ? 'MACOS' : is.linux ? 'LINUX' : null)
     } catch (error) {
       log.error('Error while figuring out what OS we are running', error)
       replyWithError(replyChannel, error)
     }
   })
 
-  ipcMain.on('download-file-and-show', (event, replyChannel, url, fileName) => {
+  listen('download-file-and-show', ({ reply }, replyChannel, url, fileName) => {
     const downloadDirectory = app.getPath('downloads')
     const fullPath = path.join(downloadDirectory, fileName || 'backup-download.pltr')
     const outputStream = fs.createWriteStream(fullPath)
@@ -385,7 +409,7 @@ export const listenOnIPCMain = (
               log.error(`Error closing write stream for file download: of ${url}`, error)
             } else {
               shell.showItemInFolder(fullPath)
-              event.sender.send(replyChannel, url)
+              reply(replyChannel, url)
             }
           })
         })
@@ -396,7 +420,7 @@ export const listenOnIPCMain = (
       })
   })
 
-  ipcMain.on('download-pro-backup-file-into-memory', (event, replyChannel, url, fileName) => {
+  listen('download-pro-backup-file-into-memory', ({ reply }, replyChannel, url, fileName) => {
     const downloadDirectory = app.getPath('temp')
     const fullPath = path.join(downloadDirectory, fileName || 'backup-download.pltr')
     const outputStream = fs.createWriteStream(fullPath)
@@ -418,7 +442,7 @@ export const listenOnIPCMain = (
               readFile(fullPath).then((fileBytes) => {
                 try {
                   const file = JSON.parse(fileBytes)
-                  event.sender.send(replyChannel, JSON.stringify(file))
+                  reply(replyChannel, JSON.stringify(file))
                 } catch (error) {
                   log.error(`Error deserialising file from ${url}`, error)
                   replyWithError(replyChannel, error)
@@ -434,40 +458,47 @@ export const listenOnIPCMain = (
       })
   })
 
-  ipcMain.on('show-item-in-folder', (event, replyChannel, fileURL) => {
+  listen('show-item-in-folder', ({ reply }, replyChannel, fileURL) => {
     try {
       shell.showItemInFolder(helpers.file.withoutProtocol(fileURL))
-      event.sender.send(replyChannel, 'done')
+      reply(replyChannel, 'done')
     } catch (error) {
       log.error(`Failed to show file at ${fileURL}`, error)
       replyWithError(replyChannel, error)
     }
   })
 
-  ipcMain.on('pls-set-my-file-path', (event, replyChannel, fileURL) => {
+  listen('pls-set-my-file-path', ({ reply, getOwnerBrowserWindow }, replyChannel, fileURL) => {
     try {
-      setFilePathForWindowWithId(event.sender.getOwnerBrowserWindow().id, fileURL)
-      event.sender.send(replyChannel, fileURL)
+      const windowId = getOwnerBrowserWindow()?.id
+      if (windowId) {
+        setFilePathForWindowWithId(windowId, fileURL)
+        reply(replyChannel, fileURL)
+      } else {
+        const error = new Error(`Failed to set my file path to: ${fileURL}`)
+        log.error(error)
+        replyWithError(replyChannel, error)
+      }
     } catch (error) {
       log.error(`Failed to set my file path to: ${fileURL}`, error)
       replyWithError(replyChannel, error)
     }
   })
 
-  ipcMain.on('pls-open-login-popup', (event, replyChannel) => {
+  listen('pls-open-login-popup', ({ reply }, replyChannel) => {
     try {
       openLoginPopupWindow()
-      event.sender.send(replyChannel, 'done')
+      reply(replyChannel, 'done')
     } catch (error) {
       log.error('Error while trying to start the login popup', error)
       replyWithError(replyChannel, error)
     }
   })
 
-  ipcMain.on('notify', (event, replyChannel, title, body) => {
+  listen('notify', ({ reply }, replyChannel, title, body) => {
     try {
       showNotification(title, body)
-      event.sender.send(replyChannel, title, body)
+      reply(replyChannel, title, body)
     } catch (error) {
       // ignore
       // on windows you need something called an Application User Model ID which may not work
@@ -475,10 +506,10 @@ export const listenOnIPCMain = (
       replyWithError(replyChannel, error)
     }
   })
-  ipcMain.on('update-last-opened-file', (event, replyChannel, newFileURL) => {
+  listen('update-last-opened-file', ({ reply }, replyChannel, newFileURL) => {
     setLastOpenedFilePath(newFileURL)
       .then(() => {
-        event.sender.send(replyChannel, newFileURL)
+        reply(replyChannel, newFileURL)
       })
       .catch((error) => {
         log.error(`Failed to update last opened file to: ${newFileURL}`, error)
@@ -486,40 +517,40 @@ export const listenOnIPCMain = (
       })
   })
 
-  ipcMain.on('log-info', (_event, ...args) => {
+  listen('log-info', ({ reply }, ...args) => {
     log.info(...args)
   })
 
-  ipcMain.on('log-warn', (_event, ...args) => {
+  listen('log-warn', ({ reply }, ...args) => {
     log.warn(...args)
   })
 
-  ipcMain.on('log-error', (_event, ...args) => {
+  listen('log-error', ({ reply }, ...args) => {
     log.localError(...args)
   })
 
-  ipcMain.on('please-tell-me-my-version', (event, replyChannel) => {
+  listen('please-tell-me-my-version', ({ reply }, replyChannel) => {
     try {
-      event.sender.send(replyChannel, app.getVersion())
+      reply(replyChannel, app.getVersion())
     } catch (error) {
       log.error(`Failed to get the app version`, error)
       replyWithError(replyChannel, error)
     }
   })
 
-  ipcMain.on('please-tell-me-what-platform-i-am-on', (event, replyChannel) => {
+  listen('please-tell-me-what-platform-i-am-on', ({ reply }, replyChannel) => {
     try {
-      event.sender.send(replyChannel, process.platform)
+      reply(replyChannel, process.platform)
     } catch (error) {
       log.error(`Failed to determine what platform we're on`, error)
       replyWithError(replyChannel, error)
     }
   })
 
-  ipcMain.on('machine-id', (event, replyChannel) => {
+  listen('machine-id', ({ reply }, replyChannel) => {
     machineId()
       .then((id) => {
-        event.sender.send(replyChannel, id)
+        reply(replyChannel, id)
       })
       .catch((error) => {
         log.error('Failed to determine the machine id', error)
@@ -527,19 +558,19 @@ export const listenOnIPCMain = (
       })
   })
 
-  ipcMain.on('get-locale', (event, replyChannel) => {
+  listen('get-locale', ({ reply }, replyChannel) => {
     try {
-      event.sender.send(replyChannel, app.getLocale())
+      reply(replyChannel, app.getLocale())
     } catch (error) {
       log.error('Failed to get machine locale', error)
       replyWithError(replyChannel, error)
     }
   })
 
-  ipcMain.on('get-env-object', (event, replyChannel) => {
+  listen('get-env-object', ({ reply }, replyChannel) => {
     readFile(path.resolve(__dirname, '..', '.env'))
       .then((rawEnvFile) => {
-        event.sender.send(replyChannel, parse(rawEnvFile))
+        reply(replyChannel, parse(rawEnvFile))
       })
       .catch((error) => {
         log.error('Failed to get the env object', error)
@@ -547,134 +578,153 @@ export const listenOnIPCMain = (
       })
   })
 
-  ipcMain.on('show-error-box', (event, replyChannel, title, message) => {
+  listen('show-error-box', ({ reply }, replyChannel, title, message) => {
     try {
       dialog.showErrorBox(title, message)
-      event.sender.send(replyChannel, 'done')
+      reply(replyChannel, 'done')
     } catch (error) {
       log.error(`Error showing error box for ${title}, ${message}`, error)
       replyWithError(replyChannel, error)
     }
   })
 
-  ipcMain.on('set-window-title', (event, replyChannel, newTitle) => {
+  listen('set-window-title', ({ reply, getOwnerBrowserWindow }, replyChannel, newTitle) => {
     try {
-      event.sender.getOwnerBrowserWindow().setTitle(newTitle)
-      event.sender.send(replyChannel, newTitle)
+      getOwnerBrowserWindow()?.setTitle?.(newTitle)
+      reply(replyChannel, newTitle)
     } catch (error) {
       log.error(`Error trying to set my window title to ${newTitle}`, error)
       replyWithError(replyChannel, error)
     }
   })
 
-  ipcMain.on('set-represented-file-name', (event, replyChannel, newFileName) => {
-    try {
-      event.sender.getOwnerBrowserWindow().setRepresentedFilename(newFileName)
-      event.sender.send(replyChannel, newFileName)
-    } catch (error) {
-      log.error(`Error setting the represented file name to ${newFileName}`, error)
-      replyWithError(replyChannel, error)
+  listen(
+    'set-represented-file-name',
+    ({ reply, getOwnerBrowserWindow }, replyChannel, newFileName) => {
+      try {
+        getOwnerBrowserWindow()?.setRepresentedFilename?.(newFileName)
+        reply(replyChannel, newFileName)
+      } catch (error) {
+        log.error(`Error setting the represented file name to ${newFileName}`, error)
+        replyWithError(replyChannel, error)
+      }
     }
-  })
+  )
 
-  ipcMain.on('show-save-dialog', (event, replyChannel, filters, title, defaultPath) => {
-    saveDialog(event.sender.getOwnerBrowserWindow(), filters, title, defaultPath)
-      .then((files) => {
-        event.sender.send(replyChannel, files.filePath)
-      })
-      .catch((error) => {
-        log.error(`Error showing save dialog for ${title}`, error)
-        replyWithError(replyChannel, error)
-      })
-  })
+  listen(
+    'show-save-dialog',
+    ({ reply, getOwnerBrowserWindow }, replyChannel, filters, title, defaultPath) => {
+      saveDialog(getOwnerBrowserWindow(), filters, title, defaultPath)
+        .then((files) => {
+          reply(replyChannel, files.filePath)
+        })
+        .catch((error) => {
+          log.error(`Error showing save dialog for ${title}`, error)
+          replyWithError(replyChannel, error)
+        })
+    }
+  )
 
-  ipcMain.on('show-message-box', (event, replyChannel, title, message, type, detail) => {
-    dialog
-      .showMessageBox(event.sender.getOwnerBrowserWindow(), {
-        title,
-        message,
-        type,
-        detail,
-      })
-      .then(() => {
-        event.sender.send(replyChannel, 'done')
-      })
-      .catch((error) => {
-        log.error(`Error showing message box for ${title}, ${message}`, error)
-        replyWithError(replyChannel, error)
-      })
-  })
+  listen(
+    'show-message-box',
+    ({ reply, getOwnerBrowserWindow }, replyChannel, title, message, type, detail) => {
+      dialog
+        .showMessageBox(getOwnerBrowserWindow(), {
+          title,
+          message,
+          type,
+          detail,
+        })
+        .then(() => {
+          reply(replyChannel, 'done')
+        })
+        .catch((error) => {
+          log.error(`Error showing message box for ${title}, ${message}`, error)
+          replyWithError(replyChannel, error)
+        })
+    }
+  )
 
-  ipcMain.on('set-file-url', (event, replyChannel, fileURL) => {
+  listen('set-file-url', ({ reply, getOwnerBrowserWindow }, replyChannel, fileURL) => {
     try {
-      setFilePathForWindowWithId(event.sender.getOwnerBrowserWindow().id, fileURL)
-      event.sender.send(replyChannel, fileURL)
+      const windowId = getOwnerBrowserWindow()?.id
+      if (windowId) {
+        setFilePathForWindowWithId(windowId, fileURL)
+        reply(replyChannel, fileURL)
+      } else {
+        const error = new Error(`Error setting my fileURL to ${fileURL}`)
+        log.error(`Error setting my fileURL to ${fileURL}`, error)
+        replyWithError(replyChannel, error)
+      }
     } catch (error) {
       log.error(`Error setting my fileURL to ${fileURL}`, error)
       replyWithError(replyChannel, error)
     }
   })
 
-  ipcMain.on('user-data-path', (event, replyChannel) => {
+  listen('user-data-path', ({ reply }, replyChannel) => {
     try {
-      event.sender.send(replyChannel, app.getPath('userData'))
+      reply(replyChannel, app.getPath('userData'))
     } catch (error) {
       log.error(`Error getting the user data path`, error)
       replyWithError(replyChannel, error)
     }
   })
 
-  ipcMain.on('user-desktop-path', (event, replyChannel) => {
+  listen('user-desktop-path', ({ reply }, replyChannel) => {
     try {
-      event.sender.send(replyChannel, app.getPath('desktop'))
+      reply(replyChannel, app.getPath('desktop'))
     } catch (error) {
       log.error(`Error getting the user desktop path`, error)
       replyWithError(replyChannel, error)
     }
   })
 
-  ipcMain.on('user-documents-path', (event, replyChannel) => {
+  listen('user-documents-path', ({ reply }, replyChannel) => {
     try {
-      event.sender.send(replyChannel, app.getPath('documents'))
+      reply(replyChannel, app.getPath('documents'))
     } catch (error) {
       log.error('Error getting the user documents path', error)
       replyWithError(replyChannel, error)
     }
   })
 
-  ipcMain.on('user-logs-path', (event, replyChannel) => {
+  listen('user-logs-path', ({ reply }, replyChannel) => {
     try {
-      event.sender.send(replyChannel, app.getPath('logs'))
+      reply(replyChannel, app.getPath('logs'))
     } catch (error) {
       log.error('Error getting the user logs path', error)
       replyWithError(replyChannel, error)
     }
   })
 
-  ipcMain.on('show-open-dialog', (event, replyChannel, title, filters, properties, defaultPath) => {
-    dialog
-      .showOpenDialog(event.sender.getOwnerBrowserWindow(), {
-        title,
-        filters,
-        properties,
-        defaultPath,
-      })
-      .then((files) => {
-        event.sender.send(replyChannel, files.filePaths)
-      })
-      .catch((error) => {
-        log.error(`Error showing the open dialog for ${title}`, error)
-        replyWithError(replyChannel, error)
-      })
-  })
+  listen(
+    'show-open-dialog',
+    ({ reply, getOwnerBrowserWindow }, replyChannel, title, filters, properties, defaultPath) => {
+      dialog
+        .showOpenDialog(getOwnerBrowserWindow(), {
+          title,
+          filters,
+          properties,
+          defaultPath,
+        })
+        .then((files) => {
+          reply(replyChannel, files.filePaths)
+        })
+        .catch((error) => {
+          log.error(`Error showing the open dialog for ${title}`, error)
+          replyWithError(replyChannel, error)
+        })
+    }
+  )
 
-  ipcMain.on('open-external', (event, replyChannel, url) => {
+  listen('open-external', ({ reply }, replyChannel, url) => {
     // If there's no protocal, assume that 'https://' was meant.
     const urlToOpen = url.match(/^[a-zA-Z]+:\/\//) ? url : `https://${url}`
     shell
       .openExternal(urlToOpen)
       .then(() => {
-        event.sender.send(replyChannel, 'done')
+        reply(replyChannel, 'done')
       })
       .catch((error) => {
         log.error(`Error opening external ${url}`, error)
@@ -682,11 +732,11 @@ export const listenOnIPCMain = (
       })
   })
 
-  ipcMain.on('open-path', (event, replyChannel, path) => {
+  listen('open-path', ({ reply }, replyChannel, path) => {
     shell
       .openPath(path)
       .then(() => {
-        event.sender.send(replyChannel, path)
+        reply(replyChannel, path)
       })
       .catch((error) => {
         log.error(`Error opening path: ${path}`, error)
@@ -694,48 +744,59 @@ export const listenOnIPCMain = (
       })
   })
 
-  ipcMain.on('export', (event, replyChannel, defaultPath, fullState, type, options, userId) => {
-    whenClientIsReady(({ rmRf, join, stat, mkdir, basename }) => {
-      return askToExport(
-        defaultPath,
-        fullState,
-        type,
-        options,
-        is.windows,
-        notifyUser,
-        log,
-        makeSaveDialog(event.sender),
-        makeMPQ(event.sender),
-        rmRf,
-        userId,
-        makeDownloadStorageImage(event.sender),
-        fs.promises.writeFile,
-        join,
-        stat,
-        mkdir,
-        basename,
-        selectors,
-        (error, success) => {
-          if (error) {
-            replyWithError(replyChannel, error)
-            return
+  listen(
+    'export',
+    (
+      { reply, getOwnerBrowserWindow },
+      replyChannel,
+      defaultPath,
+      fullState,
+      type,
+      options,
+      userId
+    ) => {
+      whenClientIsReady(({ rmRf, join, stat, mkdir, basename }) => {
+        return askToExport(
+          defaultPath,
+          fullState,
+          type,
+          options,
+          is.windows,
+          notifyUser,
+          log,
+          makeSaveDialog(getOwnerBrowserWindow),
+          makeMPQ(reply),
+          rmRf,
+          userId,
+          makeDownloadStorageImage(reply),
+          fs.promises.writeFile,
+          join,
+          stat,
+          mkdir,
+          basename,
+          selectors,
+          (error, success) => {
+            if (error) {
+              replyWithError(replyChannel, error)
+              return
+            }
+            reply(replyChannel, defaultPath)
           }
-          event.sender.send(replyChannel, defaultPath)
-        }
-      )
-    })
-  })
+        )
+      })
+    }
+  )
 
   const restartingServerStateRef = {
     restarting: false,
     restartTask: null,
   }
-  ipcMain.on('restart-server', (event, replyChannel) => {
+  listen('restart-server', ({ reply }, replyChannel) => {
     log.warn('Restart request received', JSON.stringify(restartingServerStateRef))
     if (restartingServerStateRef.restarting) {
       log.warn("A client requested that the server restart, but it's already doing so.")
       restartingServerStateRef.restartTask.then(() => {
-        event.sender.send(replyChannel, 'done')
+        reply(replyChannel, 'done')
       })
       return
     }
@@ -745,7 +806,7 @@ export const listenOnIPCMain = (
       .restartServer()
       .then(() => {
         log.info('Restarted the socket server as per client request')
-        event.sender.send(replyChannel, 'done')
+        reply(replyChannel, 'done')
       })
       .catch((error) => {
         log.error('Error restarting the socket server', error)
@@ -757,17 +818,17 @@ export const listenOnIPCMain = (
       })
   })
 
-  ipcMain.on('are-we-restarting-socket-server', (event, replyChannel) => {
+  listen('are-we-restarting-socket-server', ({ reply }, replyChannel) => {
     log.info(
       "Main process queried whether it's restarting.  Restart state:",
       JSON.stringify(restartingServerStateRef)
     )
-    event.sender.send(replyChannel, restartingServerStateRef.restarting)
+    reply(replyChannel, restartingServerStateRef.restarting)
   })
 
-  ipcMain.on(
+  listen(
     'create-desktop-shortcut',
-    (event, replyChannel, sourceFileURL, destinationFolderPath) => {
+    ({ reply }, replyChannel, sourceFileURL, destinationFolderPath) => {
       function createShortcut(counter = 0) {
         try {
           const shortcutDestination = helpers.file.withoutProtocol(destinationFolderPath)
@@ -790,12 +851,12 @@ export const listenOnIPCMain = (
           )
           const result = shell.writeShortcutLink(newShortcutPath, { target: sourceFilePath })
           if (result) {
-            event.sender.send(replyChannel, true)
+            reply(replyChannel, true)
             shell.showItemInFolder(newShortcutPath)
           } else {
             const errorMessage = `Error creating a desktop shortcut to ${sourceFilePath} at ${destinationFolderPath}`
             log.error(errorMessage)
-            event.sender.send(replyChannel, { error: errorMessage })
+            reply(replyChannel, { error: errorMessage })
           }
         } catch (error) {
           log.error(
@@ -809,7 +870,7 @@ export const listenOnIPCMain = (
     }
   )
 
-  ipcMain.on('what-is-the-download-directory-path', (event, replyChannel) => {
-    event.sender.send(replyChannel, app.getPath('downloads'))
+  listen('what-is-the-download-directory-path', ({ reply }, replyChannel) => {
+    reply(replyChannel, app.getPath('downloads'))
   })
 }

@@ -41,7 +41,8 @@ const ErrorReporter = (
   context,
   os,
   userId,
-  userEmail
+  userEmail,
+  fileURL = 'unknown-file-id'
 ) => {
   const MAX_ROLLBAR_API_RETRIES = 1
   const SEND_RETRY_INTERVAL_MILLISECONDS = 5000
@@ -88,7 +89,7 @@ const ErrorReporter = (
     itemsPerMinute: MAX_ERROR_REPORTS_PER_MINUTE,
   })
 
-  const extraContext = { os }
+  const extraContext = { os, fileURL }
 
   const validMessageAndError = (rawMessage, rawError) => {
     const typeOfMessage = typeof rawMessage

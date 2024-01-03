@@ -29,6 +29,8 @@ import { createClient, resetInitialised, setPort, getPort } from '../shared/sock
 import ProcessSwitches from './modules/processSwitches'
 import makeSafelyExitModule from './modules/safelyExit'
 import replyWithError from './lib/replyWithError'
+import { currentSettings } from './lib/current_settings'
+import { currentLicense } from './lib/current_license'
 
 const { ipcMain } = electron
 
@@ -58,24 +60,46 @@ import { broadcastToAllWindows } from './modules/broadcast'
 import { setDarkMode } from './modules/theme'
 config({ path: ENV_FILE_PATH })
 
+const readUserId = () => {
+  return currentSettings().then((settings) => {
+    return settings?.user?.frbId ?? 'no-user-id'
+  })
+}
+
+const readUserEmail = () => {
+  return currentLicense().then((license) => {
+    return license?.customer_email ?? 'no-email'
+  })
+}
+
 const environment = process.env.NODE_ENV === 'development' ? 'development' : 'production'
 const errorReporterAccessToken = process.env.ROLLBAR_ACCESS_TOKEN
-const errorReporter = createErrorReporter(
-  errorReporterAccessToken,
-  app.getVersion(),
-  environment,
-  log,
-  'MainProcess',
-  process.platform,
-  'not-knowable-from-main',
-  'not-knowable-from-main'
-)
+const errorReporter = () => {
+  return Promise.all([readUserId(), readUserEmail()]).then(([userId, email]) => {
+    return createErrorReporter(
+      errorReporterAccessToken,
+      app.getVersion(),
+      environment,
+      log,
+      'MainProcess',
+      process.platform,
+      userId,
+      email
+    )
+  })
+}
 const errorReportingLogger = {
   info: log.info,
   warn: log.warn,
   error: (...args) => {
     log.error(...args)
-    errorReporter.error(...args)
+    errorReporter()
+      .then((reporter) => {
+        reporter.error(...args)
+      })
+      .catch((error) => {
+        log.error('Error getting the error reporter', error)
+      })
   },
   localError: log.error,
 }
@@ -90,7 +114,13 @@ const safelyExitModule = makeSafelyExitModule(log)
 process.on('uncaughtException', function (error) {
   console.error('Uncaught exception.', error)
   log.error('Uncaught exception.', error)
-  errorReporter.error('Uncaught exception', error)
+  errorReporter()
+    .then((reporter) => {
+      reporter.error('Uncaught exception', error)
+    })
+    .catch((error) => {
+      log.error('Error getting the error reporter', error)
+    })
   setTimeout(() => {
     gracefullyQuit(safelyExitModule)
   }, 3000)
@@ -98,7 +128,13 @@ process.on('uncaughtException', function (error) {
 process.on('unhandledRejection', function (error) {
   console.error('Unhandled rejection.', error)
   log.error('Unhandled rejection.', error)
-  errorReporter.error('Unhandled rejection', error)
+  errorReporter()
+    .then((reporter) => {
+      reporter.error('Unhandled rejection', error)
+    })
+    .catch((error) => {
+      log.error('Error getting the error reporter', error)
+    })
 })
 
 if (!is.development) {
@@ -280,12 +316,12 @@ app.whenReady().then(() => {
                 })
                 .catch((error) => {
                   errorReportingLogger.error(
-                    'Error creating the project window to boot a file from',
+                    `Error creating the project window to boot a file (${fileLaunchedOnURL}) from`,
                     error
                   )
                 })
             } catch (error) {
-              errorReportingLogger.error('Error booting file: ', error)
+              errorReportingLogger.error(`Error booting file: ${fileLaunchedOnURL}`, error)
             }
           }
         })
