@@ -331,14 +331,19 @@ const TimelineWrapperConnector = (connector) => {
     }
 
     const scrollHandler = (e) => {
-      const position = {
-        x: e.currentTarget.scrollLeft,
-        y: e.currentTarget.scrollTop,
+      if (
+        typeof e?.currentTarget?.scrollLeft === 'number' &&
+        typeof e?.currentTarget?.scrollTop === 'number'
+      ) {
+        const position = {
+          x: e.currentTarget.scrollLeft,
+          y: e.currentTarget.scrollTop,
+        }
+        if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
+        scrollTimeoutRef.current = setTimeout(() => {
+          actions.recordTimelineScrollPosition(position)
+        }, 500)
       }
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
-      scrollTimeoutRef.current = setTimeout(() => {
-        actions.recordTimelineScrollPosition(position)
-      }, 500)
     }
 
     // ////////

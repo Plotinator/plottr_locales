@@ -11,7 +11,7 @@ const isStartOfSession = (file) => {
     ? file?.storagePath?.match(/start-of-session/)
       ? -1
       : 1
-    : file?.localFilePathSegments[file.localFilePathSegments.length - 1]?.match(/start-session/)
+    : file?.localFilePathSegments?.[file.localFilePathSegments.length - 1]?.match(/start-session/)
     ? -1
     : 1
 }

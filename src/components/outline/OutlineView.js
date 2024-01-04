@@ -96,7 +96,9 @@ const OutlineViewConnector = (connector) => {
     }, [])
 
     const handleScroll = (e) => {
-      actions.recordOutlineScrollPosition(beatsRef.current.scrollTop)
+      if (typeof beatsRef?.current?.scrollTop === 'number') {
+        actions.recordOutlineScrollPosition(beatsRef.current.scrollTop)
+      }
     }
 
     const filterItem = (id) => {

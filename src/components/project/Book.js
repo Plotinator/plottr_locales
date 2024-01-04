@@ -38,7 +38,6 @@ const BookConnector = (connector) => {
     chooseImage = (newId) => {
       const imageId = newId == -1 ? null : newId
       this.props.actions.editBookImage(this.props.book.id, imageId)
-      this.setState({ hovering: false })
     }
 
     deleteBook = (e) => {

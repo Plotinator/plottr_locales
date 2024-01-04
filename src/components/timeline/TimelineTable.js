@@ -121,7 +121,7 @@ const TimelineTableConnector = (connector) => {
     handleAppendBeat = () => {
       const { timelineViewIsTabbed, beats } = this.props
       if (timelineViewIsTabbed) {
-        this.handleInsertNewBeat(beats[beats.length - 1].id)
+        this.handleInsertNewBeat(beats[beats.length - 1]?.id)
         return
       }
       this.props.beatActions.addBeat(this.props.currentTimeline)

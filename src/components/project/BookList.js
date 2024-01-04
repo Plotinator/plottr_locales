@@ -67,7 +67,7 @@ const BookListConnector = (connector) => {
 
     chunkAccountingForAdd = (ids, itemsPerRow) => {
       const chunks = chunk(ids, itemsPerRow)
-      if (chunks[chunks.length - 1].length === itemsPerRow) {
+      if (chunks[chunks.length - 1]?.length === itemsPerRow) {
         return [...chunks, null]
       }
       return chunks

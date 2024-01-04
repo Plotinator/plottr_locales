@@ -114,10 +114,11 @@ const RichTextEditorConnector = (connector) => {
     useSpellcheck,
     jumpCounter,
     startEditing,
+    addImage,
   }) => {
     const editor = useMemo(() => {
-      return createEditor(errorReportingLogger)
-    }, [id])
+      return createEditor(errorReportingLogger, addImage)
+    }, [id, addImage])
     const registerEditor = useRegisterEditor(editor)
 
     // Rendering helpers
@@ -395,6 +396,7 @@ const RichTextEditorConnector = (connector) => {
     useSpellcheck: PropTypes.bool,
     jumpCounter: PropTypes.number,
     startEditing: PropTypes.func.isRequired,
+    addImage: PropTypes.func.isRequired,
   }
 
   const {
@@ -419,6 +421,7 @@ const RichTextEditorConnector = (connector) => {
         editState: selectors.editStateSelector(state),
       }),
       {
+        addImage: actions.image.addImage,
         cacheImage: actions.imageCache.cacheImage,
         startEditing: actions.applicationState.startEditing,
       }

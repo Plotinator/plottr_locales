@@ -273,12 +273,16 @@ const BeatHeadingCellConnector = (connector) => {
       }
       // Accounts for modals and other stacking contexts on top of this.
       const elementHoveredOver = document.elementFromPoint(mouseCoord.x, mouseCoord.y)
-      const hoveringOnThisElement = container.current.contains(elementHoveredOver)
-      const hoveringOnPlaceholder = elementHoveredOver.classList.contains('beat__heading-spacer')
-      return (
-        (hoveringOnPlaceholder || hoveringOnThisElement) &&
-        boundingRectContains(extend(container.current.getBoundingClientRect()), mouseCoord)
-      )
+      if (elementHoveredOver && typeof elementHoveredOver.classList?.contains === 'function') {
+        const hoveringOnThisElement = container.current.contains(elementHoveredOver)
+        const hoveringOnPlaceholder = elementHoveredOver.classList.contains('beat__heading-spacer')
+        return (
+          (hoveringOnPlaceholder || hoveringOnThisElement) &&
+          boundingRectContains(extend(container.current.getBoundingClientRect()), mouseCoord)
+        )
+      } else {
+        return false
+      }
     }
 
     const bottomButtonsContain = (mouseCoord) => {

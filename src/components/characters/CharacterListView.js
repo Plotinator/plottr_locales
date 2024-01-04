@@ -379,7 +379,7 @@ const CharacterListViewConnector = (connector) => {
     const renderCharacterDetails = () => {
       if (!detailsVisible) return null
 
-      if (!selectedCharacteId) return null
+      if (typeof selectedCharacteId !== 'number') return null
 
       return (
         <CharacterView

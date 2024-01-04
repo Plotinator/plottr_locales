@@ -72,12 +72,14 @@ const EditAttributeConnector = (connector) => {
 
     useEffect(() => {
       if (editTitleRef.current) {
-        if (editing) {
-          editTitleRef.current.focus()
-          editTitleRef.current.classList.add(
-            'card-dialog__custom-attributes-editable-label--with-underline'
-          )
-        } else {
+        if (editing && editTitleRef.current?.classList?.add === 'function') {
+          if (typeof editTitleRef.current?.focus === 'function') {
+            editTitleRef.current.focus()
+            editTitleRef.current.classList.add(
+              'card-dialog__custom-attributes-editable-label--with-underline'
+            )
+          }
+        } else if (editTitleRef.current?.classList?.remove === 'function') {
           editTitleRef.current.classList.remove(
             'card-dialog__custom-attributes-editable-label--with-underline'
           )
@@ -92,6 +94,7 @@ const EditAttributeConnector = (connector) => {
       }
       editAttribute(index, { id, name, type }, { id, name: newName, type })
       setEditing(false)
+      return true
     }
 
     const Label = () => (

@@ -17,7 +17,6 @@ import { withEventTargetValue } from './withEventTargetValue'
 
 const modalStyles = {
   overlay: {
-    paddingTop: '200px',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'flex-start',
@@ -30,7 +29,7 @@ const modalStyles = {
     borderRadius: 4,
     padding: 0,
     minHeight: 'min-content',
-    maxHeight: 'calc(80vh - 200px)',
+    maxHeight: 'calc(100vh - 50px)',
     overflow: 'hidden',
     width: '700px',
   },

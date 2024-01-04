@@ -103,7 +103,7 @@ const TopRowConnector = (connector) => {
           handleInsertChildBeat(activeTab, currentTimeline)
           return
         } else {
-          handleInsertNewBeat(beats[beats.length - 1].id)
+          handleInsertNewBeat(beats[beats.length - 1]?.id)
           return
         }
       }

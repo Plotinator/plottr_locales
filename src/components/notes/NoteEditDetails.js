@@ -81,11 +81,11 @@ const NoteEditDetailsConnector = (connector) => {
     }
 
     const changeCategory = (val) => {
-      actions.editNote(note.id, { categoryId: val })
+      actions.editNote(note.id, { categoryId: { value: val } })
     }
 
     const changeImage = (newImageId) => {
-      actions.editNote(note.id, { imageId: newImageId })
+      actions.editNote(note.id, { imageId: { value: newImageId } })
     }
 
     const renderDelete = () => {
