@@ -26,16 +26,16 @@ export const fileIdFromPlottrProFile = (fileURL) => {
 }
 
 export const isProtocolString = (s) => {
-  return s.match(/^[a-z]+:\/\//)
+  return s?.match?.(/^[a-z]+:\/\//)
 }
 
 export const withoutProtocol = (fileURL) => {
-  if (!fileURL) {
+  if (!fileURL || typeof fileURL.match !== 'function') {
     return null
   }
 
   const protocolMatch = fileURL.match(/^[a-z]+:\/\//)
-  if (protocolMatch) {
+  if (protocolMatch && typeof fileURL.substring === 'function') {
     return fileURL.substring(protocolMatch[0].length)
   }
 

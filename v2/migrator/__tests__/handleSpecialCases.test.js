@@ -1,5 +1,7 @@
 import { difference } from 'lodash'
 
+import { lineFromTemplate } from '../../template'
+
 import {
   file_2023_3_29,
   file_2021_07_20,
@@ -12,6 +14,7 @@ import {
   file_2022_01_11_title_object_without_description,
   file_2022_01_11_title_is_object_with_non_string_title,
   file_2022_01_11_title_is_object_with_non_array_description,
+  seven_point_plot_structure_template,
 } from './fixtures'
 import applyAllFixes, {
   handle2021_07_07,
@@ -178,6 +181,32 @@ describe('applyAllFixes', () => {
         expect(level.dark.textColor).toBeDefined()
       }
       expect(fixed.file.appliedMigrations).toEqual(expect.arrayContaining(['m2021_7_7']))
+    })
+  })
+  describe('given a plotline template', () => {
+    let file = null
+    let result = null
+    let error = null
+    lineFromTemplate(seven_point_plot_structure_template, '2023.12.20', '', (e, template) => {
+      if (e) {
+        error = e
+      } else {
+        file = template
+      }
+    })
+    try {
+      result = applyAllFixes(file)
+    } catch (e) {
+      error = e
+    }
+    it('should not error out', () => {
+      expect(error).toBe(null)
+      expect(result).not.toBe(null)
+    })
+    it('should maintain the same categories of data as the template had', () => {
+      for (const key of Object.keys(file)) {
+        expect(result[key]).toBeDefined()
+      }
     })
   })
 })

@@ -1,19 +1,20 @@
 import { omit, differenceWith, isEqual, sortBy } from 'lodash'
 
 import { configureStore, pltrAdaptor } from './fixtures/testStore'
-import { multi_tier_zelda } from './fixtures'
+import { multi_tier_zelda, eight_sequences_template } from './fixtures'
 import { emptyFile } from '../../store/newFileState'
 import { hierarchyLevel } from '../../store/initialState'
 import { maxDepth, depth, nodeParent, findNode } from '../tree'
 import actions from '../../actions'
 import selectors from '../../selectors'
+import { lineFromTemplate } from '../../template'
 
 const { allBeatsSelector, beatsForAnotherBookSelector, fullFileStateSelector } =
   selectors(pltrAdaptor)
 
 const wiredUpActions = actions(pltrAdaptor)
 const { changeCurrentTimeline, setTimelineView, loadFile } = wiredUpActions.ui
-const { addBook } = wiredUpActions.book
+const { addBook, addBookFromTemplate } = wiredUpActions.book
 const { setHierarchyLevels } = wiredUpActions.hierarchyLevels
 const { insertBeat } = wiredUpActions.beat
 
@@ -290,6 +291,106 @@ describe('insertBeat', () => {
             ])
           ).toEqual(omit(findNode(initialBeats, 26), ['id', 'templates', 'position']))
         })
+      })
+    })
+  })
+})
+
+describe('addBookFromTemplate', () => {
+  describe('given a template that lacks beats', () => {
+    const store = initialStore()
+    const originalBeats = allBeatsSelector(store.getState())
+    let template = null
+    lineFromTemplate(eight_sequences_template, '2023.12.20', '', (e, t) => {
+      if (e) {
+        throw e
+      } else {
+        template = t
+      }
+    })
+    store.dispatch(addBookFromTemplate(omit(template, 'beats')))
+    it('should not change the book state', () => {
+      expect(allBeatsSelector(store.getState())).toBe(originalBeats)
+    })
+  })
+  describe('given a template that has beats', () => {
+    const store = initialStore()
+    let template = null
+    lineFromTemplate(eight_sequences_template, '2023.12.20', '', (e, t) => {
+      if (e) {
+        throw e
+      } else {
+        template = t
+      }
+    })
+    store.dispatch(addBookFromTemplate(omit(template, 'beats')))
+    it('should add the beats', () => {
+      expect(allBeatsSelector(store.getState())).toEqual({
+        1: {
+          children: {
+            2: [],
+            null: [2],
+          },
+          heap: {
+            2: null,
+          },
+          index: {
+            2: {
+              autoOutlineSort: true,
+              bookId: 1,
+              expanded: true,
+              fromTemplateId: null,
+              id: 2,
+              position: 0,
+              templates: [],
+              time: 0,
+              title: 'auto',
+            },
+          },
+        },
+        2: {
+          children: {
+            3: [],
+            null: [3],
+          },
+          heap: {
+            3: null,
+          },
+          index: {
+            3: {
+              autoOutlineSort: true,
+              bookId: 2,
+              expanded: true,
+              fromTemplateId: null,
+              id: 3,
+              position: 0,
+              time: 0,
+              title: 'auto',
+            },
+          },
+        },
+        series: {
+          children: {
+            1: [],
+            null: [1],
+          },
+          heap: {
+            1: null,
+          },
+          index: {
+            1: {
+              autoOutlineSort: true,
+              bookId: 'series',
+              expanded: true,
+              fromTemplateId: null,
+              id: 1,
+              position: 0,
+              templates: [],
+              time: 0,
+              title: 'auto',
+            },
+          },
+        },
       })
     })
   })

@@ -1305,7 +1305,21 @@ const updateUI = (state, action) => {
     // Notes.
     case EDIT_NOTE: {
       const attributesToUpdate = Object.keys(action.attributes).filter((attribute) => {
-        return typeof defaultNote[attribute] !== 'undefined'
+        return (
+          typeof defaultNote[attribute] !== 'undefined' &&
+          ![
+            'id',
+            'categoryId',
+            'tags',
+            'characters',
+            'places',
+            'lastEdited',
+            'templates',
+            'imageId',
+            'bookIds',
+            'position',
+          ].includes(attribute)
+        )
       })
       return attributesToUpdate.reduce((acc, nextAttributeKey) => {
         const baseAttributeName = nextAttributeKey
@@ -1450,7 +1464,20 @@ const updateUI = (state, action) => {
     // Places
     case EDIT_PLACE: {
       const attributesToUpdate = Object.keys(action.attributes).filter((attribute) => {
-        return typeof defaultPlace[attribute] !== 'undefined'
+        return (
+          typeof defaultPlace[attribute] !== 'undefined' &&
+          ![
+            'id',
+            'color',
+            'cards',
+            'noteIds',
+            'templates',
+            'tags',
+            'imageId',
+            'bookIds',
+            'position',
+          ].includes(attribute)
+        )
       })
       return attributesToUpdate.reduce((acc, nextAttributeKey) => {
         const baseAttributeName = nextAttributeKey

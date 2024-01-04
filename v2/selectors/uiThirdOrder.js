@@ -247,10 +247,10 @@ export const projectSearchHitsSelector = createSelector(
     const bookLikeMatch = (entity, prefix, id) => {
       const nameKey = prefix === 'book' ? 'title' : 'name'
       const which = id ? `/${id}` : ''
-      const nameMatch = entity[nameKey].matchAll(literalRegExp(term))
-      const genreMatch = entity.genre.matchAll(literalRegExp(term))
-      const premiseMatch = entity.premise.matchAll(literalRegExp(term))
-      const themeMatch = entity.theme.matchAll(literalRegExp(term))
+      const nameMatch = entity[nameKey]?.matchAll(literalRegExp(term))
+      const genreMatch = entity.genre?.matchAll(literalRegExp(term))
+      const premiseMatch = entity.premise?.matchAll(literalRegExp(term))
+      const themeMatch = entity.theme?.matchAll(literalRegExp(term))
       return [
         ...(nameMatch ? hits(`/project/${prefix}${which}/${nameKey}`, nameMatch) : []),
         ...(genreMatch ? hits(`/project/${prefix}${which}/genre`, genreMatch) : []),
@@ -460,26 +460,33 @@ export const charactersHitsSelector = createSelector(
     const characterMatch = (character) => {
       const nameMatch = character.name.matchAll(literalRegExp(term))
       const characterCustomAttributes = (character.attributes || []).reduce((acc, attribute) => {
-        const valueAsString =
-          (Array.isArray(attribute.value)
-            ? serializeNoFormatting(attribute.value)
-            : String(attribute.value)) || ''
-        const valueMatch = valueAsString.matchAll(literalRegExp(term))
         const indexAttribute = allAttributes.characters.find(({ id }) => {
           return id === attribute.id
         })
-        const bookTitle = attribute.bookId === 'all' ? 'Series' : allBooks[attribute.bookId]?.title
-        const bookId = attribute.bookId
-        if (!valueMatch || !indexAttribute || !bookTitle) {
+        if (indexAttribute.type === 'base-attribute' && indexAttribute.name === 'tags') {
           return acc
+        } else {
+          const valueAsString =
+            (Array.isArray(attribute.value)
+              ? serializeNoFormatting(attribute.value)
+              : String(attribute.value)) || ''
+          const valueMatch = valueAsString.matchAll(literalRegExp(term))
+
+          const bookTitle =
+            attribute.bookId === 'all' ? 'Series' : allBooks[attribute.bookId]?.title
+          const bookId = attribute.bookId
+          if (!valueMatch || !indexAttribute || !bookTitle) {
+            return acc
+          } else {
+            return [
+              ...hits(
+                `/characters/${character.id}/customAttribute/${attribute.id}/${bookId}`,
+                valueMatch
+              ),
+              ...acc,
+            ]
+          }
         }
-        return [
-          ...hits(
-            `/characters/${character.id}/customAttribute/${attribute.id}/${bookId}`,
-            valueMatch
-          ),
-          ...acc,
-        ]
       }, [])
       const characterTemplateAttributes = character.templates.reduce((acc, template) => {
         const templateAttributes = template.values.flatMap((attribute) => {

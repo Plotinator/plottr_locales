@@ -6,12 +6,14 @@ import { emptyFile } from '../../store/newFileState'
 import { hierarchyLevel } from '../../store/initialState'
 import selectors from '../../selectors'
 import actions from '../../actions'
+import { lineFromTemplate } from '../../template'
+import { eight_sequences_template } from './fixtures'
 
 const { hierarchyLevelsForAnotherBookSelector, allHierarchyLevelsSelector } = selectors(pltrAdaptor)
 
 const wiredUpActions = actions(pltrAdaptor)
 const { loadFile, changeCurrentTimeline } = wiredUpActions.ui
-const { addBook, deleteBook } = wiredUpActions.book
+const { addBookFromTemplate, addBook, deleteBook } = wiredUpActions.book
 const { editHierarchyLevel, setHierarchyLevels } = wiredUpActions.hierarchyLevels
 
 const EMPTY_FILE = emptyFile('Test file')
@@ -151,6 +153,68 @@ describe('modifying the hierarchy', () => {
       expect(resultHierarcyhLevels[0].name).not.toEqual(resultHierarcyhLevels[1].name)
       expect(resultHierarcyhLevels[0].name).toEqual('Chapter')
       expect(resultHierarcyhLevels[1].name).toEqual('Scene')
+    })
+  })
+})
+
+describe('addBookFromTemplate', () => {
+  describe('when the template does not contain hierarchy levels', () => {
+    const store = initialStore()
+    let template = null
+    lineFromTemplate(eight_sequences_template, '2023.12.20', '', (e, t) => {
+      if (e) {
+        throw e
+      } else {
+        template = t
+      }
+    })
+    store.dispatch(addBookFromTemplate(template))
+    it('should add the default hierarchy levels to the book', () => {
+      expect(hierarchyLevelsForAnotherBookSelector(store.getState(), 3)).toEqual({
+        0: {
+          autoNumber: true,
+          backgroundColor: 'none',
+          borderColor: '#6cace4',
+          borderStyle: 'NONE',
+          dark: {
+            borderColor: '#c9e6ff',
+            textColor: '#c9e6ff',
+          },
+          level: 0,
+          light: {
+            borderColor: '#6cace4',
+            textColor: '#0b1117',
+          },
+          name: 'Beat',
+          textColor: '#0b1117',
+          textSize: 24,
+        },
+      })
+    })
+  })
+  describe('when the template does contain hierarcyh levels', () => {
+    const store = initialStore()
+    let template = null
+    const hierarchyLevels = { 0: hierarchyLevel(), 1: hierarchyLevel() }
+    lineFromTemplate(
+      {
+        ...eight_sequences_template,
+        templateData: { ...eight_sequences_template.templateData, hierarchyLevels },
+      },
+      '2023.12.20',
+      '',
+      (e, t) => {
+        if (e) {
+          throw e
+        } else {
+          template = t
+        }
+      }
+    )
+
+    store.dispatch(addBookFromTemplate(template))
+    it('should use those hierarchy levels for the new book', () => {
+      expect(hierarchyLevelsForAnotherBookSelector(store.getState(), 3)).toEqual(hierarchyLevels)
     })
   })
 })

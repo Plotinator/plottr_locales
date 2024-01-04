@@ -1,4 +1,4 @@
-import { identity } from 'lodash'
+import { isEqual, uniq, omit, identity } from 'lodash'
 
 import {
   ADD_CARD,
@@ -11,8 +11,12 @@ import {
 } from '../../constants/ActionTypes'
 import { card as defaultCard } from '../../store/initialState'
 import cardsReducerWithoutRepairers from '../cards'
-import { isEqual, uniq } from 'lodash'
 import selectors from '../../selectors'
+import actions from '../../actions'
+import { emptyFile } from '../../store/newFileState'
+import { configureStore, pltrAdaptor } from './fixtures/testStore'
+import { lineFromTemplate } from '../../template'
+import { eight_sequences_template } from './fixtures'
 
 const { allCardsSelector } = selectors(identity)
 
@@ -471,6 +475,66 @@ describe('reorderCardTemplateAttribute', () => {
           expect(template.id).not.toEqual(cardtemplate1.id)
         }
       })
+    })
+  })
+})
+
+describe('addBookFromTemplate', () => {
+  const wiredUpActions = actions(pltrAdaptor)
+  const { changeCurrentTimeline, loadFile } = wiredUpActions.ui
+  const { addBookFromTemplate } = wiredUpActions.book
+  const { allCardsSelector } = selectors(pltrAdaptor)
+  const EMPTY_FILE = emptyFile('Test file')
+  const initialStore = () => {
+    const store = configureStore()
+    store.dispatch(
+      loadFile(
+        'Test file',
+        false,
+        EMPTY_FILE,
+        EMPTY_FILE.file.version,
+        'device://tmp/dummy-url-test-file.pltr'
+      )
+    )
+    store.dispatch(changeCurrentTimeline(1))
+    return store
+  }
+  describe('given a template that lacks a template cards', () => {
+    const store = initialStore()
+    const originalCards = allCardsSelector(store.getState())
+    let template = null
+    lineFromTemplate(eight_sequences_template, '2023.12.20', '', (e, t) => {
+      if (e) {
+        throw e
+      } else {
+        template = t
+      }
+    })
+    store.dispatch(addBookFromTemplate(omit(template, 'cards')))
+    it('should not change the cards', () => {
+      expect(allCardsSelector(store.getState())).toBe(originalCards)
+    })
+  })
+  describe('given a template that has cards', () => {
+    const store = initialStore()
+    let template = null
+    lineFromTemplate(eight_sequences_template, '2023.12.20', '', (e, t) => {
+      if (e) {
+        throw e
+      } else {
+        template = t
+      }
+    })
+    store.dispatch(addBookFromTemplate(template))
+    const withoutChangingData = (card) => {
+      return omit(card, ['fromTemplateId', 'id', 'lineId', 'beatId'])
+    }
+    it('should add the cards', () => {
+      expect(allCardsSelector(store.getState()).map(withoutChangingData)).toEqual(
+        EMPTY_FILE.cards
+          .map(withoutChangingData)
+          .concat(eight_sequences_template.templateData.cards.map(withoutChangingData))
+      )
     })
   })
 })

@@ -1,4 +1,4 @@
-import { uniq, clone, sortBy, difference, isEmpty } from 'lodash'
+import { uniq, clone, sortBy, difference, isEmpty, omit } from 'lodash'
 import semverGt from 'semver/functions/gt'
 import semverGte from 'semver/functions/gte'
 import semverLte from 'semver/functions/lte'
@@ -281,6 +281,182 @@ export const removeCharacterAttributesForNonExistingBooks = (file) => {
   }
 }
 
+/**
+ * Mobile might still create legacy character attributes until it's
+ * upgraded.  Desktop/web handles legacy attributes fine, but they may
+ * overlap with built-in attributes (they do in the templates).
+ */
+export const migrateLegacyCharacterAttributes = (file) => {
+  if (
+    !Array.isArray(file?.customAttributes?.characters) ||
+    !Array.isArray(file?.characters) ||
+    file?.customAttributes?.characters?.length === 0 ||
+    file?.characters?.length === 0
+  ) {
+    return file
+  } else {
+    const newAttributes = file.attributes?.characters ?? []
+    const maxCharacterAttributeId = newAttributes.reduce((maxId, next) => {
+      return Math.max(maxId, next.id)
+    }, 1)
+    const withLegacyAttributes = file.customAttributes.characters.reduce(
+      (attributes, nextLegacyAttribute, index) => {
+        const alreadyHasAttribute = attributes.some((attribute) => {
+          return attribute.name === nextLegacyAttribute.name
+        })
+        if (alreadyHasAttribute) {
+          return attributes
+        } else {
+          return [
+            ...attributes,
+            {
+              id: maxCharacterAttributeId + index + 1,
+              name: nextLegacyAttribute.name,
+              type: nextLegacyAttribute.type,
+            },
+          ]
+        }
+      },
+      newAttributes
+    )
+    const characterHasLegacyAttributeDefined = (character) => {
+      return file.customAttributes.characters.some((legacyAttribute) => {
+        return typeof character[legacyAttribute.name] !== 'undefined'
+      })
+    }
+    const aCharacterHasALegacyAttributeDefined = file.characters.some(
+      characterHasLegacyAttributeDefined
+    )
+    const newCharacters = aCharacterHasALegacyAttributeDefined
+      ? file.characters.map((character) => {
+          const hasALegacyAttributeDefined = characterHasLegacyAttributeDefined
+          if (hasALegacyAttributeDefined) {
+            return file.customAttributes.characters.reduce((characterAcc, nextLegacyAttribute) => {
+              const legacyAttributeValue = character[nextLegacyAttribute.name]
+              if (
+                typeof legacyAttributeValue !== 'undefined' &&
+                (nextLegacyAttribute.name !== 'attributes' ||
+                  (nextLegacyAttribute.name === 'attributes' &&
+                    (typeof legacyAttributeValue === 'string' ||
+                      // This should be a good enough check we're not
+                      // dealing with a new character attribute.
+                      (Array.isArray(legacyAttributeValue) &&
+                        typeof legacyAttributeValue[0]?.id !== 'number'))))
+              ) {
+                const withoutLegacyAttribute = omit(characterAcc, nextLegacyAttribute.name)
+                const newAttributeId = withLegacyAttributes.find((newAttribute) => {
+                  return (
+                    newAttribute.id > maxCharacterAttributeId &&
+                    newAttribute.name === nextLegacyAttribute.name
+                  )
+                })?.id
+                if (typeof newAttributeId === 'number') {
+                  return {
+                    ...withoutLegacyAttribute,
+                    attributes: [
+                      ...(characterAcc.attributes ?? []),
+                      {
+                        id: newAttributeId,
+                        bookId: 'all',
+                        value: legacyAttributeValue,
+                      },
+                    ],
+                  }
+                } else {
+                  return withoutLegacyAttribute
+                }
+              } else {
+                return characterAcc
+              }
+            }, character)
+          } else {
+            return character
+          }
+        })
+      : file.characters
+    return {
+      ...file,
+      characters: newCharacters,
+      customAttributes: {
+        ...file.customAttributes,
+        characters: [],
+      },
+      attributes: {
+        ...(file.attributes ?? {}),
+        characters: withLegacyAttributes,
+      },
+    }
+  }
+}
+
+export const IMAGE_PLACEHOLDER =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV9TpX5UHawg4pChOlkQFXHUKhShQqgVWnUwufQLmjQkKS6OgmvBwY/FqoOLs64OroIg+AHi6uKk6CIl/i8ptIj14Lgf7+497t4BQrXINKttHNB020zEomIqvSoGXtGNXnRiAJCZZcxJUhwtx9c9fHy9i/Cs1uf+HD1qxmKATySeZYZpE28QT2/aBud94hDLyyrxOfGYSRckfuS64vEb55zLAs8MmcnEPHGIWMw1sdLELG9qxFPEYVXTKV9Ieaxy3uKsFcusfk/+wmBGX1nmOs1hxLCIJUgQoaCMAoqwEaFVJ8VCgvajLfxDrl8il0KuAhg5FlCCBtn1g//B726t7OSElxSMAu0vjvMxAgR2gVrFcb6PHad2AvifgSu94S9VgZlP0isNLXwE9G0DF9cNTdkDLneAwSdDNmVX8tMUslng/Yy+KQ303wJda15v9X2cPgBJ6ip+AxwcAqM5yl5v8e6O5t7+PVPv7wf7enJ3iw8StgAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAAuIwAALiMBeKU/dgAAAAd0SU1FB+cLDgkYCNOL7FwAAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAARklEQVRYw+3YIQ4AIAwEwSvh/18GiwZTkllVOTnZSrLSuJHmzeOuZrb1xYKAgICAgICAgICAgICAgICAgICAgIC3VXz539rLOwNPnv65RAAAAABJRU5ErkJggg=='
+
+export const removeDudImages = (file) => {
+  const isBroken = (image) => {
+    const isLocalImageThatLacksData =
+      typeof image.storageUrl === 'undefined' && typeof image.data !== 'string'
+    const lacksAName = typeof image.name !== 'string'
+    const invalidId = typeof image.id !== 'number'
+    return isLocalImageThatLacksData || lacksAName || invalidId
+  }
+  const hasBrokenImage = Object.values(file.images).some(isBroken)
+  let newId = Object.values(file.images).length + 1
+  const fixImage = (inputImage) => {
+    const fixMissingData = (image) => {
+      const isLocalImageThatLacksData =
+        typeof image.storageUrl === 'undefined' && typeof image.data !== 'string'
+      if (isLocalImageThatLacksData) {
+        return {
+          ...image,
+          data: IMAGE_PLACEHOLDER,
+        }
+      } else {
+        return image
+      }
+    }
+    const fixMissingName = (image) => {
+      const lacksAName = typeof image.name !== 'string'
+      if (lacksAName) {
+        return {
+          ...image,
+          name: ' ',
+        }
+      } else {
+        return image
+      }
+    }
+    const fixInvalidId = (image) => {
+      const invalidId = typeof image.id !== 'number'
+      if (invalidId) {
+        return {
+          ...image,
+          id: newId++,
+        }
+      } else {
+        return image
+      }
+    }
+
+    return fixMissingData(fixMissingName(fixInvalidId(inputImage)))
+  }
+  if (hasBrokenImage) {
+    return {
+      ...file,
+      images: Object.entries(file.images).reduce((imagesAcc, nextKeyValue) => {
+        const [key, image] = nextKeyValue
+        const fixedImage = fixImage(image)
+        return {
+          ...imagesAcc,
+          [fixedImage.id || key]: fixedImage,
+        }
+      }, {}),
+    }
+  } else {
+    return file
+  }
+}
+
 const applyAllFixes = (file) =>
   [
     handle2021_07_07,
@@ -289,6 +465,7 @@ const applyAllFixes = (file) =>
     handleMissingUIState,
     insertBreakingVersionsPriorToBreakingVersionChange,
     addUITimelineOrHierarchiesStateIfMissing,
+    migrateLegacyCharacterAttributes,
     removeCharacterAttributesForNonExistingBooks,
   ].reduce((acc, f) => f(acc), file)
 

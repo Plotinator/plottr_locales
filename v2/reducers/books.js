@@ -61,7 +61,26 @@ const books =
           },
         }
 
-      case ADD_BOOK_FROM_TEMPLATE:
+      case ADD_BOOK_FROM_TEMPLATE: {
+        if (typeof action.templateData?.id === 'string') {
+          return {
+            ...state,
+            allIds: [...state.allIds, action.newBookId],
+            [action.newBookId]: {
+              ...action.book,
+              id: action.newBookId,
+              title: action.title ?? '',
+              premise: action.premise ?? '',
+              genre: action.genre ?? '',
+              theme: action.theme ?? '',
+              timelineTemplates: [action.templateData.id],
+            },
+          }
+        } else {
+          return state
+        }
+      }
+
       case ADD_BOOK: {
         return {
           ...state,
@@ -69,11 +88,10 @@ const books =
           [action.newBookId]: {
             ...action.book,
             id: action.newBookId,
-            title: action.title,
-            premise: action.premise,
-            genre: action.genre,
-            theme: action.theme,
-            timelineTemplates: action.templateData ? [action.templateData.id] : [],
+            title: action.title ?? '',
+            premise: action.premise ?? '',
+            genre: action.genre ?? '',
+            theme: action.theme ?? '',
           },
         }
       }

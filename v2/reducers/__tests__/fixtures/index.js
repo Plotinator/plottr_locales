@@ -8,6 +8,7 @@ import hamlet from './hamlet.json'
 import hamlet_with_attribute_mix from './hamlet-with-attribute-mix.json'
 import hamlet_with_partial_attr_ordering from './hamlet-with-partial-attr-ordering.json'
 import post_multi_hierarchy_zelda from './post_multi_hierarchy_zelda.json'
+import eight_sequences_template from './eight_sequences_template.json'
 
 export {
   zelda,
@@ -20,4 +21,5 @@ export {
   post_multi_hierarchy_zelda,
   zelda_2_levels_in_book_7,
   zelda_2_levels_in_books_6_and_7,
+  eight_sequences_template,
 }

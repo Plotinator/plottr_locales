@@ -107,16 +107,20 @@ const cards =
       }
 
       case ADD_BOOK_FROM_TEMPLATE: {
-        const newCards = action.templateData.cards.map((c) => {
-          const newCard = cloneDeep(c)
-          newCard.id = newCard.id + action.nextCardId // give it a new id
-          newCard.lineId = action.nextLineId + newCard.lineId // give it the correct lineId
-          newCard.beatId = action.nextBeatId + newCard.beatId // give it the correct beatId
-          newCard.fromTemplateId = action.templateData.id
-          return newCard
-        })
+        if (Array.isArray(action.templateData.cards)) {
+          const newCards = action.templateData.cards.map((c) => {
+            const newCard = cloneDeep(c)
+            newCard.id = newCard.id + action.nextCardId // give it a new id
+            newCard.lineId = action.nextLineId + newCard.lineId // give it the correct lineId
+            newCard.beatId = action.nextBeatId + newCard.beatId // give it the correct beatId
+            newCard.fromTemplateId = action.templateData.id
+            return newCard
+          })
 
-        return [...state, ...newCards]
+          return [...state, ...newCards]
+        } else {
+          return state
+        }
       }
 
       case DUPLICATE_BOOK: {

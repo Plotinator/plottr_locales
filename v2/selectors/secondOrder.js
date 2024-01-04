@@ -420,9 +420,11 @@ export const hierarchyLevelNameSelector = createSelector(
   beatIdSelector,
   sortedHierarchyLevels,
   (beats, beatId, hierarchyLevels) => {
-    if (!beatId) return hierarchyLevels[0].name
-    return (hierarchyLevels[depth(beats, beatId)] || hierarchyLevels[hierarchyLevels.length - 1])
-      .name
+    if (!beatId) return hierarchyLevels[0]?.name
+    return (
+      (hierarchyLevels[depth(beats, beatId)] || hierarchyLevels[hierarchyLevels.length - 1])
+        ?.name ?? hierarchyLevels[0]?.name
+    )
   }
 )
 
@@ -445,7 +447,7 @@ export const beatInsertControlHierarchyLevelNameSelector = createSelector(
       return hierarchyLevels[0].name
     } else {
       return (hierarchyLevels[depth(beats, beatId)] || hierarchyLevels[hierarchyLevels.length - 1])
-        .name
+        ?.name
     }
   }
 )
@@ -462,7 +464,7 @@ export const hierarchyChildLevelNameSelector = createSelector(
       return level.name
     } else {
       return `${repeat('Sub-', newDepth - hierarchyLevels.length + 1)}${
-        (hierarchyLevels[hierarchyLevels.length - 1] || { name: '' }).name
+        (hierarchyLevels[hierarchyLevels.length - 1] || { name: '' })?.name
       }`
     }
   }

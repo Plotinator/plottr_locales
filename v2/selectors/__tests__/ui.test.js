@@ -1,14 +1,14 @@
 import { configureStore, pltrAdaptor } from './fixtures/testStore'
 import selectors from '../'
 import actions from '../../actions'
-import { hamlet_with_attribute_mix } from '../../actions/__tests__/fixtures'
+import { hamlet_with_attribute_mix, goldilocks } from '../../actions/__tests__/fixtures'
 
 const wiredUpActions = actions(pltrAdaptor)
 
 const { reorderCharacter } = wiredUpActions.character
 const { reorderNotes, editNote } = wiredUpActions.note
 const { reorderPlaces, editPlace } = wiredUpActions.place
-const { loadFile, setCharacterSort, setNoteSort, setPlaceSort } = wiredUpActions.ui
+const { loadFile, setCharacterSort, setNoteSort, setPlaceSort, setSearchTerm } = wiredUpActions.ui
 const { addNoteCategory, addPlaceCategory } = wiredUpActions.category
 
 const {
@@ -818,6 +818,114 @@ describe('isPlacesManuallySorted', () => {
           })
         })
       })
+    })
+  })
+})
+
+describe('projectSearchHitsSelector', () => {
+  const ordinaryFile = goldilocks
+  describe('given a file with a book that lacks a title', () => {
+    const store = configureStore()
+    store.dispatch(
+      loadFile(
+        'Goldilocks',
+        false,
+        {
+          ...ordinaryFile,
+          books: {
+            ...ordinaryFile.books,
+            [1]: {
+              ...ordinaryFile.books[1],
+              title: undefined,
+            },
+          },
+        },
+        '2020.7.30',
+        'device:///tmp.dummy.pltr'
+      )
+    )
+    it('should not throw an error', () => {
+      store.dispatch(setSearchTerm('bear'))
+      // Ensure we hit this point.
+      expect(true).toBe(true)
+    })
+  })
+  describe('given a file with a book that lacks a genre', () => {
+    const store = configureStore()
+    store.dispatch(
+      loadFile(
+        'Goldilocks',
+        false,
+        {
+          ...ordinaryFile,
+          books: {
+            ...ordinaryFile.books,
+            [1]: {
+              ...ordinaryFile.books[1],
+              genre: undefined,
+            },
+          },
+        },
+        '2020.7.30',
+        'device:///tmp.dummy.pltr'
+      )
+    )
+    it('should not throw an error', () => {
+      store.dispatch(setSearchTerm('bear'))
+      // Ensure we hit this point.
+      expect(true).toBe(true)
+    })
+  })
+  describe('given a file with a book that lacks a premise', () => {
+    const store = configureStore()
+    store.dispatch(
+      loadFile(
+        'Goldilocks',
+        false,
+        {
+          ...ordinaryFile,
+          books: {
+            ...ordinaryFile.books,
+            [1]: {
+              ...ordinaryFile.books[1],
+              premise: undefined,
+            },
+          },
+        },
+        '2020.7.30',
+        'device:///tmp.dummy.pltr'
+      )
+    )
+    it('should not throw an error', () => {
+      store.dispatch(setSearchTerm('bear'))
+      // Ensure we hit this point.
+      expect(true).toBe(true)
+    })
+  })
+  describe('given a file with a book that lacks a theme', () => {
+    const store = configureStore()
+    store.dispatch(
+      loadFile(
+        'Goldilocks',
+        false,
+        {
+          ...ordinaryFile,
+          books: {
+            ...ordinaryFile.books,
+            [1]: {
+              ...ordinaryFile.books[1],
+              theme: undefined,
+            },
+          },
+        },
+        '2020.7.30',
+        'device:///tmp.dummy.pltr'
+      )
+    )
+    it('should not throw an error', () => {
+      store.dispatch(setSearchTerm('bear'))
+      // Ensure we hit this point.
+      expect(true).toBe(true)
     })
   })
 })
