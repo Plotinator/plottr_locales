@@ -1,6 +1,6 @@
 /** @module Reducers */
 
-import { identity } from 'lodash'
+import { identity, omit } from 'lodash'
 
 import unrepairedMainReducer from './main'
 import {
@@ -397,16 +397,16 @@ const root = (dataRepairers) => (state, action) => {
     case RESET_TIMELINE: {
       let newResetAction = { ...action, isSeries }
       // finding beats that will NOT be removed
-      const beatIdsToReset = reduce(
-        state.beats,
-        (acc, beat) => {
-          if (beat.bookId != action.bookId) {
-            acc[beat.id] = true
+      const beatIdsToKeep = Object.values(omit(state.beats, action.bookId))
+        .flatMap((beatTree) => {
+          return Object.values(beatTree.index)
+        })
+        .reduce((acc, beat) => {
+          return {
+            ...acc,
+            [beat.id]: true,
           }
-          return acc
-        },
-        {}
-      )
+        }, {})
       // finding lines that will NOT be removed
       const lineIdsToReset = state.lines.reduce((acc, l) => {
         if (l.bookId != action.bookId) {
@@ -416,7 +416,7 @@ const root = (dataRepairers) => (state, action) => {
       }, {})
       newResetAction = {
         ...newResetAction,
-        beatIds: beatIdsToReset,
+        beatIds: beatIdsToKeep,
         lineIds: lineIdsToReset,
       }
       return mainReducer(state, newResetAction)

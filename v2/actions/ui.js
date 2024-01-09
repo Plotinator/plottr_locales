@@ -132,6 +132,9 @@ import {
   STOP_EDITING_PLOTLINE_HEADING_TITLE,
   START_JUMPING,
   FINISH_JUMPING,
+  START_VIEWING,
+  START_SEARCHING,
+  SET_REPLACE_WORD,
 } from '../constants/ActionTypes'
 import selectors from '../selectors'
 import { cardFocusPath, outlineCardFocusPath } from '../helpers/cards'
@@ -1278,14 +1281,27 @@ export function replaceMarkedHits() {
     const state = getState()
     const hitsMarkedForReplacement = hitsMarkedForReplacementSelector(state)
     if (hitsMarkedForReplacement.length > 0) {
+      dispatch({
+        type: START_SEARCHING,
+      })
       const replacementText = searchReplacementTextSelector(state)
       dispatch({
         type: REPLACE_MARKED_HITS,
         hitsMarkedForReplacement,
         replacementText,
       })
+      dispatch({
+        type: START_VIEWING,
+      })
     }
     dispatch(closeSearch())
+  }
+}
+
+export function setReplaceWord(replaceWord) {
+  return {
+    type: SET_REPLACE_WORD,
+    replaceWord,
   }
 }
 

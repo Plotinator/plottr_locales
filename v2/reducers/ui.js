@@ -183,6 +183,7 @@ import {
   START_JUMPING,
   FINISH_JUMPING,
   ADD_LINES_FROM_TEMPLATE,
+  SET_REPLACE_WORD,
 } from '../constants/ActionTypes'
 import {
   ui as defaultUI,
@@ -1050,6 +1051,16 @@ const updateUI = (state, action) => {
           ...(state.searchDialog || {}),
           currentHitIndex: (state.searchDialog.currentHitIndex || 0) - 1,
           scanning: true,
+        },
+      }
+    }
+
+    case SET_REPLACE_WORD: {
+      return {
+        ...state,
+        searchDialog: {
+          ...(state.searchDialog || {}),
+          replaceWord: action.replaceWord,
         },
       }
     }

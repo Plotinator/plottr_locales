@@ -81,14 +81,14 @@ describe('booksFilterItemsSelector', () => {
             title: 'Test file',
           },
           2: {
-            genre: undefined,
+            genre: '',
             id: 2,
             imageId: null,
-            premise: undefined,
+            premise: '',
             templates: [],
-            theme: undefined,
+            theme: '',
             timelineTemplates: [],
-            title: undefined,
+            title: '',
           },
           allIds: ['1', '2'],
         })

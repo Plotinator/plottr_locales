@@ -1,0 +1,1283 @@
+import { convertHTMLString, parseStyleAttribute } from '../from_html'
+
+describe('parseStyleAttribute', () => {
+  describe('given the empty string', () => {
+    it('should produce the empty object', () => {
+      expect(parseStyleAttribute('')).toEqual({})
+    })
+  })
+  describe('given a string with no colon', () => {
+    it('should produce the empty object', () => {
+      expect(parseStyleAttribute('blarg')).toEqual({})
+    })
+  })
+  describe('given a string with a colon but nothing after it', () => {
+    it('should produce an object with a key pointing to an empty string', () => {
+      expect(parseStyleAttribute('blarg:')).toEqual({ blarg: '' })
+    })
+  })
+  describe('given a string with a colon and something after it', () => {
+    it('should produce an object with a key and value', () => {
+      expect(parseStyleAttribute('blarg:test')).toEqual({ blarg: 'test' })
+    })
+  })
+  describe('given a string with a lone semicolon', () => {
+    it('should produce an empty object', () => {
+      expect(parseStyleAttribute(';')).toEqual({})
+    })
+  })
+  describe('given a string with a colon and spaces around a value and key', () => {
+    it('should produce the key-value object without whitespace padding', () => {
+      expect(parseStyleAttribute(' 	blarg :  test    ')).toEqual({ blarg: 'test' })
+    })
+  })
+  describe('given a string with colons and semi colons', () => {
+    it('should produce an object with all the keys and values in the string', () => {
+      expect(parseStyleAttribute('blarg: test; haha: hehe')).toEqual({
+        blarg: 'test',
+        haha: 'hehe',
+      })
+    })
+  })
+})
+
+describe('convertHTMLString', () => {
+  describe('given the empty string', () => {
+    it('should produce empty content', () => {
+      expect(convertHTMLString('')).toEqual([
+        {
+          children: [
+            {
+              text: '',
+            },
+          ],
+          type: 'paragraph',
+        },
+      ])
+    })
+  })
+  describe('given an empty div', () => {
+    it('should produce empty content', () => {
+      expect(convertHTMLString('<div></div>')).toEqual([
+        {
+          children: [
+            {
+              text: '',
+            },
+          ],
+          type: 'paragraph',
+        },
+      ])
+    })
+  })
+  describe('given a lone span', () => {
+    it('should produce a single paragraph', () => {
+      expect(convertHTMLString('<span>testing</span>')).toEqual([
+        {
+          children: [
+            {
+              text: 'testing',
+            },
+          ],
+          type: 'paragraph',
+        },
+      ])
+    })
+  })
+  describe('given a lone <i> tag', () => {
+    it('should produce a single paragraph with a formatted italic text section', () => {
+      expect(convertHTMLString('<i>testing</i>')).toEqual([
+        {
+          children: [
+            {
+              text: 'testing',
+              italic: true,
+            },
+          ],
+          type: 'paragraph',
+        },
+      ])
+    })
+  })
+  describe('given a lone <b> tag', () => {
+    it('should produce a single paragraph with a formatted bold text section', () => {
+      expect(convertHTMLString('<b>testing</b>')).toEqual([
+        {
+          children: [
+            {
+              text: 'testing',
+              bold: true,
+            },
+          ],
+          type: 'paragraph',
+        },
+      ])
+    })
+  })
+  describe('given a lone <u> tag', () => {
+    it('should produce a single paragraph with a formatted underline text section', () => {
+      expect(convertHTMLString('<u>testing</u>')).toEqual([
+        {
+          children: [
+            {
+              text: 'testing',
+              underline: true,
+            },
+          ],
+          type: 'paragraph',
+        },
+      ])
+    })
+  })
+  describe('given a lone <s> tag', () => {
+    it('should produce a single paragraph with a formatted strike text section', () => {
+      expect(convertHTMLString('<s>testing</s>')).toEqual([
+        {
+          children: [
+            {
+              text: 'testing',
+              strike: true,
+            },
+          ],
+          type: 'paragraph',
+        },
+      ])
+    })
+  })
+  describe('given a lone <del> tag', () => {
+    it('should produce a single paragraph with a formatted strike text section', () => {
+      expect(convertHTMLString('<del>testing</del>')).toEqual([
+        {
+          children: [
+            {
+              text: 'testing',
+              strike: true,
+            },
+          ],
+          type: 'paragraph',
+        },
+      ])
+    })
+  })
+  describe('given a lone <strike> tag', () => {
+    it('should produce a single paragraph with a formatted strike text section', () => {
+      expect(convertHTMLString('<strike>testing</strike>')).toEqual([
+        {
+          children: [
+            {
+              text: 'testing',
+              strike: true,
+            },
+          ],
+          type: 'paragraph',
+        },
+      ])
+    })
+  })
+  describe('given any other random tag', () => {
+    it('should produce an unformatted text section with the tags text', () => {
+      expect(convertHTMLString('<zzz>testing</zzz>')).toEqual([
+        {
+          children: [
+            {
+              text: 'testing',
+            },
+          ],
+          type: 'paragraph',
+        },
+      ])
+    })
+  })
+  describe('given a lone block quote', () => {
+    it('should produce a block quote with a paragraph containing the quoted text', () => {
+      expect(convertHTMLString('<blockquote><span>testing</span></blockquote>')).toEqual([
+        {
+          type: 'block-quote',
+          children: [
+            {
+              children: [
+                {
+                  text: 'testing',
+                },
+              ],
+              type: 'paragraph',
+            },
+          ],
+        },
+      ])
+    })
+  })
+  describe('given a singleton numbered list', () => {
+    it('should produce the slate equivelant list', () => {
+      const expectedResult = [
+        {
+          type: 'numbered-list',
+          children: [
+            {
+              type: 'list-item',
+              children: [
+                {
+                  text: 'testing',
+                },
+              ],
+            },
+          ],
+        },
+      ]
+      expect(convertHTMLString('<ol><li>testing</li></ol>')).toEqual(expectedResult)
+      expect(convertHTMLString('<ol><li><span>testing</span></li></ol>')).toEqual(expectedResult)
+    })
+    describe("that's indented once", () => {
+      it('should produce the equivelant Slate', () => {
+        const expectedResult = [
+          {
+            type: 'numbered-list',
+            children: [
+              {
+                type: 'numbered-list',
+                children: [
+                  {
+                    type: 'list-item',
+                    children: [
+                      {
+                        text: 'testing',
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ]
+        expect(convertHTMLString('<ol><ol><li>testing</li></ol></ol>')).toEqual(expectedResult)
+        expect(convertHTMLString('<ol><ol><li><span>testing</span></li></ol></ol>')).toEqual(
+          expectedResult
+        )
+      })
+    })
+    describe("that's indented twice", () => {
+      it('should produce the equivelant Slate', () => {
+        const expectedResult = [
+          {
+            type: 'numbered-list',
+            children: [
+              {
+                type: 'numbered-list',
+                children: [
+                  {
+                    type: 'numbered-list',
+                    children: [
+                      {
+                        type: 'list-item',
+                        children: [
+                          {
+                            text: 'testing',
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ]
+        expect(convertHTMLString('<ol><ol><ol><li>testing</li></ol></ol></ol>')).toEqual(
+          expectedResult
+        )
+        expect(
+          convertHTMLString('<ol><ol><ol><li><span>testing</span></li></ol></ol></ol>')
+        ).toEqual(expectedResult)
+      })
+    })
+    describe("that's indented three times", () => {
+      it('should produce the equivelant Slate', () => {
+        const expectedResult = [
+          {
+            type: 'numbered-list',
+            children: [
+              {
+                type: 'numbered-list',
+                children: [
+                  {
+                    type: 'numbered-list',
+                    children: [
+                      {
+                        type: 'numbered-list',
+                        children: [
+                          {
+                            type: 'list-item',
+                            children: [
+                              {
+                                text: 'testing',
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ]
+        expect(convertHTMLString('<ol><ol><ol><ol><li>testing</li></ol></ol></ol></ol>')).toEqual(
+          expectedResult
+        )
+        expect(
+          convertHTMLString('<ol><ol><ol><ol><li><span>testing</span></li></ol></ol></ol></ol>')
+        ).toEqual(expectedResult)
+      })
+    })
+    describe("that's indented four times", () => {
+      it('should produce the equivelant Slate', () => {
+        const expectedResult = [
+          {
+            type: 'numbered-list',
+            children: [
+              {
+                type: 'numbered-list',
+                children: [
+                  {
+                    type: 'numbered-list',
+                    children: [
+                      {
+                        type: 'numbered-list',
+                        children: [
+                          {
+                            type: 'numbered-list',
+                            children: [
+                              {
+                                type: 'list-item',
+                                children: [
+                                  {
+                                    text: 'testing',
+                                  },
+                                ],
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ]
+        expect(
+          convertHTMLString('<ol><ol><ol><ol><ol><li>testing</li></ol></ol></ol></ol></ol>')
+        ).toEqual(expectedResult)
+        expect(
+          convertHTMLString(
+            '<ol><ol><ol><ol><ol><li><span>testing</span></li></ol></ol></ol></ol></ol>'
+          )
+        ).toEqual(expectedResult)
+      })
+    })
+  })
+  describe('given a singleton unordered list', () => {
+    it('should produce the slate equivelant Slate', () => {
+      const expectedResult = [
+        {
+          type: 'bulleted-list',
+          children: [
+            {
+              type: 'list-item',
+              children: [
+                {
+                  text: 'testing',
+                },
+              ],
+            },
+          ],
+        },
+      ]
+      expect(convertHTMLString('<ul><li>testing</li></ul>')).toEqual(expectedResult)
+      expect(convertHTMLString('<ul><li><span>testing</span></li></ul>')).toEqual(expectedResult)
+    })
+    describe("that's indented once", () => {
+      it('should produce the equivelant Slate', () => {
+        const expectedResult = [
+          {
+            type: 'bulleted-list',
+            children: [
+              {
+                type: 'bulleted-list',
+                children: [
+                  {
+                    type: 'list-item',
+                    children: [
+                      {
+                        text: 'testing',
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ]
+        expect(convertHTMLString('<ul><ul><li>testing</li></ul></ul>')).toEqual(expectedResult)
+        expect(convertHTMLString('<ul><ul><li><span>testing</span></li></ul></ul>')).toEqual(
+          expectedResult
+        )
+      })
+    })
+    describe("that's indented twice", () => {
+      it('should produce the equivelant Slate', () => {
+        const expectedResult = [
+          {
+            type: 'bulleted-list',
+            children: [
+              {
+                type: 'bulleted-list',
+                children: [
+                  {
+                    type: 'bulleted-list',
+                    children: [
+                      {
+                        type: 'list-item',
+                        children: [
+                          {
+                            text: 'testing',
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ]
+        expect(convertHTMLString('<ul><ul><ul><li>testing</li></ul></ul></ul>')).toEqual(
+          expectedResult
+        )
+        expect(
+          convertHTMLString('<ul><ul><ul><li><span>testing</span></li></ul></ul></ul>')
+        ).toEqual(expectedResult)
+      })
+    })
+    describe("that's indented three times", () => {
+      it('should produce the equivelant Slate', () => {
+        const expectedResult = [
+          {
+            type: 'bulleted-list',
+            children: [
+              {
+                type: 'bulleted-list',
+                children: [
+                  {
+                    type: 'bulleted-list',
+                    children: [
+                      {
+                        type: 'bulleted-list',
+                        children: [
+                          {
+                            type: 'list-item',
+                            children: [
+                              {
+                                text: 'testing',
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ]
+        expect(convertHTMLString('<ul><ul><ul><ul><li>testing</li></ul></ul></ul></ul>')).toEqual(
+          expectedResult
+        )
+        expect(
+          convertHTMLString('<ul><ul><ul><ul><li><span>testing</span></li></ul></ul></ul></ul>')
+        ).toEqual(expectedResult)
+      })
+    })
+    describe("that's indented four times", () => {
+      it('should produce the equivelant Slate', () => {
+        const expectedResult = [
+          {
+            type: 'bulleted-list',
+            children: [
+              {
+                type: 'bulleted-list',
+                children: [
+                  {
+                    type: 'bulleted-list',
+                    children: [
+                      {
+                        type: 'bulleted-list',
+                        children: [
+                          {
+                            type: 'bulleted-list',
+                            children: [
+                              {
+                                type: 'list-item',
+                                children: [
+                                  {
+                                    text: 'testing',
+                                  },
+                                ],
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ]
+        expect(
+          convertHTMLString('<ul><ul><ul><ul><ul><li>testing</li></ul></ul></ul></ul></ul>')
+        ).toEqual(expectedResult)
+        expect(
+          convertHTMLString(
+            '<ul><ul><ul><ul><ul><li><span>testing</span></li></ul></ul></ul></ul></ul>'
+          )
+        ).toEqual(expectedResult)
+      })
+    })
+  })
+  describe('given a list with nested list items of different types', () => {
+    it('should produce the equivelant Slate', () => {
+      const expectedResult = [
+        {
+          type: 'numbered-list',
+          children: [
+            {
+              type: 'list-item',
+              children: [
+                {
+                  text: 'test',
+                },
+              ],
+            },
+            {
+              type: 'list-item',
+              children: [
+                {
+                  text: 'blarg',
+                },
+              ],
+            },
+            {
+              type: 'bulleted-list',
+              children: [
+                {
+                  type: 'list-item',
+                  children: [
+                    {
+                      text: 'haha',
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ]
+      expect(
+        convertHTMLString('<ol><li>test</li><li>blarg</li><ul><li>haha</li></ul></ol>')
+      ).toEqual(expectedResult)
+      expect(
+        convertHTMLString(
+          '<ol><li><span>test</span></li><li><span>blarg</span></li><ul><li><span>haha</span></li></ul></ol>'
+        )
+      ).toEqual(expectedResult)
+    })
+  })
+  describe('given a nested set of bullet points', () => {
+    describe("that aren't canonical", () => {
+      it('should convert the bullet points as though they were in the expected format', () => {
+        const html = `<ul><li>First item<ul><li><b>test 3</b>: Sub-item 1</li><li><b>test 4</b>: Sub-item 2</li></ul></li><li>Second item<ul><li><b>test</b>Sub-item 1</li><li><b>test2</b>: Sub-item 2</li></ul></li></ul>`
+        expect(convertHTMLString(html)).toEqual([
+          {
+            type: 'bulleted-list',
+            children: [
+              {
+                type: 'list-item',
+                children: [
+                  {
+                    text: 'First item',
+                  },
+                ],
+              },
+              {
+                type: 'bulleted-list',
+                children: [
+                  {
+                    type: 'list-item',
+                    children: [
+                      {
+                        text: 'test 3',
+                        bold: true,
+                      },
+                      {
+                        text: ': Sub-item 1',
+                      },
+                    ],
+                  },
+                  {
+                    type: 'list-item',
+                    children: [
+                      {
+                        text: 'test 4',
+                        bold: true,
+                      },
+                      {
+                        text: ': Sub-item 2',
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                type: 'list-item',
+                children: [
+                  {
+                    text: 'Second item',
+                  },
+                ],
+              },
+              {
+                type: 'bulleted-list',
+                children: [
+                  {
+                    type: 'list-item',
+                    children: [
+                      {
+                        text: 'test',
+                        bold: true,
+                      },
+                      {
+                        text: 'Sub-item 1',
+                      },
+                    ],
+                  },
+                  {
+                    type: 'list-item',
+                    children: [
+                      {
+                        text: 'test2',
+                        bold: true,
+                      },
+                      {
+                        text: ': Sub-item 2',
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ])
+      })
+    })
+  })
+  // FIXME: Known limitation.  Mobile RCE doesn't produce the same as
+  // Desktop/Web in this instance.
+  // eslint-disable-next-line no-undef
+  xdescribe('given a lone anchor tag', () => {
+    it('should produce empty paragraphs surrounding a link', () => {
+      expect(convertHTMLString('<a href="www.google.com">URL</a>')).toEqual([
+        {
+          text: '',
+        },
+        {
+          type: 'link',
+          url: 'www.google.com',
+          children: [
+            {
+              text: 'URL',
+            },
+          ],
+        },
+        {
+          text: '',
+        },
+      ])
+    })
+  })
+  describe('given three paragraphs where one is an anchor tag', () => {
+    it('should not wrap the link in Slate', () => {
+      expect(
+        convertHTMLString(`<p>Here's a line</p><a href="www.google.com">URL</a><p>Another line</p>`)
+      ).toEqual([
+        {
+          type: 'paragraph',
+          children: [
+            {
+              text: "Here's a line",
+            },
+          ],
+        },
+        {
+          type: 'paragraph',
+          children: [
+            {
+              type: 'link',
+              url: 'www.google.com',
+              children: [
+                {
+                  text: 'URL',
+                },
+              ],
+            },
+          ],
+        },
+        {
+          type: 'paragraph',
+          children: [
+            {
+              text: 'Another line',
+            },
+          ],
+        },
+      ])
+    })
+  })
+  describe('given a span with a colour set', () => {
+    it('should produce coloured slate text', () => {
+      expect(
+        convertHTMLString('<span style="color:#78be20">this is some green text</span>')
+      ).toEqual([
+        {
+          type: 'paragraph',
+          children: [
+            {
+              text: 'this is some green text',
+              color: '#78be20',
+            },
+          ],
+        },
+      ])
+    })
+  })
+  describe('given a span with a font set', () => {
+    it('should produce slate with a font set', () => {
+      expect(
+        convertHTMLString('<span style="font-family: IBM Plex Serif">this is some text</span>')
+      ).toEqual([
+        {
+          type: 'paragraph',
+          children: [
+            {
+              text: 'this is some text',
+              font: 'IBM Plex Serif',
+            },
+          ],
+        },
+      ])
+    })
+  })
+  describe('given an img with a data URL', () => {
+    const testImageData = 'data:image/jpeg;base64,dummy-image-data'
+    it('should produce an equivelant slate image', () => {
+      expect(convertHTMLString(`<img src="${testImageData}" />`)).toEqual([
+        {
+          type: 'image-data',
+          data: testImageData,
+          children: [
+            {
+              text: '',
+            },
+          ],
+        },
+      ])
+    })
+  })
+  describe('given an img with a storage URL', () => {
+    const testImageData = 'data:image/jpeg;base64,dummy-image-data'
+    it('should produce an equivelant slate image', () => {
+      expect(
+        convertHTMLString(
+          `<img src="${testImageData}" class="slate-editor__image-link" data-storageUrl="storage://dummy-path.webp" />`
+        )
+      ).toEqual([
+        {
+          type: 'image-link',
+          storageUrl: 'storage://dummy-path.webp',
+          children: [
+            {
+              text: '',
+            },
+          ],
+        },
+      ])
+    })
+  })
+  describe('given some html with sized text', () => {
+    it('should interpret the font size into the slate representation', () => {
+      expect(
+        convertHTMLString(
+          '<p><span style="font-family: Arial Black;color: #e5554f;font-size: 25px">Goldilocks is hungry, and she really wants food.</span></p>'
+        )
+      ).toEqual([
+        {
+          type: 'paragraph',
+          children: [
+            {
+              text: 'Goldilocks is hungry, and she really wants food.',
+              font: 'Arial Black',
+              color: '#e5554f',
+              fontSize: 25,
+            },
+          ],
+        },
+      ])
+    })
+  })
+  describe('given some html discovered from a property test', () => {
+    it('should produce the correct slate', () => {
+      expect(
+        convertHTMLString(
+          '<ol><li><img src="data:image/jpeg;base64,          " /><h1><span>          </span></h1></li></ol>'
+        )
+      ).toEqual([
+        {
+          type: 'numbered-list',
+          children: [
+            {
+              type: 'list-item',
+              children: [
+                {
+                  type: 'image-data',
+                  data: 'data:image/jpeg;base64,          ',
+                  children: [
+                    {
+                      text: '',
+                    },
+                  ],
+                },
+                {
+                  type: 'heading-one',
+                  children: [
+                    {
+                      text: '          ',
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ])
+    })
+  })
+  describe('given a heading with underlined blank text inside', () => {
+    it('should produce the slate equivelant with the underline and blank text', () => {
+      expect(convertHTMLString('<h1><u><span>          </span></u></h1>')).toEqual([
+        { type: 'heading-one', children: [{ text: '          ', underline: true }] },
+      ])
+    })
+  })
+  describe('given a nested emphasised, italicised etc span of text with all formatting', () => {
+    it('should produce the equivelant slate', () => {
+      expect(
+        convertHTMLString(
+          '<i><b><u><s><span style="color:red;font-family:IBM">Hi</span></s></u></b></i>'
+        )
+      ).toEqual([
+        {
+          type: 'paragraph',
+          children: [
+            {
+              text: 'Hi',
+              italic: true,
+              bold: true,
+              underline: true,
+              strike: true,
+              color: 'red',
+              font: 'IBM',
+            },
+          ],
+        },
+      ])
+    })
+  })
+  describe('given html with escaped angle brackets and other escaped html characters', () => {
+    it('should produce Slate with unescaped equivelant characters', () => {
+      expect(convertHTMLString('<p>&lt;&gt;&quot;&apos;&amp;&nbsp;</p>')).toEqual([
+        {
+          type: 'paragraph',
+          children: [
+            {
+              text: `<>"'& `,
+            },
+          ],
+        },
+      ])
+    })
+  })
+  // TODO!!! Check what HTML the editor produces for indented
+  // bullets/numbered lists
+  describe('given some HTML content with new lines', () => {
+    it('should produce Slate equivelant content ', () => {
+      expect(
+        convertHTMLString(`<h1><span>Test</span></h1>
+<h1><span>Hmmm</span></h1>
+<ul>
+  <li>
+    <span>Ahj</span>
+  </li>
+  <li>
+    <span>This is a test.</span>
+  </li>
+</ul>
+<p><span><br/></span></p>
+<p><span>undefined</span></p>
+<p><span>other stuff</span></p>
+<p><span>Some stuff!</span></p>
+<p>
+  <span>A list</span>
+</p>
+<ol>
+  <li>
+    <span>blah</span>
+  </li>
+  <li>
+    <span>blah</span>
+  </li>
+  <li>
+    <span>Another item</span>
+  </li>
+</ol>`)
+      ).toEqual([
+        {
+          type: 'heading-one',
+          children: [
+            {
+              text: 'Test',
+            },
+          ],
+        },
+        {
+          type: 'heading-one',
+          children: [
+            {
+              text: 'Hmmm',
+            },
+          ],
+        },
+        {
+          type: 'bulleted-list',
+          children: [
+            {
+              type: 'list-item',
+              children: [
+                {
+                  text: 'Ahj',
+                },
+              ],
+            },
+            {
+              type: 'list-item',
+              children: [
+                {
+                  text: 'This is a test.',
+                },
+              ],
+            },
+          ],
+        },
+        {
+          type: 'paragraph',
+          children: [
+            {
+              text: '',
+            },
+          ],
+        },
+        {
+          type: 'paragraph',
+          children: [
+            {
+              text: 'undefined',
+            },
+          ],
+        },
+        {
+          type: 'paragraph',
+          children: [
+            {
+              text: 'other stuff',
+            },
+          ],
+        },
+        {
+          type: 'paragraph',
+          children: [
+            {
+              text: 'Some stuff!',
+            },
+          ],
+        },
+        {
+          type: 'paragraph',
+          children: [
+            {
+              text: 'A list',
+            },
+          ],
+        },
+        {
+          type: 'numbered-list',
+          children: [
+            {
+              type: 'list-item',
+              children: [
+                {
+                  text: 'blah',
+                },
+              ],
+            },
+            {
+              type: 'list-item',
+              children: [
+                {
+                  text: 'blah',
+                },
+              ],
+            },
+            {
+              type: 'list-item',
+              children: [
+                {
+                  text: 'Another item',
+                },
+              ],
+            },
+          ],
+        },
+      ])
+    })
+  })
+  describe('given some html that the editor produced', () => {
+    it('should be able to transform it to slate', () => {
+      expect(
+        convertHTMLString(
+          '<h2>Goldilocks is hungry, and she really wants food...</h2><div><br></div><h3>Hi there!</h3><div><br></div><p>This is a paragraph<br><p><strike>this is struck</strike><br><u>this is underlined</u><br><i>this is italicised</i><br><b>this is bold</b><br><b><i><u><strike>this is everything</strike></u></i></b><br><ol><li><span style="font-size: 14.8px;">this is numbered</span><br></li></ol><ul><li><span style="font-size: 14.8px;">this is bulletted</span><br></li></ul></p></p><li>Item A</li><ul><li>Item B<ol><li><span style="font-size: 14.8px;">Item 1</span><br></li><li><span style="font-size: 14.8px;">Item 2</span><br></li></ol></li><li>Item C</li></ul><div>This is a very strange way of doing this.</div>'
+        )
+      ).toEqual([
+        {
+          children: [
+            {
+              text: 'Goldilocks is hungry, and she really wants food...',
+            },
+          ],
+          type: 'heading-two',
+        },
+        {
+          children: [
+            {
+              text: '',
+            },
+          ],
+          type: 'paragraph',
+        },
+        {
+          children: [
+            {
+              text: 'Hi there!',
+            },
+          ],
+          type: 'heading-two',
+        },
+        {
+          children: [
+            {
+              text: '',
+            },
+          ],
+          type: 'paragraph',
+        },
+        {
+          children: [
+            {
+              text: 'This is a paragraph',
+            },
+            {
+              text: '',
+            },
+          ],
+          type: 'paragraph',
+        },
+        {
+          children: [
+            {
+              strike: true,
+              text: 'this is struck',
+            },
+            {
+              text: '',
+            },
+            {
+              text: 'this is underlined',
+              underline: true,
+            },
+            {
+              text: '',
+            },
+            {
+              italic: true,
+              text: 'this is italicised',
+            },
+            {
+              text: '',
+            },
+            {
+              bold: true,
+              text: 'this is bold',
+            },
+            {
+              text: '',
+            },
+            {
+              bold: true,
+              italic: true,
+              strike: true,
+              text: 'this is everything',
+              underline: true,
+            },
+            {
+              text: '',
+            },
+          ],
+          type: 'paragraph',
+        },
+        {
+          children: [
+            {
+              children: [
+                {
+                  fontSize: 14,
+                  text: 'this is numbered',
+                },
+                {
+                  text: '',
+                },
+              ],
+              type: 'list-item',
+            },
+          ],
+          type: 'numbered-list',
+        },
+        {
+          children: [
+            {
+              children: [
+                {
+                  fontSize: 14,
+                  text: 'this is bulletted',
+                },
+                {
+                  text: '',
+                },
+              ],
+              type: 'list-item',
+            },
+          ],
+          type: 'bulleted-list',
+        },
+        {
+          children: [
+            {
+              text: '',
+            },
+          ],
+          type: 'paragraph',
+        },
+        {
+          children: [
+            {
+              text: '',
+            },
+          ],
+          type: 'paragraph',
+        },
+        {
+          children: [
+            {
+              children: [
+                {
+                  text: 'Item A',
+                },
+              ],
+              type: 'list-item',
+            },
+          ],
+          type: 'paragraph',
+        },
+        {
+          children: [
+            {
+              children: [
+                {
+                  text: 'Item B',
+                },
+              ],
+              type: 'list-item',
+            },
+            {
+              children: [
+                {
+                  children: [
+                    {
+                      fontSize: 14,
+                      text: 'Item 1',
+                    },
+                    {
+                      text: '',
+                    },
+                  ],
+                  type: 'list-item',
+                },
+                {
+                  children: [
+                    {
+                      fontSize: 14,
+                      text: 'Item 2',
+                    },
+                    {
+                      text: '',
+                    },
+                  ],
+                  type: 'list-item',
+                },
+              ],
+              type: 'numbered-list',
+            },
+            {
+              children: [
+                {
+                  text: 'Item C',
+                },
+              ],
+              type: 'list-item',
+            },
+          ],
+          type: 'bulleted-list',
+        },
+        {
+          children: [
+            {
+              text: 'This is a very strange way of doing this.',
+            },
+          ],
+          type: 'paragraph',
+        },
+      ])
+    })
+  })
+})
