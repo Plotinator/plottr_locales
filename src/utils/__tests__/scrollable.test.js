@@ -6,7 +6,10 @@ describe('Scrollable', () => {
       describe('and an expressed intention to move instantly', () => {
         it('should call `scrollTo` with `maxDuration` set to zero', async () => {
           let callsToScrollTo = []
-          const dummyRef = {}
+          const dummyRef = {
+            scrollTop: 0,
+            scrollLeft: 0,
+          }
           const dummyGetRef = () => {
             return dummyRef
           }
@@ -59,7 +62,10 @@ describe('Scrollable', () => {
     describe('and a target coordinate', () => {
       it('should call scrollTo on the dummy element with that position', async () => {
         let callsToScrollTo = []
-        const dummyRef = {}
+        const dummyRef = {
+          scrollTop: 0,
+          scrollLeft: 0,
+        }
         const dummyGetRef = () => {
           return dummyRef
         }
@@ -72,7 +78,10 @@ describe('Scrollable', () => {
       describe('followed by another call to scroll to another position', () => {
         it('should call scrollTo, then call a second scrollTo', async () => {
           let callsToScrollTo = []
-          const dummyRef = {}
+          const dummyRef = {
+            scrollTop: 0,
+            scrollLeft: 0,
+          }
           const dummyGetRef = () => {
             return dummyRef
           }
@@ -90,7 +99,10 @@ describe('Scrollable', () => {
       describe('followed by an amount to scroll by', () => {
         it('should call scrollTo with the final destination after the first scrollTo', async () => {
           let callsToScrollTo = []
-          const dummyRef = {}
+          const dummyRef = {
+            scrollTop: 0,
+            scrollLeft: 0,
+          }
           const dummyGetRef = () => {
             return dummyRef
           }
@@ -107,7 +119,10 @@ describe('Scrollable', () => {
         describe('and then a second amount to scroll by', () => {
           it('should call scrollTo with the final destination after calling the first two scrollTos', async () => {
             let callsToScrollTo = []
-            const dummyRef = {}
+            const dummyRef = {
+              scrollTop: 0,
+              scrollLeft: 0,
+            }
             const dummyGetRef = () => {
               return dummyRef
             }

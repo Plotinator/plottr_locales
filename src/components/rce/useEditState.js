@@ -40,7 +40,7 @@ export const useEditState = (
     }
 
     setValue(newValue)
-  }, [editorId])
+  }, [editorId, key])
 
   // Handle undo
   useEffect(() => {

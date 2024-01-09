@@ -283,6 +283,7 @@ const BlankCardConnector = (connector) => {
             <ControlLabel>{i18n('Scene Title')}</ControlLabel>
             <FormControl
               type="text"
+              supressScrollIntoView
               autoFocus
               inputRef={(ref) => {
                 this.titleInputRef = ref

@@ -1,14 +1,14 @@
 import { Transforms } from 'slate'
-import { convertHTMLString } from './from_html'
+import { html } from 'pltr/v2'
 
 export const withHTML = (editor) => {
   const { insertData } = editor
 
   editor.insertData = (data) => {
-    const html = data.getData('text/html')
+    const htmlRootNode = data.getData('text/html')
 
     if (html) {
-      Transforms.insertNodes(editor, convertHTMLString(html))
+      Transforms.insertNodes(editor, html.slate.deserialise(htmlRootNode))
     } else {
       insertData(data)
     }

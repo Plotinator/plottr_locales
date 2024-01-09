@@ -121,6 +121,10 @@ const RichTextEditorConnector = (connector) => {
     }, [id, addImage])
     const registerEditor = useRegisterEditor(editor)
 
+    const key = useMemo(() => {
+      return `${id}-${editState}`
+    }, [editState, id])
+
     // Rendering helpers
     const renderLeaf = useCallback((props) => <Leaf {...props} />, [])
     const renderElement = useCallback(
@@ -231,7 +235,7 @@ const RichTextEditorConnector = (connector) => {
 
     // State management
     const [
-      value,
+      initialValue,
       onValueChanged,
       onKeyDown,
       onPaste,
@@ -241,7 +245,7 @@ const RichTextEditorConnector = (connector) => {
     ] = useEditState(
       editorKey,
       fileId,
-      id,
+      key,
       editor,
       onChange,
       undo,
@@ -341,11 +345,11 @@ const RichTextEditorConnector = (connector) => {
       editorWrapperRef.current.firstChild.focus()
     }
 
-    if (value === null) return null
+    if (initialValue === null) return null
 
     const otherProps = {}
     return (
-      <Slate editor={editor} value={value} onChange={wrappedOnChange} key={id}>
+      <Slate editor={editor} value={initialValue} onChange={wrappedOnChange} key={key}>
         <div className={cx('slate-editor__wrapper', className)}>
           <ToolBar editor={editor} focusEditor={focusEditor} />
           <div

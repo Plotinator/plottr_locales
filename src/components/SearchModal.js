@@ -35,11 +35,11 @@ const modalStyles = {
   },
 }
 
-const serializePlain = slate.plain.serialize
+const { serializeNoFormatting } = slate.plain
 
 const attributeToText = (x) => {
   if (Array.isArray(x)) {
-    return serializePlain(x)
+    return serializeNoFormatting(x)
   }
   return x
 }
@@ -104,7 +104,7 @@ const computeCardHitTitle = (cardId, cards, restOfPathElements) => {
       return [`${card.title} > Title`, card.title]
     }
     case 'description': {
-      return [`${card.title} > Description`, serializePlain(card.description)]
+      return [`${card.title} > Description`, serializeNoFormatting(card.description)]
     }
     case 'customAttribute': {
       const attributeName = restOfPathElements[1] || ''
@@ -122,7 +122,7 @@ const computeCardHitTitle = (cardId, cards, restOfPathElements) => {
         })?.value
       return [
         `${card.title} > ${restOfPath}`,
-        Array.isArray(templateValue) ? serializePlain(templateValue) : templateValue,
+        Array.isArray(templateValue) ? serializeNoFormatting(templateValue) : templateValue,
       ]
     }
     default: {
@@ -135,7 +135,7 @@ const computeNoteHitTitle = (noteId, notes, restOfPathElements) => {
   const note = notes.find(({ id }) => {
     return id == noteId
   })
-  const restOfPath = restOfPathElements.join(' > ')
+  const restOfPath = restOfPathElements.slice(0, -1).join(' > ')
   if (!note) {
     return [`Unknown note > ${restOfPath}`, '']
   }
@@ -145,7 +145,7 @@ const computeNoteHitTitle = (noteId, notes, restOfPathElements) => {
       return [`${note.title} > Title`, note.title]
     }
     case 'content': {
-      return [`${note.title} > Content`, serializePlain(note.content)]
+      return [`${note.title} > Content`, serializeNoFormatting(note.content)]
     }
     case 'customAttribute': {
       const attributeName = restOfPathElements[1] || ''
@@ -167,7 +167,7 @@ const computeCharacterHitTitle = (
   const character = characters.find(({ id }) => {
     return id == characterId
   })
-  const restOfPath = restOfPathElements.join(' > ')
+  const restOfPath = restOfPathElements.slice(0, -1).join(' > ')
   if (!character) {
     return [`Unknown character > ${restOfPath}`, '']
   }
@@ -225,7 +225,7 @@ const computePlaceHitTitle = (placeId, places, restOfPathElements) => {
   const place = places.find(({ id }) => {
     return id == placeId
   })
-  const restOfPath = restOfPathElements.join(' > ')
+  const restOfPath = restOfPathElements.slice(0, -1).join(' > ')
   if (!place) {
     return [`Unknown place > ${restOfPath}`, '']
   }
@@ -238,7 +238,7 @@ const computePlaceHitTitle = (placeId, places, restOfPathElements) => {
       return [`${place.name} > Description`, place.description]
     }
     case 'notes': {
-      return [`${place.name} > Content`, serializePlain(place.notes)]
+      return [`${place.name} > Content`, serializeNoFormatting(place.notes)]
     }
     case 'customAttribute': {
       const attributeName = restOfPathElements[1] || ''
@@ -254,7 +254,7 @@ const computeTagHitTitle = (tagId, tags, restOfPathElements) => {
   const tag = tags.find(({ id }) => {
     return id == tagId
   })
-  const restOfPath = restOfPathElements.join(' > ')
+  const restOfPath = restOfPathElements.slice(0, -1).join(' > ')
   if (!tag) {
     return [`Unknown tag > ${restOfPath}`, '']
   }
@@ -273,7 +273,7 @@ const computeLineHitTitle = (lineId, lines, restOfPathElements) => {
   const line = lines.find(({ id }) => {
     return id == lineId
   })
-  const restOfPath = restOfPathElements.join(' > ')
+  const restOfPath = restOfPathElements.slice(0, -1).join(' > ')
   if (!line) {
     return [`Unknown line > ${restOfPath}`, '']
   } else {
@@ -299,7 +299,7 @@ const computeBeatHitTitle = (beatId, bookId, books, beats, series, restOfPathEle
       : books.find(({ id }) => {
           return id == bookId
         })
-  const restOfPath = restOfPathElements.join(' > ')
+  const restOfPath = restOfPathElements.slice(0, -1).join(' > ')
   if (!beat) {
     return [`Unknown beat > ${restOfPath}`, '']
   } else {
@@ -445,6 +445,7 @@ const SearchModalConnector = (connector) => {
     replacing,
     replacementText,
     hitsMarkedForReplacement,
+    replaceWord,
     closeSearch,
     currentHitIndex,
     scanning,
@@ -457,6 +458,7 @@ const SearchModalConnector = (connector) => {
     openSearch,
     openReplace,
     hasNoResults,
+    setReplaceWord,
   }) => {
     const activeTab = useMemo(() => {
       if (replacing) {
@@ -799,10 +801,27 @@ const SearchModalConnector = (connector) => {
                 )
               : null}
           </div>
-          {replacing ? (
-            <div className="search-modal__footer">
-              <hr />
-              <div>
+
+          <div className="search-modal__footer">
+            <hr />
+            <div>
+              <label htmlFor="replace-word-checkbox" className="search-modal__replace-word-label">
+                {t('Match full word')}
+                <input
+                  id="replace-word-checkbox"
+                  type="checkbox"
+                  className={'search-modal__replace-word-checkbox'}
+                  checked={replaceWord}
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    setReplaceWord(!replaceWord)
+                  }}
+                  onChange={(_event) => {
+                    // To Silence the React warning
+                  }}
+                />
+              </label>
+              {replacing ? (
                 <Button
                   bsStyle="success"
                   onClick={replaceMarkedHits}
@@ -810,9 +829,9 @@ const SearchModalConnector = (connector) => {
                 >
                   {t('Replace Selected')}
                 </Button>
-              </div>
+              ) : null}
             </div>
-          ) : null}
+          </div>
         </div>
       )
     }
@@ -858,6 +877,7 @@ const SearchModalConnector = (connector) => {
     characterAttributes: PropTypes.array,
     replacementText: PropTypes.string,
     hitsMarkedForReplacement: PropTypes.array.isRequired,
+    replaceWord: PropTypes.bool,
     closeSearch: PropTypes.func.isRequired,
     setSearchTerm: PropTypes.func.isRequired,
     jumpToHit: PropTypes.func.isRequired,
@@ -867,6 +887,7 @@ const SearchModalConnector = (connector) => {
     openSearch: PropTypes.func.isRequired,
     openReplace: PropTypes.func.isRequired,
     hasNoResults: PropTypes.bool,
+    setReplaceWord: PropTypes.func.isRequired,
   }
 
   const {
@@ -899,6 +920,7 @@ const SearchModalConnector = (connector) => {
           replacementText: selectors.searchReplacementTextSelector(state),
           hitsMarkedForReplacement: selectors.hitsMarkedForReplacementSelector(state),
           hasNoResults: selectors.hasNoResultsSelector(state),
+          replaceWord: selectors.searchModalReplaceWordSelector(state),
         }
       },
       {
@@ -910,6 +932,7 @@ const SearchModalConnector = (connector) => {
         replaceMarkedHits: actions.ui.replaceMarkedHits,
         openSearch: actions.ui.openSearch,
         openReplace: actions.ui.openReplace,
+        setReplaceWord: actions.ui.setReplaceWord,
       }
     )(SearchModal)
   }

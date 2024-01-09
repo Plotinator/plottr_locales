@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from 'react'
+import React, { useCallback, useMemo, useRef, useEffect } from 'react'
 import PropTypes from 'react-proptypes'
 import { FaLock } from 'react-icons/fa'
 import { createEditor } from 'slate'
@@ -25,6 +25,15 @@ const RichTextViewer = ({
   const editor = useMemo(() => {
     return withReact(createEditor(props.log))
   }, [])
+  const genKey = () => {
+    return `${id}-${Math.random().toString(16)}`
+  }
+  const key = useRef(genKey())
+  useEffect(() => {
+    const newValue = useTextConverter(props.text, props.log)
+    key.current = genKey()
+    editor.children = newValue
+  }, [editor, props.text])
   const renderLeaf = useCallback((props) => <Leaf {...props} />, [])
   const renderElement = useCallback(
     (innerProps) => (
@@ -39,12 +48,11 @@ const RichTextViewer = ({
     ),
     [openExternal, cacheImage, imageCache]
   )
-  const value = useTextConverter(props.text, props.log)
-  const key = useRef(Math.random().toString(16))
+  const initialValue = useTextConverter(props.text, props.log)
   const isLocked = props.lock && props.lock.clientId && props.lock?.clientId !== props.clientId
 
   return (
-    <Slate editor={editor} value={value} key={key.current} id={id}>
+    <Slate editor={editor} value={initialValue} key={key.current} id={id}>
       {!props.disabled && isLocked ? (
         <div className="lock-icon__wrapper" disabled={stealingLock} onClick={stealLock}>
           <span>{t('Take Control')}</span>
