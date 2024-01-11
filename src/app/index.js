@@ -15,7 +15,7 @@ import { helpers, migrateIfNeeded, addMissingKeys } from 'pltr/v2'
 import { actions, selectors } from 'wired-up-pltr'
 
 import { rtfToHTML } from 'pltr/v2/slate_serializers/to_html'
-import { convertHTMLNodeList } from 'pltr/v2/slate_serializers/from_html'
+import { convertHTMLNodeList } from 'pltr/v2/slate_deserializers/from_html'
 import { imageToWebpDataURL } from 'plottr_import_export'
 import exportConfig from 'plottr_import_export/src/exporter/default_config'
 import world from 'world-api'
