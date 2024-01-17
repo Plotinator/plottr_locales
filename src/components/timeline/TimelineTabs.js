@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+import { StickyTable } from 'react-sticky-table'
+import cx from 'classnames'
 
 import { t } from 'plottr_locales'
 
@@ -10,10 +12,13 @@ import MenuItem from '../MenuItem'
 import Popover from '../PlottrPopover'
 import DeleteConfirmModal from '../dialogs/DeleteConfirmModal'
 import InputModal from '../dialogs/InputModal'
+import { FunSpinner } from '../Spinner'
 import UnconnectedPlottrFloater from '../PlottrFloater'
+import UnconnectedTimelineTable from './TimelineTable'
 
 const TimelineTabsConnector = (connector) => {
   const Floater = UnconnectedPlottrFloater(connector)
+  const TimelineTable = UnconnectedTimelineTable(connector)
 
   const TimelineTabs = ({
     activeTab,
@@ -24,7 +29,6 @@ const TimelineTabsConnector = (connector) => {
     appendTopLevelBeat,
     setTimelineActiveTab,
     bookId,
-    TableComponent,
     deleteBeat,
     focussedBeat,
     beatToDelete,
@@ -34,6 +38,14 @@ const TimelineTabsConnector = (connector) => {
     editBeatTitle,
     editingBeatTitleId,
     setEditingBeatTitleId,
+    isSmall,
+    setTableRef,
+    tableRef,
+    darkMode,
+    mounted,
+    orientation,
+    stickyHeaderCount,
+    stickyLeftColumnCount,
   }) => {
     const [contextMenuAnchor, setContextMenuAnchor] = useState(null)
 
@@ -190,7 +202,31 @@ const TimelineTabsConnector = (connector) => {
                   title={tabName}
                   className="timeline__tab"
                 >
-                  <TableComponent />
+                  {isSmall ? (
+                    <TimelineTable
+                      setTableRef={setTableRef}
+                      tableRef={tableRef}
+                      activeTab={activeTab}
+                    />
+                  ) : (
+                    <StickyTable
+                      leftColumnZ={5}
+                      headerZ={5}
+                      wrapperRef={setTableRef}
+                      className={cx({
+                        darkmode: darkMode,
+                        vertical: orientation == 'vertical',
+                      })}
+                      stickyHeaderCount={stickyHeaderCount}
+                      leftStickyColumnCount={stickyLeftColumnCount}
+                    >
+                      {mounted ? (
+                        <TimelineTable activeTab={activeTab} tableRef={tableRef} />
+                      ) : (
+                        <FunSpinner />
+                      )}
+                    </StickyTable>
+                  )}
                 </Tab>
               )
             }),
@@ -211,7 +247,6 @@ const TimelineTabsConnector = (connector) => {
     timelineTabBeatIds: PropTypes.array.isRequired,
     topLevelBeatName: PropTypes.string.isRequired,
     insertBeat: PropTypes.func.isRequired,
-    TableComponent: PropTypes.func.isRequired,
     appendTopLevelBeat: PropTypes.func.isRequired,
     setTimelineActiveTab: PropTypes.func.isrequired,
     bookId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
@@ -224,6 +259,14 @@ const TimelineTabsConnector = (connector) => {
     editBeatTitle: PropTypes.func.isRequired,
     editingBeatTitleId: PropTypes.number,
     setEditingBeatTitleId: PropTypes.func.isRequired,
+    isSmall: PropTypes.bool,
+    setTableRef: PropTypes.func.isRequired,
+    tableRef: PropTypes.object.isRequired,
+    darkMode: PropTypes.bool.isRequired,
+    mounted: PropTypes.bool,
+    orientation: PropTypes.string.isRequired,
+    stickyHeaderCount: PropTypes.number,
+    stickyLeftColumnCount: PropTypes.number,
   }
 
   const {
@@ -245,6 +288,11 @@ const TimelineTabsConnector = (connector) => {
           timelineTabBeatIds: selectors.timelineTabBeatIdsSelector(state),
           topLevelBeatName: selectors.topLevelBeatNameSelector(state),
           editingBeatTitleId: selectors.editingBeatTitleIdSelector(state),
+          isSmall: selectors.isSmallSelector(state),
+          darkMode: selectors.isDarkModeSelector(state),
+          orientation: selectors.orientationSelector(state),
+          stickyHeaderCount: selectors.stickyHeaderCountSelector(state),
+          stickyLeftColumnCount: selectors.stickyLeftColumnCountSelector(state),
         }
       },
       {

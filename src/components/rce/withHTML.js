@@ -1,5 +1,5 @@
 import { Transforms } from 'slate'
-import { html } from 'pltr/v2'
+import { slate } from 'pltr/v2'
 
 export const withHTML = (editor) => {
   const { insertData } = editor
@@ -7,8 +7,10 @@ export const withHTML = (editor) => {
   editor.insertData = (data) => {
     const htmlRootNode = data.getData('text/html')
 
-    if (html) {
-      Transforms.insertNodes(editor, html.slate.deserialise(htmlRootNode))
+    if (htmlRootNode) {
+      // Don't include fonts because we don't *yet* have a means of
+      // picking a matching font from our supported subset.
+      Transforms.insertNodes(editor, slate.html.deserialise(htmlRootNode, { stripFont: true }))
     } else {
       insertData(data)
     }

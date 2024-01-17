@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { Cell } from 'react-sticky-table'
 import { FaGripLinesVertical } from 'react-icons/fa'
@@ -113,85 +113,115 @@ const BeatHeadingCellConnector = (connector) => {
           setWidth(thisHeadingCellWidth * spanIncludingThisBeat)
         }
       }
-    }, [setWidth, setHeadingCellWidth, beats])
+    }, [setWidth, setHeadingCellWidth, beats.length])
 
-    const handleReorder = (droppedPositionId, originalPositionId) => {
-      reorderBeats(originalPositionId, droppedPositionId, currentTimeline)
-    }
+    const handleReorder = useCallback(
+      (droppedPositionId, originalPositionId) => {
+        reorderBeats(originalPositionId, droppedPositionId, currentTimeline)
+      },
+      [reorderBeats]
+    )
 
-    const handleDrop = (e) => {
-      e.stopPropagation()
-      setInDropZone(false)
-      setDropDepth(0)
+    const handleDrop = useCallback(
+      (e) => {
+        e.stopPropagation()
+        setInDropZone(false)
+        setDropDepth(0)
 
-      var json = e.dataTransfer.getData('text/json')
-      var droppedBeat = JSON.parse(json)
-      if (droppedBeat.id == null) return
-      if (droppedBeat.id == beat.id) return
+        var json = e.dataTransfer.getData('text/json')
+        var droppedBeat = JSON.parse(json)
+        if (droppedBeat.id == null) return
+        if (droppedBeat.id == beat.id) return
 
-      if (!beat.expanded) {
-        expandBeat(beat.id, currentTimeline)
-      }
-      handleReorder(beat.id, droppedBeat.id)
-    }
+        if (!beat.expanded) {
+          expandBeat(beat.id, currentTimeline)
+        }
+        handleReorder(beat.id, droppedBeat.id)
+      },
+      [setInDropZone, setDropDepth, beat.id, beat.expanded, expandBeat, handleReorder]
+    )
 
-    const startEditing = (event) => {
-      event.stopPropagation()
-      startEditingBeatHeadingTitle(beatId)
-    }
+    const startEditing = useCallback(
+      (event) => {
+        event.stopPropagation()
+        startEditingBeatHeadingTitle(beatId)
+      },
+      [startEditingBeatHeadingTitle, beatId]
+    )
 
-    const stopEditing = () => {
+    const stopEditing = useCallback(() => {
       if (beat.title === '') {
         editBeatTitle(beatId, currentTimeline, 'auto')
       }
       stopEditingBeatHeadingTitle()
-    }
+    }, [beat.title, editBeatTitle, beatId, currentTimeline, stopEditingBeatHeadingTitle])
 
-    const startDeleting = (event) => {
-      event.stopPropagation()
-      setDeleting(true)
-    }
+    const startDeleting = useCallback(
+      (event) => {
+        event.stopPropagation()
+        setDeleting(true)
+      },
+      [setDeleting]
+    )
 
-    const stopDeleting = () => {
+    const stopDeleting = useCallback(() => {
       setDeleting(false)
-    }
+    }, [setDeleting])
 
-    const handleDragStart = (e) => {
-      e.dataTransfer.effectAllowed = 'move'
-      e.dataTransfer.setData('text/json', JSON.stringify(beat))
-      setDragging(true)
-    }
+    const handleDragStart = useCallback(
+      (e) => {
+        e.dataTransfer.effectAllowed = 'move'
+        e.dataTransfer.setData('text/json', JSON.stringify(beat))
+        setDragging(true)
+      },
+      [setDragging]
+    )
 
-    const handleDragEnd = (event) => {
-      dropBeat(beatId, { x: event.clientX, y: event.clientY })
-      setDragging(false)
-    }
+    const handleDragEnd = useCallback(
+      (event) => {
+        dropBeat(beatId, { x: event.clientX, y: event.clientY })
+        setDragging(false)
+      },
+      [setDragging]
+    )
 
-    const handleDragEnter = (e) => {
-      if (!dragging) setDropDepth(dropDepth + 1)
-    }
+    const handleDragEnter = useCallback(
+      (e) => {
+        if (!dragging) setDropDepth(dropDepth + 1)
+      },
+      [dragging, setDropDepth, dropDepth]
+    )
 
-    const handleDragOver = (e) => {
-      e.preventDefault()
-      if (!dragging) setInDropZone(true)
-    }
+    const handleDragOver = useCallback(
+      (e) => {
+        e.preventDefault()
+        if (!dragging) setInDropZone(true)
+      },
+      [dragging, setInDropZone]
+    )
 
-    const handleDragLeave = (e) => {
-      if (!dragging) {
-        let newDropDepth = dropDepth
-        --newDropDepth
-        setDropDepth(newDropDepth)
-        if (newDropDepth > 0) return
-        setInDropZone(false)
-      }
-    }
+    const handleDragLeave = useCallback(
+      (e) => {
+        if (!dragging) {
+          let newDropDepth = dropDepth
+          --newDropDepth
+          setDropDepth(newDropDepth)
+          if (newDropDepth > 0) return
+          setInDropZone(false)
+        }
+      },
+      [dragging, setDropDepth, setInDropZone]
+    )
 
-    const deleteThisBeat = (event) => {
-      event.stopPropagation()
-      deleteBeat(beatId, currentTimeline)
-    }
+    const deleteThisBeat = useCallback(
+      (event) => {
+        event.stopPropagation()
+        deleteBeat(beatId, currentTimeline)
+      },
+      [deleteBeat, beatId, currentTimeline]
+    )
 
-    const renderDelete = () => {
+    const renderDelete = useCallback(() => {
       if (!deleting) return null
 
       const depth =
@@ -222,13 +252,27 @@ const BeatHeadingCellConnector = (connector) => {
           onCancel={stopDeleting}
         />
       )
-    }
+    }, [deleting, hierarchyLevels, beatTitle, deleteThisBeat, stopDeleting])
 
-    const renderTitle = () => {
+    const rightControlsContentLocation = useCallback(() => {
+      if (container.current) {
+        return rightControlsPosition()
+      }
+      return { top: 0, left: 0 }
+    }, [container, rightControlsPosition, width])
+
+    const bottomControlsContentLocation = useCallback(() => {
+      if (container.current) {
+        return bottomControlsPosition()
+      }
+      return { top: 0, left: 0 }
+    }, [container, bottomControlsPosition, width])
+
+    const renderTitle = useCallback(() => {
       return <span>{truncateTitle(beatTitle, 50)}</span>
-    }
+    }, [beatTitle])
 
-    const renderControls = () => {
+    const renderControls = useCallback(() => {
       return (
         <div ref={bottomButtons}>
           <ButtonGroup>
@@ -241,14 +285,14 @@ const BeatHeadingCellConnector = (connector) => {
           </ButtonGroup>
         </div>
       )
-    }
+    }, [startEditing, bottomButtons, startDeleting])
 
-    const insert = () => {
+    const insert = useCallback(() => {
       if (readOnly) return
       insertBeat(currentTimeline, beatId)
-    }
+    }, [readOnly, insertBeat, currentTimeline, beatId])
 
-    const renderAddPeer = () => {
+    const renderAddPeer = useCallback(() => {
       return (
         <div className="insert-beat-wrapper" ref={rightButtons}>
           <Button bsSize="xs" title={t(`Insert ${hierarchyLevelName}`)} onClick={insert}>
@@ -256,7 +300,7 @@ const BeatHeadingCellConnector = (connector) => {
           </Button>
         </div>
       )
-    }
+    }, [rightButtons, hierarchyLevelName, insert])
 
     const extend = (boundingClientRect) => {
       return {
@@ -315,15 +359,44 @@ const BeatHeadingCellConnector = (connector) => {
       )
     }
 
-    const adjustedWidth = () => {
+    const adjustedWidth = useCallback(() => {
       return width - (span === 1 && beats.length <= 1 ? 0 : isMedium ? 7 : 27)
-    }
+    }, [width, span, beats.length, isMedium])
 
-    const handleEsc = (event) => {
-      if (event.which === 27 || event.which === 13) {
-        stopEditingBeatHeadingTitle()
+    const handleEsc = useCallback(
+      (event) => {
+        if (event.which === 27 || event.which === 13) {
+          stopEditingBeatHeadingTitle()
+        }
+      },
+      [stopEditingBeatHeadingTitle]
+    )
+
+    const rightControlsPosition = useCallback(() => {
+      const controlHeight = 25
+      const offset = Math.floor(controlHeight / 2)
+      const bodyElement = container.current.querySelector('.beat__heading-wrapper')
+      if (bodyElement) {
+        const { height, top } = bodyElement.getBoundingClientRect()
+        const containerRect = container.current.getBoundingClientRect()
+        return {
+          top: top + Math.floor(height / 2) - offset,
+          left: containerRect.left + adjustedWidth(),
+        }
+      } else {
+        const { height, left, top } = container.current.getBoundingClientRect()
+        return { top: top + Math.floor(height / 2) - offset, left: left + width - 27 }
       }
-    }
+    }, [container, width, adjustedWidth])
+
+    const bottomControlsPosition = useCallback(() => {
+      const controlWidth = 71
+      const { bottom, left } = container.current.getBoundingClientRect()
+      return {
+        top: bottom - 4,
+        left: left + (width - (isMedium ? 0 : spacerCellWidth || 0)) / 2 - controlWidth / 2,
+      }
+    }, [container, isMedium, spacerCellWidth, width])
 
     if (editing) {
       const focusCandidate =
@@ -353,32 +426,6 @@ const BeatHeadingCellConnector = (connector) => {
       )
     }
 
-    const rightControlsPosition = () => {
-      const controlHeight = 25
-      const offset = Math.floor(controlHeight / 2)
-      const bodyElement = container.current.querySelector('.beat__heading-wrapper')
-      if (bodyElement) {
-        const { height, top } = bodyElement.getBoundingClientRect()
-        const containerRect = container.current.getBoundingClientRect()
-        return {
-          top: top + Math.floor(height / 2) - offset,
-          left: containerRect.left + adjustedWidth(),
-        }
-      } else {
-        const { height, left, top } = container.current.getBoundingClientRect()
-        return { top: top + Math.floor(height / 2) - offset, left: left + width - 27 }
-      }
-    }
-
-    const bottomControlsPosition = () => {
-      const controlWidth = 71
-      const { bottom, left } = container.current.getBoundingClientRect()
-      return {
-        top: bottom - 4,
-        left: left + (width - (isMedium ? 0 : spacerCellWidth || 0)) / 2 - controlWidth / 2,
-      }
-    }
-
     return (
       <>
         {renderDelete()}
@@ -399,12 +446,7 @@ const BeatHeadingCellConnector = (connector) => {
                 <Floater
                   hideArrow={true}
                   open={hovering}
-                  contentLocation={() => {
-                    if (container.current) {
-                      return rightControlsPosition()
-                    }
-                    return { top: 0, left: 0 }
-                  }}
+                  contentLocation={rightControlsContentLocation}
                   component={renderAddPeer}
                 >
                   <div
@@ -420,12 +462,7 @@ const BeatHeadingCellConnector = (connector) => {
                       open={hovering}
                       placement="bottom"
                       align="start"
-                      contentLocation={() => {
-                        if (container.current) {
-                          return bottomControlsPosition()
-                        }
-                        return { top: 0, left: 0 }
-                      }}
+                      contentLocation={bottomControlsContentLocation}
                       component={renderControls}
                     >
                       <div

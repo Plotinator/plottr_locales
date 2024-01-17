@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useMemo } from 'react'
 import { isEqual } from 'lodash'
 import PropTypes from 'react-proptypes'
 import { FiCopy } from 'react-icons/fi'
@@ -103,7 +103,7 @@ const CardDialogConnector = (connector) => {
         click.counter !== previousClick.counter &&
         !contains(colourPickerPaletteListRef.current, click)
       ) {
-        uiActions.showCardDialogColorPicker()
+        uiActions.hideCardDialogColorPicker()
       }
 
       previousClick.current = click
@@ -164,10 +164,6 @@ const CardDialogConnector = (connector) => {
       uiActions.stopRemovingTemplateFromCardDialog()
     }
 
-    const saveAndClose = () => {
-      closeDialog()
-    }
-
     const toggleColorPicker = () => {
       if (!showColorPicker) {
         uiActions.showCardDialogColorPicker()
@@ -190,7 +186,7 @@ const CardDialogConnector = (connector) => {
 
     const handleEnter = (event) => {
       if (event.which === 13) {
-        saveAndClose()
+        closeDialog()
       }
     }
 
@@ -211,7 +207,7 @@ const CardDialogConnector = (connector) => {
 
     const chooseCardColor = (color) => {
       actions.editCardAttributes(cardId, { color })
-      uiActions.showCardDialogColorPicker()
+      uiActions.hideCardDialogColorPicker()
     }
 
     const changeBeat = (beatId) => {
@@ -291,6 +287,24 @@ const CardDialogConnector = (connector) => {
       )
     }
 
+    const handleAttrChangeFunctions = useMemo(() => {
+      return customAttributes.reduce((funcs, attr) => {
+        return {
+          ...funcs,
+          [attr.name]: handleAttrChange(attr.name),
+        }
+      }, {})
+    }, [customAttributes])
+
+    const valueSelectors = useMemo(() => {
+      return customAttributes.reduce((sels, attr) => {
+        return {
+          ...sels,
+          [attr.name]: selectors.attributeValueSelector(cardId, attr.name),
+        }
+      }, {})
+    }, [customAttributes, cardId])
+
     const renderEditingCustomAttributes = () => {
       return customAttributes.map((attr, index) => {
         return (
@@ -298,9 +312,9 @@ const CardDialogConnector = (connector) => {
             <EditAttribute
               index={index}
               entityType="scene"
-              valueSelector={selectors.attributeValueSelector(cardId, attr.name)}
-              onChange={handleAttrChange(attr.name)}
-              onSaveAndClose={saveAndClose}
+              valueSelector={valueSelectors[attr.name]}
+              onChange={handleAttrChangeFunctions[attr.name]}
+              onSaveAndClose={closeDialog}
               name={attr.name}
               id={attr.id}
               type={attr.type}
@@ -359,7 +373,7 @@ const CardDialogConnector = (connector) => {
                 )}
                 inputId={`card-${cardId}-template-${template.id}-attribute-${attr.name}`}
                 onChange={handleTemplateAttrChange(template.id, attr.name)}
-                onSaveAndClose={saveAndClose}
+                onSaveAndClose={closeDialog}
                 autoFocus={
                   foci &&
                   foci[0] &&
@@ -470,7 +484,7 @@ const CardDialogConnector = (connector) => {
     const renderButtonBar = () => {
       return (
         <ButtonToolbar className="card-dialog__button-bar">
-          <Button onClick={saveAndClose}>{t('Close')}</Button>
+          <Button onClick={closeDialog}>{t('Close')}</Button>
           <Button className="card-dialog__duplicate" onClick={duplicateCard}>
             <FiCopy />
             {' ' + t('Duplicate')}
@@ -637,7 +651,7 @@ const CardDialogConnector = (connector) => {
     }
 
     return (
-      <PlottrModal isOpen={true} onRequestClose={saveAndClose} style={modalStyles}>
+      <PlottrModal isOpen={true} onRequestClose={closeDialog} style={modalStyles}>
         {renderDelete()}
         {renderRemoveTemplate()}
         {renderTemplatePicker()}

@@ -284,7 +284,7 @@ const NoteListViewConnector = (connector) => {
                 trigger="click"
                 rootClose
                 open={filterVisible}
-                onClose={uiActions.showNotesFilterList}
+                onClose={uiActions.hideNotesFilterList}
                 placement="bottom"
                 component={popover}
               >

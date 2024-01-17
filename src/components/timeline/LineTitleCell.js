@@ -91,6 +91,18 @@ const LineTitleCellConnector = (connector) => {
       }
     }, [movingLine])
 
+    const startEditing = () => {
+      if (!movingLine) {
+        uiActions.startEditingPlotlineHeadingTitle(line.id)
+      }
+    }
+
+    useEffect(() => {
+      if (!editing && line.title === '') {
+        startEditing()
+      }
+    }, [])
+
     const deleteLine = (e) => {
       e.stopPropagation()
       actions.deleteLine(line.id)
@@ -201,12 +213,6 @@ const LineTitleCellConnector = (connector) => {
 
     const openColorPicker = () => {
       setShowColorPicker(true)
-    }
-
-    const startEditing = () => {
-      if (!movingLine) {
-        uiActions.startEditingPlotlineHeadingTitle(line.id)
-      }
     }
 
     const startHovering = () => {

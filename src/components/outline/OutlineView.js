@@ -216,11 +216,7 @@ const OutlineViewConnector = (connector) => {
         !!beats.length &&
         beats.slice(0, beatsToRender).map((beat, idx) => {
           let hasCards = beatsWithCards.includes(beat.id)
-          const beatCards = hasCards
-            ? cardMapping[beat.id]
-            : lines.length > 0
-            ? [emptyCard(idx, beat, lines[0])]
-            : []
+          const beatCards = hasCards ? cardMapping[beat.id] : []
           return (
             <ErrorBoundary key={beat.id}>
               <BeatView beat={beat} cards={beatCards} activeFilter={!!outlineFilter} />

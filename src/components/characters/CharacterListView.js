@@ -134,11 +134,8 @@ const CharacterListViewConnector = (connector) => {
     }
 
     const handleChooseTemplate = (templateData) => {
-      // going back to old way (without modal) to think it over
-      const id = nextIdAcrossCategories(visibleCharactersByCategory)
       actions.addCharacterWithTemplate(null, templateData)
       uiActions.setCharacterTemplateData(templateData)
-      uiActions.selectCharacter(id)
       uiActions.startEditingSelectedCharacter()
       uiActions.hideCharactersTemplatePicker()
     }
@@ -279,7 +276,7 @@ const CharacterListViewConnector = (connector) => {
               <Floater
                 trigger="click"
                 open={sortVisible}
-                onClose={uiActions.showCharacterSort}
+                onClose={uiActions.hideCharacterSort}
                 rootClose
                 placement="bottom"
                 component={sortPopover}

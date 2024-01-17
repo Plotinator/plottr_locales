@@ -64,7 +64,7 @@ const TemplateCreateConnector = (connector) => {
     const renderToolBar = () => {
       return (
         <ButtonToolbar>
-          <Button data-testid={testIds.save} bsStyle="success" onClick={saveEdit}>
+          <Button data-testid={testIds.save} bsStyle="success" onClick={saveEdit} disabled={!name}>
             {t('Save')}
           </Button>
           <Button data-testid={testIds.cancel} onClick={close}>

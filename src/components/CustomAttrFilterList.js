@@ -1,4 +1,4 @@
-import _, { identity, orderBy } from 'lodash'
+import _, { identity, orderBy, isEqual } from 'lodash'
 import React, { Component } from 'react'
 import PropTypes from 'react-proptypes'
 
@@ -47,7 +47,12 @@ const CustomAttrFilterListConnector = (connector) => {
           result[attr.id || attr.name] = filteredItems[attr.id || attr.name] || []
         return result
       }, filteredItems)
-      return { filteredItems }
+      const newState = { filteredItems }
+      if (isEqual(state, newState)) {
+        return state
+      } else {
+        return newState
+      }
     }
 
     updateFilter = (type, ids) => {

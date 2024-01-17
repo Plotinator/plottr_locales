@@ -138,11 +138,13 @@ const SelectListConnector = (connector) => {
                   <span className="colored" style={{ backgroundColor: item.color }}></span>
                 )
               }
+              const fallbackName =
+                listType && endsWith(listType, 's') ? listType.slice(0, -1) : listType
               return (
                 <li key={`${listType}-${item.id}`} onClick={() => add(parentId, item.id)}>
                   {colorSpan}
                   {glyph ? <Glyphicon glyph={glyph} style={{ fontSize: '12px' }} /> : null}{' '}
-                  {item.name || item.title}
+                  {item.name || item.title || i18n('New') + ` ${fallbackName}`}
                 </li>
               )
             }),

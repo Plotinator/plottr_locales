@@ -142,6 +142,7 @@ const CardCellConnector = (connector) => {
     }
 
     moveSceneCardAbove = (id, positionWithinLine) => {
+      this.setState({ inDropZone: false, dropDepth: 0 })
       const { beatId, lineId, cards } = this.props
       let newOrder = []
 
@@ -170,6 +171,7 @@ const CardCellConnector = (connector) => {
     }
 
     moveSceneCard = (id, positionWithinLine) => {
+      this.setState({ inDropZone: false, dropDepth: 0 })
       const { beatId, lineId, cards } = this.props
       let newOrder = []
 
@@ -206,13 +208,6 @@ const CardCellConnector = (connector) => {
       const numOfCards = cards.length
       const idxOfCards = numOfCards - 1
 
-      const endingDrop =
-        (f) =>
-        (...args) => {
-          this.setState({ inDropZone: false, dropDepth: 0 })
-          f(...args)
-        }
-
       return cards.map((card, idx) => {
         const isLastOne = idx == cards.length - 1
         return (
@@ -228,8 +223,8 @@ const CardCellConnector = (connector) => {
                 linePosition={linePosition}
                 color={color}
                 last={idxOfCards == idx}
-                moveCardAbove={endingDrop(this.moveSceneCardAbove)}
-                moveCard={endingDrop(this.moveSceneCardAbove)}
+                moveCardAbove={this.moveSceneCardAbove}
+                moveCard={this.moveSceneCardAbove}
                 allowDrop={true}
               />
             </ErrorBoundary>
@@ -237,7 +232,7 @@ const CardCellConnector = (connector) => {
               <CardAdd
                 color={color}
                 positionWithinLine={idx}
-                moveCard={endingDrop(this.moveSceneCard)}
+                moveCard={this.moveSceneCard}
                 addCard={this.addSceneCard}
                 allowDrop={isLastOne}
                 dropPosition={cards.length}
