@@ -123,6 +123,11 @@ const startupTasks = (userDataPath, stores, logInfo) => {
 
 const ONE_GIGABYTE = 1073741824
 
+// Use when we don't want to clog up the log files.
+const logQuietly = (...args) => {
+  console.log(...args)
+}
+
 const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
   process.send(`Starting server on port: ${port}`)
   const webSocketServer = new WebSocketServer({ host: 'localhost', port, maxPayload: ONE_GIGABYTE })
@@ -1114,7 +1119,7 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
       const elapsed = awaitingResponse
         ? new Date().getTime() - awaitingResponse.getTime()
         : Infinity
-      basicLogger.info(`Heart beat acknowledged in ${elapsed} (ms)`)
+      logQuietly(`Heart beat acknowledged in ${elapsed} (ms)`)
       awaitingResponse = null
     }
   })
