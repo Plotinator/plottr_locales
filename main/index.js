@@ -53,6 +53,8 @@ const { ipcMain } = electron
 ////////////////////////////////
 ////     Startup Tasks    //////
 ////////////////////////////////
+const TEN_MEGABYTES = 10485760
+log.transports.file.maxSize = TEN_MEGABYTES
 log.info(`--------Init (${app.getVersion()})--------`)
 const ENV_FILE_PATH = path.resolve('.env')
 import { config } from 'dotenv'
