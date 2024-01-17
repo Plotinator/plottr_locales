@@ -4,10 +4,10 @@ import * as htmlparser2 from 'htmlparser2'
 
 import unescapeHTML from './unescapeHTML'
 
-export function convertHTMLString(html) {
+export function convertHTMLString(html, options) {
   const parsed = htmlparser2.parseDocument(`<div id="body">${html}</div>`)
   const body = parsed.childNodes[0]
-  const slate = deserialize(null)(body)
+  const slate = deserialize(options)(null)(body)
   return slate.children.map(ensureWrapped).map(unnestLists)
 }
 
@@ -102,7 +102,7 @@ export function convertHTMLNodeList(nodeList) {
   // insert peers into.
   return compressConsecutiveSlateChildren({
     type: 'paragraph',
-    children: nodeList.map(deserialize(null)).flat(1),
+    children: nodeList.map(deserialize({})(null)).flat(1),
   }).children
 }
 
@@ -215,168 +215,174 @@ const unnestLists = (slate) => {
   return iter(slate)
 }
 
-export const deserialize = (parent) => (el) => {
-  if (el.nodeType === 3 && !parent) {
-    return jsx('element', { type: 'paragraph' }, [{ text: unescapeHTML(el.data ?? '') }])
-  } else if (el.nodeType === 3 && parent) {
-    return { text: unescapeHTML(el.data ?? '') }
-  } else if (el.nodeType !== 1) {
-    return null
-  }
+export const deserialize = (options) => (parent) => (el) => {
+  const deserializeIter = (parent) => (el) => {
+    if (el.nodeType === 3 && !parent) {
+      return jsx('element', { type: 'paragraph' }, [{ text: unescapeHTML(el.data ?? '') }])
+    } else if (el.nodeType === 3 && parent) {
+      return { text: unescapeHTML(el.data ?? '') }
+    } else if (el.nodeType !== 1) {
+      return null
+    }
 
-  const children = ensureAtLeastOneElement(
-    (el.childNodes ?? []).filter(onlyWhiteSpaceInSpan(el)).flatMap(deserialize(el))
-  )
+    const children = ensureAtLeastOneElement(
+      (el.childNodes ?? []).filter(onlyWhiteSpaceInSpan(el)).flatMap(deserializeIter(el))
+    )
 
-  const style = parseStyleAttribute(
-    (el.attributes ?? []).find((attribute) => {
-      return attribute.name === 'style'
-    })?.value
-  )
+    const style = parseStyleAttribute(
+      (el.attributes ?? []).find((attribute) => {
+        return attribute.name === 'style'
+      })?.value
+    )
 
-  const extraProps = {
-    ...(typeof style?.color === 'string' ? { color: style?.color } : {}),
-    ...(typeof style?.['font-family'] === 'string' ? { font: style?.['font-family'] } : {}),
-    ...(typeof style?.['font-size'] === 'string' && typeof safeParseInt(style?.size) === 'number'
-      ? { fontSize: safeParseInt(style?.['font-size']) }
-      : {}),
-  }
+    const extraProps = {
+      ...(typeof style?.color === 'string' ? { color: style?.color } : {}),
+      ...(typeof style?.['font-family'] === 'string' && !options.stripFont
+        ? { font: style?.['font-family'] }
+        : {}),
+      ...(typeof style?.['font-size'] === 'string' && typeof safeParseInt(style?.size) === 'number'
+        ? { fontSize: safeParseInt(style?.['font-size']) }
+        : {}),
+    }
 
-  const jsxWithProps = (type, properties, jsxChildren) => {
-    return jsx(type, { ...properties, ...extraProps }, jsxChildren)
-  }
+    const jsxWithProps = (type, properties, jsxChildren) => {
+      return jsx(type, { ...properties, ...extraProps }, jsxChildren)
+    }
 
-  switch (el.tagName?.toLowerCase() || '') {
-    case 'div': {
-      // if it's only child is a br
-      const elementChildren =
-        Array.isArray(el.childNodes) &&
-        el.childNodes.length === 1 &&
-        el.childNodes[0]?.tagName?.toLowerCase() === 'br'
-          ? [{ text: '' }]
-          : children
-      return jsxWithProps(
-        'element',
-        { type: 'paragraph' },
-        elementChildren.flatMap((child) => {
-          if (child.type === 'paragraph' && parent !== null) {
-            return child.children
-          } else {
-            return child
-          }
-        })
-      )
-    }
-    // case 'br':
-    //   return jsxWithProps('element', { type: 'paragraph' }, [{ text: '' }])
-    case 'blockquote':
-      return jsxWithProps('element', { type: 'block-quote' }, children.map(ensureWrapped))
-    case 'p':
-      return jsxWithProps(
-        'element',
-        { type: 'paragraph' },
-        children.flatMap((child) => {
-          if (child.type === 'paragraph' && parent !== null) {
-            return child.children
-          } else {
-            return child
-          }
-        })
-      )
-    case 'h1':
-      return jsxWithProps('element', { type: 'heading-one' }, children)
-    case 'h2':
-      return jsxWithProps('element', { type: 'heading-two' }, children)
-    case 'h3':
-    case 'h4':
-    case 'h5':
-    case 'h6':
-    case 'h7':
-      return jsxWithProps('element', { type: 'heading-two' }, children)
-    case 'ul':
-      return jsxWithProps('element', { type: 'bulleted-list' }, children)
-    case 'li': {
-      if (children.length === 1 && LIST_TYPES.includes(children[0].type)) {
-        return children[0]
-      } else {
-        return jsxWithProps('element', { type: 'list-item' }, children)
-      }
-    }
-    case 'ol':
-      return jsxWithProps('element', { type: 'numbered-list' }, children)
-    case 'em':
-    case 'i': {
-      return children.map((child) => {
-        return {
-          ...child,
-          ...extraProps,
-          italic: true,
-        }
-      })
-    }
-    case 'b':
-    case 'strong': {
-      return children.map((child) => {
-        return {
-          ...child,
-          ...extraProps,
-          bold: true,
-        }
-      })
-    }
-    case 'u': {
-      return children.map((child) => {
-        return {
-          ...child,
-          ...extraProps,
-          underline: true,
-        }
-      })
-    }
-    case 'span': {
-      return children.map((child) => {
-        return {
-          ...child,
-          ...extraProps,
-        }
-      })
-    }
-    case 'del':
-    case 'strike':
-    case 's': {
-      return children.map((child) => {
-        return {
-          ...extraProps,
-          ...child,
-          strike: true,
-        }
-      })
-    }
-    case 'img': {
-      const storageUrl = getAttribute(el, 'data-storageUrl')
-      if (storageUrl) {
-        const childrenNodes = [{ text: '' }]
+    switch (el.tagName?.toLowerCase() || '') {
+      case 'div': {
+        // if it's only child is a br
+        const elementChildren =
+          Array.isArray(el.childNodes) &&
+          el.childNodes.length === 1 &&
+          el.childNodes[0]?.tagName?.toLowerCase() === 'br'
+            ? [{ text: '' }]
+            : children
         return jsxWithProps(
           'element',
-          { type: 'image-link', storageUrl: getAttribute(el, 'data-storageUrl') },
-          childrenNodes
+          { type: 'paragraph' },
+          elementChildren.flatMap((child) => {
+            if (child.type === 'paragraph' && parent !== null) {
+              return child.children
+            } else {
+              return child
+            }
+          })
         )
-      } else if (typeof storageUrl === 'undefined') {
-        const childrenNodes = [{ text: '' }]
+      }
+      // case 'br':
+      //   return jsxWithProps('element', { type: 'paragraph' }, [{ text: '' }])
+      case 'blockquote':
+        return jsxWithProps('element', { type: 'block-quote' }, children.map(ensureWrapped))
+      case 'p':
         return jsxWithProps(
           'element',
-          { type: 'image-data', data: getAttribute(el, 'src') },
-          childrenNodes
+          { type: 'paragraph' },
+          children.flatMap((child) => {
+            if (child.type === 'paragraph' && parent !== null) {
+              return child.children
+            } else {
+              return child
+            }
+          })
         )
-      } else {
-        // Replace with blank span if others failed
-        return jsxWithProps('text', {}, '')
+      case 'h1':
+        return jsxWithProps('element', { type: 'heading-one' }, children)
+      case 'h2':
+        return jsxWithProps('element', { type: 'heading-two' }, children)
+      case 'h3':
+      case 'h4':
+      case 'h5':
+      case 'h6':
+      case 'h7':
+        return jsxWithProps('element', { type: 'heading-two' }, children)
+      case 'ul':
+        return jsxWithProps('element', { type: 'bulleted-list' }, children)
+      case 'li': {
+        if (children.length === 1 && LIST_TYPES.includes(children[0].type)) {
+          return children[0]
+        } else {
+          return jsxWithProps('element', { type: 'list-item' }, children)
+        }
       }
+      case 'ol':
+        return jsxWithProps('element', { type: 'numbered-list' }, children)
+      case 'em':
+      case 'i': {
+        return children.map((child) => {
+          return {
+            ...child,
+            ...extraProps,
+            italic: true,
+          }
+        })
+      }
+      case 'b':
+      case 'strong': {
+        return children.map((child) => {
+          return {
+            ...child,
+            ...extraProps,
+            bold: true,
+          }
+        })
+      }
+      case 'u': {
+        return children.map((child) => {
+          return {
+            ...child,
+            ...extraProps,
+            underline: true,
+          }
+        })
+      }
+      case 'span': {
+        return children.map((child) => {
+          return {
+            ...child,
+            ...extraProps,
+          }
+        })
+      }
+      case 'del':
+      case 'strike':
+      case 's': {
+        return children.map((child) => {
+          return {
+            ...extraProps,
+            ...child,
+            strike: true,
+          }
+        })
+      }
+      case 'img': {
+        const storageUrl = getAttribute(el, 'data-storageUrl')
+        if (storageUrl) {
+          const childrenNodes = [{ text: '' }]
+          return jsxWithProps(
+            'element',
+            { type: 'image-link', storageUrl: getAttribute(el, 'data-storageUrl') },
+            childrenNodes
+          )
+        } else if (typeof storageUrl === 'undefined') {
+          const childrenNodes = [{ text: '' }]
+          return jsxWithProps(
+            'element',
+            { type: 'image-data', data: getAttribute(el, 'src') },
+            childrenNodes
+          )
+        } else {
+          // Replace with blank span if others failed
+          return jsxWithProps('text', {}, '')
+        }
+      }
+      case 'a': {
+        return jsxWithProps('element', { type: 'link', url: getAttribute(el, 'href') }, children)
+      }
+      default:
+        return children
     }
-    case 'a': {
-      return jsxWithProps('element', { type: 'link', url: getAttribute(el, 'href') }, children)
-    }
-    default:
-      return children
   }
+
+  return deserializeIter(parent)(el)
 }

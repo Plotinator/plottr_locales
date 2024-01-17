@@ -157,7 +157,7 @@ const cards =
       case EDIT_CARD_DETAILS: {
         if (!action.attributes) return state
         const attributeValues = Object.keys(action.attributes).reduce((acc, nextKey) => {
-          if (typeof action.attributes[nextKey].value !== 'undefined') {
+          if (typeof action.attributes[nextKey]?.value !== 'undefined') {
             return {
               ...acc,
               [nextKey]: action.attributes[nextKey].value,

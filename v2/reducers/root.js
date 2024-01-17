@@ -38,6 +38,7 @@ import {
   REORDER_CARDS_WITHIN_LINE,
   DUPLICATE_BOOK,
   REORDER_CHARACTER_MANUALLY,
+  ADD_CHARACTER_WITH_TEMPLATE,
 } from '../constants/ActionTypes'
 import selectors from '../selectors'
 import { reduce, beatsByPosition, nextId as nextBeatId } from '../helpers/beats'
@@ -156,6 +157,7 @@ const root = (dataRepairers) => (state, action) => {
         currentTimeline,
       })
     }
+    case ADD_CHARACTER_WITH_TEMPLATE:
     case ADD_CHARACTER: {
       const currentBookId = selectedCharacterAttributeTabSelector(state)
       const nextCharacterId = nextId(state.characters)
@@ -395,31 +397,35 @@ const root = (dataRepairers) => (state, action) => {
     }
 
     case RESET_TIMELINE: {
-      let newResetAction = { ...action, isSeries }
-      // finding beats that will NOT be removed
-      const beatIdsToKeep = Object.values(omit(state.beats, action.bookId))
-        .flatMap((beatTree) => {
-          return Object.values(beatTree.index)
-        })
-        .reduce((acc, beat) => {
-          return {
-            ...acc,
-            [beat.id]: true,
+      if (typeof state.beats[action.bookId] === 'object') {
+        let newResetAction = { ...action, isSeries }
+        // finding beats that will NOT be removed
+        const beatIdsToKeep = Object.values(omit(state.beats, action.bookId))
+          .flatMap((beatTree) => {
+            return Object.values(beatTree.index)
+          })
+          .reduce((acc, beat) => {
+            return {
+              ...acc,
+              [beat.id]: true,
+            }
+          }, {})
+        // finding lines that will NOT be removed
+        const lineIdsToReset = state.lines.reduce((acc, l) => {
+          if (l.bookId != action.bookId) {
+            acc[l.id] = true
           }
+          return acc
         }, {})
-      // finding lines that will NOT be removed
-      const lineIdsToReset = state.lines.reduce((acc, l) => {
-        if (l.bookId != action.bookId) {
-          acc[l.id] = true
+        newResetAction = {
+          ...newResetAction,
+          beatIds: beatIdsToKeep,
+          lineIds: lineIdsToReset,
         }
-        return acc
-      }, {})
-      newResetAction = {
-        ...newResetAction,
-        beatIds: beatIdsToKeep,
-        lineIds: lineIdsToReset,
+        return mainReducer(state, newResetAction)
+      } else {
+        return state
       }
-      return mainReducer(state, newResetAction)
     }
 
     case MOVE_LINE: {

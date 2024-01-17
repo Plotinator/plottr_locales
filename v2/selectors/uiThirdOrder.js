@@ -238,11 +238,13 @@ export const searchModalReplaceWordSelector = createSelector(
 )
 
 const literalRegExp = (unescapedTerm, replaceWord) => {
-  const flags = [...unescapedTerm].some((c) => c.toLocaleUpperCase() === c) ? 'g' : 'gi'
+  const flags = [...unescapedTerm].some((c) => c.match(/\w/) && c.toLocaleUpperCase() === c)
+    ? 'g'
+    : 'gi'
   return new RegExp(
-    (replaceWord ? '\\W(?<term>' : '') +
+    (replaceWord ? '(?:^|\\W)(?<term>' : '') +
       unescapedTerm.replace(/[[\](){}$^\-.*+?|/]/g, '\\$&') +
-      (replaceWord ? ')\\W' : ''),
+      (replaceWord ? ')(?:$|\\W)' : ''),
     flags
   )
 }
@@ -508,7 +510,7 @@ export const charactersHitsSelector = createSelector(
         }
       }, [])
       const characterTemplateAttributes = character.templates.reduce((acc, template) => {
-        const templateAttributes = template.values.flatMap((attribute) => {
+        const templateAttributes = (template.values || []).flatMap((attribute) => {
           const valueAsString =
             (Array.isArray(attribute.value)
               ? serializeNoFormatting(attribute.value)

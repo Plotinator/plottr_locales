@@ -18,11 +18,20 @@ const sortManually = (items, attributeId, bookId) => {
 export function sortEachCategory(visibleByCategory, sort, isManuallySorted, attributeId, bookId) {
   const sortOperands = sort.split('~')
   const attrName = sortOperands[0]
-  const attrExtractor = attrName === 'last edited' ? 'lastEdited' : attrName
+  const attrExtractor =
+    attrName === 'last edited'
+      ? (entity) => {
+          if (typeof entity.lastEdited !== 'number') {
+            return 0
+          } else {
+            return entity.lastEdited
+          }
+        }
+      : attrName
   const direction = sortOperands[1]
   const sortByOperand = attrName === 'name' ? [attrExtractor, 'id'] : [attrExtractor, 'name']
 
-  Object.keys(visibleByCategory).forEach((k) => {
+  return Object.keys(visibleByCategory).reduce((acc, k) => {
     const itemByCategory = visibleByCategory[k]
 
     const sorted = isManuallySorted
@@ -30,7 +39,9 @@ export function sortEachCategory(visibleByCategory, sort, isManuallySorted, attr
       : positionReset(sortBy(itemByCategory, sortByOperand))
 
     if (direction == 'desc') sorted.reverse()
-    visibleByCategory[k] = sorted
-  })
-  return visibleByCategory
+    return {
+      ...acc,
+      [k]: sorted,
+    }
+  }, {})
 }

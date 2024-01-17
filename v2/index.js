@@ -91,7 +91,7 @@ import {
   serialize as serializeToPlain,
   serializeNoFormatting,
 } from './slate_serializers/to_plain_text'
-import { convertHTMLString } from './slate_serializers/from_html'
+import { convertHTMLString } from './slate_deserializers/from_html'
 
 import checkFileIntegrity from './store/checkFileIntegrity'
 
@@ -149,10 +149,7 @@ const helpers = {
 const slate = {
   rtf: { serialize: serializeToRTF },
   plain: { serialize: serializeToPlain, serializeNoFormatting },
-}
-
-const html = {
-  slate: { deserialise: convertHTMLString },
+  html: { deserialise: convertHTMLString },
 }
 
 const middlewares = {
@@ -191,7 +188,6 @@ export {
   borderStyle,
   defaultSettings,
   slate,
-  html,
   middlewares,
   ARRAY_KEYS,
   checkFileIntegrity,

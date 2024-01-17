@@ -184,6 +184,7 @@ import {
   FINISH_JUMPING,
   ADD_LINES_FROM_TEMPLATE,
   SET_REPLACE_WORD,
+  ADD_CHARACTER_WITH_TEMPLATE,
 } from '../constants/ActionTypes'
 import {
   ui as defaultUI,
@@ -588,6 +589,7 @@ const updateUI = (state, action) => {
       }
     }
 
+    case ADD_CHARACTER_WITH_TEMPLATE:
     case ADD_CHARACTER: {
       return {
         ...state,
@@ -1213,10 +1215,6 @@ const updateUI = (state, action) => {
         const pathToSet = cardFocusPath(action.id, {
           baseAttributeName,
         })
-        const newFocus = {
-          path: pathToSet,
-          selection: action.attributes[nextAttributeKey].selection,
-        }
         const key =
           acc.currentView === 'timeline'
             ? 'timeline'
@@ -1227,9 +1225,13 @@ const updateUI = (state, action) => {
         const existing = foci.find(({ path }) => {
           return isEqual(path, pathToSet)
         })
-        if (!action.attributes[nextAttributeKey].selection) {
+        if (typeof action?.attributes[nextAttributeKey]?.selection !== 'object') {
           return acc
         } else {
+          const newFocus = {
+            path: pathToSet,
+            selection: action.attributes[nextAttributeKey].selection,
+          }
           if (existing) {
             return {
               ...acc,
