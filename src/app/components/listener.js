@@ -237,23 +237,6 @@ const Listener = ({
     }
   }, [isLoggedIn, checkedSession, userId, emailAddress, hasPro, checkingProSubscription])
 
-  // ====Synchronising data file name to known file name====
-  useEffect(() => {
-    if (!fileURL || !fileName || knownFiles.length === 0) return
-
-    if (!helpers.file.urlPointsToPlottrCloud(fileURL)) {
-      return
-    }
-
-    const knownFileRecord = knownFiles.find((file) => {
-      return file.fileURL === fileURL
-    })
-    if (knownFileRecord && knownFileRecord.fileName !== fileName) {
-      const fileId = helpers.file.withoutProtocol(fileURL)
-      updateAuthFileName(fileId, fileName)
-    }
-  }, [knownFiles, fileURL, fileName])
-
   return null
 }
 
