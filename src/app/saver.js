@@ -84,8 +84,6 @@ const Saver = (
               lastFailedRef.current = shouldMarkAsFailed
             })
           })
-      } else {
-        logger.info(`State didn't change.  Not going ahead with ${name}.`)
       }
     }, intervalMS)
   }
