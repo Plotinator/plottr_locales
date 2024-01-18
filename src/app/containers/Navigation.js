@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import PropTypes from 'react-proptypes'
 import { connect } from 'react-redux'
-import { FaRegUser, FaKey } from 'react-icons/fa'
+import { FaRegUser, FaKey, FaSearch } from 'react-icons/fa'
 
 import { t } from 'plottr_locales'
 import { Navbar, NavItem, Nav, Beamer, BookChooser, Button } from 'connected-components'
@@ -20,6 +20,7 @@ const Navigation = ({
   changeCurrentView,
   clickOnDom,
   appIsBusyWithWork,
+  openSearch,
 }) => {
   const [dashboardView, setDashboardView] = useState(null)
 
@@ -97,6 +98,9 @@ const Navigation = ({
         </Nav>
         <Navbar.Form pullRight className="dashboard__navbar-form">
           {renderSaveIndicator()}
+          <Button onClick={openSearch} style={{ marginRight: '5px' }}>
+            <FaSearch /> {t('Search')}
+          </Button>
           <TrialLinks />
           <Button onClick={openDashboard}>
             <FaRegUser /> {t('Dashboard')}
@@ -116,6 +120,7 @@ Navigation.propTypes = {
   forceProjectDashboard: PropTypes.bool,
   appIsBusyWithWork: PropTypes.bool,
   clickOnDom: PropTypes.func.isRequired,
+  openSearch: PropTypes.func.isRequired,
 }
 
 function mapStateToProps(state) {
@@ -130,4 +135,5 @@ function mapStateToProps(state) {
 export default connect(mapStateToProps, {
   changeCurrentView: actions.ui.changeCurrentView,
   clickOnDom: actions.domEvents.clickOnDom,
+  openSearch: actions.ui.openSearch,
 })(Navigation)
