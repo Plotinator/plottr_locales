@@ -4,7 +4,7 @@ import * as htmlparser2 from 'htmlparser2'
 
 import unescapeHTML from './unescapeHTML'
 
-export function convertHTMLString(html, options) {
+export function convertHTMLString(html, options = {}) {
   const parsed = htmlparser2.parseDocument(`<div id="body">${html}</div>`)
   const body = parsed.childNodes[0]
   const slate = deserialize(options)(null)(body)

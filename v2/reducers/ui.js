@@ -1695,7 +1695,6 @@ const updateUI = (state, action) => {
         ...state,
         cardDialog: {
           ...state.cardDialog,
-          showTemplatePicker: true,
           removeWhichTemplate: action.id,
         },
       }

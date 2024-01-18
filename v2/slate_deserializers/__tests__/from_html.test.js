@@ -780,6 +780,24 @@ describe('convertHTMLString', () => {
         },
       ])
     })
+    describe('when the strip font option is supplied', () => {
+      it('should not interpret the font from the html', () => {
+        expect(
+          convertHTMLString('<span style="font-family: IBM Plex Serif">this is some text</span>', {
+            stripFont: true,
+          })
+        ).toEqual([
+          {
+            type: 'paragraph',
+            children: [
+              {
+                text: 'this is some text',
+              },
+            ],
+          },
+        ])
+      })
+    })
   })
   describe('given an img with a data URL', () => {
     const testImageData = 'data:image/jpeg;base64,dummy-image-data'
