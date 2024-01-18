@@ -52,7 +52,7 @@ const PlaceItemConnector = (connector) => {
 
     useEffect(() => {
       scrollIntoView()
-    }, [])
+    }, [selected])
 
     const deletePlace = (e) => {
       e.stopPropagation()

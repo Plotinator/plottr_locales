@@ -10,6 +10,7 @@
 
 .card-dialog.darkmode {
   color: $darkmode-text;
+  background-color: transparent;
 
   .card-dialog__description .card-dialog__tabs {
     .nav-tabs {

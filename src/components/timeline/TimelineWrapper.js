@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useCallback } from 'react'
 import PropTypes from 'react-proptypes'
 import { StickyTable } from 'react-sticky-table'
 import cx from 'classnames'
@@ -331,15 +331,27 @@ const TimelineWrapperConnector = (connector) => {
     }
 
     const scrollHandler = (e) => {
-      const position = {
-        x: e.currentTarget.scrollLeft,
-        y: e.currentTarget.scrollTop,
+      if (
+        typeof e?.currentTarget?.scrollLeft === 'number' &&
+        typeof e?.currentTarget?.scrollTop === 'number'
+      ) {
+        const position = {
+          x: e.currentTarget.scrollLeft,
+          y: e.currentTarget.scrollTop,
+        }
+        if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
+        scrollTimeoutRef.current = setTimeout(() => {
+          actions.recordTimelineScrollPosition(position)
+        }, 500)
       }
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
-      scrollTimeoutRef.current = setTimeout(() => {
-        actions.recordTimelineScrollPosition(position)
-      }, 500)
     }
+
+    const setTableRef = useCallback(
+      (ref) => {
+        tableRef.current = ref
+      },
+      [tableRef]
+    )
 
     // ////////
     // flip  //
@@ -648,23 +660,11 @@ const TimelineWrapperConnector = (connector) => {
       return null
     }
 
-    const setTableRef = (ref) => {
-      tableRef.current = ref
-    }
-
     const renderBody = () => {
       if (timelineBundle.isSmall) {
         if (timelineView === 'tabbed') {
           return (
-            <TimelineTabs
-              TableComponent={() => (
-                <TimelineTable
-                  setTableRef={setTableRef}
-                  tableRef={tableRef.current}
-                  activeTab={activeTab}
-                />
-              )}
-            />
+            <TimelineTabs setTableRef={setTableRef} tableRef={tableRef.current} mounted={mounted} />
           )
         } else {
           return (
@@ -680,27 +680,7 @@ const TimelineWrapperConnector = (connector) => {
       } else {
         if (timelineView === 'tabbed') {
           return (
-            <TimelineTabs
-              TableComponent={() => (
-                <StickyTable
-                  leftColumnZ={5}
-                  headerZ={5}
-                  wrapperRef={(ref) => (tableRef.current = ref)}
-                  className={cx({
-                    darkmode: timelineBundle.darkMode,
-                    vertical: timelineBundle.orientation == 'vertical',
-                  })}
-                  stickyHeaderCount={stickyHeaderCount}
-                  leftStickyColumnCount={stickyLeftColumnCount}
-                >
-                  {mounted ? (
-                    <TimelineTable activeTab={activeTab} tableRef={tableRef.current} />
-                  ) : (
-                    <FunSpinner />
-                  )}
-                </StickyTable>
-              )}
-            />
+            <TimelineTabs setTableRef={setTableRef} tableRef={tableRef.current} mounted={mounted} />
           )
         } else {
           return (

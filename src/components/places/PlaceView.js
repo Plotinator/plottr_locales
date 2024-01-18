@@ -111,11 +111,11 @@ const PlaceViewConnector = (connector) => {
     }
 
     const changeCategory = (newCategoryId) => {
-      actions.editPlace(place.id, { categoryId: newCategoryId })
+      actions.editPlace(place.id, { categoryId: { value: newCategoryId } })
     }
 
     const updateImageId = (newImageId) => {
-      actions.editPlace(place.id, { imageId: newImageId })
+      actions.editPlace(place.id, { imageId: { value: newImageId } })
     }
 
     const renderDelete = () => {

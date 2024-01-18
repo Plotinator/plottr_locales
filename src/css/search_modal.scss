@@ -252,7 +252,7 @@
 }
 
 .search-modal__body {
-  max-height: calc(80vh - 400px);
+  max-height: calc(100vh - 300px);
   overflow-y: scroll;
   background-color: #ffffff;
   padding-bottom: 20px;
@@ -269,11 +269,24 @@
   & > div {
     padding: 20px;
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: flex-end;
     flex-direction: row;    
   }
   hr {
     margin: 0px;
+  }
+
+  .search-modal__replace-word-label {
+    margin: 0px;
+  }
+
+  .search-modal__replace-word-checkbox {
+    margin: 0px !important;
+    margin-bottom: 4px !important;
+    margin-left: 5px !important;
+    width: 12px;
+    height: 12px;
   }
 }
 

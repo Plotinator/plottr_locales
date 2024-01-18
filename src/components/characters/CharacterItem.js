@@ -31,10 +31,18 @@ const CharacterItemConnector = (connector) => {
       this.ref = React.createRef()
     }
 
+    componentDidMount() {
+      this.scrollIntoView()
+    }
+
+    componentDidUpdate() {
+      this.scrollIntoView()
+    }
+
     scrollIntoView = () => {
       if (this.props.selected) {
         const node = this.ref.current
-        if (node) node.scrollIntoView()
+        if (node) node.scrollIntoView?.()
       }
     }
 

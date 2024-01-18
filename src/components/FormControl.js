@@ -36,6 +36,7 @@ const propTypes = {
   onSelectionChange: PropTypes.func,
   jumpCounter: PropTypes.number,
   onClick: PropTypes.func,
+  supressScrollIntoView: PropTypes.bool,
 }
 
 const defaultProps = {
@@ -57,7 +58,10 @@ class FormControl extends React.Component {
     if (!this.focusing && this.component && this.props.autoFocus) {
       this.focusing = true
       this.component.focus()
-      if (typeof this.component.scrollIntoView === 'function') {
+      if (
+        typeof this.component.scrollIntoView === 'function' &&
+        !this.props.supressScrollIntoView
+      ) {
         this.component.scrollIntoView({ behavior: 'smooth' })
       }
       setTimeout(() => {

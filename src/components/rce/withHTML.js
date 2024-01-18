@@ -1,14 +1,16 @@
 import { Transforms } from 'slate'
-import { convertHTMLString } from './from_html'
+import { slate } from 'pltr/v2'
 
 export const withHTML = (editor) => {
   const { insertData } = editor
 
   editor.insertData = (data) => {
-    const html = data.getData('text/html')
+    const htmlRootNode = data.getData('text/html')
 
-    if (html) {
-      Transforms.insertNodes(editor, convertHTMLString(html))
+    if (htmlRootNode) {
+      // Don't include fonts because we don't *yet* have a means of
+      // picking a matching font from our supported subset.
+      Transforms.insertNodes(editor, slate.html.deserialise(htmlRootNode, { stripFont: true }))
     } else {
       insertData(data)
     }

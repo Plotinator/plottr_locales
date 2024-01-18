@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import PropTypes from 'react-proptypes'
 import { Row, Cell } from 'react-sticky-table'
 
@@ -70,50 +70,73 @@ const TopRowConnector = (connector) => {
       return () => {}
     }, [timelineViewIsStacked])
 
-    const handleReorderBeats = (droppedPositionId, originalPositionId) => {
-      const { currentTimeline, beatActions } = props
-      beatActions.reorderBeats(originalPositionId, droppedPositionId, currentTimeline)
-    }
+    const handleReorderBeats = useCallback(
+      (droppedPositionId, originalPositionId) => {
+        const { currentTimeline, beatActions } = props
+        beatActions.reorderBeats(originalPositionId, droppedPositionId, currentTimeline)
+      },
+      [props.currentTimeline, props.beatActions]
+    )
 
-    const handleReorderLines = (droppedPosition, originalPosition) => {
-      const { lineActions } = props
-      lineActions.reorderLines(droppedPosition, originalPosition)
-    }
+    const handleReorderLines = useCallback(
+      (droppedPosition, originalPosition) => {
+        const { lineActions } = props
+        lineActions.reorderLines(droppedPosition, originalPosition)
+      },
+      [props.lineActions]
+    )
 
-    const handleTogglePinPlotline = (line) => {
-      const { lineActions } = props
-      lineActions.togglePinPlotline(line)
-    }
+    const handleTogglePinPlotline = useCallback(
+      (line) => {
+        const { lineActions } = props
+        lineActions.togglePinPlotline(line)
+      },
+      [props.lineActions]
+    )
 
-    const handleInsertNewBeat = (peerBeatId) => {
-      const { currentTimeline, beatActions } = props
-      beatActions.insertBeat(currentTimeline, peerBeatId)
-    }
+    const handleInsertNewBeat = useCallback(
+      (peerBeatId) => {
+        const { currentTimeline, beatActions } = props
+        beatActions.insertBeat(currentTimeline, peerBeatId)
+      },
+      [props.beatActions, props.currentTimeline]
+    )
 
-    const handleInsertChildBeat = (beatToLeftId) => {
-      const { currentTimeline, beatActions } = props
-      beatActions.expandBeat(beatToLeftId, currentTimeline)
-      beatActions.addBeat(currentTimeline, beatToLeftId)
-    }
+    const handleInsertChildBeat = useCallback(
+      (beatToLeftId) => {
+        const { currentTimeline, beatActions } = props
+        beatActions.expandBeat(beatToLeftId, currentTimeline)
+        beatActions.addBeat(currentTimeline, beatToLeftId)
+      },
+      [props.beatActions, props.currentTimeline]
+    )
 
-    const handleAppendBeat = () => {
+    const handleAppendBeat = useCallback(() => {
       const { currentTimeline, beatActions, beats, timelineViewIsTabbed, activeTab } = props
       if (timelineViewIsTabbed) {
         if (beats.length === 0) {
           handleInsertChildBeat(activeTab, currentTimeline)
           return
         } else {
-          handleInsertNewBeat(beats[beats.length - 1].id)
+          handleInsertNewBeat(beats[beats.length - 1]?.id)
           return
         }
       }
       beatActions.addBeat(currentTimeline)
-    }
+    }, [
+      props.currentTimeline,
+      props.beatActions,
+      props.beats,
+      props.timelineViewIsTabbed,
+      props.activeTab,
+      handleInsertChildBeat,
+      handleInsertNewBeat,
+    ])
 
-    const handleAppendLine = () => {
+    const handleAppendLine = useCallback(() => {
       const { currentTimeline, lineActions } = props
       lineActions.addLine(currentTimeline)
-    }
+    }, [props.lineActions, props.currentTimeline])
 
     const renderSecondLastInsertBeatCell = () => {
       const { timelineViewIsStacked, timelineViewIsTabbed, isLarge, isMedium } = props

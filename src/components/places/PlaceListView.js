@@ -189,7 +189,7 @@ const PlaceListViewConnector = (connector) => {
                 trigger="click"
                 rootClose
                 open={filterVisible}
-                onClose={uiActions.showPlaceFilterList}
+                onClose={uiActions.hidePlaceFilterList}
                 placement="bottom"
                 component={filterPopover}
               >

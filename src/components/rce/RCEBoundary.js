@@ -53,6 +53,7 @@ const RCEBoundaryConnector = (connector) => {
       // "user" object which comes from EDD.
       const userId = this.props.userId || this.props.user.payment_id || 'UNKNOWN_USER'
       const userEmail = this.props.email || this.props.user.customer_email || 'UNKNOWN_EMAIL'
+      const fileURL = this.props.fileURL
       Promise.all([platform(), appVersion()])
         .then(([os, version]) => {
           return errorReporter(
@@ -63,7 +64,8 @@ const RCEBoundaryConnector = (connector) => {
             'RCEErrorBoundary',
             os,
             userId,
-            userEmail
+            userEmail,
+            fileURL
           )
         })
         .then((reporter) => {
@@ -167,6 +169,7 @@ const RCEBoundaryConnector = (connector) => {
     user: PropTypes.object.isRequired,
     userId: PropTypes.string,
     email: PropTypes.string,
+    fileURL: PropTypes.string,
   }
 
   const {
@@ -183,6 +186,7 @@ const RCEBoundaryConnector = (connector) => {
       user: selectors.userSettingsSelector(state),
       userId: selectors.userIdSelector(state),
       email: selectors.emailAddressSelector(state),
+      fileURL: selectors.fileURLSelector(state),
     }))(RCEBoundary)
   }
 

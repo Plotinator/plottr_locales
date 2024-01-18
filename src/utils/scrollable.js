@@ -29,27 +29,34 @@ class Scrollable {
 
   scrollTo(leftScroll, topScroll, instant = false) {
     const ref = this.getElementRef()
-    this.targetLeft = mathematicallySensibleOr(leftScroll, ref.scrollLeft)
-    this.targetTop = mathematicallySensibleOr(topScroll, ref.scrollTop)
+    if (typeof ref?.scrollLeft === 'number' && typeof ref?.scrollTop === 'number') {
+      this.targetLeft = mathematicallySensibleOr(leftScroll, ref.scrollLeft)
+      this.targetTop = mathematicallySensibleOr(topScroll, ref.scrollTop)
 
-    return this.go(instant)
+      return this.go(instant)
+    } else {
+      return Promise.resolve()
+    }
   }
 
   scrollBy(leftDelta, topDelta, instant = false) {
     const ref = this.getElementRef()
+    if (typeof ref?.scrollLeft === 'number' && typeof ref?.scrollTop === 'number') {
+      this.targetLeft = Math.max(
+        0,
+        mathematicallySensibleOr(this.targetLeft, ref.scrollLeft) +
+          mathematicallySensibleOr(leftDelta, 0)
+      )
+      this.targetTop = Math.max(
+        0,
+        mathematicallySensibleOr(this.targetTop, ref.scrollTop) +
+          mathematicallySensibleOr(topDelta, 0)
+      )
 
-    this.targetLeft = Math.max(
-      0,
-      mathematicallySensibleOr(this.targetLeft, ref.scrollLeft) +
-        mathematicallySensibleOr(leftDelta, 0)
-    )
-    this.targetTop = Math.max(
-      0,
-      mathematicallySensibleOr(this.targetTop, ref.scrollTop) +
-        mathematicallySensibleOr(topDelta, 0)
-    )
-
-    return this.go(instant)
+      return this.go(instant)
+    } else {
+      return Promise.resolve()
+    }
   }
 }
 

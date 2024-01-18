@@ -77,6 +77,7 @@ const TagViewConnector = (connector) => {
     }
 
     const startEditing = () => {
+      uiActions.selectTag(tag.id)
       uiActions.editSelectedTag()
     }
 
@@ -235,7 +236,7 @@ const TagViewConnector = (connector) => {
     }
 
     let body = null
-    if (editing) {
+    if (editing || newTag) {
       body = renderEditing()
     } else {
       body = renderTag()

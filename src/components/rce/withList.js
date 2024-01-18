@@ -8,7 +8,7 @@ export const withList = (log) => (editor) => {
     try {
       parent = Editor.parent(editor, editor.selection)
     } catch (error) {
-      log.error(error)
+      log.error('Error finding parent node to insert a break in a list', error)
     }
 
     if (parent == null) return void insertBreak()
@@ -35,7 +35,7 @@ export const withList = (log) => (editor) => {
     try {
       parent = Editor.parent(editor, editor.selection)
     } catch (error) {
-      log.error(error)
+      log.error('Error deleting a node backwards', error)
     }
 
     if (parent == null) return void deleteBackward(unit)

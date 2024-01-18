@@ -79,46 +79,88 @@ const CharacterEditDetailsConnector = (connector) => {
       })?.selection
     }
 
-    const selectionForMainChangingElement = (attributeId) => {
+    const selectionForMainChangingElement = (attributeId, legacyAttributeName) => {
       const characterId = character.id
       const bookId = attributeTabId
 
       // The foci selector narrows down to the selected book already(!)
       if (
         foci[0] &&
-        isEqual(foci[0].path, ['character', characterId, 'customAttribute', attributeId, bookId])
+        (isEqual(foci[0].path, [
+          'character',
+          characterId,
+          'customAttribute',
+          attributeId,
+          bookId,
+        ]) ||
+          isEqual(foci[0].path, [
+            'character',
+            characterId,
+            'customAttribute',
+            legacyAttributeName,
+            bookId,
+          ]))
       ) {
         return foci[0].selection
       }
       return null
     }
 
-    const shouldFocusMainChangingElement = (attributeId) => {
+    const shouldFocusMainChangingElement = (attributeId, legacyAttributeName) => {
       const characterId = character.id
       const bookId = attributeTabId
 
       // The foci selector narrows down to the selected book already(!)
       return (
         foci[0] &&
-        isEqual(foci[0].path, ['character', characterId, 'customAttribute', attributeId, bookId])
+        (isEqual(foci[0].path, [
+          'character',
+          characterId,
+          'customAttribute',
+          attributeId,
+          bookId,
+        ]) ||
+          isEqual(foci[0].path, [
+            'character',
+            characterId,
+            'customAttribute',
+            legacyAttributeName,
+            bookId,
+          ]))
       )
     }
 
-    const selectionForCustomAttribute = (attributeId) => {
+    const selectionForCustomAttribute = (attributeId, attributeName) => {
       const characterId = character.id
       const bookId = attributeTabId
       return foci?.find(({ path }) => {
-        return isEqual(path, ['character', characterId, 'customAttribute', attributeId, bookId])
+        return (
+          isEqual(path, ['character', characterId, 'customAttribute', attributeId, bookId]) ||
+          isEqual(path, ['character', characterId, 'customAttribute', attributeName, bookId])
+        )
       })?.selection
     }
 
-    const shouldFocusCustomAttribute = (attributeId) => {
+    const shouldFocusCustomAttribute = (attributeId, attributeName) => {
       const characterId = character.id
       const bookId = attributeTabId
       return (
         foci &&
         foci[0] &&
-        isEqual(foci[0].path, ['character', characterId, 'customAttribute', attributeId, bookId])
+        (isEqual(foci[0].path, [
+          'character',
+          characterId,
+          'customAttribute',
+          attributeId,
+          bookId,
+        ]) ||
+          isEqual(foci[0].path, [
+            'character',
+            characterId,
+            'customAttribute',
+            attributeName,
+            bookId,
+          ]))
       )
     }
 
@@ -326,8 +368,8 @@ const CharacterEditDetailsConnector = (connector) => {
               name={attr.name}
               id={attr.id}
               type={attr.type}
-              autoFocus={shouldFocusCustomAttribute(attr.id)}
-              selection={selectionForCustomAttribute(attr.id)}
+              autoFocus={shouldFocusCustomAttribute(attr.id, attr.name)}
+              selection={selectionForCustomAttribute(attr.id, attr.name)}
               inputId={`character-${character.id}-custom-attribute-${
                 attr.id || attr.name
               }-book-${attributeTabId}`}
@@ -463,8 +505,14 @@ const CharacterEditDetailsConnector = (connector) => {
                   id={`character-${character.id}-short-description`}
                   type="text"
                   onChange={changeShortDescription}
-                  autoFocus={shouldFocusMainChangingElement(shortDescriptionAttributeId)}
-                  selection={selectionForMainChangingElement(shortDescriptionAttributeId)}
+                  autoFocus={shouldFocusMainChangingElement(
+                    shortDescriptionAttributeId,
+                    'description'
+                  )}
+                  selection={selectionForMainChangingElement(
+                    shortDescriptionAttributeId,
+                    'description'
+                  )}
                   onSelection
                   onKeyDown={handleEsc}
                   onKeyPress={handleEnter}
@@ -497,8 +545,8 @@ const CharacterEditDetailsConnector = (connector) => {
                 id={`character-${character.id}-notes-book-${attributeTabId}`}
                 description={character.notes}
                 onChange={handleNotesChanged}
-                autoFocus={shouldFocusMainChangingElement(descriptionAttributeId)}
-                selection={selectionForMainChangingElement(descriptionAttributeId)}
+                autoFocus={shouldFocusMainChangingElement(descriptionAttributeId, 'notes')}
+                selection={selectionForMainChangingElement(descriptionAttributeId, 'notes')}
                 editable
               />
             </Tab>

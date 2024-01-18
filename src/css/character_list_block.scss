@@ -420,6 +420,11 @@
 }
 
 .darkmode {
+  .character-list {
+    h1 {
+      background-color: transparent;
+    }
+  }
   .character-list__character-view.darkmode {
     background-color: #24252c;
     color: #aaa;

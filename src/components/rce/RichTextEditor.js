@@ -73,13 +73,13 @@ const RichTextEditorConnector = (connector) => {
     },
   } = connector
   checkDependencies({
+    getInstance,
     resolveToPublicUrl,
     isStorageURL,
     log,
     openExternal,
     undo,
     redo,
-    getInstance,
   })
 
   const errorReportingLogger = {
@@ -114,11 +114,16 @@ const RichTextEditorConnector = (connector) => {
     useSpellcheck,
     jumpCounter,
     startEditing,
+    addImage,
   }) => {
     const editor = useMemo(() => {
-      return createEditor(errorReportingLogger)
-    }, [id])
+      return createEditor(errorReportingLogger, addImage)
+    }, [id, addImage])
     const registerEditor = useRegisterEditor(editor)
+
+    const key = useMemo(() => {
+      return `${id}-${editState}`
+    }, [editState, id])
 
     // Rendering helpers
     const renderLeaf = useCallback((props) => <Leaf {...props} />, [])
@@ -230,7 +235,7 @@ const RichTextEditorConnector = (connector) => {
 
     // State management
     const [
-      value,
+      initialValue,
       onValueChanged,
       onKeyDown,
       onPaste,
@@ -240,7 +245,7 @@ const RichTextEditorConnector = (connector) => {
     ] = useEditState(
       editorKey,
       fileId,
-      id,
+      key,
       editor,
       onChange,
       undo,
@@ -248,7 +253,7 @@ const RichTextEditorConnector = (connector) => {
       text,
       selection,
       undoId,
-      log
+      errorReportingLogger
     )
 
     const wrappedOnChange = useCallback(
@@ -273,12 +278,12 @@ const RichTextEditorConnector = (connector) => {
       if (event.key === 'Tab') {
         if (event.shiftKey) {
           if (Editor.isInList(editor, editor.selection)) {
-            handleList(editor, null, log)
+            handleList(editor, null, errorReportingLogger)
             event.preventDefault()
             event.stopPropagation()
             return
           }
-        } else if (indent(editor, null, log)) {
+        } else if (indent(editor, null, errorReportingLogger)) {
           event.preventDefault()
           event.stopPropagation()
           return
@@ -328,7 +333,7 @@ const RichTextEditorConnector = (connector) => {
           Transforms.collapse(editor, { edge: 'anchor' })
         }
       } catch (error) {
-        log.warn(error)
+        errorReportingLogger.warn(error)
       }
     }
 
@@ -340,11 +345,11 @@ const RichTextEditorConnector = (connector) => {
       editorWrapperRef.current.firstChild.focus()
     }
 
-    if (value === null) return null
+    if (initialValue === null) return null
 
     const otherProps = {}
     return (
-      <Slate editor={editor} value={value} onChange={wrappedOnChange} key={id}>
+      <Slate editor={editor} value={initialValue} onChange={wrappedOnChange} key={key}>
         <div className={cx('slate-editor__wrapper', className)}>
           <ToolBar editor={editor} focusEditor={focusEditor} />
           <div
@@ -395,6 +400,7 @@ const RichTextEditorConnector = (connector) => {
     useSpellcheck: PropTypes.bool,
     jumpCounter: PropTypes.number,
     startEditing: PropTypes.func.isRequired,
+    addImage: PropTypes.func.isRequired,
   }
 
   const {
@@ -419,6 +425,7 @@ const RichTextEditorConnector = (connector) => {
         editState: selectors.editStateSelector(state),
       }),
       {
+        addImage: actions.image.addImage,
         cacheImage: actions.imageCache.cacheImage,
         startEditing: actions.applicationState.startEditing,
       }

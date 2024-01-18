@@ -33,9 +33,11 @@ const ExportDialogConnector = (connector) => {
       isWindows,
       mpq,
       storage: { downloadStorageImage },
+      errorReporter: { getInstance },
     },
   } = connector
   checkDependencies({
+    getInstance,
     log,
     showErrorBox,
     askToExport,
@@ -88,7 +90,9 @@ const ExportDialogConnector = (connector) => {
             props.close()
           })
           .catch((error) => {
-            log.error(error)
+            getInstance().then((errorReporter) => {
+              errorReporter.error('Error exporting', error)
+            })
             showErrorBox(t('Error'), t('There was an error doing that. Try again'))
             return
           })

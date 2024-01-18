@@ -32,7 +32,6 @@ const areEqual = (prevProps, nextProps) => {
   }
   return true
 }
-
 const EditAttributeConnector = (connector) => {
   const RichText = RichTextConnector(connector)
   const TextFormControl = UnconnectedTextFormControl(connector)
@@ -44,7 +43,6 @@ const EditAttributeConnector = (connector) => {
   checkDependencies({ undo, redo, log })
 
   const EditAttribute = ({
-    entityType,
     templateAttribute,
     name,
     id,
@@ -59,10 +57,8 @@ const EditAttributeConnector = (connector) => {
     onChange,
     onSave,
     onSaveAndClose,
-    addAttribute,
     removeAttribute,
     editAttribute,
-    reorderAttribute,
     autoFocus,
   }) => {
     const [deleting, setDeleting] = useState(false)
@@ -72,15 +68,8 @@ const EditAttributeConnector = (connector) => {
 
     useEffect(() => {
       if (editTitleRef.current) {
-        if (editing) {
+        if (typeof editTitleRef.current?.focus === 'function') {
           editTitleRef.current.focus()
-          editTitleRef.current.classList.add(
-            'card-dialog__custom-attributes-editable-label--with-underline'
-          )
-        } else {
-          editTitleRef.current.classList.remove(
-            'card-dialog__custom-attributes-editable-label--with-underline'
-          )
         }
       }
     }, [editing])
@@ -92,18 +81,18 @@ const EditAttributeConnector = (connector) => {
       }
       editAttribute(index, { id, name, type }, { id, name: newName, type })
       setEditing(false)
+      return true
     }
 
     const Label = () => (
       <div className="card-dialog__custom-attributes-label">
         <input
           ref={editTitleRef}
-          className={cx(
-            `card-dialog__custom-attributes-editable-label ${
-              editing ? '' : 'custom-attr-item__input--hidden'
-            }`,
-            { darkmode: darkMode }
-          )}
+          className={cx('card-dialog__custom-attributes-editable-label', {
+            'card-dialog__custom-attributes-editable-label--with-underline': editing,
+            'custom-attr-item__input--hidden': !editing,
+            darkmode: darkMode,
+          })}
           defaultValue={name}
           onBlur={(event) => {
             saveEdits(event.target.value)
@@ -203,7 +192,7 @@ const EditAttributeConnector = (connector) => {
           />
         ) : null}
         {type === 'paragraph' ? (
-          <div className="card-dialog__custom-attributes__wrapper">
+          <div className="card-dia<log__custom-attributes__wrapper">
             <Label />
             <Description />
             <RichText
@@ -252,10 +241,8 @@ const EditAttributeConnector = (connector) => {
     onChange: PropTypes.func.isRequired,
     onSave: PropTypes.func,
     onSaveAndClose: PropTypes.func,
-    addAttribute: PropTypes.func.isRequired,
     removeAttribute: PropTypes.func.isRequired,
     editAttribute: PropTypes.func.isRequired,
-    reorderAttribute: PropTypes.func.isRequired,
     autoFocus: PropTypes.bool,
     jumpCounter: PropTypes.number,
   }
@@ -269,67 +256,70 @@ const EditAttributeConnector = (connector) => {
 
   if (redux) {
     const { connect, bindActionCreators } = redux
-    const mapDispatchToProps = (dispatch, { entityType }) => {
-      const customAttributeActions = bindActionCreators(actions.customAttribute, dispatch)
-      const attributesActions = bindActionCreators(actions.attributes, dispatch)
-      const characterActions = bindActionCreators(actions.character, dispatch)
+    const mapDispatchToProps = () => {
+      const initialActions = {
+        removeAttribute: () => {
+          throw new Error('Using default edit attribute actions object')
+        },
+        editAttribute: () => {
+          throw new Error('Using default edit attribute actions object')
+        },
+      }
+      let boundActions = initialActions
+      return (dispatch, { entityType }) => {
+        if (boundActions === initialActions) {
+          const customAttributeActions = bindActionCreators(actions.customAttribute, dispatch)
+          const attributesActions = bindActionCreators(actions.attributes, dispatch)
 
-      switch (entityType) {
-        case 'character': {
-          return {
-            addAttribute: (attribute) =>
-              characterActions.createCharacterAttribute(attribute.type, attribute.name),
-            // Other attributes are still keyed by name :/
-            removeAttribute: (name, id) => {
-              attributesActions.deleteCharacterAttribute(id, name)
-            },
-            // An adaptor because the old interface for editing
-            // attributes is super-janky.
-            editAttribute: (index, oldAttribute, newAttribute) => {
-              attributesActions.editCharacterAttributeMetadata(
-                oldAttribute.id,
-                newAttribute.name,
-                newAttribute.type,
-                oldAttribute.name
-              )
-            },
-            reorderAttribute: (attribute, toIndex) =>
-              attributesActions.reorderCharacterAttribute(attribute.id, toIndex),
+          switch (entityType) {
+            case 'character': {
+              boundActions = {
+                // Other attributes are still keyed by name :/
+                removeAttribute: attributesActions.deleteCharacterAttirbuteAdaptor,
+                // An adaptor because the old interface for editing
+                // attributes is super-janky.
+                editAttribute: attributesActions.editCharacterAttributeMetadataAdaptor,
+              }
+              break
+            }
+
+            case 'place': {
+              boundActions = {
+                removeAttribute: customAttributeActions.removePlaceAttr,
+                editAttribute: customAttributeActions.editPlaceAttr,
+              }
+              break
+            }
+
+            case 'scene': {
+              boundActions = {
+                removeAttribute: customAttributeActions.removeCardAttr,
+                editAttribute: customAttributeActions.editCardAttr,
+              }
+              break
+            }
+
+            case 'note': {
+              boundActions = {
+                removeAttribute: customAttributeActions.removeNoteAttr,
+                editAttribute: customAttributeActions.editNoteAttr,
+              }
+              break
+            }
+
+            default: {
+              log.warn(`${entityType} actions not implemented`)
+              boundActions = {
+                removeAttribute: () => {},
+                editAttribute: () => {},
+              }
+              break
+            }
           }
+          return boundActions
+        } else {
+          return boundActions
         }
-
-        case 'place':
-          return {
-            addAttribute: customAttributeActions.addPlaceAttr,
-            removeAttribute: customAttributeActions.removePlaceAttr,
-            editAttribute: customAttributeActions.editPlaceAttr,
-            reorderAttribute: customAttributeActions.reorderPlacesAttribute,
-          }
-
-        case 'scene':
-          return {
-            addAttribute: customAttributeActions.addCardAttr,
-            removeAttribute: customAttributeActions.removeCardAttr,
-            editAttribute: customAttributeActions.editCardAttr,
-            reorderAttribute: customAttributeActions.reorderCardsAttribute,
-          }
-
-        case 'note':
-          return {
-            addAttribute: customAttributeActions.addNoteAttr,
-            removeAttribute: customAttributeActions.removeNoteAttr,
-            editAttribute: customAttributeActions.editNoteAttr,
-            reorderAttribute: customAttributeActions.reorderNotesAttribute,
-          }
-
-        default:
-          log.warn(`${entityType} actions not implemented`)
-          return {
-            addAttribute: () => {},
-            removeAttribute: () => {},
-            editAttribute: () => {},
-            reorderAttribute: () => {},
-          }
       }
     }
 

@@ -29,9 +29,13 @@ export function useTextConverter(text, log) {
   return rceDataRepair(rceText, log)
 }
 
-export function createEditor(log) {
+const NOP = () => {}
+
+export function createEditor(log, addImage = NOP) {
   return withList(log)(
-    withNormalizer(withHTML(withImages(withLinks(withHistory(withReact(createSlateEditor()))))))
+    withNormalizer(
+      withHTML(withImages(withLinks(withHistory(withReact(createSlateEditor()))), addImage))
+    )
   )
 }
 

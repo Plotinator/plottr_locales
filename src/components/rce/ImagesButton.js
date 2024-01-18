@@ -3,14 +3,10 @@ import { PropTypes } from 'prop-types'
 import { FaImage } from 'react-icons/fa'
 import { Editor, Transforms } from 'slate'
 
-import { actions } from 'wired-up-pltr'
-
 import Button from '../Button'
 import UnconnectedImagePicker from '../images/ImagePicker'
 import { readImage, isImageUrl, readImageFromURL } from '../images'
 import { checkDependencies } from '../checkDependencies'
-
-const { addImage } = actions.image
 
 const ImagesButtonConnector = (connector) => {
   const ImagePicker = UnconnectedImagePicker(connector)
@@ -70,7 +66,7 @@ const ImagesButtonConnector = (connector) => {
 
 export default ImagesButtonConnector
 
-export const withImages = (editor) => {
+export const withImages = (editor, addImage) => {
   const { insertData, isVoid } = editor
 
   editor.isVoid = (element) => {
@@ -87,14 +83,14 @@ export const withImages = (editor) => {
 
         if (mime === 'image') {
           readImage(file, (data) => {
-            window.specialDelivery(addImage({ data, name: file.name, path: file.path }))
+            addImage({ data, name: file.name, path: file.path })
             insertImageData(editor, data)
           })
         }
       }
     } else if (isImageUrl(text)) {
       readImageFromURL(text, (strData) => {
-        window.specialDelivery(addImage({ data: strData, name: text, path: text }))
+        addImage({ data: strData, name: text, path: text })
         insertImageData(editor, strData)
       })
     } else {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import PropTypes from 'react-proptypes'
 import { t } from 'plottr_locales'
 import { FaExpandAlt, FaCompressAlt } from 'react-icons/fa'
@@ -28,6 +28,272 @@ const {
 
 const BeatTitleCellConnector = (connector) => {
   const Floater = UnconnectedFloater(connector)
+
+  const Title = ({
+    editing,
+    beatTitle,
+    darkMode,
+    beatIndex,
+    beats,
+    beat,
+    hierarchyLevels,
+    titleInputRef,
+    selection,
+    handleEsc,
+    handleBlur,
+    handleFinishEditing,
+  }) => {
+    if (!editing) return <span>{truncateTitle(beatTitle, 50)}</span>
+
+    return (
+      <FormGroup>
+        <ControlLabel className={cx({ darkmode: darkMode })}>
+          {editingBeatLabel(beatIndex, beats, beat, hierarchyLevels)}
+        </ControlLabel>
+        <FormControl
+          type="text"
+          defaultValue={beatTitle}
+          inputRef={(ref) => {
+            titleInputRef.current = ref
+          }}
+          autoFocus
+          selection={selection}
+          onKeyDown={handleEsc}
+          onBlur={handleBlur}
+          onKeyPress={handleFinishEditing}
+        />
+      </FormGroup>
+    )
+  }
+
+  Title.propTypes = {
+    editing: PropTypes.bool,
+    beatTitle: PropTypes.string.isRequired,
+    darkMode: PropTypes.bool,
+    beatIndex: PropTypes.number.isRequired,
+    beats: PropTypes.array.isRequired,
+    beat: PropTypes.object.isRequired,
+    hierarchyLevels: PropTypes.array.isRequired,
+    titleInputRef: PropTypes.object.isRequired,
+    selection: PropTypes.object.isRequired,
+    handleEsc: PropTypes.func.isRequired,
+    handleBlur: PropTypes.func.isRequired,
+    handleFinishEditing: PropTypes.func.isRequired,
+  }
+
+  const EditInput = ({ editing, finalizeEdit, beatTitle, uiActions, setHovering }) => {
+    if (!editing) return null
+
+    return (
+      <InputModal
+        isOpen={true}
+        type="text"
+        getValue={finalizeEdit}
+        defaultValue={beatTitle}
+        title={t('Edit {beatName}', { beatName: beatTitle })}
+        cancel={() => {
+          uiActions.stopEditingBeatHeadingTitle()
+          setHovering(null)
+        }}
+      />
+    )
+  }
+
+  EditInput.propTypes = {
+    editing: PropTypes.bool,
+    finalizeEdit: PropTypes.func.isRequired,
+    beatTitle: PropTypes.string.isRequired,
+    uiActions: PropTypes.object.isRequired,
+    setHovering: PropTypes.func.isRequired,
+  }
+
+  const Delete = ({
+    deleting,
+    hierarchyLevels,
+    beatTitle,
+    hierarchyLevel,
+    deleteBeat,
+    cancelDelete,
+  }) => {
+    if (!deleting) return null
+
+    const depth =
+      hierarchyLevels.length - hierarchyLevels.findIndex(({ name }) => name === hierarchyLevel.name)
+
+    let warningMessage = null
+    switch (depth) {
+      case 1:
+        break
+      case 2:
+        warningMessage = t('Are you sure you want to delete all scene cards in "{beatTitle}".', {
+          beatTitle,
+        })
+        break
+      case 3:
+        warningMessage = t(
+          'Are you sure you want to delete all chapters and their scene cards in "{beatTitle}".',
+          { beatTitle }
+        )
+        break
+    }
+    return (
+      <DeleteConfirmModal
+        name={beatTitle}
+        customText={warningMessage && t(warningMessage)}
+        onDelete={deleteBeat}
+        onCancel={cancelDelete}
+      />
+    )
+  }
+
+  Delete.propTypes = {
+    deleting: PropTypes.bool,
+    hierarchyLevels: PropTypes.array.isRequired,
+    beatTitle: PropTypes.string.isRequired,
+    hierarchyLevel: PropTypes.object.isRequired,
+    deleteBeat: PropTypes.func.isRequired,
+    cancelDelete: PropTypes.func.isRequired,
+  }
+
+  // TODO: refactor!!!
+  const TitleCell = ({
+    orientation,
+    isMedium,
+    hovering,
+    inDropZone,
+    readOnly,
+    beatTitle,
+    startHovering,
+    stopHovering,
+    handleDrop,
+    deleting,
+    hierarchyLevels,
+    hierarchyLevel,
+    deleteBeat,
+    cancelDelete,
+    renderControls,
+    timelineSize,
+    darkMode,
+    startEditing,
+    handleDragStart,
+    handleDragEnd,
+    handleDragEnter,
+    handleDragOver,
+    handleDragLeave,
+    editing,
+    beatIndex,
+    beats,
+    beat,
+    titleInputRef,
+    selection,
+    handleEsc,
+    handleBlur,
+    handleFinishEditing,
+  }) => {
+    const innerKlass = cx(orientedClassName('beat__body', orientation), {
+      'medium-timeline': isMedium,
+      hover: hovering,
+      dropping: inDropZone,
+      disabled: readOnly,
+    })
+    const beatKlass = cx(orientedClassName('beat__cell', orientation), {
+      'medium-timeline': isMedium,
+    })
+
+    return (
+      <div
+        className={beatKlass}
+        title={beatTitle}
+        onMouseEnter={startHovering}
+        onMouseLeave={stopHovering}
+        onDrop={handleDrop}
+      >
+        <Delete
+          deleting={deleting}
+          hierarchyLevels={hierarchyLevels}
+          beatTitle={beatTitle}
+          hierarchyLevel={hierarchyLevel}
+          deleteBeat={deleteBeat}
+          cancelDelete={cancelDelete}
+        />
+        <Floater
+          hideArrow={true}
+          open={hovering}
+          placement="top"
+          align="center"
+          component={renderControls}
+        >
+          <div
+            style={hierarchyToStyles(
+              hierarchyLevel,
+              timelineSize,
+              hovering || inDropZone,
+              darkMode === true ? hierarchyLevel.dark : hierarchyLevel.light,
+              darkMode
+            )}
+            className={innerKlass}
+            onClick={startEditing}
+            draggable={!readOnly}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            onDragEnter={handleDragEnter}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+          >
+            <Title
+              editing={editing}
+              beatTitle={beatTitle}
+              darkMode={darkMode}
+              beatIndex={beatIndex}
+              beats={beats}
+              beat={beat}
+              hierarchyLevels={hierarchyLevels}
+              titleInputRef={titleInputRef}
+              selection={selection}
+              handleEsc={handleEsc}
+              handleBlur={handleBlur}
+              handleFinishEditing={handleFinishEditing}
+            />
+          </div>
+        </Floater>
+      </div>
+    )
+  }
+
+  TitleCell.propTypes = {
+    orientation: PropTypes.string.isRequired,
+    isMedium: PropTypes.bool,
+    hovering: PropTypes.bool,
+    inDropZone: PropTypes.bool,
+    readOnly: PropTypes.bool,
+    beatTitle: PropTypes.string.isRequired,
+    startHovering: PropTypes.bool,
+    stopHovering: PropTypes.func.isRequired,
+    handleDrop: PropTypes.func.isRequired,
+    deleting: PropTypes.bool,
+    hierarchyLevels: PropTypes.array.isRequired,
+    hierarchyLevel: PropTypes.object.isRequired,
+    deleteBeat: PropTypes.func.isRequired,
+    cancelDelete: PropTypes.func.isRequired,
+    renderControls: PropTypes.func.isRequired,
+    timelineSize: PropTypes.string.isRequired,
+    darkMode: PropTypes.bool.isRequired,
+    startEditing: PropTypes.func.isRequired,
+    handleDragStart: PropTypes.func.isRequired,
+    handleDragEnd: PropTypes.func.isRequired,
+    handleDragEnter: PropTypes.func.isRequired,
+    handleDragOver: PropTypes.func.isRequired,
+    handleDragLeave: PropTypes.func.isRequired,
+    editing: PropTypes.bool,
+    beatIndex: PropTypes.number.isRequired,
+    beats: PropTypes.array.isRequired,
+    beat: PropTypes.object.isRequired,
+    titleInputRef: PropTypes.object.isRequired,
+    selection: PropTypes.object.isRequired,
+    handleEsc: PropTypes.func.isRequired,
+    handleBlur: PropTypes.func.isRequired,
+    handleFinishEditing: PropTypes.func.isRequired,
+  }
 
   const BeatTitleCell = ({
     beatId,
@@ -75,132 +341,177 @@ const BeatTitleCellConnector = (connector) => {
       }
     }, [editing])
 
-    const deleteBeat = (e) => {
-      e.stopPropagation()
-      actions.deleteBeat(beat.id, currentTimeline)
-    }
+    const deleteBeat = useCallback(
+      (e) => {
+        e.stopPropagation()
+        actions.deleteBeat(beat.id, currentTimeline)
+      },
+      [actions]
+    )
 
-    const cancelDelete = (e) => {
-      e.stopPropagation()
-      setDeleting(false)
-    }
+    const cancelDelete = useCallback(
+      (e) => {
+        e.stopPropagation()
+        setDeleting(false)
+      },
+      [setDeleting]
+    )
 
-    const handleDelete = (e) => {
-      e.stopPropagation()
-      if (readOnly) return
-      setDeleting(true)
-      setHovering(null)
-    }
+    const handleDelete = useCallback(
+      (e) => {
+        e.stopPropagation()
+        if (readOnly) return
+        setDeleting(true)
+        setHovering(null)
+      },
+      [readOnly, setDeleting, setHovering]
+    )
 
-    const handleAddBeat = (e) => {
-      if (readOnly) return
-      actions.insertBeat(currentTimeline, beat.id)
-      actions.expandBeat(beat.id, currentTimeline)
-    }
+    const handleAddBeat = useCallback(
+      (e) => {
+        if (readOnly) return
+        actions.insertBeat(currentTimeline, beat.id)
+        actions.expandBeat(beat.id, currentTimeline)
+      },
+      [readOnly, actions]
+    )
 
-    const handleAddChild = (e) => {
-      if (readOnly) return
-      actions.expandBeat(beat.id, currentTimeline)
-      actions.addBeat(currentTimeline, beat.id)
-    }
+    const handleAddChild = useCallback(
+      (e) => {
+        if (readOnly) return
+        actions.expandBeat(beat.id, currentTimeline)
+        actions.addBeat(currentTimeline, beat.id)
+      },
+      [actions]
+    )
 
-    const handleToggleExpanded = (e) => {
-      const { collapseBeat, expandBeat } = actions
-      const { id, expanded } = beat
+    const handleToggleExpanded = useCallback(
+      (e) => {
+        const { collapseBeat, expandBeat } = actions
+        const { id, expanded } = beat
 
-      if (readOnly) return
+        if (readOnly) return
 
-      if (expanded) collapseBeat(id, currentTimeline)
-      else expandBeat(id, currentTimeline)
-    }
+        if (expanded) collapseBeat(id, currentTimeline)
+        else expandBeat(id, currentTimeline)
+      },
+      [actions.collapseBeat, actions.expandBeat, beat?.id, beat?.expanded]
+    )
 
-    const editTitle = () => {
+    const editTitle = useCallback(() => {
       const ref = titleInputRef.current
       if (!ref) return
 
       finalizeEdit(ref.value)
-    }
+    }, [finalizeEdit, titleInputRef])
 
-    const finalizeEdit = (newVal) => {
-      actions.editBeatTitle(beat.id, currentTimeline, newVal || 'auto') // if nothing, set to auto
-      uiActions.stopEditingBeatHeadingTitle()
-      setHovering(null)
-    }
-
-    const handleFinishEditing = (event) => {
-      if (event.which === 13) {
-        editTitle()
-      }
-    }
-
-    const handleBlur = () => {
-      editTitle()
-    }
-
-    const handleEsc = (event) => {
-      if (event.which === 27) {
+    const finalizeEdit = useCallback(
+      (newVal) => {
+        actions.editBeatTitle(beat.id, currentTimeline, newVal || 'auto') // if nothing, set to auto
         uiActions.stopEditingBeatHeadingTitle()
-      }
-    }
+        setHovering(null)
+      },
+      [actions, uiActions, setHovering]
+    )
 
-    const handleDragStart = (e) => {
-      e.dataTransfer.effectAllowed = 'move'
-      e.dataTransfer.setData('text/json', JSON.stringify(beat))
-      setDragging(true)
-    }
+    const handleFinishEditing = useCallback(
+      (event) => {
+        if (event.which === 13) {
+          editTitle()
+        }
+      },
+      [editTitle]
+    )
 
-    const handleDragEnd = (event) => {
-      domEvents.dropBeat(beatId, { x: event.clientX, y: event.clientY })
-      setDragging(false)
-    }
+    const handleBlur = useCallback(() => {
+      editTitle()
+    }, [editTitle])
 
-    const handleDragEnter = (e) => {
-      if (!dragging) setDropDepth(dropDepth + 1)
-    }
+    const handleEsc = useCallback(
+      (event) => {
+        if (event.which === 27) {
+          uiActions.stopEditingBeatHeadingTitle()
+        }
+      },
+      [uiActions]
+    )
 
-    const handleDragOver = (e) => {
-      e.preventDefault()
-      if (!dragging) setInDropZone(true)
-    }
+    const handleDragStart = useCallback(
+      (e) => {
+        e.dataTransfer.effectAllowed = 'move'
+        e.dataTransfer.setData('text/json', JSON.stringify(beat))
+        setDragging(true)
+      },
+      [setDragging]
+    )
 
-    const handleDragLeave = (e) => {
-      if (!dragging) {
-        let newDropDepth = dropDepth
-        --newDropDepth
-        setDropDepth(newDropDepth)
-        if (newDropDepth > 0) return
+    const handleDragEnd = useCallback(
+      (event) => {
+        domEvents.dropBeat(beatId, { x: event.clientX, y: event.clientY })
+        setDragging(false)
+      },
+      [setDragging]
+    )
+
+    const handleDragEnter = useCallback(
+      (e) => {
+        if (!dragging) setDropDepth(dropDepth + 1)
+      },
+      [dragging, setDropDepth, dropDepth]
+    )
+
+    const handleDragOver = useCallback(
+      (e) => {
+        e.preventDefault()
+        if (!dragging) setInDropZone(true)
+      },
+      [dragging, setInDropZone]
+    )
+
+    const handleDragLeave = useCallback(
+      (e) => {
+        if (!dragging) {
+          let newDropDepth = dropDepth
+          --newDropDepth
+          setDropDepth(newDropDepth)
+          if (newDropDepth > 0) return
+          setInDropZone(false)
+        }
+      },
+      [dragging, dropDepth, setDropDepth, setInDropZone]
+    )
+
+    const handleDrop = useCallback(
+      (e) => {
+        e.stopPropagation()
         setInDropZone(false)
-      }
-    }
+        setDropDepth(0)
 
-    const handleDrop = (e) => {
-      e.stopPropagation()
-      setInDropZone(false)
-      setDropDepth(0)
+        var json = e.dataTransfer.getData('text/json')
+        var droppedBeat = JSON.parse(json)
+        if (droppedBeat.id == null) return
+        if (droppedBeat.id == beat.id) return
 
-      var json = e.dataTransfer.getData('text/json')
-      var droppedBeat = JSON.parse(json)
-      if (droppedBeat.id == null) return
-      if (droppedBeat.id == beat.id) return
+        if (!beat.expanded) {
+          actions.expandBeat(beat.id, currentTimeline)
+        }
+        handleReorder(beat.id, droppedBeat.id)
+      },
+      [setInDropZone, setDropDepth, beat, actions, handleReorder]
+    )
 
-      if (!beat.expanded) {
-        actions.expandBeat(beat.id, currentTimeline)
-      }
-      handleReorder(beat.id, droppedBeat.id)
-    }
-
-    const startEditing = () => {
+    const startEditing = useCallback(() => {
       if (readOnly) return
       uiActions.startEditingBeatHeadingTitle(beatId)
       setHovering(null)
-    }
+    }, [readOnly, uiActions, setHovering])
 
-    const startHovering = () => {
+    const startHovering = useCallback(() => {
       if (readOnly) return
       setHovering(true)
-    }
+    }, [readOnly, setHovering])
 
-    const stopHovering = () => {
+    const stopHovering = useCallback(() => {
       if (readOnly) return
       // Tune this to the mouse tracking timeout in TopRow.
       if (stopHoveringTimeout) {
@@ -211,78 +522,7 @@ const BeatTitleCellConnector = (connector) => {
           setHovering(null)
         }, 100)
       )
-    }
-
-    // const padding = () => {
-    //   const shouldRenderInsertChild =
-    //     (timelineViewIsTabbed || timelineViewIsDefault) && !atMaximumDepth
-    //   const controlHeight = shouldRenderInsertChild ? 52 : 25
-    //   const offset = Math.floor(controlHeight / 2)
-
-    //   if (container.current) {
-    //     const isHorizontal = orientation == 'horizontal'
-    //     const bodyElement = isHorizontal
-    //       ? container.current.querySelector('.beat__body')
-    //       : container.current.querySelector('.vertical-beat__body')
-    //     if (bodyElement) {
-    //       const { height, top } = bodyElement.getBoundingClientRect()
-    //       const margin = top - container.current.getBoundingClientRect().top
-    //       return margin + Math.floor(height / 2) - offset
-    //     }
-    //   }
-    //   return 0
-    // }
-
-    const renderDelete = () => {
-      if (!deleting) return null
-
-      const depth =
-        hierarchyLevels.length -
-        hierarchyLevels.findIndex(({ name }) => name === hierarchyLevel.name)
-
-      let warningMessage = null
-      switch (depth) {
-        case 1:
-          break
-        case 2:
-          warningMessage = t('Are you sure you want to delete all scene cards in "{beatTitle}".', {
-            beatTitle,
-          })
-          break
-        case 3:
-          warningMessage = t(
-            'Are you sure you want to delete all chapters and their scene cards in "{beatTitle}".',
-            { beatTitle }
-          )
-          break
-      }
-      return (
-        <DeleteConfirmModal
-          name={beatTitle}
-          customText={warningMessage && t(warningMessage)}
-          onDelete={deleteBeat}
-          onCancel={cancelDelete}
-        />
-      )
-    }
-
-    const renderEditInput = () => {
-      if (!editing) return null
-
-      return (
-        <InputModal
-          isOpen={true}
-          type="text"
-          getValue={finalizeEdit}
-          defaultValue={beat.title}
-          title={t('Edit {beatName}', { beatName: beatTitle })}
-          cancel={() => {
-            uiActions.stopEditingBeatHeadingTitle()
-            setHovering(null)
-          }}
-        />
-      )
-    }
+    }, [readOnly, stopHoveringTimeout, setStopHoveringTimeout])
 
     const renderHorizontalHoverOptions = (style) => {
       const klasses = orientedClassName('beat-list__item__hover-options', orientation)
@@ -380,30 +620,6 @@ const BeatTitleCellConnector = (connector) => {
       }
     }
 
-    const renderTitle = () => {
-      if (!editing) return <span>{truncateTitle(beatTitle, 50)}</span>
-
-      return (
-        <FormGroup>
-          <ControlLabel className={cx({ darkmode: darkMode })}>
-            {editingBeatLabel(beatIndex, beats, beat, hierarchyLevels)}
-          </ControlLabel>
-          <FormControl
-            type="text"
-            defaultValue={beat.title}
-            inputRef={(ref) => {
-              titleInputRef.current = ref
-            }}
-            autoFocus
-            selection={selection}
-            onKeyDown={handleEsc}
-            onBlur={handleBlur}
-            onKeyPress={handleFinishEditing}
-          />
-        </FormGroup>
-      )
-    }
-
     const renderInsertPeer = () => {
       const shouldRenderInsertChild = !atMaximumDepth
 
@@ -462,7 +678,7 @@ const BeatTitleCellConnector = (connector) => {
       }
     }
 
-    const renderControls = () => {
+    const renderControls = useCallback(() => {
       const showExpandCollapse =
         !timelineViewIsTabbed &&
         !timelineViewIsStacked &&
@@ -520,58 +736,18 @@ const BeatTitleCellConnector = (connector) => {
           </ButtonGroup>
         )
       }
-    }
-
-    const innerKlass = cx(orientedClassName('beat__body', orientation), {
-      'medium-timeline': isMedium,
-      hover: hovering,
-      dropping: inDropZone,
-      disabled: readOnly,
-    })
-    const beatKlass = cx(orientedClassName('beat__cell', orientation), {
-      'medium-timeline': isMedium,
-    })
-
-    const renderTitleCell = () => {
-      return (
-        <div
-          className={beatKlass}
-          title={beatTitle}
-          onMouseEnter={startHovering}
-          onMouseLeave={stopHovering}
-          onDrop={handleDrop}
-        >
-          {renderDelete()}
-          <Floater
-            hideArrow={true}
-            open={hovering}
-            placement="top"
-            align="center"
-            component={renderControls}
-          >
-            <div
-              style={hierarchyToStyles(
-                hierarchyLevel,
-                timelineSize,
-                hovering || inDropZone,
-                darkMode === true ? hierarchyLevel.dark : hierarchyLevel.light,
-                darkMode
-              )}
-              className={innerKlass}
-              onClick={startEditing}
-              draggable={!readOnly}
-              onDragStart={handleDragStart}
-              onDragEnd={handleDragEnd}
-              onDragEnter={handleDragEnter}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-            >
-              {renderTitle()}
-            </div>
-          </Floater>
-        </div>
-      )
-    }
+    }, [
+      startEditing,
+      handleDelete,
+      beatTitle,
+      handleToggleExpanded,
+      isLarge,
+      orientation,
+      beat,
+      timelineViewIsTabbed,
+      timelineViewIsStacked,
+      hierarchyLevels,
+    ])
 
     const editingKeySuffix = editing ? 'editing' : 'displaying'
     if (isSmall) {
@@ -590,8 +766,21 @@ const BeatTitleCellConnector = (connector) => {
           onDrop={handleDrop}
         >
           {renderHoverOptions()}
-          {renderDelete()}
-          {renderEditInput()}
+          <Delete
+            deleting={deleting}
+            hierarchyLevels={hierarchyLevels}
+            beatTitle={beatTitle}
+            hierarchyLevel={hierarchyLevel}
+            deleteBeat={deleteBeat}
+            cancelDelete={cancelDelete}
+          />
+          <EditInput
+            editing={editing}
+            finalizeEdit={finalizeEdit}
+            beatTitle={beatTitle}
+            uiActions={uiActions}
+            setHovering={setHovering}
+          />
           <div
             title={beatTitle}
             onClick={hovering ? stopHovering : startHovering}
@@ -612,7 +801,40 @@ const BeatTitleCellConnector = (connector) => {
           }}
           key={`beat-title-cell-${beatId}--${editingKeySuffix}--${beatTitle}`}
         >
-          {renderTitleCell()}
+          <TitleCell
+            orientation={orientation}
+            isMedium={isMedium}
+            hovering={hovering}
+            inDropZone={inDropZone}
+            readOnly={readOnly}
+            beatTitle={beatTitle}
+            startHovering={startHovering}
+            stopHovering={stopHovering}
+            handleDrop={handleDrop}
+            deleting={deleting}
+            hierarchyLevels={hierarchyLevels}
+            hierarchyLevel={hierarchyLevel}
+            deleteBeat={deleteBeat}
+            cancelDelete={cancelDelete}
+            renderControls={renderControls}
+            timelineSize={timelineSize}
+            darkMode={darkMode}
+            startEditing={startEditing}
+            handleDragStart={handleDragStart}
+            handleDragEnd={handleDragEnd}
+            handleDragEnter={handleDragEnter}
+            handleDragOver={handleDragOver}
+            handleDragLeave={handleDragLeave}
+            editing={editing}
+            beatIndex={beatIndex}
+            beats={beats}
+            beat={beat}
+            titleInputRef={titleInputRef}
+            selection={selection}
+            handleEsc={handleEsc}
+            handleBlur={handleBlur}
+            handleFinishEditing={handleFinishEditing}
+          />
         </Cell>
       )
     } else {
@@ -624,7 +846,40 @@ const BeatTitleCellConnector = (connector) => {
           }}
           key={`beat-title-cell-${beatId}--${editingKeySuffix}--${beatTitle}`}
         >
-          {renderTitleCell()}
+          <TitleCell
+            orientation={orientation}
+            isMedium={isMedium}
+            hovering={hovering}
+            inDropZone={inDropZone}
+            readOnly={readOnly}
+            beatTitle={beatTitle}
+            startHovering={startHovering}
+            stopHovering={stopHovering}
+            handleDrop={handleDrop}
+            deleting={deleting}
+            hierarchyLevels={hierarchyLevels}
+            hierarchyLevel={hierarchyLevel}
+            deleteBeat={deleteBeat}
+            cancelDelete={cancelDelete}
+            renderControls={renderControls}
+            timelineSize={timelineSize}
+            darkMode={darkMode}
+            startEditing={startEditing}
+            handleDragStart={handleDragStart}
+            handleDragEnd={handleDragEnd}
+            handleDragEnter={handleDragEnter}
+            handleDragOver={handleDragOver}
+            handleDragLeave={handleDragLeave}
+            editing={editing}
+            beatIndex={beatIndex}
+            beats={beats}
+            beat={beat}
+            titleInputRef={titleInputRef}
+            selection={selection}
+            handleEsc={handleEsc}
+            handleBlur={handleBlur}
+            handleFinishEditing={handleFinishEditing}
+          />
         </Cell>,
         <Cell key={`beat-insert-cell-${beatId}--${editingKeySuffix}--${beatTitle}`}>
           {renderInsertPeer()}

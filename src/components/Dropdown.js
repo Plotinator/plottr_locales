@@ -123,7 +123,7 @@ const Dropdown = ({
   const toggle = useRef()
 
   const focusNextOnOpen = () => {
-    if (!menu.current || !menu.current.focusNext) {
+    if (typeof menu?.current?.focusNext !== 'function') {
       return
     }
 
@@ -176,7 +176,7 @@ const Dropdown = ({
       case keycode.codes.down:
         if (!open) {
           toggleOpen(event, { source: 'keydown' })
-        } else if (menu.current.focusNext) {
+        } else if (typeof menu.current?.focusNext === 'function') {
           menu.current.focusNext()
         }
         event.preventDefault()

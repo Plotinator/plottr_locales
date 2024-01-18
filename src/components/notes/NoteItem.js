@@ -35,10 +35,14 @@ const NoteItemConnector = (connector) => {
       this.scrollIntoView()
     }
 
+    componentDidUpdate() {
+      this.scrollIntoView()
+    }
+
     scrollIntoView = () => {
       if (this.props.selected) {
         const node = this.ref.current
-        if (node) node.scrollIntoView()
+        if (node) node.scrollIntoView?.()
       }
     }
 

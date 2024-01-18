@@ -49,7 +49,9 @@ const UnforwardedDropdownMenu = (
     }
 
     const nextIndex = activeIndex === items.length - 1 ? 0 : activeIndex + 1
-    items[nextIndex].focus()
+    if (typeof items[nextIndex]?.focus === 'function') {
+      items[nextIndex].focus()
+    }
   }
 
   const focusPrevious = () => {
