@@ -174,7 +174,7 @@ const Resume = ({
     <MessageModal
       message="Reconnecting"
       onAcknowledge={acknowledge}
-      disabledAcknowledge={checkingOfflineDrift}
+      disabledAcknowledge={isResuming || checkingOfflineDrift}
       buttonText={isResuming ? 'Busy' : 'Dismiss'}
     >
       {checkingOfflineDrift && !overwritingCloudWithBackup ? <Spinner /> : null}
