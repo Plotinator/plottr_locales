@@ -146,7 +146,7 @@ const Dropdown = ({
   }, [open])
 
   const focus = () => {
-    if (toggle.current && toggle.current.focus) {
+    if (typeof toggle.current?.focus === 'function') {
       toggle.current.focus()
     }
   }

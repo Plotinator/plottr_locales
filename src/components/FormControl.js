@@ -57,12 +57,14 @@ class FormControl extends React.Component {
   focusSelection = () => {
     if (!this.focusing && this.component && this.props.autoFocus) {
       this.focusing = true
-      this.component.focus()
+      if (typeof this.component?.focus === 'function') {
+        this.component.focus()
+      }
       if (
         typeof this.component.scrollIntoView === 'function' &&
         !this.props.supressScrollIntoView
       ) {
-        this.component.scrollIntoView({ behavior: 'smooth' })
+        this.component.scrollIntoView({ behavior: 'smooth', block: 'center' })
       }
       setTimeout(() => {
         if (this.props.selection && this.component) {

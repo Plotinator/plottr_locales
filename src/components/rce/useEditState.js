@@ -79,7 +79,7 @@ export const useEditState = (
     const valueChanged = !isEqual(newValue, value)
     const selectionChanged = !isEqual(editor.selection, currentSelection.current)
     // Update local state
-    if (focussed.current && (valueChanged || selectionChanged)) {
+    if (valueChanged || (selectionChanged && focussed.current)) {
       setValue(newValue)
       currentSelection.current = editor.selection
       debouncedOnUpdateValue(newValue, editor.selection)

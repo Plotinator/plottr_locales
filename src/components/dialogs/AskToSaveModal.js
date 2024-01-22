@@ -11,7 +11,7 @@ export const testIds = getTestIds()
 
 export default function AskToSaveModal({ save, busy, dismiss }) {
   return (
-    <Modal show={true} onHide={dismiss} dialogClassName="center-modal-vertically">
+    <Modal animation={false} show={true} onHide={dismiss} dialogClassName="center-modal-vertically">
       <Modal.Header closeButton>{i18n('There are unsaved changes')}</Modal.Header>
       <Modal.Body>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>

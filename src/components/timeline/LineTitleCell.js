@@ -85,7 +85,7 @@ const LineTitleCellConnector = (connector) => {
       if (movingLine && bookChoiceDropDown.current) {
         const dropDownId = bookChoiceDropDown.current.props.id
         const dropDown = document.querySelector(`#${dropDownId}`)
-        if (dropDown) {
+        if (typeof dropDown?.focus === 'function') {
           dropDown.focus()
         }
       }

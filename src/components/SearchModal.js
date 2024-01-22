@@ -509,7 +509,7 @@ const SearchModalConnector = (connector) => {
 
     useEffect(() => {
       setTimeout(() => {
-        if (searchInputRef.current && typeof searchInputRef.current.focus === 'function') {
+        if (typeof searchInputRef?.current?.focus === 'function') {
           searchInputRef.current.focus()
         }
       }, 100)

@@ -226,7 +226,7 @@ const RichTextEditorConnector = (connector) => {
 
     const focusEditor = useCallback((previousSelection) => {
       setTimeout(() => {
-        if (editorWrapperRef.current && editorWrapperRef.current.firstChild) {
+        if (typeof editorWrapperRef?.current?.firstChild?.focus === 'function') {
           editorWrapperRef.current.firstChild.focus()
           editor.selection = previousSelection
         }
@@ -342,7 +342,9 @@ const RichTextEditorConnector = (connector) => {
       if (editorWrapperRef.current.firstChild.contains(event.target)) return
 
       // Focus the Editable content
-      editorWrapperRef.current.firstChild.focus()
+      if (typeof editorWrapperRef?.current?.firstChild?.focus === 'function') {
+        editorWrapperRef.current.firstChild.focus()
+      }
     }
 
     if (initialValue === null) return null

@@ -117,7 +117,9 @@ class Nav extends React.Component {
         return
       }
 
-      activeNode.firstChild.focus()
+      if (typeof activeNode?.firstChild?.focus === 'function') {
+        activeNode.firstChild.focus()
+      }
     }
   }
 

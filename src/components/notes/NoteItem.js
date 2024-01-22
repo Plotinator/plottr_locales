@@ -35,8 +35,10 @@ const NoteItemConnector = (connector) => {
       this.scrollIntoView()
     }
 
-    componentDidUpdate() {
-      this.scrollIntoView()
+    componentDidUpdate(prevProps) {
+      if (prevProps.selected !== this.props.selected) {
+        this.scrollIntoView()
+      }
     }
 
     scrollIntoView = () => {

@@ -43,7 +43,9 @@ const EditOrDisplayConnector = (connector) => {
 
     const controlRef = React.createRef()
     useEffect(() => {
-      if (controlRef.current) controlRef.current.focus()
+      if (typeof controlRef?.current?.focus === 'function') {
+        controlRef.current.focus()
+      }
     }, [value, editing, stagedValue])
 
     const ControlSwitch = ({ className }) => {
