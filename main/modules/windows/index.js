@@ -65,7 +65,9 @@ function getWindowByObjectEq(window) {
 function focusFirstWindow() {
   if (!windows.length) return
 
-  windows[0].browserWindow.focus()
+  if (typeof windows?.[0]?.browserWindow?.focus === 'function'){
+    windows[0].browserWindow.focus()
+  }
 }
 
 function numberOfWindows() {
@@ -87,7 +89,9 @@ function focusIfOpen(fileURL) {
     (w) => w.fileURL == fileURL || (offlineURL !== null && w.fileURL === offlineURL)
   )
   if (win) {
-    win.browserWindow.focus()
+    if (typeof win.browserWindow?.focus === 'function') {
+      win.browserWindow.focus()
+    }
     win.browserWindow.webContents.send('close-dashboard')
     // If it's this window and we're trying to open a new file, then
     // we need to refresh the contents.
