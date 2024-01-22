@@ -83,6 +83,7 @@ const notes =
             return {
               ...note,
               content: action.newContent,
+              lastEdited: new Date().getTime(),
             }
           }
           return note
@@ -95,6 +96,7 @@ const notes =
             return {
               ...note,
               title: action.newTitle,
+              lastEdited: new Date().getTime(),
             }
           }
           return note
@@ -151,6 +153,7 @@ const notes =
           if (note.id === action.id) {
             return {
               ...state,
+              lastEdited: new Date().getTime(),
               templates: note.templates.map((template) => {
                 if (template.id === action.templateId) {
                   return {
@@ -198,26 +201,49 @@ const notes =
       case DELETE_NOTE:
         return state.filter((note) => note.id !== action.id)
 
-      case ATTACH_CHARACTER_TO_NOTE:
+      case ATTACH_CHARACTER_TO_NOTE: {
         return state.map((note) => {
-          let characters = cloneDeep(note.characters)
-          characters.push(action.characterId)
-          return note.id === action.id ? Object.assign({}, note, { characters: characters }) : note
+          if (note.id === action.id && !note.characters.includes(action.characterId)) {
+            return {
+              ...note,
+              characters: [...note.characters, action.characterId],
+              lastEdited: new Date().getTime(),
+            }
+          } else {
+            return note
+          }
         })
+      }
 
-      case REMOVE_CHARACTER_FROM_NOTE:
+      case REMOVE_CHARACTER_FROM_NOTE: {
         return state.map((note) => {
-          let characters = cloneDeep(note.characters)
-          characters.splice(characters.indexOf(action.characterId), 1)
-          return note.id === action.id ? Object.assign({}, note, { characters: characters }) : note
+          if (note.id === action.id && note.characters.includes(action.characterId)) {
+            return {
+              ...note,
+              characters: note.characters.filter((characterId) => {
+                return characterId !== action.characterId
+              }),
+              lastEdited: new Date().getTime(),
+            }
+          } else {
+            return note
+          }
         })
+      }
 
-      case ATTACH_PLACE_TO_NOTE:
+      case ATTACH_PLACE_TO_NOTE: {
         return state.map((note) => {
-          let places = cloneDeep(note.places)
-          places.push(action.placeId)
-          return note.id === action.id ? Object.assign({}, note, { places: places }) : note
+          if (note.id === action.id && !note.places.includes(action.placeId)) {
+            return {
+              ...note,
+              places: [...note.places, action.placeId],
+              lastEdited: new Date().getTime(),
+            }
+          } else {
+            return note
+          }
         })
+      }
 
       case DELETE_NOTE_CATEGORY:
         return state.map((note) => {
@@ -233,40 +259,81 @@ const notes =
           }
         })
 
-      case REMOVE_PLACE_FROM_NOTE:
+      case REMOVE_PLACE_FROM_NOTE: {
         return state.map((note) => {
-          let places = cloneDeep(note.places)
-          places.splice(places.indexOf(action.placeId), 1)
-          return note.id === action.id ? Object.assign({}, note, { places: places }) : note
+          if (note.id === action.id && note.places.includes(action.placeId)) {
+            return {
+              ...note,
+              places: note.places.filter((placeId) => {
+                return placeId !== action.placeId
+              }),
+              lastEdited: new Date().getTime(),
+            }
+          } else {
+            return note
+          }
         })
+      }
 
-      case ATTACH_TAG_TO_NOTE:
+      case ATTACH_TAG_TO_NOTE: {
         return state.map((note) => {
-          let tags = cloneDeep(note.tags)
-          tags.push(action.tagId)
-          return note.id === action.id ? Object.assign({}, note, { tags: tags }) : note
+          if (note.id === action.id && !note.tags.includes(action.tagId)) {
+            return {
+              ...note,
+              tags: [...note.tags, action.tagId],
+              lastEdited: new Date().getTime(),
+            }
+          } else {
+            return note
+          }
         })
+      }
 
-      case REMOVE_TAG_FROM_NOTE:
+      case REMOVE_TAG_FROM_NOTE: {
         return state.map((note) => {
-          let tags = cloneDeep(note.tags)
-          tags.splice(tags.indexOf(action.tagId), 1)
-          return note.id === action.id ? Object.assign({}, note, { tags: tags }) : note
+          if (note.id === action.id && note.tags.includes(action.tagId)) {
+            return {
+              ...note,
+              tags: note.tags.filter((tag) => {
+                return tag !== action.tagId
+              }),
+              lastEdited: new Date().getTime(),
+            }
+          } else {
+            return note
+          }
         })
+      }
 
-      case ATTACH_BOOK_TO_NOTE:
+      case ATTACH_BOOK_TO_NOTE: {
         return state.map((note) => {
-          let bookIds = cloneDeep(note.bookIds)
-          bookIds.push(action.bookId)
-          return note.id === action.id ? Object.assign({}, note, { bookIds: bookIds }) : note
+          if (note.id === action.id && !note.bookIds.includes(action.bookId)) {
+            return {
+              ...note,
+              bookIds: [...note.bookIds, action.bookId],
+              lastEdited: new Date().getTime(),
+            }
+          } else {
+            return note
+          }
         })
+      }
 
-      case REMOVE_BOOK_FROM_NOTE:
+      case REMOVE_BOOK_FROM_NOTE: {
         return state.map((note) => {
-          let bookIds = cloneDeep(note.bookIds)
-          bookIds.splice(bookIds.indexOf(action.bookId), 1)
-          return note.id === action.id ? Object.assign({}, note, { bookIds: bookIds }) : note
+          if (note.id === action.id && note.bookIds.includes(action.bookId)) {
+            return {
+              ...note,
+              bookIds: note.bookIds.filter((bookId) => {
+                return bookId !== action.bookId
+              }),
+              lastEdited: new Date().getTime(),
+            }
+          } else {
+            return note
+          }
         })
+      }
 
       case DELETE_TAG:
         return state.map((note) => {
@@ -337,6 +404,7 @@ const notes =
             return {
               ...note,
               [action.name]: action.newValue,
+              lastEdited: new Date().getTime(),
             }
           }
           return note
@@ -375,6 +443,7 @@ const notes =
                   hit,
                   action.replacementText
                 ),
+                lastEdited: new Date().getTime(),
               }
             } else {
               return nextNote

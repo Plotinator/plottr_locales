@@ -257,7 +257,8 @@ const hits = (pathSansPosition, regexMatches) => {
   while (((result = regexMatches.next()), !result.done && count++ < HIT_LIMIT)) {
     const isGroupMatch = !!result.value.groups?.term
     const value = result.value.groups?.term ?? result.value[0]
-    const position = result.value.index + (isGroupMatch ? (result.value[0].match(/\W/) ? 1 : 0) : 0)
+    const position =
+      result.value.index + (isGroupMatch ? (result.value[0].match(/^\W/) ? 1 : 0) : 0)
     results.push({
       path: `${pathSansPosition}/${position}`,
       hit: value,

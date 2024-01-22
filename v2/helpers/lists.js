@@ -1,3 +1,5 @@
+import { groupBy } from 'lodash'
+
 export function reorderList(originalPosition, newPosition, list) {
   const newList = [...list]
   const [removed] = newList.splice(newPosition, 1)
@@ -38,6 +40,12 @@ export function positionReset(items) {
         position: index,
       }
     })
+}
+
+export function positionResetByGroup(items, group) {
+  return Object.values(groupBy(items, group)).flatMap((subItems) => {
+    return positionReset(subItems)
+  })
 }
 
 export function nextPositionInBook(items, bookId) {

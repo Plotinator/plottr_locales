@@ -33,7 +33,7 @@ import { line } from '../store/initialState'
 import { newFileLines, newFileSeriesLines } from '../store/newFileState'
 import { nextId } from '../store/newIds'
 import { nextColor } from '../store/lineColors'
-import { nextPositionInBook, positionReset } from '../helpers/lists'
+import { nextPositionInBook, positionReset, positionResetByGroup } from '../helpers/lists'
 import { associateWithBroadestScope, isNotSeries } from '../helpers/lines'
 import { sortByHitPosition } from './sortByHitPosition'
 import { safeParseInt } from './safeParseInt'
@@ -85,27 +85,26 @@ const lines = (dataRepairers) => (state, action) => {
       if (Array.isArray(action.templateData?.lines)) {
         const linesInBook = state.filter((l) => l.bookId == actionBookId)
         const nextPosition = nextPositionInBook(linesInBook, actionBookId)
-        const newLines = action.templateData.lines
-          .filter(({ bookId }) => bookId !== 'series') // this is to protect against a bad template that unnecessarily had a series line
-          .map((l, index) => {
-            const newLine = cloneDeep(l)
-            newLine.id = action.nextLineId + newLine.id // give it a new id
-            newLine.bookId = actionBookId // add it to the new/current book
-            newLine.position = nextPosition + newLine.position // put it in the right position
-            newLine.fromTemplateId = action.id || action.templateData.id
-            if (!newLine.color || newLine.color == nextColor(0)) {
-              newLine.color = nextColor(linesInBook.length + index)
-            }
-            return newLine
-          })
-        return [
-          ...positionReset(
-            sortBy(
-              [...state, ...newLines],
-              [(item) => (item?.isPinned === true ? 'isPinned' : 'position')]
-            )
-          ),
-        ]
+        const newLines = sortBy(
+          action.templateData.lines
+            // this is to protect against a bad template that unnecessarily had a series line
+            .filter(({ bookId }) => bookId !== 'series'),
+          'position'
+        ).map((l, index) => {
+          const newLine = cloneDeep(l)
+          newLine.id = action.nextLineId + newLine.id // give it a new id
+          newLine.bookId = actionBookId // add it to the new/current book
+          newLine.position = nextPosition + newLine.position // put it in the right position
+          newLine.fromTemplateId = action.id || action.templateData.id
+          if (!newLine.color || newLine.color == nextColor(0)) {
+            newLine.color = nextColor(linesInBook.length + index)
+          }
+          return newLine
+        })
+        return positionResetByGroup(
+          sortBy([...state, ...newLines], (item) => (item?.isPinned === true ? 0 : item.position)),
+          ({ bookId }) => bookId
+        )
       } else {
         return state
       }

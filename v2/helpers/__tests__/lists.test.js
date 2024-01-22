@@ -1,4 +1,4 @@
-import { moveToAbove } from '../lists'
+import { moveToAbove, positionResetByGroup } from '../lists'
 
 const goldilocksNotes = [
   {
@@ -251,6 +251,95 @@ describe('moveToAbove', () => {
           })
         })
       })
+    })
+  })
+})
+
+describe('positionResetByGroup', () => {
+  const areaCode = ({ areaCode }) => {
+    return areaCode
+  }
+  describe('given an empty list', () => {
+    it('should produce an empty list', () => {
+      expect(positionResetByGroup([], areaCode)).toEqual([])
+    })
+  })
+  describe('given a singleton list', () => {
+    const singleton = [{ name: 'bob', areaCode: 10, position: 0 }]
+    it('should produce that list unchanged', () => {
+      expect(positionResetByGroup(singleton, areaCode)).toEqual(singleton)
+    })
+  })
+  describe('given a two element list', () => {
+    describe('where the two elements come from the same area', () => {
+      describe('and they are out of order', () => {
+        const input = [
+          { name: 'bob', areaCode: 10, position: 1 },
+          { name: 'sarah', areaCode: 10, position: 0 },
+        ]
+        it('should put the elements in the correct order', () => {
+          expect(positionResetByGroup(input, areaCode)).toEqual([
+            { name: 'bob', areaCode: 10, position: 0 },
+            { name: 'sarah', areaCode: 10, position: 1 },
+          ])
+        })
+      })
+      describe('and they are in the correct order', () => {
+        const input = [
+          { name: 'sarah', areaCode: 10, position: 0 },
+          { name: 'bob', areaCode: 10, position: 1 },
+        ]
+        it('should produce the lists unchanged', () => {
+          expect(positionResetByGroup(input, areaCode)).toEqual(input)
+        })
+      })
+    })
+    describe('where the two element come from different areas', () => {
+      describe('and their positions are both 0', () => {
+        const input = [
+          { name: 'sarah', areaCode: 1, position: 0 },
+          { name: 'bob', areaCode: 10, position: 0 },
+        ]
+        it('should produce the lists unchanged', () => {
+          expect(positionResetByGroup(input, areaCode)).toEqual(input)
+        })
+      })
+      describe('and their positions are non-zero', () => {
+        const input = [
+          { name: 'sarah', areaCode: 1, position: 5 },
+          { name: 'bob', areaCode: 10, position: 3 },
+        ]
+        it('should reset their postiions to 0', () => {
+          expect(positionResetByGroup(input, areaCode)).toEqual([
+            { name: 'sarah', areaCode: 1, position: 0 },
+            { name: 'bob', areaCode: 10, position: 0 },
+          ])
+        })
+      })
+    })
+  })
+  describe('given a multi-element list with various area codes', () => {
+    const input = [
+      { name: 'sarah', areaCode: 1, position: 5 },
+      { name: 'bob', areaCode: 10, position: 3 },
+      { name: 'jude', areaCode: 10, position: 1 },
+      { name: 'jasnah', areaCode: 1, position: 2 },
+      { name: 'ralf', areaCode: 10, position: 3 },
+      { name: 'gary', areaCode: 11, position: 1 },
+      { name: 'mike', areaCode: 11, position: 0 },
+      { name: 'mary', areaCode: 14, position: 2 },
+    ]
+    it('should order each area code distinctly', () => {
+      expect(positionResetByGroup(input, areaCode)).toEqual([
+        { name: 'sarah', areaCode: 1, position: 0 },
+        { name: 'jasnah', areaCode: 1, position: 1 },
+        { name: 'bob', areaCode: 10, position: 0 },
+        { name: 'jude', areaCode: 10, position: 1 },
+        { name: 'ralf', areaCode: 10, position: 2 },
+        { name: 'gary', areaCode: 11, position: 0 },
+        { name: 'mike', areaCode: 11, position: 1 },
+        { name: 'mary', areaCode: 14, position: 0 },
+      ])
     })
   })
 })
