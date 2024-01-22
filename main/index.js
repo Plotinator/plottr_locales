@@ -241,29 +241,35 @@ app.whenReady().then(() => {
       const fileLaunchedOnURL = helpers.file.filePathToFileURL(fileLaunchedOn)
       const restartServerRef = {
         killServer: killServer,
+        killingApp: false,
         restartServer: () => {
-          resetInitialised()
-          return restartServerRef
-            .killServer()
-            .then(() => {
-              return startSocketServer().then(({ port, killServer }) => {
-                setPort(port)
-                restartServerRef.killServer = killServer
+          if (restartServerRef.killingApp) {
+            log.warn('Instructed to restart the server, but we are killing the app.')
+            return Promise.resolve()
+          } else {
+            resetInitialised()
+            return restartServerRef
+              .killServer()
+              .then(() => {
+                return startSocketServer().then(({ port, killServer }) => {
+                  setPort(port)
+                  restartServerRef.killServer = killServer
+                })
               })
-            })
-            .catch((error) => {
-              errorReportingLogger.error(
-                'Failed to restart the socket server.  Killing the app.',
-                error
-              )
-              dialog.showErrorBox(
-                'Error',
-                'Plottr ran into a problem and needs to shutdown.  Please contact support.'
-              )
-              setTimeout(() => {
-                app.quit()
-              }, 5000)
-            })
+              .catch((error) => {
+                errorReportingLogger.error(
+                  'Failed to restart the socket server.  Killing the app.',
+                  error
+                )
+                dialog.showErrorBox(
+                  'Error',
+                  'Plottr ran into a problem and needs to shutdown.  Please contact support.'
+                )
+                setTimeout(() => {
+                  app.quit()
+                }, 5000)
+              })
+          }
         },
       }
 
