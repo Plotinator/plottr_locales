@@ -65,7 +65,7 @@ function getWindowByObjectEq(window) {
 function focusFirstWindow() {
   if (!windows.length) return
 
-  if (typeof windows?.[0]?.browserWindow?.focus === 'function'){
+  if (typeof windows?.[0]?.browserWindow?.focus === 'function') {
     windows[0].browserWindow.focus()
   }
 }
