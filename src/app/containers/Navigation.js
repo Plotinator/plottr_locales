@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useCallback } from 'react'
 import PropTypes from 'react-proptypes'
 import { connect } from 'react-redux'
 import { FaRegUser, FaKey, FaSearch } from 'react-icons/fa'
@@ -17,19 +17,19 @@ const Navigation = ({
   isInTrialMode,
   darkMode,
   currentView,
+  dashboardView,
   changeCurrentView,
   clickOnDom,
   appIsBusyWithWork,
   openSearch,
+  setDashboardModalView,
 }) => {
-  const [dashboardView, setDashboardView] = useState(null)
-
   useEffect(() => {
     const openListener = document.addEventListener('open-dashboard', () => {
-      setDashboardView('files')
+      setDashboardModalView('files')
     })
     const closeListener = document.addEventListener('close-dashboard', () => {
-      setDashboardView(null)
+      setDashboardModalView(null)
     })
     return () => {
       document.removeEventListener('open-dashboard', openListener)
@@ -52,15 +52,15 @@ const Navigation = ({
   }
 
   const openDashboard = () => {
-    setDashboardView('files')
+    setDashboardModalView('files')
   }
 
   const resetDashboardView = useCallback(() => {
-    setDashboardView(null)
-  }, [setDashboardView])
+    setDashboardModalView(null)
+  }, [setDashboardModalView])
 
   const selectDashboardView = (view) => {
-    setDashboardView(view)
+    setDashboardModalView(view)
   }
 
   const renderSaveIndicator = () => {
@@ -116,11 +116,13 @@ Navigation.propTypes = {
   isInTrialMode: PropTypes.bool,
   currentView: PropTypes.string.isRequired,
   darkMode: PropTypes.bool,
+  dashboardView: PropTypes.string,
   changeCurrentView: PropTypes.func.isRequired,
   forceProjectDashboard: PropTypes.bool,
   appIsBusyWithWork: PropTypes.bool,
   clickOnDom: PropTypes.func.isRequired,
   openSearch: PropTypes.func.isRequired,
+  setDashboardModalView: PropTypes.func.isRequired,
 }
 
 function mapStateToProps(state) {
@@ -129,6 +131,7 @@ function mapStateToProps(state) {
     currentView: selectors.currentViewSelector(state),
     darkMode: selectors.isDarkModeSelector(state),
     appIsBusyWithWork: selectors.busyWithWorkThatPreventsQuittingSelector(state),
+    dashboardView: selectors.dashboardModalViewSelector(state),
   }
 }
 
@@ -136,4 +139,5 @@ export default connect(mapStateToProps, {
   changeCurrentView: actions.ui.changeCurrentView,
   clickOnDom: actions.domEvents.clickOnDom,
   openSearch: actions.ui.openSearch,
+  setDashboardModalView: actions.ui.setDashboardModalView,
 })(Navigation)
