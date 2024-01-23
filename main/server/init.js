@@ -4,6 +4,11 @@ import { join } from 'path'
 const START_PORT = 8000
 const MAX_ATTEMPTS = 10
 
+// Use when we don't want to clog up the log files.
+const logQuietly = (...args) => {
+  console.log(...args)
+}
+
 export const startServer = (log, broadcastPortChange, userDataPath, onFatalError, appVersion) => {
   let attempts = 0
 
@@ -31,43 +36,50 @@ export const startServer = (log, broadcastPortChange, userDataPath, onFatalError
       if (weInstructedServerToDie) {
         return
       }
-      log.warn(`Socket server died with code: ${code}`)
+      log.warn(`[${server.pid}] Socket server died with code: ${code}`)
       if (code === 1 || code === 7) {
-        log.warn(`Restarting the server on a new port.`)
+        log.warn(`[${server.pid}] Restarting the server on a new port.`)
         attempts++
         attemptAStart(resolve, reject)
         return
       } else {
-        log.error(`Failed with an unhandled error.  Killing the server.`)
-        reject(new Error(`Socket worker died with unhandled error code: ${code}`))
-        onFatalError(`Socket worker died with unhandled error code: ${code}`)
+        log.error(`[${server.pid}] Failed with an unhandled error.  Killing the server.`)
+        reject(new Error(`[${server.pid}] Socket worker died with unhandled error code: ${code}`))
+        onFatalError(`[${server.pid}] Socket worker died with unhandled error code: ${code}`)
         return
       }
     })
     server.on('message', (message) => {
       if (message === 'ready') {
-        log.info(`Received "${message}" from socket worker.`)
-        log.info('Started socket server!')
+        log.info(`[${server.pid}] Received "${message}" from socket worker.`)
+        log.info(`[${server.pid}] Started socket server!`)
         const killServer = () => {
           weInstructedServerToDie = true
           if (server.kill()) {
             return Promise.resolve()
+          } else {
+            log.warn(
+              `[${server.pid}] Failed to kill the socket server.  Treating it as though it's dead already.`
+            )
+            return Promise.resolve()
           }
-          return Promise.reject('Failed to kill the socket server')
         }
         resolve({ port: randomPort, killServer })
         broadcastPortChange(randomPort)
       } else if (message === 'shutdown') {
-        log.info(`Received "${message}" from socket worker.`)
-        log.info('SHUTTING DOWN SOCKET SERVER!')
+        log.info(`[${server.pid}] Received "${message}" from socket worker.`)
+        log.info(`[${server.pid}] SHUTTING DOWN SOCKET SERVER!`)
         weInstructedServerToDie = true
         server.kill()
       } else if (message === 'heartbeat') {
-        log.info(`Received heartbeat from socket worker.`)
+        logQuietly(`[${server.pid}] Received heartbeat from socket worker.`)
         server.send('ack')
       } else {
         log.info(message)
       }
+    })
+    server.on('error', (error) => {
+      log.error(`A socket server identified as ${server.pid}.  Reported an error.`, error)
     })
   }
 

@@ -6,6 +6,7 @@ import { makeMainProcessClient } from '../../app/mainProcessClient'
 import { closeDashboard } from '../../dashboard-events'
 import { uploadProject } from './upload_project'
 import { whenClientIsReady } from '../../../shared/socket-client'
+import { getErrorReporterInstance } from '../../../shared/error-reporter-instance'
 
 const { showOpenDialog, openKnownFile, addToKnownFilesAndOpen } = makeMainProcessClient()
 
@@ -46,6 +47,9 @@ export function openExistingFile(loggedIn, userId, email, defaultPath) {
                   const fileId = response.data.fileId
                   if (!fileId) {
                     const message = `Tried to upload project from ${filePath} but the server replied without a fileId`
+                    getErrorReporterInstance().then((errorReporter) => {
+                      errorReporter.error(message, new Error('Failed to upload file'))
+                    })
                     logger.error(message)
                     return Promise.reject(new Error(message))
                   }
@@ -57,6 +61,9 @@ export function openExistingFile(loggedIn, userId, email, defaultPath) {
                 })
               })
             } catch (error) {
+              getErrorReporterInstance().then((errorReporter) => {
+                errorReporter.error('Error uploading file', error)
+              })
               logger.error('Error uploading file', error)
               return Promise.reject(error)
             }

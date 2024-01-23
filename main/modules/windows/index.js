@@ -3,6 +3,7 @@ import log from 'electron-log'
 import { openBuyWindow } from './buy'
 import { offlineFileURL } from '../offlineFilePath'
 import { featureFlags } from '../feature_flags'
+import replyWithError from '../../lib/replyWithError'
 
 ipcMain.on('open-buy-window', (event, replyChannel) => {
   try {
@@ -10,7 +11,7 @@ ipcMain.on('open-buy-window', (event, replyChannel) => {
     event.sender.send(replyChannel, 'done')
   } catch (error) {
     log.error('Error opening buy window', error)
-    event.sender.send(replyChannel, { error: error.message })
+    replyWithError(replyChannel, error)
   }
 })
 
@@ -64,7 +65,9 @@ function getWindowByObjectEq(window) {
 function focusFirstWindow() {
   if (!windows.length) return
 
-  windows[0].browserWindow.focus()
+  if (typeof windows?.[0]?.browserWindow?.focus === 'function') {
+    windows[0].browserWindow.focus()
+  }
 }
 
 function numberOfWindows() {
@@ -86,7 +89,9 @@ function focusIfOpen(fileURL) {
     (w) => w.fileURL == fileURL || (offlineURL !== null && w.fileURL === offlineURL)
   )
   if (win) {
-    win.browserWindow.focus()
+    if (typeof win.browserWindow?.focus === 'function') {
+      win.browserWindow.focus()
+    }
     win.browserWindow.webContents.send('close-dashboard')
     // If it's this window and we're trying to open a new file, then
     // we need to refresh the contents.

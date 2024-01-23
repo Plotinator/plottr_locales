@@ -1,6 +1,7 @@
 import { helpers, SYSTEM_REDUCER_KEYS, migrateIfNeeded, Migrator, emptyFile } from 'pltr/v2'
 import { actions, selectors } from 'wired-up-pltr'
 import { t } from 'plottr_locales'
+import { v4 as uuid } from 'uuid'
 import {
   currentUser,
   initialFetch,
@@ -37,6 +38,8 @@ const {
   setMyFilePath,
   isRestarting,
   pleaseTellMeWhatPlatformIAmOn,
+  showSaveDialog,
+  userDocumentsPath,
 } = makeMainProcessClient()
 
 const withFileId = (fileId, file) => ({
@@ -75,7 +78,7 @@ function waitForUser() {
 
 // NOTE: Only for cloud files.
 const loadFileIntoRedux = (data, fileId) => {
-  store.dispatch(
+  store().dispatch(
     actions.ui.loadFile(
       data.file.fileName,
       false,
@@ -84,7 +87,7 @@ const loadFileIntoRedux = (data, fileId) => {
       helpers.file.fileIdToPlottrCloudFileURL(fileId)
     )
   )
-  store.dispatch(
+  store().dispatch(
     actions.project.selectFile({
       ...data.file,
       id: fileId,
@@ -101,9 +104,12 @@ export function removeSystemKeys(jsonData) {
   return withoutSystemKeys
 }
 
+const MAX_FILE_BOOT_TIME_MS = 60000
+
 const SAVE_INTERVAL_MS = 10000
 const BACKUP_INTERVAL_MS = 60000
-let saver = null
+const saverRef = { current: null }
+const bootingFile = { current: null }
 
 export function bootFile(
   whenClientIsReady,
@@ -113,7 +119,76 @@ export function bootFile(
   saveBackup,
   bootingOfflineFile
 ) {
+  const now = new Date().getTime()
+  if (bootingFile.current && now - bootingFile.current < MAX_FILE_BOOT_TIME_MS) {
+    logger.warn(
+      `Trying to boot ${fileURL} and we're trying to boot a file already.  It's been ${
+        (now - bootingFile.current) / 1000
+      } seconds since we started booting.`
+    )
+    return Promise.resolve()
+  }
+  bootingFile.current = now
+
+  if (saverRef.current) {
+    saverRef.current.cancelAllRemainingRequests()
+  }
+
   const recordedErrorsDuringStartup = []
+
+  function offerSaveAsThenQuit() {
+    saverRef.current.stop()
+    const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
+    return showErrorBox(
+      t('Error'),
+      t(
+        'There was an error saving your file.  Please use the following dialog to save your file and contact support.'
+      )
+    ).then(() => {
+      return showSaveDialog(filters, t('Please name this backup')).then((fileName) => {
+        if (fileName) {
+          const backupFolder = selectors.backupFolderPathSelector(store().getState())
+          if (fileName.startsWith(backupFolder)) {
+            return showErrorBox(
+              t('Error'),
+              t('Please choose a destination other than your backup folder')
+            )
+          } else {
+            const newFilePath = helpers.file.ensureEndsInPltr(fileName)
+            return whenClientIsReady(({ saveRawFile }) => {
+              return saveRawFile(
+                newFilePath,
+                JSON.stringify(removeSystemKeys(store().getState()))
+              ).then(() => {
+                setTimeout(() => {
+                  const event = new Event('force-close')
+                  window.dispatchEvent(event)
+                }, 3000)
+              })
+            })
+          }
+        } else {
+          return whenClientIsReady(({ saveRawFile, join }) => {
+            return userDocumentsPath().then((documentsPath) => {
+              return join(documentsPath, `Plottr-fatal-exit-backup-${uuid()}.pltr`).then(
+                (newFilePath) => {
+                  return saveRawFile(
+                    newFilePath,
+                    JSON.stringify(removeSystemKeys(store().getState()))
+                  ).then(() => {
+                    setTimeout(() => {
+                      const event = new Event('force-close')
+                      window.dispatchEvent(event)
+                    }, 3000)
+                  })
+                }
+              )
+            })
+          })
+        }
+      })
+    })
+  }
 
   const migrate = (originalFile, fileId) => (overwrittenFile) => {
     const json = overwrittenFile || originalFile
@@ -127,7 +202,7 @@ export function bootFile(
           } else {
             machineId().then((clientId) => {
               loadFileIntoRedux(json, fileId)
-              store.dispatch(actions.client.setClientId(clientId))
+              store().dispatch(actions.client.setClientId(clientId))
               resolve(json)
             })
           }
@@ -159,13 +234,13 @@ export function bootFile(
                   overwriteAllKeys(fileId, clientId, removeSystemKeys(data))
                     .then((results) => {
                       loadFileIntoRedux(data, fileId)
-                      store.dispatch(actions.client.setClientId(clientId))
+                      store().dispatch(actions.client.setClientId(clientId))
                       return results
                     })
                     .then(resolve, reject)
                 } else {
                   loadFileIntoRedux(data, fileId)
-                  store.dispatch(actions.client.setClientId(clientId))
+                  store().dispatch(actions.client.setClientId(clientId))
                   resolve(data)
                 }
               })
@@ -236,7 +311,11 @@ export function bootFile(
               fileName: offlineFile.file.originalFileName || offlineFile.file.fileName,
             },
           }).catch((error) => {
-            logger.error(`Erorr uploading our offline file ${fileId}`, error)
+            logger.error(`Error uploading our offline file ${fileId}`, error)
+            recordedErrorsDuringStartup.push({
+              message: `Error uploading our offline file ${fileId}`,
+              error,
+            })
             return showErrorBox(
               t('Error'),
               t('There was an error uploading your offline backup. Please exit and start again')
@@ -272,7 +351,7 @@ export function bootFile(
   }
 
   const handleEroneousUserStates = (fileURL) => (user) => {
-    if (!user.uid) {
+    if (typeof user?.uid !== 'string') {
       return handleNoUserId(fileURL)
     }
     return user
@@ -446,7 +525,7 @@ export function bootFile(
                       }
                       return reject(`bootLocalFile002: migration (${fileURL})`)
                     }
-                    store.dispatch(
+                    store().dispatch(
                       actions.ui.loadFile(
                         state.file.fileName || helpers.file.withoutProtocol(fileURL),
                         didMigrate,
@@ -462,7 +541,7 @@ export function bootFile(
                         fileURL
                       )
                     )
-                    store.dispatch(
+                    store().dispatch(
                       actions.project.selectFile({
                         ...state.file,
                         fileURL,
@@ -481,10 +560,10 @@ export function bootFile(
                     )
 
                     if (state && state.tour && state.tour.showTour)
-                      store.dispatch(actions.ui.changeOrientation('horizontal'))
+                      store().dispatch(actions.ui.changeOrientation('horizontal'))
 
                     return machineId().then((clientId) => {
-                      store.dispatch(actions.client.setClientId(clientId))
+                      store().dispatch(actions.client.setClientId(clientId))
 
                       resolve()
                     })
@@ -500,11 +579,15 @@ export function bootFile(
   function _bootFile(fileURL, options, numOpenFiles, saveBackup) {
     if (!helpers.file.isProtocolString(fileURL)) {
       const message = `Can't boot a file without a protocol: ${fileURL}`
+      recordedErrorsDuringStartup.push({
+        message,
+        error: new Error('Cannot boot file without protocol'),
+      })
       logger.error(message)
-      store.dispatch(actions.applicationState.errorLoadingFile())
+      store().dispatch(actions.applicationState.errorLoadingFile())
       return Promise.reject(new Error(message))
     }
-    store.dispatch(actions.applicationState.startLoadingFile())
+    store().dispatch(actions.applicationState.startLoadingFile())
 
     // Now that we know what the file path for this window should be,
     // tell the main process.
@@ -519,37 +602,40 @@ export function bootFile(
             : bootLocalFile(fileURL, numOpenFiles, saveBackup)
         )
           .then(() => {
-            store.dispatch(actions.applicationState.finishLoadingFile())
+            store().dispatch(actions.applicationState.finishLoadingFile())
           })
           .catch((error) => {
             nukeLastKnown()
             logger.error(error)
-            recordedErrorsDuringStartup.push({ message: 'Error booting the file', error })
-            store.dispatch(
+            recordedErrorsDuringStartup.push({
+              message: `Error booting the file: ${fileURL}`,
+              error,
+            })
+            store().dispatch(
               actions.applicationState.errorLoadingFile(error.message === UPDATE_MESSAGE)
             )
           })
       } catch (error) {
         nukeLastKnown()
         logger.error(error)
-        recordedErrorsDuringStartup.push({ message: 'Error booting a file', error })
-        store.dispatch(actions.applicationState.errorLoadingFile())
+        recordedErrorsDuringStartup.push({ message: `Error booting a file: ${fileURL}`, error })
+        store().dispatch(actions.applicationState.errorLoadingFile())
         return Promise.reject(error)
       }
     })
   }
 
   return _bootFile(fileURL, options, numOpenFiles, saveBackup).then(() => {
-    if (saver) {
-      saver.cancelAllRemainingRequests()
+    if (saverRef.current) {
+      saverRef.current.cancelAllRemainingRequests()
     }
     const postSaveHook = () => {
-      store.dispatch(actions.ui.fileSaved())
+      store().dispatch(actions.ui.fileSaved())
     }
     const postBackupHook = () => {
       // NOP
     }
-    const state = store.getState()
+    const state = store().getState()
     const licenseUserObject = selectors.userSettingsSelector(state)
     const userId = selectors.userIdSelector(state) || licenseUserObject.payment_id || 'UNKNOWN_USER'
     const userEmail =
@@ -566,6 +652,14 @@ export function bootFile(
           userId,
           userEmail
         )
+        const errorReportingLogger = {
+          info: logger.info,
+          warn: logger.warn,
+          error: (...args) => {
+            logger.error(...args)
+            errorReporter.error(...args)
+          },
+        }
         if (recordedErrorsDuringStartup.length > 0) {
           recordedErrorsDuringStartup.forEach(({ message, error }) => {
             errorReporter.error(message, error)
@@ -574,29 +668,32 @@ export function bootFile(
           // memory and remove ambiguity.
           recordedErrorsDuringStartup.splice(0, recordedErrorsDuringStartup.length)
         }
-        saver = Saver(
+        saverRef.current = Saver(
           () => {
-            return selectors.fullFileStateSelector(store.getState())
+            return selectors.fullFileStateSelector(store().getState())
           },
-          saveFile(whenClientIsReady, logger, postSaveHook),
+          saveFile(whenClientIsReady, errorReportingLogger, postSaveHook),
           backupFile(
             whenClientIsReady,
             saveBackupOnFirebase,
             cachedDowloadStorageImage.downloadStorageImage,
-            logger,
+            errorReportingLogger,
             postBackupHook
           ),
           SAVE_INTERVAL_MS,
           BACKUP_INTERVAL_MS,
-          logger,
-          errorReporter,
+          errorReportingLogger,
           (title, message) => {
             showMessageBox(title, message)
           },
           (title, message) => {
             showErrorBox(title, message)
           },
-          isRestarting
+          isRestarting,
+          () => {
+            return selectors.isLoggedInSelector(store().getState())
+          },
+          offerSaveAsThenQuit
         )
       })
       .catch((error) => {
@@ -606,6 +703,9 @@ export function bootFile(
             window.close()
           }, 3000)
         })
+      })
+      .finally(() => {
+        bootingFile.current = null
       })
   })
 }

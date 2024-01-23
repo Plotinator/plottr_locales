@@ -4,9 +4,8 @@ import exportToSelfContainedPlottrFile from 'plottr_import_export/src/exporter/p
 import { helpers, SYSTEM_REDUCER_KEYS, emptyFile } from 'pltr/v2'
 import { selectors } from 'wired-up-pltr'
 
-const emptyFileState = emptyFile('DummyFile', '2022.11.2')
-
 export const saveFile = (whenClientIsReady, logger, postSaveHook) => (state) => {
+  const emptyFileState = emptyFile('DummyFile', '2022.11.2')
   return whenClientIsReady(({ saveFile, saveOfflineFile }) => {
     const hasAllKeys = selectors.hasAllKeysSelector(state)
     const fileJSON = selectors.fullFileStateSelector(state)
@@ -56,6 +55,8 @@ export const backupFile =
 
     const cloudBackup =
       !isOffline && isCloudFile ? saveBackupOnFirebase(userId, state) : Promise.resolve()
+
+    const emptyFileState = emptyFile('DummyFile', '2022.11.2')
 
     return cloudBackup
       .then(() => {

@@ -17,6 +17,7 @@ import {
   ExportDialog,
   UpdateNotifier,
   NewProjectInputModal,
+  SearchModal,
   ImagePicker,
 } from 'connected-components'
 import { store } from '../store'
@@ -45,6 +46,9 @@ const App = ({
   clickOnDom,
   applicationIsBusyAndCannotBeQuit,
   showErrorBox,
+  searchDialogIsOpen,
+  openSearch,
+  startSearching,
   unsavedChanges,
   fileSaved,
 }) => {
@@ -69,7 +73,9 @@ const App = ({
       !isOffline &&
       sessionChecked
     ) {
-      log.error('Attempting to open a cloud file locally without being logged in.')
+      log.warn(
+        "Window belongs to a pro file, but we're not logged in.  We could have just logged out."
+      )
       showErrorBox(t('Error'), t('This appears to be a Plottr Pro file.  Please log in.'))
     }
   }, [isResuming, userId, isCloudFile, userNeedsToLogin, isOffline, sessionChecked])
@@ -93,6 +99,21 @@ const App = ({
       unsubscribeFromImagePickerMenu()
     }
   }, [])
+
+  useEffect(() => {
+    const searchListener = (event) => {
+      if (!searchDialogIsOpen && event.key === 'f' && (event.ctrlKey || event.metaKey)) {
+        event.preventDefault()
+        event.stopPropagation()
+        openSearch()
+        startSearching()
+      }
+    }
+    document.addEventListener('keydown', searchListener)
+    return () => {
+      document.removeEventListener('keydown', searchListener)
+    }
+  }, [searchDialogIsOpen, openSearch])
 
   const closeOrRefresh = (reloading) => {
     if (reloading) {
@@ -194,7 +215,7 @@ const App = ({
   }, [applicationIsBusyAndCannotBeQuit, setWaitingForSaveDoneSignal])
 
   const saveAndClose = (saveFile, saveOfflineFile) => () => {
-    const { present } = store.getState()
+    const { present } = store().getState()
     setWaitingForSaveDoneSignal(true)
     return (
       isCloudFile && isOffline
@@ -278,6 +299,7 @@ const App = ({
         {renderAskToSave()}
         {renderAdvanceExportModal()}
         {renderImagePickerModal()}
+        {searchDialogIsOpen ? <SearchModal /> : null}
       </React.StrictMode>
     </ErrorBoundary>
   )
@@ -291,9 +313,12 @@ App.propTypes = {
   isResuming: PropTypes.bool,
   userNeedsToLogin: PropTypes.bool,
   sessionChecked: PropTypes.bool,
+  searchDialogIsOpen: PropTypes.bool,
   clickOnDom: PropTypes.func,
   applicationIsBusyAndCannotBeQuit: PropTypes.bool,
   showErrorBox: PropTypes.func.isRequired,
+  openSearch: PropTypes.func.isRequired,
+  startSearching: PropTypes.func.isRequired,
   unsavedChanges: PropTypes.bool,
   fileSaved: PropTypes.func.isRequired,
 }
@@ -307,11 +332,14 @@ function mapStateToProps(state) {
     userNeedsToLogin: selectors.userNeedsToLoginSelector(state),
     sessionChecked: selectors.sessionCheckedSelector(state),
     applicationIsBusyAndCannotBeQuit: selectors.busyWithWorkThatPreventsQuittingSelector(state),
+    searchDialogIsOpen: selectors.searchDialogIsOpenSelector(state),
     unsavedChanges: selectors.unsavedChangesSelector(state),
   }
 }
 
 export default connect(mapStateToProps, {
   clickOnDom: actions.domEvents.clickOnDom,
+  openSearch: actions.ui.openSearch,
+  startSearching: actions.applicationState.startSearching,
   fileSaved: actions.ui.fileSaved,
 })(App)

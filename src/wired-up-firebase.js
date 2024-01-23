@@ -7,6 +7,9 @@ import { makeMainProcessClient } from './app/mainProcessClient'
 
 const { machineId } = makeMainProcessClient()
 
+// Errors can happen inside of the firebase worker, but we're going to
+// defer reporting them to the calling code when it handles the
+// rejected promise.
 const worker = firebaseWorker(logger, machineId, selectors)
 
 export const editFileName = worker.editFileName

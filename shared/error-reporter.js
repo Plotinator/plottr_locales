@@ -41,7 +41,8 @@ const ErrorReporter = (
   context,
   os,
   userId,
-  userEmail
+  userEmail,
+  fileURL = 'unknown-file-id'
 ) => {
   const MAX_ROLLBAR_API_RETRIES = 1
   const SEND_RETRY_INTERVAL_MILLISECONDS = 5000
@@ -88,7 +89,7 @@ const ErrorReporter = (
     itemsPerMinute: MAX_ERROR_REPORTS_PER_MINUTE,
   })
 
-  const extraContext = { os }
+  const extraContext = { os, fileURL }
 
   const validMessageAndError = (rawMessage, rawError) => {
     const typeOfMessage = typeof rawMessage
@@ -101,9 +102,9 @@ const ErrorReporter = (
         ? rawMessage
         : typeofError === 'string'
         ? rawError
-        : rawMessage
+        : typeof rawMessage?.toString === 'function'
         ? rawMessage.toString()
-        : rawError
+        : typeof rawError?.toString === 'function'
         ? rawError.toString()
         : 'No error or message supplied'
     const error = errorIsError
@@ -112,8 +113,12 @@ const ErrorReporter = (
       ? rawMessage
       : new Error(
           `No error supplied.  Other args: message: ${
-            rawMessage?.toString() ?? 'No message supplied'
-          }, error: ${rawError?.toString() ?? 'No error supplied'}`
+            typeof rawMessage.toString === 'function'
+              ? rawMessage.toString()
+              : 'No message supplied'
+          }, error: ${
+            typeof rawError.toString === 'function' ? rawError.toString() : 'No error supplied'
+          }`
         )
 
     return [message, error]

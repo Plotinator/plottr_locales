@@ -9,6 +9,7 @@ import logger from '../shared/logger'
 import { uploadToFirebase } from './upload-to-firebase'
 import { whenClientIsReady } from '../shared/socket-client'
 import { makeMainProcessClient } from './app/mainProcessClient'
+import { getErrorReporterInstance } from '../shared/error-reporter-instance'
 
 const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
 
@@ -115,7 +116,7 @@ export const offlineFileURLFromFile = (file) => {
 }
 
 export const renameFile = (fileURL) => {
-  const state = store.getState()
+  const state = store().getState()
   const isCloudFile = selectors.isCloudFileSelector(state)
   const isOffline = selectors.isOfflineSelector(state)
   if (isOffline && isCloudFile) {
@@ -126,6 +127,12 @@ export const renameFile = (fileURL) => {
     const fileList = selectors.knownFilesSelector(state)
     const fileId = fileURL.replace(/^plottr:\/\//, '')
     if (!fileList.find(({ id }) => id === fileId)) {
+      getErrorReporterInstance().then((errorReporter) => {
+        errorReporter.error(
+          `Coludn't find file with id: ${fileId} to rename`,
+          new Error('Error renaming file')
+        )
+      })
       logger.error(`Coludn't find file with id: ${fileId} to rename`)
       return Promise.resolve()
     }
@@ -163,13 +170,16 @@ export const renameFile = (fileURL) => {
                           return editKnownFilePath(fileURL, newFileURL)
                         })
                         .then(() => {
-                          store.dispatch(actions.applicationState.finishRenamingFile())
+                          store().dispatch(actions.applicationState.finishRenamingFile())
                         })
                     }
                   )
                 }).catch((error) => {
                   logger.error('Error renaming file', error)
-                  store.dispatch(actions.applicationState.finishRenamingFile())
+                  getErrorReporterInstance().then((errorReporter) => {
+                    errorReporter.error('Error renaming file', error)
+                  })
+                  store().dispatch(actions.applicationState.finishRenamingFile())
                   if (error.code === errorCodes.FILE_LACKS_ALL_KEYS) {
                     return showErrorBox(
                       t('File too old'),
@@ -181,7 +191,10 @@ export const renameFile = (fileURL) => {
                 })
               } catch (error) {
                 logger.error('Error renaming file', error)
-                store.dispatch(actions.applicationState.finishRenamingFile())
+                getErrorReporterInstance().then((errorReporter) => {
+                  errorReporter.error('Error renaming file', error)
+                })
+                store().dispatch(actions.applicationState.finishRenamingFile())
                 return showErrorBox(t('Error'), t('There was an error doing that. Try again'))
               }
             }
@@ -276,41 +289,44 @@ export const createAndOpenCopy = (oldFilePathSegments, newFileName) => {
 }
 
 export const userFilePickerDefaultFolder = () => {
-  const hasDefaultFolder = selectors.hasDefaultFolderSelector(store.getState())
+  const hasDefaultFolder = selectors.hasDefaultFolderSelector(store().getState())
   if (hasDefaultFolder) {
-    return Promise.resolve(selectors.defaultFolderLocationSelector(store.getState()))
+    return Promise.resolve(selectors.defaultFolderLocationSelector(store().getState()))
   } else {
     return userDocumentsPath()
   }
 }
 
 export const openExistingFile = () => {
-  const state = store.getState()
+  const state = store().getState()
   const isInOfflineMode = selectors.isInOfflineModeSelector(state)
   if (!isInOfflineMode) {
     const emailAddress = selectors.emailAddressSelector(state)
     const userId = selectors.userIdSelector(state)
     const isLoggedIn = selectors.isLoggedInSelector(state)
     if (isLoggedIn) {
-      store.dispatch(actions.applicationState.startUploadingFileToCloud())
+      store().dispatch(actions.applicationState.startUploadingFileToCloud())
     }
 
-    store.dispatch(actions.project.showLoader(true))
+    store().dispatch(actions.project.showLoader(true))
     userFilePickerDefaultFolder().then((defaultPath) => {
       _openExistingFile(!!userId, userId, emailAddress, defaultPath)
         .then(() => {
           logger.info('Opened existing file')
-          store.dispatch(actions.project.showLoader(false))
+          store().dispatch(actions.project.showLoader(false))
           if (isLoggedIn) {
-            store.dispatch(actions.applicationState.finishUploadingFileToCloud())
+            store().dispatch(actions.applicationState.finishUploadingFileToCloud())
           }
         })
         .catch((error) => {
           logger.error('Error opening existing file', error)
+          getErrorReporterInstance().then((errorReporter) => {
+            errorReporter.error('Error opening existing file', error)
+          })
           showErrorBox(t('Error'), t('There was an error doing that. Try again.')).then(() => {
-            store.dispatch(actions.project.showLoader(false))
+            store().dispatch(actions.project.showLoader(false))
             if (isLoggedIn) {
-              store.dispatch(actions.applicationState.finishUploadingFileToCloud())
+              store().dispatch(actions.applicationState.finishUploadingFileToCloud())
             }
           })
         })
@@ -319,7 +335,7 @@ export const openExistingFile = () => {
 }
 
 export const duplicateFile = (fileUrl, suggestedNewName, forceCloseWhenDone) => {
-  const state = store.getState()
+  const state = store().getState()
   const isLoggedIntoPro = selectors.hasProSelector(state)
 
   const event = isLoggedIntoPro

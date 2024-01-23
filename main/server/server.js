@@ -7,6 +7,7 @@ import {
   READ_FILE,
   RM_RF,
   SAVE_FILE,
+  SAVE_RAW_FILE,
   SAVE_OFFLINE_FILE,
   BACKUP_FILE,
   SAVE_BACKUP_ERROR,
@@ -122,6 +123,11 @@ const startupTasks = (userDataPath, stores, logInfo) => {
 
 const ONE_GIGABYTE = 1073741824
 
+// Use when we don't want to clog up the log files.
+const logQuietly = (...args) => {
+  console.log(...args)
+}
+
 const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
   process.send(`Starting server on port: ${port}`)
   const webSocketServer = new WebSocketServer({ host: 'localhost', port, maxPayload: ONE_GIGABYTE })
@@ -174,6 +180,7 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
     const fileModule = makeFileModule(backupModule, settings, logger)
     const {
       saveFile,
+      saveRawFile,
       saveOfflineFile,
       basename,
       readFile,
@@ -380,6 +387,24 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
                     ...payload?.file?.file,
                   },
                   fileURL: fileURL,
+                },
+              ]
+            )
+          }
+          case SAVE_RAW_FILE: {
+            const { filePath, data } = payload
+            return handlePromise(
+              () => [
+                'Saving (reduced payload): ',
+                {
+                  filePath,
+                },
+              ],
+              () => statusManager.registerTask(saveRawFile(filePath, data), SAVE_RAW_FILE),
+              (error) => [
+                'Error while saving file ',
+                {
+                  filePath,
                 },
               ]
             )
@@ -1094,7 +1119,7 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
       const elapsed = awaitingResponse
         ? new Date().getTime() - awaitingResponse.getTime()
         : Infinity
-      basicLogger.info(`Heart beat acknowledged in ${elapsed} (ms)`)
+      logQuietly(`Heart beat acknowledged in ${elapsed} (ms)`)
       awaitingResponse = null
     }
   })

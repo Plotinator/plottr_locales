@@ -15,7 +15,7 @@ import { helpers, migrateIfNeeded, addMissingKeys } from 'pltr/v2'
 import { actions, selectors } from 'wired-up-pltr'
 
 import { rtfToHTML } from 'pltr/v2/slate_serializers/to_html'
-import { convertHTMLNodeList } from 'pltr/v2/slate_serializers/from_html'
+import { convertHTMLNodeList } from 'pltr/v2/slate_deserializers/from_html'
 import { imageToWebpDataURL } from 'plottr_import_export'
 import exportConfig from 'plottr_import_export/src/exporter/default_config'
 import world from 'world-api'
@@ -41,6 +41,7 @@ import { removeSystemKeys } from './bootFile'
 import { makeMainProcessClient } from './mainProcessClient'
 import { downloadStorageImage } from '../common/downloadStorageImage'
 import createErrorReporter from '../../shared/error-reporter'
+import { getErrorReporterInstance } from '../../shared/error-reporter-instance'
 
 const {
   showErrorBox,
@@ -80,19 +81,30 @@ const {
   onCreateFileShortcut,
   showItemInFolder,
   userDesktopPath,
-  userDocumentsPath,
-  createNewFile,
   askToExport,
   getVersion,
   createDesktopShortcut,
+  userDocumentsPath,
+  createNewFile,
   pleaseTellMeWhatPlatformIAmOn,
 } = makeMainProcessClient()
+
+const errorReportingLogger = {
+  info: logger.info,
+  warn: logger.warn,
+  error: (...args) => {
+    logger.error(...args)
+    getErrorReporterInstance().then((errorReporter) => {
+      return errorReporter.error(...args)
+    })
+  },
+}
 
 const connectToSocketServer = (port) => {
   let doneTimeout = null
   const socketServerEventHandlers = {
     onBusy: () => {
-      store.dispatch(actions.applicationState.startWorkThatPreventsQuitting())
+      store().dispatch(actions.applicationState.startWorkThatPreventsQuitting())
     },
     onDone: () => {
       if (doneTimeout) {
@@ -100,7 +112,7 @@ const connectToSocketServer = (port) => {
         doneTimeout = null
       }
       doneTimeout = setTimeout(() => {
-        store.dispatch(actions.applicationState.finishWorkThatPreventsQuitting())
+        store().dispatch(actions.applicationState.finishWorkThatPreventsQuitting())
       }, 2000)
     },
   }
@@ -109,7 +121,7 @@ const connectToSocketServer = (port) => {
     logger,
     WebSocket,
     (error) => {
-      logger.error(
+      errorReportingLogger.error(
         `Failed to reconnect to socket server on port: <${port}>.  Killing the window.`,
         error
       )
@@ -125,6 +137,11 @@ const connectToSocketServer = (port) => {
   )
 }
 
+const IGNORED_ERRORS = [
+  // This error happens because sticky table schedules a check that
+  // doesn't check the table was unmounted.
+  "Cannot read properties of undefined (reading 'childNodes')",
+]
 let errorReporter = null
 tellMeWhatOSImOn()
   .then((osIAmOn) => {
@@ -141,7 +158,7 @@ tellMeWhatOSImOn()
     return connectToSocketServer(socketWorkerPort)
   })
   .then(() => {
-    const state = store.getState()
+    const state = store().getState()
     const licenseUserObject = selectors.userSettingsSelector(state)
     const userId = selectors.userIdSelector(state) || licenseUserObject.payment_id || 'UNKNOWN_USER'
     const userEmail =
@@ -183,7 +200,7 @@ tellMeWhatOSImOn()
     fileSystemAPIs
       .currentAppSettings()
       .then((settings) => {
-        store.dispatch(actions.settings.setDarkMode(settings.user?.dark))
+        store().dispatch(actions.settings.setDarkMode(settings.user?.dark))
         return getLocale().then((locale) => {
           setupI18n(settings, { locale })
         })
@@ -214,20 +231,14 @@ tellMeWhatOSImOn()
           { timeout: 1000 }
         )
 
-        // TODO: fix this by exporting store from the configureStore file
-        // kind of a hack to enable store dispatches in otherwise hard situations
-        window.specialDelivery = (action) => {
-          store.dispatch(action)
-        }
-
         document.addEventListener('save-custom-template', (event) => {
-          const currentState = store.getState()
+          const currentState = store().getState()
           const options = event.payload
           addNewCustomTemplate(currentState, options)
         })
 
         onExportFileFromMenu(({ type }) => {
-          const currentState = store.getState()
+          const currentState = store().getState()
           const bookId = selectors.currentTimelineSelector(currentState)
           const name = selectors.seriesNameSelector(currentState)
           const books = selectors.allBooksSelector(currentState)
@@ -237,14 +248,14 @@ tellMeWhatOSImOn()
           const file = selectors.fullFileStateSelector(currentState)
 
           askToExport(defaultPath, file, type, exportConfig[type], userId).catch((error) => {
-            logger.error(error)
+            errorReportingLogger.error('Error exporting', error)
             showErrorBox(t('Error'), t('There was an error doing that. Try again'))
             return
           })
         })
 
         onSave(() => {
-          const state = store.getState()
+          const state = store().getState()
           const isOffline = selectors.isOfflineSelector(state)
           const isOfflineModeEnabled = selectors.offlineModeEnabledSelector(state)
           const isCloudFile = selectors.isCloudFileSelector(state)
@@ -252,19 +263,19 @@ tellMeWhatOSImOn()
           if (isCloudFile && isOffline && isOfflineModeEnabled) {
             saveOfflineFile(fileState)
               .then(() => {
-                store.dispatch(actions.ui.fileSaved())
+                store().dispatch(actions.ui.fileSaved())
               })
               .catch((error) => {
-                logger.error('Failed to save offline file', error)
+                errorReportingLogger.error('Failed to save offline file', error)
               })
           } else if (!isCloudFile) {
             const fileURL = selectors.fileURLSelector(state)
             saveFile(fileURL, fileState)
               .then(() => {
-                store.dispatch(actions.ui.fileSaved())
+                store().dispatch(actions.ui.fileSaved())
               })
               .catch((error) => {
-                logger.error('Failed to save classic file', error)
+                errorReportingLogger.error('Failed to save classic file', error)
                 showErrorBox(t('Error'), t('There was a problem saving your file'))
               })
           }
@@ -312,8 +323,7 @@ tellMeWhatOSImOn()
                                     null,
                                     (err, didMigrate, migratedState) => {
                                       if (err) {
-                                        errorReporter.error('Error migrating a file', err)
-                                        logger.error(err)
+                                        errorReportingLogger.error('Error migrating a file', err)
                                         if (err === 'Plottr behind file') {
                                           showErrorBox(t('Error'), t('Please update Plottr'))
                                           reject(new Error('Need to update Plottr'))
@@ -335,7 +345,7 @@ tellMeWhatOSImOn()
                             (fileName) => {
                               if (fileName) {
                                 const backupFolder = selectors.backupFolderPathSelector(
-                                  store.getState()
+                                  store().getState()
                                 )
                                 if (fileName.startsWith(backupFolder)) {
                                   return showErrorBox(
@@ -347,7 +357,9 @@ tellMeWhatOSImOn()
                                   const newFileURL = helpers.file.filePathToFileURL(newFilePath)
                                   return saveFile(newFileURL, addMissingKeys(migratedState))
                                     .then(() => {
-                                      store.dispatch(actions.applicationState.finishRenamingFile())
+                                      store().dispatch(
+                                        actions.applicationState.finishRenamingFile()
+                                      )
                                       return addToKnownFilesAndOpen(newFileURL)
                                     })
                                     .then(() => {
@@ -365,7 +377,7 @@ tellMeWhatOSImOn()
                     })
                   })
               } else {
-                const currentState = store.getState()
+                const currentState = store().getState()
                 const isInOfflineMode = selectors.isInOfflineModeSelector(currentState)
                 const fileState = selectors.fullFileStateSelector(currentState)
                 if (isInOfflineMode) {
@@ -386,7 +398,9 @@ tellMeWhatOSImOn()
                     .then((finalDefaultPath) => {
                       return showSaveDialog(filters, title, finalDefaultPath).then((fileName) => {
                         if (fileName) {
-                          const backupFolder = selectors.backupFolderPathSelector(store.getState())
+                          const backupFolder = selectors.backupFolderPathSelector(
+                            store().getState()
+                          )
                           if (fileName.startsWith(backupFolder)) {
                             return showErrorBox(
                               t('Error'),
@@ -420,7 +434,7 @@ tellMeWhatOSImOn()
         // default folder release because this was discovered on the
         // eve of releasing.
         const moveFromTempHandler = () => {
-          const state = store.getState()
+          const state = store().getState()
           const file = selectors.fullFileStateSelector(state)
           const isCloudFile = selectors.isCloudFileSelector(state)
           if (isCloudFile) {
@@ -430,14 +444,15 @@ tellMeWhatOSImOn()
           isTempFile(file).then((isTemp) => {
             const oldFileURL = selectors.fileURLSelector(state)
             if (!oldFileURL) {
-              logger.error(
-                `Tried to move the current file from temp but we couldn't compute its URL.`
+              errorReportingLogger.error(
+                `Tried to move the current file from temp but we couldn't compute its URL.`,
+                new Error('Failed to move from temp directory')
               )
               return
             }
             if (!isTemp) {
               saveFile(oldFileURL, file).then(() => {
-                store.dispatch(actions.ui.fileSaved())
+                store().dispatch(actions.ui.fileSaved())
               })
               return
             }
@@ -450,8 +465,9 @@ tellMeWhatOSImOn()
                   const newFileURL = helpers.file.filePathToFileURL(newFilePath)
                   const oldFileURL = selectors.fileURLSelector(state)
                   if (!newFilePath || !newFileURL) {
-                    logger.error(
-                      `Tried to move file at ${oldFileURL} to ${newFilePath} (path: ${newFilePath})`
+                    errorReportingLogger.error(
+                      `Tried to move file at ${oldFileURL} to ${newFilePath} (path: ${newFilePath})`,
+                      new Error('Need destination and source to move a file')
                     )
                     return
                   }
@@ -459,7 +475,7 @@ tellMeWhatOSImOn()
                     return basename(newFilePath).then((newFileName) => {
                       // load the new file: the only way to set a new
                       // `project.fileURL`(!)
-                      store.dispatch(
+                      store().dispatch(
                         actions.ui.loadFile(
                           newFileName,
                           false,
@@ -482,11 +498,11 @@ tellMeWhatOSImOn()
         document.addEventListener('save-as', saveAsHandler)
 
         onUndo(() => {
-          store.dispatch(ActionCreators.undo())
+          store().dispatch(ActionCreators.undo())
         })
 
         onRedu(() => {
-          store.dispatch(ActionCreators.redo())
+          store().dispatch(ActionCreators.redo())
         })
 
         let lastError = null
@@ -495,7 +511,7 @@ tellMeWhatOSImOn()
           event.preventDefault()
           event.stopPropagation()
           const error = event.error
-          if (error === lastError) {
+          if (error === lastError || IGNORED_ERRORS.includes(error.message)) {
             return
           } else {
             logger.error(error)
@@ -505,25 +521,31 @@ tellMeWhatOSImOn()
         })
 
         document.addEventListener('keydown', (e) => {
-          const state = store.getState()
+          const state = store().getState()
           const cardDialogIsOpen = selectors.cardDialogCardIdSelector(state)
           const attributesDialogIsOpen = selectors.attributesDialogIsOpenSelector(state)
           const viewIsTimeline = selectors.currentViewSelector(state)
           const actConfigModalIsOpen = selectors.actConfigModalIsOpenSelector(state)
+          const searchModalIsOpen = selectors.searchDialogIsOpenSelector(state)
           if (!cardDialogIsOpen) {
             const table = document.querySelector('.sticky-table')
             const targetIsEditable = e.target.isContentEditable || e.target.nodeName === 'INPUT'
             // No redux state for a few.  Here's a catch all for modals.
             const aModalIsOpen = document.querySelector('.ReactModalPortal')
             const aPopoverIsOpen = document.querySelector('.react-tiny-popover-container')
+            const SCROLL_KEYS = ['ArrowUp', 'ArrowRight', 'ArrowDown', 'ArrowLeft']
             if (
+              !searchModalIsOpen &&
               !aModalIsOpen &&
               !aPopoverIsOpen &&
               !actConfigModalIsOpen &&
               !targetIsEditable &&
               !attributesDialogIsOpen &&
+              typeof table?.scrollTop === 'number' &&
+              typeof table?.scrollLeft === 'number' &&
               viewIsTimeline &&
-              typeof table !== 'undefined'
+              typeof table !== 'undefined' &&
+              SCROLL_KEYS.includes(e.key)
             ) {
               e.preventDefault()
               e.stopPropagation()
@@ -559,7 +581,7 @@ tellMeWhatOSImOn()
         onCloseDashboard(closeDashboard)
 
         onCreatePlottrCloudFile((json, fileName, isScrivenerFile) => {
-          const state = store.getState()
+          const state = store().getState()
           const emailAddress = selectors.emailAddressSelector(state)
           const userId = selectors.userIdSelector(state)
           uploadToFirebase(emailAddress, userId, json, fileName)
@@ -567,14 +589,14 @@ tellMeWhatOSImOn()
               const fileId = response.data.fileId
               if (!fileId) {
                 const message = `Tried to create cloud file for ${fileName} but we didn't get a fileId back`
-                logger.error(message)
+                errorReportingLogger.error(message, new Error('Error creating plottr cloud file'))
                 return Promise.reject(new Error(message))
               }
               const fileURL = helpers.file.fileIdToPlottrCloudFileURL(fileId)
               openFile(fileURL, false)
 
               if (isScrivenerFile) {
-                store.dispatch(actions.applicationState.finishScrivenerImporter())
+                store().dispatch(actions.applicationState.finishScrivenerImporter())
               }
 
               closeDashboard()
@@ -586,13 +608,13 @@ tellMeWhatOSImOn()
         })
 
         onFinishCreatingLocalScrivenerImportedFile(() => {
-          store.dispatch(actions.applicationState.finishScrivenerImporter())
+          store().dispatch(actions.applicationState.finishScrivenerImporter())
         })
 
         onErrorImportingScrivener((error) => {
           logger.warn('[scrivener import]', error)
-          errorReporter.warn({ message: error })
-          store.dispatch(actions.applicationState.finishScrivenerImporter())
+          errorReporter.error(`Error importing from scrivener ${error}`)
+          store().dispatch(actions.applicationState.finishScrivenerImporter())
           showErrorBox(t('Error'), t('There was an error doing that. Try again'))
         })
 
@@ -609,14 +631,14 @@ tellMeWhatOSImOn()
         onNewProject(() => {
           fileSystemAPIs.currentAppSettings().then((settings) => {
             if (settings.user.defaultFolder && settings.user.defaultFolderLocation) {
-              store.dispatch(actions.project.startCreatingNewProject())
+              store().dispatch(actions.project.startCreatingNewProject())
             } else {
               userDocumentsPath().then((docPath) => {
                 const title = t('Choose where to save this file on your computer')
                 const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
                 showSaveDialog(filters, title, docPath).then((fileName) => {
                   if (fileName) {
-                    const backupFolder = selectors.backupFolderPathSelector(store.getState())
+                    const backupFolder = selectors.backupFolderPathSelector(store().getState())
                     if (fileName.startsWith(backupFolder)) {
                       showErrorBox(
                         t('Error'),
@@ -667,14 +689,14 @@ tellMeWhatOSImOn()
 
         onError(({ message, source }) => {
           logger.error(`Error reported via IPC from <${source}> with message: ${message}`)
-          store.dispatch(actions.error.saveTempFileError(message))
+          store().dispatch(actions.error.saveTempFileError(message))
         })
 
         onReloadDarkMode((newValue) => {
           fileSystemAPIs.saveAppSetting('user.dark', newValue).catch((error) => {
             logger.error(`Failed to set user.dark to ${newValue}`, error)
           })
-          store.dispatch(actions.settings.setDarkMode(newValue))
+          store().dispatch(actions.settings.setDarkMode(newValue))
         })
 
         onImportScrivenerFile((sourceFile, destinationFile) => {
@@ -687,7 +709,7 @@ tellMeWhatOSImOn()
         //
         // Could be important to do so because it might set up inotify
         // listeners and too many of those cause slow-downs.
-        const _unsubscribeToPublishers = world(whenClientIsReady).publishChangesToStore(store)
+        const _unsubscribeToPublishers = world(whenClientIsReady).publishChangesToStore(store())
 
         const root = rootComponent()
 
