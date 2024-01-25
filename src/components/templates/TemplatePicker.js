@@ -69,6 +69,7 @@ const TemplatePickerConnector = (connector) => {
 
   const TemplatePicker = ({
     newProject,
+    newBook,
     modal,
     close,
     onChooseTemplate,
@@ -216,7 +217,11 @@ const TemplatePickerConnector = (connector) => {
                   file,
                   fullTemplate
                 )
-                if (helpers.template.levelsDiffer(selectors)(file, template)) {
+                if (
+                  !newProject &&
+                  !newBook &&
+                  helpers.template.levelsDiffer(selectors)(file, template)
+                ) {
                   setStagedPlotlineTemplate({
                     template: fullTemplate,
                     level: defaultHierarchyLevelIndex,
@@ -571,6 +576,7 @@ const TemplatePickerConnector = (connector) => {
 
   TemplatePicker.propTypes = {
     newProject: PropTypes.bool,
+    newBook: PropTypes.bool,
     modal: PropTypes.bool.isRequired,
     close: PropTypes.func,
     onChooseTemplate: PropTypes.func.isRequired,

@@ -64,13 +64,14 @@ const TagListViewConnector = (connector) => {
     tagsSearchTerm,
     uiActions,
     isTagTabFocusing,
+    isJumping,
   }) => {
     const [appending, setAppending] = useState(false)
     const [categoriesDialogOpen, setCategoriesDialogOpen] = useState(false)
     const [newCategoryId, setNewCategoryId] = useState(null)
 
     useEffect(() => {
-      if (!isTagTabFocusing) {
+      if (!isTagTabFocusing && !isJumping) {
         uiActions.selectTag(detailID(tagsByCategory, tags, categories, selectedTagId))
       }
     }, [tags, tagsByCategory, categories])
@@ -217,6 +218,7 @@ const TagListViewConnector = (connector) => {
     selectedTagId: PropTypes.number,
     uiActions: PropTypes.object.isRequired,
     isTagTabFocusing: PropTypes.bool,
+    isJumping: PropTypes.bool,
   }
 
   const { redux } = connector
@@ -245,6 +247,7 @@ const TagListViewConnector = (connector) => {
           tagsSearchTerm: selectors.tagsSearchTermSelector(state),
           selectedTagId: selectors.selectedTagSelector(state),
           isTagTabFocusing: selectors.isTagTabFocusingSelector(state),
+          isJumping: selectors.isJumpingSelector(state),
         }
       },
       (dispatch) => {

@@ -374,6 +374,7 @@ const CardCellConnector = (connector) => {
                 orientation={orientation}
                 tableLength={tableLength}
                 beatHeadingCount={beatHeadingCount}
+                disableAnimation={isPinned}
               />
             ) : null}
             {this.renderBody()}

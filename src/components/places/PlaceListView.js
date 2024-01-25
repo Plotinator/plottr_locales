@@ -85,12 +85,15 @@ const PlaceListViewConnector = (connector) => {
     editingSelected,
     categoriesOpen,
     attributeDialogOpen,
+    isJumping,
   }) => {
     const [isMovingToNewCategory, setMovingToNewCategory] = useState(false)
     const [draggedPlace, setDraggedPlace] = useState()
 
     useEffect(() => {
-      uiActions.selectPlace(detailID(visiblePlacesByCategory, selectedPlaceId))
+      if (!isJumping) {
+        uiActions.selectPlace(detailID(visiblePlacesByCategory, selectedPlaceId))
+      }
     }, [visiblePlacesByCategory])
 
     const editSelected = () => {
@@ -388,6 +391,7 @@ const PlaceListViewConnector = (connector) => {
     editingSelected: PropTypes.bool,
     categoriesOpen: PropTypes.bool,
     attributeDialogOpen: PropTypes.bool,
+    isJumping: PropTypes.bool,
   }
 
   const {
@@ -424,6 +428,7 @@ const PlaceListViewConnector = (connector) => {
           categoriesOpen: selectors.placesCategoriesOpenSelector(state),
           attributeDialogOpen: selectors.placeAttributeDialogIsOpenSelector(state),
           isPlacesManuallySorted: selectors.isPlacesManuallySortedSelector(state),
+          isJumping: selectors.isJumpingSelector(state),
         }
       },
       (dispatch) => {

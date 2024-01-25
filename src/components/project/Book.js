@@ -121,6 +121,7 @@ const BookConnector = (connector) => {
 
       return (
         <TemplatePicker
+          newBook
           types={['plotlines']}
           modal={true}
           isOpen={this.state.showTemplatePicker}

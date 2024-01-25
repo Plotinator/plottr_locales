@@ -33,6 +33,12 @@ const Leaf = ({ attributes, children, leaf }) => {
     attributes.style = attributes.style ? { ...attributes.style, ...size } : size
   }
 
+  if (leaf.placeholder) {
+    attributes.style = attributes.style
+      ? { ...attributes.style, display: 'block' }
+      : attributes.style
+  }
+
   return <span {...attributes}>{children}</span>
 }
 
@@ -43,6 +49,7 @@ Leaf.propTypes = {
   }),
   children: PropTypes.node,
   leaf: PropTypes.shape({
+    placeholder: PropTypes.string,
     bold: PropTypes.bool,
     italic: PropTypes.bool,
     underline: PropTypes.bool,

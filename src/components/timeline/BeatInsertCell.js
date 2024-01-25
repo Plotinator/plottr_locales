@@ -112,6 +112,7 @@ const BeatInsertCellConnector = (connector) => {
           color={color}
           isMedium={isMedium}
           beatHeadingCount={beatHeadingCount}
+          disableAnimation={isPinned}
         />
       )
     }
@@ -138,6 +139,7 @@ const BeatInsertCellConnector = (connector) => {
               isMedium={isMedium}
               tableLength={tableLength}
               beatHeadingCount={beatHeadingCount}
+              disableAnimation={isPinned}
             />
           ) : null}
           <div className={wrapperClass()}>
@@ -160,6 +162,7 @@ const BeatInsertCellConnector = (connector) => {
               isMedium={isMedium}
               tableLength={tableLength}
               beatHeadingCount={beatHeadingCount}
+              disableAnimation={isPinned}
             />
           ) : null}
           <div className={lastWrapperClass()}>
@@ -188,6 +191,7 @@ const BeatInsertCellConnector = (connector) => {
               isMedium={isMedium}
               tableLength={tableLength}
               beatHeadingCount={beatHeadingCount}
+              disableAnimation={isPinned}
             />
           ) : null}
           <div

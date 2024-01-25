@@ -240,7 +240,7 @@ const SelectListConnector = (connector) => {
     remove: PropTypes.func.isRequired,
     selectedItems: PropTypes.array.isRequired,
     allItems: PropTypes.array.isRequired,
-    categories: PropTypes.object,
+    categories: PropTypes.array,
     horizontal: PropTypes.bool,
     click: PropTypes.object,
   }

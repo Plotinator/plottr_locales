@@ -160,7 +160,7 @@ class FormControl extends React.Component {
 
           return (
             <Component
-              {...omit(elementProps, 'inputRef')}
+              {...omit(elementProps, 'inputRef', 'jumpCounter')}
               onMouseDown={this.handleMouseDown}
               type={type}
               id={id}

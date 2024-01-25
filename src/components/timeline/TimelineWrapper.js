@@ -322,9 +322,14 @@ const TimelineWrapperConnector = (connector) => {
     const scrollEnd = () => {
       // mpq.push('btn_scroll_end')
       const element = timelineBundle.isSmall ? tableRef.current.parentElement : tableRef.current
+      const subNavHeight =
+        document.querySelector('.subnav__container')?.getBoundingClientRect?.()?.height ??
+        SUB_NAV_HEIGHT
+      const navHeight =
+        document.querySelector('.project-nav')?.getBoundingClientRect?.()?.height ?? NAV_HEIGHT
       const target =
         timelineBundle.orientation === 'vertical'
-          ? element.scrollHeight - (window.innerHeight - NAV_HEIGHT - SUB_NAV_HEIGHT)
+          ? element.scrollHeight - (window.innerHeight - navHeight - subNavHeight)
           : element.scrollWidth - window.innerWidth
 
       if (tableRef.current) scrollTo(target)

@@ -138,6 +138,12 @@
   h2 {
     margin-top: 4px;
   }
+
+  [data-slate-editor="true"] p:only-child:has([data-slate-placeholder="true"]) {
+    display: flex;
+    min-height: 22px;
+    align-items: end;
+  }
 }
 
 .darkmode {

@@ -336,6 +336,7 @@ const BlankCardConnector = (connector) => {
                   isMedium={isMedium}
                   tableLength={tableLength}
                   beatHeadingCount={beatHeadingCount}
+                  disableAnimation={isPinned}
                 />
               ) : null}
               <div

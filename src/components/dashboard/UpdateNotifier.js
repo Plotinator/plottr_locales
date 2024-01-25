@@ -63,6 +63,7 @@ const UpdateNotifierConnector = (connector) => {
     info,
     hidden,
     checking,
+    dashboardModalView,
     requestCheckForUpdates,
     autoCheckForUpdates,
     processResponseToRequestUpdate,
@@ -133,7 +134,8 @@ const UpdateNotifierConnector = (connector) => {
       const version = info && info.version ? info.version : ''
       let text = ''
       if (checking) text = t('Checking for updates')
-      if (inDashboard && !checking && !available) text = t("You're on the latest version")
+      if ((inDashboard || dashboardModalView) && !checking && !available)
+        text = t("You're on the latest version")
       if (available) text = t('Update Available 🎉 (version {version})', { version })
       if (downloadInProgress) text = t('Downloading version {version}', { version: version })
       if (finishedDownloading) text = t('Download Complete 🎉 (version {version})', { version })
@@ -223,6 +225,7 @@ const UpdateNotifierConnector = (connector) => {
     darkMode: PropTypes.bool,
     settings: PropTypes.object.isRequired,
     inDashboard: PropTypes.bool,
+    dashboardModalView: PropTypes.string,
     requestCheckForUpdates: PropTypes.func.isRequired,
     autoCheckForUpdates: PropTypes.func.isRequired,
     processResponseToRequestUpdate: PropTypes.func.isRequired,
@@ -252,6 +255,7 @@ const UpdateNotifierConnector = (connector) => {
         checking: selectors.checkingForUpdatesSelector(state),
         darkMode: selectors.isDarkModeSelector(state),
         settings: selectors.appSettingsSelector(state),
+        dashboardModalView: selectors.dashboardModalViewSelector(state),
       }),
       {
         requestCheckForUpdates: actions.applicationState.requestCheckForUpdates,
