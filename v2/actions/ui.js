@@ -135,6 +135,7 @@ import {
   START_VIEWING,
   START_SEARCHING,
   SET_REPLACE_WORD,
+  SET_DASHBOARD_MODAL_VIEW,
 } from '../constants/ActionTypes'
 import selectors from '../selectors'
 import { cardFocusPath, outlineCardFocusPath } from '../helpers/cards'
@@ -462,6 +463,7 @@ export const jumpToHit = (cards, hitType, searchHit) => (dispatch, getState) => 
         } else {
           const [attribute] = rest
           if (['name', 'premise', 'genre', 'theme'].indexOf(attribute) !== -1) {
+            dispatch(closeBookDialog())
             const focusPath = projectFocusPath(null, attribute)
             const focusStart = safeParseInt(rest[rest.length - 1])
             dispatch(startJumping())
@@ -879,7 +881,7 @@ export const jumpToHit = (cards, hitType, searchHit) => (dispatch, getState) => 
             })
           )
           dispatch(incrementJumpCounter())
-          dispatch(startJumping())
+          dispatch(finishJumping())
         }
         return
       }
@@ -1323,6 +1325,10 @@ export function startEditingPlotlineHeadingTitle(id) {
 
 export function stopEditingPlotlineHeadingTitle() {
   return { type: STOP_EDITING_PLOTLINE_HEADING_TITLE }
+}
+
+export function setDashboardModalView(view) {
+  return { type: SET_DASHBOARD_MODAL_VIEW, view }
 }
 
 export function load(patching, ui) {

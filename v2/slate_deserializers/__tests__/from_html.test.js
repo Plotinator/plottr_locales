@@ -938,6 +938,22 @@ describe('convertHTMLString', () => {
       ])
     })
   })
+  describe('given html with a meta tag at the start of the body', () => {
+    const input = `<meta http-equiv="content-type" content="text/html; charset=utf-8"><span>Why you should do it regularly:</span>`
+    it('should remove the meta tag', () => {
+      const expected = [
+        {
+          type: 'paragraph',
+          children: [
+            {
+              text: 'Why you should do it regularly:',
+            },
+          ],
+        },
+      ]
+      expect(convertHTMLString(input)).toEqual(expected)
+    })
+  })
   // TODO!!! Check what HTML the editor produces for indented
   // bullets/numbered lists
   describe('given some HTML content with new lines', () => {

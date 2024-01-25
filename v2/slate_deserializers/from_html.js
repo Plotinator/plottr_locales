@@ -215,6 +215,10 @@ const unnestLists = (slate) => {
   return iter(slate)
 }
 
+const notMeta = (el) => {
+  return el?.name?.toLowerCase() !== 'meta'
+}
+
 export const deserialize = (options) => (parent) => (el) => {
   const deserializeIter = (parent) => (el) => {
     if (el.nodeType === 3 && !parent) {
@@ -226,7 +230,10 @@ export const deserialize = (options) => (parent) => (el) => {
     }
 
     const children = ensureAtLeastOneElement(
-      (el.childNodes ?? []).filter(onlyWhiteSpaceInSpan(el)).flatMap(deserializeIter(el))
+      (el.childNodes ?? [])
+        .filter(onlyWhiteSpaceInSpan(el))
+        .filter(notMeta)
+        .flatMap(deserializeIter(el))
     )
 
     const style = parseStyleAttribute(

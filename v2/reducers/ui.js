@@ -185,6 +185,7 @@ import {
   ADD_LINES_FROM_TEMPLATE,
   SET_REPLACE_WORD,
   ADD_CHARACTER_WITH_TEMPLATE,
+  SET_DASHBOARD_MODAL_VIEW,
 } from '../constants/ActionTypes'
 import {
   ui as defaultUI,
@@ -2235,6 +2236,7 @@ const updateUI = (state, action) => {
       return {
         ...state,
         tagTab: {
+          ...state.tagTab,
           editingSelectedTab: false,
           selectedTag: null,
         },
@@ -2348,6 +2350,15 @@ const updateUI = (state, action) => {
         searchDialog: {
           ...state.searchDialog,
           jumping: false,
+        },
+      }
+    }
+
+    case SET_DASHBOARD_MODAL_VIEW: {
+      return {
+        ...state,
+        dashboardModal: {
+          view: action.view,
         },
       }
     }

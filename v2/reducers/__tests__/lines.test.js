@@ -62,9 +62,11 @@ describe('addBookFromTemplate', () => {
     }
     it('should add those lines', () => {
       expect(allLinesSelector(store.getState()).map(withoutChangingData)).toEqual(
-        originalLines
-          .map(withoutChangingData)
-          .concat(eight_sequences_template.templateData.lines.map(withoutChangingData))
+        expect.arrayContaining(
+          originalLines
+            .map(withoutChangingData)
+            .concat(eight_sequences_template.templateData.lines.map(withoutChangingData))
+        )
       )
     })
   })

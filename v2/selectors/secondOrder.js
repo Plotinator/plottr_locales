@@ -354,7 +354,7 @@ export const whichTemplateIsBeingRemovedViaCardDialogSelector = createSelector(
   }
 )
 export const cardDialogTabSelector = createSelector(cardDialogSelector, ({ activeTab }) => {
-  return activeTab
+  return activeTab || 1
 })
 
 export const cardsCustomAttributesThatCanChangeSelector = createSelector(

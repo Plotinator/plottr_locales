@@ -1039,3 +1039,10 @@ export const editingGivenLinesTitleSelector = createSelector(
     return typeof lineIdBeingEdited === 'number' && lineIdBeingEdited === suppliedLineId
   }
 )
+
+const dashboardModalSelector = createSelector(uiSelector, ({ dashboardModal }) => {
+  return dashboardModal || {}
+})
+export const dashboardModalViewSelector = createSelector(dashboardModalSelector, ({ view }) => {
+  return view ?? null
+})
