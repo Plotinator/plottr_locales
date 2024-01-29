@@ -63,6 +63,7 @@ const LineTitleCellConnector = (connector) => {
     const [showColorPicker, setShowColorPicker] = useState(false)
     const [deleting, setDeleting] = useState(false)
     const [movingLine, setMovingLine] = useState(false)
+    const [supressScroll, setSuppressScroll] = useState(false)
 
     const hoverTimeout = useRef(null)
     const titleInputRef = useRef()
@@ -93,6 +94,7 @@ const LineTitleCellConnector = (connector) => {
 
     const startEditing = () => {
       if (!movingLine) {
+        setSuppressScroll(true)
         uiActions.startEditingPlotlineHeadingTitle(line.id)
       }
     }
@@ -131,6 +133,7 @@ const LineTitleCellConnector = (connector) => {
       setMovingLine(false)
       uiActions.stopEditingPlotlineHeadingTitle()
       setHovering(false)
+      setSuppressScroll(false)
     }
 
     const handleFinishEditingTitle = (event) => {
@@ -528,6 +531,7 @@ const LineTitleCellConnector = (connector) => {
               inputRef={(ref) => {
                 titleInputRef.current = ref
               }}
+              supressScrollIntoView={supressScroll}
               autoFocus
               selection={selection}
               onKeyDown={handleEsc}

@@ -150,6 +150,13 @@ const TimelineWrapperConnector = (connector) => {
 
       window.addEventListener('resize', handleResize)
       if (window.innerWidth < BREAKPOINT) setIsSmallerThanToolbar(true)
+      return () => {
+        window.removeEventListener('resize', handleResize)
+        if (tableRef.current) {
+          tableRef.current.onScroll = null
+          tableRef.current = null
+        }
+      }
     }, [])
 
     useEffect(() => {
@@ -178,15 +185,7 @@ const TimelineWrapperConnector = (connector) => {
           handleCloseToast()
         }, 5000)
       }
-
-      return () => {
-        window.removeEventListener('resize', handleResize)
-        if (tableRef.current) {
-          tableRef.current.onScroll = null
-          tableRef.current = null
-        }
-      }
-    }, [])
+    }, [toast?.visible])
 
     const handleResize = () => {
       setIsSmallerThanToolbar(window.innerWidth < BREAKPOINT)
