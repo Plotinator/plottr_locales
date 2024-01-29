@@ -130,6 +130,7 @@ const BeatHeadingCellConnector = (connector) => {
 
         var json = e.dataTransfer.getData('text/json')
         var droppedBeat = JSON.parse(json)
+        if (droppedBeat.type !== 'beat') return
         if (droppedBeat.id == null) return
         if (droppedBeat.id == beat.id) return
 
@@ -138,7 +139,7 @@ const BeatHeadingCellConnector = (connector) => {
         }
         handleReorder(beat.id, droppedBeat.id)
       },
-      [setInDropZone, setDropDepth, beat.id, beat.expanded, expandBeat, handleReorder]
+      [setInDropZone, setDropDepth, beat?.id, beat?.expanded, expandBeat, handleReorder]
     )
 
     const startEditing = useCallback(
@@ -150,11 +151,11 @@ const BeatHeadingCellConnector = (connector) => {
     )
 
     const stopEditing = useCallback(() => {
-      if (beat.title === '') {
+      if (beat?.title === '') {
         editBeatTitle(beatId, currentTimeline, 'auto')
       }
       stopEditingBeatHeadingTitle()
-    }, [beat.title, editBeatTitle, beatId, currentTimeline, stopEditingBeatHeadingTitle])
+    }, [beat?.title, editBeatTitle, beatId, currentTimeline, stopEditingBeatHeadingTitle])
 
     const startDeleting = useCallback(
       (event) => {
@@ -171,7 +172,7 @@ const BeatHeadingCellConnector = (connector) => {
     const handleDragStart = useCallback(
       (e) => {
         e.dataTransfer.effectAllowed = 'move'
-        e.dataTransfer.setData('text/json', JSON.stringify(beat))
+        e.dataTransfer.setData('text/json', JSON.stringify({ ...beat, type: 'beat' }))
         setDragging(true)
       },
       [setDragging]
@@ -416,7 +417,7 @@ const BeatHeadingCellConnector = (connector) => {
             onChange={(event) => {
               editBeatTitle(beatId, currentTimeline, event.target.value)
             }}
-            value={beat.title}
+            value={beat?.title}
             autoFocus
             selection={selection}
             onKeyDown={handleEsc}

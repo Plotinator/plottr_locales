@@ -439,7 +439,7 @@ const BeatTitleCellConnector = (connector) => {
     const handleDragStart = useCallback(
       (e) => {
         e.dataTransfer.effectAllowed = 'move'
-        e.dataTransfer.setData('text/json', JSON.stringify(beat))
+        e.dataTransfer.setData('text/json', JSON.stringify({ ...beat, type: 'beat' }))
         setDragging(true)
       },
       [setDragging]
@@ -490,6 +490,7 @@ const BeatTitleCellConnector = (connector) => {
         var json = e.dataTransfer.getData('text/json')
         var droppedBeat = JSON.parse(json)
         if (droppedBeat.id == null) return
+        if (droppedBeat.type !== 'beat') return
         if (droppedBeat.id == beat.id) return
 
         if (!beat.expanded) {
