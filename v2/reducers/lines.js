@@ -144,30 +144,45 @@ const lines = (dataRepairers) => (state, action) => {
       return state.filter((l) => l.id !== action.id)
 
     case PIN_PLOTLINE: {
-      const bookLines = action.lines.map((l) =>
-        l.id === action.lineId && l.bookId === action.bookId
-          ? Object.assign({}, l, { isPinned: true, expanded: false })
-          : l
-      )
+      const bookLines = state
+        .filter((line) => {
+          return line.bookId == actionBookId
+        })
+        .map((l) => {
+          if (l.id === action.lineId) {
+            return {
+              ...l,
+              isPinned: true,
+              expanded: false,
+            }
+          } else {
+            return l
+          }
+        })
       return [
         ...state.filter((l) => l && l.bookId != actionBookId),
-        ...positionReset(
-          sortBy(bookLines, [(item) => (item?.isPinned === true ? 'isPinned' : 'position')])
-        ),
+        ...positionReset(sortBy(bookLines, [({ isPinned }) => (isPinned ? -1 : 1), 'position'])),
       ]
     }
 
     case UNPIN_PLOTLINE: {
-      const bookLines = action.lines.map((l) =>
-        l.id === action.lineId && l.bookId === action.bookId
-          ? Object.assign({}, l, { isPinned: false })
-          : l
-      )
+      const bookLines = state
+        .filter((line) => {
+          return line.bookId == actionBookId
+        })
+        .map((l) => {
+          if (l.id === action.lineId) {
+            return {
+              ...l,
+              isPinned: false,
+            }
+          } else {
+            return l
+          }
+        })
       return [
         ...state.filter((l) => l && l.bookId != actionBookId),
-        ...positionReset(
-          sortBy(bookLines, [(item) => (item?.isPinned === true ? 'isPinned' : 'position')])
-        ),
+        ...positionReset(sortBy(bookLines, [({ isPinned }) => (isPinned ? -1 : 1), 'position'])),
       ]
     }
 

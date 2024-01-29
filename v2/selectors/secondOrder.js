@@ -194,14 +194,12 @@ export const selectedTimelineViewSelector = createSelector(timelineSelector, (ti
 })
 
 export const pinnedPlotlinesSelector = createSelector(
-  timelineSelector,
+  allLinesSelector,
   currentTimelineSelector,
-  (timeline, bookId) => {
-    return !timeline?.pinnedPlotlines ||
-      !timeline?.pinnedPlotlines[bookId] ||
-      isNaN(timeline?.pinnedPlotlines[bookId])
-      ? 0
-      : parseInt(timeline?.pinnedPlotlines[bookId])
+  (lines, bookId) => {
+    return lines.reduce((pinnedCount, line) => {
+      return pinnedCount + (line.bookId === bookId && line.isPinned ? 1 : 0)
+    }, 0)
   }
 )
 

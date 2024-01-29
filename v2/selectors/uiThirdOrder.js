@@ -243,7 +243,7 @@ const literalRegExp = (unescapedTerm, replaceWord) => {
     : 'gi'
   return new RegExp(
     (replaceWord ? '(?:^|\\W)(?<term>' : '') +
-      unescapedTerm.replace(/[[\](){}$^\-.*+?|/]/g, '\\$&') +
+      unescapedTerm.replace(/[\\[\](){}$^\-.*+?|/]/g, '\\$&') +
       (replaceWord ? ')(?:$|\\W)' : ''),
     flags
   )

@@ -90,27 +90,22 @@ export const reorderLines = (droppedPosition, originalPosition) => (dispatch, ge
 export const togglePinPlotline = (line) => (dispatch, getState) => {
   const state = getState()
   const pinnedPlotlines = pinnedPlotlinesSelector(state)
-  const lines = sortedLinesByBookSelector(state)
   const bookId = currentTimelineSelector(state)
 
   if (!isNaN(line?.id)) {
     if (line?.isPinned) {
-      const reorderedLines = reorderList(pinnedPlotlines - 1, line?.position, lines)
       const totalPinnedPlotlines = Math.max(0, pinnedPlotlines - 1)
       return dispatch({
         type: UNPIN_PLOTLINE,
         lineId: line.id,
-        lines: reorderedLines,
         bookId,
         totalPinnedPlotlines,
       })
     } else {
-      const reorderedLines = reorderList(pinnedPlotlines, line?.position, lines)
       const totalPinnedPlotlines = Math.max(1, pinnedPlotlines + 1)
       return dispatch({
         type: PIN_PLOTLINE,
         lineId: line.id,
-        lines: reorderedLines,
         bookId,
         totalPinnedPlotlines,
       })
