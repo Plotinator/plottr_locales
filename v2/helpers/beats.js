@@ -236,11 +236,11 @@ export const beatFocusPath = (rawBeatId, rawBookId, type) => {
 
   if (
     (typeof rawBeatId !== 'number' && rawBeatId !== `${beatId}`) ||
-    (typeof rawBookId !== 'number' && rawBookId !== `${bookId}`)
+    (rawBookId !== 'series' && typeof rawBookId !== 'number' && rawBookId !== `${bookId}`)
   ) {
     return ['unknown']
   } else if (['title'].indexOf(type) !== -1) {
-    return ['beat', bookId, beatId, type]
+    return ['beat', rawBookId === 'series' ? 'series' : bookId, beatId, type]
   } else {
     return ['unknown']
   }

@@ -4686,6 +4686,55 @@ describe('jumpToHit', () => {
               expect(finalFileState.ui.currentView).toEqual('timeline')
             })
           })
+          describe('and the beat is on the series tab', () => {
+            const store = storeWithZelda()
+            const fileState = fullFileStateSelector(store.getState())
+            const cards = allCardsSelector(store.getState())
+            store.dispatch(setSearchTerm('Builder beat'))
+            store.dispatch(
+              jumpToHit(cards, 'beats', { hit: 'Builder beat', path: '/beats/series/1/title/0' })
+            )
+            it('should navigate to the timeline and push the focus', async () => {
+              // Insert a delay because navigation is scheduled async.
+              await new Promise((resolve) => {
+                setTimeout(resolve, 100)
+              })
+              const finalFileState = fullFileStateSelector(store.getState())
+              expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
+                withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
+              )
+              expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
+              expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+              expect(
+                omit(finalFileState.ui, [
+                  'timeline',
+                  'searchDialog',
+                  'currentView',
+                  'cardDialog',
+                  'currentTimeline',
+                ])
+              ).toEqual(
+                omit(fileState.ui, [
+                  'timeline',
+                  'searchDialog',
+                  'currentView',
+                  'cardDialog',
+                  'currentTimeline',
+                ])
+              )
+              expect(finalFileState.ui.timeline.focus[0]).toEqual({
+                path: ['beat', 'series', 1, 'title'],
+                selection: {
+                  direction: 'forward',
+                  end: 12,
+                  start: 0,
+                },
+              })
+              expect(finalFileState.ui.searchDialog.term).toEqual('Builder beat')
+              expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
+              expect(finalFileState.ui.currentView).toEqual('timeline')
+            })
+          })
         })
       })
     })

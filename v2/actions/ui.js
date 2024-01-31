@@ -920,9 +920,12 @@ export const jumpToHit = (cards, hitType, searchHit) => (dispatch, getState) => 
         const beatId = safeParseInt(rawBeatId)
         const bookId = parseNumberOrString(rawBookId)
         const books = allBooksAsArraySelector(getState())
-        const book = books.find(({ id }) => {
-          return id === bookId
-        })
+        const book =
+          bookId === 'series'
+            ? seriesSelector(getState())
+            : books.find(({ id }) => {
+                return id === bookId
+              })
         const beats = allBeatsAsArraySelector(getState())
         const beat = beats.find(({ id }) => {
           return id === beatId
