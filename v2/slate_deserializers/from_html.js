@@ -221,12 +221,22 @@ const notMeta = (el) => {
 
 export const deserialize = (options) => (parent) => (el) => {
   const deserializeIter = (parent) => (el) => {
+    const tagName = el?.tagName?.toLowerCase?.()
+
     if (el.nodeType === 3 && !parent) {
       return jsx('element', { type: 'paragraph' }, [{ text: unescapeHTML(el.data ?? '') }])
     } else if (el.nodeType === 3 && parent) {
       return { text: unescapeHTML(el.data ?? '') }
-    } else if (el.nodeType !== 1) {
+    } else if (el.nodeType !== 1 || ['footer', 'script', 'head'].includes(tagName)) {
       return null
+    } else if (tagName === 'html') {
+      const body = (el.childNodes ?? []).find((child) => {
+        const childTagName = child?.tagName?.toLowerCase?.()
+        return childTagName === 'body'
+      })
+      if (body) {
+        return deserializeIter(null)(body)
+      }
     }
 
     const children = ensureAtLeastOneElement(
@@ -234,6 +244,7 @@ export const deserialize = (options) => (parent) => (el) => {
         .filter(onlyWhiteSpaceInSpan(el))
         .filter(notMeta)
         .flatMap(deserializeIter(el))
+        .filter(Boolean)
     )
 
     const style = parseStyleAttribute(
@@ -256,13 +267,13 @@ export const deserialize = (options) => (parent) => (el) => {
       return jsx(type, { ...properties, ...extraProps }, jsxChildren)
     }
 
-    switch (el.tagName?.toLowerCase() || '') {
+    switch (tagName ?? '') {
       case 'div': {
         // if it's only child is a br
         const elementChildren =
           Array.isArray(el.childNodes) &&
           el.childNodes.length === 1 &&
-          el.childNodes[0]?.tagName?.toLowerCase() === 'br'
+          el.childNodes[0]?.tagName?.toLowerCase?.() === 'br'
             ? [{ text: '' }]
             : children
         return jsxWithProps(
@@ -373,11 +384,12 @@ export const deserialize = (options) => (parent) => (el) => {
           )
         } else if (typeof storageUrl === 'undefined') {
           const childrenNodes = [{ text: '' }]
-          return jsxWithProps(
-            'element',
-            { type: 'image-data', data: getAttribute(el, 'src') },
-            childrenNodes
-          )
+          const data = getAttribute(el, 'src')
+          if (data.match(/^https?:\/\//)) {
+            return null
+          } else {
+            return jsxWithProps('element', { type: 'image-data', data }, childrenNodes)
+          }
         } else {
           // Replace with blank span if others failed
           return jsxWithProps('text', {}, '')

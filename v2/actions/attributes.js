@@ -39,7 +39,7 @@ export const deleteCharacterAttribute = (id, name) => {
   }
 }
 export const deleteCharacterAttirbuteAdaptor = (name, id) => {
-  deleteCharacterAttribute(id, name)
+  return deleteCharacterAttribute(id, name)
 }
 
 export function reorderCharacterAttribute(attributeId, toIndex, attributeName) {

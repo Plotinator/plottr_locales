@@ -573,6 +573,7 @@ describe('setSearchTerm', () => {
             { hit: 'The', path: '/outline/8/card/19/description/0' },
             { hit: 'the', path: '/outline/8/card/19/description/64' },
             { hit: 'the', path: '/outline/undefined/card/10/description/10' },
+            { hit: 'The', path: '/outline/series/card/50/title/0' },
           ],
           places: [
             { hit: 'The', path: '/places/1/notes/0' },
@@ -606,6 +607,7 @@ describe('setSearchTerm', () => {
             { hit: 'the', path: '/timeline/8/card/19/customAttribute/att 3/91' },
             { hit: 'the', path: '/timeline/8/card/19/templateAttribute/sc4/Motivation/3' },
             { hit: 'the', path: '/timeline/undefined/card/10/description/10' },
+            { hit: 'The', path: '/timeline/series/card/50/title/0' },
           ],
         })
       })
@@ -2065,6 +2067,71 @@ describe('jumpToHit', () => {
               cardId: 19,
               isOpen: true,
               lineId: 14,
+              deleting: false,
+              removeWhichTemplate: null,
+              removing: false,
+              showColorPicker: false,
+              showTemplatePicker: false,
+            })
+          })
+        })
+        describe('given a hit on the series timeline', () => {
+          const store = storeWithZelda()
+          const fileState = fullFileStateSelector(store.getState())
+          const cards = allCardsSelector(store.getState())
+          store.dispatch(setSearchTerm('The target'))
+          store.dispatch(
+            jumpToHit(cards, 'timeline', {
+              hit: 'The target',
+              path: '/timeline/series/card/50/title/0',
+            })
+          )
+          it('should navigate to the timeline card dialog & push focus', async () => {
+            // Insert a delay because navigation is scheduled async.
+            await new Promise((resolve) => {
+              setTimeout(resolve, 100)
+            })
+            const finalFileState = fullFileStateSelector(store.getState())
+            expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
+              withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
+            )
+            expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
+            expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+            expect(
+              omit(finalFileState.ui, [
+                'timeline',
+                'searchDialog',
+                'currentView',
+                'cardDialog',
+                'currentTimeline',
+              ])
+            ).toEqual(
+              omit(fileState.ui, [
+                'timeline',
+                'searchDialog',
+                'currentView',
+                'cardDialog',
+                'currentTimeline',
+              ])
+            )
+            expect(finalFileState.ui.timeline.focus[0]).toEqual({
+              path: ['card', 50, 'title'],
+              selection: {
+                direction: 'forward',
+                end: 10,
+                start: 0,
+              },
+            })
+            expect(finalFileState.ui.searchDialog.term).toEqual('The target')
+            expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
+            expect(finalFileState.ui.currentView).toEqual('timeline')
+            expect(finalFileState.ui.currentTimeline).toEqual('series')
+            expect(finalFileState.ui.cardDialog).toEqual({
+              activeTab: 1,
+              beatId: 1,
+              cardId: 50,
+              isOpen: true,
+              lineId: 2,
               deleting: false,
               removeWhichTemplate: null,
               removing: false,

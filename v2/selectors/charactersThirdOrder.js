@@ -470,7 +470,11 @@ const combinedAttributesForCharacter = (
   })
   const missing = differenceWith([...newAttributes, ...legacyAttributes], ordered, isEqual)
 
-  return [...ordered, ...missing]
+  // filter(Boolean) accounts for transitive states transmitting the
+  // characters that have attributes without the file yet having the
+  // attribute.  (Adding an attribute from mobile causes one such
+  // transitive state.)
+  return [...ordered, ...missing].filter(Boolean)
 }
 
 export const characterAttributesSelector = createSelector(

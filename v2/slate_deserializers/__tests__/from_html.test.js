@@ -1314,4 +1314,106 @@ describe('convertHTMLString', () => {
       ])
     })
   })
+  describe('given some html that copy-pasting from Firefox created on Windows', () => {
+    const fromFirefoxOnWindows = `<html><body>
+<!--StartFragment--><li data-layout="organic" class="wLL07_0Xnd1QZpzpfR4W"><article id="r1-0" data-handled-by-react="true" data-testid="result" data-nrn="result" class="yQDlj3B5DI5YO8c8Ulio CpkrTDP54mqzpuCSn1Fa SKlplDuh9FjtDprgoMxk"><div class="OQ_6vPwNhCeusNiEDcGp"><div class="mwuQiMOjmFJ5vmN6Vcqw B433VpEfaxl6n8VNRUDy NvMwcsUp56q4W2Z_b8E7 hAeZQDlu0XXeGwL7U722 SgSTKoqQXa0tEszD2zWF LQVY1Jpkk8nyJ6HBWKAk"><span class="DpVR46dTZaePK29PDkz8"><a href="https://duckduckgo.com/?q=disable%20windows%20key%20shortcuts%20in%20emacs+site:emacs.stackexchange.com&amp;t=ffab&amp;atb=v323-1" rel="noopener" title="Search domain emacs.stackexchange.com" data-testid="result-extras-site-search-link" data-handled-by-react="true"><img src="https://external-content.duckduckgo.com/ip3/emacs.stackexchange.com.ico" height="16" width="16" loading="lazy"></a></span><a href="https://emacs.stackexchange.com/questions/48720/disable-left-win-key-in-emacs-for-windows" rel="noopener" target="_self" data-testid="result-extras-url-link" data-handled-by-react="true" class="Rn_JXVtoPVAFyGkcaXyK"><span class="Wo6ZAEmESLNUuWBkbMxx">https://emacs.stackexchange.com</span><span class="oaxCunrdbQs3WQDCq3Ls"> › questions › 48720 › disable-left-win-key-in-emacs-for-windows</span></a></div></div><div class="ikg2IXiCD14iVX7AdZo1"><h2 class="LnpumSThxEWMIsDdAT17 BrPN5UiFwJN5HlfRhga9 CXMyPcQ6nDv47DKFeywM"><a href="https://emacs.stackexchange.com/questions/48720/disable-left-win-key-in-emacs-for-windows" rel="noopener" target="_self" data-testid="result-title-a" data-handled-by-react="true" class="eVNpHGjtxRBq_gLOfGDr LQNqh2U1kzYxREs65IJu"><span class="EKtkFWMYpwzMKOYr0GYm LQVY1Jpkk8nyJ6HBWKAk">Disable left win key in Emacs for Windows</span></a></h2></div><div class="E2eLOJr8HctVnDOTM8fs"><div data-result="snippet" class="OgdwYG6KE2qthn9XQWFC"><span style="-webkit-line-clamp: 3;" class="kY2IgmnCmOGjharHErah"><span>1 Answer Sorted by: 1 So firstly, I assume you mean you've set your <b>Windows</b> <b>key</b> to do nothing in AHK with something like: LWin::Return. If this is the case, the <b>Windows</b> menu certainly shouldn't be opening in <b>Emacs</b>.</span></span></div></div></article></li><!--EndFragment-->
+</body>
+</html>`
+    it('should produce appropriate Slate content', () => {
+      console.log('Result', JSON.stringify(convertHTMLString(fromFirefoxOnWindows), null, 2))
+      expect(convertHTMLString(fromFirefoxOnWindows)).toEqual([
+        {
+          type: 'paragraph',
+          children: [
+            {
+              type: 'list-item',
+              children: [
+                {
+                  type: 'paragraph',
+                  children: [
+                    {
+                      type: 'link',
+                      url: 'https://duckduckgo.com/?q=disable%20windows%20key%20shortcuts%20in%20emacs+site:emacs.stackexchange.com&t=ffab&atb=v323-1',
+                      children: [
+                        {
+                          text: '',
+                        },
+                      ],
+                    },
+                    {
+                      type: 'link',
+                      url: 'https://emacs.stackexchange.com/questions/48720/disable-left-win-key-in-emacs-for-windows',
+                      children: [
+                        {
+                          text: 'https://emacs.stackexchange.com',
+                        },
+                        {
+                          text: ' › questions › 48720 › disable-left-win-key-in-emacs-for-windows',
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  type: 'paragraph',
+                  children: [
+                    {
+                      type: 'heading-two',
+                      children: [
+                        {
+                          type: 'link',
+                          url: 'https://emacs.stackexchange.com/questions/48720/disable-left-win-key-in-emacs-for-windows',
+                          children: [
+                            {
+                              text: 'Disable left win key in Emacs for Windows',
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  type: 'paragraph',
+                  children: [
+                    {
+                      text: "1 Answer Sorted by: 1 So firstly, I assume you mean you've set your ",
+                    },
+                    {
+                      text: 'Windows',
+                      bold: true,
+                    },
+                    {
+                      text: ' ',
+                    },
+                    {
+                      text: 'key',
+                      bold: true,
+                    },
+                    {
+                      text: ' to do nothing in AHK with something like: LWin::Return. If this is the case, the ',
+                    },
+                    {
+                      text: 'Windows',
+                      bold: true,
+                    },
+                    {
+                      text: " menu certainly shouldn't be opening in ",
+                    },
+                    {
+                      text: 'Emacs',
+                      bold: true,
+                    },
+                    {
+                      text: '.',
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ])
+    })
+  })
 })

@@ -2105,6 +2105,32 @@
       "templates": [],
       "imageId": null,
       "fromTemplateId": null
+    },
+    {
+      "id": 50,
+      "lineId": 2,
+      "beatId": 1,
+      "bookId": null,
+      "positionWithinLine": 0,
+      "positionInBeat": 0,
+      "title": "The target",
+      "description": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "text": ""
+            }
+          ]
+        }
+      ],
+      "tags": [],
+      "characters": [],
+      "places": [],
+      "templates": [],
+      "imageId": null,
+      "fromTemplateId": null,
+      "color": null
     }
   ],
   "categories": {

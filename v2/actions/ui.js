@@ -486,7 +486,7 @@ export const jumpToHit = (cards, hitType, searchHit) => (dispatch, getState) => 
         const [_, _timeline, rawBookId, _card, cardId, type, ...rest] = path.split('/')
         const bookId = parseNumberOrString(rawBookId)
         const books = allBooksSelector(getState())
-        const book = books[bookId]
+        const book = bookId === 'series' ? seriesSelector(getState()) : books[bookId]
         if (typeof book !== 'undefined') {
           const card = cards.find((card) => {
             return card.id == cardId
