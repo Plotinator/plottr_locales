@@ -210,7 +210,7 @@ const removeCustomAttributeFilter = (state, action) => {
   }
 }
 
-const addCustomAttributeOrdering = (state, fullState) => {
+export const addCustomAttributeOrdering = (state, fullState) => {
   const { characterAttributesForCurrentBookSelector } = selectors(identity)
 
   const toAttributeOrderEntry = (attribute) => {
@@ -238,6 +238,19 @@ const addCustomAttributeOrdering = (state, fullState) => {
     }
   }
 
+  const existingOrder = state.customAttributeOrder.characters.filter(({ type, id, name }) => {
+    return (
+      (type === 'customAttributes' &&
+        fullState.customAttributes.characters.some((customAttribute) => {
+          return customAttribute?.name === name
+        })) ||
+      (type === 'attributes' &&
+        fullState.attributes.characters.some((attribute) => {
+          return attribute?.id === id
+        }))
+    )
+  })
+
   // Case 2: there is an incomplete custom attribute ordering
   const attributes = fullState?.ui ? characterAttributesForCurrentBookSelector(fullState) : []
   const notOrdered = attributes.filter((attribute) => {
@@ -253,15 +266,19 @@ const addCustomAttributeOrdering = (state, fullState) => {
     return {
       ...state,
       customAttributeOrder: {
-        characters: [
-          ...state.customAttributeOrder.characters,
-          ...notOrdered.map(toAttributeOrderEntry),
-        ],
+        characters: [...existingOrder, ...notOrdered.map(toAttributeOrderEntry)],
       },
     }
+  } else if (!isEqual(existingOrder, state.customAttributeOrder.characters)) {
+    return {
+      ...state,
+      customAttributeOrder: {
+        characters: existingOrder,
+      },
+    }
+  } else {
+    return state
   }
-
-  return state
 }
 
 const updateUI = (state, action) => {

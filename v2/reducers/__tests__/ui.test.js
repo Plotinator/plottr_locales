@@ -11,6 +11,7 @@ import { emptyFile } from '../../store/newFileState'
 import { uiState } from '../../store/initialState'
 import selectors from '../../selectors'
 import actions from '../../actions'
+import { addCustomAttributeOrdering } from '../ui'
 
 const wiredUpActions = actions(pltrAdaptor)
 
@@ -1403,6 +1404,432 @@ describe('reorderLines', () => {
           expect(secondLine.position).toBe(2)
           expect(fourthLine.position).toBe(3)
         })
+      })
+    })
+  })
+})
+
+describe('addCustomAttributeOrdering', () => {
+  describe('given the initial file', () => {
+    const newFile = emptyFile()
+    it('should not change the file', () => {
+      expect(addCustomAttributeOrdering(newFile.ui, newFile)).toEqual(newFile.ui)
+    })
+  })
+  describe('given a file with legacy custom attributes for characters', () => {
+    const newFile = emptyFile()
+    const newFileWithCustomAttributes = {
+      ...newFile,
+      customAttributes: {
+        ...newFile.customAttributes,
+        characters: [
+          {
+            name: 'attribute 1',
+            type: 'text',
+          },
+          {
+            name: 'attribute 2',
+            type: 'paragraph',
+          },
+          {
+            name: 'attribute 3',
+            type: 'text',
+          },
+        ],
+      },
+    }
+    describe('when the file has no custom attribute order', () => {
+      it('should add the custom attribute order', () => {
+        expect(
+          addCustomAttributeOrdering(newFileWithCustomAttributes.ui, newFileWithCustomAttributes)
+            .customAttributeOrder.characters
+        ).toEqual([
+          {
+            type: 'customAttributes',
+            name: 'attribute 1',
+          },
+          {
+            type: 'customAttributes',
+            name: 'attribute 2',
+          },
+          {
+            type: 'customAttributes',
+            name: 'attribute 3',
+          },
+        ])
+      })
+    })
+    describe('when the file has a complete custom attribute order', () => {
+      const fileWithCompleteOrdering = {
+        ...newFileWithCustomAttributes,
+        ui: {
+          ...newFileWithCustomAttributes.ui,
+          customAttributeOrder: {
+            ...newFileWithCustomAttributes.ui.customAttributeOrder,
+            characters: [
+              {
+                type: 'customAttributes',
+                name: 'attribute 1',
+              },
+              {
+                type: 'customAttributes',
+                name: 'attribute 2',
+              },
+              {
+                type: 'customAttributes',
+                name: 'attribute 3',
+              },
+            ],
+          },
+        },
+      }
+      it('should leave the file as-is', () => {
+        expect(
+          addCustomAttributeOrdering(fileWithCompleteOrdering.ui, fileWithCompleteOrdering)
+        ).toEqual(fileWithCompleteOrdering.ui)
+      })
+    })
+    describe('when the file has a partial custom attribute order', () => {
+      const fileWithPartialOrdering = {
+        ...newFileWithCustomAttributes,
+        ui: {
+          ...newFileWithCustomAttributes.ui,
+          customAttributeOrder: {
+            ...newFileWithCustomAttributes.ui.customAttributeOrder,
+            characters: [
+              {
+                type: 'customAttributes',
+                name: 'attribute 3',
+              },
+            ],
+          },
+        },
+      }
+      it('should fill in the missing attributes', () => {
+        expect(
+          addCustomAttributeOrdering(fileWithPartialOrdering.ui, fileWithPartialOrdering)
+            .customAttributeOrder.characters
+        ).toEqual([
+          {
+            type: 'customAttributes',
+            name: 'attribute 3',
+          },
+          {
+            type: 'customAttributes',
+            name: 'attribute 1',
+          },
+          {
+            type: 'customAttributes',
+            name: 'attribute 2',
+          },
+        ])
+      })
+    })
+    describe('when some of those attributes no longer exist', () => {
+      const fileWithCustomAttributesRemoved = {
+        ...newFileWithCustomAttributes,
+        customAttributeOrder: {
+          ...newFileWithCustomAttributes.ui.customAttributeOrder,
+          characters: [
+            {
+              type: 'customAttributes',
+              name: 'attribute 1',
+            },
+            {
+              type: 'customAttributes',
+              name: 'attribute 2',
+            },
+            {
+              type: 'customAttributes',
+              name: 'attribute 3',
+            },
+          ],
+        },
+        customAttributes: {
+          ...newFileWithCustomAttributes.customAttributes,
+          characters: [
+            {
+              name: 'attribute 1',
+              type: 'text',
+            },
+            {
+              name: 'attribute 3',
+              type: 'text',
+            },
+          ],
+        },
+      }
+      it('should remove them from the ordering', () => {
+        expect(
+          addCustomAttributeOrdering(
+            fileWithCustomAttributesRemoved.ui,
+            fileWithCustomAttributesRemoved
+          ).customAttributeOrder.characters
+        ).toEqual([
+          {
+            type: 'customAttributes',
+            name: 'attribute 1',
+          },
+          {
+            type: 'customAttributes',
+            name: 'attribute 3',
+          },
+        ])
+      })
+    })
+  })
+  describe('given a file with new custom attributes for characters', () => {
+    const newFile = emptyFile()
+    const newFileWithNewCustomAttributes = {
+      ...newFile,
+      attributes: {
+        ...newFile.attributes,
+        characters: [
+          {
+            name: 'attribute 1',
+            type: 'text',
+            id: 1,
+          },
+          {
+            name: 'attribute 2',
+            type: 'paragraph',
+            id: 2,
+          },
+          {
+            name: 'attribute 3',
+            type: 'text',
+            id: 3,
+          },
+        ],
+      },
+    }
+    describe('when the file has no custom attribute order', () => {
+      it('should add the custom attribute order', () => {
+        expect(
+          addCustomAttributeOrdering(
+            newFileWithNewCustomAttributes.ui,
+            newFileWithNewCustomAttributes
+          ).customAttributeOrder.characters
+        ).toEqual([
+          {
+            type: 'attributes',
+            id: 1,
+          },
+          {
+            type: 'attributes',
+            id: 2,
+          },
+          {
+            type: 'attributes',
+            id: 3,
+          },
+        ])
+      })
+    })
+    describe('when the file has a complete custom attribute order', () => {
+      const fileWithCompleteOrdering = {
+        ...newFileWithNewCustomAttributes,
+        ui: {
+          ...newFileWithNewCustomAttributes.ui,
+          customAttributeOrder: {
+            ...newFileWithNewCustomAttributes.ui.customAttributeOrder,
+            characters: [
+              {
+                type: 'attributes',
+                id: 1,
+              },
+              {
+                type: 'attributes',
+                id: 2,
+              },
+              {
+                type: 'attributes',
+                id: 3,
+              },
+            ],
+          },
+        },
+      }
+      it('should leave the file as-is', () => {
+        expect(
+          addCustomAttributeOrdering(fileWithCompleteOrdering.ui, fileWithCompleteOrdering)
+        ).toEqual(fileWithCompleteOrdering.ui)
+      })
+    })
+    describe('when the file has a partial custom attribute order', () => {
+      const fileWithPartialOrdering = {
+        ...newFileWithNewCustomAttributes,
+        ui: {
+          ...newFileWithNewCustomAttributes.ui,
+          customAttributeOrder: {
+            ...newFileWithNewCustomAttributes.ui.customAttributeOrder,
+            characters: [
+              {
+                type: 'attributes',
+                id: 3,
+              },
+            ],
+          },
+        },
+      }
+      it('should fill in the missing attributes', () => {
+        expect(
+          addCustomAttributeOrdering(fileWithPartialOrdering.ui, fileWithPartialOrdering)
+            .customAttributeOrder.characters
+        ).toEqual([
+          {
+            type: 'attributes',
+            id: 3,
+          },
+          {
+            type: 'attributes',
+            id: 1,
+          },
+          {
+            type: 'attributes',
+            id: 2,
+          },
+        ])
+      })
+    })
+    describe('when some of those attributes no longer exist', () => {
+      const fileWithRemoveAttributesOrdering = {
+        ...newFileWithNewCustomAttributes,
+        ui: {
+          ...newFileWithNewCustomAttributes.ui,
+          customAttributeOrder: {
+            ...newFileWithNewCustomAttributes.ui.customAttributeOrder,
+            characters: [
+              {
+                type: 'attributes',
+                id: 1,
+              },
+              {
+                type: 'attributes',
+                id: 2,
+              },
+              {
+                type: 'attributes',
+                id: 3,
+              },
+            ],
+          },
+        },
+        attributes: {
+          ...newFile.attributes,
+          characters: [
+            {
+              name: 'attribute 1',
+              type: 'text',
+              id: 1,
+            },
+            {
+              name: 'attribute 3',
+              type: 'text',
+              id: 3,
+            },
+          ],
+        },
+      }
+      it('should remove them from the ordering', () => {
+        expect(
+          addCustomAttributeOrdering(
+            fileWithRemoveAttributesOrdering.ui,
+            fileWithRemoveAttributesOrdering
+          ).customAttributeOrder.characters
+        ).toEqual([
+          {
+            type: 'attributes',
+            id: 1,
+          },
+          {
+            type: 'attributes',
+            id: 3,
+          },
+        ])
+      })
+    })
+  })
+  describe('given a file with a mix of legacy and new custom attributes', () => {
+    describe('and a mix of those attributes still existing, not existing and being abscent/present in the ordering', () => {
+      const newFile = emptyFile()
+      const newFileWithMixOfIssues = {
+        ...newFile,
+        ui: {
+          ...newFile.ui,
+          customAttributeOrder: {
+            ...newFile.ui.customAttributeOrder,
+            characters: [
+              {
+                type: 'customAttributes',
+                name: 'attribute 2',
+              },
+              {
+                type: 'attributes',
+                id: 1,
+              },
+              {
+                type: 'customAttributes',
+                name: 'attribute 1',
+              },
+              {
+                type: 'attributes',
+                id: 3,
+              },
+            ],
+          },
+        },
+        attributes: {
+          ...newFile.attributes,
+          characters: [
+            {
+              name: 'attribute 1',
+              type: 'text',
+              id: 1,
+            },
+            {
+              name: 'attribute 2',
+              type: 'paragraph',
+              id: 2,
+            },
+          ],
+        },
+        customAttributes: {
+          ...newFile.customAttributes,
+          characters: [
+            {
+              name: 'attribute 1',
+              type: 'text',
+            },
+            {
+              name: 'attribute 3',
+              type: 'text',
+            },
+          ],
+        },
+      }
+      it('should obey the aforementioned rules to construct a correct ordering', () => {
+        expect(
+          addCustomAttributeOrdering(newFileWithMixOfIssues.ui, newFileWithMixOfIssues)
+            .customAttributeOrder.characters
+        ).toEqual([
+          {
+            type: 'attributes',
+            id: 1,
+          },
+          {
+            type: 'customAttributes',
+            name: 'attribute 1',
+          },
+          {
+            type: 'attributes',
+            id: 2,
+          },
+          {
+            type: 'customAttributes',
+            name: 'attribute 3',
+          },
+        ])
       })
     })
   })

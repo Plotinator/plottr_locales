@@ -240,7 +240,7 @@ export const deserialize = (options) => (parent) => (el) => {
     }
 
     const children = ensureAtLeastOneElement(
-      (el.childNodes ?? [])
+      (Array.from(el.childNodes) ?? [])
         .filter(onlyWhiteSpaceInSpan(el))
         .filter(notMeta)
         .flatMap(deserializeIter(el))
@@ -248,7 +248,7 @@ export const deserialize = (options) => (parent) => (el) => {
     )
 
     const style = parseStyleAttribute(
-      (el.attributes ?? []).find((attribute) => {
+      (Array.from(el.attributes) ?? []).find((attribute) => {
         return attribute.name === 'style'
       })?.value
     )
