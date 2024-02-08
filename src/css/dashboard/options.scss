@@ -68,6 +68,16 @@
       }
     }
   }
+
+  .slate-editor__wrapper {
+    position: relative;
+
+    .slate-editor__editor {
+      p:last-of-type {
+        margin-bottom: 30px;
+      }
+    }
+  }
 }
 
 .dashboard__options-item-help {
