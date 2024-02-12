@@ -152,7 +152,7 @@ export const characterEditorTemplateBeingRemovedSelector = createSelector(
 export const characterEditorActiveTabSelector = createSelector(
   characterEditorSelector,
   ({ activeTab }) => {
-    return activeTab
+    return activeTab ?? 1
   }
 )
 export const characterEditorShowTemplatePickerSelector = createSelector(
