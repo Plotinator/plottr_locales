@@ -15,10 +15,12 @@
     margin-right: 4px;
   }
   h1 {
+    @include header-font;
     font-size: 24pt;
     margin-top: 8px;
   }
   h2 {
+    @include sub-header-font;
     font-size: 20pt;
     margin-top: 8px;
   }

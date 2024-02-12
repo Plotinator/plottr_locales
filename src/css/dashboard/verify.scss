@@ -52,6 +52,7 @@
 
     @media (max-width: 768px) {
       h2 {
+        @include header-font;
         font-size: 18px;
         word-break: break-all;
       }
@@ -59,6 +60,7 @@
 
     @media (max-width: 480px) {
       h2 {
+        @include header-font;
         font-size: 16px;
       }
     }

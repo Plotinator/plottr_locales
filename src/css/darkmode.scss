@@ -28,8 +28,21 @@ body.darkmode {
     color: $darkmode-v2-darker-text;
   }
 
+  h1 {
+    @include header-font;
+  }
+
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @include sub-header-font;
+  }
+
   p {
     color: $darkmode-v2-darker-text;
+    @include body-text-font;
   }
 
   hr {
@@ -316,12 +329,26 @@ body.darkmode {
   }
 
   // RCE
-  .slate-editor__editor.darkmode {
-    background-color: $darkmode-v2-background;
-    border: 1px solid $darkmode-v2-border;
+  .slate-editor__editor {
 
-    div > * {
-      color: #ccc !important;
+    &.darkmode {
+      background-color: $darkmode-v2-background;
+      border: 1px solid $darkmode-v2-border;
+    }
+
+    @include rce-text-font;
+    @include rce-darkmode-font-color;
+
+    h1 {
+      @include header-font;
+      @include rce-title-font;
+      @include rce-title-darkmode-font-color;
+    }
+
+    h2 {
+      @include sub-header-font;
+      @include rce-subtitle-font;
+      @include rce-subtitle-darkmode-font-color;
     }
   }
 
