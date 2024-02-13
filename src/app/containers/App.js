@@ -5,6 +5,7 @@ import PropTypes from 'react-proptypes'
 import { t } from 'plottr_locales'
 import { selectors, actions } from 'wired-up-pltr'
 
+import PreventExittingWithoutSaving from './PreventExittingWithoutSaving'
 import log from '../../../shared/logger'
 import Navigation from 'containers/Navigation'
 import Body from 'containers/Body'
@@ -133,6 +134,7 @@ const App = ({
       </main>
       <React.StrictMode>
         <Spinner />
+        <PreventExittingWithoutSaving />
         {renderTemplateCreate()}
         {renderAdvanceExportModal()}
         {renderImagePickerModal()}
