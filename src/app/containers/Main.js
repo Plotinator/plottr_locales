@@ -7,7 +7,6 @@ import { t } from 'plottr_locales'
 import { helpers } from 'pltr/v2'
 import { actions, selectors } from 'wired-up-pltr'
 import { Button } from 'plottr_components'
-import { AskToSaveModal } from 'connected-components'
 
 import { bootFile } from '../bootFile'
 
@@ -25,7 +24,6 @@ import { whenClientIsReady } from '../../../shared/socket-client'
 import logger from '../../../shared/logger'
 import { makeMainProcessClient } from '../mainProcessClient'
 import { getErrorReporterInstance } from '../../../shared/error-reporter-instance'
-import { useAskToSave } from './useAskToSave'
 
 const { onReloadFromFile, pleaseFetchState, openExternal, showItemInFolder, updateLastOpenedFile } =
   makeMainProcessClient()
@@ -96,7 +94,6 @@ const Main = ({
   loadingState,
   errorLoadingFile,
   errorIsUpdateError,
-  selectedFileIsCloudFile,
   startCheckingFileToLoad,
   finishCheckingFileToLoad,
   loadingProgress,
@@ -122,14 +119,8 @@ const Main = ({
   settings,
   generalError,
   clearErrorLoadingFile,
-  windowId,
   setWindowTitle,
   isInSettingsWizard,
-  unsavedChanges,
-  isCloudFile,
-  applicationIsBusyAndCannotBeQuit,
-  isOffline,
-  fileSaved,
 }) => {
   // The user needs a way to dismiss the files dashboard and continue
   // to the file that's open.
@@ -137,14 +128,6 @@ const Main = ({
   const [firstTimeBooting, setFirstTimeBooting] = useState(busyBooting)
   const [openDashboardTo, setOpenDashboardTo] = useState(null)
   const [pathToProject, setPathToProject] = useState('')
-
-  const { showAskToSave, dismissAskToSave, saveAndClose, waitingForSaveDoneSignal } = useAskToSave(
-    unsavedChanges,
-    isCloudFile,
-    applicationIsBusyAndCannotBeQuit,
-    isOffline,
-    fileSaved
-  )
 
   useEffect(() => {
     if (showDashboard && !dashboardClosed) {
@@ -660,49 +643,20 @@ const Main = ({
     return <SettingsWizard />
   }
 
-  const renderAskToSave = () => {
-    if (!waitingForSaveDoneSignal && (!showAskToSave || isCloudFile)) return null
-
-    return (
-      <MainIntegrationContext.Consumer>
-        {({ saveFile, saveOfflineFile }) => {
-          return (
-            <>
-              {renderAskToSave()}
-              <AskToSaveModal
-                save={saveAndClose(saveFile, saveOfflineFile)}
-                busy={waitingForSaveDoneSignal}
-                dismiss={dismissAskToSave}
-              />
-            </>
-          )
-        }}
-      </MainIntegrationContext.Consumer>
-    )
-  }
-
   if (cantShowFile || ((currentAppStateIsDashboard || showDashboard) && !dashboardClosed)) {
     return (
-      <>
-        {renderAskToSave()}
-        <Dashboard
-          closeDashboard={closeDashboard}
-          cantShowFile={cantShowFile}
-          openTo={openDashboardTo}
-        />
-      </>
+      <Dashboard
+        closeDashboard={closeDashboard}
+        cantShowFile={cantShowFile}
+        openTo={openDashboardTo}
+      />
     )
   }
 
   return (
     <MainIntegrationContext.Consumer>
       {({ showErrorBox }) => {
-        return (
-          <>
-            {renderAskToSave()}
-            <App forceProjectDashboard={showDashboard} showErrorBox={showErrorBox} />
-          </>
-        )
+        return <App forceProjectDashboard={showDashboard} showErrorBox={showErrorBox} />
       }}
     </MainIntegrationContext.Consumer>
   )
@@ -720,7 +674,6 @@ Main.propTypes = {
   checkedFileToLoad: PropTypes.bool,
   readyToCheckFileToLoad: PropTypes.bool,
   cantShowFile: PropTypes.bool,
-  selectedFileIsCloudFile: PropTypes.bool,
   loadingState: PropTypes.string.isRequired,
   loadingProgress: PropTypes.number.isRequired,
   fileToUpload: PropTypes.string,
@@ -750,14 +703,8 @@ Main.propTypes = {
   settings: PropTypes.object,
   generalError: PropTypes.func,
   clearErrorLoadingFile: PropTypes.func.isRequired,
-  windowId: PropTypes.func.isRequired,
   setWindowTitle: PropTypes.func.isRequired,
   isInSettingsWizard: PropTypes.bool,
-  unsavedChanges: PropTypes.bool,
-  isCloudFile: PropTypes.bool,
-  applicationIsBusyAndCannotBeQuit: PropTypes.bool,
-  isOffline: PropTypes.bool,
-  fileSaved: PropTypes.func.isRequired,
 }
 
 export default connect(
@@ -772,7 +719,6 @@ export default connect(
     checkedFileToLoad: selectors.checkedFileToLoadSelector(state),
     readyToCheckFileToLoad: selectors.readyToCheckFileToLoadSelector(state),
     cantShowFile: selectors.cantShowFileSelector(state),
-    selectedFileIsCloudFile: selectors.isCloudFileSelector(state),
     loadingState: selectors.loadingStateSelector(state),
     errorLoadingFile: selectors.errorLoadingFileSelector(state) || false,
     errorIsUpdateError: selectors.errorIsUpdateErrorSelector(state) || false,
@@ -790,10 +736,6 @@ export default connect(
     userId: selectors.userIdSelector(state),
     settings: selectors.appSettingsSelector(state),
     isInSettingsWizard: selectors.isInSettingsWizardSelector(state),
-    unsavedChanges: selectors.unsavedChangesSelector(state),
-    isCloudFile: selectors.isCloudFileSelector(state),
-    applicationIsBusyAndCannotBeQuit: selectors.busyWithWorkThatPreventsQuittingSelector(state),
-    isOffline: selectors.isOfflineSelector(state),
   }),
   {
     setOffline: actions.project.setOffline,
@@ -808,6 +750,5 @@ export default connect(
     enableTestUtilities: actions.testingAndDiagnosis.enableTestUtilities,
     generalError: actions.error.generalError,
     clearErrorLoadingFile: actions.applicationState.clearErrorLoadingFile,
-    fileSaved: actions.ui.fileSaved,
   }
 )(Main)

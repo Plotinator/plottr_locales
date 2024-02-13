@@ -6,6 +6,7 @@ import cx from 'classnames'
 import { selectors } from 'wired-up-pltr'
 import { DashboardBody, DashboardNav, FullPageSpinner as Spinner } from 'connected-components'
 
+import PreventExittingWithoutSaving from './PreventExittingWithoutSaving'
 import OfflineBanner from '../components/OfflineBanner'
 import { makeMainProcessClient } from '../mainProcessClient'
 
@@ -36,6 +37,7 @@ const Dashboard = ({ darkMode, closeDashboard, cantShowFile, busy, isOffline, op
   return (
     <div id="dashboard__react__root">
       <div className={cx('dashboard__main', { darkmode: darkMode })}>
+        <PreventExittingWithoutSaving />
         <OfflineBanner />
         {busy ? <Spinner /> : null}
         <DashboardNav currentView={activeView} setView={setActiveView} />
