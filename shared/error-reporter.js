@@ -121,7 +121,11 @@ const ErrorReporter = (
           }`
         )
 
-    return [message, error]
+    const messageWithContext = `${message}--${
+      error?.message?.slice?.(0, 100) ?? 'no-extra-context'
+    }`
+
+    return [messageWithContext, error]
   }
 
   const error = (rawMessage, rawError) => {
