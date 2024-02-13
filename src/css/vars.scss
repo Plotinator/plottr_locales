@@ -71,7 +71,7 @@ $new-item-border: 2px dashed $new-item-border-color;
 
 @mixin plotline-font {
   font-family: var(--plotline-font, 'IBM Plex Serif'), serif !important;
-  font-size: var(--plotline-fontSize, '16px') !important;
+  font-size: var(--plotline-fontSize, '20px') !important;
 }
 
 @mixin scenecard-title-font {
