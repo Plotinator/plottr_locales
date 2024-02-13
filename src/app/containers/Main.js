@@ -293,7 +293,7 @@ const Main = ({
     }
     if (settings.user?.fonts?.timeline?.headings?.fontSize) {
       window.document.documentElement.style.setProperty(
-        '--timeline-body-fontSize',
+        '--timeline-header-fontSize',
         settings.user.fonts.timeline.headings.fontSize
       )
     }
