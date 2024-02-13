@@ -7,6 +7,7 @@ import { t } from 'plottr_locales'
 import { helpers } from 'pltr/v2'
 import { actions, selectors } from 'wired-up-pltr'
 import { Button } from 'plottr_components'
+import { AskToSaveModal } from 'connected-components'
 
 import { bootFile } from '../bootFile'
 
@@ -24,6 +25,7 @@ import { whenClientIsReady } from '../../../shared/socket-client'
 import logger from '../../../shared/logger'
 import { makeMainProcessClient } from '../mainProcessClient'
 import { getErrorReporterInstance } from '../../../shared/error-reporter-instance'
+import { useAskToSave } from './useAskToSave'
 
 const { onReloadFromFile, pleaseFetchState, openExternal, showItemInFolder, updateLastOpenedFile } =
   makeMainProcessClient()
@@ -123,6 +125,11 @@ const Main = ({
   windowId,
   setWindowTitle,
   isInSettingsWizard,
+  unsavedChanges,
+  isCloudFile,
+  applicationIsBusyAndCannotBeQuit,
+  isOffline,
+  fileSaved,
 }) => {
   // The user needs a way to dismiss the files dashboard and continue
   // to the file that's open.
@@ -130,6 +137,14 @@ const Main = ({
   const [firstTimeBooting, setFirstTimeBooting] = useState(busyBooting)
   const [openDashboardTo, setOpenDashboardTo] = useState(null)
   const [pathToProject, setPathToProject] = useState('')
+
+  const { showAskToSave, dismissAskToSave, saveAndClose, waitingForSaveDoneSignal } = useAskToSave(
+    unsavedChanges,
+    isCloudFile,
+    applicationIsBusyAndCannotBeQuit,
+    isOffline,
+    fileSaved
+  )
 
   useEffect(() => {
     if (showDashboard && !dashboardClosed) {
@@ -645,20 +660,49 @@ const Main = ({
     return <SettingsWizard />
   }
 
+  const renderAskToSave = () => {
+    if (!waitingForSaveDoneSignal && (!showAskToSave || isCloudFile)) return null
+
+    return (
+      <MainIntegrationContext.Consumer>
+        {({ saveFile, saveOfflineFile }) => {
+          return (
+            <>
+              {renderAskToSave()}
+              <AskToSaveModal
+                save={saveAndClose(saveFile, saveOfflineFile)}
+                busy={waitingForSaveDoneSignal}
+                dismiss={dismissAskToSave}
+              />
+            </>
+          )
+        }}
+      </MainIntegrationContext.Consumer>
+    )
+  }
+
   if (cantShowFile || ((currentAppStateIsDashboard || showDashboard) && !dashboardClosed)) {
     return (
-      <Dashboard
-        closeDashboard={closeDashboard}
-        cantShowFile={cantShowFile}
-        openTo={openDashboardTo}
-      />
+      <>
+        {renderAskToSave()}
+        <Dashboard
+          closeDashboard={closeDashboard}
+          cantShowFile={cantShowFile}
+          openTo={openDashboardTo}
+        />
+      </>
     )
   }
 
   return (
     <MainIntegrationContext.Consumer>
       {({ showErrorBox }) => {
-        return <App forceProjectDashboard={showDashboard} showErrorBox={showErrorBox} />
+        return (
+          <>
+            {renderAskToSave()}
+            <App forceProjectDashboard={showDashboard} showErrorBox={showErrorBox} />
+          </>
+        )
       }}
     </MainIntegrationContext.Consumer>
   )
@@ -709,6 +753,11 @@ Main.propTypes = {
   windowId: PropTypes.func.isRequired,
   setWindowTitle: PropTypes.func.isRequired,
   isInSettingsWizard: PropTypes.bool,
+  unsavedChanges: PropTypes.bool,
+  isCloudFile: PropTypes.bool,
+  applicationIsBusyAndCannotBeQuit: PropTypes.bool,
+  isOffline: PropTypes.bool,
+  fileSaved: PropTypes.func.isRequired,
 }
 
 export default connect(
@@ -741,6 +790,10 @@ export default connect(
     userId: selectors.userIdSelector(state),
     settings: selectors.appSettingsSelector(state),
     isInSettingsWizard: selectors.isInSettingsWizardSelector(state),
+    unsavedChanges: selectors.unsavedChangesSelector(state),
+    isCloudFile: selectors.isCloudFileSelector(state),
+    applicationIsBusyAndCannotBeQuit: selectors.busyWithWorkThatPreventsQuittingSelector(state),
+    isOffline: selectors.isOfflineSelector(state),
   }),
   {
     setOffline: actions.project.setOffline,
@@ -755,5 +808,6 @@ export default connect(
     enableTestUtilities: actions.testingAndDiagnosis.enableTestUtilities,
     generalError: actions.error.generalError,
     clearErrorLoadingFile: actions.applicationState.clearErrorLoadingFile,
+    fileSaved: actions.ui.fileSaved,
   }
 )(Main)

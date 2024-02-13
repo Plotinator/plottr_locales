@@ -11,34 +11,57 @@ const FIREBASE_REQUEST_TIMEOUT = 30000
 const firebaseSync = (logger) => {
   const inflightRequests = {
     counter: 0,
+    lastRequestFailed: false,
   }
 
   const overwritePreventingDefault = (...args) => {
     inflightRequests.counter++
     const timeout = setTimeout(() => {
+      inflightRequests.lastRequestFailed = true
       inflightRequests.counter = Math.max(0, inflightRequests.counter - 1)
       if (typeof logger?.warn === 'function') {
         logger.warn('Request to overwrite a document in firebase timed out', ...args)
       }
     }, FIREBASE_REQUEST_TIMEOUT)
-    return overwrite(...args).finally(() => {
-      clearTimeout(timeout)
-      inflightRequests.counter = Math.max(0, inflightRequests.counter - 1)
-    })
+    return overwrite(...args)
+      .then(() => {
+        inflightRequests.lastRequestFailed = false
+      })
+      .catch((error) => {
+        if (typeof logger?.error === 'function') {
+          logger.error('Failed to write to Firebase', error)
+        }
+        inflightRequests.lastRequestFailed = true
+      })
+      .finally(() => {
+        clearTimeout(timeout)
+        inflightRequests.counter = Math.max(0, inflightRequests.counter - 1)
+      })
   }
 
   const deleteSinglePreventingDefault = (...args) => {
     inflightRequests.counter++
     const timeout = setTimeout(() => {
+      inflightRequests.lastRequestFailed = true
       inflightRequests.counter = Math.max(0, inflightRequests.counter - 1)
       if (typeof logger?.warn === 'function') {
         logger.warn('Request to delete a document in firebase timed out', ...args)
       }
     }, FIREBASE_REQUEST_TIMEOUT)
-    return deleteSingle(...args).finally(() => {
-      clearTimeout(timeout)
-      inflightRequests.counter = Math.max(0, inflightRequests.counter - 1)
-    })
+    return deleteSingle(...args)
+      .then(() => {
+        inflightRequests.lastRequestFailed = false
+      })
+      .catch((error) => {
+        if (typeof logger?.error === 'function') {
+          logger.error('Failed to delete from Firebase', error)
+        }
+        inflightRequests.lastRequestFailed = true
+      })
+      .finally(() => {
+        clearTimeout(timeout)
+        inflightRequests.counter = Math.max(0, inflightRequests.counter - 1)
+      })
   }
 
   return {
