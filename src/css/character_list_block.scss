@@ -4,6 +4,7 @@
   h1 {
     text-align: center;
     @include application-text;
+    @include header-font;
   }
 
   .tab-body {
@@ -32,6 +33,7 @@
   position: relative;
 
   h2 {
+    @include sub-header-font;
     font-size: 17px;
   }
 }
@@ -237,6 +239,12 @@
     }
   }
 
+  .slate-editor__wrapper {
+    .slate-editor__word-counter {
+      display: none !important;
+    }
+  }
+
   &:hover {
     .character-list__character-notes {
       border: 2px dashed $blue-7;
@@ -417,6 +425,16 @@
       font-size: 1.5rem;
     }
   }
+
+  .character-list__character__tabs {
+    .slate-editor__wrapper {
+      position: relative;
+      .slate-editor__word-counter {
+        display: block !important;
+      }
+    }
+  }
+
 }
 
 .darkmode {

@@ -37,7 +37,7 @@ $medium_width: 80px;
 }
 
 .line-title__body {
-  @include sub-header-font;
+  @include plotline-font;
   display: flex;
   text-align: right;
   justify-content: flex-end;
@@ -85,6 +85,7 @@ $medium_width: 80px;
 }
 
 .line-title__body.hover {
+  @include plotline-font;
   border-top: 3px dashed $blue-7;
   border-left: 3px dashed $blue-7;
   border-bottom: 3px dashed $blue-7;

@@ -107,7 +107,11 @@
         margin-bottom: 20px;
       }
     }
+    h1 {
+      @include header-font;
+    }
     h2 {
+      @include header-font;
       font-size: 14pt;
       color: $gray-4;
     }
@@ -193,6 +197,7 @@
   }
 
   h2 {
+    @include header-font;
     font-size: 18pt;
   }
 

@@ -1,6 +1,8 @@
-import { isEqual } from 'lodash'
-
 import { useEffect, useState, useRef } from 'react'
+import { isEqual } from 'lodash'
+import { Editor } from 'slate'
+
+import { countWords } from './helpers'
 import { useTextConverter } from './helpers'
 
 export const useEditState = (
@@ -22,6 +24,7 @@ export const useEditState = (
   const focussed = useRef(false)
 
   const [value, setValue] = useState(useTextConverter(initialValue, log))
+  const [wordCount, setWordCount] = useState(0)
 
   useEffect(() => {
     const newValue = useTextConverter(initialValue)
@@ -60,6 +63,12 @@ export const useEditState = (
     setValue(newValue)
   }, [undoId])
 
+  const updateWordCount = () => {
+    const [start, end] = Editor.edges(editor, editor.selection)
+    const wordCount = isEqual(start, end) ? 0 : countWords(editor.getFragment())
+    setWordCount(wordCount)
+  }
+
   const debouncedOnUpdateValue = (value, selection) => {
     if (valueUpdateTimer.current) {
       clearTimeout(valueUpdateTimer.current)
@@ -67,6 +76,7 @@ export const useEditState = (
     deferredValuesToUpdate.current.value = value || deferredValuesToUpdate.current.value
     deferredValuesToUpdate.current.selection = selection || deferredValuesToUpdate.current.selection
     valueUpdateTimer.current = setTimeout(() => {
+      updateWordCount()
       onValueChanged(deferredValuesToUpdate.current.value, deferredValuesToUpdate.current.selection)
       deferredValuesToUpdate.current.value = null
       deferredValuesToUpdate.current.selection = null
@@ -133,5 +143,5 @@ export const useEditState = (
     focussed.current = false
   }
 
-  return [value, onChange, onKeyDown, onPaste, onFocus, onBlur]
+  return [value, onChange, onKeyDown, onPaste, wordCount, onFocus, onBlur]
 }

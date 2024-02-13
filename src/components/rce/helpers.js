@@ -1,4 +1,4 @@
-import { cloneDeep } from 'lodash'
+import { cloneDeep, isPlainObject } from 'lodash'
 import { Editor, createEditor as createSlateEditor } from 'slate'
 import { withReact } from 'slate-react'
 import { rceDataRepair } from './rceDataRepair'
@@ -9,6 +9,7 @@ import { withHTML } from './withHTML'
 import withNormalizer from './Normalizer'
 import { withList } from './withList'
 import { initialState } from 'pltr/v2'
+import { isEmpty } from './isEmpty'
 
 const { RCE_INITIAL_VALUE } = initialState
 
@@ -37,6 +38,24 @@ export function createEditor(log, addImage = NOP) {
       withHTML(withImages(withLinks(withHistory(withReact(createSlateEditor()))), addImage))
     )
   )
+}
+
+export const countWords = (nodes) => {
+  if (nodes && Array.isArray(nodes) && nodes.filter(Boolean).length) {
+    const wordCount = (nodes || []).reduce((acc, node) => {
+      if (!isPlainObject(node) || isEmpty(node)) {
+        return acc
+      } else if (node.children && Array.isArray(node.children) && node.children.length) {
+        return acc + countWords(node.children)
+      } else if (node.text) {
+        const words = node.text.trim().split(/\s+/g)
+        return acc + words.filter((word) => word !== '').length
+      }
+      return acc
+    }, 0)
+    return wordCount
+  }
+  return 0
 }
 
 // Gets the previous sibling node to the provided path at the same depth

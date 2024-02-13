@@ -33,6 +33,7 @@
   position: relative;
 
   h2 {
+    @include sub-header-font;
     font-size: 17px;
   }
 }
@@ -260,6 +261,12 @@
         margin: auto;
       }
     }
+
+    .slate-editor__wrapper {
+      .slate-editor__word-counter {
+        display: none !important;
+      }
+    }
   }
 
   &:hover {
@@ -307,6 +314,15 @@
 
     svg {
       font-size: 2rem;
+    }
+  }
+
+  .place-list__inputs__normal {
+    .slate-editor__wrapper {
+      position: relative;
+      .slate-editor__word-counter {
+        display: flex !important;
+      }
     }
   }
 }

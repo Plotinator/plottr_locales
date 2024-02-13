@@ -109,7 +109,7 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
 }
 
 .beat__body {
-  @include sub-header-font;
+  @include timeline-header-font;
   padding: 10px;
   text-align: center;
   transition: all 0.4s $cubic;

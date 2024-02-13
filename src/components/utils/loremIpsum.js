@@ -17,3 +17,52 @@ export const rceHalfLoremIpsum = [
     children: [{ text: halfLoremIpsum }],
   },
 ]
+
+export const rceHalfLoremWithTitle = [
+  {
+    type: 'paragraph',
+    children: [{ text: halfLoremIpsum }],
+  },
+  {
+    type: 'heading-one',
+    children: [{ text: 'Example Title' }],
+  },
+  {
+    type: 'paragraph',
+    children: [{ text: halfLoremIpsum }],
+  },
+]
+
+export const rceHalfLoremWithSubtitle = [
+  {
+    type: 'paragraph',
+    children: [{ text: halfLoremIpsum }],
+  },
+  {
+    type: 'heading-two',
+    children: [{ text: 'Example Subtitle' }],
+  },
+  {
+    type: 'paragraph',
+    children: [{ text: halfLoremIpsum }],
+  },
+]
+
+export const rceHalfLoremWithTitleAndSubtitle = [
+  {
+    type: 'paragraph',
+    children: [{ text: halfLoremIpsum }],
+  },
+  {
+    type: 'heading-one',
+    children: [{ text: 'Example Title' }],
+  },
+  {
+    type: 'heading-two',
+    children: [{ text: 'Example Subtitle' }],
+  },
+  {
+    type: 'paragraph',
+    children: [{ text: halfLoremIpsum }],
+  },
+]

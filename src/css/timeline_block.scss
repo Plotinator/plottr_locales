@@ -347,6 +347,7 @@
       cursor: pointer;
 
       .card__title {
+        @include scenecard-title-font;
         padding: 6px;
       }
     }

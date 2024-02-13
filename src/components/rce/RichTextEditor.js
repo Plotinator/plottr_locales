@@ -19,6 +19,7 @@ import { indent } from './IndentParagraphButton'
 import { handleList } from './BlockButton'
 import { isEmpty } from './isEmpty'
 import { notOnFirstLine } from './notOnFirstLine'
+import WordCounter from './WordCounter'
 
 const HOTKEYS = {
   'mod+b': 'bold',
@@ -158,6 +159,7 @@ const RichTextEditorConnector = (connector) => {
       let innerIdleCallback = null
       let reAttemptCallback = null
       let focusAttempts = 0
+
       function focus() {
         focusAttempts++
         if (focusAttempts > 3) {
@@ -239,6 +241,7 @@ const RichTextEditorConnector = (connector) => {
       onValueChanged,
       onKeyDown,
       onPaste,
+      wordCount,
       signalFocusToEditState,
       signalBlurToEditState,
       _editorIsReady,
@@ -376,6 +379,7 @@ const RichTextEditorConnector = (connector) => {
               onFocus={handleOnFocus}
               onClick={startEditingIfNotAlready}
             />
+            <WordCounter text={initialValue} totalSelectedWords={wordCount} />
           </div>
         </div>
       </Slate>

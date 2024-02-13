@@ -52,7 +52,9 @@ const SettingsWizardStep1Connector = (connector) => {
 
   const SettingsWizardStep1 = ({ nextStep, settings, stagedLanguage, stageLanguage }) => {
     const [fonts, setFonts] = useState(null)
-    const [recentFonts, setRecentFonts] = useState(settings.user.font ? [settings.user.font] : null)
+    const [recentFonts, setRecentFonts] = useState(
+      settings.user.fonts.rce.defaultFont ? [settings.user.fonts?.rce?.defaultFont] : null
+    )
 
     useEffect(() => {
       if (!fonts) setFonts(getFonts(os()))
@@ -66,14 +68,15 @@ const SettingsWizardStep1Connector = (connector) => {
     }, [settings.locale])
 
     const setFontDefaults = useCallback(() => {
-      saveAppSetting('user.font', 'Forum')
+      saveAppSetting('user.fonts.rce.defaultFont', 'Forum')
       addRecent('Forum')
-      saveAppSetting('user.fontSize', 20)
+      saveAppSetting('user.fonts.rce.defaultFontSize', '20px')
     }, [saveAppSetting])
 
     const { user } = defaultSettings.defaultsForPlatform(os())
-    const rceFontIsDefault = settings.user.font === user?.font
-    const rceFontSizeIsDefault = settings.user.fontSize === user?.fontSize
+    const rceFontIsDefault = settings.user?.fonts?.rce.defaultFont === user.fonts?.rce?.defaultFont
+    const rceFontSizeIsDefault =
+      settings.user?.fonts?.rce?.defaultFontSize === user.fonts?.rce?.defaultFontSize
     const rceIsDefault = rceFontIsDefault && rceFontSizeIsDefault
 
     return (
@@ -103,18 +106,18 @@ const SettingsWizardStep1Connector = (connector) => {
               <h4>{t('Font Default: Text Editor')}</h4>
               <ButtonGroup>
                 <FontSettingDropdown
-                  activeFont={settings.user.font}
+                  activeFont={settings.user?.fonts?.rce?.defaultFont}
                   fonts={fonts || []}
                   recentFonts={recentFonts || []}
                   addRecent={addRecent}
                   onChange={(newFont) => {
-                    saveAppSetting('user.font', newFont)
+                    saveAppSetting('user.fonts.rce.defaultFont', newFont)
                   }}
                 />
                 <FontSizeSettingDropdown
-                  defaultFontSize={settings.user.fontSize}
+                  defaultFontSize={settings.user?.fonts?.rce?.fontSize?.replace('px', '')}
                   onChange={(newSize) => {
-                    saveAppSetting('user.fontSize', newSize)
+                    saveAppSetting('user.fonts.rce.defaultFontSize', `${newSize}px`)
                   }}
                 />
               </ButtonGroup>
@@ -124,7 +127,7 @@ const SettingsWizardStep1Connector = (connector) => {
                 </Button>
               )}
               <p style={{ paddingTop: '8px', margin: 0 }}>{t('Preview:')}</p>
-              <div style={{ width: '50%' }}>
+              <div>
                 <RichTextSettingsViewer
                   log={errorReportingLogger}
                   fontFamily={settings.user.font}

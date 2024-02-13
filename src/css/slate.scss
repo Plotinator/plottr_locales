@@ -5,8 +5,65 @@
   margin-bottom: 10px;
   display: flex;
   flex-direction: column;
+
+  p,
+  ul,
+  ol {
+      @include rce-text-font;
+    }
   &.readonly {
     margin: 0;
+  }
+
+  .slate-editor__editor {
+    p,
+    ul,
+    ol {
+      @include rce-text-font;
+    }
+    &.global__setting {
+      padding: 10px;
+      &.light {
+        background-color: $gray-9;  
+        color: #102A42;
+
+        p {
+          @include rce-text-font;
+        }
+
+        h1 {
+          @include header-font;
+          @include rce-title-font;
+        }
+
+        h2 {
+          @include sub-header-font;
+          @include rce-subtitle-font;
+        }
+      }
+
+      &.darkmode {
+        background-color: $darkmode-v2-card-background;
+        color: #ccc;
+
+        p {
+          @include rce-text-font;
+          @include rce-darkmode-font-color;
+        }
+
+        h1 {
+          @include header-font;
+          @include rce-title-font;
+          @include rce-title-darkmode-font-color;
+        }
+
+        h2 {
+          @include sub-header-font;
+          @include rce-subtitle-font;
+          @include rce-subtitle-darkmode-font-color;
+        }
+      }
+    }
   }
 }
 
@@ -46,6 +103,11 @@
       }
     }
   }
+  p,
+  ul,
+  ol {
+    @include rce-text-font;
+  }
   &.readonly {
     display: none;
   }
@@ -58,6 +120,25 @@
     .btn-primary {
       background-color: $gray-8;
       color: $darkmode-background;
+    }
+
+    p,
+    ul,
+    ol {
+      @include rce-text-font;
+      @include rce-darkmode-font-color;
+    }
+
+    h1 {
+      @include header-font;
+      @include rce-title-font;
+      @include rce-title-darkmode-font-color;
+    }
+
+    h2 {
+      @include sub-header-font;
+      @include rce-subtitle-font;
+      @include rce-subtitle-darkmode-font-color;
     }
   }
 
@@ -109,7 +190,26 @@
   padding: 10px 12px;
   font-size: 20px;
   cursor: text;
-  @include rce-text-font;
+  color: inherit;
+
+  p,
+  ul,
+  ol {
+    @include rce-text-font;
+    @include rce-darkmode-font-color;
+  }
+
+  h1 {
+    @include header-font;
+    @include rce-title-font;
+    @include rce-title-darkmode-font-color;
+  }
+
+  h2 {
+    @include sub-header-font;
+    @include rce-subtitle-font;
+    @include rce-subtitle-darkmode-font-color;
+  }
 
   &.readonly {
     border: none;
@@ -117,11 +217,6 @@
     border-radius: 0;
     box-shadow: none;
     cursor: inherit;
-  }
-
-  &.darkmode {
-    background-color: #444;
-    border: 1px solid $darkmode-darker-border;
   }
 
   img.slate-editor__image-link {
@@ -134,9 +229,52 @@
     }
   }
 
+  h1 {
+    @include header-font;
+    @include rce-title-font;
+  }
+
+  h2 {
+    @include sub-header-font;
+    @include rce-subtitle-font;
+  }
+
   h1,
   h2 {
     margin-top: 4px;
+  }
+
+  .slate-editor__word-counter {
+    display: flex;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    font-size: 12px;
+    padding: 0px 5px;
+    border-radius: $border-radius;
+    align-items: center;
+    justify-content: space-evenly;
+    background-color: #fff;
+    border: 1px solid $new-item-border-color;
+
+    > :first-child {
+      margin-right: 5px;
+    }  
+  }
+
+  &.light {
+    .slate-editor__word-counter {
+      background-color: #fff;
+      border: 1px solid $new-item-border-color;
+      color: #102A42;
+    }
+  }
+  &.darkmode {
+    .slate-editor__word-counter {
+      border: 1px solid $darkmode-v2-border;
+      background-color: $darkmode-v2-background;
+      color: $darkmode-v2-darker-text;
+    }
   }
 
   [data-slate-editor="true"] p:only-child:has([data-slate-placeholder="true"]) {
@@ -149,6 +287,27 @@
 .darkmode {
   .slate-editor__editor {
     color: $darkmode-v2-darker-text;
+
+    .slate-editor__word-counter {
+      color: $darkmode-v2-darker-text;
+      border: 1px solid $darkmode-v2-border;
+      background-color: $darkmode-v2-background;
+    }
+
+    &.light {
+      .slate-editor__word-counter {
+        background-color: #fff;
+        border: 1px solid $new-item-border-color;
+        color: #102A42;
+      }
+    }
+    &.darkmode {
+      .slate-editor__word-counter {
+        border: 1px solid $darkmode-v2-border;
+        background-color: $darkmode-v2-background;
+        color: $darkmode-v2-darker-text;
+      }
+    }
   }
 
   .slate-editor__toolbar-wrapper {
@@ -163,6 +322,61 @@
 
     .btn {
       border-color: #555;
+    }
+  }
+
+  .slate-editor__wrapper {
+    .slate-editor__editor {
+      
+      p,
+      ul,
+      ol {
+        @include rce-text-font;
+        @include rce-darkmode-font-color;
+      }
+
+      .global-setting {
+        &.darkmode {
+          background-color: $darkmode-v2-card-background;
+
+          p {
+            @include rce-text-font;
+            @include rce-darkmode-font-color;
+          }
+
+          h1 {
+            @include header-font;
+            @include rce-title-font;
+            @include rce-title-darkmode-font-color;
+          }
+
+          h2 {
+            @include sub-header-font;
+            @include rce-subtitle-font;
+            @include rce-subtitle-darkmode-font-color;
+          }
+        }
+        
+        &.light {
+          background-color: $gray-9;  
+          color: #102A42;
+          @include rce-text-font;
+
+          p {
+            @include rce-text-font;
+          }
+
+          h1 {
+            @include header-font;
+            @include rce-title-font;
+          }
+
+          h2 {
+            @include sub-header-font;
+            @include rce-subtitle-font;
+          }
+        }
+      }
     }
   }
 }

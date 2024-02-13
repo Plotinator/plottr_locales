@@ -19,18 +19,25 @@ const Leaf = ({ attributes, children, leaf }) => {
   }
 
   if (leaf.color) {
-    const colorStyle = { color: leaf.color }
+    const colorStyle = {
+      color: leaf.color,
+    }
     attributes.style = attributes.style ? { ...attributes.style, ...colorStyle } : colorStyle
   }
 
   if (leaf.font) {
-    const fontStyle = { fontFamily: `${leaf.font}, --default-rce-font, Forum, sans-serif` }
+    const fontStyle = { fontFamily: leaf.font }
     attributes.style = attributes.style ? { ...attributes.style, ...fontStyle } : fontStyle
   }
 
   if (leaf.fontSize) {
     const size = { fontSize: leaf.fontSize }
     attributes.style = attributes.style ? { ...attributes.style, ...size } : size
+  }
+
+  if (leaf.fontWeight) {
+    const weight = { fontSize: leaf.fontWeight }
+    attributes.style = attributes.style ? { ...attributes.style, ...weight } : weight
   }
 
   if (leaf.placeholder) {
@@ -57,6 +64,8 @@ Leaf.propTypes = {
     color: PropTypes.string,
     font: PropTypes.string,
     fontSize: PropTypes.number,
+    fontWeight: PropTypes.number,
+    darkMode: PropTypes.bool,
   }),
 }
 

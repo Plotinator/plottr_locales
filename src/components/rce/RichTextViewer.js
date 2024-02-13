@@ -10,6 +10,7 @@ import { t } from 'plottr_locales'
 import Leaf from './Leaf'
 import Element from './Element'
 import { useTextConverter } from './helpers'
+import WordCounter from './WordCounter'
 
 const RichTextViewer = ({
   stealingLock,
@@ -67,6 +68,7 @@ const RichTextViewer = ({
           })}
         >
           <Editable readOnly renderLeaf={renderLeaf} renderElement={renderElement} />
+          <WordCounter text={initialValue} />
         </div>
       </div>
     </Slate>
