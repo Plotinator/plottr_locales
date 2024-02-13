@@ -18,7 +18,25 @@ export const userSettingsSelector = createSelector(
 export const appSettingsSelector = createSelector(settingsSelector, (settings) => {
   return settings.appSettings
 })
+
 export const appUserSettingsSelector = createSelector(appSettingsSelector, ({ user }) => user || {})
+
+export const fontSettingsSelector = createSelector(appUserSettingsSelector, ({ fonts }) => {
+  return fonts || {}
+})
+
+export const globalFontsSettingsSelector = createSelector(
+  fontSettingsSelector,
+  ({ global }) => global || {}
+)
+
+export const timelineFontsSettingsSelector = createSelector(
+  fontSettingsSelector,
+  ({ timeline }) => timeline || {}
+)
+
+export const rceFontsSettingsSelector = createSelector(fontSettingsSelector, ({ rce }) => rce || {})
+
 export const previouslyLoggedIntoProSelector = createSelector(
   appSettingsSelector,
   (appSettings) => {
