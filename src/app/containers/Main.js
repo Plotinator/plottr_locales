@@ -327,7 +327,7 @@ const Main = ({
     }
     if (settings.user?.fonts?.rce?.defaultFontSize) {
       window.document.documentElement.style.setProperty(
-        '--rce-font-default-size',
+        '--rce-default-font-size',
         settings.user.fonts.rce.defaultFontSize
       )
     }
