@@ -14,13 +14,15 @@ const PreventExitingWithoutSaving = ({
   applicationIsBusyAndCannotBeQuit,
   isOffline,
   fileSaved,
+  fileLoaded,
 }) => {
   const { showAskToSave, dismissAskToSave, saveAndClose, waitingForSaveDoneSignal } = useAskToSave(
     unsavedChanges,
     isCloudFile,
     applicationIsBusyAndCannotBeQuit,
     isOffline,
-    fileSaved
+    fileSaved,
+    fileLoaded
   )
 
   if (!waitingForSaveDoneSignal && (!showAskToSave || isCloudFile)) return null
@@ -46,6 +48,7 @@ PreventExitingWithoutSaving.propTypes = {
   applicationIsBusyAndCannotBeQuit: PropTypes.bool,
   isOffline: PropTypes.bool,
   fileSaved: PropTypes.func.isRequired,
+  fileLoaded: PropTypes.string.isRequired,
 }
 
 export default connect(
@@ -55,6 +58,7 @@ export default connect(
       isCloudFile: selectors.isCloudFileSelector(state),
       applicationIsBusyAndCannotBeQuit: selectors.busyWithWorkThatPreventsQuittingSelector(state),
       isOffline: selectors.isOfflineSelector(state),
+      fileLoaded: selectors.fileURLLoadedSelector(state),
     }
   },
   {
