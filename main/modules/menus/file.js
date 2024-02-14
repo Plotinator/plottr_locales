@@ -99,7 +99,7 @@ function buildFileMenu(fileURL, getTrialInfo) {
         },
         {
           label: t('Create Desktop Shortcut'),
-          visible: !!fileURL && !isTemp,
+          visible: !!fileURL && !isTemp && !isPro,
           click: function (event, focusedWindow) {
             log.info('sending create-file-shortcut')
             focusedWindow.webContents.send('create-file-shortcut', fileURL, 'desktop')
