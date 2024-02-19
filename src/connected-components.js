@@ -116,6 +116,12 @@ const writeFile = (filePath, data) => {
   })
 }
 
+const directoryIsWritable = (filePath) => {
+  return whenClientIsReady(({ directoryIsWritable }) => {
+    return directoryIsWritable(filePath)
+  })
+}
+
 const { saveAppSetting, startTrial, deleteLicense, saveLicenseInfo, saveExportConfigSettings } =
   makeFileSystemAPIs(whenClientIsReady)
 
@@ -337,6 +343,7 @@ const platform = {
     createAndOpenCopy: (oldFilePath, newFileName) => {
       return createAndOpenCopy(oldFilePath, newFileName)
     },
+    directoryIsWritable,
   },
   update: {
     quitToInstall: () => {

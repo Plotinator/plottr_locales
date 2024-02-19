@@ -25,6 +25,7 @@ import {
   ADD_KNOWN_FILE,
   EDIT_KNOWN_FILE_PATH,
   UPDATE_LAST_OPENED_DATE,
+  DIRECTORY_IS_WRITABLE,
 
   // Error reply types
   REMOVE_FROM_KNOWN_FILES_ERROR_REPLY,
@@ -147,6 +148,7 @@ import {
   FIND_UNIQUE_NAME_IN_PATH_ERROR_REPLY,
   FILE_PATH_AS_ARRAY,
   FILE_PATH_AS_ARRAY_ERROR_REPLY,
+  DIRECTORY_IS_WRITABLE_ERROR_REPLY,
 } from '../socket-server-message-types'
 import { setPort, getPort } from './workerPort'
 
@@ -332,6 +334,7 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           case RESOLVE:
           case FIND_UNIQUE_NAME_IN_PATH:
           case FILE_PATH_AS_ARRAY:
+          case DIRECTORY_IS_WRITABLE:
           case PING: {
             resolvePromise()
             return
@@ -417,6 +420,7 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           case MKDIR_ERROR_REPLY:
           case FIND_UNIQUE_NAME_IN_PATH_ERROR_REPLY:
           case FILE_PATH_AS_ARRAY_ERROR_REPLY:
+          case DIRECTORY_IS_WRITABLE_ERROR_REPLY:
           case FILE_EXISTS_ERROR_REPLY: {
             rejectPromise()
             return
@@ -643,6 +647,10 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
       return sendPromise(FILE_PATH_AS_ARRAY, { path })
     }
 
+    const directoryIsWritable = (path) => {
+      return sendPromise(DIRECTORY_IS_WRITABLE, { path })
+    }
+
     // ===File System APIs===
 
     const backupBasePath = () => {
@@ -847,6 +855,7 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           inBadState,
           findUniqueNameInPath,
           filePathAsArray,
+          directoryIsWritable,
         })
       })
     })

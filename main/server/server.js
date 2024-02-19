@@ -88,6 +88,7 @@ import {
   CREATE_SHORTCUT,
   FIND_UNIQUE_NAME_IN_PATH,
   FILE_PATH_AS_ARRAY,
+  DIRECTORY_IS_WRITABLE,
 } from '../../shared/socket-server-message-types'
 import { makeLogger } from './logger'
 import wireupFileModule from './files'
@@ -201,6 +202,7 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
       mkdir,
       findUniqueNameInPath,
       filePathAsArray,
+      directoryIsWritable,
     } = fileModule
     const fileSystemModule = makeFileSystemModule(stores, logger)
     const {
@@ -957,6 +959,14 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
               () => ['Splitting path into array on separator', path],
               () => statusManager.registerTask(filePathAsArray(path), JOIN),
               () => ['Splitting path into array on separator', path]
+            )
+          }
+          case DIRECTORY_IS_WRITABLE: {
+            const { path } = payload
+            return handlePromise(
+              () => ['Testing whether the supplied directory is writable', path],
+              () => statusManager.registerTask(directoryIsWritable(path), DIRECTORY_IS_WRITABLE),
+              () => ['Testing whether the supplied directory is writable', path]
             )
           }
           case PATH_SEP: {
