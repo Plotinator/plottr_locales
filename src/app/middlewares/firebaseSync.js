@@ -1,12 +1,15 @@
 import { middlewares, ARRAY_KEYS, SYSTEM_REDUCER_ACTION_TYPES } from 'pltr/v2'
 import { overwrite, deleteSingle, toFirestoreArray } from 'wired-up-firebase'
 import { selectors, selectPresentState } from 'wired-up-pltr'
+import { makeMainProcessClient } from '../mainProcessClient'
 
 const FLAT_ARRAY_KEYS = ['cards', 'notes', 'places', 'characters']
 
 const externalSync = middlewares.externalSync(selectPresentState)
 
 const FIREBASE_REQUEST_TIMEOUT = 30000
+
+const { markProjectAsSaved, markProjectAsUnsaved } = makeMainProcessClient()
 
 const firebaseSync = (logger) => {
   const inflightRequests = {
@@ -16,11 +19,14 @@ const firebaseSync = (logger) => {
 
   const overwritePreventingDefault = (...args) => {
     inflightRequests.counter++
+    if (inflightRequests.counter === 1) {
+      markProjectAsUnsaved()
+    }
     const timeout = setTimeout(() => {
       inflightRequests.lastRequestFailed = true
       inflightRequests.counter = Math.max(0, inflightRequests.counter - 1)
       if (typeof logger?.warn === 'function') {
-        logger.warn('Request to overwrite a document in firebase timed out', ...args)
+        logger.warn('Request to overwrite a document in firebase timed out')
       }
     }, FIREBASE_REQUEST_TIMEOUT)
     return overwrite(...args)
@@ -36,6 +42,9 @@ const firebaseSync = (logger) => {
       .finally(() => {
         clearTimeout(timeout)
         inflightRequests.counter = Math.max(0, inflightRequests.counter - 1)
+        if (inflightRequests.counter === 0 && !inflightRequests.lastRequestFailed) {
+          markProjectAsSaved()
+        }
       })
   }
 
@@ -45,7 +54,7 @@ const firebaseSync = (logger) => {
       inflightRequests.lastRequestFailed = true
       inflightRequests.counter = Math.max(0, inflightRequests.counter - 1)
       if (typeof logger?.warn === 'function') {
-        logger.warn('Request to delete a document in firebase timed out', ...args)
+        logger.warn('Request to delete a document in firebase timed out')
       }
     }, FIREBASE_REQUEST_TIMEOUT)
     return deleteSingle(...args)
@@ -61,6 +70,9 @@ const firebaseSync = (logger) => {
       .finally(() => {
         clearTimeout(timeout)
         inflightRequests.counter = Math.max(0, inflightRequests.counter - 1)
+        if (inflightRequests.counter === 0 && !inflightRequests.lastRequestFailed) {
+          markProjectAsSaved()
+        }
       })
   }
 

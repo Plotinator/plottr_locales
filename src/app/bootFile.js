@@ -40,6 +40,7 @@ const {
   pleaseTellMeWhatPlatformIAmOn,
   showSaveDialog,
   userDocumentsPath,
+  markProjectAsSaved,
 } = makeMainProcessClient()
 
 const withFileId = (fileId, file) => ({
@@ -630,6 +631,10 @@ export function bootFile(
       saverRef.current.cancelAllRemainingRequests()
     }
     const postSaveHook = () => {
+      const isDeviceFile = selectors.isDeviceFileSelector(store().getState())
+      if (isDeviceFile) {
+        markProjectAsSaved()
+      }
       store().dispatch(actions.ui.fileSaved())
     }
     const postBackupHook = () => {

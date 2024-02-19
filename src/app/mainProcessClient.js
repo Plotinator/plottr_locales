@@ -418,6 +418,14 @@ const _makeMainProcessClient = () => {
     return ask('what-is-the-download-directory-path')
   }
 
+  const markProjectAsUnsaved = () => {
+    return ask('please-mark-my-window-as-unsaved')
+  }
+
+  const markProjectAsSaved = () => {
+    return ask('please-mark-my-window-as-saved')
+  }
+
   return {
     setWindowTitle,
     setRepresentedFileName,
@@ -512,6 +520,8 @@ const _makeMainProcessClient = () => {
     createDesktopShortcut,
     listenToForceReload,
     downloadDirectoryPath,
+    markProjectAsUnsaved,
+    markProjectAsSaved,
   }
 }
 
