@@ -254,7 +254,7 @@ describe('Saver', (describe, it) => {
           })
         })
         describe('given  a saveFile function that succeeds, fails and then succeeds', (describe, it) => {
-          it('should show an error box once and then show a message box to indicate failure and subsequent success', () => {
+          it('should not show an error box because it did not fail enough times in a row', () => {
             let stateCounter = 1
             const getState = () => {
               return {
@@ -306,18 +306,18 @@ describe('Saver', (describe, it) => {
               new Promise((resolve) => {
                 setTimeout(resolve, 110)
               }).then(() => {
-                assertEqual(calledShowErrorBox, 1)
+                assertEqual(calledShowErrorBox, 0)
                 assertEqual(calledShowMessageBox, 0)
                 new Promise((resolve) => {
                   setTimeout(resolve, 110)
                 }).then(() => {
-                  assertEqual(calledShowErrorBox, 1)
-                  assertEqual(calledShowMessageBox, 1)
+                  assertEqual(calledShowErrorBox, 0)
+                  assertEqual(calledShowMessageBox, 0)
                   new Promise((resolve) => {
                     setTimeout(resolve, 110)
                   }).then(() => {
-                    assertEqual(calledShowErrorBox, 1)
-                    assertEqual(calledShowMessageBox, 1)
+                    assertEqual(calledShowErrorBox, 0)
+                    assertEqual(calledShowMessageBox, 0)
                     expectToMatchArrayLoosely(
                       saveCalls,
                       [
@@ -419,6 +419,111 @@ describe('Saver', (describe, it) => {
                     }).then(() => {
                       assertEqual(calledShowErrorBox, 0)
                       assertEqual(calledShowMessageBox, 0)
+                      expectToMatchArrayLoosely(
+                        saveCalls,
+                        [
+                          [
+                            {
+                              stateCounter: 1,
+                            },
+                          ],
+                          [
+                            {
+                              stateCounter: 2,
+                            },
+                          ],
+                          [
+                            {
+                              stateCounter: 3,
+                            },
+                          ],
+                          [
+                            {
+                              stateCounter: 4,
+                            },
+                          ],
+                        ],
+                        2,
+                        2
+                      )
+                      saver.cancelAllRemainingRequests()
+                    })
+                  })
+                })
+              })
+            })
+          })
+        })
+        describe('given  a saveFile function that succeeds, fails twice and then succeeds', (describe, it) => {
+          it('should show an error box once and then show a message box to indicate failure and subsequent success', () => {
+            let stateCounter = 1
+            const getState = () => {
+              return {
+                stateCounter: stateCounter++,
+              }
+            }
+            const saveCalls = []
+            const saveFile = (...args) => {
+              saveCalls.push(args)
+              if (saveCalls.length === 1) {
+                return Promise.resolve()
+              } else if (saveCalls.length === 2 || saveCalls.length === 3) {
+                return Promise.reject(new Error('boom!'))
+              } else {
+                return Promise.resolve()
+              }
+            }
+            const backupFile = () => {
+              return Promise.resolve()
+            }
+            let calledShowErrorBox = 0
+            const showErrorBox = () => {
+              calledShowErrorBox++
+            }
+            let calledShowMessageBox = 0
+            const showMessageBox = () => {
+              calledShowMessageBox++
+            }
+            const saver = Saver(
+              getState,
+              saveFile,
+              backupFile,
+              100,
+              10000,
+              NOP_LOGGER,
+              showMessageBox,
+              showErrorBox,
+              DUMMY_SERVER_IS_BUSY_RESTARTING,
+              isNotLoggedInThunk,
+              DUMMY_OFFER_SAVE_AND_QUIT
+            )
+            assertEqual(calledShowErrorBox, 0)
+            assertEqual(calledShowMessageBox, 0)
+            new Promise((resolve) => {
+              setTimeout(resolve, 110)
+            }).then(() => {
+              assertEqual(calledShowErrorBox, 0)
+              assertEqual(calledShowMessageBox, 0)
+              new Promise((resolve) => {
+                setTimeout(resolve, 110)
+              }).then(() => {
+                assertEqual(calledShowErrorBox, 0)
+                assertEqual(calledShowMessageBox, 0)
+                new Promise((resolve) => {
+                  setTimeout(resolve, 110)
+                }).then(() => {
+                  assertEqual(calledShowErrorBox, 1)
+                  assertEqual(calledShowMessageBox, 0)
+                  new Promise((resolve) => {
+                    setTimeout(resolve, 110)
+                  }).then(() => {
+                    assertEqual(calledShowErrorBox, 1)
+                    assertEqual(calledShowMessageBox, 1)
+                    new Promise((resolve) => {
+                      setTimeout(resolve, 110)
+                    }).then(() => {
+                      assertEqual(calledShowErrorBox, 1)
+                      assertEqual(calledShowMessageBox, 1)
                       expectToMatchArrayLoosely(
                         saveCalls,
                         [
@@ -891,7 +996,7 @@ describe('Saver', (describe, it) => {
     })
     describe('given a state that doesnt change', (describe, it) => {
       describe('and given  a save function that always fails', (describe, it) => {
-        it('should report failure each time', () => {
+        it('should report failure every other time', () => {
           const THE_STATE = {
             a: 'haha',
           }
@@ -943,24 +1048,32 @@ describe('Saver', (describe, it) => {
             setTimeout(resolve, 110)
           }).then(() => {
             assertGreaterThan(loggedInfos, 0)
-            assertEqual(loggedWarnings, 1)
+            assertEqual(loggedWarnings, 0)
             assertEqual(loggedErrors, 0)
-            assertEqual(notifierCount, 1)
+            assertEqual(notifierCount, 0)
             new Promise((resolve) => {
               setTimeout(resolve, 110)
             }).then(() => {
               assertGreaterThan(loggedInfos, 0)
-              assertEqual(loggedWarnings, 2)
+              assertEqual(loggedWarnings, 1)
               assertEqual(loggedErrors, 0)
-              assertEqual(notifierCount, 2)
+              assertEqual(notifierCount, 1)
               new Promise((resolve) => {
                 setTimeout(resolve, 110)
               }).then(() => {
                 assertGreaterThan(loggedInfos, 0)
-                assertEqual(loggedWarnings, 3)
+                assertEqual(loggedWarnings, 1)
                 assertEqual(loggedErrors, 0)
-                assertEqual(notifierCount, 3)
-                saver.cancelAllRemainingRequests()
+                assertEqual(notifierCount, 1)
+                new Promise((resolve) => {
+                  setTimeout(resolve, 110)
+                }).then(() => {
+                  assertGreaterThan(loggedInfos, 0)
+                  assertEqual(loggedWarnings, 2)
+                  assertEqual(loggedErrors, 0)
+                  assertEqual(notifierCount, 2)
+                  saver.cancelAllRemainingRequests()
+                })
               })
             })
           })
