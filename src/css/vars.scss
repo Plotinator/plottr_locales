@@ -76,7 +76,7 @@ $new-item-border: 2px dashed $new-item-border-color;
 
 @mixin scenecard-title-font {
   font-family: var(--scenecard-title-font, 'Forum'), serif !important;
-  font-size: var(--scenecard-title-fontSize, '16px') !important;
+  font-size: var(--scenecard-title-font-size, '16px') !important;
 }
 
 @mixin body-text-font {
