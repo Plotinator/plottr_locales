@@ -2038,7 +2038,7 @@
       "bookId": null,
       "positionWithinLine": 0,
       "positionInBeat": 0,
-      "title": "",
+      "title": "Xeno Morph",
       "description": [
         {
           "type": "paragraph",
@@ -2105,6 +2105,32 @@
       "templates": [],
       "imageId": null,
       "fromTemplateId": null
+    },
+    {
+      "id": 50,
+      "lineId": 2,
+      "beatId": 1,
+      "bookId": null,
+      "positionWithinLine": 0,
+      "positionInBeat": 0,
+      "title": "The target",
+      "description": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "text": ""
+            }
+          ]
+        }
+      ],
+      "tags": [],
+      "characters": [],
+      "places": [],
+      "templates": [],
+      "imageId": null,
+      "fromTemplateId": null,
+      "color": null
     }
   ],
   "categories": {
@@ -2333,6 +2359,11 @@
           "bookId": 5
         },
         {
+          "value": "hi!  How are you?",
+          "id": 2,
+          "bookId": "all"
+        },
+        {
           "value": "there",
           "id": 3,
           "bookId": 5
@@ -2342,11 +2373,31 @@
           "id": 4,
           "bookId": 5
         }
+      ],
+      "a": "aaayy ooooo",
+      "Special Sauce": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "text": "Her special sauce is that she's got lazer eyes(!)"
+            }
+          ]
+        }
       ]
     }
   ],
   "customAttributes": {
-    "characters": [],
+    "characters": [
+      {
+        "name": "Special Sauce",
+        "type": "paragraph"
+      },
+      {
+        "name": "a",
+        "type": "text"
+      }
+    ],
     "places": [
       {
         "name": "one",

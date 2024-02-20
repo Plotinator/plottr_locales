@@ -30,7 +30,7 @@ import * as editStates from './constants/editStates'
 
 import migrateIfNeeded from './migrator/migration_manager'
 import Migrator from './migrator/migrator.js'
-import addHierarchiesIfMissing from './migrator/handleSpecialCases'
+import addUITimelineOrHierarchiesStateIfMissing from './migrator/handleSpecialCases'
 
 import selectors from './selectors'
 
@@ -87,7 +87,11 @@ import * as tree from './reducers/tree'
 
 // Slate serialisers
 import serializeToRTF from './slate_serializers/to_rtf'
-import { serialize as serializeToPlain } from './slate_serializers/to_plain_text'
+import {
+  serialize as serializeToPlain,
+  serializeNoFormatting,
+} from './slate_serializers/to_plain_text'
+import { convertHTMLString } from './slate_deserializers/from_html'
 
 import checkFileIntegrity from './store/checkFileIntegrity'
 
@@ -144,7 +148,8 @@ const helpers = {
 
 const slate = {
   rtf: { serialize: serializeToRTF },
-  plain: { serialize: serializeToPlain },
+  plain: { serialize: serializeToPlain, serializeNoFormatting },
+  html: { deserialise: convertHTMLString },
 }
 
 const middlewares = {
@@ -153,7 +158,7 @@ const middlewares = {
 }
 
 const specialCaseFixes = {
-  addHierarchiesIfMissing,
+  addUITimelineOrHierarchiesStateIfMissing,
 }
 
 export {

@@ -1,4 +1,4 @@
-import { difference, omit, range, zip, identity } from 'lodash'
+import { difference, omit, range, zip, identity, uniq } from 'lodash'
 import fc from 'fast-check'
 
 import {
@@ -6,15 +6,18 @@ import {
   multi_tier_zelda,
   zelda_2_levels_in_book_7,
   zelda_2_levels_in_books_6_and_7,
+  eight_sequences_template,
 } from './fixtures'
 import { moveLine } from '../../actions/lines'
 import { restructureTimeline } from '../../actions/beats'
 import { addCard, reorderCardsWithinLine } from '../../actions/cards'
+import { addBookFromTemplate } from '../../actions/books'
 import { ADD_LINES_FROM_TEMPLATE } from '../../constants/ActionTypes'
 import rootReducerWithoutRepairers from '../root'
 import * as tree from '../tree'
 import { beatsByPosition } from '../../helpers/beats'
 import selectors from '../../selectors'
+import { lineFromTemplate } from '../../template'
 
 const {
   sortedBeatsForAnotherBookSelector,
@@ -1055,6 +1058,31 @@ describe('REORDER_CARDS_WITHIN_LINE', () => {
           })
         })
       })
+    })
+  })
+})
+
+describe('addBookFromTemplate', () => {
+  describe('given a valid template', () => {
+    let template = null
+    lineFromTemplate(eight_sequences_template, '2023.12.20', '', (e, t) => {
+      if (e) {
+        throw e
+      } else {
+        template = t
+      }
+    })
+    const newState = rootReducer(multi_tier_zelda, addBookFromTemplate(omit(template, 'lines')))
+    it('should add a book, lines, beats and cards with non-conflicting ids', () => {
+      expect(newState.books.allIds.length).toEqual(uniq(newState.books.allIds).length)
+      const getId = ({ id }) => {
+        return id
+      }
+      expect(newState.cards.map(getId).length).toEqual(uniq(newState.cards.map(getId)).length)
+      expect(newState.lines.map(getId).length).toEqual(uniq(newState.lines.map(getId)).length)
+      expect(Object.values(newState.beats[8].index).map(getId).length).toEqual(
+        uniq(Object.values(newState.beats[8].index).map(getId)).length
+      )
     })
   })
 })

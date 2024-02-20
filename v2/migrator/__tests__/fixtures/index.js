@@ -22,6 +22,14 @@ import file_without_hierarchy_levels from './file_without_hierarchy_levels.json'
 import file_with_series_hierarchy_levels_but_no_others from './file_with_series_hierarchy_levels_but_no_others.json'
 import file_with_non_existing_books_for_character_attributes from './file_with_non_existing_books_for_character_attributes.json'
 import file_with_character_attributes from './file_with_character_attributes.json'
+import file_with_legacy_character_attributes_but_no_values from './file_with_legacy_character_attributes_but_no_values.json'
+import file_with_legacy_character_attributes_and_values from './file_with_legacy_character_attributes_and_values.json'
+import file_with_new_character_attributes from './file_with_new_character_attributes.json'
+import file_with_new_and_legacy_character_attributes from './file_with_new_and_legacy_character_attributes.json'
+import file_with_new_and_legacy_character_attributes_where_values_overlap from './file_with_new_and_legacy_character_attributes_where_values_overlap.json'
+import file_with_legacy_character_attribute_named_attributes from './file_with_legacy_character_attribute_named_attributes.json'
+import file_with_dud_images from './file_with_dud_images.json'
+import seven_point_plot_structure_template from './seven_point_plot_structure_template.json'
 
 export {
   file_2021_07_20,
@@ -48,4 +56,12 @@ export {
   file_with_series_hierarchy_levels_but_no_others,
   file_with_non_existing_books_for_character_attributes,
   file_with_character_attributes,
+  file_with_legacy_character_attributes_but_no_values,
+  file_with_legacy_character_attributes_and_values,
+  file_with_new_character_attributes,
+  file_with_new_and_legacy_character_attributes,
+  file_with_new_and_legacy_character_attributes_where_values_overlap,
+  file_with_legacy_character_attribute_named_attributes,
+  file_with_dud_images,
+  seven_point_plot_structure_template,
 }

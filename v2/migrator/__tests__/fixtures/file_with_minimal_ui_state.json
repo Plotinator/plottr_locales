@@ -23,6 +23,9 @@
     "timelineIsExpanded": true,
     "orientation": "horizontal",
     "darkMode": false,
+    "dashboardModal": {
+      "view": null
+    },
     "characterSort": "name~asc",
     "characterFilter": null,
     "placeSort": "name~asc",

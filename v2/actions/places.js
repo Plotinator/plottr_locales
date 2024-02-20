@@ -1,3 +1,5 @@
+import { identity } from 'lodash'
+
 import {
   ADD_PLACE,
   ADD_PLACE_WITH_VALUES,
@@ -20,6 +22,9 @@ import {
   REORDER_PLACE_MANUALLY,
 } from '../constants/ActionTypes'
 import { place } from '../store/initialState'
+import selectors from '../selectors'
+
+const { visibleSortedPlacesByCategorySelector } = selectors(identity)
 
 export function addPlace() {
   return { type: ADD_PLACE, name: place.name, description: place.description, notes: place.notes }
@@ -108,12 +113,16 @@ export function removeSingle(patching, place) {
   return { type: REMOVE_PLACE, patching, place }
 }
 
-export const reorderPlaces = (placeId, oldPosition, newPosition, newCategoryId) => {
-  return {
-    type: REORDER_PLACE_MANUALLY,
-    id: placeId,
-    oldPosition,
-    newPosition,
-    newCategoryId,
+export const reorderPlaces =
+  (placeId, oldPosition, newPosition, newCategoryId, direction) => (dispatch, getState) => {
+    const visiblePlacesByCategory = visibleSortedPlacesByCategorySelector(getState())
+    dispatch({
+      type: REORDER_PLACE_MANUALLY,
+      id: placeId,
+      oldPosition,
+      newPosition,
+      newCategoryId,
+      direction,
+      placesByCategory: visiblePlacesByCategory,
+    })
   }
-}

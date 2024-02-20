@@ -107,16 +107,20 @@ const cards =
       }
 
       case ADD_BOOK_FROM_TEMPLATE: {
-        const newCards = action.templateData.cards.map((c) => {
-          const newCard = cloneDeep(c)
-          newCard.id = newCard.id + action.nextCardId // give it a new id
-          newCard.lineId = action.nextLineId + newCard.lineId // give it the correct lineId
-          newCard.beatId = action.nextBeatId + newCard.beatId // give it the correct beatId
-          newCard.fromTemplateId = action.templateData.id
-          return newCard
-        })
+        if (Array.isArray(action.templateData.cards)) {
+          const newCards = action.templateData.cards.map((c) => {
+            const newCard = cloneDeep(c)
+            newCard.id = newCard.id + action.nextCardId // give it a new id
+            newCard.lineId = action.nextLineId + newCard.lineId // give it the correct lineId
+            newCard.beatId = action.nextBeatId + newCard.beatId // give it the correct beatId
+            newCard.fromTemplateId = action.templateData.id
+            return newCard
+          })
 
-        return [...state, ...newCards]
+          return [...state, ...newCards]
+        } else {
+          return state
+        }
       }
 
       case DUPLICATE_BOOK: {
@@ -153,7 +157,7 @@ const cards =
       case EDIT_CARD_DETAILS: {
         if (!action.attributes) return state
         const attributeValues = Object.keys(action.attributes).reduce((acc, nextKey) => {
-          if (typeof action.attributes[nextKey].value !== 'undefined') {
+          if (typeof action.attributes[nextKey]?.value !== 'undefined') {
             return {
               ...acc,
               [nextKey]: action.attributes[nextKey].value,
@@ -509,12 +513,12 @@ const cards =
 
         const newId = nextId(state)
         const highestPositionInLine = state.reduce((highestPositionInLine, nextCard) => {
-          if (nextCard.beatId !== existingCard.beatId) {
+          if (nextCard.beatId === existingCard.beatId) {
             return Math.max(highestPositionInLine, nextCard.positionWithinLine)
           }
 
           return highestPositionInLine
-        })
+        }, 0)
 
         return [
           ...state,

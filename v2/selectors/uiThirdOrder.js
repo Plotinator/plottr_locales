@@ -10,6 +10,7 @@ import { seriesSelector } from './seriesFirstOrder'
 import { card, place, note } from '../store/initialState'
 import { allLinesSelector } from './linesFirstOrder'
 import {
+  characterCustomAttributesSelector,
   cardsCustomAttributesSelector,
   noteCustomAttributesSelector,
   placeCustomAttributesSelector,
@@ -151,7 +152,7 @@ export const characterEditorTemplateBeingRemovedSelector = createSelector(
 export const characterEditorActiveTabSelector = createSelector(
   characterEditorSelector,
   ({ activeTab }) => {
-    return activeTab
+    return activeTab ?? 1
   }
 )
 export const characterEditorShowTemplatePickerSelector = createSelector(
@@ -193,6 +194,9 @@ export const searchDialogSelector = createSelector(uiSelector, ({ searchDialog }
 export const searchDialogIsOpenSelector = createSelector(searchDialogSelector, ({ isOpen }) => {
   return isOpen
 })
+export const isJumpingSelector = createSelector(searchDialogSelector, ({ jumping }) => {
+  return jumping
+})
 export const searchDialogSearchTermSelector = createSelector(searchDialogSelector, ({ term }) => {
   return term
 })
@@ -226,12 +230,49 @@ export const hitsMarkedForReplacementSelector = createSelector(
     return hitsToReplace || []
   }
 )
+export const searchModalReplaceWordSelector = createSelector(
+  searchDialogSelector,
+  ({ replaceWord }) => {
+    return replaceWord
+  }
+)
+
+const literalRegExp = (unescapedTerm, replaceWord) => {
+  const flags = [...unescapedTerm].some((c) => c.match(/\w/) && c.toLocaleUpperCase() === c)
+    ? 'g'
+    : 'gi'
+  return new RegExp(
+    (replaceWord ? '(?:^|\\W)(?<term>' : '') +
+      unescapedTerm.replace(/[\\[\](){}$^\-.*+?|/]/g, '\\$&') +
+      (replaceWord ? ')(?:$|\\W)' : ''),
+    flags
+  )
+}
+
+const HIT_LIMIT = 30
+const hits = (pathSansPosition, regexMatches) => {
+  const results = []
+  let result = null
+  let count = 0
+  while (((result = regexMatches.next()), !result.done && count++ < HIT_LIMIT)) {
+    const isGroupMatch = !!result.value.groups?.term
+    const value = result.value.groups?.term ?? result.value[0]
+    const position =
+      result.value.index + (isGroupMatch ? (result.value[0].match(/^\W/) ? 1 : 0) : 0)
+    results.push({
+      path: `${pathSansPosition}/${position}`,
+      hit: value,
+    })
+  }
+  return results
+}
 
 export const projectSearchHitsSelector = createSelector(
   searchDialogSearchTermSelector,
   seriesSelector,
   allBooksAsArraySelector,
-  (term, series, books) => {
+  searchModalReplaceWordSelector,
+  (term, series, books, replaceWord) => {
     if (term === '' || !term || term.length < 3) {
       return []
     }
@@ -239,10 +280,10 @@ export const projectSearchHitsSelector = createSelector(
     const bookLikeMatch = (entity, prefix, id) => {
       const nameKey = prefix === 'book' ? 'title' : 'name'
       const which = id ? `/${id}` : ''
-      const nameMatch = entity[nameKey].matchAll(new RegExp(term, 'gi'))
-      const genreMatch = entity.genre.matchAll(new RegExp(term, 'gi'))
-      const premiseMatch = entity.premise.matchAll(new RegExp(term, 'gi'))
-      const themeMatch = entity.theme.matchAll(new RegExp(term, 'gi'))
+      const nameMatch = entity[nameKey]?.matchAll(literalRegExp(term, replaceWord))
+      const genreMatch = entity.genre?.matchAll(literalRegExp(term, replaceWord))
+      const premiseMatch = entity.premise?.matchAll(literalRegExp(term, replaceWord))
+      const themeMatch = entity.theme?.matchAll(literalRegExp(term, replaceWord))
       return [
         ...(nameMatch ? hits(`/project/${prefix}${which}/${nameKey}`, nameMatch) : []),
         ...(genreMatch ? hits(`/project/${prefix}${which}/genre`, genreMatch) : []),
@@ -263,27 +304,13 @@ const allCardsSelector = (state) => {
   return state.cards
 }
 const CARD_BASIC_ATTRIBUTES = [...Object.keys(card), 'positionInChapter', 'position']
-const HIT_LIMIT = 5
-const hits = (pathSansPosition, regexMatches) => {
-  const results = []
-  let result = null
-  let count = 0
-  while (((result = regexMatches.next()), !result.done && count++ < HIT_LIMIT)) {
-    const value = result.value[0]
-    const position = result.value.index
-    results.push({
-      path: `${pathSansPosition}/${position}`,
-      hit: value,
-    })
-  }
-  return results
-}
 export const timelineSearchHitsSelector = createSelector(
   searchDialogSearchTermSelector,
   allLinesSelector,
   allCardsSelector,
   cardsCustomAttributesSelector,
-  (term, lines, cards, customAttributes) => {
+  searchModalReplaceWordSelector,
+  (term, lines, cards, customAttributes, replaceWord) => {
     if (term === '' || !term || term.length < 3) {
       return []
     }
@@ -292,9 +319,9 @@ export const timelineSearchHitsSelector = createSelector(
       const timeline = lines.find((line) => {
         return line.id == card.lineId
       })?.bookId
-      const titleMatch = card.title.matchAll(new RegExp(term, 'gi'))
+      const titleMatch = card.title.matchAll(literalRegExp(term, replaceWord))
       const descriptionText = serializeNoFormatting(card.description)
-      const descriptionMatch = descriptionText.matchAll(new RegExp(term, 'gi'))
+      const descriptionMatch = descriptionText.matchAll(literalRegExp(term, replaceWord))
       const cardCustomAttributes = customAttributes
         .filter((attribute) => {
           return typeof card[attribute.name] !== 'undefined'
@@ -307,8 +334,9 @@ export const timelineSearchHitsSelector = createSelector(
         })
       const customAttributeMatches = cardCustomAttributes.flatMap((attribute) => {
         const { id, value } = attribute
-        const valueAsString = (Array.isArray(value) ? serializeNoFormatting(value) : value) || ''
-        const valueMatch = valueAsString.matchAll(new RegExp(term, 'gi'))
+        const valueAsString =
+          (Array.isArray(value) ? serializeNoFormatting(value) : String(value)) || ''
+        const valueMatch = valueAsString.matchAll(literalRegExp(term, replaceWord))
         if (!valueMatch) {
           return []
         }
@@ -318,8 +346,9 @@ export const timelineSearchHitsSelector = createSelector(
         const templateAttributeHit = (attribute) => {
           const name = attribute.name
           const value = attribute.value
-          const valueAsString = (Array.isArray(value) ? serializeNoFormatting(value) : value) || ''
-          const valueMatch = valueAsString.matchAll(new RegExp(term, 'gi'))
+          const valueAsString =
+            (Array.isArray(value) ? serializeNoFormatting(value) : String(value)) || ''
+          const valueMatch = valueAsString.matchAll(literalRegExp(term))
           if (!valueMatch) {
             return []
           }
@@ -355,15 +384,16 @@ export const outlineSearchHitsSelector = createSelector(
   searchDialogSearchTermSelector,
   allLinesSelector,
   allCardsSelector,
-  (term, lines, cards) => {
+  searchModalReplaceWordSelector,
+  (term, lines, cards, replaceWord) => {
     if (term === '' || !term || term.length < 3) {
       return []
     }
 
     const cardMatch = (card) => {
-      const titleMatch = card.title.matchAll(new RegExp(term, 'gi'))
+      const titleMatch = card.title.matchAll(literalRegExp(term, replaceWord))
       const descriptionText = serializeNoFormatting(card.description)
-      const descriptionMatch = descriptionText.matchAll(new RegExp(term, 'gi'))
+      const descriptionMatch = descriptionText.matchAll(literalRegExp(term, replaceWord))
       const timeline = lines.find((line) => {
         return line.id == card.lineId
       })?.bookId
@@ -388,15 +418,16 @@ export const notesSearchHitsSelector = createSelector(
   searchDialogSearchTermSelector,
   allNotes,
   noteCustomAttributesSelector,
-  (term, notes, customAttributes) => {
+  searchModalReplaceWordSelector,
+  (term, notes, customAttributes, replaceWord) => {
     if (term === '' || !term || term.length < 3) {
       return []
     }
 
     const noteMatch = (note) => {
-      const titleMatch = note.title.matchAll(new RegExp(term, 'gi'))
+      const titleMatch = note.title.matchAll(literalRegExp(term, replaceWord))
       const contentText = serializeNoFormatting(note.content)
-      const contentMatch = contentText.matchAll(new RegExp(term, 'gi'))
+      const contentMatch = contentText.matchAll(literalRegExp(term, replaceWord))
       const noteCustomAttributes = customAttributes
         .filter((attribute) => {
           return typeof note[attribute.name] !== 'undefined'
@@ -405,8 +436,9 @@ export const notesSearchHitsSelector = createSelector(
           return [attribute.name, note[attribute.name]]
         })
       const customAttributeMatches = noteCustomAttributes.flatMap(([key, value]) => {
-        const valueAsString = (Array.isArray(value) ? serializeNoFormatting(value) : value) || ''
-        const valueMatch = valueAsString.matchAll(new RegExp(term, 'gi'))
+        const valueAsString =
+          (Array.isArray(value) ? serializeNoFormatting(value) : String(value)) || ''
+        const valueMatch = valueAsString.matchAll(literalRegExp(term, replaceWord))
         if (!valueMatch) {
           return []
         }
@@ -440,42 +472,51 @@ export const charactersHitsSelector = createSelector(
   characters,
   attributes,
   books,
-  (term, allCharacters, allAttributes, allBooks) => {
+  characterCustomAttributesSelector,
+  searchModalReplaceWordSelector,
+  (term, allCharacters, allAttributes, allBooks, legacyCustomAttributes, replaceWord) => {
     if (term === '' || !term || term.length < 3) {
       return []
     }
 
     const characterMatch = (character) => {
-      const nameMatch = character.name.matchAll(new RegExp(term, 'gi'))
+      const nameMatch = character.name.matchAll(literalRegExp(term, replaceWord))
       const characterCustomAttributes = (character.attributes || []).reduce((acc, attribute) => {
-        const valueAsString =
-          (Array.isArray(attribute.value)
-            ? serializeNoFormatting(attribute.value)
-            : attribute.value) || ''
-        const valueMatch = valueAsString.matchAll(new RegExp(term, 'gi'))
         const indexAttribute = allAttributes.characters.find(({ id }) => {
           return id === attribute.id
         })
-        const bookTitle = attribute.bookId === 'all' ? 'Series' : allBooks[attribute.bookId]?.title
-        const bookId = attribute.bookId
-        if (!valueMatch || !indexAttribute || !bookTitle) {
+        if (indexAttribute.type === 'base-attribute' && indexAttribute.name === 'tags') {
           return acc
-        }
-        return [
-          ...hits(
-            `/characters/${character.id}/customAttribute/${attribute.id}/${bookId}`,
-            valueMatch
-          ),
-          ...acc,
-        ]
-      }, [])
-      const characterTemplateAttributes = character.templates.reduce((acc, template) => {
-        const templateAttributes = template.values.flatMap((attribute) => {
+        } else {
           const valueAsString =
             (Array.isArray(attribute.value)
               ? serializeNoFormatting(attribute.value)
-              : attribute.value) || ''
-          const valueMatch = valueAsString.matchAll(new RegExp(term, 'gi'))
+              : String(attribute.value)) || ''
+          const valueMatch = valueAsString.matchAll(literalRegExp(term, replaceWord))
+
+          const bookTitle =
+            attribute.bookId === 'all' ? 'Series' : allBooks[attribute.bookId]?.title
+          const bookId = attribute.bookId
+          if (!valueMatch || !indexAttribute || !bookTitle) {
+            return acc
+          } else {
+            return [
+              ...hits(
+                `/characters/${character.id}/customAttribute/${attribute.id}/${bookId}`,
+                valueMatch
+              ),
+              ...acc,
+            ]
+          }
+        }
+      }, [])
+      const characterTemplateAttributes = character.templates.reduce((acc, template) => {
+        const templateAttributes = (template.values || []).flatMap((attribute) => {
+          const valueAsString =
+            (Array.isArray(attribute.value)
+              ? serializeNoFormatting(attribute.value)
+              : String(attribute.value)) || ''
+          const valueMatch = valueAsString.matchAll(literalRegExp(term, replaceWord))
           const indexAttribute = template.attributes.find(({ name }) => {
             return name === attribute.name
           })
@@ -492,10 +533,39 @@ export const charactersHitsSelector = createSelector(
         })
         return [...acc, ...templateAttributes]
       }, [])
+      const characterLegacyAttributesHits = [
+        'notes',
+        'description',
+        ...legacyCustomAttributes.map(({ name }) => {
+          return name
+        }),
+      ]
+        .filter((attributeName) => {
+          return !(character.attributes || []).some((attribute) => {
+            const indexAttribute = allAttributes.characters.find(({ id }) => {
+              return id === attribute.id
+            })
+            const attributeAttributeName = attributeName === 'notes' ? 'description' : attributeName
+            return indexAttribute.name === attributeAttributeName && attribute.bookId === 'all'
+          })
+        })
+        .flatMap((attributeName) => {
+          const attributeValue = character[attributeName]
+          const valueAsString =
+            (Array.isArray(attributeValue)
+              ? serializeNoFormatting(attributeValue)
+              : String(attributeValue)) || ''
+          const valueMatch = valueAsString.matchAll(literalRegExp(term, replaceWord))
+          return hits(
+            `/characters/${character.id}/customAttribute/${attributeName}/all`,
+            valueMatch
+          )
+        })
       return [
         ...[nameMatch ? hits(`/characters/${character.id}/name`, nameMatch) : []].flatMap((x) => x),
         ...characterCustomAttributes,
         ...characterTemplateAttributes,
+        ...characterLegacyAttributesHits,
       ]
     }
 
@@ -512,16 +582,17 @@ export const placesHitsSelector = createSelector(
   searchDialogSearchTermSelector,
   places,
   placeCustomAttributesSelector,
-  (term, allPlaces, customAttributes) => {
+  searchModalReplaceWordSelector,
+  (term, allPlaces, customAttributes, replaceWord) => {
     if (term === '' || !term || term.length < 3) {
       return []
     }
 
     const placeMatch = (place) => {
-      const nameMatch = place.name.matchAll(new RegExp(term, 'gi'))
-      const descriptionMatch = place.description.matchAll(new RegExp(term, 'gi'))
+      const nameMatch = place.name.matchAll(literalRegExp(term, replaceWord))
+      const descriptionMatch = place.description.matchAll(literalRegExp(term, replaceWord))
       const notesText = serializeNoFormatting(place.notes)
-      const notesMatch = notesText.matchAll(new RegExp(term, 'gi'))
+      const notesMatch = notesText.matchAll(literalRegExp(term, replaceWord))
       const placeCustomAttributes = customAttributes
         .filter((attribute) => {
           return typeof place[attribute.name] !== 'undefined'
@@ -530,8 +601,9 @@ export const placesHitsSelector = createSelector(
           return [attribute.name, place[attribute.name]]
         })
       const customAttributeMatches = placeCustomAttributes.flatMap(([key, value]) => {
-        const valueAsString = (Array.isArray(value) ? serializeNoFormatting(value) : value) || ''
-        const valueMatch = valueAsString.matchAll(new RegExp(term, 'gi'))
+        const valueAsString =
+          (Array.isArray(value) ? serializeNoFormatting(value) : String(value)) || ''
+        const valueMatch = valueAsString.matchAll(literalRegExp(term, replaceWord))
         if (!valueMatch) {
           return []
         }
@@ -559,13 +631,14 @@ const tags = (state) => {
 export const tagsSearchHitsSelector = createSelector(
   searchDialogSearchTermSelector,
   tags,
-  (term, allTags) => {
+  searchModalReplaceWordSelector,
+  (term, allTags, replaceWord) => {
     if (term === '' || !term || term.length < 3) {
       return []
     }
 
     const tagMatch = (tag) => {
-      const titleMatch = tag.title.matchAll(new RegExp(term, 'gi'))
+      const titleMatch = tag.title.matchAll(literalRegExp(term, replaceWord))
       return [titleMatch ? hits(`/tags/${tag.id}/title`, titleMatch) : []].flatMap((x) => x)
     }
 
@@ -577,12 +650,13 @@ export const tagsSearchHitsSelector = createSelector(
 export const linesSearchHitsSelector = createSelector(
   searchDialogSearchTermSelector,
   allLinesSelector,
-  (term, lines) => {
+  searchModalReplaceWordSelector,
+  (term, lines, replaceWord) => {
     if (term === '' || !term || term.length < 3) {
       return []
     } else {
       const lineHit = (line) => {
-        const titleMatch = line.title.matchAll(new RegExp(term, 'gi'))
+        const titleMatch = line.title.matchAll(literalRegExp(term, replaceWord))
         return [titleMatch ? hits(`/lines/${line.id}/title`, titleMatch) : []].flatMap((x) => x)
       }
       return lines.flatMap(lineHit).filter((hit) => {
@@ -594,12 +668,13 @@ export const linesSearchHitsSelector = createSelector(
 export const beatHitsSelector = createSelector(
   searchDialogSearchTermSelector,
   allBeatsSelector,
-  (term, allBeatTrees) => {
+  searchModalReplaceWordSelector,
+  (term, allBeatTrees, replaceWord) => {
     if (term === '' || !term || term.length < 3) {
       return []
     } else {
       const beatHit = (bookId) => (beat) => {
-        const titleMatch = beat.title.matchAll(new RegExp(term, 'gi'))
+        const titleMatch = beat.title.matchAll(literalRegExp(term, replaceWord))
         return [titleMatch ? hits(`/beats/${bookId}/${beat.id}/title`, titleMatch) : []].flatMap(
           (x) => x
         )
@@ -685,6 +760,45 @@ export const flatSearchHitsSelector = createDeepEqualSelector(
       ...lineHits,
       ...beatHits,
     ]
+  }
+)
+
+export const hasNoResultsSelector = createSelector(
+  projectSearchHitsSelector,
+  timelineSearchHitsSelector,
+  outlineSearchHitsSelector,
+  notesSearchHitsSelector,
+  charactersHitsSelector,
+  placesHitsSelector,
+  tagsSearchHitsSelector,
+  linesSearchHitsSelector,
+  beatHitsSelector,
+  (
+    projectHits,
+    timelineHits,
+    outlineHits,
+    notesHits,
+    charactersHits,
+    placesHits,
+    tagsHits,
+    lineHits,
+    beatHits
+  ) => {
+    const total = [
+      projectHits,
+      timelineHits,
+      outlineHits,
+      notesHits,
+      charactersHits,
+      placesHits,
+      tagsHits,
+      lineHits,
+      beatHits,
+    ].reduce((acc, hits) => {
+      return hits?.length + acc
+    }, 0)
+
+    return !total ? true : false
   }
 )
 
@@ -799,6 +913,14 @@ export const placeCurrentFocusSelector = createSelector(
 const tagsSelector = createSelector(uiSelector, ({ tagTab }) => {
   return tagTab || {}
 })
+
+export const isTagTabFocusingSelector = createSelector(
+  tagsSelector,
+  ({ focus, editingSelectedTab }) => {
+    return Boolean(focus?.length) || editingSelectedTab
+  }
+)
+
 export const selectedTagSelector = createSelector(tagsSelector, ({ selectedTag }) => {
   return selectedTag
 })
@@ -917,3 +1039,10 @@ export const editingGivenLinesTitleSelector = createSelector(
     return typeof lineIdBeingEdited === 'number' && lineIdBeingEdited === suppliedLineId
   }
 )
+
+const dashboardModalSelector = createSelector(uiSelector, ({ dashboardModal }) => {
+  return dashboardModal || {}
+})
+export const dashboardModalViewSelector = createSelector(dashboardModalSelector, ({ view }) => {
+  return view ?? null
+})

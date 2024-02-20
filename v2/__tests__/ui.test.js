@@ -82,6 +82,9 @@ const {
     startScanningSearch,
     pushFocus,
     replaceMarkedHits,
+    resetTimeline,
+    changeCurrentTimeline,
+    setReplaceWord,
   },
   applicationState: { startEditing },
 } = actions(pltrAdaptor)
@@ -144,6 +147,7 @@ const {
   characterTemplateAttributeValueSelector,
   singleLineSelector,
   allBeatsSelector,
+  allLinesSelector,
 } = selectors(pltrAdaptor)
 
 // TODO: test that marked candidates recomputes on openSearch, closeSearch
@@ -344,79 +348,304 @@ describe('setSearchTerm', () => {
       const searchTerm = searchDialogSearchTermSelector(store.getState())
       expect(searchTerm).toEqual('')
     })
-    describe('when changing the search term', () => {
+  })
+  describe('when changing the search term', () => {
+    const store = storeWithZelda()
+    const searchTerm = searchDialogSearchTermSelector(store.getState())
+    store.dispatch(setSearchTerm('builder'))
+    const newSearchTerm = searchDialogSearchTermSelector(store.getState())
+    it('should edit the search term', () => {
+      expect(newSearchTerm).not.toEqual(searchTerm)
+      expect(newSearchTerm).toEqual('builder')
+    })
+    it('should list all relevant hits', () => {
+      const hits = searchHitsSelector(store.getState())
+      expect(hits).toEqual({
+        characters: [
+          { hit: 'Builder', path: '/characters/3/name/8' },
+          { hit: 'Builder', path: '/characters/3/customAttribute/1/all/51' },
+        ],
+        notes: [
+          { hit: 'Builder', path: '/notes/2/title/8' },
+          { hit: 'Builder', path: '/notes/2/content/26' },
+        ],
+        outline: [
+          { hit: 'Builder', path: '/outline/7/card/23/description/54' },
+          { hit: 'Builder', path: '/outline/8/card/19/description/68' },
+        ],
+        places: [{ hit: 'Builder', path: '/places/2/name/8' }],
+        project: [
+          { hit: 'Builder', path: '/project/series/name/22' },
+          { hit: 'Builder', path: '/project/book/8/title/22' },
+        ],
+        tags: [],
+        timeline: [
+          { hit: 'Builder', path: '/timeline/7/card/23/description/54' },
+          { hit: 'Builder', path: '/timeline/8/card/19/description/68' },
+          { hit: 'Builder', path: '/timeline/8/card/19/customAttribute/attr 1/36' },
+          { hit: 'Builder', path: '/timeline/8/card/19/customAttribute/att 3/34' },
+          { hit: 'Builder', path: '/timeline/8/card/19/customAttribute/att 3/95' },
+        ],
+        lines: [
+          {
+            hit: 'Builder',
+            path: '/lines/15/title/10',
+          },
+        ],
+        beats: [
+          {
+            hit: 'Builder',
+            path: '/beats/series/1/title/0',
+          },
+        ],
+      })
+    })
+    describe('when the search term is shorter than three characters', () => {
       const store = storeWithZelda()
       const searchTerm = searchDialogSearchTermSelector(store.getState())
-      store.dispatch(setSearchTerm('builder'))
+      store.dispatch(setSearchTerm('bu'))
       const newSearchTerm = searchDialogSearchTermSelector(store.getState())
-      it('should edit the search term', () => {
-        expect(newSearchTerm).not.toEqual(searchTerm)
-        expect(newSearchTerm).toEqual('builder')
+      it('should change the search term', () => {
+        expect(searchTerm).not.toEqual(newSearchTerm)
       })
-      it('should list all relevant hits', () => {
+      it('should not search', () => {
         const hits = searchHitsSelector(store.getState())
+        for (const value of Object.values(hits)) {
+          expect(value.length).toEqual(0)
+        }
+      })
+    })
+    describe('when the dialog is closed and opened again', () => {
+      it('should remember the search term', () => {
+        const store = storeWithZelda()
+        store.dispatch(openSearch())
+        store.dispatch(setSearchTerm('builder'))
+        const searchTerm = searchDialogSearchTermSelector(store.getState())
+        store.dispatch(closeSearch)
+        const finalSearchTerm = searchDialogSearchTermSelector(store.getState())
+        expect(finalSearchTerm).not.toEqual('')
+        expect(finalSearchTerm).toEqual(searchTerm)
+      })
+    })
+  })
+  describe('when the search term matches a legacy character "description"', () => {
+    const store = storeWithZelda()
+    store.dispatch(setSearchTerm('he princess'))
+    it("should list that character's hit", () => {
+      const hits = searchHitsSelector(store.getState())
+      expect(hits.characters).toEqual([
+        { hit: 'he princess', path: '/characters/1/customAttribute/notes/all/13' },
+        { hit: 'he princess', path: '/characters/3/customAttribute/1/all/63' },
+      ])
+    })
+  })
+  describe('when the search term matches new character "notes" and legacy "notes"', () => {
+    const store = storeWithZelda()
+    store.dispatch(setSearchTerm('a lot less helpless'))
+    it('should list only the new character "notes" hit', () => {
+      const hits = searchHitsSelector(store.getState())
+      expect(hits.characters).toEqual([
+        { hit: 'a lot less helpless', path: '/characters/3/customAttribute/1/all/10' },
+      ])
+    })
+  })
+  describe("when the search term matches a legacy attribute that's not shadowed", () => {
+    const store = storeWithZelda()
+    store.dispatch(setSearchTerm("she's got lazer eyes(!)"))
+    it('should list the legacy character attribute hit', () => {
+      const hits = searchHitsSelector(store.getState())
+      expect(hits.characters).toEqual([
+        {
+          hit: "she's got lazer eyes(!)",
+          path: '/characters/3/customAttribute/Special Sauce/all/26',
+        },
+      ])
+    })
+  })
+  describe("when the search term matches a legacy attribute that's shadowed", () => {
+    const store = storeWithZelda()
+    store.dispatch(setSearchTerm('aaayy ooooo'))
+    it('should not list the hit for the old attribute', () => {
+      const hits = searchHitsSelector(store.getState())
+      expect(hits.characters).toEqual([])
+    })
+    const store2 = storeWithZelda()
+    store2.dispatch(setSearchTerm('How are you?'))
+    it('should list the hit for the new attribute', () => {
+      const hits = searchHitsSelector(store2.getState())
+      expect(hits.characters).toEqual([
+        {
+          hit: 'How are you?',
+          path: '/characters/3/customAttribute/2/all/5',
+        },
+      ])
+    })
+  })
+  describe('given a search term that contains a word with mixed case and punctuation', () => {
+    const store = storeWithZelda()
+    describe('when the search term contains an upper case character', () => {
+      store.dispatch(setSearchTerm('Builder;'))
+      const hits = searchHitsSelector(store.getState())
+      it('should produce the relevant hit', () => {
         expect(hits).toEqual({
+          beats: [],
+          characters: [],
+          lines: [],
+          notes: [],
+          outline: [{ hit: 'Builder;', path: '/outline/7/card/23/description/54' }],
+          places: [],
+          project: [],
+          tags: [],
+          timeline: [{ hit: 'Builder;', path: '/timeline/7/card/23/description/54' }],
+        })
+      })
+    })
+    describe('when the wrong character is upper case', () => {
+      store.dispatch(setSearchTerm('buIlder;'))
+      const hits = searchHitsSelector(store.getState())
+      it('should not produce the same result', () => {
+        expect(hits).toEqual({
+          beats: [],
+          characters: [],
+          lines: [],
+          notes: [],
+          outline: [],
+          places: [],
+          project: [],
+          tags: [],
+          timeline: [],
+        })
+      })
+    })
+    describe('when the search term contains no upper case character', () => {
+      store.dispatch(setSearchTerm('builder;'))
+      const hits = searchHitsSelector(store.getState())
+      it('should produce the relevant hit', () => {
+        expect(hits).toEqual({
+          beats: [],
+          characters: [],
+          lines: [],
+          notes: [],
+          outline: [{ hit: 'Builder;', path: '/outline/7/card/23/description/54' }],
+          places: [],
+          project: [],
+          tags: [],
+          timeline: [{ hit: 'Builder;', path: '/timeline/7/card/23/description/54' }],
+        })
+      })
+    })
+  })
+  describe('given the term "the"', () => {
+    describe('when the search is full-word', () => {
+      const store = storeWithZelda()
+      store.dispatch(setSearchTerm('the'))
+      const anyHits = searchHitsSelector(store.getState())
+      store.dispatch(setReplaceWord(true))
+      const fullWordHits = searchHitsSelector(store.getState())
+      it('should not produce hits inside of words that contain "the"', () => {
+        expect(anyHits).not.toEqual(fullWordHits)
+        expect(Object.values(fullWordHits).flat().length).toBeLessThan(
+          Object.values(anyHits).flat().length
+        )
+        expect(fullWordHits).toEqual({
+          beats: [],
           characters: [
-            { hit: 'Builder', path: '/characters/3/name/8' },
-            { hit: 'Builder', path: '/characters/3/customAttribute/1/all/51' },
+            { hit: 'the', path: '/characters/1/customAttribute/notes/all/12' },
+            { hit: 'the', path: '/characters/2/customAttribute/notes/all/26' },
+            { hit: 'the', path: '/characters/3/name/4' },
+            { hit: 'the', path: '/characters/3/customAttribute/1/all/47' },
+            { hit: 'the', path: '/characters/3/customAttribute/1/all/62' },
+            { hit: 'the', path: '/characters/3/customAttribute/1/all/82' },
+            { hit: 'the', path: '/characters/3/customAttribute/1/all/116' },
+            { hit: 'the', path: '/characters/3/templateAttribute/ch3/Description/5/15' },
           ],
+          lines: [],
           notes: [
-            { hit: 'Builder', path: '/notes/2/title/8' },
-            { hit: 'Builder', path: '/notes/2/content/26' },
+            { hit: 'the', path: '/notes/2/title/4' },
+            { hit: 'the', path: '/notes/2/content/22' },
           ],
           outline: [
-            { hit: 'Builder', path: '/outline/7/card/23/description/54' },
-            { hit: 'Builder', path: '/outline/8/card/19/description/68' },
+            { hit: 'the', path: '/outline/7/card/31/title/7' },
+            { hit: 'the', path: '/outline/7/card/26/title/8' },
+            { hit: 'the', path: '/outline/7/card/23/description/50' },
+            { hit: 'the', path: '/outline/7/card/23/description/63' },
+            { hit: 'the', path: '/outline/7/card/23/description/79' },
+            { hit: 'The', path: '/outline/8/card/19/description/0' },
+            { hit: 'the', path: '/outline/8/card/19/description/64' },
+            { hit: 'the', path: '/outline/undefined/card/10/description/10' },
+            { hit: 'The', path: '/outline/series/card/50/title/0' },
           ],
-          places: [{ hit: 'Builder', path: '/places/2/name/8' }],
+          places: [
+            { hit: 'The', path: '/places/1/notes/0' },
+            { hit: 'the', path: '/places/2/name/4' },
+          ],
           project: [
-            { hit: 'Builder', path: '/project/series/name/22' },
-            { hit: 'Builder', path: '/project/book/8/title/22' },
+            { hit: 'The', path: '/project/series/name/0' },
+            { hit: 'the', path: '/project/series/name/18' },
+            { hit: 'the', path: '/project/book/1/title/10' },
+            { hit: 'The', path: '/project/book/6/title/0' },
+            { hit: 'the', path: '/project/book/7/title/10' },
+            { hit: 'The', path: '/project/book/8/title/0' },
+            { hit: 'the', path: '/project/book/8/title/18' },
+            { hit: 'the', path: '/project/book/8/premise/5' },
+            { hit: 'the', path: '/project/book/9/premise/5' },
           ],
           tags: [],
           timeline: [
-            { hit: 'Builder', path: '/timeline/7/card/23/description/54' },
-            { hit: 'Builder', path: '/timeline/8/card/19/description/68' },
-            { hit: 'Builder', path: '/timeline/8/card/19/customAttribute/attr 1/36' },
-            { hit: 'Builder', path: '/timeline/8/card/19/customAttribute/att 3/34' },
-            { hit: 'Builder', path: '/timeline/8/card/19/customAttribute/att 3/95' },
-          ],
-          lines: [
-            {
-              hit: 'Builder',
-              path: '/lines/15/title/10',
-            },
-          ],
-          beats: [
-            {
-              hit: 'Builder',
-              path: '/beats/series/1/title/0',
-            },
+            { hit: 'the', path: '/timeline/7/card/31/title/7' },
+            { hit: 'the', path: '/timeline/7/card/26/title/8' },
+            { hit: 'the', path: '/timeline/7/card/23/description/50' },
+            { hit: 'the', path: '/timeline/7/card/23/description/63' },
+            { hit: 'the', path: '/timeline/7/card/23/description/79' },
+            { hit: 'The', path: '/timeline/8/card/19/description/0' },
+            { hit: 'the', path: '/timeline/8/card/19/description/64' },
+            { hit: 'the', path: '/timeline/8/card/19/customAttribute/attr 1/32' },
+            { hit: 'the', path: '/timeline/8/card/19/customAttribute/att 3/30' },
+            { hit: 'the', path: '/timeline/8/card/19/customAttribute/att 3/45' },
+            { hit: 'the', path: '/timeline/8/card/19/customAttribute/att 3/63' },
+            { hit: 'The', path: '/timeline/8/card/19/customAttribute/att 3/73' },
+            { hit: 'the', path: '/timeline/8/card/19/customAttribute/att 3/91' },
+            { hit: 'the', path: '/timeline/8/card/19/templateAttribute/sc4/Motivation/3' },
+            { hit: 'the', path: '/timeline/undefined/card/10/description/10' },
+            { hit: 'The', path: '/timeline/series/card/50/title/0' },
           ],
         })
       })
-      describe('when the search term is shorter than three characters', () => {
-        const store = storeWithZelda()
-        const searchTerm = searchDialogSearchTermSelector(store.getState())
-        store.dispatch(setSearchTerm('bu'))
-        const newSearchTerm = searchDialogSearchTermSelector(store.getState())
-        it('should not search', () => {
-          const hits = searchHitsSelector(store.getState())
-          for (const value of Object.values(hits)) {
-            expect(value.length).toEqual(0)
-          }
+    })
+  })
+  describe('given search terms that occur at the start or end of input', () => {
+    describe('when full-word matching is enabled', () => {
+      const store = storeWithZelda()
+      store.dispatch(setSearchTerm('xeno'))
+      store.dispatch(setReplaceWord(true))
+      const hits = searchHitsSelector(store.getState())
+      it('should nevertheless match the word at the start', () => {
+        expect(hits).toEqual({
+          beats: [],
+          characters: [],
+          lines: [],
+          notes: [],
+          outline: [{ hit: 'Xeno', path: '/outline/undefined/card/3/title/0' }],
+          places: [],
+          project: [],
+          tags: [],
+          timeline: [{ hit: 'Xeno', path: '/timeline/undefined/card/3/title/0' }],
         })
       })
-      describe('when the dialog is closed and opened again', () => {
-        it('should remember the search term', () => {
-          const store = storeWithZelda()
-          store.dispatch(openSearch())
-          store.dispatch(setSearchTerm('builder'))
-          const searchTerm = searchDialogSearchTermSelector(store.getState())
-          store.dispatch(closeSearch)
-          const finalSearchTerm = searchDialogSearchTermSelector(store.getState())
-          expect(finalSearchTerm).not.toEqual('')
-          expect(finalSearchTerm).toEqual(searchTerm)
+      store.dispatch(setSearchTerm('morph'))
+      store.dispatch(setReplaceWord(true))
+      const hits2 = searchHitsSelector(store.getState())
+      it('and should nevertheless match the word at the end', () => {
+        expect(hits2).toEqual({
+          beats: [],
+          characters: [],
+          lines: [],
+          notes: [],
+          outline: [{ hit: 'Morph', path: '/outline/undefined/card/3/title/5' }],
+          places: [],
+          project: [],
+          tags: [],
+          timeline: [{ hit: 'Morph', path: '/timeline/undefined/card/3/title/5' }],
         })
       })
     })
@@ -1838,6 +2067,71 @@ describe('jumpToHit', () => {
               cardId: 19,
               isOpen: true,
               lineId: 14,
+              deleting: false,
+              removeWhichTemplate: null,
+              removing: false,
+              showColorPicker: false,
+              showTemplatePicker: false,
+            })
+          })
+        })
+        describe('given a hit on the series timeline', () => {
+          const store = storeWithZelda()
+          const fileState = fullFileStateSelector(store.getState())
+          const cards = allCardsSelector(store.getState())
+          store.dispatch(setSearchTerm('The target'))
+          store.dispatch(
+            jumpToHit(cards, 'timeline', {
+              hit: 'The target',
+              path: '/timeline/series/card/50/title/0',
+            })
+          )
+          it('should navigate to the timeline card dialog & push focus', async () => {
+            // Insert a delay because navigation is scheduled async.
+            await new Promise((resolve) => {
+              setTimeout(resolve, 100)
+            })
+            const finalFileState = fullFileStateSelector(store.getState())
+            expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
+              withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
+            )
+            expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
+            expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+            expect(
+              omit(finalFileState.ui, [
+                'timeline',
+                'searchDialog',
+                'currentView',
+                'cardDialog',
+                'currentTimeline',
+              ])
+            ).toEqual(
+              omit(fileState.ui, [
+                'timeline',
+                'searchDialog',
+                'currentView',
+                'cardDialog',
+                'currentTimeline',
+              ])
+            )
+            expect(finalFileState.ui.timeline.focus[0]).toEqual({
+              path: ['card', 50, 'title'],
+              selection: {
+                direction: 'forward',
+                end: 10,
+                start: 0,
+              },
+            })
+            expect(finalFileState.ui.searchDialog.term).toEqual('The target')
+            expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
+            expect(finalFileState.ui.currentView).toEqual('timeline')
+            expect(finalFileState.ui.currentTimeline).toEqual('series')
+            expect(finalFileState.ui.cardDialog).toEqual({
+              activeTab: 1,
+              beatId: 1,
+              cardId: 50,
+              isOpen: true,
+              lineId: 2,
               deleting: false,
               removeWhichTemplate: null,
               removing: false,
@@ -4392,6 +4686,55 @@ describe('jumpToHit', () => {
               expect(finalFileState.ui.currentView).toEqual('timeline')
             })
           })
+          describe('and the beat is on the series tab', () => {
+            const store = storeWithZelda()
+            const fileState = fullFileStateSelector(store.getState())
+            const cards = allCardsSelector(store.getState())
+            store.dispatch(setSearchTerm('Builder beat'))
+            store.dispatch(
+              jumpToHit(cards, 'beats', { hit: 'Builder beat', path: '/beats/series/1/title/0' })
+            )
+            it('should navigate to the timeline and push the focus', async () => {
+              // Insert a delay because navigation is scheduled async.
+              await new Promise((resolve) => {
+                setTimeout(resolve, 100)
+              })
+              const finalFileState = fullFileStateSelector(store.getState())
+              expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
+                withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
+              )
+              expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
+              expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+              expect(
+                omit(finalFileState.ui, [
+                  'timeline',
+                  'searchDialog',
+                  'currentView',
+                  'cardDialog',
+                  'currentTimeline',
+                ])
+              ).toEqual(
+                omit(fileState.ui, [
+                  'timeline',
+                  'searchDialog',
+                  'currentView',
+                  'cardDialog',
+                  'currentTimeline',
+                ])
+              )
+              expect(finalFileState.ui.timeline.focus[0]).toEqual({
+                path: ['beat', 'series', 1, 'title'],
+                selection: {
+                  direction: 'forward',
+                  end: 12,
+                  start: 0,
+                },
+              })
+              expect(finalFileState.ui.searchDialog.term).toEqual('Builder beat')
+              expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
+              expect(finalFileState.ui.currentView).toEqual('timeline')
+            })
+          })
         })
       })
     })
@@ -5533,6 +5876,42 @@ describe('replaceMarkedHits', () => {
       expect(finalCharacter.description).toEqual('MVP')
     })
   })
+  describe('given a state with hits on a character legacy attribute', () => {
+    const store = storeWithZelda()
+    const initialState = fullFileStateSelector(store.getState())
+    const initialCharacter = displayedSingleCharacterSelector(store.getState(), 3)
+    store.dispatch(openSearch())
+    store.dispatch(toggleReplaceSearch())
+    store.dispatch(setSearchTerm("she's got lazer eyes(!)"))
+    store.dispatch(setReplacementText("she's got rocket boots(!)"))
+    store.dispatch(
+      toggleHitMarkedForReplacement({
+        hit: "she's got lazer eyes(!)",
+        path: '/characters/3/customAttribute/Special Sauce/all/26',
+      })
+    )
+    store.dispatch(replaceMarkedHits())
+    it('should replace that hit', () => {
+      const finalState = fullFileStateSelector(store.getState())
+      const finalCharacter = displayedSingleCharacterSelector(store.getState(), 3)
+      expect(
+        withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(initialState, 'characters'))
+      ).toEqual(
+        withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(finalState, 'characters'))
+      )
+      expect(finalCharacter['Special Sauce']).not.toEqual(initialCharacter['Special Sauce'])
+      expect(finalCharacter['Special Sauce']).toEqual([
+        {
+          type: 'paragraph',
+          children: [
+            {
+              text: "Her special sauce is that she's got rocket boots(!)",
+            },
+          ],
+        },
+      ])
+    })
+  })
   describe('given a state with hits on a character notes', () => {
     const store = storeWithZelda()
     const initialState = fullFileStateSelector(store.getState())
@@ -5656,6 +6035,312 @@ describe('replaceMarkedHits', () => {
       ).toEqual(withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(finalState, 'beats')))
       expect(finalValue).not.toEqual(initialValue)
       expect(finalValue['9'].index['25'].title).toEqual('Replaced!')
+    })
+  })
+})
+
+describe('resetTimeline', () => {
+  describe('given the zelda book', () => {
+    describe('when we are in a book that does not exist', () => {
+      const store = storeWithZelda()
+      const initialState = fullFileStateSelector(store.getState())
+      store.dispatch(changeCurrentTimeline(2))
+      store.dispatch(resetTimeline(2))
+      it('should do nothing', () => {
+        const withoutUnimportantDetails = (state) => {
+          return omit(state, [
+            'file.versionStamp',
+            'file.dirty',
+            'project.unsavedChanges',
+            'ui.currentTimeline',
+          ])
+        }
+        expect(withoutUnimportantDetails(fullFileStateSelector(store.getState()))).toEqual(
+          withoutUnimportantDetails(initialState)
+        )
+      })
+    })
+    describe('when we are in book 1', () => {
+      const store = storeWithZelda()
+      const initialLines = allLinesSelector(store.getState())
+      const initialCards = allCardsSelector(store.getState())
+      const initialBeats = allBeatsSelector(store.getState())
+      store.dispatch(changeCurrentTimeline(1))
+      store.dispatch(resetTimeline(1))
+      it('should delete beats, lines and cards for book 1', () => {
+        const finalLines = allLinesSelector(store.getState())
+        const finalCards = allCardsSelector(store.getState())
+        const finalBeats = allBeatsSelector(store.getState())
+        expect(finalLines).not.toEqual(initialLines)
+        expect(finalCards).not.toEqual(initialCards)
+        expect(finalBeats).not.toEqual(initialBeats)
+        expect(finalLines).toEqual([
+          {
+            bookId: 1,
+            color: '#6cace4',
+            expanded: null,
+            fromTemplateId: null,
+            id: 17,
+            position: 0,
+            title: 'Main Plot',
+          },
+          {
+            bookId: 7,
+            characterId: null,
+            color: '#78be20',
+            expanded: null,
+            fromTemplateId: null,
+            id: 16,
+            position: 1,
+            title: 'Memories',
+          },
+          {
+            bookId: 9,
+            characterId: null,
+            color: '#6cace4',
+            expanded: null,
+            fromTemplateId: null,
+            id: 15,
+            position: 0,
+            title: 'Main Plot Builder',
+          },
+          {
+            bookId: 8,
+            characterId: null,
+            color: '#6cace4',
+            expanded: null,
+            fromTemplateId: null,
+            id: 14,
+            position: 0,
+            title: 'Main Plot',
+          },
+          {
+            bookId: 7,
+            characterId: null,
+            color: '#6cace4',
+            expanded: null,
+            fromTemplateId: null,
+            id: 13,
+            position: 0,
+            title: 'Main Plot',
+          },
+          {
+            bookId: 6,
+            characterId: null,
+            color: '#6cace4',
+            expanded: null,
+            fromTemplateId: null,
+            id: 12,
+            position: 0,
+            title: 'Main Plot',
+          },
+          {
+            bookId: 5,
+            characterId: null,
+            color: '#6cace4',
+            expanded: null,
+            fromTemplateId: null,
+            id: 11,
+            position: 0,
+            title: 'Main Plot',
+          },
+          {
+            bookId: 'series',
+            characterId: null,
+            color: '#6cace4',
+            expanded: null,
+            fromTemplateId: null,
+            id: 2,
+            position: 0,
+            title: 'Main Plot',
+          },
+        ])
+        expect(finalBeats['1']).toEqual({
+          children: {
+            34: [],
+            null: [34],
+          },
+          heap: {
+            34: null,
+          },
+          index: {
+            34: {
+              autoOutlineSort: true,
+              bookId: 1,
+              fromTemplateId: null,
+              id: 34,
+              position: 0,
+              time: 0,
+              title: 'auto',
+            },
+          },
+        })
+        expect(omit(finalBeats, '1')).toEqual(omit(initialBeats, '1'))
+        const originalBook1BeatIds = new Set(Object.values(initialBeats['1'].index))
+        const isFromBookOne = (card) => {
+          return originalBook1BeatIds.has(card.beatId)
+        }
+        expect(finalCards.some(isFromBookOne)).toBeFalsy()
+        const originalCardIds = new Set(initialCards.map(({ id }) => id))
+        const isNewCard = ({ id }) => {
+          return !originalCardIds.has(id)
+        }
+        expect(finalCards.filter(isNewCard)).toEqual([])
+        const originalOtherBooksBeatIds = new Set(
+          Object.values(omit(initialBeats, '1')).flatMap((beatTree) => {
+            return Object.values(beatTree.index).map(({ id }) => id)
+          })
+        )
+        expect(finalCards.filter((card) => !isNewCard(card))).toEqual(
+          initialCards.filter((card) => originalOtherBooksBeatIds.has(card.beatId))
+        )
+      })
+    })
+    describe('when we are in book 5', () => {
+      const store = storeWithZelda()
+      const initialLines = allLinesSelector(store.getState())
+      const initialCards = allCardsSelector(store.getState())
+      const initialBeats = allBeatsSelector(store.getState())
+      store.dispatch(changeCurrentTimeline(5))
+      store.dispatch(resetTimeline(5))
+      it('should delete beats, lines and cards for book 5', () => {
+        const finalLines = allLinesSelector(store.getState())
+        const finalCards = allCardsSelector(store.getState())
+        const finalBeats = allBeatsSelector(store.getState())
+        expect(finalLines).not.toEqual(initialLines)
+        expect(finalCards).not.toEqual(initialCards)
+        expect(finalBeats).not.toEqual(initialBeats)
+        expect(finalLines).toEqual([
+          {
+            bookId: 5,
+            color: '#6cace4',
+            expanded: null,
+            fromTemplateId: null,
+            id: 17,
+            position: 0,
+            title: 'Main Plot',
+          },
+          {
+            bookId: 7,
+            characterId: null,
+            color: '#78be20',
+            expanded: null,
+            fromTemplateId: null,
+            id: 16,
+            position: 1,
+            title: 'Memories',
+          },
+          {
+            bookId: 9,
+            characterId: null,
+            color: '#6cace4',
+            expanded: null,
+            fromTemplateId: null,
+            id: 15,
+            position: 0,
+            title: 'Main Plot Builder',
+          },
+          {
+            bookId: 8,
+            characterId: null,
+            color: '#6cace4',
+            expanded: null,
+            fromTemplateId: null,
+            id: 14,
+            position: 0,
+            title: 'Main Plot',
+          },
+          {
+            bookId: 7,
+            characterId: null,
+            color: '#6cace4',
+            expanded: null,
+            fromTemplateId: null,
+            id: 13,
+            position: 0,
+            title: 'Main Plot',
+          },
+          {
+            bookId: 6,
+            characterId: null,
+            color: '#6cace4',
+            expanded: null,
+            fromTemplateId: null,
+            id: 12,
+            position: 0,
+            title: 'Main Plot',
+          },
+          {
+            bookId: 1,
+            characterId: null,
+            color: '#78be20',
+            expanded: null,
+            fromTemplateId: null,
+            id: 9,
+            position: 1,
+            title: 'subplot',
+          },
+          {
+            bookId: 1,
+            characterId: null,
+            color: '#6cace4',
+            expanded: null,
+            fromTemplateId: null,
+            id: 1,
+            position: 0,
+            title: 'Main Plot',
+          },
+          {
+            bookId: 'series',
+            characterId: null,
+            color: '#6cace4',
+            expanded: null,
+            fromTemplateId: null,
+            id: 2,
+            position: 0,
+            title: 'Main Plot',
+          },
+        ])
+        expect(finalBeats['5']).toEqual({
+          children: {
+            34: [],
+            null: [34],
+          },
+          heap: {
+            34: null,
+          },
+          index: {
+            34: {
+              autoOutlineSort: true,
+              bookId: 5,
+              fromTemplateId: null,
+              id: 34,
+              position: 0,
+              time: 0,
+              title: 'auto',
+            },
+          },
+        })
+        expect(omit(finalBeats, '5')).toEqual(omit(initialBeats, '5'))
+        const originalBook1BeatIds = new Set(Object.values(initialBeats['5'].index))
+        const isFromBookOne = (card) => {
+          return originalBook1BeatIds.has(card.beatId)
+        }
+        expect(finalCards.some(isFromBookOne)).toBeFalsy()
+        const originalCardIds = new Set(initialCards.map(({ id }) => id))
+        const isNewCard = ({ id }) => {
+          return !originalCardIds.has(id)
+        }
+        expect(finalCards.filter(isNewCard)).toEqual([])
+        const originalOtherBooksBeatIds = new Set(
+          Object.values(omit(initialBeats, '5')).flatMap((beatTree) => {
+            return Object.values(beatTree.index).map(({ id }) => id)
+          })
+        )
+        expect(finalCards.filter((card) => !isNewCard(card))).toEqual(
+          initialCards.filter((card) => originalOtherBooksBeatIds.has(card.beatId))
+        )
+      })
     })
   })
 })

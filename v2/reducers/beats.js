@@ -128,28 +128,32 @@ const beats =
       }
 
       case ADD_BOOK_FROM_TEMPLATE: {
-        const beats = action.templateData.beats['1']
-        const idMap = {}
-        // this recreates the template's tree but with new ids
-        const newBeats = tree.reduce('id')(
-          beats,
-          (newBeatTree, nextBeat, parentId) => {
-            const newId = action.nextBeatId + nextBeat.id // give it a new id
-            idMap[nextBeat.id] = newId
-            const newParentId = idMap[parentId] || null
-            const newBeat = {
-              ...clone(nextBeat),
-              id: newId,
-              bookId: actionBookId, // add it to the new book
-              fromTemplateId: action.templateData.id,
-            }
-            return tree.addNode('id')(newBeatTree, newParentId, newBeat)
-          },
-          clone(newTree)
-        )
-        return {
-          ...state,
-          [actionBookId]: newBeats,
+        const beats = action.templateData?.beats?.['1']
+        if (typeof beats === 'object') {
+          const idMap = {}
+          // this recreates the template's tree but with new ids
+          const newBeats = tree.reduce('id')(
+            beats,
+            (newBeatTree, nextBeat, parentId) => {
+              const newId = action.nextBeatId + nextBeat.id // give it a new id
+              idMap[nextBeat.id] = newId
+              const newParentId = idMap[parentId] || null
+              const newBeat = {
+                ...clone(nextBeat),
+                id: newId,
+                bookId: actionBookId, // add it to the new book
+                fromTemplateId: action.templateData.id,
+              }
+              return tree.addNode('id')(newBeatTree, newParentId, newBeat)
+            },
+            clone(newTree)
+          )
+          return {
+            ...state,
+            [actionBookId]: newBeats,
+          }
+        } else {
+          return state
         }
       }
 

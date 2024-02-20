@@ -2,6 +2,7 @@ import { configureStore, pltrAdaptor } from './testStore'
 import actions from '../../actions'
 import zelda from './zelda.json'
 import character_template from './character-template.json'
+import twelve_step_mystery_formula_template from './12_step_mystery_formula_template.json'
 
 const {
   ui: { loadFile },
@@ -13,4 +14,4 @@ export const storeWithZelda = () => {
   return store
 }
 
-export { configureStore, pltrAdaptor, character_template }
+export { configureStore, pltrAdaptor, character_template, twelve_step_mystery_formula_template }

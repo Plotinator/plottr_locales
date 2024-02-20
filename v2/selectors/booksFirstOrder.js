@@ -5,6 +5,7 @@
 // dependencies.
 import { createSelector } from 'reselect'
 import { omit } from 'lodash'
+import { createAggressiveDeepEqualSelector } from './createDeepEqualSelector'
 
 import { fullFileStateSelector } from './fullFileFirstOrder'
 
@@ -25,9 +26,12 @@ export const allBookIdsSelector = createSelector(
  * @example [{ ...<bookData> }, { ...<bookData> }]
  */
 export const allBooksSelector = createSelector(fullFileStateSelector, (state) => state.books)
-export const allBooksAsArraySelector = createSelector(fullFileStateSelector, (state) => {
-  return [...Object.values(omit(state.books, 'allIds'))]
-})
+export const allBooksAsArraySelector = createAggressiveDeepEqualSelector(
+  fullFileStateSelector,
+  (state) => {
+    return [...Object.values(omit(state.books, 'allIds'))]
+  }
+)
 
 const bookIdSelector = (_state, bookId) => {
   return bookId

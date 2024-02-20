@@ -96,6 +96,10 @@ const leaf = (node, doc) => {
 }
 
 const leafInElement = (node) => {
+  if (node.type === 'link') {
+    return new rtf.TextElement(node.url)
+  }
+
   if (node.bold) {
     return new rtf.TextElement(node.text, styleBold)
   }

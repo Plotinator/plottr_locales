@@ -33,7 +33,7 @@ import { line } from '../store/initialState'
 import { newFileLines, newFileSeriesLines } from '../store/newFileState'
 import { nextId } from '../store/newIds'
 import { nextColor } from '../store/lineColors'
-import { nextPositionInBook, positionReset } from '../helpers/lists'
+import { nextPositionInBook, positionReset, positionResetByGroup } from '../helpers/lists'
 import { associateWithBroadestScope, isNotSeries } from '../helpers/lines'
 import { sortByHitPosition } from './sortByHitPosition'
 import { safeParseInt } from './safeParseInt'
@@ -82,11 +82,15 @@ const lines = (dataRepairers) => (state, action) => {
 
     case ADD_LINES_FROM_TEMPLATE:
     case ADD_BOOK_FROM_TEMPLATE: {
-      const linesInBook = state.filter((l) => l.bookId == actionBookId)
-      const nextPosition = nextPositionInBook(linesInBook, actionBookId)
-      const newLines = action.templateData.lines
-        .filter(({ bookId }) => bookId !== 'series') // this is to protect against a bad template that unnecessarily had a series line
-        .map((l, index) => {
+      if (Array.isArray(action.templateData?.lines)) {
+        const linesInBook = state.filter((l) => l.bookId == actionBookId)
+        const nextPosition = nextPositionInBook(linesInBook, actionBookId)
+        const newLines = sortBy(
+          action.templateData.lines
+            // this is to protect against a bad template that unnecessarily had a series line
+            .filter(({ bookId }) => bookId !== 'series'),
+          'position'
+        ).map((l, index) => {
           const newLine = cloneDeep(l)
           newLine.id = action.nextLineId + newLine.id // give it a new id
           newLine.bookId = actionBookId // add it to the new/current book
@@ -97,7 +101,13 @@ const lines = (dataRepairers) => (state, action) => {
           }
           return newLine
         })
-      return [...state, ...newLines]
+        return positionResetByGroup(
+          sortBy([...state, ...newLines], (item) => (item?.isPinned === true ? 0 : item.position)),
+          ({ bookId }) => bookId
+        )
+      } else {
+        return state
+      }
     }
 
     case DUPLICATE_BOOK: {
@@ -134,30 +144,45 @@ const lines = (dataRepairers) => (state, action) => {
       return state.filter((l) => l.id !== action.id)
 
     case PIN_PLOTLINE: {
-      const bookLines = action.lines.map((l) =>
-        l.id === action.lineId && l.bookId === action.bookId
-          ? Object.assign({}, l, { isPinned: true, expanded: false })
-          : l
-      )
+      const bookLines = state
+        .filter((line) => {
+          return line.bookId == actionBookId
+        })
+        .map((l) => {
+          if (l.id === action.lineId) {
+            return {
+              ...l,
+              isPinned: true,
+              expanded: false,
+            }
+          } else {
+            return l
+          }
+        })
       return [
         ...state.filter((l) => l && l.bookId != actionBookId),
-        ...positionReset(
-          sortBy(bookLines, [(item) => (item?.isPinned === true ? 'isPinned' : 'position')])
-        ),
+        ...positionReset(sortBy(bookLines, [({ isPinned }) => (isPinned ? -1 : 1), 'position'])),
       ]
     }
 
     case UNPIN_PLOTLINE: {
-      const bookLines = action.lines.map((l) =>
-        l.id === action.lineId && l.bookId === action.bookId
-          ? Object.assign({}, l, { isPinned: false })
-          : l
-      )
+      const bookLines = state
+        .filter((line) => {
+          return line.bookId == actionBookId
+        })
+        .map((l) => {
+          if (l.id === action.lineId) {
+            return {
+              ...l,
+              isPinned: false,
+            }
+          } else {
+            return l
+          }
+        })
       return [
         ...state.filter((l) => l && l.bookId != actionBookId),
-        ...positionReset(
-          sortBy(bookLines, [(item) => (item?.isPinned === true ? 'isPinned' : 'position')])
-        ),
+        ...positionReset(sortBy(bookLines, [({ isPinned }) => (isPinned ? -1 : 1), 'position'])),
       ]
     }
 

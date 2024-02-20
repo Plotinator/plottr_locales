@@ -180,6 +180,12 @@ import {
   REORDER_NOTE_MANUALLY,
   REORDER_CHARACTER_MANUALLY,
   REORDER_PLACE_MANUALLY,
+  START_JUMPING,
+  FINISH_JUMPING,
+  ADD_LINES_FROM_TEMPLATE,
+  SET_REPLACE_WORD,
+  ADD_CHARACTER_WITH_TEMPLATE,
+  SET_DASHBOARD_MODAL_VIEW,
 } from '../constants/ActionTypes'
 import {
   ui as defaultUI,
@@ -204,7 +210,7 @@ const removeCustomAttributeFilter = (state, action) => {
   }
 }
 
-const addCustomAttributeOrdering = (state, fullState) => {
+export const addCustomAttributeOrdering = (state, fullState) => {
   const { characterAttributesForCurrentBookSelector } = selectors(identity)
 
   const toAttributeOrderEntry = (attribute) => {
@@ -232,6 +238,19 @@ const addCustomAttributeOrdering = (state, fullState) => {
     }
   }
 
+  const existingOrder = state.customAttributeOrder.characters.filter(({ type, id, name }) => {
+    return (
+      (type === 'customAttributes' &&
+        fullState.customAttributes.characters.some((customAttribute) => {
+          return customAttribute?.name === name
+        })) ||
+      (type === 'attributes' &&
+        fullState.attributes.characters.some((attribute) => {
+          return attribute?.id === id
+        }))
+    )
+  })
+
   // Case 2: there is an incomplete custom attribute ordering
   const attributes = fullState?.ui ? characterAttributesForCurrentBookSelector(fullState) : []
   const notOrdered = attributes.filter((attribute) => {
@@ -247,15 +266,19 @@ const addCustomAttributeOrdering = (state, fullState) => {
     return {
       ...state,
       customAttributeOrder: {
-        characters: [
-          ...state.customAttributeOrder.characters,
-          ...notOrdered.map(toAttributeOrderEntry),
-        ],
+        characters: [...existingOrder, ...notOrdered.map(toAttributeOrderEntry)],
       },
     }
+  } else if (!isEqual(existingOrder, state.customAttributeOrder.characters)) {
+    return {
+      ...state,
+      customAttributeOrder: {
+        characters: existingOrder,
+      },
+    }
+  } else {
+    return state
   }
-
-  return state
 }
 
 const updateUI = (state, action) => {
@@ -284,6 +307,7 @@ const updateUI = (state, action) => {
       return state
     }
 
+    case ADD_LINES_FROM_TEMPLATE:
     case LOAD_LINES: {
       const linesPerBook = groupBy(action.lines, 'bookId')
       const pinnedPlotlines = {}
@@ -583,6 +607,7 @@ const updateUI = (state, action) => {
       }
     }
 
+    case ADD_CHARACTER_WITH_TEMPLATE:
     case ADD_CHARACTER: {
       return {
         ...state,
@@ -1050,6 +1075,16 @@ const updateUI = (state, action) => {
       }
     }
 
+    case SET_REPLACE_WORD: {
+      return {
+        ...state,
+        searchDialog: {
+          ...(state.searchDialog || {}),
+          replaceWord: action.replaceWord,
+        },
+      }
+    }
+
     case SELECT_OUTLINE_CARD: {
       return {
         ...state,
@@ -1198,10 +1233,6 @@ const updateUI = (state, action) => {
         const pathToSet = cardFocusPath(action.id, {
           baseAttributeName,
         })
-        const newFocus = {
-          path: pathToSet,
-          selection: action.attributes[nextAttributeKey].selection,
-        }
         const key =
           acc.currentView === 'timeline'
             ? 'timeline'
@@ -1212,9 +1243,13 @@ const updateUI = (state, action) => {
         const existing = foci.find(({ path }) => {
           return isEqual(path, pathToSet)
         })
-        if (!action.attributes[nextAttributeKey].selection) {
+        if (typeof action?.attributes[nextAttributeKey]?.selection !== 'object') {
           return acc
         } else {
+          const newFocus = {
+            path: pathToSet,
+            selection: action.attributes[nextAttributeKey].selection,
+          }
           if (existing) {
             return {
               ...acc,
@@ -1301,7 +1336,21 @@ const updateUI = (state, action) => {
     // Notes.
     case EDIT_NOTE: {
       const attributesToUpdate = Object.keys(action.attributes).filter((attribute) => {
-        return typeof defaultNote[attribute] !== 'undefined'
+        return (
+          typeof defaultNote[attribute] !== 'undefined' &&
+          ![
+            'id',
+            'categoryId',
+            'tags',
+            'characters',
+            'places',
+            'lastEdited',
+            'templates',
+            'imageId',
+            'bookIds',
+            'position',
+          ].includes(attribute)
+        )
       })
       return attributesToUpdate.reduce((acc, nextAttributeKey) => {
         const baseAttributeName = nextAttributeKey
@@ -1446,7 +1495,20 @@ const updateUI = (state, action) => {
     // Places
     case EDIT_PLACE: {
       const attributesToUpdate = Object.keys(action.attributes).filter((attribute) => {
-        return typeof defaultPlace[attribute] !== 'undefined'
+        return (
+          typeof defaultPlace[attribute] !== 'undefined' &&
+          ![
+            'id',
+            'color',
+            'cards',
+            'noteIds',
+            'templates',
+            'tags',
+            'imageId',
+            'bookIds',
+            'position',
+          ].includes(attribute)
+        )
       })
       return attributesToUpdate.reduce((acc, nextAttributeKey) => {
         const baseAttributeName = nextAttributeKey
@@ -1651,7 +1713,6 @@ const updateUI = (state, action) => {
         ...state,
         cardDialog: {
           ...state.cardDialog,
-          showTemplatePicker: true,
           removeWhichTemplate: action.id,
         },
       }
@@ -2194,6 +2255,7 @@ const updateUI = (state, action) => {
         tagTab: {
           ...state.tagTab,
           editingSelectedTab: false,
+          selectedTag: null,
         },
       }
     }
@@ -2285,6 +2347,35 @@ const updateUI = (state, action) => {
         timeline: {
           ...state.timeline,
           plotlineTitleBeingEdited: null,
+        },
+      }
+    }
+
+    case START_JUMPING: {
+      return {
+        ...state,
+        searchDialog: {
+          ...state.searchDialog,
+          jumping: true,
+        },
+      }
+    }
+
+    case FINISH_JUMPING: {
+      return {
+        ...state,
+        searchDialog: {
+          ...state.searchDialog,
+          jumping: false,
+        },
+      }
+    }
+
+    case SET_DASHBOARD_MODAL_VIEW: {
+      return {
+        ...state,
+        dashboardModal: {
+          view: action.view,
         },
       }
     }

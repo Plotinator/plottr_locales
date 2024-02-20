@@ -265,7 +265,7 @@ export const reorderCharacterTemplateAttribute = (originalPosition, destination,
 }
 
 export const reorderCharacter =
-  (characterId, newPosition, newCategoryId) => (dispatch, getState) => {
+  (characterId, newPosition, newCategoryId, direction) => (dispatch, getState) => {
     const characterIdsInOrder = sortBy(
       Object.entries(visibleSortedCharactersByCategorySelector(getState())),
       ([groupName, _characters]) => groupName
@@ -283,5 +283,6 @@ export const reorderCharacter =
       characterId,
       newPosition,
       newCategoryId,
+      direction,
     })
   }

@@ -1,3 +1,5 @@
+import { identity } from 'lodash'
+
 import {
   ADD_NOTE,
   EDIT_NOTE,
@@ -22,6 +24,9 @@ import {
   REORDER_NOTE_MANUALLY,
 } from '../constants/ActionTypes'
 import { note } from '../store/initialState'
+import selectors from '../selectors'
+
+const { visibleSortedNotesByCategorySelector } = selectors(identity)
 
 export function addNote() {
   return { type: ADD_NOTE, title: note.title, content: note.content }
@@ -114,15 +119,19 @@ export function duplicateNote(id) {
   return { type: DUPLICATE_NOTE, id, lastEdited: new Date().getTime() }
 }
 
-export const reorderNotes = (noteId, oldPosition, newPosition, newCategoryId) => {
-  return {
-    type: REORDER_NOTE_MANUALLY,
-    id: noteId,
-    oldPosition,
-    newPosition,
-    newCategoryId,
+export const reorderNotes =
+  (noteId, oldPosition, newPosition, newCategoryId, direction) => (dispatch, getState) => {
+    const visibleNotesByCategory = visibleSortedNotesByCategorySelector(getState())
+    dispatch({
+      type: REORDER_NOTE_MANUALLY,
+      id: noteId,
+      oldPosition,
+      newPosition,
+      newCategoryId,
+      direction,
+      notesByCategory: visibleNotesByCategory,
+    })
   }
-}
 
 export function editNoteTitle(id, newTitle, selection) {
   return { type: EDIT_NOTE_TITLE, id, newTitle, selection }

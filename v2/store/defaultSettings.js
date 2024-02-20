@@ -32,8 +32,42 @@ export function desktop() {
       enableOfflineMode: false,
       streamFriendly: false,
       useSpellcheck: true,
-      font: 'Forum',
-      fontSize: 20,
+      fonts: {
+        rce: {
+          defaultFont: 'Forum',
+          defaultFontSize: '20px',
+          defaultDarkModeFontColor: '#CCCCCC',
+          defaultFontColor: '#102A42', //$gray-0
+          titleFont: 'Forum',
+          titleFontSize: '24px',
+          titleFontWeight: 400,
+          titleDarkModeFontColor: '#CCCCCC',
+          titleFontColor: '#102A42',
+          subtitleFont: 'Forum',
+          subtitleFontSize: '24px',
+          subtitleFontWeight: 400,
+          subtitleDarkModeFontColor: '#CCCCCC',
+          subtitleFontColor: '#102A42',
+        },
+        global: {
+          headingFont: 'IBM Plex Serif',
+          bodyFont: 'IBM Plex Serif',
+        },
+        timeline: {
+          headings: {
+            font: 'IBM Plex Serif',
+            fontSize: '24px',
+          },
+          plotlines: {
+            font: 'IBM Plex Serif',
+            fontSize: '20px',
+          },
+          sceneCardTitles: {
+            font: 'Forum',
+            fontSize: '16px',
+          },
+        },
+      },
       defaultFolder: true,
     },
   }
@@ -61,6 +95,42 @@ export function web() {
       numberOfBackups: 30,
       openDashboardFirst: true,
       backupType: 'never-delete',
+      fonts: {
+        rce: {
+          defaultFont: 'Forum',
+          defaultFontSize: '20px',
+          defaultDarkModeFontColor: '#CCCCCC',
+          defaultFontColor: '#102A42', //$gray-0
+          titleFont: 'Forum',
+          titleFontSize: '24px',
+          titleFontWeight: 400,
+          titleDarkModeFontColor: '#CCCCCC',
+          titleFontColor: '#102A42',
+          subtitleFont: 'Forum',
+          subtitleFontSize: '24px',
+          subtitleFontWeight: 400,
+          subtitleDarkModeFontColor: '#CCCCCC',
+          subtitleFontColor: '#102A42',
+        },
+        global: {
+          headerFont: 'IBM Plex Serif',
+          bodyFont: 'IBM Plex Serif',
+        },
+        timeline: {
+          headings: {
+            font: 'IBM Plex Serif',
+            fontSize: '24px',
+          },
+          plotlines: {
+            font: 'IBM Plex Serif',
+            fontSize: '20px',
+          },
+          sceneCardTitles: {
+            font: 'Forum',
+            fontSize: '16px',
+          },
+        },
+      },
     },
   }
 }

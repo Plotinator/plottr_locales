@@ -15,6 +15,15 @@ export const editCharacterAttributeMetadata = (id, name, type, oldName) => (disp
     attributeType: type,
   })
 }
+export const editCharacterAttributeMetadataAdaptor =
+  (index, oldAttribute, newAttribute) => (dispatch, getState) => {
+    editCharacterAttributeMetadata(
+      oldAttribute.id,
+      newAttribute.name,
+      newAttribute.type,
+      oldAttribute.name
+    )(dispatch, getState)
+  }
 
 export const deleteCharacterAttribute = (id, name) => {
   if (name && !id) {
@@ -28,6 +37,9 @@ export const deleteCharacterAttribute = (id, name) => {
     type: DELETE_CHARACTER_ATTRIBUTE,
     id,
   }
+}
+export const deleteCharacterAttirbuteAdaptor = (name, id) => {
+  return deleteCharacterAttribute(id, name)
 }
 
 export function reorderCharacterAttribute(attributeId, toIndex, attributeName) {

@@ -2,6 +2,14 @@ import { uniq } from 'lodash'
 
 import { emptyFile } from './newFileState'
 import { SYSTEM_REDUCER_KEYS } from '../reducers/systemReducers'
+import {
+  FILE_HAS_DUPLICATED_CHARACTER_ATTIRBUTES,
+  FILE_LACKS_ALL_KEYS,
+  FILE_HAS_NO_CHARACTER_ATTRIBUTES,
+  FILE_LACKS_CHARACTER_ATTRIBUTE_METADATA,
+  FILE_CONTAINS_INVALID_CHARACTER_ATTRIBUTE_METADATA,
+  FILE_CONTAINS_INVALID_CHARACTER_ATTRIBUTE_VALUES,
+} from '../constants/errorCodes'
 
 export const checkForMinimalSetOfKeys =
   (filePath, actionTrail = []) =>
@@ -16,7 +24,9 @@ export const checkForMinimalSetOfKeys =
       const errorMessage = `Tried to save file at ${filePath} but after removing system keys it lacks the following expected keys: ${missingKeys}.  Action trail: ${JSON.stringify(
         actionTrail
       )}`
-      return Promise.reject(new Error(errorMessage))
+      const error = new Error(errorMessage)
+      error.code = FILE_LACKS_ALL_KEYS
+      return Promise.reject(error)
     }
 
     return Promise.resolve(file)
@@ -30,7 +40,9 @@ export const checkForMissingCharacterAttributes =
       const errorMessage = `Tried to save file at ${filePath}, but it doesn't have character attributes.  Action trail: ${JSON.stringify(
         actionTrail
       )}`
-      return Promise.reject(new Error(errorMessage))
+      const error = new Error(errorMessage)
+      error.code = FILE_HAS_NO_CHARACTER_ATTRIBUTES
+      return Promise.reject(error)
     }
 
     const attributesOnCharacters = uniq(
@@ -50,7 +62,9 @@ export const checkForMissingCharacterAttributes =
       const errorMessage = `Tried to save file at ${filePath}, but one or more of the attributes on characters aren't in the "attributes" collection (${missingIds}).  Action trail: ${JSON.stringify(
         actionTrail
       )}`
-      return Promise.reject(new Error(errorMessage))
+      const error = new Error(errorMessage)
+      error.code = FILE_LACKS_CHARACTER_ATTRIBUTE_METADATA
+      return Promise.reject(error)
     }
 
     return Promise.resolve(file)
@@ -64,7 +78,9 @@ export const checkForBrokenCharacterAttributesRelationships =
       const errorMessage = `Tried to save file at ${filePath}, but it doesn't have character attributes.  Action trail: ${JSON.stringify(
         actionTrail
       )}`
-      return Promise.reject(new Error(errorMessage))
+      const error = new Error(errorMessage)
+      error.code = FILE_HAS_NO_CHARACTER_ATTRIBUTES
+      return Promise.reject(error)
     }
     const brokenAttributeMetadata = characterAttributes.filter((attribute) => {
       return !attribute.id || !attribute.type || !attribute.name
@@ -73,7 +89,9 @@ export const checkForBrokenCharacterAttributesRelationships =
       const errorMessage = `Tried to save file at ${filePath}, but it has broken character attribute metadata: ${JSON.stringify(
         brokenAttributeMetadata
       )}.  Action trail: ${JSON.stringify(actionTrail)}`
-      return Promise.reject(new Error(errorMessage))
+      const error = new Error(errorMessage)
+      error.code = FILE_CONTAINS_INVALID_CHARACTER_ATTRIBUTE_METADATA
+      return Promise.reject(error)
     }
 
     const attributesOnCharacters = uniq(
@@ -92,7 +110,9 @@ export const checkForBrokenCharacterAttributesRelationships =
       const errorMessage = `Tried to save file at ${filePath}, but it has broken character attribute values: ${JSON.stringify(
         brokenCharacterAttributes
       )}.  Action trail: ${JSON.stringify(actionTrail)}`
-      return Promise.reject(new Error(errorMessage))
+      const error = new Error(errorMessage)
+      error.code = FILE_CONTAINS_INVALID_CHARACTER_ATTRIBUTE_VALUES
+      return Promise.reject(error)
     }
 
     const thereIsADuplicatedCharacterAttributeValue = file.characters.some((character) => {
@@ -111,7 +131,9 @@ export const checkForBrokenCharacterAttributesRelationships =
       const errorMessage = `Tried to save file at ${filePath}, but it has a duplicated character attribute value.  Action trail: ${JSON.stringify(
         actionTrail
       )}`
-      return Promise.reject(new Error(errorMessage))
+      const error = new Error(errorMessage)
+      error.code = FILE_HAS_DUPLICATED_CHARACTER_ATTIRBUTES
+      return Promise.reject(error)
     }
 
     return Promise.resolve(file)

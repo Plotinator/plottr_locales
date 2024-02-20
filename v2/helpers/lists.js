@@ -1,3 +1,5 @@
+import { groupBy } from 'lodash'
+
 export function reorderList(originalPosition, newPosition, list) {
   const newList = [...list]
   const [removed] = newList.splice(newPosition, 1)
@@ -5,7 +7,7 @@ export function reorderList(originalPosition, newPosition, list) {
   return newList
 }
 
-export function moveToAbove(sourcePosition, newPosition, list) {
+export function moveToAbove(sourcePosition, newPosition, list, moveUp = true) {
   const newList = [...list]
   let targetPosition = newPosition
   if (sourcePosition < newPosition) {
@@ -13,8 +15,20 @@ export function moveToAbove(sourcePosition, newPosition, list) {
     targetPosition = newPosition == 0 ? 0 : newPosition - 1
   }
   const [removed] = newList.splice(sourcePosition, 1)
-  newList.splice(targetPosition, 0, removed)
-  return newList
+  if (moveUp) {
+    newList.splice(targetPosition, 0, removed)
+  } else {
+    newList.splice(targetPosition + 1, 0, removed)
+  }
+  return newList.filter(Boolean)
+}
+
+export function moveItemToPosition(newPosition, list, newItem, moveUp) {
+  const newList = [...list]
+  const targetPosition = moveUp ? newPosition : newPosition + 1
+
+  newList.splice(targetPosition, 0, newItem)
+  return positionReset(newList)
 }
 
 export function positionReset(items) {
@@ -28,10 +42,39 @@ export function positionReset(items) {
     })
 }
 
+export function positionResetByGroup(items, group) {
+  return Object.values(groupBy(items, group)).flatMap((subItems) => {
+    return positionReset(subItems)
+  })
+}
+
 export function nextPositionInBook(items, bookId) {
   return (
     items
       .filter((item) => item && item.bookId == bookId)
       .reduce((maxPosition, item) => Math.max(item.position, maxPosition), -1) + 1
+  )
+}
+
+export function isNotDroppingToSamePosition(
+  draggedPosition,
+  hoveredPosition,
+  isHoveringUpperPart,
+  isMovingToNewCategory
+) {
+  return (
+    draggedPosition !== hoveredPosition &&
+    !(
+      isHoveringUpperPart &&
+      (Number(draggedPosition + 1) === Number(hoveredPosition) ||
+        Number(draggedPosition) === Number(hoveredPosition)) &&
+      !isMovingToNewCategory
+    ) &&
+    !(
+      !isHoveringUpperPart &&
+      (Number(draggedPosition - 1) === Number(hoveredPosition) ||
+        Number(draggedPosition) === Number(hoveredPosition)) &&
+      !isMovingToNewCategory
+    )
   )
 }

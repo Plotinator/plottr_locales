@@ -1,6 +1,6 @@
 /** @module Reducers */
 
-import { identity } from 'lodash'
+import { identity, omit } from 'lodash'
 
 import unrepairedMainReducer from './main'
 import {
@@ -38,6 +38,7 @@ import {
   REORDER_CARDS_WITHIN_LINE,
   DUPLICATE_BOOK,
   REORDER_CHARACTER_MANUALLY,
+  ADD_CHARACTER_WITH_TEMPLATE,
 } from '../constants/ActionTypes'
 import selectors from '../selectors'
 import { reduce, beatsByPosition, nextId as nextBeatId } from '../helpers/beats'
@@ -52,6 +53,7 @@ import { reorderCardsWithinLine } from '../actions/cards'
 import { applyTemplate, moveLineActions } from '../helpers/templates'
 import { reorderList } from '../helpers/lists'
 import { pinMovedLine } from '../actions/lines'
+import { sortedLinesByBookSelector } from '../selectors/timelineThirdOrder'
 
 const {
   selectedCharacterAttributeTabSelector,
@@ -155,6 +157,7 @@ const root = (dataRepairers) => (state, action) => {
         currentTimeline,
       })
     }
+    case ADD_CHARACTER_WITH_TEMPLATE:
     case ADD_CHARACTER: {
       const currentBookId = selectedCharacterAttributeTabSelector(state)
       const nextCharacterId = nextId(state.characters)
@@ -317,6 +320,7 @@ const root = (dataRepairers) => (state, action) => {
       // but if more beats are needed, they will be created with subsequent ids
       const bookId = state.ui.currentTimeline
       let nextIdForBeats = nextBeatId(state.beats)
+      const lines = sortedLinesByBookSelector(state)
       let beatTree = cloneDeep(state.beats[bookId])
       let createdNewBeats = false
       // make a card -> beatId mapping (beatId is from existing beats … augmented with new ones)
@@ -349,6 +353,7 @@ const root = (dataRepairers) => (state, action) => {
         createdNewBeats,
         newTree: beatTree,
         cardToBeatIdMap,
+        lines: [...lines, ...action.templateData.lines],
       })
     }
 
@@ -392,31 +397,35 @@ const root = (dataRepairers) => (state, action) => {
     }
 
     case RESET_TIMELINE: {
-      let newResetAction = { ...action, isSeries }
-      // finding beats that will NOT be removed
-      const beatIdsToReset = reduce(
-        state.beats,
-        (acc, beat) => {
-          if (beat.bookId != action.bookId) {
-            acc[beat.id] = true
+      if (typeof state.beats[action.bookId] === 'object') {
+        let newResetAction = { ...action, isSeries }
+        // finding beats that will NOT be removed
+        const beatIdsToKeep = Object.values(omit(state.beats, action.bookId))
+          .flatMap((beatTree) => {
+            return Object.values(beatTree.index)
+          })
+          .reduce((acc, beat) => {
+            return {
+              ...acc,
+              [beat.id]: true,
+            }
+          }, {})
+        // finding lines that will NOT be removed
+        const lineIdsToReset = state.lines.reduce((acc, l) => {
+          if (l.bookId != action.bookId) {
+            acc[l.id] = true
           }
           return acc
-        },
-        {}
-      )
-      // finding lines that will NOT be removed
-      const lineIdsToReset = state.lines.reduce((acc, l) => {
-        if (l.bookId != action.bookId) {
-          acc[l.id] = true
+        }, {})
+        newResetAction = {
+          ...newResetAction,
+          beatIds: beatIdsToKeep,
+          lineIds: lineIdsToReset,
         }
-        return acc
-      }, {})
-      newResetAction = {
-        ...newResetAction,
-        beatIds: beatIdsToReset,
-        lineIds: lineIdsToReset,
+        return mainReducer(state, newResetAction)
+      } else {
+        return state
       }
-      return mainReducer(state, newResetAction)
     }
 
     case MOVE_LINE: {

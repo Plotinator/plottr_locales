@@ -53,9 +53,19 @@ describe('characterFocusPath', () => {
       })
       describe('and an invalid attributeId', () => {
         it('should produce the unknown path', () => {
-          expect(characterFocusPath('1', '8', { attributeId: 'blah' })).toEqual(['unknown'])
           expect(characterFocusPath('1', '8', { attributeId: null })).toEqual(['unknown'])
           expect(characterFocusPath('1', '8', { attributeId: undefined })).toEqual(['unknown'])
+        })
+      })
+      describe('and a string attributeId', () => {
+        it('should produce a path to a legacy attribute', () => {
+          expect(characterFocusPath('1', 8, { attributeId: 'blah' })).toEqual([
+            'character',
+            1,
+            'customAttribute',
+            'blah',
+            8,
+          ])
         })
       })
       describe('and a valid attribute id', () => {

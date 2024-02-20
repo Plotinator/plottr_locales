@@ -17,7 +17,7 @@ export function nextIdAcrossCategories(categories) {
           return Math.max(maxInnerId, character.id)
         })
       )
-    }, Math.NEGATIVE_INFINITY)
+    }, 1)
   )
 }
 

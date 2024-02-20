@@ -360,12 +360,15 @@ const characters =
           newCategoryId,
           positionAttributeId,
           newPosition,
+          direction,
         } = action
+        const moveUp = direction === 'up'
         const originalPosition = characterIdsInOrder.findIndex((id) => {
           return id === characterId
         })
         const adjustedNewPosition =
-          newPosition > originalPosition ? newPosition + 0.5 : newPosition - 0.5
+          newPosition > originalPosition && newPosition === 0 ? 0 : newPosition
+
         // Assign each character it's visible position in the current
         // book as reported by the action.
         //
@@ -384,6 +387,7 @@ const characters =
             const existingPositionAttribute = existingAttributes?.find(theAttribute)
             const position =
               characterId === currentCharacterId ? adjustedNewPosition : visiblePosition
+
             const newAttribute = {
               id: positionAttributeId,
               bookId,
@@ -457,7 +461,12 @@ const characters =
             const theAttribute = (attribute) => {
               return attribute.id === positionAttributeId && attribute.bookId == bookId
             }
-            return character.attributes?.find(theAttribute)?.value
+            const attributeValue = character.attributes?.find(theAttribute)?.value
+            if (character.id === characterId) {
+              return moveUp ? attributeValue - 0.1 : attributeValue + 0.1
+            } else {
+              return attributeValue
+            }
           })
           return sortedByPosition.map((character, position) => {
             const existingAttributes = character?.attributes || []
@@ -927,28 +936,50 @@ const characters =
                 const [rawAttributeId, rawBookId, rawFocusStart] = rest
                 const attributeId = safeParseInt(rawAttributeId)
                 const bookId = parseNumberOrString(rawBookId)
+                const isNewAttribute =
+                  attributeId &&
+                  nextCharacter.attributes.some((attribute) => {
+                    return attribute.id === attributeId && attribute.bookId === bookId
+                  })
                 const focusStart = safeParseInt(rawFocusStart)
-                return {
-                  ...nextCharacter,
-                  attributes: nextCharacter.attributes.map((attribute) => {
-                    if (attribute.id === attributeId && attribute.bookId === bookId) {
-                      const attributeValue = attribute.value
-                      const replaceFunction = Array.isArray(attributeValue)
-                        ? replaceInSlateDatastructure
-                        : replacePlainTextHit
-                      return {
-                        ...attribute,
-                        value: replaceFunction(
-                          attributeValue,
-                          focusStart,
-                          hit,
-                          action.replacementText
-                        ),
+                if (isNewAttribute) {
+                  return {
+                    ...nextCharacter,
+                    attributes: nextCharacter.attributes.map((attribute) => {
+                      if (attribute.id === attributeId && attribute.bookId === bookId) {
+                        const attributeValue = attribute.value
+                        const replaceFunction = Array.isArray(attributeValue)
+                          ? replaceInSlateDatastructure
+                          : replacePlainTextHit
+                        return {
+                          ...attribute,
+                          value: replaceFunction(
+                            attributeValue,
+                            focusStart,
+                            hit,
+                            action.replacementText
+                          ),
+                        }
+                      } else {
+                        return attribute
                       }
-                    } else {
-                      return attribute
-                    }
-                  }),
+                    }),
+                  }
+                } else {
+                  const attributeValue = nextCharacter[rawAttributeId]
+                  const replaceFunction = Array.isArray(attributeValue)
+                    ? replaceInSlateDatastructure
+                    : replacePlainTextHit
+                  const newValue = replaceFunction(
+                    attributeValue,
+                    focusStart,
+                    hit,
+                    action.replacementText
+                  )
+                  return {
+                    ...nextCharacter,
+                    [rawAttributeId]: newValue,
+                  }
                 }
               } else if (type === 'templateAttribute') {
                 const [templateId, attributeName, rawBookId, rawFocusStart] = rest

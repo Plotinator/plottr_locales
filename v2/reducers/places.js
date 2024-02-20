@@ -1,4 +1,4 @@
-import { cloneDeep, groupBy, sortBy } from 'lodash'
+import { cloneDeep, isNumber } from 'lodash'
 import {
   ADD_PLACE,
   EDIT_PLACE,
@@ -42,7 +42,7 @@ import { repairIfPresent } from './repairIfPresent'
 import { safeParseInt } from './safeParseInt'
 import { sortByHitPosition } from './sortByHitPosition'
 import { replacePlainTextHit, replaceInSlateDatastructure } from './replace'
-import { positionReset, reorderList } from '../helpers/lists'
+import { moveItemToPosition, moveToAbove, positionReset } from '../helpers/lists'
 
 const initialState = [place]
 
@@ -428,26 +428,31 @@ const places =
       }
 
       case REORDER_PLACE_MANUALLY: {
-        const { id, oldPosition, newPosition, newCategoryId } = action
+        const { id, oldPosition, newPosition, newCategoryId, direction, placesByCategory } = action
+        const moveUp = direction === 'up'
         const originalPlace = state.find((place) => place.id == id)
         const isNewcategory = originalPlace.categoryId != newCategoryId
-        const placesByCategory = groupBy(state, 'categoryId')
-
         const reorderedList = Object.values(placesByCategory).flatMap((group) => {
           const groupCategory = group[0].categoryId
 
           if (!isNewcategory && groupCategory == newCategoryId) {
-            return reorderList(newPosition, oldPosition, group)
+            return moveToAbove(oldPosition, newPosition, group, moveUp)
           } else if (isNewcategory && groupCategory == newCategoryId) {
-            const place = {
+            const newPlace = {
               ...originalPlace,
               position: newPosition,
               categoryId: newCategoryId,
             }
-            return positionReset(sortBy([...group, place], ['position', 'lastEdited']))
+            const placesInCategoryHasPositions = group.every((place) => isNumber(place?.position))
+            if (!placesInCategoryHasPositions) {
+              const placesWithPositions = positionReset(group)
+              return moveItemToPosition(newPosition, placesWithPositions, newPlace, moveUp)
+            } else {
+              return moveItemToPosition(newPosition, group, newPlace, moveUp)
+            }
           } else if (isNewcategory && originalPlace.categoryId == groupCategory) {
             const filteredGroup = group.filter((grp) => grp.id != id)
-            return positionReset(sortBy(filteredGroup, ['position', 'lastEdited']))
+            return positionReset(filteredGroup)
           }
           return group
         })

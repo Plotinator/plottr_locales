@@ -181,6 +181,9 @@ export const uiState = {
   resturctureTimelineModal: {
     open: false,
   },
+  dashboardModal: {
+    view: null,
+  },
 }
 
 export const ui = {
