@@ -85,8 +85,10 @@ const {
     resetTimeline,
     changeCurrentTimeline,
     setReplaceWord,
+    setTimelineView,
   },
   applicationState: { startEditing },
+  hierarchyLevels: { setHierarchyLevels },
 } = actions(pltrAdaptor)
 const {
   searchDialogIsOpenSelector,
@@ -148,6 +150,7 @@ const {
   singleLineSelector,
   allBeatsSelector,
   allLinesSelector,
+  selectedTimelineViewSelector,
 } = selectors(pltrAdaptor)
 
 // TODO: test that marked candidates recomputes on openSearch, closeSearch
@@ -647,6 +650,42 @@ describe('setSearchTerm', () => {
           tags: [],
           timeline: [{ hit: 'Morph', path: '/timeline/undefined/card/3/title/5' }],
         })
+      })
+    })
+  })
+  describe('given a search term that matches attribute names with slashes', () => {
+    const store = storeWithZelda()
+    store.dispatch(setSearchTerm('slashedy-slashed'))
+    store.dispatch(setReplaceWord(true))
+    const hits = searchHitsSelector(store.getState())
+    it('should produce matches with the slashes escaped', () => {
+      expect(hits).toEqual({
+        beats: [],
+        characters: [
+          {
+            hit: 'slashedy-slashed',
+            path: '/characters/1/customAttribute/Character Name%2FWith Slashes/all/0',
+          },
+        ],
+        lines: [],
+        notes: [
+          { hit: 'slashedy-slashed', path: '/notes/1/customAttribute/Note Name%2FWith Slashes/0' },
+        ],
+        outline: [],
+        places: [
+          {
+            hit: 'slashedy-slashed',
+            path: '/places/1/customAttribute/Place Name%2FWith Slashes/0',
+          },
+        ],
+        project: [],
+        tags: [],
+        timeline: [
+          {
+            hit: 'slashedy-slashed',
+            path: '/timeline/7/card/35/customAttribute/Scene Name%2FWith Slashes/0',
+          },
+        ],
       })
     })
   })
@@ -6340,6 +6379,69 @@ describe('resetTimeline', () => {
         expect(finalCards.filter((card) => !isNewCard(card))).toEqual(
           initialCards.filter((card) => originalOtherBooksBeatIds.has(card.beatId))
         )
+      })
+    })
+  })
+})
+
+describe('changeCurrentTimeline', () => {
+  describe('given the zelda book', () => {
+    describe('when we are in book 1', () => {
+      describe('and then we add a level of hierarchy', () => {
+        describe('and then we view that timeline as stacked', () => {
+          describe('and then we switch to a single-level timeline', () => {
+            const store = storeWithZelda()
+            store.dispatch(changeCurrentTimeline(1))
+            store.dispatch(
+              setHierarchyLevels([
+                {
+                  name: 'Chapter',
+                  level: 0,
+                  autoNumber: true,
+                  textSize: 24,
+                  borderStyle: 'DASHED',
+                  backgroundColor: 'none',
+                  textColor: '#78be20',
+                  borderColor: '#78be20',
+                  dark: {
+                    textColor: '#baed79',
+                    borderColor: '#baed79',
+                  },
+                  light: {
+                    textColor: '#78be20',
+                    borderColor: '#78be20',
+                  },
+                },
+                {
+                  textColor: '#0b1117',
+                  borderStyle: 'NONE',
+                  name: 'Scene',
+                  autoNumber: true,
+                  dark: {
+                    borderColor: '#c9e6ff',
+                    textColor: '#c9e6ff',
+                  },
+                  backgroundColor: 'none',
+                  textSize: 24,
+                  level: 1,
+                  light: {
+                    borderColor: '#6cace4',
+                    textColor: '#0b1117',
+                  },
+                  borderColor: '#6cace4',
+                },
+              ])
+            )
+            store.dispatch(setTimelineView('stacked'))
+            const originalView = selectedTimelineViewSelector(store.getState())
+            store.dispatch(changeCurrentTimeline(5))
+            const newView = selectedTimelineViewSelector(store.getState())
+            it('should switch to the "default" view', () => {
+              expect(originalView).toEqual('stacked')
+              expect(newView).toEqual('default')
+            })
+          })
+        })
       })
     })
   })

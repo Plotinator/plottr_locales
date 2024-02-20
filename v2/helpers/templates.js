@@ -4,7 +4,7 @@ import * as tree from '../reducers/tree'
 import { addCard } from '../actions/cards'
 import { addBeat } from '../actions/beats'
 import root from '../reducers/root'
-import { addLinesFromTemplate, addLineWithTitle, deleteLine } from '../actions/lines'
+import { addLinesFromTemplate, addLineWithTitle, deleteLine, editLineColor } from '../actions/lines'
 import { nextId } from './nextBeatId'
 import { nextId as nextLineId } from '../store/newIds'
 
@@ -397,6 +397,7 @@ export const moveLineActions = (file, sourceLineId, destinationBookId) => {
 
   const newLineId = nextLineId(file.lines)
   const addLineAction = addLineWithTitle(sourceLine.title, destinationBookId)
+  const changeLineColourAction = editLineColor(newLineId, sourceLine.color)
   const bookId = sourceLine.bookId
   // Also deletes the old cards
   const removeOldLineAction = deleteLine(sourceLineId, bookId, sourceLine?.isPinned)
@@ -421,7 +422,13 @@ export const moveLineActions = (file, sourceLineId, destinationBookId) => {
   )
 
   return {
-    actions: [addLineAction, removeOldLineAction, ...addBeatActions, ...addCardActions],
+    actions: [
+      addLineAction,
+      changeLineColourAction,
+      removeOldLineAction,
+      ...addBeatActions,
+      ...addCardActions,
+    ],
     newLineId,
   }
 }

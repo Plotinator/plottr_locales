@@ -1320,7 +1320,6 @@ describe('convertHTMLString', () => {
 </body>
 </html>`
     it('should produce appropriate Slate content', () => {
-      console.log('Result', JSON.stringify(convertHTMLString(fromFirefoxOnWindows), null, 2))
       expect(convertHTMLString(fromFirefoxOnWindows)).toEqual([
         {
           type: 'paragraph',
@@ -1412,6 +1411,291 @@ describe('convertHTMLString', () => {
               ],
             },
           ],
+        },
+      ])
+    })
+  })
+  describe('given some HTML with a doctype', () => {
+    const HTML_STARTS_WITH_DOCTYPE = `<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<title></title>
+<meta name="Generator" content="Cocoa HTML Writer">
+<meta name="CocoaVersion" content="2487.2">
+<style type="text/css">
+p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 13.0px 'Helvetica Neue'}
+p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 13.0px 'Helvetica Neue'; min-height: 15.0px}
+li.li1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 13.0px 'Helvetica Neue'}
+span.s1 {font: 9.0px Menlo}
+span.Apple-tab-span {white-space:pre}
+ul.ul1 {list-style-type: disc}
+</style>
+</head>
+<body>
+<p class="p1">This channel will track the next release of Plottr.</p>
+<p class="p1">There are<b> two features </b>in this release:</p>
+<ul class="ul1">
+<li class="li1"><span class="s1"></span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>"RCE Word Counter" i.e. count total and selected words in editors, and</li>
+<li class="li1"><span class="s1"></span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>"Fonts Everywhere" i.e. customise any font family and size across Plottr.</li>
+</ul>
+<p class="p2"><br></p>
+<p class="p1">Additionally, we have a couple of important bug fixes; some are in already and some need to be done before we release.</p>
+</body>
+</html>`
+    it('should produce slate content', () => {
+      expect(convertHTMLString(HTML_STARTS_WITH_DOCTYPE)).toEqual([
+        {
+          children: [{ text: 'This channel will track the next release of Plottr.' }],
+          type: 'paragraph',
+        },
+        {
+          children: [
+            { text: 'There are' },
+            { bold: true, text: ' two features ' },
+            { text: 'in this release:' },
+          ],
+          type: 'paragraph',
+        },
+        {
+          children: [
+            {
+              children: [
+                { text: '' },
+                { text: '	' },
+                { text: '	' },
+                { text: '"RCE Word Counter" i.e. count total and selected words in editors, and' },
+              ],
+              type: 'list-item',
+            },
+            {
+              children: [
+                { text: '' },
+                { text: '	' },
+                { text: '	' },
+                {
+                  text: '"Fonts Everywhere" i.e. customise any font family and size across Plottr.',
+                },
+              ],
+              type: 'list-item',
+            },
+          ],
+          type: 'bulleted-list',
+        },
+        { children: [{ text: '' }], type: 'paragraph' },
+        {
+          children: [
+            {
+              text: 'Additionally, we have a couple of important bug fixes; some are in already and some need to be done before we release.',
+            },
+          ],
+          type: 'paragraph',
+        },
+      ])
+    })
+  })
+  describe('given some html that starts with a meta tag', () => {
+    const HTML_STARTS_WITH_META = `
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<title></title>
+<meta name="Generator" content="Cocoa HTML Writer">
+<meta name="CocoaVersion" content="2487.2">
+<style type="text/css">
+p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 13.0px 'Helvetica Neue'}
+p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 13.0px 'Helvetica Neue'; min-height: 15.0px}
+li.li1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 13.0px 'Helvetica Neue'}
+span.s1 {font: 9.0px Menlo}
+span.Apple-tab-span {white-space:pre}
+ul.ul1 {list-style-type: disc}
+</style>
+</head>
+<body>
+<p class="p1">This channel will track the next release of Plottr.</p>
+<p class="p1">There are<b> two features </b>in this release:</p>
+<ul class="ul1">
+<li class="li1"><span class="s1"></span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>"RCE Word Counter" i.e. count total and selected words in editors, and</li>
+<li class="li1"><span class="s1"></span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>"Fonts Everywhere" i.e. customise any font family and size across Plottr.</li>
+</ul>
+<p class="p2"><br></p>
+<p class="p1">Additionally, we have a couple of important bug fixes; some are in already and some need to be done before we release.</p>
+</body>
+`
+    it('should produce slate content', () => {
+      expect(convertHTMLString(HTML_STARTS_WITH_META)).toEqual([
+        { children: [{ text: '' }], type: 'paragraph' },
+        {
+          children: [{ text: 'This channel will track the next release of Plottr.' }],
+          type: 'paragraph',
+        },
+        {
+          children: [
+            { text: 'There are' },
+            { bold: true, text: ' two features ' },
+            { text: 'in this release:' },
+          ],
+          type: 'paragraph',
+        },
+        {
+          children: [
+            {
+              children: [
+                { text: '' },
+                { text: '	' },
+                { text: '	' },
+                { text: '"RCE Word Counter" i.e. count total and selected words in editors, and' },
+              ],
+              type: 'list-item',
+            },
+            {
+              children: [
+                { text: '' },
+                { text: '	' },
+                { text: '	' },
+                {
+                  text: '"Fonts Everywhere" i.e. customise any font family and size across Plottr.',
+                },
+              ],
+              type: 'list-item',
+            },
+          ],
+          type: 'bulleted-list',
+        },
+        { children: [{ text: '' }], type: 'paragraph' },
+        {
+          children: [
+            {
+              text: 'Additionally, we have a couple of important bug fixes; some are in already and some need to be done before we release.',
+            },
+          ],
+          type: 'paragraph',
+        },
+      ])
+    })
+  })
+  describe('given some html that starts with "body"', () => {
+    const HTML_STARTS_WITH_BODY = `
+<body>
+<p class="p1">This channel will track the next release of Plottr.</p>
+<p class="p1">There are<b> two features </b>in this release:</p>
+<ul class="ul1">
+<li class="li1"><span class="s1"></span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>"RCE Word Counter" i.e. count total and selected words in editors, and</li>
+<li class="li1"><span class="s1"></span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>"Fonts Everywhere" i.e. customise any font family and size across Plottr.</li>
+</ul>
+<p class="p2"><br></p>
+<p class="p1">Additionally, we have a couple of important bug fixes; some are in already and some need to be done before we release.</p>
+</body>
+`
+    it('should produce slate content', () => {
+      expect(convertHTMLString(HTML_STARTS_WITH_BODY)).toEqual([
+        {
+          children: [{ text: 'This channel will track the next release of Plottr.' }],
+          type: 'paragraph',
+        },
+        {
+          children: [
+            { text: 'There are' },
+            { bold: true, text: ' two features ' },
+            { text: 'in this release:' },
+          ],
+          type: 'paragraph',
+        },
+        {
+          children: [
+            {
+              children: [
+                { text: '' },
+                { text: '	' },
+                { text: '	' },
+                { text: '"RCE Word Counter" i.e. count total and selected words in editors, and' },
+              ],
+              type: 'list-item',
+            },
+            {
+              children: [
+                { text: '' },
+                { text: '	' },
+                { text: '	' },
+                {
+                  text: '"Fonts Everywhere" i.e. customise any font family and size across Plottr.',
+                },
+              ],
+              type: 'list-item',
+            },
+          ],
+          type: 'bulleted-list',
+        },
+        { children: [{ text: '' }], type: 'paragraph' },
+        {
+          children: [
+            {
+              text: 'Additionally, we have a couple of important bug fixes; some are in already and some need to be done before we release.',
+            },
+          ],
+          type: 'paragraph',
+        },
+      ])
+    })
+  })
+  describe('given some html that starts without a body', () => {
+    const HTML_STARTS_WITHOUT_BODY = `
+<p class="p1">This channel will track the next release of Plottr.</p>
+<p class="p1">There are<b> two features </b>in this release:</p>
+<ul class="ul1">
+<li class="li1"><span class="s1"></span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>"RCE Word Counter" i.e. count total and selected words in editors, and</li>
+<li class="li1"><span class="s1"></span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>"Fonts Everywhere" i.e. customise any font family and size across Plottr.</li>
+</ul>
+<p class="p2"><br></p>
+<p class="p1">Additionally, we have a couple of important bug fixes; some are in already and some need to be done before we release.</p>
+`
+    it('should produce slate content', () => {
+      expect(convertHTMLString(HTML_STARTS_WITHOUT_BODY)).toEqual([
+        {
+          children: [{ text: 'This channel will track the next release of Plottr.' }],
+          type: 'paragraph',
+        },
+        {
+          children: [
+            { text: 'There are' },
+            { bold: true, text: ' two features ' },
+            { text: 'in this release:' },
+          ],
+          type: 'paragraph',
+        },
+        {
+          children: [
+            {
+              children: [
+                { text: '' },
+                { text: '	' },
+                { text: '	' },
+                { text: '"RCE Word Counter" i.e. count total and selected words in editors, and' },
+              ],
+              type: 'list-item',
+            },
+            {
+              children: [
+                { text: '' },
+                { text: '	' },
+                { text: '	' },
+                {
+                  text: '"Fonts Everywhere" i.e. customise any font family and size across Plottr.',
+                },
+              ],
+              type: 'list-item',
+            },
+          ],
+          type: 'bulleted-list',
+        },
+        { children: [{ text: '' }], type: 'paragraph' },
+        {
+          children: [
+            {
+              text: 'Additionally, we have a couple of important bug fixes; some are in already and some need to be done before we release.',
+            },
+          ],
+          type: 'paragraph',
         },
       ])
     })

@@ -1,8 +1,9 @@
 import { omit } from 'lodash'
 
 import { tree } from '../../index'
+import { EDIT_LINE_COLOR } from '../../constants/ActionTypes'
 
-import { applyTemplate } from '../templates'
+import { applyTemplate, moveLineActions } from '../templates'
 import {
   // Templates
   one_level_plotline_template,
@@ -25,6 +26,7 @@ import {
   file_with_two_levels_but_no_chapter,
   file_with_three_levels_but_no_chapter,
   file_with_three_levels_but_no_scene,
+  zelda,
 } from './fixtures'
 
 const withoutLineBeatOrCardIds = (x) => omit(x, 'id', 'lineId', 'beatId')
@@ -2363,6 +2365,24 @@ describe('applyTemplate', () => {
           expect(addedCards.map(withoutLineBeatOrCardIds)).toEqual(
             expect.arrayContaining(templateCards.map(withoutLineBeatOrCardIds))
           )
+        })
+      })
+    })
+  })
+})
+
+describe('moveLineActions', () => {
+  describe('given a store with multiple books and lines', () => {
+    describe('and a valid source and target', () => {
+      it('should maintain the original lines colour', () => {
+        const result = moveLineActions(zelda, 16, 9)
+        const changeColourAction = result.actions.find(({ type }) => {
+          return type === EDIT_LINE_COLOR
+        })
+        expect(changeColourAction).toEqual({
+          color: '#78be20',
+          id: 17,
+          type: 'EDIT_STORYLINE_COLOR',
         })
       })
     })

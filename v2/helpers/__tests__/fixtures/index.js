@@ -25,6 +25,7 @@ import file_with_three_levels from './file-with-three-levels.json'
 import file_with_two_levels_but_no_chapter from './file-with-two-levels-but-no-chapter.json'
 import file_with_three_levels_but_no_chapter from './file-with-three-levels-but-no-chapter.json'
 import file_with_three_levels_but_no_scene from './file-with-three-levels-but-no-scene.json'
+import zelda from './zelda.json'
 
 export {
   // Templates
@@ -47,4 +48,5 @@ export {
   file_with_two_levels_but_no_chapter,
   file_with_three_levels_but_no_chapter,
   file_with_three_levels_but_no_scene,
+  zelda,
 }

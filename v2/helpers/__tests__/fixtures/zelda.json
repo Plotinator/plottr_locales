@@ -1190,8 +1190,7 @@
       "templates": [],
       "imageId": null,
       "fromTemplateId": null,
-      "color": null,
-      "Scene Name/With Slashes": "slashedy-slashed"
+      "color": null
     },
     {
       "id": 34,
@@ -2221,8 +2220,7 @@
             }
           ]
         }
-      ],
-      "Character Name/With Slashes": "slashedy-slashed"
+      ]
     },
     {
       "id": 2,
@@ -2398,10 +2396,6 @@
       {
         "name": "a",
         "type": "text"
-      },
-      {
-        "name": "Character Name/With Slashes",
-        "type": "text"
       }
     ],
     "places": [
@@ -2415,10 +2409,6 @@
       },
       {
         "name": "three",
-        "type": "text"
-      },
-      {
-        "name": "Place Name/With Slashes",
         "type": "text"
       }
     ],
@@ -2434,10 +2424,6 @@
       {
         "name": "att 3",
         "type": "text"
-      },
-      {
-        "name": "Scene Name/With Slashes",
-        "type": "text"
       }
     ],
     "lines": [],
@@ -2452,10 +2438,6 @@
       },
       {
         "name": "third",
-        "type": "text"
-      },
-      {
-        "name": "Note Name/With Slashes",
         "type": "text"
       }
     ]
@@ -2601,8 +2583,7 @@
       "lastEdited": 1617071347633,
       "templates": [],
       "imageId": null,
-      "bookIds": [],
-      "Note Name/With Slashes": "slashedy-slashed"
+      "bookIds": []
     },
     {
       "id": 2,
@@ -2652,8 +2633,7 @@
       "tags": [],
       "imageId": null,
       "bookIds": [],
-      "sljkfl": "",
-      "Place Name/With Slashes": "slashedy-slashed"
+      "sljkfl": ""
     },
     {
       "id": 2,

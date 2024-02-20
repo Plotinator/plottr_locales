@@ -17,6 +17,7 @@ import {
 } from './customAttributesFirstOrder'
 import { allBeatsSelector } from './beatsFirstOrder'
 import { createAggressiveDeepEqualSelector } from './createDeepEqualSelector'
+import { escapeUIPathElement } from '../helpers/ui'
 
 export const cardDialogSelector = createSelector(uiSelector, ({ cardDialog }) => {
   return cardDialog
@@ -340,7 +341,10 @@ export const timelineSearchHitsSelector = createSelector(
         if (!valueMatch) {
           return []
         }
-        return hits(`/timeline/${timeline}/card/${card.id}/customAttribute/${id}`, valueMatch)
+        return hits(
+          `/timeline/${timeline}/card/${card.id}/customAttribute/${escapeUIPathElement(id)}`,
+          valueMatch
+        )
       })
       const templateMatches = card.templates.flatMap((template) => {
         const templateAttributeHit = (attribute) => {
@@ -353,7 +357,9 @@ export const timelineSearchHitsSelector = createSelector(
             return []
           }
           return hits(
-            `/timeline/${timeline}/card/${card.id}/templateAttribute/${template.id}/${name}`,
+            `/timeline/${timeline}/card/${card.id}/templateAttribute/${
+              template.id
+            }/${escapeUIPathElement(name)}`,
             valueMatch
           )
         }
@@ -391,7 +397,7 @@ export const outlineSearchHitsSelector = createSelector(
     }
 
     const cardMatch = (card) => {
-      const titleMatch = card.title.matchAll(literalRegExp(term, replaceWord))
+      const titleMatch = card?.title?.matchAll(literalRegExp(term, replaceWord))
       const descriptionText = serializeNoFormatting(card.description)
       const descriptionMatch = descriptionText.matchAll(literalRegExp(term, replaceWord))
       const timeline = lines.find((line) => {
@@ -442,7 +448,7 @@ export const notesSearchHitsSelector = createSelector(
         if (!valueMatch) {
           return []
         }
-        return hits(`/notes/${note.id}/customAttribute/${key}`, valueMatch)
+        return hits(`/notes/${note.id}/customAttribute/${escapeUIPathElement(key)}`, valueMatch)
       })
       return [
         ...[
@@ -527,7 +533,9 @@ export const charactersHitsSelector = createSelector(
             return []
           }
           return hits(
-            `/characters/${character.id}/templateAttribute/${template.id}/${attribute.name}/${bookId}`,
+            `/characters/${character.id}/templateAttribute/${template.id}/${escapeUIPathElement(
+              attribute.name
+            )}/${bookId}`,
             valueMatch
           )
         })
@@ -557,7 +565,7 @@ export const charactersHitsSelector = createSelector(
               : String(attributeValue)) || ''
           const valueMatch = valueAsString.matchAll(literalRegExp(term, replaceWord))
           return hits(
-            `/characters/${character.id}/customAttribute/${attributeName}/all`,
+            `/characters/${character.id}/customAttribute/${escapeUIPathElement(attributeName)}/all`,
             valueMatch
           )
         })
@@ -607,7 +615,7 @@ export const placesHitsSelector = createSelector(
         if (!valueMatch) {
           return []
         }
-        return hits(`/places/${place.id}/customAttribute/${key}`, valueMatch)
+        return hits(`/places/${place.id}/customAttribute/${escapeUIPathElement(key)}`, valueMatch)
       })
       // TODO template attributes
       return [

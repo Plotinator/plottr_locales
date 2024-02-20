@@ -51,7 +51,7 @@ export function desktop() {
         },
         global: {
           headingFont: 'IBM Plex Serif',
-          bodyFont: 'IBM Plex Serif',
+          bodyFont: 'Forum',
         },
         timeline: {
           headings: {
@@ -114,7 +114,7 @@ export function web() {
         },
         global: {
           headerFont: 'IBM Plex Serif',
-          bodyFont: 'IBM Plex Serif',
+          bodyFont: 'Forum',
         },
         timeline: {
           headings: {

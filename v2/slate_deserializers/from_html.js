@@ -4,11 +4,15 @@ import * as htmlparser2 from 'htmlparser2'
 
 import unescapeHTML from './unescapeHTML'
 
+const guardIterable = (xs) => {
+  return Array.from(xs ?? [])
+}
+
 export function convertHTMLString(html, options = {}) {
   const parsed = htmlparser2.parseDocument(`<div id="body">${html}</div>`)
   const body = parsed.childNodes[0]
   const slate = deserialize(options)(null)(body)
-  return slate.children.map(ensureWrapped).map(unnestLists)
+  return guardIterable(slate.children).map(ensureWrapped).map(unnestLists)
 }
 
 const TYPE_OR_VALUE_ATTRIBUTES = ['type', 'text', 'children']
@@ -102,7 +106,7 @@ export function convertHTMLNodeList(nodeList) {
   // insert peers into.
   return compressConsecutiveSlateChildren({
     type: 'paragraph',
-    children: nodeList.map(deserialize({})(null)).flat(1),
+    children: guardIterable(nodeList).map(deserialize({})(null)).flat(1),
   }).children
 }
 
@@ -119,7 +123,7 @@ const PARAGRAPH_LIKE_ELEMENTS = [
 
 const getAttribute = (el, name) => {
   const lowercaseName = name.toLowerCase()
-  return (el.attributes || []).find((attribute) => {
+  return guardIterable(el.attributes).find((attribute) => {
     return attribute.name.toLowerCase() === lowercaseName
   })?.value
 }
@@ -219,6 +223,22 @@ const notMeta = (el) => {
   return el?.name?.toLowerCase() !== 'meta'
 }
 
+const notDocType = (el) => {
+  return el?.name?.toLowerCase() !== '!doctype'
+}
+
+const notHead = (el) => {
+  return el?.name?.toLowerCase() !== 'head'
+}
+
+const notStyle = (el) => {
+  return el?.name?.toLowerCase() !== 'style'
+}
+
+const notScript = (el) => {
+  return el?.name?.toLowerCase() !== 'script'
+}
+
 export const deserialize = (options) => (parent) => (el) => {
   const deserializeIter = (parent) => (el) => {
     const tagName = el?.tagName?.toLowerCase?.()
@@ -240,15 +260,19 @@ export const deserialize = (options) => (parent) => (el) => {
     }
 
     const children = ensureAtLeastOneElement(
-      (Array.from(el.childNodes) ?? [])
+      guardIterable(el.childNodes)
         .filter(onlyWhiteSpaceInSpan(el))
         .filter(notMeta)
+        .filter(notDocType)
+        .filter(notHead)
+        .filter(notStyle)
+        .filter(notScript)
         .flatMap(deserializeIter(el))
         .filter(Boolean)
     )
 
     const style = parseStyleAttribute(
-      (Array.from(el.attributes) ?? []).find((attribute) => {
+      guardIterable(el.attributes).find((attribute) => {
         return attribute.name === 'style'
       })?.value
     )

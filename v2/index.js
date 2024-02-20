@@ -23,6 +23,7 @@ import * as dateHelpers from './helpers/date'
 import * as fileHelpers from './helpers/file'
 import * as templatesHelpers from './helpers/templates'
 import * as characterHelpers from './helpers/characters'
+import * as uiHelpers from './helpers/ui'
 
 import * as template from './template'
 
@@ -144,6 +145,7 @@ const helpers = {
   file: fileHelpers,
   template: templatesHelpers,
   characters: characterHelpers,
+  ui: uiHelpers,
 }
 
 const slate = {
