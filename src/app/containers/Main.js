@@ -291,7 +291,7 @@ const Main = ({
     }
     if (settings.user?.fonts?.timeline?.headings?.fontSize) {
       window.document.documentElement.style.setProperty(
-        '--timeline-header-fontSize',
+        '--timeline-header-font-size',
         settings.user.fonts.timeline.headings.fontSize
       )
     }
@@ -303,7 +303,7 @@ const Main = ({
     }
     if (settings.user?.fonts?.timeline?.plotlines?.fontSize) {
       window.document.documentElement.style.setProperty(
-        '--plotline-fontSize',
+        '--plotline-font-size',
         settings.user.fonts.timeline.plotlines.fontSize
       )
     }
