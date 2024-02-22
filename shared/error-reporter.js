@@ -89,7 +89,7 @@ const ErrorReporter = (
     itemsPerMinute: MAX_ERROR_REPORTS_PER_MINUTE,
   })
 
-  const extraContext = { os, fileURL }
+  const extraContext = { os, fileURL, userId, userEmail }
 
   const validMessageAndError = (rawMessage, rawError) => {
     const typeOfMessage = typeof rawMessage
