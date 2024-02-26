@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react'
 
 import { t } from 'plottr_locales'
+import { selectors } from 'wired-up-pltr'
 
 import { whenClientIsReady } from '../../../shared/socket-client/index'
 import { store } from '../store'
@@ -90,10 +91,16 @@ export const useAskToSave = (
   useEffect(() => {
     const forceReload = () => {
       whenClientIsReady(({ saveOfflineFile, saveFile }) => {
-        const { present } = store.getState()
-        return isCloudFile && isOffline
-          ? saveOfflineFile(present)
-          : saveFile(present.project.fileURL, present)
+        const { present } = store().getState()
+        const fileLoaded = selectors.fileURLLoadedSelector(store().getState())
+        const isCloudFile = selectors.isCloudFileSelector(store().getState())
+        if (!fileLoaded) {
+          return Promise.resolve()
+        } else {
+          return isCloudFile && isOffline
+            ? saveOfflineFile(present)
+            : saveFile(present.project.fileURL, present)
+        }
       })
         .then(() => {
           return new Promise((resolve) => {
