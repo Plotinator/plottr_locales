@@ -10,7 +10,7 @@ import PreventExittingWithoutSaving from './PreventExittingWithoutSaving'
 import OfflineBanner from '../components/OfflineBanner'
 import { makeMainProcessClient } from '../mainProcessClient'
 
-const { onReload, listenToForceReload } = makeMainProcessClient()
+const { onReload } = makeMainProcessClient()
 
 const Dashboard = ({ darkMode, closeDashboard, cantShowFile, busy, isOffline, openTo }) => {
   const [activeView, setActiveView] = useState(openTo || 'files')
@@ -25,13 +25,6 @@ const Dashboard = ({ darkMode, closeDashboard, cantShowFile, busy, isOffline, op
       document.removeEventListener('close-dashboard', closeListener)
       unsubscribeFromReload()
     }
-  }, [])
-
-  useEffect(() => {
-    const forceReload = () => {
-      window.location.reload()
-    }
-    return listenToForceReload(forceReload)
   }, [])
 
   return (
