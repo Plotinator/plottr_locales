@@ -58,30 +58,82 @@ $new-item-border-color: #aaa;
 $new-item-border: 2px dashed $new-item-border-color;
 
 @mixin header-font {
-  font-family: 'IBM Plex Serif', serif !important;
+  font-family: var(--global-header-font, 'IBM Plex Serif'), serif !important;
 }
 
 @mixin sub-header-font {
-  font-family: 'IBM Plex Serif', serif;
-  font-size: 20px;
+  font-family: var(--global-header-font, 'IBM Plex Serif'), serif !important;
+}
+
+@mixin timeline-header-font {
+  font-family: var(--timeline-header-font, 'IBM Plex Serif'), serif !important;
+  font-size: var(--timeline-header-font-size, '24px') !important;
+}
+
+@mixin plotline-font {
+  font-family: var(--plotline-font, 'IBM Plex Serif'), serif !important;
+  font-size: var(--plotline-font-size, '16px') !important;
+}
+
+@mixin scenecard-title-font {
+  font-family: var(--scenecard-title-font, 'Forum'), serif !important;
+  font-size: var(--scenecard-title-font-size, '16px') !important;
+}
+
+@mixin medium-timeline-header-font-size {
+  font-size: calc(var(--timeline-header-font-size, '24px') * 14 / 24) !important; 
+}
+
+@mixin medium-plotline-font-size {
+  font-size: calc(var(--plotline-font-size, '20px') * 14 / 20) !important; 
+}
+
+@mixin medium-scenecard-title-font-size {
+  font-size: calc(var(--scenecard-title-font-size, '16px') * 14 / 16) !important; 
 }
 
 @mixin body-text-font {
-  font-family: 'Forum', sans-serif !important;
-  font-size: 16px !important;
-}
-
-@mixin rce-text-font {
-  font-family: var(--default-rce-font, 'Forum'), sans-serif !important;
-  font-size: var(--default-rce-font-size, 20px) !important;
+  font-family: var(--global-body-font, 'Forum'), sans-serif !important;
 }
 
 @mixin application-text {
   font-family: 'Lato', sans-serif !important;
 }
 
+@mixin rce-text-font {
+  font-family: var(--rce-default-font, 'Forum'), sans-serif !important;
+  font-size: var(--rce-default-font-size, 20px) !important;
+  color: var(--rce-default-font-color, $gray-0) !important;
+}
+
+@mixin rce-title-font {
+  font-family: var(--rce-title-font, --global-header-font, 'Forum'), sans-serif !important;
+  font-size: var(--rce-title-font-size, 20px) !important;
+  font-weight: var(--rce-title-font-weight, 400) !important;
+  color: var(--rce-title-font-color, $gray-0) !important;
+}
+
+@mixin rce-subtitle-font {
+  font-family: var(--rce-subtitle-font, 'Forum'), sans-serif !important;
+  font-size: var(--rce-subtitle-font-size, 20px) !important;
+  font-weight: var(--rce-subtitle-font-weight, 400) !important;
+  color: var(--rce-subtitle-font-color, $gray-0) !important;
+}
+
+@mixin rce-darkmode-font-color {
+  color: var(--rce-default-darkmode-font-color, $darkmode-v2-text) !important;
+}
+
+@mixin rce-title-darkmode-font-color {
+  color: var(--rce-title-darkmode-font-color, $darkmode-v2-text) !important;
+}
+
+@mixin rce-subtitle-darkmode-font-color {
+  color: var(--rce-subtitle-darkmode-font-color, $darkmode-v2-text) !important;
+}
+
 @mixin user-text {
-  font-family: 'Forum', sans-serif !important;
+  font-family: var(--global-body-font, 'Forum'), sans-serif !important;
 }
 
 @mixin secondary-text {

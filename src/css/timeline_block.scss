@@ -313,10 +313,10 @@
 
   .table-header-rotated tr {
     &:last-child {
-      border-bottom: 1px dashed $gray-8;
+      border-bottom: 1px solid $gray-8;
 
       td {
-        border-style: dashed;
+        border-style: solid;
         border-color: $gray-8;
         border-width: 1px;
         border-top: 1px solid $gray-8;
@@ -333,7 +333,7 @@
     padding: 2px 0;
 
     &:last-child {
-      border-style: dashed;
+      border-style: solid;
       border-width: 1px;
       border-color: $gray-8;
     }
@@ -347,6 +347,7 @@
       cursor: pointer;
 
       .card__title {
+        @include scenecard-title-font;
         padding: 6px;
       }
     }

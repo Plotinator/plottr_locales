@@ -150,6 +150,13 @@ const TimelineWrapperConnector = (connector) => {
 
       window.addEventListener('resize', handleResize)
       if (window.innerWidth < BREAKPOINT) setIsSmallerThanToolbar(true)
+      return () => {
+        window.removeEventListener('resize', handleResize)
+        if (tableRef.current) {
+          tableRef.current.onScroll = null
+          tableRef.current = null
+        }
+      }
     }, [])
 
     useEffect(() => {
@@ -178,15 +185,7 @@ const TimelineWrapperConnector = (connector) => {
           handleCloseToast()
         }, 5000)
       }
-
-      return () => {
-        window.removeEventListener('resize', handleResize)
-        if (tableRef.current) {
-          tableRef.current.onScroll = null
-          tableRef.current = null
-        }
-      }
-    }, [])
+    }, [toast?.visible])
 
     const handleResize = () => {
       setIsSmallerThanToolbar(window.innerWidth < BREAKPOINT)
@@ -322,9 +321,14 @@ const TimelineWrapperConnector = (connector) => {
     const scrollEnd = () => {
       // mpq.push('btn_scroll_end')
       const element = timelineBundle.isSmall ? tableRef.current.parentElement : tableRef.current
+      const subNavHeight =
+        document.querySelector('.subnav__container')?.getBoundingClientRect?.()?.height ??
+        SUB_NAV_HEIGHT
+      const navHeight =
+        document.querySelector('.project-nav')?.getBoundingClientRect?.()?.height ?? NAV_HEIGHT
       const target =
         timelineBundle.orientation === 'vertical'
-          ? element.scrollHeight - (window.innerHeight - NAV_HEIGHT - SUB_NAV_HEIGHT)
+          ? element.scrollHeight - (window.innerHeight - navHeight - subNavHeight)
           : element.scrollWidth - window.innerWidth
 
       if (tableRef.current) scrollTo(target)

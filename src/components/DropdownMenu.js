@@ -49,7 +49,7 @@ const UnforwardedDropdownMenu = (
     }
 
     const nextIndex = activeIndex === items.length - 1 ? 0 : activeIndex + 1
-    if (typeof items[nextIndex]?.focus === 'function') {
+    if (typeof items?.[nextIndex]?.focus === 'function') {
       items[nextIndex].focus()
     }
   }
@@ -61,7 +61,9 @@ const UnforwardedDropdownMenu = (
     }
 
     const prevIndex = activeIndex === 0 ? items.length - 1 : activeIndex - 1
-    items[prevIndex].focus()
+    if (typeof items?.[prevIndex]?.focus === 'function') {
+      items[prevIndex].focus()
+    }
   }
 
   const handleKeyDown = (event) => {

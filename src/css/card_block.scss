@@ -35,7 +35,15 @@
     }
 
     .card__title {
+      @include scenecard-title-font;
       word-break: break-word;
+    }
+
+    .medium-timeline {
+      .card__title {
+        @include scenecard-title-font;
+        @include medium-scenecard-title-font-size;
+      }
     }
   }
 
@@ -53,6 +61,7 @@
   }
 
   &.vertical {
+    @include scenecard-title-font;
     display: flex;
 
     & > div {
@@ -70,6 +79,7 @@
   }
 
   &.vertical.medium-timeline {
+    @include medium-scenecard-title-font-size;
     & > div:first-child {
       padding-left: 29px;
     }
@@ -103,6 +113,7 @@
     cursor: move;
 
     .card__title {
+      @include scenecard-title-font;
       font-style: italic;
     }
   }
@@ -125,6 +136,7 @@
   }
 
   &.vertical {
+    @include scenecard-title-font;
     .card__add-card {
       display: block;
       z-index: 10;
@@ -152,6 +164,7 @@
   }
 
   &.medium-timeline {
+    @include medium-scenecard-title-font-size;
     .card__behind {
       right: -2px;
       width: 80px;
@@ -227,7 +240,8 @@
     width: 80px;
 
     .card__title {
-      font-size: 14px;
+      @include scenecard-title-font;
+      @include medium-scenecard-title-font-size;
       padding: 6px;
     }
   }
@@ -369,6 +383,14 @@
   .slate-editor__editor {
     text-align: justify;
     @include rce-text-font;
+    
+    .slate-editor__word-counter {
+      bottom: 10px;
+      right: 10px;
+      background-color: #fff;
+      border: 1px solid $new-item-border-color;
+      color: #102A42;
+    }
   }
 }
 
@@ -414,10 +436,17 @@
   .card__cell {
     .card__body-wrapper {
       .card__title {
+        @include scenecard-title-font;
         color: $darkmode-v2-darker-text;
 
         &:hover {
           color: $darkmode-v2-darker-text;
+        }
+      }
+
+      .medium-timeline {
+        .card__title {
+          @include medium-scenecard-title-font-size;
         }
       }
     }
@@ -426,6 +455,29 @@
   .card__popover {
     .popover-title {
       color: $darkmode-v2-darker-text;
+    }
+  }
+
+  .card__popover__description {
+    .slate-editor__editor {
+      @include rce-darkmode-font-color;
+      color: inherit;
+
+      h1 {
+        @include header-font;
+        @include rce-title-darkmode-font-color;
+      }
+
+      h2 {
+        @include sub-header-font;
+        @include rce-subtitle-darkmode-font-color;
+      }
+
+      .slate-editor__word-counter {
+        border: 1px solid $darkmode-v2-border;
+        background-color: $darkmode-v2-background;
+        color: $darkmode-v2-darker-text;
+      }
     }
   }
 }

@@ -12,6 +12,7 @@ import Button from '../Button'
 import DeleteConfirmModal from '../dialogs/DeleteConfirmModal'
 import UnconnectedImage from '../images/Image'
 import { checkDependencies } from '../checkDependencies'
+import { isInviewport } from '../domHelpers'
 
 const PlaceItemConnector = (connector) => {
   const Image = UnconnectedImage(connector)
@@ -46,7 +47,9 @@ const PlaceItemConnector = (connector) => {
     const scrollIntoView = () => {
       if (selected) {
         const node = ref.current
-        if (node) node.scrollIntoView()
+        if (node && !isInviewport(node)) {
+          node.scrollIntoView()
+        }
       }
     }
 

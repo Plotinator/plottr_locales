@@ -13,6 +13,7 @@ import Button from '../Button'
 import DeleteConfirmModal from '../dialogs/DeleteConfirmModal'
 import UnconnectedImage from '../images/Image'
 import { checkDependencies } from '../checkDependencies'
+import { isInviewport } from '../domHelpers'
 
 const NoteItemConnector = (connector) => {
   const Image = UnconnectedImage(connector)
@@ -35,14 +36,18 @@ const NoteItemConnector = (connector) => {
       this.scrollIntoView()
     }
 
-    componentDidUpdate() {
-      this.scrollIntoView()
+    componentDidUpdate(prevProps) {
+      if (prevProps.selected !== this.props.selected) {
+        this.scrollIntoView()
+      }
     }
 
     scrollIntoView = () => {
       if (this.props.selected) {
         const node = this.ref.current
-        if (node) node.scrollIntoView?.()
+        if (node && !isInviewport(node)) {
+          node.scrollIntoView?.()
+        }
       }
     }
 

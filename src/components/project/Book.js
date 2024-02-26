@@ -121,6 +121,7 @@ const BookConnector = (connector) => {
 
       return (
         <TemplatePicker
+          newBook
           types={['plotlines']}
           modal={true}
           isOpen={this.state.showTemplatePicker}
@@ -140,8 +141,9 @@ const BookConnector = (connector) => {
     renderTitle() {
       const { book } = this.props
       if (book.imageId) return null
+      const maxTitleLength = 320
 
-      return <h6>{book.title || t('Untitled')}</h6>
+      return <h6>{book.title?.slice?.(0, maxTitleLength) || t('Untitled')}</h6>
     }
 
     handleClickAddBook = () => {
@@ -182,6 +184,7 @@ const BookConnector = (connector) => {
         )
       }
 
+      const titleLength = book?.title?.length ?? 0
       return (
         <div
           className={cx('book-container', { darkmode: darkMode })}
@@ -195,14 +198,19 @@ const BookConnector = (connector) => {
             onClick={this.navigateToBook}
           >
             <div className="front">
-              <div className="cover">
+              <div
+                className={cx('cover', {
+                  'smaller-font': titleLength <= 140 && titleLength > 80,
+                  'very-small-font': titleLength > 140,
+                })}
+              >
                 {this.renderTitle()}
                 <div className="book-container__cover-image-wrapper">{this.renderImage()}</div>
               </div>
             </div>
             <div className="left-side">
               <h2>
-                <span>{book.title || t('Untitled')}</span>
+                <span>{book.title?.slice?.(0, 48) || t('Untitled')}</span>
               </h2>
             </div>
           </div>

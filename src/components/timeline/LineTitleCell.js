@@ -30,6 +30,10 @@ const {
   orientedClassName: { orientedClassName },
 } = helpers
 
+const formatTitle = (lineTitle) => {
+  return truncateTitle(lineTitle?.match(/[{}]/) ? lineTitle : t(lineTitle), 50)
+}
+
 const LineTitleCellConnector = (connector) => {
   const ColorPicker = UnconnectedColorPicker(connector)
   const Floater = UnconnectedPlottrFloater(connector)
@@ -63,6 +67,7 @@ const LineTitleCellConnector = (connector) => {
     const [showColorPicker, setShowColorPicker] = useState(false)
     const [deleting, setDeleting] = useState(false)
     const [movingLine, setMovingLine] = useState(false)
+    const [supressScroll, setSuppressScroll] = useState(false)
 
     const hoverTimeout = useRef(null)
     const titleInputRef = useRef()
@@ -85,7 +90,7 @@ const LineTitleCellConnector = (connector) => {
       if (movingLine && bookChoiceDropDown.current) {
         const dropDownId = bookChoiceDropDown.current.props.id
         const dropDown = document.querySelector(`#${dropDownId}`)
-        if (dropDown) {
+        if (typeof dropDown?.focus === 'function') {
           dropDown.focus()
         }
       }
@@ -93,6 +98,7 @@ const LineTitleCellConnector = (connector) => {
 
     const startEditing = () => {
       if (!movingLine) {
+        setSuppressScroll(true)
         uiActions.startEditingPlotlineHeadingTitle(line.id)
       }
     }
@@ -131,6 +137,7 @@ const LineTitleCellConnector = (connector) => {
       setMovingLine(false)
       uiActions.stopEditingPlotlineHeadingTitle()
       setHovering(false)
+      setSuppressScroll(false)
     }
 
     const handleFinishEditingTitle = (event) => {
@@ -504,10 +511,10 @@ const LineTitleCellConnector = (connector) => {
         return line?.isPinned ? (
           <span>
             <BsPinFill />
-            {truncateTitle(t(line.title), 50)}
+            {formatTitle(line.title)}
           </span>
         ) : (
-          truncateTitle(t(line.title), 50)
+          formatTitle(line.title)
         )
       } else {
         const focusCandidate =
@@ -528,6 +535,7 @@ const LineTitleCellConnector = (connector) => {
               inputRef={(ref) => {
                 titleInputRef.current = ref
               }}
+              supressScrollIntoView={supressScroll}
               autoFocus
               selection={selection}
               onKeyDown={handleEsc}
@@ -577,10 +585,10 @@ const LineTitleCellConnector = (connector) => {
                 {line?.isPinned ? (
                   <>
                     <BsPinFill />
-                    {truncateTitle(t(line.title), 50)}
+                    {formatTitle(line.title)}
                   </>
                 ) : (
-                  truncateTitle(t(line.title), 50)
+                  formatTitle(line.title)
                 )}
               </span>
             </Floater>

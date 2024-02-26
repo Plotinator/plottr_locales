@@ -3,7 +3,6 @@ import PropTypes from 'react-proptypes'
 
 import { t as i18n } from 'plottr_locales'
 import { helpers } from 'pltr/v2'
-import { emptyCard } from 'pltr/v2/helpers/cards'
 
 import Grid from '../Grid'
 import Alert from '../Alert'

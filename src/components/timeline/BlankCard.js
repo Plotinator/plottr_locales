@@ -45,7 +45,9 @@ const BlankCardConnector = (connector) => {
       // user just chose a template, and now needs to give the card a name
       if (creating && prevState.showTemplatePicker && !showTemplatePicker) {
         setTimeout(() => {
-          if (this.titleInputRef) this.titleInputRef.focus()
+          if (typeof this.titleInputRef?.focus === 'function') {
+            this.titleInputRef.focus()
+          }
         }, 100)
       }
     }
@@ -334,6 +336,7 @@ const BlankCardConnector = (connector) => {
                   isMedium={isMedium}
                   tableLength={tableLength}
                   beatHeadingCount={beatHeadingCount}
+                  disableAnimation={isPinned}
                 />
               ) : null}
               <div

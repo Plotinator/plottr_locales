@@ -222,7 +222,9 @@ const ImagePickerConnector = (connector) => {
                 </ControlLabel>
                 <FormControl
                   onClick={(event) => {
-                    event.target.focus()
+                    if (typeof event?.target?.focus === 'function') {
+                      event.target.focus()
+                    }
                   }}
                   placeholder={i18n('URL')}
                   type="text"

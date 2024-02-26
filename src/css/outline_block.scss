@@ -93,6 +93,16 @@
       .glyphicon-pencil {
         display: none;
       }
+
+      .outline__description__editing {
+        .slate-editor__editor {
+          .slate-editor__word-counter {
+            // space for close button
+            bottom: 60px;
+          }
+        }
+      }
+
     }
 
     &:not(.editing) {

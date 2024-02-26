@@ -91,7 +91,6 @@ const BookDialogConnector = (connector) => {
     renderToolBar() {
       return (
         <ButtonToolbar>
-          <Button onClick={this.handleCancel}>{i18n('Cancel')}</Button>
           <Button bsStyle="success" onClick={() => this.saveEdit()}>
             {i18n('Save')}
           </Button>

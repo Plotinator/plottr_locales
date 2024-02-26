@@ -93,12 +93,15 @@ const NoteListViewConnector = (connector) => {
     attributesDialogOpen,
     filterVisible,
     sortVisible,
+    isJumping,
   }) => {
     const [draggedNote, setDraggedNote] = useState()
     const [isMovingToNewCategory, setMovingToNewCategory] = useState(false)
 
     useEffect(() => {
-      uiActions.selectNote(detailID(visibleNotesByCategory, notes, categories, selectedNoteId))
+      if (!isJumping) {
+        uiActions.selectNote(detailID(visibleNotesByCategory, notes, categories, selectedNoteId))
+      }
     }, [notes, visibleNotesByCategory, categories])
 
     const handleCreateNewNote = () => {
@@ -388,6 +391,7 @@ const NoteListViewConnector = (connector) => {
     attributesDialogOpen: PropTypes.bool,
     filterVisible: PropTypes.bool,
     sortVisible: PropTypes.bool,
+    isJumping: PropTypes.bool,
   }
 
   const {
@@ -423,6 +427,7 @@ const NoteListViewConnector = (connector) => {
           attributesDialogOpen: selectors.noteAttributesDialogOpenSelector(state),
           filterVisible: selectors.noteFilterVisibleSelector(state),
           sortVisible: selectors.noteSortVisibleSelector(state),
+          isJumping: selectors.isJumpingSelector(state),
         }
       },
       (dispatch) => {

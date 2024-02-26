@@ -33,6 +33,7 @@
   position: relative;
 
   h2 {
+    @include sub-header-font;
     font-size: 17px;
   }
 }
@@ -243,7 +244,6 @@
 
     .place-list__right-side {
       display: flex;
-      width: 100%;
       align-items: center;
 
       .img-responsive {
@@ -258,6 +258,12 @@
 
       svg {
         margin: auto;
+      }
+    }
+
+    .slate-editor__wrapper {
+      .slate-editor__word-counter {
+        display: none !important;
       }
     }
   }
@@ -307,6 +313,15 @@
 
     svg {
       font-size: 2rem;
+    }
+  }
+
+  .place-list__inputs__normal {
+    .slate-editor__wrapper {
+      position: relative;
+      .slate-editor__word-counter {
+        display: flex !important;
+      }
     }
   }
 }

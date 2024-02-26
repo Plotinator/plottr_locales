@@ -42,6 +42,7 @@ export default function VisualLine({
   isMedium,
   tableLength,
   beatHeadingCount,
+  disableAnimation,
 }) {
   const margins = useMemo(() => {
     return getMargins(orientation, isMedium)
@@ -66,7 +67,9 @@ export default function VisualLine({
   } else {
     lineStyle.height = `${currentLength}px`
   }
-  lineStyle.transitionDuration = `${transitionSeconds}s`
+  if (!disableAnimation) {
+    lineStyle.transitionDuration = `${transitionSeconds}s`
+  }
 
   const lineKlass = cx(orientedClassName('line-title__line-line', orientation), {
     'medium-timeline': isMedium,
@@ -82,4 +85,5 @@ VisualLine.propTypes = {
   isMedium: PropTypes.bool,
   isPinned: PropTypes.bool,
   beatHeadingCount: PropTypes.number,
+  disableAnimation: PropTypes.bool,
 }

@@ -2,22 +2,17 @@ import React, { useState, useEffect, useCallback } from 'react'
 import PropTypes from 'react-proptypes'
 
 import { t, setupI18n } from 'plottr_locales'
-import { defaultSettings } from 'pltr/v2'
 
 import Tab from '../../Tab'
 import Tabs from '../../Tabs'
 import Button from '../../Button'
 import Switch from '../../Switch'
-import ButtonGroup from '../../ButtonGroup'
 import UnconnectedLanguagePicker from '../../LanguagePicker'
 import UnconnectedDarkOptionsSelect from './DarkOptionsSelect'
 import UnconnectedBackupSettings from './BackupSettings'
-import { checkDependencies } from '../../checkDependencies'
-import { addRecent, getFonts, getRecent } from '../../rce/fonts'
-import { FontSettingDropdown } from './FontSettingDropdown'
-import { FontSizeSettingDropdown } from './FontSizeSettingDropdown'
-import RichTextSettingsViewer from './RichTextSettingsViewer'
 import UnconnectedFileSettings from './FileSettings'
+import UnconnectedFontSettings from './FontSettings'
+import { checkDependencies } from '../../checkDependencies'
 
 const OptionsHomeConnector = (connector) => {
   const {
@@ -43,11 +38,10 @@ const OptionsHomeConnector = (connector) => {
   const DarkOptionsSelect = UnconnectedDarkOptionsSelect(connector)
   const BackupSettings = UnconnectedBackupSettings(connector)
   const FileSettings = UnconnectedFileSettings(connector)
+  const FontSettings = UnconnectedFontSettings(connector)
 
   const OptionsHome = ({ settings, shouldBeInPro }) => {
     const [activeTab, setActiveTab] = useState(1)
-    const [fonts, setFonts] = useState(null)
-    const [recentFonts, setRecentFonts] = useState(settings.user.font ? [settings.user.font] : null)
 
     useEffect(() => {
       hostLocale().then((locale) => {
@@ -60,11 +54,6 @@ const OptionsHomeConnector = (connector) => {
         setActiveTab(x)
       }
     }
-
-    useEffect(() => {
-      if (!fonts) setFonts(getFonts(os()))
-      setRecentFonts(getRecent())
-    }, [settings.user.font])
 
     const osIsUnknown = os() === 'unknown'
 
@@ -85,11 +74,6 @@ const OptionsHomeConnector = (connector) => {
 
     const spellCheckText = spellCheckAtFirstIsOn ? t('Enabled') : t('Disabled')
 
-    const { user } = defaultSettings.defaultsForPlatform(os())
-    const rceFontIsDefault = settings.user.font === user?.font
-    const rceFontSizeIsDefault = settings.user.fontSize === user?.fontSize
-    const rceIsDefault = rceFontIsDefault && rceFontSizeIsDefault
-
     const handleSelectLanguage = useCallback(
       (newLanguage) => {
         saveAppSetting('locale', newLanguage)
@@ -97,12 +81,6 @@ const OptionsHomeConnector = (connector) => {
       },
       [saveAppSetting, updateLanguage]
     )
-
-    const setFontDefaults = useCallback(() => {
-      saveAppSetting('user.font', 'Forum')
-      addRecent('Forum')
-      saveAppSetting('user.fontSize', 20)
-    }, [saveAppSetting])
 
     return (
       <div className="dashboard__options">
@@ -145,46 +123,16 @@ const OptionsHomeConnector = (connector) => {
                 />
                 <p>{t('Requires you to restart plottr')}</p>
               </div>
-              <div className="dashboard__options__item rce">
-                <h4>{t('Font Default: Text Editor')}</h4>
-                <ButtonGroup>
-                  <FontSettingDropdown
-                    activeFont={settings.user.font}
-                    fonts={fonts || []}
-                    recentFonts={recentFonts || []}
-                    addRecent={addRecent}
-                    onChange={(newFont) => {
-                      saveAppSetting('user.font', newFont)
-                    }}
-                  />
-                  <FontSizeSettingDropdown
-                    defaultFontSize={settings.user.fontSize}
-                    onChange={(newSize) => {
-                      saveAppSetting('user.fontSize', newSize)
-                    }}
-                  />
-                </ButtonGroup>
-                {rceIsDefault ? null : (
-                  <Button style={{ marginLeft: '16px' }} onClick={setFontDefaults}>
-                    {t('Restore Defaults')}
-                  </Button>
-                )}
-                <p style={{ paddingTop: '8px', margin: 0 }}>{t('Preview:')}</p>
-                <div style={{ width: '50%' }}>
-                  <RichTextSettingsViewer
-                    log={log}
-                    fontFamily={settings.user.font}
-                    fontSize={settings.user.fontSize}
-                  />
-                </div>
-              </div>
             </Tab>
             {!shouldBeInPro ? (
               <Tab eventKey={2} title={t('Files')}>
                 <FileSettings />
               </Tab>
             ) : null}
-            <Tab eventKey={3} title={t('Dashboard')}>
+            <Tab eventKey={3} title={t('Fonts')}>
+              <FontSettings />
+            </Tab>
+            <Tab eventKey={4} title={t('Dashboard')}>
               <div className="dashboard__options__item">
                 <h4>{t('Always Open Dashboard First')}</h4>
                 <Switch
@@ -211,11 +159,11 @@ const OptionsHomeConnector = (connector) => {
                 />
               </div>
             </Tab>
-            <Tab eventKey={4} title={t('Backups')}>
+            <Tab eventKey={5} title={t('Backups')}>
               <BackupSettings />
             </Tab>
             {!osIsUnknown && shouldBeInPro ? (
-              <Tab eventKey={5} title={t('Beta')}>
+              <Tab eventKey={6} title={t('Beta')}>
                 <div className="dashboard__options__item">
                   <h4>{t('Offline Mode')}</h4>
                   <Switch

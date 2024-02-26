@@ -9,6 +9,7 @@
   padding: 16px 20px 10px 20px;
 
   h2 {
+    @include sub-header-font;
     padding-left: 20px;
     margin-top: 0;
   }
@@ -24,6 +25,7 @@
   position: relative;
 
   h2 {
+    @include sub-header-font;
     margin-top: 0;
 
     .glyphicon {
@@ -280,6 +282,18 @@
     //   }
     // }
   }
+
+  &.smaller-font {
+    h6 {
+      font-size: 16px !important;
+    }
+  }
+
+  &.very-small-font {
+    h6 {
+      font-size: 12px !important;
+    }
+  }
 }
 
 .book-container .left-side {
@@ -333,6 +347,7 @@
   text-align: right;
   transform-origin: 0 0;
   transform: rotate(90deg) translateY(-45px);
+  @include sub-header-font;
 }
 
 .cover {
@@ -484,6 +499,7 @@
   .book-list__container,
   .edit-book__container {
     h2 {
+      @include sub-header-font;
       color: $darkmode-v2-heading-text;
     }
   }

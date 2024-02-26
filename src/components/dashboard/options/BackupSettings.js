@@ -20,7 +20,7 @@ const BackupSettingsConnector = (connector) => {
       os,
       userDocumentsPath,
       settings: { saveAppSetting },
-      file: { joinPath, filePathAsArray },
+      file: { joinPath, filePathAsArray, directoryIsWritable },
       showErrorBox,
     },
   } = connector
@@ -34,6 +34,7 @@ const BackupSettingsConnector = (connector) => {
     userDocumentsPath,
     filePathAsArray,
     showErrorBox,
+    directoryIsWritable,
   })
 
   const BackupOptions = UnconnectedBackupOptions(connector)
@@ -85,7 +86,25 @@ const BackupSettingsConnector = (connector) => {
               t('Please store your backups in a different location to your default folder')
             )
           } else {
-            saveAppSetting('user.backupLocation', folderPath)
+            directoryIsWritable(folderPath)
+              .then((isWritable) => {
+                if (isWritable) {
+                  return saveAppSetting('user.backupLocation', folderPath)
+                } else {
+                  return showErrorBox(
+                    t('Invalid default folder location'),
+                    t("Plottr can't write to that directory.  Please choose another")
+                  ).catch((_error) => {
+                    // Ignore
+                  })
+                }
+              })
+              .catch((error) => {
+                return showErrorBox(
+                  t('Something went wrong'),
+                  t('Plottr ran into an error saving that setting')
+                )
+              })
           }
         }
       })

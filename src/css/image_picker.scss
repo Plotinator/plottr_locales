@@ -306,6 +306,7 @@
     border: 3px dashed $darkmode-v2-border;
 
     h2 {
+      @include sub-header-font;
       color: #bbb;
     }
   }

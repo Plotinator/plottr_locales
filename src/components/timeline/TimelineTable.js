@@ -462,7 +462,6 @@ const TimelineTableConnector = (connector) => {
     activeTab: PropTypes.number,
     timelineViewIsTabbed: PropTypes.bool,
     timelineViewIsStacked: PropTypes.bool,
-    pinnedPlotlines: PropTypes.number,
   }
 
   const {
@@ -496,7 +495,6 @@ const TimelineTableConnector = (connector) => {
           message: selectors.messageSelector(state),
           timelineViewIsTabbed: selectors.timelineViewIsTabbedSelector(state),
           timelineViewIsStacked: selectors.timelineViewIsStackedSelector(state),
-          pinnedPlotlines: selectors.pinnedPlotlinesSelector(state),
         }
       },
       (dispatch) => {

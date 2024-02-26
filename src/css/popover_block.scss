@@ -30,12 +30,12 @@
 
   ul,
   ol {
-    color: $darkmode-text;
+    color: inherit;
   }
 
   .slate-editor__editor {
     div > * {
-      color: $darkmode-v2-darker-text;
+      color: inherit;
     }
   }
 

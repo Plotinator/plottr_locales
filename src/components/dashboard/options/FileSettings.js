@@ -13,7 +13,7 @@ const FileSettingsConnector = (connector) => {
   const {
     platform: {
       settings: { saveAppSetting },
-      file: { joinPath, filePathAsArray },
+      file: { joinPath, filePathAsArray, directoryIsWritable },
       showOpenDialog,
       showItemInFolder,
       userDocumentsPath,
@@ -28,6 +28,7 @@ const FileSettingsConnector = (connector) => {
     joinPath,
     filePathAsArray,
     showErrorBox,
+    directoryIsWritable,
   })
 
   const FileSettings = ({ settings }) => {
@@ -70,7 +71,25 @@ const FileSettingsConnector = (connector) => {
               t('Please set your default folder to a different location from your backups')
             )
           } else {
-            saveAppSetting('user.defaultFolderLocation', folderPath)
+            directoryIsWritable(folderPath)
+              .then((isWritable) => {
+                if (isWritable) {
+                  return saveAppSetting('user.defaultFolderLocation', folderPath)
+                } else {
+                  return showErrorBox(
+                    t('Invalid default folder location'),
+                    t("Plottr can't write to that directory.  Please choose another")
+                  ).catch((_error) => {
+                    // Ignore
+                  })
+                }
+              })
+              .catch((error) => {
+                return showErrorBox(
+                  t('Something went wrong'),
+                  t('Plottr ran into an error saving that setting')
+                )
+              })
           }
         }
       })
