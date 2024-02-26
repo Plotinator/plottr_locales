@@ -120,15 +120,17 @@
           h4 {
             display: flex;
             justify-content: center;
-            width: 100%;  
             margin: 0;
           }
+        }
+        svg {
+          cursor: pointer;
         }
 
         h4 {
           display: flex;
-          width: 100%;  
           margin: 0;
+          margin-right: 20px;
         }
       }
     }
