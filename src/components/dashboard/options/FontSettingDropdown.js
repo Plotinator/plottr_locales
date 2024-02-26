@@ -4,7 +4,14 @@ import PropTypes from 'react-proptypes'
 import DropdownButton from '../../DropdownButton'
 import MenuItem from '../../MenuItem'
 
-const UnMemoisedFontSettingDropdown = ({ activeFont, addRecent, fonts, recentFonts, onChange }) => {
+const UnMemoisedFontSettingDropdown = ({
+  activeFont,
+  addRecent,
+  fonts,
+  recentFonts,
+  onChange,
+  onClick,
+}) => {
   const title = activeFont || recentFonts?.[0] || 'Forum'
 
   const changeFont = (font) => {
@@ -30,7 +37,7 @@ const UnMemoisedFontSettingDropdown = ({ activeFont, addRecent, fonts, recentFon
   }
 
   return (
-    <DropdownButton title={title} onSelect={changeFont} id="font-dropdown">
+    <DropdownButton title={title} onSelect={changeFont} id="font-dropdown" onClick={onClick}>
       {renderFonts()}
     </DropdownButton>
   )
@@ -42,6 +49,7 @@ UnMemoisedFontSettingDropdown.propTypes = {
   recentFonts: PropTypes.arrayOf(PropTypes.string),
   fonts: PropTypes.arrayOf(PropTypes.string),
   onChange: PropTypes.func,
+  onClick: PropTypes.func,
 }
 
 export const FontSettingDropdown = React.memo(UnMemoisedFontSettingDropdown)

@@ -112,11 +112,26 @@ const RCESettingSectionConnector = (connector) => {
     }, [showDarkModeColourPicker])
 
     const toggleColorPicker = () => {
+      if (showDarkModeColourPicker) {
+        setShowDarkModeColourPicker(false)
+      }
       setShowColourPicker(!showColourPicker)
     }
 
     const toggleDarkModeColorPicker = () => {
+      if (showColourPicker) {
+        setShowColourPicker(false)
+      }
       setShowDarkModeColourPicker(!showDarkModeColourPicker)
+    }
+
+    const handleCloseColorPickers = () => {
+      if (showColourPicker) {
+        setShowColourPicker(false)
+      }
+      if (showDarkModeColourPicker) {
+        setShowDarkModeColourPicker(false)
+      }
     }
 
     return (
@@ -129,6 +144,7 @@ const RCESettingSectionConnector = (connector) => {
               fonts={fonts || []}
               recentFonts={[]}
               addRecent={addRecent}
+              onClick={handleCloseColorPickers}
               onChange={(newFont) => {
                 saveAppSetting(`user.fonts.rce.${sectionName}Font`, newFont)
               }}
@@ -144,6 +160,7 @@ const RCESettingSectionConnector = (connector) => {
               onChange={(newSize) => {
                 saveAppSetting(`user.fonts.rce.${sectionName}FontSize`, `${newSize}px`)
               }}
+              onClick={handleCloseColorPickers}
             />
           </div>
           {noFontWeight ? null : (
@@ -154,6 +171,7 @@ const RCESettingSectionConnector = (connector) => {
                 onChange={(newWeight) => {
                   saveAppSetting(`user.fonts.rce.${sectionName}FontWeight`, newWeight)
                 }}
+                onClick={handleCloseColorPickers}
               />
             </div>
           )}

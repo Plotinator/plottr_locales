@@ -194,4 +194,79 @@ describe('isEmpty', () => {
       })
     })
   })
+  describe('given an object a field that has a null value', () => {
+    it("shouldn't count the field towards the word count (and should not crash either)", () => {
+      expect(
+        isEmpty([
+          {
+            children: [
+              {
+                type: 'link',
+                url: null,
+                children: [
+                  {
+                    text: 'Some text',
+                  },
+                ],
+              },
+              {
+                text: null,
+              },
+              {
+                blah: null,
+              },
+            ],
+            type: 'paragraph',
+          },
+          {
+            children: [
+              {
+                text: 'Some more text',
+              },
+              {
+                blah: null,
+              },
+            ],
+            type: 'paragraph',
+          },
+        ])
+      ).toBeFalsy()
+
+      expect(
+        isEmpty([
+          {
+            children: [
+              {
+                type: 'link',
+                url: null,
+                children: [
+                  {
+                    text: '',
+                  },
+                ],
+              },
+              {
+                text: null,
+              },
+              {
+                blah: null,
+              },
+            ],
+            type: 'paragraph',
+          },
+          {
+            children: [
+              {
+                text: '',
+              },
+              {
+                blah: null,
+              },
+            ],
+            type: 'paragraph',
+          },
+        ])
+      ).toBeTruthy()
+    })
+  })
 })

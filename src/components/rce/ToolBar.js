@@ -62,9 +62,10 @@ const UnconnectedToolBar = (connector) => {
   const strikeThroughIcon = <FaStrikethrough />
 
   const ToolBar = ({ editor, darkMode, settings, focusEditor }) => {
+    const currentFont = settings.user.fonts?.rce?.defaultFont
     const [showColorPicker, toggleColorPicker] = useState(false)
     const [fonts, setFonts] = useState(null)
-    const [recentFonts, setRecentFonts] = useState(settings.user.font ? [settings.user.font] : null)
+    const [recentFonts, setRecentFonts] = useState(currentFont ? [currentFont] : null)
     const defaultFontSize = settings.user.fontSize
 
     const changeColor = useCallback(
@@ -79,7 +80,7 @@ const UnconnectedToolBar = (connector) => {
     useEffect(() => {
       if (!fonts) setFonts(getFonts(os()))
       setRecentFonts(getRecent())
-    }, [settings.user.font])
+    }, [currentFont])
 
     const closeColorPicker = useCallback(() => {
       toggleColorPicker(false)
@@ -94,7 +95,7 @@ const UnconnectedToolBar = (connector) => {
         <ButtonToolbar>
           <ButtonGroup>
             <FontsButton
-              currentSetting={settings.user.font}
+              currentSetting={currentFont}
               fonts={fonts || []}
               recentFonts={recentFonts || []}
               addRecent={addRecent}

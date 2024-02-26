@@ -679,4 +679,213 @@ describe('normalize', () => {
       })
     })
   })
+  describe('given two bulleted-lists that follow one another without any elements between them', () => {
+    const rceContent = [
+      {
+        children: [
+          {
+            children: [
+              {
+                text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+              },
+            ],
+            type: 'list-item',
+          },
+        ],
+        type: 'bulleted-list',
+      },
+      {
+        children: [
+          {
+            children: [
+              {
+                children: [
+                  {
+                    text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+                  },
+                ],
+                type: 'list-item',
+              },
+            ],
+            type: 'bulleted-list',
+          },
+        ],
+        type: 'paragraph',
+      },
+    ]
+    it('should merge the lists', () => {
+      expect(normalize(dummyLog)(rceContent)).toEqual([
+        {
+          children: [
+            {
+              children: [
+                {
+                  text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+                },
+              ],
+              type: 'list-item',
+            },
+            {
+              children: [
+                {
+                  text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+                },
+              ],
+              type: 'list-item',
+            },
+          ],
+          type: 'bulleted-list',
+        },
+      ])
+    })
+  })
+  describe('given two bulleted-lists that follow one another with an empty paragraph between them', () => {
+    const rceContent = [
+      {
+        children: [
+          {
+            children: [
+              {
+                text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+              },
+            ],
+            type: 'list-item',
+          },
+        ],
+        type: 'bulleted-list',
+      },
+      {
+        children: [
+          {
+            text: '',
+          },
+        ],
+        type: 'paragraph',
+      },
+      {
+        children: [
+          {
+            children: [
+              {
+                children: [
+                  {
+                    text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+                  },
+                ],
+                type: 'list-item',
+              },
+            ],
+            type: 'bulleted-list',
+          },
+        ],
+        type: 'paragraph',
+      },
+    ]
+    it('should merge the lists', () => {
+      expect(normalize(dummyLog)(rceContent)).toEqual([
+        {
+          children: [
+            {
+              children: [
+                {
+                  text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+                },
+              ],
+              type: 'list-item',
+            },
+            {
+              children: [
+                {
+                  text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+                },
+              ],
+              type: 'list-item',
+            },
+          ],
+          type: 'bulleted-list',
+        },
+      ])
+    })
+  })
+  describe('given two bulleted-lists that follow one another with a non-empty paragraph between them', () => {
+    const rceContent = [
+      {
+        children: [
+          {
+            children: [
+              {
+                text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+              },
+            ],
+            type: 'list-item',
+          },
+        ],
+        type: 'bulleted-list',
+      },
+      {
+        children: [
+          {
+            text: 'I am a non-empty paragraph!',
+          },
+        ],
+        type: 'paragraph',
+      },
+      {
+        children: [
+          {
+            children: [
+              {
+                children: [
+                  {
+                    text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+                  },
+                ],
+                type: 'list-item',
+              },
+            ],
+            type: 'bulleted-list',
+          },
+        ],
+        type: 'paragraph',
+      },
+    ]
+    it('should not merge the lists', () => {
+      expect(normalize(dummyLog)(rceContent)).toEqual([
+        {
+          children: [
+            {
+              children: [
+                {
+                  text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+                },
+              ],
+              type: 'list-item',
+            },
+          ],
+          type: 'bulleted-list',
+        },
+        {
+          children: [
+            {
+              text: 'I am a non-empty paragraph!',
+            },
+          ],
+          type: 'paragraph',
+        },
+        {
+          children: [
+            {
+              children: [
+                {
+                  text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+                },
+              ],
+              type: 'list-item',
+            },
+          ],
+          type: 'bulleted-list',
+        },
+      ])
+    })
+  })
 })

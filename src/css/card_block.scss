@@ -91,6 +91,13 @@
 
   cursor: pointer;
 
+  &.vertical {
+    .card__behind {
+      left: 48px;
+      right: unset !important;
+    }
+  }
+
   &.medium-timeline {
     max-width: 72px;
   }

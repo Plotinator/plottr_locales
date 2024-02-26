@@ -26,8 +26,8 @@ const GlobalFontSettingsConnector = (connector) => {
     const { user } = defaultSettings.defaultsForPlatform(os())
     const defaultGlobalHeadingFont = user?.fonts?.global?.headingFont
     const defaultGlobalBodyFont = user?.fonts?.global?.bodyFont
-    const globalHeadingFontIsDefault = globalFontsSettings?.headingFont == defaultGlobalHeadingFont
-    const globalBodyFontIsDefault = globalFontsSettings?.bodyFont == defaultGlobalBodyFont
+    const globalHeadingFontIsDefault = globalFontsSettings?.headingFont === defaultGlobalHeadingFont
+    const globalBodyFontIsDefault = globalFontsSettings?.bodyFont === defaultGlobalBodyFont
     const globalFontSettingIsDefault =
       isEmpty(globalFontsSettings) || (globalHeadingFontIsDefault && globalBodyFontIsDefault)
 
@@ -37,7 +37,7 @@ const GlobalFontSettingsConnector = (connector) => {
 
     const setGlobalFontDefaults = useCallback(() => {
       saveAppSetting('user.fonts.global.headingFont', defaultGlobalHeadingFont)
-      saveAppSetting('user.fonts.global.bodyFont', defaultGlobalHeadingFont)
+      saveAppSetting('user.fonts.global.bodyFont', defaultGlobalBodyFont)
     }, [saveAppSetting])
 
     return (

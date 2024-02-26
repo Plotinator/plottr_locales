@@ -263,6 +263,7 @@
     justify-content: space-evenly;
     background-color: #fff;
     border: 1px solid $new-item-border-color;
+    @include body-text-font;
 
     > :first-child {
       margin-right: 5px;

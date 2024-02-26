@@ -4,6 +4,8 @@ export const isEmpty = (children) => {
   function anyText(node) {
     if (Array.isArray(node)) {
       return node.some(anyText)
+    } else if (!node) {
+      return false
     } else if (typeof node === 'object') {
       return Object.entries(node).some(([key, value]) => {
         return (key === 'text' && typeof value === 'string' && value !== '') || anyText(value)
