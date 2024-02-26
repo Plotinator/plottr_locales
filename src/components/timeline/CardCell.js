@@ -4,6 +4,7 @@ import { Cell } from 'react-sticky-table'
 import cx from 'classnames'
 import { FaCircle } from 'react-icons/fa'
 import tinycolor from 'tinycolor2'
+import { omit } from 'lodash'
 
 import { helpers } from 'pltr/v2'
 
@@ -285,6 +286,11 @@ const CardCellConnector = (connector) => {
         if (!isVisible) {
           cardStyle.opacity = '0.1'
         }
+        const cardBehindStyle = {
+          ...omit(cardStyle, ['borderColor', 'backgroundColor']),
+          ...(cards[1]?.color ? { backgroundColor: cards[1]?.color } : {}),
+          borderColor: cards[1]?.color ? tinycolor(cards[1].color).darken(10).toHslString() : color,
+        }
         const bodyKlass = cx('card__body shadow', { 'medium-timeline': isMedium })
         const overviewKlass = cx('card__cell__overview-cell', {
           vertical: vertical,
@@ -320,7 +326,7 @@ const CardCellConnector = (connector) => {
                   <div className={bodyKlass} style={cardStyle}>
                     <div className="card__title">{cards[0].title}</div>
                   </div>
-                  <div className="card__behind" style={cardStyle}></div>
+                  <div className="card__behind" style={cardBehindStyle}></div>
                 </div>
               </Floater>
             </div>

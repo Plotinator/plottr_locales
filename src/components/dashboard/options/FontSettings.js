@@ -44,7 +44,7 @@ const FontSettingsConnector = (connector) => {
                     setSelectedSetting('global')
                   }}
                 >
-                  <div>{t('Global Fonts')}</div>
+                  <div>{t('General')}</div>
                 </li>
                 <li
                   key="timeline"

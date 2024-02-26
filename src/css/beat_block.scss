@@ -141,7 +141,7 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
 
   &.medium-timeline {
     width: $medium_width + 6px; // +6px for the 3px border
-    font-size: 14px;
+    @include medium-timeline-header-font-size;
     padding: 12px 4px;
     margin: auto;
 
@@ -358,7 +358,7 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
 }
 
 .vertical-beat__body {
-  @include sub-header-font;
+  @include timeline-header-font;
   display: flex;
   text-align: right;
   justify-content: flex-end;
@@ -391,6 +391,7 @@ $medium_width: 82px; // +2px to fit two-digit `Chapter` names e.g. Chapter 12
     width: $medium_width + 16px; // +6px for the 3px border
     font-size: 14px;
     padding: 12px 8px;
+    @include medium-timeline-header-font-size;
 
     .form-group {
       .control-label {

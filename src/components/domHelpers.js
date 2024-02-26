@@ -8,3 +8,18 @@ export const boundingRectContains = (boundingRect, coord) => {
 export const contains = (element, click) => {
   return boundingRectContains(element.getBoundingClientRect(), click)
 }
+
+export const isInviewport = (element) => {
+  const rect = element.getBoundingClientRect()
+  if (typeof rect !== 'object') {
+    return false
+  } else {
+    const { top, left, right, bottom } = rect
+    return (
+      top >= 0 &&
+      left >= 0 &&
+      right <= (window?.innerWidth ?? document?.documentElement?.clientWidth ?? 0) &&
+      bottom <= (window?.innerHeight ?? document?.documentElement?.clientHeight ?? 0)
+    )
+  }
+}

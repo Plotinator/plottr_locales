@@ -9,8 +9,10 @@
   p,
   ul,
   ol {
+    &:not(.dropdown-menu) {
       @include rce-text-font;
     }
+  }
   &.readonly {
     margin: 0;
   }
@@ -106,7 +108,9 @@
   p,
   ul,
   ol {
-    @include rce-text-font;
+    &:not(.dropdown-menu) {
+      @include rce-text-font;
+    }
   }
   &.readonly {
     display: none;
@@ -125,8 +129,10 @@
     p,
     ul,
     ol {
-      @include rce-text-font;
-      @include rce-darkmode-font-color;
+      &:not(.dropdown-menu) {
+        @include rce-text-font;
+        @include rce-darkmode-font-color;
+      }
     }
 
     h1 {
@@ -195,8 +201,9 @@
   p,
   ul,
   ol {
-    @include rce-text-font;
-    @include rce-darkmode-font-color;
+    &:not(.dropdown-menu) {
+      @include rce-text-font;
+    }
   }
 
   h1 {
@@ -287,6 +294,14 @@
 .darkmode {
   .slate-editor__editor {
     color: $darkmode-v2-darker-text;
+    p,
+    ul,
+    ol {
+      &:not(.dropdown-menu) {
+        @include rce-text-font;
+        @include rce-darkmode-font-color;
+      }
+    }
 
     .slate-editor__word-counter {
       color: $darkmode-v2-darker-text;
@@ -317,6 +332,19 @@
           background-color: $darkmode-v2-nav-background;
           color: $darkmode-v2-darker-text;
         }
+
+        .btn {
+          &.active {
+            background-color: $darkmode-v2-darker-background;
+          }
+    
+          &:focus,
+          &:hover,
+          &:active {
+            color: $darkmode-v2-link-text;
+            background-color: $darkmode-v2-background;
+          }
+        }
       }
     }
 
@@ -327,22 +355,25 @@
 
   .slate-editor__wrapper {
     .slate-editor__editor {
-      
-      p,
-      ul,
-      ol {
-        @include rce-text-font;
-        @include rce-darkmode-font-color;
+      &:not(.light) {
+        p,
+        ul,
+        ol {
+          &:not(.dropdown-menu) {
+            @include rce-text-font;
+            @include rce-darkmode-font-color;
+          }
+        }
       }
 
-      .global-setting {
+      &.global-setting {
         &.darkmode {
           background-color: $darkmode-v2-card-background;
 
           p {
-            @include rce-text-font;
-            @include rce-darkmode-font-color;
-          }
+          @include rce-text-font;
+          @include rce-darkmode-font-color;
+}
 
           h1 {
             @include header-font;
@@ -359,11 +390,13 @@
         
         &.light {
           background-color: $gray-9;  
-          color: #102A42;
-          @include rce-text-font;
-
-          p {
-            @include rce-text-font;
+          p,
+          ul,
+          ol {
+            &:not(.dropdown-menu) {
+              @include rce-text-font;
+              @include rce-darkmode-font-color;
+            }
           }
 
           h1 {

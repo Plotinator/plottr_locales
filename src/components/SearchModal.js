@@ -5,7 +5,7 @@ import { FaExchangeAlt, FaPlus, FaMinus } from 'react-icons/fa'
 import cx from 'classnames'
 
 import { t } from 'plottr_locales'
-import { slate } from 'pltr/v2'
+import { slate, helpers } from 'pltr/v2'
 
 import Collapse from './Collapse'
 import Button from './Button'
@@ -14,6 +14,8 @@ import Tab from './Tab'
 import UnconnectedPlottrModal from './PlottrModal'
 import { checkDependencies } from './checkDependencies'
 import { withEventTargetValue } from './withEventTargetValue'
+
+const { unescapeUIPathElement } = helpers.ui
 
 const modalStyles = {
   overlay: {
@@ -38,10 +40,13 @@ const modalStyles = {
 const { serializeNoFormatting } = slate.plain
 
 const attributeToText = (x) => {
-  if (Array.isArray(x)) {
+  if (!x) {
+    return ''
+  } else if (Array.isArray(x)) {
     return serializeNoFormatting(x)
+  } else {
+    return x
   }
-  return x
 }
 
 const seriesAttributeToTitle = (seriesAttribute, series) => {
@@ -94,7 +99,7 @@ const computeCardHitTitle = (cardId, cards, restOfPathElements) => {
   const card = cards.find(({ id }) => {
     return id == cardId
   })
-  const restOfPath = restOfPathElements.slice(0, -1).join(' > ')
+  const restOfPath = restOfPathElements.slice(0, -1).map(unescapeUIPathElement).join(' > ')
   if (!card) {
     return [`Unknown card > ${restOfPath}`, '']
   }
@@ -107,12 +112,12 @@ const computeCardHitTitle = (cardId, cards, restOfPathElements) => {
       return [`${card.title} > Description`, serializeNoFormatting(card.description)]
     }
     case 'customAttribute': {
-      const attributeName = restOfPathElements[1] || ''
+      const attributeName = unescapeUIPathElement(restOfPathElements[1]) || ''
       return [`${card.title} > ${restOfPath}`, attributeToText(card[attributeName])]
     }
     case 'templateAttribute': {
       const templateId = restOfPathElements[1] || ''
-      const attributeName = restOfPathElements[2] || ''
+      const attributeName = unescapeUIPathElement(restOfPathElements[2]) || ''
       const templateValue = card.templates
         .find(({ id }) => {
           return id == templateId
@@ -135,7 +140,7 @@ const computeNoteHitTitle = (noteId, notes, restOfPathElements) => {
   const note = notes.find(({ id }) => {
     return id == noteId
   })
-  const restOfPath = restOfPathElements.slice(0, -1).join(' > ')
+  const restOfPath = restOfPathElements.slice(0, -1).map(unescapeUIPathElement).join(' > ')
   if (!note) {
     return [`Unknown note > ${restOfPath}`, '']
   }
@@ -148,7 +153,7 @@ const computeNoteHitTitle = (noteId, notes, restOfPathElements) => {
       return [`${note.title} > Content`, serializeNoFormatting(note.content)]
     }
     case 'customAttribute': {
-      const attributeName = restOfPathElements[1] || ''
+      const attributeName = unescapeUIPathElement(restOfPathElements[1]) || ''
       return [`${note.title} > ${restOfPath}`, attributeToText(note[attributeName])]
     }
     default: {
@@ -167,7 +172,7 @@ const computeCharacterHitTitle = (
   const character = characters.find(({ id }) => {
     return id == characterId
   })
-  const restOfPath = restOfPathElements.slice(0, -1).join(' > ')
+  const restOfPath = restOfPathElements.slice(0, -1).map(unescapeUIPathElement).join(' > ')
   if (!character) {
     return [`Unknown character > ${restOfPath}`, '']
   }
@@ -181,7 +186,7 @@ const computeCharacterHitTitle = (
       const attributeName =
         (characterAttributes || []).find(({ id }) => {
           return id == attributeId
-        })?.name || attributeId
+        })?.name || unescapeUIPathElement(attributeId)
       const bookName =
         attributeBookId === 'all'
           ? 'Series'
@@ -193,11 +198,12 @@ const computeCharacterHitTitle = (
       })
       return [
         `${character.name} > ${attributeName} > ${bookName}`,
-        attributeToText(newAttribute?.value ?? character[attributeId]),
+        attributeToText(newAttribute?.value ?? character[attributeId] ?? ''),
       ]
     }
     case 'templateAttribute': {
-      const [_templateAttribute, templateId, attributeName, attributeBookId] = restOfPathElements
+      const [_templateAttribute, templateId, rawAttributeName, attributeBookId] = restOfPathElements
+      const attributeName = unescapeUIPathElement(rawAttributeName)
       const template = character.templates.find(({ id }) => {
         return id == templateId
       })
@@ -211,7 +217,7 @@ const computeCharacterHitTitle = (
         attributeToText(
           template.values?.find(({ name, bookId }) => {
             return name == attributeName && bookId == attributeBookId
-          })?.value || ''
+          })?.value ?? ''
         ),
       ]
     }
@@ -225,7 +231,7 @@ const computePlaceHitTitle = (placeId, places, restOfPathElements) => {
   const place = places.find(({ id }) => {
     return id == placeId
   })
-  const restOfPath = restOfPathElements.slice(0, -1).join(' > ')
+  const restOfPath = restOfPathElements.slice(0, -1).map(unescapeUIPathElement).join(' > ')
   if (!place) {
     return [`Unknown place > ${restOfPath}`, '']
   }
@@ -241,8 +247,8 @@ const computePlaceHitTitle = (placeId, places, restOfPathElements) => {
       return [`${place.name} > Content`, serializeNoFormatting(place.notes)]
     }
     case 'customAttribute': {
-      const attributeName = restOfPathElements[1] || ''
-      return [`${place.name} > ${restOfPath}`, attributeToText(place[attributeName])]
+      const attributeName = unescapeUIPathElement(restOfPathElements[1]) || ''
+      return [`${place.name} > ${restOfPath}`, attributeToText(place[attributeName] ?? '')]
     }
     default: {
       return [`${place.name} > ${restOfPath}`, '']
@@ -254,7 +260,7 @@ const computeTagHitTitle = (tagId, tags, restOfPathElements) => {
   const tag = tags.find(({ id }) => {
     return id == tagId
   })
-  const restOfPath = restOfPathElements.slice(0, -1).join(' > ')
+  const restOfPath = restOfPathElements.slice(0, -1).map(unescapeUIPathElement).join(' > ')
   if (!tag) {
     return [`Unknown tag > ${restOfPath}`, '']
   }

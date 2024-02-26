@@ -189,12 +189,19 @@
     height: 100%;
     overflow-y: auto;
     margin: 0;
+    position: relative;
   }
 
   .slate-editor__editor {
     height: calc(100% - 30px);
     overflow-y: auto;
     @include rce-text-font;
+
+    .slate-editor__word-counter {
+      background-color: #fff;
+      border: 1px solid $new-item-border-color;
+      color: #102A42;
+    }
   }
 }
 
@@ -208,6 +215,7 @@
 
   .slate-editor__wrapper {
     overflow-y: unset;
+    position: relative;
   }
 }
 
@@ -444,6 +452,14 @@
               background-color: $darkmode-v2-background;
             }
           }
+        }
+      }
+
+      .slate-editor__editor {
+        .slate-editor__word-counter {
+          border: 1px solid $darkmode-v2-border;
+          background-color: $darkmode-v2-background;
+          color: $darkmode-v2-darker-text;
         }
       }
 

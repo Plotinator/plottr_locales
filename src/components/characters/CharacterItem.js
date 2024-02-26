@@ -12,6 +12,7 @@ import Button from '../Button'
 import DeleteConfirmModal from '../dialogs/DeleteConfirmModal'
 import UnconnectedImage from '../images/Image'
 
+import { isInviewport } from '../domHelpers'
 import { checkDependencies } from '../checkDependencies'
 
 const CharacterItemConnector = (connector) => {
@@ -44,7 +45,9 @@ const CharacterItemConnector = (connector) => {
     scrollIntoView = () => {
       if (this.props.selected) {
         const node = this.ref.current
-        if (node) node.scrollIntoView?.()
+        if (node && !isInviewport(node)) {
+          node.scrollIntoView?.()
+        }
       }
     }
 

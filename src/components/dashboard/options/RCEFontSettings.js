@@ -8,6 +8,7 @@ import { checkDependencies } from '../../checkDependencies'
 import { getFonts } from '../../rce/fonts'
 import Button from '../../Button'
 import UnconnectedRCESettingSection from './RCESettingSection'
+import { isEmpty } from 'lodash'
 
 const RCEFontSettingConnector = (connector) => {
   const RCESettingSection = UnconnectedRCESettingSection(connector)
@@ -88,20 +89,21 @@ const RCEFontSettingConnector = (connector) => {
       userSubtitleDarkModeFontColor == defaultSubtitleDarkModeFontColor
 
     const rceFontSettingIsDefault =
-      rceFontIsDefault &&
-      rceFontSizeIsDefault &&
-      rceFontColorIsDefault &&
-      rceTitleFontIsDefault &&
-      rceTitleFontSizeIsDefault &&
-      rceTitleFontWeightIsDefault &&
-      rceTitleFontColorIsDefault &&
-      rceSubtitleFontIsDefault &&
-      rceSubtitleFontSizeIsDefault &&
-      rceSubtitleFontWeightIsDefault &&
-      rceSubtitleFontColorIsDefault &&
-      rceDarkModeFontColorIsDefault &&
-      rceTitleDarkModeFontColorIsDefault &&
-      rceSubtitleDarkModeFontColorIsDefault
+      isEmpty(rceFontsSettings) ||
+      (rceFontIsDefault &&
+        rceFontSizeIsDefault &&
+        rceFontColorIsDefault &&
+        rceTitleFontIsDefault &&
+        rceTitleFontSizeIsDefault &&
+        rceTitleFontWeightIsDefault &&
+        rceTitleFontColorIsDefault &&
+        rceSubtitleFontIsDefault &&
+        rceSubtitleFontSizeIsDefault &&
+        rceSubtitleFontWeightIsDefault &&
+        rceSubtitleFontColorIsDefault &&
+        rceDarkModeFontColorIsDefault &&
+        rceTitleDarkModeFontColorIsDefault &&
+        rceSubtitleDarkModeFontColorIsDefault)
 
     useEffect(() => {
       if (!fonts) setFonts(getFonts(os()))

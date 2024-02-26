@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'react-proptypes'
+import { isEmpty } from 'lodash'
 
 import { defaultSettings } from 'pltr/v2'
 import { t } from 'plottr_locales'
@@ -27,7 +28,8 @@ const GlobalFontSettingsConnector = (connector) => {
     const defaultGlobalBodyFont = user?.fonts?.global?.bodyFont
     const globalHeadingFontIsDefault = globalFontsSettings?.headingFont == defaultGlobalHeadingFont
     const globalBodyFontIsDefault = globalFontsSettings?.bodyFont == defaultGlobalBodyFont
-    const globalFontSettingIsDefault = globalHeadingFontIsDefault && globalBodyFontIsDefault
+    const globalFontSettingIsDefault =
+      isEmpty(globalFontsSettings) || (globalHeadingFontIsDefault && globalBodyFontIsDefault)
 
     useEffect(() => {
       if (!fonts) setFonts(getFonts(os()))
@@ -42,12 +44,12 @@ const GlobalFontSettingsConnector = (connector) => {
       <>
         <div className="dashboard__options__item">
           <div className="dashboard__options__item__font-setting__heading">
-            <h4>{t('Global Fonts')}</h4>
+            <h4>{t('General')}</h4>
             <hr />
           </div>
         </div>
         <div className="dashboard__options__item">
-          <span>{t('Global Heading Font')}</span>
+          <span>{t('General Heading Font')}</span>
           <FontSettingDropdown
             activeFont={globalFontsSettings.headingFont || defaultGlobalHeadingFont}
             fonts={fonts || []}
@@ -59,7 +61,7 @@ const GlobalFontSettingsConnector = (connector) => {
           />
         </div>
         <div className="dashboard__options__item">
-          <span>{t('Global Body Font')}</span>
+          <span>{t('General Body Font')}</span>
           <FontSettingDropdown
             activeFont={globalFontsSettings.bodyFont || defaultGlobalBodyFont}
             fonts={fonts || []}

@@ -282,6 +282,18 @@
     //   }
     // }
   }
+
+  &.smaller-font {
+    h6 {
+      font-size: 16px !important;
+    }
+  }
+
+  &.very-small-font {
+    h6 {
+      font-size: 12px !important;
+    }
+  }
 }
 
 .book-container .left-side {

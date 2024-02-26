@@ -30,6 +30,10 @@ const {
   orientedClassName: { orientedClassName },
 } = helpers
 
+const formatTitle = (lineTitle) => {
+  return truncateTitle(lineTitle?.match(/[{}]/) ? lineTitle : t(lineTitle), 50)
+}
+
 const LineTitleCellConnector = (connector) => {
   const ColorPicker = UnconnectedColorPicker(connector)
   const Floater = UnconnectedPlottrFloater(connector)
@@ -507,10 +511,10 @@ const LineTitleCellConnector = (connector) => {
         return line?.isPinned ? (
           <span>
             <BsPinFill />
-            {truncateTitle(t(line.title), 50)}
+            {formatTitle(line.title)}
           </span>
         ) : (
-          truncateTitle(t(line.title), 50)
+          formatTitle(line.title)
         )
       } else {
         const focusCandidate =
@@ -581,10 +585,10 @@ const LineTitleCellConnector = (connector) => {
                 {line?.isPinned ? (
                   <>
                     <BsPinFill />
-                    {truncateTitle(t(line.title), 50)}
+                    {formatTitle(line.title)}
                   </>
                 ) : (
-                  truncateTitle(t(line.title), 50)
+                  formatTitle(line.title)
                 )}
               </span>
             </Floater>

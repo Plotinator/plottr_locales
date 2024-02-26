@@ -10,6 +10,7 @@ import { FontSettingDropdown } from './FontSettingDropdown'
 import Button from '../../Button'
 import ButtonGroup from '../../ButtonGroup'
 import { FontSizeSettingDropdown } from './FontSizeSettingDropdown'
+import { isEmpty } from 'lodash'
 
 const TimelineFontSettingConnector = (connector) => {
   const {
@@ -53,9 +54,10 @@ const TimelineFontSettingConnector = (connector) => {
       timelineSceneCardTitlesFontIsDefault && timelineSceneCardTitlesFontSizeIsDefault
 
     const timelineFontSettingIsDefault =
-      timelineHeadingFontSettingIsDefault &&
-      timelinePlotlineFontSettingIsDefault &&
-      timelineSceneCardTitleFontSettingIsDefault
+      isEmpty(timelineFontsSettings) ||
+      (timelineHeadingFontSettingIsDefault &&
+        timelinePlotlineFontSettingIsDefault &&
+        timelineSceneCardTitleFontSettingIsDefault)
 
     useEffect(() => {
       if (!fonts) setFonts(getFonts(os()))

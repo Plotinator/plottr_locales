@@ -126,6 +126,8 @@ const RichTextEditorConnector = (connector) => {
       return `${id}-${editState}`
     }, [editState, id])
 
+    const forceEdit = useRef(false)
+
     // Rendering helpers
     const renderLeaf = useCallback((props) => <Leaf {...props} />, [])
     const renderElement = useCallback(
@@ -259,17 +261,17 @@ const RichTextEditorConnector = (connector) => {
       errorReportingLogger
     )
 
-    const wrappedOnChange = useCallback(
-      (event) => {
-        if (isEditing) {
-          onValueChanged(event)
-        }
-      },
-      [onChange]
-    )
-
     const isEditing = editState === EDITING
     const isSearching = editState === SEARCHING
+
+    const wrappedOnChange = useCallback(
+      (value) => {
+        if (isEditing || forceEdit.current) {
+          onValueChanged(value)
+        }
+      },
+      [isEditing, onValueChanged]
+    )
 
     const startEditingIfNotAlready = useCallback(() => {
       if (!isEditing) {
@@ -278,6 +280,8 @@ const RichTextEditorConnector = (connector) => {
     }, [isEditing])
 
     const handleKeyDown = (event) => {
+      forceEdit.current = false
+
       if (event.key === 'Tab') {
         if (event.shiftKey) {
           if (Editor.isInList(editor, editor.selection)) {
@@ -311,9 +315,21 @@ const RichTextEditorConnector = (connector) => {
           return
         }
       }
-      if (!isEditing && !event.ctrlKey && !event.altKey && !event.metaKey) {
+
+      if (
+        !isEditing &&
+        !event.ctrlKey &&
+        !event.altKey &&
+        !event.metaKey &&
+        event.key !== 'Backspace'
+      ) {
         startEditing()
       }
+
+      if (event.key === 'Backspace' && !isEditing) {
+        forceEdit.current = true
+      }
+
       onKeyDown(event)
     }
 

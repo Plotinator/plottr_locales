@@ -53,7 +53,7 @@ const SettingsWizardStep1Connector = (connector) => {
   const SettingsWizardStep1 = ({ nextStep, settings, stagedLanguage, stageLanguage }) => {
     const [fonts, setFonts] = useState(null)
     const [recentFonts, setRecentFonts] = useState(
-      settings.user.fonts.rce.defaultFont ? [settings.user.fonts?.rce?.defaultFont] : null
+      settings?.user?.fonts?.rce?.defaultFont ? [settings.user.fonts?.rce?.defaultFont] : null
     )
 
     useEffect(() => {
