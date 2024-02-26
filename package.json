@@ -33,7 +33,7 @@
     "test": "jest --runInBand \"(src.*)|(lib.*)|(main.*)\" && npm run integration-test",
     "integration-test": "babel-node main/server/__tests__/StatusManager.integration.js && babel-node src/app/__tests__/saver.integration.js && cross-env NODE_ENV=production node_modules/.bin/webpack --config=socket-server-only.config.js && cross-env NODE_ENV=test babel-node main/server/__tests__/server.integration.js",
     "test:watch": "jest \"(src.*)|(lib.*)|(main.*)\" --watch",
-    "test:debug": "node --inspect node_modules/.bin/jest --runInBand lib/plottr_import_export/src/exporter/scrivener/v2/exporters/__tests__/places.test.js",
+    "test:debug": "node --inspect node_modules/.bin/jest --runInBand lib/plottr_components/src/components/rce/__tests__/Normalizer.test.js",
     "test:integration": "jest test/integration",
     "lint-file": "eslint",
     "lint": "eslint .",
