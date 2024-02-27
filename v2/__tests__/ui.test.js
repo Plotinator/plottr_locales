@@ -2308,6 +2308,71 @@ describe('jumpToHit', () => {
               showTemplatePicker: false,
             })
           })
+          describe('when the attribute has a slash in it encoded with %2F', () => {
+            const store = storeWithZelda()
+            const fileState = fullFileStateSelector(store.getState())
+            const cards = allCardsSelector(store.getState())
+            store.dispatch(setSearchTerm('slashedy-slashed'))
+            store.dispatch(
+              jumpToHit(cards, 'timeline', {
+                hit: 'slashedy-slashed',
+                path: '/timeline/7/card/35/customAttribute/Scene Name%2FWith Slashes/0',
+              })
+            )
+            it('should navigate to the timeline card dialog, open the attributes tab and push focus for that attribute (with a decoded slash from %2F)', async () => {
+              // Insert a delay because navigation is scheduled async.
+              await new Promise((resolve) => {
+                setTimeout(resolve, 100)
+              })
+              const finalFileState = fullFileStateSelector(store.getState())
+              expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
+                withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
+              )
+              expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
+              expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+              expect(
+                omit(finalFileState.ui, [
+                  'timeline',
+                  'searchDialog',
+                  'currentView',
+                  'cardDialog',
+                  'currentTimeline',
+                ])
+              ).toEqual(
+                omit(fileState.ui, [
+                  'timeline',
+                  'searchDialog',
+                  'currentView',
+                  'cardDialog',
+                  'currentTimeline',
+                ])
+              )
+              expect(finalFileState.ui.timeline.focus[0]).toEqual({
+                path: ['card', 35, 'Scene Name/With Slashes'],
+                selection: {
+                  direction: 'forward',
+                  end: 16,
+                  start: 0,
+                },
+              })
+              expect(finalFileState.ui.searchDialog.term).toEqual('slashedy-slashed')
+              expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
+              expect(finalFileState.ui.currentView).toEqual('timeline')
+              expect(finalFileState.ui.currentTimeline).toEqual(7)
+              expect(finalFileState.ui.cardDialog).toEqual({
+                activeTab: 2,
+                beatId: 33,
+                cardId: 35,
+                isOpen: true,
+                lineId: 13,
+                deleting: false,
+                removeWhichTemplate: null,
+                removing: false,
+                showColorPicker: false,
+                showTemplatePicker: false,
+              })
+            })
+          })
         })
         describe('given a hit on a template attribute', () => {
           const store = storeWithZelda()
@@ -2371,6 +2436,71 @@ describe('jumpToHit', () => {
               removing: false,
               showColorPicker: false,
               showTemplatePicker: false,
+            })
+          })
+          describe('given the hit has slashes in the attribute name', () => {
+            const store = storeWithZelda()
+            const fileState = fullFileStateSelector(store.getState())
+            const cards = allCardsSelector(store.getState())
+            store.dispatch(setSearchTerm('zzzzzzzzzzz'))
+            store.dispatch(
+              jumpToHit(cards, 'timeline', {
+                hit: 'zzzzzzzzzzz',
+                path: '/timeline/8/card/19/templateAttribute/sc4/template%2Fattribute-with-slashes/0',
+              })
+            )
+            it('should navigate to the timeline card dialog, open the correct template tab and push the focus for that attribute', async () => {
+              // Insert a delay because navigation is scheduled async.
+              await new Promise((resolve) => {
+                setTimeout(resolve, 100)
+              })
+              const finalFileState = fullFileStateSelector(store.getState())
+              expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
+                withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
+              )
+              expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
+              expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+              expect(
+                omit(finalFileState.ui, [
+                  'timeline',
+                  'searchDialog',
+                  'currentView',
+                  'cardDialog',
+                  'currentTimeline',
+                ])
+              ).toEqual(
+                omit(fileState.ui, [
+                  'timeline',
+                  'searchDialog',
+                  'currentView',
+                  'cardDialog',
+                  'currentTimeline',
+                ])
+              )
+              expect(finalFileState.ui.timeline.focus[0]).toEqual({
+                path: ['card', 19, 'template', 'sc4', 'template/attribute-with-slashes'],
+                selection: {
+                  direction: 'forward',
+                  end: 11,
+                  start: 0,
+                },
+              })
+              expect(finalFileState.ui.searchDialog.term).toEqual('zzzzzzzzzzz')
+              expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
+              expect(finalFileState.ui.currentView).toEqual('timeline')
+              expect(finalFileState.ui.currentTimeline).toEqual(8)
+              expect(finalFileState.ui.cardDialog).toEqual({
+                activeTab: 3,
+                beatId: 21,
+                cardId: 19,
+                isOpen: true,
+                lineId: 14,
+                deleting: false,
+                removeWhichTemplate: null,
+                removing: false,
+                showColorPicker: false,
+                showTemplatePicker: false,
+              })
             })
           })
         })
@@ -3085,6 +3215,116 @@ describe('jumpToHit', () => {
               ],
               selectedNote: 2,
               sortVisible: false,
+            })
+          })
+          describe('given a hit for a custom attribute with slashes in the name', () => {
+            const store = storeWithZelda()
+            const fileState = fullFileStateSelector(store.getState())
+            const cards = allCardsSelector(store.getState())
+            store.dispatch(setSearchTerm('here'))
+            store.dispatch(
+              jumpToHit(cards, 'notes', {
+                hit: 'here',
+                path: '/notes/2/customAttribute/Note Name%2FWith Slashes/0',
+              })
+            )
+            it('should navigate to the content tab, edit the note and push focus', async () => {
+              // Insert a delay because navigation is scheduled async.
+              await new Promise((resolve) => {
+                setTimeout(resolve, 100)
+              })
+              const finalFileState = fullFileStateSelector(store.getState())
+              expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
+                withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
+              )
+              expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
+              expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+              expect(
+                omit(finalFileState.ui, [
+                  'noteTab',
+                  'searchDialog',
+                  'currentView',
+                  'cardDialog',
+                  'currentTimeline',
+                ])
+              ).toEqual(
+                omit(fileState.ui, [
+                  'noteTab',
+                  'searchDialog',
+                  'currentView',
+                  'cardDialog',
+                  'currentTimeline',
+                ])
+              )
+              expect(finalFileState.ui.noteTab.focus[0]).toEqual({
+                path: ['note', 2, 'Note Name/With Slashes'],
+                selection: {
+                  direction: 'forward',
+                  end: 4,
+                  start: 0,
+                },
+              })
+              expect(finalFileState.ui.searchDialog.term).toEqual('here')
+              expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
+              expect(finalFileState.ui.currentView).toEqual('notes')
+              expect(finalFileState.ui.noteTab).toEqual({
+                attributesDialogOpen: false,
+                categoriesDialogOpen: false,
+                editingSelected: true,
+                filterVisible: false,
+                focus: [
+                  {
+                    path: ['note', 2, 'Note Name/With Slashes'],
+                    selection: {
+                      direction: 'forward',
+                      end: 4,
+                      start: 0,
+                    },
+                  },
+                  {
+                    path: ['note', 2, 'third'],
+                    selection: {
+                      direction: 'none',
+                      end: 15,
+                      start: 15,
+                    },
+                  },
+                  {
+                    path: ['note', 2, 'second'],
+                    selection: {
+                      direction: 'none',
+                      end: 2,
+                      start: 2,
+                    },
+                  },
+                  {
+                    path: ['note', 2, 'first'],
+                    selection: {
+                      direction: 'none',
+                      end: 4,
+                      start: 4,
+                    },
+                  },
+                  {
+                    path: ['note', 2, 'content'],
+                    selection: {
+                      direction: 'forward',
+                      end: 25,
+                      start: 22,
+                    },
+                  },
+                  {
+                    path: ['note', 2, 'title'],
+                    selection: {
+                      direction: 'forward',
+                      end: 7,
+                      start: 4,
+                    },
+                  },
+                ],
+                selectedNote: 2,
+                sortVisible: false,
+              })
             })
           })
         })
@@ -3840,6 +4080,164 @@ describe('jumpToHit', () => {
                       showTemplatePicker: false,
                       sortVisible: false,
                       templateData: null,
+                    })
+                  })
+                  describe('when the attribute name has slashes in it', () => {
+                    const store = storeWithZelda()
+                    const fileState = fullFileStateSelector(store.getState())
+                    const cards = allCardsSelector(store.getState())
+                    store.dispatch(setSearchTerm('yyyyy'))
+                    store.dispatch(
+                      jumpToHit(cards, 'characters', {
+                        hit: 'yyyyy',
+                        path: '/characters/3/templateAttribute/ch3/Character template%2Fwith-slashes/5/0',
+                      })
+                    )
+                    it('should navigate to the character, book tab and correct template tab, then push the focus', async () => {
+                      // Insert a delay because navigation is scheduled async.
+                      await new Promise((resolve) => {
+                        setTimeout(resolve, 100)
+                      })
+                      const finalFileState = fullFileStateSelector(store.getState())
+                      expect(
+                        withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)
+                      ).toEqual(withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState))
+                      expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
+                      expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(
+                        1
+                      )
+                      expect(
+                        omit(finalFileState.ui, ['characterTab', 'searchDialog', 'currentView'])
+                      ).toEqual(omit(fileState.ui, ['characterTab', 'searchDialog', 'currentView']))
+                      expect(finalFileState.ui.characterTab.focus[0]).toEqual({
+                        path: [
+                          'character',
+                          3,
+                          'template',
+                          'ch3',
+                          'Character template/with-slashes',
+                          5,
+                        ],
+                        selection: {
+                          direction: 'forward',
+                          end: 5,
+                          start: 0,
+                        },
+                      })
+                      expect(finalFileState.ui.searchDialog.term).toEqual('yyyyy')
+                      expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
+                      expect(finalFileState.ui.characterTab.editingSelected).toBeTruthy()
+                      expect(finalFileState.ui.currentView).toEqual('characters')
+                      expect(finalFileState.ui.characterTab).toEqual({
+                        attributesDialogOpen: false,
+                        categoriesDialogOpen: false,
+                        characterEditor: {
+                          activeTab: 3,
+                          deleting: false,
+                          removeWhichTemplate: null,
+                          removing: false,
+                          showTemplatePicker: false,
+                        },
+                        creating: false,
+                        detailsVisible: true,
+                        editingSelected: true,
+                        filterVisible: false,
+                        focus: [
+                          {
+                            path: [
+                              'character',
+                              3,
+                              'template',
+                              'ch3',
+                              'Character template/with-slashes',
+                              5,
+                            ],
+                            selection: {
+                              direction: 'forward',
+                              end: 5,
+                              start: 0,
+                            },
+                          },
+                          {
+                            path: ['character', 3, 4, 5],
+                            selection: {
+                              direction: 'none',
+                              end: 4,
+                              start: 4,
+                            },
+                          },
+                          {
+                            path: ['character', 3, 3, 5],
+                            selection: {
+                              direction: 'none',
+                              end: 5,
+                              start: 5,
+                            },
+                          },
+                          {
+                            path: ['character', 3, 2, 5],
+                            selection: {
+                              direction: 'none',
+                              end: 2,
+                              start: 2,
+                            },
+                          },
+                          {
+                            path: ['character', 3, 'template', 'ch3', 'Description', 5],
+                            selection: {
+                              anchor: {
+                                offset: 31,
+                                path: [0, 0],
+                              },
+                              focus: {
+                                offset: 31,
+                                path: [0, 0],
+                              },
+                            },
+                          },
+                          {
+                            path: ['character', 3, 'template', 'ch3', 'Birth Order', 5],
+                            selection: {
+                              direction: 'none',
+                              end: 4,
+                              start: 4,
+                            },
+                          },
+                          {
+                            path: ['character', 3, 'customAttribute', 1, 'all'],
+                            selection: {
+                              direction: 'forward',
+                              end: 119,
+                              start: 116,
+                            },
+                          },
+                          {
+                            path: ['character', 3, 'name'],
+                            selection: {
+                              direction: 'forward',
+                              end: 7,
+                              start: 4,
+                            },
+                          },
+                          {
+                            path: ['character', 3, 'description', 1, 'all'],
+                            selection: {
+                              anchor: {
+                                offset: 72,
+                                path: [1, 0],
+                              },
+                              focus: {
+                                offset: 72,
+                                path: [1, 0],
+                              },
+                            },
+                          },
+                        ],
+                        selectedCharacter: 3,
+                        showTemplatePicker: false,
+                        sortVisible: false,
+                        templateData: null,
+                      })
                     })
                   })
                 })

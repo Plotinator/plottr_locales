@@ -1626,6 +1626,12 @@
           "version": "2022.7.20",
           "attributes": [
             {
+              "name": "template/attribute-with-slashes",
+              "type": "text",
+              "description": "Blah di blah blah",
+              "value": "zzzzzzzzzzz"
+            },
+            {
               "name": "Goal",
               "type": "text",
               "description": "What does the character want or need to achieve in this scene?",
@@ -2290,6 +2296,10 @@
           "version": "2020.5.27",
           "attributes": [
             {
+              "name": "Character template/with-slashes",
+              "type": "text"
+            },
+            {
               "name": "Birth Order",
               "type": "text"
             },
@@ -2300,6 +2310,11 @@
           ],
           "value": "",
           "values": [
+            {
+              "name": "Character template/with-slashes",
+              "value": "yyyyy",
+              "bookId": 5
+            },
             {
               "name": "Birth Order",
               "value": "Last",
@@ -2627,7 +2642,8 @@
       "bookIds": [],
       "first": "here",
       "second": "is",
-      "third": "some text... :)"
+      "third": "some text... :)",
+      "Note Name/With Slashes": "xxxxx"
     }
   ],
   "places": [

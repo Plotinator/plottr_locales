@@ -113,7 +113,7 @@ export function web() {
           subtitleFontColor: '#102A42',
         },
         global: {
-          headerFont: 'IBM Plex Serif',
+          headingFont: 'IBM Plex Serif',
           bodyFont: 'Forum',
         },
         timeline: {

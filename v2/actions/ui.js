@@ -149,6 +149,7 @@ import { lineFocusPath } from '../helpers/lines'
 import { beatFocusPath } from '../helpers/beats'
 import { parseNumberOrString } from '../helpers/parseNumberOrString'
 import { safeParseInt } from '../helpers/safeParseInt'
+import { unescapeUIPathElement } from '../helpers/ui'
 
 const {
   allCardsSelector,
@@ -494,9 +495,12 @@ export const jumpToHit = (cards, hitType, searchHit) => (dispatch, getState) => 
           if (typeof card !== 'undefined') {
             if (type === 'customAttribute') {
               // This is the tab on Card dialog corresponding to custom attributes.
-              const focusPath = cardFocusPath(cardId, { customAttributeName: rest[0] })
+              const attributeName = unescapeUIPathElement(rest[0])
+              const focusPath = cardFocusPath(cardId, {
+                customAttributeName: attributeName,
+              })
               const focusStart = safeParseInt(rest[rest.length - 1])
-              if (typeof card[rest[0]] !== 'undefined') {
+              if (typeof card[attributeName] !== 'undefined') {
                 dispatch(startJumping())
                 dispatch(changeCurrentView('timeline'))
                 dispatch(changeCurrentTimeline(bookId))
@@ -513,7 +517,8 @@ export const jumpToHit = (cards, hitType, searchHit) => (dispatch, getState) => 
                 dispatch(finishJumping())
               }
             } else if (type === 'templateAttribute') {
-              const [templateId, attributeName] = rest
+              const [templateId, rawAttributeName] = rest
+              const attributeName = unescapeUIPathElement(rawAttributeName)
               const template = card.templates.find(({ id }) => {
                 return id === templateId
               })
@@ -622,7 +627,8 @@ export const jumpToHit = (cards, hitType, searchHit) => (dispatch, getState) => 
         })
         if (typeof note !== 'undefined') {
           if (type === 'customAttribute') {
-            const [attributeName, rawFocusStart] = rest
+            const [rawAttributeName, rawFocusStart] = rest
+            const attributeName = unescapeUIPathElement(rawAttributeName)
             if (typeof note[attributeName] !== 'undefined') {
               const focusStart = safeParseInt(rawFocusStart)
               const focusPath = noteFocusPath(noteId, { attributeName })
@@ -711,8 +717,9 @@ export const jumpToHit = (cards, hitType, searchHit) => (dispatch, getState) => 
           } else if (
             typeof book !== 'undefined' &&
             typeof attributeType === 'undefined' &&
-            typeof character[rawAttributeId] !== 'undefined'
+            typeof character[unescapeUIPathElement(rawAttributeId)] !== 'undefined'
           ) {
+            const attributeName = unescapeUIPathElement(rawAttributeId)
             dispatch(startJumping())
             dispatch(selectCharacterAttributeBookTab(tabBookId))
             dispatch(hideCharacterDetails())
@@ -725,7 +732,9 @@ export const jumpToHit = (cards, hitType, searchHit) => (dispatch, getState) => 
             } else {
               dispatch(setActiveCharacterTab(2))
             }
-            const focusPath = characterFocusPath(characterId, tabBookId, { attributeId })
+            const focusPath = characterFocusPath(characterId, tabBookId, {
+              attributeId: attributeName,
+            })
             dispatch(
               pushFocus('character', focusPath, {
                 start: focusStart,
@@ -738,7 +747,8 @@ export const jumpToHit = (cards, hitType, searchHit) => (dispatch, getState) => 
             dispatch(finishJumping())
           }
         } else if (type === 'templateAttribute') {
-          const [templateId, attributeName, rawBookId, rawFocusStart] = rest
+          const [templateId, rawAttributeName, rawBookId, rawFocusStart] = rest
+          const attributeName = unescapeUIPathElement(rawAttributeName)
           const currentCharacterAttributeBookTab = characterAttributeTabSelector(getState())
           const bookId = parseNumberOrString(rawBookId)
           const allBooks = allBooksSelector(getState())
@@ -817,7 +827,8 @@ export const jumpToHit = (cards, hitType, searchHit) => (dispatch, getState) => 
         })
         if (typeof place !== 'undefined') {
           if (type === 'customAttribute') {
-            const [customAttributeName, rawFocusStart] = rest
+            const [rawCustomAttributeName, rawFocusStart] = rest
+            const customAttributeName = unescapeUIPathElement(rawCustomAttributeName)
             const focusPath = placeFocusPath(placeId, { customAttributeName })
             const focusStart = safeParseInt(rawFocusStart)
             if (typeof place[customAttributeName] !== 'undefined') {
