@@ -53,8 +53,8 @@ const Saver = (
 ) => {
   const saveInterval = { current: null }
   const backupInterval = { current: null }
-  const lastSaveFailed = { current: false }
-  const lastBackupFailed = { current: false }
+  const failedSaveCount = { current: 0 }
+  const failedBackupCount = { current: 0 }
   const lastStateBackedUp = { current: {} }
   const lastStateSaved = { current: {} }
 
@@ -63,7 +63,7 @@ const Saver = (
     f,
     intervalMS,
     lastStateRef,
-    lastFailedRef,
+    failedCountRef,
     onSuccessThisTime,
     onFailed
   ) => {
@@ -74,14 +74,18 @@ const Saver = (
         f(state)
           .then(() => {
             lastStateRef.current = state
-            if (lastFailedRef.current) {
-              lastFailedRef.current = false
-              onSuccessThisTime()
+            if (failedCountRef.current > 0) {
+              if (failedCountRef.current > 1) {
+                onSuccessThisTime()
+              }
+              failedCountRef.current = 0
             }
           })
           .catch((error) => {
             onFailed(error).then((shouldMarkAsFailed) => {
-              lastFailedRef.current = shouldMarkAsFailed
+              if (shouldMarkAsFailed) {
+                failedCountRef.current++
+              }
             })
           })
       }
@@ -119,17 +123,21 @@ const Saver = (
           "Failed to save, but the server is restarting, so we're going to ignore this error"
         )
         return !restarting
-      }
-      if (ERROR_CODES_TO_OFFER_BAILOUT.includes(error.code)) {
+      } else if (ERROR_CODES_TO_OFFER_BAILOUT.includes(error.code)) {
         offerSaveAsThenQuit()
-      } else {
+        return !restarting
+      } else if (failedSaveCount.current % 2 === 1) {
+        // Only warn every other time.  Note the save fail hook is
+        // called before incrementing the counter.
         logger.warn('Failed to autosave', error)
         showErrorBox(
           t('Auto-saving failed'),
           t("Saving your file didn't work. Check where it's stored.")
         )
+        return !restarting
+      } else {
+        return !restarting
       }
-      return !restarting
     })
   }
 
@@ -144,7 +152,7 @@ const Saver = (
       saveFile,
       saveIntervalMS,
       lastStateSaved,
-      lastSaveFailed,
+      failedSaveCount,
       onAutoSaveWorkedThisTime,
       onAutoSaveError
     )
@@ -154,7 +162,7 @@ const Saver = (
       backupFile,
       backupIntervalMS,
       lastStateBackedUp,
-      lastBackupFailed,
+      failedBackupCount,
       onSaveBackupSuccess,
       onSaveBackupError
     )

@@ -873,4 +873,31 @@ export const listenOnIPCMain = (
   listen('what-is-the-download-directory-path', ({ reply }, replyChannel) => {
     reply(replyChannel, app.getPath('downloads'))
   })
+
+  listen('please-mark-my-window-as-unsaved', ({ reply, getOwnerBrowserWindow }, replyChannel) => {
+    try {
+      const window = getOwnerBrowserWindow()
+      if (window && !window.title?.endsWith('*')) {
+        const windowTitle = window.title.endsWith('  ')
+          ? window.title.substring(0, window.title.length - 2)
+          : window.title
+        window?.setTitle?.(`${windowTitle ?? ''}*`)
+      }
+    } catch (error) {
+      log.error(`Error trying to indicate that the file is unsaved`)
+      replyWithError(replyChannel, error)
+    }
+  })
+
+  listen('please-mark-my-window-as-saved', ({ reply, getOwnerBrowserWindow }, replyChannel) => {
+    try {
+      const window = getOwnerBrowserWindow()
+      if (window && window.title?.endsWith('*')) {
+        window?.setTitle?.(window.title.substring(0, window.title.length - 1) + '  ')
+      }
+    } catch (error) {
+      log.error(`Error trying to indicate that the file is saved`)
+      replyWithError(replyChannel, error)
+    }
+  })
 }

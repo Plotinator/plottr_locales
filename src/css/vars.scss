@@ -66,17 +66,29 @@ $new-item-border: 2px dashed $new-item-border-color;
 
 @mixin timeline-header-font {
   font-family: var(--timeline-header-font, 'IBM Plex Serif'), serif !important;
-  font-size: var(--timeline-header-fontSize, '24px') !important;
+  font-size: var(--timeline-header-font-size, '24px') !important;
 }
 
 @mixin plotline-font {
   font-family: var(--plotline-font, 'IBM Plex Serif'), serif !important;
-  font-size: var(--plotline-fontSize, '20px') !important;
+  font-size: var(--plotline-font-size, '20px') !important;
 }
 
 @mixin scenecard-title-font {
   font-family: var(--scenecard-title-font, 'Forum'), serif !important;
-  font-size: var(--scenecard-title-fontSize, '16px') !important;
+  font-size: var(--scenecard-title-font-size, '16px') !important;
+}
+
+@mixin medium-timeline-header-font-size {
+  font-size: calc(var(--timeline-header-font-size, '24px') * 14 / 24) !important; 
+}
+
+@mixin medium-plotline-font-size {
+  font-size: calc(var(--plotline-font-size, '20px') * 14 / 20) !important; 
+}
+
+@mixin medium-scenecard-title-font-size {
+  font-size: calc(var(--scenecard-title-font-size, '16px') * 14 / 16) !important; 
 }
 
 @mixin body-text-font {

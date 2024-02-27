@@ -1,11 +1,11 @@
-import fs from 'fs'
+import fs, { constants } from 'fs'
 import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
 import { lock } from 'proper-lockfile'
 
 import { checkFileIntegrity, SYSTEM_REDUCER_KEYS, helpers } from 'pltr/v2'
 
-const { readFile, lstat, writeFile, open, unlink, readdir, mkdir } = fs.promises
+const { readFile, lstat, writeFile, open, unlink, readdir, mkdir, access } = fs.promises
 
 const basename = path.basename
 
@@ -398,6 +398,17 @@ const fileModule = (userDataPath) => {
       return Promise.resolve(filePath.split(separator))
     }
 
+    const directoryIsWritable = (filePath) => {
+      return access(filePath, constants.R_OK | constants.W_OK)
+        .then(() => {
+          return true
+        })
+        .catch((error) => {
+          logger.warn(`Directory not writable ${error.message}`)
+          return false
+        })
+    }
+
     return {
       saveRawFile,
       saveFile,
@@ -422,6 +433,7 @@ const fileModule = (userDataPath) => {
       mkdir: makeDirectory,
       findUniqueNameInPath,
       filePathAsArray,
+      directoryIsWritable,
     }
   }
 }

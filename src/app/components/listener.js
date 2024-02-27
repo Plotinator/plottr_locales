@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 
 import { helpers } from 'pltr/v2'
 import { actions, selectors } from 'wired-up-pltr'
-import { listen, fetchFiles, getIdTokenResult, logOut, updateAuthFileName } from 'wired-up-firebase'
+import { listen, fetchFiles, getIdTokenResult, logOut } from 'wired-up-firebase'
 import { t } from 'plottr_locales'
 
 import { store } from '../store'
@@ -15,7 +15,7 @@ import { duplicateFile } from '../../files'
 import { makeMainProcessClient } from '../mainProcessClient'
 import { getErrorReporterInstance } from '../../../shared/error-reporter-instance'
 
-const { pleaseOpenWindow } = makeMainProcessClient()
+const { pleaseOpenWindow, markProjectAsUnsaved } = makeMainProcessClient()
 
 const Listener = ({
   hasPro,
@@ -50,6 +50,8 @@ const Listener = ({
   startLoadingALicenseType,
   finishLoadingALicenseType,
   showErrorBox,
+  unsavedChanges,
+  isDeviceFile,
 }) => {
   const fileSystemAPIs = makeFileSystemAPIs(whenClientIsReady)
 
@@ -237,6 +239,13 @@ const Listener = ({
     }
   }, [isLoggedIn, checkedSession, userId, emailAddress, hasPro, checkingProSubscription])
 
+  const previousUnsavedChanges = useRef(unsavedChanges)
+  useEffect(() => {
+    if (isDeviceFile && previousUnsavedChanges.current !== unsavedChanges && unsavedChanges) {
+      markProjectAsUnsaved()
+    }
+  }, [unsavedChanges, previousUnsavedChanges, isDeviceFile])
+
   return null
 }
 
@@ -259,6 +268,8 @@ Listener.propTypes = {
   selectFile: PropTypes.func.isRequired,
   resuming: PropTypes.bool,
   hasDefaultFolder: PropTypes.bool,
+  unsavedChanges: PropTypes.bool,
+  isDeviceFile: PropTypes.bool,
   isCloudFile: PropTypes.bool,
   fileVersion: PropTypes.string,
   withFullFileState: PropTypes.func.isRequired,
@@ -298,6 +309,8 @@ export default connect(
     knownFiles: selectors.knownFilesSelector(state),
     fileVersion: selectors.fileVersionSelector(state),
     hasDefaultFolder: selectors.hasDefaultFolderSelector(state),
+    unsavedChanges: selectors.unsavedChangesSelector(state),
+    isDeviceFile: selectors.isDeviceFileSelector(state),
   }),
   {
     setPermission: actions.permission.setPermission,

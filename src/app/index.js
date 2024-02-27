@@ -87,6 +87,7 @@ const {
   userDocumentsPath,
   createNewFile,
   pleaseTellMeWhatPlatformIAmOn,
+  markProjectAsSaved,
 } = makeMainProcessClient()
 
 const errorReportingLogger = {
@@ -272,6 +273,10 @@ tellMeWhatOSImOn()
             const fileURL = selectors.fileURLSelector(state)
             saveFile(fileURL, fileState)
               .then(() => {
+                const isDeviceFile = selectors.isDeviceFileSelector(store().getState())
+                if (isDeviceFile) {
+                  markProjectAsSaved()
+                }
                 store().dispatch(actions.ui.fileSaved())
               })
               .catch((error) => {

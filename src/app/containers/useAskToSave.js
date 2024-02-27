@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react'
 
 import { t } from 'plottr_locales'
+import { selectors } from 'wired-up-pltr'
 
 import { whenClientIsReady } from '../../../shared/socket-client/index'
 import { store } from '../store'
@@ -15,7 +16,8 @@ export const useAskToSave = (
   isCloudFile,
   applicationIsBusyAndCannotBeQuit,
   isOffline,
-  fileSaved
+  fileSaved,
+  fileLoaded
 ) => {
   const [showAskToSave, setShowAskToSave] = useState(false)
   const [waitingForSaveDoneSignal, setWaitingForSaveDoneSignal] = useState(false)
@@ -53,7 +55,7 @@ export const useAskToSave = (
           "We can't reach our servers.  Please check your network connection, and don't close Plottr."
         )
       )
-    } else if (unsavedChanges && !isCloudFile) {
+    } else if (fileLoaded && unsavedChanges && !isCloudFile) {
       // There are unsaved changes to a classic file
       logger.info("There are unsaved changes so we're not quitting")
       event.preventDefault()
@@ -89,10 +91,16 @@ export const useAskToSave = (
   useEffect(() => {
     const forceReload = () => {
       whenClientIsReady(({ saveOfflineFile, saveFile }) => {
-        const { present } = store.getState()
-        return isCloudFile && isOffline
-          ? saveOfflineFile(present)
-          : saveFile(present.project.fileURL, present)
+        const { present } = store().getState()
+        const fileLoaded = selectors.fileURLLoadedSelector(store().getState())
+        const isCloudFile = selectors.isCloudFileSelector(store().getState())
+        if (!fileLoaded) {
+          return Promise.resolve()
+        } else {
+          return isCloudFile && isOffline
+            ? saveOfflineFile(present)
+            : saveFile(present.project.fileURL, present)
+        }
       })
         .then(() => {
           return new Promise((resolve) => {
@@ -122,7 +130,7 @@ export const useAskToSave = (
 
     unsubscribeFromUnloadRef.current = unsubscribeAll
     return unsubscribeAll
-  }, [applicationIsBusyAndCannotBeQuit, unsavedChanges, isCloudFile])
+  }, [applicationIsBusyAndCannotBeQuit, fileLoaded, unsavedChanges, isCloudFile])
 
   useEffect(() => {
     if (!applicationIsBusyAndCannotBeQuit) {
