@@ -100,6 +100,8 @@ const {
   addToKnownFilesAndOpen,
   createDesktopShortcut,
   downloadDirectoryPath,
+  onUndo,
+  onRedo,
 } = makeMainProcessClient()
 
 export const rmRF = (path, ...args) => {
@@ -147,6 +149,8 @@ const errorReportingLogger = {
 }
 
 const platform = {
+  onUndo,
+  onRedo,
   hostLocale,
   appVersion: getVersion,
   defaultBackupLocation: () => {

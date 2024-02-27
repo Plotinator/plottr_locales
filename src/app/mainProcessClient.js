@@ -206,7 +206,7 @@ const _makeMainProcessClient = () => {
     return subscribeTo('undo', cb)
   }
 
-  const onRedu = (cb) => {
+  const onRedo = (cb) => {
     return subscribeTo('redo', cb)
   }
 
@@ -466,7 +466,7 @@ const _makeMainProcessClient = () => {
     editKnownFilePath,
     pleaseTellDashboardToReloadRecents,
     onUndo,
-    onRedu,
+    onRedo,
     onCreateErrorReport,
     onCloseDashboard,
     onCreatePlottrCloudFile,
