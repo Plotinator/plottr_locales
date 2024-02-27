@@ -2,7 +2,6 @@ import { createStore } from 'redux'
 import { exec } from 'child_process'
 import fs from 'fs'
 import { xml2json } from 'xml-js'
-import undoable from 'redux-undo'
 
 import default_config from 'plottr_import_export/src/exporter/default_config'
 import { wordExporter } from 'plottr_import_export'
@@ -27,7 +26,7 @@ const extract = (filePath, destDir) => {
 describe('wordExporter', () => {
   copyCurrent('example3.docx')
   const example3 = readExample3()
-  const reducer = undoable(rootReducer, { limit: 10, ignoreInitialState: true })
+  const reducer = rootReducer
   const store = createStore(reducer)
   store.dispatch(
     actions.ui.loadFile(

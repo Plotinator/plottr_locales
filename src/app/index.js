@@ -22,7 +22,6 @@ import world from 'world-api'
 
 import MPQ from '../common/utils/MPQ'
 import initMixpanel from '../common/utils/mixpanel'
-import { ActionCreators } from 'redux-undo'
 import { addNewCustomTemplate } from '../common/utils/custom_templates'
 import { createFullErrorReport } from '../common/utils/full_error_report'
 import { openDashboard, closeDashboard, createFromTemplate } from '../dashboard-events'
@@ -501,14 +500,6 @@ tellMeWhatOSImOn()
 
         const _unsubscribeFromSaveAs = onSaveAs(saveAsHandler)
         document.addEventListener('save-as', saveAsHandler)
-
-        onUndo(() => {
-          store().dispatch(ActionCreators.undo())
-        })
-
-        onRedu(() => {
-          store().dispatch(ActionCreators.redo())
-        })
 
         let lastError = null
         window.addEventListener('error', (event) => {

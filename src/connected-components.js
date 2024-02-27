@@ -1,5 +1,3 @@
-import { ActionCreators } from 'redux-undo'
-
 import { t } from 'plottr_locales'
 import { connections } from 'plottr_components'
 import export_config from 'plottr_import_export/src/exporter/default_config'
@@ -150,10 +148,10 @@ const errorReportingLogger = {
 
 const platform = {
   undo: () => {
-    store().dispatch(ActionCreators.undo())
+    // TODO
   },
   redo: () => {
-    store().dispatch(ActionCreators.redo())
+    // TODO
   },
   hostLocale,
   appVersion: getVersion,

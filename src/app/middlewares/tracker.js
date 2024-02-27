@@ -36,7 +36,7 @@ const tracker = (whenClientIsReady) => {
       if (!user.payment_id) return
 
       const state = store.getState()
-      const { present } = state
+      const present = selectors.fullFileStateSelector(state)
       if (present && present.ui && present.file) {
         const attrs = {
           timeline_orientation: selectors.orientationSelector(present),
