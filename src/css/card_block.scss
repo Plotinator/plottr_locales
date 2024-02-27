@@ -76,6 +76,13 @@
       height: 70px;
       line-height: 70px;
     }
+
+    &:not(.multiple) {
+      .card__add-card {
+        align-items: center;
+        align-self: center;
+      }
+    }
   }
 
   &.vertical.medium-timeline {
@@ -98,8 +105,16 @@
     }
   }
 
-  &.medium-timeline {
+  &.medium-timeline:not(.vertical) {
     max-width: 72px;
+
+    .card__behind {
+      left: 4px;
+    }
+
+    .card__add-card {
+      margin-left: 20px;
+    }
   }
 
   .card__cell__overview__drag-anchor {
@@ -147,6 +162,7 @@
     .card__add-card {
       display: block;
       z-index: 10;
+      margin-top: 0px;
     }
 
     &:hover .card__add-card {
@@ -155,8 +171,7 @@
         padding: 2px 2px 2.5px 3px;
         border: 1px solid $blue-7;
         border-radius: 3px;
-        margin-left: 12px;
-        margin-right: -19px;
+        color: $blue-5;
       }
     }
 
@@ -465,7 +480,7 @@
     }
   }
 
-  .card__popover__description {
+  .card__popover-description {
     .slate-editor__editor {
       @include rce-darkmode-font-color;
       color: inherit;
