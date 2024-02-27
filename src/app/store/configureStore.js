@@ -6,7 +6,6 @@ import { rootReducer } from 'pltr/v2'
 import tracker from '../middlewares/tracker'
 import logger from '../middlewares/logger'
 import reporter from '../middlewares/reporter'
-import actionRecorder from '../middlewares/actionRecorder'
 import firebaseSync from '../middlewares/firebaseSync'
 import dataRepairers from './dataRepairers'
 import log from '../../../shared/logger'
@@ -16,7 +15,6 @@ export function configureStore(whenClientIsReady, initialState) {
   const middlewareWithInflightRequestTracker = firebaseSync(log)
   const middlewares = applyMiddleware(
     thunk,
-    actionRecorder,
     middlewareWithInflightRequestTracker.firebaseMiddleware,
     tracker(whenClientIsReady),
     logger,
