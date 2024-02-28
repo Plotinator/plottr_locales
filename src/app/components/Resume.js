@@ -58,7 +58,8 @@ const Resume = ({
         return new Promise((resolve, reject) => {
           withFullFileState((state) => {
             const offlineFile = state
-            return backupOfflineBackupForResume(offlineFile)
+            const withoutSystemKeys = selectors.fullFileStateSelector(offlineFile)
+            return backupOfflineBackupForResume(withoutSystemKeys)
               .then(() => {
                 return getVersion().then((version) => {
                   return retryWithBackOff(() => {
@@ -84,11 +85,14 @@ const Resume = ({
                       `Detected that the online version of file with id: ${fileId} didn't cahnge, but we changed ours.  Uploading our version.`
                     )
                     retryWithBackOff(() => {
+                      const withoutSystemKeys = selectors.fullFileStateSelector(offlineFile)
                       return overwriteAllKeys(fileId, clientId, {
-                        ...offlineFile,
+                        ...withoutSystemKeys,
                         file: {
-                          ...offlineFile.file,
-                          fileName: offlineFile.file.originalFileName || offlineFile.file.fileName,
+                          ...withoutSystemKeys.file,
+                          fileName:
+                            withoutSystemKeys.file.originalFileName ??
+                            withoutSystemKeys.file.fileName,
                         },
                       })
                     }).then(() => {
@@ -102,12 +106,15 @@ const Resume = ({
                       `Detected that file ${fileId} has changes.  Backing up the offline file and switching to the online file.`
                     )
                     const date = new Date()
+                    const withoutSystemKeys = selectors.fullFileStateSelector(offlineFile)
                     uploadProject(
                       {
-                        ...offlineFile,
+                        ...withoutSystemKeys,
                         file: {
-                          ...offlineFile.file,
-                          fileName: `${decodeURI(offlineFile.file.fileName)} - Resume Backup - ${
+                          ...withoutSystemKeys.file,
+                          fileName: `${decodeURI(
+                            withoutSystemKeys.file.fileName
+                          )} - Resume Backup - ${
                             date.getMonth() + 1
                           }-${date.getDate()}-${date.getFullYear()}`,
                         },

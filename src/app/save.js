@@ -42,9 +42,15 @@ export const saveFile = (whenClientIsReady, logger, postSaveHook) => (state) => 
   })
 }
 
-export const backupFile =
-  (whenClientIsReady, saveBackupOnFirebase, downloadStorageImage, logger, postBackupHook) =>
-  (state) => {
+export const backupFile = (
+  whenClientIsReady,
+  saveBackupOnFirebase,
+  downloadStorageImage,
+  logger,
+  postBackupHook
+) => {
+  const emptyFileState = emptyFile('DummyFile', '2022.11.2')
+  return (state) => {
     const isOffline = selectors.isOfflineSelector(state)
     const isCloudFile = selectors.isCloudFileSelector(state)
     const backupEnabled = selectors.backupEnabledSelector(state)
@@ -53,23 +59,21 @@ export const backupFile =
 
     if (!backupEnabled) return Promise.resolve()
 
+    const hasAllKeys = selectors.hasAllKeysSelector(state)
+    if (!hasAllKeys) {
+      const withoutSystemKeys = difference(Object.keys(fileJSON), SYSTEM_REDUCER_KEYS)
+      const missing = difference(Object.keys(emptyFileState), withoutSystemKeys)
+      const message = `File is missing keys (${missing}).  Refusing to save.`
+      logger.error('Missing keys', new Error(message))
+      return Promise.reject(message)
+    }
+
     const cloudBackup =
       !isOffline && isCloudFile ? saveBackupOnFirebase(userId, state) : Promise.resolve()
-
-    const emptyFileState = emptyFile('DummyFile', '2022.11.2')
 
     return cloudBackup
       .then(() => {
         return whenClientIsReady(({ saveBackup, offlineFileBasePath }) => {
-          const hasAllKeys = selectors.hasAllKeysSelector(state)
-          if (!hasAllKeys) {
-            const withoutSystemKeys = difference(Object.keys(fileJSON), SYSTEM_REDUCER_KEYS)
-            const missing = difference(Object.keys(emptyFileState), withoutSystemKeys)
-            const message = `File is missing keys (${missing}).  Refusing to save.`
-            logger.error('Missing keys', new Error(message))
-            return Promise.reject(message)
-          }
-
           const canBackup = selectors.canBackupSelector(state)
           if (!canBackup) {
             logger.warn('File is in a state that prohibits backing up.  Refusing to backup.')
@@ -104,3 +108,4 @@ export const backupFile =
         }
       })
   }
+}

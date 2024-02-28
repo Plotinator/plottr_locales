@@ -76,8 +76,9 @@ const Listener = ({
                       const day = date.getDate()
                       const year = date.getUTCFullYear()
                       const backupDate = `${t('Resumed at')}:${month}-${day}-${year}`
+                      const withoutSystemKeys = selectors.fullFileStateSelector(state)
                       return saveToDefaultLocation(
-                        state,
+                        withoutSystemKeys,
                         `${name} [${backupText} ${backupDate}]`
                       ).then((newFileURL) => {
                         return pleaseOpenWindow(newFileURL)
