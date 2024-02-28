@@ -53,6 +53,8 @@ const {
   onSave,
   onSaveAs,
   addToKnownFilesAndOpen,
+  onUndo,
+  onRedu,
   onCreateErrorReport,
   onCloseDashboard,
   onCreatePlottrCloudFile,

@@ -147,6 +147,12 @@ const errorReportingLogger = {
 }
 
 const platform = {
+  undo: () => {
+    // TODO
+  },
+  redo: () => {
+    // TODO
+  },
   hostLocale,
   appVersion: getVersion,
   defaultBackupLocation: () => {
