@@ -7,7 +7,7 @@ function buildEditMenu() {
     submenu: [
       {
         label: t('Undo'),
-        accelerator: is.macos ? 'Cmd+Z' : 'Ctrl+Y',
+        accelerator: 'CmdOrCtrl+Z',
         click: (event, focusedWindow) => {
           focusedWindow.webContents.send('undo')
         },
