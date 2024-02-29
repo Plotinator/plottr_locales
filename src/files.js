@@ -20,6 +20,7 @@ const {
   editKnownFilePath,
   userDocumentsPath,
   addToKnownFilesAndOpen,
+  showOpenDialog,
 } = makeMainProcessClient()
 
 export const newEmptyFile = (fileName, appVersion, currentFile) => {
@@ -331,6 +332,53 @@ export const openExistingFile = () => {
         })
     })
   }
+}
+
+export const importExistingFile = (fileUrl, properties) => {
+  return showOpenDialog('Choose file to import', filters, properties, fileUrl).then((files) => {
+    const filePath = files && files.length && files[0]
+
+    if (typeof filePath !== 'string') {
+      return Promise.resolve('No file selected')
+    }
+
+    return whenClientIsReady(({ readFile }) => {
+      store().dispatch(actions.project.showLoader(true))
+      return readFile(helpers.file.withoutProtocol(filePath), 'utf-8').then((rawFile) => {
+        const contents = JSON.parse(rawFile)
+
+        return getVersion()
+          .then((version) => {
+            return new Promise((resolve, reject) => {
+              migrateIfNeeded(
+                version,
+                contents,
+                fileUrl,
+                null,
+                (error, didMigrate, migratedState) => {
+                  if (error) {
+                    getErrorReporterInstance().then((errorReporter) => {
+                      errorReporter.error('Error migrating file', error)
+                    })
+                    logger.error('Error migrating file', error)
+                    reject(error)
+                    return
+                  } else if (didMigrate) {
+                    store().dispatch(actions.ui.openImportPltrModal(migratedState))
+                    store().dispatch(actions.project.showLoader(false))
+                  }
+                }
+              )
+            })
+          })
+          .catch((error) => {
+            getErrorReporterInstance().then((errorReporter) => {
+              errorReporter.error('Error importing project', error)
+            })
+          })
+      })
+    })
+  })
 }
 
 export const duplicateFile = (fileUrl, suggestedNewName, forceCloseWhenDone) => {

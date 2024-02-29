@@ -37,6 +37,7 @@ import {
   openExistingFile,
   duplicateFile,
   userFilePickerDefaultFolder,
+  importExistingFile,
 } from './files'
 import logger from '../shared/logger'
 import { closeDashboard } from './dashboard-events'
@@ -498,6 +499,7 @@ const platform = {
     document.dispatchEvent(event)
   },
   duplicateFile,
+  importExistingFile,
   showItemInFolder: (fileURL, fileName) => {
     isStorageURL(fileURL).then((storageURL) => {
       if (!storageURL) {
@@ -768,3 +770,4 @@ export const UpdateNotifier = components.UpdateNotifier
 export const NewProjectInputModal = components.NewProjectInputModal
 export const SettingsWizard = components.SettingsWizard
 export const RestructureTimelineModal = components.RestructureTimelineModal
+export const ImportModal = components.ImportModal

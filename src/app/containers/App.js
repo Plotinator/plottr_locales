@@ -18,6 +18,7 @@ import {
   NewProjectInputModal,
   SearchModal,
   ImagePicker,
+  ImportModal,
 } from 'connected-components'
 import { makeMainProcessClient } from '../mainProcessClient'
 
@@ -38,6 +39,7 @@ const App = ({
   searchDialogIsOpen,
   openSearch,
   startSearching,
+  isImportModalOpen,
 }) => {
   const [showTemplateCreate, setShowTemplateCreate] = useState(false)
   const [type, setType] = useState(null)
@@ -141,6 +143,7 @@ const App = ({
         {renderAdvanceExportModal()}
         {renderImagePickerModal()}
         {searchDialogIsOpen ? <SearchModal /> : null}
+        {isImportModalOpen ? <ImportModal /> : null}
       </React.StrictMode>
     </ErrorBoundary>
   )
@@ -160,6 +163,7 @@ App.propTypes = {
   showErrorBox: PropTypes.func.isRequired,
   openSearch: PropTypes.func.isRequired,
   startSearching: PropTypes.func.isRequired,
+  isImportModalOpen: PropTypes.bool,
 }
 
 function mapStateToProps(state) {
@@ -172,6 +176,7 @@ function mapStateToProps(state) {
     sessionChecked: selectors.sessionCheckedSelector(state),
     searchDialogIsOpen: selectors.searchDialogIsOpenSelector(state),
     isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
+    isImportModalOpen: selectors.isImportModalOpenSelector(state),
   }
 }
 
