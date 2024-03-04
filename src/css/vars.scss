@@ -101,20 +101,20 @@ $new-item-border: 2px dashed $new-item-border-color;
 
 @mixin rce-text-font {
   font-family: var(--rce-default-font, 'Forum'), sans-serif !important;
-  font-size: var(--rce-default-font-size, 20px) !important;
+  font-size: var(--rce-default-font-size, 20pt) !important;
   color: var(--rce-default-font-color, $gray-0) !important;
 }
 
 @mixin rce-title-font {
   font-family: var(--rce-title-font, 'Forum'), sans-serif !important;
-  font-size: var(--rce-title-font-size, 20px) !important;
+  font-size: var(--rce-title-font-size, 28pt) !important;
   font-weight: var(--rce-title-font-weight, 400) !important;
   color: var(--rce-title-font-color, $gray-0) !important;
 }
 
 @mixin rce-subtitle-font {
   font-family: var(--rce-subtitle-font, 'Forum'), sans-serif !important;
-  font-size: var(--rce-subtitle-font-size, 20px) !important;
+  font-size: var(--rce-subtitle-font-size, 24pt) !important;
   font-weight: var(--rce-subtitle-font-weight, 400) !important;
   color: var(--rce-subtitle-font-color, $gray-0) !important;
 }
