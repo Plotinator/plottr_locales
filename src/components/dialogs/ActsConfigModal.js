@@ -158,9 +158,31 @@ const ActsConfigModalConnector = (connector) => {
                           </div>
                         </MenuItem>
                       )}
-                      <MenuItem key={'stacked'} onSelect={() => setTimelineView('stacked')}>
-                        <div className="acts-modal__timeline-view-selector">{t('Stacked')}</div>
-                      </MenuItem>
+                      {hierarchyLevels.length < 2 ? (
+                        <ToolTip
+                          id={`acts-modal-tabbed-tooltip`}
+                          placement="right"
+                          text={t('At least two levels of hierarchy required to view as stacked')}
+                        >
+                          <MenuItem
+                            disabled={hierarchyLevels.length < 2}
+                            key={'stacked'}
+                            onSelect={() => setTimelineView('stacked')}
+                          >
+                            <div
+                              className={cx(`acts-modal__timeline-view-selector`, {
+                                disabled: hierarchyLevels.length < 2,
+                              })}
+                            >
+                              {t('Stacked')}
+                            </div>
+                          </MenuItem>
+                        </ToolTip>
+                      ) : (
+                        <MenuItem key={'stacked'} onSelect={() => setTimelineView('stacked')}>
+                          <div className="acts-modal__timeline-view-selector">{t('Stacked')}</div>
+                        </MenuItem>
+                      )}
                     </DropdownButton>
                   </div>
                 </div>

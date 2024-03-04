@@ -371,7 +371,6 @@ const TopRowConnector = (connector) => {
     leavesPerBeat: PropTypes.object.isRequired,
     timelineViewIsTabbed: PropTypes.bool,
     activeTab: PropTypes.number.isRequired,
-    pinnedPlotlines: PropTypes.number,
   }
 
   const {
@@ -426,7 +425,6 @@ const TopRowConnector = (connector) => {
           leavesPerBeat: leavesPerBeatSelector(state),
           timelineViewIsTabbed: timelineViewIsTabbedSelector(state),
           activeTab: timelineActiveTabSelector(state),
-          pinnedPlotlines: selectors.pinnedPlotlinesSelector(state),
         }
       },
       (dispatch) => {

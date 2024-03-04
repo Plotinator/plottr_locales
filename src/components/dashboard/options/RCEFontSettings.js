@@ -26,16 +26,16 @@ const RCEFontSettingConnector = (connector) => {
     const [fonts, setFonts] = useState(null)
     const defaultRCEFontSettings = {
       defaultFont: 'Forum',
-      defaultFontSize: '20px',
+      defaultFontSize: '16pt',
       defaultDarkModeFontColor: '#CCCCCC',
       defaultFontColor: '#102A42', //$gray-0
       titleFont: 'Forum',
-      titleFontSize: '24px',
+      titleFontSize: '28pt',
       titleFontWeight: 400,
       titleDarkModeFontColor: '#CCCCCC',
       titleFontColor: '#102A42',
       subtitleFont: 'Forum',
-      subtitleFontSize: '24px',
+      subtitleFontSize: '24pt',
       subtitleFontWeight: 400,
       subtitleDarkModeFontColor: '#CCCCCC',
       subtitleFontColor: '#102A42',
@@ -148,7 +148,7 @@ const RCEFontSettingConnector = (connector) => {
       await saveAppSetting('user.fonts.rce', {
         ...rceFontsSettings,
         defaultFont: 'Forum',
-        defaultFontSize: '20px',
+        defaultFontSize: '16pt',
         defaultDarkModeFontColor: '#CCCCCC',
         defaultFontColor: '#102A42', //$gray-0
       })
@@ -158,7 +158,7 @@ const RCEFontSettingConnector = (connector) => {
       await saveAppSetting('user.fonts.rce', {
         ...rceFontsSettings,
         titleFont: 'Forum',
-        titleFontSize: '24px',
+        titleFontSize: '28pt',
         titleFontWeight: 400,
         titleDarkModeFontColor: '#CCCCCC',
         titleFontColor: '#102A42',
@@ -169,7 +169,7 @@ const RCEFontSettingConnector = (connector) => {
       await saveAppSetting('user.fonts.rce', {
         ...rceFontsSettings,
         subtitleFont: 'Forum',
-        subtitleFontSize: '24px',
+        subtitleFontSize: '24pt',
         subtitleFontWeight: 400,
         subtitleDarkModeFontColor: '#CCCCCC',
         subtitleFontColor: '#102A42',

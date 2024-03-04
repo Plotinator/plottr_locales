@@ -70,7 +70,7 @@ const SettingsWizardStep1Connector = (connector) => {
     const setFontDefaults = useCallback(() => {
       saveAppSetting('user.fonts.rce.defaultFont', 'Forum')
       addRecent('Forum')
-      saveAppSetting('user.fonts.rce.defaultFontSize', '20px')
+      saveAppSetting('user.fonts.rce.defaultFontSize', '16pt')
     }, [saveAppSetting])
 
     const { user } = defaultSettings.defaultsForPlatform(os())
@@ -115,9 +115,9 @@ const SettingsWizardStep1Connector = (connector) => {
                   }}
                 />
                 <FontSizeSettingDropdown
-                  defaultFontSize={settings.user?.fonts?.rce?.fontSize?.replace('px', '')}
+                  defaultFontSize={settings.user?.fonts?.rce?.fontSize?.replace('pt', '')}
                   onChange={(newSize) => {
-                    saveAppSetting('user.fonts.rce.defaultFontSize', `${newSize}px`)
+                    saveAppSetting('user.fonts.rce.defaultFontSize', `${newSize}pt`)
                   }}
                 />
               </ButtonGroup>

@@ -17,6 +17,7 @@ const CharacterCategoryFilterListConnector = (connector) => {
         <GenericFilterList
           items={categoryFilterItems}
           title={i18n('Categories')}
+          singleItemTitle={i18n('Category')}
           displayAttribute={'name'}
           updateItems={this.updateItems}
           filteredItems={this.props.filteredItems}

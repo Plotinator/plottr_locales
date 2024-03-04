@@ -154,11 +154,11 @@ const RCESettingSectionConnector = (connector) => {
             <span>{t('Font Size')}</span>
             <FontSizeSettingDropdown
               defaultFontSize={
-                Number(sectionFontSize?.replace('px', '')) ||
-                Number(defaultFontSize?.replace('px', ''))
+                Number(sectionFontSize?.replace('pt', '')) ||
+                Number(defaultFontSize?.replace('pt', ''))
               }
               onChange={(newSize) => {
-                saveAppSetting(`user.fonts.rce.${sectionName}FontSize`, `${newSize}px`)
+                saveAppSetting(`user.fonts.rce.${sectionName}FontSize`, `${newSize}pt`)
               }}
               onClick={handleCloseColorPickers}
             />
