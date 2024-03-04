@@ -135,16 +135,16 @@ const INITIAL_STATE = {
       fonts: {
         rce: {
           defaultFont: 'Forum',
-          defaultFontSize: '20px',
+          defaultFontSize: '16pt',
           defaultDarkModeFontColor: '#CCCCCC',
           defaultFontColor: '#102A42', //$gray-0
           titleFont: 'Forum',
-          titleFontSize: '24px',
+          titleFontSize: '28pt',
           titleFontWeight: 400,
           titleDarkModeFontColor: '#CCCCCC',
           titleFontColor: '#102A42',
           subtitleFont: 'Forum',
-          subtitleFontSize: '24px',
+          subtitleFontSize: '24pt',
           subtitleFontWeight: 400,
           subtitleDarkModeFontColor: '#CCCCCC',
           subtitleFontColor: '#102A42',
