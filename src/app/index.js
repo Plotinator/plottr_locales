@@ -501,6 +501,14 @@ tellMeWhatOSImOn()
         const _unsubscribeFromSaveAs = onSaveAs(saveAsHandler)
         document.addEventListener('save-as', saveAsHandler)
 
+        onUndo(() => {
+          store().dispatch(actions.undo.undo())
+        })
+
+        onRedu(() => {
+          store().dispatch(actions.undo.redo())
+        })
+
         let lastError = null
         window.addEventListener('error', (event) => {
           // If we hit an unhandled error, let this be the handler.

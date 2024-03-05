@@ -7,6 +7,7 @@ import tracker from '../middlewares/tracker'
 import logger from '../middlewares/logger'
 import reporter from '../middlewares/reporter'
 import firebaseSync from '../middlewares/firebaseSync'
+import shadow from '../middlewares/shadow'
 import dataRepairers from './dataRepairers'
 import log from '../../../shared/logger'
 
@@ -18,7 +19,8 @@ export function configureStore(whenClientIsReady, initialState) {
     middlewareWithInflightRequestTracker.firebaseMiddleware,
     tracker(whenClientIsReady),
     logger,
-    reporter
+    reporter,
+    shadow
   )
   const store = createStore(reducer, initialState, middlewares)
   return { store, inflightFirebaseRequests: middlewareWithInflightRequestTracker.inflightRequests }

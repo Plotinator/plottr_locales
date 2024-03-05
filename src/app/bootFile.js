@@ -675,7 +675,7 @@ export function bootFile(
         }
         saverRef.current = Saver(
           () => {
-            return selectors.fullFileStateSelector(store().getState())
+            return store().getState()
           },
           saveFile(whenClientIsReady, errorReportingLogger, postSaveHook),
           backupFile(

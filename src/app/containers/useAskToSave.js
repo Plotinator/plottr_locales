@@ -140,12 +140,9 @@ export const useAskToSave = (
 
   const saveAndClose = (saveFile, saveOfflineFile) => () => {
     const present = selectors.fullFileStateSelector(store().getState())
+    const fileURL = selectors.fileURLSelector(store().getState())
     setWaitingForSaveDoneSignal(true)
-    return (
-      isCloudFile && isOffline
-        ? saveOfflineFile(present)
-        : saveFile(present.project.fileURL, present)
-    )
+    return (isCloudFile && isOffline ? saveOfflineFile(present) : saveFile(fileURL, present))
       .then(() => {
         return new Promise((resolve) => {
           setTimeout(resolve, 1000)
