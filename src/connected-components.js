@@ -598,8 +598,17 @@ const platform = {
   },
 }
 
+// Use in cases where we get something that looks roughly like the
+// user state and we want it to appear at the right place for
+// selectors to find it.
+const mountState = (state) => {
+  return {
+    user: state,
+  }
+}
+
 // Override the selectors and actions with the ones that are wired up.
-const components = connections.pltr(platform, { ...pltr, actions, selectors })
+const components = connections.pltr(platform, { ...pltr, actions, selectors, mountState })
 
 export const Navbar = components.Navbar
 export const Grid = components.Grid
