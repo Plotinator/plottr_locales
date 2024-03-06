@@ -148,10 +148,10 @@ const errorReportingLogger = {
 
 const platform = {
   undo: () => {
-    // TODO
+    store().dispatch(actions.undo.undo())
   },
   redo: () => {
-    // TODO
+    store().dispatch(actions.undo.redo())
   },
   hostLocale,
   appVersion: getVersion,
