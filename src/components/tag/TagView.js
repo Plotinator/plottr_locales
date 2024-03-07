@@ -30,12 +30,20 @@ const TagViewConnector = (connector) => {
     const [deleting, setDeleting] = useState(false)
     const [categoryId, setCategoryId] = useState(tag.categoryId)
     const [title, setTitle] = useState(tag.title || '')
+    const userInitiatedEdit = useRef(false)
+    const titleRef = useRef()
 
     useRef(() => {
       return () => {
         if (editing && !newTag) saveEdit()
       }
     }, [])
+
+    useEffect(() => {
+      if (userInitiatedEdit.current && typeof titleRef.current?.focus === 'function') {
+        titleRef.current.focus()
+      }
+    }, [editing])
 
     useEffect(() => {
       setCategoryId(categoryId)
@@ -79,6 +87,7 @@ const TagViewConnector = (connector) => {
     const startEditing = () => {
       uiActions.selectTag(tag.id)
       uiActions.editSelectedTag()
+      userInitiatedEdit.current = true
     }
 
     const startHovering = () => {
@@ -113,6 +122,7 @@ const TagViewConnector = (connector) => {
       }
       uiActions.finishEditingSelectedTag()
       stopHovering()
+      userInitiatedEdit.current = false
     }
 
     const changeColor = (color) => {
@@ -172,6 +182,9 @@ const TagViewConnector = (connector) => {
               onChange={handleTitleChange}
               onKeyDown={handleEsc}
               onKeyPress={handleEnter}
+              inputRef={(ref) => {
+                titleRef.current = ref
+              }}
               autoFocus
               selection={selectionForMainElement('title')}
               value={title}
