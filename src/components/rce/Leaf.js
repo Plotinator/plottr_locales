@@ -31,7 +31,13 @@ const Leaf = ({ attributes, children, leaf }) => {
   }
 
   if (leaf.fontSize) {
-    const size = { fontSize: leaf.fontSize }
+    const size = {
+      fontSize:
+        typeof leaf.fontSize === 'number' ||
+        (typeof leaf.fontSize === 'string' && leaf.fontSize.includes('px'))
+          ? `${leaf.fontSize}pt`
+          : leaf.fontSize,
+    }
     attributes.style = attributes.style ? { ...attributes.style, ...size } : size
   }
 
