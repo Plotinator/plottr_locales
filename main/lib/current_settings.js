@@ -10,8 +10,8 @@ export const currentSettings = () => {
   const isAlphaOrBeta = appVersion.match(/\d{4}\.\d\d?.\d\d?-(alpha|beta)\.\d+/)
     ? 'isBetaOrAlpha'
     : ''
-  const NODE_ENV = JSON.parse(JSON.stringify(process.env)).NODE_ENV
-  const isDevelopment = NODE_ENV === 'development' ? 'development' : 'production'
+  const env = JSON.parse(JSON.stringify(process.env))['NODE_ENV']
+  const isDevelopment = env === 'development' ? 'development' : 'production'
   const suffix = isDevelopment ? '_dev' : isAlphaOrBeta ? '_test' : ''
   const configStorePath = `config${suffix}.json`
   return readFile(path.join(app.getPath('userData'), configStorePath)).then((result) => {
