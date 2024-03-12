@@ -50,4 +50,14 @@ jest.mock('electron', () => ({
   },
 }))
 
+jest.mock('react-redux', () => {
+  const { connect, Provider } = jest.requireActual('react-redux')
+
+  return {
+    connect: connect,
+    Provider: Provider,
+    batch: (f) => f(),
+  }
+})
+
 jest.mock('wired-up-firebase', () => ({}))
