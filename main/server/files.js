@@ -80,26 +80,30 @@ const fileModule = (userDataPath) => {
               return Promise.reject(new Error('Failed to lock'))
             })
             .then((release) => {
-              const result = f()
-              if (typeof result.then === 'function') {
-                return result
-                  .then(() => {
-                    return release()
-                  })
-                  .catch((error) => {
+              function attemptRelease(secondAttempt) {
+                return release().catch((error) => {
+                  if (secondAttempt) {
                     logger.error(
-                      'Failed to lock the file for',
+                      'Failed to release the lock file for',
                       filePath,
                       error.message,
                       error.stack
                     )
                     return Promise.reject(new Error('Failed to release lock'))
-                  })
-              } else {
-                return release().catch((error) => {
-                  logger.error('Failed to lock the file for', filePath, error.message, error.stack)
-                  return Promise.reject(new Error('Failed to release lock'))
+                  } else {
+                    return new Promise((resolve, reject) => {
+                      return attemptRelease(true).then(resolve, reject)
+                    })
+                  }
                 })
+              }
+              const result = f()
+              if (typeof result.then === 'function') {
+                return result.then(() => {
+                  return attemptRelease()
+                })
+              } else {
+                return attemptRelease()
               }
             })
         })
