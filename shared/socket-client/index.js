@@ -154,7 +154,7 @@ import { setPort, getPort } from './workerPort'
 
 const FORCE_IDLE_WORK_TIMEOUT = 1000
 const defer =
-  typeof process === 'object' && process.type === 'renderer'
+  typeof process === 'object' && process?.type === 'renderer'
     ? (f) => window.requestIdleCallback(f, { timeout: FORCE_IDLE_WORK_TIMEOUT })
     : (f) => {
         setTimeout(f, 0)
