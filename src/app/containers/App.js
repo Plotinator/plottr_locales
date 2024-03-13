@@ -18,6 +18,7 @@ import {
   NewProjectInputModal,
   SearchModal,
   ImagePicker,
+  UndoRedo,
 } from 'connected-components'
 import { makeMainProcessClient } from '../mainProcessClient'
 
@@ -133,6 +134,7 @@ const App = ({
         </React.StrictMode>
       </main>
       <React.StrictMode>
+        <UndoRedo />
         <Spinner />
         <PreventExittingWithoutSaving />
         {renderTemplateCreate()}

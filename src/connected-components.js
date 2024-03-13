@@ -697,3 +697,4 @@ export const UpdateNotifier = components.UpdateNotifier
 export const NewProjectInputModal = components.NewProjectInputModal
 export const SettingsWizard = components.SettingsWizard
 export const RestructureTimelineModal = components.RestructureTimelineModal
+export const UndoRedo = components.UndoRedo
