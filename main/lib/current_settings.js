@@ -11,7 +11,7 @@ export const currentSettings = () => {
     ? 'isBetaOrAlpha'
     : ''
   const env = JSON.parse(JSON.stringify(process.env))['NODE_ENV']
-  const isDevelopment = env === 'development' ? 'development' : 'production'
+  const isDevelopment = env === 'development'
   const suffix = isDevelopment ? '_dev' : isAlphaOrBeta ? '_test' : ''
   const configStorePath = `config${suffix}.json`
   return readFile(path.join(app.getPath('userData'), configStorePath)).then((result) => {
