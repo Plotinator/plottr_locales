@@ -7,6 +7,7 @@ import {
   initialFetch,
   overwriteAllKeys,
   saveBackup as saveBackupOnFirebase,
+  writeUserOwnershipNote,
 } from 'wired-up-firebase'
 import exportToSelfContainedPlottrFile from 'plottr_import_export/src/exporter/plottr'
 
@@ -421,6 +422,12 @@ export function bootFile(
           return computeAndHandleResumeDirectives(fileId, email, userId, fetchedFile)
             .then(migrate(fetchedFile, fileId))
             .then(afterLoading(userId, saveBackup))
+        })
+        .then((result) => {
+          const permission = selectors.permissionSelector(store().getState())
+          return writeUserOwnershipNote(userId, fileId, permission).then(() => {
+            return result
+          })
         })
         .catch((error) => {
           const errorMessage = `Error fetching ${fileId} for user: ${userId}, clientId: ${clientId}`
