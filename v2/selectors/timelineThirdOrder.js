@@ -757,7 +757,7 @@ export const cardMetaDataMapSelector = createDeepEqualSelector(
 export const _searchedCardMetaDataMapSelector = createDeepEqualSelector(
   allCardMetaDataSelector,
   collapsedBeatSelector,
-  visibleSortedBeatsForTimelineByBookSelector,
+  sortedBeatsByBookSelector,
   timelineSearchTermSelector,
   stringifiedCardsByIdSelector,
   beatsByBookSelector,

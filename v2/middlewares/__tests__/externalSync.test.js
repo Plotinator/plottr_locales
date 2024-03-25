@@ -204,9 +204,6 @@ describe('computeNewPaths', () => {
               [key]: toChange,
             }
             const paths = computeNewPaths(hamletKeyed, stateWithChange, wiredSelectors)
-            if (paths.length === 0) {
-              console.log('paths', paths, 'path', path)
-            }
             expect(paths.length).toEqual(1)
             expect(
               paths.map(({ path }) => {
@@ -262,9 +259,6 @@ describe('computeNewPaths', () => {
               const pathsIntendedToChange = pathIndicesToChange.map((index) => {
                 return allPaths[index]
               })
-              if (paths.length !== pathsIntendedToChange.length) {
-                console.log('paths', paths, 'path', pathsIntendedToChange)
-              }
               expect(paths.length).toEqual(pathsIntendedToChange.length)
               expect(
                 paths.map(({ path }) => {

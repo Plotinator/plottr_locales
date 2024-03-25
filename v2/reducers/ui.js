@@ -291,11 +291,17 @@ const updateUI = (state, action) => {
     case CHANGE_ORIENTATION:
       return Object.assign({}, state, { orientation: action.orientation })
 
-    case CHANGE_CURRENT_TIMELINE:
-      return Object.assign({}, state, {
+    case CHANGE_CURRENT_TIMELINE: {
+      return {
+        ...state,
         currentTimeline: action.id,
         timelineScrollPosition: { x: 0, y: 0 },
-      })
+        timeline: {
+          ...state.timeline,
+          ...(typeof action.timelineView === 'string' ? { view: action.timelineView } : {}),
+        },
+      }
+    }
 
     case LOAD_BEATS: {
       if (!action.beats[state.currentTimeline]) {

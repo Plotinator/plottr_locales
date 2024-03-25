@@ -4,9 +4,7 @@
   "name": "Seven Point Plot Structure",
   "description": "A plot structure popularized by Dan Wells",
   "version": "2021.10.15",
-  "categories": [
-    "general"
-  ],
+  "categories": ["general"],
   "templateData": {
     "cards": [
       {
@@ -799,15 +797,7 @@
           "5": [],
           "6": [],
           "7": [],
-          "null": [
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7
-          ]
+          "null": [1, 2, 3, 4, 5, 6, 7]
         },
         "heap": {
           "1": null,
@@ -901,9 +891,7 @@
       "series": {
         "children": {
           "8": [],
-          "null": [
-            8
-          ]
+          "null": [8]
         },
         "heap": {
           "8": null
@@ -957,9 +945,5 @@
     }
   },
   "initialVersion": "2021.2.19",
-  "appliedMigrations": [
-    "m2021_4_13",
-    "m2021_6_9",
-    "m2021_8_1"
-  ]
+  "appliedMigrations": ["m2021_4_13", "m2021_6_9", "m2021_8_1"]
 }

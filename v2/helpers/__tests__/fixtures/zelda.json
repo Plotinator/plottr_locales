@@ -43,7 +43,13 @@
       "size": "large",
       "focus": [
         {
-          "path": ["card", 19, "template", "sc4", "Conflict"],
+          "path": [
+            "card",
+            19,
+            "template",
+            "sc4",
+            "Conflict"
+          ],
           "selection": {
             "start": 17,
             "end": 17,
@@ -51,7 +57,13 @@
           }
         },
         {
-          "path": ["card", 19, "template", "sc4", "Motivation"],
+          "path": [
+            "card",
+            19,
+            "template",
+            "sc4",
+            "Motivation"
+          ],
           "selection": {
             "start": 13,
             "end": 13,
@@ -59,7 +71,13 @@
           }
         },
         {
-          "path": ["card", 19, "template", "sc4", "Goal"],
+          "path": [
+            "card",
+            19,
+            "template",
+            "sc4",
+            "Goal"
+          ],
           "selection": {
             "start": 7,
             "end": 7,
@@ -67,7 +85,11 @@
           }
         },
         {
-          "path": ["card", 10, "description"],
+          "path": [
+            "card",
+            10,
+            "description"
+          ],
           "selection": {
             "start": 10,
             "end": 13,
@@ -75,7 +97,11 @@
           }
         },
         {
-          "path": ["card", 13, "title"],
+          "path": [
+            "card",
+            13,
+            "title"
+          ],
           "selection": {
             "start": 3,
             "end": 6,
@@ -83,7 +109,11 @@
           }
         },
         {
-          "path": ["card", 19, "att 3"],
+          "path": [
+            "card",
+            19,
+            "att 3"
+          ],
           "selection": {
             "start": 91,
             "end": 94,
@@ -91,7 +121,11 @@
           }
         },
         {
-          "path": ["card", 19, "attr 1"],
+          "path": [
+            "card",
+            19,
+            "attr 1"
+          ],
           "selection": {
             "start": 32,
             "end": 35,
@@ -99,7 +133,11 @@
           }
         },
         {
-          "path": ["card", 19, "description"],
+          "path": [
+            "card",
+            19,
+            "description"
+          ],
           "selection": {
             "start": 64,
             "end": 67,
@@ -107,7 +145,11 @@
           }
         },
         {
-          "path": ["card", 23, "description"],
+          "path": [
+            "card",
+            23,
+            "description"
+          ],
           "selection": {
             "start": 79,
             "end": 82,
@@ -115,7 +157,11 @@
           }
         },
         {
-          "path": ["card", 26, "title"],
+          "path": [
+            "card",
+            26,
+            "title"
+          ],
           "selection": {
             "start": 8,
             "end": 11,
@@ -123,7 +169,11 @@
           }
         },
         {
-          "path": ["card", 31, "title"],
+          "path": [
+            "card",
+            31,
+            "title"
+          ],
           "selection": {
             "start": 7,
             "end": 10,
@@ -149,7 +199,12 @@
       "selectedCharacter": 3,
       "focus": [
         {
-          "path": ["character", 3, 4, 5],
+          "path": [
+            "character",
+            3,
+            4,
+            5
+          ],
           "selection": {
             "start": 4,
             "end": 4,
@@ -157,7 +212,12 @@
           }
         },
         {
-          "path": ["character", 3, 3, 5],
+          "path": [
+            "character",
+            3,
+            3,
+            5
+          ],
           "selection": {
             "start": 5,
             "end": 5,
@@ -165,7 +225,12 @@
           }
         },
         {
-          "path": ["character", 3, 2, 5],
+          "path": [
+            "character",
+            3,
+            2,
+            5
+          ],
           "selection": {
             "start": 2,
             "end": 2,
@@ -173,20 +238,40 @@
           }
         },
         {
-          "path": ["character", 3, "template", "ch3", "Description", 5],
+          "path": [
+            "character",
+            3,
+            "template",
+            "ch3",
+            "Description",
+            5
+          ],
           "selection": {
             "anchor": {
-              "path": [0, 0],
+              "path": [
+                0,
+                0
+              ],
               "offset": 31
             },
             "focus": {
-              "path": [0, 0],
+              "path": [
+                0,
+                0
+              ],
               "offset": 31
             }
           }
         },
         {
-          "path": ["character", 3, "template", "ch3", "Birth Order", 5],
+          "path": [
+            "character",
+            3,
+            "template",
+            "ch3",
+            "Birth Order",
+            5
+          ],
           "selection": {
             "start": 4,
             "end": 4,
@@ -194,7 +279,13 @@
           }
         },
         {
-          "path": ["character", 3, "customAttribute", 1, "all"],
+          "path": [
+            "character",
+            3,
+            "customAttribute",
+            1,
+            "all"
+          ],
           "selection": {
             "start": 116,
             "end": 119,
@@ -202,7 +293,11 @@
           }
         },
         {
-          "path": ["character", 3, "name"],
+          "path": [
+            "character",
+            3,
+            "name"
+          ],
           "selection": {
             "start": 4,
             "end": 7,
@@ -210,14 +305,26 @@
           }
         },
         {
-          "path": ["character", 3, "description", 1, "all"],
+          "path": [
+            "character",
+            3,
+            "description",
+            1,
+            "all"
+          ],
           "selection": {
             "anchor": {
-              "path": [1, 0],
+              "path": [
+                1,
+                0
+              ],
               "offset": 72
             },
             "focus": {
-              "path": [1, 0],
+              "path": [
+                1,
+                0
+              ],
               "offset": 72
             }
           }
@@ -285,7 +392,11 @@
     "projectTab": {
       "focus": [
         {
-          "path": ["book", 9, "premise"],
+          "path": [
+            "book",
+            9,
+            "premise"
+          ],
           "selection": {
             "start": 5,
             "end": 8,
@@ -293,7 +404,11 @@
           }
         },
         {
-          "path": ["book", 8, "premise"],
+          "path": [
+            "book",
+            8,
+            "premise"
+          ],
           "selection": {
             "start": 5,
             "end": 8,
@@ -301,7 +416,11 @@
           }
         },
         {
-          "path": ["book", 8, "title"],
+          "path": [
+            "book",
+            8,
+            "title"
+          ],
           "selection": {
             "start": 18,
             "end": 21,
@@ -309,7 +428,11 @@
           }
         },
         {
-          "path": ["book", 7, "title"],
+          "path": [
+            "book",
+            7,
+            "title"
+          ],
           "selection": {
             "start": 10,
             "end": 13,
@@ -317,7 +440,11 @@
           }
         },
         {
-          "path": ["book", 6, "title"],
+          "path": [
+            "book",
+            6,
+            "title"
+          ],
           "selection": {
             "start": 0,
             "end": 3,
@@ -325,7 +452,11 @@
           }
         },
         {
-          "path": ["book", 1, "title"],
+          "path": [
+            "book",
+            1,
+            "title"
+          ],
           "selection": {
             "start": 10,
             "end": 13,
@@ -333,7 +464,9 @@
           }
         },
         {
-          "path": ["name"],
+          "path": [
+            "name"
+          ],
           "selection": {
             "start": 18,
             "end": 21,
@@ -341,7 +474,9 @@
           }
         },
         {
-          "path": ["theme"],
+          "path": [
+            "theme"
+          ],
           "selection": {
             "start": 8,
             "end": 8,
@@ -349,7 +484,9 @@
           }
         },
         {
-          "path": ["premise"],
+          "path": [
+            "premise"
+          ],
           "selection": {
             "start": 6,
             "end": 6,
@@ -357,7 +494,9 @@
           }
         },
         {
-          "path": ["genre"],
+          "path": [
+            "genre"
+          ],
           "selection": {
             "start": 5,
             "end": 5,
@@ -369,7 +508,11 @@
     "outlineTab": {
       "focus": [
         {
-          "path": ["card", 10, "description"],
+          "path": [
+            "card",
+            10,
+            "description"
+          ],
           "selection": {
             "start": 10,
             "end": 13,
@@ -377,7 +520,11 @@
           }
         },
         {
-          "path": ["card", 13, "title"],
+          "path": [
+            "card",
+            13,
+            "title"
+          ],
           "selection": {
             "start": 3,
             "end": 6,
@@ -385,7 +532,11 @@
           }
         },
         {
-          "path": ["card", 19, "description"],
+          "path": [
+            "card",
+            19,
+            "description"
+          ],
           "selection": {
             "start": 64,
             "end": 67,
@@ -393,7 +544,11 @@
           }
         },
         {
-          "path": ["card", 23, "description"],
+          "path": [
+            "card",
+            23,
+            "description"
+          ],
           "selection": {
             "start": 79,
             "end": 82,
@@ -401,7 +556,11 @@
           }
         },
         {
-          "path": ["card", 26, "title"],
+          "path": [
+            "card",
+            26,
+            "title"
+          ],
           "selection": {
             "start": 8,
             "end": 11,
@@ -409,7 +568,11 @@
           }
         },
         {
-          "path": ["card", 31, "title"],
+          "path": [
+            "card",
+            31,
+            "title"
+          ],
           "selection": {
             "start": 7,
             "end": 10,
@@ -425,7 +588,11 @@
     "noteTab": {
       "focus": [
         {
-          "path": ["note", 2, "third"],
+          "path": [
+            "note",
+            2,
+            "third"
+          ],
           "selection": {
             "start": 15,
             "end": 15,
@@ -433,7 +600,11 @@
           }
         },
         {
-          "path": ["note", 2, "second"],
+          "path": [
+            "note",
+            2,
+            "second"
+          ],
           "selection": {
             "start": 2,
             "end": 2,
@@ -441,7 +612,11 @@
           }
         },
         {
-          "path": ["note", 2, "first"],
+          "path": [
+            "note",
+            2,
+            "first"
+          ],
           "selection": {
             "start": 4,
             "end": 4,
@@ -449,7 +624,11 @@
           }
         },
         {
-          "path": ["note", 2, "content"],
+          "path": [
+            "note",
+            2,
+            "content"
+          ],
           "selection": {
             "start": 22,
             "end": 25,
@@ -457,7 +636,11 @@
           }
         },
         {
-          "path": ["note", 2, "title"],
+          "path": [
+            "note",
+            2,
+            "title"
+          ],
           "selection": {
             "start": 4,
             "end": 7,
@@ -475,7 +658,11 @@
     "placeTab": {
       "focus": [
         {
-          "path": ["place", 2, "three"],
+          "path": [
+            "place",
+            2,
+            "three"
+          ],
           "selection": {
             "start": 1,
             "end": 1,
@@ -483,7 +670,11 @@
           }
         },
         {
-          "path": ["place", 2, "two"],
+          "path": [
+            "place",
+            2,
+            "two"
+          ],
           "selection": {
             "start": 15,
             "end": 15,
@@ -491,7 +682,11 @@
           }
         },
         {
-          "path": ["place", 2, "one"],
+          "path": [
+            "place",
+            2,
+            "one"
+          ],
           "selection": {
             "start": 15,
             "end": 15,
@@ -499,7 +694,11 @@
           }
         },
         {
-          "path": ["place", 2, "description"],
+          "path": [
+            "place",
+            2,
+            "description"
+          ],
           "selection": {
             "start": 20,
             "end": 23,
@@ -507,7 +706,11 @@
           }
         },
         {
-          "path": ["place", 2, "name"],
+          "path": [
+            "place",
+            2,
+            "name"
+          ],
           "selection": {
             "start": 4,
             "end": 7,
@@ -515,7 +718,11 @@
           }
         },
         {
-          "path": ["place", 1, "notes"],
+          "path": [
+            "place",
+            1,
+            "notes"
+          ],
           "selection": {
             "start": 0,
             "end": 3,
@@ -615,7 +822,14 @@
       "timelineTemplates": [],
       "imageId": "5"
     },
-    "allIds": [8, 1, 5, 9, 6, 7]
+    "allIds": [
+      8,
+      1,
+      5,
+      9,
+      6,
+      7
+    ]
   },
   "beats": {
     "1": {
@@ -623,7 +837,11 @@
         "2": [],
         "16": [],
         "17": [],
-        "null": [17, 16, 2]
+        "null": [
+          17,
+          16,
+          2
+        ]
       },
       "heap": {
         "2": null,
@@ -667,7 +885,9 @@
     "5": {
       "children": {
         "18": [],
-        "null": [18]
+        "null": [
+          18
+        ]
       },
       "heap": {
         "18": null
@@ -688,7 +908,9 @@
     "6": {
       "children": {
         "19": [],
-        "null": [19]
+        "null": [
+          19
+        ]
       },
       "heap": {
         "19": null
@@ -717,7 +939,17 @@
         "31": [],
         "32": [],
         "33": [],
-        "null": [33, 32, 31, 30, 29, 28, 27, 26, 20]
+        "null": [
+          33,
+          32,
+          31,
+          30,
+          29,
+          28,
+          27,
+          26,
+          20
+        ]
       },
       "heap": {
         "20": null,
@@ -829,7 +1061,12 @@
         "22": [],
         "23": [],
         "24": [],
-        "null": [24, 23, 22, 21]
+        "null": [
+          24,
+          23,
+          22,
+          21
+        ]
       },
       "heap": {
         "21": null,
@@ -883,7 +1120,9 @@
     "9": {
       "children": {
         "25": [],
-        "null": [25]
+        "null": [
+          25
+        ]
       },
       "heap": {
         "25": null
@@ -904,7 +1143,9 @@
     "series": {
       "children": {
         "1": [],
-        "null": [1]
+        "null": [
+          1
+        ]
       },
       "heap": {
         "1": null
@@ -949,8 +1190,7 @@
       "templates": [],
       "imageId": null,
       "fromTemplateId": null,
-      "color": null,
-      "Scene Name/With Slashes": "slashedy-slashed"
+      "color": null
     },
     {
       "id": 34,
@@ -1384,12 +1624,6 @@
           "id": "sc4",
           "version": "2022.7.20",
           "attributes": [
-            {
-              "name": "template/attribute-with-slashes",
-              "type": "text",
-              "description": "Blah di blah blah",
-              "value": "zzzzzzzzzzz"
-            },
             {
               "name": "Goal",
               "type": "text",
@@ -1946,7 +2180,14 @@
       "tags": [],
       "categoryId": "1",
       "imageId": null,
-      "bookIds": [1, 5, 8, 6, 7, 9],
+      "bookIds": [
+        1,
+        5,
+        8,
+        6,
+        7,
+        9
+      ],
       "attributes": [
         {
           "id": 2,
@@ -1979,8 +2220,7 @@
             }
           ]
         }
-      ],
-      "Character Name/With Slashes": "slashedy-slashed"
+      ]
     },
     {
       "id": 2,
@@ -2003,7 +2243,13 @@
       "tags": [],
       "categoryId": "2",
       "imageId": null,
-      "bookIds": [8, 1, 5, 6, 7],
+      "bookIds": [
+        8,
+        1,
+        5,
+        6,
+        7
+      ],
       "attributes": [
         {
           "id": 2,
@@ -2042,10 +2288,6 @@
           "version": "2020.5.27",
           "attributes": [
             {
-              "name": "Character template/with-slashes",
-              "type": "text"
-            },
-            {
               "name": "Birth Order",
               "type": "text"
             },
@@ -2056,11 +2298,6 @@
           ],
           "value": "",
           "values": [
-            {
-              "name": "Character template/with-slashes",
-              "value": "yyyyy",
-              "bookId": 5
-            },
             {
               "name": "Birth Order",
               "value": "Last",
@@ -2086,7 +2323,13 @@
       "tags": [],
       "categoryId": null,
       "imageId": null,
-      "bookIds": [8, 1, 5, 6, 7],
+      "bookIds": [
+        8,
+        1,
+        5,
+        6,
+        7
+      ],
       "attributes": [
         {
           "bookId": "all",
@@ -2153,10 +2396,6 @@
       {
         "name": "a",
         "type": "text"
-      },
-      {
-        "name": "Character Name/With Slashes",
-        "type": "text"
       }
     ],
     "places": [
@@ -2170,10 +2409,6 @@
       },
       {
         "name": "three",
-        "type": "text"
-      },
-      {
-        "name": "Place Name/With Slashes",
         "type": "text"
       }
     ],
@@ -2189,10 +2424,6 @@
       {
         "name": "att 3",
         "type": "text"
-      },
-      {
-        "name": "Scene Name/With Slashes",
-        "type": "text"
       }
     ],
     "lines": [],
@@ -2207,10 +2438,6 @@
       },
       {
         "name": "third",
-        "type": "text"
-      },
-      {
-        "name": "Note Name/With Slashes",
         "type": "text"
       }
     ]
@@ -2356,8 +2583,7 @@
       "lastEdited": 1617071347633,
       "templates": [],
       "imageId": null,
-      "bookIds": [],
-      "Note Name/With Slashes": "slashedy-slashed"
+      "bookIds": []
     },
     {
       "id": 2,
@@ -2382,8 +2608,7 @@
       "bookIds": [],
       "first": "here",
       "second": "is",
-      "third": "some text... :)",
-      "Note Name/With Slashes": "xxxxx"
+      "third": "some text... :)"
     }
   ],
   "places": [
@@ -2408,8 +2633,7 @@
       "tags": [],
       "imageId": null,
       "bookIds": [],
-      "sljkfl": "",
-      "Place Name/With Slashes": "slashedy-slashed"
+      "sljkfl": ""
     },
     {
       "id": 2,

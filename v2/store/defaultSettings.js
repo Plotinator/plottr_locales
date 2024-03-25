@@ -35,23 +35,23 @@ export function desktop() {
       fonts: {
         rce: {
           defaultFont: 'Forum',
-          defaultFontSize: '20px',
+          defaultFontSize: '16pt',
           defaultDarkModeFontColor: '#CCCCCC',
           defaultFontColor: '#102A42', //$gray-0
           titleFont: 'Forum',
-          titleFontSize: '24px',
+          titleFontSize: '28pt',
           titleFontWeight: 400,
           titleDarkModeFontColor: '#CCCCCC',
           titleFontColor: '#102A42',
           subtitleFont: 'Forum',
-          subtitleFontSize: '24px',
+          subtitleFontSize: '24pt',
           subtitleFontWeight: 400,
           subtitleDarkModeFontColor: '#CCCCCC',
           subtitleFontColor: '#102A42',
         },
         global: {
           headingFont: 'IBM Plex Serif',
-          bodyFont: 'IBM Plex Serif',
+          bodyFont: 'Forum',
         },
         timeline: {
           headings: {
@@ -94,27 +94,29 @@ export function web() {
       dark: 'system',
       numberOfBackups: 30,
       openDashboardFirst: true,
+      font: 'Forum',
+      fontSize: 20,
       backupType: 'never-delete',
       fonts: {
         rce: {
           defaultFont: 'Forum',
-          defaultFontSize: '20px',
+          defaultFontSize: '16pt',
           defaultDarkModeFontColor: '#CCCCCC',
           defaultFontColor: '#102A42', //$gray-0
           titleFont: 'Forum',
-          titleFontSize: '24px',
+          titleFontSize: '28pt',
           titleFontWeight: 400,
           titleDarkModeFontColor: '#CCCCCC',
           titleFontColor: '#102A42',
           subtitleFont: 'Forum',
-          subtitleFontSize: '24px',
+          subtitleFontSize: '24pt',
           subtitleFontWeight: 400,
           subtitleDarkModeFontColor: '#CCCCCC',
           subtitleFontColor: '#102A42',
         },
         global: {
-          headerFont: 'IBM Plex Serif',
-          bodyFont: 'IBM Plex Serif',
+          headingFont: 'IBM Plex Serif',
+          bodyFont: 'Forum',
         },
         timeline: {
           headings: {

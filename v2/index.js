@@ -23,6 +23,7 @@ import * as dateHelpers from './helpers/date'
 import * as fileHelpers from './helpers/file'
 import * as templatesHelpers from './helpers/templates'
 import * as characterHelpers from './helpers/characters'
+import * as uiHelpers from './helpers/ui'
 
 import * as template from './template'
 
@@ -30,7 +31,10 @@ import * as editStates from './constants/editStates'
 
 import migrateIfNeeded from './migrator/migration_manager'
 import Migrator from './migrator/migrator.js'
-import addUITimelineOrHierarchiesStateIfMissing from './migrator/handleSpecialCases'
+import applyAllFixes, {
+  addHierarchiesIfMissing,
+  addUITimelineOrHierarchiesStateIfMissing,
+} from './migrator/handleSpecialCases'
 
 import selectors from './selectors'
 
@@ -144,6 +148,7 @@ const helpers = {
   file: fileHelpers,
   template: templatesHelpers,
   characters: characterHelpers,
+  ui: uiHelpers,
 }
 
 const slate = {
@@ -158,6 +163,8 @@ const middlewares = {
 }
 
 const specialCaseFixes = {
+  applyAllFixes,
+  addHierarchiesIfMissing,
   addUITimelineOrHierarchiesStateIfMissing,
 }
 
