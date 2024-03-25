@@ -13,6 +13,7 @@ import {
   STOP_LISTENING,
   LISTEN_TO_FILES,
   FETCH_FILES,
+  FETCH_FILE,
   LOG_OUT,
   MINT_COOKIE_TOKEN,
   ON_SESSION_CHANGE,
@@ -47,11 +48,14 @@ import {
   IS_STORAGE_URL,
   LOGIN_WITH_EMAIL_AND_PASSWORD,
   GET_ID_TOKEN_RESULT,
+  DELETE_PRO_BACKUP,
   INITIALISE_WORKER,
   ON_SESSION_CHANGE_UNSUBSCRIBE,
   LISTEN_TO_FILES_UNSUBSCRIBE,
   LISTEN_UNSUBSCRIBE,
   LISTEN_FOR_RCE_LOCK_UNSUBSCRIBE,
+  LISTEN_TO_CUSTOM_TEMPLATES_UNSUBSCRIBE,
+  LISTEN_FOR_BACKUPS_UNSUBSCRIBE,
 } from './firebase-messages'
 import { logger } from './worker-logger'
 
@@ -81,6 +85,7 @@ const initialFetch = wiredUp.initialFetch
 const deleteFile = wiredUp.deleteFile
 const listenToFiles = wiredUp.listenToFiles
 const fetchFiles = wiredUp.fetchFiles
+const fetchFile = wiredUp.fetchFile
 const logOut = wiredUp.logOut
 const mintCookieToken = wiredUp.mintCookieToken
 const onSessionChange = wiredUp.onSessionChange
@@ -105,6 +110,7 @@ const backupPublicURL = wiredUp.backupPublicURL
 const imagePublicURL = wiredUp.imagePublicURL
 const isStorageURL = wiredUp.isStorageURL
 const loginWithEmailAndPassword = wiredUp.loginWithEmailAndPassword
+const deleteProBackup = wiredUp.deleteProBackup
 
 const typeToReplyType = (type) => `${type}_REPLY`
 const errorTypeToReplyType = (type) => `${type}_ERROR_REPLY`
@@ -336,13 +342,15 @@ self.onmessage = (event) => {
       unsubscribeFunctions.set(messageId, unsubscribe)
       return
     }
+    case LISTEN_FOR_BACKUPS_UNSUBSCRIBE:
+    case LISTEN_TO_CUSTOM_TEMPLATES_UNSUBSCRIBE:
     case LISTEN_FOR_RCE_LOCK_UNSUBSCRIBE:
     case ON_SESSION_CHANGE_UNSUBSCRIBE:
     case LISTEN_TO_FILES_UNSUBSCRIBE:
     case LISTEN_UNSUBSCRIBE: {
       const unsubscribe = unsubscribeFunctions.get(messageId)
       if (!unsubscribe) {
-        console.error(
+        console.warn(
           `Tried to unsubscribe from ${type} with a message id of ${messageId} but it's either already been done or never existed.`
         )
         return
@@ -404,6 +412,16 @@ self.onmessage = (event) => {
         .then(replyToPromise(FETCH_FILES))
         .catch((error) => {
           logger.error(`Error fetching all files for user ${userId}`, error.message)
+          replyToPromiseWithError(type, error.message)
+        })
+      return
+    }
+    case FETCH_FILE: {
+      const { userId, fileId, clientId } = messagePayload
+      fetchFile(userId, fileId, clientId)
+        .then(replyToPromise(FETCH_FILE))
+        .catch((error) => {
+          logger.error(`Error fetching file ${fileId} for user ${userId}`)
           replyToPromiseWithError(type, error.message)
         })
       return
@@ -521,13 +539,8 @@ self.onmessage = (event) => {
       const { fileId, editorId, expectedLock } = messagePayload
       releaseRCELock(fileId, editorId, expectedLock)
         .then(replyToPromise(RELEASE_RCE_LOCK, (_lock) => null))
-        .catch((error) => {
-          logger.error(
-            `Error releasing the RCE lock for id <${fileId}> to ${editorId}`,
-            error.message
-          )
-          replyToPromiseWithError(type, error.message)
-        })
+        // Ignore errors releasing the RCE lock.
+        .catch(replyToPromise(RELEASE_RCE_LOCK, (_lock) => null))
       return
     }
     case LOCK_RCE: {
@@ -680,6 +693,19 @@ self.onmessage = (event) => {
           logger.error('Error replying to GET_ID_TOKEN_RESULT: ', error.message)
         }
       }
+      return
+    }
+    case DELETE_PRO_BACKUP: {
+      const { userId, backupRecordId, storageProtocolURL } = messagePayload
+      deleteProBackup(userId, backupRecordId, storageProtocolURL)
+        .then(replyToPromise(DELETE_PRO_BACKUP, () => true))
+        .catch((error) => {
+          logger.error(
+            `Error deleting a pro backup for <${userId}>, record id ${backupRecordId} and storage protocol URL ${storageProtocolURL}`,
+            error.message
+          )
+          replyToPromiseWithError(type, error.message)
+        })
       return
     }
     case IS_STORAGE_URL: {

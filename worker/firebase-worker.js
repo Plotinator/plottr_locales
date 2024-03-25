@@ -23,6 +23,8 @@ import {
   LISTEN_TO_FILES_REPLY,
   FETCH_FILES,
   FETCH_FILES_REPLY,
+  FETCH_FILE,
+  FETCH_FILE_REPLY,
   LOG_OUT,
   LOG_OUT_REPLY,
   MINT_COOKIE_TOKEN,
@@ -91,6 +93,8 @@ import {
   LOGIN_WITH_EMAIL_AND_PASSWORD_REPLY,
   GET_ID_TOKEN_RESULT,
   GET_ID_TOKEN_RESULT_REPLY,
+  DELETE_PRO_BACKUP,
+  DELETE_PRO_BACKUP_REPLY,
   INITIALISE_WORKER,
   LISTEN_UNSUBSCRIBE,
   LOG_FROM_WORKER,
@@ -116,6 +120,7 @@ import {
   IMAGE_PUBLIC_URL_ERROR_REPLY,
   GET_ID_TOKEN_RESULT_ERROR_REPLY,
   LOGIN_WITH_EMAIL_AND_PASSWORD_ERROR_REPLY,
+  DELETE_PRO_BACKUP_ERROR_REPLY,
 } from './firebase-messages'
 
 export const firebaseWorker = (logger, mintSessionClientId, selectors) => {
@@ -238,6 +243,9 @@ export const firebaseWorker = (logger, mintSessionClientId, selectors) => {
   const fetchFiles = (userId) => {
     return sendPromise(FETCH_FILES, { userId })
   }
+  const fetchFile = (userId, fileId, clientId) => {
+    return sendPromise(FETCH_FILE, { fileId, userId, clientId })
+  }
   const logOut = () => {
     return sendPromise(LOG_OUT, {})
   }
@@ -313,6 +321,9 @@ export const firebaseWorker = (logger, mintSessionClientId, selectors) => {
   const getIdTokenResult = () => {
     return sendPromise(GET_ID_TOKEN_RESULT, {})
   }
+  const deleteProBackup = (userId, backupRecordId, storageProtocolURL) => {
+    return sendPromise(DELETE_PRO_BACKUP, { userId, backupRecordId, storageProtocolURL })
+  }
 
   worker.onmessage = (event) => {
     const { type, payload, messageId } = event.data
@@ -364,6 +375,7 @@ export const firebaseWorker = (logger, mintSessionClientId, selectors) => {
         return
       }
       case IS_STORAGE_URL_REPLY:
+      case DELETE_PRO_BACKUP_REPLY:
       case GET_ID_TOKEN_RESULT_REPLY:
       case IMAGE_PUBLIC_URL_REPLY:
       case BACKUP_PUBLIC_URL_REPLY:
@@ -384,6 +396,7 @@ export const firebaseWorker = (logger, mintSessionClientId, selectors) => {
       case MINT_COOKIE_TOKEN_REPLY:
       case LOG_OUT_REPLY:
       case FETCH_FILES_REPLY:
+      case FETCH_FILE_REPLY:
       case INITIAL_FETCH_REPLY:
       case DELETE_FILE_REPLY:
       case EDIT_FILE_NAME_REPLY:
@@ -435,6 +448,7 @@ export const firebaseWorker = (logger, mintSessionClientId, selectors) => {
       case BACKUP_PUBLIC_URL_ERROR_REPLY:
       case IMAGE_PUBLIC_URL_ERROR_REPLY:
       case GET_ID_TOKEN_RESULT_ERROR_REPLY:
+      case DELETE_PRO_BACKUP_ERROR_REPLY:
       case LOGIN_WITH_EMAIL_AND_PASSWORD_ERROR_REPLY: {
         resolvePromiseWithError()
         return
@@ -464,6 +478,7 @@ export const firebaseWorker = (logger, mintSessionClientId, selectors) => {
     deleteFile,
     listenToFiles,
     fetchFiles,
+    fetchFile,
     logOut,
     mintCookieToken,
     onSessionChange,
@@ -489,6 +504,7 @@ export const firebaseWorker = (logger, mintSessionClientId, selectors) => {
     isStorageURL,
     loginWithEmailAndPassword,
     getIdTokenResult,
+    deleteProBackup,
     isInitialised: () => initialised,
   }
 }

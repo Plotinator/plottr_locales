@@ -24,6 +24,9 @@ const auth = () => {
     signInWithEmailAndPassword: (email, password) => {
       return legacyAPIAuth().signInWithEmailAndPassword(email, password)
     },
+    sendPasswordResetEmail: (email) => {
+      return legacyAPIAuth().sendPasswordResetEmail(email)
+    },
   }
 }
 
@@ -263,6 +266,7 @@ export const wireUpAPI = (logger, actions, selectors) => {
     backupPublicURL: wiredUp.backupPublicURL,
     imagePublicURL: wiredUp.imagePublicURL,
     isStorageURL: wiredUp.isStorageURL,
+    deleteProBackup: wiredUp.deleteProBackup,
     loginWithEmailAndPassword: (email, password) => {
       return wiredUp.loginWithEmailAndPassword(email, password).then((result) => {
         return wiredUp.mintCookieToken().then(() => {
@@ -270,5 +274,6 @@ export const wireUpAPI = (logger, actions, selectors) => {
         })
       })
     },
+    sendPasswordResetEmail: wiredUp.sendPasswordResetEmail,
   }
 }

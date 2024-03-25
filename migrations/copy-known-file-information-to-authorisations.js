@@ -2,6 +2,8 @@ const admin = require('firebase-admin')
 const readline = require('node:readline')
 const { stdin, stdout } = require('node:process')
 
+const { isEqual } = require('lodash')
+
 const { logChange } = require('./log-change')
 const { sequencePromises } = require('./util')
 
@@ -172,38 +174,47 @@ const copyKnownFileInformationToAuthorisation = (userId, executingUserId, readOn
               return file.id === fileId
             })
             if (correspondingFile) {
-              const change = {
-                lastOpened: correspondingFile.lastOpened || correspondingFile.timeStamp || null,
-                fileURL: `plottr://${correspondingFile.id}`,
-                fileName: correspondingFile.fileName || 'Untitled',
-              }
               return database
                 .doc(`authorisation/${userId}/granted/${fileId}`)
                 .get()
                 .then((ref) => ref.data())
                 .then((oldRecord) => {
+                  const change = {
+                    lastOpened:
+                      oldRecord.lastOpened ||
+                      correspondingFile.lastOpened ||
+                      correspondingFile.timeStamp ||
+                      null,
+                    fileURL: `plottr://${correspondingFile.id}`,
+                    fileName: correspondingFile.fileName || 'Untitled',
+                  }
                   const newRecord = {
                     ...oldRecord,
                     ...change,
                   }
-                  console.log(
-                    `Adding ${JSON.stringify(
-                      change,
-                      null,
-                      2
-                    )} to authorisation/${userId}/granted/${fileId} to produce: ${JSON.stringify(
-                      newRecord,
-                      null,
-                      2
-                    )}`
-                  )
-                  return runTransactionWithAuditing(
-                    userId,
-                    fileId,
-                    `authorisation/${userId}/granted`,
-                    oldRecord,
-                    newRecord
-                  )
+                  if (isEqual(oldRecord, newRecord)) {
+                    console.log('! Nothing would change.  Leaving the record alone.')
+                    return Promise.resolve()
+                  } else {
+                    console.log(
+                      `Adding ${JSON.stringify(
+                        change,
+                        null,
+                        2
+                      )} to authorisation/${userId}/granted/${fileId} to produce: ${JSON.stringify(
+                        newRecord,
+                        null,
+                        2
+                      )}`
+                    )
+                    return runTransactionWithAuditing(
+                      userId,
+                      fileId,
+                      `authorisation/${userId}/granted`,
+                      oldRecord,
+                      newRecord
+                    )
+                  }
                 })
             } else {
               console.log(`No file found for: authorisation/${userId}/granted/${fileId}`)

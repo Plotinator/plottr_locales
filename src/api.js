@@ -37,7 +37,13 @@ const api = (
       : `https://${baseAPIDomain || ''}`
 
   const defaultErrorHandler = (label) => (error) => {
-    log.error(`[${label}]: Error communicating with Firebase.`, error.message, error)
+    if (!currentUser()) {
+      log.info(
+        `[${label}]: We're logged out and failed to communicate with Firebase.  ${error.message}`
+      )
+    } else {
+      log.error(`[${label}]: Error communicating with Firebase. ${error.message}`, error)
+    }
   }
 
   const pingAuth = (userId, fileId) => {
@@ -53,9 +59,8 @@ const api = (
       .catch((error) => {
         const status = error && error.response && error.response.status
         log.error(
-          'Error pinging auth (to signal that the file list was updated)',
-          status,
-          error.response
+          `Error pinging auth (to signal that the file list was updated). ${status}. ${error.response}`,
+          error
         )
         if (status === 401) {
           return mintCookieToken(currentUser())
@@ -76,11 +81,7 @@ const api = (
       }))
       .catch((error) => {
         const status = error && error.response && error.response.status
-        log.error(
-          'Error pinging auth (to signal that the file list was updated)',
-          status,
-          error.response
-        )
+        log.error(`Error updating auth file name auth.  ${status}. ${error?.response}`, error)
         if (status === 401) {
           return mintCookieToken(currentUser())
         } else {
@@ -151,6 +152,7 @@ const api = (
     return null
   }
 
+  const handleHandleSnapshotError = defaultErrorHandler('handleSnapshot')
   const handleSnapshot = (
     withAction,
     fileId,
@@ -165,34 +167,36 @@ const api = (
       next: (documentRef) => {
         const data = documentRef && documentRef.data()
         if (!data) {
-          log.warn(`No data in firestore at key ${path} for file: ${fileId}`)
           return
+        } else {
+          if (data.clientId === clientId) return
+          const patchAction = patchActions(path)
+          if (!patchAction) {
+            log.error(`No patch action for ${path}`, new Error('No patch action'))
+            return
+          } else {
+            delete data.fileId
+            delete data.clientId
+            withAction({
+              ...patchAction[loadFunctionKey](
+                patching,
+                withData({ ...usingFromDocRef(documentRef), ...data })
+              ),
+              fileId,
+            })
+          }
         }
-        if (data.clientId === clientId) return
-        const patchAction = patchActions(path)
-        if (!patchAction) {
-          log.error('No patch action for ', path)
-          return
-        }
-        delete data.fileId
-        delete data.clientId
-        withAction({
-          ...patchAction[loadFunctionKey](
-            patching,
-            withData({ ...usingFromDocRef(documentRef), ...data })
-          ),
-          fileId,
-        })
       },
       error: (error) => {
-        log.error(
-          `Error listening to ${fileId} at ${path} with a loadFunctionKey of ${loadFunctionKey}`,
-          error.message
+        handleHandleSnapshotError(
+          `Error listening to ${fileId} at ${path} with a loadFunctionKey of ${loadFunctionKey}.  ${error.message}`,
+          error
         )
       },
     }
   }
 
+  const handleHandleFlatArraySnapshotError = defaultErrorHandler('handleFlatArraySnapshot')
   const handleFlatArraySnapshot = (
     withAction,
     fileId,
@@ -209,7 +213,7 @@ const api = (
         const documentsToAdd = []
         const patchAction = patchActions(path)
         if (!patchAction) {
-          log.error('No patch action for ', path)
+          log.error(`No patch action for ${path}`, new Error('No patch action'))
         } else {
           snapshot.docChanges().forEach((docChange) => {
             const document = docChange.doc.data()
@@ -244,9 +248,9 @@ const api = (
         }
       },
       error: (error) => {
-        log.error(
-          `Error listening to ${fileId} at ${path} with a loadFunctionKey of ${loadFunctionKey}`,
-          error.message
+        handleHandleFlatArraySnapshotError(
+          `Error listening to ${fileId} at ${path} with a loadFunctionKey of ${loadFunctionKey}.  ${error.message}`,
+          error
         )
       },
     }
@@ -361,7 +365,6 @@ const api = (
   const onFetched = (fileId, path, withData, clientId) => (documentRef) => {
     const data = documentRef && documentRef.data()
     if (!data) {
-      log.warn(`No entry for ${path} on file ${fileId}`)
       return [path, withData({})]
     }
     delete data.fileId
@@ -491,6 +494,26 @@ const api = (
     return FLAT_ARRAY_KEYS.indexOf(key) !== -1
   }
 
+  const joinResults = (results) => {
+    return results.reduce((acc, next) => {
+      const [key, value] = next
+      const newValue =
+        typeof acc[key] === 'undefined'
+          ? value
+          : Array.isArray(acc[key]) || isObject(acc[key])
+          ? [...acc[key], ...value]
+          : null
+      if (newValue) {
+        return {
+          ...acc,
+          [key]: newValue,
+        }
+      } else {
+        return acc
+      }
+    }, {})
+  }
+
   const overwriteAllKeys = (fileId, clientId, state) => {
     const requests = []
     Object.keys(state).forEach((key) => {
@@ -505,9 +528,7 @@ const api = (
                 log.error(`Error while force updating file ${fileId} at key: ${key}`, error)
                 return Promise.reject(error)
               })
-              .then(() => ({
-                [key]: ARRAY_KEYS.indexOf(key) !== -1 ? Object.values(payload) : payload,
-              }))
+              .then(() => [key, [payload]])
           )
         })
       } else {
@@ -518,14 +539,12 @@ const api = (
               log.error(`Error while force updating file ${fileId} at key: ${key}`, error)
               return Promise.reject(error)
             })
-            .then(() => ({
-              [key]: ARRAY_KEYS.indexOf(key) !== -1 ? Object.values(payload) : payload,
-            }))
+            .then(() => [key, ARRAY_KEYS.indexOf(key) !== -1 ? Object.values(payload) : payload])
         )
       }
     })
     return Promise.all(requests).then((results) => {
-      return Object.assign({}, ...results)
+      return joinResults(results)
     })
   }
 
@@ -562,7 +581,6 @@ const api = (
         const newOpenDate = new Date()
         return patch('file', fileId, { lastOpened: newOpenDate }, clientId)
           .catch((error) => {
-            log.info(`Attempted to update file (${fileId}) timestamp and couldn't`, error)
             return {
               results,
               newOpenDate: newOpenDate.getTime(),
@@ -576,23 +594,7 @@ const api = (
           })
       })
       .then(({ results, newOpenDate }) => {
-        const json = results.reduce((acc, next) => {
-          const [key, value] = next
-          const newValue =
-            typeof acc[key] === 'undefined'
-              ? value
-              : Array.isArray(acc[key]) || isObject(acc[key])
-              ? [...acc[key], ...value]
-              : null
-          if (newValue) {
-            return {
-              ...acc,
-              [key]: newValue,
-            }
-          } else {
-            return acc
-          }
-        }, {})
+        const json = joinResults(results)
         return pingAuth(userId, fileId).then(() => {
           return {
             ...json,
@@ -639,9 +641,9 @@ const api = (
           entitys.push({ ...entity, id: entity.id })
         })
         return Promise.all(
-          entitys.map((entity, index) => {
+          entitys.map((entity) => {
             return patchWithNoPathTranslation(
-              `${rootPath}/${index}`,
+              `${rootPath}/${entity.id}`,
               fileId,
               { deleted: true, id: entity.id },
               clientId
@@ -709,7 +711,6 @@ const api = (
         callback(authorisedDocuments)
       },
       error: (error) => {
-        log.error('Error listening to files', error.message, error)
         errorHandler(error)
       },
     })
@@ -898,22 +899,23 @@ const api = (
           )
           if (existingShareRecord) {
             return pingAuth(userId, fileId)
+          } else {
+            return setDoc(
+              doc(`file/${fileId}`),
+              {
+                shareRecords: [...shareRecords, { emailAddress, permission }],
+              },
+              { merge: true }
+            ).then(() => {
+              return pingAuth(userId, fileId)
+            })
           }
-          return setDoc(
-            doc(`file/${fileId}`),
-            {
-              shareRecords: [...shareRecords, { emailAddress, permission }],
-            },
-            { merge: true }
-          ).then(() => {
-            return pingAuth(userId, fileId)
-          })
         })
       })
       .catch((error) => {
         const message = error?.message
         const status = error?.response?.status
-        log.error('Error sharing document', message, status, error)
+        log.error(`Error sharing document.  ${message}. ${status}`, error, error)
         if (error?.response?.status === 401) {
           return mintCookieToken(currentUser())
         } else {
@@ -942,7 +944,9 @@ const api = (
     })
   }
 
-  const lockRCE = (fileId, editorId, clientId, expectedLock, emailAddress = '') => {
+  const handleLockRCEError = defaultErrorHandler('lockRCE')
+  const lockRCE = (fileId, rawEditorId, clientId, expectedLock, emailAddress = '') => {
+    const editorId = rawEditorId.replace(/\//g, '__')
     const { doc, getDoc, runTransaction } = database()
     return runTransaction((transactions) => {
       const lockReference = doc(`rce/${fileId}/editors/${editorId}/locks/current`)
@@ -969,16 +973,18 @@ const api = (
         )
       })
       .catch((error) => {
-        log.error(
-          `Error acquiring the RCE lock for rce/${fileId}/editors/${editorId}/locks/current`,
-          error.message
+        handleLockRCEError(
+          `Error acquiring the RCE lock for rce/${fileId}/editors/${editorId}/locks/current.  ${error.message}`,
+          error
         )
         return Promise.reject(error)
       })
   }
 
-  const listenForRCELock = (fileId, editorId, clientId, cb) => {
+  const handleListenToRCELockError = defaultErrorHandler('listenForRCELock')
+  const listenForRCELock = (fileId, rawEditorId, clientId, cb) => {
     const { doc, onSnapshot } = database()
+    const editorId = rawEditorId.replace(/\//g, '__')
     return onSnapshot(doc(`rce/${fileId}/editors/${editorId}/locks/current`), {
       next: (documentRef) => {
         const data = documentRef && documentRef.data()
@@ -989,7 +995,10 @@ const api = (
         cb(data)
       },
       error: (error) => {
-        log.error(`Error listening for a lock on ${clientId}/${fileId}/${editorId}`, error.message)
+        handleListenToRCELockError(
+          `Error listening for a lock on ${clientId}/${fileId}/${editorId}`,
+          error.message
+        )
       },
     })
   }
@@ -1055,40 +1064,52 @@ const api = (
                 return Promise.resolve({ message: 'Not backed up', delta })
               }
               return backupToStorage(userId, file, startOfToday, false).then((path) => {
-                const { doc, updateDoc } = database()
-                return updateDoc(doc(`backup/${userId}/files/${documentRef.id}`), {
-                  ...document,
-                  fileName,
-                  storagePath: path,
-                  lastModified: new Date(),
-                })
+                if (path !== null) {
+                  const { doc, updateDoc } = database()
+                  return updateDoc(doc(`backup/${userId}/files/${documentRef.id}`), {
+                    ...document,
+                    fileName,
+                    storagePath: path,
+                    lastModified: new Date(),
+                  })
+                } else {
+                  return null
+                }
               })
             }
             // Add a non-start-of-session backup.
             return backupToStorage(userId, file, startOfToday, false).then((path) => {
-              const { addDoc, collection } = database()
-              return addDoc(collection(`backup/${userId}/files`), {
-                backupTime: startOfToday,
-                storagePath: path,
-                startOfSession: false,
-                fileId,
-                fileName,
-                lastModified: new Date(),
-              })
+              if (path !== null) {
+                const { addDoc, collection } = database()
+                return addDoc(collection(`backup/${userId}/files`), {
+                  backupTime: startOfToday,
+                  storagePath: path,
+                  startOfSession: false,
+                  fileId,
+                  fileName,
+                  lastModified: new Date(),
+                })
+              } else {
+                return null
+              }
             })
           })
         }
         // Add a start-of-session backup
         return backupToStorage(userId, file, startOfToday, true).then((path) => {
-          const { addDoc, collection } = database()
-          return addDoc(collection(`backup/${userId}/files`), {
-            backupTime: startOfToday,
-            fileId,
-            storagePath: path,
-            fileName,
-            startOfSession: true,
-            lastModified: new Date(),
-          })
+          if (path !== null) {
+            const { addDoc, collection } = database()
+            return addDoc(collection(`backup/${userId}/files`), {
+              backupTime: startOfToday,
+              fileId,
+              storagePath: path,
+              fileName,
+              startOfSession: true,
+              lastModified: new Date(),
+            })
+          } else {
+            return null
+          }
         })
       })
       .then(() => {
@@ -1096,18 +1117,25 @@ const api = (
       })
   }
 
+  const handleListenToBackupsError = defaultErrorHandler('listenForBackups')
   const listenForBackups = (userId, onBackupsChanged) => {
     const { collection, onSnapshot } = database()
     return onSnapshot(collection(`backup/${userId}/files`), {
       next: (documentsRef) => {
         const documents = []
         documentsRef.forEach((document) => {
-          documents.push(document.data())
+          documents.push({
+            ...document.data(),
+            proRecordId: document.id,
+          })
         })
         onBackupsChanged(documents)
       },
       error: (error) => {
-        log.error(`Error listening for backups for ${userId}`, error.message)
+        handleListenToBackupsError(
+          `Error listening for backups for ${userId}. ${error.message}`,
+          error
+        )
       },
     })
   }
@@ -1138,7 +1166,9 @@ const api = (
             `Failed to upload file for user ${userId} to ${storageURL}.  Unauthourised.`,
             error
           )
-          return mintCookieToken(currentUser())
+          return mintCookieToken(currentUser()).then(() => {
+            return null
+          })
         } else {
           log.error(`Failed to upload file for user ${userId} to ${storageURL}`, error)
           return Promise.reject(error)
@@ -1158,15 +1188,19 @@ const api = (
 
   const saveCustomTemplate = (userId, template) => {
     const storageURL = toTemplatePath(userId, template.id)
-    return saveFileToStorage(userId, storageURL, JSON.stringify(template)).then(() => {
-      // Bumping the timestamp will guarantee that listeners fetch
-      // the latest versions.
-      const { doc, setDoc } = database()
-      return setDoc(doc(`templates/${userId}/userTemplates/${template.id}`), {
-        id: template.id,
-        path: storageURL,
-        timeStamp: new Date(),
-      })
+    return saveFileToStorage(userId, storageURL, JSON.stringify(template)).then((path) => {
+      if (path !== null) {
+        // Bumping the timestamp will guarantee that listeners fetch
+        // the latest versions.
+        const { doc, setDoc } = database()
+        return setDoc(doc(`templates/${userId}/userTemplates/${template.id}`), {
+          id: template.id,
+          path,
+          timeStamp: new Date(),
+        })
+      } else {
+        return null
+      }
     })
   }
 
@@ -1178,7 +1212,7 @@ const api = (
       })
       .catch((error) => {
         const status = error && error.response && error.response.status
-        log.error('Error getting template public url', status, error && error.response, error)
+        log.error(`Error getting template public url ${status} ${error?.response}`, error)
         if (status === 401) {
           return mintCookieToken(currentUser())
         } else {
@@ -1233,7 +1267,7 @@ const api = (
                     })
                   })
                   .catch((error) => {
-                    log.error(`Failed to fetch custom template at ${url}`, error)
+                    log.info(`Failed to fetch custom template at ${url}.  ${error.message}.`, error)
                     return Promise.resolve('IGNORE')
                   })
               )
@@ -1261,7 +1295,7 @@ const api = (
       })
       .catch((error) => {
         const status = error && error.response && error.response.status
-        log.error('Error getting template public url', status, error && error.response, error)
+        log.error(`Error getting template public url. ${status} ${error?.response}`, error)
         if (status === 401) {
           return mintCookieToken(currentUser())
         } else {
@@ -1312,7 +1346,7 @@ const api = (
       })
       .catch((error) => {
         const status = error && error.response && error.response.status
-        log.error('Error getting file public url', status, error && error.response, error)
+        log.error(`Error getting file public url.  ${status}.  ${error?.response}`, error)
         if (status === 401) {
           return mintCookieToken(currentUser())
         } else {
@@ -1333,7 +1367,7 @@ const api = (
       })
       .catch((error) => {
         const status = error && error.response && error.response.status
-        log.error('Error getting file public url', status, error && error.response, error)
+        log.error(`Error getting file public url.  ${status}.  ${error?.response}`, error)
         if (status === 401) {
           return mintCookieToken(currentUser())
         } else {
@@ -1352,6 +1386,45 @@ const api = (
 
   const loginWithEmailAndPassword = (userName, password) => {
     return auth().signInWithEmailAndPassword(userName, password)
+  }
+
+  const deleteProBackup = (userId, backupRecordId, storageProtocolURL) => {
+    if (
+      typeof backupRecordId !== 'string' ||
+      !backupRecordId ||
+      typeof storageProtocolURL !== 'string' ||
+      !storageProtocolURL
+    ) {
+      return Promise.reject(
+        `Invalid backup record id (${backupRecordId}) or storage URL supplied (${storageProtocolURL}).  We need both because there's a reference to there being a backup on Firestore *and* a backup file on Firebase Storage.`
+      )
+    } else if (typeof userId !== 'string' || !userId) {
+      return Promise.reject(
+        `Invalid user id (${userId}).  We need them to delete the Firestore record that the backup exists.`
+      )
+    } else {
+      const { doc, deleteDoc } = database()
+      return deleteDoc(doc(`backup/${userId}/files/${backupRecordId}`)).then(() => {
+        return axios
+          .get(`${BASE_API_URL}/api/move-backup-to-trash?url=${storageProtocolURL}`)
+          .catch((error) => {
+            const status = error && error.response && error.response.status
+            log.error(
+              `Error deleting backup (${storageProtocolURL}).  ${status}.  ${error?.response}`,
+              error
+            )
+            if (status === 401) {
+              return mintCookieToken(currentUser())
+            } else {
+              return Promise.reject(error)
+            }
+          })
+      })
+    }
+  }
+
+  const sendPasswordResetEmail = (email) => {
+    return auth().sendPasswordResetEmail(email)
   }
 
   return {
@@ -1384,6 +1457,7 @@ const api = (
     deleteFile,
     listenToFiles,
     fetchFiles,
+    fetchFile,
     logOut,
     mintCookieToken,
     onSessionChange,
@@ -1410,6 +1484,8 @@ const api = (
     imagePublicURL,
     isStorageURL,
     loginWithEmailAndPassword,
+    deleteProBackup,
+    sendPasswordResetEmail,
   }
 }
 

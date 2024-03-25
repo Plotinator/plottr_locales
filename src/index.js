@@ -8,6 +8,7 @@ import {
   EmailAuthProvider,
   signOut,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail,
 } from 'firebase/auth'
 import {
   initializeFirestore,
@@ -140,6 +141,9 @@ const auth = () => {
     signInWithEmailAndPassword: (email, password) => {
       return signInWithEmailAndPassword(_auth, email, password)
     },
+    sendPasswordResetEmail: (email) => {
+      return sendPasswordResetEmail(_auth, email)
+    },
   }
 }
 
@@ -181,6 +185,7 @@ const firebaseUI = () => {
 
 export const startUI = (queryString) => {
   const ui = firebaseUI()
+
   ui.start(queryString, {
     signInOptions: [
       {
@@ -247,6 +252,7 @@ export const wireUpAPI = (logger, actions, selectors) => {
     deleteFile: wiredUp.deleteFile,
     listenToFiles: wiredUp.listenToFiles,
     fetchFiles: wiredUp.fetchFiles,
+    fetchFile: wiredUp.fetchFile,
     logOut: wiredUp.logOut,
     mintCookieToken: wiredUp.mintCookieToken,
     onSessionChange: wiredUp.onSessionChange,
@@ -272,6 +278,8 @@ export const wireUpAPI = (logger, actions, selectors) => {
     backupPublicURL: wiredUp.backupPublicURL,
     imagePublicURL: wiredUp.imagePublicURL,
     isStorageURL: wiredUp.isStorageURL,
+    deleteProBackup: wiredUp.deleteProBackup,
     loginWithEmailAndPassword: wiredUp.loginWithEmailAndPassword,
+    sendPasswordResetEmail: wiredUp.sendPasswordResetEmail,
   }
 }
