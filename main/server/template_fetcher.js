@@ -5,6 +5,7 @@ import { isDevelopment } from './isDevelopment'
 export const MANIFEST_ROOT = 'manifest'
 const OLD_TEMPLATES_ROOT = 'templates'
 const DEPRECATED_TEMPLATE_IDS = ['pl6', 'pl12']
+const TEMPLATE_REQUEST_TIMEOUT = 1000
 
 const sequencePromises = (promiseThunks) => {
   if (promiseThunks.length === 0) {
@@ -187,7 +188,11 @@ class TemplateFetcher {
 
   fetchTemplate = (id, url) => {
     const fullURL = `${this.baseURL}${url}`
-    return fetch(fullURL)
+    const controller = new AbortController()
+    const _timeout = setTimeout(() => {
+      controller.abort()
+    }, TEMPLATE_REQUEST_TIMEOUT)
+    return fetch(fullURL, { signal: controller.signal })
       .then((resp) => {
         if (!resp.ok) {
           return Promise.reject(
