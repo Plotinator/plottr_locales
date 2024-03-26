@@ -12,7 +12,8 @@ import { makeMainProcessClient } from '../app/mainProcessClient'
 export const trial90days = ['nanoCAMP@90', 'infoSTACK90!']
 export const trial60days = ['infoSTACK60!']
 
-const { machineId } = makeMainProcessClient()
+const { machineId, pleaseTellMeWhatPlatformIAmOn, machineName, localUserName } =
+  makeMainProcessClient()
 
 export function checkForActiveLicense(licenseInfo, callback) {
   if (!licenseInfo || !Object.keys(licenseInfo).length) {
