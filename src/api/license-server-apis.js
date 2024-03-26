@@ -12,88 +12,49 @@ import { makeMainProcessClient } from '../app/mainProcessClient'
 export const trial90days = ['nanoCAMP@90', 'infoSTACK90!']
 export const trial60days = ['infoSTACK60!']
 
-const { machineId } = makeMainProcessClient()
+const { machineId, pleaseTellMeWhatPlatformIAmOn, machineName, localUserName } =
+  makeMainProcessClient()
 
-export function checkForActiveLicense(licenseInfo, callback) {
-  if (!licenseInfo || !Object.keys(licenseInfo).length) {
-    callback(null, false)
-  } else {
-    const key = licenseInfo.licenseKey
-    const itemID = licenseInfo.item_id
-    log.info('checking for active license', itemID, key)
-    machineId().then((generatedMachineId) => {
-      axios
-        .get(licenseURL('check_license', itemID, key, generatedMachineId))
-        .then(({ data }) => {
-          const activeLicense = isActiveLicense(data)
-          log.info('[license_checker]', 'active license?', itemID, activeLicense)
-          // TODO: update site_count and/or activations_left locally
-          productMapping[`${itemID}`](activeLicense)
-          callback(null, activeLicense)
-        })
-        .catch((err) => {
-          log.error(err)
-          callback(err, null)
-        })
+/**
+ * Check our API to see what license(s) it thinks you have.
+ *
+ * There are no arguments to this function because we expect the
+ * client to have minted a server-only cookie by the time we check the
+ * license.  That cookie is automatically submitted to the API on each
+ * request and the client never gets to see whether it's there.  It'll
+ * hear back from the server if it's missing or there's something
+ * wrong with it.
+ *
+ * Produces a promise containing an object of the schema:
+ *
+ * {
+ *   hasPro: bool,
+ *   proExpiresAt: UTCDateTimeStamp,
+ *   proLicensePayload: LicensePayload,
+ *   hasPlottr: bool,
+ *   plottrLicensePayload: LicensePayload,
+ * }
+ *
+ * LicensePayload: {
+ *   machineInfo: {
+ *     id: String,
+ *     name: String,
+ *     os: String,
+ *     localUsername: String,
+ *   },
+ *   secret: String,
+ * }
+ *
+ * We're expected to record the license payload so that we can decrypt
+ * the local license and check it's running on the right machine.
+ */
+export function checkForLicense() {
+  return axios
+    .post('/api/check-subscription')
+    .then((response) => {
+      const { hasPro, proExpiresAt } = response.body // continue here
     })
-  }
 }
-
-// callback(isValid, data)
-export function verifyLicense(license, callback) {
-  // this is going to fire all 3 requests no matter what
-  machineId().then((generatedMachineId) => {
-    Promise.allSettled(
-      productIds().map((id) =>
-        axios.get(licenseURL('activate_license', id, license, generatedMachineId))
-      )
-    ).then((results) => {
-      // find the product that this key belongs to
-      let productForKey = null
-      results.some((res, index) => {
-        const productID = productIds()[index]
-        if (process.env.NODE_ENV === 'development') {
-          log.info(productID, res)
-        }
-        if (res.status == 'fulfilled') {
-          const isProductForKey = licenseIsForProduct(res.value.data)
-          if (isProductForKey) productForKey = { productID, value: res.value.data }
-          return isProductForKey
-        } else {
-          log.info('license check request failed', productID)
-          log.error(productID)
-          return false
-        }
-      })
-      if (productForKey) {
-        const activeLicense = isActiveLicense(productForKey.value)
-        log.info('[verifyRequest]', productForKey.productID, 'active license?', activeLicense)
-
-        // set config vars
-        productMapping[productForKey.productID](activeLicense)
-
-        if (activeLicense) {
-          const data = {
-            licenseKey: license,
-            ...productForKey.value,
-          }
-          callback(true, data)
-        } else {
-          callback(false, {
-            ...productForKey.value,
-            problem: productForKey.value.error,
-            hasActivationsLeft: hasActivationsLeft(productForKey.value),
-          })
-        }
-      } else {
-        // doesn't belong to any product
-        callback(false, { problem: 'invalid_item_id' })
-      }
-    })
-  })
-}
-
-export const PRO_ID = '104900'
 
 // callback(hasPro, info)
 export function checkForPro(email, callback) {
