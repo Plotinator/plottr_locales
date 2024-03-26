@@ -71,6 +71,7 @@
     "ci:plottr_import_export": "yarn --cwd lib/plottr_import_export install"
   },
   "dependencies": {
+    "cryptr": "^6.3.0",
     "sharp": "^0.31.3",
     "utf-8-validate": "^5.0.9",
     "ws": "^8.5.0"

@@ -347,6 +347,8 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           case FIND_UNIQUE_NAME_IN_PATH:
           case FILE_PATH_AS_ARRAY:
           case DIRECTORY_IS_WRITABLE:
+          case SAVE_PLOTTR_LICENSE:
+          case SAVE_PRO_LICENSE:
           case PING: {
             resolvePromise()
             return

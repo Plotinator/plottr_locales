@@ -138,7 +138,7 @@ const logQuietly = (...args) => {
   console.log(...args)
 }
 
-const ENCRYPT_TIMEOUT = 3000
+const ENCRYPT_TIMEOUT = 10000
 
 const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
   const messagesAwaitingResponse = new Map()
@@ -149,8 +149,10 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
       messagesAwaitingResponse.set(id, { resolve, reject })
       process.send(`encrypt:${JSON.stringify({ id, s })}`)
       setTimeout(() => {
-        reject(new Error('Timed out waiting for encryption service'))
-        messagesAwaitingResponse.delete(id)
+        if (messagesAwaitingResponse.has(id)) {
+          console.error(new Error('Timed out waiting for encryption service'))
+          messagesAwaitingResponse.delete(id)
+        }
       }, ENCRYPT_TIMEOUT)
     })
   }
@@ -161,8 +163,10 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
       messagesAwaitingResponse.set(id, { resolve, reject })
       process.send(`decrypt:${JSON.stringify({ id, s })}`)
       setTimeout(() => {
-        reject(new Error('Timed out waiting for decryption service'))
-        messagesAwaitingResponse.delete(id)
+        if (messagesAwaitingResponse.has(id)) {
+          console.error(new Error('Timed out waiting for decryption service'))
+          messagesAwaitingResponse.delete(id)
+        }
       }, ENCRYPT_TIMEOUT)
     })
   }
@@ -850,10 +854,11 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
             const { secret, machineInfo } = payload
             return handlePromise(
               () => ['Saving Plottr license'],
-              statusManager.registerTask(
-                savePlottrLicense(secret, machineInfo),
-                SAVE_PLOTTR_LICENSE
-              ),
+              () =>
+                statusManager.registerTask(
+                  savePlottrLicense(secret, machineInfo),
+                  SAVE_PLOTTR_LICENSE
+                ),
               () => ['Error saving Plottr license']
             )
           }
@@ -862,7 +867,8 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
             const { secret, machineInfo } = payload
             return handlePromise(
               () => ['Saving Pro license'],
-              statusManager.registerTask(saveProLicense(secret, machineInfo), SAVE_PRO_LICENSE),
+              () =>
+                statusManager.registerTask(saveProLicense(secret, machineInfo), SAVE_PRO_LICENSE),
               () => ['Error saving Pro license']
             )
           }
@@ -1224,7 +1230,7 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
   process.on('message', (message) => {
     if (message?.startsWith?.('encrypt:')) {
       try {
-        const { id, s } = JSON.parse(message.split(':')[1])
+        const { id, s } = JSON.parse(message.substring(message.indexOf(':') + 1))
         const { resolve } = messagesAwaitingResponse.get(id)
         messagesAwaitingResponse.delete(id)
         resolve(s)
@@ -1233,7 +1239,7 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
       }
     } else if (message?.startsWith?.('decrypt:')) {
       try {
-        const { id, s } = JSON.parse(message.split(':')[1])
+        const { id, s } = JSON.parse(message.substring(message.indexOf(':') + 1))
         const { resolve } = messagesAwaitingResponse.get(id)
         messagesAwaitingResponse.delete(id)
         resolve(s)

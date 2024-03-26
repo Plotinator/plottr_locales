@@ -119,7 +119,7 @@ class Store {
             // The store doesn't yet exist.  Create it.
             this.store = this.defaults
             return this.writeStore().then(() => {
-              return JSON.stringify(this.store)
+              return this.preprocessForWrite(JSON.stringify(this.store, null, 2))
             })
           }
           // Does the user data folder exist?
@@ -147,7 +147,12 @@ class Store {
         throw new Error(`Failed to construct store for ${this.name} at ${this.path}`, error)
       })
       .then((rawStoreContents) => {
-        return this.preprocessForRead(rawStoreContents)
+        const rawContentsAsString = rawStoreContents.toString()
+        if (rawContentsAsString === '') {
+          return Promise.resolve('{}')
+        } else {
+          return this.preprocessForRead(rawContentsAsString)
+        }
       })
       .then((storeContents) => {
         try {
@@ -208,9 +213,12 @@ class Store {
             })
         })
         .catch((error) => {
-          this.logger.error(`Failed to write ${this.store} store for ${this.path}`, error)
+          this.logger.error(
+            `Failed to write ${JSON.stringify(this.store)} store for ${this.path}`,
+            error
+          )
           return Promise.reject(
-            new Error(`Failed to write ${this.store} store for ${this.path}`, error)
+            new Error(`Failed to write ${JSON.stringify(this.store)} store for ${this.path}`, error)
           )
         })
         .finally(() => {

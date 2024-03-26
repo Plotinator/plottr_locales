@@ -60,19 +60,21 @@ export const startServer = (
     server.on('message', (message) => {
       if (message?.startsWith?.('encrypt:')) {
         try {
-          const { id, s } = JSON.parse(message.split(':')[1])
-          const encrypted = encryptStringToBase64(s)
-          server.send(`encrypt:${JSON.stringify({ id, s: encrypted })}`)
+          const { id, s } = JSON.parse(message.substring(message.indexOf(':') + 1))
+          encryptStringToBase64(s).then((encrypted) => {
+            server.send(`encrypt:${JSON.stringify({ id, s: encrypted })}`)
+          })
         } catch (error) {
           log.error('Error encrypting')
         }
       } else if (message?.startsWith?.('decrypt:')) {
         try {
-          const { id, s } = JSON.parse(message.split(':')[1])
-          const encrypted = decryptStringFromBase64(s)
-          server.send(`decrypt:${JSON.stringify({ id, s: encrypted })}`)
+          const { id, s } = JSON.parse(message.substring(message.indexOf(':') + 1))
+          decryptStringFromBase64(s).then((encrypted) => {
+            server.send(`decrypt:${JSON.stringify({ id, s: encrypted })}`)
+          })
         } catch (error) {
-          log.error('Error decrypting')
+          log.error('Error decrypting', error)
         }
       } else if (message === 'ready') {
         log.info(`[${server.pid}] Received "${message}" from socket worker.`)

@@ -4,6 +4,7 @@ import SETTINGS from './modules/settings'
 import { setupI18n } from 'plottr_locales'
 import yargs from 'yargs/yargs'
 import { hideBin } from 'yargs/helpers'
+import Cryptr from 'cryptr'
 
 setupI18n(SETTINGS, { locale: electron.app.getLocale() })
 
@@ -74,11 +75,34 @@ const readUserEmail = () => {
   })
 }
 
+const fallbackEncryptionKey = process.env.FALLBACK_ENCRYPTION_KEY
+const cryptr = new Cryptr(fallbackEncryptionKey, { encoding: 'base64' })
+
+// Based on the node documentation at: https://nodejs.org/api/crypto.html#class-cipher
+const fallbackEncrypt = (plainText) => {
+  if (plainText === '') {
+    return Promise.resolve(plainText)
+  } else {
+    return Promise.resolve(cryptr.encrypt(plainText))
+  }
+}
+const fallbackDecrypt = (base64CipherText) => {
+  if (base64CipherText === '') {
+    return Promise.resolve(base64CipherText)
+  } else {
+    return Promise.resolve(cryptr.decrypt(base64CipherText))
+  }
+}
+
 const encryptStringToBase64 = (s) => {
   return new Promise((resolve, reject) => {
     try {
-      const encryptedBuffer = safeStorage.encryptString(s)
-      resolve(encryptedBuffer.toString('hex'))
+      if (!safeStorage.isEncryptionAvailable()) {
+        fallbackEncrypt(s).then(resolve, reject)
+      } else {
+        const encryptedBuffer = safeStorage.encryptString(s)
+        resolve(encryptedBuffer.toString('base64'))
+      }
     } catch (error) {
       reject(error)
     }
@@ -88,9 +112,13 @@ const encryptStringToBase64 = (s) => {
 const decryptStringFromBase64 = (base64) => {
   return new Promise((resolve, reject) => {
     try {
-      const s = Buffer.from(base64, 'base64')
-      const encryptedBuffer = safeStorage.decryptString(s)
-      resolve(encryptedBuffer.toString('hex'))
+      if (!safeStorage.isEncryptionAvailable()) {
+        fallbackDecrypt(base64).then(resolve, reject)
+      } else {
+        const s = Buffer.from(base64, 'base64')
+        const encryptedBuffer = safeStorage.decryptString(s)
+        resolve(encryptedBuffer.toString('base64'))
+      }
     } catch (error) {
       reject(error)
     }

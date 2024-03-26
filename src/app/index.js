@@ -722,4 +722,20 @@ tellMeWhatOSImOn()
 
         listenersRegistered()
       })
+      .then(() => {
+        whenClientIsReady(({ savePlottrLicense, saveProLicense }) => {
+          savePlottrLicense('secrets', {
+            id: 'bro_machine_1',
+            name: 'charles',
+            os: 'mega_os',
+            localUsername: 'sam',
+          })
+          saveProLicense('secrets', {
+            id: 'bro_machine_1',
+            name: 'charles',
+            os: 'mega_os',
+            localUsername: 'sam',
+          })
+        })
+      })
   })
