@@ -62,8 +62,14 @@ import {
   CURRENT_USER_SETTINGS_ERROR_REPLY,
   CURRENT_BACKUPS_ERROR_REPLY,
   SET_TEMPLATE_ERROR_REPLY,
+  CURRENT_PLOTTR_LICENSE_ERROR_REPLY,
+  CURRENT_PRO_LICENSE_ERROR_REPLY,
+  SAVE_PLOTTR_LICENSE_ERROR_REPLY,
+  SAVE_PRO_LICENSE_ERROR_REPLY,
 
   // File system APIs
+  LISTEN_TO_PLOTTR_LICENSE,
+  LISTEN_TO_PRO_LICENSE,
   LISTEN_TO_TRIAL_CHANGES,
   CURRENT_TRIAL,
   START_TRIAL,
@@ -149,6 +155,10 @@ import {
   FILE_PATH_AS_ARRAY,
   FILE_PATH_AS_ARRAY_ERROR_REPLY,
   DIRECTORY_IS_WRITABLE_ERROR_REPLY,
+  CURRENT_PLOTTR_LICENSE,
+  CURRENT_PRO_LICENSE,
+  SAVE_PLOTTR_LICENSE,
+  SAVE_PRO_LICENSE,
 } from '../socket-server-message-types'
 import { setPort, getPort } from './workerPort'
 
@@ -254,6 +264,8 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
         // TODO: handle SAVE_BACKUP_ERRORs
         switch (type) {
           // Subscription replies
+          case LISTEN_TO_PRO_LICENSE:
+          case LISTEN_TO_PLOTTR_LICENSE:
           case LISTEN_TO_TRIAL_CHANGES:
           case LISTEN_TO_LICENSE_CHANGES:
           case LISTEN_TO_KNOWN_FILES_CHANGES:
@@ -421,7 +433,11 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           case FIND_UNIQUE_NAME_IN_PATH_ERROR_REPLY:
           case FILE_PATH_AS_ARRAY_ERROR_REPLY:
           case DIRECTORY_IS_WRITABLE_ERROR_REPLY:
-          case FILE_EXISTS_ERROR_REPLY: {
+          case FILE_EXISTS_ERROR_REPLY:
+          case SAVE_PLOTTR_LICENSE_ERROR_REPLY:
+          case SAVE_PRO_LICENSE_ERROR_REPLY:
+          case CURRENT_PLOTTR_LICENSE_ERROR_REPLY:
+          case CURRENT_PRO_LICENSE_ERROR_REPLY: {
             rejectPromise()
             return
           }
@@ -733,6 +749,56 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
       return sendPromise(CREATE_SHORTCUT, { sourceFileURL, newFileURL })
     }
 
+    /**
+     * secret: String
+     * A secret token to pass back to an
+     * unauthenticated API on the server to verify whether the user
+     * identified with a specific email address has an active license
+     * without logging in.
+     *
+     * machineInfo: {
+     *   id: String,
+     *   name: String,
+     *   os: String,
+     *   localUsername: String,
+     * }
+     *
+     * A payload of identifying features against which the secret was
+     * generated.
+     */
+    const savePlottrLicense = (secret, machineInfo) => {
+      return sendPromise(SAVE_PLOTTR_LICENSE, { secret, machineInfo })
+    }
+
+    /**
+     * secret: String
+     * A secret token to pass back to an
+     * unauthenticated API on the server to verify whether the user
+     * identified with a specific email address has an active license
+     * without logging in.
+     *
+     * machineInfo: {
+     *   id: String,
+     *   name: String,
+     *   os: String,
+     *   localUsername: String,
+     * }
+     *
+     * A payload of identifying features against which the secret was
+     * generated.
+     */
+    const saveProLicense = (secret, machineInfo) => {
+      return sendPromise(SAVE_PRO_LICENSE, { secret, machineInfo })
+    }
+
+    const currentPlottrLicense = () => {
+      return sendPromise(CURRENT_PLOTTR_LICENSE)
+    }
+
+    const currentProLicense = () => {
+      return sendPromise(CURRENT_PRO_LICENSE)
+    }
+
     // Subscriptions
     const listenToTrialChanges = (cb) => {
       return registerCallback(LISTEN_TO_TRIAL_CHANGES, {}, cb)
@@ -772,6 +838,14 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
 
     const listenToBackupsChanges = (cb) => {
       return registerCallback(LISTEN_TO_BACKUPS_CHANGES, {}, cb)
+    }
+
+    const listenToPlottrLicenseChanges = (cb) => {
+      return registerCallback(LISTEN_TO_PLOTTR_LICENSE, {}, cb)
+    }
+
+    const listenToProLicenseChanges = (cb) => {
+      return registerCallback(LISTEN_TO_PRO_LICENSE, {}, cb)
     }
 
     return new Promise((resolve, reject) => {
@@ -838,6 +912,8 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           listenToAppSettingsChanges,
           listenToUserSettingsChanges,
           listenToBackupsChanges,
+          listenToPlottrLicenseChanges,
+          listenToProLicenseChanges,
           lastOpenedFile,
           setLastOpenedFilePath,
           nukeLastOpenedFileURL,
@@ -856,6 +932,10 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           findUniqueNameInPath,
           filePathAsArray,
           directoryIsWritable,
+          currentPlottrLicense,
+          currentProLicense,
+          savePlottrLicense,
+          saveProLicense,
         })
       })
     })

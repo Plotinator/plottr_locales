@@ -54,6 +54,8 @@ const fileSystemModule = (userDataPath) => {
     const {
       trialStore,
       licenseStore,
+      plottrLicenseStore,
+      proLicenseStore,
       knownFilesStore,
       templatesStore,
       customTemplatesStore,
@@ -608,6 +610,32 @@ const fileSystemModule = (userDataPath) => {
       }
     }
 
+    const savePlottrLicense = (secret, machineInfo) => {
+      return plottrLicenseStore.set({ secret, machineInfo })
+    }
+
+    const saveProLicense = (secret, machineInfo) => {
+      return proLicenseStore.set({ secret, machineInfo })
+    }
+
+    const currentPlottrLicense = () => {
+      return plottrLicenseStore.currentStore()
+    }
+
+    const listenToPlottrLicenseChanges = (cb) => {
+      cb(plottrLicenseStore.store)
+      return plottrLicenseStore.onDidAnyChange.bind(plottrLicenseStore)(cb)
+    }
+
+    const currentProLicense = (cb) => {
+      cb(proLicenseStore.store)
+      return proLicenseStore.onDidAnyChange.bind(proLicenseStore)(cb)
+    }
+
+    const listenToProLicenseChanges = () => {
+      return Promise.resolve()
+    }
+
     return {
       TEMP_FILES_PATH,
       setTemplate,
@@ -646,6 +674,12 @@ const fileSystemModule = (userDataPath) => {
       copyFile,
       createFileShortcut,
       watchForFilesInDefaultFolder,
+      savePlottrLicense,
+      saveProLicense,
+      currentPlottrLicense,
+      currentProLicense,
+      listenToPlottrLicenseChanges,
+      listenToProLicenseChanges,
     }
   }
 }

@@ -9,7 +9,15 @@ const logQuietly = (...args) => {
   console.log(...args)
 }
 
-export const startServer = (log, broadcastPortChange, userDataPath, onFatalError, appVersion) => {
+export const startServer = (
+  log,
+  broadcastPortChange,
+  userDataPath,
+  onFatalError,
+  appVersion,
+  encryptStringToBase64,
+  decryptStringFromBase64
+) => {
   let attempts = 0
 
   function attemptAStart(resolve, reject) {
@@ -50,7 +58,23 @@ export const startServer = (log, broadcastPortChange, userDataPath, onFatalError
       }
     })
     server.on('message', (message) => {
-      if (message === 'ready') {
+      if (message?.startsWith?.('encrypt:')) {
+        try {
+          const { id, s } = JSON.parse(message.split(':')[1])
+          const encrypted = encryptStringToBase64(s)
+          server.send(`encrypt:${JSON.stringify({ id, s: encrypted })}`)
+        } catch (error) {
+          log.error('Error encrypting')
+        }
+      } else if (message?.startsWith?.('decrypt:')) {
+        try {
+          const { id, s } = JSON.parse(message.split(':')[1])
+          const encrypted = decryptStringFromBase64(s)
+          server.send(`decrypt:${JSON.stringify({ id, s: encrypted })}`)
+        } catch (error) {
+          log.error('Error decrypting')
+        }
+      } else if (message === 'ready') {
         log.info(`[${server.pid}] Received "${message}" from socket worker.`)
         log.info(`[${server.pid}] Started socket server!`)
         const killServer = () => {

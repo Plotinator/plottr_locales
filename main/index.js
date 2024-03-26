@@ -1,4 +1,4 @@
-import electron, { dialog } from 'electron'
+import electron, { dialog, safeStorage } from 'electron'
 import WebSocket from 'ws'
 import SETTINGS from './modules/settings'
 import { setupI18n } from 'plottr_locales'
@@ -71,6 +71,29 @@ const readUserId = () => {
 const readUserEmail = () => {
   return currentLicense().then((license) => {
     return license?.customer_email ?? 'no-email'
+  })
+}
+
+const encryptStringToBase64 = (s) => {
+  return new Promise((resolve, reject) => {
+    try {
+      const encryptedBuffer = safeStorage.encryptString(s)
+      resolve(encryptedBuffer.toString('hex'))
+    } catch (error) {
+      reject(error)
+    }
+  })
+}
+
+const decryptStringFromBase64 = (base64) => {
+  return new Promise((resolve, reject) => {
+    try {
+      const s = Buffer.from(base64, 'base64')
+      const encryptedBuffer = safeStorage.decryptString(s)
+      resolve(encryptedBuffer.toString('hex'))
+    } catch (error) {
+      reject(error)
+    }
   })
 }
 
@@ -204,7 +227,9 @@ app.whenReady().then(() => {
           app.quit()
         }, 5000)
       },
-      app.getVersion()
+      app.getVersion(),
+      encryptStringToBase64,
+      decryptStringFromBase64
     )
       .then(({ port, killServer }) => {
         log.info(`Socket worker started on ${port}`)

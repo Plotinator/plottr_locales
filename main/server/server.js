@@ -1,5 +1,6 @@
 import { WebSocketServer } from 'ws'
 import fs from 'fs'
+import { v4 as uuid } from 'uuid'
 
 import {
   FILE_BASENAME,
@@ -20,6 +21,10 @@ import {
   START_TRIAL,
   EXTEND_TRIAL_WITH_RESET,
   CURRENT_LICENSE,
+  SAVE_PLOTTR_LICENSE,
+  SAVE_PRO_LICENSE,
+  CURRENT_PLOTTR_LICENSE,
+  CURRENT_PRO_LICENSE,
   DELETE_LICENSE,
   SAVE_LICENSE_INFO,
   CURRENT_KNOWN_FILES,
@@ -42,6 +47,8 @@ import {
   LISTEN_TO_APP_SETTINGS_CHANGES,
   LISTEN_TO_USER_SETTINGS_CHANGES,
   LISTEN_TO_BACKUPS_CHANGES,
+  LISTEN_TO_PLOTTR_LICENSE,
+  LISTEN_TO_PRO_LICENSE,
   LISTEN_TO_TRIAL_CHANGES_UNSUBSCRIBE,
   LISTEN_TO_LICENSE_CHANGES_UNSUBSCRIBE,
   LISTEN_TO_KNOWN_FILES_CHANGES_UNSUBSCRIBE,
@@ -52,6 +59,8 @@ import {
   LISTEN_TO_APP_SETTINGS_CHANGES_UNSUBSCRIBE,
   LISTEN_TO_USER_SETTINGS_CHANGES_UNSUBSCRIBE,
   LISTEN_TO_BACKUPS_CHANGES_UNSUBSCRIBE,
+  LISTEN_TO_PLOTTR_LICENSE_UNSUBSCRIBE,
+  LISTEN_TO_PRO_LICENSE_UNSUBSCRIBE,
   IS_TEMP_FILE,
   BACKUP_BASE_PATH,
   SET_TEMPLATE,
@@ -129,7 +138,35 @@ const logQuietly = (...args) => {
   console.log(...args)
 }
 
+const ENCRYPT_TIMEOUT = 3000
+
 const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
+  const messagesAwaitingResponse = new Map()
+
+  const encryptString = (s) => {
+    const id = uuid()
+    return new Promise((resolve, reject) => {
+      messagesAwaitingResponse.set(id, { resolve, reject })
+      process.send(`encrypt:${JSON.stringify({ id, s })}`)
+      setTimeout(() => {
+        reject(new Error('Timed out waiting for encryption service'))
+        messagesAwaitingResponse.delete(id)
+      }, ENCRYPT_TIMEOUT)
+    })
+  }
+
+  const decryptString = (s) => {
+    const id = uuid()
+    return new Promise((resolve, reject) => {
+      messagesAwaitingResponse.set(id, { resolve, reject })
+      process.send(`decrypt:${JSON.stringify({ id, s })}`)
+      setTimeout(() => {
+        reject(new Error('Timed out waiting for decryption service'))
+        messagesAwaitingResponse.delete(id)
+      }, ENCRYPT_TIMEOUT)
+    })
+  }
+
   process.send(`Starting server on port: ${port}`)
   const webSocketServer = new WebSocketServer({ host: 'localhost', port, maxPayload: ONE_GIGABYTE })
   const unsubscribeFunctions = new Map()
@@ -143,7 +180,7 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
     error: logInfo,
   }
 
-  const stores = makeStores(userDataPath, basicLogger, isBetaOrAlpha)
+  const stores = makeStores(userDataPath, basicLogger, isBetaOrAlpha, encryptString, decryptString)
   const settings = makeSettingsModule(stores)
 
   const makeFileModule = wireupFileModule(userDataPath)
@@ -242,6 +279,12 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
       copyFile,
       createFileShortcut,
       watchForFilesInDefaultFolder,
+      savePlottrLicense,
+      saveProLicense,
+      currentPlottrLicense,
+      currentProLicense,
+      listenToPlottrLicenseChanges,
+      listenToProLicenseChanges,
     } = fileSystemModule
     const trashModule = makeTrashModule(userDataPath, logger)
     const { trashByURL } = trashModule
@@ -799,6 +842,46 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
               () => 'Error while extending trial with reset'
             )
           }
+          // NB!  Notice that all the license requests use arrays.
+          // That means that only the messages are logged and not the
+          // arguments important so we don't leak unencrypted secrets
+          // to the operating system.
+          case SAVE_PLOTTR_LICENSE: {
+            const { secret, machineInfo } = payload
+            return handlePromise(
+              () => ['Saving Plottr license'],
+              statusManager.registerTask(
+                savePlottrLicense(secret, machineInfo),
+                SAVE_PLOTTR_LICENSE
+              ),
+              () => ['Error saving Plottr license']
+            )
+          }
+          // NB!  Preserve the arrays!
+          case SAVE_PRO_LICENSE: {
+            const { secret, machineInfo } = payload
+            return handlePromise(
+              () => ['Saving Pro license'],
+              statusManager.registerTask(saveProLicense(secret, machineInfo), SAVE_PRO_LICENSE),
+              () => ['Error saving Pro license']
+            )
+          }
+          // NB!  Preserve the arrays!
+          case CURRENT_PLOTTR_LICENSE: {
+            return handlePromise(
+              () => ['Fetching the current Plottr license'],
+              currentPlottrLicense,
+              () => ['Error while fetching the current license']
+            )
+          }
+          // NB!  Preserve the arrays!
+          case CURRENT_PRO_LICENSE: {
+            return handlePromise(
+              () => ['Fetching the current Pro license'],
+              currentProLicense,
+              () => ['Error while fetching the current license']
+            )
+          }
           case DELETE_LICENSE: {
             return handlePromise(
               () => 'Deleting the license',
@@ -1071,6 +1154,20 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
               () => 'Error listening to backups changes'
             )
           }
+          case LISTEN_TO_PLOTTR_LICENSE: {
+            return handleSubscription(
+              () => 'Listening to PLOTTR license changes',
+              listenToPlottrLicenseChanges,
+              () => 'Error listening to PLOTTR license changes'
+            )
+          }
+          case LISTEN_TO_PRO_LICENSE: {
+            return handleSubscription(
+              () => 'Listening to PRO license changes',
+              listenToProLicenseChanges,
+              () => 'Error listening to PRO license changes'
+            )
+          }
           case LISTEN_TO_TRIAL_CHANGES_UNSUBSCRIBE:
           case LISTEN_TO_LICENSE_CHANGES_UNSUBSCRIBE:
           case LISTEN_TO_KNOWN_FILES_CHANGES_UNSUBSCRIBE:
@@ -1125,7 +1222,25 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
   }
 
   process.on('message', (message) => {
-    if (message === 'ack') {
+    if (message?.startsWith?.('encrypt:')) {
+      try {
+        const { id, s } = JSON.parse(message.split(':')[1])
+        const { resolve } = messagesAwaitingResponse.get(id)
+        messagesAwaitingResponse.delete(id)
+        resolve(s)
+      } catch (error) {
+        console.error('Error servicing encryption request', error)
+      }
+    } else if (message?.startsWith?.('decrypt:')) {
+      try {
+        const { id, s } = JSON.parse(message.split(':')[1])
+        const { resolve } = messagesAwaitingResponse.get(id)
+        messagesAwaitingResponse.delete(id)
+        resolve(s)
+      } catch (error) {
+        console.error('Error servicing decryption request', error)
+      }
+    } else if (message === 'ack') {
       const elapsed = awaitingResponse
         ? new Date().getTime() - awaitingResponse.getTime()
         : Infinity
