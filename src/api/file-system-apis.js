@@ -32,16 +32,48 @@ const makeFileSystemAPIs = (socketClient) => {
     })
   }
 
-  const listenToLicenseChanges = (cb) => {
-    return socketClient(({ listenToLicenseChanges }) => {
-      return listenToLicenseChanges(cb)
-    })
-  }
   const currentLicense = () => {
-    return socketClient(({ currentLicense }) => {
-      return currentLicense()
+    return socketClient(({ currentPlottrLicense, currentProLicense }) => {
+      return Promise.all([currentPlottrLicense(), currentProLicense()]).then(
+        ([plottrLicense, proLicense]) => {
+          return {
+            plottrLicense,
+            proLicense,
+          }
+        }
+      )
     })
   }
+
+  const listenToLicenseChanges = (cb) => {
+    return socketClient(({ listenToPlottrLicenseChanges, listenToProLicenseChanges }) => {
+      let license = {
+        plottrLicense: null,
+        proLicense: null,
+      }
+      currentLicense().then((initialLicense) => {
+        license = initialLicense
+        cb(license)
+      })
+      const plottrListener = listenToPlottrLicenseChanges((newPlottrLicense) => {
+        license.plottrLicense = newPlottrLicense
+        cb(license)
+      })
+      const proListener = listenToProLicenseChanges((newProLicense) => {
+        license.proLicense = newProLicense
+        cb(license)
+      })
+      return () => {
+        if (typeof plottrListener === 'function') {
+          plottrListener()
+        }
+        if (typeof proListener === 'function') {
+          proListener()
+        }
+      }
+    })
+  }
+
   const deleteLicense = () => {
     return socketClient(({ deleteLicense }) => {
       return deleteLicense()

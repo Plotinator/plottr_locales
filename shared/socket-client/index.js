@@ -349,6 +349,8 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           case DIRECTORY_IS_WRITABLE:
           case SAVE_PLOTTR_LICENSE:
           case SAVE_PRO_LICENSE:
+          case CURRENT_PLOTTR_LICENSE:
+          case CURRENT_PRO_LICENSE:
           case PING: {
             resolvePromise()
             return
@@ -768,8 +770,8 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
      * A payload of identifying features against which the secret was
      * generated.
      */
-    const savePlottrLicense = (secret, machineInfo) => {
-      return sendPromise(SAVE_PLOTTR_LICENSE, { secret, machineInfo })
+    const savePlottrLicense = (secret, machineInfo, dateChecked) => {
+      return sendPromise(SAVE_PLOTTR_LICENSE, { secret, machineInfo, dateChecked })
     }
 
     /**
@@ -789,8 +791,8 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
      * A payload of identifying features against which the secret was
      * generated.
      */
-    const saveProLicense = (secret, machineInfo, expiresAt) => {
-      return sendPromise(SAVE_PRO_LICENSE, { secret, machineInfo, expiresAt })
+    const saveProLicense = (secret, machineInfo, expiresAt, dateChecked) => {
+      return sendPromise(SAVE_PRO_LICENSE, { secret, machineInfo, expiresAt, dateChecked })
     }
 
     const currentPlottrLicense = () => {
