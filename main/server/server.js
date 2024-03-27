@@ -864,11 +864,14 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
           }
           // NB!  Preserve the arrays!
           case SAVE_PRO_LICENSE: {
-            const { secret, machineInfo } = payload
+            const { secret, machineInfo, expiresAt } = payload
             return handlePromise(
               () => ['Saving Pro license'],
               () =>
-                statusManager.registerTask(saveProLicense(secret, machineInfo), SAVE_PRO_LICENSE),
+                statusManager.registerTask(
+                  saveProLicense(secret, machineInfo, expiresAt),
+                  SAVE_PRO_LICENSE
+                ),
               () => ['Error saving Pro license']
             )
           }

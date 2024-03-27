@@ -48,12 +48,42 @@ const { machineId, pleaseTellMeWhatPlatformIAmOn, machineName, localUserName } =
  * We're expected to record the license payload so that we can decrypt
  * the local license and check it's running on the right machine.
  */
-export function checkForLicense() {
-  return axios
-    .post('/api/check-subscription')
-    .then((response) => {
-      const { hasPro, proExpiresAt } = response.body // continue here
-    })
+export function checkForLicense(whenClientIsReady) {
+  return Promise.all([
+    machineId(),
+    pleaseTellMeWhatPlatformIAmOn(),
+    machineName(),
+    localUserName(),
+  ]).then(([id, os, name, userName]) => {
+    return axios
+      .post('/api/check-subscription', {
+        id,
+        os,
+        name,
+        localUserName: userName,
+      })
+      .then((response) => {
+        const { hasPro, proExpiresAt, proLicensePayload, hasPlottr, plottrLicensePayload } =
+          response.body
+        return whenClientIsReady(({ savePlottrLicense, saveProLicense }) => {
+          return (
+            hasPlottr
+              ? savePlottrLicense(plottrLicensePayload.secret, plottrLicensePayload.machineInfo)
+              : Promise.resolve()
+          ).then(() => {
+            if (hasPro) {
+              return saveProLicense(
+                proLicensePayload.secret,
+                proLicensePayload.machineInfo,
+                proExpiresAt
+              )
+            } else {
+              return Promise.resolve()
+            }
+          })
+        })
+      })
+  })
 }
 
 // callback(hasPro, info)
