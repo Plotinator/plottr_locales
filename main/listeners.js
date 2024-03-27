@@ -7,6 +7,8 @@ import fs from 'fs'
 import { machineId } from 'node-machine-id'
 import { parse } from 'dotenv'
 import { v4 as uuid } from 'uuid'
+import computerName from 'computer-name'
+import { userInfo } from 'os'
 
 import { helpers, selectors as pltrSelectors } from 'pltr/v2'
 import { askToExport } from 'plottr_import_export'
@@ -899,5 +901,13 @@ export const listenOnIPCMain = (
       log.error(`Error trying to indicate that the file is saved`)
       replyWithError(replyChannel, error)
     }
+  })
+
+  listen('please-may-i-have-the-machine-name', ({ reply }, replyChannel) => {
+    reply(replyChannel, computerName())
+  })
+
+  listen('please-may-i-have-the-local-username', ({ reply }, replyChannel) => {
+    reply(replyChannel, userInfo().username)
   })
 }
