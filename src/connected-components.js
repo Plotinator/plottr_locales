@@ -392,11 +392,6 @@ const platform = {
     return pleaseUpdateLanguage(newLanguage)
   },
   license: {
-    checkForActiveLicense: licenseServerAPIs.checkForActiveLicense,
-    verifyLicense: licenseServerAPIs.verifyLicense,
-    trial90days: licenseServerAPIs.trial90days,
-    trial60days: licenseServerAPIs.trial60days,
-    checkForPro: licenseServerAPIs.checkForPro,
     startTrial,
     deleteLicense,
     saveLicenseInfo,

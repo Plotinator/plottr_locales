@@ -851,12 +851,12 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
           // arguments important so we don't leak unencrypted secrets
           // to the operating system.
           case SAVE_PLOTTR_LICENSE: {
-            const { secret, machineInfo } = payload
+            const { secret, machineInfo, dateChecked } = payload
             return handlePromise(
               () => ['Saving Plottr license'],
               () =>
                 statusManager.registerTask(
-                  savePlottrLicense(secret, machineInfo),
+                  savePlottrLicense(secret, machineInfo, dateChecked),
                   SAVE_PLOTTR_LICENSE
                 ),
               () => ['Error saving Plottr license']
@@ -864,12 +864,12 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
           }
           // NB!  Preserve the arrays!
           case SAVE_PRO_LICENSE: {
-            const { secret, machineInfo, expiresAt } = payload
+            const { secret, machineInfo, expiresAt, dateChecked } = payload
             return handlePromise(
               () => ['Saving Pro license'],
               () =>
                 statusManager.registerTask(
-                  saveProLicense(secret, machineInfo, expiresAt),
+                  saveProLicense(secret, machineInfo, expiresAt, dateChecked),
                   SAVE_PRO_LICENSE
                 ),
               () => ['Error saving Pro license']

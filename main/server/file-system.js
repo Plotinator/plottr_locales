@@ -610,12 +610,12 @@ const fileSystemModule = (userDataPath) => {
       }
     }
 
-    const savePlottrLicense = (secret, machineInfo) => {
-      return plottrLicenseStore.set({ secret, machineInfo })
+    const savePlottrLicense = (secret, machineInfo, dateChecked) => {
+      return plottrLicenseStore.set({ secret, machineInfo, dateChecked })
     }
 
-    const saveProLicense = (secret, machineInfo, expiresAt) => {
-      return proLicenseStore.set({ secret, machineInfo, expiresAt })
+    const saveProLicense = (secret, machineInfo, expiresAt, dateChecked) => {
+      return proLicenseStore.set({ secret, machineInfo, expiresAt, dateChecked })
     }
 
     const currentPlottrLicense = () => {
@@ -627,13 +627,13 @@ const fileSystemModule = (userDataPath) => {
       return plottrLicenseStore.onDidAnyChange.bind(plottrLicenseStore)(cb)
     }
 
-    const currentProLicense = (cb) => {
-      cb(proLicenseStore.store)
-      return proLicenseStore.onDidAnyChange.bind(proLicenseStore)(cb)
+    const currentProLicense = () => {
+      return proLicenseStore.currentStore()
     }
 
-    const listenToProLicenseChanges = () => {
-      return Promise.resolve()
+    const listenToProLicenseChanges = (cb) => {
+      cb(proLicenseStore.store)
+      return proLicenseStore.onDidAnyChange.bind(proLicenseStore)(cb)
     }
 
     return {
