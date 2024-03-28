@@ -161,17 +161,6 @@ const makeFileSystemAPIs = (socketClient) => {
     })
   }
 
-  const listenToUserSettingsChanges = (cb) => {
-    return socketClient(({ listenToUserSettingsChanges }) => {
-      return listenToUserSettingsChanges(cb)
-    })
-  }
-  const currentUserSettings = () => {
-    return socketClient(({ currentUserSettings }) => {
-      return currentUserSettings()
-    })
-  }
-
   const listenToBackupsChanges = (cb) => {
     return socketClient(({ listenToBackupsChanges }) => {
       return listenToBackupsChanges(cb)
@@ -190,6 +179,11 @@ const makeFileSystemAPIs = (socketClient) => {
   const setLastOpenedFilePath = (filePath) => {
     return socketClient(({ setLastOpenedFilePath }) => {
       return setLastOpenedFilePath(filePath)
+    })
+  }
+  const persistUserId = (uid) => {
+    return socketClient(({ saveAppSetting }) => {
+      return saveAppSetting('user.frbId', uid)
     })
   }
 
@@ -218,12 +212,11 @@ const makeFileSystemAPIs = (socketClient) => {
     listenToAppSettingsChanges,
     currentAppSettings,
     saveAppSetting,
-    listenToUserSettingsChanges,
-    currentUserSettings,
     listenToBackupsChanges,
     currentBackups,
     lastOpenedFile,
     setLastOpenedFilePath,
+    persistUserId,
   }
 }
 

@@ -316,12 +316,12 @@ const platform = {
     writeFile,
     createFromSnowflake: (importedPath) => {
       const state = store().getState()
-      const isLoggedIntoPro = selectors.hasProSelector(state)
+      const isLoggedIntoPro = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
       createFromSnowflake(importedPath, isLoggedIntoPro)
     },
     createFromScrivener: (importedPath) => {
       const state = store().getState()
-      const isLoggedIntoPro = selectors.hasProSelector(state)
+      const isLoggedIntoPro = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
       createFromScrivener(importedPath, isLoggedIntoPro)
     },
     joinPath: (...args) => {
@@ -680,6 +680,7 @@ export const FirebaseLogin = components.FirebaseLogin
 export const FullPageSpinner = components.FullPageSpinner
 export const ChoiceView = components.ChoiceView
 export const ExpiredView = components.ExpiredView
+export const ProLicenseExpired = components.ProLicenseExpired
 export const ProOnboarding = components.ProOnboarding
 export const UpdateNotifier = components.UpdateNotifier
 export const NewProjectInputModal = components.NewProjectInputModal

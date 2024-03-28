@@ -45,33 +45,47 @@ export function checkForLicense(whenClientIsReady) {
     machineName(),
     localUserName(),
   ]).then(([id, os, name, userName]) => {
+    const machineInfo = {
+      id,
+      os,
+      name,
+      localUserName: userName,
+    }
     return axios
-      .post(`https://${process.env.API_BASE_DOMAIN}/api/check-subscription`, {
-        id,
-        os,
-        name,
-        localUserName: userName,
-      })
+      .post(`https://${process.env.API_BASE_DOMAIN}/api/check-subscription`, machineInfo)
       .then((response) => {
         const { hasPro, proExpiresAt, proLicensePayload, hasPlottr, plottrLicensePayload } =
           response.data
+        const dateChecked = new Date().toISOString()
         return whenClientIsReady(({ savePlottrLicense, saveProLicense }) => {
           return (
             hasPlottr
-              ? savePlottrLicense(plottrLicensePayload.secret, plottrLicensePayload.machineInfo)
+              ? savePlottrLicense(plottrLicensePayload?.secret ?? '', machineInfo, dateChecked)
               : Promise.resolve()
           ).then(() => {
             if (hasPro) {
               return saveProLicense(
-                proLicensePayload.secret,
-                proLicensePayload.machineInfo,
-                proExpiresAt
+                proLicensePayload?.secret ?? '',
+                machineInfo,
+                proExpiresAt,
+                dateChecked
               )
             } else {
               return Promise.resolve()
             }
           })
         })
+      })
+      .catch((error) => {
+        if (error.response) {
+          if (error.response.status === 401) {
+            return Promise.resolve()
+          } else {
+            return Promise.reject()
+          }
+        } else {
+          return Promise.reject(error)
+        }
       })
   })
 }

@@ -7,6 +7,7 @@ import { t } from 'plottr_locales'
 import { helpers } from 'pltr/v2'
 import { actions, selectors } from 'wired-up-pltr'
 import { Button } from 'plottr_components'
+import { ProLicenseExpired } from 'connected-components'
 
 import { bootFile } from '../bootFile'
 
@@ -121,6 +122,9 @@ const Main = ({
   clearErrorLoadingFile,
   setWindowTitle,
   isInSettingsWizard,
+  isInSomeValidLicenseState,
+  licenseExpired,
+  needsToConnectToInternet,
 }) => {
   // The user needs a way to dismiss the files dashboard and continue
   // to the file that's open.
@@ -194,7 +198,7 @@ const Main = ({
     }
     const unsubscribeFromReloadFromFile = onReloadFromFile(reloadListener)
 
-    if (checkedFileToLoad || checkingFileToLoad || needsToLogin) {
+    if (checkedFileToLoad || checkingFileToLoad || !isInSomeValidLicenseState) {
       return () => {
         unsubscribeFromReloadFromFile()
       }
@@ -242,10 +246,11 @@ const Main = ({
     }
   }, [
     isInOfflineMode,
+    isInProMode,
     readyToCheckFileToLoad,
     checkingFileToLoad,
     checkedFileToLoad,
-    needsToLogin,
+    isInSomeValidLicenseState,
     promptToUploadFile,
   ])
 
@@ -479,7 +484,7 @@ const Main = ({
     return <ProOnboarding />
   }
 
-  if (needsToLogin) {
+  if (needsToLogin || needsToConnectToInternet) {
     return <Login darkMode={darkMode} />
   }
 
@@ -639,6 +644,10 @@ const Main = ({
     return <Expired />
   }
 
+  if (licenseExpired) {
+    return <ProLicenseExpired />
+  }
+
   if (isInSettingsWizard) {
     return <SettingsWizard />
   }
@@ -705,6 +714,9 @@ Main.propTypes = {
   clearErrorLoadingFile: PropTypes.func.isRequired,
   setWindowTitle: PropTypes.func.isRequired,
   isInSettingsWizard: PropTypes.bool,
+  isInSomeValidLicenseState: PropTypes.bool,
+  licenseExpired: PropTypes.bool,
+  needsToConnectToInternet: PropTypes.bool,
 }
 
 export default connect(
@@ -712,7 +724,7 @@ export default connect(
     busyBooting: selectors.applicationIsBusyButFileCouldBeUnloadedSelector(state),
     isFirstTime: selectors.isFirstTimeSelector(state),
     needsToLogin: selectors.userNeedsToLoginSelector(state),
-    isInProMode: selectors.hasProSelector(state),
+    isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
     isInTrialModeWithExpiredTrial: selectors.isInTrialModeWithExpiredTrialSelector(state),
     showDashboard: selectors.showDashboardOnBootSelector(state),
     checkingFileToLoad: selectors.checkingFileToLoadSelector(state),
@@ -736,6 +748,9 @@ export default connect(
     userId: selectors.userIdSelector(state),
     settings: selectors.appSettingsSelector(state),
     isInSettingsWizard: selectors.isInSettingsWizardSelector(state),
+    isInSomeValidLicenseState: selectors.isInSomeValidLicenseStateSelector(state),
+    licenseExpired: selectors.licenseExpiredSelector(state),
+    needsToConnectToInternet: selectors.needsToConnectToInternetSelector(state),
   }),
   {
     setOffline: actions.project.setOffline,

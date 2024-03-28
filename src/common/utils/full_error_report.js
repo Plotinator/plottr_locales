@@ -61,7 +61,7 @@ function prepareErrorReport() {
               .then((rendererLogContents) => {
                 const fileSystemAPIs = makeFileSystemAPIs(whenClientIsReady)
                 return Promise.all([
-                  fileSystemAPIs.currentUserSettings(),
+                  Promise.resolve({ payment_id: 'blarg' }),
                   fileSystemAPIs.currentTrial(),
                   fileSystemAPIs.currentAppSettings(),
                   getVersion(),

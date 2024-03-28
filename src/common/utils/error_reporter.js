@@ -3,7 +3,6 @@ import { t as i18n } from 'plottr_locales'
 
 import log from '../../../shared/logger'
 import { whenClientIsReady } from '../../../shared/socket-client/index'
-import makeFileSystemAPIs from '../../api/file-system-apis'
 import { makeMainProcessClient } from '../../app/mainProcessClient'
 
 let previousAction = null
@@ -44,10 +43,9 @@ export function createErrorReport(error, errorInfo) {
 }
 
 function prepareErrorReport(error, errorInfo) {
-  const { currentUserSettings } = makeFileSystemAPIs(whenClientIsReady)
-
   return Promise.all([getVersion(), pleaseTellMeWhatPlatformIAmOn]).then(([version, platform]) => {
-    return currentUserSettings().then((user) => {
+    // TODO
+    return Promise.resolve({ payment_id: 'blarg' }).then((user) => {
       const hasLicense = !!user.licenseKey
       const report = `
 ----------------------------------

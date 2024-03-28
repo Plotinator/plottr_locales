@@ -163,6 +163,7 @@ const theWorld = (socketClient) => {
   return {
     logger: errorReportingLogger,
     license: {
+      persistUserId: fileSystemAPIs.persistUserId,
       checkForAndSaveLicense,
       listenToTrialChanges: ignoringStore(fileSystemAPIs.listenToTrialChanges),
       currentTrial: fileSystemAPIs.currentTrial,
@@ -197,8 +198,6 @@ const theWorld = (socketClient) => {
       currentExportConfigSettings: fileSystemAPIs.currentExportConfigSettings,
       listenToAppSettingsChanges: ignoringStore(fileSystemAPIs.listenToAppSettingsChanges),
       currentAppSettings: fileSystemAPIs.currentAppSettings,
-      listenToUserSettingsChanges: ignoringStore(fileSystemAPIs.listenToUserSettingsChanges),
-      currentUserSettings: fileSystemAPIs.currentUserSettings,
     },
   }
 }

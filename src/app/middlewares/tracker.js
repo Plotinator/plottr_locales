@@ -1,6 +1,5 @@
 import { ActionTypes } from 'pltr/v2'
 import { selectors } from 'wired-up-pltr'
-import makeFileSystemAPIs from '../../api/file-system-apis'
 import MPQ from '../../common/utils/MPQ'
 import { shouldIgnoreAction } from './shouldIgnoreAction'
 
@@ -23,8 +22,6 @@ const WHITE_LIST = [
 ]
 
 const tracker = (whenClientIsReady) => {
-  const { currentUserSettings } = makeFileSystemAPIs(whenClientIsReady)
-
   return (store) => (next) => (action) => {
     const result = next(action)
     // Support redux-thunk and friends where non-objects are dispatched.
@@ -32,7 +29,8 @@ const tracker = (whenClientIsReady) => {
     if (shouldIgnoreAction(action)) return result
     if (!WHITE_LIST.includes(action.type)) return result
 
-    currentUserSettings().then((user) => {
+    // TODO
+    Promise.resolve({ payment_id: 'blarg' }).then((user) => {
       if (!user.payment_id) return
 
       const state = store.getState()

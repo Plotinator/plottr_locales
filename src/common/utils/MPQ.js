@@ -28,7 +28,8 @@ class MixpanelQueue {
 
   projectEventStats(event, basicAttrs = {}, state) {
     if (!event || process.env.NODE_ENV == 'development') return
-    this.fileSystemAPIs.currentUserSettings().then((user) => {
+    // TODO
+    Promise.resolve({ payment_id: 'blarg' }).then((user) => {
       if (!user.payment_id) return
 
       window.requestIdleCallback(() => {
@@ -69,7 +70,8 @@ class MixpanelQueue {
 
   push(event, attrs = {}) {
     if (!event || process.env.NODE_ENV == 'development') return
-    this.fileSystemAPIs.currentUserSettings().then((user) => {
+    // TODO
+    Promise.resolve({ payment_id: 'blarg' }).then((user) => {
       if (!user['payment_id']) return
 
       // TODO: save to localStorage

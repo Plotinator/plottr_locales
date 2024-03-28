@@ -35,7 +35,6 @@ import {
   SAVE_EXPORT_CONFIG_SETTINGS,
   CURRENT_APP_SETTINGS,
   SAVE_APP_SETTING,
-  CURRENT_USER_SETTINGS,
   CURRENT_BACKUPS,
   LISTEN_TO_TRIAL_CHANGES,
   LISTEN_TO_LICENSE_CHANGES,
@@ -45,7 +44,6 @@ import {
   LISTEN_TO_TEMPLATE_MANIFEST_CHANGES,
   LISTEN_TO_EXPORT_CONFIG_SETTINGS_CHANGES,
   LISTEN_TO_APP_SETTINGS_CHANGES,
-  LISTEN_TO_USER_SETTINGS_CHANGES,
   LISTEN_TO_BACKUPS_CHANGES,
   LISTEN_TO_PLOTTR_LICENSE,
   LISTEN_TO_PRO_LICENSE,
@@ -57,7 +55,6 @@ import {
   LISTEN_TO_TEMPLATE_MANIFEST_CHANGES_UNSUBSCRIBE,
   LISTEN_TO_EXPORT_CONFIG_SETTINGS_CHANGES_UNSUBSCRIBE,
   LISTEN_TO_APP_SETTINGS_CHANGES_UNSUBSCRIBE,
-  LISTEN_TO_USER_SETTINGS_CHANGES_UNSUBSCRIBE,
   LISTEN_TO_BACKUPS_CHANGES_UNSUBSCRIBE,
   LISTEN_TO_PLOTTR_LICENSE_UNSUBSCRIBE,
   LISTEN_TO_PRO_LICENSE_UNSUBSCRIBE,
@@ -270,8 +267,6 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
       listenToAppSettingsChanges,
       currentAppSettings,
       saveAppSetting,
-      listenToUserSettingsChanges,
-      currentUserSettings,
       listenToBackupsChanges,
       currentBackups,
       setCustomTemplate,
@@ -968,13 +963,6 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
               () => `Error while setting ${key} to ${value} in app settings`
             )
           }
-          case CURRENT_USER_SETTINGS: {
-            return handlePromise(
-              () => 'Getting current user settings',
-              currentUserSettings,
-              () => 'Error while getting the current user settings'
-            )
-          }
           case CURRENT_BACKUPS: {
             return handlePromise(
               () => 'Getting the current backups',
@@ -1149,13 +1137,6 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
               () => 'Error listening to app settings changes'
             )
           }
-          case LISTEN_TO_USER_SETTINGS_CHANGES: {
-            return handleSubscription(
-              () => 'Listening to user settings changes',
-              listenToUserSettingsChanges,
-              () => 'Error listening to user settings changes'
-            )
-          }
           case LISTEN_TO_BACKUPS_CHANGES: {
             return handleSubscription(
               () => 'Listening to backups changes',
@@ -1185,7 +1166,6 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
           case LISTEN_TO_TEMPLATE_MANIFEST_CHANGES_UNSUBSCRIBE:
           case LISTEN_TO_EXPORT_CONFIG_SETTINGS_CHANGES_UNSUBSCRIBE:
           case LISTEN_TO_APP_SETTINGS_CHANGES_UNSUBSCRIBE:
-          case LISTEN_TO_USER_SETTINGS_CHANGES_UNSUBSCRIBE:
           case LISTEN_TO_BACKUPS_CHANGES_UNSUBSCRIBE: {
             const unsubscribe = unsubscribeFunctions.get(messageId)
             if (!unsubscribe) {

@@ -336,7 +336,7 @@ export const openExistingFile = () => {
 
 export const duplicateFile = (fileUrl, suggestedNewName, forceCloseWhenDone) => {
   const state = store().getState()
-  const isLoggedIntoPro = selectors.hasProSelector(state)
+  const isLoggedIntoPro = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
 
   const event = isLoggedIntoPro
     ? new Event('save-as--pro', { fileUrl, suggestedNewName })

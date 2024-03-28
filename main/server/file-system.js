@@ -286,14 +286,6 @@ const fileSystemModule = (userDataPath) => {
       return SETTINGS.set(key, value)
     }
 
-    const listenToUserSettingsChanges = (cb) => {
-      cb(USER.store)
-      return USER.onDidAnyChange.bind(USER)(cb)
-    }
-    const currentUserSettings = () => {
-      return USER.currentStore()
-    }
-
     const backupDirExists = () => {
       return backupBasePath()
         .then((basePath) => {
@@ -664,8 +656,6 @@ const fileSystemModule = (userDataPath) => {
       listenToAppSettingsChanges,
       currentAppSettings,
       saveAppSetting,
-      listenToUserSettingsChanges,
-      currentUserSettings,
       listenToBackupsChanges,
       currentBackups,
       customTemplatesPath,

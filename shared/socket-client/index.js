@@ -59,7 +59,6 @@ import {
   SAVE_EXPORT_CONFIG_SETTINGS_ERROR_REPLY,
   CURRENT_APP_SETTINGS_ERROR_REPLY,
   SAVE_APP_SETTING_ERROR_REPLY,
-  CURRENT_USER_SETTINGS_ERROR_REPLY,
   CURRENT_BACKUPS_ERROR_REPLY,
   SET_TEMPLATE_ERROR_REPLY,
   CURRENT_PLOTTR_LICENSE_ERROR_REPLY,
@@ -92,8 +91,6 @@ import {
   LISTEN_TO_APP_SETTINGS_CHANGES,
   CURRENT_APP_SETTINGS,
   SAVE_APP_SETTING,
-  LISTEN_TO_USER_SETTINGS_CHANGES,
-  CURRENT_USER_SETTINGS,
   LISTEN_TO_BACKUPS_CHANGES,
   CURRENT_BACKUPS,
   IS_TEMP_FILE,
@@ -274,7 +271,6 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           case LISTEN_TO_TEMPLATE_MANIFEST_CHANGES:
           case LISTEN_TO_EXPORT_CONFIG_SETTINGS_CHANGES:
           case LISTEN_TO_APP_SETTINGS_CHANGES:
-          case LISTEN_TO_USER_SETTINGS_CHANGES:
           case LISTEN_TO_BACKUPS_CHANGES: {
             const callback = callbacks.get(messageId)
             // We might get a late reply from the worker thread.  i.e. it
@@ -317,7 +313,6 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           case SAVE_EXPORT_CONFIG_SETTINGS:
           case CURRENT_APP_SETTINGS:
           case SAVE_APP_SETTING:
-          case CURRENT_USER_SETTINGS:
           case CURRENT_BACKUPS:
           case READ_OFFLINE_FILES:
           case BACKUP_OFFLINE_BACKUP_FOR_RESUME:
@@ -409,7 +404,6 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           case SAVE_EXPORT_CONFIG_SETTINGS_ERROR_REPLY:
           case CURRENT_APP_SETTINGS_ERROR_REPLY:
           case SAVE_APP_SETTING_ERROR_REPLY:
-          case CURRENT_USER_SETTINGS_ERROR_REPLY:
           case CURRENT_BACKUPS_ERROR_REPLY:
           case BACKUP_OFFLINE_BACKUP_FOR_RESUME_ERROR_REPLY:
           case READ_OFFLINE_FILES_ERROR_REPLY:
@@ -733,10 +727,6 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
       return sendPromise(SAVE_APP_SETTING, { key, value })
     }
 
-    const currentUserSettings = () => {
-      return sendPromise(CURRENT_USER_SETTINGS)
-    }
-
     const currentBackups = () => {
       return sendPromise(CURRENT_BACKUPS)
     }
@@ -836,10 +826,6 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
       return registerCallback(LISTEN_TO_APP_SETTINGS_CHANGES, {}, cb)
     }
 
-    const listenToUserSettingsChanges = (cb) => {
-      return registerCallback(LISTEN_TO_USER_SETTINGS_CHANGES, {}, cb)
-    }
-
     const listenToBackupsChanges = (cb) => {
       return registerCallback(LISTEN_TO_BACKUPS_CHANGES, {}, cb)
     }
@@ -904,7 +890,6 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           saveExportConfigSettings,
           currentAppSettings,
           saveAppSetting,
-          currentUserSettings,
           currentBackups,
           listenToTrialChanges,
           listenToLicenseChanges,
@@ -914,7 +899,6 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           listenToTemplateManifestChanges,
           listenToExportConfigSettingsChanges,
           listenToAppSettingsChanges,
-          listenToUserSettingsChanges,
           listenToBackupsChanges,
           listenToPlottrLicenseChanges,
           listenToProLicenseChanges,
