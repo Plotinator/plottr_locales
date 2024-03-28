@@ -15,8 +15,50 @@
         <style>
           body {
               background-color: white !important;
-          }
+            }
+            .firebaseui-form-links a {
+                border: none;
+                color: #3f51b5;
+                position: relative;
+                font-family: "Roboto","Helvetica","Arial",sans-serif;
+                font-size: 14px;
+                font-weight: 500;
+                text-transform: uppercase;
+                text-decoration: none;
+                padding: 10px;
+            }
+            .firebaseui-form-links a:hover {
+                background-color: #3f51b5;
+                color: #fff;
+                text-decoration: none;
+                padding: 10px;
+                box-shadow: 0 2px 2px 0 rgb(0 0 0 / 14%), 0 3px 1px -2px rgb(0 0 0 / 20%), 0 1px 5px 0 rgb(0 0 0 / 12%);
+                border-radius: 2px;
+            }
         </style>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+            // Wait for DOM content to load
+            const observer = new MutationObserver(function(mutationsList, observer) {
+                for(let mutation of mutationsList) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                        handleClassChanges();
+                    }
+                }
+            });
+            
+            observer.observe(document.body, { attributes: true, subtree: true });
+        });
+
+        function handleClassChanges() {
+            const passwordForgetLink = document.querySelector('.firebaseui-form-links a');
+            const rootElement = document.querySelector('#react-root');
+            
+            if (passwordForgetLink && rootElement) {
+                passwordForgetLink.textContent = 'Reset Password'   
+            }
+        }
+        </script>
     </head>
     <body>
         <div id="react-root"></div>

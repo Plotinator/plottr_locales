@@ -133,6 +133,8 @@ export function checkForPro(email, callback) {
     })
 }
 
+const PRO_ID = 'pro_01hr7kgbzyvjkncex5fakgvw5k'
+
 function isProProduct(info) {
   return info.product_id == PRO_ID
 }
