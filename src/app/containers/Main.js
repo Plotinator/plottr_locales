@@ -435,23 +435,22 @@ const Main = ({
   }
 
   if (firstTimeBooting) {
-    const body = (
-      <>
-        {darkMode ? (
-          <img src="../icons/logo_dark_28_500.png" height="375" />
-        ) : (
-          <img src="../icons/logo_light_28_500.png" height="375" />
-        )}
-        <h3>{loadingState}</h3>
-        <div className="loading-splash__progress">
-          <div className="loading-splash__progress__bar" style={{ width: `${loadingProgress}%` }} />
-        </div>
-      </>
-    )
-
     return (
       <div id="temporary-inner">
-        <div className="loading-splash">{body}</div>
+        <div className="loading-splash">
+          {darkMode ? (
+            <img src="../icons/logo_dark_28_500.png" height="375" />
+          ) : (
+            <img src="../icons/logo_light_28_500.png" height="375" />
+          )}
+          <h3>{loadingState}</h3>
+          <div className="loading-splash__progress">
+            <div
+              className="loading-splash__progress__bar"
+              style={{ width: `${loadingProgress}%` }}
+            />
+          </div>
+        </div>
       </div>
     )
   }
