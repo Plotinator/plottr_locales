@@ -1,12 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { PropTypes } from 'prop-types'
 import { connect } from 'react-redux'
-import { IoIosAlert } from 'react-icons/io'
 
-import { t } from 'plottr_locales'
 import { helpers } from 'pltr/v2'
 import { actions, selectors } from 'wired-up-pltr'
-import { Button } from 'plottr_components'
 import { ProLicenseExpired } from 'connected-components'
 
 import { bootFile } from '../bootFile'
@@ -19,15 +16,13 @@ import Expired from './Expired'
 import Dashboard from './Dashboard'
 import ProOnboarding from './ProOnboarding'
 import SettingsWizard from './SettingsWizard'
-import UploadOfflineFile from '../components/UploadOfflineFile'
-import { uploadProject } from '../../common/utils/upload_project'
-import { whenClientIsReady } from '../../../shared/socket-client'
-import logger from '../../../shared/logger'
-import { makeMainProcessClient } from '../mainProcessClient'
-import { getErrorReporterInstance } from '../../../shared/error-reporter-instance'
+import UploadLastOpenedFileToPro from '../components/UploadLastOpenedFileToPro'
+import ErrorLoadingFile from '../components/ErrorLoadingFile'
 
-const { onReloadFromFile, pleaseFetchState, openExternal, showItemInFolder, updateLastOpenedFile } =
-  makeMainProcessClient()
+import { makeMainProcessClient } from '../mainProcessClient'
+import { whenClientIsReady } from '../../../shared/socket-client'
+
+const { onReloadFromFile, pleaseFetchState } = makeMainProcessClient()
 
 function displayFileName(fileName, fileURL, displayFilePath) {
   const isOnCloud = helpers.file.urlPointsToPlottrCloud(fileURL)
@@ -52,34 +47,6 @@ function displayFileName(fileName, fileURL, displayFilePath) {
   })
 }
 
-const LoadingSplash = ({ loadingState, loadingProgress, darkMode }) => {
-  return (
-    <div id="temporary-inner">
-      <div className="loading-splash">
-        {darkMode ? (
-          <img src="../icons/logo_dark_28_500.png" height="375" />
-        ) : (
-          <img src="../icons/logo_light_28_500.png" height="375" />
-        )}
-        {loadingState ? <h3>{loadingState}</h3> : null}
-        {loadingProgress ? (
-          <div className="loading-splash__progress">
-            <div
-              className="loading-splash__progress__bar"
-              style={{ width: `${loadingProgress}%` }}
-            />
-          </div>
-        ) : null}
-      </div>
-    </div>
-  )
-}
-LoadingSplash.propTypes = {
-  loadingState: PropTypes.string,
-  loadingProgress: PropTypes.number,
-  darkMode: PropTypes.bool,
-}
-
 const Main = ({
   isFirstTime,
   busyBooting,
@@ -94,14 +61,10 @@ const Main = ({
   cantShowFile,
   loadingState,
   errorLoadingFile,
-  errorIsUpdateError,
   startCheckingFileToLoad,
   finishCheckingFileToLoad,
   loadingProgress,
   fileToUpload,
-  uploadingFileToCloud,
-  emailAddress,
-  userId,
   darkMode,
   isInOfflineMode,
   currentAppStateIsDashboard,
@@ -112,14 +75,9 @@ const Main = ({
   setCurrentAppStateToDashboard,
   setCurrentAppStateToApplication,
   promptToUploadFile,
-  dismissPromptToUploadFile,
-  startUploadingFileToCloud,
-  finishUploadingFileToCloud,
   enableTestUtilities,
   saveBackup,
   settings,
-  generalError,
-  clearErrorLoadingFile,
   setWindowTitle,
   isInSettingsWizard,
   isInSomeValidLicenseState,
@@ -444,32 +402,6 @@ const Main = ({
     dashboardClosed,
   ])
 
-  const dismissUploadPromptHandlingLastOpened = useCallback(() => {
-    dismissPromptToUploadFile()
-    whenClientIsReady(({ nukeLastOpenedFileURL }) => {
-      return nukeLastOpenedFileURL()
-    })
-  }, [dismissPromptToUploadFile])
-
-  const goToSupport = () => {
-    openExternal('https://plottr.com/support/')
-  }
-
-  const goToDownloads = () => {
-    openExternal('https://my.plottr.com/file-downloads/')
-  }
-
-  const viewBackups = () => {
-    setFirstTimeBooting(false)
-    setOpenDashboardTo('backups')
-    setCurrentAppStateToDashboard()
-    clearErrorLoadingFile()
-  }
-
-  const showFile = () => {
-    showItemInFolder(helpers.file.withoutProtocol(pathToProject))
-  }
-
   // IMPORTANT: the order of these return statements is significant.
   // We'll exit at the earliest one that evaluates true for it's
   // guarding if.
@@ -489,132 +421,20 @@ const Main = ({
   }
 
   if (fileToUpload) {
-    return (
-      <MainIntegrationContext.Consumer>
-        {({ readFile }) => {
-          return (
-            <>
-              <LoadingSplash darkMode={darkMode} />
-              <UploadOfflineFile
-                fileURL={fileToUpload}
-                onUploadFile={() => {
-                  readFile(helpers.file.withoutProtocol(fileToUpload)).then((data) => {
-                    let file
-                    try {
-                      file = JSON.parse(data)
-                    } catch (error) {
-                      logger.error('Error uploading file to Pro', error)
-                      getErrorReporterInstance().then((errorReporter) => {
-                        errorReporter.error('Error uploading file to Pro', error)
-                      })
-                      generalError("We couldn't read your file.  Please try again.")
-                      return
-                    }
-                    startUploadingFileToCloud()
-                    uploadProject(file, emailAddress, userId)
-                      .then((response) => {
-                        const { fileId } = response.data || {}
-                        if (!fileId) {
-                          // FIXME: Use the new error loading file component
-                          // here when its merged.
-                          return
-                        }
-                        finishUploadingFileToCloud()
-                        dismissUploadPromptHandlingLastOpened()
-                        // Lie about the number of open files to avoid opening
-                        // the dashboard when we double click a file.
-                        //
-                        // FIXME: where should the options come from?
-                        const newFileURL = helpers.file.fileIdToPlottrCloudFileURL(fileId)
-                        bootFile(whenClientIsReady, newFileURL, {}, 2, saveBackup).then(
-                          closeDashboard
-                        )
-                        updateLastOpenedFile(newFileURL)
-                      })
-                      .catch((error) => {})
-                  })
-                }}
-                onCancel={dismissUploadPromptHandlingLastOpened}
-                busy={uploadingFileToCloud}
-              />
-            </>
-          )
-        }}
-      </MainIntegrationContext.Consumer>
-    )
+    return <UploadLastOpenedFileToPro saveBackup={saveBackup} />
   }
 
   if (errorLoadingFile) {
-    let errorMessage = isInProMode
-      ? t(
-          'Plottr ran into an issue opening your project. Please check your backups or contact support about this project and we will get it running for you quickly.'
-        )
-      : t(
-          'Plottr ran into an issue opening your project. Please check your backups or contact support with this file and we will get it running for you quickly.'
-        )
-
-    errorMessage = errorIsUpdateError
-      ? t(
-          'It looks like your version of Plottr is older than this project. Please update Plottr to avoid any issues'
-        )
-      : errorMessage
-
-    const body = (
-      <>
-        <div className="error-boundary">
-          <div className="text-center">
-            <IoIosAlert />
-            <h1>
-              {errorIsUpdateError ? t('You need to update Plottr') : t('Something went wrong,')}
-            </h1>
-            <h2>
-              {errorIsUpdateError
-                ? t("but don't panic, you haven't lost anything")
-                : t("but don't worry!")}
-            </h2>
-          </div>
-          <div className="error-boundary__view-error well text-center">
-            <h5 className="error-boundary-title" style={{ lineHeight: 1.75 }}>
-              {errorMessage}
-            </h5>
-          </div>
-          {errorIsUpdateError ? (
-            <div className="error-boundary__options" style={{ width: '50%' }}>
-              <Button bsSize="lg" onClick={goToDownloads}>
-                {t('Download Plottr')}
-              </Button>
-            </div>
-          ) : (
-            <div className="error-boundary__options" style={{ width: '50%' }}>
-              <Button bsSize="lg" onClick={goToSupport}>
-                {t('Contact Support')}
-              </Button>
-              {isInProMode ? null : (
-                <Button bsSize="lg" onClick={showFile}>
-                  {t('Show File')}
-                </Button>
-              )}
-              <Button bsSize="lg" onClick={viewBackups}>
-                {t('View Backups')}
-              </Button>
-            </div>
-          )}
-        </div>
-      </>
-    )
-
     return (
-      <div id="temporary-inner">
-        <div className="loading-splash">{body}</div>
-      </div>
+      <ErrorLoadingFile
+        setCurrentAppStateToDashboard={setCurrentAppStateToDashboard}
+        pathToProject={pathToProject}
+        setOpenDashboardTo={setOpenDashboardTo}
+      />
     )
   }
 
   if (firstTimeBooting) {
-    // TODO: @cameron, @jeana, this is where we can put a more
-    // interesting loading component for users and let them know what
-    // we're loading based on the `applicationState` key in Redux ^_^
-
     const body = (
       <>
         {darkMode ? (
@@ -686,11 +506,7 @@ Main.propTypes = {
   loadingState: PropTypes.string.isRequired,
   loadingProgress: PropTypes.number.isRequired,
   fileToUpload: PropTypes.string,
-  uploadingFileToCloud: PropTypes.bool,
-  emailAddress: PropTypes.string,
-  userId: PropTypes.string,
   errorLoadingFile: PropTypes.bool.isRequired,
-  errorIsUpdateError: PropTypes.bool.isRequired,
   setOffline: PropTypes.func.isRequired,
   startCheckingFileToLoad: PropTypes.func.isRequired,
   finishCheckingFileToLoad: PropTypes.func.isRequired,
@@ -704,14 +520,9 @@ Main.propTypes = {
   setCurrentAppStateToDashboard: PropTypes.func.isRequired,
   setCurrentAppStateToApplication: PropTypes.func.isRequired,
   promptToUploadFile: PropTypes.func.isRequired,
-  dismissPromptToUploadFile: PropTypes.func.isRequired,
-  startUploadingFileToCloud: PropTypes.func.isRequired,
-  finishUploadingFileToCloud: PropTypes.func.isRequired,
   enableTestUtilities: PropTypes.func.isRequired,
   saveBackup: PropTypes.func.isRequired,
   settings: PropTypes.object,
-  generalError: PropTypes.func,
-  clearErrorLoadingFile: PropTypes.func.isRequired,
   setWindowTitle: PropTypes.func.isRequired,
   isInSettingsWizard: PropTypes.bool,
   isInSomeValidLicenseState: PropTypes.bool,
@@ -733,7 +544,6 @@ export default connect(
     cantShowFile: selectors.cantShowFileSelector(state),
     loadingState: selectors.loadingStateSelector(state),
     errorLoadingFile: selectors.errorLoadingFileSelector(state) || false,
-    errorIsUpdateError: selectors.errorIsUpdateErrorSelector(state) || false,
     loadingProgress: selectors.loadingProgressSelector(state),
     darkMode: selectors.isDarkModeSelector(state),
     isInOfflineMode: selectors.isInOfflineModeSelector(state),
@@ -743,9 +553,6 @@ export default connect(
     isOnboardingFromRoot: selectors.isOnboardingToProFromRootSelector(state),
     isOnboarding: selectors.isOnboardingToProSelector(state),
     fileToUpload: selectors.filePathToUploadSelector(state),
-    uploadingFileToCloud: selectors.uploadingFileToCloudSelector(state),
-    emailAddress: selectors.emailAddressSelector(state),
-    userId: selectors.userIdSelector(state),
     settings: selectors.appSettingsSelector(state),
     isInSettingsWizard: selectors.isInSettingsWizardSelector(state),
     isInSomeValidLicenseState: selectors.isInSomeValidLicenseStateSelector(state),
@@ -759,11 +566,6 @@ export default connect(
     setCurrentAppStateToDashboard: actions.client.setCurrentAppStateToDashboard,
     setCurrentAppStateToApplication: actions.client.setCurrentAppStateToApplication,
     promptToUploadFile: actions.applicationState.promptToUploadFile,
-    dismissPromptToUploadFile: actions.applicationState.dismissPromptToUploadFile,
-    startUploadingFileToCloud: actions.applicationState.startUploadingFileToCloud,
-    finishUploadingFileToCloud: actions.applicationState.finishUploadingFileToCloud,
     enableTestUtilities: actions.testingAndDiagnosis.enableTestUtilities,
-    generalError: actions.error.generalError,
-    clearErrorLoadingFile: actions.applicationState.clearErrorLoadingFile,
   }
 )(Main)

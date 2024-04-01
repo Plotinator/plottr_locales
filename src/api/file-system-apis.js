@@ -54,7 +54,6 @@ const makeFileSystemAPIs = (socketClient) => {
         proLicense: null,
       }
       currentLicense().then((initialLicense) => {
-        license = initialLicense
         license = cloneDeep(initialLicense)
         cb(license)
       })
