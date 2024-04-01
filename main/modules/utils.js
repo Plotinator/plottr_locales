@@ -79,33 +79,36 @@ function makeBrowserWindow(fileURL) {
         newWindow.show()
       })
 
-      newWindow.webContents.on('did-finish-load', () => {
-        if (!newWindow.isVisible()) newWindow.show()
-      })
+      if (typeof newWindow?.webContents?.on === 'function') {
+        newWindow.webContents.on('did-finish-load', () => {
+          if (!newWindow.isVisible()) newWindow.show()
+        })
 
-      newWindow.webContents.on('unresponsive', () => {
-        log.warn('webContents became unresponsive')
-        newWindow.webContents.reload()
-      })
-      newWindow.webContents.on('responsive', () => {
-        log.info('webContents responsive again')
-      })
+        newWindow.webContents.on('unresponsive', () => {
+          log.warn('webContents became unresponsive')
+          newWindow.webContents.reload()
+        })
 
-      newWindow.on('unresponsive', () => {
-        log.warn('window became unresponsive')
-        newWindow.webContents.reload()
-      })
+        newWindow.webContents.on('responsive', () => {
+          log.info('webContents responsive again')
+        })
 
-      newWindow.on('responsive', () => {
-        log.info('window responsive again')
-      })
+        newWindow.on('unresponsive', () => {
+          log.warn('window became unresponsive')
+          newWindow.webContents.reload()
+        })
 
-      newWindow.webContents.on(
-        'new-window',
-        (event, url, frameName, disposition, options, additionalFeatures) => {
-          event.preventDefault()
-        }
-      )
+        newWindow.on('responsive', () => {
+          log.info('window responsive again')
+        })
+
+        newWindow.webContents.on(
+          'new-window',
+          (event, url, frameName, disposition, options, additionalFeatures) => {
+            event.preventDefault()
+          }
+        )
+      }
 
       if (is.development || settings.forceDevTools) {
         newWindow.openDevTools()

@@ -30,20 +30,26 @@ function buildFileMenu(fileURL, getTrialInfo) {
           label: t('Create Blank Project'),
           accelerator: 'CmdOrCtrl+N',
           click: function (event, focusedWindow) {
-            focusedWindow && focusedWindow.webContents.send('new-project')
+            if (focusedWindow?.webContents?.send === 'function') {
+              focusedWindow && focusedWindow.webContents.send('new-project')
+            }
           },
         },
         {
           label: t('Create From Template'),
           click: function (event, focusedWindow) {
-            focusedWindow && focusedWindow.webContents.send('from-template')
+            if (focusedWindow?.webContents?.send === 'function') {
+              focusedWindow.webContents.send('from-template')
+            }
           },
         },
         {
           label: t('Open Existing File'),
           accelerator: 'CmdOrCtrl+O',
           click: function (event, focusedWindow) {
-            focusedWindow && focusedWindow.webContents.send('open-existing')
+            if (typeof focusedWindow?.webContents?.send === 'function') {
+              focusedWindow.webContents.send('open-existing')
+            }
           },
         },
         {
@@ -59,10 +65,12 @@ function buildFileMenu(fileURL, getTrialInfo) {
           accelerator: 'CmdOrCtrl+S',
           visible: !!fileURL,
           click: function (event, focusedWindow) {
-            if (isTemp) {
-              focusedWindow.webContents.send('move-from-temp')
-            } else {
-              focusedWindow.webContents.send('save')
+            if (typeof focusedWindow?.webContents?.send === 'function') {
+              if (isTemp) {
+                focusedWindow.webContents.send('move-from-temp')
+              } else {
+                focusedWindow.webContents.send('save')
+              }
             }
           },
         },
@@ -71,10 +79,12 @@ function buildFileMenu(fileURL, getTrialInfo) {
           accelerator: 'CmdOrCtrl+Shift+S',
           visible: !!fileURL,
           click: function (event, focusedWindow) {
-            if (isPro) {
-              focusedWindow.webContents.send('save-as--pro', fileURL)
-            } else {
-              focusedWindow.webContents.send('save-as', fileURL)
+            if (typeof focusedWindow?.webContents?.send === 'function') {
+              if (isPro) {
+                focusedWindow.webContents.send('save-as--pro', fileURL)
+              } else {
+                focusedWindow.webContents.send('save-as', fileURL)
+              }
             }
           },
         },
@@ -83,10 +93,12 @@ function buildFileMenu(fileURL, getTrialInfo) {
           accelerator: 'CmdOrCtrl+Shift+S',
           visible: !!fileURL,
           click: function (event, focusedWindow) {
-            if (isPro) {
-              focusedWindow.webContents.send('save-as--pro', fileURL)
-            } else {
-              focusedWindow.webContents.send('save-as', fileURL)
+            if (typeof focusedWindow?.webContents?.send === 'function') {
+              if (isPro) {
+                focusedWindow.webContents.send('save-as--pro', fileURL)
+              } else {
+                focusedWindow.webContents.send('save-as', fileURL)
+              }
             }
           },
         },
@@ -101,8 +113,9 @@ function buildFileMenu(fileURL, getTrialInfo) {
           label: t('Create Desktop Shortcut'),
           visible: !!fileURL && !isTemp && !isPro,
           click: function (event, focusedWindow) {
-            log.info('sending create-file-shortcut')
-            focusedWindow.webContents.send('create-file-shortcut', fileURL, 'desktop')
+            if (typeof focusedWindow?.webContents?.send === 'function') {
+              focusedWindow.webContents.send('create-file-shortcut', fileURL, 'desktop')
+            }
           },
         },
         {
@@ -121,7 +134,9 @@ function buildFileMenu(fileURL, getTrialInfo) {
           label: t('Open Image Gallery'),
           visible: !!fileURL,
           click: (event, focusedWindow) => {
-            focusedWindow.webContents.send('image-picker-file-from-menu')
+            if (typeof focusedWindow?.webContents?.send === 'function') {
+              focusedWindow.webContents.send('image-picker-file-from-menu')
+            }
           },
         },
         {
@@ -135,20 +150,26 @@ function buildFileMenu(fileURL, getTrialInfo) {
               label: t('MS Word'),
               click: (event, focusedWindow) => {
                 const options = { type: 'word' }
-                focusedWindow.webContents.send('export-file-from-menu', options)
+                if (typeof focusedWindow?.webContents?.send === 'function') {
+                  focusedWindow.webContents.send('export-file-from-menu', options)
+                }
               },
             },
             {
               label: t('Scrivener'),
               click: (event, focusedWindow) => {
                 const options = { type: 'scrivener' }
-                focusedWindow.webContents.send('export-file-from-menu', options)
+                if (typeof focusedWindow?.webContents?.send === 'function') {
+                  focusedWindow.webContents.send('export-file-from-menu', options)
+                }
               },
             },
             {
               label: t('Advanced...'),
               click: (event, focusedWindow) => {
-                focusedWindow.webContents.send('advanced-export-file-from-menu')
+                if (typeof focusedWindow?.webContents?.send === 'function') {
+                  focusedWindow.webContents.send('advanced-export-file-from-menu')
+                }
               },
             },
           ],
@@ -157,16 +178,18 @@ function buildFileMenu(fileURL, getTrialInfo) {
           label: t('Reload from File'),
           visible: NODE_ENV === 'development' && !!fileURL,
           click: (event, focusedWindow) => {
-            const winObj = getWindowById(focusedWindow.id)
-            if (winObj) {
-              featureFlags().then((flags) => {
-                focusedWindow.webContents.send(
-                  'reload-from-file',
-                  winObj.fileURL,
-                  flags,
-                  numberOfWindows()
-                )
-              })
+            if (typeof focusedWindow?.webContents?.send === 'function') {
+              const winObj = getWindowById(focusedWindow.id)
+              if (winObj) {
+                featureFlags().then((flags) => {
+                  focusedWindow.webContents.send(
+                    'reload-from-file',
+                    winObj.fileURL,
+                    flags,
+                    numberOfWindows()
+                  )
+                })
+              }
             }
           },
         },
