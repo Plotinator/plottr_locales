@@ -113,6 +113,7 @@ import DashboardBody from './dashboard/navigation/DashboardBody'
 import DashboardNav from './dashboard/navigation/DashboardNav'
 import ChoiceView from './dashboard/account/ChoiceView'
 import ExpiredView from './dashboard/account/ExpiredView'
+import ProLicenseExpired from './dashboard/account/ProLicenseExpired'
 import ProOnboarding from './dashboard/account/proOnboarding/index'
 import SettingsWizard from './dashboard/account/settingsWizard/index'
 import UpdateNotifier from './dashboard/UpdateNotifier'
@@ -216,6 +217,7 @@ export {
   ExpiredView,
   ProOnboarding,
   UpdateNotifier,
+  ProLicenseExpired,
   NewProjectInputModal,
   SettingsWizard,
   RestructureTimelineModal,

@@ -35,7 +35,7 @@ const BackupFileDisplayConnector = (connector) => {
     showErrorBox,
   })
 
-  const BackupFileDisplay = ({ folder, groupName, file, folderDate, hasCurrentProLicense }) => {
+  const BackupFileDisplay = ({ folder, groupName, file, folderDate, isInProMode }) => {
     const [deleting, setDeleting] = useState(false)
     const [busyDeleting, setBusyDeleting] = useState(false)
 
@@ -48,7 +48,7 @@ const BackupFileDisplayConnector = (connector) => {
       if (isCloudBackup) {
         showItemInFolder(file.storagePath, newName)
       } else {
-        if (hasCurrentProLicense) {
+        if (isInProMode) {
           uploadToProAsDuplicate(file.localFilePathSegments, newName)
         } else {
           createAndOpenCopy(file.localFilePathSegments, newName)
@@ -132,7 +132,7 @@ const BackupFileDisplayConnector = (connector) => {
     return (
       <div className="dashboard__backups__item">
         <div>{renderFileDetails(file)}</div>
-        {!isCloudBackup || (hasCurrentProLicense && isCloudBackup) ? (
+        {!isCloudBackup || (isInProMode && isCloudBackup) ? (
           <>
             <div className="dashboard__backups__item-actions">
               <div className="dashboard__backups__item-button">
@@ -163,7 +163,7 @@ const BackupFileDisplayConnector = (connector) => {
     file: PropTypes.object.isRequired,
     folderDate: PropTypes.string,
     showActions: PropTypes.bool,
-    hasCurrentProLicense: PropTypes.bool,
+    isInProMode: PropTypes.bool,
   }
 
   const {
@@ -175,7 +175,7 @@ const BackupFileDisplayConnector = (connector) => {
     const { connect } = redux
 
     return connect((state) => ({
-      hasCurrentProLicense: selectors.hasProSelector(state),
+      isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
     }))(BackupFileDisplay)
   }
 

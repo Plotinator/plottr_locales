@@ -25,9 +25,6 @@ const ExpiredViewConnector = (connector) => {
     }
 
     const renderChoices = () => {
-      // eslint-disable-next-line react/display-name, react/prop-types
-      const licenseText = t.rich('I have a<br/>License Key', { br: () => <br key="unique" /> })
-
       return (
         <>
           <p style={{ padding: '5px 70px' }}>
@@ -36,9 +33,6 @@ const ExpiredViewConnector = (connector) => {
           <div className="expired__chooser" style={{ marginBottom: '20px' }}>
             <div className="expired__choice" onClick={buy}>
               <h2>{t('I want to buy the full version!')}</h2>
-            </div>
-            <div className="expired__choice" onClick={() => setView('verify')}>
-              <h2>{licenseText}</h2>
             </div>
           </div>
         </>

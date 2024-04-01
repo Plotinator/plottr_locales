@@ -230,7 +230,6 @@ const UploadingConnector = (connector) => {
     templates: PropTypes.array,
     userId: PropTypes.string,
     emailAddress: PropTypes.string,
-    hasCurrentProLicense: PropTypes.bool,
   }
 
   const {
@@ -240,14 +239,10 @@ const UploadingConnector = (connector) => {
 
   if (redux) {
     const { connect } = redux
-    return connect(
-      (state) => ({
-        userId: selectors.userIdSelector(state),
-        emailAddress: selectors.emailAddressSelector(state),
-        hasCurrentProLicense: selectors.hasProSelector(state),
-      }),
-      {}
-    )(Uploading)
+    return connect((state) => ({
+      userId: selectors.userIdSelector(state),
+      emailAddress: selectors.emailAddressSelector(state),
+    }))(Uploading)
   }
 
   throw new Error('Could not connect Uploading')

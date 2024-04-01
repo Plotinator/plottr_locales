@@ -80,7 +80,7 @@ const DashboardErrorBoundaryConnector = (connector) => {
     }
 
     createReport = () => {
-      createErrorReport(this.error, this.errorInfo, this.props.proInfo, this.props.trialInfo)
+      createErrorReport(this.error, this.errorInfo, {}, this.props.trialInfo)
     }
 
     goToSupport = () => {
@@ -142,7 +142,6 @@ const DashboardErrorBoundaryConnector = (connector) => {
   DashboardErrorBoundary.propTypes = {
     children: PropTypes.node,
     darkMode: PropTypes.bool,
-    proInfo: PropTypes.object,
     trialInfo: PropTypes.object,
     user: PropTypes.object.isRequired,
     userId: PropTypes.string,
@@ -159,7 +158,6 @@ const DashboardErrorBoundaryConnector = (connector) => {
     const { connect } = redux
 
     return connect((state) => ({
-      proInfo: selectors.proInfoSelector(state),
       trialInfo: selectors.trialInfoSelector(state),
       darkMode: selectors.isDarkModeSelector(state),
       user: selectors.userSettingsSelector(state),

@@ -74,7 +74,7 @@ const SettingsWizardStep1Connector = (connector) => {
     }, [saveAppSetting])
 
     const { user } = defaultSettings.defaultsForPlatform(os())
-    const rceFontIsDefault = settings.user?.fonts?.rce.defaultFont === user.fonts?.rce?.defaultFont
+    const rceFontIsDefault = settings.user?.fonts?.rce?.defaultFont === user.fonts?.rce?.defaultFont
     const rceFontSizeIsDefault =
       settings.user?.fonts?.rce?.defaultFontSize === user.fonts?.rce?.defaultFontSize
     const rceIsDefault = rceFontIsDefault && rceFontSizeIsDefault

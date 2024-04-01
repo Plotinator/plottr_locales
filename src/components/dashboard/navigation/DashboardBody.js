@@ -16,14 +16,12 @@ import UnconnectedErrorBoundary from '../../containers/ErrorBoundary'
 const DashboardBodyConnector = (connector) => {
   const {
     platform: {
-      license: { checkForActiveLicense },
       settings: { saveAppSetting },
       reloadMenu,
       os,
     },
   } = connector
   checkDependencies({
-    checkForActiveLicense,
     saveAppSetting,
     reloadMenu,
   })
@@ -59,13 +57,12 @@ const DashboardBodyConnector = (connector) => {
 
   const DashboardBody = ({
     isModal,
-    hasCurrentProLicense,
+    isInProMode,
     currentView,
     children,
     started,
     expired,
     hasLicense,
-    licenseInfo,
     trialMode,
     canGetUpdates,
     darkMode,
@@ -80,7 +77,7 @@ const DashboardBodyConnector = (connector) => {
       // completed.
       reloadMenu()
 
-      if (hasCurrentProLicense || os() == 'unknown') {
+      if (isInProMode || os() == 'unknown') {
         setShowAccount(false)
         return
       }
@@ -109,21 +106,7 @@ const DashboardBodyConnector = (connector) => {
       } else {
         setShowAccount(false)
       }
-    }, [licenseInfo, hasLicense, started, expired, hasCurrentProLicense])
-
-    useEffect(() => {
-      if (os() == 'unknown') return
-      if (hasCurrentProLicense) return
-      if (process.env.NODE_ENV == 'development') return
-
-      checkForActiveLicense(licenseInfo, (err, success) => {
-        if (!err) {
-          // conscious choice not to display anything different if the license isn't active
-          // that may change in the future
-          // setShowAccount(!success)
-        }
-      })
-    }, [])
+    }, [hasLicense, started, expired, isInProMode])
 
     // only allow these tabs in certain cases (see comment above)
     if (showAccount) {
@@ -174,11 +157,10 @@ const DashboardBodyConnector = (connector) => {
     currentView: PropTypes.string,
     children: PropTypes.node,
     isModal: PropTypes.bool,
-    hasCurrentProLicense: PropTypes.bool,
+    isInProMode: PropTypes.bool,
     started: PropTypes.bool,
     expired: PropTypes.bool,
     hasLicense: PropTypes.bool,
-    licenseInfo: PropTypes.object,
     trialMode: PropTypes.bool,
     canGetUpdates: PropTypes.bool,
     darkMode: PropTypes.bool,
@@ -193,11 +175,10 @@ const DashboardBodyConnector = (connector) => {
     const { connect } = redux
     return connect(
       (state) => ({
-        hasCurrentProLicense: selectors.hasProSelector(state),
+        isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
         started: selectors.trialStartedSelector(state),
         expired: selectors.trialExpiredSelector(state),
-        hasLicense: selectors.hasLicenseSelector(state),
-        licenseInfo: selectors.licenseInfoSelector(state),
+        hasLicense: selectors.hasAnActiveLicenseSelector(state),
         trialMode: selectors.trialModeSelector(state),
         canGetUpdates: selectors.canGetUpdatesSelector(state),
         darkMode: selectors.isDarkModeSelector(state),

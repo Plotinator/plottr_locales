@@ -3,8 +3,6 @@ import PropTypes from 'react-proptypes'
 
 import { t } from 'plottr_locales'
 
-import Button from '../../Button'
-import DeleteConfirmModal from '../../dialogs/DeleteConfirmModal'
 import { checkDependencies } from '../../checkDependencies'
 
 const LicenseInfoConnector = (connector) => {
@@ -13,15 +11,7 @@ const LicenseInfoConnector = (connector) => {
   } = connector
   checkDependencies({ machineId, os })
 
-  const LicenseInfo = ({
-    expires,
-    itemName,
-    customerEmail,
-    licenseKey,
-    deleteLicense,
-    settings,
-  }) => {
-    const [deleting, setDeleting] = useState(false)
+  const LicenseInfo = ({ customerEmail, settings }) => {
     const [deviceId, setDeviceId] = useState(null)
 
     useEffect(() => {
@@ -32,26 +22,7 @@ const LicenseInfoConnector = (connector) => {
       }
     }, [deviceId, setDeviceId])
 
-    const expiresDate =
-      expires == 'lifetime' ? t('Never') : t('{date, date, long}', { date: new Date(expires) })
     const usableDeviceID = os == 'unknown' ? t('Browser') : deviceId
-
-    let deleteModal = false
-    if (deleting) {
-      deleteModal = (
-        <DeleteConfirmModal
-          notSubmit
-          customText={t('Are you sure you want to deactivate your license key?')}
-          onDelete={() => {
-            deleteLicense().then(() => {
-              setDeleting(false)
-            })
-          }}
-          confirmText={t('Deactivate')}
-          onCancel={() => setDeleting(false)}
-        />
-      )
-    }
 
     const blurClass = settings.user.streamFriendly ? 'blurred' : ''
 
@@ -59,30 +30,14 @@ const LicenseInfoConnector = (connector) => {
       <div className="dashboard__user-info">
         <div className="dashboard__user-info license-info__label">
           <h2>{t('License Information')}</h2>
-          {os == 'unknown' ? null : (
-            <div className="text-right">
-              <Button bsStyle="danger" bsSize="small" onClick={() => setDeleting(true)}>
-                {t('Deactivate License Key')}
-              </Button>
-              {deleteModal}
-            </div>
-          )}
         </div>
         <hr />
         <div className="dashboard__user-info__wrapper">
           <dl className="dl-horizontal">
             <dt>{t('Purchase Email')}</dt>
             <dd className={blurClass}>{customerEmail}</dd>
-            <dt>{t('Product Name')}</dt>
-            <dd>{itemName}</dd>
             <dt>{t('Device ID')}</dt>
             <dd className={blurClass}>{usableDeviceID}</dd>
-          </dl>
-          <dl className="dl-horizontal">
-            <dt>{t('License Key')}</dt>
-            <dd className={blurClass}>{licenseKey}</dd>
-            <dt>{t('Expires')}</dt>
-            <dd>{expiresDate}</dd>
           </dl>
         </div>
       </div>
@@ -90,12 +45,8 @@ const LicenseInfoConnector = (connector) => {
   }
 
   LicenseInfo.propTypes = {
-    expires: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    itemName: PropTypes.string,
     customerEmail: PropTypes.string,
-    licenseKey: PropTypes.string,
     settings: PropTypes.object,
-    deleteLicense: PropTypes.func,
   }
 
   const {
@@ -106,10 +57,7 @@ const LicenseInfoConnector = (connector) => {
   if (redux) {
     const { connect } = redux
     return connect((state) => ({
-      expires: selectors.licenseExpiresSelector(state),
-      itemName: selectors.licenseItemNameSelector(state),
-      customerEmail: selectors.licenseCustomerEmailSelector(state),
-      licenseKey: selectors.licenseKeySelector(state),
+      customerEmail: selectors.emailAddressSelector(state),
       settings: selectors.appSettingsSelector(state),
     }))(LicenseInfo)
   }

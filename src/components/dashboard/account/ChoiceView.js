@@ -26,8 +26,6 @@ const ChoiceViewConnector = (connector) => {
 
     // eslint-disable-next-line react/display-name, react/prop-types
     const trialText = t.rich('Start the<br/>Free Trial', { br: () => <br key={'br'} /> })
-    // eslint-disable-next-line react/display-name, react/prop-types
-    const licenseText = t.rich('I have a<br/>License Key', { br: () => <br key={'br'} /> })
 
     const renderBody = () => {
       switch (view) {
@@ -37,9 +35,6 @@ const ChoiceViewConnector = (connector) => {
               <div className="verify__choice" onClick={() => setView('explain')}>
                 <h2>{trialText}</h2>
               </div>
-              <div className="verify__choice" onClick={() => setView('verify')}>
-                <h2>{licenseText}</h2>
-              </div>
               <div
                 className="verify__choice"
                 onClick={() => {
@@ -47,7 +42,7 @@ const ChoiceViewConnector = (connector) => {
                   setView('pro')
                 }}
               >
-                <h2>{t('I have Plottr Pro')}</h2>
+                <h2>{t(`I've bought Plottr`)}</h2>
               </div>
             </div>
           )

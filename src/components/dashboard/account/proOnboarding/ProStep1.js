@@ -26,23 +26,30 @@ const ProStep1Connector = (connector) => {
   const ProStep1 = ({
     nextStep,
     cancel,
-    hasCurrentProLicense,
+    isInProMode,
     checkedProSubscription,
     checkingProSubscription,
     startLoadingALicenseType,
     finishLoadingALicenseType,
     finishCheckingSession,
+    checkedLicense,
+    hasActivePlottrLicense,
+    startSettingsWizard,
   }) => {
-    const noPro = checkedProSubscription && !hasCurrentProLicense
-    const showFrb = !hasCurrentProLicense
+    const noPro = checkedProSubscription && !isInProMode
+    const noClassic = checkedLicense && !hasActivePlottrLicense
+    const showFrb = !isInProMode
 
     useEffect(() => {
-      if (!checkedProSubscription) return
-
-      if (hasCurrentProLicense) {
+      if (!checkedProSubscription) {
+        return
+      } else if (isInProMode) {
         nextStep()
+      } else if (hasActivePlottrLicense) {
+        cancel()
+        startSettingsWizard()
       }
-    }, [checkedProSubscription, hasCurrentProLicense])
+    }, [checkedProSubscription, isInProMode, hasActivePlottrLicense])
 
     const toggleChecking = (newVal) => {
       if (newVal) {
@@ -68,10 +75,10 @@ const ProStep1Connector = (connector) => {
           <h2>{t('Sign in with your my.plottr.com account')}</h2>
           {checkingProSubscription ? <Spinner /> : null}
         </StepHeader>
-        {noPro ? (
+        {noPro && noClassic ? (
           <StepBody>
             <Alert bsStyle="danger">
-              <h4>{t("We couldn't find a Pro account with that email")}</h4>
+              <h4>{t("We couldn't find an active license for that email address")}</h4>
             </Alert>
             <Button onClick={cancelAndLogout} bsSize="sm">
               {t('Cancel')}
@@ -93,12 +100,15 @@ const ProStep1Connector = (connector) => {
   ProStep1.propTypes = {
     nextStep: PropTypes.func,
     cancel: PropTypes.func,
-    hasCurrentProLicense: PropTypes.bool,
+    isInProMode: PropTypes.bool,
     checkingProSubscription: PropTypes.bool,
     checkedProSubscription: PropTypes.bool,
     startLoadingALicenseType: PropTypes.func.isRequired,
     finishLoadingALicenseType: PropTypes.func.isRequired,
     finishCheckingSession: PropTypes.func.isRequired,
+    hasActivePlottrLicense: PropTypes.bool,
+    checkedLicense: PropTypes.bool,
+    startSettingsWizard: PropTypes.func.isRequired,
   }
 
   const {
@@ -110,14 +120,17 @@ const ProStep1Connector = (connector) => {
     const { connect } = redux
     return connect(
       (state) => ({
-        hasCurrentProLicense: selectors.hasProSelector(state),
+        isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
         checkingProSubscription: selectors.checkingProSubscriptionSelector(state),
         checkedProSubscription: selectors.checkedProSubscriptionSelector(state),
+        hasActivePlottrLicense: selectors.hasActivePlottrLicenseSelector(state),
+        checkedLicense: selectors.checkedLicenseSelector(state),
       }),
       {
         startLoadingALicenseType: actions.applicationState.startLoadingALicenseType,
         finishLoadingALicenseType: actions.applicationState.finishLoadingALicenseType,
         finishCheckingSession: actions.applicationState.finishCheckingSession,
+        startSettingsWizard: actions.applicationState.startSettingsWizard,
       }
     )(ProStep1)
   }

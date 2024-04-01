@@ -93,6 +93,7 @@ import {
   NewProjectInputModal as UnconnectedNewProjectInputModal,
   SettingsWizard as UnconnectedSettingsWizard,
   RestructureTimelineModal as UnconnectedRestructureTimelineModal,
+  ProLicenseExpired as UnconnectedProLicenseExpired,
 } from '../components'
 
 const connector = {
@@ -159,10 +160,6 @@ const pltrTypeSpecs = {
   }),
   updateLanguage: PropTypes.func.isRequired,
   license: PropTypes.shape({
-    checkForActiveLicense: PropTypes.func.isRequired,
-    verifyLicense: PropTypes.func.isRequired,
-    trial90days: PropTypes.array.isRequired,
-    checkForPro: PropTypes.func.isRequired,
     startTrial: PropTypes.func.isRequired,
     deleteLicense: PropTypes.func.isRequired,
     saveLicenseInfo: PropTypes.func.isRequired,
@@ -348,5 +345,6 @@ export default (platform, pltr) => {
     NewProjectInputModal: UnconnectedNewProjectInputModal(connectorObject),
     SettingsWizard: UnconnectedSettingsWizard(connectorObject),
     RestructureTimelineModal: UnconnectedRestructureTimelineModal(connectorObject),
+    ProLicenseExpired: UnconnectedProLicenseExpired(connectorObject),
   }
 }

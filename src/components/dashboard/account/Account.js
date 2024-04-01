@@ -28,38 +28,14 @@ const AccountConnector = (connector) => {
   const LicenseInfo = UnconnectedLicenseInfo(connector)
   const ProInfo = UnconnectedProInfo(connector)
 
-  // TODO: Move ALL of this logic into pltr/v2/selectors/license.js
-  //
-  // many possible states:
-  // choices (handled by AccountHome)
-  //  - no trialInfo
-  //  - no license
-  //  - no pro
-  // trial
-  //  - trialInfo
-  //  - not expired
-  //  - no license
-  //  - no pro
-  // trial expired
-  //  - trialInfo
-  //  - expired
-  //  - no license
-  //  - no pro
-  // license
-  //  - license
-  // Pro
-  //  - pro
-  // license & Pro
-  //  - license
-  //  - pro
   const Account = ({
     startProOnboarding,
-    hasCurrentProLicense,
+    isInProMode,
     hasLicense,
     isInTrialMode,
     isInTrialModeWithExpiredTrial,
   }) => {
-    const hideProButton = os() == 'unknown' || hasCurrentProLicense
+    const hideProButton = os() == 'unknown' || isInProMode
 
     const _deleteLicense = () => {
       // mpq.push('btn_remove_license_confirm')
@@ -71,7 +47,7 @@ const AccountConnector = (connector) => {
       if (isInTrialModeWithExpiredTrial) return <ExpiredView />
 
       const body = []
-      if (hasCurrentProLicense) body.push(<ProInfo key="pro" />)
+      if (isInProMode) body.push(<ProInfo key="pro" />)
 
       if (hasLicense) {
         body.push(<LicenseInfo key="license" deleteLicense={_deleteLicense} />)
@@ -98,7 +74,7 @@ const AccountConnector = (connector) => {
 
   Account.propTypes = {
     startProOnboarding: PropTypes.func,
-    hasCurrentProLicense: PropTypes.bool,
+    isInProMode: PropTypes.bool,
     hasLicense: PropTypes.bool,
     isInTrialMode: PropTypes.bool,
     isInTrialModeWithExpiredTrial: PropTypes.bool,
@@ -111,15 +87,12 @@ const AccountConnector = (connector) => {
 
   if (redux) {
     const { connect } = redux
-    return connect(
-      (state) => ({
-        hasCurrentProLicense: selectors.hasProSelector(state),
-        hasLicense: selectors.hasLicenseSelector(state),
-        isInTrialMode: selectors.isInTrialModeSelector(state),
-        isInTrialModeWithExpiredTrial: selectors.isInTrialModeWithExpiredTrialSelector(state),
-      }),
-      {}
-    )(Account)
+    return connect((state) => ({
+      isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
+      hasLicense: selectors.hasAnActiveLicenseSelector(state),
+      isInTrialMode: selectors.isInTrialModeSelector(state),
+      isInTrialModeWithExpiredTrial: selectors.isInTrialModeWithExpiredTrialSelector(state),
+    }))(Account)
   }
 
   throw new Error('Could not connect Account')

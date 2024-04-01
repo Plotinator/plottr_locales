@@ -105,12 +105,7 @@ const RCEBoundaryConnector = (connector) => {
     }
 
     createReport = () => {
-      this.props.createErrorReport(
-        this.error,
-        this.errorInfo,
-        this.props.proInfo,
-        this.props.trialInfo
-      )
+      this.props.createErrorReport(this.error, this.errorInfo, {}, this.props.trialInfo)
     }
 
     goToSupport = () => {
@@ -164,7 +159,6 @@ const RCEBoundaryConnector = (connector) => {
   }
 
   RCEBoundary.propTypes = {
-    proInfo: PropTypes.object,
     trialInfo: PropTypes.object,
     user: PropTypes.object.isRequired,
     userId: PropTypes.string,
@@ -181,7 +175,6 @@ const RCEBoundaryConnector = (connector) => {
     const { connect } = redux
 
     return connect((state) => ({
-      proInfo: selectors.proInfoSelector(state),
       trialInfo: selectors.trialInfoSelector(state),
       user: selectors.userSettingsSelector(state),
       userId: selectors.userIdSelector(state),
