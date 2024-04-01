@@ -38,7 +38,7 @@ const { machineId, pleaseTellMeWhatPlatformIAmOn, machineName, localUserName } =
  * We're expected to record the license payload so that we can decrypt
  * the local license and check it's running on the right machine.
  */
-export function checkForLicense(whenClientIsReady) {
+export function checkForLicense(whenClientIsReady, persistUserId) {
   return Promise.all([
     machineId(),
     pleaseTellMeWhatPlatformIAmOn(),
@@ -57,19 +57,21 @@ export function checkForLicense(whenClientIsReady) {
         const { hasPro, proExpiresAt, proLicensePayload, hasPlottr, plottrLicensePayload } =
           response.data
         const dateChecked = new Date().toISOString()
-        return whenClientIsReady(({ savePlottrLicense, saveProLicense }) => {
+        return whenClientIsReady(({ savePlottrLicense, saveProLicense, saveAppSetting }) => {
           return (
             hasPlottr
               ? savePlottrLicense(plottrLicensePayload?.secret ?? '', machineInfo, dateChecked)
               : Promise.resolve()
           ).then(() => {
             if (hasPro) {
-              return saveProLicense(
-                proLicensePayload?.secret ?? '',
-                machineInfo,
-                proExpiresAt,
-                dateChecked
-              )
+              return persistUserId().then(() => {
+                return saveProLicense(
+                  proLicensePayload?.secret ?? '',
+                  machineInfo,
+                  proExpiresAt,
+                  dateChecked
+                )
+              })
             } else {
               return Promise.resolve()
             }
@@ -92,6 +94,6 @@ export function checkForLicense(whenClientIsReady) {
 
 export const makeLicenseServerAPIs = (whenClientIsReady) => {
   return {
-    checkForAndSaveLicense: () => checkForLicense(whenClientIsReady),
+    checkForAndSaveLicense: (persistUserId) => checkForLicense(whenClientIsReady, persistUserId),
   }
 }

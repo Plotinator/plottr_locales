@@ -426,6 +426,8 @@ const Main = ({
         setOpenDashboardTo={setOpenDashboardTo}
       />
     )
+  } else if (licenseExpired) {
+    return <ProLicenseExpired />
   } else if (firstTimeBooting) {
     return (
       <div id="temporary-inner">
@@ -449,8 +451,6 @@ const Main = ({
     return <Choice />
   } else if (isInTrialModeWithExpiredTrial) {
     return <Expired />
-  } else if (licenseExpired) {
-    return <ProLicenseExpired />
   } else if (isInSettingsWizard) {
     return <SettingsWizard />
   } else if (!isInSomeValidLicenseState) {
