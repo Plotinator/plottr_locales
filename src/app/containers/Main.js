@@ -414,17 +414,11 @@ const Main = ({
 
   if (isOnboardingFromRoot || (cantShowFile && isOnboarding)) {
     return <ProOnboarding />
-  }
-
-  if (needsToLogin || needsToConnectToInternet) {
+  } else if (needsToLogin || needsToConnectToInternet) {
     return <Login darkMode={darkMode} />
-  }
-
-  if (fileToUpload) {
+  } else if (fileToUpload) {
     return <UploadLastOpenedFileToPro saveBackup={saveBackup} />
-  }
-
-  if (errorLoadingFile) {
+  } else if (errorLoadingFile) {
     return (
       <ErrorLoadingFile
         setCurrentAppStateToDashboard={setCurrentAppStateToDashboard}
@@ -432,9 +426,7 @@ const Main = ({
         setOpenDashboardTo={setOpenDashboardTo}
       />
     )
-  }
-
-  if (firstTimeBooting) {
+  } else if (firstTimeBooting) {
     return (
       <div id="temporary-inner">
         <div className="loading-splash">
@@ -453,25 +445,19 @@ const Main = ({
         </div>
       </div>
     )
-  }
-
-  if (isFirstTime) {
+  } else if (isFirstTime) {
     return <Choice />
-  }
-
-  if (isInTrialModeWithExpiredTrial) {
+  } else if (isInTrialModeWithExpiredTrial) {
     return <Expired />
-  }
-
-  if (licenseExpired) {
+  } else if (licenseExpired) {
     return <ProLicenseExpired />
-  }
-
-  if (isInSettingsWizard) {
+  } else if (isInSettingsWizard) {
     return <SettingsWizard />
-  }
-
-  if (cantShowFile || ((currentAppStateIsDashboard || showDashboard) && !dashboardClosed)) {
+  } else if (!isInSomeValidLicenseState) {
+    // The other way we can get to the Choice view is the license
+    // dissapeared.
+    return <Choice />
+  } else if (cantShowFile || ((currentAppStateIsDashboard || showDashboard) && !dashboardClosed)) {
     return (
       <Dashboard
         closeDashboard={closeDashboard}
@@ -479,15 +465,15 @@ const Main = ({
         openTo={openDashboardTo}
       />
     )
+  } else {
+    return (
+      <MainIntegrationContext.Consumer>
+        {({ showErrorBox }) => {
+          return <App forceProjectDashboard={showDashboard} showErrorBox={showErrorBox} />
+        }}
+      </MainIntegrationContext.Consumer>
+    )
   }
-
-  return (
-    <MainIntegrationContext.Consumer>
-      {({ showErrorBox }) => {
-        return <App forceProjectDashboard={showDashboard} showErrorBox={showErrorBox} />
-      }}
-    </MainIntegrationContext.Consumer>
-  )
 }
 
 Main.propTypes = {
