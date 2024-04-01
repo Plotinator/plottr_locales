@@ -1,3 +1,5 @@
+import { cloneDeep } from 'lodash'
+
 const makeFileSystemAPIs = (socketClient) => {
   function customTemplatesPath() {
     return socketClient(({ customTemplatesPath }) => {
@@ -53,14 +55,21 @@ const makeFileSystemAPIs = (socketClient) => {
       }
       currentLicense().then((initialLicense) => {
         license = initialLicense
+        license = cloneDeep(initialLicense)
         cb(license)
       })
       const plottrListener = listenToPlottrLicenseChanges((newPlottrLicense) => {
-        license.plottrLicense = newPlottrLicense
+        license = {
+          ...license,
+          plottrLicense: newPlottrLicense,
+        }
         cb(license)
       })
       const proListener = listenToProLicenseChanges((newProLicense) => {
-        license.proLicense = newProLicense
+        license = {
+          ...license,
+          proLicense: newProLicense,
+        }
         cb(license)
       })
       return () => {
