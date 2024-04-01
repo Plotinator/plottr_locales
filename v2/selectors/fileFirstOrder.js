@@ -30,3 +30,6 @@ export const fileIdSelector = createSelector(fullFileStateSelector, (state) => {
 export const fileVersionSelector = createSelector(fileSelector, ({ version }) => {
   return version
 })
+export const shareRecordsSelector = createSelector(fileSelector, ({ shareRecords }) => {
+  return shareRecords ?? []
+})

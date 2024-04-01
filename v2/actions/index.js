@@ -1,3 +1,5 @@
+import { isObject } from 'lodash'
+
 import * as beatActions from './beats'
 import * as bookActions from './books'
 import * as cardActions from './cards'
@@ -32,24 +34,63 @@ import * as testingAndDiagnosisActions from './testingAndDiagnosis'
 import * as attributeActions from './attributes'
 
 const actions = (selectState) => {
+  function thunkActionObjectUntilAction(action) {
+    // If the action says it was curried, we need to keep thunking
+    // until we get to the redux thunk args.
+    if (action.curried > 0) {
+      return (...args) => {
+        return thunkActionObjectUntilAction({
+          curried: action.curried - 1,
+          action: action.action(...args),
+        })
+      }
+    } else {
+      // When we hit zero, this has to be a thunk action.
+      return (dispatch, getState) => {
+        const augmentedGetState = () => {
+          return selectState(getState())
+        }
+        return action.action(dispatch, augmentedGetState)
+      }
+    }
+  }
+
+  function thunkUntilAction(action) {
+    // If it's an object, it uses the new convention of specifying
+    // curried depth.
+    if (isObject(action) && typeof action !== 'function') {
+      return thunkActionObjectUntilAction(action)
+    } else {
+      // Otherwise, we accomodate at most a depth of one in the
+      // curried chain.
+      const actionFunction = action
+      return (...actionArgs) => {
+        const applied = actionFunction(...actionArgs)
+        if (typeof applied === 'function') {
+          return (dispatch, getState) => {
+            const augmentedGetState = () => {
+              return selectState(getState())
+            }
+            return applied(dispatch, augmentedGetState)
+          }
+        } else {
+          return applied
+        }
+      }
+    }
+  }
+
   const wiredActions = (actions) => {
     return Object.entries(actions).reduce((actionGroupAcc, nextEntry) => {
-      const [actionName, actionFunction] = nextEntry
-      return {
-        ...actionGroupAcc,
-        [actionName]: (...actionArgs) => {
-          const applied = actionFunction(...actionArgs)
-          if (typeof applied === 'function') {
-            return (dispatch, getState) => {
-              const augmentedGetState = () => {
-                return selectState(getState())
-              }
-              return applied(dispatch, augmentedGetState)
-            }
-          } else {
-            return applied
-          }
-        },
+      const [actionName, action] = nextEntry
+      // Ignore the default export
+      if (actionName === 'default') {
+        return actionGroupAcc
+      } else {
+        return {
+          ...actionGroupAcc,
+          [actionName]: thunkUntilAction(action),
+        }
       }
     }, {})
   }

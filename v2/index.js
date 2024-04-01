@@ -31,7 +31,10 @@ import * as editStates from './constants/editStates'
 
 import migrateIfNeeded from './migrator/migration_manager'
 import Migrator from './migrator/migrator.js'
-import addUITimelineOrHierarchiesStateIfMissing from './migrator/handleSpecialCases'
+import applyAllFixes, {
+  addHierarchiesIfMissing,
+  addUITimelineOrHierarchiesStateIfMissing,
+} from './migrator/handleSpecialCases'
 
 import selectors from './selectors'
 
@@ -160,6 +163,8 @@ const middlewares = {
 }
 
 const specialCaseFixes = {
+  applyAllFixes,
+  addHierarchiesIfMissing,
   addUITimelineOrHierarchiesStateIfMissing,
 }
 

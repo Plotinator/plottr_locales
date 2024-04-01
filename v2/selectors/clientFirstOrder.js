@@ -17,7 +17,6 @@ export const hasOnboardedSelector = createSelector(
   clientSelector,
   ({ hasOnboarded }) => hasOnboarded
 )
-export const hasProSelector = createSelector(clientSelector, ({ hasPro }) => hasPro)
 export const isLoggedInSelector = createSelector(clientSelector, (client) => !!client.userId)
 export const isOnWebSelector = createSelector(clientSelector, ({ isOnWeb }) => isOnWeb)
 export const currentAppStateSelector = createSelector(

@@ -2420,6 +2420,7 @@ describe('externalSync', () => {
             initialVersion: '2020.7.30',
             isCloudFile: false,
             loaded: true,
+            shareRecords: [],
             version: '2023.8.21-alpha.3',
           },
           '123323',

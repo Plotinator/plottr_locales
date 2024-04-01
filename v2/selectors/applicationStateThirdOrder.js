@@ -7,7 +7,7 @@ import {
   localBackupsEnabledSelector,
   offlineModeEnabledSelector,
 } from './settingsFirstOrder'
-import { hasProSelector, isLoggedInSelector, isOnWebSelector } from './clientFirstOrder'
+import { isLoggedInSelector, isOnWebSelector } from './clientFirstOrder'
 import {
   applicationSettingsAreLoadedSelector,
   checkedLicenseSelector,
@@ -31,9 +31,16 @@ import {
   hasAllKeysSelector,
   projectSelector,
 } from './projectFirstOrder'
-import { hasLicenseSelector, trialExpiredSelector, trialStartedSelector } from './licenseFirstOrder'
+import {
+  hasActivePlottrLicenseSelector,
+  hasActiveProLicenseSelector,
+  trialExpiredSelector,
+  trialStartedSelector,
+  needsToCheckALicenseType,
+  failedToContactLicenseServerSelector,
+} from './licenseFirstOrder'
 import { fileIsLoadedSelector } from './applicationStateFirstOrder'
-import { shouldBeInProSelector } from './secondOrder'
+import { shouldBeInProSelector, isLoggedIntoProWithActiveLicenseSelector } from './secondOrder'
 
 export const userNeedsToLoginSelector = createSelector(
   applicationSettingsAreLoadedSelector,
@@ -65,8 +72,8 @@ export const needToCheckProSubscriptionSelector = createSelector(
 export const isInTrialModeSelector = createSelector(
   trialStartedSelector,
   trialExpiredSelector,
-  hasLicenseSelector,
-  hasProSelector,
+  hasActivePlottrLicenseSelector,
+  hasActiveProLicenseSelector,
   shouldBeInProSelector,
   (started, trialExpired, hasLicense, hasCurrentProLicense, shouldBeInPro) => {
     return started && !trialExpired && !hasLicense && !hasCurrentProLicense && !shouldBeInPro
@@ -77,22 +84,24 @@ export const isInSomeValidLicenseStateSelector = createSelector(
   applicationSettingsAreLoadedSelector,
   sessionCheckedSelector,
   userNeedsToLoginSelector,
-
   isInOfflineModeSelector,
   needToCheckProSubscriptionSelector,
-  hasProSelector,
-  hasLicenseSelector,
+  hasActiveProLicenseSelector,
+  hasActivePlottrLicenseSelector,
   isInTrialModeSelector,
+  isLoggedInSelector,
+  shouldBeInProSelector,
   (
     applicationSettingsAreLoaded,
     sessionChecked,
     needsToLogin,
-
     isInOfflineMode,
     needToCheckProSubscription,
-    hasPro,
-    hasLicense,
-    isInTrialMode
+    hasProLicense,
+    hasPlottrLicense,
+    isInTrialMode,
+    isLoggedIn,
+    shouldBeInPro
   ) => {
     return (
       applicationSettingsAreLoaded &&
@@ -100,8 +109,19 @@ export const isInSomeValidLicenseStateSelector = createSelector(
         (sessionChecked &&
           !needsToLogin &&
           !needToCheckProSubscription &&
-          (hasPro || hasLicense || isInTrialMode)))
+          ((isLoggedIn && hasProLicense) ||
+            (!shouldBeInPro && (hasPlottrLicense || isInTrialMode)))))
     )
+  }
+)
+
+export const licenseExpiredSelector = createSelector(
+  shouldBeInProSelector,
+  isLoggedInSelector,
+  hasActiveProLicenseSelector,
+  sessionCheckedSelector,
+  (shouldBeInPro, isLoggedIn, hasActiveProLicense, sessionChecked) => {
+    return !hasActiveProLicense && shouldBeInPro && isLoggedIn && sessionChecked
   }
 )
 
@@ -173,9 +193,9 @@ export const applicationIsBusyAndUninterruptableSelector = createSelector(
 )
 
 export const isFirstTimeSelector = createSelector(
-  hasLicenseSelector,
+  hasActivePlottrLicenseSelector,
   trialStartedSelector,
-  hasProSelector,
+  hasActiveProLicenseSelector,
   shouldBeInProSelector,
   (hasLicense, trialStarted, hasCurrentProLicense, shouldBeInPro) => {
     return !hasLicense && !trialStarted && !hasCurrentProLicense && !shouldBeInPro
@@ -183,11 +203,31 @@ export const isFirstTimeSelector = createSelector(
 )
 
 export const isInTrialModeWithExpiredTrialSelector = createSelector(
+  trialStartedSelector,
   trialExpiredSelector,
-  hasLicenseSelector,
-  hasProSelector,
-  (trialExpired, hasLicense, hasCurrentProLicense) => {
-    return trialExpired && !hasLicense && !hasCurrentProLicense
+  hasActivePlottrLicenseSelector,
+  hasActiveProLicenseSelector,
+  checkedProSubscriptionSelector,
+  checkedLicenseSelector,
+  checkingSessionOrNeedToCheckSessionSelector,
+  (
+    started,
+    trialExpired,
+    hasLicense,
+    hasCurrentProLicense,
+    checkingSessionOrNeedToCheckSession,
+    checkedPro,
+    checkedLicense
+  ) => {
+    return (
+      checkedPro &&
+      checkedLicense &&
+      !checkingSessionOrNeedToCheckSession &&
+      started &&
+      trialExpired &&
+      !hasLicense &&
+      !hasCurrentProLicense
+    )
   }
 )
 
@@ -342,7 +382,7 @@ export const isCloudFileSelector = createSelector(
 
 export const cantShowFileSelector = createSelector(
   fileIsLoadedSelector,
-  hasProSelector,
+  isLoggedIntoProWithActiveLicenseSelector,
   isCloudFileSelector,
   isResumingSelector,
   isOfflineSelector,
@@ -350,6 +390,7 @@ export const cantShowFileSelector = createSelector(
   shouldBeInProSelector,
   (
     fileLoaded,
+    isInProMode,
     hasActiveProSubscription,
     selectedFileIsACloudFile,
     isResuming,
@@ -361,7 +402,7 @@ export const cantShowFileSelector = createSelector(
       !isResuming &&
       (!fileLoaded ||
         (!isInOfflineMode && isOffline && shouldBeInPro) ||
-        (!isInOfflineMode && !!hasActiveProSubscription !== !!selectedFileIsACloudFile))
+        (!isInOfflineMode && !!isInProMode !== !!selectedFileIsACloudFile))
     )
   }
 )
@@ -419,5 +460,13 @@ export const canBackupSelector = createSelector(
       ((isCloudFile && localBackupsEnabled) || !isCloudFile) &&
       hasAllKeys
     )
+  }
+)
+
+export const needsToConnectToInternetSelector = createSelector(
+  needsToCheckALicenseType,
+  failedToContactLicenseServerSelector,
+  (needsToCheck, failedToContactLicenseServer) => {
+    return needsToCheck && failedToContactLicenseServer
   }
 )

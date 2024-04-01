@@ -9,7 +9,7 @@ import { noEntityHasLegacyAttributeBound } from './noEntitiyHasValueBound'
 import { allCardsSelector, singleCardSelector } from './cardsFirstOrder'
 import { allBeatsSelector } from './beatsFirstOrder'
 import { previouslyLoggedIntoProSelector } from './settingsFirstOrder'
-import { isOnWebSelector, userIdSelector } from './clientFirstOrder'
+import { isLoggedInSelector, isOnWebSelector, userIdSelector } from './clientFirstOrder'
 import { permissionSelector } from './permissionFirstOrder'
 import { allBookIdsSelector } from './booksFirstOrder'
 import {
@@ -20,12 +20,13 @@ import {
 import { allNotesSelector } from './notesFirstOrder'
 import { allLinesSelector } from './linesFirstOrder'
 import { fullFileStateSelector } from './fullFileFirstOrder'
+import { hasActiveProLicenseSelector } from './licenseFirstOrder'
 
 export const shouldBeInProSelector = createSelector(
   previouslyLoggedIntoProSelector,
   isOnWebSelector,
   (previouslyLoggedIntoPro, isOnWeb) => {
-    return !!(previouslyLoggedIntoPro || isOnWeb)
+    return previouslyLoggedIntoPro || isOnWeb
   }
 )
 
@@ -545,5 +546,13 @@ export const cardsLineOrDefaultSelector = createSelector(
   allLinesSelector,
   (line, lines) => {
     return line || lines[0]
+  }
+)
+
+export const isLoggedIntoProWithActiveLicenseSelector = createSelector(
+  isLoggedInSelector,
+  hasActiveProLicenseSelector,
+  (isLoggedIn, hasActiveProLicense) => {
+    return isLoggedIn && hasActiveProLicense
   }
 )

@@ -48,6 +48,7 @@ const file =
           appliedMigrations: action.data.file.appliedMigrations || [],
           initialVersion: action.data.file.initialVersion || action.version,
           isCloudFile: action.data.file.isCloudFile || false,
+          shareRecords: action.data.file.shareRecords ?? [],
         }
 
       case FILE_SAVED:

@@ -40,77 +40,101 @@ export const trialStartedOnSelector = createSelector(trialInfoSelector, ({ start
 export const trialEndsOnSelector = createSelector(trialInfoSelector, ({ endsAt }) => endsAt)
 
 export const licenseSelector = createSelector(fullFileStateSelector, ({ license }) => {
-  return license || {}
+  return license ?? {}
 })
-export const licenseInfoSelector = createSelector(licenseSelector, ({ licenseInfo }) => licenseInfo)
-export const licenseExpiresSelector = createSelector(licenseInfoSelector, ({ expires }) => expires)
-export const licenseItemNameSelector = createSelector(
-  licenseInfoSelector,
-  ({ item_name }) => item_name && item_name.replace('&#8211;', '-')
+export const licenseInfoSelector = createSelector(licenseSelector, ({ licenseInfo }) => {
+  return licenseInfo ?? {}
+})
+export const plottrLicenseSelector = createSelector(licenseInfoSelector, ({ plottrLicense }) => {
+  return plottrLicense ?? {}
+})
+export const MAX_DAYS_WITHOUT_CHECKING = 30
+const MILISECONDS_IN_A_DAY = 24 * 60 * 60 * 1000
+const MAX_DAYS_WITHOUT_CHECKING_MILISECONDS = MAX_DAYS_WITHOUT_CHECKING * MILISECONDS_IN_A_DAY
+const dateCheckedExistsAndIsWithinLimit = (inDateChecked) => {
+  if (inDateChecked && typeof inDateChecked === 'string') {
+    const dateChecked = new Date(inDateChecked)
+    if (isNaN(dateChecked)) {
+      return false
+    } else {
+      const dateToday = new Date()
+      const expiryDate = new Date(dateChecked.getTime() + MAX_DAYS_WITHOUT_CHECKING_MILISECONDS)
+      return dateToday < expiryDate
+    }
+  } else {
+    return false
+  }
+}
+export const hasActivePlottrLicenseSelector = createSelector(
+  plottrLicenseSelector,
+  ({ dateChecked }) => {
+    return dateCheckedExistsAndIsWithinLimit(dateChecked)
+  }
 )
-export const licenseCustomerEmailSelector = createSelector(
-  licenseInfoSelector,
-  ({ customer_email }) => customer_email
+export const needsToCheckPlottrLicense = createSelector(
+  plottrLicenseSelector,
+  ({ dateChecked }) => {
+    return !dateCheckedExistsAndIsWithinLimit(dateChecked)
+  }
 )
-export const licenseKeySelector = createSelector(
-  licenseInfoSelector,
-  ({ licenseKey }) => licenseKey
+export const proLicenseSelector = createSelector(licenseInfoSelector, ({ proLicense }) => {
+  return proLicense ?? {}
+})
+export const hasActiveProLicenseSelector = createSelector(
+  proLicenseSelector,
+  ({ dateChecked, expiresAt }) => {
+    if (dateCheckedExistsAndIsWithinLimit(dateChecked)) {
+      if (expiresAt && typeof expiresAt === 'string') {
+        const dateExpiresAt = new Date(expiresAt)
+        if (isNaN(dateExpiresAt)) {
+          return false
+        } else {
+          const dateToday = new Date()
+          return dateToday < dateExpiresAt
+        }
+      } else {
+        return false
+      }
+    } else {
+      return false
+    }
+  }
 )
-export const itemIdSelector = createSelector(licenseInfoSelector, ({ item_id }) => item_id)
-export const activationsLeftSelector = createSelector(
-  licenseInfoSelector,
-  ({ activations_left }) => activations_left
+export const hasAnActiveLicenseSelector = createSelector(
+  hasActivePlottrLicenseSelector,
+  hasActiveProLicenseSelector,
+  (hasActivePlottrLicense, hasActiveProLicense) => {
+    return hasActivePlottrLicense || hasActiveProLicense
+  }
 )
-export const siteCountSelector = createSelector(licenseInfoSelector, ({ site_count }) => site_count)
-export const licenseLicenseSelector = createSelector(licenseInfoSelector, ({ license }) => license)
-export const hasLicenseSelector = createSelector(
-  licenseExpiresSelector,
-  licenseItemNameSelector,
-  licenseCustomerEmailSelector,
-  licenseKeySelector,
-  itemIdSelector,
-  activationsLeftSelector,
-  siteCountSelector,
-  licenseLicenseSelector,
-  (
-    expires,
-    itemName,
-    customerEmail,
-    licenseKey,
-    itemId,
-    activationsLeft,
-    siteCount,
-    licenseLicense
-  ) => {
-    return (
-      expires !== null &&
-      expires !== undefined &&
-      itemName !== null &&
-      itemName !== undefined &&
-      customerEmail !== null &&
-      customerEmail !== undefined &&
-      licenseKey !== null &&
-      licenseKey !== undefined &&
-      itemId !== null &&
-      itemId !== undefined &&
-      activationsLeft !== null &&
-      activationsLeft !== undefined &&
-      siteCount !== null &&
-      siteCount !== undefined &&
-      licenseLicense !== null &&
-      licenseLicense !== undefined
-    )
+export const proLicenseExpirySelector = createSelector(proLicenseSelector, ({ expiresAt }) => {
+  if (expiresAt && typeof expiresAt === 'string') {
+    return new Date(expiresAt)
+  } else {
+    return null
+  }
+})
+export const needsToCheckProLicense = createSelector(proLicenseSelector, ({ dateChecked }) => {
+  return !dateCheckedExistsAndIsWithinLimit(dateChecked)
+})
+export const needsToCheckALicenseType = createSelector(
+  needsToCheckPlottrLicense,
+  needsToCheckProLicense,
+  (needsToCheckPlottr, needsToCheckPro) => {
+    return needsToCheckPlottr || needsToCheckPro
   }
 )
 
-export const proInfoSelector = createSelector(
+export const licenseCheckIntervalSelector = createSelector(
   licenseSelector,
-  ({ proLicenseInfo }) => proLicenseInfo || {}
+  ({ licenseCheckInterval }) => {
+    return licenseCheckInterval ?? null
+  }
 )
 
-export const proLicenseInfoSelector = proInfoSelector
-export const proLicenseExpirationSelector = createSelector(
-  proLicenseInfoSelector,
-  ({ expiration }) => expiration
+export const failedToContactLicenseServerSelector = createSelector(
+  licenseSelector,
+  ({ couldNotContactLicenseServer }) => {
+    return couldNotContactLicenseServer
+  }
 )
-export const proLicenseAdminSelector = createSelector(proLicenseInfoSelector, ({ admin }) => admin)
