@@ -122,8 +122,15 @@ const directoryIsWritable = (filePath) => {
   })
 }
 
-const { saveAppSetting, startTrial, deleteLicense, saveLicenseInfo, saveExportConfigSettings } =
-  makeFileSystemAPIs(whenClientIsReady)
+const {
+  saveAppSetting,
+  startTrial,
+  deleteLicense,
+  saveLicenseInfo,
+  saveExportConfigSettings,
+  deletePlottrLicense,
+  deleteProLicense,
+} = makeFileSystemAPIs(whenClientIsReady)
 
 export const openFile = (fileURL, unknown) => {
   openKnownFile(fileURL, unknown)
@@ -395,6 +402,8 @@ const platform = {
     startTrial,
     deleteLicense,
     saveLicenseInfo,
+    deletePlottrLicense,
+    deleteProLicense,
   },
   reloadMenu: () => {
     pleaseReloadMenu()

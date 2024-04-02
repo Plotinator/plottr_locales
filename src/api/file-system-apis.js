@@ -194,6 +194,17 @@ const makeFileSystemAPIs = (socketClient) => {
       return saveAppSetting('user.frbId', uid)
     })
   }
+  const deletePlottrLicense = () => {
+    return socketClient(({ deletePlottrLicense }) => {
+      return deletePlottrLicense()
+    })
+  }
+
+  const deleteProLicense = () => {
+    return socketClient(({ deleteProLicense }) => {
+      return deleteProLicense()
+    })
+  }
 
   return {
     customTemplatesPath,
@@ -205,6 +216,8 @@ const makeFileSystemAPIs = (socketClient) => {
     listenToLicenseChanges,
     currentLicense,
     deleteLicense,
+    deletePlottrLicense,
+    deleteProLicense,
     saveLicenseInfo,
     listenToknownFilesChanges,
     currentKnownFiles,

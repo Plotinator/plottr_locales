@@ -156,6 +156,10 @@ import {
   CURRENT_PRO_LICENSE,
   SAVE_PLOTTR_LICENSE,
   SAVE_PRO_LICENSE,
+  DELETE_PLOTTR_LICENSE,
+  DELETE_PRO_LICENSE,
+  DELETE_PRO_LICENSE_ERROR_REPLY,
+  DELETE_PLOTTR_LICENSE_ERROR_REPLY,
 } from '../socket-server-message-types'
 import { setPort, getPort } from './workerPort'
 
@@ -395,6 +399,8 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           case EXTEND_TRIAL_WITH_RESET_ERROR_REPLY:
           case CURRENT_LICENSE_ERROR_REPLY:
           case DELETE_LICENSE_ERROR_REPLY:
+          case DELETE_PRO_LICENSE_ERROR_REPLY:
+          case DELETE_PLOTTR_LICENSE_ERROR_REPLY:
           case SAVE_LICENSE_INFO_ERROR_REPLY:
           case CURRENT_KNOWN_FILES_ERROR_REPLY:
           case CURRENT_TEMPLATES_ERROR_REPLY:
@@ -691,6 +697,14 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
       return sendPromise(DELETE_LICENSE)
     }
 
+    const deletePlottrLicense = () => {
+      return sendPromise(DELETE_PLOTTR_LICENSE)
+    }
+
+    const deleteProLicense = () => {
+      return sendPromise(DELETE_PRO_LICENSE)
+    }
+
     const saveLicenseInfo = (newLicense) => {
       return sendPromise(SAVE_LICENSE_INFO, { newLicense })
     }
@@ -881,6 +895,8 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           extendTrialWithReset,
           currentLicense,
           deleteLicense,
+          deletePlottrLicense,
+          deleteProLicense,
           saveLicenseInfo,
           currentKnownFiles,
           currentTemplates,
