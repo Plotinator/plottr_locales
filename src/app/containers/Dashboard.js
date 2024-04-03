@@ -3,6 +3,8 @@ import { PropTypes } from 'prop-types'
 import { connect } from 'react-redux'
 import cx from 'classnames'
 
+import { t } from 'plottr_locales'
+import { helpers } from 'pltr/v2'
 import { selectors } from 'wired-up-pltr'
 import { DashboardBody, DashboardNav, FullPageSpinner as Spinner } from 'connected-components'
 
@@ -12,8 +14,34 @@ import { makeMainProcessClient } from '../mainProcessClient'
 
 const { onReload } = makeMainProcessClient()
 
-const Dashboard = ({ darkMode, closeDashboard, cantShowFile, busy, isOffline, openTo }) => {
+const { getVersion, showErrorBox } = makeMainProcessClient()
+
+const Dashboard = ({
+  darkMode,
+  closeDashboard,
+  cantShowFile,
+  busy,
+  isOffline,
+  openTo,
+  latestExpiryDate,
+}) => {
   const [activeView, setActiveView] = useState(openTo || 'files')
+
+  useEffect(() => {
+    getVersion().then((version) => {
+      const dateBooted = helpers.date.versionToDate(version)
+      if (latestExpiryDate < dateBooted) {
+        showErrorBox(
+          t('Error'),
+          t('Your license expired before this version of Plottr was released')
+        )
+        // Never resolve, because we'd rather just quit.
+        setTimeout(() => {
+          window.close()
+        }, 3000)
+      }
+    })
+  }, [])
 
   useEffect(() => {
     const closeListener = document.addEventListener('close-dashboard', closeDashboard)
@@ -47,6 +75,7 @@ Dashboard.propTypes = {
   busy: PropTypes.bool,
   isOffline: PropTypes.bool,
   openTo: PropTypes.string,
+  latestExpiryDate: PropTypes.object,
 }
 
 export default React.memo(
@@ -54,5 +83,6 @@ export default React.memo(
     darkMode: selectors.isDarkModeSelector(state),
     busy: selectors.manipulatingAFileSelector(state),
     isOffline: selectors.isOfflineSelector(state),
+    latestExpiryDate: selectors.latestExpiryDateSelector(state),
   }))(Dashboard)
 )

@@ -578,50 +578,67 @@ export function bootFile(
   }
 
   function _bootFile(fileURL, options, numOpenFiles, saveBackup) {
-    if (!helpers.file.isProtocolString(fileURL)) {
-      const message = `Can't boot a file without a protocol: ${fileURL}`
-      recordedErrorsDuringStartup.push({
-        message,
-        error: new Error('Cannot boot file without protocol'),
-      })
-      logger.error(message)
-      store().dispatch(actions.applicationState.errorLoadingFile())
-      return Promise.reject(new Error(message))
-    }
-    store().dispatch(actions.applicationState.startLoadingFile())
-
-    // Now that we know what the file path for this window should be,
-    // tell the main process.
-    return setMyFilePath(fileURL).then(() => {
-      // And then boot the file.
-      const isCloudFile = isPlottrCloudFile(fileURL) && !bootingOfflineFile
-
-      try {
-        return (
-          isCloudFile
-            ? bootCloudFile(fileURL, saveBackup)
-            : bootLocalFile(fileURL, numOpenFiles, saveBackup)
+    const latestExpiryDate = selectors.latestExpiryDateSelector(store().getState())
+    getVersion().then((version) => {
+      const dateBooted = helpers.date.versionToDate(version)
+      if (latestExpiryDate < dateBooted) {
+        showErrorBox(
+          t('Error'),
+          t('Your license expired before this version of Plottr was released')
         )
-          .then(() => {
-            store().dispatch(actions.applicationState.finishLoadingFile())
+        return new Promise(() => {
+          // Never resolve, because we'd rather just quit.
+          setTimeout(() => {
+            window.close()
+          }, 3000)
+        })
+      } else {
+        if (!helpers.file.isProtocolString(fileURL)) {
+          const message = `Can't boot a file without a protocol: ${fileURL}`
+          recordedErrorsDuringStartup.push({
+            message,
+            error: new Error('Cannot boot file without protocol'),
           })
-          .catch((error) => {
+          logger.error(message)
+          store().dispatch(actions.applicationState.errorLoadingFile())
+          return Promise.reject(new Error(message))
+        }
+        store().dispatch(actions.applicationState.startLoadingFile())
+
+        // Now that we know what the file path for this window should be,
+        // tell the main process.
+        return setMyFilePath(fileURL).then(() => {
+          // And then boot the file.
+          const isCloudFile = isPlottrCloudFile(fileURL) && !bootingOfflineFile
+
+          try {
+            return (
+              isCloudFile
+                ? bootCloudFile(fileURL, saveBackup)
+                : bootLocalFile(fileURL, numOpenFiles, saveBackup)
+            )
+              .then(() => {
+                store().dispatch(actions.applicationState.finishLoadingFile())
+              })
+              .catch((error) => {
+                nukeLastKnown()
+                logger.error(error)
+                recordedErrorsDuringStartup.push({
+                  message: `Error booting the file: ${fileURL}`,
+                  error,
+                })
+                store().dispatch(
+                  actions.applicationState.errorLoadingFile(error.message === UPDATE_MESSAGE)
+                )
+              })
+          } catch (error) {
             nukeLastKnown()
             logger.error(error)
-            recordedErrorsDuringStartup.push({
-              message: `Error booting the file: ${fileURL}`,
-              error,
-            })
-            store().dispatch(
-              actions.applicationState.errorLoadingFile(error.message === UPDATE_MESSAGE)
-            )
-          })
-      } catch (error) {
-        nukeLastKnown()
-        logger.error(error)
-        recordedErrorsDuringStartup.push({ message: `Error booting a file: ${fileURL}`, error })
-        store().dispatch(actions.applicationState.errorLoadingFile())
-        return Promise.reject(error)
+            recordedErrorsDuringStartup.push({ message: `Error booting a file: ${fileURL}`, error })
+            store().dispatch(actions.applicationState.errorLoadingFile())
+            return Promise.reject(error)
+          }
+        })
       }
     })
   }
@@ -642,9 +659,12 @@ export function bootFile(
     }
     const state = store().getState()
     const licenseUserObject = selectors.userSettingsSelector(state)
-    const userId = selectors.userIdSelector(state) || licenseUserObject.payment_id || 'UNKNOWN_USER'
+    const userId =
+          selectors.userIdSelector(state) || licenseUserObject.payment_id || 'UNKNOWN_USER'
     const userEmail =
-      selectors.emailAddressSelector(state) || licenseUserObject.customer_email || 'UNKNOWN_EMAIL'
+          selectors.emailAddressSelector(state) ||
+          licenseUserObject.customer_email ||
+          'UNKNOWN_EMAIL'
     Promise.all([pleaseTellMeWhatPlatformIAmOn(), getVersion()])
       .then(([os, version]) => {
         const errorReporter = createErrorReporter(
@@ -703,11 +723,13 @@ export function bootFile(
       })
       .catch((error) => {
         logger.error('Could not set up auto saver.  Bailing.')
-        return showErrorBox(t('Error'), t('There was an error doing that. Try again')).then(() => {
-          setTimeout(() => {
-            window.close()
-          }, 3000)
-        })
+        return showErrorBox(t('Error'), t('There was an error doing that. Try again')).then(
+          () => {
+            setTimeout(() => {
+              window.close()
+            }, 3000)
+          }
+        )
       })
       .finally(() => {
         bootingFile.current = null
