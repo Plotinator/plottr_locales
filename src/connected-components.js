@@ -23,6 +23,7 @@ import {
   lockRCE,
   releaseRCELock,
   deleteProBackup,
+  deleteMachineLicenseActivation,
 } from 'wired-up-firebase'
 
 import {
@@ -102,6 +103,8 @@ const {
   addToKnownFilesAndOpen,
   createDesktopShortcut,
   downloadDirectoryPath,
+  machineName,
+  localUserName,
 } = makeMainProcessClient()
 
 export const rmRF = (path, ...args) => {
@@ -521,6 +524,19 @@ const platform = {
   lockRCE,
   releaseRCELock,
   machineId,
+  machineInfo: () => {
+    const info = Promise.all([machineId(), machineName(), localUserName()]).then(
+      ([id, name, user, os]) => {
+        return {
+          id,
+          os: isWindows() ? 'windows' : isMacOS() ? 'macos' : isLinux() ? 'linux' : 'unknown',
+          name,
+          localUserName: user,
+        }
+      }
+    )
+    return Promise.resolve(info)
+  },
   extractImages,
   firebase: {
     onSessionChange,
@@ -601,6 +617,21 @@ const platform = {
     const state = store().getState()
     const userId = selectors.userIdSelector(state)
     return deleteProBackup(userId, backupRecordId, storageProtocolURL)
+  },
+  deleteMachineLicenseActivation: (id, os, name, localUserName) => {
+    return deleteMachineLicenseActivation(id, os, name, localUserName).then(() => {
+      const state = store().getState()
+      const hasPlottrLicense = selectors.hasActivePlottrLicenseSelector(state)
+      const hasProLicense = selectors.hasActiveProLicenseSelector(state)
+
+      if (hasPlottrLicense) {
+        deletePlottrLicense()
+      }
+
+      if (hasProLicense) {
+        deleteProLicense()
+      }
+    })
   },
 }
 
