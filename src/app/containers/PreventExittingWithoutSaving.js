@@ -48,7 +48,7 @@ PreventExitingWithoutSaving.propTypes = {
   applicationIsBusyAndCannotBeQuit: PropTypes.bool,
   isOffline: PropTypes.bool,
   fileSaved: PropTypes.func.isRequired,
-  fileLoaded: PropTypes.string.isRequired,
+  fileLoaded: PropTypes.bool,
 }
 
 export default connect(

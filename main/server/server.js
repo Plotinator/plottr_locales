@@ -846,12 +846,12 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
           // arguments important so we don't leak unencrypted secrets
           // to the operating system.
           case SAVE_PLOTTR_LICENSE: {
-            const { secret, machineInfo, dateChecked } = payload
+            const { secret, machineInfo, expiresAt, dateChecked } = payload
             return handlePromise(
               () => ['Saving Plottr license'],
               () =>
                 statusManager.registerTask(
-                  savePlottrLicense(secret, machineInfo, dateChecked),
+                  savePlottrLicense(secret, machineInfo, expiresAt, dateChecked),
                   SAVE_PLOTTR_LICENSE
                 ),
               () => ['Error saving Plottr license']

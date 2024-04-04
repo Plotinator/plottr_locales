@@ -54,13 +54,24 @@ export function checkForLicense(whenClientIsReady, persistUserId) {
     return axios
       .post(`https://${process.env.API_BASE_DOMAIN}/api/check-subscription`, machineInfo)
       .then((response) => {
-        const { hasPro, proExpiresAt, proLicensePayload, hasPlottr, plottrLicensePayload } =
-          response.data
+        const {
+          hasPro,
+          proExpiresAt,
+          proLicensePayload,
+          hasPlottr,
+          plottrLicensePayload,
+          plottrExpiresAt,
+        } = response.data
         const dateChecked = new Date().toISOString()
         return whenClientIsReady(({ savePlottrLicense, saveProLicense, saveAppSetting }) => {
           return (
             hasPlottr
-              ? savePlottrLicense(plottrLicensePayload?.secret ?? '', machineInfo, dateChecked)
+              ? savePlottrLicense(
+                  plottrLicensePayload?.secret ?? '',
+                  machineInfo,
+                  plottrExpiresAt,
+                  dateChecked
+                )
               : Promise.resolve()
           ).then(() => {
             if (hasPro) {

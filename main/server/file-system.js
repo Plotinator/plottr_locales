@@ -602,8 +602,8 @@ const fileSystemModule = (userDataPath) => {
       }
     }
 
-    const savePlottrLicense = (secret, machineInfo, dateChecked) => {
-      return plottrLicenseStore.set({ secret, machineInfo, dateChecked })
+    const savePlottrLicense = (secret, machineInfo, expiresAt, dateChecked) => {
+      return plottrLicenseStore.set({ secret, machineInfo, dateChecked, expiresAt })
     }
 
     const saveProLicense = (secret, machineInfo, expiresAt, dateChecked) => {

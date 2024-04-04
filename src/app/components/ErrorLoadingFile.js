@@ -121,10 +121,12 @@ export default connect(
     return {
       isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
       errorIsUpdateError: selectors.errorIsUpdateErrorSelector(state) || false,
+      pathToProject: selectors.filePathToProjectDuringBootSelector(state),
     }
   },
   {
     setCurrentAppStateToDashboard: actions.client.setCurrentAppStateToDashboard,
     clearErrorLoadingFile: actions.applicationState.clearErrorLoadingFile,
+    setOpenDashboardTo: actions.applicationState.setOpenDashboardTo,
   }
 )

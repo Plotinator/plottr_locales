@@ -579,9 +579,10 @@ export function bootFile(
 
   function _bootFile(fileURL, options, numOpenFiles, saveBackup) {
     const latestExpiryDate = selectors.latestExpiryDateSelector(store().getState())
-    getVersion().then((version) => {
+    const inTrialMode = selectors.isInTrialModeSelector(store().getState())
+    return getVersion().then((version) => {
       const dateBooted = helpers.date.versionToDate(version)
-      if (latestExpiryDate < dateBooted) {
+      if (!inTrialMode && latestExpiryDate !== null && latestExpiryDate < dateBooted) {
         showErrorBox(
           t('Error'),
           t('Your license expired before this version of Plottr was released')
@@ -723,13 +724,11 @@ export function bootFile(
       })
       .catch((error) => {
         logger.error('Could not set up auto saver.  Bailing.')
-        return showErrorBox(t('Error'), t('There was an error doing that. Try again')).then(
-          () => {
-            setTimeout(() => {
-              window.close()
-            }, 3000)
-          }
-        )
+        return showErrorBox(t('Error'), t('There was an error doing that. Try again')).then(() => {
+          setTimeout(() => {
+            window.close()
+          }, 3000)
+        })
       })
       .finally(() => {
         bootingFile.current = null

@@ -5,7 +5,7 @@ import cx from 'classnames'
 
 import { t } from 'plottr_locales'
 import { helpers } from 'pltr/v2'
-import { selectors } from 'wired-up-pltr'
+import { selectors, actions } from 'wired-up-pltr'
 import { DashboardBody, DashboardNav, FullPageSpinner as Spinner } from 'connected-components'
 
 import PreventExittingWithoutSaving from './PreventExittingWithoutSaving'
@@ -19,18 +19,20 @@ const { getVersion, showErrorBox } = makeMainProcessClient()
 const Dashboard = ({
   darkMode,
   closeDashboard,
+  setCurrentAppStateToApplication,
   cantShowFile,
   busy,
   isOffline,
   openTo,
   latestExpiryDate,
+  inTrialMode,
 }) => {
   const [activeView, setActiveView] = useState(openTo || 'files')
 
   useEffect(() => {
     getVersion().then((version) => {
       const dateBooted = helpers.date.versionToDate(version)
-      if (latestExpiryDate < dateBooted) {
+      if (!inTrialMode && latestExpiryDate !== null && latestExpiryDate < dateBooted) {
         showErrorBox(
           t('Error'),
           t('Your license expired before this version of Plottr was released')
@@ -44,7 +46,10 @@ const Dashboard = ({
   }, [])
 
   useEffect(() => {
-    const closeListener = document.addEventListener('close-dashboard', closeDashboard)
+    const closeListener = document.addEventListener('close-dashboard', () => {
+      closeDashboard()
+      setCurrentAppStateToApplication()
+    })
     const unsubscribeFromReload = onReload(() => {
       window.location.reload()
     })
@@ -71,18 +76,29 @@ const Dashboard = ({
 Dashboard.propTypes = {
   darkMode: PropTypes.bool,
   closeDashboard: PropTypes.func.isRequired,
+  setCurrentAppStateToApplication: PropTypes.func.isRequired,
   cantShowFile: PropTypes.bool,
   busy: PropTypes.bool,
   isOffline: PropTypes.bool,
   openTo: PropTypes.string,
   latestExpiryDate: PropTypes.object,
+  inTrialMode: PropTypes.bool,
 }
 
 export default React.memo(
-  connect((state) => ({
-    darkMode: selectors.isDarkModeSelector(state),
-    busy: selectors.manipulatingAFileSelector(state),
-    isOffline: selectors.isOfflineSelector(state),
-    latestExpiryDate: selectors.latestExpiryDateSelector(state),
-  }))(Dashboard)
+  connect(
+    (state) => ({
+      darkMode: selectors.isDarkModeSelector(state),
+      busy: selectors.manipulatingAFileSelector(state),
+      isOffline: selectors.isOfflineSelector(state),
+      latestExpiryDate: selectors.latestExpiryDateSelector(state),
+      openTo: selectors.dashboardViewToOpenToSelector(state),
+      cantShowFile: selectors.cantShowFileSelector(state),
+      inTrialMode: selectors.isInTrialModeSelector(state),
+    }),
+    {
+      closeDashboard: actions.applicationState.dashboardClosed,
+      setCurrentAppStateToApplication: actions.client.setCurrentAppStateToApplication,
+    }
+  )(Dashboard)
 )

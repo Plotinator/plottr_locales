@@ -517,7 +517,11 @@ const platform = {
     onSessionChange,
     currentUser,
     fetchFiles,
-    logOut,
+    logOut: () => {
+      return saveAppSetting('user.frbId', null).then(() => {
+        return logOut()
+      })
+    },
     saveCustomTemplate,
     uploadExisting,
   },

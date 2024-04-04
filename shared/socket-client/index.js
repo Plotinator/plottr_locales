@@ -760,8 +760,8 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
      * A payload of identifying features against which the secret was
      * generated.
      */
-    const savePlottrLicense = (secret, machineInfo, dateChecked) => {
-      return sendPromise(SAVE_PLOTTR_LICENSE, { secret, machineInfo, dateChecked })
+    const savePlottrLicense = (secret, machineInfo, expiresAt, dateChecked) => {
+      return sendPromise(SAVE_PLOTTR_LICENSE, { secret, machineInfo, expiresAt, dateChecked })
     }
 
     /**
