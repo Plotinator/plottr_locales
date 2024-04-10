@@ -525,7 +525,7 @@ const platform = {
   releaseRCELock,
   machineId,
   machineInfo: () => {
-    const info = Promise.all([machineId(), machineName(), localUserName()]).then(
+    return Promise.all([machineId(), machineName(), localUserName()]).then(
       ([id, name, user, os]) => {
         return {
           id,
@@ -535,7 +535,6 @@ const platform = {
         }
       }
     )
-    return Promise.resolve(info)
   },
   extractImages,
   firebase: {
