@@ -95,6 +95,8 @@ import {
   FIND_UNIQUE_NAME_IN_PATH,
   FILE_PATH_AS_ARRAY,
   DIRECTORY_IS_WRITABLE,
+  DELETE_PLOTTR_LICENSE,
+  DELETE_PRO_LICENSE,
 } from '../../shared/socket-server-message-types'
 import { makeLogger } from './logger'
 import wireupFileModule from './files'
@@ -252,6 +254,8 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
       listenToLicenseChanges,
       currentLicense,
       deleteLicense,
+      deletePlottrLicense,
+      deleteProLicense,
       saveLicenseInfo,
       listenToknownFilesChanges,
       currentKnownFiles,
@@ -891,6 +895,20 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
               () => 'Deleting the license',
               deleteLicense,
               () => 'Error while deleting the license'
+            )
+          }
+          case DELETE_PLOTTR_LICENSE: {
+            return handlePromise(
+              () => 'Deleting the Plottr license',
+              deletePlottrLicense,
+              () => 'Error while deleting the license'
+            )
+          }
+          case DELETE_PRO_LICENSE: {
+            return handlePromise(
+              () => 'Deleting the Pro license',
+              deleteProLicense,
+              () => 'Error while deleting Pro license'
             )
           }
           case SAVE_LICENSE_INFO: {

@@ -614,6 +614,14 @@ const fileSystemModule = (userDataPath) => {
       return plottrLicenseStore.currentStore()
     }
 
+    const deletePlottrLicense = () => {
+      return plottrLicenseStore.clear()
+    }
+
+    const deleteProLicense = () => {
+      return proLicenseStore.clear()
+    }
+
     const listenToPlottrLicenseChanges = (cb) => {
       cb(plottrLicenseStore.store)
       return plottrLicenseStore.onDidAnyChange.bind(plottrLicenseStore)(cb)
@@ -670,6 +678,8 @@ const fileSystemModule = (userDataPath) => {
       currentProLicense,
       listenToPlottrLicenseChanges,
       listenToProLicenseChanges,
+      deleteProLicense,
+      deletePlottrLicense,
     }
   }
 }

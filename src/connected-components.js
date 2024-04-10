@@ -23,6 +23,7 @@ import {
   lockRCE,
   releaseRCELock,
   deleteProBackup,
+  deleteMachineLicenseActivation,
 } from 'wired-up-firebase'
 
 import {
@@ -102,6 +103,8 @@ const {
   addToKnownFilesAndOpen,
   createDesktopShortcut,
   downloadDirectoryPath,
+  machineName,
+  localUserName,
 } = makeMainProcessClient()
 
 export const rmRF = (path, ...args) => {
@@ -122,8 +125,15 @@ const directoryIsWritable = (filePath) => {
   })
 }
 
-const { saveAppSetting, startTrial, deleteLicense, saveLicenseInfo, saveExportConfigSettings } =
-  makeFileSystemAPIs(whenClientIsReady)
+const {
+  saveAppSetting,
+  startTrial,
+  deleteLicense,
+  saveLicenseInfo,
+  saveExportConfigSettings,
+  deletePlottrLicense,
+  deleteProLicense,
+} = makeFileSystemAPIs(whenClientIsReady)
 
 export const openFile = (fileURL, unknown) => {
   openKnownFile(fileURL, unknown)
@@ -395,6 +405,8 @@ const platform = {
     startTrial,
     deleteLicense,
     saveLicenseInfo,
+    deletePlottrLicense,
+    deleteProLicense,
   },
   reloadMenu: () => {
     pleaseReloadMenu()
@@ -512,6 +524,18 @@ const platform = {
   lockRCE,
   releaseRCELock,
   machineId,
+  machineInfo: () => {
+    return Promise.all([machineId(), machineName(), localUserName()]).then(
+      ([id, name, user, os]) => {
+        return {
+          id,
+          os: isWindows() ? 'windows' : isMacOS() ? 'macos' : isLinux() ? 'linux' : 'unknown',
+          name,
+          localUserName: user,
+        }
+      }
+    )
+  },
   extractImages,
   firebase: {
     onSessionChange,
@@ -596,6 +620,22 @@ const platform = {
     const state = store().getState()
     const userId = selectors.userIdSelector(state)
     return deleteProBackup(userId, backupRecordId, storageProtocolURL)
+  },
+  deleteMachineLicenseActivation: (id, os, name, localUserName) => {
+    return deleteMachineLicenseActivation(id, os, name, localUserName).then(() => {
+      const state = store().getState()
+      const hasPlottrLicense = selectors.hasActivePlottrLicenseSelector(state)
+      const hasProLicense = selectors.hasActiveProLicenseSelector(state)
+      const plottrLicensePromise = hasPlottrLicense ? deletePlottrLicense() : Promise.resolve()
+
+      return plottrLicensePromise.then(() => {
+        if (hasProLicense) {
+          return deleteProLicense()
+        } else {
+          return Promise.resolve()
+        }
+      })
+    })
   },
 }
 
