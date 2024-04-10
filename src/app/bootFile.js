@@ -660,12 +660,9 @@ export function bootFile(
     }
     const state = store().getState()
     const licenseUserObject = selectors.userSettingsSelector(state)
-    const userId =
-          selectors.userIdSelector(state) || licenseUserObject.payment_id || 'UNKNOWN_USER'
+    const userId = selectors.userIdSelector(state) || licenseUserObject.payment_id || 'UNKNOWN_USER'
     const userEmail =
-          selectors.emailAddressSelector(state) ||
-          licenseUserObject.customer_email ||
-          'UNKNOWN_EMAIL'
+      selectors.emailAddressSelector(state) || licenseUserObject.customer_email || 'UNKNOWN_EMAIL'
     Promise.all([pleaseTellMeWhatPlatformIAmOn(), getVersion()])
       .then(([os, version]) => {
         const errorReporter = createErrorReporter(
