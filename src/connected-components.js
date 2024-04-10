@@ -623,14 +623,15 @@ const platform = {
       const state = store().getState()
       const hasPlottrLicense = selectors.hasActivePlottrLicenseSelector(state)
       const hasProLicense = selectors.hasActiveProLicenseSelector(state)
+      const plottrLicensePromise = hasPlottrLicense ? deletePlottrLicense() : Promise.resolve()
 
-      if (hasPlottrLicense) {
-        deletePlottrLicense()
-      }
-
-      if (hasProLicense) {
-        deleteProLicense()
-      }
+      return plottrLicensePromise.then(() => {
+        if (hasProLicense) {
+          return deleteProLicense()
+        } else {
+          return Promise.resolve()
+        }
+      })
     })
   },
 }
