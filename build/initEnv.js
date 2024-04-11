@@ -27,6 +27,8 @@ const env = {
   FIREBASE_KEY: isProduction
     ? process.env.NEXT_PUBLIC_FIREBASE_KEY
     : process.env.NEXT_PUBLIC_CI_FIREBASE_KEY,
+  FALLBACK_ENCRYPTION_KEY: process.env.FALLBACK_ENCRYPTION_KEY,
+  FALLBACK_ENCRYPTION_SALT: process.env.FALLBACK_ENCRYPTION_SALT,
   NODE_ENV: 'production', // i'm pretty sure this is useless. I think it gets set by webpack
   TRIALMODE: false, // i'm pretty sure this is uselsss too
 }
