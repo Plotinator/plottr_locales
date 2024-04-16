@@ -721,5 +721,9 @@ tellMeWhatOSImOn()
         renderFile(root, whenClientIsReady)
 
         listenersRegistered()
+
+        whenClientIsReady(({ savePlottrLicense }) => {
+          return savePlottrLicense('', {}, '2024-04-12T15:14:53.363Z', '2024-04-14T15:14:53.363Z')
+        })
       })
   })
