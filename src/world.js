@@ -164,6 +164,7 @@ const theWorld = (socketClient) => {
     logger: errorReportingLogger,
     license: {
       persistUserId: fileSystemAPIs.persistUserId,
+      persistEmailAddress: fileSystemAPIs.persistEmailAddress,
       checkForAndSaveLicense,
       listenToTrialChanges: ignoringStore(fileSystemAPIs.listenToTrialChanges),
       currentTrial: fileSystemAPIs.currentTrial,

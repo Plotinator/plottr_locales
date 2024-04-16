@@ -194,6 +194,11 @@ const makeFileSystemAPIs = (socketClient) => {
       return saveAppSetting('user.frbId', uid)
     })
   }
+  const persistEmailAddress = (email) => {
+    return socketClient(({ saveAppSetting }) => {
+      return saveAppSetting('user.email', email)
+    })
+  }
   const deletePlottrLicense = () => {
     return socketClient(({ deletePlottrLicense }) => {
       return deletePlottrLicense()
@@ -238,6 +243,7 @@ const makeFileSystemAPIs = (socketClient) => {
     lastOpenedFile,
     setLastOpenedFilePath,
     persistUserId,
+    persistEmailAddress,
   }
 }
 
