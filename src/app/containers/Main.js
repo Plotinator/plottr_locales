@@ -53,12 +53,12 @@ const Main = ({
     return <Choice />
   } else if (showTrialExpired) {
     return <Expired />
+  } else if (showConnectToTheInternet) {
+    return <PleaseConnectToTheInternet />
   } else if (showExpiredPlottrLicense) {
     return <ExpiredPlottrLicense />
   } else if (showExpiredProLicense) {
     return <ProLicenseExpired />
-  } else if (showConnectToTheInternet) {
-    return <PleaseConnectToTheInternet />
   } else if (showLoginSelector) {
     return <Login darkMode={darkMode} />
   } else if (fileToUpload) {
