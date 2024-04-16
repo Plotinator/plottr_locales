@@ -172,31 +172,9 @@ export const startupStateMachine = (getStore, selectors, actions, saveBackupOnFi
   let checkingWhetherToBootAfileLatch = false
   const stopCheckingWhetherToBootAfile = onStoreChanges(
     getStore,
-    [
-      selectors.readyToCheckFileToLoadSelector,
-      selectors.showDashboardOnBootSelector,
-      selectors.isLoggedIntoProWithActiveLicenseSelector,
-      selectors.isInOfflineModeSelector,
-      selectors.checkedFileToLoadSelector,
-      selectors.checkingFileToLoadSelector,
-      selectors.isInSomeValidLicenseStateSelector,
-    ],
-    (
-      readyToCheckFileToLoad,
-      showDashboard,
-      isInProMode,
-      isInOfflineMode,
-      checkedFileToLoad,
-      checkingFileToLoad,
-      isInSomeValidLicenseState
-    ) => {
-      if (
-        !checkingWhetherToBootAfileLatch &&
-        readyToCheckFileToLoad &&
-        !checkedFileToLoad &&
-        !checkingFileToLoad &&
-        isInSomeValidLicenseState
-      ) {
+    [selectors.readyToCheckFileToLoadSelector, selectors.isLoggedIntoProWithActiveLicenseSelector],
+    (readyToCheckFileToLoad, isInProMode) => {
+      if (!checkingWhetherToBootAfileLatch && readyToCheckFileToLoad) {
         checkingWhetherToBootAfileLatch = true
         getStore().dispatch(actions.applicationState.startCheckingFileToLoad())
         pleaseFetchState(isInProMode).then(
@@ -218,49 +196,24 @@ export const startupStateMachine = (getStore, selectors, actions, saveBackupOnFi
   // A latch so that we only show initial loading splash once.
   const stopListeningForFirstBoot = onStoreChanges(
     getStore,
-    [selectors.applicationIsBusyButFileCouldBeUnloadedSelector, selectors.firstTimeBootingSelector],
-    (busyBooting, firstTimeBooting) => {
-      if (!listeningForFirstBootLatch && !busyBooting && firstTimeBooting) {
+    [selectors.notBootingForTheFirstTimeSelector],
+    (notBootingForTheFirstTime) => {
+      if (!listeningForFirstBootLatch && notBootingForTheFirstTime) {
         listeningForFirstBootLatch = true
         getStore().dispatch(actions.applicationState.finishFirstTimeBooting())
       }
     }
   )
 
-  let listeninForSwitchToDashboardOnStartupLatch = false
+  let listeningForSwitchToDashboardOnStartupLatch = false
   // If we opened a file then don't show the dashboard all of a sudden
   // when the user changes the always show dashboard setting.
   const stopListeningForSwitchToDashboardOnStartup = onStoreChanges(
     getStore,
-    [
-      selectors.userNeedsToLoginSelector,
-      selectors.isFirstTimeSelector,
-      selectors.isInTrialModeWithExpiredTrialSelector,
-      selectors.cantShowFileSelector,
-      selectors.currentAppStateIsDashboardSelector,
-      selectors.showDashboardOnBootSelector,
-      selectors.firstTimeBootingSelector,
-      selectors.dashboardClosedSelector,
-    ],
-    (
-      needsToLogin,
-      isFirstTime,
-      isInTrialModeWithExpiredTrial,
-      cantShowFile,
-      currentAppStateIsDashboard,
-      showDashboard,
-      firstTimeBooting,
-      dashboardClosed
-    ) => {
-      if (
-        !listeninForSwitchToDashboardOnStartupLatch &&
-        !firstTimeBooting &&
-        !needsToLogin &&
-        !isFirstTime &&
-        !isInTrialModeWithExpiredTrial &&
-        !(cantShowFile || ((currentAppStateIsDashboard || showDashboard) && !dashboardClosed))
-      ) {
-        listeninForSwitchToDashboardOnStartupLatch = true
+    [selectors.shouldSwitchToDashboardOnStartupSelector],
+    (shouldSwitchToDashboardOnStartup) => {
+      if (!listeningForSwitchToDashboardOnStartupLatch && shouldSwitchToDashboardOnStartup) {
+        listeningForSwitchToDashboardOnStartupLatch = true
         // Condition is that it passes by all the other root views and
         // hits `App`.
         getStore().dispatch(actions.client.setCurrentAppStateToDashboard())

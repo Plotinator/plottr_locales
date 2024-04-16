@@ -22,32 +22,9 @@ export const fallbackDecrypt = (base64CipherText) => {
 }
 
 export const encryptStringToBase64 = (s) => {
-  return new Promise((resolve, reject) => {
-    try {
-      if (!safeStorage.isEncryptionAvailable()) {
-        fallbackEncrypt(s).then(resolve, reject)
-      } else {
-        const encryptedBuffer = safeStorage.encryptString(s)
-        resolve(encryptedBuffer.toString('base64'))
-      }
-    } catch (error) {
-      reject(error)
-    }
-  })
+  return fallbackEncrypt(s)
 }
 
 export const decryptStringFromBase64 = (base64) => {
-  return new Promise((resolve, reject) => {
-    try {
-      if (!safeStorage.isEncryptionAvailable()) {
-        fallbackDecrypt(base64).then(resolve, reject)
-      } else {
-        const s = Buffer.from(base64, 'base64')
-        const encryptedBuffer = safeStorage.decryptString(s)
-        resolve(encryptedBuffer.toString('base64'))
-      }
-    } catch (error) {
-      reject(error)
-    }
-  })
+  return fallbackDecrypt(base64)
 }

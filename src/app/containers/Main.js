@@ -10,16 +10,15 @@ import App from './App'
 import Choice from './Choice'
 import Login from './Login'
 import Expired from './Expired'
+import ExpiredPlottrLicense from './ExpiredPlottrLicense'
 import Dashboard from './Dashboard'
 import ProOnboarding from './ProOnboarding'
 import SettingsWizard from './SettingsWizard'
 import UploadLastOpenedFileToPro from '../components/UploadLastOpenedFileToPro'
 import ErrorLoadingFile from '../components/ErrorLoadingFile'
+import PleaseConnectToTheInternet from './PleaseConnectToTheInternet'
 
 const Main = ({
-  isFirstTime,
-  needsToLogin,
-  isInTrialModeWithExpiredTrial,
   showDashboard,
   cantShowFile,
   loadingState,
@@ -27,16 +26,17 @@ const Main = ({
   loadingProgress,
   fileToUpload,
   darkMode,
-  currentAppStateIsDashboard,
   isOnboardingFromRoot,
   isOnboarding,
   saveBackup,
   isInSettingsWizard,
-  isInSomeValidLicenseState,
-  licenseExpired,
-  needsToConnectToInternet,
   firstTimeBooting,
-  dashboardClosed,
+  showChoiceView,
+  showTrialExpired,
+  showExpiredPlottrLicense,
+  showExpiredProLicense,
+  showConnectToTheInternet,
+  showLoginSelector,
 }) => {
   // IMPORTANT: the order of these return statements is significant.
   // We'll exit at the earliest one that evaluates true for it's
@@ -49,16 +49,22 @@ const Main = ({
   // licenses.
   if (isOnboardingFromRoot || (cantShowFile && isOnboarding)) {
     return <ProOnboarding />
-  } else if (needsToLogin || needsToConnectToInternet) {
+  } else if (showChoiceView) {
+    return <Choice />
+  } else if (showTrialExpired) {
+    return <Expired />
+  } else if (showConnectToTheInternet) {
+    return <PleaseConnectToTheInternet />
+  } else if (showExpiredPlottrLicense) {
+    return <ExpiredPlottrLicense />
+  } else if (showExpiredProLicense) {
+    return <ProLicenseExpired />
+  } else if (showLoginSelector) {
     return <Login darkMode={darkMode} />
   } else if (fileToUpload) {
     return <UploadLastOpenedFileToPro saveBackup={saveBackup} />
   } else if (errorLoadingFile) {
     return <ErrorLoadingFile />
-  } else if (licenseExpired) {
-    return <ProLicenseExpired />
-  } else if (isInTrialModeWithExpiredTrial) {
-    return <Expired />
   } else if (firstTimeBooting) {
     return (
       <div id="temporary-inner">
@@ -78,15 +84,9 @@ const Main = ({
         </div>
       </div>
     )
-  } else if (isFirstTime) {
-    return <Choice />
   } else if (isInSettingsWizard) {
     return <SettingsWizard />
-  } else if (!isInSomeValidLicenseState) {
-    // The other way we can get to the Choice view is the license
-    // dissapeared.
-    return <Choice />
-  } else if (cantShowFile || ((currentAppStateIsDashboard || showDashboard) && !dashboardClosed)) {
+  } else if (showDashboard) {
     return <Dashboard />
   } else {
     return (
@@ -101,9 +101,6 @@ const Main = ({
 
 Main.propTypes = {
   forceProjectDashboard: PropTypes.bool,
-  isFirstTime: PropTypes.bool,
-  needsToLogin: PropTypes.bool,
-  isInTrialModeWithExpiredTrial: PropTypes.bool,
   showDashboard: PropTypes.bool,
   cantShowFile: PropTypes.bool,
   loadingState: PropTypes.string.isRequired,
@@ -111,36 +108,35 @@ Main.propTypes = {
   fileToUpload: PropTypes.string,
   errorLoadingFile: PropTypes.bool.isRequired,
   darkMode: PropTypes.bool.isRequired,
-  currentAppStateIsDashboard: PropTypes.bool.isRequired,
   isOnboardingFromRoot: PropTypes.bool,
   isOnboarding: PropTypes.bool,
   saveBackup: PropTypes.func.isRequired,
   isInSettingsWizard: PropTypes.bool,
-  isInSomeValidLicenseState: PropTypes.bool,
-  licenseExpired: PropTypes.bool,
-  needsToConnectToInternet: PropTypes.bool,
   firstTimeBooting: PropTypes.bool,
-  dashboardClosed: PropTypes.bool,
+  showChoiceView: PropTypes.bool,
+  showTrialExpired: PropTypes.bool,
+  showExpiredPlottrLicense: PropTypes.bool,
+  showExpiredProLicense: PropTypes.bool,
+  showConnectToTheInternet: PropTypes.bool,
+  showLoginSelector: PropTypes.bool,
 }
 
 export default connect((state) => ({
-  isFirstTime: selectors.isFirstTimeSelector(state),
-  needsToLogin: selectors.userNeedsToLoginSelector(state),
-  isInTrialModeWithExpiredTrial: selectors.isInTrialModeWithExpiredTrialSelector(state),
-  showDashboard: selectors.showDashboardOnBootSelector(state),
+  showConnectToTheInternet: selectors.displayConnectToTheInternetSelector(state),
+  showExpiredProLicense: selectors.displayExpiredProLicenseSelector(state),
+  showExpiredPlottrLicense: selectors.displayExpiredPlottrLicenseSelector(state),
+  showChoiceView: selectors.displayChoiceViewSelector(state),
+  showTrialExpired: selectors.displayTrialExpiredSelector(state),
+  showLoginSelector: selectors.displayLoginSelector(state),
+  showDashboard: selectors.displayDashboardSelector(state),
   cantShowFile: selectors.cantShowFileSelector(state),
   loadingState: selectors.loadingStateSelector(state),
-  errorLoadingFile: selectors.errorLoadingFileSelector(state) || false,
+  errorLoadingFile: selectors.errorLoadingFileSelector(state),
   loadingProgress: selectors.loadingProgressSelector(state),
   darkMode: selectors.isDarkModeSelector(state),
-  currentAppStateIsDashboard: selectors.currentAppStateIsDashboardSelector(state),
   isOnboardingFromRoot: selectors.isOnboardingToProFromRootSelector(state),
   isOnboarding: selectors.isOnboardingToProSelector(state),
   fileToUpload: selectors.filePathToUploadSelector(state),
   isInSettingsWizard: selectors.isInSettingsWizardSelector(state),
-  isInSomeValidLicenseState: selectors.isInSomeValidLicenseStateSelector(state),
-  licenseExpired: selectors.licenseExpiredSelector(state),
-  needsToConnectToInternet: selectors.needsToConnectToInternetSelector(state),
   firstTimeBooting: selectors.firstTimeBootingSelector(state),
-  dashboardClosed: selectors.dashboardClosedSelector(state),
 }))(Main)

@@ -308,6 +308,8 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           case EXTEND_TRIAL_WITH_RESET:
           case CURRENT_LICENSE:
           case DELETE_LICENSE:
+          case DELETE_PLOTTR_LICENSE:
+          case DELETE_PRO_LICENSE:
           case SAVE_LICENSE_INFO:
           case CURRENT_KNOWN_FILES:
           case CURRENT_TEMPLATES:
