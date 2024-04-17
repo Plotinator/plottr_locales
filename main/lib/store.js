@@ -108,6 +108,15 @@ class Store {
     })
   }
 
+  handleBadPreprocess = (error) => {
+    if (error?.message === 'encrypt-error') {
+      this.store = {}
+      return {}
+    } else {
+      return Promise.reject(error)
+    }
+  }
+
   // This doesn't need to wait for active writes because it's
   // internal.  Please don't use it externally, That will lead to race
   // conditions.  Use `currentStore` instead!!
@@ -119,7 +128,9 @@ class Store {
             // The store doesn't yet exist.  Create it.
             this.store = this.defaults
             return this.writeStore().then(() => {
-              return this.preprocessForWrite(JSON.stringify(this.store, null, 2))
+              return this.preprocessForWrite(JSON.stringify(this.store, null, 2)).catch(
+                this.handleBadPreprocess
+              )
             })
           }
           // Does the user data folder exist?
@@ -151,7 +162,16 @@ class Store {
         if (rawContentsAsString === '') {
           return Promise.resolve('{}')
         } else {
-          return this.preprocessForRead(rawContentsAsString)
+          return this.preprocessForRead(rawContentsAsString).catch((error) => {
+            if (error?.message === 'decrypt-error') {
+              this.store = {}
+              return this.writeStore().then(() => {
+                return '{}'
+              })
+            } else {
+              return Promise.reject({})
+            }
+          })
         }
       })
       .then((storeContents) => {
@@ -200,6 +220,7 @@ class Store {
               2
             )
           )
+            .catch(this.handleBadPreprocess)
             .then((fileContents) => {
               return writeFile(fileHandle, fileContents)
             })

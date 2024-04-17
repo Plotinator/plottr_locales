@@ -1,4 +1,3 @@
-import { safeStorage } from 'electron'
 import Cryptr from 'cryptr'
 
 const fallbackEncryptionKey = process.env.FALLBACK_ENCRYPTION_KEY
@@ -9,7 +8,11 @@ export const fallbackEncrypt = (plainText) => {
   if (plainText === '') {
     return Promise.resolve(plainText)
   } else {
-    return Promise.resolve(cryptr.encrypt(plainText))
+    try {
+      return Promise.resolve(cryptr.encrypt(plainText))
+    } catch (error) {
+      return Promise.reject(error)
+    }
   }
 }
 
@@ -17,7 +20,11 @@ export const fallbackDecrypt = (base64CipherText) => {
   if (base64CipherText === '') {
     return Promise.resolve(base64CipherText)
   } else {
-    return Promise.resolve(cryptr.decrypt(base64CipherText))
+    try {
+      return Promise.resolve(cryptr.decrypt(base64CipherText))
+    } catch (error) {
+      return Promise.reject(error)
+    }
   }
 }
 

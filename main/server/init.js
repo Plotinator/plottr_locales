@@ -61,20 +61,30 @@ export const startServer = (
       if (message?.startsWith?.('encrypt:')) {
         try {
           const { id, s } = JSON.parse(message.substring(message.indexOf(':') + 1))
-          encryptStringToBase64(s).then((encrypted) => {
-            server.send(`encrypt:${JSON.stringify({ id, s: encrypted })}`)
-          })
+          encryptStringToBase64(s)
+            .then((encrypted) => {
+              server.send(`encrypt:${JSON.stringify({ id, s: encrypted })}`)
+            })
+            .catch((error) => {
+              log.error('Error encrypting', error)
+              server.send(`encrypt-error:${JSON.stringify({ id })}`)
+            })
         } catch (error) {
-          log.error('Error encrypting')
+          log.error('Error parsing encryption request', error)
         }
       } else if (message?.startsWith?.('decrypt:')) {
         try {
           const { id, s } = JSON.parse(message.substring(message.indexOf(':') + 1))
-          decryptStringFromBase64(s).then((encrypted) => {
-            server.send(`decrypt:${JSON.stringify({ id, s: encrypted })}`)
-          })
+          decryptStringFromBase64(s)
+            .then((encrypted) => {
+              server.send(`decrypt:${JSON.stringify({ id, s: encrypted })}`)
+            })
+            .catch((error) => {
+              log.error('Error decrypting', error)
+              server.send(`decrypt-error:${JSON.stringify({ id })}`)
+            })
         } catch (error) {
-          log.error('Error decrypting', error)
+          log.error('Error parsing decryption request', error)
         }
       } else if (message === 'ready') {
         log.info(`[${server.pid}] Received "${message}" from socket worker.`)

@@ -1247,6 +1247,24 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
       } catch (error) {
         console.error('Error servicing decryption request', error)
       }
+    } else if (message?.startsWith?.('encrypt-error:')) {
+      try {
+        const { id } = JSON.parse(message.substring(message.indexOf(':') + 1))
+        const { reject } = messagesAwaitingResponse.get(id)
+        messagesAwaitingResponse.delete(id)
+        reject(new Error('encrypt-error'))
+      } catch (error) {
+        console.error('Error servicing encryption request', error)
+      }
+    } else if (message?.startsWith?.('decrypt-error:')) {
+      try {
+        const { id } = JSON.parse(message.substring(message.indexOf(':') + 1))
+        const { reject } = messagesAwaitingResponse.get(id)
+        messagesAwaitingResponse.delete(id)
+        reject(new Error('decrypt-error'))
+      } catch (error) {
+        console.error('Error servicing decryption request', error)
+      }
     } else if (message === 'ack') {
       const elapsed = awaitingResponse
         ? new Date().getTime() - awaitingResponse.getTime()
