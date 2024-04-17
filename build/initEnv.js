@@ -19,11 +19,11 @@ const env = {
       'app.plottr.com'
     : isBeta
     ? // Beta uses the latest release branch
-      'plottr-web-beta.vercel.app'
+      'beta.plottr.com'
     : isAlpha
-    ? 'plottr-web-alpha.vercel.app'
+    ? 'alpha.plottr.com'
     : // Default to alpha (staging branch)
-      'plottr-web-alpha.vercel.app',
+      'alpha.plottr.com',
   FIREBASE_KEY: isProduction
     ? process.env.NEXT_PUBLIC_FIREBASE_KEY
     : process.env.NEXT_PUBLIC_CI_FIREBASE_KEY,
