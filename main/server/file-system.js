@@ -615,12 +615,10 @@ const fileSystemModule = (userDataPath) => {
     }
 
     const deletePlottrLicense = () => {
-      console.log('proLicenseStore.currentStore()', plottrLicenseStore.currentStore())
       return plottrLicenseStore.clear()
     }
 
     const deleteProLicense = () => {
-      console.log('proLicenseStore.currentStore()', proLicenseStore.currentStore())
       return proLicenseStore.clear()
     }
 
