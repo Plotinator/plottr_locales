@@ -63,37 +63,45 @@ export function checkForLicense(whenClientIsReady, persistLicenseMode) {
           plottrExpiresAt,
         } = response.data
         const dateChecked = new Date().toISOString()
-        return whenClientIsReady(({ savePlottrLicense, saveProLicense, saveAppSetting }) => {
-          return (
-            hasPlottr || (plottrExpiresAt && typeof plottrExpiresAt === 'string')
-              ? savePlottrLicense(
-                  plottrLicensePayload?.secret ?? '',
-                  machineInfo,
-                  plottrExpiresAt,
-                  dateChecked
-                ).then(() => {
-                  if (!hasPro) {
-                    return persistLicenseMode(false)
-                  } else {
-                    return Promise.resolve()
-                  }
+        return whenClientIsReady(
+          ({
+            deletePlottrLicense,
+            deleteProLicense,
+            savePlottrLicense,
+            saveProLicense,
+            saveAppSetting,
+          }) => {
+            return (
+              hasPlottr || (plottrExpiresAt && typeof plottrExpiresAt === 'string')
+                ? savePlottrLicense(
+                    plottrLicensePayload?.secret ?? '',
+                    machineInfo,
+                    plottrExpiresAt,
+                    dateChecked
+                  ).then(() => {
+                    if (!hasPro) {
+                      return persistLicenseMode(false)
+                    } else {
+                      return Promise.resolve()
+                    }
+                  })
+                : deletePlottrLicense()
+            ).then(() => {
+              if (hasPro || (proExpiresAt && typeof proExpiresAt === 'string')) {
+                return persistLicenseMode(true).then(() => {
+                  return saveProLicense(
+                    proLicensePayload?.secret ?? '',
+                    machineInfo,
+                    proExpiresAt,
+                    dateChecked
+                  )
                 })
-              : Promise.resolve()
-          ).then(() => {
-            if (hasPro || (proExpiresAt && typeof proExpiresAt === 'string')) {
-              return persistLicenseMode(true).then(() => {
-                return saveProLicense(
-                  proLicensePayload?.secret ?? '',
-                  machineInfo,
-                  proExpiresAt,
-                  dateChecked
-                )
-              })
-            } else {
-              return Promise.resolve()
-            }
-          })
-        })
+              } else {
+                return deleteProLicense()
+              }
+            })
+          }
+        )
       })
       .catch((error) => {
         if (error.response) {
