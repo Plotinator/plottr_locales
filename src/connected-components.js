@@ -527,16 +527,19 @@ const platform = {
   releaseRCELock,
   machineId,
   machineInfo: () => {
-    return Promise.all([machineId(), machineName(), localUserName()]).then(
-      ([id, name, user, os]) => {
-        return {
-          id,
-          os: isWindows() ? 'windows' : isMacOS() ? 'macos' : isLinux() ? 'linux' : 'unknown',
-          name,
-          localUserName: user,
-        }
+    return Promise.all([
+      machineId(),
+      machineName(),
+      localUserName(),
+      pleaseTellMeWhatPlatformIAmOn(),
+    ]).then(([id, name, user, os]) => {
+      return {
+        id,
+        os,
+        name,
+        localUserName: user,
       }
-    )
+    })
   },
   extractImages,
   firebase: {
