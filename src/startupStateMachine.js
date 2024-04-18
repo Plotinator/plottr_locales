@@ -128,7 +128,6 @@ export const startupStateMachine = (getStore, selectors, actions, saveBackupOnFi
     }
   }
 
-  let listeningToDashboardStateLatch = false
   const stopListeningToDashboardState = onStoreChanges(
     getStore,
     [
@@ -138,17 +137,15 @@ export const startupStateMachine = (getStore, selectors, actions, saveBackupOnFi
       selectors.dashboardClosedSelector,
     ],
     (showDashboard, fileName, fileURL, dashboardClosed) => {
-      if (!listeningToDashboardStateLatch && showDashboard && !dashboardClosed) {
+      if (showDashboard && !dashboardClosed) {
         if (fileName && fileName.length > 0) {
-          listeningToDashboardStateLatch = true
           displayFileName(fileName, fileURL, false).then((fileName) => {
             setWindowTitle(fileName)
           })
         }
         getStore().dispatch(actions.client.setCurrentAppStateToDashboard())
-      } else if (!listeningToDashboardStateLatch) {
+      } else {
         if (fileName && fileName.length > 0) {
-          listeningToDashboardStateLatch = true
           displayFileName(fileName, fileURL, true).then((fileName) => {
             setWindowTitle(fileName)
           })

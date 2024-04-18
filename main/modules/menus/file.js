@@ -20,11 +20,10 @@ if (is.macos) {
 }
 
 function buildFileMenu(fileURL, getTrialInfo) {
-  const isCloudFile = helpers.file.urlPointsToPlottrCloud(fileURL)
   const isTemp = fileURL && fileURL.includes(TEMP_FILES_PATH)
   return Promise.all([getTrialInfo(), getLicenseInfo(), buildRecents(), currentSettings()]).then(
     ([trialInfo, licenseInfo, recents, settings]) => {
-      const isPro = settings.user.frbId || isCloudFile
+      const isPro = settings.user.isInProMode
       let submenu = [
         {
           label: t('Create Blank Project'),

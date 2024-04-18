@@ -38,7 +38,7 @@ const { machineId, pleaseTellMeWhatPlatformIAmOn, machineName, localUserName } =
  * We're expected to record the license payload so that we can decrypt
  * the local license and check it's running on the right machine.
  */
-export function checkForLicense(whenClientIsReady, persistUserId) {
+export function checkForLicense(whenClientIsReady, persistLicenseMode) {
   return Promise.all([
     machineId(),
     pleaseTellMeWhatPlatformIAmOn(),
@@ -65,17 +65,23 @@ export function checkForLicense(whenClientIsReady, persistUserId) {
         const dateChecked = new Date().toISOString()
         return whenClientIsReady(({ savePlottrLicense, saveProLicense, saveAppSetting }) => {
           return (
-            hasPlottr
+            hasPlottr || (plottrExpiresAt && typeof plottrExpiresAt === 'string')
               ? savePlottrLicense(
                   plottrLicensePayload?.secret ?? '',
                   machineInfo,
                   plottrExpiresAt,
                   dateChecked
-                )
+                ).then(() => {
+                  if (!hasPro) {
+                    return persistLicenseMode(false)
+                  } else {
+                    return Promise.resolve()
+                  }
+                })
               : Promise.resolve()
           ).then(() => {
-            if (hasPro) {
-              return persistUserId().then(() => {
+            if (hasPro || (proExpiresAt && typeof proExpiresAt === 'string')) {
+              return persistLicenseMode(true).then(() => {
                 return saveProLicense(
                   proLicensePayload?.secret ?? '',
                   machineInfo,
@@ -105,6 +111,7 @@ export function checkForLicense(whenClientIsReady, persistUserId) {
 
 export const makeLicenseServerAPIs = (whenClientIsReady) => {
   return {
-    checkForAndSaveLicense: (persistUserId) => checkForLicense(whenClientIsReady, persistUserId),
+    checkForAndSaveLicense: (persistLicenseMode) =>
+      checkForLicense(whenClientIsReady, persistLicenseMode),
   }
 }

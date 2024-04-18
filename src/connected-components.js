@@ -133,6 +133,7 @@ const {
   saveExportConfigSettings,
   deletePlottrLicense,
   deleteProLicense,
+  persistLicenseMode,
 } = makeFileSystemAPIs(whenClientIsReady)
 
 export const openFile = (fileURL, unknown) => {
@@ -407,6 +408,7 @@ const platform = {
     saveLicenseInfo,
     deletePlottrLicense,
     deleteProLicense,
+    checkForLicense: () => licenseServerAPIs.checkForLicense(whenClientIsReady, persistLicenseMode),
   },
   reloadMenu: () => {
     pleaseReloadMenu()
@@ -542,9 +544,13 @@ const platform = {
     currentUser,
     fetchFiles,
     logOut: () => {
-      return saveAppSetting('user.frbId', null).then(() => {
-        return logOut()
-      })
+      return saveAppSetting('user.frbId', null)
+        .then(() => {
+          return saveAppSetting('user.isInProMode', false)
+        })
+        .then(() => {
+          return logOut()
+        })
     },
     saveCustomTemplate,
     uploadExisting,

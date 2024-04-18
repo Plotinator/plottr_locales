@@ -194,6 +194,11 @@ const makeFileSystemAPIs = (socketClient) => {
       return saveAppSetting('user.frbId', uid)
     })
   }
+  const persistLicenseMode = (isInProMode) => {
+    return socketClient(({ saveAppSetting }) => {
+      return saveAppSetting('user.isInProMode', isInProMode)
+    })
+  }
   const persistEmailAddress = (email) => {
     return socketClient(({ saveAppSetting }) => {
       return saveAppSetting('user.email', email)
@@ -243,6 +248,7 @@ const makeFileSystemAPIs = (socketClient) => {
     lastOpenedFile,
     setLastOpenedFilePath,
     persistUserId,
+    persistLicenseMode,
     persistEmailAddress,
   }
 }
