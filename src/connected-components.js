@@ -629,17 +629,8 @@ const platform = {
   },
   deleteMachineLicenseActivation: (id, os, name, localUserName) => {
     return deleteMachineLicenseActivation(id, os, name, localUserName).then(() => {
-      const state = store().getState()
-      const hasPlottrLicense = selectors.hasActivePlottrLicenseSelector(state)
-      const hasProLicense = selectors.hasActiveProLicenseSelector(state)
-      const plottrLicensePromise = hasPlottrLicense ? deletePlottrLicense() : Promise.resolve()
-
-      return plottrLicensePromise.then(() => {
-        if (hasProLicense) {
-          return deleteProLicense()
-        } else {
-          return Promise.resolve()
-        }
+      return deletePlottrLicense().then(() => {
+        return deleteProLicense()
       })
     })
   },
@@ -731,6 +722,7 @@ export const FullPageSpinner = components.FullPageSpinner
 export const ChoiceView = components.ChoiceView
 export const ExpiredView = components.ExpiredView
 export const ProLicenseExpired = components.ProLicenseExpired
+export const PlottrLicenseExpired = components.PlottrLicenseExpired
 export const ProOnboarding = components.ProOnboarding
 export const UpdateNotifier = components.UpdateNotifier
 export const NewProjectInputModal = components.NewProjectInputModal

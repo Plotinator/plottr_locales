@@ -3,14 +3,13 @@ import { PropTypes } from 'prop-types'
 import { connect } from 'react-redux'
 
 import { selectors } from 'wired-up-pltr'
-import { ProLicenseExpired } from 'connected-components'
+import { ProLicenseExpired, PlottrLicenseExpired } from 'connected-components'
 
 import MainIntegrationContext from '../../mainIntegrationContext'
 import App from './App'
 import Choice from './Choice'
 import Login from './Login'
 import Expired from './Expired'
-import ExpiredPlottrLicense from './ExpiredPlottrLicense'
 import Dashboard from './Dashboard'
 import ProOnboarding from './ProOnboarding'
 import SettingsWizard from './SettingsWizard'
@@ -56,7 +55,7 @@ const Main = ({
   } else if (showConnectToTheInternet) {
     return <PleaseConnectToTheInternet />
   } else if (showExpiredPlottrLicense) {
-    return <ExpiredPlottrLicense />
+    return <PlottrLicenseExpired />
   } else if (showExpiredProLicense) {
     return <ProLicenseExpired />
   } else if (showLoginSelector) {
