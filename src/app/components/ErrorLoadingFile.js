@@ -55,6 +55,8 @@ const ErrorLoadingFile = ({
       )
     : errorMessage
 
+  errorMessage = typeof errorMessage === 'string' ? errorMessage : `${errorMessage}`
+
   const body = (
     <>
       <div className="error-boundary">
@@ -129,4 +131,4 @@ export default connect(
     clearErrorLoadingFile: actions.applicationState.clearErrorLoadingFile,
     setOpenDashboardTo: actions.applicationState.setOpenDashboardTo,
   }
-)
+)(ErrorLoadingFile)
