@@ -71,7 +71,6 @@ export const newFile = (
       const fileId = response.data.fileId
       const fileURL = helpers.file.fileIdToPlottrCloudFileURL(fileId)
       openFile(fileURL, false)
-      closeDashboard()
       return fileId
     })
   })
