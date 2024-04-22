@@ -198,6 +198,35 @@ const onlineWithOfflineDisabledAndLocalBackupDisabledState = () => {
         ...oldSettings.user,
         enableOfflineMode: false,
         localBackups: false,
+        isInProMode: true,
+        frbId: 'antoehuteut',
+      },
+    })
+  )
+  store.dispatch(actions.client.setUserId('aonetuhentuhe'))
+  store.dispatch(
+    actions.license.setLicenseInfo({
+      plottrLicense: {
+        secret: '',
+        machineInfo: {
+          id: 'f3cdecaab7a08a84570a4a354ea85ad4b3a389dbf0e7800aba50f94299b0efb2',
+          os: 'linux',
+          name: 'quiescent.home',
+          localUserName: 'edward',
+        },
+        dateChecked: '2024-04-22T13:35:48.429Z',
+        expiresAt: '2050-04-23T09:44:42.469Z',
+      },
+      proLicense: {
+        secret: '',
+        machineInfo: {
+          id: 'f3cdecaab7a08a84570a4a354ea85ad4b3a389dbf0e7800aba50f94299b0efb2',
+          os: 'linux',
+          name: 'quiescent.home',
+          localUserName: 'edward',
+        },
+        expiresAt: '2024-04-26T11:12:49.682Z',
+        dateChecked: '2050-04-22T13:17:16.626Z',
       },
     })
   )
@@ -223,6 +252,35 @@ const onlineWithOfflineDisabledAndLocalBackupEnabledState = () => {
         ...oldSettings.user,
         enableOfflineMode: false,
         localBackups: true,
+        isInProMode: true,
+        frbId: 'antoehuteut',
+      },
+    })
+  )
+  store.dispatch(actions.client.setUserId('aonetuhentuhe'))
+  store.dispatch(
+    actions.license.setLicenseInfo({
+      plottrLicense: {
+        secret: '',
+        machineInfo: {
+          id: 'f3cdecaab7a08a84570a4a354ea85ad4b3a389dbf0e7800aba50f94299b0efb2',
+          os: 'linux',
+          name: 'quiescent.home',
+          localUserName: 'edward',
+        },
+        dateChecked: '2024-04-22T13:35:48.429Z',
+        expiresAt: '2050-04-23T09:44:42.469Z',
+      },
+      proLicense: {
+        secret: '',
+        machineInfo: {
+          id: 'f3cdecaab7a08a84570a4a354ea85ad4b3a389dbf0e7800aba50f94299b0efb2',
+          os: 'linux',
+          name: 'quiescent.home',
+          localUserName: 'edward',
+        },
+        expiresAt: '2024-04-26T11:12:49.682Z',
+        dateChecked: '2050-04-22T13:17:16.626Z',
       },
     })
   )
@@ -256,7 +314,7 @@ const localFileWithBackupsDisabled = () => {
   const store = initialStore()
   store.dispatch(
     actions.ui.loadFile(
-      'Test Pro file',
+      'Test Local file',
       false,
       EMPTY_FILE,
       EMPTY_FILE.file.version,
@@ -276,7 +334,7 @@ const localFileWithBackupsEnabled = () => {
   const store = initialStore()
   store.dispatch(
     actions.ui.loadFile(
-      'Test Pro file',
+      'Test Local file',
       false,
       EMPTY_FILE,
       EMPTY_FILE.file.version,
@@ -296,7 +354,7 @@ const localFileWithBackupsEnabledThatPointsAtOfflineModeFile = () => {
   const store = initialStore()
   store.dispatch(
     actions.ui.loadFile(
-      'Test Pro file',
+      'Test Local file',
       false,
       EMPTY_FILE,
       EMPTY_FILE.file.version,
