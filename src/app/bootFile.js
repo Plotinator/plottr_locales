@@ -611,33 +611,47 @@ export function bootFile(
         return setMyFilePath(fileURL).then(() => {
           // And then boot the file.
           const isCloudFile = isPlottrCloudFile(fileURL) && !bootingOfflineFile
-
-          try {
-            return (
-              isCloudFile
-                ? bootCloudFile(fileURL, saveBackup)
-                : bootLocalFile(fileURL, numOpenFiles, saveBackup)
+          const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(store().getState())
+          if (isCloudFile && !isInProMode) {
+            const error = Error(
+              "Error booting file.  Attempted to boot pro file, but we're not in Pro"
             )
-              .then(() => {
-                store().dispatch(actions.applicationState.finishLoadingFile())
-              })
-              .catch((error) => {
-                nukeLastKnown()
-                logger.error(error)
-                recordedErrorsDuringStartup.push({
-                  message: `Error booting the file: ${fileURL}`,
-                  error,
-                })
-                store().dispatch(
-                  actions.applicationState.errorLoadingFile(error.message === UPDATE_MESSAGE)
-                )
-              })
-          } catch (error) {
-            nukeLastKnown()
-            logger.error(error)
-            recordedErrorsDuringStartup.push({ message: `Error booting a file: ${fileURL}`, error })
-            store().dispatch(actions.applicationState.errorLoadingFile())
+            recordedErrorsDuringStartup.push({
+              message: `Error booting a file: ${fileURL}`,
+              error,
+            })
             return Promise.reject(error)
+          } else {
+            try {
+              return (
+                isCloudFile
+                  ? bootCloudFile(fileURL, saveBackup)
+                  : bootLocalFile(fileURL, numOpenFiles, saveBackup)
+              )
+                .then(() => {
+                  store().dispatch(actions.applicationState.finishLoadingFile())
+                })
+                .catch((error) => {
+                  nukeLastKnown()
+                  logger.error(error)
+                  recordedErrorsDuringStartup.push({
+                    message: `Error booting the file: ${fileURL}`,
+                    error,
+                  })
+                  store().dispatch(
+                    actions.applicationState.errorLoadingFile(error.message === UPDATE_MESSAGE)
+                  )
+                })
+            } catch (error) {
+              nukeLastKnown()
+              logger.error(error)
+              recordedErrorsDuringStartup.push({
+                message: `Error booting a file: ${fileURL}`,
+                error,
+              })
+              store().dispatch(actions.applicationState.errorLoadingFile())
+              return Promise.reject(error)
+            }
           }
         })
       }

@@ -187,7 +187,8 @@ const platform = {
       const userId = selectors.userIdSelector(state)
       const clientId = selectors.clientIdSelector(state)
       const fileList = selectors.knownFilesSelector(state)
-      if (userId) {
+      const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
+      if (isInProMode) {
         store().dispatch(actions.project.showLoader(true))
         store().dispatch(actions.applicationState.startCreatingCloudFile())
         newFile(emailAddress, userId, fileList, file, clientId, template, openFile, name)
@@ -243,11 +244,12 @@ const platform = {
       const state = store().getState()
       const currentFileURL = selectors.fileURLSelector(state)
       const userId = selectors.userIdSelector(state)
+      const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
       const clientId = selectors.clientIdSelector(state)
       const isLoggedIn = selectors.isLoggedInSelector(state)
       const file = isLoggedIn && selectors.fileFromFileURLSelector(state, fileURL)
       const isOnCloud = file?.isCloudFile
-      if (isLoggedIn && isOnCloud) {
+      if (isLoggedIn && isOnCloud && isInProMode) {
         if (!file) {
           errorReportingLogger.error(
             `Error deleting file at url: ${fileURL}.  File is not known to Plottr`,
@@ -417,12 +419,14 @@ const platform = {
     deleteTemplate: (templateId) => {
       const state = store().getState()
       const userId = selectors.userIdSelector(state)
-      return deleteTemplate(templateId, userId, errorReportingLogger)
+      const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
+      return deleteTemplate(templateId, userId, errorReportingLogger, isInProMode)
     },
     editTemplateDetails: (templateId, templateDetails) => {
       const state = store().getState()
       const userId = selectors.userIdSelector(state)
-      editTemplateDetails(templateId, templateDetails, userId, errorReportingLogger)
+      const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
+      editTemplateDetails(templateId, templateDetails, userId, errorReportingLogger, isInProMode)
     },
     startSaveAsTemplate: (itemType) => {
       const event = new Event('save-as-template-start', { bubbles: true, cancelable: false })
@@ -571,64 +575,88 @@ const platform = {
 
       const fileId = selectors.fileIdSelector(state)
       const userId = selectors.userIdSelector(state)
-      if (!fileId || !userId) {
+      const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
+      if (!fileId || !userId || !isInProMode) {
         return Promise.reject(
           'No file or you are not logged in.  Either way we cannot fetch a picture.'
         )
+      } else {
+        return imagePublicURL(storageUrl, fileId, userId)
       }
-      return imagePublicURL(storageUrl, fileId, userId)
     },
     saveImageToStorageBlob: (blob, name) => {
       const state = store().getState()
       const userId = selectors.userIdSelector(state)
-      return saveImageToStorageBlobInFirebase(userId, name, blob)
+      const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
+      if (!isInProMode) {
+        return saveImageToStorageBlobInFirebase(userId, name, blob)
+      } else {
+        return Promise.reject(new Error("Trying to save an image to storage but we're not in pro"))
+      }
     },
     saveImageToStorageFromURL: (url, name) => {
       const state = store().getState()
       const userId = selectors.userIdSelector(state)
-      return saveImageToStorageFromURLInFirebase(userId, name, url)
+      const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
+      if (isInProMode) {
+        return saveImageToStorageFromURLInFirebase(userId, name, url)
+      } else {
+        return Promise.reject(new Error("Trying to save an image to storage but we're not in pro"))
+      }
     },
     resizeImage,
     downloadStorageImage,
   },
   uploadToProAsDuplicate: (sourceFilePathSegments, newName) => {
-    return whenClientIsReady(({ join, readFile }) => {
-      return join(...sourceFilePathSegments).then((sourceFilePath) => {
-        return readFile(sourceFilePath).then((fileData) => {
-          try {
-            const fileJSON = JSON.parse(fileData)
-            const state = store().getState()
-            const emailAddress = selectors.emailAddressSelector(state)
-            const userId = selectors.userIdSelector(state)
-            return uploadToFirebase(emailAddress, userId, fileJSON, newName).then((response) => {
-              const fileId = response.data.fileId
-              if (!fileId) {
-                const message = `Tried to create cloud file for ${sourceFilePath} but we didn't get a fileId back`
-                errorReportingLogger.error(
-                  message,
-                  new Error('Could not create cloud file as duplicate')
+    const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(store().getState())
+    if (isInProMode) {
+      return whenClientIsReady(({ join, readFile }) => {
+        return join(...sourceFilePathSegments).then((sourceFilePath) => {
+          return readFile(sourceFilePath).then((fileData) => {
+            try {
+              const fileJSON = JSON.parse(fileData)
+              const state = store().getState()
+              const emailAddress = selectors.emailAddressSelector(state)
+              const userId = selectors.userIdSelector(state)
+              return uploadToFirebase(emailAddress, userId, fileJSON, newName).then((response) => {
+                const fileId = response.data.fileId
+                if (!fileId) {
+                  const message = `Tried to create cloud file for ${sourceFilePath} but we didn't get a fileId back`
+                  errorReportingLogger.error(
+                    message,
+                    new Error('Could not create cloud file as duplicate')
+                  )
+                  return Promise.reject(new Error(message))
+                }
+                const fileURL = helpers.file.fileIdToPlottrCloudFileURL(fileId)
+                return openFile(fileURL, false)
+              })
+            } catch (error) {
+              return Promise.reject(
+                new Error(
+                  `Couldn't parse file data to upload backup at ${sourceFilePath} to Firebase`,
+                  error
                 )
-                return Promise.reject(new Error(message))
-              }
-              const fileURL = helpers.file.fileIdToPlottrCloudFileURL(fileId)
-              return openFile(fileURL, false)
-            })
-          } catch (error) {
-            return Promise.reject(
-              new Error(
-                `Couldn't parse file data to upload backup at ${sourceFilePath} to Firebase`,
-                error
               )
-            )
-          }
+            }
+          })
         })
       })
-    })
+    } else {
+      return Promise.reject(
+        new Error("Tried to upload file to Pro as duplicate, but we're not in pro mode")
+      )
+    }
   },
   deleteProBackup: (backupRecordId, storageProtocolURL) => {
     const state = store().getState()
     const userId = selectors.userIdSelector(state)
-    return deleteProBackup(userId, backupRecordId, storageProtocolURL)
+    const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
+    if (isInProMode) {
+      return deleteProBackup(userId, backupRecordId, storageProtocolURL)
+    } else {
+      return Promise.reject(new Error("Tried to delete Pro backup, but we're not in Pro mode."))
+    }
   },
   deleteMachineLicenseActivation: (id, os, name, localUserName) => {
     return deleteMachineLicenseActivation(id, os, name, localUserName).then(() => {

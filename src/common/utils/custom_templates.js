@@ -22,7 +22,8 @@ export function addNewCustomTemplate(pltrData, { type, data }) {
 
   templatePromise.then((template) => {
     const userId = selectors.userIdSelector(pltrData)
-    if (userId) {
+    const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(pltrData)
+    if (isInProMode) {
       saveCustomTemplate(userId, template)
     } else {
       whenClientIsReady(({ setCustomTemplate }) => {

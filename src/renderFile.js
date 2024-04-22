@@ -55,10 +55,12 @@ export const renderFile = (root, whenClientIsReady) => {
   const saveBackup = (filePath, file) => {
     const state = store().getState()
     const onCloud = selectors.isCloudFileSelector(state)
+    const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
     const userId = selectors.userIdSelector(state)
     const localBackupsEnabled = selectors.localBackupsEnabledSelector(state)
 
-    const result = onCloud ? saveBackupOnFirebase(userId, file) : Promise.resolve(true)
+    const result =
+      isInProMode && onCloud ? saveBackupOnFirebase(userId, file) : Promise.resolve(true)
 
     return result.then(() => {
       return whenClientIsReady(({ saveBackup }) => {

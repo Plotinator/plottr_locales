@@ -12,7 +12,7 @@ import logger from '../../../shared/logger'
 import { getErrorReporterInstance } from '../../../shared/error-reporter-instance'
 
 const Renamer = ({
-  userId,
+  isInProMode,
   showLoader,
   fileList,
   startRenamingFile,
@@ -25,32 +25,33 @@ const Renamer = ({
 
   const renameFile = (newName) => {
     // This component is for renaming cloud files only.
-    if (!userId || isOffline) {
+    if (!isInProMode || isOffline) {
       return
-    }
-    startRenamingFile()
-    showLoader(true)
+    } else {
+      startRenamingFile()
+      showLoader(true)
 
-    editFileNameOnFirebase(fileId, newName)
-      .then((result) => {
-        finishRenamingFile()
-        return result
-      })
-      .then(() => {
-        logger.info(`Renamed file with id ${fileId} to ${newName}`)
-        setFileId(null)
-        setVisible(false)
-        showLoader(false)
-        finishRenamingFile()
-      })
-      .catch((error) => {
-        logger.error(`Error renaming file with id ${fileId}`, error)
-        getErrorReporterInstance().then((errorReporter) => {
-          errorReporter.error(`Error renaming file with id ${fileId}`, error)
+      editFileNameOnFirebase(fileId, newName)
+        .then((result) => {
+          finishRenamingFile()
+          return result
         })
-        showLoader(false)
-        finishRenamingFile()
-      })
+        .then(() => {
+          logger.info(`Renamed file with id ${fileId} to ${newName}`)
+          setFileId(null)
+          setVisible(false)
+          showLoader(false)
+          finishRenamingFile()
+        })
+        .catch((error) => {
+          logger.error(`Error renaming file with id ${fileId}`, error)
+          getErrorReporterInstance().then((errorReporter) => {
+            errorReporter.error(`Error renaming file with id ${fileId}`, error)
+          })
+          showLoader(false)
+          finishRenamingFile()
+        })
+    }
   }
 
   useEffect(() => {
@@ -81,7 +82,7 @@ const Renamer = ({
 }
 
 Renamer.propTypes = {
-  userId: PropTypes.string,
+  isInProMode: PropTypes.bool,
   showLoader: PropTypes.func.isRequired,
   fileList: PropTypes.array.isRequired,
   startRenamingFile: PropTypes.func.isRequired,
@@ -92,7 +93,7 @@ Renamer.propTypes = {
 
 export default connect(
   (state) => ({
-    userId: selectors.userIdSelector(state),
+    isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
     isCloudFile: selectors.isCloudFileSelector(state),
     fileList: selectors.knownFilesSelector(state),
     isOffline: selectors.isOfflineSelector(state),

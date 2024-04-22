@@ -33,6 +33,7 @@ const Listener = ({
   showErrorBox,
   unsavedChanges,
   isDeviceFile,
+  isInProMode,
 }) => {
   const fileSystemAPIs = makeFileSystemAPIs(whenClientIsReady)
 
@@ -106,20 +107,19 @@ const Listener = ({
     const fileIsntACloudFile = !helpers.file.urlPointsToPlottrCloud(fileURL)
     const weAreResuming = offlineModeIsEnabled && resuming
 
-    if (weDontHaveBasicInfo || fileIsntACloudFile || isOffline || weAreResuming) {
+    if (weDontHaveBasicInfo || fileIsntACloudFile || isOffline || weAreResuming || !isInProMode) {
       return () => {}
-    }
-
-    let unsubscribeFunction = () => {}
-    if (fileLoaded) {
-      const fileId = helpers.file.fileIdFromPlottrProFile(fileURL)
-      unsubscribeFunction = listen(store(), userId, fileId, clientId, fileVersion)
-      setPermission(selectedFile.permission)
     } else {
-      setFileLoaded()
+      let unsubscribeFunction = () => {}
+      if (fileLoaded) {
+        const fileId = helpers.file.fileIdFromPlottrProFile(fileURL)
+        unsubscribeFunction = listen(store(), userId, fileId, clientId, fileVersion)
+        setPermission(selectedFile.permission)
+      } else {
+        setFileLoaded()
+      }
+      return unsubscribeFunction
     }
-
-    return unsubscribeFunction
   }, [
     offlineModeIsEnabled,
     fileVersion,
@@ -129,6 +129,7 @@ const Listener = ({
     fileLoaded,
     isOffline,
     resuming,
+    isInProMode,
   ])
 
   const selectedFileVersionRef = useRef(null)
@@ -183,6 +184,7 @@ Listener.propTypes = {
   offlineModeIsEnabled: PropTypes.bool,
   showErrorBox: PropTypes.func.isRequired,
   startCreatingNewProject: PropTypes.func.isRequired,
+  isInProMode: PropTypes.bool,
 }
 
 export default connect(
@@ -200,6 +202,7 @@ export default connect(
     hasDefaultFolder: selectors.hasDefaultFolderSelector(state),
     unsavedChanges: selectors.unsavedChangesSelector(state),
     isDeviceFile: selectors.isDeviceFileSelector(state),
+    isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
   }),
   {
     setPermission: actions.permission.setPermission,
