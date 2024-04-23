@@ -9,3 +9,40 @@ export const parseStringDate = (stringDate) => {
   }
   return new Date(year, month - 1, day)
 }
+
+const safeParseInt = (string) => {
+  if (typeof string === 'string' && string.match(/[0-9]+/)) {
+    try {
+      const x = parseInt(string)
+      if (isNaN(x)) {
+        return null
+      } else {
+        return x
+      }
+    } catch (error) {
+      return null
+    }
+  } else {
+    return null
+  }
+}
+
+export const versionToDate = (version) => {
+  if (typeof version === 'string') {
+    const [rawYear, rawMonth, rawDay] = version.split('.')
+    const year = safeParseInt(rawYear)
+    const month = safeParseInt(rawMonth)
+    const day = safeParseInt(rawDay)
+    if (year && month && day) {
+      const versionDate = new Date()
+      versionDate.setUTCFullYear(year)
+      versionDate.setUTCMonth(month - 1)
+      versionDate.setUTCDate(day)
+      return versionDate
+    } else {
+      return null
+    }
+  } else {
+    return null
+  }
+}

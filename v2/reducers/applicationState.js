@@ -54,6 +54,12 @@ import {
   CLOSE_SEARCH,
   OPEN_REPLACE,
   STAGE_LANGUAGE,
+  SET_PATH_TO_PROJECT,
+  OPEN_DASHBOARD_TO,
+  DASHBOARD_CLOSED,
+  FINISH_FIRST_TIME_BOOTING,
+  START_FETCHING_A_LICENSE_TYPE,
+  FINISH_FETCHING_A_LICENSE_TYPE,
 } from '../constants/ActionTypes'
 import { EDITING, VIEWING, SEARCHING } from '../constants/editStates'
 
@@ -74,6 +80,7 @@ const INITIAL_STATE = {
     renamingFile: false,
     deletingFile: false,
     savingFileAs: false,
+    pathToProjectDuringBoot: null,
   },
   session: {
     loggingIn: false,
@@ -85,8 +92,12 @@ const INITIAL_STATE = {
     trialLoaded: false,
     loadingLicense: false,
     licenseLoaded: false,
+    fetchingLicense: false,
+    fetchedLicense: false,
     checkingProSubscription: false,
     proSubscriptionChecked: false,
+    fetchingProSubscription: false,
+    fetchedProSubscription: false,
   },
   settings: {
     loadingSettings: false,
@@ -120,6 +131,13 @@ const INITIAL_STATE = {
   userInteractions: {
     jumpCounter: 0,
     editState: EDITING,
+  },
+  dashboard: {
+    openTo: null,
+    closed: false,
+  },
+  booting: {
+    firstTimeBooting: true,
   },
 }
 
@@ -170,6 +188,61 @@ const finishLoadingLicenseType = (licenseState, licenseType) => {
         ...licenseState,
         checkingProSubscription: false,
         proSubscriptionChecked: true,
+      }
+    }
+    default: {
+      return licenseState
+    }
+  }
+}
+
+const startFetchingLicenseType = (licenseState, licenseType) => {
+  switch (licenseType) {
+    case 'trial': {
+      return {
+        ...licenseState,
+        fetchingTrial: true,
+      }
+    }
+    case 'license': {
+      return {
+        ...licenseState,
+        fetchingLicense: true,
+      }
+    }
+    case 'proSubscription': {
+      return {
+        ...licenseState,
+        fetchingProSubscription: true,
+      }
+    }
+    default: {
+      return licenseState
+    }
+  }
+}
+
+const finishFetchingLicenseType = (licenseState, licenseType) => {
+  switch (licenseType) {
+    case 'trial': {
+      return {
+        ...licenseState,
+        fetchingTrial: false,
+        trialFetched: true,
+      }
+    }
+    case 'license': {
+      return {
+        ...licenseState,
+        fetchingLicense: false,
+        fetchedLicense: true,
+      }
+    }
+    case 'proSubscription': {
+      return {
+        ...licenseState,
+        fetchingProSubscription: false,
+        fetchedProSubscription: true,
       }
     }
     default: {
@@ -467,6 +540,22 @@ function applicationStateReducer(state = INITIAL_STATE, action) {
         },
       }
     }
+    case START_FETCHING_A_LICENSE_TYPE: {
+      return {
+        ...state,
+        license: {
+          ...startFetchingLicenseType(state.license, action.licenseType),
+        },
+      }
+    }
+    case FINISH_FETCHING_A_LICENSE_TYPE: {
+      return {
+        ...state,
+        license: {
+          ...finishFetchingLicenseType(state.license, action.licenseType),
+        },
+      }
+    }
     case START_LOADING_A_SETTINGS_TYPE: {
       return {
         ...state,
@@ -548,6 +637,42 @@ function applicationStateReducer(state = INITIAL_STATE, action) {
         }
       }
     }
+    case SET_PATH_TO_PROJECT: {
+      return {
+        ...state,
+        file: {
+          ...state.file,
+          pathToProjectDuringBoot: action.filePath,
+        },
+      }
+    }
+    case OPEN_DASHBOARD_TO: {
+      return {
+        ...state,
+        dashboard: {
+          ...state.dashboard,
+          openTo: action.view,
+        },
+      }
+    }
+    case DASHBOARD_CLOSED: {
+      return {
+        ...state,
+        dashboard: {
+          ...state.dashboard,
+          closed: true,
+        },
+      }
+    }
+    case FINISH_FIRST_TIME_BOOTING: {
+      return {
+        ...state,
+        booting: {
+          ...state.booting,
+          firstTimeBooting: false,
+        },
+      }
+    }
     case ADVANCE_PRO_ONBOARDING: {
       if (!state.proOnboarding.isOnboarding && !state.proOnboarding.isOnboardingFromRoot) {
         return state
@@ -576,8 +701,10 @@ function applicationStateReducer(state = INITIAL_STATE, action) {
         },
         license: {
           ...state.license,
-          checkingProSubscription: false,
-          proSubscriptionChecked: false,
+          fetchingProSubscription: false,
+          fetchedProSubscription: false,
+          fetchingLicense: false,
+          fetchedLicense: false,
         },
         session: {
           loggingIn: false,
@@ -597,8 +724,10 @@ function applicationStateReducer(state = INITIAL_STATE, action) {
         },
         license: {
           ...state.license,
-          checkingProSubscription: false,
-          proSubscriptionChecked: false,
+          fetchingProSubscription: false,
+          fetchedProSubscription: false,
+          fetchingLicense: false,
+          fetchedLicense: false,
         },
       }
     }

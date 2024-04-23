@@ -49,6 +49,10 @@ import {
   START_VIEWING,
   START_SEARCHING,
   STAGE_LANGUAGE,
+  SET_PATH_TO_PROJECT,
+  OPEN_DASHBOARD_TO,
+  DASHBOARD_CLOSED,
+  FINISH_FIRST_TIME_BOOTING,
 } from '../constants/ActionTypes'
 
 // Project states
@@ -251,3 +255,29 @@ export const stageLanguage = (language) => ({
   type: STAGE_LANGUAGE,
   language,
 })
+
+export const setPathToProject = (filePath) => {
+  return {
+    type: SET_PATH_TO_PROJECT,
+    filePath,
+  }
+}
+
+export const setOpenDashboardTo = (view) => {
+  return {
+    type: OPEN_DASHBOARD_TO,
+    view,
+  }
+}
+
+export const dashboardClosed = () => {
+  return {
+    type: DASHBOARD_CLOSED,
+  }
+}
+
+export const finishFirstTimeBooting = () => {
+  return {
+    type: FINISH_FIRST_TIME_BOOTING,
+  }
+}

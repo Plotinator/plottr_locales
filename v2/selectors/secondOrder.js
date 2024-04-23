@@ -20,7 +20,11 @@ import {
 import { allNotesSelector } from './notesFirstOrder'
 import { allLinesSelector } from './linesFirstOrder'
 import { fullFileStateSelector } from './fullFileFirstOrder'
-import { hasActiveProLicenseSelector } from './licenseFirstOrder'
+import {
+  hasActiveProLicenseSelector,
+  needsToCheckPlottrLicense,
+  needsToCheckProLicense,
+} from './licenseFirstOrder'
 
 export const shouldBeInProSelector = createSelector(
   previouslyLoggedIntoProSelector,
@@ -551,8 +555,18 @@ export const cardsLineOrDefaultSelector = createSelector(
 
 export const isLoggedIntoProWithActiveLicenseSelector = createSelector(
   isLoggedInSelector,
+  previouslyLoggedIntoProSelector,
   hasActiveProLicenseSelector,
-  (isLoggedIn, hasActiveProLicense) => {
-    return isLoggedIn && hasActiveProLicense
+  (isLoggedIn, shouldBeInPro, hasActiveProLicense) => {
+    return isLoggedIn && shouldBeInPro && hasActiveProLicense
+  }
+)
+
+export const needsToCheckALicenseType = createSelector(
+  needsToCheckPlottrLicense,
+  needsToCheckProLicense,
+  isLoggedInSelector,
+  (needsToCheckPlottr, needsToCheckPro, isLoggedIn) => {
+    return needsToCheckPlottr || needsToCheckPro || (!needsToCheckPro && !isLoggedIn)
   }
 )

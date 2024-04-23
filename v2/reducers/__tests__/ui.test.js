@@ -355,6 +355,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: null,
+              isInProMode: false,
             },
           })
         )
@@ -385,6 +386,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
+              isInProMode: true,
             },
           })
         )
@@ -412,6 +414,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
+              isInProMode: true,
             },
           })
         )
@@ -440,6 +443,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
+              isInProMode: true,
             },
           })
         )
@@ -467,6 +471,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
+              isInProMode: true,
             },
           })
         )
@@ -496,6 +501,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
+              isInProMode: true,
             },
           })
         )
@@ -523,6 +529,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
+              isInProMode: true,
             },
           })
         )
@@ -552,6 +559,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
+              isInProMode: true,
             },
           })
         )
@@ -584,6 +592,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
+              isInProMode: true,
             },
           })
         )
@@ -627,6 +636,7 @@ describe('ui-per-user', () => {
               user: {
                 ...appSettings.user,
                 frbId: 'dummy-id',
+                isInProMode: true,
               },
             })
           )
@@ -677,6 +687,7 @@ describe('ui-per-user', () => {
               user: {
                 ...appSettings.user,
                 frbId: 'dummy-id',
+                isInProMode: true,
               },
             })
           )
@@ -732,6 +743,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
+              isInProMode: true,
             },
           })
         )
@@ -764,6 +776,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
+              isInProMode: true,
             },
           })
         )
@@ -807,6 +820,7 @@ describe('ui-per-user', () => {
               user: {
                 ...appSettings.user,
                 frbId: 'dummy-id',
+                isInProMode: true,
               },
             })
           )
@@ -856,6 +870,7 @@ describe('ui-per-user', () => {
               user: {
                 ...appSettings.user,
                 frbId: 'frb-dummy-owner-id',
+                isInProMode: true,
               },
             })
           )
@@ -886,6 +901,7 @@ describe('ui-per-user', () => {
               user: {
                 ...appSettings.user,
                 frbId: 'frb-dummy-collaborator-id',
+                isInProMode: true,
               },
             })
           )
@@ -915,7 +931,6 @@ describe('ui-per-user', () => {
 
       describe('given the permission is changed back to "owner"', () => {
         it('should read ui changes from both "owner" and "collaborator"', () => {
-          store
           const appSettings = appSettingsSelector(store.getState())
           store.dispatch(
             setAppSettings({
@@ -923,6 +938,7 @@ describe('ui-per-user', () => {
               user: {
                 ...appSettings.user,
                 frbId: 'frb-dummy-owner-id',
+                isInProMode: true,
               },
             })
           )

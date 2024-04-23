@@ -2,12 +2,13 @@
 // Use secondOrder and *ThirdOrder for your selector if it has other
 // dependencies.
 import { createSelector } from 'reselect'
+import { isEmpty } from 'lodash'
 
 import { fullFileStateSelector } from './fullFileFirstOrder'
 
 export const trialInfoSelector = createSelector(
   fullFileStateSelector,
-  (state) => state.license.trialInfo
+  (state) => state?.license?.trialInfo ?? {}
 )
 export const trialEndSelector = createSelector(trialInfoSelector, ({ endsAt }) => endsAt)
 export const daysLeftOfTrialSelector = createSelector(trialEndSelector, (endsAt) => {
@@ -67,8 +68,22 @@ const dateCheckedExistsAndIsWithinLimit = (inDateChecked) => {
 }
 export const hasActivePlottrLicenseSelector = createSelector(
   plottrLicenseSelector,
-  ({ dateChecked }) => {
-    return dateCheckedExistsAndIsWithinLimit(dateChecked)
+  ({ dateChecked, expiresAt }) => {
+    if (dateCheckedExistsAndIsWithinLimit(dateChecked)) {
+      if (expiresAt && typeof expiresAt === 'string') {
+        const dateExpiresAt = new Date(expiresAt)
+        if (isNaN(dateExpiresAt)) {
+          return false
+        } else {
+          const dateToday = new Date()
+          return dateToday < dateExpiresAt
+        }
+      } else {
+        return expiresAt === null
+      }
+    } else {
+      return false
+    }
   }
 )
 export const needsToCheckPlottrLicense = createSelector(
@@ -93,7 +108,7 @@ export const hasActiveProLicenseSelector = createSelector(
           return dateToday < dateExpiresAt
         }
       } else {
-        return false
+        return expiresAt === null
       }
     } else {
       return false
@@ -117,13 +132,6 @@ export const proLicenseExpirySelector = createSelector(proLicenseSelector, ({ ex
 export const needsToCheckProLicense = createSelector(proLicenseSelector, ({ dateChecked }) => {
   return !dateCheckedExistsAndIsWithinLimit(dateChecked)
 })
-export const needsToCheckALicenseType = createSelector(
-  needsToCheckPlottrLicense,
-  needsToCheckProLicense,
-  (needsToCheckPlottr, needsToCheckPro) => {
-    return needsToCheckPlottr || needsToCheckPro
-  }
-)
 
 export const licenseCheckIntervalSelector = createSelector(
   licenseSelector,
@@ -136,5 +144,68 @@ export const failedToContactLicenseServerSelector = createSelector(
   licenseSelector,
   ({ couldNotContactLicenseServer }) => {
     return couldNotContactLicenseServer
+  }
+)
+
+export const plottrLicenseExpirySelector = createSelector(
+  plottrLicenseSelector,
+  ({ expiresAt }) => {
+    if (expiresAt && typeof expiresAt === 'string') {
+      return new Date(expiresAt)
+    } else {
+      return null
+    }
+  }
+)
+export const hasATrialExpiredOrNotSelector = createSelector(trialInfoSelector, (trialInfo) => {
+  return !isEmpty(trialInfo)
+})
+export const hasAPlottrLicenseExpiredOrNotSelector = createSelector(
+  plottrLicenseSelector,
+  (plottrLicense) => {
+    return !isEmpty(plottrLicense)
+  }
+)
+export const hasAProLicenseExpiredOrNotSelector = createSelector(
+  proLicenseSelector,
+  (proLicense) => {
+    return !isEmpty(proLicense)
+  }
+)
+
+export const latestExpiryDateSelector = createSelector(
+  proLicenseExpirySelector,
+  plottrLicenseExpirySelector,
+  hasAPlottrLicenseExpiredOrNotSelector,
+  hasAProLicenseExpiredOrNotSelector,
+  (
+    proLicenseExpiry,
+    plottrLicenseExpiry,
+    hasAPlottrLicenseExpiredOrNot,
+    hasAProLicenseExpiredOrNot
+  ) => {
+    // If we have a license without an expiry date, then it's
+    // lifetime, so there's no expiry date.
+    if (
+      (hasAPlottrLicenseExpiredOrNot && !plottrLicenseExpiry) ||
+      (hasAProLicenseExpiredOrNot && !proLicenseExpiry)
+    ) {
+      return null
+    } else if (proLicenseExpiry && plottrLicenseExpiry) {
+      // We have both expiry dates, which one comes later?
+      if (proLicenseExpiry > plottrLicenseExpiry) {
+        return proLicenseExpiry
+      } else {
+        return plottrLicenseExpiry
+      }
+    } else if (proLicenseExpiry) {
+      // We only have a pro expiry date, and we have no Plottr
+      // license.
+      return proLicenseExpiry
+    } else {
+      // We don't have a pro license, so produce the Plottr expiry
+      // whether or not it's there.
+      return plottrLicenseExpiry
+    }
   }
 )

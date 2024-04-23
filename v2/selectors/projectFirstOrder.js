@@ -49,7 +49,7 @@ export const backingUpOfflineFileSelector = createSelector(
 )
 export const fileURLSelector = createSelector(projectSelector, ({ fileURL }) => fileURL)
 export const fileURLLoadedSelector = createSelector(fileURLSelector, (fileURL) => {
-  return fileURL && typeof fileURL === 'string' && fileURL.length && fileURL
+  return !!(fileURL && typeof fileURL === 'string' && fileURL.length && fileURL)
 })
 export const isDeviceFileSelector = createSelector(fileURLSelector, (fileURL) =>
   isDeviceFileURL(fileURL)

@@ -6,8 +6,14 @@ import {
   backupEnabledSelector,
   localBackupsEnabledSelector,
   offlineModeEnabledSelector,
+  showDashboardOnBootSelector,
+  previouslyLoggedIntoProSelector,
 } from './settingsFirstOrder'
-import { isLoggedInSelector, isOnWebSelector } from './clientFirstOrder'
+import {
+  isLoggedInSelector,
+  isOnWebSelector,
+  currentAppStateIsDashboardSelector,
+} from './clientFirstOrder'
 import {
   applicationSettingsAreLoadedSelector,
   checkedLicenseSelector,
@@ -23,6 +29,15 @@ import {
   sessionCheckedSelector,
   checkingSessionSelector,
   loadingFileSelector,
+  firstTimeBootingSelector,
+  dashboardClosedSelector,
+  checkedFileToLoadSelector,
+  checkingFileToLoadSelector,
+  trialLoadedSelector,
+  plottrLicenseLoadedSelector,
+  proLicenseLoadedSelector,
+  fetchedPlottrLicenseSelector,
+  fetchedProLicenseSelector,
 } from './applicationStateFirstOrder'
 import {
   isOfflineSelector,
@@ -36,8 +51,11 @@ import {
   hasActiveProLicenseSelector,
   trialExpiredSelector,
   trialStartedSelector,
-  needsToCheckALicenseType,
-  failedToContactLicenseServerSelector,
+  hasAPlottrLicenseExpiredOrNotSelector,
+  hasAProLicenseExpiredOrNotSelector,
+  hasATrialExpiredOrNotSelector,
+  needsToCheckPlottrLicense,
+  needsToCheckProLicense,
 } from './licenseFirstOrder'
 import { fileIsLoadedSelector } from './applicationStateFirstOrder'
 import { shouldBeInProSelector, isLoggedIntoProWithActiveLicenseSelector } from './secondOrder'
@@ -46,9 +64,10 @@ export const userNeedsToLoginSelector = createSelector(
   applicationSettingsAreLoadedSelector,
   shouldBeInProSelector,
   sessionCheckedSelector,
+  checkingSessionSelector,
   isLoggedInSelector,
-  (settingsAreLoaded, shouldBeInPro, sessionChecked, isLoggedIn) => {
-    return settingsAreLoaded && shouldBeInPro && sessionChecked && !isLoggedIn
+  (settingsAreLoaded, shouldBeInPro, sessionChecked, checkingSession, isLoggedIn) => {
+    return settingsAreLoaded && shouldBeInPro && !checkingSession && sessionChecked && !isLoggedIn
   }
 )
 
@@ -128,8 +147,10 @@ export const licenseExpiredSelector = createSelector(
 export const readyToCheckFileToLoadSelector = createSelector(
   isInSomeValidLicenseStateSelector,
   filePathToUploadSelector,
-  (inValidLicenseState, filePathToUpload) => {
-    return !filePathToUpload && inValidLicenseState
+  checkedFileToLoadSelector,
+  checkingFileToLoadSelector,
+  (inValidLicenseState, filePathToUpload, checkedFileToLoad, checkingFileToLoad) => {
+    return !filePathToUpload && inValidLicenseState && !checkedFileToLoad && !checkingFileToLoad
   }
 )
 
@@ -215,9 +236,9 @@ export const isInTrialModeWithExpiredTrialSelector = createSelector(
     trialExpired,
     hasLicense,
     hasCurrentProLicense,
-    checkingSessionOrNeedToCheckSession,
     checkedPro,
-    checkedLicense
+    checkedLicense,
+    checkingSessionOrNeedToCheckSession
   ) => {
     return (
       checkedPro &&
@@ -463,10 +484,171 @@ export const canBackupSelector = createSelector(
   }
 )
 
-export const needsToConnectToInternetSelector = createSelector(
-  needsToCheckALicenseType,
-  failedToContactLicenseServerSelector,
-  (needsToCheck, failedToContactLicenseServer) => {
-    return needsToCheck && failedToContactLicenseServer
+export const shouldSwitchToDashboardOnStartupSelector = createSelector(
+  userNeedsToLoginSelector,
+  isFirstTimeSelector,
+  isInTrialModeWithExpiredTrialSelector,
+  cantShowFileSelector,
+  currentAppStateIsDashboardSelector,
+  showDashboardOnBootSelector,
+  firstTimeBootingSelector,
+  dashboardClosedSelector,
+  (
+    needsToLogin,
+    isFirstTime,
+    isInTrialModeWithExpiredTrial,
+    cantShowFile,
+    currentAppStateIsDashboard,
+    showDashboard,
+    firstTimeBooting,
+    dashboardClosed
+  ) => {
+    return (
+      !firstTimeBooting &&
+      !needsToLogin &&
+      !isFirstTime &&
+      !isInTrialModeWithExpiredTrial &&
+      !(cantShowFile || ((currentAppStateIsDashboard || showDashboard) && !dashboardClosed))
+    )
+  }
+)
+
+export const notBootingForTheFirstTimeSelector = createSelector(
+  applicationIsBusyButFileCouldBeUnloadedSelector,
+  firstTimeBootingSelector,
+  (busyBooting, firstTimeBooting) => {
+    return !busyBooting && firstTimeBooting
+  }
+)
+
+export const loadedLocalSessionSelector = createSelector(
+  applicationSettingsAreLoadedSelector,
+  trialLoadedSelector,
+  plottrLicenseLoadedSelector,
+  proLicenseLoadedSelector,
+  (settingsLoaded, trialLoaded, plottrLicenseLoaded, proLicenseLoaded) => {
+    return settingsLoaded && trialLoaded && plottrLicenseLoaded && proLicenseLoaded
+  }
+)
+
+export const hasNoLicensesSelector = createSelector(
+  hasAPlottrLicenseExpiredOrNotSelector,
+  hasAProLicenseExpiredOrNotSelector,
+  hasATrialExpiredOrNotSelector,
+  (hasPlottrLicense, hasProLicense, hasTrialLicense) => {
+    return !hasPlottrLicense && !hasProLicense && !hasTrialLicense
+  }
+)
+
+export const hasNoPurchasedLicenseSelector = createSelector(
+  hasAPlottrLicenseExpiredOrNotSelector,
+  hasAProLicenseExpiredOrNotSelector,
+  (hasPlottrLicense, hasProLicense) => {
+    return !hasPlottrLicense && !hasProLicense
+  }
+)
+
+export const displayChoiceViewSelector = createSelector(
+  loadedLocalSessionSelector,
+  hasNoLicensesSelector,
+  (loadedLocalSession, hasNoLicense) => {
+    return loadedLocalSession && hasNoLicense
+  }
+)
+
+export const displayTrialExpiredSelector = createSelector(
+  loadedLocalSessionSelector,
+  hasNoPurchasedLicenseSelector,
+  trialExpiredSelector,
+  (loadedLocalSession, hasNoPurchasedLicense, trialExpired) => {
+    return loadedLocalSession && hasNoPurchasedLicense && trialExpired
+  }
+)
+
+export const displayExpiredPlottrLicenseSelector = createSelector(
+  loadedLocalSessionSelector,
+  previouslyLoggedIntoProSelector,
+  hasAPlottrLicenseExpiredOrNotSelector,
+  fetchedPlottrLicenseSelector,
+  hasActivePlottrLicenseSelector,
+  (
+    loadedLocalSession,
+    previouslyLoggedIntoPro,
+    hasAPlottrLicenseExpiredOrNot,
+    fetchedPlottrLicense,
+    hasActivePlottrLicense
+  ) => {
+    return (
+      loadedLocalSession &&
+      !previouslyLoggedIntoPro &&
+      hasAPlottrLicenseExpiredOrNot &&
+      fetchedPlottrLicense &&
+      !hasActivePlottrLicense
+    )
+  }
+)
+
+export const displayExpiredProLicenseSelector = createSelector(
+  loadedLocalSessionSelector,
+  previouslyLoggedIntoProSelector,
+  hasAProLicenseExpiredOrNotSelector,
+  fetchedProLicenseSelector,
+  hasActiveProLicenseSelector,
+  (
+    loadedLocalSession,
+    previouslyLoggedIntoPro,
+    hasAProLicenseExpiredOrNot,
+    fetchedProLicense,
+    hasActiveProLicense
+  ) => {
+    return (
+      loadedLocalSession &&
+      previouslyLoggedIntoPro &&
+      hasAProLicenseExpiredOrNot &&
+      fetchedProLicense &&
+      !hasActiveProLicense
+    )
+  }
+)
+
+export const displayConnectToTheInternetSelector = createSelector(
+  loadedLocalSessionSelector,
+  isOfflineSelector,
+  previouslyLoggedIntoProSelector,
+  needsToCheckPlottrLicense,
+  needsToCheckProLicense,
+  (loadedLocalSession, isOffline, previouslyLoggedIntoPro, needsToCheckPlottr, needsToCheckPro) => {
+    return (
+      loadedLocalSession &&
+      isOffline &&
+      ((!previouslyLoggedIntoPro && needsToCheckPlottr) ||
+        (previouslyLoggedIntoPro && needsToCheckPro))
+    )
+  }
+)
+
+export const displayLoginSelector = createSelector(
+  loadedLocalSessionSelector,
+  hasAProLicenseExpiredOrNotSelector,
+  sessionCheckedSelector,
+  isLoggedInSelector,
+  previouslyLoggedIntoProSelector,
+  (loadedLocalSession, hasAProLicense, sessionChecked, isLoggedIn, previouslyLoggedIntoPro) => {
+    return (
+      loadedLocalSession &&
+      hasAProLicense &&
+      sessionChecked &&
+      !isLoggedIn &&
+      previouslyLoggedIntoPro
+    )
+  }
+)
+
+export const displayDashboardSelector = createSelector(
+  cantShowFileSelector,
+  currentAppStateIsDashboardSelector,
+  showDashboardOnBootSelector,
+  (cantShowFile, currentAppStateIsDashboard, showDashboardOnBoot) => {
+    return cantShowFile && currentAppStateIsDashboard && showDashboardOnBoot
   }
 )
