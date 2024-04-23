@@ -10,7 +10,7 @@ import { helpers } from 'pltr/v2'
 
 const { readdir, mkdir, lstat, cp, symlink, link } = fs.promises
 
-const TRIAL_LENGTH = 14
+const TRIAL_LENGTH = 60
 const EXTENSIONS = 2
 
 function americanToYearFirst(dateString) {
