@@ -405,7 +405,11 @@ const platform = {
     return pleaseUpdateLanguage(newLanguage)
   },
   license: {
-    startTrial,
+    startTrial: () => {
+      startTrial().then(() => {
+        return saveAppSetting('user.choseTrialMode', true)
+      })
+    },
     deleteLicense,
     saveLicenseInfo,
     deletePlottrLicense,
@@ -553,7 +557,7 @@ const platform = {
     logOut: () => {
       return saveAppSetting('user.frbId', null)
         .then(() => {
-          return saveAppSetting('user.isInProMode', false)
+          return saveAppSetting('user.choseProMode', false)
         })
         .then(() => {
           return logOut()

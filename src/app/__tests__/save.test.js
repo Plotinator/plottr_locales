@@ -198,7 +198,7 @@ const onlineWithOfflineDisabledAndLocalBackupDisabledState = () => {
         ...oldSettings.user,
         enableOfflineMode: false,
         localBackups: false,
-        isInProMode: true,
+        choseProMode: true,
         frbId: 'antoehuteut',
       },
     })
@@ -252,7 +252,7 @@ const onlineWithOfflineDisabledAndLocalBackupEnabledState = () => {
         ...oldSettings.user,
         enableOfflineMode: false,
         localBackups: true,
-        isInProMode: true,
+        choseProMode: true,
         frbId: 'antoehuteut',
       },
     })

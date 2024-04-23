@@ -196,7 +196,7 @@ const makeFileSystemAPIs = (socketClient) => {
   }
   const persistLicenseMode = (isInProMode) => {
     return socketClient(({ saveAppSetting }) => {
-      return saveAppSetting('user.isInProMode', isInProMode)
+      return saveAppSetting('user.choseProMode', isInProMode)
     })
   }
   const persistEmailAddress = (email) => {

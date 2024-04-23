@@ -92,7 +92,7 @@ const fileSystemModule = (userDataPath) => {
     const setLastOpenedFilePath = (filePath) => {
       // We don't want to record last opened when we should be in pro
       // and opened a device file.
-      const isInProMode = SETTINGS.get('user.isInProMode')
+      const isInProMode = SETTINGS.get('user.choseProMode')
       if (isInProMode) {
         return Promise.resolve()
       }
