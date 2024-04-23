@@ -8,6 +8,7 @@ import {
   offlineModeEnabledSelector,
   showDashboardOnBootSelector,
   previouslyLoggedIntoProSelector,
+  choseTrialModeSelector,
 } from './settingsFirstOrder'
 import {
   isLoggedInSelector,
@@ -92,10 +93,10 @@ export const isInTrialModeSelector = createSelector(
   trialStartedSelector,
   trialExpiredSelector,
   hasActivePlottrLicenseSelector,
-  hasActiveProLicenseSelector,
   shouldBeInProSelector,
-  (started, trialExpired, hasLicense, hasCurrentProLicense, shouldBeInPro) => {
-    return started && !trialExpired && !hasLicense && !hasCurrentProLicense && !shouldBeInPro
+  choseTrialModeSelector,
+  (started, trialExpired, hasLicense, shouldBeInPro, choseTrialMode) => {
+    return started && !trialExpired && !hasLicense && !shouldBeInPro && choseTrialMode
   }
 )
 
@@ -229,6 +230,7 @@ export const isInTrialModeWithExpiredTrialSelector = createSelector(
   hasActivePlottrLicenseSelector,
   hasActiveProLicenseSelector,
   checkedProSubscriptionSelector,
+  previouslyLoggedIntoProSelector,
   checkedLicenseSelector,
   checkingSessionOrNeedToCheckSessionSelector,
   (
@@ -237,6 +239,7 @@ export const isInTrialModeWithExpiredTrialSelector = createSelector(
     hasLicense,
     hasCurrentProLicense,
     checkedPro,
+    choseProMode,
     checkedLicense,
     checkingSessionOrNeedToCheckSession
   ) => {
@@ -247,7 +250,7 @@ export const isInTrialModeWithExpiredTrialSelector = createSelector(
       started &&
       trialExpired &&
       !hasLicense &&
-      !hasCurrentProLicense
+      (!hasCurrentProLicense || (hasCurrentProLicense && !choseProMode))
     )
   }
 )
@@ -534,9 +537,15 @@ export const loadedLocalSessionSelector = createSelector(
 export const hasNoLicensesSelector = createSelector(
   hasAPlottrLicenseExpiredOrNotSelector,
   hasAProLicenseExpiredOrNotSelector,
+  previouslyLoggedIntoProSelector,
   hasATrialExpiredOrNotSelector,
-  (hasPlottrLicense, hasProLicense, hasTrialLicense) => {
-    return !hasPlottrLicense && !hasProLicense && !hasTrialLicense
+  choseTrialModeSelector,
+  (hasPlottrLicense, hasProLicense, choseProMode, hasTrialLicense, choseTrialMode) => {
+    return (
+      !hasPlottrLicense &&
+      (!hasProLicense || (hasProLicense && !choseProMode)) &&
+      (!hasTrialLicense || !choseTrialMode)
+    )
   }
 )
 
@@ -559,9 +568,24 @@ export const displayChoiceViewSelector = createSelector(
 export const displayTrialExpiredSelector = createSelector(
   loadedLocalSessionSelector,
   hasNoPurchasedLicenseSelector,
+  hasAProLicenseExpiredOrNotSelector,
+  previouslyLoggedIntoProSelector,
   trialExpiredSelector,
-  (loadedLocalSession, hasNoPurchasedLicense, trialExpired) => {
-    return loadedLocalSession && hasNoPurchasedLicense && trialExpired
+  choseTrialModeSelector,
+  (
+    loadedLocalSession,
+    hasNoPurchasedLicense,
+    hasProLicense,
+    previouslyLoggedIntoPro,
+    trialExpired,
+    choseTrialMode
+  ) => {
+    return (
+      loadedLocalSession &&
+      (hasNoPurchasedLicense || (hasProLicense && !previouslyLoggedIntoPro)) &&
+      trialExpired &&
+      choseTrialMode
+    )
   }
 )
 
@@ -591,22 +615,11 @@ export const displayExpiredPlottrLicenseSelector = createSelector(
 export const displayExpiredProLicenseSelector = createSelector(
   loadedLocalSessionSelector,
   previouslyLoggedIntoProSelector,
-  hasAProLicenseExpiredOrNotSelector,
   fetchedProLicenseSelector,
   hasActiveProLicenseSelector,
-  (
-    loadedLocalSession,
-    previouslyLoggedIntoPro,
-    hasAProLicenseExpiredOrNot,
-    fetchedProLicense,
-    hasActiveProLicense
-  ) => {
+  (loadedLocalSession, previouslyLoggedIntoPro, fetchedProLicense, hasActiveProLicense) => {
     return (
-      loadedLocalSession &&
-      previouslyLoggedIntoPro &&
-      hasAProLicenseExpiredOrNot &&
-      fetchedProLicense &&
-      !hasActiveProLicense
+      loadedLocalSession && previouslyLoggedIntoPro && fetchedProLicense && !hasActiveProLicense
     )
   }
 )

@@ -40,9 +40,13 @@ export const rceFontsSettingsSelector = createSelector(fontSettingsSelector, ({ 
 export const previouslyLoggedIntoProSelector = createSelector(
   appSettingsSelector,
   (appSettings) => {
-    return !!appSettings?.user?.isInProMode
+    return !!appSettings?.user?.choseProMode
   }
 )
+export const choseProModeSelector = previouslyLoggedIntoProSelector
+export const choseTrialModeSelector = createSelector(appSettingsSelector, (appSettings) => {
+  return !!appSettings?.user?.choseTrialMode
+})
 export const emailFromLastLoginSelector = createSelector(appUserSettingsSelector, ({ email }) => {
   return email ?? ''
 })

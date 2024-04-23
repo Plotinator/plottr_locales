@@ -355,7 +355,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: null,
-              isInProMode: false,
+              choseProMode: false,
             },
           })
         )
@@ -386,7 +386,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
-              isInProMode: true,
+              choseProMode: true,
             },
           })
         )
@@ -414,7 +414,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
-              isInProMode: true,
+              choseProMode: true,
             },
           })
         )
@@ -443,7 +443,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
-              isInProMode: true,
+              choseProMode: true,
             },
           })
         )
@@ -471,7 +471,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
-              isInProMode: true,
+              choseProMode: true,
             },
           })
         )
@@ -501,7 +501,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
-              isInProMode: true,
+              choseProMode: true,
             },
           })
         )
@@ -529,7 +529,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
-              isInProMode: true,
+              choseProMode: true,
             },
           })
         )
@@ -559,7 +559,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
-              isInProMode: true,
+              choseProMode: true,
             },
           })
         )
@@ -592,7 +592,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
-              isInProMode: true,
+              choseProMode: true,
             },
           })
         )
@@ -636,7 +636,7 @@ describe('ui-per-user', () => {
               user: {
                 ...appSettings.user,
                 frbId: 'dummy-id',
-                isInProMode: true,
+                choseProMode: true,
               },
             })
           )
@@ -687,7 +687,7 @@ describe('ui-per-user', () => {
               user: {
                 ...appSettings.user,
                 frbId: 'dummy-id',
-                isInProMode: true,
+                choseProMode: true,
               },
             })
           )
@@ -743,7 +743,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
-              isInProMode: true,
+              choseProMode: true,
             },
           })
         )
@@ -776,7 +776,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
-              isInProMode: true,
+              choseProMode: true,
             },
           })
         )
@@ -820,7 +820,7 @@ describe('ui-per-user', () => {
               user: {
                 ...appSettings.user,
                 frbId: 'dummy-id',
-                isInProMode: true,
+                choseProMode: true,
               },
             })
           )
@@ -870,7 +870,7 @@ describe('ui-per-user', () => {
               user: {
                 ...appSettings.user,
                 frbId: 'frb-dummy-owner-id',
-                isInProMode: true,
+                choseProMode: true,
               },
             })
           )
@@ -901,7 +901,7 @@ describe('ui-per-user', () => {
               user: {
                 ...appSettings.user,
                 frbId: 'frb-dummy-collaborator-id',
-                isInProMode: true,
+                choseProMode: true,
               },
             })
           )
@@ -938,7 +938,7 @@ describe('ui-per-user', () => {
               user: {
                 ...appSettings.user,
                 frbId: 'frb-dummy-owner-id',
-                isInProMode: true,
+                choseProMode: true,
               },
             })
           )
