@@ -50,7 +50,14 @@ const SettingsWizardStep1Connector = (connector) => {
   const LanguagePicker = UnconnectedLanguagePicker(connector)
   const DarkOptionsSelect = UnconnectedDarkOptionsSelect(connector)
 
-  const SettingsWizardStep1 = ({ nextStep, settings, stagedLanguage, stageLanguage }) => {
+  const SettingsWizardStep1 = ({
+    nextStep,
+    settings,
+    stagedLanguage,
+    stageLanguage,
+    isInProMode,
+    finishSettingsWizard,
+  }) => {
     const [fonts, setFonts] = useState(null)
     const [recentFonts, setRecentFonts] = useState(
       settings?.user?.fonts?.rce?.defaultFont ? [settings.user.fonts?.rce?.defaultFont] : null
@@ -139,9 +146,15 @@ const SettingsWizardStep1Connector = (connector) => {
         </StepBody>
         <StepFooter>
           <OnboardingButtonBar>
-            <Button bsSize="large" bsStyle="success" onClick={nextStep}>
-              {t('Next')}
-            </Button>
+            {isInProMode ? (
+              <Button bsSize="large" bsStyle="success" onClick={finishSettingsWizard}>
+                {t('Done')}
+              </Button>
+            ) : (
+              <Button bsSize="large" bsStyle="success" onClick={nextStep}>
+                {t('Next')}
+              </Button>
+            )}
           </OnboardingButtonBar>
         </StepFooter>
       </OnboardingStep>
@@ -153,6 +166,8 @@ const SettingsWizardStep1Connector = (connector) => {
     settings: PropTypes.object.isRequired,
     stagedLanguage: PropTypes.string,
     stageLanguage: PropTypes.func.isRequired,
+    isInProMode: PropTypes.bool,
+    finishSettingsWizard: PropTypes.func.isRequired,
   }
 
   const {
@@ -167,10 +182,12 @@ const SettingsWizardStep1Connector = (connector) => {
       (state) => ({
         settings: selectors.appSettingsSelector(state),
         stagedLanguage: selectors.stagedLanguageSelector(state),
+        isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
       }),
       {
         nextStep: actions.applicationState.advanceSettingsWizard,
         stageLanguage: actions.applicationState.stageLanguage,
+        finishSettingsWizard: actions.applicationState.finishSettingsWizard,
       }
     )(SettingsWizardStep1)
   }

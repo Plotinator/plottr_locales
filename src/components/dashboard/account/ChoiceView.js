@@ -8,6 +8,8 @@ import UnconnectedVerifyView from './VerifyView'
 import UnconnectedVerifyPro from './VerifyPro'
 import AccountHeader from './AccountHeader'
 
+const TRIAL_LENGTH = 60
+
 const ChoiceViewConnector = (connector) => {
   const {
     platform: {
@@ -19,7 +21,13 @@ const ChoiceViewConnector = (connector) => {
   const VerifyView = UnconnectedVerifyView(connector)
   const VerifyPro = UnconnectedVerifyPro(connector)
 
-  const ChoiceView = ({ goToAccount, startProOnboarding, startSettingsWizard }) => {
+  const ChoiceView = ({
+    goToAccount,
+    startProOnboarding,
+    startSettingsWizard,
+    trialExpired,
+    trialStarted,
+  }) => {
     const [view, setView] = useState('chooser')
 
     const goBack = () => setView('chooser')
@@ -32,9 +40,11 @@ const ChoiceViewConnector = (connector) => {
         case 'chooser':
           return (
             <div className="verify__chooser with-3">
-              <div className="verify__choice" onClick={() => setView('explain')}>
-                <h2>{trialText}</h2>
-              </div>
+              {!trialExpired && !trialStarted ? (
+                <div className="verify__choice" onClick={() => setView('explain')}>
+                  <h2>{trialText}</h2>
+                </div>
+              ) : null}
               <div
                 className="verify__choice"
                 onClick={() => {
@@ -51,7 +61,7 @@ const ChoiceViewConnector = (connector) => {
         case 'explain':
           return (
             <div>
-              <p>{t("You'll have 14 days")}</p>
+              <p>{t("You'll have {trialDays} days", { trialDays: TRIAL_LENGTH })}</p>
               <p>{t('Access all the features')}</p>
               <p>{t('Create unlimited projects')}</p>
               <div style={{ marginTop: '30px' }}>
@@ -89,19 +99,29 @@ const ChoiceViewConnector = (connector) => {
     goToAccount: PropTypes.func.isRequired,
     startProOnboarding: PropTypes.func.isRequired,
     startSettingsWizard: PropTypes.func.isRequired,
+    trialExpired: PropTypes.bool,
+    trialStarted: PropTypes.bool,
   }
 
   const {
-    pltr: { actions },
+    pltr: { actions, selectors },
     redux,
   } = connector
 
   if (redux) {
     const { connect } = redux
 
-    return connect(null, {
-      startSettingsWizard: actions.applicationState.startSettingsWizard,
-    })(ChoiceView)
+    return connect(
+      (state) => {
+        return {
+          trialExpired: selectors.trialExpiredSelector(state),
+          trialStarted: selectors.trialStartedSelector(state),
+        }
+      },
+      {
+        startSettingsWizard: actions.applicationState.startSettingsWizard,
+      }
+    )(ChoiceView)
   }
 
   throw new Error('Could not connect ChoiceView')

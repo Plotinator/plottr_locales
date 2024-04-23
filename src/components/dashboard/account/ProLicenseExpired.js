@@ -1,18 +1,34 @@
-import React from 'react'
+import React, { useState } from 'react'
+import PropTypes from 'prop-types'
 
 import { t } from 'plottr_locales'
+
+import Button from '../../Button'
+import { Spinner } from '../../Spinner'
 
 import { checkDependencies } from '../../checkDependencies'
 
 const ProLicenseExpiredConnector = (connector) => {
   const {
-    platform: { openExternal },
+    platform: {
+      openExternal,
+      firebase: { logOut },
+    },
   } = connector
-  checkDependencies({ openExternal })
+  checkDependencies({ openExternal, logOut })
 
-  const ProLicenseExpired = () => {
+  const ProLicenseExpired = ({ hasActivePlottrLicense }) => {
+    const [loggingOut, setLoggingOut] = useState(false)
+
     const buy = () => {
       openExternal('https://plottr.com/pricing/')
+    }
+
+    const handleLogOut = () => {
+      setLoggingOut(true)
+      logOut().then(() => {
+        setLoggingOut(false)
+      })
     }
 
     return (
@@ -26,20 +42,37 @@ const ProLicenseExpiredConnector = (connector) => {
             <div className="expired__choice" onClick={buy}>
               <h2>{t('I want to renew my subscription!')}</h2>
             </div>
+            {hasActivePlottrLicense ? (
+              <div className="expired__choice" onClick={logOut}>
+                <h2>{t('Use Plottr License')}</h2>
+              </div>
+            ) : null}
           </div>
+          <Button bsStyle="danger" bsSize="small" onClick={handleLogOut}>
+            {t('Log Out')} {loggingOut ? <Spinner /> : null}
+          </Button>
           <p>{t('Please contact us with any questions at support@plottr.com')}</p>
         </div>
       </div>
     )
   }
 
-  ProLicenseExpired.propTypes = {}
+  ProLicenseExpired.propTypes = {
+    hasActivePlottrLicense: PropTypes.bool,
+  }
 
-  const { redux } = connector
+  const {
+    redux,
+    pltr: { selectors },
+  } = connector
 
   if (redux) {
     const { connect } = redux
-    return connect()(ProLicenseExpired)
+    return connect((state) => {
+      return {
+        hasActivePlottrLicense: selectors.hasActivePlottrLicenseSelector(state),
+      }
+    })(ProLicenseExpired)
   }
 
   throw new Error('Could not connect ProLicenseExpired')

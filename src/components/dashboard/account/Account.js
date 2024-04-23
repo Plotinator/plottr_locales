@@ -89,7 +89,7 @@ const AccountConnector = (connector) => {
     const { connect } = redux
     return connect((state) => ({
       isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
-      hasLicense: selectors.hasAnActiveLicenseSelector(state),
+      hasLicense: selectors.hasActivePlottrLicenseSelector(state),
       isInTrialMode: selectors.isInTrialModeSelector(state),
       isInTrialModeWithExpiredTrial: selectors.isInTrialModeWithExpiredTrialSelector(state),
     }))(Account)

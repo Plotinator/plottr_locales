@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'react-proptypes'
 
 import { t } from 'plottr_locales'
@@ -17,31 +17,56 @@ const ProStep1Connector = (connector) => {
     platform: {
       isDevelopment,
       firebase: { logOut },
+      license: { checkForLicense },
     },
   } = connector
-  checkDependencies({ isDevelopment })
+  checkDependencies({ isDevelopment, logOut, checkForLicense })
 
   const FirebaseLogin = UnconnectedFirebaseLogin(connector)
 
   const ProStep1 = ({
     nextStep,
     cancel,
+    isLoggedIn,
     isInProMode,
-    checkedProSubscription,
-    checkingProSubscription,
-    startLoadingALicenseType,
-    finishLoadingALicenseType,
     finishCheckingSession,
-    checkedLicense,
     hasActivePlottrLicense,
     startSettingsWizard,
+    fetchedProSubscription,
+    fetchingProSubscription,
+    fetchedLicense,
+    fetchingLicense,
+    finishLoggingIn,
   }) => {
-    const noPro = checkedProSubscription && !isInProMode
-    const noClassic = checkedLicense && !hasActivePlottrLicense
+    const noPro = fetchedProSubscription && !fetchingProSubscription && !isInProMode
+    const noClassic = fetchedLicense && !fetchingLicense && !hasActivePlottrLicense
     const showFrb = !isInProMode
 
+    const [loggedOut, setLoggedOut] = useState(false)
+    const [checkedLicense, setCheckedLicense] = useState(false)
+
     useEffect(() => {
-      if (!checkedProSubscription) {
+      logOut().then(() => {
+        setLoggedOut(true)
+      })
+    }, [])
+
+    useEffect(() => {
+      if (isLoggedIn) {
+        checkForLicense().then(() => {
+          setCheckedLicense(true)
+        })
+      }
+    }, [isLoggedIn])
+
+    useEffect(() => {
+      if (
+        !checkedLicense ||
+        !fetchedProSubscription ||
+        !fetchedLicense ||
+        fetchingLicense ||
+        fetchingProSubscription
+      ) {
         return
       } else if (isInProMode) {
         nextStep()
@@ -49,66 +74,77 @@ const ProStep1Connector = (connector) => {
         cancel()
         startSettingsWizard()
       }
-    }, [checkedProSubscription, isInProMode, hasActivePlottrLicense])
-
-    const toggleChecking = (newVal) => {
-      if (newVal) {
-        // started checking
-        startLoadingALicenseType('proSubscription')
-      } else {
-        if (checkedProSubscription) return
-        // finished checking
-        finishLoadingALicenseType('proSubscription')
-      }
-    }
+    }, [
+      checkedLicense,
+      fetchedProSubscription,
+      fetchedLicense,
+      fetchingLicense,
+      fetchingProSubscription,
+      isInProMode,
+      hasActivePlottrLicense,
+    ])
 
     const cancelAndLogout = () => {
+      finishLoggingIn()
       logOut().then(() => {
-        finishCheckingSession()
         cancel()
       })
     }
 
-    return (
-      <OnboardingStep>
-        <StepHeader>
-          <h2>{t('Sign in with your my.plottr.com account')}</h2>
-          {checkingProSubscription ? <Spinner /> : null}
-        </StepHeader>
-        {noPro && noClassic ? (
-          <StepBody>
-            <Alert bsStyle="danger">
-              <h4>{t("We couldn't find an active license for that email address")}</h4>
-            </Alert>
-            <Button onClick={cancelAndLogout} bsSize="sm">
-              {t('Cancel')}
-            </Button>
-          </StepBody>
-        ) : null}
-        <StepBody>{showFrb ? <FirebaseLogin setChecking={toggleChecking} /> : null}</StepBody>
-        {noPro || checkingProSubscription ? null : (
-          <StepFooter>
-            <OnboardingButtonBar>
-              <Button onClick={cancelAndLogout}>{t('Cancel')}</Button>
-            </OnboardingButtonBar>
-          </StepFooter>
-        )}
-      </OnboardingStep>
-    )
+    const fetching = fetchingProSubscription || fetchingLicense
+
+    if (!loggedOut) {
+      return (
+        <OnboardingStep>
+          <StepHeader>
+            <h2>{t('Busy')}</h2>
+            {fetching ? <Spinner /> : null}
+          </StepHeader>
+        </OnboardingStep>
+      )
+    } else {
+      return (
+        <OnboardingStep>
+          <StepHeader>
+            <h2>{t('Sign in with your my.plottr.com account')}</h2>
+            {fetching ? <Spinner /> : null}
+          </StepHeader>
+          {noPro && noClassic ? (
+            <StepBody>
+              <Alert bsStyle="danger">
+                <h4>{t("We couldn't find an active license for that email address")}</h4>
+              </Alert>
+              <Button onClick={cancelAndLogout} bsSize="sm">
+                {t('Cancel')}
+              </Button>
+            </StepBody>
+          ) : null}
+          <StepBody>{showFrb ? <FirebaseLogin /> : null}</StepBody>
+          {noPro || fetching ? null : (
+            <StepFooter>
+              <OnboardingButtonBar>
+                <Button onClick={cancelAndLogout}>{t('Cancel')}</Button>
+              </OnboardingButtonBar>
+            </StepFooter>
+          )}
+        </OnboardingStep>
+      )
+    }
   }
 
   ProStep1.propTypes = {
+    isLoggedIn: PropTypes.bool,
     nextStep: PropTypes.func,
     cancel: PropTypes.func,
     isInProMode: PropTypes.bool,
-    checkingProSubscription: PropTypes.bool,
-    checkedProSubscription: PropTypes.bool,
-    startLoadingALicenseType: PropTypes.func.isRequired,
-    finishLoadingALicenseType: PropTypes.func.isRequired,
     finishCheckingSession: PropTypes.func.isRequired,
     hasActivePlottrLicense: PropTypes.bool,
-    checkedLicense: PropTypes.bool,
     startSettingsWizard: PropTypes.func.isRequired,
+    fetchedProSubscription: PropTypes.bool,
+    fetchingProSubscription: PropTypes.bool,
+    fetchedLicense: PropTypes.bool,
+    fetchingLicense: PropTypes.bool,
+    finishLoggingIn: PropTypes.func.isRequired,
   }
 
   const {
@@ -120,17 +156,20 @@ const ProStep1Connector = (connector) => {
     const { connect } = redux
     return connect(
       (state) => ({
+        isLoggedIn: selectors.isLoggedInSelector(state),
         isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
-        checkingProSubscription: selectors.checkingProSubscriptionSelector(state),
-        checkedProSubscription: selectors.checkedProSubscriptionSelector(state),
         hasActivePlottrLicense: selectors.hasActivePlottrLicenseSelector(state),
-        checkedLicense: selectors.checkedLicenseSelector(state),
+        fetchedProSubscription: selectors.fetchedProSubscriptionSelector(state),
+        fetchingProSubscription: selectors.fetchingProSubscriptionSelector(state),
+        fetchedLicense: selectors.fetchedLicenseSelector(state),
+        fetchingLicense: selectors.fetchingLicenseSelector(state),
       }),
       {
         startLoadingALicenseType: actions.applicationState.startLoadingALicenseType,
         finishLoadingALicenseType: actions.applicationState.finishLoadingALicenseType,
         finishCheckingSession: actions.applicationState.finishCheckingSession,
         startSettingsWizard: actions.applicationState.startSettingsWizard,
+        finishLoggingIn: actions.applicationState.finishLoggingIn,
       }
     )(ProStep1)
   }

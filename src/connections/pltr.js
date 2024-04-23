@@ -94,6 +94,7 @@ import {
   SettingsWizard as UnconnectedSettingsWizard,
   RestructureTimelineModal as UnconnectedRestructureTimelineModal,
   ProLicenseExpired as UnconnectedProLicenseExpired,
+  PlottrLicenseExpired as UnconnectedPlottrLicenseExpired,
 } from '../components'
 
 const connector = {
@@ -162,7 +163,10 @@ const pltrTypeSpecs = {
   license: PropTypes.shape({
     startTrial: PropTypes.func.isRequired,
     deleteLicense: PropTypes.func.isRequired,
+    deletePlottrLicense: PropTypes.func.isRequired,
+    deleteProLicense: PropTypes.func.isRequired,
     saveLicenseInfo: PropTypes.func.isRequired,
+    checkForLicense: PropTypes.func.isRequired,
   }),
   reloadMenu: PropTypes.func.isRequired,
   template: PropTypes.shape({
@@ -221,6 +225,8 @@ const pltrTypeSpecs = {
   listenForRCELock: PropTypes.func.isRequired,
   lockRCE: PropTypes.func.isRequired,
   machineId: PropTypes.func.isRequired,
+  machineInfo: PropTypes.func.isRequired,
+  deleteMachineLicenseActivation: PropTypes.func.isRequired,
   extractImages: PropTypes.func.isRequired,
   firebase: PropTypes.shape({
     onSessionChange: PropTypes.func.isRequired,
@@ -346,5 +352,6 @@ export default (platform, pltr) => {
     SettingsWizard: UnconnectedSettingsWizard(connectorObject),
     RestructureTimelineModal: UnconnectedRestructureTimelineModal(connectorObject),
     ProLicenseExpired: UnconnectedProLicenseExpired(connectorObject),
+    PlottrLicenseExpired: UnconnectedPlottrLicenseExpired(connectorObject),
   }
 }

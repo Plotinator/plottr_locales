@@ -11,6 +11,7 @@ const ProInfoConnector = (connector) => {
   const {
     platform: {
       firebase: { logOut, currentUser },
+      license: { deleteProLicense },
       settings: { saveAppSetting },
     },
   } = connector
@@ -32,6 +33,7 @@ const ProInfoConnector = (connector) => {
       logOut().then(() => {
         // the order of these might matter
         saveAppSetting('user.frbId', null)
+        deleteProLicense()
         setLoggingOut(false)
         // Ordering is significant!  If you set has pro to false
         // before nuking the email address and user id then it might
