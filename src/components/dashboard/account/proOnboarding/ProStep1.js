@@ -18,6 +18,7 @@ const ProStep1Connector = (connector) => {
       isDevelopment,
       firebase: { logOut },
       license: { checkForLicense },
+      settings: { saveAppSetting },
     },
   } = connector
   checkDependencies({ isDevelopment, logOut, checkForLicense })
@@ -69,10 +70,14 @@ const ProStep1Connector = (connector) => {
       ) {
         return
       } else if (isInProMode) {
-        nextStep()
+        saveAppSetting('user.choseTrialMode', false).then(() => {
+          nextStep()
+        })
       } else if (hasActivePlottrLicense) {
-        cancel()
-        startSettingsWizard()
+        saveAppSetting('user.choseTrialMode', false).then(() => {
+          cancel()
+          startSettingsWizard()
+        })
       }
     }, [
       checkedLicense,

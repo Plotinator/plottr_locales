@@ -4,7 +4,6 @@ import PropTypes from 'react-proptypes'
 import { t } from 'plottr_locales'
 
 import Button from '../../Button'
-import UnconnectedVerifyView from './VerifyView'
 import UnconnectedVerifyPro from './VerifyPro'
 import AccountHeader from './AccountHeader'
 
@@ -18,7 +17,6 @@ const ChoiceViewConnector = (connector) => {
     },
   } = connector
 
-  const VerifyView = UnconnectedVerifyView(connector)
   const VerifyPro = UnconnectedVerifyPro(connector)
 
   const ChoiceView = ({
@@ -56,8 +54,6 @@ const ChoiceViewConnector = (connector) => {
               </div>
             </div>
           )
-        case 'verify':
-          return <VerifyView goBack={goBack} success={startSettingsWizard} />
         case 'explain':
           return (
             <div>

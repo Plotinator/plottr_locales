@@ -3,13 +3,9 @@ import { PropTypes } from 'prop-types'
 
 import { t } from 'plottr_locales'
 
-import Button from '../../Button'
-import UnconnectedVerifyView from './VerifyView'
 import { checkDependencies } from '../../checkDependencies'
 
 const ExpiredViewConnector = (connector) => {
-  const VerifyView = UnconnectedVerifyView(connector)
-
   const {
     platform: { openExternal },
   } = connector
@@ -49,11 +45,10 @@ const ExpiredViewConnector = (connector) => {
           <p>{t('Please contact us with any questions at support@plottr.com')}</p>
         </div>
       )
-    } else if (view === 'verify') {
-      return <VerifyView goBack={() => setView('chooser')} success={startSettingsWizard} />
+    } else {
+      // Better than undefined! :P
+      return null
     }
-    // Better than undefined! :P
-    return null
   }
 
   ExpiredView.propTypes = {
