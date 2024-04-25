@@ -423,6 +423,16 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
     }
   }
 
+  .onboarding__step {
+    .step__body {
+      .alert-danger {
+        h4 {
+          color: #a94442;
+        }
+      }
+    }
+  }
+
   .onboarding__progress__titles {
     > div {
       color: $darkmode-v2-darker-text;
