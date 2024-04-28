@@ -38,7 +38,7 @@ const { machineId, pleaseTellMeWhatPlatformIAmOn, machineName, localUserName } =
  * We're expected to record the license payload so that we can decrypt
  * the local license and check it's running on the right machine.
  */
-export function checkForLicense(whenClientIsReady, persistLicenseMode) {
+function checkForLicense(whenClientIsReady, persistLicenseMode, logger) {
   return Promise.all([
     machineId(),
     pleaseTellMeWhatPlatformIAmOn(),
@@ -51,6 +51,7 @@ export function checkForLicense(whenClientIsReady, persistLicenseMode) {
       name,
       localUserName: userName,
     }
+    logger.info('About to check license API with machine info', machineInfo)
     return axios
       .post(`https://${process.env.API_BASE_DOMAIN}/api/check-subscription`, machineInfo)
       .then((response) => {
@@ -62,6 +63,7 @@ export function checkForLicense(whenClientIsReady, persistLicenseMode) {
           plottrLicensePayload,
           plottrExpiresAt,
         } = response.data
+        logger.info('Got back the response', response.data)
         const dateChecked = new Date().toISOString()
         return whenClientIsReady(
           ({
@@ -117,9 +119,9 @@ export function checkForLicense(whenClientIsReady, persistLicenseMode) {
   })
 }
 
-export const makeLicenseServerAPIs = (whenClientIsReady) => {
+export const makeLicenseServerAPIs = (whenClientIsReady, logger) => {
   return {
     checkForAndSaveLicense: (persistLicenseMode) =>
-      checkForLicense(whenClientIsReady, persistLicenseMode),
+      checkForLicense(whenClientIsReady, persistLicenseMode, logger),
   }
 }

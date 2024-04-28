@@ -159,6 +159,11 @@ const errorReportingLogger = {
   },
 }
 
+const { checkForAndSaveLicense } = licenseServerAPIs.makeLicenseServerAPIs(
+  whenClientIsReady,
+  logger
+)
+
 const platform = {
   undo: () => {
     store().dispatch(ActionCreators.undo())
@@ -414,7 +419,7 @@ const platform = {
     saveLicenseInfo,
     deletePlottrLicense,
     deleteProLicense,
-    checkForLicense: () => licenseServerAPIs.checkForLicense(whenClientIsReady, persistLicenseMode),
+    checkForLicense: () => checkForAndSaveLicense(persistLicenseMode),
   },
   reloadMenu: () => {
     pleaseReloadMenu()

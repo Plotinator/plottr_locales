@@ -5,6 +5,7 @@ import { helpers } from 'pltr/v2'
 import { bootFile } from './app/bootFile'
 import { makeMainProcessClient } from './app/mainProcessClient'
 import { whenClientIsReady } from '../shared/socket-client'
+import logger from '../shared/logger'
 
 const { onReloadFromFile, pleaseFetchState, setWindowTitle } = makeMainProcessClient()
 
@@ -129,6 +130,63 @@ export const startupStateMachine = (getStore, selectors, actions, saveBackupOnFi
       getStore().dispatch(actions.applicationState.finishCheckingFileToLoad())
     }
   }
+
+  onStoreChanges(
+    getStore,
+    [
+      selectors.applicationSettingsAreLoadedSelector,
+      selectors.trialLoadedSelector,
+      selectors.plottrLicenseLoadedSelector,
+      selectors.proLicenseLoadedSelector,
+      selectors.hasNoLicensesSelector,
+      selectors.hasNoPurchasedLicenseSelector,
+      selectors.sessionCheckedSelector,
+      selectors.userNeedsToLoginSelector,
+      selectors.isInOfflineModeSelector,
+      selectors.needToCheckProSubscriptionSelector,
+      selectors.hasActiveProLicenseSelector,
+      selectors.hasActivePlottrLicenseSelector,
+      selectors.isInTrialModeSelector,
+      selectors.isLoggedInSelector,
+      selectors.shouldBeInProSelector,
+      selectors.displayChoiceViewSelector,
+      selectors.displayTrialExpiredSelector,
+      selectors.displayExpiredPlottrLicenseSelector,
+      selectors.displayExpiredProLicenseSelector,
+      selectors.displayConnectToTheInternetSelector,
+      selectors.displayLoginSelector,
+      selectors.displayDashboardSelector,
+    ],
+    (
+      applicationSettingsAreLoaded,
+      trialLoaded,
+      plottrLicenseLoaded,
+      proLicenseLoaded,
+      hasNoLicenses,
+      hasNoPurchasedLicense,
+      sessionChecked,
+      userNeedsToLogin,
+      isInOfflineMode,
+      needToCheckProSubscription,
+      hasActiveProLicense,
+      hasActivePlottrLicense,
+      isInTrialMode,
+      isLoggedIn,
+      shouldBeInPro,
+      displayChoiceView,
+      displayTrialExpired,
+      displayExpiredPlottrLicense,
+      displayExpiredProLicense,
+      displayConnectToTheInternet,
+      displayLogin,
+      displayDashboard
+    ) => {
+      // applicationSettingsAreLoaded,trialLoaded,plottrLicenseLoaded,proLicenseLoaded,hasNoLicenses,hasNoPurchasedLicense,sessionChecked,userNeedsToLogin,isInOfflineMode,needToCheckProSubscription,hasActiveProLicense,hasActivePlottrLicense,isInTrialMode,isLoggedIn,shouldBeInPro,displayChoiceView,displayTrialExpired,displayExpiredPlottrLicense,displayExpiredProLicense,displayConnectToTheInternet,displayLogin,displayDashboard
+      logger.info(
+        `H: ${applicationSettingsAreLoaded},${trialLoaded},${plottrLicenseLoaded},${proLicenseLoaded},${hasNoLicenses},${hasNoPurchasedLicense},${sessionChecked},${userNeedsToLogin},${isInOfflineMode},${needToCheckProSubscription},${hasActiveProLicense},${hasActivePlottrLicense},${isInTrialMode},${isLoggedIn},${shouldBeInPro},${displayChoiceView},${displayTrialExpired},${displayExpiredPlottrLicense},${displayExpiredProLicense},${displayConnectToTheInternet},${displayLogin},${displayDashboard}`
+      )
+    }
+  )
 
   const stopListeningToDashboardState = onStoreChanges(
     getStore,

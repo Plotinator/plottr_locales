@@ -158,7 +158,7 @@ const theWorld = (socketClient) => {
     })
   }
 
-  const { checkForAndSaveLicense } = licenseServerAPIs.makeLicenseServerAPIs(socketClient)
+  const { checkForAndSaveLicense } = licenseServerAPIs.makeLicenseServerAPIs(socketClient, logger)
 
   return {
     logger: errorReportingLogger,
