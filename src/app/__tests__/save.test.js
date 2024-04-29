@@ -225,8 +225,8 @@ const onlineWithOfflineDisabledAndLocalBackupDisabledState = () => {
           name: 'quiescent.home',
           localUserName: 'edward',
         },
-        expiresAt: '2024-04-26T11:12:49.682Z',
-        dateChecked: '2050-04-22T13:17:16.626Z',
+        expiresAt: '2050-04-22T13:17:16.626Z',
+        dateChecked: '2024-04-26T11:12:49.682Z',
       },
     })
   )
@@ -279,8 +279,8 @@ const onlineWithOfflineDisabledAndLocalBackupEnabledState = () => {
           name: 'quiescent.home',
           localUserName: 'edward',
         },
-        expiresAt: '2024-04-26T11:12:49.682Z',
-        dateChecked: '2050-04-22T13:17:16.626Z',
+        expiresAt: '2050-04-22T13:17:16.626Z',
+        dateChecked: '2024-04-26T11:12:49.682Z',
       },
     })
   )
