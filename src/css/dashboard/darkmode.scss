@@ -430,6 +430,12 @@ $white-highlight-box-shadow: inset 0px -1px 1px 0px rgba(0, 0, 0, 0.1),
           color: #a94442;
         }
       }
+
+      .onboarding__scrolling-list {
+        .list-group-item {
+          color: $darkmode-v2-darker-text;
+        }
+      }
     }
   }
 
