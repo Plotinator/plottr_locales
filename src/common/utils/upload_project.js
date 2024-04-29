@@ -1,4 +1,4 @@
-import { migrateIfNeeded } from 'pltr/v2'
+import { migrateIfNeeded } from 'pltr'
 
 import { uploadExisting } from '../../files'
 import extractImages from '../extract_images'

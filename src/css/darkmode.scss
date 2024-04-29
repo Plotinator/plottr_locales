@@ -153,10 +153,12 @@ body.darkmode {
       background-color: $darkmode-v2-border;
     }
 
-    >.active {
+    >.active >a {
+      color: #ddd;
+    }
 
-      >a,
-      >a &:hover,
+    >.active >a {
+      &:hover,
       &:focus,
       &:active {
         color: #ddd;
@@ -446,7 +448,7 @@ body.darkmode {
       }
     }
 
-    >&:last-child:not(:first-child)>.btn:first-child {
+    >:last-child:not(:first-child)>.btn:first-child {
       color: $darkmode-v2-text;
       background: $darkmode-v2-background;
 

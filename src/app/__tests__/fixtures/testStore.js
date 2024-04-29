@@ -2,7 +2,7 @@ import thunk from 'redux-thunk'
 import { createStore, applyMiddleware } from 'redux'
 import undoable, { excludeAction } from 'redux-undo'
 
-import { rootReducer, ActionTypes, SYSTEM_REDUCER_ACTION_TYPES } from 'pltr/v2'
+import { rootReducer, ActionTypes, SYSTEM_REDUCER_ACTION_TYPES } from 'pltr'
 
 export function configureStore(whenClientIsReady, initialState) {
   const reducer = undoable(rootReducer({}), {

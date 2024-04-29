@@ -1,4 +1,4 @@
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import { makeFileModule } from '../../app/files'
 import { whenClientIsReady } from '../../../shared/socket-client'

@@ -13,7 +13,7 @@ import log from 'electron-log'
 import { is } from 'electron-util'
 import contextMenu from 'electron-context-menu'
 
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import './modules/updater_events'
 import createErrorReporter from '../shared/error-reporter'

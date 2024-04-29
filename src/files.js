@@ -1,5 +1,5 @@
 import { t } from 'plottr_locales'
-import { helpers, reducers, emptyFile, migrateIfNeeded, addMissingKeys, errorCodes } from 'pltr/v2'
+import { helpers, reducers, emptyFile, migrateIfNeeded, addMissingKeys, errorCodes } from 'pltr'
 import { actions, selectors } from 'wired-up-pltr'
 
 import { openExistingFile as _openExistingFile } from './common/utils/window_manager'

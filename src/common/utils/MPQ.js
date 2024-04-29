@@ -1,5 +1,5 @@
 import mixpanel from 'mixpanel-browser'
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import log from '../../../shared/logger'
 import { whenClientIsReady } from '../../../shared/socket-client/index'

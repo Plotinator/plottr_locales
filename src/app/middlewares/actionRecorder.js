@@ -1,4 +1,4 @@
-import { ActionTypes } from 'pltr/v2'
+import { ActionTypes } from 'pltr'
 
 const actionRecorder = (store) => (next) => (action) => {
   // Support redux-thunk and friends where non-objects are dispatched.

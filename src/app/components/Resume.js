@@ -5,7 +5,7 @@ import { Spinner } from 'connected-components'
 
 import { t } from 'plottr_locales'
 import { selectors, actions } from 'wired-up-pltr'
-import { SYSTEM_REDUCER_KEYS } from 'pltr/v2'
+import { SYSTEM_REDUCER_KEYS } from 'pltr'
 import { MessageModal } from 'connected-components'
 import { initialFetch, overwriteAllKeys } from 'wired-up-firebase'
 

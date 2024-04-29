@@ -2,7 +2,7 @@ import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 import { actions, selectors } from 'wired-up-pltr'
 
 import UploadOfflineFile from './UploadOfflineFile'

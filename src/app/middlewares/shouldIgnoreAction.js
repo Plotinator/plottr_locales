@@ -1,4 +1,4 @@
-import { ActionTypes, SYSTEM_REDUCER_ACTION_TYPES } from 'pltr/v2'
+import { ActionTypes, SYSTEM_REDUCER_ACTION_TYPES } from 'pltr'
 
 export const shouldIgnoreAction = (action) => {
   return (

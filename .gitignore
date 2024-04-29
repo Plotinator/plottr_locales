@@ -44,3 +44,5 @@ data/*
 dist/
 lib/plottr_components/src/css/components.css.map
 
+/bin/294.bundle.js.LICENSE.txt
+/bin/74.bundle.js.LICENSE.txt

@@ -3,7 +3,7 @@ import { createStore, applyMiddleware } from 'redux'
 import undoable, { excludeAction } from 'redux-undo'
 import thunk from 'redux-thunk'
 
-import { rootReducer, ActionTypes, SYSTEM_REDUCER_ACTION_TYPES } from 'pltr/v2'
+import { rootReducer, ActionTypes, SYSTEM_REDUCER_ACTION_TYPES } from 'pltr'
 
 import tracker from '../middlewares/tracker'
 import logger from '../middlewares/logger'

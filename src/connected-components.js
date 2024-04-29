@@ -2,10 +2,8 @@ import { ActionCreators } from 'redux-undo'
 
 import { t } from 'plottr_locales'
 import { connections } from 'plottr_components'
-import export_config from 'plottr_import_export/src/exporter/default_config'
-import exportToSelfContainedPlottrFile from 'plottr_import_export/src/exporter/plottr'
-import { helpers } from 'pltr/v2'
-import * as pltr from 'pltr/v2'
+import { helpers } from 'pltr'
+import * as pltr from 'pltr'
 import { actions, selectors } from 'wired-up-pltr'
 import {
   backupPublicURL,
@@ -25,6 +23,9 @@ import {
   deleteProBackup,
   deleteMachineLicenseActivation,
 } from 'wired-up-firebase'
+
+import export_config from '../lib/plottr_import_export/src/exporter/default_config'
+import exportToSelfContainedPlottrFile from '../lib/plottr_import_export/src/exporter/plottr'
 
 import {
   renameFile,

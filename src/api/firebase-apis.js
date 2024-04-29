@@ -1,6 +1,6 @@
 import { groupBy, sortBy, uniqBy } from 'lodash'
 
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 import {
   onSessionChange,
   listenToCustomTemplates as listenToCustomTemplatesFromFirebase,
