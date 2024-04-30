@@ -13,6 +13,8 @@
   },
   "main": "bin/electron_main.js",
   "scripts": {
+    "analyse-bundle": "webpack --profile --json > bin/stats.json",
+    "analyse-bundle:view": "webpack-bundle-analyzer bin/stats.json",
     "spit-out-version": "node build/spit-out-version.js",
     "start": "cross-env NODE_ENV=dev electron --inspect=5858 --enable-test-utilities .",
     "compile": "cross-env NODE_ENV=production node_modules/.bin/webpack",
@@ -136,7 +138,7 @@
     "react": "^16.14.0",
     "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^16.14.0",
-    "react-icons": "^4.12.0",
+    "react-icons": "^5.1.0",
     "react-image-file-resizer": "^0.4.8",
     "react-is": "^16.13.1",
     "react-json-view": "^1.21.3",
