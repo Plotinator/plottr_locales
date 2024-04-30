@@ -168,7 +168,7 @@ module.exports = {
   testMatch: ['**/__tests__/**/*.(spec|test).[jt]s?(x)'],
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
-  testPathIgnorePatterns: ['/node_modules/', 'lib/plottr_locales/lib'],
+  testPathIgnorePatterns: ['/node_modules/', 'lib/format-message-cli'],
 
   // The regexp pattern or array of patterns that Jest uses to detect test files
   // testRegex: [],
@@ -186,11 +186,37 @@ module.exports = {
   // timers: "real",
 
   // A map from regular expressions to paths to transformers
-  // transform: undefined,
+  transform: {
+    '\\.[jt]sx?$': [
+      'babel-jest',
+      {
+        extends: './babel.config.js',
+        plugins: [
+          'lodash',
+          '@babel/plugin-proposal-class-properties',
+          '@babel/plugin-transform-modules-commonjs',
+          [
+            'module-resolver',
+            {
+              alias: {
+                plottr_locales: './lib/plottr_locales/src',
+                plottr_components: './lib/plottr_components/src/components',
+                pltr: './lib/pltr/v2',
+              },
+            },
+          ],
+        ],
+        presets: [
+          ['@babel/preset-react', { useBuiltIns: true }],
+          ['@babel/preset-env', { modules: false, targets: { node: true } }],
+        ],
+      },
+    ],
+  },
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
   transformIgnorePatterns: [
-    'node_modules/(?!(pltr|axios)/)',
+    'node_modules/(?!(axios)/)',
     //   "\\.pnp\\.[^\\/]+$"
   ],
 
