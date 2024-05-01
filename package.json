@@ -207,7 +207,7 @@
     "extraResources": [
       {
         "from": "node_modules/sharp",
-        "to": "node_modules",
+        "to": "node_modules/sharp",
         "filter": [
           "**/*"
         ]
