@@ -1,4 +1,4 @@
-import { helpers, SYSTEM_REDUCER_KEYS, migrateIfNeeded, Migrator, emptyFile } from 'pltr/v2'
+import { helpers, SYSTEM_REDUCER_KEYS, migrateIfNeeded, Migrator, emptyFile } from 'pltr'
 import { actions, selectors } from 'wired-up-pltr'
 import { t } from 'plottr_locales'
 import { v4 as uuid } from 'uuid'
@@ -9,7 +9,7 @@ import {
   saveBackup as saveBackupOnFirebase,
   writeUserOwnershipNote,
 } from 'wired-up-firebase'
-import exportToSelfContainedPlottrFile from 'plottr_import_export/src/exporter/plottr'
+import exportToSelfContainedPlottrFile from '../../lib/plottr_import_export/src/exporter/plottr'
 
 import { makeFileSystemAPIs } from '../api'
 import { offlineFileURLFromFile } from '../files'

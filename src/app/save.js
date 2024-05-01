@@ -1,7 +1,7 @@
 import { difference } from 'lodash'
 
-import exportToSelfContainedPlottrFile from 'plottr_import_export/src/exporter/plottr'
-import { helpers, SYSTEM_REDUCER_KEYS, emptyFile } from 'pltr/v2'
+import exportToSelfContainedPlottrFile from '../../lib/plottr_import_export/src/exporter/plottr'
+import { helpers, SYSTEM_REDUCER_KEYS, emptyFile } from 'pltr'
 import { selectors } from 'wired-up-pltr'
 
 export const saveFile = (whenClientIsReady, logger, postSaveHook) => (state) => {

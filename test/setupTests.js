@@ -22,6 +22,13 @@ ReactWrapper.prototype.findTypeWithTestId = ShallowWrapper.prototype.findTypeWit
 
 configure({ adapter: new Adapter() })
 
+const rtfjsModule = { loggingEnabled: () => {} }
+jest.mock('rtf.js', () => ({
+  RTFJS: rtfjsModule,
+  WMFJS: rtfjsModule,
+  EMFJS: rtfjsModule,
+}))
+
 jest.mock('electron-util', () => ({
   is: jest.fn(),
 }))

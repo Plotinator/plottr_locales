@@ -4,7 +4,7 @@ import log from 'electron-log'
 import { app, shell } from 'electron'
 import { is } from 'electron-util'
 
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import { getWindowById, numberOfWindows } from '../windows'
 import { NODE_ENV } from '../constants'

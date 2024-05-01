@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import cx from 'classnames'
 
 import { t } from 'plottr_locales'
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 import { selectors, actions } from 'wired-up-pltr'
 import { DashboardBody, DashboardNav, FullPageSpinner as Spinner } from 'connected-components'
 

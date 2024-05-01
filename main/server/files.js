@@ -3,7 +3,7 @@ import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
 import { lock } from 'proper-lockfile'
 
-import { checkFileIntegrity, SYSTEM_REDUCER_KEYS, helpers } from 'pltr/v2'
+import { checkFileIntegrity, SYSTEM_REDUCER_KEYS, helpers } from 'pltr'
 
 const { readFile, lstat, writeFile, open, unlink, readdir, mkdir, access } = fs.promises
 

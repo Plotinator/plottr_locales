@@ -2,7 +2,7 @@ import path from 'path'
 import { app, ipcMain, dialog } from 'electron'
 import log from 'electron-log'
 
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 import { t } from 'plottr_locales'
 
 import { makeBrowserWindow } from '../utils'

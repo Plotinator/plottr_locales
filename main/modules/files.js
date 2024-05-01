@@ -10,7 +10,7 @@ import { addToKnownFiles, addToKnown } from './known_files'
 import currentSettings from './settings'
 import { importFromSnowflake, importFromScrivener } from 'plottr_import_export'
 
-import { helpers, emptyFile, tree, SYSTEM_REDUCER_KEYS, specialCaseFixes } from 'pltr/v2'
+import { helpers, emptyFile, tree, SYSTEM_REDUCER_KEYS, specialCaseFixes } from 'pltr'
 import { openProjectWindow } from './windows/projects'
 import { broadcastToAllWindows } from './broadcast'
 import { OFFLINE_FILE_FILES_PATH, isOfflineFile } from './offlineFilePath'

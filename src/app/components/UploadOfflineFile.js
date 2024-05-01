@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { PropTypes } from 'prop-types'
 
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 import { t } from 'plottr_locales'
 
 import MainIntegrationContext from '../../mainIntegrationContext'

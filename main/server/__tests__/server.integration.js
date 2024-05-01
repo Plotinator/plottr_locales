@@ -6,8 +6,8 @@ import { assertEqual, assertGreaterThan, describe } from '../../../test/simpleIn
 import { createClient, whenClientIsReady } from '../../../shared/socket-client/index'
 
 import { startServer } from '../init'
-import { defaultSettings } from 'pltr/v2'
-import export_config from 'plottr_import_export/src/exporter/default_config'
+import { defaultSettings } from 'pltr'
+import export_config from '../../../lib/plottr_import_export/src/exporter/default_config'
 
 const NOP_LOGGER = {
   info: () => {},

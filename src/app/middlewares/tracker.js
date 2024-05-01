@@ -1,4 +1,4 @@
-import { ActionTypes } from 'pltr/v2'
+import { ActionTypes } from 'pltr'
 import { selectors } from 'wired-up-pltr'
 import MPQ from '../../common/utils/MPQ'
 import { shouldIgnoreAction } from './shouldIgnoreAction'

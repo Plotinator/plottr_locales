@@ -1,4 +1,4 @@
-import { actions as pltrActions, selectors as pltrSelectors } from 'pltr/v2'
+import { actions as pltrActions, selectors as pltrSelectors } from 'pltr'
 
 export const selectPresentState = (fullState) => {
   return fullState

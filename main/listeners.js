@@ -10,7 +10,7 @@ import { v4 as uuid } from 'uuid'
 import computerName from 'computer-name'
 import { userInfo } from 'os'
 
-import { helpers, selectors as pltrSelectors } from 'pltr/v2'
+import { helpers, selectors as pltrSelectors } from 'pltr'
 import { askToExport } from 'plottr_import_export'
 import { t } from 'plottr_locales'
 

@@ -1,7 +1,7 @@
 import { cloneDeep } from 'lodash'
 
 import { t } from 'plottr_locales'
-import { tree, helpers } from 'pltr/v2'
+import { tree, helpers } from 'pltr'
 import { selectors } from 'wired-up-pltr'
 
 import { saveCustomTemplate } from './templates_from_firestore'

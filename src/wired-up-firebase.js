@@ -1,6 +1,6 @@
-import { firebaseWorker } from 'plottr_firebase/worker/firebase-worker'
-
 import { selectors } from 'wired-up-pltr'
+
+import { firebaseWorker } from '../lib/plottr_firebase/worker/firebase-worker'
 
 import logger from '../shared/logger'
 import { makeMainProcessClient } from './app/mainProcessClient'

@@ -1,7 +1,7 @@
 import { createStore, applyMiddleware } from 'redux'
 import thunk from 'redux-thunk'
 
-import { rootReducer } from 'pltr/v2'
+import { rootReducer } from 'pltr'
 
 import tracker from '../middlewares/tracker'
 import logger from '../middlewares/logger'

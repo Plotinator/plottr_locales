@@ -77,7 +77,7 @@ const mainConfig = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        include: path.resolve(__dirname, 'lib', 'pltr'),
+        include: path.resolve(__dirname, 'lib', 'pltr', 'v2', 'index.js'),
         exclude: /node_modules/,
       },
     ],
@@ -90,8 +90,22 @@ const mainConfig = {
     extensions: ['.js', '.json'],
     modules: ['node_modules', 'main'],
     alias: {
-      plottr_locales: path.resolve('./node_modules/plottr_locales'),
       'wired-up-pltr': path.resolve(__dirname, 'src', 'wired-up-pltr.js'),
+      'plottr_check-prop-types': path.resolve(
+        __dirname,
+        'lib',
+        'plottr_check-prop-types',
+        'index.js'
+      ),
+      plottr_import_export: path.resolve(
+        __dirname,
+        'lib',
+        'plottr_import_export',
+        'src',
+        'index.js'
+      ),
+      plottr_locales: path.resolve(__dirname, 'lib', 'plottr_locales', 'src', 'index.js'),
+      pltr: path.resolve(__dirname, 'lib', 'pltr', 'v2', 'index.js'),
     },
   },
   target: 'electron-main',
@@ -117,7 +131,7 @@ const preloadConfig = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        include: path.resolve(__dirname, 'lib', 'pltr'),
+        include: path.resolve(__dirname, 'lib', 'pltr', 'v2', 'index.js'),
         exclude: /node_modules/,
       },
     ],
@@ -169,7 +183,13 @@ const rendererConfig = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        include: path.resolve(__dirname, 'lib', 'pltr'),
+        include: path.resolve(__dirname, 'lib', 'pltr', 'v2'),
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.js$/,
+        loader: 'babel-loader',
+        include: path.resolve(__dirname, 'lib', 'plottr_components', 'src'),
         exclude: /node_modules/,
       },
       {
@@ -177,6 +197,11 @@ const rendererConfig = {
         loader: 'babel-loader',
         include: path.resolve(__dirname, 'src'),
         exclude: /node_modules/,
+      },
+      {
+        test: /\.scss$/,
+        loader: 'sass-loader',
+        include: path.resolve(__dirname, 'lib', 'plottr_components', 'src', 'css'),
       },
       {
         test: /\.scss$/,
@@ -204,7 +229,6 @@ const rendererConfig = {
       'wired-up-firebase': path.resolve(__dirname, 'src', 'wired-up-firebase.js'),
       'wired-up-pltr': path.resolve(__dirname, 'src', 'wired-up-pltr.js'),
       'world-api': path.resolve(__dirname, 'src', 'world.js'),
-      plottr_components: path.resolve(__dirname, 'lib', 'plottr_components', 'dist', 'components'),
       // Avoid duplicate react in libs problem (see
       // https://medium.com/@penx/managing-dependencies-in-a-node-package-so-that-they-are-compatible-with-npm-link-61befa5aaca7)
       // If a better solution arose since this was written then feel
@@ -213,7 +237,6 @@ const rendererConfig = {
       'react-dom': path.resolve('./node_modules/react-dom'),
       'react-redux': path.resolve('./node_modules/react-redux'),
       redux: path.resolve('./node_modules/redux'),
-      plottr_locales: path.resolve('./node_modules/plottr_locales'),
       // Force firebase to use the browser builds rather than node builds
       '@firebase/auth/internal': path.resolve(
         __dirname,
@@ -235,6 +258,31 @@ const rendererConfig = {
         __dirname,
         'node_modules/@firebase/storage/dist/index.esm2017.js'
       ),
+      'plottr_check-prop-types': path.resolve(
+        __dirname,
+        'lib',
+        'plottr_check-prop-types',
+        'index.js'
+      ),
+      plottr_components: path.resolve(
+        __dirname,
+        'lib',
+        'plottr_components',
+        'src',
+        'components',
+        'index.js'
+      ),
+      plottr_firebase: path.resolve(__dirname, 'lib', 'plottr_firebase', 'src', 'index.js'),
+      plottr_import_export: path.resolve(
+        __dirname,
+        'lib',
+        'plottr_import_export',
+        'src',
+        'index.js'
+      ),
+      plottr_locales: path.resolve(__dirname, 'lib', 'plottr_locales', 'src', 'index.js'),
+      plottr_world: path.resolve(__dirname, 'lib', 'plottr_world', 'src', 'index.js'),
+      pltr: path.resolve(__dirname, 'lib', 'pltr', 'v2', 'index.js'),
     },
     fallback: {
       stream: require.resolve('stream-browserify'),
@@ -270,7 +318,7 @@ const loginPopupConfig = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        include: path.resolve(__dirname, 'lib', 'pltr'),
+        include: path.resolve(__dirname, 'lib', 'pltr', 'v2', 'index.js'),
         exclude: /node_modules/,
       },
       {
@@ -305,7 +353,6 @@ const loginPopupConfig = {
       'wired-up-firebase': path.resolve(__dirname, 'src', 'wired-up-firebase.js'),
       'wired-up-pltr': path.resolve(__dirname, 'src', 'wired-up-pltr.js'),
       'world-api': path.resolve(__dirname, 'src', 'world.js'),
-      plottr_components: path.resolve(__dirname, 'lib', 'plottr_components', 'dist', 'components'),
       // Avoid duplicate react in libs problem (see
       // https://medium.com/@penx/managing-dependencies-in-a-node-package-so-that-they-are-compatible-with-npm-link-61befa5aaca7)
       // If a better solution arose since this was written then feel
@@ -315,7 +362,6 @@ const loginPopupConfig = {
       'react-dom': path.resolve('./node_modules/react-dom'),
       'react-redux': path.resolve('./node_modules/react-redux'),
       redux: path.resolve('./node_modules/redux'),
-      plottr_locales: path.resolve('./node_modules/plottr_locales'),
       // Force firebase to use the browser builds rather than node builds
       '@firebase/auth/internal': path.resolve(
         __dirname,
@@ -337,6 +383,17 @@ const loginPopupConfig = {
         __dirname,
         'node_modules/@firebase/storage/dist/index.esm2017.js'
       ),
+      plottr_components: path.resolve(
+        __dirname,
+        'lib',
+        'plottr_components',
+        'src',
+        'components',
+        'index.js'
+      ),
+      plottr_firebase: path.resolve(__dirname, 'lib', 'plottr_firebase', 'src', 'index.js'),
+      plottr_locales: path.resolve(__dirname, 'lib', 'plottr_locales', 'src', 'index.js'),
+      pltr: path.resolve(__dirname, 'lib', 'pltr', 'v2', 'index.js'),
     },
   },
   target: 'web',
@@ -347,9 +404,6 @@ const loginPopupConfig = {
     sharp: 'sharp',
   },
 }
-
-// PROBLEM SEEMS TO BE THAT PLOTTR_IMPORT_EXPORT STILL USES NODE
-// DEPENDENCIES.
 
 const socketServerConfig = {
   mode: process.env.NODE_ENV === 'dev' ? 'development' : 'production',
@@ -367,7 +421,7 @@ const socketServerConfig = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        include: path.resolve(__dirname, 'lib', 'pltr'),
+        include: path.resolve(__dirname, 'lib', 'pltr', 'v2'),
         exclude: /node_modules/,
       },
       {
@@ -383,7 +437,8 @@ const socketServerConfig = {
     modules: ['main', 'node_modules'],
     alias: {
       docx: path.resolve('./node_modules/docx'),
-      plottr_locales: path.resolve('./node_modules/plottr_locales'),
+      plottr_locales: path.resolve(__dirname, 'lib', 'plottr_locales', 'src', 'index.js'),
+      pltr: path.resolve(__dirname, 'lib', 'pltr', 'v2', 'index.js'),
     },
   },
   target: 'node',

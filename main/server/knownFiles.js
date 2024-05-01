@@ -1,6 +1,6 @@
 import { basename } from 'path'
 
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 const makeKnownFilesModule = (stores, fileModule, trashModule, backupModule, logger) => {
   const { knownFilesStore } = stores

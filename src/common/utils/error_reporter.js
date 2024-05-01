@@ -1,4 +1,4 @@
-import { ActionTypes } from 'pltr/v2'
+import { ActionTypes } from 'pltr'
 import { t as i18n } from 'plottr_locales'
 
 import log from '../../../shared/logger'

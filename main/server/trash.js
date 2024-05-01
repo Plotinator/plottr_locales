@@ -3,7 +3,7 @@ import { join, basename } from 'path'
 import { sortBy } from 'lodash'
 import mv from 'mv'
 
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 const { lstat, mkdir, readdir, rm } = fs.promises
 

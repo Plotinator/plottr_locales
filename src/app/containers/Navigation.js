@@ -1,7 +1,9 @@
 import React, { useEffect, useCallback } from 'react'
 import PropTypes from 'react-proptypes'
 import { connect } from 'react-redux'
-import { FaRegUser, FaKey, FaSearch } from 'react-icons/fa'
+import { FaRegUser } from '@react-icons/all-files/fa/FaRegUser'
+import { FaKey } from '@react-icons/all-files/fa/FaKey'
+import { FaSearch } from '@react-icons/all-files/fa/FaSearch'
 
 import { t } from 'plottr_locales'
 import { Navbar, NavItem, Nav, Beamer, BookChooser, Button } from 'connected-components'
