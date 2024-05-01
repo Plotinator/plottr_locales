@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { IoIosAlert } from 'react-icons/io'
+import { IoIosAlert } from '@react-icons/all-files/io/IoIosAlert'
 import { connect } from 'react-redux'
 
 import { helpers } from 'pltr'

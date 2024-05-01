@@ -1,7 +1,7 @@
 import React from 'react'
 import { PropTypes } from 'prop-types'
 import { connect } from 'react-redux'
-import { FaSignal } from 'react-icons/fa'
+import { FaSignal } from '@react-icons/all-files/fa/FaSignal'
 
 import { selectors } from 'wired-up-pltr'
 
