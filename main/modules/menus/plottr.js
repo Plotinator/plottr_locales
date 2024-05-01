@@ -32,7 +32,7 @@ const setLocale = (locale) => {
 function buildPlottrMenu(loadMenu, safelyExit) {
   return currentSettings()
     .then((settings) => {
-      const isPro = settings.user?.frbId
+      const isPro = settings.user?.isInProMode
       const notEnglish = { ...localeNames }
       delete notEnglish.en
       const englishFirst = [

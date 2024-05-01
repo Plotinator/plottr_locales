@@ -27,6 +27,7 @@ const Resume = ({
   overwritingCloudWithBackup,
   checkingOfflineDrift,
   backingUpOfflineFile,
+  previouslyLoggedIntoPro,
   showResumeMessageDialog,
   setCheckingForOfflineDrift,
   setOverwritingCloudWithBackup,
@@ -37,22 +38,24 @@ const Resume = ({
   showErrorBox,
 }) => {
   useEffect(() => {
-    if (!offlineModeEnabled) return
-    // Only resume when we're loaded up and good to go.  The hook
-    // depends on email, userId etc. so we can safely guard the resume
-    // process with this check.
-    if (
-      isResuming &&
-      email &&
-      userId &&
-      clientId &&
-      fileId &&
-      !checkingOfflineDrift &&
-      !overwritingCloudWithBackup &&
-      !backingUpOfflineFile
-    ) {
-      setCheckingForOfflineDrift(true)
-      setShowResumeMessageDialog(true)
+    if (!offlineModeEnabled || !previouslyLoggedIntoPro) {
+      return
+    } else {
+      // Only resume when we're loaded up and good to go.  The hook
+      // depends on email, userId etc. so we can safely guard the resume
+      // process with this check.
+      if (
+        isResuming &&
+        email &&
+        userId &&
+        clientId &&
+        fileId &&
+        !checkingOfflineDrift &&
+        !overwritingCloudWithBackup &&
+        !backingUpOfflineFile
+      ) {
+        setCheckingForOfflineDrift(true)
+        setShowResumeMessageDialog(true)
 
       const checkAndUploadBackup = () => {
         return new Promise((resolve, reject) => {
@@ -66,16 +69,11 @@ const Resume = ({
                     return initialFetch(userId, fileId, clientId, version)
                   })
                 })
-              })
-              .then((cloudFile) => {
-                return new Promise((resolve, reject) => {
-                  const [uploadOurs, backupOurs, doNothing] = resumeDirective(
-                    offlineFile,
-                    cloudFile
-                  )
-                  if (doNothing) {
-                    logger.info(
-                      `After resuming, there are no changes to upload to the cloud, for file with id: ${fileId}.`
+                .then((cloudFile) => {
+                  return new Promise((resolve, reject) => {
+                    const [uploadOurs, backupOurs, doNothing] = resumeDirective(
+                      offlineFile,
+                      cloudFile
                     )
                     setResuming(false)
                     setCheckingForOfflineDrift(false)
@@ -118,35 +116,35 @@ const Resume = ({
                             date.getMonth() + 1
                           }-${date.getDate()}-${date.getFullYear()}`,
                         },
-                      },
-                      email,
-                      userId
-                    ).then(() => {
-                      setBackingUpOfflineFile(true)
-                      setCheckingForOfflineDrift(false)
-                      setResuming(false)
-                      resolve(true)
-                    })
-                  }
+                        email,
+                        userId
+                      ).then(() => {
+                        setBackingUpOfflineFile(true)
+                        setCheckingForOfflineDrift(false)
+                        setResuming(false)
+                        resolve(true)
+                      })
+                    }
+                  })
                 })
-              })
-              .then(resolve, reject)
+                .then(resolve, reject)
+            })
           })
+        }
+        checkAndUploadBackup().catch((error) => {
+          logger.error('Error trying to resume online mode', error)
+          getErrorReporterInstance().then((errorReporter) => {
+            errorReporter.error('Error trying to resume online mode', error)
+          })
+          setResuming(false)
+          setCheckingForOfflineDrift(false)
+          setOverwritingCloudWithBackup(false)
+          showErrorBox(
+            t('Error'),
+            t('There was an error reconnecting.  Please save the file and restart Plottr.')
+          )
         })
       }
-      checkAndUploadBackup().catch((error) => {
-        logger.error('Error trying to resume online mode', error)
-        getErrorReporterInstance().then((errorReporter) => {
-          errorReporter.error('Error trying to resume online mode', error)
-        })
-        setResuming(false)
-        setCheckingForOfflineDrift(false)
-        setOverwritingCloudWithBackup(false)
-        showErrorBox(
-          t('Error'),
-          t('There was an error reconnecting.  Please save the file and restart Plottr.')
-        )
-      })
     }
   }, [
     offlineModeEnabled,
@@ -173,29 +171,31 @@ const Resume = ({
     setBackingUpOfflineFile(false)
   }
 
-  if (!offlineModeEnabled) return null
-
-  if (!isResuming && !showResumeMessageDialog) return null
-
-  return (
-    <MessageModal
-      message="Reconnecting"
-      onAcknowledge={acknowledge}
-      disabledAcknowledge={isResuming || checkingOfflineDrift}
-      buttonText={isResuming ? 'Busy' : 'Dismiss'}
-    >
-      {checkingOfflineDrift && !overwritingCloudWithBackup ? <Spinner /> : null}
-      {backingUpOfflineFile
-        ? t(
-            'The cloud file is different from your local copy.  We created a duplicate of your local file and switched to the cloud file.'
-          )
-        : null}
-      {overwritingCloudWithBackup ? t('Your changes were uploaded to the cloud.') : null}
-      {!checkingOfflineDrift && !backingUpOfflineFile && !overwritingCloudWithBackup
-        ? t('Successfully resumed.')
-        : null}
-    </MessageModal>
-  )
+  if (!offlineModeEnabled || !previouslyLoggedIntoPro) {
+    return null
+  } else if (!isResuming && !showResumeMessageDialog) {
+    return null
+  } else {
+    return (
+      <MessageModal
+        message="Reconnecting"
+        onAcknowledge={acknowledge}
+        disabledAcknowledge={isResuming || checkingOfflineDrift}
+        buttonText={isResuming ? 'Busy' : 'Dismiss'}
+      >
+        {checkingOfflineDrift && !overwritingCloudWithBackup ? <Spinner /> : null}
+        {backingUpOfflineFile
+          ? t(
+              'The cloud file is different from your local copy.  We created a duplicate of your local file and switched to the cloud file.'
+            )
+          : null}
+        {overwritingCloudWithBackup ? t('Your changes were uploaded to the cloud.') : null}
+        {!checkingOfflineDrift && !backingUpOfflineFile && !overwritingCloudWithBackup
+          ? t('Successfully resumed.')
+          : null}
+      </MessageModal>
+    )
+  }
 }
 
 Resume.propTypes = {
@@ -209,6 +209,7 @@ Resume.propTypes = {
   overwritingCloudWithBackup: PropTypes.bool,
   checkingOfflineDrift: PropTypes.bool,
   backingUpOfflineFile: PropTypes.bool,
+  previouslyLoggedIntoPro: PropTypes.bool,
   showResumeMessageDialog: PropTypes.bool,
   setCheckingForOfflineDrift: PropTypes.func.isRequired,
   setOverwritingCloudWithBackup: PropTypes.func.isRequired,
@@ -227,6 +228,7 @@ export default connect(
     checkingOfflineDrift: selectors.isCheckingForOfflineDriftSelector(state),
     showResumeMessageDialog: selectors.showResumeMessageDialogSelector(state),
     backingUpOfflineFile: selectors.backingUpOfflineFileSelector(state),
+    previouslyLoggedIntoPro: selectors.previouslyLoggedIntoProSelector(state),
     userId: selectors.userIdSelector(state),
     email: selectors.emailAddressSelector(state),
     fileId: selectors.fileIdSelector(state),

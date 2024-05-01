@@ -27,6 +27,7 @@ import { startServer } from './server'
 import { listenOnIPCMain } from './listeners'
 import { createClient, resetInitialised, setPort, getPort } from '../shared/socket-client'
 import ProcessSwitches from './modules/processSwitches'
+import { encryptStringToBase64, decryptStringFromBase64 } from './modules/encrypt'
 import makeSafelyExitModule from './modules/safelyExit'
 import replyWithError from './lib/replyWithError'
 import { currentSettings } from './lib/current_settings'
@@ -204,7 +205,9 @@ app.whenReady().then(() => {
           app.quit()
         }, 5000)
       },
-      app.getVersion()
+      app.getVersion(),
+      encryptStringToBase64,
+      decryptStringFromBase64
     )
       .then(({ port, killServer }) => {
         log.info(`Socket worker started on ${port}`)

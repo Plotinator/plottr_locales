@@ -426,6 +426,14 @@ const _makeMainProcessClient = () => {
     return ask('please-mark-my-window-as-saved')
   }
 
+  const machineName = () => {
+    return ask('please-may-i-have-the-machine-name')
+  }
+
+  const localUserName = () => {
+    return ask('please-may-i-have-the-local-username')
+  }
+
   return {
     setWindowTitle,
     setRepresentedFileName,
@@ -522,6 +530,8 @@ const _makeMainProcessClient = () => {
     downloadDirectoryPath,
     markProjectAsUnsaved,
     markProjectAsSaved,
+    machineName,
+    localUserName,
   }
 }
 

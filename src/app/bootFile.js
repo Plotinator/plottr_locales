@@ -585,50 +585,82 @@ export function bootFile(
   }
 
   function _bootFile(fileURL, options, numOpenFiles, saveBackup) {
-    if (!helpers.file.isProtocolString(fileURL)) {
-      const message = `Can't boot a file without a protocol: ${fileURL}`
-      recordedErrorsDuringStartup.push({
-        message,
-        error: new Error('Cannot boot file without protocol'),
-      })
-      logger.error(message)
-      store().dispatch(actions.applicationState.errorLoadingFile())
-      return Promise.reject(new Error(message))
-    }
-    store().dispatch(actions.applicationState.startLoadingFile())
-
-    // Now that we know what the file path for this window should be,
-    // tell the main process.
-    return setMyFilePath(fileURL).then(() => {
-      // And then boot the file.
-      const isCloudFile = isPlottrCloudFile(fileURL) && !bootingOfflineFile
-
-      try {
-        return (
-          isCloudFile
-            ? bootCloudFile(fileURL, saveBackup)
-            : bootLocalFile(fileURL, numOpenFiles, saveBackup)
+    const latestExpiryDate = selectors.latestExpiryDateSelector(store().getState())
+    const inTrialMode = selectors.isInTrialModeSelector(store().getState())
+    return getVersion().then((version) => {
+      const dateBooted = helpers.date.versionToDate(version)
+      if (!inTrialMode && latestExpiryDate !== null && latestExpiryDate < dateBooted) {
+        showErrorBox(
+          t('Error'),
+          t('Your license expired before this version of Plottr was released')
         )
-          .then(() => {
-            store().dispatch(actions.applicationState.finishLoadingFile())
+        return new Promise(() => {
+          // Never resolve, because we'd rather just quit.
+          setTimeout(() => {
+            window.close()
+          }, 3000)
+        })
+      } else {
+        if (!helpers.file.isProtocolString(fileURL)) {
+          const message = `Can't boot a file without a protocol: ${fileURL}`
+          recordedErrorsDuringStartup.push({
+            message,
+            error: new Error('Cannot boot file without protocol'),
           })
-          .catch((error) => {
-            nukeLastKnown()
-            logger.error(error)
+          logger.error(message)
+          store().dispatch(actions.applicationState.errorLoadingFile())
+          return Promise.reject(new Error(message))
+        }
+        store().dispatch(actions.applicationState.startLoadingFile())
+
+        // Now that we know what the file path for this window should be,
+        // tell the main process.
+        return setMyFilePath(fileURL).then(() => {
+          // And then boot the file.
+          const isCloudFile = isPlottrCloudFile(fileURL) && !bootingOfflineFile
+          const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(store().getState())
+          if (isCloudFile && !isInProMode) {
+            const error = Error(
+              "Error booting file.  Attempted to boot pro file, but we're not in Pro"
+            )
             recordedErrorsDuringStartup.push({
-              message: `Error booting the file: ${fileURL}`,
+              message: `Error booting a file: ${fileURL}`,
               error,
             })
-            store().dispatch(
-              actions.applicationState.errorLoadingFile(error.message === UPDATE_MESSAGE)
-            )
-          })
-      } catch (error) {
-        nukeLastKnown()
-        logger.error(error)
-        recordedErrorsDuringStartup.push({ message: `Error booting a file: ${fileURL}`, error })
-        store().dispatch(actions.applicationState.errorLoadingFile())
-        return Promise.reject(error)
+            return Promise.reject(error)
+          } else {
+            try {
+              return (
+                isCloudFile
+                  ? bootCloudFile(fileURL, saveBackup)
+                  : bootLocalFile(fileURL, numOpenFiles, saveBackup)
+              )
+                .then(() => {
+                  store().dispatch(actions.applicationState.finishLoadingFile())
+                })
+                .catch((error) => {
+                  nukeLastKnown()
+                  logger.error(error)
+                  recordedErrorsDuringStartup.push({
+                    message: `Error booting the file: ${fileURL}`,
+                    error,
+                  })
+                  store().dispatch(
+                    actions.applicationState.errorLoadingFile(error.message === UPDATE_MESSAGE)
+                  )
+                })
+            } catch (error) {
+              nukeLastKnown()
+              logger.error(error)
+              recordedErrorsDuringStartup.push({
+                message: `Error booting a file: ${fileURL}`,
+                error,
+              })
+              store().dispatch(actions.applicationState.errorLoadingFile())
+              return Promise.reject(error)
+            }
+          }
+        })
       }
     })
   }

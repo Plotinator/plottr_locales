@@ -4,11 +4,15 @@ import { cloneDeep, set, get } from 'lodash'
 
 const { readFile, open, writeFile, lstat, mkdir } = fs.promises
 
+const promiseIdentity = (s) => {
+  return Promise.resolve(s)
+}
+
 class Store {
   store = {}
   watchers = new Set()
 
-  constructor(userDataPath, logger, { name, watch, defaults, onInvalidStore }) {
+  constructor(userDataPath, logger, { name, watch, defaults, onInvalidStore, encryption }) {
     logger.info(`Constructing store for: ${name}`)
 
     this.name = name
@@ -20,6 +24,11 @@ class Store {
     this.path = path.join(userDataPath, `${name}.json`)
     this.activeWrite = null
     this.initialReadComplete = false
+    this.encryptionEnabled =
+      typeof encryption?.encryptString === 'function' &&
+      typeof encryption?.decryptString === 'function'
+    this.preprocessForWrite = encryption?.encryptString || promiseIdentity
+    this.preprocessForRead = encryption?.decryptString || promiseIdentity
 
     this._readStore().then(() => {
       this.initialReadComplete = true
@@ -99,6 +108,15 @@ class Store {
     })
   }
 
+  handleBadPreprocess = (error) => {
+    if (error?.message === 'encrypt-error') {
+      this.store = {}
+      return {}
+    } else {
+      return Promise.reject(error)
+    }
+  }
+
   // This doesn't need to wait for active writes because it's
   // internal.  Please don't use it externally, That will lead to race
   // conditions.  Use `currentStore` instead!!
@@ -110,7 +128,9 @@ class Store {
             // The store doesn't yet exist.  Create it.
             this.store = this.defaults
             return this.writeStore().then(() => {
-              return JSON.stringify(this.store)
+              return this.preprocessForWrite(JSON.stringify(this.store, null, 2)).catch(
+                this.handleBadPreprocess
+              )
             })
           }
           // Does the user data folder exist?
@@ -136,6 +156,23 @@ class Store {
         }
         this.logger.error(`Failed to construct store for ${this.name} at ${this.path}`, error)
         throw new Error(`Failed to construct store for ${this.name} at ${this.path}`, error)
+      })
+      .then((rawStoreContents) => {
+        const rawContentsAsString = rawStoreContents.toString()
+        if (rawContentsAsString === '') {
+          return Promise.resolve('{}')
+        } else {
+          return this.preprocessForRead(rawContentsAsString).catch((error) => {
+            if (error?.message === 'decrypt-error') {
+              this.store = {}
+              return this.writeStore().then(() => {
+                return '{}'
+              })
+            } else {
+              return Promise.reject({})
+            }
+          })
+        }
       })
       .then((storeContents) => {
         try {
@@ -173,8 +210,7 @@ class Store {
     return this.activeWriteRequest().then(() => {
       this.activeWrite = open(this.path, 'w+')
         .then((fileHandle) => {
-          return writeFile(
-            fileHandle,
+          return this.preprocessForWrite(
             JSON.stringify(
               {
                 ...this.defaults,
@@ -184,6 +220,10 @@ class Store {
               2
             )
           )
+            .catch(this.handleBadPreprocess)
+            .then((fileContents) => {
+              return writeFile(fileHandle, fileContents)
+            })
             .then(() => {
               return fileHandle.sync().then(() => {
                 return fileHandle.close()
@@ -194,9 +234,12 @@ class Store {
             })
         })
         .catch((error) => {
-          this.logger.error(`Failed to write ${this.store} store for ${this.path}`, error)
+          this.logger.error(
+            `Failed to write ${JSON.stringify(this.store)} store for ${this.path}`,
+            error
+          )
           return Promise.reject(
-            new Error(`Failed to write ${this.store} store for ${this.path}`, error)
+            new Error(`Failed to write ${JSON.stringify(this.store)} store for ${this.path}`, error)
           )
         })
         .finally(() => {

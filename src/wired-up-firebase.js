@@ -48,6 +48,7 @@ export const getIdTokenResult = worker.getIdTokenResult
 export const isInitialised = worker.isInitialised
 export const deleteProBackup = worker.deleteProBackup
 export const writeUserOwnershipNote = worker.writeUserOwnershipNote
+export const deleteMachineLicenseActivation = worker.deleteMachineLicenseActivation
 
 // Duplicated utility functions
 export const toFirestoreArray = (array) =>

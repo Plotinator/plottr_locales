@@ -588,27 +588,34 @@ tellMeWhatOSImOn()
           const state = store().getState()
           const emailAddress = selectors.emailAddressSelector(state)
           const userId = selectors.userIdSelector(state)
-          uploadToFirebase(emailAddress, userId, json, fileName)
-            .then((response) => {
-              const fileId = response.data.fileId
-              if (!fileId) {
-                const message = `Tried to create cloud file for ${fileName} but we didn't get a fileId back`
-                errorReportingLogger.error(message, new Error('Error creating plottr cloud file'))
-                return Promise.reject(new Error(message))
-              }
-              const fileURL = helpers.file.fileIdToPlottrCloudFileURL(fileId)
-              openFile(fileURL, false)
+          const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
+          if (!isInProMode) {
+            uploadToFirebase(emailAddress, userId, json, fileName)
+              .then((response) => {
+                const fileId = response.data.fileId
+                if (!fileId) {
+                  const message = `Tried to create cloud file for ${fileName} but we didn't get a fileId back`
+                  errorReportingLogger.error(message, new Error('Error creating plottr cloud file'))
+                  return Promise.reject(new Error(message))
+                }
+                const fileURL = helpers.file.fileIdToPlottrCloudFileURL(fileId)
+                openFile(fileURL, false)
 
-              if (isScrivenerFile) {
-                store().dispatch(actions.applicationState.finishScrivenerImporter())
-              }
+                if (isScrivenerFile) {
+                  store().dispatch(actions.applicationState.finishScrivenerImporter())
+                }
 
-              closeDashboard()
-              return fileId
-            })
-            .catch((error) => {
-              errorImportingScrivener(error)
-            })
+                closeDashboard()
+                return fileId
+              })
+              .catch((error) => {
+                errorImportingScrivener(error)
+              })
+          } else {
+            errorImportingScrivener(
+              new Error("Attempted to create Plottr Cloud file but we're not in Pro Mode")
+            )
+          }
         })
 
         onFinishCreatingLocalScrivenerImportedFile(() => {

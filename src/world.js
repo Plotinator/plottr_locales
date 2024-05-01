@@ -3,7 +3,7 @@ import { groupBy, flatten } from 'lodash'
 import { selectors } from 'wired-up-pltr'
 import { plottrWorldAPI } from 'plottr_world'
 
-import { makeFileSystemAPIs, firebaseAPIs } from './api'
+import { makeFileSystemAPIs, firebaseAPIs, licenseServerAPIs } from './api'
 import logger from '../shared/logger'
 import { getErrorReporterInstance } from '../shared/error-reporter-instance'
 
@@ -158,9 +158,15 @@ const theWorld = (socketClient) => {
     })
   }
 
+  const { checkForAndSaveLicense } = licenseServerAPIs.makeLicenseServerAPIs(socketClient, logger)
+
   return {
     logger: errorReportingLogger,
     license: {
+      persistUserId: fileSystemAPIs.persistUserId,
+      persistLicenseMode: fileSystemAPIs.persistLicenseMode,
+      persistEmailAddress: fileSystemAPIs.persistEmailAddress,
+      checkForAndSaveLicense,
       listenToTrialChanges: ignoringStore(fileSystemAPIs.listenToTrialChanges),
       currentTrial: fileSystemAPIs.currentTrial,
       listenToLicenseChanges: ignoringStore(fileSystemAPIs.listenToLicenseChanges),
@@ -194,8 +200,6 @@ const theWorld = (socketClient) => {
       currentExportConfigSettings: fileSystemAPIs.currentExportConfigSettings,
       listenToAppSettingsChanges: ignoringStore(fileSystemAPIs.listenToAppSettingsChanges),
       currentAppSettings: fileSystemAPIs.currentAppSettings,
-      listenToUserSettingsChanges: ignoringStore(fileSystemAPIs.listenToUserSettingsChanges),
-      currentUserSettings: fileSystemAPIs.currentUserSettings,
     },
   }
 }

@@ -71,7 +71,6 @@ export const newFile = (
       const fileId = response.data.fileId
       const fileURL = helpers.file.fileIdToPlottrCloudFileURL(fileId)
       openFile(fileURL, false)
-      closeDashboard()
       return fileId
     })
   })
@@ -303,18 +302,18 @@ export const openExistingFile = () => {
   if (!isInOfflineMode) {
     const emailAddress = selectors.emailAddressSelector(state)
     const userId = selectors.userIdSelector(state)
-    const isLoggedIn = selectors.isLoggedInSelector(state)
-    if (isLoggedIn) {
+    const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
+    if (isInProMode) {
       store().dispatch(actions.applicationState.startUploadingFileToCloud())
     }
 
     store().dispatch(actions.project.showLoader(true))
     userFilePickerDefaultFolder().then((defaultPath) => {
-      _openExistingFile(!!userId, userId, emailAddress, defaultPath)
+      _openExistingFile(isInProMode, userId, emailAddress, defaultPath)
         .then(() => {
           logger.info('Opened existing file')
           store().dispatch(actions.project.showLoader(false))
-          if (isLoggedIn) {
+          if (isInProMode) {
             store().dispatch(actions.applicationState.finishUploadingFileToCloud())
           }
         })
@@ -325,7 +324,7 @@ export const openExistingFile = () => {
           })
           showErrorBox(t('Error'), t('There was an error doing that. Try again.')).then(() => {
             store().dispatch(actions.project.showLoader(false))
-            if (isLoggedIn) {
+            if (isInProMode) {
               store().dispatch(actions.applicationState.finishUploadingFileToCloud())
             }
           })
@@ -336,7 +335,7 @@ export const openExistingFile = () => {
 
 export const duplicateFile = (fileUrl, suggestedNewName, forceCloseWhenDone) => {
   const state = store().getState()
-  const isLoggedIntoPro = selectors.hasProSelector(state)
+  const isLoggedIntoPro = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
 
   const event = isLoggedIntoPro
     ? new Event('save-as--pro', { fileUrl, suggestedNewName })

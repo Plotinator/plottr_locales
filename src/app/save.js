@@ -55,9 +55,16 @@ export const backupFile = (
     const isCloudFile = selectors.isCloudFileSelector(state)
     const backupEnabled = selectors.backupEnabledSelector(state)
     const userId = selectors.userIdSelector(state)
+    const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
     const fileJSON = selectors.fullFileStateSelector(state)
 
-    if (!backupEnabled) return Promise.resolve()
+    if (!backupEnabled) {
+      return Promise.resolve()
+    } else {
+      const cloudBackup =
+        !isOffline && isInProMode && isCloudFile
+          ? saveBackupOnFirebase(userId, state)
+          : Promise.resolve()
 
     const hasAllKeys = selectors.hasAllKeysSelector(state)
     if (!hasAllKeys) {
@@ -67,10 +74,6 @@ export const backupFile = (
       logger.error('Missing keys', new Error(message))
       return Promise.reject(message)
     }
-
-    const cloudBackup =
-      !isOffline && isCloudFile ? saveBackupOnFirebase(userId, state) : Promise.resolve()
-
     return cloudBackup
       .then(() => {
         return whenClientIsReady(({ saveBackup, offlineFileBasePath }) => {
@@ -89,23 +92,33 @@ export const backupFile = (
               return Promise.resolve()
             }
 
-            const stateToSave = isCloudFile
-              ? exportToSelfContainedPlottrFile(fileJSON, userId, downloadStorageImage)
-              : Promise.resolve(fileJSON)
+            return offlineFileBasePath().then((offlineFilePath) => {
+              const fileURL = selectors.fileURLSelector(state)
+              if (helpers.file.withoutProtocol(fileURL).startsWith(offlineFilePath)) {
+                logger.warn(
+                  `Attempting to backup a file at ${fileURL}, but the file is in the offline folder ${offlineFilePath}.`
+                )
+                return Promise.resolve()
+              }
 
-            return stateToSave.then((selfContainedFile) => {
-              const filePath = isCloudFile
-                ? `${selfContainedFile.file.fileName}.pltr`
-                : helpers.file.withoutProtocol(fileURL)
-              return saveBackup(filePath, selfContainedFile)
+              const stateToSave = isCloudFile
+                ? exportToSelfContainedPlottrFile(fileJSON, userId, downloadStorageImage)
+                : Promise.resolve(fileJSON)
+
+              return stateToSave.then((selfContainedFile) => {
+                const filePath = isCloudFile
+                  ? `${selfContainedFile.file.fileName}.pltr`
+                  : helpers.file.withoutProtocol(fileURL)
+                return saveBackup(filePath, selfContainedFile)
+              })
             })
           })
         })
-      })
-      .then(() => {
-        if (postBackupHook) {
-          postBackupHook()
-        }
-      })
+        .then(() => {
+          if (postBackupHook) {
+            postBackupHook()
+          }
+        })
+    }
   }
 }

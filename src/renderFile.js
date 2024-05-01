@@ -2,7 +2,7 @@ import React from 'react'
 import { render } from 'react-dom'
 import { Provider } from 'react-redux'
 
-import { selectors } from 'wired-up-pltr'
+import { selectors, actions } from 'wired-up-pltr'
 import { saveBackup as saveBackupOnFirebase } from 'wired-up-firebase'
 
 import Main from 'containers/Main'
@@ -17,8 +17,17 @@ import MainIntegrationContext from './mainIntegrationContext'
 import { store } from './app/store'
 import makeFileSystemAPIs from './api/file-system-apis'
 import { makeMainProcessClient } from './app/mainProcessClient'
+import { listenToOfflineState } from './listenToOfflineState'
+import { keepGlobalFontVariablesUpToDate } from './keepGlobalFontVariablesUpToDate'
+import { startupStateMachine } from './startupStateMachine'
+import { listenToDarkMode } from './darkModeListener'
 
 export const renderFile = (root, whenClientIsReady) => {
+  listenToOfflineState(store, selectors, actions)
+  keepGlobalFontVariablesUpToDate(store, selectors)
+  startupStateMachine(store, selectors, actions, saveBackupOnFirebase)
+  listenToDarkMode(store, selectors)
+
   const saveOfflineFile = (file) => {
     return whenClientIsReady(({ saveOfflineFile }) => {
       return saveOfflineFile(file)
@@ -46,10 +55,12 @@ export const renderFile = (root, whenClientIsReady) => {
   const saveBackup = (filePath, file) => {
     const state = store().getState()
     const onCloud = selectors.isCloudFileSelector(state)
+    const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
     const userId = selectors.userIdSelector(state)
     const localBackupsEnabled = selectors.localBackupsEnabledSelector(state)
 
-    const result = onCloud ? saveBackupOnFirebase(userId, file) : Promise.resolve(true)
+    const result =
+      isInProMode && onCloud ? saveBackupOnFirebase(userId, file) : Promise.resolve(true)
 
     return result.then(() => {
       return whenClientIsReady(({ saveBackup }) => {
@@ -67,7 +78,7 @@ export const renderFile = (root, whenClientIsReady) => {
     })
   }
 
-  const { showErrorBox, getVersion, windowId, setWindowTitle } = makeMainProcessClient()
+  const { showErrorBox, getVersion, windowId } = makeMainProcessClient()
 
   const { saveAppSetting } = makeFileSystemAPIs(whenClientIsReady)
 
@@ -95,7 +106,7 @@ export const renderFile = (root, whenClientIsReady) => {
           showErrorBox={showErrorBox}
         />
         <Busy />
-        <Main saveBackup={saveBackup} windowId={windowId} setWindowTitle={setWindowTitle} />
+        <Main saveBackup={saveBackup} windowId={windowId} />
       </MainIntegrationContext.Provider>
     </Provider>,
     root

@@ -10,7 +10,7 @@ import { helpers } from 'pltr/v2'
 
 const { readdir, mkdir, lstat, cp, symlink, link } = fs.promises
 
-const TRIAL_LENGTH = 14
+const TRIAL_LENGTH = 60
 const EXTENSIONS = 2
 
 function americanToYearFirst(dateString) {
@@ -54,13 +54,14 @@ const fileSystemModule = (userDataPath) => {
     const {
       trialStore,
       licenseStore,
+      plottrLicenseStore,
+      proLicenseStore,
       knownFilesStore,
       templatesStore,
       customTemplatesStore,
       manifestStore,
       exportConfigStore,
       SETTINGS,
-      USER,
       lastOpenedFileStore,
     } = stores
 
@@ -91,12 +92,8 @@ const fileSystemModule = (userDataPath) => {
     const setLastOpenedFilePath = (filePath) => {
       // We don't want to record last opened when we should be in pro
       // and opened a device file.
-      const frbId = typeof SETTINGS.get('user.frbId')
-      if (
-        typeof SETTINGS.get('user.frbId') === 'string' &&
-        frbId !== '' &&
-        helpers.file.isDeviceFileURL(filePath)
-      ) {
+      const isInProMode = SETTINGS.get('user.choseProMode')
+      if (isInProMode) {
         return Promise.resolve()
       }
 
@@ -282,14 +279,6 @@ const fileSystemModule = (userDataPath) => {
     }
     const saveAppSetting = (key, value) => {
       return SETTINGS.set(key, value)
-    }
-
-    const listenToUserSettingsChanges = (cb) => {
-      cb(USER.store)
-      return USER.onDidAnyChange.bind(USER)(cb)
-    }
-    const currentUserSettings = () => {
-      return USER.currentStore()
     }
 
     const backupDirExists = () => {
@@ -608,6 +597,40 @@ const fileSystemModule = (userDataPath) => {
       }
     }
 
+    const savePlottrLicense = (secret, machineInfo, expiresAt, dateChecked) => {
+      return plottrLicenseStore.set({ secret, machineInfo, dateChecked, expiresAt })
+    }
+
+    const saveProLicense = (secret, machineInfo, expiresAt, dateChecked) => {
+      return proLicenseStore.set({ secret, machineInfo, expiresAt, dateChecked })
+    }
+
+    const currentPlottrLicense = () => {
+      return plottrLicenseStore.currentStore()
+    }
+
+    const deletePlottrLicense = () => {
+      return plottrLicenseStore.clear()
+    }
+
+    const deleteProLicense = () => {
+      return proLicenseStore.clear()
+    }
+
+    const listenToPlottrLicenseChanges = (cb) => {
+      cb(plottrLicenseStore.store)
+      return plottrLicenseStore.onDidAnyChange.bind(plottrLicenseStore)(cb)
+    }
+
+    const currentProLicense = () => {
+      return proLicenseStore.currentStore()
+    }
+
+    const listenToProLicenseChanges = (cb) => {
+      cb(proLicenseStore.store)
+      return proLicenseStore.onDidAnyChange.bind(proLicenseStore)(cb)
+    }
+
     return {
       TEMP_FILES_PATH,
       setTemplate,
@@ -636,8 +659,6 @@ const fileSystemModule = (userDataPath) => {
       listenToAppSettingsChanges,
       currentAppSettings,
       saveAppSetting,
-      listenToUserSettingsChanges,
-      currentUserSettings,
       listenToBackupsChanges,
       currentBackups,
       customTemplatesPath,
@@ -646,6 +667,14 @@ const fileSystemModule = (userDataPath) => {
       copyFile,
       createFileShortcut,
       watchForFilesInDefaultFolder,
+      savePlottrLicense,
+      saveProLicense,
+      currentPlottrLicense,
+      currentProLicense,
+      listenToPlottrLicenseChanges,
+      listenToProLicenseChanges,
+      deleteProLicense,
+      deletePlottrLicense,
     }
   }
 }

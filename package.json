@@ -71,6 +71,7 @@
     "ci:plottr_import_export": "yarn --cwd lib/plottr_import_export install"
   },
   "dependencies": {
+    "cryptr": "^6.3.0",
     "sharp": "^0.31.3",
     "utf-8-validate": "^5.0.9",
     "ws": "^8.5.0"
@@ -98,6 +99,7 @@
     "changelog": "^1.4.2",
     "circular-dependency-plugin": "^5.2.2",
     "classnames": "^2.2.6",
+    "computer-name": "^0.1.0",
     "cross-env": "^7.0.3",
     "crypto-browserify": "^3.12.0",
     "css-loader": "^3.0.0",

@@ -1,3 +1,5 @@
+import { cloneDeep } from 'lodash'
+
 const makeFileSystemAPIs = (socketClient) => {
   function customTemplatesPath() {
     return socketClient(({ customTemplatesPath }) => {
@@ -32,16 +34,54 @@ const makeFileSystemAPIs = (socketClient) => {
     })
   }
 
-  const listenToLicenseChanges = (cb) => {
-    return socketClient(({ listenToLicenseChanges }) => {
-      return listenToLicenseChanges(cb)
-    })
-  }
   const currentLicense = () => {
-    return socketClient(({ currentLicense }) => {
-      return currentLicense()
+    return socketClient(({ currentPlottrLicense, currentProLicense }) => {
+      return Promise.all([currentPlottrLicense(), currentProLicense()]).then(
+        ([plottrLicense, proLicense]) => {
+          return {
+            plottrLicense,
+            proLicense,
+          }
+        }
+      )
     })
   }
+
+  const listenToLicenseChanges = (cb) => {
+    return socketClient(({ listenToPlottrLicenseChanges, listenToProLicenseChanges }) => {
+      let license = {
+        plottrLicense: null,
+        proLicense: null,
+      }
+      currentLicense().then((initialLicense) => {
+        license = cloneDeep(initialLicense)
+        cb(license)
+      })
+      const plottrListener = listenToPlottrLicenseChanges((newPlottrLicense) => {
+        license = {
+          ...license,
+          plottrLicense: newPlottrLicense,
+        }
+        cb(license)
+      })
+      const proListener = listenToProLicenseChanges((newProLicense) => {
+        license = {
+          ...license,
+          proLicense: newProLicense,
+        }
+        cb(license)
+      })
+      return () => {
+        if (typeof plottrListener === 'function') {
+          plottrListener()
+        }
+        if (typeof proListener === 'function') {
+          proListener()
+        }
+      }
+    })
+  }
+
   const deleteLicense = () => {
     return socketClient(({ deleteLicense }) => {
       return deleteLicense()
@@ -129,17 +169,6 @@ const makeFileSystemAPIs = (socketClient) => {
     })
   }
 
-  const listenToUserSettingsChanges = (cb) => {
-    return socketClient(({ listenToUserSettingsChanges }) => {
-      return listenToUserSettingsChanges(cb)
-    })
-  }
-  const currentUserSettings = () => {
-    return socketClient(({ currentUserSettings }) => {
-      return currentUserSettings()
-    })
-  }
-
   const listenToBackupsChanges = (cb) => {
     return socketClient(({ listenToBackupsChanges }) => {
       return listenToBackupsChanges(cb)
@@ -160,6 +189,32 @@ const makeFileSystemAPIs = (socketClient) => {
       return setLastOpenedFilePath(filePath)
     })
   }
+  const persistUserId = (uid) => {
+    return socketClient(({ saveAppSetting }) => {
+      return saveAppSetting('user.frbId', uid)
+    })
+  }
+  const persistLicenseMode = (isInProMode) => {
+    return socketClient(({ saveAppSetting }) => {
+      return saveAppSetting('user.choseProMode', isInProMode)
+    })
+  }
+  const persistEmailAddress = (email) => {
+    return socketClient(({ saveAppSetting }) => {
+      return saveAppSetting('user.email', email)
+    })
+  }
+  const deletePlottrLicense = () => {
+    return socketClient(({ deletePlottrLicense }) => {
+      return deletePlottrLicense()
+    })
+  }
+
+  const deleteProLicense = () => {
+    return socketClient(({ deleteProLicense }) => {
+      return deleteProLicense()
+    })
+  }
 
   return {
     customTemplatesPath,
@@ -171,6 +226,8 @@ const makeFileSystemAPIs = (socketClient) => {
     listenToLicenseChanges,
     currentLicense,
     deleteLicense,
+    deletePlottrLicense,
+    deleteProLicense,
     saveLicenseInfo,
     listenToknownFilesChanges,
     currentKnownFiles,
@@ -186,12 +243,13 @@ const makeFileSystemAPIs = (socketClient) => {
     listenToAppSettingsChanges,
     currentAppSettings,
     saveAppSetting,
-    listenToUserSettingsChanges,
-    currentUserSettings,
     listenToBackupsChanges,
     currentBackups,
     lastOpenedFile,
     setLastOpenedFilePath,
+    persistUserId,
+    persistLicenseMode,
+    persistEmailAddress,
   }
 }
 

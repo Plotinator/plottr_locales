@@ -33,6 +33,7 @@ const App = ({
   isResuming,
   userNeedsToLogin,
   sessionChecked,
+  isInProMode,
   clickOnDom,
   showErrorBox,
   searchDialogIsOpen,
@@ -55,14 +56,15 @@ const App = ({
       isCloudFile &&
       !userNeedsToLogin &&
       !isOffline &&
-      sessionChecked
+      sessionChecked &&
+      !isInProMode
     ) {
       log.warn(
         "Window belongs to a pro file, but we're not logged in.  We could have just logged out."
       )
       showErrorBox(t('Error'), t('This appears to be a Plottr Pro file.  Please log in.'))
     }
-  }, [isResuming, userId, isCloudFile, userNeedsToLogin, isOffline, sessionChecked])
+  }, [isResuming, userId, isCloudFile, userNeedsToLogin, isOffline, sessionChecked, isInProMode])
 
   useEffect(() => {
     const saveAsTemplateListener = (event) => {
@@ -155,6 +157,7 @@ App.propTypes = {
   userNeedsToLogin: PropTypes.bool,
   sessionChecked: PropTypes.bool,
   searchDialogIsOpen: PropTypes.bool,
+  isInProMode: PropTypes.bool,
   clickOnDom: PropTypes.func,
   showErrorBox: PropTypes.func.isRequired,
   openSearch: PropTypes.func.isRequired,
@@ -170,6 +173,7 @@ function mapStateToProps(state) {
     userNeedsToLogin: selectors.userNeedsToLoginSelector(state),
     sessionChecked: selectors.sessionCheckedSelector(state),
     searchDialogIsOpen: selectors.searchDialogIsOpenSelector(state),
+    isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
   }
 }
 

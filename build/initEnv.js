@@ -19,14 +19,16 @@ const env = {
       'app.plottr.com'
     : isBeta
     ? // Beta uses the latest release branch
-      'plottr-web-beta.vercel.app'
+      'beta.plottr.com'
     : isAlpha
-    ? 'plottr-web-alpha.vercel.app'
+    ? 'alpha.plottr.com'
     : // Default to alpha (staging branch)
-      'plottr-web-alpha.vercel.app',
+      'alpha.plottr.com',
   FIREBASE_KEY: isProduction
     ? process.env.NEXT_PUBLIC_FIREBASE_KEY
     : process.env.NEXT_PUBLIC_CI_FIREBASE_KEY,
+  FALLBACK_ENCRYPTION_KEY: process.env.FALLBACK_ENCRYPTION_KEY,
+  FALLBACK_ENCRYPTION_SALT: process.env.FALLBACK_ENCRYPTION_SALT,
   NODE_ENV: 'production', // i'm pretty sure this is useless. I think it gets set by webpack
   TRIALMODE: false, // i'm pretty sure this is uselsss too
 }
