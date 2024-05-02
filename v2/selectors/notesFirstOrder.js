@@ -7,9 +7,9 @@ import { groupBy } from 'lodash'
 import { fullFileStateSelector } from './fullFileFirstOrder'
 import { positionReset } from '../helpers/lists'
 
-export const allNotesSelector = createSelector(fullFileStateSelector, (state) => state.notes)
+export const allNotesSelector = createSelector(fullFileStateSelector, ({ notes }) => notes ?? [])
 
-const selectId = (state, id) => id
+const selectId = (_state, id) => id
 
 export const singleNoteSelector = createSelector(allNotesSelector, selectId, (notes, propId) =>
   notes.find((n) => n.id == propId)

@@ -3,7 +3,7 @@ import { createSelector, createSelectorCreator, defaultMemoize } from 'reselect'
 import { serializeNoFormatting } from '../slate_serializers/to_plain_text'
 
 // Other selector dependencies
-import { allBookIdsSelector, allBooksAsArraySelector } from './booksFirstOrder'
+import { allBookIdsSelector, allBooksAsArraySelector, allBooksSelector } from './booksFirstOrder'
 import { selectedCharacterAttributeTabSelector, showBookTabsSelector } from './charactersThirdOrder'
 import { characterTabSelector, selectedCharacterSelector, uiSelector } from './secondOrder'
 import { seriesSelector } from './seriesFirstOrder'
@@ -18,33 +18,39 @@ import {
 import { allBeatsSelector } from './beatsFirstOrder'
 import { createAggressiveDeepEqualSelector } from './createDeepEqualSelector'
 import { escapeUIPathElement } from '../helpers/ui'
+import { allCardsSelector } from './cardsFirstOrder'
+import { allNotesSelector } from './notesFirstOrder'
+import { allCharactersSelector } from './charactersFirstOrder'
+import { attributesSelector } from './attributesFirstOrder'
+import { allPlacesSelector } from './placesFirstOrder'
+import { allTagsSelector } from './tagsFirstOrder'
 
 export const cardDialogSelector = createSelector(uiSelector, ({ cardDialog }) => {
-  return cardDialog
+  return cardDialog ?? {}
 })
 export const bookDialogSelector = createSelector(uiSelector, ({ bookDialog }) => {
-  return bookDialog
+  return bookDialog ?? {}
 })
 
-export const cardDialogCardIdSelector = createSelector(cardDialogSelector, (cardDialog) => {
-  return cardDialog?.cardId
+export const cardDialogCardIdSelector = createSelector(cardDialogSelector, ({ cardId }) => {
+  return cardId
 })
-export const cardDialogLineIdSelector = createSelector(cardDialogSelector, (cardDialog) => {
-  return cardDialog?.lineId
+export const cardDialogLineIdSelector = createSelector(cardDialogSelector, ({ lineId }) => {
+  return lineId
 })
-export const cardDialogBeatIdSelector = createSelector(cardDialogSelector, (cardDialog) => {
-  return cardDialog?.beatId
+export const cardDialogBeatIdSelector = createSelector(cardDialogSelector, ({ beatId }) => {
+  return beatId
 })
-export const isCardDialogVisibleSelector = createSelector(cardDialogSelector, (cardDialog) => {
-  return cardDialog?.isOpen
-})
-
-export const isBookDialogVisibleSelector = createSelector(bookDialogSelector, (bookDialog) => {
-  return bookDialog?.isOpen
+export const isCardDialogVisibleSelector = createSelector(cardDialogSelector, ({ isOpen }) => {
+  return isOpen
 })
 
-export const bookDialogBookIdSelector = createSelector(bookDialogSelector, (bookDialog) => {
-  return bookDialog?.bookId
+export const isBookDialogVisibleSelector = createSelector(bookDialogSelector, ({ isOpen }) => {
+  return isOpen
+})
+
+export const bookDialogBookIdSelector = createSelector(bookDialogSelector, ({ bookId }) => {
+  return bookId
 })
 
 export const bookNumberSelector = createSelector(
@@ -163,7 +169,7 @@ export const characterEditorShowTemplatePickerSelector = createSelector(
   }
 )
 export const characterFociSelector = createSelector(characterTabSelector, ({ focus }) => {
-  return focus || []
+  return focus ?? []
 })
 const characterAttributeTabSelector = createSelector(
   selectedCharacterAttributeTabSelector,
@@ -190,7 +196,7 @@ export const characterCurrentFociSelector = createSelector(
 )
 
 export const searchDialogSelector = createSelector(uiSelector, ({ searchDialog }) => {
-  return searchDialog || {}
+  return searchDialog ?? {}
 })
 export const searchDialogIsOpenSelector = createSelector(searchDialogSelector, ({ isOpen }) => {
   return isOpen
@@ -228,7 +234,7 @@ export const searchReplacementTextSelector = createSelector(
 export const hitsMarkedForReplacementSelector = createSelector(
   searchDialogSelector,
   ({ hitsToReplace }) => {
-    return hitsToReplace || []
+    return hitsToReplace ?? []
   }
 )
 export const searchModalReplaceWordSelector = createSelector(
@@ -301,9 +307,6 @@ export const projectSearchHitsSelector = createSelector(
     })
   }
 )
-const allCardsSelector = (state) => {
-  return state.cards
-}
 const CARD_BASIC_ATTRIBUTES = [...Object.keys(card), 'positionInChapter', 'position']
 export const timelineSearchHitsSelector = createSelector(
   searchDialogSearchTermSelector,
@@ -416,13 +419,10 @@ export const outlineSearchHitsSelector = createSelector(
     })
   }
 )
-const allNotes = (state) => {
-  return state.notes
-}
 const NOTE_BASIC_ATTRIBUTES = [...Object.keys(note)]
 export const notesSearchHitsSelector = createSelector(
   searchDialogSearchTermSelector,
-  allNotes,
+  allNotesSelector,
   noteCustomAttributesSelector,
   searchModalReplaceWordSelector,
   (term, notes, customAttributes, replaceWord) => {
@@ -464,20 +464,11 @@ export const notesSearchHitsSelector = createSelector(
     })
   }
 )
-const characters = (state) => {
-  return state.characters
-}
-const attributes = (state) => {
-  return state.attributes
-}
-const books = (state) => {
-  return state.books
-}
 export const charactersHitsSelector = createSelector(
   searchDialogSearchTermSelector,
-  characters,
-  attributes,
-  books,
+  allCharactersSelector,
+  attributesSelector,
+  allBooksSelector,
   characterCustomAttributesSelector,
   searchModalReplaceWordSelector,
   (term, allCharacters, allAttributes, allBooks, legacyCustomAttributes, replaceWord) => {
@@ -583,12 +574,9 @@ export const charactersHitsSelector = createSelector(
   }
 )
 const PLACE_BASIC_ATTRIBUTES = [...Object.keys(place)]
-const places = (state) => {
-  return state.places
-}
 export const placesHitsSelector = createSelector(
   searchDialogSearchTermSelector,
-  places,
+  allPlacesSelector,
   placeCustomAttributesSelector,
   searchModalReplaceWordSelector,
   (term, allPlaces, customAttributes, replaceWord) => {
@@ -633,12 +621,9 @@ export const placesHitsSelector = createSelector(
     })
   }
 )
-const tags = (state) => {
-  return state.tags
-}
 export const tagsSearchHitsSelector = createSelector(
   searchDialogSearchTermSelector,
-  tags,
+  allTagsSelector,
   searchModalReplaceWordSelector,
   (term, allTags, replaceWord) => {
     if (term === '' || !term || term.length < 3) {
@@ -810,17 +795,17 @@ export const hasNoResultsSelector = createSelector(
   }
 )
 
-const outlineSelector = createSelector(uiSelector, ({ outlineTab }) => {
-  return outlineTab || {}
+export const outlineSelector = createSelector(uiSelector, ({ outlineTab }) => {
+  return outlineTab ?? {}
 })
 export const selectedOutlineCardSelector = createSelector(outlineSelector, ({ selectedCard }) => {
   return selectedCard
 })
 export const outlineFociSelector = createSelector(outlineSelector, ({ focus }) => {
-  return focus || []
+  return focus ?? []
 })
 const outlineTabCardEditorSelector = createSelector(outlineSelector, ({ cardEditor }) => {
-  return cardEditor || {}
+  return cardEditor ?? {}
 })
 export const editingOutlineCardSelector = createSelector(
   outlineTabCardEditorSelector,
@@ -833,108 +818,120 @@ export const outlineCurrentFocusSelector = createSelector(
   editingOutlineCardSelector,
   (foci, cardId) => {
     return foci.filter((focus) => {
-      return focus.path[1] === cardId
+      return focus.path?.[1] === cardId
     })
   }
 )
 
-const notesSelector = createSelector(uiSelector, ({ noteTab }) => {
-  return noteTab || {}
+export const noteTabSelector = createSelector(uiSelector, ({ noteTab }) => {
+  return noteTab ?? {}
 })
-export const selectedNoteSelector = createSelector(notesSelector, ({ selectedNote }) => {
+export const selectedNoteSelector = createSelector(noteTabSelector, ({ selectedNote }) => {
   return selectedNote
 })
-export const editingSelectedNoteSelector = createSelector(notesSelector, ({ editingSelected }) => {
-  return editingSelected
-})
+export const editingSelectedNoteSelector = createSelector(
+  noteTabSelector,
+  ({ editingSelected }) => {
+    return editingSelected
+  }
+)
 export const noteCategoriesDialogOpenSelector = createSelector(
-  notesSelector,
+  noteTabSelector,
   ({ categoriesDialogOpen }) => {
     return categoriesDialogOpen
   }
 )
 export const noteAttributesDialogOpenSelector = createSelector(
-  notesSelector,
+  noteTabSelector,
   ({ attributesDialogOpen }) => {
     return attributesDialogOpen
   }
 )
-export const noteFilterVisibleSelector = createSelector(notesSelector, ({ filterVisible }) => {
+export const noteFilterVisibleSelector = createSelector(noteTabSelector, ({ filterVisible }) => {
   return filterVisible
 })
-export const noteSortVisibleSelector = createSelector(notesSelector, ({ sortVisible }) => {
+export const noteSortVisibleSelector = createSelector(noteTabSelector, ({ sortVisible }) => {
   return sortVisible
 })
-export const noteFociSelector = createSelector(notesSelector, ({ focus }) => {
-  return focus || []
+export const noteFociSelector = createSelector(noteTabSelector, ({ focus }) => {
+  return focus ?? []
 })
 export const noteCurrentFocusSelector = createSelector(
   noteFociSelector,
   selectedNoteSelector,
   (foci, noteId) => {
     return foci.filter((focus) => {
-      return focus.path[1] === noteId
+      return focus.path?.[1] === noteId
     })
   }
 )
 
-const placesSelector = createSelector(uiSelector, ({ placeTab }) => {
-  return placeTab || {}
+export const placeTabSelector = createSelector(uiSelector, ({ placeTab }) => {
+  return placeTab ?? {}
 })
-export const selectedPlaceSelector = createSelector(placesSelector, ({ selectedPlace }) => {
+export const selectedPlaceSelector = createSelector(placeTabSelector, ({ selectedPlace }) => {
   return selectedPlace
 })
 export const placeAttributeDialogIsOpenSelector = createSelector(
-  placesSelector,
+  placeTabSelector,
   ({ attributeDialogOpen }) => {
     return attributeDialogOpen
   }
 )
 export const editingSelectedPlaceSelector = createSelector(
-  placesSelector,
+  placeTabSelector,
   ({ editingSelected }) => {
     return editingSelected
   }
 )
-export const placesCategoriesOpenSelector = createSelector(placesSelector, ({ categoriesOpen }) => {
-  return categoriesOpen
-})
-export const placesFilterIsVisibleSelector = createSelector(placesSelector, ({ filterVisible }) => {
-  return filterVisible
-})
-export const placesSortIsVisibleSelector = createSelector(placesSelector, ({ sortVisible }) => {
+export const placesCategoriesOpenSelector = createSelector(
+  placeTabSelector,
+  ({ categoriesOpen }) => {
+    return categoriesOpen
+  }
+)
+export const placesFilterIsVisibleSelector = createSelector(
+  placeTabSelector,
+  ({ filterVisible }) => {
+    return filterVisible
+  }
+)
+export const placesSortIsVisibleSelector = createSelector(placeTabSelector, ({ sortVisible }) => {
   return sortVisible
 })
-export const placeFociSelector = createSelector(placesSelector, ({ focus }) => {
-  return focus || []
+export const placeFociSelector = createSelector(placeTabSelector, ({ focus }) => {
+  return focus ?? []
 })
 export const placeCurrentFocusSelector = createSelector(
   placeFociSelector,
   selectedPlaceSelector,
   (foci, placeId) => {
     return foci.filter((focus) => {
-      return focus.path[1] === placeId
+      return focus.path?.[1] === placeId
     })
   }
 )
 
-const tagsSelector = createSelector(uiSelector, ({ tagTab }) => {
-  return tagTab || {}
+export const tagTabSelector = createSelector(uiSelector, ({ tagTab }) => {
+  return tagTab ?? {}
 })
 
 export const isTagTabFocusingSelector = createSelector(
-  tagsSelector,
+  tagTabSelector,
   ({ focus, editingSelectedTab }) => {
-    return Boolean(focus?.length) || editingSelectedTab
+    return Boolean(focus?.length) ?? editingSelectedTab
   }
 )
 
-export const selectedTagSelector = createSelector(tagsSelector, ({ selectedTag }) => {
+export const selectedTagSelector = createSelector(tagTabSelector, ({ selectedTag }) => {
   return selectedTag
 })
-export const editingSelectedTagSelector = createSelector(tagsSelector, ({ editingSelectedTab }) => {
-  return editingSelectedTab
-})
+export const editingSelectedTagSelector = createSelector(
+  tagTabSelector,
+  ({ editingSelectedTab }) => {
+    return editingSelectedTab
+  }
+)
 const tagIdSelector = (_state, id) => id
 export const isEditingTagSelector = createSelector(
   selectedTagSelector,
@@ -944,8 +941,8 @@ export const isEditingTagSelector = createSelector(
     return selectedTagId === tagId && editing
   }
 )
-export const allTagFociSelector = createSelector(tagsSelector, ({ focus }) => {
-  return focus || []
+export const allTagFociSelector = createSelector(tagTabSelector, ({ focus }) => {
+  return focus ?? []
 })
 export const tagCurrentFociSelector = createSelector(
   selectedTagSelector,
@@ -958,7 +955,7 @@ export const tagCurrentFociSelector = createSelector(
 )
 
 const projectTabSelector = createSelector(uiSelector, ({ projectTab }) => {
-  return projectTab || {}
+  return projectTab ?? {}
 })
 export const projectCurrentFocusSelector = createSelector(
   projectTabSelector,
@@ -975,14 +972,14 @@ export const projectCurrentFocusSelector = createSelector(
   }
 )
 export const projectAllFociSelector = createSelector(projectTabSelector, ({ focus }) => {
-  return focus
+  return focus ?? []
 })
 
 const timelineSelector = createSelector(uiSelector, ({ timeline }) => {
   return timeline
 })
 export const timelineFociSelector = createSelector(timelineSelector, ({ focus }) => {
-  return focus || []
+  return focus ?? []
 })
 export const timelineFocusCandidateSelector = createAggressiveDeepEqualSelector(
   timelineFociSelector,
@@ -1049,7 +1046,7 @@ export const editingGivenLinesTitleSelector = createSelector(
 )
 
 const dashboardModalSelector = createSelector(uiSelector, ({ dashboardModal }) => {
-  return dashboardModal || {}
+  return dashboardModal ?? {}
 })
 export const dashboardModalViewSelector = createSelector(dashboardModalSelector, ({ view }) => {
   return view ?? null

@@ -312,7 +312,7 @@ export const firstVisibleBeatForBookThunkSelector = createSelector(
   }
 )
 
-const bookIdSelector = (state, bookId) => bookId
+const bookIdSelector = (_state, bookId) => bookId
 export const firstVisibleBeatForBookSelector = createSelector(
   allBeatsSelector,
   bookIdSelector,
@@ -660,10 +660,12 @@ export const timelineSparceBeatMap = createSelector(
   }
 )
 
-const fullStateSelector = (state) => state
+// We're sumonning the full state in order to call a selector on it
+// later.
+const rawUnsafeFullStateSelector = (state) => state
 export const sortedBeatsHierachyLevels = createSelector(
   sortedBeatsByBookSelector,
-  fullStateSelector,
+  rawUnsafeFullStateSelector,
   (beats, state) => {
     return beats.map((beat) => {
       return hierarchyLevelSelector(state, beat.id)

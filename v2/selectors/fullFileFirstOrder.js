@@ -4,4 +4,6 @@
 import { identity } from 'lodash'
 import { createSelector } from 'reselect'
 
-export const fullFileStateSelector = createSelector(identity, (state) => state)
+export const rawFileStateSelector = identity
+export const fullFileStateSelector = createSelector(identity, ({ user }) => user ?? {})
+export const fullSystemStateSelector = createSelector(identity, ({ system }) => system ?? {})

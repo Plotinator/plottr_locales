@@ -211,18 +211,5 @@
       }
     }
   },
-  "images": {},
-  "error": {
-    "error": null,
-    "storeKey": null,
-    "action": null
-  },
-  "permission": {
-    "permission": "owner"
-  },
-  "project": {
-    "fileList": [],
-    "selectedFile": null,
-    "userNameSearchResults": []
-  }
+  "images": {}
 }

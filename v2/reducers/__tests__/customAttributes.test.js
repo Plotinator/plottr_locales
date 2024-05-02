@@ -1,7 +1,7 @@
 // Doesn not work because of configuration difficulties in babel.  Ran
 // out of time during the week to finish the implementation.
 
-// import { reducers } from 'pltr/v2'
+// import { reducers } from 'pltr'
 // import { allCustomAttributesSelector } from 'app/selectors'
 // import { isEqual } from 'lodash'
 // import { ADD_SCENES_ATTRIBUTE } from '../../constants/ActionTypes'

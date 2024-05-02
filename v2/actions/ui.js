@@ -1,5 +1,7 @@
 import { identity, isEqual, isObject } from 'lodash'
 
+import { batch } from './undo'
+
 import {
   CHANGE_CURRENT_VIEW,
   CHANGE_ORIENTATION,
@@ -25,7 +27,6 @@ import {
   SET_NOTE_SORT,
   SET_NOTE_FILTER,
   SET_OUTLINE_FILTER,
-  SET_NOTES_FILTER,
   LOAD_UI,
   LOAD_FILE,
   SET_NOTES_SEARCH_TERM,
@@ -157,7 +158,6 @@ const {
   searchDialogCurrentHitIndexSelector,
   flatSearchHitsSelector,
   allCharacterAttributesSelector,
-  fullFileStateSelector,
   singleCharacterSelector,
   characterAttributeTabSelector,
   hitsMarkedForReplacementSelector,
@@ -381,13 +381,15 @@ export function setFocussedTimelineTabBeat(beatId) {
 
 export function setSearchTerm(term) {
   return function (dispatch, getState) {
-    dispatch({ type: SET_SEARCH_TERM, term })
-    const newState = getState()
-    const newHits = flatSearchHitsSelector(newState)
-    dispatch({
-      type: UPDATE_HITS_MARKED_FOR_REPLACEMENT,
-      newHits,
-    })
+    batch(() => {
+      dispatch({ type: SET_SEARCH_TERM, term })
+      const newState = getState()
+      const newHits = flatSearchHitsSelector(newState)
+      dispatch({
+        type: UPDATE_HITS_MARKED_FOR_REPLACEMENT,
+        newHits,
+      })
+    })(dispatch, getState)
   }
 }
 
@@ -447,37 +449,41 @@ export const jumpToHit = (cards, hitType, searchHit) => (dispatch, getState) => 
           ) {
             const focusPath = projectFocusPath(bookId, attribute)
             const focusStart = safeParseInt(rest[rest.length - 1])
-            dispatch(startJumping())
-            dispatch(closeBookDialog())
-            dispatch(changeCurrentView('project'))
-            dispatch(
-              pushFocus('project', focusPath, {
-                start: focusStart,
-                end: focusStart + hit.length,
-                direction: 'forward',
-              })
-            )
-            dispatch(openEditBookDialog(bookId))
-            dispatch(incrementJumpCounter())
-            dispatch(finishJumping())
+            batch(() => {
+              dispatch(startJumping())
+              dispatch(closeBookDialog())
+              dispatch(changeCurrentView('project'))
+              dispatch(
+                pushFocus('project', focusPath, {
+                  start: focusStart,
+                  end: focusStart + hit.length,
+                  direction: 'forward',
+                })
+              )
+              dispatch(openEditBookDialog(bookId))
+              dispatch(incrementJumpCounter())
+              dispatch(finishJumping())
+            })(dispatch, getState)
           }
         } else {
           const [attribute] = rest
           if (['name', 'premise', 'genre', 'theme'].indexOf(attribute) !== -1) {
-            dispatch(closeBookDialog())
             const focusPath = projectFocusPath(null, attribute)
             const focusStart = safeParseInt(rest[rest.length - 1])
-            dispatch(startJumping())
-            dispatch(changeCurrentView('project'))
-            dispatch(
-              pushFocus('project', focusPath, {
-                start: focusStart,
-                end: focusStart + hit.length,
-                direction: 'forward',
-              })
-            )
-            dispatch(incrementJumpCounter())
-            dispatch(finishJumping())
+            batch(() => {
+              dispatch(closeBookDialog())
+              dispatch(startJumping())
+              dispatch(changeCurrentView('project'))
+              dispatch(
+                pushFocus('project', focusPath, {
+                  start: focusStart,
+                  end: focusStart + hit.length,
+                  direction: 'forward',
+                })
+              )
+              dispatch(incrementJumpCounter())
+              dispatch(finishJumping())
+            })(dispatch, getState)
           }
         }
         return
@@ -501,20 +507,22 @@ export const jumpToHit = (cards, hitType, searchHit) => (dispatch, getState) => 
               })
               const focusStart = safeParseInt(rest[rest.length - 1])
               if (typeof card[attributeName] !== 'undefined') {
-                dispatch(startJumping())
-                dispatch(changeCurrentView('timeline'))
-                dispatch(changeCurrentTimeline(bookId))
-                dispatch(
-                  pushFocus('timeline', focusPath, {
-                    start: focusStart,
-                    end: focusStart + hit.length,
-                    direction: 'forward',
-                  })
-                )
-                dispatch(setActiveTabOnCardDialog(2))
-                dispatch(incrementJumpCounter())
-                setCardDialogOpen(card?.id, card?.beatId, card?.lineId)(dispatch, getState)
-                dispatch(finishJumping())
+                batch(() => {
+                  dispatch(startJumping())
+                  dispatch(changeCurrentView('timeline'))
+                  dispatch(changeCurrentTimeline(bookId))
+                  dispatch(
+                    pushFocus('timeline', focusPath, {
+                      start: focusStart,
+                      end: focusStart + hit.length,
+                      direction: 'forward',
+                    })
+                  )
+                  dispatch(setActiveTabOnCardDialog(2))
+                  dispatch(incrementJumpCounter())
+                  setCardDialogOpen(card?.id, card?.beatId, card?.lineId)(dispatch, getState)
+                  dispatch(finishJumping())
+                })(dispatch, getState)
               }
             } else if (type === 'templateAttribute') {
               const [templateId, rawAttributeName] = rest
@@ -534,6 +542,33 @@ export const jumpToHit = (cards, hitType, searchHit) => (dispatch, getState) => 
                   const indexOfTemplate = card.templates.findIndex((template) => {
                     return template.id === templateId
                   })
+                  batch(() => {
+                    dispatch(startJumping())
+                    dispatch(changeCurrentView('timeline'))
+                    dispatch(changeCurrentTimeline(bookId))
+                    dispatch(
+                      pushFocus('timeline', focusPath, {
+                        start: focusStart,
+                        end: focusStart + hit.length,
+                        direction: 'forward',
+                      })
+                    )
+                    // ASSUME: order of tabs is the same as the order of
+                    // templates on the card.
+                    dispatch(setActiveTabOnCardDialog(3 + indexOfTemplate))
+                    dispatch(incrementJumpCounter())
+                    setCardDialogOpen(card?.id, card?.beatId, card?.lineId)(dispatch, getState)
+                    dispatch(finishJumping())
+                  })(dispatch, getState)
+                }
+              }
+            } else {
+              const baseAttributeName = type
+              if (['title', 'description'].indexOf(baseAttributeName) !== -1) {
+                const [rawFocusStart] = rest
+                const focusStart = safeParseInt(rawFocusStart)
+                const focusPath = cardFocusPath(cardId, { baseAttributeName })
+                batch(() => {
                   dispatch(startJumping())
                   dispatch(changeCurrentView('timeline'))
                   dispatch(changeCurrentTimeline(bookId))
@@ -544,36 +579,13 @@ export const jumpToHit = (cards, hitType, searchHit) => (dispatch, getState) => 
                       direction: 'forward',
                     })
                   )
-                  // ASSUME: order of tabs is the same as the order of
-                  // templates on the card.
-                  dispatch(setActiveTabOnCardDialog(3 + indexOfTemplate))
+                  // It's not a template attribute or a custom attribute.
+                  // Go to the normal tab.
+                  dispatch(setActiveTabOnCardDialog(1))
                   dispatch(incrementJumpCounter())
                   setCardDialogOpen(card?.id, card?.beatId, card?.lineId)(dispatch, getState)
                   dispatch(finishJumping())
-                }
-              }
-            } else {
-              const baseAttributeName = type
-              if (['title', 'description'].indexOf(baseAttributeName) !== -1) {
-                const [rawFocusStart] = rest
-                const focusStart = safeParseInt(rawFocusStart)
-                const focusPath = cardFocusPath(cardId, { baseAttributeName })
-                dispatch(startJumping())
-                dispatch(changeCurrentView('timeline'))
-                dispatch(changeCurrentTimeline(bookId))
-                dispatch(
-                  pushFocus('timeline', focusPath, {
-                    start: focusStart,
-                    end: focusStart + hit.length,
-                    direction: 'forward',
-                  })
-                )
-                // It's not a template attribute or a custom attribute.
-                // Go to the normal tab.
-                dispatch(setActiveTabOnCardDialog(1))
-                dispatch(incrementJumpCounter())
-                setCardDialogOpen(card?.id, card?.beatId, card?.lineId)(dispatch, getState)
-                dispatch(finishJumping())
+                })(dispatch, getState)
               }
             }
           }
@@ -599,20 +611,22 @@ export const jumpToHit = (cards, hitType, searchHit) => (dispatch, getState) => 
             const focusPath = outlineCardFocusPath(cardId, descriptionOrTitle)
             const [rawFocusStart] = rest
             const focusStart = safeParseInt(rawFocusStart)
-            dispatch(startJumping())
-            dispatch(changeCurrentView('outline'))
-            dispatch(changeCurrentTimeline(bookId))
-            dispatch(
-              pushFocus('outline', focusPath, {
-                start: focusStart,
-                end: focusStart + hit.length,
-                direction: 'forward',
-              })
-            )
-            dispatch(selectOutlineCard(cardId))
-            dispatch(startEditingOutlineCard(cardId))
-            dispatch(incrementJumpCounter())
-            dispatch(finishJumping())
+            batch(() => {
+              dispatch(startJumping())
+              dispatch(changeCurrentView('outline'))
+              dispatch(changeCurrentTimeline(bookId))
+              dispatch(
+                pushFocus('outline', focusPath, {
+                  start: focusStart,
+                  end: focusStart + hit.length,
+                  direction: 'forward',
+                })
+              )
+              dispatch(selectOutlineCard(cardId))
+              dispatch(startEditingOutlineCard(cardId))
+              dispatch(incrementJumpCounter())
+              dispatch(finishJumping())
+            })(dispatch, getState)
           }
         }
         return
@@ -632,19 +646,21 @@ export const jumpToHit = (cards, hitType, searchHit) => (dispatch, getState) => 
             if (typeof note[attributeName] !== 'undefined') {
               const focusStart = safeParseInt(rawFocusStart)
               const focusPath = noteFocusPath(noteId, { attributeName })
-              dispatch(startJumping())
-              dispatch(changeCurrentView('notes'))
-              dispatch(
-                pushFocus('note', focusPath, {
-                  start: focusStart,
-                  end: focusStart + hit.length,
-                  direction: 'forward',
-                })
-              )
-              dispatch(selectNote(noteId))
-              dispatch(startEditingSelectedNote())
-              dispatch(incrementJumpCounter())
-              dispatch(finishJumping())
+              batch(() => {
+                dispatch(startJumping())
+                dispatch(changeCurrentView('notes'))
+                dispatch(
+                  pushFocus('note', focusPath, {
+                    start: focusStart,
+                    end: focusStart + hit.length,
+                    direction: 'forward',
+                  })
+                )
+                dispatch(selectNote(noteId))
+                dispatch(startEditingSelectedNote())
+                dispatch(incrementJumpCounter())
+                dispatch(finishJumping())
+              })(dispatch, getState)
             }
           } else {
             if (typeof note[type] !== 'undefined') {
@@ -652,19 +668,21 @@ export const jumpToHit = (cards, hitType, searchHit) => (dispatch, getState) => 
               const contentOrTitle = type
               const focusStart = safeParseInt(rawFocusStart)
               const focusPath = noteFocusPath(noteId, { contentOrTitle })
-              dispatch(startJumping())
-              dispatch(changeCurrentView('notes'))
-              dispatch(
-                pushFocus('note', focusPath, {
-                  start: focusStart,
-                  end: focusStart + hit.length,
-                  direction: 'forward',
-                })
-              )
-              dispatch(selectNote(noteId))
-              dispatch(startEditingSelectedNote())
-              dispatch(incrementJumpCounter())
-              dispatch(finishJumping())
+              batch(() => {
+                dispatch(startJumping())
+                dispatch(changeCurrentView('notes'))
+                dispatch(
+                  pushFocus('note', focusPath, {
+                    start: focusStart,
+                    end: focusStart + hit.length,
+                    direction: 'forward',
+                  })
+                )
+                dispatch(selectNote(noteId))
+                dispatch(startEditingSelectedNote())
+                dispatch(incrementJumpCounter())
+                dispatch(finishJumping())
+              })(dispatch, getState)
             }
           }
         }
@@ -682,7 +700,7 @@ export const jumpToHit = (cards, hitType, searchHit) => (dispatch, getState) => 
           const focusStart = safeParseInt(rawFocusStart)
           const attributeId = parseNumberOrString(rawAttributeId)
           const tabBookId = parseNumberOrString(rawBookId)
-          const state = fullFileStateSelector(getState())
+          const state = getState()
           const characterAttributes = allCharacterAttributesSelector(state)
           const attributeType = characterAttributes.find(({ id }) => {
             return id === attributeId
@@ -691,60 +709,64 @@ export const jumpToHit = (cards, hitType, searchHit) => (dispatch, getState) => 
           const series = seriesSelector(state)
           const book = tabBookId === 'all' ? series : allBooks[tabBookId]
           if (typeof book !== 'undefined' && typeof attributeType !== 'undefined') {
-            dispatch(startJumping())
-            dispatch(selectCharacterAttributeBookTab(tabBookId))
-            dispatch(hideCharacterDetails())
-            dispatch(changeCurrentView('characters'))
-            dispatch(selectCharacter(characterId))
-            dispatch(startEditingSelectedCharacter())
-            // 2 is the id of the attributes tab in `CharacterEditDetails`
-            if (attributeType === 'base-attribute') {
-              dispatch(setActiveCharacterTab(1))
-            } else {
-              dispatch(setActiveCharacterTab(2))
-            }
-            const focusPath = characterFocusPath(characterId, tabBookId, { attributeId })
-            dispatch(
-              pushFocus('character', focusPath, {
-                start: focusStart,
-                end: focusStart + hit.length,
-                direction: 'forward',
-              })
-            )
-            dispatch(incrementJumpCounter())
-            dispatch(showCharacterDetails())
-            dispatch(finishJumping())
+            batch(() => {
+              dispatch(startJumping())
+              dispatch(selectCharacterAttributeBookTab(tabBookId))
+              dispatch(hideCharacterDetails())
+              dispatch(changeCurrentView('characters'))
+              dispatch(selectCharacter(characterId))
+              dispatch(startEditingSelectedCharacter())
+              // 2 is the id of the attributes tab in `CharacterEditDetails`
+              if (attributeType === 'base-attribute') {
+                dispatch(setActiveCharacterTab(1))
+              } else {
+                dispatch(setActiveCharacterTab(2))
+              }
+              const focusPath = characterFocusPath(characterId, tabBookId, { attributeId })
+              dispatch(
+                pushFocus('character', focusPath, {
+                  start: focusStart,
+                  end: focusStart + hit.length,
+                  direction: 'forward',
+                })
+              )
+              dispatch(incrementJumpCounter())
+              dispatch(showCharacterDetails())
+              dispatch(finishJumping())
+            })(dispatch, getState)
           } else if (
             typeof book !== 'undefined' &&
             typeof attributeType === 'undefined' &&
             typeof character[unescapeUIPathElement(rawAttributeId)] !== 'undefined'
           ) {
             const attributeName = unescapeUIPathElement(rawAttributeId)
-            dispatch(startJumping())
-            dispatch(selectCharacterAttributeBookTab(tabBookId))
-            dispatch(hideCharacterDetails())
-            dispatch(changeCurrentView('characters'))
-            dispatch(selectCharacter(characterId))
-            dispatch(startEditingSelectedCharacter())
-            // 2 is the id of the attributes tab in `CharacterEditDetails`
-            if (['description', 'notes'].includes(rawAttributeId)) {
-              dispatch(setActiveCharacterTab(1))
-            } else {
-              dispatch(setActiveCharacterTab(2))
-            }
-            const focusPath = characterFocusPath(characterId, tabBookId, {
-              attributeId: attributeName,
-            })
-            dispatch(
-              pushFocus('character', focusPath, {
-                start: focusStart,
-                end: focusStart + hit.length,
-                direction: 'forward',
+            batch(() => {
+              dispatch(startJumping())
+              dispatch(selectCharacterAttributeBookTab(tabBookId))
+              dispatch(hideCharacterDetails())
+              dispatch(changeCurrentView('characters'))
+              dispatch(selectCharacter(characterId))
+              dispatch(startEditingSelectedCharacter())
+              // 2 is the id of the attributes tab in `CharacterEditDetails`
+              if (['description', 'notes'].includes(rawAttributeId)) {
+                dispatch(setActiveCharacterTab(1))
+              } else {
+                dispatch(setActiveCharacterTab(2))
+              }
+              const focusPath = characterFocusPath(characterId, tabBookId, {
+                attributeId: attributeName,
               })
-            )
-            dispatch(incrementJumpCounter())
-            dispatch(showCharacterDetails())
-            dispatch(finishJumping())
+              dispatch(
+                pushFocus('character', focusPath, {
+                  start: focusStart,
+                  end: focusStart + hit.length,
+                  direction: 'forward',
+                })
+              )
+              dispatch(incrementJumpCounter())
+              dispatch(showCharacterDetails())
+              dispatch(finishJumping())
+            })(dispatch, getState)
           }
         } else if (type === 'templateAttribute') {
           const [templateId, rawAttributeName, rawBookId, rawFocusStart] = rest
@@ -771,49 +793,53 @@ export const jumpToHit = (cards, hitType, searchHit) => (dispatch, getState) => 
                   attributeName,
                 })
                 const focusStart = safeParseInt(rawFocusStart)
-                dispatch(startJumping())
-                if (currentCharacterAttributeBookTab !== bookId) {
-                  dispatch(selectCharacterAttributeBookTab(bookId))
-                }
-                dispatch(hideCharacterDetails())
-                dispatch(changeCurrentView('characters'))
-                dispatch(selectCharacter(characterId))
-                dispatch(startEditingSelectedCharacter())
-                dispatch(
-                  pushFocus('character', focusPath, {
-                    start: focusStart,
-                    end: focusStart + hit.length,
-                    direction: 'forward',
-                  })
-                )
-                if (templateTab !== -1) {
-                  dispatch(setActiveCharacterTab(templateTab + 3))
-                }
-                dispatch(incrementJumpCounter())
-                dispatch(showCharacterDetails())
-                dispatch(finishJumping())
+                batch(() => {
+                  dispatch(startJumping())
+                  if (currentCharacterAttributeBookTab !== bookId) {
+                    dispatch(selectCharacterAttributeBookTab(bookId))
+                  }
+                  dispatch(hideCharacterDetails())
+                  dispatch(changeCurrentView('characters'))
+                  dispatch(selectCharacter(characterId))
+                  dispatch(startEditingSelectedCharacter())
+                  dispatch(
+                    pushFocus('character', focusPath, {
+                      start: focusStart,
+                      end: focusStart + hit.length,
+                      direction: 'forward',
+                    })
+                  )
+                  if (templateTab !== -1) {
+                    dispatch(setActiveCharacterTab(templateTab + 3))
+                  }
+                  dispatch(incrementJumpCounter())
+                  dispatch(showCharacterDetails())
+                  dispatch(finishJumping())
+                })(dispatch, getState)
               }
             }
           }
         } else {
-          dispatch(startJumping())
-          dispatch(hideCharacterDetails())
-          dispatch(changeCurrentView('characters'))
-          dispatch(selectCharacter(characterId))
-          dispatch(startEditingSelectedCharacter())
-          const [rawFocusStart] = rest
-          const focusStart = safeParseInt(rawFocusStart)
-          const focusPath = characterFocusPath(characterId, 'all', { type })
-          dispatch(
-            pushFocus('character', focusPath, {
-              start: focusStart,
-              end: focusStart + hit.length,
-              direction: 'forward',
-            })
-          )
-          dispatch(incrementJumpCounter())
-          dispatch(showCharacterDetails())
-          dispatch(finishJumping())
+          batch(() => {
+            dispatch(startJumping())
+            dispatch(hideCharacterDetails())
+            dispatch(changeCurrentView('characters'))
+            dispatch(selectCharacter(characterId))
+            dispatch(startEditingSelectedCharacter())
+            const [rawFocusStart] = rest
+            const focusStart = safeParseInt(rawFocusStart)
+            const focusPath = characterFocusPath(characterId, 'all', { type })
+            dispatch(
+              pushFocus('character', focusPath, {
+                start: focusStart,
+                end: focusStart + hit.length,
+                direction: 'forward',
+              })
+            )
+            dispatch(incrementJumpCounter())
+            dispatch(showCharacterDetails())
+            dispatch(finishJumping())
+          })(dispatch, getState)
         }
         return
       }
@@ -832,38 +858,42 @@ export const jumpToHit = (cards, hitType, searchHit) => (dispatch, getState) => 
             const focusPath = placeFocusPath(placeId, { customAttributeName })
             const focusStart = safeParseInt(rawFocusStart)
             if (typeof place[customAttributeName] !== 'undefined') {
-              dispatch(startJumping())
-              dispatch(changeCurrentView('places'))
-              dispatch(selectPlace(placeId))
-              dispatch(
-                pushFocus('place', focusPath, {
-                  start: focusStart,
-                  end: focusStart + hit.length,
-                  direction: 'forward',
-                })
-              )
-              dispatch(startEditingSelectedPlace())
-              dispatch(incrementJumpCounter())
-              dispatch(finishJumping())
+              batch(() => {
+                dispatch(startJumping())
+                dispatch(changeCurrentView('places'))
+                dispatch(selectPlace(placeId))
+                dispatch(
+                  pushFocus('place', focusPath, {
+                    start: focusStart,
+                    end: focusStart + hit.length,
+                    direction: 'forward',
+                  })
+                )
+                dispatch(startEditingSelectedPlace())
+                dispatch(incrementJumpCounter())
+                dispatch(finishJumping())
+              })(dispatch, getState)
             }
           } else {
             const [rawFocusStart] = rest
             const focusStart = safeParseInt(rawFocusStart)
             const focusPath = placeFocusPath(placeId, { type })
             if (typeof place[type] !== 'undefined') {
-              dispatch(startJumping())
-              dispatch(startEditingSelectedPlace())
-              dispatch(incrementJumpCounter())
-              dispatch(
-                pushFocus('place', focusPath, {
-                  start: focusStart,
-                  end: focusStart + hit.length,
-                  direction: 'forward',
-                })
-              )
-              dispatch(changeCurrentView('places'))
-              dispatch(selectPlace(placeId))
-              dispatch(finishJumping())
+              batch(() => {
+                dispatch(startJumping())
+                dispatch(startEditingSelectedPlace())
+                dispatch(incrementJumpCounter())
+                dispatch(
+                  pushFocus('place', focusPath, {
+                    start: focusStart,
+                    end: focusStart + hit.length,
+                    direction: 'forward',
+                  })
+                )
+                dispatch(changeCurrentView('places'))
+                dispatch(selectPlace(placeId))
+                dispatch(finishJumping())
+              })(dispatch, getState)
             }
           }
         }
@@ -879,20 +909,22 @@ export const jumpToHit = (cards, hitType, searchHit) => (dispatch, getState) => 
           return id === tagId
         })
         if (typeof tag !== 'undefined' && typeof tag[type] !== 'undefined') {
-          dispatch(startJumping())
-          dispatch(changeCurrentView('tags'))
-          dispatch(selectTag(tagId))
-          dispatch(editSelectedTag())
-          const focusPath = tagFocusPath(tagId, type)
-          dispatch(
-            pushFocus('tag', focusPath, {
-              start: focusStart,
-              end: focusStart + hit.length,
-              direction: 'forward',
-            })
-          )
-          dispatch(incrementJumpCounter())
-          dispatch(finishJumping())
+          batch(() => {
+            dispatch(startJumping())
+            dispatch(changeCurrentView('tags'))
+            dispatch(selectTag(tagId))
+            dispatch(editSelectedTag())
+            const focusPath = tagFocusPath(tagId, type)
+            dispatch(
+              pushFocus('tag', focusPath, {
+                start: focusStart,
+                end: focusStart + hit.length,
+                direction: 'forward',
+              })
+            )
+            dispatch(incrementJumpCounter())
+            dispatch(finishJumping())
+          })(dispatch, getState)
         }
         return
       }
@@ -906,21 +938,23 @@ export const jumpToHit = (cards, hitType, searchHit) => (dispatch, getState) => 
           return id === lineId
         })
         if (typeof line !== 'undefined' && typeof line[type] !== 'undefined') {
-          dispatch(startJumping())
-          dispatch(setCardDialogClose())
-          dispatch(changeCurrentView('timeline'))
-          dispatch(changeCurrentTimeline(line.bookId))
-          dispatch(startEditingPlotlineHeadingTitle(line.id))
-          const focusPath = lineFocusPath(lineId, type)
-          dispatch(
-            pushFocus('line', focusPath, {
-              start: focusStart,
-              end: focusStart + hit.length,
-              direction: 'forward',
-            })
-          )
-          dispatch(incrementJumpCounter())
-          dispatch(finishJumping())
+          batch(() => {
+            dispatch(startJumping())
+            dispatch(setCardDialogClose())
+            dispatch(changeCurrentView('timeline'))
+            dispatch(changeCurrentTimeline(line.bookId))
+            dispatch(startEditingPlotlineHeadingTitle(line.id))
+            const focusPath = lineFocusPath(lineId, type)
+            dispatch(
+              pushFocus('line', focusPath, {
+                start: focusStart,
+                end: focusStart + hit.length,
+                direction: 'forward',
+              })
+            )
+            dispatch(incrementJumpCounter())
+            dispatch(finishJumping())
+          })(dispatch, getState)
         }
         return
       }
@@ -946,21 +980,23 @@ export const jumpToHit = (cards, hitType, searchHit) => (dispatch, getState) => 
           typeof beat !== 'undefined' &&
           typeof beat[type] !== 'undefined'
         ) {
-          dispatch(startJumping())
-          dispatch(setCardDialogClose())
-          dispatch(changeCurrentView('timeline'))
-          dispatch(changeCurrentTimeline(bookId))
-          dispatch(startEditingBeatHeadingTitle(beat.id))
-          const focusPath = beatFocusPath(beatId, bookId, type)
-          dispatch(
-            pushFocus('beat', focusPath, {
-              start: focusStart,
-              end: focusStart + hit.length,
-              direction: 'forward',
-            })
-          )
-          dispatch(incrementJumpCounter())
-          dispatch(finishJumping())
+          batch(() => {
+            dispatch(startJumping())
+            dispatch(setCardDialogClose())
+            dispatch(changeCurrentView('timeline'))
+            dispatch(changeCurrentTimeline(bookId))
+            dispatch(startEditingBeatHeadingTitle(beat.id))
+            const focusPath = beatFocusPath(beatId, bookId, type)
+            dispatch(
+              pushFocus('beat', focusPath, {
+                start: focusStart,
+                end: focusStart + hit.length,
+                direction: 'forward',
+              })
+            )
+            dispatch(incrementJumpCounter())
+            dispatch(finishJumping())
+          })(dispatch, getState)
         }
         return
       }
@@ -1002,12 +1038,14 @@ export const nextSearchHit = () => (dispatch, getState) => {
   const allHitsLength = searchHits.length
   const currentHitIndex = searchDialogCurrentHitIndexSelector(state)
   const nextHitIndex = currentHitIndex + 1 < allHitsLength ? currentHitIndex + 1 : currentHitIndex
-  if (currentHitIndex + 1 < allHitsLength) {
-    dispatch({ type: NEXT_SEARCH_HIT })
-  }
-  const hit = searchHits[nextHitIndex]
-  const [_, hitType] = hit.path.split('/')
-  jumpToHit(cards, hitType, hit)(dispatch, getState)
+  batch(() => {
+    if (currentHitIndex + 1 < allHitsLength) {
+      dispatch({ type: NEXT_SEARCH_HIT })
+    }
+    const hit = searchHits[nextHitIndex]
+    const [_, hitType] = hit.path.split('/')
+    jumpToHit(cards, hitType, hit)(dispatch, getState)
+  })(dispatch, getState)
 }
 
 export const previousSearchHit = () => (dispatch, getState) => {
@@ -1016,12 +1054,14 @@ export const previousSearchHit = () => (dispatch, getState) => {
   const searchHits = flatSearchHitsSelector(state)
   const currentHitIndex = searchDialogCurrentHitIndexSelector(state)
   const nextHitIndex = currentHitIndex - 1 >= 0 ? currentHitIndex - 1 : currentHitIndex
-  if (currentHitIndex - 1 >= 0) {
-    dispatch({ type: PREVIOUS_SEARCH_HIT })
-  }
-  const hit = searchHits[nextHitIndex]
-  const [_, hitType] = hit.path.split('/')
-  jumpToHit(cards, hitType, hit)(dispatch, getState)
+  batch(() => {
+    if (currentHitIndex - 1 >= 0) {
+      dispatch({ type: PREVIOUS_SEARCH_HIT })
+    }
+    const hit = searchHits[nextHitIndex]
+    const [_, hitType] = hit.path.split('/')
+    jumpToHit(cards, hitType, hit)(dispatch, getState)
+  })(dispatch, getState)
 }
 
 export const startDeletingCardFromCardDialog = () => {
@@ -1297,6 +1337,9 @@ export function replaceMarkedHits() {
     const state = getState()
     const hitsMarkedForReplacement = hitsMarkedForReplacementSelector(state)
     if (hitsMarkedForReplacement.length > 0) {
+      // N.B.  Don't batch these actions because components need to
+      // know that they ought not to trigger any effects while we're
+      // still searching.
       dispatch({
         type: START_SEARCHING,
       })

@@ -4,12 +4,15 @@
 
 import { createSelector } from 'reselect'
 
-import { fullFileStateSelector } from './fullFileFirstOrder'
+import { fullSystemStateSelector } from './fullFileFirstOrder'
 
-export const backupFoldersSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.backups.folders
-)
+const backupsSelector = createSelector(fullSystemStateSelector, ({ backups }) => {
+  return backups ?? {}
+})
+
+export const backupFoldersSelector = createSelector(backupsSelector, ({ folders }) => {
+  return folders ?? []
+})
 
 export const nonEmptyBackupFoldersSelector = createSelector(
   backupFoldersSelector,

@@ -8,9 +8,13 @@ import {
   EDIT_HIERARCHY_LEVEL,
   LOAD_HIERARCHY,
   SET_HIERARCHY_LEVELS,
+  UNDO,
+  REDO,
+  UNDO_N_TIMES,
+  REDO_N_TIMES,
 } from '../constants/ActionTypes'
 import { newFileHierarchies } from '../store/newFileState'
-import { FILE_LOADED, NEW_FILE, RESET } from '../constants/ActionTypes'
+import { FILE_LOADED, NEW_FILE } from '../constants/ActionTypes'
 import { hierarchyLevel } from '../store/initialState'
 
 const hierarchy = (dataRepairers) => (state, action) => {
@@ -83,7 +87,17 @@ const hierarchy = (dataRepairers) => (state, action) => {
       }
     }
 
-    case RESET:
+    case UNDO_N_TIMES:
+    case REDO_N_TIMES:
+    case UNDO:
+    case REDO: {
+      if (action?.state?.hierarchy && typeof action.state.hierarchy === 'object') {
+        return action.state.hierarchy
+      } else {
+        return state
+      }
+    }
+
     case FILE_LOADED:
       return action.data.hierarchyLevels || newFileHierarchies()
 

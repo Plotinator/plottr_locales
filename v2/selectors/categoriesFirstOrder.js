@@ -9,23 +9,20 @@ import { fullFileStateSelector } from './fullFileFirstOrder'
 
 export const allCategoriesSelector = createSelector(
   fullFileStateSelector,
-  (state) => state.categories
+  ({ categories }) => categories ?? {}
 )
 export const characterCategoriesSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.categories.characters
+  allCategoriesSelector,
+  ({ characters }) => characters ?? []
 )
 export const noteCategoriesSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.categories.notes
+  allCategoriesSelector,
+  ({ notes }) => notes ?? []
 )
-export const tagCategoriesSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.categories.tags
-)
+export const tagCategoriesSelector = createSelector(allCategoriesSelector, ({ tags }) => tags ?? [])
 export const placeCategoriesSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.categories.places
+  allCategoriesSelector,
+  ({ places }) => places ?? []
 )
 
 const typeSelector = (_state, type) => {
@@ -35,7 +32,7 @@ export const categoryByTypeSelector = createSelector(
   allCategoriesSelector,
   typeSelector,
   (categories, categoryType) => {
-    return categories[categoryType]
+    return categories[categoryType] ?? []
   }
 )
 

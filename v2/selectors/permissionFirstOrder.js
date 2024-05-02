@@ -3,11 +3,14 @@
 // dependencies.
 import { createSelector } from 'reselect'
 
-import { fullFileStateSelector } from './fullFileFirstOrder'
+import { fullSystemStateSelector } from './fullFileFirstOrder'
 
+const fullPermissionSelector = createSelector(fullSystemStateSelector, ({ permission }) => {
+  return permission ?? {}
+})
 export const permissionSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.permission && state.permission.permission
+  fullPermissionSelector,
+  ({ permission }) => permission ?? null
 )
 export const canReadSelector = createSelector(
   permissionSelector,

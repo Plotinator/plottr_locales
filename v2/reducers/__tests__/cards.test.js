@@ -26,9 +26,9 @@ const cardsReducer = cardsReducerWithoutRepairers({
 
 // Only these functions should change if we change the structure of
 // the state object.
-const mountToState = (cards) => ({ cards })
-const cardInState = ({ cards }, card) => cards.find((x) => isEqual(x, card))
-const cardIdInState = ({ cards }, cardId) => cards.find(({ id }) => id === cardId)
+const mountToState = (cards) => ({ user: { cards } })
+const cardInState = ({ user: { cards } }, card) => cards.find((x) => isEqual(x, card))
+const cardIdInState = ({ user: { cards } }, cardId) => cards.find(({ id }) => id === cardId)
 
 // Test fixtures
 const emptyState = cardsReducer(undefined, { type: 'blarg' })

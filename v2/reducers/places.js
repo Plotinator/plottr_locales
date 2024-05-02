@@ -4,7 +4,6 @@ import {
   EDIT_PLACE,
   FILE_LOADED,
   NEW_FILE,
-  RESET,
   ADD_PLACE_WITH_VALUES,
   ATTACH_PLACE_TO_CARD,
   REMOVE_PLACE_FROM_CARD,
@@ -33,6 +32,10 @@ import {
   EDIT_PLACE_CUSTOM_ATTRIBUTE,
   REPLACE_MARKED_HITS,
   REORDER_PLACE_MANUALLY,
+  UNDO,
+  REDO,
+  UNDO_N_TIMES,
+  REDO_N_TIMES,
 } from '../constants/ActionTypes'
 import { place } from '../store/initialState'
 import { newFilePlaces } from '../store/newFileState'
@@ -258,7 +261,6 @@ const places =
         })
       }
 
-      case RESET:
       case FILE_LOADED:
         return action.data.places.map((place) => {
           const normalizeRCEContent = repair('normalizeRCEContent')
@@ -458,6 +460,17 @@ const places =
         })
 
         return reorderedList
+      }
+
+      case UNDO_N_TIMES:
+      case REDO_N_TIMES:
+      case UNDO:
+      case REDO: {
+        if (Array.isArray(action.state.places)) {
+          return action.state.places
+        } else {
+          return state
+        }
       }
 
       default:

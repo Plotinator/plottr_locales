@@ -1,5 +1,7 @@
 import { identity, sortBy } from 'lodash'
 
+import { batch } from './undo'
+
 import {
   ADD_CHARACTER,
   ADD_CHARACTER_WITH_TEMPLATE,
@@ -126,10 +128,12 @@ export const removeBook = (id, bookId) => (dispatch, getState) => {
   const state = getState()
   const allCharactersByBook = allDisplayedCharactersForCurrentBookSelector(state)
 
-  dispatch({ type: REMOVE_BOOK_FROM_CHARACTER, id, bookId })
-  if (allCharactersByBook.length === 1) {
-    dispatch({ type: SELECT_CHARACTER_ATTRIBUTE_BOOK_TAB, bookId: 'all' })
-  }
+  batch(() => {
+    dispatch({ type: REMOVE_BOOK_FROM_CHARACTER, id, bookId })
+    if (allCharactersByBook.length === 1) {
+      dispatch({ type: SELECT_CHARACTER_ATTRIBUTE_BOOK_TAB, bookId: 'all' })
+    }
+  })(dispatch, getState)
 }
 
 export function removeTemplateFromCharacter(id, templateId) {
@@ -200,30 +204,31 @@ export const editCharacterAttributeValue =
           value,
           selection,
         })
-        return
+      } else {
+        dispatch({
+          type: EDIT_CHARACTER_ATTRIBUTE_VALUE,
+          characterId,
+          attributeId,
+          value,
+          selection,
+        })
       }
-      dispatch({
-        type: EDIT_CHARACTER_ATTRIBUTE_VALUE,
-        characterId,
-        attributeId,
-        value,
-        selection,
-      })
-      return
-    }
-
-    const legacyCustomAttribute = legacyCustomCharacterAttributeByName(state, attributeId)
-    if (legacyCustomAttribute) {
-      const characterAttributes = characterAttributesForBookSelector(state)
-      const nextAttributeId = nextId(characterAttributes)
-      dispatch(
-        createCharacterAttribute(legacyCustomAttribute.type, legacyCustomAttribute.name, true)
-      )
-      dispatch({
-        type: DELETE_CHARACTER_LEGACY_CUSTOM_ATTRIBUTE,
-        attributeName: attributeId,
-      })
-      editCharacterAttributeValue(characterId, nextAttributeId, value)(dispatch, getState)
+    } else {
+      const legacyCustomAttribute = legacyCustomCharacterAttributeByName(state, attributeId)
+      if (legacyCustomAttribute) {
+        const characterAttributes = characterAttributesForBookSelector(state)
+        const nextAttributeId = nextId(characterAttributes)
+        batch(() => {
+          dispatch(
+            createCharacterAttribute(legacyCustomAttribute.type, legacyCustomAttribute.name, true)
+          )
+          dispatch({
+            type: DELETE_CHARACTER_LEGACY_CUSTOM_ATTRIBUTE,
+            attributeName: attributeId,
+          })
+          editCharacterAttributeValue(characterId, nextAttributeId, value)(dispatch, getState)
+        })(dispatch, getState)
+      }
     }
 
     // TODO: handle error state.  There was no legacy attribute.

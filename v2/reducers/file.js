@@ -4,7 +4,6 @@ import {
   FILE_LOADED,
   FILE_SAVED,
   NEW_FILE,
-  RESET,
   EDIT_FILENAME,
   LOAD_FILE,
   SET_OFFLINE,
@@ -12,6 +11,10 @@ import {
   RECORD_LAST_ACTION,
   CLICK_ON_DOM,
   SELECT_FILE,
+  UNDO,
+  REDO,
+  UNDO_N_TIMES,
+  REDO_N_TIMES,
 } from '../constants/ActionTypes'
 import { file as defaultFile } from '../store/initialState'
 import { SYSTEM_REDUCER_ACTION_TYPES } from './systemReducers'
@@ -48,6 +51,7 @@ const file =
           appliedMigrations: action.data.file.appliedMigrations || [],
           initialVersion: action.data.file.initialVersion || action.version,
           isCloudFile: action.data.file.isCloudFile || false,
+          shareRecords: action.data.file.shareRecords ?? [],
         }
 
       case FILE_SAVED:
@@ -58,9 +62,6 @@ const file =
 
       case EDIT_FILENAME:
         return Object.assign({}, state, { fileName: action.newName })
-
-      case RESET:
-        return Object.assign({}, action.data.file, { dirty: true })
 
       case LOAD_FILE:
         return action.file
@@ -78,6 +79,17 @@ const file =
         } else {
           return state
         }
+
+      case UNDO_N_TIMES:
+      case REDO_N_TIMES:
+      case UNDO:
+      case REDO: {
+        if (action?.state?.file && typeof action.state.file === 'object') {
+          return action.state.file
+        } else {
+          return state
+        }
+      }
 
       default:
         return Object.assign({}, state, { dirty: true })

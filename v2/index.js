@@ -31,7 +31,10 @@ import * as editStates from './constants/editStates'
 
 import migrateIfNeeded from './migrator/migration_manager'
 import Migrator from './migrator/migrator.js'
-import addUITimelineOrHierarchiesStateIfMissing from './migrator/handleSpecialCases'
+import applyAllFixes, {
+  addHierarchiesIfMissing,
+  addUITimelineOrHierarchiesStateIfMissing,
+} from './migrator/handleSpecialCases'
 
 import selectors from './selectors'
 
@@ -61,7 +64,6 @@ import featureFlagReducer from './reducers/featureFlags'
 import errorReducer from './reducers/error'
 import permissionReducer from './reducers/permission'
 import clientReducer from './reducers/client'
-import editorsReducer from './reducers/editors'
 import licenseReducer from './reducers/license'
 import knownFilesReducer from './reducers/knownFiles'
 import templatesReducer from './reducers/templates'
@@ -92,7 +94,8 @@ import {
   serialize as serializeToPlain,
   serializeNoFormatting,
 } from './slate_serializers/to_plain_text'
-import { convertHTMLString } from './slate_deserializers/from_html'
+import { convertHTMLString, convertHTMLNodeList } from './slate_deserializers/from_html'
+import { rtfToHTML } from './slate_serializers/to_html'
 
 import checkFileIntegrity from './store/checkFileIntegrity'
 
@@ -116,7 +119,6 @@ const reducers = {
   error: errorReducer,
   permission: permissionReducer,
   client: clientReducer,
-  editors: editorsReducer,
   license: licenseReducer,
   knownFiles: knownFilesReducer,
   templates: templatesReducer,
@@ -151,7 +153,11 @@ const helpers = {
 const slate = {
   rtf: { serialize: serializeToRTF },
   plain: { serialize: serializeToPlain, serializeNoFormatting },
-  html: { deserialise: convertHTMLString },
+  html: { deserialise: convertHTMLString, deserialiseHTMLNodeList: convertHTMLNodeList },
+}
+
+const rtfSerialisersAndDeserialisers = {
+  toHTML: rtfToHTML,
 }
 
 const middlewares = {
@@ -160,6 +166,8 @@ const middlewares = {
 }
 
 const specialCaseFixes = {
+  applyAllFixes,
+  addHierarchiesIfMissing,
   addUITimelineOrHierarchiesStateIfMissing,
 }
 
@@ -196,4 +204,5 @@ export {
   specialCaseFixes,
   editStates,
   rtf,
+  rtfSerialisersAndDeserialisers,
 }

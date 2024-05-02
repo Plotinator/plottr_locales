@@ -10,24 +10,26 @@ describe('collapsedBeatSelector', () => {
   describe('given an empty beat tree', () => {
     const emptyBeatTree = newTree('id')
     const state = {
-      books: {
-        1: {
-          id: 1,
-          title: 'A Link to the Past',
-          premise: 'same as last time..',
-          genre: 'Adventure',
-          theme: 'SNES',
-          templates: [],
-          timelineTemplates: [],
-          imageId: '3',
+      user: {
+        books: {
+          1: {
+            id: 1,
+            title: 'A Link to the Past',
+            premise: 'same as last time..',
+            genre: 'Adventure',
+            theme: 'SNES',
+            templates: [],
+            timelineTemplates: [],
+            imageId: '3',
+          },
+          allIds: [1],
         },
-        allIds: [1],
-      },
-      beats: {
-        1: emptyBeatTree,
-      },
-      ui: {
-        currentTimeline: 1,
+        beats: {
+          1: emptyBeatTree,
+        },
+        ui: {
+          currentTimeline: 1,
+        },
       },
     }
     it('should produce an empty map', () => {
@@ -60,24 +62,26 @@ describe('collapsedBeatSelector', () => {
         },
       }
       const state = {
-        books: {
-          1: {
-            id: 1,
-            title: 'A Link to the Past',
-            premise: 'same as last time..',
-            genre: 'Adventure',
-            theme: 'SNES',
-            templates: [],
-            timelineTemplates: [],
-            imageId: '3',
+        user: {
+          books: {
+            1: {
+              id: 1,
+              title: 'A Link to the Past',
+              premise: 'same as last time..',
+              genre: 'Adventure',
+              theme: 'SNES',
+              templates: [],
+              timelineTemplates: [],
+              imageId: '3',
+            },
+            allIds: [1],
           },
-          allIds: [1],
-        },
-        beats: {
-          1: tree,
-        },
-        ui: {
-          currentTimeline: 1,
+          beats: {
+            1: tree,
+          },
+          ui: {
+            currentTimeline: 1,
+          },
         },
       }
       it('should produce a single entry map, whose sole value is null', () => {
@@ -110,24 +114,26 @@ describe('collapsedBeatSelector', () => {
         },
       }
       const state = {
-        books: {
-          1: {
-            id: 1,
-            title: 'A Link to the Past',
-            premise: 'same as last time..',
-            genre: 'Adventure',
-            theme: 'SNES',
-            templates: [],
-            timelineTemplates: [],
-            imageId: '3',
+        user: {
+          books: {
+            1: {
+              id: 1,
+              title: 'A Link to the Past',
+              premise: 'same as last time..',
+              genre: 'Adventure',
+              theme: 'SNES',
+              templates: [],
+              timelineTemplates: [],
+              imageId: '3',
+            },
+            allIds: [1],
           },
-          allIds: [1],
-        },
-        beats: {
-          1: tree,
-        },
-        ui: {
-          currentTimeline: 1,
+          beats: {
+            1: tree,
+          },
+          ui: {
+            currentTimeline: 1,
+          },
         },
       }
       it('should produce a single entry map, whose sole value is itself', () => {
@@ -176,24 +182,26 @@ describe('collapsedBeatSelector', () => {
           },
         }
         const state = {
-          books: {
-            1: {
-              id: 1,
-              title: 'A Link to the Past',
-              premise: 'same as last time..',
-              genre: 'Adventure',
-              theme: 'SNES',
-              templates: [],
-              timelineTemplates: [],
-              imageId: '3',
+          user: {
+            books: {
+              1: {
+                id: 1,
+                title: 'A Link to the Past',
+                premise: 'same as last time..',
+                genre: 'Adventure',
+                theme: 'SNES',
+                templates: [],
+                timelineTemplates: [],
+                imageId: '3',
+              },
+              allIds: [1],
             },
-            allIds: [1],
-          },
-          beats: {
-            1: tree,
-          },
-          ui: {
-            currentTimeline: 1,
+            beats: {
+              1: tree,
+            },
+            ui: {
+              currentTimeline: 1,
+            },
           },
         }
         it('should produce a two entry map, whose values are both null', () => {
@@ -240,24 +248,26 @@ describe('collapsedBeatSelector', () => {
           },
         }
         const state = {
-          books: {
-            1: {
-              id: 1,
-              title: 'A Link to the Past',
-              premise: 'same as last time..',
-              genre: 'Adventure',
-              theme: 'SNES',
-              templates: [],
-              timelineTemplates: [],
-              imageId: '3',
+          user: {
+            books: {
+              1: {
+                id: 1,
+                title: 'A Link to the Past',
+                premise: 'same as last time..',
+                genre: 'Adventure',
+                theme: 'SNES',
+                templates: [],
+                timelineTemplates: [],
+                imageId: '3',
+              },
+              allIds: [1],
             },
-            allIds: [1],
-          },
-          beats: {
-            1: tree,
-          },
-          ui: {
-            currentTimeline: 1,
+            beats: {
+              1: tree,
+            },
+            ui: {
+              currentTimeline: 1,
+            },
           },
         }
         it('should produce a two entry map, where only one beat is collapsed', () => {
@@ -306,24 +316,26 @@ describe('collapsedBeatSelector', () => {
           },
         }
         const state = {
-          books: {
-            1: {
-              id: 1,
-              title: 'A Link to the Past',
-              premise: 'same as last time..',
-              genre: 'Adventure',
-              theme: 'SNES',
-              templates: [],
-              timelineTemplates: [],
-              imageId: '3',
+          user: {
+            books: {
+              1: {
+                id: 1,
+                title: 'A Link to the Past',
+                premise: 'same as last time..',
+                genre: 'Adventure',
+                theme: 'SNES',
+                templates: [],
+                timelineTemplates: [],
+                imageId: '3',
+              },
+              allIds: [1],
             },
-            allIds: [1],
-          },
-          beats: {
-            1: tree,
-          },
-          ui: {
-            currentTimeline: 1,
+            beats: {
+              1: tree,
+            },
+            ui: {
+              currentTimeline: 1,
+            },
           },
         }
         it('should produce a two entry map, whose values are both null', () => {
@@ -370,24 +382,26 @@ describe('collapsedBeatSelector', () => {
           },
         }
         const state = {
-          books: {
-            1: {
-              id: 1,
-              title: 'A Link to the Past',
-              premise: 'same as last time..',
-              genre: 'Adventure',
-              theme: 'SNES',
-              templates: [],
-              timelineTemplates: [],
-              imageId: '3',
+          user: {
+            books: {
+              1: {
+                id: 1,
+                title: 'A Link to the Past',
+                premise: 'same as last time..',
+                genre: 'Adventure',
+                theme: 'SNES',
+                templates: [],
+                timelineTemplates: [],
+                imageId: '3',
+              },
+              allIds: [1],
             },
-            allIds: [1],
-          },
-          beats: {
-            1: tree,
-          },
-          ui: {
-            currentTimeline: 1,
+            beats: {
+              1: tree,
+            },
+            ui: {
+              currentTimeline: 1,
+            },
           },
         }
         it('should produce a two entry map, where only the child is collapsed', () => {
@@ -434,24 +448,26 @@ describe('collapsedBeatSelector', () => {
           },
         }
         const state = {
-          books: {
-            1: {
-              id: 1,
-              title: 'A Link to the Past',
-              premise: 'same as last time..',
-              genre: 'Adventure',
-              theme: 'SNES',
-              templates: [],
-              timelineTemplates: [],
-              imageId: '3',
+          user: {
+            books: {
+              1: {
+                id: 1,
+                title: 'A Link to the Past',
+                premise: 'same as last time..',
+                genre: 'Adventure',
+                theme: 'SNES',
+                templates: [],
+                timelineTemplates: [],
+                imageId: '3',
+              },
+              allIds: [1],
             },
-            allIds: [1],
-          },
-          beats: {
-            1: tree,
-          },
-          ui: {
-            currentTimeline: 1,
+            beats: {
+              1: tree,
+            },
+            ui: {
+              currentTimeline: 1,
+            },
           },
         }
         it('should produce a two entry map, where the child and parent reference the parent', () => {
@@ -498,24 +514,26 @@ describe('collapsedBeatSelector', () => {
           },
         }
         const state = {
-          books: {
-            1: {
-              id: 1,
-              title: 'A Link to the Past',
-              premise: 'same as last time..',
-              genre: 'Adventure',
-              theme: 'SNES',
-              templates: [],
-              timelineTemplates: [],
-              imageId: '3',
+          user: {
+            books: {
+              1: {
+                id: 1,
+                title: 'A Link to the Past',
+                premise: 'same as last time..',
+                genre: 'Adventure',
+                theme: 'SNES',
+                templates: [],
+                timelineTemplates: [],
+                imageId: '3',
+              },
+              allIds: [1],
             },
-            allIds: [1],
-          },
-          beats: {
-            1: tree,
-          },
-          ui: {
-            currentTimeline: 1,
+            beats: {
+              1: tree,
+            },
+            ui: {
+              currentTimeline: 1,
+            },
           },
         }
         it('should produce a two entry map, where the child and parent reference the parent', () => {
@@ -578,24 +596,26 @@ describe('collapsedBeatSelector', () => {
         },
       }
       const state = {
-        books: {
-          1: {
-            id: 1,
-            title: 'A Link to the Past',
-            premise: 'same as last time..',
-            genre: 'Adventure',
-            theme: 'SNES',
-            templates: [],
-            timelineTemplates: [],
-            imageId: '3',
+        user: {
+          books: {
+            1: {
+              id: 1,
+              title: 'A Link to the Past',
+              premise: 'same as last time..',
+              genre: 'Adventure',
+              theme: 'SNES',
+              templates: [],
+              timelineTemplates: [],
+              imageId: '3',
+            },
+            allIds: [1],
           },
-          allIds: [1],
-        },
-        beats: {
-          1: tree,
-        },
-        ui: {
-          currentTimeline: 1,
+          beats: {
+            1: tree,
+          },
+          ui: {
+            currentTimeline: 1,
+          },
         },
       }
       it('should produce a three entry map, whose values are all null', () => {
@@ -656,24 +676,26 @@ describe('collapsedBeatSelector', () => {
         },
       }
       const state = {
-        books: {
-          1: {
-            id: 1,
-            title: 'A Link to the Past',
-            premise: 'same as last time..',
-            genre: 'Adventure',
-            theme: 'SNES',
-            templates: [],
-            timelineTemplates: [],
-            imageId: '3',
+        user: {
+          books: {
+            1: {
+              id: 1,
+              title: 'A Link to the Past',
+              premise: 'same as last time..',
+              genre: 'Adventure',
+              theme: 'SNES',
+              templates: [],
+              timelineTemplates: [],
+              imageId: '3',
+            },
+            allIds: [1],
           },
-          allIds: [1],
-        },
-        beats: {
-          1: tree,
-        },
-        ui: {
-          currentTimeline: 1,
+          beats: {
+            1: tree,
+          },
+          ui: {
+            currentTimeline: 1,
+          },
         },
       }
       it('should produce a three entry map, where the leaf references itself', () => {
@@ -734,24 +756,26 @@ describe('collapsedBeatSelector', () => {
         },
       }
       const state = {
-        books: {
-          1: {
-            id: 1,
-            title: 'A Link to the Past',
-            premise: 'same as last time..',
-            genre: 'Adventure',
-            theme: 'SNES',
-            templates: [],
-            timelineTemplates: [],
-            imageId: '3',
+        user: {
+          books: {
+            1: {
+              id: 1,
+              title: 'A Link to the Past',
+              premise: 'same as last time..',
+              genre: 'Adventure',
+              theme: 'SNES',
+              templates: [],
+              timelineTemplates: [],
+              imageId: '3',
+            },
+            allIds: [1],
           },
-          allIds: [1],
-        },
-        beats: {
-          1: tree,
-        },
-        ui: {
-          currentTimeline: 1,
+          beats: {
+            1: tree,
+          },
+          ui: {
+            currentTimeline: 1,
+          },
         },
       }
       it('should produce a three entry map, where the leaf references itself', () => {
@@ -812,24 +836,26 @@ describe('collapsedBeatSelector', () => {
         },
       }
       const state = {
-        books: {
-          1: {
-            id: 1,
-            title: 'A Link to the Past',
-            premise: 'same as last time..',
-            genre: 'Adventure',
-            theme: 'SNES',
-            templates: [],
-            timelineTemplates: [],
-            imageId: '3',
+        user: {
+          books: {
+            1: {
+              id: 1,
+              title: 'A Link to the Past',
+              premise: 'same as last time..',
+              genre: 'Adventure',
+              theme: 'SNES',
+              templates: [],
+              timelineTemplates: [],
+              imageId: '3',
+            },
+            allIds: [1],
           },
-          allIds: [1],
-        },
-        beats: {
-          1: tree,
-        },
-        ui: {
-          currentTimeline: 1,
+          beats: {
+            1: tree,
+          },
+          ui: {
+            currentTimeline: 1,
+          },
         },
       }
       it('should produce a three entry map, where all nodes reference the parent', () => {
@@ -890,24 +916,26 @@ describe('collapsedBeatSelector', () => {
         },
       }
       const state = {
-        books: {
-          1: {
-            id: 1,
-            title: 'A Link to the Past',
-            premise: 'same as last time..',
-            genre: 'Adventure',
-            theme: 'SNES',
-            templates: [],
-            timelineTemplates: [],
-            imageId: '3',
+        user: {
+          books: {
+            1: {
+              id: 1,
+              title: 'A Link to the Past',
+              premise: 'same as last time..',
+              genre: 'Adventure',
+              theme: 'SNES',
+              templates: [],
+              timelineTemplates: [],
+              imageId: '3',
+            },
+            allIds: [1],
           },
-          allIds: [1],
-        },
-        beats: {
-          1: tree,
-        },
-        ui: {
-          currentTimeline: 1,
+          beats: {
+            1: tree,
+          },
+          ui: {
+            currentTimeline: 1,
+          },
         },
       }
       it('should produce a three entry map, where the leaf and middle reference the middle', () => {
@@ -968,24 +996,26 @@ describe('collapsedBeatSelector', () => {
         },
       }
       const state = {
-        books: {
-          1: {
-            id: 1,
-            title: 'A Link to the Past',
-            premise: 'same as last time..',
-            genre: 'Adventure',
-            theme: 'SNES',
-            templates: [],
-            timelineTemplates: [],
-            imageId: '3',
+        user: {
+          books: {
+            1: {
+              id: 1,
+              title: 'A Link to the Past',
+              premise: 'same as last time..',
+              genre: 'Adventure',
+              theme: 'SNES',
+              templates: [],
+              timelineTemplates: [],
+              imageId: '3',
+            },
+            allIds: [1],
           },
-          allIds: [1],
-        },
-        beats: {
-          1: tree,
-        },
-        ui: {
-          currentTimeline: 1,
+          beats: {
+            1: tree,
+          },
+          ui: {
+            currentTimeline: 1,
+          },
         },
       }
       it('should produce a three entry map, where all nodes reference the root', () => {
@@ -1087,24 +1117,26 @@ describe('collapsedBeatSelector', () => {
         },
       }
       const state = {
-        books: {
-          1: {
-            id: 1,
-            title: 'A Link to the Past',
-            premise: 'same as last time..',
-            genre: 'Adventure',
-            theme: 'SNES',
-            templates: [],
-            timelineTemplates: [],
-            imageId: '3',
+        user: {
+          books: {
+            1: {
+              id: 1,
+              title: 'A Link to the Past',
+              premise: 'same as last time..',
+              genre: 'Adventure',
+              theme: 'SNES',
+              templates: [],
+              timelineTemplates: [],
+              imageId: '3',
+            },
+            allIds: [1],
           },
-          allIds: [1],
-        },
-        beats: {
-          1: tree,
-        },
-        ui: {
-          currentTimeline: 1,
+          beats: {
+            1: tree,
+          },
+          ui: {
+            currentTimeline: 1,
+          },
         },
       }
       it('produce a map containing all nodes where only the collapsed branch is collapsed', () => {

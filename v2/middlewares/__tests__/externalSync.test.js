@@ -143,34 +143,40 @@ describe('updatePrevious', () => {
 describe('computeNewPaths', () => {
   describe('given the hamlet file with a selected file in the project key', () => {
     const hamletWithSelectedFile = {
-      ...hamlet,
-      project: {
-        selectedFile: {
-          permission: 'owner',
+      user: hamlet,
+      system: {
+        project: {
+          selectedFile: {
+            permission: 'owner',
+          },
+          fileURL: 'plottr://123e',
+          userNameSearchResults: [],
+          fileLoaded: false,
+          isLoading: false,
+          isOffline: false,
+          resuming: false,
+          checkingOfflineDrift: false,
+          overwritingCloudWithBackup: false,
+          showResumeMessageDialog: false,
+          backingUpOfflineFile: false,
+          unsavedChanges: false,
         },
-        fileURL: 'plottr://123e',
-        userNameSearchResults: [],
-        fileLoaded: false,
-        isLoading: false,
-        isOffline: false,
-        resuming: false,
-        checkingOfflineDrift: false,
-        overwritingCloudWithBackup: false,
-        showResumeMessageDialog: false,
-        backingUpOfflineFile: false,
-        unsavedChanges: false,
       },
     }
     describe('given an object that did not change', () => {
       it('should produce an empty array', () => {
-        const hamletKeyed = keyFlatArraysById(hamletWithSelectedFile)
+        const hamletKeyed = keyFlatArraysById(
+          wiredSelectors.fullFileStateSelector(hamletWithSelectedFile)
+        )
         const paths = computeNewPaths(hamletKeyed, hamletWithSelectedFile, wiredSelectors)
         expect(paths).toEqual([])
       })
     })
     describe('given a single arbitrary change to the state object', () => {
       it('should compute the corresponding paths', () => {
-        const hamletKeyed = keyFlatArraysById(hamletWithSelectedFile)
+        const hamletKeyed = keyFlatArraysById(
+          wiredSelectors.fullFileStateSelector(hamletWithSelectedFile)
+        )
         const allPaths = Object.keys(hamlet).reduce((acc, key) => {
           if (isFlatArrayKey(key)) {
             return [
@@ -187,7 +193,8 @@ describe('computeNewPaths', () => {
           fc.property(fc.integer({ min: 0, max: allPaths.length - 1 }), (pathToChange) => {
             const path = allPaths[pathToChange]
             const key = path[0]
-            const toChange = clone(hamletWithSelectedFile[key])
+            const fileStateWithChange = wiredSelectors.fullFileStateSelector(hamletWithSelectedFile)
+            const toChange = clone(fileStateWithChange[key])
             if (path.length === 2) {
               const index = toChange.findIndex(({ id }) => {
                 return id === path[1]
@@ -201,7 +208,10 @@ describe('computeNewPaths', () => {
             }
             const stateWithChange = {
               ...hamletWithSelectedFile,
-              [key]: toChange,
+              user: {
+                ...fileStateWithChange,
+                [key]: toChange,
+              },
             }
             const paths = computeNewPaths(hamletKeyed, stateWithChange, wiredSelectors)
             expect(paths.length).toEqual(1)
@@ -216,7 +226,6 @@ describe('computeNewPaths', () => {
     })
     describe('given a collection of arbitrary change to the state object', () => {
       it('should compute the corresponding paths', () => {
-        const hamletKeyed = keyFlatArraysById(hamletWithSelectedFile)
         const allPaths = Object.keys(hamlet).reduce((acc, key) => {
           if (isFlatArrayKey(key)) {
             return [
@@ -236,12 +245,15 @@ describe('computeNewPaths', () => {
               maxLength: 10,
             }),
             (rawPathIndicesToChange) => {
+              const file = cloneDeep(hamletWithSelectedFile)
+              const hamletKeyed = keyFlatArraysById(wiredSelectors.fullFileStateSelector(file))
               const pathIndicesToChange = uniq(rawPathIndicesToChange)
-              const stateWithChange = clone(hamletWithSelectedFile)
+              const stateWithChange = clone(file)
+              const fileStateWithChange = wiredSelectors.fullFileStateSelector(stateWithChange)
               for (const pathIndex of pathIndicesToChange) {
                 const path = allPaths[pathIndex % allPaths.length]
                 const key = path[0]
-                const toChange = clone(stateWithChange[key])
+                const toChange = clone(fileStateWithChange[key])
                 if (path.length === 2) {
                   const index = toChange.findIndex(({ id }) => {
                     return id === path[1]
@@ -253,7 +265,7 @@ describe('computeNewPaths', () => {
                 } else {
                   toChange.newStuff = 'some new data'
                 }
-                stateWithChange[key] = toChange
+                fileStateWithChange[key] = toChange
               }
               const paths = computeNewPaths(hamletKeyed, stateWithChange, wiredSelectors)
               const pathsIntendedToChange = pathIndicesToChange.map((index) => {
@@ -273,67 +285,69 @@ describe('computeNewPaths', () => {
     describe('given that the file key changed', () => {
       describe('and we are not the owner of the file', () => {
         const hamletWithSelectedFile = {
-          ...hamlet,
-          project: {
-            selectedFile: {
-              permission: 'collaborator',
+          user: hamlet,
+          system: {
+            project: {
+              selectedFile: {
+                permission: 'collaborator',
+              },
+              fileURL: 'plottr://123e',
+              userNameSearchResults: [],
+              fileLoaded: false,
+              isLoading: false,
+              isOffline: false,
+              resuming: false,
+              checkingOfflineDrift: false,
+              overwritingCloudWithBackup: false,
+              showResumeMessageDialog: false,
+              backingUpOfflineFile: false,
+              unsavedChanges: false,
             },
-            fileURL: 'plottr://123e',
-            userNameSearchResults: [],
-            fileLoaded: false,
-            isLoading: false,
-            isOffline: false,
-            resuming: false,
-            checkingOfflineDrift: false,
-            overwritingCloudWithBackup: false,
-            showResumeMessageDialog: false,
-            backingUpOfflineFile: false,
-            unsavedChanges: false,
           },
         }
-        const hamletKeyed = keyFlatArraysById(hamletWithSelectedFile)
-        const withStateChanged = {
-          ...hamletWithSelectedFile,
-          file: {
-            ...hamletWithSelectedFile.file,
-            new: 'All new.  Today only.',
-          },
+        const file = cloneDeep(hamletWithSelectedFile)
+        const hamletKeyed = keyFlatArraysById(wiredSelectors.fullFileStateSelector(file))
+        const fileState = wiredSelectors.fullFileStateSelector(file)
+        fileState.file = {
+          ...fileState.file,
+          new: 'All new.  Today only.',
         }
         it('should not produce the file path', () => {
-          const paths = computeNewPaths(hamletKeyed, withStateChanged, wiredSelectors)
+          const paths = computeNewPaths(hamletKeyed, file, wiredSelectors)
           expect(paths.length).toEqual(0)
         })
       })
       describe('and we are the owner of the file', () => {
         const hamletWithSelectedFile = {
-          ...hamlet,
-          project: {
-            selectedFile: {
-              permission: 'owner',
+          user: hamlet,
+          system: {
+            project: {
+              selectedFile: {
+                permission: 'owner',
+              },
+              fileURL: 'plottr://123e',
+              userNameSearchResults: [],
+              fileLoaded: false,
+              isLoading: false,
+              isOffline: false,
+              resuming: false,
+              checkingOfflineDrift: false,
+              overwritingCloudWithBackup: false,
+              showResumeMessageDialog: false,
+              backingUpOfflineFile: false,
+              unsavedChanges: false,
             },
-            fileURL: 'plottr://123e',
-            userNameSearchResults: [],
-            fileLoaded: false,
-            isLoading: false,
-            isOffline: false,
-            resuming: false,
-            checkingOfflineDrift: false,
-            overwritingCloudWithBackup: false,
-            showResumeMessageDialog: false,
-            backingUpOfflineFile: false,
-            unsavedChanges: false,
           },
         }
-        const hamletKeyed = keyFlatArraysById(hamletWithSelectedFile)
-        const withStateChanged = {
-          ...hamletWithSelectedFile,
-          file: {
-            ...hamletWithSelectedFile.file,
-            new: 'All new.  Today only.',
-          },
+        const file = cloneDeep(hamletWithSelectedFile)
+        const hamletKeyed = keyFlatArraysById(wiredSelectors.fullFileStateSelector(file))
+        const fileState = wiredSelectors.fullFileStateSelector(file)
+        fileState.file = {
+          ...fileState.file,
+          new: 'All new.  Today only.',
         }
         it('should produce the file path', () => {
-          const paths = computeNewPaths(hamletKeyed, withStateChanged, wiredSelectors)
+          const paths = computeNewPaths(hamletKeyed, file, wiredSelectors)
           expect(
             paths.map(({ path }) => {
               return path
@@ -343,16 +357,15 @@ describe('computeNewPaths', () => {
       })
     })
     describe('given that the project key changes', () => {
-      const hamletKeyed = keyFlatArraysById(hamletWithSelectedFile)
-      const withStateChanged = {
-        ...hamletWithSelectedFile,
-        project: {
-          ...hamletWithSelectedFile.project,
-          new: 'All new.  Today only.',
-        },
+      const file = cloneDeep(hamletWithSelectedFile)
+      const hamletKeyed = keyFlatArraysById(wiredSelectors.fullFileStateSelector(file))
+      const systemState = wiredSelectors.fullSystemStateSelector(file)
+      systemState.project = {
+        ...systemState.project,
+        new: 'All new.  Today only.',
       }
       it('should not compute that path because it is a system key', () => {
-        const paths = computeNewPaths(hamletKeyed, withStateChanged, wiredSelectors)
+        const paths = computeNewPaths(hamletKeyed, file, wiredSelectors)
         expect(
           paths.map(({ path }) => {
             return path
@@ -370,22 +383,24 @@ describe('sync', () => {
   describe('given a file', () => {
     describe('with permission set to collaborator', () => {
       const hamletWithSelectedFile = {
-        ...hamlet,
-        project: {
-          selectedFile: {
-            permission: 'collaborator',
+        user: hamlet,
+        system: {
+          project: {
+            selectedFile: {
+              permission: 'collaborator',
+            },
+            fileURL: 'plottr://123e',
+            userNameSearchResults: [],
+            fileLoaded: false,
+            isLoading: false,
+            isOffline: false,
+            resuming: false,
+            checkingOfflineDrift: false,
+            overwritingCloudWithBackup: false,
+            showResumeMessageDialog: false,
+            backingUpOfflineFile: false,
+            unsavedChanges: false,
           },
-          fileURL: 'plottr://123e',
-          userNameSearchResults: [],
-          fileLoaded: false,
-          isLoading: false,
-          isOffline: false,
-          resuming: false,
-          checkingOfflineDrift: false,
-          overwritingCloudWithBackup: false,
-          showResumeMessageDialog: false,
-          backingUpOfflineFile: false,
-          unsavedChanges: false,
         },
       }
       const hamletKeyed = keyFlatArraysById(hamletWithSelectedFile)
@@ -430,36 +445,40 @@ describe('sync', () => {
     })
     describe('with permission set to owner', () => {
       const hamletWithSelectedFile = {
-        ...hamlet,
-        file: {
-          ...hamlet.file,
-          id: '123e',
-        },
-        client: {
-          userId: 'dummy-id',
-          clientId: '11233222',
-          emailAddress: null,
-          hasOnboarded: null,
-          hasPro: null,
-          isOnWeb: null,
-          currentAppState: null,
-        },
-        project: {
-          selectedFile: {
-            permission: 'owner',
+        user: {
+          ...hamlet,
+          file: {
+            ...hamlet.file,
             id: '123e',
           },
-          fileURL: 'plottr://123e',
-          userNameSearchResults: [],
-          fileLoaded: false,
-          isLoading: false,
-          isOffline: false,
-          resuming: false,
-          checkingOfflineDrift: false,
-          overwritingCloudWithBackup: false,
-          showResumeMessageDialog: false,
-          backingUpOfflineFile: false,
-          unsavedChanges: false,
+        },
+        system: {
+          client: {
+            userId: 'dummy-id',
+            clientId: '11233222',
+            emailAddress: null,
+            hasOnboarded: null,
+            hasPro: null,
+            isOnWeb: null,
+            currentAppState: null,
+          },
+          project: {
+            selectedFile: {
+              permission: 'owner',
+              id: '123e',
+            },
+            fileURL: 'plottr://123e',
+            userNameSearchResults: [],
+            fileLoaded: false,
+            isLoading: false,
+            isOffline: false,
+            resuming: false,
+            checkingOfflineDrift: false,
+            overwritingCloudWithBackup: false,
+            showResumeMessageDialog: false,
+            backingUpOfflineFile: false,
+            unsavedChanges: false,
+          },
         },
       }
       const hamletKeyed = keyFlatArraysById(hamletWithSelectedFile)
@@ -675,36 +694,40 @@ describe('sync', () => {
       })
       describe("and we're not dealing with a cloud file", () => {
         const hamletWithSelectedFile = {
-          ...hamlet,
-          file: {
-            ...hamlet.file,
-            id: '123e',
-          },
-          client: {
-            userId: null,
-            clientId: '11233222',
-            emailAddress: null,
-            hasOnboarded: null,
-            hasPro: null,
-            isOnWeb: null,
-            currentAppState: null,
-          },
-          project: {
-            selectedFile: {
-              permission: 'owner',
+          user: {
+            ...hamlet,
+            file: {
+              ...hamlet.file,
               id: '123e',
             },
-            fileURL: 'device:///tmp/123e',
-            userNameSearchResults: [],
-            fileLoaded: false,
-            isLoading: false,
-            isOffline: false,
-            resuming: false,
-            checkingOfflineDrift: false,
-            overwritingCloudWithBackup: false,
-            showResumeMessageDialog: false,
-            backingUpOfflineFile: false,
-            unsavedChanges: false,
+          },
+          system: {
+            client: {
+              userId: null,
+              clientId: '11233222',
+              emailAddress: null,
+              hasOnboarded: null,
+              hasPro: null,
+              isOnWeb: null,
+              currentAppState: null,
+            },
+            project: {
+              selectedFile: {
+                permission: 'owner',
+                id: '123e',
+              },
+              fileURL: 'device:///tmp/123e',
+              userNameSearchResults: [],
+              fileLoaded: false,
+              isLoading: false,
+              isOffline: false,
+              resuming: false,
+              checkingOfflineDrift: false,
+              overwritingCloudWithBackup: false,
+              showResumeMessageDialog: false,
+              backingUpOfflineFile: false,
+              unsavedChanges: false,
+            },
           },
         }
         const hamletKeyed = keyFlatArraysById(hamletWithSelectedFile)
@@ -748,36 +771,40 @@ describe('sync', () => {
       })
       describe("and we're offline", () => {
         const hamletWithSelectedFile = {
-          ...hamlet,
-          file: {
-            ...hamlet.file,
-            id: '123e',
-          },
-          client: {
-            userId: null,
-            clientId: '11233222',
-            emailAddress: null,
-            hasOnboarded: null,
-            hasPro: null,
-            isOnWeb: null,
-            currentAppState: null,
-          },
-          project: {
-            selectedFile: {
-              permission: 'owner',
+          user: {
+            ...hamlet,
+            file: {
+              ...hamlet.file,
               id: '123e',
             },
-            fileURL: 'plottr:///tmp/123e',
-            userNameSearchResults: [],
-            fileLoaded: false,
-            isLoading: false,
-            isOffline: true,
-            resuming: false,
-            checkingOfflineDrift: false,
-            overwritingCloudWithBackup: false,
-            showResumeMessageDialog: false,
-            backingUpOfflineFile: false,
-            unsavedChanges: false,
+          },
+          system: {
+            client: {
+              userId: null,
+              clientId: '11233222',
+              emailAddress: null,
+              hasOnboarded: null,
+              hasPro: null,
+              isOnWeb: null,
+              currentAppState: null,
+            },
+            project: {
+              selectedFile: {
+                permission: 'owner',
+                id: '123e',
+              },
+              fileURL: 'plottr:///tmp/123e',
+              userNameSearchResults: [],
+              fileLoaded: false,
+              isLoading: false,
+              isOffline: true,
+              resuming: false,
+              checkingOfflineDrift: false,
+              overwritingCloudWithBackup: false,
+              showResumeMessageDialog: false,
+              backingUpOfflineFile: false,
+              unsavedChanges: false,
+            },
           },
         }
         const hamletKeyed = keyFlatArraysById(hamletWithSelectedFile)
@@ -821,36 +848,40 @@ describe('sync', () => {
       })
       describe("and we're resuming", () => {
         const hamletWithSelectedFile = {
-          ...hamlet,
-          file: {
-            ...hamlet.file,
-            id: '123e',
-          },
-          client: {
-            userId: null,
-            clientId: '11233222',
-            emailAddress: null,
-            hasOnboarded: null,
-            hasPro: null,
-            isOnWeb: null,
-            currentAppState: null,
-          },
-          project: {
-            selectedFile: {
-              permission: 'owner',
+          user: {
+            ...hamlet,
+            file: {
+              ...hamlet.file,
               id: '123e',
             },
-            fileURL: 'plottr:///tmp/123e',
-            userNameSearchResults: [],
-            fileLoaded: false,
-            isLoading: false,
-            isOffline: false,
-            resuming: true,
-            checkingOfflineDrift: false,
-            overwritingCloudWithBackup: false,
-            showResumeMessageDialog: false,
-            backingUpOfflineFile: false,
-            unsavedChanges: false,
+          },
+          system: {
+            client: {
+              userId: null,
+              clientId: '11233222',
+              emailAddress: null,
+              hasOnboarded: null,
+              hasPro: null,
+              isOnWeb: null,
+              currentAppState: null,
+            },
+            project: {
+              selectedFile: {
+                permission: 'owner',
+                id: '123e',
+              },
+              fileURL: 'plottr:///tmp/123e',
+              userNameSearchResults: [],
+              fileLoaded: false,
+              isLoading: false,
+              isOffline: false,
+              resuming: true,
+              checkingOfflineDrift: false,
+              overwritingCloudWithBackup: false,
+              showResumeMessageDialog: false,
+              backingUpOfflineFile: false,
+              unsavedChanges: false,
+            },
           },
         }
         const hamletKeyed = keyFlatArraysById(hamletWithSelectedFile)
@@ -894,36 +925,40 @@ describe('sync', () => {
       })
       describe("and there's no fileId", () => {
         const hamletWithSelectedFile = {
-          ...hamlet,
-          file: {
-            ...hamlet.file,
-            id: null,
-          },
-          client: {
-            userId: null,
-            clientId: '11233222',
-            emailAddress: null,
-            hasOnboarded: null,
-            hasPro: null,
-            isOnWeb: null,
-            currentAppState: null,
-          },
-          project: {
-            selectedFile: {
-              permission: 'owner',
-              id: '123e',
+          user: {
+            ...hamlet,
+            file: {
+              ...hamlet.file,
+              id: null,
             },
-            fileURL: 'plottr:///tmp/123e',
-            userNameSearchResults: [],
-            fileLoaded: false,
-            isLoading: false,
-            isOffline: false,
-            resuming: false,
-            checkingOfflineDrift: false,
-            overwritingCloudWithBackup: false,
-            showResumeMessageDialog: false,
-            backingUpOfflineFile: false,
-            unsavedChanges: false,
+          },
+          system: {
+            client: {
+              userId: null,
+              clientId: '11233222',
+              emailAddress: null,
+              hasOnboarded: null,
+              hasPro: null,
+              isOnWeb: null,
+              currentAppState: null,
+            },
+            project: {
+              selectedFile: {
+                permission: 'owner',
+                id: '123e',
+              },
+              fileURL: 'plottr:///tmp/123e',
+              userNameSearchResults: [],
+              fileLoaded: false,
+              isLoading: false,
+              isOffline: false,
+              resuming: false,
+              checkingOfflineDrift: false,
+              overwritingCloudWithBackup: false,
+              showResumeMessageDialog: false,
+              backingUpOfflineFile: false,
+              unsavedChanges: false,
+            },
           },
         }
         const hamletKeyed = keyFlatArraysById(hamletWithSelectedFile)
@@ -967,36 +1002,40 @@ describe('sync', () => {
       })
       describe("and there's no clientId", () => {
         const hamletWithSelectedFile = {
-          ...hamlet,
-          file: {
-            ...hamlet.file,
-            id: '123e',
-          },
-          client: {
-            userId: null,
-            clientId: null,
-            emailAddress: null,
-            hasOnboarded: null,
-            hasPro: null,
-            isOnWeb: null,
-            currentAppState: null,
-          },
-          project: {
-            selectedFile: {
-              permission: 'owner',
+          user: {
+            ...hamlet,
+            file: {
+              ...hamlet.file,
               id: '123e',
             },
-            fileURL: 'plottr:///tmp/123e',
-            userNameSearchResults: [],
-            fileLoaded: false,
-            isLoading: false,
-            isOffline: false,
-            resuming: false,
-            checkingOfflineDrift: false,
-            overwritingCloudWithBackup: false,
-            showResumeMessageDialog: false,
-            backingUpOfflineFile: false,
-            unsavedChanges: false,
+          },
+          system: {
+            client: {
+              userId: null,
+              clientId: null,
+              emailAddress: null,
+              hasOnboarded: null,
+              hasPro: null,
+              isOnWeb: null,
+              currentAppState: null,
+            },
+            project: {
+              selectedFile: {
+                permission: 'owner',
+                id: '123e',
+              },
+              fileURL: 'plottr:///tmp/123e',
+              userNameSearchResults: [],
+              fileLoaded: false,
+              isLoading: false,
+              isOffline: false,
+              resuming: false,
+              checkingOfflineDrift: false,
+              overwritingCloudWithBackup: false,
+              showResumeMessageDialog: false,
+              backingUpOfflineFile: false,
+              unsavedChanges: false,
+            },
           },
         }
         const hamletKeyed = keyFlatArraysById(hamletWithSelectedFile)
@@ -1040,36 +1079,40 @@ describe('sync', () => {
       })
       describe('and the selected file id does not match the file id', () => {
         const hamletWithSelectedFile = {
-          ...hamlet,
-          file: {
-            ...hamlet.file,
-            id: '123e',
-          },
-          client: {
-            userId: null,
-            clientId: '123323',
-            emailAddress: null,
-            hasOnboarded: null,
-            hasPro: null,
-            isOnWeb: null,
-            currentAppState: null,
-          },
-          project: {
-            selectedFile: {
-              permission: 'owner',
-              id: '123ezzz',
+          user: {
+            ...hamlet,
+            file: {
+              ...hamlet.file,
+              id: '123e',
             },
-            fileURL: 'plottr:///tmp/123e',
-            userNameSearchResults: [],
-            fileLoaded: false,
-            isLoading: false,
-            isOffline: false,
-            resuming: false,
-            checkingOfflineDrift: false,
-            overwritingCloudWithBackup: false,
-            showResumeMessageDialog: false,
-            backingUpOfflineFile: false,
-            unsavedChanges: false,
+          },
+          system: {
+            client: {
+              userId: null,
+              clientId: '123323',
+              emailAddress: null,
+              hasOnboarded: null,
+              hasPro: null,
+              isOnWeb: null,
+              currentAppState: null,
+            },
+            project: {
+              selectedFile: {
+                permission: 'owner',
+                id: '123ezzz',
+              },
+              fileURL: 'plottr:///tmp/123e',
+              userNameSearchResults: [],
+              fileLoaded: false,
+              isLoading: false,
+              isOffline: false,
+              resuming: false,
+              checkingOfflineDrift: false,
+              overwritingCloudWithBackup: false,
+              showResumeMessageDialog: false,
+              backingUpOfflineFile: false,
+              unsavedChanges: false,
+            },
           },
         }
         const hamletKeyed = keyFlatArraysById(hamletWithSelectedFile)
@@ -1113,36 +1156,40 @@ describe('sync', () => {
       })
       describe("and we don't supply a previous state", () => {
         const hamletWithSelectedFile = {
-          ...hamlet,
-          file: {
-            ...hamlet.file,
-            id: '123e',
-          },
-          client: {
-            userId: null,
-            clientId: '123323',
-            emailAddress: null,
-            hasOnboarded: null,
-            hasPro: null,
-            isOnWeb: null,
-            currentAppState: null,
-          },
-          project: {
-            selectedFile: {
-              permission: 'owner',
+          user: {
+            ...hamlet,
+            file: {
+              ...hamlet.file,
               id: '123e',
             },
-            fileURL: 'plottr:///tmp/123e',
-            userNameSearchResults: [],
-            fileLoaded: false,
-            isLoading: false,
-            isOffline: false,
-            resuming: false,
-            checkingOfflineDrift: false,
-            overwritingCloudWithBackup: false,
-            showResumeMessageDialog: false,
-            backingUpOfflineFile: false,
-            unsavedChanges: false,
+          },
+          system: {
+            client: {
+              userId: null,
+              clientId: '123323',
+              emailAddress: null,
+              hasOnboarded: null,
+              hasPro: null,
+              isOnWeb: null,
+              currentAppState: null,
+            },
+            project: {
+              selectedFile: {
+                permission: 'owner',
+                id: '123e',
+              },
+              fileURL: 'plottr:///tmp/123e',
+              userNameSearchResults: [],
+              fileLoaded: false,
+              isLoading: false,
+              isOffline: false,
+              resuming: false,
+              checkingOfflineDrift: false,
+              overwritingCloudWithBackup: false,
+              showResumeMessageDialog: false,
+              backingUpOfflineFile: false,
+              unsavedChanges: false,
+            },
           },
         }
         it('should not call patch', () => {
@@ -1186,36 +1233,40 @@ describe('sync', () => {
     })
     describe('given multiple instructions', () => {
       const hamletWithSelectedFile = {
-        ...hamlet,
-        file: {
-          ...hamlet.file,
-          id: '123e',
-        },
-        client: {
-          userId: 'dummy-id',
-          clientId: '123323',
-          emailAddress: null,
-          hasOnboarded: null,
-          hasPro: null,
-          isOnWeb: null,
-          currentAppState: null,
-        },
-        project: {
-          selectedFile: {
-            permission: 'owner',
+        user: {
+          ...hamlet,
+          file: {
+            ...hamlet.file,
             id: '123e',
           },
-          fileURL: 'plottr:///tmp/123e',
-          userNameSearchResults: [],
-          fileLoaded: false,
-          isLoading: false,
-          isOffline: false,
-          resuming: false,
-          checkingOfflineDrift: false,
-          overwritingCloudWithBackup: false,
-          showResumeMessageDialog: false,
-          backingUpOfflineFile: false,
-          unsavedChanges: false,
+        },
+        system: {
+          client: {
+            userId: 'dummy-id',
+            clientId: '123323',
+            emailAddress: null,
+            hasOnboarded: null,
+            hasPro: null,
+            isOnWeb: null,
+            currentAppState: null,
+          },
+          project: {
+            selectedFile: {
+              permission: 'owner',
+              id: '123e',
+            },
+            fileURL: 'plottr:///tmp/123e',
+            userNameSearchResults: [],
+            fileLoaded: false,
+            isLoading: false,
+            isOffline: false,
+            resuming: false,
+            checkingOfflineDrift: false,
+            overwritingCloudWithBackup: false,
+            showResumeMessageDialog: false,
+            backingUpOfflineFile: false,
+            unsavedChanges: false,
+          },
         },
       }
       const hamletKeyed = keyFlatArraysById(hamletWithSelectedFile)
@@ -1665,36 +1716,40 @@ describe('sync', () => {
     })
     describe('given an instruction to delete the file', () => {
       const hamletWithSelectedFile = {
-        ...hamlet,
-        file: {
-          ...hamlet.file,
-          id: '123e',
-        },
-        client: {
-          userId: 'dummy-id',
-          clientId: '123323',
-          emailAddress: null,
-          hasOnboarded: null,
-          hasPro: null,
-          isOnWeb: null,
-          currentAppState: null,
-        },
-        project: {
-          selectedFile: {
-            permission: 'owner',
+        user: {
+          ...hamlet,
+          file: {
+            ...hamlet.file,
             id: '123e',
           },
-          fileURL: 'plottr:///tmp/123e',
-          userNameSearchResults: [],
-          fileLoaded: false,
-          isLoading: false,
-          isOffline: false,
-          resuming: false,
-          checkingOfflineDrift: false,
-          overwritingCloudWithBackup: false,
-          showResumeMessageDialog: false,
-          backingUpOfflineFile: false,
-          unsavedChanges: false,
+        },
+        system: {
+          client: {
+            userId: 'dummy-id',
+            clientId: '123323',
+            emailAddress: null,
+            hasOnboarded: null,
+            hasPro: null,
+            isOnWeb: null,
+            currentAppState: null,
+          },
+          project: {
+            selectedFile: {
+              permission: 'owner',
+              id: '123e',
+            },
+            fileURL: 'plottr:///tmp/123e',
+            userNameSearchResults: [],
+            fileLoaded: false,
+            isLoading: false,
+            isOffline: false,
+            resuming: false,
+            checkingOfflineDrift: false,
+            overwritingCloudWithBackup: false,
+            showResumeMessageDialog: false,
+            backingUpOfflineFile: false,
+            unsavedChanges: false,
+          },
         },
       }
       const hamletKeyed = keyFlatArraysById(hamletWithSelectedFile)
@@ -1768,36 +1823,40 @@ describe('sync', () => {
     })
     describe('given an instruction to delete a card', () => {
       const hamletWithSelectedFile = {
-        ...hamlet,
-        file: {
-          ...hamlet.file,
-          id: '123e',
-        },
-        client: {
-          userId: 'dummy-id',
-          clientId: '123323',
-          emailAddress: null,
-          hasOnboarded: null,
-          hasPro: null,
-          isOnWeb: null,
-          currentAppState: null,
-        },
-        project: {
-          selectedFile: {
-            permission: 'owner',
+        user: {
+          ...hamlet,
+          file: {
+            ...hamlet.file,
             id: '123e',
           },
-          fileURL: 'plottr:///tmp/123e',
-          userNameSearchResults: [],
-          fileLoaded: false,
-          isLoading: false,
-          isOffline: false,
-          resuming: false,
-          checkingOfflineDrift: false,
-          overwritingCloudWithBackup: false,
-          showResumeMessageDialog: false,
-          backingUpOfflineFile: false,
-          unsavedChanges: false,
+        },
+        system: {
+          client: {
+            userId: 'dummy-id',
+            clientId: '123323',
+            emailAddress: null,
+            hasOnboarded: null,
+            hasPro: null,
+            isOnWeb: null,
+            currentAppState: null,
+          },
+          project: {
+            selectedFile: {
+              permission: 'owner',
+              id: '123e',
+            },
+            fileURL: 'plottr:///tmp/123e',
+            userNameSearchResults: [],
+            fileLoaded: false,
+            isLoading: false,
+            isOffline: false,
+            resuming: false,
+            checkingOfflineDrift: false,
+            overwritingCloudWithBackup: false,
+            showResumeMessageDialog: false,
+            backingUpOfflineFile: false,
+            unsavedChanges: false,
+          },
         },
       }
       const hamletKeyed = keyFlatArraysById(hamletWithSelectedFile)
@@ -1900,36 +1959,40 @@ describe('sync', () => {
     describe('given an instruction to delete a card', () => {
       describe('and a delete function that errors out', () => {
         const hamletWithSelectedFile = {
-          ...hamlet,
-          file: {
-            ...hamlet.file,
-            id: '123e',
-          },
-          client: {
-            userId: 'dummy-id',
-            clientId: '123323',
-            emailAddress: null,
-            hasOnboarded: null,
-            hasPro: null,
-            isOnWeb: null,
-            currentAppState: null,
-          },
-          project: {
-            selectedFile: {
-              permission: 'owner',
+          user: {
+            ...hamlet,
+            file: {
+              ...hamlet.file,
               id: '123e',
             },
-            fileURL: 'plottr:///tmp/123e',
-            userNameSearchResults: [],
-            fileLoaded: false,
-            isLoading: false,
-            isOffline: false,
-            resuming: false,
-            checkingOfflineDrift: false,
-            overwritingCloudWithBackup: false,
-            showResumeMessageDialog: false,
-            backingUpOfflineFile: false,
-            unsavedChanges: false,
+          },
+          system: {
+            client: {
+              userId: 'dummy-id',
+              clientId: '123323',
+              emailAddress: null,
+              hasOnboarded: null,
+              hasPro: null,
+              isOnWeb: null,
+              currentAppState: null,
+            },
+            project: {
+              selectedFile: {
+                permission: 'owner',
+                id: '123e',
+              },
+              fileURL: 'plottr:///tmp/123e',
+              userNameSearchResults: [],
+              fileLoaded: false,
+              isLoading: false,
+              isOffline: false,
+              resuming: false,
+              checkingOfflineDrift: false,
+              overwritingCloudWithBackup: false,
+              showResumeMessageDialog: false,
+              backingUpOfflineFile: false,
+              unsavedChanges: false,
+            },
           },
         }
         const hamletKeyed = keyFlatArraysById(hamletWithSelectedFile)
@@ -2049,36 +2112,40 @@ describe('sync', () => {
     describe('given an instruction to patch the file', () => {
       describe('and a patch function that errors out', () => {
         const hamletWithSelectedFile = {
-          ...hamlet,
-          file: {
-            ...hamlet.file,
-            id: '123e',
-          },
-          client: {
-            userId: 'dummy-id',
-            clientId: '123323',
-            emailAddress: null,
-            hasOnboarded: null,
-            hasPro: null,
-            isOnWeb: null,
-            currentAppState: null,
-          },
-          project: {
-            selectedFile: {
-              permission: 'owner',
+          user: {
+            ...hamlet,
+            file: {
+              ...hamlet.file,
               id: '123e',
             },
-            fileURL: 'plottr:///tmp/123e',
-            userNameSearchResults: [],
-            fileLoaded: false,
-            isLoading: false,
-            isOffline: false,
-            resuming: false,
-            checkingOfflineDrift: false,
-            overwritingCloudWithBackup: false,
-            showResumeMessageDialog: false,
-            backingUpOfflineFile: false,
-            unsavedChanges: false,
+          },
+          system: {
+            client: {
+              userId: 'dummy-id',
+              clientId: '123323',
+              emailAddress: null,
+              hasOnboarded: null,
+              hasPro: null,
+              isOnWeb: null,
+              currentAppState: null,
+            },
+            project: {
+              selectedFile: {
+                permission: 'owner',
+                id: '123e',
+              },
+              fileURL: 'plottr:///tmp/123e',
+              userNameSearchResults: [],
+              fileLoaded: false,
+              isLoading: false,
+              isOffline: false,
+              resuming: false,
+              checkingOfflineDrift: false,
+              overwritingCloudWithBackup: false,
+              showResumeMessageDialog: false,
+              backingUpOfflineFile: false,
+              unsavedChanges: false,
+            },
           },
         }
         const hamletKeyed = keyFlatArraysById(hamletWithSelectedFile)
@@ -2171,36 +2238,40 @@ describe('sync', () => {
     describe('given an instruction to patch a card', () => {
       describe('and a patch function that errors out', () => {
         const hamletWithSelectedFile = {
-          ...hamlet,
-          file: {
-            ...hamlet.file,
-            id: '123e',
-          },
-          client: {
-            userId: 'dummy-id',
-            clientId: '123323',
-            emailAddress: null,
-            hasOnboarded: null,
-            hasPro: null,
-            isOnWeb: null,
-            currentAppState: null,
-          },
-          project: {
-            selectedFile: {
-              permission: 'owner',
+          user: {
+            ...hamlet,
+            file: {
+              ...hamlet.file,
               id: '123e',
             },
-            fileURL: 'plottr:///tmp/123e',
-            userNameSearchResults: [],
-            fileLoaded: false,
-            isLoading: false,
-            isOffline: false,
-            resuming: false,
-            checkingOfflineDrift: false,
-            overwritingCloudWithBackup: false,
-            showResumeMessageDialog: false,
-            backingUpOfflineFile: false,
-            unsavedChanges: false,
+          },
+          system: {
+            client: {
+              userId: 'dummy-id',
+              clientId: '123323',
+              emailAddress: null,
+              hasOnboarded: null,
+              hasPro: null,
+              isOnWeb: null,
+              currentAppState: null,
+            },
+            project: {
+              selectedFile: {
+                permission: 'owner',
+                id: '123e',
+              },
+              fileURL: 'plottr:///tmp/123e',
+              userNameSearchResults: [],
+              fileLoaded: false,
+              isLoading: false,
+              isOffline: false,
+              resuming: false,
+              checkingOfflineDrift: false,
+              overwritingCloudWithBackup: false,
+              showResumeMessageDialog: false,
+              backingUpOfflineFile: false,
+              unsavedChanges: false,
+            },
           },
         }
         const hamletKeyed = keyFlatArraysById(hamletWithSelectedFile)
@@ -2420,6 +2491,7 @@ describe('externalSync', () => {
             initialVersion: '2020.7.30',
             isCloudFile: false,
             loaded: true,
+            shareRecords: [],
             version: '2023.8.21-alpha.3',
           },
           '123323',
@@ -2485,6 +2557,7 @@ describe('externalSync', () => {
             initialVersion: '2020.7.30',
             isCloudFile: false,
             loaded: true,
+            shareRecords: [],
             version: '2023.8.21-alpha.3',
           },
           '123323',
@@ -2550,6 +2623,7 @@ describe('externalSync', () => {
             initialVersion: '2020.7.30',
             isCloudFile: false,
             loaded: true,
+            shareRecords: [],
             version: '2023.8.21-alpha.3',
           },
           '123323',
@@ -2620,6 +2694,7 @@ describe('externalSync', () => {
             initialVersion: '2020.7.30',
             isCloudFile: false,
             loaded: true,
+            shareRecords: [],
             version: '2023.8.21-alpha.3',
           },
           '123323',
@@ -2703,6 +2778,7 @@ describe('externalSync', () => {
             initialVersion: '2020.7.30',
             isCloudFile: false,
             loaded: true,
+            shareRecords: [],
             version: '2023.8.21-alpha.3',
           },
           '123323',
@@ -3084,6 +3160,7 @@ describe('externalSync', () => {
             initialVersion: '2020.7.30',
             isCloudFile: false,
             loaded: true,
+            shareRecords: [],
             version: '2023.8.21-alpha.3',
           },
           '123323',
@@ -3733,6 +3810,7 @@ describe('externalSync', () => {
             initialVersion: '2020.7.30',
             isCloudFile: false,
             loaded: true,
+            shareRecords: [],
             version: '2023.8.21-alpha.3',
           },
           '123323',
@@ -5029,6 +5107,7 @@ describe('externalSync', () => {
             initialVersion: '2020.7.30',
             isCloudFile: false,
             loaded: true,
+            shareRecords: [],
             version: '2023.8.21-alpha.3',
           },
           '123323',
@@ -5257,6 +5336,7 @@ describe('externalSync', () => {
             initialVersion: '2020.7.30',
             isCloudFile: false,
             loaded: true,
+            shareRecords: [],
             version: '2023.8.21-alpha.3',
           },
           '123323',

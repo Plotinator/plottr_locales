@@ -151,6 +151,24 @@ const {
   allBeatsSelector,
   allLinesSelector,
   selectedTimelineViewSelector,
+  jumpCounterSelector,
+  uiSelector,
+  projectAllFociSelector,
+  currentViewSelector,
+  bookDialogSelector,
+  currentTimelineSelector,
+  cardDialogSelector,
+  timelineFociSelector,
+  outlineSelector,
+  outlineFociSelector,
+  noteTabSelector,
+  noteFociSelector,
+  characterFociSelector,
+  characterTabSelector,
+  placeFociSelector,
+  placeTabSelector,
+  allTagFociSelector,
+  tagTabSelector,
 } = selectors(pltrAdaptor)
 
 // TODO: test that marked candidates recomputes on openSearch, closeSearch
@@ -1471,7 +1489,8 @@ describe('toggleHitMarkedForReplacement', () => {
 })
 
 const withoutChangesWeDontCareAbout = (state) => {
-  return omit(state, ['file.dirty', 'file.versionStamp', 'project.unsavedChanges'])
+  const userState = fullFileStateSelector(state)
+  return omit(userState, ['file.dirty', 'file.versionStamp', 'project.unsavedChanges'])
 }
 
 const withoutChangesWeDontCareAboutNorUIAndApplicationState = (state) => {
@@ -1512,7 +1531,8 @@ describe('jumpToHit', () => {
       })
       describe('and a project hit in the series "name" of the project', () => {
         const store = storeWithZelda()
-        const fileState = fullFileStateSelector(store.getState())
+        const originalState = store.getState()
+        const fileState = fullFileStateSelector(originalState)
         const cards = allCardsSelector(store.getState())
         store.dispatch(setSearchTerm('legend'))
         store.dispatch(
@@ -1523,16 +1543,22 @@ describe('jumpToHit', () => {
           await new Promise((resolve) => {
             setTimeout(resolve, 100)
           })
-          const finalFileState = fullFileStateSelector(store.getState())
+          const finalState = store.getState()
+          const finalFileState = fullFileStateSelector(finalState)
           expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
             withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
           )
-          expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-          expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
-          expect(omit(finalFileState.ui, ['projectTab', 'searchDialog', 'currentView'])).toEqual(
-            omit(fileState.ui, ['projectTab', 'searchDialog', 'currentView'])
+          const originalJumpCount = jumpCounterSelector(originalState)
+          expect(originalJumpCount).toEqual(0)
+          const finalJumpCount = jumpCounterSelector(finalState)
+          expect(finalJumpCount).toEqual(1)
+          const originalUI = uiSelector(originalState)
+          const finalUI = uiSelector(finalState)
+          expect(omit(finalUI, ['projectTab', 'searchDialog', 'currentView'])).toEqual(
+            omit(originalUI, ['projectTab', 'searchDialog', 'currentView'])
           )
-          expect(finalFileState.ui.projectTab.focus[0]).toEqual({
+          const projectFoci = projectAllFociSelector(finalState)
+          expect(projectFoci[0]).toEqual({
             path: ['name'],
             selection: {
               direction: 'forward',
@@ -1540,14 +1566,18 @@ describe('jumpToHit', () => {
               start: 0,
             },
           })
-          expect(finalFileState.ui.searchDialog.term).toEqual('legend')
-          expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-          expect(finalFileState.ui.currentView).toEqual('project')
+          const searchTerm = searchDialogSearchTermSelector(finalState)
+          expect(searchTerm).toEqual('legend')
+          const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+          expect(currentHitIndex).toBe(0)
+          const currentView = currentViewSelector(finalState)
+          expect(currentView).toEqual('project')
         })
       })
       describe('and a project hit in the series "premise" of the project', () => {
         const store = storeWithZelda()
-        const fileState = fullFileStateSelector(store.getState())
+        const originalState = store.getState()
+        const fileState = fullFileStateSelector(originalState)
         const cards = allCardsSelector(store.getState())
         store.dispatch(setSearchTerm('hings'))
         store.dispatch(
@@ -1558,16 +1588,22 @@ describe('jumpToHit', () => {
           await new Promise((resolve) => {
             setTimeout(resolve, 100)
           })
-          const finalFileState = fullFileStateSelector(store.getState())
+          const finalState = store.getState()
+          const finalFileState = fullFileStateSelector(finalState)
           expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
             withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
           )
-          expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-          expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
-          expect(omit(finalFileState.ui, ['projectTab', 'searchDialog', 'currentView'])).toEqual(
-            omit(fileState.ui, ['projectTab', 'searchDialog', 'currentView'])
+          const originalJumpCount = jumpCounterSelector(originalState)
+          expect(originalJumpCount).toEqual(0)
+          const finalJumpCount = jumpCounterSelector(finalState)
+          expect(finalJumpCount).toEqual(1)
+          const finalUI = uiSelector(finalState)
+          const originalUI = uiSelector(originalState)
+          expect(omit(finalUI, ['projectTab', 'searchDialog', 'currentView'])).toEqual(
+            omit(originalUI, ['projectTab', 'searchDialog', 'currentView'])
           )
-          expect(finalFileState.ui.projectTab.focus[0]).toEqual({
+          const projectFoci = projectAllFociSelector(finalState)
+          expect(projectFoci[0]).toEqual({
             path: ['premise'],
             selection: {
               direction: 'forward',
@@ -1575,14 +1611,18 @@ describe('jumpToHit', () => {
               start: 1,
             },
           })
-          expect(finalFileState.ui.searchDialog.term).toEqual('hings')
-          expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-          expect(finalFileState.ui.currentView).toEqual('project')
+          const searchTerm = searchDialogSearchTermSelector(finalState)
+          expect(searchTerm).toEqual('hings')
+          const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+          expect(currentHitIndex).toBe(0)
+          const currentView = currentViewSelector(finalState)
+          expect(currentView).toEqual('project')
         })
       })
       describe('and a project hit in the series "genre" of the project', () => {
         const store = storeWithZelda()
-        const fileState = fullFileStateSelector(store.getState())
+        const originalState = store.getState()
+        const fileState = fullFileStateSelector(originalState)
         const cards = allCardsSelector(store.getState())
         store.dispatch(setSearchTerm('ff'))
         store.dispatch(jumpToHit(cards, 'project', { hit: 'ff', path: '/project/series/genre/3' }))
@@ -1591,16 +1631,22 @@ describe('jumpToHit', () => {
           await new Promise((resolve) => {
             setTimeout(resolve, 100)
           })
-          const finalFileState = fullFileStateSelector(store.getState())
+          const finalState = store.getState()
+          const finalFileState = fullFileStateSelector(finalState)
           expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
             withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
           )
-          expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-          expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
-          expect(omit(finalFileState.ui, ['projectTab', 'searchDialog', 'currentView'])).toEqual(
-            omit(fileState.ui, ['projectTab', 'searchDialog', 'currentView'])
+          const originalJumpCount = jumpCounterSelector(originalState)
+          expect(originalJumpCount).toEqual(0)
+          const finalJumpCount = jumpCounterSelector(finalState)
+          expect(finalJumpCount).toEqual(1)
+          const originalUI = uiSelector(originalState)
+          const finalUI = uiSelector(finalState)
+          expect(omit(finalUI, ['projectTab', 'searchDialog', 'currentView'])).toEqual(
+            omit(originalUI, ['projectTab', 'searchDialog', 'currentView'])
           )
-          expect(finalFileState.ui.projectTab.focus[0]).toEqual({
+          const projectFoci = projectAllFociSelector(finalState)
+          expect(projectFoci[0]).toEqual({
             path: ['genre'],
             selection: {
               direction: 'forward',
@@ -1608,14 +1654,18 @@ describe('jumpToHit', () => {
               start: 3,
             },
           })
-          expect(finalFileState.ui.searchDialog.term).toEqual('ff')
-          expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-          expect(finalFileState.ui.currentView).toEqual('project')
+          const searchTerm = searchDialogSearchTermSelector(finalState)
+          expect(searchTerm).toEqual('ff')
+          const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+          expect(currentHitIndex).toBe(0)
+          const currentView = currentViewSelector(finalState)
+          expect(currentView).toEqual('project')
         })
       })
       describe('and a project hit in the series "theme" of the project', () => {
         const store = storeWithZelda()
-        const fileState = fullFileStateSelector(store.getState())
+        const originalState = store.getState()
+        const fileState = fullFileStateSelector(originalState)
         const cards = allCardsSelector(store.getState())
         store.dispatch(setSearchTerm('Wha'))
         store.dispatch(jumpToHit(cards, 'project', { hit: 'Wha', path: '/project/series/theme/0' }))
@@ -1624,16 +1674,22 @@ describe('jumpToHit', () => {
           await new Promise((resolve) => {
             setTimeout(resolve, 100)
           })
-          const finalFileState = fullFileStateSelector(store.getState())
+          const finalState = store.getState()
+          const finalFileState = fullFileStateSelector(finalState)
           expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
             withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
           )
-          expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-          expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
-          expect(omit(finalFileState.ui, ['projectTab', 'searchDialog', 'currentView'])).toEqual(
-            omit(fileState.ui, ['projectTab', 'searchDialog', 'currentView'])
+          const originalJumpCount = jumpCounterSelector(originalState)
+          expect(originalJumpCount).toEqual(0)
+          const finalJumpCount = jumpCounterSelector(finalState)
+          expect(finalJumpCount).toEqual(1)
+          const originalUI = uiSelector(originalState)
+          const finalUI = uiSelector(finalState)
+          expect(omit(finalUI, ['projectTab', 'searchDialog', 'currentView'])).toEqual(
+            omit(originalUI, ['projectTab', 'searchDialog', 'currentView'])
           )
-          expect(finalFileState.ui.projectTab.focus[0]).toEqual({
+          const projectFoci = projectAllFociSelector(finalState)
+          expect(projectFoci[0]).toEqual({
             path: ['theme'],
             selection: {
               direction: 'forward',
@@ -1641,9 +1697,12 @@ describe('jumpToHit', () => {
               start: 0,
             },
           })
-          expect(finalFileState.ui.searchDialog.term).toEqual('Wha')
-          expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-          expect(finalFileState.ui.currentView).toEqual('project')
+          const searchTerm = searchDialogSearchTermSelector(finalState)
+          expect(searchTerm).toEqual('Wha')
+          const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+          expect(currentHitIndex).toBe(0)
+          const currentView = currentViewSelector(finalState)
+          expect(currentView).toEqual('project')
         })
       })
       describe('considering the tabs books', () => {
@@ -1704,7 +1763,8 @@ describe('jumpToHit', () => {
           })
           describe('and a book hit in the book "title"', () => {
             const store = storeWithZelda()
-            const fileState = fullFileStateSelector(store.getState())
+            const originalState = store.getState()
+            const fileState = fullFileStateSelector(originalState)
             const cards = allCardsSelector(store.getState())
             store.dispatch(setSearchTerm('of time'))
             store.dispatch(
@@ -1715,18 +1775,24 @@ describe('jumpToHit', () => {
               await new Promise((resolve) => {
                 setTimeout(resolve, 100)
               })
-              const finalFileState = fullFileStateSelector(store.getState())
+              const finalState = store.getState()
+              const finalFileState = fullFileStateSelector(finalState)
               expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
                 withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
               )
-              expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-              expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+              const originalJumpCount = jumpCounterSelector(originalState)
+              expect(originalJumpCount).toEqual(0)
+              const finalJumpCount = jumpCounterSelector(finalState)
+              expect(finalJumpCount).toEqual(1)
+              const originalUI = uiSelector(originalState)
+              const finalUI = uiSelector(finalState)
               expect(
-                omit(finalFileState.ui, ['projectTab', 'searchDialog', 'currentView', 'bookDialog'])
+                omit(finalUI, ['projectTab', 'searchDialog', 'currentView', 'bookDialog'])
               ).toEqual(
-                omit(fileState.ui, ['projectTab', 'searchDialog', 'currentView', 'bookDialog'])
+                omit(originalUI, ['projectTab', 'searchDialog', 'currentView', 'bookDialog'])
               )
-              expect(finalFileState.ui.projectTab.focus[0]).toEqual({
+              const projectFoci = projectAllFociSelector(finalState)
+              expect(projectFoci[0]).toEqual({
                 path: ['book', 5, 'title'],
                 selection: {
                   direction: 'forward',
@@ -1734,10 +1800,14 @@ describe('jumpToHit', () => {
                   start: 8,
                 },
               })
-              expect(finalFileState.ui.searchDialog.term).toEqual('of time')
-              expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-              expect(finalFileState.ui.currentView).toEqual('project')
-              expect(finalFileState.ui.bookDialog).toEqual({
+              const searchTerm = searchDialogSearchTermSelector(finalState)
+              expect(searchTerm).toEqual('of time')
+              const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+              expect(currentHitIndex).toBe(0)
+              const currentView = currentViewSelector(finalState)
+              expect(currentView).toEqual('project')
+              const bookDialog = bookDialogSelector(finalState)
+              expect(bookDialog).toEqual({
                 bookId: 5,
                 isOpen: true,
               })
@@ -1745,7 +1815,8 @@ describe('jumpToHit', () => {
           })
           describe('and a book hit in the book "premise"', () => {
             const store = storeWithZelda()
-            const fileState = fullFileStateSelector(store.getState())
+            const originalState = store.getState()
+            const fileState = fullFileStateSelector(originalState)
             const cards = allCardsSelector(store.getState())
             store.dispatch(setSearchTerm('same as'))
             store.dispatch(
@@ -1756,18 +1827,22 @@ describe('jumpToHit', () => {
               await new Promise((resolve) => {
                 setTimeout(resolve, 100)
               })
-              const finalFileState = fullFileStateSelector(store.getState())
+              const finalState = store.getState()
+              const finalFileState = fullFileStateSelector(finalState)
               expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
                 withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
               )
-              expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-              expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+              const originalJumpCount = jumpCounterSelector(originalState)
+              expect(originalJumpCount).toEqual(0)
+              const finalJumpCount = jumpCounterSelector(finalState)
+              expect(finalJumpCount).toEqual(1)
+              const originalUI = uiSelector(originalState)
+              const finalUI = uiSelector(finalState)
               expect(
-                omit(finalFileState.ui, ['projectTab', 'searchDialog', 'currentView', 'bookDialog'])
-              ).toEqual(
-                omit(fileState.ui, ['projectTab', 'searchDialog', 'currentView', 'bookDialog'])
-              )
-              expect(finalFileState.ui.projectTab.focus[0]).toEqual({
+                omit(originalUI, ['projectTab', 'searchDialog', 'currentView', 'bookDialog'])
+              ).toEqual(omit(finalUI, ['projectTab', 'searchDialog', 'currentView', 'bookDialog']))
+              const projectFoci = projectAllFociSelector(finalState)
+              expect(projectFoci[0]).toEqual({
                 path: ['book', 5, 'premise'],
                 selection: {
                   direction: 'forward',
@@ -1775,10 +1850,14 @@ describe('jumpToHit', () => {
                   start: 0,
                 },
               })
-              expect(finalFileState.ui.searchDialog.term).toEqual('same as')
-              expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-              expect(finalFileState.ui.currentView).toEqual('project')
-              expect(finalFileState.ui.bookDialog).toEqual({
+              const searchTerm = searchDialogSearchTermSelector(finalState)
+              expect(searchTerm).toEqual('same as')
+              const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+              expect(currentHitIndex).toBe(0)
+              const currentView = currentViewSelector(finalState)
+              expect(currentView).toEqual('project')
+              const bookDialog = bookDialogSelector(finalState)
+              expect(bookDialog).toEqual({
                 bookId: 5,
                 isOpen: true,
               })
@@ -1786,7 +1865,8 @@ describe('jumpToHit', () => {
           })
           describe('and a book hit in the book "genre"', () => {
             const store = storeWithZelda()
-            const fileState = fullFileStateSelector(store.getState())
+            const originalState = store.getState()
+            const fileState = fullFileStateSelector(originalState)
             const cards = allCardsSelector(store.getState())
             store.dispatch(setSearchTerm('adventure'))
             store.dispatch(
@@ -1797,18 +1877,24 @@ describe('jumpToHit', () => {
               await new Promise((resolve) => {
                 setTimeout(resolve, 100)
               })
-              const finalFileState = fullFileStateSelector(store.getState())
+              const finalState = store.getState()
+              const finalFileState = fullFileStateSelector(finalState)
               expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
                 withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
               )
-              expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-              expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+              const originalJumpCount = jumpCounterSelector(originalState)
+              expect(originalJumpCount).toEqual(0)
+              const finalJumpCount = jumpCounterSelector(finalState)
+              expect(finalJumpCount).toEqual(1)
+              const originalUI = uiSelector(originalState)
+              const finalUI = uiSelector(finalState)
               expect(
-                omit(finalFileState.ui, ['projectTab', 'searchDialog', 'currentView', 'bookDialog'])
+                omit(finalUI, ['projectTab', 'searchDialog', 'currentView', 'bookDialog'])
               ).toEqual(
-                omit(fileState.ui, ['projectTab', 'searchDialog', 'currentView', 'bookDialog'])
+                omit(originalUI, ['projectTab', 'searchDialog', 'currentView', 'bookDialog'])
               )
-              expect(finalFileState.ui.projectTab.focus[0]).toEqual({
+              const projectFoci = projectAllFociSelector(finalState)
+              expect(projectFoci[0]).toEqual({
                 path: ['book', 5, 'genre'],
                 selection: {
                   direction: 'forward',
@@ -1816,10 +1902,14 @@ describe('jumpToHit', () => {
                   start: 0,
                 },
               })
-              expect(finalFileState.ui.searchDialog.term).toEqual('adventure')
-              expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-              expect(finalFileState.ui.currentView).toEqual('project')
-              expect(finalFileState.ui.bookDialog).toEqual({
+              const searchTerm = searchDialogSearchTermSelector(finalState)
+              expect(searchTerm).toEqual('adventure')
+              const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+              expect(currentHitIndex).toBe(0)
+              const currentView = currentViewSelector(finalState)
+              expect(currentView).toEqual('project')
+              const bookDialog = bookDialogSelector(finalState)
+              expect(bookDialog).toEqual({
                 bookId: 5,
                 isOpen: true,
               })
@@ -1827,7 +1917,8 @@ describe('jumpToHit', () => {
           })
           describe('and a book hit in the book "theme"', () => {
             const store = storeWithZelda()
-            const fileState = fullFileStateSelector(store.getState())
+            const originalState = store.getState()
+            const fileState = fullFileStateSelector(originalState)
             const cards = allCardsSelector(store.getState())
             store.dispatch(setSearchTerm('n64'))
             store.dispatch(
@@ -1838,18 +1929,24 @@ describe('jumpToHit', () => {
               await new Promise((resolve) => {
                 setTimeout(resolve, 100)
               })
-              const finalFileState = fullFileStateSelector(store.getState())
+              const finalState = store.getState()
+              const finalFileState = fullFileStateSelector(finalState)
               expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
                 withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
               )
-              expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-              expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+              const originalJumpCount = jumpCounterSelector(originalState)
+              expect(originalJumpCount).toEqual(0)
+              const finalJumpCount = jumpCounterSelector(finalState)
+              expect(finalJumpCount).toEqual(1)
+              const originalUI = uiSelector(originalState)
+              const finalUI = uiSelector(finalState)
               expect(
-                omit(finalFileState.ui, ['projectTab', 'searchDialog', 'currentView', 'bookDialog'])
+                omit(finalUI, ['projectTab', 'searchDialog', 'currentView', 'bookDialog'])
               ).toEqual(
-                omit(fileState.ui, ['projectTab', 'searchDialog', 'currentView', 'bookDialog'])
+                omit(originalUI, ['projectTab', 'searchDialog', 'currentView', 'bookDialog'])
               )
-              expect(finalFileState.ui.projectTab.focus[0]).toEqual({
+              const projectFoci = projectAllFociSelector(finalState)
+              expect(projectFoci[0]).toEqual({
                 path: ['book', 5, 'theme'],
                 selection: {
                   direction: 'forward',
@@ -1857,10 +1954,14 @@ describe('jumpToHit', () => {
                   start: 0,
                 },
               })
-              expect(finalFileState.ui.searchDialog.term).toEqual('n64')
-              expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-              expect(finalFileState.ui.currentView).toEqual('project')
-              expect(finalFileState.ui.bookDialog).toEqual({
+              const searchTerm = searchDialogSearchTermSelector(finalState)
+              expect(searchTerm).toEqual('n64')
+              const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+              expect(currentHitIndex).toBe(0)
+              const currentView = currentViewSelector(finalState)
+              expect(currentView).toEqual('project')
+              const bookDialog = bookDialogSelector(finalState)
+              expect(bookDialog).toEqual({
                 bookId: 5,
                 isOpen: true,
               })
@@ -2051,7 +2152,8 @@ describe('jumpToHit', () => {
         })
         describe('given a card title hit', () => {
           const store = storeWithZelda()
-          const fileState = fullFileStateSelector(store.getState())
+          const originalState = store.getState()
+          const fileState = fullFileStateSelector(originalState)
           const cards = allCardsSelector(store.getState())
           store.dispatch(setSearchTerm('Intro- awake'))
           store.dispatch(
@@ -2065,14 +2167,19 @@ describe('jumpToHit', () => {
             await new Promise((resolve) => {
               setTimeout(resolve, 100)
             })
-            const finalFileState = fullFileStateSelector(store.getState())
+            const finalState = store.getState()
+            const finalFileState = fullFileStateSelector(finalState)
             expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
               withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
             )
-            expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-            expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+            const originalJumpCount = jumpCounterSelector(originalState)
+            expect(originalJumpCount).toEqual(0)
+            const finalJumpCount = jumpCounterSelector(finalState)
+            expect(finalJumpCount).toEqual(1)
+            const originalUI = uiSelector(originalState)
+            const finalUI = uiSelector(finalState)
             expect(
-              omit(finalFileState.ui, [
+              omit(finalUI, [
                 'timeline',
                 'searchDialog',
                 'currentView',
@@ -2080,7 +2187,7 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             ).toEqual(
-              omit(fileState.ui, [
+              omit(originalUI, [
                 'timeline',
                 'searchDialog',
                 'currentView',
@@ -2088,7 +2195,8 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             )
-            expect(finalFileState.ui.timeline.focus[0]).toEqual({
+            const cardFoci = timelineFociSelector(finalState)
+            expect(cardFoci[0]).toEqual({
               path: ['card', 19, 'title'],
               selection: {
                 direction: 'forward',
@@ -2096,11 +2204,16 @@ describe('jumpToHit', () => {
                 start: 0,
               },
             })
-            expect(finalFileState.ui.searchDialog.term).toEqual('Intro- awake')
-            expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-            expect(finalFileState.ui.currentView).toEqual('timeline')
-            expect(finalFileState.ui.currentTimeline).toEqual(8)
-            expect(finalFileState.ui.cardDialog).toEqual({
+            const searchTerm = searchDialogSearchTermSelector(finalState)
+            expect(searchTerm).toEqual('Intro- awake')
+            const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+            expect(currentHitIndex).toBe(0)
+            const currentView = currentViewSelector(finalState)
+            expect(currentView).toEqual('timeline')
+            const currentTimeline = currentTimelineSelector(finalState)
+            expect(currentTimeline).toEqual(8)
+            const cardDialog = cardDialogSelector(finalState)
+            expect(cardDialog).toEqual({
               activeTab: 1,
               beatId: 21,
               cardId: 19,
@@ -2116,7 +2229,8 @@ describe('jumpToHit', () => {
         })
         describe('given a hit on the series timeline', () => {
           const store = storeWithZelda()
-          const fileState = fullFileStateSelector(store.getState())
+          const originalState = store.getState()
+          const fileState = fullFileStateSelector(originalState)
           const cards = allCardsSelector(store.getState())
           store.dispatch(setSearchTerm('The target'))
           store.dispatch(
@@ -2130,14 +2244,19 @@ describe('jumpToHit', () => {
             await new Promise((resolve) => {
               setTimeout(resolve, 100)
             })
-            const finalFileState = fullFileStateSelector(store.getState())
+            const finalState = store.getState()
+            const finalFileState = fullFileStateSelector(finalState)
             expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
               withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
             )
-            expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-            expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+            const originalJumpCount = jumpCounterSelector(originalState)
+            expect(originalJumpCount).toEqual(0)
+            const finalJumpCount = jumpCounterSelector(finalState)
+            expect(finalJumpCount).toEqual(1)
+            const originalUI = uiSelector(originalState)
+            const finalUI = uiSelector(finalState)
             expect(
-              omit(finalFileState.ui, [
+              omit(finalUI, [
                 'timeline',
                 'searchDialog',
                 'currentView',
@@ -2145,7 +2264,7 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             ).toEqual(
-              omit(fileState.ui, [
+              omit(originalUI, [
                 'timeline',
                 'searchDialog',
                 'currentView',
@@ -2153,7 +2272,8 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             )
-            expect(finalFileState.ui.timeline.focus[0]).toEqual({
+            const cardFoci = timelineFociSelector(finalState)
+            expect(cardFoci[0]).toEqual({
               path: ['card', 50, 'title'],
               selection: {
                 direction: 'forward',
@@ -2161,11 +2281,16 @@ describe('jumpToHit', () => {
                 start: 0,
               },
             })
-            expect(finalFileState.ui.searchDialog.term).toEqual('The target')
-            expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-            expect(finalFileState.ui.currentView).toEqual('timeline')
-            expect(finalFileState.ui.currentTimeline).toEqual('series')
-            expect(finalFileState.ui.cardDialog).toEqual({
+            const searchTerm = searchDialogSearchTermSelector(finalState)
+            expect(searchTerm).toEqual('The target')
+            const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+            expect(currentHitIndex).toBe(0)
+            const currentView = currentViewSelector(finalState)
+            expect(currentView).toEqual('timeline')
+            const currentTimeline = currentTimelineSelector(finalState)
+            expect(currentTimeline).toEqual('series')
+            const cardDialog = cardDialogSelector(finalState)
+            expect(cardDialog).toEqual({
               activeTab: 1,
               beatId: 1,
               cardId: 50,
@@ -2181,7 +2306,8 @@ describe('jumpToHit', () => {
         })
         describe('given a card description hit', () => {
           const store = storeWithZelda()
-          const fileState = fullFileStateSelector(store.getState())
+          const originalState = store.getState()
+          const fileState = fullFileStateSelector(originalState)
           const cards = allCardsSelector(store.getState())
           store.dispatch(setSearchTerm('The old man'))
           store.dispatch(
@@ -2195,14 +2321,19 @@ describe('jumpToHit', () => {
             await new Promise((resolve) => {
               setTimeout(resolve, 100)
             })
-            const finalFileState = fullFileStateSelector(store.getState())
+            const finalState = store.getState()
+            const finalFileState = fullFileStateSelector(finalState)
             expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
               withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
             )
-            expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-            expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+            const originalJumpCount = jumpCounterSelector(originalState)
+            expect(originalJumpCount).toEqual(0)
+            const finalJumpCount = jumpCounterSelector(finalState)
+            expect(finalJumpCount).toEqual(1)
+            const originalUI = uiSelector(originalState)
+            const finalUI = uiSelector(finalState)
             expect(
-              omit(finalFileState.ui, [
+              omit(finalUI, [
                 'timeline',
                 'searchDialog',
                 'currentView',
@@ -2210,7 +2341,7 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             ).toEqual(
-              omit(fileState.ui, [
+              omit(originalUI, [
                 'timeline',
                 'searchDialog',
                 'currentView',
@@ -2218,7 +2349,8 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             )
-            expect(finalFileState.ui.timeline.focus[0]).toEqual({
+            const cardFoci = timelineFociSelector(finalState)
+            expect(cardFoci[0]).toEqual({
               path: ['card', 19, 'description'],
               selection: {
                 direction: 'forward',
@@ -2226,11 +2358,16 @@ describe('jumpToHit', () => {
                 start: 0,
               },
             })
-            expect(finalFileState.ui.searchDialog.term).toEqual('The old man')
-            expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-            expect(finalFileState.ui.currentView).toEqual('timeline')
-            expect(finalFileState.ui.currentTimeline).toEqual(8)
-            expect(finalFileState.ui.cardDialog).toEqual({
+            const searchTerm = searchDialogSearchTermSelector(finalState)
+            expect(searchTerm).toEqual('The old man')
+            const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+            expect(currentHitIndex).toBe(0)
+            const currentView = currentViewSelector(finalState)
+            expect(currentView).toEqual('timeline')
+            const currentTimeline = currentTimelineSelector(finalState)
+            expect(currentTimeline).toEqual(8)
+            const cardDialog = cardDialogSelector(finalState)
+            expect(cardDialog).toEqual({
               activeTab: 1,
               beatId: 21,
               cardId: 19,
@@ -2246,7 +2383,8 @@ describe('jumpToHit', () => {
         })
         describe('given a hit on a custom attribute', () => {
           const store = storeWithZelda()
-          const fileState = fullFileStateSelector(store.getState())
+          const originalState = store.getState()
+          const fileState = fullFileStateSelector(originalState)
           const cards = allCardsSelector(store.getState())
           store.dispatch(setSearchTerm('another reference'))
           store.dispatch(
@@ -2260,14 +2398,19 @@ describe('jumpToHit', () => {
             await new Promise((resolve) => {
               setTimeout(resolve, 100)
             })
-            const finalFileState = fullFileStateSelector(store.getState())
+            const finalState = store.getState()
+            const finalFileState = fullFileStateSelector(finalState)
             expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
               withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
             )
-            expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-            expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+            const originalJumpCount = jumpCounterSelector(originalState)
+            expect(originalJumpCount).toEqual(0)
+            const finalJumpCount = jumpCounterSelector(finalState)
+            expect(finalJumpCount).toEqual(1)
+            const originalUI = uiSelector(originalState)
+            const finalUI = uiSelector(finalState)
             expect(
-              omit(finalFileState.ui, [
+              omit(finalUI, [
                 'timeline',
                 'searchDialog',
                 'currentView',
@@ -2275,7 +2418,7 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             ).toEqual(
-              omit(fileState.ui, [
+              omit(originalUI, [
                 'timeline',
                 'searchDialog',
                 'currentView',
@@ -2283,7 +2426,8 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             )
-            expect(finalFileState.ui.timeline.focus[0]).toEqual({
+            const cardFoci = timelineFociSelector(finalState)
+            expect(cardFoci[0]).toEqual({
               path: ['card', 19, 'attr 1'],
               selection: {
                 direction: 'forward',
@@ -2291,11 +2435,16 @@ describe('jumpToHit', () => {
                 start: 7,
               },
             })
-            expect(finalFileState.ui.searchDialog.term).toEqual('another reference')
-            expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-            expect(finalFileState.ui.currentView).toEqual('timeline')
-            expect(finalFileState.ui.currentTimeline).toEqual(8)
-            expect(finalFileState.ui.cardDialog).toEqual({
+            const searchTerm = searchDialogSearchTermSelector(finalState)
+            expect(searchTerm).toEqual('another reference')
+            const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+            expect(currentHitIndex).toBe(0)
+            const currentView = currentViewSelector(finalState)
+            expect(currentView).toEqual('timeline')
+            const currentTimeline = currentTimelineSelector(finalState)
+            expect(currentTimeline).toEqual(8)
+            const cardDialog = cardDialogSelector(finalState)
+            expect(cardDialog).toEqual({
               activeTab: 2,
               beatId: 21,
               cardId: 19,
@@ -2310,7 +2459,8 @@ describe('jumpToHit', () => {
           })
           describe('when the attribute has a slash in it encoded with %2F', () => {
             const store = storeWithZelda()
-            const fileState = fullFileStateSelector(store.getState())
+            const originalState = store.getState()
+            const fileState = fullFileStateSelector(originalState)
             const cards = allCardsSelector(store.getState())
             store.dispatch(setSearchTerm('slashedy-slashed'))
             store.dispatch(
@@ -2324,14 +2474,19 @@ describe('jumpToHit', () => {
               await new Promise((resolve) => {
                 setTimeout(resolve, 100)
               })
-              const finalFileState = fullFileStateSelector(store.getState())
+              const finalState = store.getState()
+              const finalFileState = fullFileStateSelector(finalState)
               expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
                 withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
               )
-              expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-              expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+              const originalJumpCount = jumpCounterSelector(originalState)
+              expect(originalJumpCount).toEqual(0)
+              const finalJumpCount = jumpCounterSelector(finalState)
+              expect(finalJumpCount).toEqual(1)
+              const originalUI = uiSelector(originalState)
+              const finalUI = uiSelector(finalState)
               expect(
-                omit(finalFileState.ui, [
+                omit(finalUI, [
                   'timeline',
                   'searchDialog',
                   'currentView',
@@ -2339,7 +2494,7 @@ describe('jumpToHit', () => {
                   'currentTimeline',
                 ])
               ).toEqual(
-                omit(fileState.ui, [
+                omit(originalUI, [
                   'timeline',
                   'searchDialog',
                   'currentView',
@@ -2347,7 +2502,8 @@ describe('jumpToHit', () => {
                   'currentTimeline',
                 ])
               )
-              expect(finalFileState.ui.timeline.focus[0]).toEqual({
+              const cardFoci = timelineFociSelector(finalState)
+              expect(cardFoci[0]).toEqual({
                 path: ['card', 35, 'Scene Name/With Slashes'],
                 selection: {
                   direction: 'forward',
@@ -2355,11 +2511,16 @@ describe('jumpToHit', () => {
                   start: 0,
                 },
               })
-              expect(finalFileState.ui.searchDialog.term).toEqual('slashedy-slashed')
-              expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-              expect(finalFileState.ui.currentView).toEqual('timeline')
-              expect(finalFileState.ui.currentTimeline).toEqual(7)
-              expect(finalFileState.ui.cardDialog).toEqual({
+              const searchTerm = searchDialogSearchTermSelector(finalState)
+              expect(searchTerm).toEqual('slashedy-slashed')
+              const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+              expect(currentHitIndex).toBe(0)
+              const currentView = currentViewSelector(finalState)
+              expect(currentView).toEqual('timeline')
+              const currentTimeline = currentTimelineSelector(finalState)
+              expect(currentTimeline).toEqual(7)
+              const cardDialog = cardDialogSelector(finalState)
+              expect(cardDialog).toEqual({
                 activeTab: 2,
                 beatId: 33,
                 cardId: 35,
@@ -2376,7 +2537,8 @@ describe('jumpToHit', () => {
         })
         describe('given a hit on a template attribute', () => {
           const store = storeWithZelda()
-          const fileState = fullFileStateSelector(store.getState())
+          const originalState = store.getState()
+          const fileState = fullFileStateSelector(originalState)
           const cards = allCardsSelector(store.getState())
           store.dispatch(setSearchTerm('A value'))
           store.dispatch(
@@ -2390,14 +2552,19 @@ describe('jumpToHit', () => {
             await new Promise((resolve) => {
               setTimeout(resolve, 100)
             })
-            const finalFileState = fullFileStateSelector(store.getState())
+            const finalState = store.getState()
+            const finalFileState = fullFileStateSelector(finalState)
             expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
               withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
             )
-            expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-            expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+            const originalJumpCount = jumpCounterSelector(originalState)
+            expect(originalJumpCount).toEqual(0)
+            const finalJumpCount = jumpCounterSelector(finalState)
+            expect(finalJumpCount).toEqual(1)
+            const originalUI = uiSelector(originalState)
+            const finalUI = uiSelector(finalState)
             expect(
-              omit(finalFileState.ui, [
+              omit(finalUI, [
                 'timeline',
                 'searchDialog',
                 'currentView',
@@ -2405,7 +2572,7 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             ).toEqual(
-              omit(fileState.ui, [
+              omit(originalUI, [
                 'timeline',
                 'searchDialog',
                 'currentView',
@@ -2413,7 +2580,8 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             )
-            expect(finalFileState.ui.timeline.focus[0]).toEqual({
+            const cardFoci = timelineFociSelector(finalState)
+            expect(cardFoci[0]).toEqual({
               path: ['card', 19, 'template', 'sc4', 'Goal'],
               selection: {
                 direction: 'forward',
@@ -2421,11 +2589,16 @@ describe('jumpToHit', () => {
                 start: 0,
               },
             })
-            expect(finalFileState.ui.searchDialog.term).toEqual('A value')
-            expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-            expect(finalFileState.ui.currentView).toEqual('timeline')
-            expect(finalFileState.ui.currentTimeline).toEqual(8)
-            expect(finalFileState.ui.cardDialog).toEqual({
+            const searchTerm = searchDialogSearchTermSelector(finalState)
+            expect(searchTerm).toEqual('A value')
+            const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+            expect(currentHitIndex).toBe(0)
+            const currentView = currentViewSelector(finalState)
+            expect(currentView).toEqual('timeline')
+            const currentTimeline = currentTimelineSelector(finalState)
+            expect(currentTimeline).toEqual(8)
+            const cardDialog = cardDialogSelector(finalState)
+            expect(cardDialog).toEqual({
               activeTab: 3,
               beatId: 21,
               cardId: 19,
@@ -2440,7 +2613,8 @@ describe('jumpToHit', () => {
           })
           describe('given the hit has slashes in the attribute name', () => {
             const store = storeWithZelda()
-            const fileState = fullFileStateSelector(store.getState())
+            const originalState = store.getState()
+            const fileState = fullFileStateSelector(originalState)
             const cards = allCardsSelector(store.getState())
             store.dispatch(setSearchTerm('zzzzzzzzzzz'))
             store.dispatch(
@@ -2454,14 +2628,19 @@ describe('jumpToHit', () => {
               await new Promise((resolve) => {
                 setTimeout(resolve, 100)
               })
-              const finalFileState = fullFileStateSelector(store.getState())
+              const finalState = store.getState()
+              const finalFileState = fullFileStateSelector(finalState)
               expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
                 withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
               )
-              expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-              expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+              const originalJumpCount = jumpCounterSelector(originalState)
+              expect(originalJumpCount).toEqual(0)
+              const finalJumpCount = jumpCounterSelector(finalState)
+              expect(finalJumpCount).toEqual(1)
+              const originalUI = uiSelector(originalState)
+              const finalUI = uiSelector(finalState)
               expect(
-                omit(finalFileState.ui, [
+                omit(finalUI, [
                   'timeline',
                   'searchDialog',
                   'currentView',
@@ -2469,7 +2648,7 @@ describe('jumpToHit', () => {
                   'currentTimeline',
                 ])
               ).toEqual(
-                omit(fileState.ui, [
+                omit(originalUI, [
                   'timeline',
                   'searchDialog',
                   'currentView',
@@ -2477,7 +2656,8 @@ describe('jumpToHit', () => {
                   'currentTimeline',
                 ])
               )
-              expect(finalFileState.ui.timeline.focus[0]).toEqual({
+              const cardFoci = timelineFociSelector(finalState)
+              expect(cardFoci[0]).toEqual({
                 path: ['card', 19, 'template', 'sc4', 'template/attribute-with-slashes'],
                 selection: {
                   direction: 'forward',
@@ -2485,11 +2665,16 @@ describe('jumpToHit', () => {
                   start: 0,
                 },
               })
-              expect(finalFileState.ui.searchDialog.term).toEqual('zzzzzzzzzzz')
-              expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-              expect(finalFileState.ui.currentView).toEqual('timeline')
-              expect(finalFileState.ui.currentTimeline).toEqual(8)
-              expect(finalFileState.ui.cardDialog).toEqual({
+              const searchTerm = searchDialogSearchTermSelector(finalState)
+              expect(searchTerm).toEqual('zzzzzzzzzzz')
+              const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+              expect(currentHitIndex).toBe(0)
+              const currentView = currentViewSelector(finalState)
+              expect(currentView).toEqual('timeline')
+              const currentTimeline = currentTimelineSelector(finalState)
+              expect(currentTimeline).toEqual(8)
+              const cardDialog = cardDialogSelector(finalState)
+              expect(cardDialog).toEqual({
                 activeTab: 3,
                 beatId: 21,
                 cardId: 19,
@@ -2509,7 +2694,8 @@ describe('jumpToHit', () => {
     describe('considering the outline tab', () => {
       describe('given a book id that does not exist', () => {
         const store = storeWithZelda()
-        const fileState = fullFileStateSelector(store.getState())
+        const originalState = store.getState()
+        const fileState = fullFileStateSelector(originalState)
         const cards = allCardsSelector(store.getState())
         store.dispatch(setSearchTerm('of time'))
         store.dispatch(
@@ -2520,7 +2706,8 @@ describe('jumpToHit', () => {
           await new Promise((resolve) => {
             setTimeout(resolve, 100)
           })
-          const finalFileState = fullFileStateSelector(store.getState())
+          const finalState = store.getState()
+          const finalFileState = fullFileStateSelector(finalState)
           expect(
             omit(withoutChangesWeDontCareAbout(finalFileState), [
               'ui.searchDialog.currentHitIndex',
@@ -2594,7 +2781,8 @@ describe('jumpToHit', () => {
         })
         describe('given a hit on a card title', () => {
           const store = storeWithZelda()
-          const fileState = fullFileStateSelector(store.getState())
+          const originalState = store.getState()
+          const fileState = fullFileStateSelector(originalState)
           const cards = allCardsSelector(store.getState())
           store.dispatch(setSearchTerm('Intro- awake'))
           store.dispatch(
@@ -2605,14 +2793,19 @@ describe('jumpToHit', () => {
             await new Promise((resolve) => {
               setTimeout(resolve, 100)
             })
-            const finalFileState = fullFileStateSelector(store.getState())
+            const finalState = store.getState()
+            const finalFileState = fullFileStateSelector(finalState)
             expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
               withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
             )
-            expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-            expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+            const originalJumpCount = jumpCounterSelector(originalState)
+            expect(originalJumpCount).toEqual(0)
+            const finalJumpCount = jumpCounterSelector(finalState)
+            expect(finalJumpCount).toEqual(1)
+            const originalUI = uiSelector(originalState)
+            const finalUI = uiSelector(finalState)
             expect(
-              omit(finalFileState.ui, [
+              omit(finalUI, [
                 'outlineTab',
                 'searchDialog',
                 'currentView',
@@ -2620,7 +2813,7 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             ).toEqual(
-              omit(fileState.ui, [
+              omit(originalUI, [
                 'outlineTab',
                 'searchDialog',
                 'currentView',
@@ -2628,7 +2821,8 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             )
-            expect(finalFileState.ui.outlineTab.focus[0]).toEqual({
+            const outlineFoci = outlineFociSelector(finalState)
+            expect(outlineFoci[0]).toEqual({
               path: ['card', 19, 'title'],
               selection: {
                 direction: 'forward',
@@ -2636,11 +2830,16 @@ describe('jumpToHit', () => {
                 start: 0,
               },
             })
-            expect(finalFileState.ui.searchDialog.term).toEqual('Intro- awake')
-            expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-            expect(finalFileState.ui.currentView).toEqual('outline')
-            expect(finalFileState.ui.currentTimeline).toEqual(8)
-            expect(finalFileState.ui.outlineTab).toEqual({
+            const searchTerm = searchDialogSearchTermSelector(finalState)
+            expect(searchTerm).toEqual('Intro- awake')
+            const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+            expect(currentHitIndex).toBe(0)
+            const currentView = currentViewSelector(finalState)
+            expect(currentView).toEqual('outline')
+            const currentTimeline = currentTimelineSelector(finalState)
+            expect(currentTimeline).toEqual(8)
+            const outlineTab = outlineSelector(finalState)
+            expect(outlineTab).toEqual({
               cardEditor: {
                 editing: 19,
               },
@@ -2708,7 +2907,8 @@ describe('jumpToHit', () => {
         })
         describe('given a hit on a card description', () => {
           const store = storeWithZelda()
-          const fileState = fullFileStateSelector(store.getState())
+          const originalState = store.getState()
+          const fileState = fullFileStateSelector(originalState)
           const cards = allCardsSelector(store.getState())
           store.dispatch(setSearchTerm('The old man'))
           store.dispatch(
@@ -2722,14 +2922,19 @@ describe('jumpToHit', () => {
             await new Promise((resolve) => {
               setTimeout(resolve, 100)
             })
-            const finalFileState = fullFileStateSelector(store.getState())
+            const finalState = store.getState()
+            const finalFileState = fullFileStateSelector(finalState)
             expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
               withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
             )
-            expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-            expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+            const originalJumpCount = jumpCounterSelector(originalState)
+            expect(originalJumpCount).toEqual(0)
+            const finalJumpCount = jumpCounterSelector(finalState)
+            expect(finalJumpCount).toEqual(1)
+            const originalUI = uiSelector(originalState)
+            const finalUI = uiSelector(finalState)
             expect(
-              omit(finalFileState.ui, [
+              omit(finalUI, [
                 'outlineTab',
                 'searchDialog',
                 'currentView',
@@ -2737,7 +2942,7 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             ).toEqual(
-              omit(fileState.ui, [
+              omit(originalUI, [
                 'outlineTab',
                 'searchDialog',
                 'currentView',
@@ -2745,7 +2950,8 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             )
-            expect(finalFileState.ui.outlineTab.focus[0]).toEqual({
+            const outlineFoci = outlineFociSelector(finalState)
+            expect(outlineFoci[0]).toEqual({
               path: ['card', 19, 'description'],
               selection: {
                 direction: 'forward',
@@ -2753,11 +2959,16 @@ describe('jumpToHit', () => {
                 start: 0,
               },
             })
-            expect(finalFileState.ui.searchDialog.term).toEqual('The old man')
-            expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-            expect(finalFileState.ui.currentView).toEqual('outline')
-            expect(finalFileState.ui.currentTimeline).toEqual(8)
-            expect(finalFileState.ui.outlineTab).toEqual({
+            const searchTerm = searchDialogSearchTermSelector(finalState)
+            expect(searchTerm).toEqual('The old man')
+            const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+            expect(currentHitIndex).toBe(0)
+            const currentView = currentViewSelector(finalState)
+            expect(currentView).toEqual('outline')
+            const currentTimeline = currentTimelineSelector(finalState)
+            expect(currentTimeline).toEqual(8)
+            const outlineTab = outlineSelector(finalState)
+            expect(outlineTab).toEqual({
               cardEditor: {
                 editing: 19,
               },
@@ -2907,7 +3118,8 @@ describe('jumpToHit', () => {
         })
         describe('given a hit for the title', () => {
           const store = storeWithZelda()
-          const fileState = fullFileStateSelector(store.getState())
+          const originalState = store.getState()
+          const fileState = fullFileStateSelector(originalState)
           const cards = allCardsSelector(store.getState())
           store.dispatch(setSearchTerm('Yo, this is'))
           store.dispatch(
@@ -2918,14 +3130,19 @@ describe('jumpToHit', () => {
             await new Promise((resolve) => {
               setTimeout(resolve, 100)
             })
-            const finalFileState = fullFileStateSelector(store.getState())
+            const finalState = store.getState()
+            const finalFileState = fullFileStateSelector(finalState)
             expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
               withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
             )
-            expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-            expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+            const originalJumpCount = jumpCounterSelector(originalState)
+            expect(originalJumpCount).toEqual(0)
+            const finalJumpCount = jumpCounterSelector(finalState)
+            expect(finalJumpCount).toEqual(1)
+            const originalUI = uiSelector(originalState)
+            const finalUI = uiSelector(finalState)
             expect(
-              omit(finalFileState.ui, [
+              omit(finalUI, [
                 'noteTab',
                 'searchDialog',
                 'currentView',
@@ -2933,7 +3150,7 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             ).toEqual(
-              omit(fileState.ui, [
+              omit(originalUI, [
                 'noteTab',
                 'searchDialog',
                 'currentView',
@@ -2941,7 +3158,8 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             )
-            expect(finalFileState.ui.noteTab.focus[0]).toEqual({
+            const noteFoci = noteFociSelector(finalState)
+            expect(noteFoci[0]).toEqual({
               path: ['note', 1, 'title'],
               selection: {
                 direction: 'forward',
@@ -2949,10 +3167,14 @@ describe('jumpToHit', () => {
                 start: 0,
               },
             })
-            expect(finalFileState.ui.searchDialog.term).toEqual('Yo, this is')
-            expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-            expect(finalFileState.ui.currentView).toEqual('notes')
-            expect(finalFileState.ui.noteTab).toEqual({
+            const searchTerm = searchDialogSearchTermSelector(finalState)
+            expect(searchTerm).toEqual('Yo, this is')
+            const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+            expect(currentHitIndex).toBe(0)
+            const currentView = currentViewSelector(finalState)
+            expect(currentView).toEqual('notes')
+            const noteTab = noteTabSelector(finalState)
+            expect(noteTab).toEqual({
               attributesDialogOpen: false,
               categoriesDialogOpen: false,
               editingSelected: true,
@@ -3014,8 +3236,9 @@ describe('jumpToHit', () => {
         })
         describe('given a hit for the content', () => {
           const store = storeWithZelda()
-          const fileState = fullFileStateSelector(store.getState())
           const cards = allCardsSelector(store.getState())
+          const originalState = store.getState()
+          const fileState = fullFileStateSelector(originalState)
           store.dispatch(setSearchTerm('heres a note'))
           store.dispatch(
             jumpToHit(cards, 'notes', { hit: 'heres a note', path: '/notes/1/content/0' })
@@ -3025,14 +3248,19 @@ describe('jumpToHit', () => {
             await new Promise((resolve) => {
               setTimeout(resolve, 100)
             })
-            const finalFileState = fullFileStateSelector(store.getState())
+            const finalState = store.getState()
+            const finalFileState = fullFileStateSelector(finalState)
             expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
               withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
             )
-            expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-            expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+            const originalJumpCount = jumpCounterSelector(originalState)
+            expect(originalJumpCount).toEqual(0)
+            const finalJumpCount = jumpCounterSelector(finalState)
+            expect(finalJumpCount).toEqual(1)
+            const originalUI = uiSelector(originalState)
+            const finalUI = uiSelector(finalState)
             expect(
-              omit(finalFileState.ui, [
+              omit(finalUI, [
                 'noteTab',
                 'searchDialog',
                 'currentView',
@@ -3040,7 +3268,7 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             ).toEqual(
-              omit(fileState.ui, [
+              omit(originalUI, [
                 'noteTab',
                 'searchDialog',
                 'currentView',
@@ -3048,7 +3276,8 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             )
-            expect(finalFileState.ui.noteTab.focus[0]).toEqual({
+            const noteFoci = noteFociSelector(finalState)
+            expect(noteFoci[0]).toEqual({
               path: ['note', 1, 'content'],
               selection: {
                 direction: 'forward',
@@ -3056,10 +3285,14 @@ describe('jumpToHit', () => {
                 start: 0,
               },
             })
-            expect(finalFileState.ui.searchDialog.term).toEqual('heres a note')
-            expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-            expect(finalFileState.ui.currentView).toEqual('notes')
-            expect(finalFileState.ui.noteTab).toEqual({
+            const searchTerm = searchDialogSearchTermSelector(finalState)
+            expect(searchTerm).toEqual('heres a note')
+            const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+            expect(currentHitIndex).toBe(0)
+            const currentView = currentViewSelector(finalState)
+            expect(currentView).toEqual('notes')
+            const noteTab = noteTabSelector(finalState)
+            expect(noteTab).toEqual({
               attributesDialogOpen: false,
               categoriesDialogOpen: false,
               editingSelected: true,
@@ -3121,7 +3354,8 @@ describe('jumpToHit', () => {
         })
         describe('given a hit for a custom attribute', () => {
           const store = storeWithZelda()
-          const fileState = fullFileStateSelector(store.getState())
+          const originalState = store.getState()
+          const fileState = fullFileStateSelector(originalState)
           const cards = allCardsSelector(store.getState())
           store.dispatch(setSearchTerm('here'))
           store.dispatch(
@@ -3132,14 +3366,19 @@ describe('jumpToHit', () => {
             await new Promise((resolve) => {
               setTimeout(resolve, 100)
             })
-            const finalFileState = fullFileStateSelector(store.getState())
+            const finalState = store.getState()
+            const finalFileState = fullFileStateSelector(finalState)
             expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
               withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
             )
-            expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-            expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+            const originalJumpCount = jumpCounterSelector(originalState)
+            expect(originalJumpCount).toEqual(0)
+            const finalJumpCount = jumpCounterSelector(finalState)
+            expect(finalJumpCount).toEqual(1)
+            const originalUI = uiSelector(originalState)
+            const finalUI = uiSelector(finalState)
             expect(
-              omit(finalFileState.ui, [
+              omit(finalUI, [
                 'noteTab',
                 'searchDialog',
                 'currentView',
@@ -3147,7 +3386,7 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             ).toEqual(
-              omit(fileState.ui, [
+              omit(originalUI, [
                 'noteTab',
                 'searchDialog',
                 'currentView',
@@ -3155,7 +3394,8 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             )
-            expect(finalFileState.ui.noteTab.focus[0]).toEqual({
+            const noteFoci = noteFociSelector(finalState)
+            expect(noteFoci[0]).toEqual({
               path: ['note', 2, 'first'],
               selection: {
                 direction: 'forward',
@@ -3163,10 +3403,14 @@ describe('jumpToHit', () => {
                 start: 0,
               },
             })
-            expect(finalFileState.ui.searchDialog.term).toEqual('here')
-            expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-            expect(finalFileState.ui.currentView).toEqual('notes')
-            expect(finalFileState.ui.noteTab).toEqual({
+            const searchTerm = searchDialogSearchTermSelector(finalState)
+            expect(searchTerm).toEqual('here')
+            const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+            expect(currentHitIndex).toBe(0)
+            const currentView = currentViewSelector(finalState)
+            expect(currentView).toEqual('notes')
+            const noteTab = noteTabSelector(finalState)
+            expect(noteTab).toEqual({
               attributesDialogOpen: false,
               categoriesDialogOpen: false,
               editingSelected: true,
@@ -3219,7 +3463,8 @@ describe('jumpToHit', () => {
           })
           describe('given a hit for a custom attribute with slashes in the name', () => {
             const store = storeWithZelda()
-            const fileState = fullFileStateSelector(store.getState())
+            const originalState = store.getState()
+            const fileState = fullFileStateSelector(originalState)
             const cards = allCardsSelector(store.getState())
             store.dispatch(setSearchTerm('here'))
             store.dispatch(
@@ -3233,14 +3478,19 @@ describe('jumpToHit', () => {
               await new Promise((resolve) => {
                 setTimeout(resolve, 100)
               })
-              const finalFileState = fullFileStateSelector(store.getState())
+              const finalState = store.getState()
+              const finalFileState = fullFileStateSelector(finalState)
               expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
                 withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
               )
-              expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-              expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+              const originalJumpCount = jumpCounterSelector(originalState)
+              expect(originalJumpCount).toEqual(0)
+              const finalJumpCount = jumpCounterSelector(finalState)
+              expect(finalJumpCount).toEqual(1)
+              const originalUI = uiSelector(originalState)
+              const finalUI = uiSelector(finalState)
               expect(
-                omit(finalFileState.ui, [
+                omit(finalUI, [
                   'noteTab',
                   'searchDialog',
                   'currentView',
@@ -3248,7 +3498,7 @@ describe('jumpToHit', () => {
                   'currentTimeline',
                 ])
               ).toEqual(
-                omit(fileState.ui, [
+                omit(originalUI, [
                   'noteTab',
                   'searchDialog',
                   'currentView',
@@ -3256,7 +3506,8 @@ describe('jumpToHit', () => {
                   'currentTimeline',
                 ])
               )
-              expect(finalFileState.ui.noteTab.focus[0]).toEqual({
+              const noteFoci = noteFociSelector(finalState)
+              expect(noteFoci[0]).toEqual({
                 path: ['note', 2, 'Note Name/With Slashes'],
                 selection: {
                   direction: 'forward',
@@ -3264,10 +3515,14 @@ describe('jumpToHit', () => {
                   start: 0,
                 },
               })
-              expect(finalFileState.ui.searchDialog.term).toEqual('here')
-              expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-              expect(finalFileState.ui.currentView).toEqual('notes')
-              expect(finalFileState.ui.noteTab).toEqual({
+              const searchTerm = searchDialogSearchTermSelector(finalState)
+              expect(searchTerm).toEqual('here')
+              const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+              expect(currentHitIndex).toBe(0)
+              const currentView = currentViewSelector(finalState)
+              expect(currentView).toEqual('notes')
+              const noteTab = noteTabSelector(finalState)
+              expect(noteTab).toEqual({
                 attributesDialogOpen: false,
                 categoriesDialogOpen: false,
                 editingSelected: true,
@@ -3362,7 +3617,8 @@ describe('jumpToHit', () => {
         describe('and a characters hit in the name of the character', () => {
           describe('and the path exists', () => {
             const store = storeWithZelda()
-            const fileState = fullFileStateSelector(store.getState())
+            const originalState = store.getState()
+            const fileState = fullFileStateSelector(originalState)
             const cards = allCardsSelector(store.getState())
             store.dispatch(setSearchTerm('builder'))
             store.dispatch(
@@ -3373,16 +3629,22 @@ describe('jumpToHit', () => {
               await new Promise((resolve) => {
                 setTimeout(resolve, 100)
               })
-              const finalFileState = fullFileStateSelector(store.getState())
+              const finalState = store.getState()
+              const finalFileState = fullFileStateSelector(finalState)
               expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
                 withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
               )
-              expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-              expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
-              expect(
-                omit(finalFileState.ui, ['characterTab', 'searchDialog', 'currentView'])
-              ).toEqual(omit(fileState.ui, ['characterTab', 'searchDialog', 'currentView']))
-              expect(finalFileState.ui.characterTab.focus[0]).toEqual({
+              const originalJumpCount = jumpCounterSelector(originalState)
+              expect(originalJumpCount).toEqual(0)
+              const finalJumpCount = jumpCounterSelector(finalState)
+              expect(finalJumpCount).toEqual(1)
+              const originalUI = uiSelector(originalState)
+              const finalUI = uiSelector(finalState)
+              expect(omit(finalUI, ['characterTab', 'searchDialog', 'currentView'])).toEqual(
+                omit(originalUI, ['characterTab', 'searchDialog', 'currentView'])
+              )
+              const characterFoci = characterFociSelector(finalState)
+              expect(characterFoci[0]).toEqual({
                 path: ['character', 3, 'name'],
                 selection: {
                   direction: 'forward',
@@ -3390,16 +3652,21 @@ describe('jumpToHit', () => {
                   start: 8,
                 },
               })
-              expect(finalFileState.ui.searchDialog.term).toEqual('builder')
-              expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-              expect(finalFileState.ui.characterTab.editingSelected).toBeTruthy()
-              expect(finalFileState.ui.currentView).toEqual('characters')
+              const searchTerm = searchDialogSearchTermSelector(finalState)
+              expect(searchTerm).toEqual('builder')
+              const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+              expect(currentHitIndex).toBe(0)
+              const editingSelected = editingSelectedCharacterSelector(finalState)
+              expect(editingSelected).toBeTruthy()
+              const currentView = currentViewSelector(finalState)
+              expect(currentView).toEqual('characters')
             })
           })
         })
         describe('for a book that does not exist', () => {
           const store = storeWithZelda()
-          const fileState = fullFileStateSelector(store.getState())
+          const originalState = store.getState()
+          const fileState = fullFileStateSelector(originalState)
           const cards = allCardsSelector(store.getState())
           store.dispatch(setSearchTerm('Yo'))
           store.dispatch(
@@ -3430,7 +3697,8 @@ describe('jumpToHit', () => {
         describe('for a book that does exist', () => {
           describe('and the id of the description attribute', () => {
             const store = storeWithZelda()
-            const fileState = fullFileStateSelector(store.getState())
+            const originalState = store.getState()
+            const fileState = fullFileStateSelector(originalState)
             const cards = allCardsSelector(store.getState())
             store.dispatch(setSearchTerm("I'm some"))
             store.dispatch(
@@ -3444,16 +3712,22 @@ describe('jumpToHit', () => {
               await new Promise((resolve) => {
                 setTimeout(resolve, 100)
               })
-              const finalFileState = fullFileStateSelector(store.getState())
+              const finalState = store.getState()
+              const finalFileState = fullFileStateSelector(finalState)
               expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
                 withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
               )
-              expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-              expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
-              expect(
-                omit(finalFileState.ui, ['characterTab', 'searchDialog', 'currentView'])
-              ).toEqual(omit(fileState.ui, ['characterTab', 'searchDialog', 'currentView']))
-              expect(finalFileState.ui.characterTab.focus[0]).toEqual({
+              const originalJumpCount = jumpCounterSelector(originalState)
+              expect(originalJumpCount).toEqual(0)
+              const finalJumpCount = jumpCounterSelector(finalState)
+              expect(finalJumpCount).toEqual(1)
+              const originalUI = uiSelector(originalState)
+              const finalUI = uiSelector(finalState)
+              expect(omit(finalUI, ['characterTab', 'searchDialog', 'currentView'])).toEqual(
+                omit(originalUI, ['characterTab', 'searchDialog', 'currentView'])
+              )
+              const characterFoci = characterFociSelector(finalState)
+              expect(characterFoci[0]).toEqual({
                 path: ['character', 1, 'customAttribute', 1, 5],
                 selection: {
                   direction: 'forward',
@@ -3461,11 +3735,16 @@ describe('jumpToHit', () => {
                   start: 0,
                 },
               })
-              expect(finalFileState.ui.searchDialog.term).toEqual("I'm some")
-              expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-              expect(finalFileState.ui.characterTab.editingSelected).toBeTruthy()
-              expect(finalFileState.ui.currentView).toEqual('characters')
-              expect(finalFileState.ui.characterTab).toEqual({
+              const searchTerm = searchDialogSearchTermSelector(finalState)
+              expect(searchTerm).toEqual("I'm some")
+              const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+              expect(currentHitIndex).toBe(0)
+              const editingSelected = editingSelectedCharacterSelector(finalState)
+              expect(editingSelected).toBeTruthy()
+              const currentView = currentViewSelector(finalState)
+              expect(currentView).toEqual('characters')
+              const characterTab = characterTabSelector(finalState)
+              expect(characterTab).toEqual({
                 attributesDialogOpen: false,
                 categoriesDialogOpen: false,
                 characterEditor: {
@@ -3572,7 +3851,8 @@ describe('jumpToHit', () => {
           })
           describe('and the id of the short description attribute', () => {
             const store = storeWithZelda()
-            const fileState = fullFileStateSelector(store.getState())
+            const originalState = store.getState()
+            const fileState = fullFileStateSelector(originalState)
             const cards = allCardsSelector(store.getState())
             store.dispatch(setSearchTerm('Hi there'))
             store.dispatch(
@@ -3586,16 +3866,22 @@ describe('jumpToHit', () => {
               await new Promise((resolve) => {
                 setTimeout(resolve, 100)
               })
-              const finalFileState = fullFileStateSelector(store.getState())
+              const finalState = store.getState()
+              const finalFileState = fullFileStateSelector(finalState)
               expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
                 withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
               )
-              expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-              expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
-              expect(
-                omit(finalFileState.ui, ['characterTab', 'searchDialog', 'currentView'])
-              ).toEqual(omit(fileState.ui, ['characterTab', 'searchDialog', 'currentView']))
-              expect(finalFileState.ui.characterTab.focus[0]).toEqual({
+              const originalJumpCount = jumpCounterSelector(originalState)
+              expect(originalJumpCount).toEqual(0)
+              const finalJumpCount = jumpCounterSelector(finalState)
+              expect(finalJumpCount).toEqual(1)
+              const originalUI = uiSelector(originalState)
+              const finalUI = uiSelector(finalState)
+              expect(omit(finalUI, ['characterTab', 'searchDialog', 'currentView'])).toEqual(
+                omit(originalUI, ['characterTab', 'searchDialog', 'currentView'])
+              )
+              const characterFoci = characterFociSelector(finalState)
+              expect(characterFoci[0]).toEqual({
                 path: ['character', 1, 'customAttribute', 5, 5],
                 selection: {
                   direction: 'forward',
@@ -3603,11 +3889,16 @@ describe('jumpToHit', () => {
                   start: 0,
                 },
               })
-              expect(finalFileState.ui.searchDialog.term).toEqual('Hi there')
-              expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-              expect(finalFileState.ui.characterTab.editingSelected).toBeTruthy()
-              expect(finalFileState.ui.currentView).toEqual('characters')
-              expect(finalFileState.ui.characterTab).toEqual({
+              const searchTerm = searchDialogSearchTermSelector(finalState)
+              expect(searchTerm).toEqual('Hi there')
+              const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+              expect(currentHitIndex).toBe(0)
+              const editingSelected = editingSelectedCharacterSelector(finalState)
+              expect(editingSelected).toBeTruthy()
+              const currentView = currentViewSelector(finalState)
+              expect(currentView).toEqual('characters')
+              const characterTab = characterTabSelector(finalState)
+              expect(characterTab).toEqual({
                 attributesDialogOpen: false,
                 categoriesDialogOpen: false,
                 characterEditor: {
@@ -3745,7 +4036,8 @@ describe('jumpToHit', () => {
             })
             describe('that exists', () => {
               const store = storeWithZelda()
-              const fileState = fullFileStateSelector(store.getState())
+              const originalState = store.getState()
+              const fileState = fullFileStateSelector(originalState)
               const cards = allCardsSelector(store.getState())
               store.dispatch(setSearchTerm('hi'))
               store.dispatch(
@@ -3759,16 +4051,22 @@ describe('jumpToHit', () => {
                 await new Promise((resolve) => {
                   setTimeout(resolve, 100)
                 })
-                const finalFileState = fullFileStateSelector(store.getState())
+                const finalState = store.getState()
+                const finalFileState = fullFileStateSelector(finalState)
                 expect(
                   withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)
                 ).toEqual(withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState))
-                expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-                expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
-                expect(
-                  omit(finalFileState.ui, ['characterTab', 'searchDialog', 'currentView'])
-                ).toEqual(omit(fileState.ui, ['characterTab', 'searchDialog', 'currentView']))
-                expect(finalFileState.ui.characterTab.focus[0]).toEqual({
+                const originalJumpCount = jumpCounterSelector(originalState)
+                expect(originalJumpCount).toEqual(0)
+                const finalJumpCount = jumpCounterSelector(finalState)
+                expect(finalJumpCount).toEqual(1)
+                const originalUI = uiSelector(originalState)
+                const finalUI = uiSelector(finalState)
+                expect(omit(finalUI, ['characterTab', 'searchDialog', 'currentView'])).toEqual(
+                  omit(originalUI, ['characterTab', 'searchDialog', 'currentView'])
+                )
+                const characterFoci = characterFociSelector(finalState)
+                expect(characterFoci[0]).toEqual({
                   path: ['character', 3, 'customAttribute', 2, 5],
                   selection: {
                     direction: 'forward',
@@ -3776,11 +4074,16 @@ describe('jumpToHit', () => {
                     start: 0,
                   },
                 })
-                expect(finalFileState.ui.searchDialog.term).toEqual('hi')
-                expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-                expect(finalFileState.ui.characterTab.editingSelected).toBeTruthy()
-                expect(finalFileState.ui.currentView).toEqual('characters')
-                expect(finalFileState.ui.characterTab).toEqual({
+                const searchTerm = searchDialogSearchTermSelector(finalState)
+                expect(searchTerm).toEqual('hi')
+                const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+                expect(currentHitIndex).toBe(0)
+                const editingSelected = editingSelectedCharacterSelector(finalState)
+                expect(editingSelected).toBeTruthy()
+                const currentView = currentViewSelector(finalState)
+                expect(currentView).toEqual('characters')
+                const characterTab = characterTabSelector(finalState)
+                expect(characterTab).toEqual({
                   attributesDialogOpen: false,
                   categoriesDialogOpen: false,
                   characterEditor: {
@@ -3889,7 +4192,8 @@ describe('jumpToHit', () => {
           describe('and a template', () => {
             describe('that does not exist', () => {
               const store = storeWithZelda()
-              const fileState = fullFileStateSelector(store.getState())
+              const originalState = store.getState()
+              const fileState = fullFileStateSelector(originalState)
               const cards = allCardsSelector(store.getState())
               store.dispatch(setSearchTerm('hi'))
               store.dispatch(
@@ -3951,7 +4255,8 @@ describe('jumpToHit', () => {
                 })
                 describe('that does exist on the template', () => {
                   const store = storeWithZelda()
-                  const fileState = fullFileStateSelector(store.getState())
+                  const originalState = store.getState()
+                  const fileState = fullFileStateSelector(originalState)
                   const cards = allCardsSelector(store.getState())
                   store.dispatch(setSearchTerm('Last'))
                   store.dispatch(
@@ -3965,16 +4270,22 @@ describe('jumpToHit', () => {
                     await new Promise((resolve) => {
                       setTimeout(resolve, 100)
                     })
-                    const finalFileState = fullFileStateSelector(store.getState())
+                    const finalState = store.getState()
+                    const finalFileState = fullFileStateSelector(finalState)
                     expect(
                       withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)
                     ).toEqual(withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState))
-                    expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-                    expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
-                    expect(
-                      omit(finalFileState.ui, ['characterTab', 'searchDialog', 'currentView'])
-                    ).toEqual(omit(fileState.ui, ['characterTab', 'searchDialog', 'currentView']))
-                    expect(finalFileState.ui.characterTab.focus[0]).toEqual({
+                    const originalJumpCount = jumpCounterSelector(originalState)
+                    expect(originalJumpCount).toEqual(0)
+                    const finalJumpCount = jumpCounterSelector(finalState)
+                    expect(finalJumpCount).toEqual(1)
+                    const originalUI = uiSelector(originalState)
+                    const finalUI = uiSelector(finalState)
+                    expect(omit(finalUI, ['characterTab', 'searchDialog', 'currentView'])).toEqual(
+                      omit(originalUI, ['characterTab', 'searchDialog', 'currentView'])
+                    )
+                    const characterFoci = characterFociSelector(finalState)
+                    expect(characterFoci[0]).toEqual({
                       path: ['character', 3, 'template', 'ch3', 'Birth Order', 5],
                       selection: {
                         direction: 'forward',
@@ -3982,11 +4293,16 @@ describe('jumpToHit', () => {
                         start: 0,
                       },
                     })
-                    expect(finalFileState.ui.searchDialog.term).toEqual('Last')
-                    expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-                    expect(finalFileState.ui.characterTab.editingSelected).toBeTruthy()
-                    expect(finalFileState.ui.currentView).toEqual('characters')
-                    expect(finalFileState.ui.characterTab).toEqual({
+                    const searchTerm = searchDialogSearchTermSelector(finalState)
+                    expect(searchTerm).toEqual('Last')
+                    const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+                    expect(currentHitIndex).toBe(0)
+                    const editingSelected = editingSelectedCharacterSelector(finalState)
+                    expect(editingSelected).toBeTruthy()
+                    const currentView = currentViewSelector(finalState)
+                    expect(currentView).toEqual('characters')
+                    const characterTab = characterTabSelector(finalState)
+                    expect(characterTab).toEqual({
                       attributesDialogOpen: false,
                       categoriesDialogOpen: false,
                       characterEditor: {
@@ -4084,7 +4400,8 @@ describe('jumpToHit', () => {
                   })
                   describe('when the attribute name has slashes in it', () => {
                     const store = storeWithZelda()
-                    const fileState = fullFileStateSelector(store.getState())
+                    const originalState = store.getState()
+                    const fileState = fullFileStateSelector(originalState)
                     const cards = allCardsSelector(store.getState())
                     store.dispatch(setSearchTerm('yyyyy'))
                     store.dispatch(
@@ -4098,18 +4415,20 @@ describe('jumpToHit', () => {
                       await new Promise((resolve) => {
                         setTimeout(resolve, 100)
                       })
-                      const finalFileState = fullFileStateSelector(store.getState())
+                      const finalState = store.getState()
+                      const finalFileState = fullFileStateSelector(finalState)
                       expect(
                         withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)
                       ).toEqual(withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState))
-                      expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-                      expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(
-                        1
-                      )
+                      const originalJumpCount = jumpCounterSelector(originalState)
+                      expect(originalJumpCount).toEqual(0)
+                      const finalJumpCount = jumpCounterSelector(finalState)
+                      expect(finalJumpCount).toEqual(1)
                       expect(
                         omit(finalFileState.ui, ['characterTab', 'searchDialog', 'currentView'])
                       ).toEqual(omit(fileState.ui, ['characterTab', 'searchDialog', 'currentView']))
-                      expect(finalFileState.ui.characterTab.focus[0]).toEqual({
+                      const characterFoci = characterFociSelector(finalState)
+                      expect(characterFoci[0]).toEqual({
                         path: [
                           'character',
                           3,
@@ -4124,11 +4443,16 @@ describe('jumpToHit', () => {
                           start: 0,
                         },
                       })
-                      expect(finalFileState.ui.searchDialog.term).toEqual('yyyyy')
-                      expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-                      expect(finalFileState.ui.characterTab.editingSelected).toBeTruthy()
-                      expect(finalFileState.ui.currentView).toEqual('characters')
-                      expect(finalFileState.ui.characterTab).toEqual({
+                      const searchTerm = searchDialogSearchTermSelector(finalState)
+                      expect(searchTerm).toEqual('yyyyy')
+                      const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+                      expect(currentHitIndex).toBe(0)
+                      const editingSelected = editingSelectedCharacterSelector(finalState)
+                      expect(editingSelected).toBeTruthy()
+                      const currentView = currentViewSelector(finalState)
+                      expect(currentView).toEqual('characters')
+                      const characterTab = characterTabSelector(finalState)
+                      expect(characterTab).toEqual({
                         attributesDialogOpen: false,
                         categoriesDialogOpen: false,
                         characterEditor: {
@@ -4341,7 +4665,8 @@ describe('jumpToHit', () => {
         })
         describe('given a hit for the name', () => {
           const store = storeWithZelda()
-          const fileState = fullFileStateSelector(store.getState())
+          const originalState = store.getState()
+          const fileState = fullFileStateSelector(originalState)
           const cards = allCardsSelector(store.getState())
           store.dispatch(setSearchTerm('Hyrule'))
           store.dispatch(jumpToHit(cards, 'places', { hit: 'Hyrule', path: '/places/1/name/0' }))
@@ -4350,14 +4675,19 @@ describe('jumpToHit', () => {
             await new Promise((resolve) => {
               setTimeout(resolve, 100)
             })
-            const finalFileState = fullFileStateSelector(store.getState())
+            const finalState = store.getState()
+            const finalFileState = fullFileStateSelector(finalState)
             expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
               withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
             )
-            expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-            expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+            const originalJumpCount = jumpCounterSelector(originalState)
+            expect(originalJumpCount).toEqual(0)
+            const finalJumpCount = jumpCounterSelector(finalState)
+            expect(finalJumpCount).toEqual(1)
+            const originalUI = uiSelector(originalState)
+            const finalUI = uiSelector(finalState)
             expect(
-              omit(finalFileState.ui, [
+              omit(finalUI, [
                 'placeTab',
                 'searchDialog',
                 'currentView',
@@ -4365,7 +4695,7 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             ).toEqual(
-              omit(fileState.ui, [
+              omit(originalUI, [
                 'placeTab',
                 'searchDialog',
                 'currentView',
@@ -4373,7 +4703,8 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             )
-            expect(finalFileState.ui.placeTab.focus[0]).toEqual({
+            const placeFoci = placeFociSelector(finalState)
+            expect(placeFoci[0]).toEqual({
               path: ['place', 1, 'name'],
               selection: {
                 direction: 'forward',
@@ -4381,10 +4712,14 @@ describe('jumpToHit', () => {
                 start: 0,
               },
             })
-            expect(finalFileState.ui.searchDialog.term).toEqual('Hyrule')
-            expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-            expect(finalFileState.ui.currentView).toEqual('places')
-            expect(finalFileState.ui.placeTab).toEqual({
+            const searchTerm = searchDialogSearchTermSelector(finalState)
+            expect(searchTerm).toEqual('Hyrule')
+            const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+            expect(currentHitIndex).toBe(0)
+            const currentView = currentViewSelector(finalState)
+            expect(currentView).toEqual('places')
+            const placeTab = placeTabSelector(finalState)
+            expect(placeTab).toEqual({
               attributeDialogOpen: false,
               categoriesOpen: false,
               editingSelected: true,
@@ -4454,7 +4789,8 @@ describe('jumpToHit', () => {
         })
         describe('given a hit for the description', () => {
           const store = storeWithZelda()
-          const fileState = fullFileStateSelector(store.getState())
+          const originalState = store.getState()
+          const fileState = fullFileStateSelector(originalState)
           const cards = allCardsSelector(store.getState())
           store.dispatch(setSearchTerm('likes to hide there'))
           store.dispatch(
@@ -4468,14 +4804,19 @@ describe('jumpToHit', () => {
             await new Promise((resolve) => {
               setTimeout(resolve, 100)
             })
-            const finalFileState = fullFileStateSelector(store.getState())
+            const finalState = store.getState()
+            const finalFileState = fullFileStateSelector(finalState)
             expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
               withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
             )
-            expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-            expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+            const originalJumpCount = jumpCounterSelector(originalState)
+            expect(originalJumpCount).toEqual(0)
+            const finalJumpCount = jumpCounterSelector(finalState)
+            expect(finalJumpCount).toEqual(1)
+            const originalUI = uiSelector(originalState)
+            const finalUI = uiSelector(finalState)
             expect(
-              omit(finalFileState.ui, [
+              omit(finalUI, [
                 'placeTab',
                 'searchDialog',
                 'currentView',
@@ -4483,7 +4824,7 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             ).toEqual(
-              omit(fileState.ui, [
+              omit(originalUI, [
                 'placeTab',
                 'searchDialog',
                 'currentView',
@@ -4491,7 +4832,8 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             )
-            expect(finalFileState.ui.placeTab.focus[0]).toEqual({
+            const placeFoci = placeFociSelector(finalState)
+            expect(placeFoci[0]).toEqual({
               path: ['place', 2, 'description'],
               selection: {
                 direction: 'forward',
@@ -4499,10 +4841,14 @@ describe('jumpToHit', () => {
                 start: 6,
               },
             })
-            expect(finalFileState.ui.searchDialog.term).toEqual('likes to hide there')
-            expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-            expect(finalFileState.ui.currentView).toEqual('places')
-            expect(finalFileState.ui.placeTab).toEqual({
+            const searchTerm = searchDialogSearchTermSelector(finalState)
+            expect(searchTerm).toEqual('likes to hide there')
+            const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+            expect(currentHitIndex).toBe(0)
+            const currentView = currentViewSelector(finalState)
+            expect(currentView).toEqual('places')
+            const placeTab = placeTabSelector(finalState)
+            expect(placeTab).toEqual({
               attributeDialogOpen: false,
               categoriesOpen: false,
               editingSelected: true,
@@ -4564,7 +4910,8 @@ describe('jumpToHit', () => {
         })
         describe('given a hit for the notes', () => {
           const store = storeWithZelda()
-          const fileState = fullFileStateSelector(store.getState())
+          const originalState = store.getState()
+          const fileState = fullFileStateSelector(originalState)
           const cards = allCardsSelector(store.getState())
           store.dispatch(setSearchTerm('The castle'))
           store.dispatch(
@@ -4575,14 +4922,19 @@ describe('jumpToHit', () => {
             await new Promise((resolve) => {
               setTimeout(resolve, 100)
             })
-            const finalFileState = fullFileStateSelector(store.getState())
+            const finalState = store.getState()
+            const finalFileState = fullFileStateSelector(finalState)
             expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
               withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
             )
-            expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-            expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+            const originalJumpCount = jumpCounterSelector(originalState)
+            expect(originalJumpCount).toEqual(0)
+            const finalJumpCount = jumpCounterSelector(finalState)
+            expect(finalJumpCount).toEqual(1)
+            const originalUI = uiSelector(originalState)
+            const finalUI = uiSelector(finalState)
             expect(
-              omit(finalFileState.ui, [
+              omit(finalUI, [
                 'placeTab',
                 'searchDialog',
                 'currentView',
@@ -4590,7 +4942,7 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             ).toEqual(
-              omit(fileState.ui, [
+              omit(originalUI, [
                 'placeTab',
                 'searchDialog',
                 'currentView',
@@ -4598,7 +4950,8 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             )
-            expect(finalFileState.ui.placeTab.focus[0]).toEqual({
+            const placeFoci = placeFociSelector(finalState)
+            expect(placeFoci[0]).toEqual({
               path: ['place', 1, 'notes'],
               selection: {
                 direction: 'forward',
@@ -4606,64 +4959,44 @@ describe('jumpToHit', () => {
                 start: 0,
               },
             })
-            expect(finalFileState.ui.searchDialog.term).toEqual('The castle')
-            expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-            expect(finalFileState.ui.currentView).toEqual('places')
-            expect(finalFileState.ui.noteTab).toEqual({
-              attributesDialogOpen: false,
-              categoriesDialogOpen: false,
-              editingSelected: false,
+            const searchTerm = searchDialogSearchTermSelector(finalState)
+            expect(searchTerm).toEqual('The castle')
+            const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+            expect(currentHitIndex).toBe(0)
+            const currentView = currentViewSelector(finalState)
+            expect(currentView).toEqual('places')
+            const placeTab = placeTabSelector(finalState)
+            expect(placeTab).toEqual({
+              attributeDialogOpen: false,
+              categoriesOpen: false,
+              editingSelected: true,
               filterVisible: false,
               focus: [
                 {
-                  path: ['note', 2, 'third'],
-                  selection: {
-                    direction: 'none',
-                    end: 15,
-                    start: 15,
-                  },
+                  path: ['place', 1, 'notes'],
+                  selection: { direction: 'forward', end: 10, start: 0 },
+                },
+                { path: ['place', 2, 'three'], selection: { direction: 'none', end: 1, start: 1 } },
+                { path: ['place', 2, 'two'], selection: { direction: 'none', end: 15, start: 15 } },
+                { path: ['place', 2, 'one'], selection: { direction: 'none', end: 15, start: 15 } },
+                {
+                  path: ['place', 2, 'description'],
+                  selection: { direction: 'forward', end: 23, start: 20 },
                 },
                 {
-                  path: ['note', 2, 'second'],
-                  selection: {
-                    direction: 'none',
-                    end: 2,
-                    start: 2,
-                  },
-                },
-                {
-                  path: ['note', 2, 'first'],
-                  selection: {
-                    direction: 'none',
-                    end: 4,
-                    start: 4,
-                  },
-                },
-                {
-                  path: ['note', 2, 'content'],
-                  selection: {
-                    direction: 'forward',
-                    end: 25,
-                    start: 22,
-                  },
-                },
-                {
-                  path: ['note', 2, 'title'],
-                  selection: {
-                    direction: 'forward',
-                    end: 7,
-                    start: 4,
-                  },
+                  path: ['place', 2, 'name'],
+                  selection: { direction: 'forward', end: 7, start: 4 },
                 },
               ],
-              selectedNote: 2,
+              selectedPlace: 1,
               sortVisible: false,
             })
           })
         })
         describe('given a hit for a custom attribute', () => {
           const store = storeWithZelda()
-          const fileState = fullFileStateSelector(store.getState())
+          const originalState = store.getState()
+          const fileState = fullFileStateSelector(originalState)
           const cards = allCardsSelector(store.getState())
           store.dispatch(setSearchTerm('believe'))
           store.dispatch(
@@ -4674,14 +5007,19 @@ describe('jumpToHit', () => {
             await new Promise((resolve) => {
               setTimeout(resolve, 100)
             })
-            const finalFileState = fullFileStateSelector(store.getState())
+            const finalState = store.getState()
+            const finalFileState = fullFileStateSelector(finalState)
             expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
               withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
             )
-            expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-            expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+            const originalJumpCount = jumpCounterSelector(originalState)
+            expect(originalJumpCount).toEqual(0)
+            const finalJumpCount = jumpCounterSelector(finalState)
+            expect(finalJumpCount).toEqual(1)
+            const originalUI = uiSelector(originalState)
+            const finalUI = uiSelector(finalState)
             expect(
-              omit(finalFileState.ui, [
+              omit(finalUI, [
                 'placeTab',
                 'searchDialog',
                 'currentView',
@@ -4689,7 +5027,7 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             ).toEqual(
-              omit(fileState.ui, [
+              omit(originalUI, [
                 'placeTab',
                 'searchDialog',
                 'currentView',
@@ -4697,7 +5035,8 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             )
-            expect(finalFileState.ui.placeTab.focus[0]).toEqual({
+            const placeFoci = placeFociSelector(finalState)
+            expect(placeFoci[0]).toEqual({
               path: ['place', 2, 'one'],
               selection: {
                 direction: 'forward',
@@ -4705,10 +5044,14 @@ describe('jumpToHit', () => {
                 start: 8,
               },
             })
-            expect(finalFileState.ui.searchDialog.term).toEqual('believe')
-            expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-            expect(finalFileState.ui.currentView).toEqual('places')
-            expect(finalFileState.ui.placeTab).toEqual({
+            const searchTerm = searchDialogSearchTermSelector(finalState)
+            expect(searchTerm).toEqual('believe')
+            const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+            expect(currentHitIndex).toBe(0)
+            const currentView = currentViewSelector(finalState)
+            expect(currentView).toEqual('places')
+            const placeTab = placeTabSelector(finalState)
+            expect(placeTab).toEqual({
               attributeDialogOpen: false,
               categoriesOpen: false,
               editingSelected: true,
@@ -4773,7 +5116,8 @@ describe('jumpToHit', () => {
     describe('considering the tags tab', () => {
       describe('given the id of a non-existent tag', () => {
         const store = storeWithZelda()
-        const fileState = fullFileStateSelector(store.getState())
+        const originalState = store.getState()
+        const fileState = fullFileStateSelector(originalState)
         const cards = allCardsSelector(store.getState())
         store.dispatch(setSearchTerm('its a tag'))
         store.dispatch(jumpToHit(cards, 'tags', { hit: 'its a tag', path: '/tags/22/title/0' }))
@@ -4782,7 +5126,8 @@ describe('jumpToHit', () => {
           await new Promise((resolve) => {
             setTimeout(resolve, 100)
           })
-          const finalFileState = fullFileStateSelector(store.getState())
+          const finalState = store.getState()
+          const finalFileState = fullFileStateSelector(finalState)
           expect(
             omit(withoutChangesWeDontCareAbout(finalFileState), [
               'ui.searchDialog.currentHitIndex',
@@ -4826,7 +5171,8 @@ describe('jumpToHit', () => {
         })
         describe('and a tag attribute of "title"', () => {
           const store = storeWithZelda()
-          const fileState = fullFileStateSelector(store.getState())
+          const originalState = store.getState()
+          const fileState = fullFileStateSelector(originalState)
           const cards = allCardsSelector(store.getState())
           store.dispatch(setSearchTerm('its a tag'))
           store.dispatch(jumpToHit(cards, 'tags', { hit: 'its a tag', path: '/tags/1/title/0' }))
@@ -4835,14 +5181,19 @@ describe('jumpToHit', () => {
             await new Promise((resolve) => {
               setTimeout(resolve, 100)
             })
-            const finalFileState = fullFileStateSelector(store.getState())
+            const finalState = store.getState()
+            const finalFileState = fullFileStateSelector(finalState)
             expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
               withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
             )
-            expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-            expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+            const originalJumpCount = jumpCounterSelector(originalState)
+            expect(originalJumpCount).toEqual(0)
+            const finalJumpCount = jumpCounterSelector(finalState)
+            expect(finalJumpCount).toEqual(1)
+            const originalUI = uiSelector(originalState)
+            const finalUI = uiSelector(finalState)
             expect(
-              omit(finalFileState.ui, [
+              omit(finalUI, [
                 'tagTab',
                 'searchDialog',
                 'currentView',
@@ -4850,7 +5201,7 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             ).toEqual(
-              omit(fileState.ui, [
+              omit(originalUI, [
                 'tagTab',
                 'searchDialog',
                 'currentView',
@@ -4858,7 +5209,8 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             )
-            expect(finalFileState.ui.tagTab.focus[0]).toEqual({
+            const tagFoci = allTagFociSelector(finalState)
+            expect(tagFoci[0]).toEqual({
               path: ['tag', 1, 'title'],
               selection: {
                 direction: 'forward',
@@ -4866,10 +5218,14 @@ describe('jumpToHit', () => {
                 start: 0,
               },
             })
-            expect(finalFileState.ui.searchDialog.term).toEqual('its a tag')
-            expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-            expect(finalFileState.ui.currentView).toEqual('tags')
-            expect(finalFileState.ui.tagTab).toEqual({
+            const searchTerm = searchDialogSearchTermSelector(finalState)
+            expect(searchTerm).toEqual('its a tag')
+            const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+            expect(currentHitIndex).toBe(0)
+            const currentView = currentViewSelector(finalState)
+            expect(currentView).toEqual('tags')
+            const tagTab = tagTabSelector(finalState)
+            expect(tagTab).toEqual({
               editingSelectedTab: true,
               focus: [
                 {
@@ -4943,7 +5299,8 @@ describe('jumpToHit', () => {
         })
         describe('and a line attribute of "title"', () => {
           const store = storeWithZelda()
-          const fileState = fullFileStateSelector(store.getState())
+          const originalState = store.getState()
+          const fileState = fullFileStateSelector(originalState)
           const cards = allCardsSelector(store.getState())
           store.dispatch(setSearchTerm('Memories'))
           store.dispatch(jumpToHit(cards, 'lines', { hit: 'Memories', path: '/lines/16/title/0' }))
@@ -4952,14 +5309,19 @@ describe('jumpToHit', () => {
             await new Promise((resolve) => {
               setTimeout(resolve, 100)
             })
-            const finalFileState = fullFileStateSelector(store.getState())
+            const finalState = store.getState()
+            const finalFileState = fullFileStateSelector(finalState)
             expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
               withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
             )
-            expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-            expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+            const originalJumpCount = jumpCounterSelector(originalState)
+            expect(originalJumpCount).toEqual(0)
+            const finalJumpCount = jumpCounterSelector(finalState)
+            expect(finalJumpCount).toEqual(1)
+            const originalUI = uiSelector(originalState)
+            const finalUI = uiSelector(finalState)
             expect(
-              omit(finalFileState.ui, [
+              omit(finalUI, [
                 'timeline',
                 'searchDialog',
                 'currentView',
@@ -4967,7 +5329,7 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             ).toEqual(
-              omit(fileState.ui, [
+              omit(originalUI, [
                 'timeline',
                 'searchDialog',
                 'currentView',
@@ -4975,7 +5337,8 @@ describe('jumpToHit', () => {
                 'currentTimeline',
               ])
             )
-            expect(finalFileState.ui.timeline.focus[0]).toEqual({
+            const timelineFoci = timelineFociSelector(finalState)
+            expect(timelineFoci[0]).toEqual({
               path: ['line', 16, 'title'],
               selection: {
                 direction: 'forward',
@@ -4983,9 +5346,12 @@ describe('jumpToHit', () => {
                 start: 0,
               },
             })
-            expect(finalFileState.ui.searchDialog.term).toEqual('Memories')
-            expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-            expect(finalFileState.ui.currentView).toEqual('timeline')
+            const searchTerm = searchDialogSearchTermSelector(finalState)
+            expect(searchTerm).toEqual('Memories')
+            const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+            expect(currentHitIndex).toBe(0)
+            const currentView = currentViewSelector(finalState)
+            expect(currentView).toEqual('timeline')
           })
         })
       })
@@ -5076,7 +5442,8 @@ describe('jumpToHit', () => {
           })
           describe('and an attribute type that is "title"', () => {
             const store = storeWithZelda()
-            const fileState = fullFileStateSelector(store.getState())
+            const originalState = store.getState()
+            const fileState = fullFileStateSelector(originalState)
             const cards = allCardsSelector(store.getState())
             store.dispatch(setSearchTerm('Replace me'))
             store.dispatch(
@@ -5087,14 +5454,19 @@ describe('jumpToHit', () => {
               await new Promise((resolve) => {
                 setTimeout(resolve, 100)
               })
-              const finalFileState = fullFileStateSelector(store.getState())
+              const finalState = store.getState()
+              const finalFileState = fullFileStateSelector(finalState)
               expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
                 withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
               )
-              expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-              expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+              const originalJumpCount = jumpCounterSelector(originalState)
+              expect(originalJumpCount).toEqual(0)
+              const finalJumpCount = jumpCounterSelector(finalState)
+              expect(finalJumpCount).toEqual(1)
+              const originalUI = uiSelector(originalState)
+              const finalUI = uiSelector(finalState)
               expect(
-                omit(finalFileState.ui, [
+                omit(finalUI, [
                   'timeline',
                   'searchDialog',
                   'currentView',
@@ -5102,7 +5474,7 @@ describe('jumpToHit', () => {
                   'currentTimeline',
                 ])
               ).toEqual(
-                omit(fileState.ui, [
+                omit(originalUI, [
                   'timeline',
                   'searchDialog',
                   'currentView',
@@ -5110,7 +5482,8 @@ describe('jumpToHit', () => {
                   'currentTimeline',
                 ])
               )
-              expect(finalFileState.ui.timeline.focus[0]).toEqual({
+              const timelineFoci = timelineFociSelector(finalState)
+              expect(timelineFoci[0]).toEqual({
                 path: ['beat', 9, 25, 'title'],
                 selection: {
                   direction: 'forward',
@@ -5118,14 +5491,18 @@ describe('jumpToHit', () => {
                   start: 0,
                 },
               })
-              expect(finalFileState.ui.searchDialog.term).toEqual('Replace me')
-              expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-              expect(finalFileState.ui.currentView).toEqual('timeline')
+              const searchTerm = searchDialogSearchTermSelector(finalState)
+              expect(searchTerm).toEqual('Replace me')
+              const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+              expect(currentHitIndex).toBe(0)
+              const currentView = currentViewSelector(finalState)
+              expect(currentView).toEqual('timeline')
             })
           })
           describe('and the beat is on the series tab', () => {
             const store = storeWithZelda()
-            const fileState = fullFileStateSelector(store.getState())
+            const originalState = store.getState()
+            const fileState = fullFileStateSelector(originalState)
             const cards = allCardsSelector(store.getState())
             store.dispatch(setSearchTerm('Builder beat'))
             store.dispatch(
@@ -5136,14 +5513,19 @@ describe('jumpToHit', () => {
               await new Promise((resolve) => {
                 setTimeout(resolve, 100)
               })
-              const finalFileState = fullFileStateSelector(store.getState())
+              const finalState = store.getState()
+              const finalFileState = fullFileStateSelector(finalState)
               expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(finalFileState)).toEqual(
                 withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
               )
-              expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-              expect(finalFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
+              const originalJumpCount = jumpCounterSelector(originalState)
+              expect(originalJumpCount).toEqual(0)
+              const finalJumpCount = jumpCounterSelector(finalState)
+              expect(finalJumpCount).toEqual(1)
+              const originalUI = uiSelector(originalState)
+              const finalUI = uiSelector(finalState)
               expect(
-                omit(finalFileState.ui, [
+                omit(finalUI, [
                   'timeline',
                   'searchDialog',
                   'currentView',
@@ -5151,7 +5533,7 @@ describe('jumpToHit', () => {
                   'currentTimeline',
                 ])
               ).toEqual(
-                omit(fileState.ui, [
+                omit(originalUI, [
                   'timeline',
                   'searchDialog',
                   'currentView',
@@ -5159,7 +5541,8 @@ describe('jumpToHit', () => {
                   'currentTimeline',
                 ])
               )
-              expect(finalFileState.ui.timeline.focus[0]).toEqual({
+              const timelineFoci = timelineFociSelector(finalState)
+              expect(timelineFoci[0]).toEqual({
                 path: ['beat', 'series', 1, 'title'],
                 selection: {
                   direction: 'forward',
@@ -5167,9 +5550,12 @@ describe('jumpToHit', () => {
                   start: 0,
                 },
               })
-              expect(finalFileState.ui.searchDialog.term).toEqual('Builder beat')
-              expect(finalFileState.ui.searchDialog.currentHitIndex).toBe(0)
-              expect(finalFileState.ui.currentView).toEqual('timeline')
+              const searchTerm = searchDialogSearchTermSelector(finalState)
+              expect(searchTerm).toEqual('Builder beat')
+              const currentHitIndex = searchDialogCurrentHitIndexSelector(finalState)
+              expect(currentHitIndex).toBe(0)
+              const currentView = currentViewSelector(finalState)
+              expect(currentView).toEqual('timeline')
             })
           })
         })
@@ -5183,7 +5569,8 @@ describe('nextSearchHit', () => {
     describe('when setting the search term to "builder"', () => {
       it('should scan through the hits to the end and not roll over', async () => {
         const store = storeWithZelda()
-        const fileState = fullFileStateSelector(store.getState())
+        const originalState = store.getState()
+        const fileState = fullFileStateSelector(originalState)
         store.dispatch(setSearchTerm('builder'))
         store.dispatch(startScanningSearch())
         const searchHits = flatSearchHitsSelector(store.getState())
@@ -5263,12 +5650,17 @@ describe('nextSearchHit', () => {
         expect(withoutChangesWeDontCareAboutNorUIAndApplicationState(secondFileState)).toEqual(
           withoutChangesWeDontCareAboutNorUIAndApplicationState(fileState)
         )
-        expect(fileState.applicationState.userInteractions.jumpCounter).toEqual(0)
-        expect(secondFileState.applicationState.userInteractions.jumpCounter).toEqual(1)
-        expect(
-          omit(secondFileState.ui, ['projectTab', 'bookDialog', 'searchDialog', 'currentView'])
-        ).toEqual(omit(fileState.ui, ['projectTab', 'bookDialog', 'searchDialog', 'currentView']))
-        expect(secondFileState.ui.projectTab.focus[0]).toEqual({
+        const originalJumpCount = jumpCounterSelector(originalState)
+        expect(originalJumpCount).toEqual(0)
+        const finalJumpCount = jumpCounterSelector(store.getState())
+        expect(finalJumpCount).toEqual(1)
+        const originalUI = uiSelector(originalState)
+        const finalUI = uiSelector(store.getState())
+        expect(omit(finalUI, ['projectTab', 'bookDialog', 'searchDialog', 'currentView'])).toEqual(
+          omit(originalUI, ['projectTab', 'bookDialog', 'searchDialog', 'currentView'])
+        )
+        const projectFoci = projectAllFociSelector(store.getState())
+        expect(projectFoci[0]).toEqual({
           path: ['book', 8, 'title'],
           selection: {
             direction: 'forward',
@@ -5276,97 +5668,100 @@ describe('nextSearchHit', () => {
             start: 22,
           },
         })
-        expect(secondFileState.ui.projectTab).toEqual({
-          focus: [
-            {
-              path: ['book', 8, 'title'],
-              selection: {
-                direction: 'forward',
-                end: 29,
-                start: 22,
-              },
+        const finalProjectFoci = projectAllFociSelector(store.getState())
+        expect(finalProjectFoci).toEqual([
+          {
+            path: ['book', 8, 'title'],
+            selection: {
+              direction: 'forward',
+              end: 29,
+              start: 22,
             },
-            {
-              path: ['book', 9, 'premise'],
-              selection: {
-                direction: 'forward',
-                end: 8,
-                start: 5,
-              },
+          },
+          {
+            path: ['book', 9, 'premise'],
+            selection: {
+              direction: 'forward',
+              end: 8,
+              start: 5,
             },
-            {
-              path: ['book', 8, 'premise'],
-              selection: {
-                direction: 'forward',
-                end: 8,
-                start: 5,
-              },
+          },
+          {
+            path: ['book', 8, 'premise'],
+            selection: {
+              direction: 'forward',
+              end: 8,
+              start: 5,
             },
-            {
-              path: ['book', 7, 'title'],
-              selection: {
-                direction: 'forward',
-                end: 13,
-                start: 10,
-              },
+          },
+          {
+            path: ['book', 7, 'title'],
+            selection: {
+              direction: 'forward',
+              end: 13,
+              start: 10,
             },
-            {
-              path: ['book', 6, 'title'],
-              selection: {
-                direction: 'forward',
-                end: 3,
-                start: 0,
-              },
+          },
+          {
+            path: ['book', 6, 'title'],
+            selection: {
+              direction: 'forward',
+              end: 3,
+              start: 0,
             },
-            {
-              path: ['book', 1, 'title'],
-              selection: {
-                direction: 'forward',
-                end: 13,
-                start: 10,
-              },
+          },
+          {
+            path: ['book', 1, 'title'],
+            selection: {
+              direction: 'forward',
+              end: 13,
+              start: 10,
             },
-            {
-              path: ['name'],
-              selection: {
-                direction: 'forward',
-                end: 21,
-                start: 18,
-              },
+          },
+          {
+            path: ['name'],
+            selection: {
+              direction: 'forward',
+              end: 21,
+              start: 18,
             },
-            {
-              path: ['theme'],
-              selection: {
-                direction: 'none',
-                end: 8,
-                start: 8,
-              },
+          },
+          {
+            path: ['theme'],
+            selection: {
+              direction: 'none',
+              end: 8,
+              start: 8,
             },
-            {
-              path: ['premise'],
-              selection: {
-                direction: 'none',
-                end: 6,
-                start: 6,
-              },
+          },
+          {
+            path: ['premise'],
+            selection: {
+              direction: 'none',
+              end: 6,
+              start: 6,
             },
-            {
-              path: ['genre'],
-              selection: {
-                direction: 'none',
-                end: 5,
-                start: 5,
-              },
+          },
+          {
+            path: ['genre'],
+            selection: {
+              direction: 'none',
+              end: 5,
+              start: 5,
             },
-          ],
-        })
-        expect(secondFileState.ui.bookDialog).toEqual({
+          },
+        ])
+        const bookDialog = bookDialogSelector(store.getState())
+        expect(bookDialog).toEqual({
           bookId: 8,
           isOpen: true,
         })
-        expect(secondFileState.ui.searchDialog.term).toEqual('builder')
-        expect(secondFileState.ui.searchDialog.currentHitIndex).toBe(1)
-        expect(secondFileState.ui.currentView).toEqual('project')
+        const searchTerm = searchDialogSearchTermSelector(store.getState())
+        expect(searchTerm).toEqual('builder')
+        const secondCurrentHitIndex = searchDialogCurrentHitIndexSelector(store.getState())
+        expect(secondCurrentHitIndex).toBe(1)
+        const currentView = currentViewSelector(store.getState())
+        expect(currentView).toEqual('project')
         for (let i = 0; i < 17; ++i) {
           store.dispatch(nextSearchHit())
           await new Promise((resolve) => setTimeout(resolve, 500))
@@ -5387,7 +5782,8 @@ describe('nextSearchHit', () => {
           await new Promise((resolve) => setTimeout(resolve, 500))
         }
         expect(thirdHitIndex).toEqual(15)
-        expect(thirdFileState.ui.placeTab.focus[0]).toEqual({
+        const thirdPlaceFoci = placeFociSelector(store.getState())
+        expect(thirdPlaceFoci[0]).toEqual({
           path: ['place', 2, 'name'],
           selection: {
             direction: 'forward',

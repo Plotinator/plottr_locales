@@ -17,7 +17,6 @@ import {
   DELETE_LINE,
   FILE_LOADED,
   NEW_FILE,
-  RESET,
   DELETE_BOOK,
   LOAD_LINES,
   ADD_BOOK_FROM_TEMPLATE,
@@ -28,6 +27,10 @@ import {
   UNPIN_PLOTLINE,
   DUPLICATE_BOOK,
   REPLACE_MARKED_HITS,
+  UNDO,
+  REDO,
+  UNDO_N_TIMES,
+  REDO_N_TIMES,
 } from '../constants/ActionTypes'
 import { line } from '../store/initialState'
 import { newFileLines, newFileSeriesLines } from '../store/newFileState'
@@ -318,7 +321,17 @@ const lines = (dataRepairers) => (state, action) => {
       }, state)
     }
 
-    case RESET:
+    case UNDO_N_TIMES:
+    case REDO_N_TIMES:
+    case UNDO:
+    case REDO: {
+      if (Array.isArray(action.state.lines)) {
+        return action.state.lines
+      } else {
+        return state
+      }
+    }
+
     case FILE_LOADED:
       return action.data.lines
 

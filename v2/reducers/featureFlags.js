@@ -2,7 +2,6 @@ import {
   FILE_LOADED,
   LOAD_FEATURE_FLAGS,
   NEW_FILE,
-  RESET,
   SET_FEATURE_FLAG,
   UNSET_FEATURE_FLAG,
 } from '../constants/ActionTypes'
@@ -25,7 +24,6 @@ const featureFlagsReducer =
           [action.flagName]: false,
         }
 
-      case RESET:
       case FILE_LOADED:
         return action.data.featureFlags || INITIAL_STATE
 

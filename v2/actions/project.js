@@ -4,7 +4,6 @@ import {
   SELECT_FILE,
   SELECT_EMPTY_FILE,
   SET_FILE_LIST,
-  SET_USERNAME_SEARCH_RESULTS,
   SET_FILE_LOADED,
   SHOW_LOADER,
   UNSET_FILE_LOADED,
@@ -16,7 +15,6 @@ import {
   SET_BACKING_UP_OFFLINE_FILE,
   START_CREATING_NEW_PROJECT,
   FINISH_CREATING_NEW_PROJECT,
-  SET_FILE_URL,
 } from '../constants/ActionTypes'
 import selectors from '../selectors'
 const { offlineModeEnabledSelector, fileURLSelector } = selectors(identity)

@@ -5,10 +5,13 @@ import { createSelector } from 'reselect'
 
 import { sortBy } from 'lodash'
 import { getDateValue, isDeviceFileURL } from '../helpers/file'
-import { fullFileStateSelector } from './fullFileFirstOrder'
+import { fullSystemStateSelector } from './fullFileFirstOrder'
 
-export const knownFilesSelector = createSelector(fullFileStateSelector, (state) => state.knownFiles)
-const selectId = (state, id) => id
+export const knownFilesSelector = createSelector(
+  fullSystemStateSelector,
+  ({ knownFiles }) => knownFiles ?? []
+)
+const selectId = (_state, id) => id
 export const fileFromFileIdSelector = createSelector(
   knownFilesSelector,
   selectId,
@@ -16,7 +19,7 @@ export const fileFromFileIdSelector = createSelector(
     return fileList.find(({ id }) => id === fileId)
   }
 )
-const selectURL = (state, url) => url
+const selectURL = (_state, url) => url
 export const fileFromFileURLSelector = createSelector(
   knownFilesSelector,
   selectURL,
@@ -61,7 +64,7 @@ export const sortedFileSystemKnownFilesByIdSelector = createSelector(
   }
 )
 
-const fileURLSelector = (state, fileURL) => {
+const fileURLSelector = (_state, fileURL) => {
   return fileURL
 }
 

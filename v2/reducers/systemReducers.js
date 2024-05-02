@@ -15,6 +15,7 @@ import {
   DOM_EVENT_ACTIONS,
   TESTING_AND_DIAGNOSIS_ACTIONS,
   SET_USER_ID,
+  UNDO_ACTIONS,
 } from '../constants/ActionTypes'
 
 export const SYSTEM_REDUCER_KEYS = [
@@ -50,6 +51,7 @@ export const SYSTEM_REDUCER_ACTION_TYPES = ERROR_ACTIONS.concat(PERMISSION_ACTIO
   .concat(DOM_EVENT_ACTIONS)
   .concat(TESTING_AND_DIAGNOSIS_ACTIONS)
   .concat(SET_USER_ID)
+  .concat(UNDO_ACTIONS)
 
 export const removeSystemKeys = (jsonData) => {
   const withoutSystemKeys = {}

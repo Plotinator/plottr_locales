@@ -1,7 +1,7 @@
 // IMPORTANT NOTE: Please don't import other selectors from this file.
 // Use secondOrder and *ThirdOrder for your selector if it has other
 // dependencies.
-
+import { identity } from 'lodash'
 import { createSelector } from 'reselect'
 
 import { richContentIsNonEmpty } from '../helpers/cards'
@@ -9,8 +9,8 @@ import { nextId } from '../store/newIds'
 import { createDeepEqualSelector } from './createDeepEqualSelector'
 import { fullFileStateSelector } from './fullFileFirstOrder'
 
-export const allCardsSelector = createSelector(fullFileStateSelector, (state) => {
-  return state.cards
+export const allCardsSelector = createSelector(fullFileStateSelector, ({ cards }) => {
+  return cards ?? []
 })
 
 const selectId = (_state, id) => id
@@ -60,8 +60,8 @@ const cardMetaData = (card) => {
   }
 }
 
-export const allCardMetaDataSelector = createSelector(fullFileStateSelector, (state) =>
-  state.cards.map(cardMetaData)
+export const allCardMetaDataSelector = createSelector(allCardsSelector, (cards) =>
+  cards.map(cardMetaData)
 )
 
 const cardIdAndKeyData = (card) => {
@@ -75,13 +75,13 @@ const cardIdAndKeyData = (card) => {
   }
 }
 
-export const allCardIdAndKeyDataSelector = createSelector(fullFileStateSelector, (state) =>
-  state.cards.map(cardIdAndKeyData)
+export const allCardIdAndKeyDataSelector = createSelector(allCardsSelector, (cards) =>
+  cards.map(cardIdAndKeyData)
 )
 
 export const nextCardIdSelector = createSelector(allCardsSelector, (cards) => nextId(cards))
 
-const cardIdSelector = (state, cardId) => cardId
+const cardIdSelector = (_state, cardId) => cardId
 export const cardByIdSelector = createSelector(
   cardIdSelector,
   allCardsSelector,
@@ -106,10 +106,10 @@ export const cardMetaDataSelector = createDeepEqualSelector(_cardMetaDataSelecto
 })
 
 export const attributeValueSelector = (cardId, attributeName) =>
-  createSelector(fullFileStateSelector, (state) => cardByIdSelector(state, cardId)[attributeName])
+  createSelector(identity, (state) => cardByIdSelector(state, cardId)[attributeName])
 
 export const templateAttributeValueSelector = (cardId, templateId, attributeName) =>
-  createSelector(fullFileStateSelector, (state) => {
+  createSelector(identity, (state) => {
     const card = cardByIdSelector(state, cardId)
     const templateOnCard = card && card.templates.find(({ id }) => id === templateId)
     const valueInAttributes =

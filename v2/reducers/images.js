@@ -4,8 +4,11 @@ import {
   DELETE_IMAGE,
   FILE_LOADED,
   NEW_FILE,
-  RESET,
   LOAD_IMAGES,
+  UNDO,
+  REDO,
+  UNDO_N_TIMES,
+  REDO_N_TIMES,
 } from '../constants/ActionTypes'
 import { newFileImages } from '../store/newFileState'
 import { imageId } from '../store/newIds'
@@ -38,7 +41,17 @@ const cards = (dataRepairers) => (state, action) => {
         return acc
       }, {})
 
-    case RESET:
+    case UNDO_N_TIMES:
+    case REDO_N_TIMES:
+    case UNDO:
+    case REDO: {
+      if (action?.state?.images && typeof action.state.images === 'object') {
+        return action.state.images
+      } else {
+        return state
+      }
+    }
+
     case FILE_LOADED:
       return action.data.images
 

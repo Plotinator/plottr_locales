@@ -186,6 +186,11 @@ import {
   SET_REPLACE_WORD,
   ADD_CHARACTER_WITH_TEMPLATE,
   SET_DASHBOARD_MODAL_VIEW,
+  // TODO!  How do we handle collaborators?
+  UNDO,
+  REDO,
+  UNDO_N_TIMES,
+  REDO_N_TIMES,
 } from '../constants/ActionTypes'
 import {
   ui as defaultUI,
@@ -229,7 +234,9 @@ export const addCustomAttributeOrdering = (state, fullState) => {
 
   // Case 1: there is no custom attribute ordering
   if (!state.customAttributeOrder) {
-    const attributes = fullState?.ui ? characterAttributesForCurrentBookSelector(fullState) : []
+    const attributes = fullState?.user?.ui
+      ? characterAttributesForCurrentBookSelector(fullState)
+      : []
     return {
       ...state,
       customAttributeOrder: {
@@ -241,18 +248,18 @@ export const addCustomAttributeOrdering = (state, fullState) => {
   const existingOrder = state.customAttributeOrder.characters.filter(({ type, id, name }) => {
     return (
       (type === 'customAttributes' &&
-        fullState.customAttributes.characters.some((customAttribute) => {
+        fullState?.user?.customAttributes?.characters?.some((customAttribute) => {
           return customAttribute?.name === name
         })) ||
       (type === 'attributes' &&
-        fullState.attributes.characters.some((attribute) => {
+        fullState?.user?.attributes?.characters?.some((attribute) => {
           return attribute?.id === id
         }))
     )
   })
 
   // Case 2: there is an incomplete custom attribute ordering
-  const attributes = fullState?.ui ? characterAttributesForCurrentBookSelector(fullState) : []
+  const attributes = fullState?.user?.ui ? characterAttributesForCurrentBookSelector(fullState) : []
   const notOrdered = attributes.filter((attribute) => {
     return !state.customAttributeOrder.characters.some((orderEntry) => {
       if (attribute.id) {
@@ -398,7 +405,7 @@ const updateUI = (state, action) => {
     case SET_OUTLINE_FILTER: {
       if (!action.filter || !Object.values(action.filter)) {
         filter = null
-      } else if (typeof action.filter === 'object') {
+      } else if (action.filter && typeof action.filter === 'object') {
         filter = action.filter
       } else if (
         Array.isArray(state.outlineFilter) &&
@@ -419,7 +426,7 @@ const updateUI = (state, action) => {
 
     case FILE_LOADED: {
       const initialState = (!isEmpty(action.data.ui) && action.data.ui) || newFileUI
-      return addCustomAttributeOrdering(initialState, action.data)
+      return addCustomAttributeOrdering(initialState, { user: action.data })
     }
 
     case CREATE_CHARACTER_ATTRIBUTE: {
@@ -2383,6 +2390,17 @@ const updateUI = (state, action) => {
         dashboardModal: {
           view: action.view,
         },
+      }
+    }
+
+    case UNDO_N_TIMES:
+    case REDO_N_TIMES:
+    case UNDO:
+    case REDO: {
+      if (action?.state?.ui && typeof action.state.ui === 'object') {
+        return action.state.ui
+      } else {
+        return state
       }
     }
 

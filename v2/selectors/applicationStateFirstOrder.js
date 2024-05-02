@@ -4,10 +4,10 @@
 
 import { createSelector } from 'reselect'
 
-import { fullFileStateSelector } from './fullFileFirstOrder'
+import { fullSystemStateSelector } from './fullFileFirstOrder'
 import { EDITING, SEARCHING } from '../constants/editStates'
 
-export const applicationStateSelector = createSelector(fullFileStateSelector, (state) => {
+export const applicationStateSelector = createSelector(fullSystemStateSelector, (state) => {
   return state.applicationState || {}
 })
 
@@ -81,7 +81,7 @@ export const loadingFileSelector = createSelector(
 )
 export const errorLoadingFileSelector = createSelector(
   fileStateSelector,
-  ({ errorLoadingFile }) => errorLoadingFile
+  ({ errorLoadingFile }) => !!errorLoadingFile
 )
 export const errorIsUpdateErrorSelector = createSelector(
   fileStateSelector,
@@ -99,6 +99,15 @@ export const filePathToUploadSelector = createSelector(
   fileStateSelector,
   ({ filePathToUpload }) => filePathToUpload
 )
+export const filePathToProjectDuringBootSelector = createSelector(
+  fileStateSelector,
+  ({ pathToProjectDuringBoot }) => {
+    return pathToProjectDuringBoot
+  }
+)
+export const noFileToShowSelector = createSelector(fileStateSelector, ({ noFileToShow }) => {
+  return noFileToShow
+})
 
 export const sessionStateSelector = createSelector(
   applicationStateSelector,
@@ -125,6 +134,7 @@ export const checkedTrialSelector = createSelector(
   licenseStateSelector,
   ({ trialLoaded }) => trialLoaded
 )
+export const trialLoadedSelector = checkedTrialSelector
 export const checkingTrialSelector = createSelector(
   licenseStateSelector,
   ({ loadingTrial }) => loadingTrial
@@ -133,6 +143,7 @@ export const checkedLicenseSelector = createSelector(
   licenseStateSelector,
   ({ licenseLoaded }) => licenseLoaded
 )
+export const plottrLicenseLoadedSelector = checkedLicenseSelector
 export const checkingLicenseSelector = createSelector(
   licenseStateSelector,
   ({ loadingLicense }) => loadingLicense
@@ -141,9 +152,33 @@ export const checkedProSubscriptionSelector = createSelector(
   licenseStateSelector,
   ({ proSubscriptionChecked }) => proSubscriptionChecked
 )
+export const proLicenseLoadedSelector = checkedProSubscriptionSelector
 export const checkingProSubscriptionSelector = createSelector(
   licenseStateSelector,
   ({ checkingProSubscription }) => checkingProSubscription
+)
+export const fetchedProSubscriptionSelector = createSelector(
+  licenseStateSelector,
+  ({ fetchedProSubscription }) => {
+    return fetchedProSubscription ?? false
+  }
+)
+export const fetchedProLicenseSelector = fetchedProSubscriptionSelector
+export const fetchingProSubscriptionSelector = createSelector(
+  licenseStateSelector,
+  ({ fetchingProSubscription }) => {
+    return fetchingProSubscription ?? false
+  }
+)
+export const fetchedLicenseSelector = createSelector(licenseStateSelector, ({ fetchedLicense }) => {
+  return fetchedLicense ?? false
+})
+export const fetchedPlottrLicenseSelector = fetchedLicenseSelector
+export const fetchingLicenseSelector = createSelector(
+  licenseStateSelector,
+  ({ fetchingLicense }) => {
+    return fetchingLicense ?? false
+  }
 )
 
 export const settingsWizardStateSelector = createSelector(
@@ -282,3 +317,29 @@ export const editStateSelector = createSelector(userInteractionsSelector, ({ edi
 export const isSearchingSelector = createSelector(editStateSelector, (editState) => {
   return editState === SEARCHING
 })
+
+export const dashboardAppStateSelector = createSelector(
+  applicationStateSelector,
+  ({ dashboard }) => {
+    return dashboard ?? {}
+  }
+)
+export const dashboardViewToOpenToSelector = createSelector(
+  dashboardAppStateSelector,
+  ({ openTo }) => {
+    return openTo ?? null
+  }
+)
+export const dashboardClosedSelector = createSelector(dashboardAppStateSelector, ({ closed }) => {
+  return closed ?? false
+})
+
+export const bootingAppStateSelector = createSelector(applicationStateSelector, ({ booting }) => {
+  return booting ?? false
+})
+export const firstTimeBootingSelector = createSelector(
+  bootingAppStateSelector,
+  ({ firstTimeBooting }) => {
+    return firstTimeBooting
+  }
+)

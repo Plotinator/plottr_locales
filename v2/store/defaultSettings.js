@@ -94,6 +94,8 @@ export function web() {
       dark: 'system',
       numberOfBackups: 30,
       openDashboardFirst: true,
+      font: 'Forum',
+      fontSize: 20,
       backupType: 'never-delete',
       fonts: {
         rce: {

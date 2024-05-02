@@ -1,9 +1,3 @@
-import { EMFJS, RTFJS, WMFJS } from 'rtf.js'
-
-RTFJS.loggingEnabled(false)
-WMFJS.loggingEnabled(false)
-EMFJS.loggingEnabled(false)
-
 // From: https://github.com/tbluemel/rtf.js/blob/HEAD/GETTING_STARTED.md
 function stringToArrayBuffer(string) {
   const buffer = new ArrayBuffer(string.length)
@@ -34,10 +28,14 @@ function stripListTable(rtfString) {
 
 // String -> Promise<NodeList>
 export const rtfToHTML = (string) => {
-  const doc = new RTFJS.Document(stringToArrayBuffer(stripListTable(string)))
-  return doc.render().catch((error) => {
-    // FIXME: this wont work on the web :/
-    console.error('rtfjs', error)
-    return []
+  import('rtf.js').then(({ RTFJS }) => {
+    RTFJS.loggingEnabled(false)
+
+    const doc = new RTFJS.Document(stringToArrayBuffer(stripListTable(string)))
+    return doc.render().catch((error) => {
+      // FIXME: this wont work on the web :/
+      console.error('rtfjs', error)
+      return []
+    })
   })
 }

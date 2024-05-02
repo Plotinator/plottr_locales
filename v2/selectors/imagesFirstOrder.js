@@ -5,7 +5,7 @@ import { createSelector } from 'reselect'
 
 import { fullFileStateSelector } from './fullFileFirstOrder'
 
-export const imagesSelector = createSelector(fullFileStateSelector, (state) => state.images)
+export const imagesSelector = createSelector(fullFileStateSelector, ({ images }) => images ?? {})
 const imageIdSelector = (_state, id) => id
 export const imageByIdSelector = createSelector(
   imagesSelector,

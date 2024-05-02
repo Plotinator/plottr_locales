@@ -8,24 +8,24 @@ import { groupBy, mapValues } from 'lodash'
 import { fullFileStateSelector } from './fullFileFirstOrder'
 
 export const attributesSelector = createSelector(fullFileStateSelector, (state) => {
-  return state.attributes || []
+  return state.attributes ?? {}
 })
 
 export const characterAttributesForBookSelector = createSelector(
   attributesSelector,
   (attributes) => {
-    return (attributes && attributes.characters) || []
+    return attributes?.characters ?? []
   }
 )
 
 export const allCharacterAttributesSelector = createSelector(attributesSelector, (attributes) => {
-  return (attributes && attributes.characters) || []
+  return attributes?.characters ?? []
 })
 
 export const allNonBaseCharacterAttributesSelector = createSelector(
   attributesSelector,
   (attributes) => {
-    return ((attributes && attributes.characters) || []).filter((attribute) => {
+    return (attributes?.characters ?? []).filter((attribute) => {
       return attribute.type !== 'base-attribute'
     })
   }
@@ -34,7 +34,7 @@ export const allNonBaseCharacterAttributesSelector = createSelector(
 export const allBaseCharacterAttributesSelector = createSelector(
   attributesSelector,
   (attributes) => {
-    return ((attributes && attributes.characters) || []).filter((attribute) => {
+    return (attributes?.characters ?? []).filter((attribute) => {
       return attribute.type == 'base-attribute'
     })
   }

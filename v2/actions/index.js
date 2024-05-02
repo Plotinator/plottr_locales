@@ -1,3 +1,5 @@
+import { isObject } from 'lodash'
+
 import * as beatActions from './beats'
 import * as bookActions from './books'
 import * as cardActions from './cards'
@@ -11,14 +13,12 @@ import * as placeActions from './places'
 import * as seriesActions from './series'
 import * as tagActions from './tags'
 import * as uiActions from './ui'
-import * as undoActions from './undo'
 import * as hierarchyActions from './hierarchy'
 import * as featureFlagActions from './featureFlags'
 import * as errorActions from './error'
 import * as permissionActions from './permission'
 import * as projectActions from './project'
 import * as clientActions from './client'
-import * as editorActions from './editors'
 import * as licenseActions from './license'
 import * as knownFilesActions from './knownFiles'
 import * as templatesActions from './templates'
@@ -30,26 +30,66 @@ import * as notificationActions from './notifications'
 import * as domEventActions from './domEvents'
 import * as testingAndDiagnosisActions from './testingAndDiagnosis'
 import * as attributeActions from './attributes'
+import * as undoActions from './undo'
 
 const actions = (selectState) => {
+  function thunkActionObjectUntilAction(action) {
+    // If the action says it was curried, we need to keep thunking
+    // until we get to the redux thunk args.
+    if (action.curried > 0) {
+      return (...args) => {
+        return thunkActionObjectUntilAction({
+          curried: action.curried - 1,
+          action: action.action(...args),
+        })
+      }
+    } else {
+      // When we hit zero, this has to be a thunk action.
+      return (dispatch, getState) => {
+        const augmentedGetState = () => {
+          return selectState(getState())
+        }
+        return action.action(dispatch, augmentedGetState)
+      }
+    }
+  }
+
+  function thunkUntilAction(action) {
+    // If it's an object, it uses the new convention of specifying
+    // curried depth.
+    if (isObject(action) && typeof action !== 'function') {
+      return thunkActionObjectUntilAction(action)
+    } else {
+      // Otherwise, we accomodate at most a depth of one in the
+      // curried chain.
+      const actionFunction = action
+      return (...actionArgs) => {
+        const applied = actionFunction(...actionArgs)
+        if (typeof applied === 'function') {
+          return (dispatch, getState) => {
+            const augmentedGetState = () => {
+              return selectState(getState())
+            }
+            return applied(dispatch, augmentedGetState)
+          }
+        } else {
+          return applied
+        }
+      }
+    }
+  }
+
   const wiredActions = (actions) => {
     return Object.entries(actions).reduce((actionGroupAcc, nextEntry) => {
-      const [actionName, actionFunction] = nextEntry
-      return {
-        ...actionGroupAcc,
-        [actionName]: (...actionArgs) => {
-          const applied = actionFunction(...actionArgs)
-          if (typeof applied === 'function') {
-            return (dispatch, getState) => {
-              const augmentedGetState = () => {
-                return selectState(getState())
-              }
-              return applied(dispatch, augmentedGetState)
-            }
-          } else {
-            return applied
-          }
-        },
+      const [actionName, action] = nextEntry
+      // Ignore the default export
+      if (actionName === 'default') {
+        return actionGroupAcc
+      } else {
+        return {
+          ...actionGroupAcc,
+          [actionName]: thunkUntilAction(action),
+        }
       }
     }, {})
   }
@@ -68,14 +108,12 @@ const actions = (selectState) => {
     series: seriesActions,
     tag: tagActions,
     ui: uiActions,
-    undo: undoActions,
     hierarchyLevels: hierarchyActions,
     featureFlags: featureFlagActions,
     error: errorActions,
     permission: permissionActions,
     project: projectActions,
     client: clientActions,
-    editors: editorActions,
     license: licenseActions,
     knownFiles: knownFilesActions,
     templates: templatesActions,
@@ -87,6 +125,7 @@ const actions = (selectState) => {
     domEvents: domEventActions,
     testingAndDiagnosis: testingAndDiagnosisActions,
     attributes: attributeActions,
+    undo: undoActions,
   }).reduce((actionsAcc, nextEntry) => {
     const [name, actionBundle] = nextEntry
     return {

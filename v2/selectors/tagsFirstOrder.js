@@ -7,9 +7,9 @@ import { createSelector } from 'reselect'
 
 import { fullFileStateSelector } from './fullFileFirstOrder'
 
-export const allTagsSelector = createSelector(fullFileStateSelector, (state) => state.tags)
-const selectId = (state, id) => id
+export const allTagsSelector = createSelector(fullFileStateSelector, ({ tags }) => tags ?? [])
 
+const selectId = (_state, id) => id
 export const sortedTagsSelector = createSelector(allTagsSelector, (tags) =>
   sortBy(tags, ['title', 'id'])
 )

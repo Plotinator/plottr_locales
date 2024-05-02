@@ -11,7 +11,6 @@ import {
   NEW_FILE,
   REORDER_BEATS,
   REORDER_CARDS_IN_BEAT,
-  RESET,
   RESET_TIMELINE,
   DELETE_BOOK,
   INSERT_BEAT,
@@ -25,6 +24,10 @@ import {
   UNSAFE_SET_BEATS,
   DUPLICATE_BOOK,
   REPLACE_MARKED_HITS,
+  UNDO,
+  REDO,
+  UNDO_N_TIMES,
+  REDO_N_TIMES,
 } from '../constants/ActionTypes'
 import { beat as defaultBeat } from '../store/initialState'
 import { newFileBeats, newFileChapters } from '../store/newFileState'
@@ -129,7 +132,7 @@ const beats =
 
       case ADD_BOOK_FROM_TEMPLATE: {
         const beats = action.templateData?.beats?.['1']
-        if (typeof beats === 'object') {
+        if (beats && typeof beats === 'object') {
           const idMap = {}
           // this recreates the template's tree but with new ids
           const newBeats = tree.reduce('id')(
@@ -330,7 +333,6 @@ const beats =
           [actionBookId]: tree.editNode(state[actionBookId], action.id, { expanded: true }),
         }
 
-      case RESET:
       case FILE_LOADED: {
         const {
           data: { beats },
@@ -421,6 +423,17 @@ const beats =
             },
           }
         }, state)
+      }
+
+      case UNDO_N_TIMES:
+      case REDO_N_TIMES:
+      case UNDO:
+      case REDO: {
+        if (action?.state?.beats && typeof action.state.beats === 'object') {
+          return action.state.beats
+        } else {
+          return state
+        }
       }
 
       case LOAD_BEATS:

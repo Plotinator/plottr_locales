@@ -12,6 +12,10 @@ import {
   LOAD_ATTRIBUTES,
   FILE_LOADED,
   REORDER_CHARACTER_MANUALLY,
+  UNDO,
+  REDO,
+  UNDO_N_TIMES,
+  REDO_N_TIMES,
 } from '../constants/ActionTypes'
 
 const EMPTY_ATTRIBUTE_STATE = []
@@ -211,6 +215,17 @@ const attributesReducer =
               id: action.attributeId,
             },
           ],
+        }
+      }
+
+      case UNDO_N_TIMES:
+      case REDO_N_TIMES:
+      case UNDO:
+      case REDO: {
+        if (action?.state?.attributes && typeof action.state.attributes === 'object') {
+          return action.state.attributes
+        } else {
+          return state
         }
       }
 

@@ -4,7 +4,6 @@ import {
   ADD_CHARACTER_WITH_TEMPLATE,
   FILE_LOADED,
   NEW_FILE,
-  RESET,
   ATTACH_CHARACTER_TO_CARD,
   REMOVE_CHARACTER_FROM_CARD,
   ATTACH_CHARACTER_TO_NOTE,
@@ -41,6 +40,10 @@ import {
   REORDER_CHARACTER_TEMPLATES,
   REPLACE_MARKED_HITS,
   REORDER_CHARACTER_MANUALLY,
+  UNDO,
+  REDO,
+  UNDO_N_TIMES,
+  REDO_N_TIMES,
 } from '../constants/ActionTypes'
 import { character as defaultCharacter } from '../store/initialState'
 import { newFileCharacters } from '../store/newFileState'
@@ -637,7 +640,6 @@ const characters =
           }
         })
 
-      case RESET:
       case FILE_LOADED:
         return action.data.characters.map((character) => {
           const normalizeRCEContent = repair('normalizeRCEContent')
@@ -1036,6 +1038,17 @@ const characters =
             }
           })
         }, state)
+      }
+
+      case UNDO_N_TIMES:
+      case REDO_N_TIMES:
+      case UNDO:
+      case REDO: {
+        if (Array.isArray(action.state.characters)) {
+          return action.state.characters
+        } else {
+          return state
+        }
       }
 
       default:

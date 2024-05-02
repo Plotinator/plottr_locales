@@ -13,7 +13,11 @@ function popPath() {
 }
 
 function pushError(expected, value) {
-  errors.push({ path, expected, value: typeof value === 'object' ? JSON.stringify(value) : value })
+  errors.push({
+    path,
+    expected,
+    value: value && typeof value === 'object' ? JSON.stringify(value) : value,
+  })
 }
 
 function isUnbound(x) {

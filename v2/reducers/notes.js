@@ -5,7 +5,6 @@ import {
   DELETE_NOTE,
   FILE_LOADED,
   NEW_FILE,
-  RESET,
   ATTACH_CHARACTER_TO_NOTE,
   REMOVE_CHARACTER_FROM_NOTE,
   ATTACH_PLACE_TO_NOTE,
@@ -31,6 +30,10 @@ import {
   EDIT_NOTE_CUSTOM_ATTRIBUTE,
   REPLACE_MARKED_HITS,
   REORDER_NOTE_MANUALLY,
+  UNDO,
+  REDO,
+  UNDO_N_TIMES,
+  REDO_N_TIMES,
 } from '../constants/ActionTypes'
 import { note } from '../store/initialState'
 import { newFileNotes } from '../store/newFileState'
@@ -380,7 +383,6 @@ const notes =
           }
         })
 
-      case RESET:
       case FILE_LOADED: {
         const notes = action.data.notes || []
         return notes.map((note) => {
@@ -503,6 +505,17 @@ const notes =
         return state.filter(({ id }) => {
           return id !== action.note.id
         })
+      }
+
+      case UNDO_N_TIMES:
+      case REDO_N_TIMES:
+      case UNDO:
+      case REDO: {
+        if (Array.isArray(action.state.notes)) {
+          return action.state.notes
+        } else {
+          return state
+        }
       }
 
       default:

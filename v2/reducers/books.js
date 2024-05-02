@@ -2,7 +2,6 @@ import { find, mapValues } from 'lodash'
 import {
   FILE_LOADED,
   NEW_FILE,
-  RESET,
   EDIT_BOOK,
   ADD_BOOK,
   DELETE_BOOK,
@@ -19,6 +18,10 @@ import {
   SET_BOOK_GENRE,
   DUPLICATE_BOOK,
   REPLACE_MARKED_HITS,
+  UNDO,
+  REDO,
+  UNDO_N_TIMES,
+  REDO_N_TIMES,
 } from '../constants/ActionTypes'
 import { getCopyName, isSeries } from '../helpers/books'
 import { book as defaultBook } from '../store/initialState'
@@ -269,12 +272,22 @@ const books =
         })
       }
 
-      case RESET:
       case FILE_LOADED:
         return action.data.books
 
       case NEW_FILE:
         return newFileBooks
+
+      case UNDO_N_TIMES:
+      case REDO_N_TIMES:
+      case UNDO:
+      case REDO: {
+        if (action?.state?.books && typeof action.state.books === 'object') {
+          return action.state.books
+        } else {
+          return state
+        }
+      }
 
       case LOAD_BOOKS:
         return action.books

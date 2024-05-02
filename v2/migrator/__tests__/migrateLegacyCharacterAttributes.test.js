@@ -1,6 +1,6 @@
 import { omit } from 'lodash'
 
-import { emptyFile } from 'pltr/v2'
+import { emptyFile } from 'pltr'
 
 import {
   file_with_character_attributes,
