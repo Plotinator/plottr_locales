@@ -66,16 +66,15 @@ export const backupFile = (
           ? saveBackupOnFirebase(userId, state)
           : Promise.resolve()
 
-    const hasAllKeys = selectors.hasAllKeysSelector(state)
-    if (!hasAllKeys) {
-      const withoutSystemKeys = difference(Object.keys(fileJSON), SYSTEM_REDUCER_KEYS)
-      const missing = difference(Object.keys(emptyFileState), withoutSystemKeys)
-      const message = `File is missing keys (${missing}).  Refusing to save.`
-      logger.error('Missing keys', new Error(message))
-      return Promise.reject(message)
-    }
-    return cloudBackup
-      .then(() => {
+      const hasAllKeys = selectors.hasAllKeysSelector(state)
+      if (!hasAllKeys) {
+        const withoutSystemKeys = difference(Object.keys(fileJSON), SYSTEM_REDUCER_KEYS)
+        const missing = difference(Object.keys(emptyFileState), withoutSystemKeys)
+        const message = `File is missing keys (${missing}).  Refusing to save.`
+        logger.error('Missing keys', new Error(message))
+        return Promise.reject(message)
+      }
+      return cloudBackup.then(() => {
         return whenClientIsReady(({ saveBackup, offlineFileBasePath }) => {
           const canBackup = selectors.canBackupSelector(state)
           if (!canBackup) {
@@ -113,12 +112,12 @@ export const backupFile = (
               })
             })
           })
-        })
-        .then(() => {
+        }).then(() => {
           if (postBackupHook) {
             postBackupHook()
           }
         })
+      })
     }
   }
 }

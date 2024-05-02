@@ -57,77 +57,81 @@ const Resume = ({
         setCheckingForOfflineDrift(true)
         setShowResumeMessageDialog(true)
 
-      const checkAndUploadBackup = () => {
-        return new Promise((resolve, reject) => {
-          withFullFileState((state) => {
-            const offlineFile = state
-            const withoutSystemKeys = selectors.fullFileStateSelector(offlineFile)
-            return backupOfflineBackupForResume(withoutSystemKeys)
-              .then(() => {
-                return getVersion().then((version) => {
-                  return retryWithBackOff(() => {
-                    return initialFetch(userId, fileId, clientId, version)
-                  })
-                })
-                .then((cloudFile) => {
-                  return new Promise((resolve, reject) => {
-                    const [uploadOurs, backupOurs, doNothing] = resumeDirective(
-                      offlineFile,
-                      cloudFile
-                    )
-                    setResuming(false)
-                    setCheckingForOfflineDrift(false)
-                    resolve(false)
-                  } else if (uploadOurs) {
-                    logger.info(
-                      `Detected that the online version of file with id: ${fileId} didn't cahnge, but we changed ours.  Uploading our version.`
-                    )
-                    retryWithBackOff(() => {
-                      const withoutSystemKeys = selectors.fullFileStateSelector(offlineFile)
-                      return overwriteAllKeys(fileId, clientId, {
-                        ...withoutSystemKeys,
-                        file: {
-                          ...withoutSystemKeys.file,
-                          fileName:
-                            withoutSystemKeys.file.originalFileName ??
-                            withoutSystemKeys.file.fileName,
-                        },
-                      })
-                    }).then(() => {
-                      setOverwritingCloudWithBackup(true)
-                      setCheckingForOfflineDrift(false)
-                      setResuming(false)
-                      resolve(true)
+        const checkAndUploadBackup = () => {
+          return new Promise((resolve, reject) => {
+            withFullFileState((state) => {
+              const offlineFile = state
+              const withoutSystemKeys = selectors.fullFileStateSelector(offlineFile)
+              return backupOfflineBackupForResume(withoutSystemKeys).then(() => {
+                return getVersion()
+                  .then((version) => {
+                    return retryWithBackOff(() => {
+                      return initialFetch(userId, fileId, clientId, version)
                     })
-                  } else if (backupOurs) {
-                    logger.info(
-                      `Detected that file ${fileId} has changes.  Backing up the offline file and switching to the online file.`
-                    )
-                    const date = new Date()
-                    const withoutSystemKeys = selectors.fullFileStateSelector(offlineFile)
-                    uploadProject(
-                      {
-                        ...withoutSystemKeys,
-                        file: {
-                          ...withoutSystemKeys.file,
-                          fileName: `${decodeURI(
-                            withoutSystemKeys.file.fileName
-                          )} - Resume Backup - ${
-                            date.getMonth() + 1
-                          }-${date.getDate()}-${date.getFullYear()}`,
-                        },
-                        email,
-                        userId
-                      ).then(() => {
-                        setBackingUpOfflineFile(true)
-                        setCheckingForOfflineDrift(false)
-                        setResuming(false)
-                        resolve(true)
-                      })
-                    }
                   })
-                })
-                .then(resolve, reject)
+                  .then((cloudFile) => {
+                    return new Promise((resolve, reject) => {
+                      const [uploadOurs, backupOurs, doNothing] = resumeDirective(
+                        offlineFile,
+                        cloudFile
+                      )
+                      if (doNothing) {
+                        logger.info(
+                          `After resuming, there are no changes to upload to the cloud, for file with id: ${fileId}.`
+                        )
+                        setResuming(false)
+                        setCheckingForOfflineDrift(false)
+                        resolve(false)
+                      } else if (uploadOurs) {
+                        logger.info(
+                          `Detected that the online version of file with id: ${fileId} didn't cahnge, but we changed ours.  Uploading our version.`
+                        )
+                        retryWithBackOff(() => {
+                          const withoutSystemKeys = selectors.fullFileStateSelector(offlineFile)
+                          return overwriteAllKeys(fileId, clientId, {
+                            ...withoutSystemKeys,
+                            file: {
+                              ...withoutSystemKeys.file,
+                              fileName:
+                                withoutSystemKeys.file.originalFileName ??
+                                withoutSystemKeys.file.fileName,
+                            },
+                          })
+                        }).then(() => {
+                          setOverwritingCloudWithBackup(true)
+                          setCheckingForOfflineDrift(false)
+                          setResuming(false)
+                          resolve(true)
+                        })
+                      } else if (backupOurs) {
+                        logger.info(
+                          `Detected that file ${fileId} has changes.  Backing up the offline file and switching to the online file.`
+                        )
+                        const date = new Date()
+                        const withoutSystemKeys = selectors.fullFileStateSelector(offlineFile)
+                        uploadProject({
+                          ...withoutSystemKeys,
+                          file: {
+                            ...withoutSystemKeys.file,
+                            fileName: `${decodeURI(
+                              withoutSystemKeys.file.fileName
+                            )} - Resume Backup - ${
+                              date.getMonth() + 1
+                            }-${date.getDate()}-${date.getFullYear()}`,
+                          },
+                          email,
+                          userId,
+                        }).then(() => {
+                          setBackingUpOfflineFile(true)
+                          setCheckingForOfflineDrift(false)
+                          setResuming(false)
+                          resolve(true)
+                        })
+                      }
+                    })
+                  })
+                  .then(resolve, reject)
+              })
             })
           })
         }
