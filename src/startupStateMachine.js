@@ -131,6 +131,8 @@ export const startupStateMachine = (getStore, selectors, actions, saveBackupOnFi
     } else if (fileURL) {
       load(fileURL, options, numOpenFiles, windowOpenedWithKnownPath)
     } else {
+      getStore().dispatch(actions.client.setCurrentAppStateToDashboard())
+      getStore().dispatch(actions.applicationState.noFileToShow())
       getStore().dispatch(actions.applicationState.finishCheckingFileToLoad())
     }
   }
