@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'react-proptypes'
 import { t } from 'plottr_locales'
 import _ from 'lodash'
-import { template } from 'pltr/v2'
+import { template } from 'pltr'
 import { isEmpty } from 'lodash'
 
 import { checkDependencies } from '../checkDependencies'
@@ -14,6 +14,7 @@ const PlotlineTemplateDetailsConnector = (connector) => {
     platform: { appVersion, log },
     pltr: {
       selectors: { templateBeatsForBookOne },
+      mountState,
     },
   } = connector
   checkDependencies({ appVersion, log, templateBeatsForBookOne })
@@ -88,7 +89,7 @@ const PlotlineTemplateDetailsConnector = (connector) => {
 
     render() {
       const { template } = this.state
-      const beatsToRender = isEmpty(template) ? null : templateBeatsForBookOne(template)
+      const beatsToRender = isEmpty(template) ? null : templateBeatsForBookOne(mountState(template))
       const beatEntry = (
         <div key="beats">
           <h5 className="text-center text-capitalize">{t('Beats')}</h5>

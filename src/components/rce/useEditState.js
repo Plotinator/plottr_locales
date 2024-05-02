@@ -15,8 +15,8 @@ export const useEditState = (
   redo,
   initialValue,
   initialSelection,
-  undoId,
-  log
+  log,
+  undoGeneration
 ) => {
   const valueUpdateTimer = useRef(null)
   const deferredValuesToUpdate = useRef({ value: null })
@@ -43,25 +43,7 @@ export const useEditState = (
     }
 
     setValue(newValue)
-  }, [editorId, key])
-
-  // Handle undo
-  useEffect(() => {
-    if (isEqual(initialValue, value)) return
-
-    const newValue = useTextConverter(initialValue)
-    editor.children = newValue
-
-    // We could receive an initial selection from a search hit.  It'll
-    // look like a normal text field selection in that case.
-    if (initialSelection?.start && initialSelection?.end && initialSelection?.direction) {
-      // editor.focus()
-    } else {
-      editor.selection = initialSelection
-    }
-
-    setValue(newValue)
-  }, [undoId])
+  }, [editorId, key, undoGeneration])
 
   const updateWordCount = () => {
     const [start, end] = Editor.edges(editor, editor.selection)
@@ -96,33 +78,6 @@ export const useEditState = (
     }
   }
 
-  const handleUndoRedo = (event) => {
-    // If we don't have a selection, then the editor can't support
-    // programatic undo.  This isn't desirable because built-in undo
-    // leads to strange interactions when, e.g. the user undoes
-    // something, selections outside the RCE and then undoes again.
-    // (The result could be that text in the RCE is redone!)
-    //
-    // To ensure that the RCE has a selection, make sure that the on
-    // change handlers create actions that add `editorMetadata`.
-    // See the `editors` reducer for schema.
-    if (event.key === 'z' && (event.ctrlKey || event.metaKey)) {
-      event.preventDefault()
-      if (event.shiftKey) {
-        redo()
-      } else {
-        undo()
-      }
-      return
-    }
-    // On Linux, redo is CTRL+y
-    if (initialSelection && event.key === 'y' && event.ctrlKey) {
-      event.preventDefault()
-      redo()
-      return
-    }
-  }
-
   // It's possible for invalid RCE data to result from pasting.
   const onPaste = (event) => {
     // We're using operations rather than the actual value now...
@@ -130,7 +85,18 @@ export const useEditState = (
 
   // Handle user typing
   const onKeyDown = (event) => {
-    handleUndoRedo(event)
+    if (event.key === 'z' && (event.ctrlKey || event.metaKey)) {
+      event.preventDefault()
+      if (event.shiftKey) {
+        redo()
+      } else {
+        undo()
+      }
+    } else if (event.key === 'y' && event.ctrlKey) {
+      // On Linux, redo is CTRL+y
+      event.preventDefault()
+      redo()
+    }
   }
 
   // Add our cursor back in

@@ -12,6 +12,7 @@ describe('links', () => {
       <div id="react-root">
         <RichTextEditor
           id="test-editor"
+          editorKey="test-editor"
           recentFonts={['Forum']}
           fonts={['Forum', 'IBM Plex Serif', 'Lato', 'Yellowtail']}
           text={[

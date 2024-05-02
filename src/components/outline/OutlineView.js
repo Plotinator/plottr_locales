@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import PropTypes from 'react-proptypes'
 
 import { t as i18n } from 'plottr_locales'
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import Grid from '../Grid'
 import Alert from '../Alert'

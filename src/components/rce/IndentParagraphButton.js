@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import PropTypes from 'prop-types'
-import { FaIndent } from 'react-icons/fa'
+import { FaIndent } from '@react-icons/all-files/fa/FaIndent'
 import { Transforms, Editor } from 'slate'
 
 import Button from '../Button'

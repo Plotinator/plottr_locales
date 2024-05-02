@@ -113,6 +113,8 @@ import DashboardBody from './dashboard/navigation/DashboardBody'
 import DashboardNav from './dashboard/navigation/DashboardNav'
 import ChoiceView from './dashboard/account/ChoiceView'
 import ExpiredView from './dashboard/account/ExpiredView'
+import ProLicenseExpired from './dashboard/account/ProLicenseExpired'
+import PlottrLicenseExpired from './dashboard/account/PlottrLicenseExpired'
 import ProOnboarding from './dashboard/account/proOnboarding/index'
 import SettingsWizard from './dashboard/account/settingsWizard/index'
 import UpdateNotifier from './dashboard/UpdateNotifier'
@@ -122,6 +124,9 @@ import SearchModal from './SearchModal'
 
 // Firebase
 import FirebaseLogin from './FirebaseLogin'
+
+// Undo Redo
+import UndoRedo from './UndoRedo'
 
 const ModalBody = Modal.Body
 const ModalHeader = Modal.Header
@@ -216,8 +221,11 @@ export {
   ExpiredView,
   ProOnboarding,
   UpdateNotifier,
+  ProLicenseExpired,
+  PlottrLicenseExpired,
   NewProjectInputModal,
   SettingsWizard,
   RestructureTimelineModal,
+  UndoRedo,
   connections,
 }

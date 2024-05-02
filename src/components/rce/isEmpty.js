@@ -6,7 +6,7 @@ export const isEmpty = (children) => {
       return node.some(anyText)
     } else if (!node) {
       return false
-    } else if (typeof node === 'object') {
+    } else if (node && typeof node === 'object') {
       return Object.entries(node).some(([key, value]) => {
         return (key === 'text' && typeof value === 'string' && value !== '') || anyText(value)
       })

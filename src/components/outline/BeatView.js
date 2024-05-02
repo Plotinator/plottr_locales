@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import PropTypes from 'react-proptypes'
-import { FaCircle } from 'react-icons/fa'
+import { FaCircle } from '@react-icons/all-files/fa/FaCircle'
 import cx from 'classnames'
 
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 import { t as i18n } from 'plottr_locales'
 
 import Glyphicon from '../Glyphicon'

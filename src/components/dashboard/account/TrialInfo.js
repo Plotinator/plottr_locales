@@ -1,16 +1,12 @@
-import React, { useState } from 'react'
+import React from 'react'
 import PropTypes from 'react-proptypes'
 import { t } from 'plottr_locales'
 import cx from 'classnames'
-import { FaKey } from 'react-icons/fa'
-import UnconnectedVerifyView from './VerifyView'
+import { FaKey } from '@react-icons/all-files/fa/FaKey'
 
 const TrialInfoConnector = (connector) => {
-  const VerifyView = UnconnectedVerifyView(connector)
-
-  const TrialInfo = ({ trialInfo, daysLeft, darkMode }) => {
+  const TrialInfo = ({ trialInfo, daysLeft, darkMode, startProOnboarding }) => {
     const { startsAt, endsAt } = trialInfo
-    const [showVerify, setShowVerify] = useState(false)
     const startedDate = new Date(startsAt)
     const fewDays = daysLeft < 10
 
@@ -35,7 +31,7 @@ const TrialInfoConnector = (connector) => {
               <a
                 href="#"
                 draggable={false}
-                onClick={() => setShowVerify(true)}
+                onClick={startProOnboarding}
                 className={cx({ darkmode: darkMode })}
               >
                 <FaKey />
@@ -44,7 +40,6 @@ const TrialInfoConnector = (connector) => {
             </dd>
           </dl>
         </div>
-        {showVerify ? <VerifyView goBack={() => setShowVerify(false)} success={() => {}} /> : null}
       </div>
     )
   }
@@ -53,20 +48,28 @@ const TrialInfoConnector = (connector) => {
     trialInfo: PropTypes.object,
     daysLeft: PropTypes.number,
     darkMode: PropTypes.bool,
+    startProOnboarding: PropTypes.func.isRequired,
   }
 
   const {
-    pltr: { selectors },
+    pltr: { selectors, actions },
     redux,
   } = connector
 
   if (redux) {
     const { connect } = redux
-    return connect((state) => ({
-      trialInfo: selectors.trialInfoSelector(state),
-      daysLeft: selectors.daysLeftOfTrialSelector(state),
-      darkMode: selectors.isDarkModeSelector(state),
-    }))(TrialInfo)
+    return connect(
+      (state) => {
+        return {
+          trialInfo: selectors.trialInfoSelector(state),
+          daysLeft: selectors.daysLeftOfTrialSelector(state),
+          darkMode: selectors.isDarkModeSelector(state),
+        }
+      },
+      {
+        startProOnboarding: actions.applicationState.startProOnboarding,
+      }
+    )(TrialInfo)
   }
 
   throw new Error('Could not connect TrialInfo')

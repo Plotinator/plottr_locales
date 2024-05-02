@@ -3,55 +3,57 @@ import PropTypes from 'react-proptypes'
 
 import { t } from 'plottr_locales'
 
-import Button from '../../Button'
-import DeleteConfirmModal from '../../dialogs/DeleteConfirmModal'
 import { checkDependencies } from '../../checkDependencies'
+import Button from '../../Button'
+import { Spinner } from '../../Spinner'
 
 const LicenseInfoConnector = (connector) => {
   const {
-    platform: { machineId, os },
+    platform: {
+      machineId,
+      os,
+      firebase: { logOut },
+      settings: { saveAppSetting },
+      machineInfo,
+      deleteMachineLicenseActivation,
+    },
   } = connector
-  checkDependencies({ machineId, os })
+  checkDependencies({ machineId, os, machineInfo })
 
   const LicenseInfo = ({
-    expires,
-    itemName,
     customerEmail,
-    licenseKey,
-    deleteLicense,
     settings,
+    hasLicense,
+    isInProMode,
+    emailFromLastLogin,
   }) => {
-    const [deleting, setDeleting] = useState(false)
     const [deviceId, setDeviceId] = useState(null)
+    const [loggingOut, setLoggingOut] = useState(false)
+
+    const handleLogOut = () => {
+      setLoggingOut(true)
+      machineInfo().then((info) => {
+        const { id, name, localUserName, os } = info
+        return deleteMachineLicenseActivation(id, os, name, localUserName).then(() => {
+          // the order of these might matter
+          return saveAppSetting('user.frbId', null).then(() => {
+            return logOut().then(() => {
+              setLoggingOut(false)
+            })
+          })
+        })
+      })
+    }
 
     useEffect(() => {
-      if (!deviceId) {
+      if (!deviceId && !loggingOut) {
         machineId().then((id) => {
           setDeviceId(id)
         })
       }
-    }, [deviceId, setDeviceId])
+    }, [deviceId, setDeviceId, loggingOut])
 
-    const expiresDate =
-      expires == 'lifetime' ? t('Never') : t('{date, date, long}', { date: new Date(expires) })
     const usableDeviceID = os == 'unknown' ? t('Browser') : deviceId
-
-    let deleteModal = false
-    if (deleting) {
-      deleteModal = (
-        <DeleteConfirmModal
-          notSubmit
-          customText={t('Are you sure you want to deactivate your license key?')}
-          onDelete={() => {
-            deleteLicense().then(() => {
-              setDeleting(false)
-            })
-          }}
-          confirmText={t('Deactivate')}
-          onCancel={() => setDeleting(false)}
-        />
-      )
-    }
 
     const blurClass = settings.user.streamFriendly ? 'blurred' : ''
 
@@ -59,30 +61,32 @@ const LicenseInfoConnector = (connector) => {
       <div className="dashboard__user-info">
         <div className="dashboard__user-info license-info__label">
           <h2>{t('License Information')}</h2>
-          {os == 'unknown' ? null : (
-            <div className="text-right">
-              <Button bsStyle="danger" bsSize="small" onClick={() => setDeleting(true)}>
-                {t('Deactivate License Key')}
-              </Button>
-              {deleteModal}
-            </div>
-          )}
         </div>
         <hr />
         <div className="dashboard__user-info__wrapper">
           <dl className="dl-horizontal">
-            <dt>{t('Purchase Email')}</dt>
-            <dd className={blurClass}>{customerEmail}</dd>
-            <dt>{t('Product Name')}</dt>
-            <dd>{itemName}</dd>
-            <dt>{t('Device ID')}</dt>
-            <dd className={blurClass}>{usableDeviceID}</dd>
-          </dl>
-          <dl className="dl-horizontal">
-            <dt>{t('License Key')}</dt>
-            <dd className={blurClass}>{licenseKey}</dd>
-            <dt>{t('Expires')}</dt>
-            <dd>{expiresDate}</dd>
+            {customerEmail || emailFromLastLogin ? (
+              <>
+                <dt>{t('Purchase Email')}</dt>
+                <dd className={blurClass}>{customerEmail ?? emailFromLastLogin}</dd>
+              </>
+            ) : null}
+            {usableDeviceID ? (
+              <>
+                <dt>{t('Device ID')}</dt>
+                <dd className={blurClass}>{usableDeviceID}</dd>
+              </>
+            ) : null}
+            {hasLicense && !isInProMode ? (
+              <>
+                <dt></dt>
+                <dd>
+                  <Button bsStyle="danger" bsSize="small" onClick={handleLogOut}>
+                    {t('Log Out')} {loggingOut ? <Spinner /> : null}
+                  </Button>
+                </dd>
+              </>
+            ) : null}
           </dl>
         </div>
       </div>
@@ -90,12 +94,11 @@ const LicenseInfoConnector = (connector) => {
   }
 
   LicenseInfo.propTypes = {
-    expires: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    itemName: PropTypes.string,
     customerEmail: PropTypes.string,
-    licenseKey: PropTypes.string,
+    emailFromLastLogin: PropTypes.string,
     settings: PropTypes.object,
-    deleteLicense: PropTypes.func,
+    hasLicense: PropTypes.bool,
+    isInProMode: PropTypes.bool,
   }
 
   const {
@@ -106,11 +109,11 @@ const LicenseInfoConnector = (connector) => {
   if (redux) {
     const { connect } = redux
     return connect((state) => ({
-      expires: selectors.licenseExpiresSelector(state),
-      itemName: selectors.licenseItemNameSelector(state),
-      customerEmail: selectors.licenseCustomerEmailSelector(state),
-      licenseKey: selectors.licenseKeySelector(state),
+      customerEmail: selectors.emailAddressSelector(state),
+      emailFromLastLogin: selectors.emailFromLastLoginSelector(state),
       settings: selectors.appSettingsSelector(state),
+      hasLicense: selectors.hasActivePlottrLicenseSelector(state),
+      isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
     }))(LicenseInfo)
   }
 

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'react-proptypes'
 
-import { defaultSettings } from 'pltr/v2'
+import { defaultSettings } from 'pltr'
 import { t } from 'plottr_locales'
 
 import { checkDependencies } from '../../checkDependencies'

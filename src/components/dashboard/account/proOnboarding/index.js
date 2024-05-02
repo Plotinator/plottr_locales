@@ -17,7 +17,7 @@ const ProOnboardingConnector = (connector) => {
   const ProStep2 = UnconnectedProStep2(connector)
   const ProStep3 = UnconnectedProStep3(connector)
 
-  const ProOnboarding = ({ cancel, hasCurrentProLicense, step, advanceProOnboarding }) => {
+  const ProOnboarding = ({ cancel, step, advanceProOnboarding }) => {
     const CurrentStep = () => {
       switch (step) {
         case 1:
@@ -33,7 +33,7 @@ const ProOnboardingConnector = (connector) => {
 
     return (
       <OnboardingFlow>
-        <h1>{t('Welcome to Plottr Pro')}</h1>
+        <h1>{t('Welcome to Plottr')}</h1>
         <OnboardingProgress currentStep={step} totalSteps={steps} />
         <ErrorBoundary>
           <CurrentStep />
@@ -44,7 +44,6 @@ const ProOnboardingConnector = (connector) => {
 
   ProOnboarding.propTypes = {
     cancel: PropTypes.func,
-    hasCurrentProLicense: PropTypes.bool,
     step: PropTypes.number,
     advanceProOnboarding: PropTypes.func.isRequired,
   }
@@ -60,7 +59,6 @@ const ProOnboardingConnector = (connector) => {
     return connect(
       (state) => {
         return {
-          hasCurrentProLicense: selectors.hasProSelector(state),
           step: selectors.currentProOnboardingStepSelector(state),
         }
       },

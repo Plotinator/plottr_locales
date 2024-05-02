@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'react-proptypes'
-import { FaUndoAlt } from 'react-icons/fa'
+import { FaUndoAlt } from '@react-icons/all-files/fa/FaUndoAlt'
 
-import { defaultSettings } from 'pltr/v2'
+import { defaultSettings } from 'pltr'
 import { t } from 'plottr_locales'
 
 import { checkDependencies } from '../../checkDependencies'

@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
-import { FaCaretDown, FaCaretRight } from 'react-icons/fa'
-import { FiHelpCircle } from 'react-icons/fi'
+import { FaCaretDown } from '@react-icons/all-files/fa/FaCaretDown'
+import { FaCaretRight } from '@react-icons/all-files/fa/FaCaretRight'
+import { FiHelpCircle } from '@react-icons/all-files/fi/FiHelpCircle'
 
 import { t } from 'plottr_locales'
 

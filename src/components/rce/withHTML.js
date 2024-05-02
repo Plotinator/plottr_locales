@@ -1,5 +1,5 @@
 import { Transforms } from 'slate'
-import { slate } from 'pltr/v2'
+import { slate } from 'pltr'
 
 export const withHTML = (editor) => {
   const { insertData } = editor

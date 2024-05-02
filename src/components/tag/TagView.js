@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import PropTypes from 'react-proptypes'
 import { isEqual } from 'lodash'
 import cx from 'classnames'
-import { FiCopy } from 'react-icons/fi'
+import { FiCopy } from '@react-icons/all-files/fi/FiCopy'
 
 import { t as i18n } from 'plottr_locales'
 
@@ -23,7 +23,17 @@ const TagViewConnector = (connector) => {
   const CategoryPicker = UnconnectedCategoryPicker(connector)
   const TextFormControl = UnconnectedTextFormControl(connector)
 
-  const TagView = ({ tag, newTag, darkMode, editing, foci, doneCreating, actions, uiActions }) => {
+  const TagView = ({
+    tag,
+    newTag,
+    darkMode,
+    editing,
+    foci,
+    doneCreating,
+    actions,
+    uiActions,
+    undo,
+  }) => {
     const [showColorPicker, setShowColorPicker] = useState(false)
     const [hovering, setHovering] = useState(false)
     const [color, setColor] = useState(null)
@@ -33,11 +43,13 @@ const TagViewConnector = (connector) => {
     const userInitiatedEdit = useRef(false)
     const titleRef = useRef()
 
-    useRef(() => {
-      return () => {
-        if (editing && !newTag) saveEdit()
+    useEffect(() => {
+      if (!editing) {
+        setColor(tag.color)
+        setCategoryId(tag.categoryId)
+        setTitle(tag.title)
       }
-    }, [])
+    }, [editing])
 
     useEffect(() => {
       if (userInitiatedEdit.current && typeof titleRef.current?.focus === 'function') {
@@ -110,17 +122,19 @@ const TagViewConnector = (connector) => {
 
       let { id } = tag
       var newTitle = title || tag.title
-      if (newTag) {
-        actions.addCreatedTag({
-          title: newTitle,
-          color: tag.color || color,
-          categoryId: categoryId,
-        })
-        doneCreating()
-      } else {
-        actions.editTag(id, newTitle, tag.color || color, categoryId)
-      }
-      uiActions.finishEditingSelectedTag()
+      undo.batch(() => {
+        if (newTag) {
+          actions.addCreatedTag({
+            title: newTitle,
+            color: tag.color || color,
+            categoryId: categoryId,
+          })
+          doneCreating()
+        } else {
+          actions.editTag(id, newTitle, tag.color || color, categoryId)
+        }
+        uiActions.finishEditingSelectedTag()
+      })
       stopHovering()
       userInitiatedEdit.current = false
     }
@@ -285,6 +299,7 @@ const TagViewConnector = (connector) => {
     foci: PropTypes.array,
     actions: PropTypes.object.isRequired,
     uiActions: PropTypes.object.isRequired,
+    undo: PropTypes.object.isRequired,
     darkMode: PropTypes.bool,
   }
 
@@ -293,6 +308,7 @@ const TagViewConnector = (connector) => {
   } = connector
   const TagActions = actions.tag
   const UiActions = actions.ui
+  const UndoActions = actions.undo
   const { redux } = connector
   checkDependencies({ actions, TagActions, UiActions, redux })
 
@@ -311,6 +327,7 @@ const TagViewConnector = (connector) => {
         return {
           actions: bindActionCreators(TagActions, dispatch),
           uiActions: bindActionCreators(UiActions, dispatch),
+          undo: bindActionCreators(UndoActions, dispatch),
         }
       }
     )(TagView)

@@ -10,14 +10,17 @@ const FirebaseLoginConnector = (connector) => {
   const {
     platform: {
       login: { launchLoginPopup },
+      firebase: { logOut },
     },
   } = connector
   checkDependencies({ launchLoginPopup })
 
   const FirebaseLogin = ({ startLoggingIn, loggingIn }) => {
     const handleLogin = () => {
-      startLoggingIn()
-      launchLoginPopup()
+      logOut().then(() => {
+        startLoggingIn()
+        launchLoginPopup()
+      })
     }
 
     return (

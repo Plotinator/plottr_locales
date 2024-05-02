@@ -2,21 +2,20 @@ import React, { useEffect, useState, useRef, useCallback } from 'react'
 import PropTypes from 'react-proptypes'
 import { StickyTable } from 'react-sticky-table'
 import cx from 'classnames'
-import { VscSymbolStructure } from 'react-icons/vsc'
-import { CgArrowLongRight, CgArrowLongDown } from 'react-icons/cg'
-import {
-  HiOutlineChevronDoubleRight,
-  HiOutlineChevronDoubleLeft,
-  HiOutlineChevronLeft,
-  HiOutlineChevronRight,
-  HiOutlineChevronUp,
-  HiOutlineChevronDown,
-  HiOutlineChevronDoubleDown,
-  HiOutlineChevronDoubleUp,
-} from 'react-icons/hi'
+import { VscSymbolStructure } from '@react-icons/all-files/vsc/VscSymbolStructure'
+import { CgArrowLongRight } from '@react-icons/all-files/cg/CgArrowLongRight'
+import { CgArrowLongDown } from '@react-icons/all-files/cg/CgArrowLongDown'
+import { HiOutlineChevronDoubleRight } from '@react-icons/all-files/hi/HiOutlineChevronDoubleRight'
+import { HiOutlineChevronDoubleLeft } from '@react-icons/all-files/hi/HiOutlineChevronDoubleLeft'
+import { HiOutlineChevronLeft } from '@react-icons/all-files/hi/HiOutlineChevronLeft'
+import { HiOutlineChevronRight } from '@react-icons/all-files/hi/HiOutlineChevronRight'
+import { HiOutlineChevronUp } from '@react-icons/all-files/hi/HiOutlineChevronUp'
+import { HiOutlineChevronDown } from '@react-icons/all-files/hi/HiOutlineChevronDown'
+import { HiOutlineChevronDoubleDown } from '@react-icons/all-files/hi/HiOutlineChevronDoubleDown'
+import { HiOutlineChevronDoubleUp } from '@react-icons/all-files/hi/HiOutlineChevronDoubleUp'
 
 import { t } from 'plottr_locales'
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import UnconnectedPlottrFloater from '../PlottrFloater'
 import Popover from '../PlottrPopover'
@@ -93,7 +92,6 @@ const TimelineWrapperConnector = (connector) => {
     timelineViewIsStacked,
     timelineViewIsTabbed,
     hierarchyLevels,
-    beatActions,
     isCardDialogVisible,
     cardDialogBeatId,
     cardDialogCardId,
@@ -765,7 +763,6 @@ const TimelineWrapperConnector = (connector) => {
     timelineViewIsStacked: PropTypes.bool,
     timelineViewIsTabbed: PropTypes.bool,
     hierarchyLevels: PropTypes.array.isRequired,
-    beatActions: PropTypes.object.isRequired,
     cardDialogCardId: PropTypes.number,
     cardDialogLineId: PropTypes.number,
     cardDialogBeatId: PropTypes.number,
@@ -823,7 +820,6 @@ const TimelineWrapperConnector = (connector) => {
         return {
           actions: bindActionCreators(actions.ui, dispatch),
           projectActions: bindActionCreators(actions.project, dispatch),
-          beatActions: bindActionCreators(actions.beat, dispatch),
           notificationActions: bindActionCreators(actions.notifications, dispatch),
         }
       }

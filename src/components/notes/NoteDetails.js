@@ -94,7 +94,6 @@ const NoteDetailsConnector = (connector) => {
       noteId: PropTypes.number.isRequired,
       note: PropTypes.object.isRequired,
       categories: PropTypes.array.isRequired,
-      actions: PropTypes.object.isRequired,
       customAttributes: PropTypes.array.isRequired,
       startEditing: PropTypes.func.isRequired,
     }
@@ -104,26 +103,18 @@ const NoteDetailsConnector = (connector) => {
     redux,
     pltr: { selectors },
   } = connector
-  const noteActions = connector.pltr.actions.note
-  checkDependencies({ redux, selectors, noteActions })
+  checkDependencies({ redux, selectors })
 
   if (redux) {
-    const { connect, bindActionCreators } = redux
+    const { connect } = redux
 
-    return connect(
-      (state, ownProps) => {
-        return {
-          note: selectors.singleNoteSelector(state, ownProps.noteId),
-          categories: selectors.noteCategoriesSelector(state),
-          customAttributes: selectors.noteCustomAttributesSelector(state),
-        }
-      },
-      (dispatch) => {
-        return {
-          actions: bindActionCreators(noteActions, dispatch),
-        }
+    return connect((state, ownProps) => {
+      return {
+        note: selectors.singleNoteSelector(state, ownProps.noteId),
+        categories: selectors.noteCategoriesSelector(state),
+        customAttributes: selectors.noteCustomAttributesSelector(state),
       }
-    )(NoteDetails)
+    })(NoteDetails)
   }
 
   throw new Error('Cannot connect NoteDetails')

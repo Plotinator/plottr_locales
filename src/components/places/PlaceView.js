@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import PropTypes from 'react-proptypes'
 import { isEqual } from 'lodash'
 import cx from 'classnames'
-import { FiCopy } from 'react-icons/fi'
+import { FiCopy } from '@react-icons/all-files/fi/FiCopy'
 
 import { t } from 'plottr_locales'
 

@@ -4,7 +4,7 @@ import cx from 'classnames'
 import { flatten } from 'lodash'
 
 import { t as i18n } from 'plottr_locales'
-import { newIds } from 'pltr/v2'
+import { newIds } from 'pltr'
 
 import Grid from '../Grid'
 import Alert from '../Alert'
@@ -78,6 +78,7 @@ const PlaceListViewConnector = (connector) => {
     selectedPlaceId,
     customAttributeActions,
     uiActions,
+    undo,
     places,
     placeSort,
     filterVisible,
@@ -91,8 +92,9 @@ const PlaceListViewConnector = (connector) => {
     const [draggedPlace, setDraggedPlace] = useState()
 
     useEffect(() => {
-      if (!isJumping) {
-        uiActions.selectPlace(detailID(visiblePlacesByCategory, selectedPlaceId))
+      const placeToSelect = detailID(visiblePlacesByCategory, selectedPlaceId)
+      if (!isJumping && placeToSelect !== selectedPlaceId) {
+        uiActions.selectPlace(placeToSelect)
       }
     }, [visiblePlacesByCategory])
 
@@ -105,15 +107,19 @@ const PlaceListViewConnector = (connector) => {
     }
 
     const closeDialog = () => {
-      uiActions.hidePlaceAttributeDialog()
-      uiActions.hidePlaceCategoryModal()
+      undo.batch(() => {
+        uiActions.hidePlaceAttributeDialog()
+        uiActions.hidePlaceCategoryModal()
+      })
     }
 
     const handleCreateNewPlace = () => {
       const id = nextId(places)
-      actions.addPlace()
-      uiActions.selectPlace(id)
-      uiActions.startEditingSelectedPlace()
+      undo.batch(() => {
+        actions.addPlace()
+        uiActions.selectPlace(id)
+        uiActions.startEditingSelectedPlace()
+      })
     }
 
     const insertSpace = (event) => {
@@ -384,6 +390,7 @@ const PlaceListViewConnector = (connector) => {
     placeSearchTerm: PropTypes.string,
     selectedPlaceId: PropTypes.number,
     uiActions: PropTypes.object.isRequired,
+    undo: PropTypes.object.isRequired,
     places: PropTypes.array,
     placeSort: PropTypes.string.isRequired,
     filterVisible: PropTypes.bool,
@@ -403,6 +410,7 @@ const PlaceListViewConnector = (connector) => {
   const CustomAttributeActions = actions.customAttribute
   const PlaceActions = actions.place
   const UIActions = actions.ui
+  const UndoActions = actions.undo
 
   if (redux) {
     const { connect, bindActionCreators } = redux
@@ -436,6 +444,7 @@ const PlaceListViewConnector = (connector) => {
           actions: bindActionCreators(PlaceActions, dispatch),
           customAttributeActions: bindActionCreators(CustomAttributeActions, dispatch),
           uiActions: bindActionCreators(UIActions, dispatch),
+          undo: bindActionCreators(UndoActions, dispatch),
         }
       }
     )(PlaceListView)

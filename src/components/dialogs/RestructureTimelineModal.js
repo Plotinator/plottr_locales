@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { PropTypes } from 'prop-types'
 import cx from 'classnames'
 import { cloneDeep } from 'lodash'
-import { FaGripLinesVertical } from 'react-icons/fa'
+import { FaGripLinesVertical } from '@react-icons/all-files/fa/FaGripLinesVertical'
 
 import { t } from 'plottr_locales'
 

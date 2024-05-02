@@ -13,17 +13,19 @@ export default function ProStep0({ nextStep, cancel }) {
   return (
     <OnboardingStep>
       <StepHeader>
-        <h2>{t("Let's set up your Pro account")}</h2>
+        <h2>{t("Let's set up your account")}</h2>
       </StepHeader>
       <StepBody>
         <Jumbotron>
-          <p className="accented-text">
-            {t('This will be quick and painless. There are only 3 steps:')}
-          </p>
+          <p className="accented-text">{t('This will be quick and painless.')}</p>
           <ol>
             <li>{t('Sign in')}</li>
-            <li>{t('Upload your projects and templates')}</li>
-            <li>{t('Configure Pro settings')}</li>
+            <li>
+              {t(
+                'If you have pro, upload your projects and templates, then Configure Pro settings'
+              )}
+            </li>
+            <li>{t('Configure Plottr')}</li>
           </ol>
         </Jumbotron>
       </StepBody>

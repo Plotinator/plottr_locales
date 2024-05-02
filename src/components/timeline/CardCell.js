@@ -2,11 +2,11 @@ import React, { Component } from 'react'
 import PropTypes from 'react-proptypes'
 import { Cell } from 'react-sticky-table'
 import cx from 'classnames'
-import { FaCircle } from 'react-icons/fa'
+import { FaCircle } from '@react-icons/all-files/fa/FaCircle'
 import tinycolor from 'tinycolor2'
 import { omit } from 'lodash'
 
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import UnconnectedCard from './Card'
 import UnconnectedPlottrFloater from '../PlottrFloater'

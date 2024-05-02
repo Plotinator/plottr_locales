@@ -57,7 +57,6 @@ const TagListViewConnector = (connector) => {
   const TagListView = ({
     tags,
     selectedTagId,
-    actions,
     darkMode,
     tagsByCategory,
     categories,
@@ -210,7 +209,6 @@ const TagListViewConnector = (connector) => {
 
   TagListView.propTypes = {
     tags: PropTypes.array.isRequired,
-    actions: PropTypes.object.isRequired,
     darkMode: PropTypes.bool,
     tagsByCategory: PropTypes.object.isRequired,
     categories: PropTypes.array.isRequired,
@@ -225,12 +223,10 @@ const TagListViewConnector = (connector) => {
   const {
     pltr: { selectors, actions },
   } = connector
-  const TagActions = actions.tag
   const UiActions = actions.ui
   checkDependencies({
     redux,
     actions,
-    TagActions,
     UiActions,
   })
 
@@ -252,7 +248,6 @@ const TagListViewConnector = (connector) => {
       },
       (dispatch) => {
         return {
-          actions: bindActionCreators(TagActions, dispatch),
           uiActions: bindActionCreators(UiActions, dispatch),
         }
       }

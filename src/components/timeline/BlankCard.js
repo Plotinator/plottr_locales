@@ -4,8 +4,7 @@ import { Cell } from 'react-sticky-table'
 import cx from 'classnames'
 
 import { t as i18n } from 'plottr_locales'
-import { lineColors } from 'pltr/v2'
-import { orientedClassName } from 'pltr/v2/helpers/orientedClassName'
+import { helpers, lineColors } from 'pltr'
 
 import Glyphicon from '../Glyphicon'
 import ControlLabel from '../ControlLabel'
@@ -16,6 +15,7 @@ import UnconnectedTemplatePicker from '../templates/TemplatePicker'
 import VisualLine from './VisualLine'
 
 const { lightBackground } = lineColors
+const { orientedClassName } = helpers.orientedClassName
 
 const BlankCardConnector = (connector) => {
   const TemplatePicker = UnconnectedTemplatePicker(connector)
@@ -385,7 +385,6 @@ const BlankCardConnector = (connector) => {
     isSmall: PropTypes.bool,
     isMedium: PropTypes.bool,
     actions: PropTypes.object,
-    notificationActions: PropTypes.object,
     readOnly: PropTypes.bool,
     addMissingBeats: PropTypes.bool,
     isPinned: PropTypes.bool,
@@ -397,7 +396,6 @@ const BlankCardConnector = (connector) => {
     pltr: { actions, selectors },
   } = connector
   const CardActions = actions.card
-  const NotificationActions = actions.notifications
   checkDependencies({
     redux,
     actions,
@@ -426,7 +424,6 @@ const BlankCardConnector = (connector) => {
       (dispatch) => {
         return {
           actions: bindActionCreators(CardActions, dispatch),
-          notificationActions: bindActionCreators(NotificationActions, dispatch),
         }
       }
     )(BlankCard)

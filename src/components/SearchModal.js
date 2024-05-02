@@ -1,11 +1,13 @@
 import React, { useCallback, useRef, useEffect, useState, useMemo } from 'react'
 import PropTypes from 'react-proptypes'
 import { last } from 'lodash'
-import { FaExchangeAlt, FaPlus, FaMinus } from 'react-icons/fa'
+import { FaExchangeAlt } from '@react-icons/all-files/fa/FaExchangeAlt'
+import { FaPlus } from '@react-icons/all-files/fa/FaPlus'
+import { FaMinus } from '@react-icons/all-files/fa/FaMinus'
 import cx from 'classnames'
 
 import { t } from 'plottr_locales'
-import { slate, helpers } from 'pltr/v2'
+import { slate, helpers } from 'pltr'
 
 import Collapse from './Collapse'
 import Button from './Button'

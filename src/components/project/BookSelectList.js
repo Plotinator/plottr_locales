@@ -10,7 +10,7 @@ import Glyphicon from '../Glyphicon'
 import Button from '../Button'
 import UnconnectedImage from '../images/Image'
 import UnconnectedFloater from '../PlottrFloater'
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 import { checkDependencies } from '../checkDependencies'
 import { contains } from '../domHelpers'
 

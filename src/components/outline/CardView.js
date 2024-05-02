@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import PropTypes from 'react-proptypes'
 import { isEqual } from 'lodash'
-import { FaGripLinesVertical, FaCircle } from 'react-icons/fa'
+import { FaGripLinesVertical } from '@react-icons/all-files/fa/FaGripLinesVertical'
+import { FaCircle } from '@react-icons/all-files/fa/FaCircle'
 import cx from 'classnames'
 
 import { t as i18n } from 'plottr_locales'
@@ -16,7 +17,6 @@ import TagLabel from '../TagLabel'
 import UnconnectedImage from '../images/Image'
 import UnconnectedSelectList from '../SelectList'
 import { checkDependencies } from '../checkDependencies'
-import { withArgs } from '../withArgs'
 
 const CardViewConnector = (connector) => {
   const RichText = UnconnectedRichText(connector)
@@ -36,9 +36,32 @@ const CardViewConnector = (connector) => {
         dragging: false,
         inDropZone: false,
         dropDepth: 0,
+        title: this.props.card.title,
       }
 
       this.componentRef = null
+      this.titleChangeTimeout = null
+    }
+
+    componentDidUpdate(prevProps) {
+      if (
+        this.state.title !== this.props.card.title &&
+        prevProps.card.title !== this.props.card.title
+      ) {
+        this.setState({
+          title: this.props.card.title,
+        })
+      }
+    }
+
+    handleTitleChange = (value, selection) => {
+      this.setState({ title: value })
+      if (typeof this.titleChangeTimeout === 'number') {
+        clearTimeout(this.titleChangeTimeout)
+      }
+      this.titleChangeTimeout = setTimeout(() => {
+        this.props.actions.editCardTitle(this.props.card.id, value, selection)
+      }, 300)
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -162,14 +185,20 @@ const CardViewConnector = (connector) => {
       this.setState({ inDropZone: false, dropDepth: 0 })
 
       const json = e.dataTransfer.getData('text/json')
-      const droppedData = JSON.parse(json)
-      if (!droppedData.cardId) return
+      try {
+        const droppedData = JSON.parse(json)
+        if (!droppedData.cardId) return
 
-      this.props.reorder({
-        current: this.props.card,
-        currentIndex: this.props.index,
-        dropped: droppedData,
-      })
+        this.props.reorder({
+          current: this.props.card,
+          currentIndex: this.props.index,
+          dropped: droppedData,
+        })
+      } catch (_error) {
+        // Fail silently.  Something was dropped that didn't have
+        // valid JSON data.  (Could be any part of the UI that was
+        // dragged but not intended to be dropped here.)
+      }
     }
 
     selectionForMainCardElement = (name) => {
@@ -192,8 +221,8 @@ const CardViewConnector = (connector) => {
     }
 
     renderTitle() {
-      const { title, id } = this.props.card
-      const { actions, foci, editing } = this.props
+      const { id } = this.props.card
+      const { foci, editing } = this.props
 
       if (!editing) return null
 
@@ -204,10 +233,10 @@ const CardViewConnector = (connector) => {
             onKeyPress={this.handleEnter}
             onKeyDown={this.handleEsc}
             type="text"
-            onChange={withArgs(actions.editCardTitle, id)}
+            onChange={this.handleTitleChange}
             autoFocus={foci && foci[0] && foci[0].path[2] === 'title' && foci[0].path[1] === id}
             selection={this.selectionForMainCardElement('title')}
-            value={title}
+            value={this.state.title}
           />
         </FormGroup>
       )

@@ -16,7 +16,7 @@ const SettingsWizardConnector = (connector) => {
   const SettingsWizardStep2 = UnconnectedSettingsWizardStep2(connector)
   const SettingsWizardStep3 = UnconnectedSettingsWizardStep3(connector)
 
-  const SettingsWizard = ({ step }) => {
+  const SettingsWizard = ({ step, isInProMode }) => {
     const CurrentStep = () => {
       switch (step) {
         case 1:
@@ -37,7 +37,7 @@ const SettingsWizardConnector = (connector) => {
         </div>
         <div className="settings-wizard__body">
           <OnboardingFlow>
-            <OnboardingProgress currentStep={step} totalSteps={steps} />
+            <OnboardingProgress currentStep={step} totalSteps={isInProMode ? 1 : steps} />
             <ErrorBoundary>
               <CurrentStep />
             </ErrorBoundary>
@@ -49,6 +49,7 @@ const SettingsWizardConnector = (connector) => {
 
   SettingsWizard.propTypes = {
     step: PropTypes.number,
+    isInProMode: PropTypes.bool,
   }
 
   const {
@@ -62,6 +63,7 @@ const SettingsWizardConnector = (connector) => {
     return connect((state) => {
       return {
         step: selectors.currentSettingsWizardStepSelector(state),
+        isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
       }
     })(SettingsWizard)
   }

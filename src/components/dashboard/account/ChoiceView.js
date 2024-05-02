@@ -4,9 +4,10 @@ import PropTypes from 'react-proptypes'
 import { t } from 'plottr_locales'
 
 import Button from '../../Button'
-import UnconnectedVerifyView from './VerifyView'
 import UnconnectedVerifyPro from './VerifyPro'
 import AccountHeader from './AccountHeader'
+
+const TRIAL_LENGTH = 60
 
 const ChoiceViewConnector = (connector) => {
   const {
@@ -16,30 +17,32 @@ const ChoiceViewConnector = (connector) => {
     },
   } = connector
 
-  const VerifyView = UnconnectedVerifyView(connector)
   const VerifyPro = UnconnectedVerifyPro(connector)
 
-  const ChoiceView = ({ goToAccount, startProOnboarding, startSettingsWizard }) => {
+  const ChoiceView = ({
+    goToAccount,
+    startProOnboarding,
+    startSettingsWizard,
+    trialExpired,
+    trialStarted,
+  }) => {
     const [view, setView] = useState('chooser')
 
     const goBack = () => setView('chooser')
 
     // eslint-disable-next-line react/display-name, react/prop-types
     const trialText = t.rich('Start the<br/>Free Trial', { br: () => <br key={'br'} /> })
-    // eslint-disable-next-line react/display-name, react/prop-types
-    const licenseText = t.rich('I have a<br/>License Key', { br: () => <br key={'br'} /> })
 
     const renderBody = () => {
       switch (view) {
         case 'chooser':
           return (
             <div className="verify__chooser with-3">
-              <div className="verify__choice" onClick={() => setView('explain')}>
-                <h2>{trialText}</h2>
-              </div>
-              <div className="verify__choice" onClick={() => setView('verify')}>
-                <h2>{licenseText}</h2>
-              </div>
+              {!trialExpired && !trialStarted ? (
+                <div className="verify__choice" onClick={() => setView('explain')}>
+                  <h2>{trialText}</h2>
+                </div>
+              ) : null}
               <div
                 className="verify__choice"
                 onClick={() => {
@@ -47,16 +50,14 @@ const ChoiceViewConnector = (connector) => {
                   setView('pro')
                 }}
               >
-                <h2>{t('I have Plottr Pro')}</h2>
+                <h2>{t(`I've bought Plottr`)}</h2>
               </div>
             </div>
           )
-        case 'verify':
-          return <VerifyView goBack={goBack} success={startSettingsWizard} />
         case 'explain':
           return (
             <div>
-              <p>{t("You'll have 14 days")}</p>
+              <p>{t("You'll have {trialDays} days", { trialDays: TRIAL_LENGTH })}</p>
               <p>{t('Access all the features')}</p>
               <p>{t('Create unlimited projects')}</p>
               <div style={{ marginTop: '30px' }}>
@@ -94,19 +95,29 @@ const ChoiceViewConnector = (connector) => {
     goToAccount: PropTypes.func.isRequired,
     startProOnboarding: PropTypes.func.isRequired,
     startSettingsWizard: PropTypes.func.isRequired,
+    trialExpired: PropTypes.bool,
+    trialStarted: PropTypes.bool,
   }
 
   const {
-    pltr: { actions },
+    pltr: { actions, selectors },
     redux,
   } = connector
 
   if (redux) {
     const { connect } = redux
 
-    return connect(null, {
-      startSettingsWizard: actions.applicationState.startSettingsWizard,
-    })(ChoiceView)
+    return connect(
+      (state) => {
+        return {
+          trialExpired: selectors.trialExpiredSelector(state),
+          trialStarted: selectors.trialStartedSelector(state),
+        }
+      },
+      {
+        startSettingsWizard: actions.applicationState.startSettingsWizard,
+      }
+    )(ChoiceView)
   }
 
   throw new Error('Could not connect ChoiceView')

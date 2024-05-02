@@ -16,10 +16,11 @@ const ProStep3Connector = (connector) => {
     },
   } = connector
 
-  const ProStep3 = ({ finish, settings }) => {
+  const ProStep3 = ({ finish, settings, startSettingsWizard }) => {
     const handleFinishOnboarding = () => {
       saveAppSetting('isOnboardingDone', true)
-      return finish()
+      finish()
+      startSettingsWizard()
     }
 
     return (
@@ -65,19 +66,27 @@ const ProStep3Connector = (connector) => {
   ProStep3.propTypes = {
     finish: PropTypes.func,
     settings: PropTypes.object.isRequired,
+    startSettingsWizard: PropTypes.func.isRequired,
   }
 
   const {
-    pltr: { selectors },
+    pltr: { selectors, actions },
     redux,
   } = connector
 
   if (redux) {
     const { connect } = redux
 
-    return connect((state) => ({
-      settings: selectors.appSettingsSelector(state),
-    }))(ProStep3)
+    return connect(
+      (state) => {
+        return {
+          settings: selectors.appSettingsSelector(state),
+        }
+      },
+      {
+        startSettingsWizard: actions.applicationState.startSettingsWizard,
+      }
+    )(ProStep3)
   }
 
   throw new Error('Could not connect ProStep3.')

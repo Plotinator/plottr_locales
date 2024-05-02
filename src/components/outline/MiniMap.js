@@ -2,12 +2,14 @@ import React, { useEffect, useState, useRef } from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
 
-import { emptyCard } from 'pltr/v2/helpers/cards'
+import { helpers } from 'pltr'
 
 import NavItem from '../NavItem'
 import Nav from '../Nav'
 import MiniBeatConnector from './MiniBeat'
 import { checkDependencies } from '../checkDependencies'
+
+const { emptyCard } = helpers.card
 
 const targetPosition = 115
 

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react'
 import PropTypes from 'react-proptypes'
 import { Row, Cell } from 'react-sticky-table'
 
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import Glyphicon from '../Glyphicon'
 import UnconnectedBeatTitleCell from './BeatTitleCell'
@@ -104,9 +104,11 @@ const TopRowConnector = (connector) => {
 
     const handleInsertChildBeat = useCallback(
       (beatToLeftId) => {
-        const { currentTimeline, beatActions } = props
-        beatActions.expandBeat(beatToLeftId, currentTimeline)
-        beatActions.addBeat(currentTimeline, beatToLeftId)
+        const { currentTimeline, beatActions, undo } = props
+        undo.batch(() => {
+          beatActions.expandBeat(beatToLeftId, currentTimeline)
+          beatActions.addBeat(currentTimeline, beatToLeftId)
+        })
       },
       [props.beatActions, props.currentTimeline]
     )
@@ -116,13 +118,12 @@ const TopRowConnector = (connector) => {
       if (timelineViewIsTabbed) {
         if (beats.length === 0) {
           handleInsertChildBeat(activeTab, currentTimeline)
-          return
         } else {
           handleInsertNewBeat(beats[beats.length - 1]?.id)
-          return
         }
+      } else {
+        beatActions.addBeat(currentTimeline)
       }
-      beatActions.addBeat(currentTimeline)
     }, [
       props.currentTimeline,
       props.beatActions,
@@ -364,6 +365,7 @@ const TopRowConnector = (connector) => {
     lines: PropTypes.array,
     lineActions: PropTypes.object,
     beatActions: PropTypes.object,
+    undo: PropTypes.object,
     timelineViewIsStacked: PropTypes.bool,
     topTierBeats: PropTypes.array,
     secondTierBeats: PropTypes.array,
@@ -381,6 +383,7 @@ const TopRowConnector = (connector) => {
 
   const LineActions = actions.line
   const BeatActions = actions.beat
+  const UndoActions = actions.undo
 
   const {
     visibleSortedBeatsForTimelineByBookSelector,
@@ -431,6 +434,7 @@ const TopRowConnector = (connector) => {
         return {
           lineActions: bindActionCreators(LineActions, dispatch),
           beatActions: bindActionCreators(BeatActions, dispatch),
+          undo: bindActionCreators(UndoActions, dispatch),
         }
       }
     )(TopRow)

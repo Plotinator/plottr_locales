@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'react-proptypes'
 
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import Label from './Label'
 

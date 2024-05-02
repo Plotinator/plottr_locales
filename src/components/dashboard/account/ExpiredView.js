@@ -3,31 +3,22 @@ import { PropTypes } from 'prop-types'
 
 import { t } from 'plottr_locales'
 
-import Button from '../../Button'
-import UnconnectedVerifyView from './VerifyView'
 import { checkDependencies } from '../../checkDependencies'
 
 const ExpiredViewConnector = (connector) => {
-  const VerifyView = UnconnectedVerifyView(connector)
-
   const {
-    platform: { openExternal, os },
+    platform: { openExternal },
   } = connector
   checkDependencies({ openExternal })
 
-  const ExpiredView = ({ startProOnboardingFromRoot, startSettingsWizard }) => {
+  const ExpiredView = ({ startSettingsWizard, startProOnboardingFromRoot }) => {
     const [view, setView] = useState('chooser')
-
-    const hideProButton = os() == 'unknown'
 
     const buy = () => {
       openExternal('https://plottr.com/pricing/')
     }
 
     const renderChoices = () => {
-      // eslint-disable-next-line react/display-name, react/prop-types
-      const licenseText = t.rich('I have a<br/>License Key', { br: () => <br key="unique" /> })
-
       return (
         <>
           <p style={{ padding: '5px 70px' }}>
@@ -37,8 +28,8 @@ const ExpiredViewConnector = (connector) => {
             <div className="expired__choice" onClick={buy}>
               <h2>{t('I want to buy the full version!')}</h2>
             </div>
-            <div className="expired__choice" onClick={() => setView('verify')}>
-              <h2>{licenseText}</h2>
+            <div className="expired__choice" onClick={startProOnboardingFromRoot}>
+              <h2>{t("I've bought Plottr")}</h2>
             </div>
           </div>
         </>
@@ -49,21 +40,15 @@ const ExpiredViewConnector = (connector) => {
       return (
         <div className="text-center">
           <h1 className="expired">{t('Thanks for trying Plottr')}</h1>
-          {hideProButton ? null : (
-            <div className="text-right">
-              <Button onClick={startProOnboardingFromRoot}>{t('Start Plottr Pro')} 🎉</Button>
-            </div>
-          )}
           <h2>{t('Your free trial has expired')} 😭</h2>
           {renderChoices()}
           <p>{t('Please contact us with any questions at support@plottr.com')}</p>
         </div>
       )
-    } else if (view === 'verify') {
-      return <VerifyView goBack={() => setView('chooser')} success={startSettingsWizard} />
+    } else {
+      // Better than undefined! :P
+      return null
     }
-    // Better than undefined! :P
-    return null
   }
 
   ExpiredView.propTypes = {

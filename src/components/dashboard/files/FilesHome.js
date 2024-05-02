@@ -3,7 +3,7 @@ import PropTypes from 'react-proptypes'
 import { isObject } from 'lodash'
 
 import { t } from 'plottr_locales'
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import UnconnectedNewProjectInputModal from '../../dialogs/NewProjectInputModal'
 import UnconnectedNewFiles from './NewFiles'

@@ -2,13 +2,12 @@ import { cloneDeep, isPlainObject } from 'lodash'
 import { Editor, createEditor as createSlateEditor } from 'slate'
 import { withReact } from 'slate-react'
 import { rceDataRepair } from './rceDataRepair'
-import { withHistory } from 'slate-history'
 import { withLinks } from './LinkButton'
 import { withImages } from './ImagesButton'
 import { withHTML } from './withHTML'
 import withNormalizer from './Normalizer'
 import { withList } from './withList'
-import { initialState } from 'pltr/v2'
+import { initialState } from 'pltr'
 import { isEmpty } from './isEmpty'
 
 const { RCE_INITIAL_VALUE } = initialState
@@ -34,9 +33,7 @@ const NOP = () => {}
 
 export function createEditor(log, addImage = NOP) {
   return withList(log)(
-    withNormalizer(
-      withHTML(withImages(withLinks(withHistory(withReact(createSlateEditor()))), addImage))
-    )
+    withNormalizer(withHTML(withImages(withLinks(withReact(createSlateEditor())), addImage)))
   )
 }
 

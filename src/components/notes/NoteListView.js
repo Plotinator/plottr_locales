@@ -3,7 +3,7 @@ import PropTypes from 'react-proptypes'
 import cx from 'classnames'
 
 import { t as i18n } from 'plottr_locales'
-import { newIds } from 'pltr/v2'
+import { newIds } from 'pltr'
 
 import Grid from '../Grid'
 import Alert from '../Alert'
@@ -85,6 +85,7 @@ const NoteListViewConnector = (connector) => {
     darkMode,
     selectedNoteId,
     uiActions,
+    undo,
     filterIsEmpty,
     noteSort,
     notesSearchTerm,
@@ -100,15 +101,20 @@ const NoteListViewConnector = (connector) => {
 
     useEffect(() => {
       if (!isJumping) {
-        uiActions.selectNote(detailID(visibleNotesByCategory, notes, categories, selectedNoteId))
+        const noteToJumpTo = detailID(visibleNotesByCategory, notes, categories, selectedNoteId)
+        if (noteToJumpTo !== selectedNoteId) {
+          uiActions.selectNote(noteToJumpTo)
+        }
       }
     }, [notes, visibleNotesByCategory, categories])
 
     const handleCreateNewNote = () => {
       const id = nextId(notes)
-      actions.addNote()
-      uiActions.selectNote(id)
-      uiActions.startEditingSelectedNote()
+      undo.batch(() => {
+        actions.addNote()
+        uiActions.selectNote(id)
+        uiActions.startEditingSelectedNote()
+      })
     }
 
     const startEditing = () => {
@@ -120,8 +126,10 @@ const NoteListViewConnector = (connector) => {
     }
 
     const closeDialog = () => {
-      uiActions.hideNotesCategoryDialog()
-      uiActions.hideNotesAttributesDialog()
+      undo.batch(() => {
+        uiActions.hideNotesCategoryDialog()
+        uiActions.hideNotesAttributesDialog()
+      })
     }
 
     const renderCustomAttributes = () => {
@@ -382,6 +390,7 @@ const NoteListViewConnector = (connector) => {
     tags: PropTypes.array.isRequired,
     darkMode: PropTypes.bool,
     uiActions: PropTypes.object.isRequired,
+    undo: PropTypes.object.isRequired,
     filterIsEmpty: PropTypes.bool.isRequired,
     noteSort: PropTypes.string.isRequired,
     notesSearchTerm: PropTypes.string,
@@ -433,8 +442,8 @@ const NoteListViewConnector = (connector) => {
       (dispatch) => {
         return {
           actions: bindActionCreators(actions.note, dispatch),
-          customAttributeActions: bindActionCreators(actions.customAttribute, dispatch),
           uiActions: bindActionCreators(actions.ui, dispatch),
+          undo: bindActionCreators(actions.undo, dispatch),
         }
       }
     )(NoteListView)

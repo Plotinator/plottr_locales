@@ -4,7 +4,7 @@ import cx from 'classnames'
 import { isEqual } from 'lodash'
 
 import { t } from 'plottr_locales'
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import ButtonToolbar from '../ButtonToolbar'
 import Glyphicon from '../Glyphicon'
@@ -18,7 +18,7 @@ import CardTemplateDetails from './CardTemplateDetails'
 import ProjectTemplateDetails from './ProjectTemplateDetails'
 import TemplateEdit from './TemplateEdit'
 import getTestIds from '../getTestIds'
-import { template } from 'pltr/v2'
+import { template } from 'pltr'
 import { checkDependencies } from '../checkDependencies'
 
 export const testIds = getTestIds()
@@ -594,8 +594,8 @@ const TemplatePickerConnector = (connector) => {
   }
 
   const {
-    pltr: { actions },
     redux,
+    pltr: { actions },
   } = connector
 
   if (redux) {

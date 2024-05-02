@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react'
 import PropTypes from 'react-proptypes'
-import { IoIosBrowsers, IoIosDocument } from 'react-icons/io'
-import { BiImport } from 'react-icons/bi'
-import { VscCloudUpload } from 'react-icons/vsc'
+import { IoIosBrowsers } from '@react-icons/all-files/io/IoIosBrowsers'
+import { IoIosDocument } from '@react-icons/all-files/io/IoIosDocument'
+import { BiImport } from '@react-icons/all-files/bi/BiImport'
+import { VscCloudUpload } from '@react-icons/all-files/vsc/VscCloudUpload'
 import cx from 'classnames'
 
 import { t } from 'plottr_locales'

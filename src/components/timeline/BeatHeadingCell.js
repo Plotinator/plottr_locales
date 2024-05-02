@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { Cell } from 'react-sticky-table'
-import { FaGripLinesVertical } from 'react-icons/fa'
+import { FaGripLinesVertical } from '@react-icons/all-files/fa/FaGripLinesVertical'
 import cx from 'classnames'
 
 import { t } from 'plottr_locales'
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import UnconnectedFloater from '../PlottrFloater'
 import Glyphicon from '../Glyphicon'
@@ -53,6 +53,7 @@ const BeatHeadingCellConnector = (connector) => {
     timelineFoci,
     startEditingBeatHeadingTitle,
     stopEditingBeatHeadingTitle,
+    batch,
   }) => {
     const [width, setWidth] = useState(null)
     const [spacerCellWidth, setSpacerCellWidth] = useState(null)
@@ -78,11 +79,13 @@ const BeatHeadingCellConnector = (connector) => {
 
       const droppedInThisContainer = headingContains(droppedBeat.coord)
       if (droppedInThisContainer) {
-        collectBeat()
-        if (!beat.expanded) {
-          expandBeat(beat.id, currentTimeline)
-        }
-        handleReorder(beat.id, droppedBeat.id)
+        batch(() => {
+          collectBeat()
+          if (!beat.expanded) {
+            expandBeat(beat.id, currentTimeline)
+          }
+          handleReorder(beat.id, droppedBeat.id)
+        })
       }
     }, [droppedBeat])
 
@@ -134,10 +137,12 @@ const BeatHeadingCellConnector = (connector) => {
         if (droppedBeat.id == null) return
         if (droppedBeat.id == beat.id) return
 
-        if (!beat.expanded) {
-          expandBeat(beat.id, currentTimeline)
-        }
-        handleReorder(beat.id, droppedBeat.id)
+        batch(() => {
+          if (!beat.expanded) {
+            expandBeat(beat.id, currentTimeline)
+          }
+          handleReorder(beat.id, droppedBeat.id)
+        })
       },
       [setInDropZone, setDropDepth, beat?.id, beat?.expanded, expandBeat, handleReorder]
     )
@@ -151,10 +156,12 @@ const BeatHeadingCellConnector = (connector) => {
     )
 
     const stopEditing = useCallback(() => {
-      if (beat?.title === '') {
-        editBeatTitle(beatId, currentTimeline, 'auto')
-      }
-      stopEditingBeatHeadingTitle()
+      batch(() => {
+        if (beat?.title === '') {
+          editBeatTitle(beatId, currentTimeline, 'auto')
+        }
+        stopEditingBeatHeadingTitle()
+      })
     }, [beat?.title, editBeatTitle, beatId, currentTimeline, stopEditingBeatHeadingTitle])
 
     const startDeleting = useCallback(
@@ -539,6 +546,7 @@ const BeatHeadingCellConnector = (connector) => {
     collectBeat: PropTypes.func.isRequired,
     startEditingBeatHeadingTitle: PropTypes.func.isRequired,
     stopEditingBeatHeadingTitle: PropTypes.func.isRequired,
+    batch: PropTypes.func.isRequired,
   }
 
   const {
@@ -585,6 +593,7 @@ const BeatHeadingCellConnector = (connector) => {
         collectBeat: actions.domEvents.collectBeat,
         startEditingBeatHeadingTitle: actions.ui.startEditingBeatHeadingTitle,
         stopEditingBeatHeadingTitle: actions.ui.stopEditingBeatHeadingTitle,
+        batch: actions.undo.batch,
       }
     )(BeatHeadingCell)
   }

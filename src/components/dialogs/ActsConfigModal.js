@@ -38,9 +38,7 @@ const ActsConfigModalConnector = (connector) => {
 
   const {
     pltr: {
-      helpers: {
-        hierarchyLevels: { newHierarchyLevel },
-      },
+      initialState: { newHierarchyLevel },
     },
     platform: { isDevelopment },
   } = connector

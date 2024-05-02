@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import tinycolor from 'tinycolor2'
 
 import { t } from 'plottr_locales'
-import { defaultSettings } from 'pltr/v2'
+import { defaultSettings } from 'pltr'
 
 import { checkDependencies } from '../../checkDependencies'
 import { addRecent } from '../../rce/fonts'

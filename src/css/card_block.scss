@@ -103,6 +103,12 @@
       left: 48px;
       right: unset !important;
     }
+
+    .card__cell__overview__drag-anchor {
+      &.medium-timeline {
+        margin-left: 12.5px;
+      }
+    }
   }
 
   &.medium-timeline:not(.vertical) {
@@ -124,6 +130,7 @@
 
     &.medium-timeline {
       width: 80px;
+      margin-left: 10px;
     }
   }
 
@@ -231,7 +238,7 @@
 
 .card__body {
   width: 150px;
-  min-height: 70px;
+  min-height: 80px;
   display: flex;
   border: 3px solid black;
   border-radius: 4px;
@@ -277,6 +284,7 @@
   padding: 10px;
   flex-grow: 1;
   overflow: auto;
+  word-break: break-word;
 }
 
 .card__svg-line {

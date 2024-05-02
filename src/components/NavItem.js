@@ -1,8 +1,8 @@
 import classNames from 'classnames'
 import React from 'react'
 import PropTypes from 'prop-types'
-import { FiXCircle } from 'react-icons/fi'
-import { AiOutlineMenu } from 'react-icons/ai'
+import { FiXCircle } from '@react-icons/all-files/fi/FiXCircle'
+import { AiOutlineMenu } from '@react-icons/all-files/ai/AiOutlineMenu'
 
 import SafeAnchor from './SafeAnchor'
 import createChainedFunction from './utils/createChainedFunction'

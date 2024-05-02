@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
-import { FaRegBell } from 'react-icons/fa'
+import { FaRegBell } from '@react-icons/all-files/fa/FaRegBell'
 
 import Button from './Button'
 import { checkDependencies } from './checkDependencies'

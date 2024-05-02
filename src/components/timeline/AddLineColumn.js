@@ -4,7 +4,7 @@ import { Cell } from 'react-sticky-table'
 import cx from 'classnames'
 
 import { t } from 'plottr_locales'
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import Glyphicon from '../Glyphicon'
 import InputModal from '../dialogs/InputModal'

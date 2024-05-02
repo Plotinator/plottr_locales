@@ -98,7 +98,6 @@ const RichTextEditorConnector = (connector) => {
   const RichTextEditor = ({
     editorKey,
     id,
-    undoId,
     text,
     selection,
     darkMode,
@@ -116,6 +115,7 @@ const RichTextEditorConnector = (connector) => {
     jumpCounter,
     startEditing,
     addImage,
+    undoGeneration,
   }) => {
     const editor = useMemo(() => {
       return createEditor(errorReportingLogger, addImage)
@@ -257,8 +257,8 @@ const RichTextEditorConnector = (connector) => {
       redo,
       text,
       selection,
-      undoId,
-      errorReportingLogger
+      errorReportingLogger,
+      undoGeneration
     )
 
     const isEditing = editState === EDITING
@@ -307,12 +307,17 @@ const RichTextEditorConnector = (connector) => {
         event.preventDefault()
         return
       }
-      for (const hotkey in HOTKEYS) {
-        if (isHotkey(hotkey, event)) {
-          event.preventDefault()
-          const mark = HOTKEYS[hotkey]
-          toggleMark(editor, mark)
-          return
+      const isAnUndoEvent =
+        (event.key === 'z' && (event.ctrlKey || event.metaKey)) ||
+        (event.key === 'y' && event.ctrlKey)
+      if (!isAnUndoEvent) {
+        for (const hotkey in HOTKEYS) {
+          if (isHotkey(hotkey, event)) {
+            event.preventDefault()
+            const mark = HOTKEYS[hotkey]
+            toggleMark(editor, mark)
+            return
+          }
         }
       }
 
@@ -338,7 +343,7 @@ const RichTextEditorConnector = (connector) => {
       try {
         const domPoint = ReactEditor.toDOMPoint(editor, editor.selection.anchor)
         // domPoint.nodeValue is the whole line, we just want the corrected word
-        const selectionBegin = editor.selection.anchor.offset
+        const selectionBegin = editor.selection?.anchor?.offset
         const substr = domPoint[0].nodeValue.substr(selectionBegin)
         let endIndex = substr.search(/\W/) // first non-word character
         if (endIndex == -1) {
@@ -412,9 +417,9 @@ const RichTextEditorConnector = (connector) => {
     autoFocus: PropTypes.bool,
     darkMode: PropTypes.bool,
     className: PropTypes.string,
-    undoId: PropTypes.number,
     clientId: PropTypes.string,
     editState: PropTypes.string,
+    undoGeneration: PropTypes.number.isRequired,
     onBlur: PropTypes.func,
     onFocus: PropTypes.func,
     imageCache: PropTypes.object.isRequired,
@@ -436,7 +441,6 @@ const RichTextEditorConnector = (connector) => {
 
     return connect(
       (state) => ({
-        undoId: selectors.undoIdSelector(state),
         clientId: selectors.clientIdSelector(state),
         fileId: selectors.fileIdSelector(state),
         darkMode: selectors.isDarkModeSelector(state),
@@ -445,6 +449,7 @@ const RichTextEditorConnector = (connector) => {
         settings: selectors.appSettingsSelector(state),
         jumpCounter: selectors.jumpCounterSelector(state),
         editState: selectors.editStateSelector(state),
+        undoGeneration: selectors.undoGenerationSelector(state),
       }),
       {
         addImage: actions.image.addImage,
@@ -454,22 +459,25 @@ const RichTextEditorConnector = (connector) => {
     )(
       // eslint-disable-next-line react/display-name
       React.memo(RichTextEditor, (prevProps, nextProps) => {
-        return (
-          prevProps.id === nextProps.id &&
-          prevProps.undoId === nextProps.undoId &&
-          prevProps.darkMode === nextProps.darkMode &&
-          prevProps.className === nextProps.className &&
-          prevProps.autoFocus === nextProps.autoFocus &&
-          prevProps.jumpCounter === nextProps.jumpCounter &&
-          prevProps.onChange === nextProps.onChange &&
-          prevProps.fileId === nextProps.fileId &&
-          prevProps.clientId === nextProps.clientId &&
-          prevProps.onBlur === nextProps.onBlur &&
-          prevProps.onFocus === nextProps.onFocus &&
-          prevProps.imageCache === nextProps.imageCache &&
-          prevProps.cacheImage === nextProps.cacheImage &&
-          prevProps.editState === nextProps.editState
-        )
+        if (prevProps.undoGeneration !== nextProps.undoGeneration) {
+          return isEqual(prevProps.text, nextProps.text)
+        } else {
+          return (
+            prevProps.id === nextProps.id &&
+            prevProps.darkMode === nextProps.darkMode &&
+            prevProps.className === nextProps.className &&
+            prevProps.autoFocus === nextProps.autoFocus &&
+            prevProps.jumpCounter === nextProps.jumpCounter &&
+            prevProps.onChange === nextProps.onChange &&
+            prevProps.fileId === nextProps.fileId &&
+            prevProps.clientId === nextProps.clientId &&
+            prevProps.onBlur === nextProps.onBlur &&
+            prevProps.onFocus === nextProps.onFocus &&
+            prevProps.imageCache === nextProps.imageCache &&
+            prevProps.cacheImage === nextProps.cacheImage &&
+            prevProps.editState === nextProps.editState
+          )
+        }
       })
     )
   }

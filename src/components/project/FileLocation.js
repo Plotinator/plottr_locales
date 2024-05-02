@@ -13,7 +13,7 @@ const FileLocationConnector = (connector) => {
   } = connector
   checkDependencies({ moveFromTemp, showItemInFolder, isMacOS, os })
 
-  const FileLocation = ({ fileURL, withFullState, hasCurrentProLicense, isTemp }) => {
+  const FileLocation = ({ fileURL, isLoggedIntoPro, isTemp }) => {
     let showInMessage = t('Show in File Explorer')
     if (isMacOS()) {
       showInMessage = t('Show in Finder')
@@ -24,7 +24,7 @@ const FileLocationConnector = (connector) => {
     const chooseLocation = moveFromTemp
 
     if (osIsUnknown) return null
-    if (hasCurrentProLicense) return null
+    if (isLoggedIntoPro) return null
 
     let button = (
       <div className="file-actions-wrapper">
@@ -41,9 +41,7 @@ const FileLocationConnector = (connector) => {
         <Button
           bsSize="small"
           onClick={() => {
-            withFullState((state) => {
-              return chooseLocation(state)
-            })
+            return chooseLocation()
           }}
           title={t('Choose where to save this file on your computer')}
         >
@@ -57,8 +55,7 @@ const FileLocationConnector = (connector) => {
 
   FileLocation.propTypes = {
     fileURL: PropTypes.string.isRequired,
-    hasCurrentProLicense: PropTypes.bool,
-    withFullState: PropTypes.func.isRequired,
+    isLoggedIntoPro: PropTypes.bool,
     isTemp: PropTypes.bool,
   }
 
@@ -75,15 +72,12 @@ const FileLocationConnector = (connector) => {
       (state) => {
         return {
           fileURL: selectors.fileURLSelector(state),
-          hasCurrentProLicense: selectors.hasProSelector(state),
+          isLoggedIntoPro: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
           // NOTE: In other places we call this selector with a given
           // prop for the fileURL selector.  That's why fileURL isn't
           // *inside* isTempFileSelector.
           isTemp: selectors.isTempFileSelector(state, selectors.fileURLSelector(state)),
         }
-      },
-      {
-        withFullState: actions.project.withFullFileState,
       }
     )(FileLocation)
   }

@@ -1,7 +1,7 @@
 import React from 'react'
 import { identity } from 'lodash'
 
-import * as rawPltr from 'pltr/v2'
+import * as rawPltr from 'pltr'
 
 import fileState from './example-state'
 

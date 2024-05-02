@@ -2,8 +2,7 @@ import React, { useState } from 'react'
 import { PropTypes } from 'prop-types'
 
 import { actions } from 'wired-up-pltr'
-import { borderStyle as borderStyles, helpers } from 'pltr/v2'
-import { getBorderColor } from 'pltr/v2/helpers/colors'
+import { borderStyle as borderStyles, helpers } from 'pltr'
 
 import UnconnectedEditOrDisplay from './EditOrDisplay'
 import { checkDependencies } from '../checkDependencies'
@@ -12,7 +11,7 @@ const {
   hierarchyLevels: { editHierarchyLevel },
 } = actions
 const {
-  colors: { getBackgroundColor },
+  colors: { getBackgroundColor, getBorderColor },
 } = helpers
 
 const HierarchyLevelConnector = (connector) => {

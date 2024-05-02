@@ -6,9 +6,8 @@ export default function AccountHeader({ os }) {
   const imgSrc = os == 'unknown' ? '/logo_light_28_500.png' : '../icons/logo_light_28_500.png'
   return (
     <div className="dashboard__account__header text-center">
-      <h1>
-        <img src={imgSrc} style={{ height: 125 }} /> {t('Welcome to Plottr')}
-      </h1>
+      <img src={imgSrc} style={{ height: 125 }} />
+      <h1>{t('Welcome to Plottr')}</h1>
     </div>
   )
 }

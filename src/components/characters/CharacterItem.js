@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
-import { FiCopy } from 'react-icons/fi'
+import { FiCopy } from '@react-icons/all-files/fi/FiCopy'
 
 import { t as i18n } from 'plottr_locales'
-import { isNotDroppingToSamePosition } from 'pltr/v2/helpers/lists'
+import { helpers } from 'pltr'
 
 import ButtonGroup from '../ButtonGroup'
 import Glyphicon from '../Glyphicon'
@@ -14,6 +14,8 @@ import UnconnectedImage from '../images/Image'
 
 import { isInviewport } from '../domHelpers'
 import { checkDependencies } from '../checkDependencies'
+
+const { isNotDroppingToSamePosition } = helpers.lists
 
 const CharacterItemConnector = (connector) => {
   const Image = UnconnectedImage(connector)

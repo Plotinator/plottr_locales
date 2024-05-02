@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import { checkDependencies } from '../checkDependencies'
 

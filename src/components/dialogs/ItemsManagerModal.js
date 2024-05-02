@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
-import { FaSave } from 'react-icons/fa'
+import { FaSave } from '@react-icons/all-files/fa/FaSave'
 
 import { t } from 'plottr_locales'
 

@@ -1,14 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import PropTypes from 'react-proptypes'
-import {
-  FaBold,
-  FaItalic,
-  FaUnderline,
-  FaQuoteLeft,
-  FaListOl,
-  FaListUl,
-  FaStrikethrough,
-} from 'react-icons/fa'
+import { FaBold } from '@react-icons/all-files/fa/FaBold'
+import { FaItalic } from '@react-icons/all-files/fa/FaItalic'
+import { FaUnderline } from '@react-icons/all-files/fa/FaUnderline'
+import { FaQuoteLeft } from '@react-icons/all-files/fa/FaQuoteLeft'
+import { FaListOl } from '@react-icons/all-files/fa/FaListOl'
+import { FaListUl } from '@react-icons/all-files/fa/FaListUl'
+import { FaStrikethrough } from '@react-icons/all-files/fa/FaStrikethrough'
 import cx from 'classnames'
 
 import { t } from 'plottr_locales'

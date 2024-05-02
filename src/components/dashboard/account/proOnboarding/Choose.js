@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import PropTypes from 'react-proptypes'
 
 import { t } from 'plottr_locales'
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import ListGroup from '../../../ListGroup'
 import ListGroupItem from '../../../ListGroupItem'

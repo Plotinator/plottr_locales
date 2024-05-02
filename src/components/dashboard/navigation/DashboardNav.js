@@ -3,7 +3,11 @@ import PropTypes from 'react-proptypes'
 import cx from 'classnames'
 
 import { t } from 'plottr_locales'
-import { IoMdContact, IoIosDocument, IoMdSettings, IoIosHelpBuoy, IoMdTime } from 'react-icons/io'
+import { IoMdContact } from '@react-icons/all-files/io/IoMdContact'
+import { IoIosDocument } from '@react-icons/all-files/io/IoIosDocument'
+import { IoMdSettings } from '@react-icons/all-files/io/IoMdSettings'
+import { IoIosHelpBuoy } from '@react-icons/all-files/io/IoIosHelpBuoy'
+import { IoMdTime } from '@react-icons/all-files/io/IoMdTime'
 
 export default function DashboardNavigation({ currentView, setView }) {
   const tabs = [
