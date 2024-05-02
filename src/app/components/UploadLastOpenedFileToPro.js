@@ -28,7 +28,6 @@ const UploadLastOpenedFileToPro = ({
   userId,
   finishUploadingFileToCloud,
   saveBackup,
-  setDashboardClosed,
   setCurrentAppStateToApplication,
   uploadingFileToCloud,
 }) => {
@@ -40,7 +39,6 @@ const UploadLastOpenedFileToPro = ({
   }, [dismissPromptToUploadFile])
 
   const closeDashboard = useCallback(() => {
-    setDashboardClosed(true)
     setCurrentAppStateToApplication()
   }, [])
 
@@ -109,7 +107,6 @@ UploadLastOpenedFileToPro.propTypes = {
   userId: PropTypes.string,
   finishUploadingFileToCloud: PropTypes.func.isRequired,
   saveBackup: PropTypes.func.isRequired,
-  setDashboardClosed: PropTypes.func.isRequired,
   setCurrentAppStateToApplication: PropTypes.func.isRequired,
   uploadingFileToCloud: PropTypes.bool,
 }
