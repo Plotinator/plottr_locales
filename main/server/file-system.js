@@ -90,13 +90,6 @@ const fileSystemModule = (userDataPath) => {
     }
 
     const setLastOpenedFilePath = (filePath) => {
-      // We don't want to record last opened when we should be in pro
-      // and opened a device file.
-      const isInProMode = SETTINGS.get('user.choseProMode')
-      if (isInProMode) {
-        return Promise.resolve()
-      }
-
       // Never record offline files as the last opened file(!)  Rather
       // try to open the cloud file and redirect to the local file
       // when Plottr discovers that it's offline.
