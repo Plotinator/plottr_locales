@@ -73,16 +73,19 @@ const UploadLastOpenedFileToPro = ({
                         return
                       }
                       finishUploadingFileToCloud()
-                      dismissUploadPromptHandlingLastOpened()
+                      dismissPromptToUploadFile()
                       // Lie about the number of open files to avoid opening
                       // the dashboard when we double click a file.
                       //
                       // FIXME: where should the options come from?
                       const newFileURL = helpers.file.fileIdToPlottrCloudFileURL(fileId)
-                      bootFile(whenClientIsReady, newFileURL, {}, 2, saveBackup).then(
-                        closeDashboard
-                      )
-                      updateLastOpenedFile(newFileURL)
+                      bootFile(whenClientIsReady, newFileURL, {}, 2, saveBackup)
+                        .then(() => {
+                          closeDashboard()
+                        })
+                        .then(() => {
+                          updateLastOpenedFile(newFileURL)
+                        })
                     })
                     .catch((error) => {})
                 })
@@ -102,7 +105,7 @@ UploadLastOpenedFileToPro.propTypes = {
   fileToUpload: PropTypes.string.isRequired,
   dismissPromptToUploadFile: PropTypes.func.isRequired,
   generalError: PropTypes.func.isRequired,
-  startUploadingFileToCloud: actions.applicationState.startUploadingFileToCloud,
+  startUploadingFileToCloud: PropTypes.func.isRequired,
   emailAddress: PropTypes.string,
   userId: PropTypes.string,
   finishUploadingFileToCloud: PropTypes.func.isRequired,

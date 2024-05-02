@@ -998,7 +998,7 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
           case SET_LAST_OPENED_FILE: {
             const { filePath } = payload
             return handlePromise(
-              () => 'Setting the last opened file',
+              () => `Setting the last opened file to ${filePath}`,
               () =>
                 statusManager.registerTask(setLastOpenedFilePath(filePath), SET_LAST_OPENED_FILE),
               () => 'Error while setting last opened file'
