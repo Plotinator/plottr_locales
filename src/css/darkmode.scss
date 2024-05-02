@@ -59,7 +59,6 @@ body.darkmode {
     .nav.navbar-nav {
       li.dropdown {
         ul {
-
           li :hover,
           li a:focus,
           li a:active,
@@ -68,7 +67,6 @@ body.darkmode {
           }
         }
       }
-
     }
   }
   .subnav__container {
@@ -102,9 +100,8 @@ body.darkmode {
   }
 
   .open {
-
-    >.btn-default.dropdown-toggle,
-    >.btn-default.dropdown-toggle:hover {
+    > .btn-default.dropdown-toggle,
+    > .btn-default.dropdown-toggle:hover {
       background-color: $darkmode-v2-background;
     }
   }
@@ -136,7 +133,7 @@ body.darkmode {
   .dropdown-menu {
     background-color: #1e2124;
 
-    li>a {
+    li > a {
       color: $darkmode-v2-text;
 
       &:hover {
@@ -202,7 +199,7 @@ body.darkmode {
   // Navs
   .navbar-inverse {
     .nav.navbar-nav {
-      li.dropdown ul li>a:focus-visible {
+      li.dropdown ul li > a:focus-visible {
         outline: none;
       }
 
@@ -246,7 +243,6 @@ body.darkmode {
         }
       }
     }
-
   }
 
   .nav-tabs {
@@ -300,7 +296,6 @@ body.darkmode {
         color: #ccc;
         border-bottom: none;
       }
-
     }
   }
 
@@ -457,10 +452,9 @@ body.darkmode {
           background: $darkmode-v2-card-background;
         }
       }
-
     }
 
-    >.btn {
+    > .btn {
       background-color: $darkmode-v2-background;
 
       &:active,
@@ -502,7 +496,7 @@ body.darkmode {
 
   .nav-tabs {
     li {
-      &.active>a {
+      &.active > a {
         color: #ccc !important;
         background-color: $darkmode-v2-background;
         border: 1px solid $darkmode-v2-nav-tabs-border;
@@ -520,7 +514,7 @@ body.darkmode {
         }
       }
 
-      >a {
+      > a {
         &:hover {
           border-color: $darkmode-v2-nav-tabs-border $darkmode-v2-nav-tabs-border transparent;
         }
@@ -540,7 +534,6 @@ body.darkmode {
       }
 
       .sticky-table-row:not(:first-child) {
-
         .sticky-table-cell,
         .sticky-table-cell:not(:first-child) {
           border-left: none;
@@ -554,7 +547,6 @@ body.darkmode {
       }
 
       .dashboard__recent-files__file-cell {
-
         .secondary-text,
         .sub-header {
           color: #ccc;
@@ -562,7 +554,6 @@ body.darkmode {
       }
 
       .sticky-table-row:first-child {
-
         .sticky-table-cell:first-child,
         .sticky-table-cell:nth-child(2) {
           border-right: 1px solid #4b4d4f;
@@ -599,7 +590,7 @@ body.darkmode {
         color: #bbb;
         border-bottom-color: $darkmode-v2-nav-tabs-border;
 
-        >li:not(.active)>a:not(:hover) {
+        > li:not(.active) > a:not(:hover) {
           color: #bbb;
           border-bottom-color: $darkmode-v2-nav-tabs-border;
         }
@@ -619,7 +610,7 @@ body.darkmode {
     div.alert.alert-danger {
       background-color: transparent;
       border-color: $darkmode-v2-btn-danger;
-      color: #D1D2D4;
+      color: #d1d2d4;
     }
 
     .btn-link {
@@ -659,18 +650,17 @@ body.darkmode {
   }
 
   // Toolbar
-  .dropdown.disabled>#book_chooser {
+  .dropdown.disabled > #book_chooser {
     background-color: $darkmode-v2-darker-background;
   }
-  
 
   .table-striped {
-    >tbody {
-      >tr:nth-of-type(odd) {
+    > tbody {
+      > tr:nth-of-type(odd) {
         background-color: $darkmode-v2-background;
       }
 
-      >tr:nth-of-type(even) {
+      > tr:nth-of-type(even) {
         background-color: #404350;
       }
     }
@@ -741,8 +731,8 @@ body.darkmode {
   .item-list__book-tabs-wrapper,
   .timeline__tabs-wrapper {
     .nav-pills {
-      &>li {
-        &>a {
+      & > li {
+        & > a {
           color: $darkmode-darker-text !important;
         }
 
@@ -773,7 +763,7 @@ body.darkmode {
         ul {
           background-color: $darkmode-v2-background;
 
-          li>a {
+          li > a {
             color: $darkmode-text;
           }
 
@@ -791,13 +781,13 @@ body.darkmode {
       }
 
       li.dropdown.open {
-        &>a {
+        & > a {
           background-color: $darkmode-v2-background;
           color: $darkmode-v2-text;
         }
       }
 
-      li>a {
+      li > a {
         color: #bbb;
 
         &:hover {
@@ -805,9 +795,9 @@ body.darkmode {
         }
       }
 
-      .active>a,
-      .active>a:hover,
-      .active>a:focus {
+      .active > a,
+      .active > a:hover,
+      .active > a:focus {
         color: #bbb;
         background-color: $darkmode-v2-background;
       }
@@ -852,7 +842,7 @@ body.darkmode {
   .panel-primary {
     border-color: $darkmode-v2-border;
 
-    >.panel-heading {
+    > .panel-heading {
       background-color: #24252c;
       border-color: $darkmode-v2-border;
     }
@@ -882,7 +872,6 @@ body.darkmode {
   // Acts modal
 
   button {
-
     #select-timeline-view,
     #dropdown-hierarchy-level-auto-border-style-0,
     #dropdown-hierarchy-level-auto-border-style-1,
@@ -896,7 +885,6 @@ body.darkmode {
   }
 
   // Outline
-
 
   label.select-list__details-label {
     color: #bbb;
