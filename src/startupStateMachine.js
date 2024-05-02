@@ -74,7 +74,11 @@ export const startupStateMachine = (getStore, selectors, actions, saveBackupOnFi
       // We only want to obey the setting to show the dashboard on
       // start-up for the first file opened.  All files opened after
       // that shouldn't have the dashboard opened.
-      if (windowOpenedWithKnownPath || numOpenFiles > 1) {
+      if (
+        windowOpenedWithKnownPath ||
+        numOpenFiles > 1 ||
+        (!showDashboard && fileURL && typeof fileURL === 'string')
+      ) {
         // To boot the file automatically: we must either be running pro
         // and it's a cloud file, we must be running classic mode and
         // it's not a cloud file, or we must be running pro with offline
@@ -127,6 +131,8 @@ export const startupStateMachine = (getStore, selectors, actions, saveBackupOnFi
     } else if (fileURL) {
       load(fileURL, options, numOpenFiles, windowOpenedWithKnownPath)
     } else {
+      getStore().dispatch(actions.client.setCurrentAppStateToDashboard())
+      getStore().dispatch(actions.applicationState.noFileToShow())
       getStore().dispatch(actions.applicationState.finishCheckingFileToLoad())
     }
   }
