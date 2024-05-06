@@ -8,7 +8,7 @@ import { t } from 'plottr_locales'
 
 import { addToKnownFiles, addToKnown } from './known_files'
 import currentSettings from './settings'
-import { importFromSnowflake, importFromScrivener } from 'plottr_import_export'
+import { importFromSnowflake, importFromScrivener, importFromWord } from 'plottr_import_export'
 
 import { helpers, emptyFile, tree, SYSTEM_REDUCER_KEYS, specialCaseFixes } from 'pltr'
 import { openProjectWindow } from './windows/projects'
@@ -283,6 +283,100 @@ const makeFileModule = (errorReportingLogger) => {
     )
   }
 
+  function createFromWord(importedPath, sender, isLoggedIntoPro, destinationFile) {
+    const storyName = path.basename(importedPath, '.docx')
+    const isScrivener = false
+    const isWord = true
+    let json = emptyFile(storyName, app.getVersion())
+    json.beats = {
+      series: tree.newTree('id'),
+    }
+    json.lines = []
+    const importedJsonPromise = whenClientIsReady(({ convertDocxToHtml }) => {
+      return importFromWord(importedPath, convertDocxToHtml, storyName, app.getVersion())
+    })
+
+    if (isLoggedIntoPro) {
+      importedJsonPromise
+        .then((importedJson) => {
+          sender.send('create-plottr-cloud-file', importedJson, storyName, isScrivener, isWord)
+        })
+        .catch((error) => {
+          return sender.send('error-importing-scrivener', error)
+        })
+      return Promise.resolve()
+    }
+
+    return Promise.all([currentSettings(), importedJsonPromise]).then(
+      ([settings, importedJson]) => {
+        if (!settings.user.defaultFolder) {
+          const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
+          const title = t('Where would you like to save the imported file?')
+          const destinationPath =
+            typeof destinationFile === 'string'
+              ? Promise.resolve({ filePath: destinationFile, canceled: false })
+              : dialog.showSaveDialog({ filters, title, defaultPath: app.getPath('documents') })
+          return destinationPath.then(({ filePath, canceled }) => {
+            if (canceled) {
+              return Promise.resolve()
+            } else {
+              const finalPath = helpers.file.ensureEndsInPltr(filePath)
+              return writeFile(finalPath, JSON.stringify(importedJson, null, 2)).then(() => {
+                // Right now, this is only used for testing so we want to quit when we're done.
+                log.info(`Finished importing from ${importedPath} to ${finalPath}`)
+                // If we have a forced path then this was invoked by
+                // an automated script.
+                if (typeof destinationFile === 'string') {
+                  app.quit()
+                  return Promise.resolve()
+                } else {
+                  const fileURL = helpers.file.filePathToFileURL(finalPath)
+                  return addToKnownFiles(fileURL).then(() => {
+                    return openFile(fileURL)
+                      .then(() => {
+                        log.info('Opened file from imported scrivener data', storyName)
+                        sender.send('finish-creating-local-scrivener-imported-file')
+                        return true
+                      })
+                      .catch((error) => {
+                        sender.send('error-importing-scrivener', error)
+                        log.error(
+                          'Failed to open a known file after importing from scrivener',
+                          error
+                        )
+                        return Promise.reject(error)
+                      })
+                  })
+                }
+              })
+            }
+          })
+        } else {
+          return saveToDefaultLocation(importedJson, storyName)
+            .then((fileURL) => {
+              return addToKnownFiles(fileURL).then(() => {
+                return openFile(fileURL)
+                  .then(() => {
+                    log.info('Opened file from imported scrivener data', storyName)
+                    sender.send('finish-creating-local-scrivener-imported-file')
+                    return true
+                  })
+                  .catch((error) => {
+                    sender.send('error-importing-scrivener', error)
+                    log.error('Failed to open a known file after importing from scrivener', error)
+                    return Promise.reject(error)
+                  })
+              })
+            })
+            .catch((error) => {
+              log.error('Failed to save imported word file', error)
+              sender.send('error-importing-scrivener', error)
+            })
+        }
+      }
+    )
+  }
+
   function openFile(fileURL, unknown) {
     if (helpers.file.isDeviceFileURL(fileURL)) {
       // update lastOpen, but wait a little so the file doesn't move from under their mouse
@@ -325,6 +419,7 @@ const makeFileModule = (errorReportingLogger) => {
     createNew,
     createFromSnowflake,
     createFromScrivener,
+    createFromWord,
     openFile,
     deleteKnownFile,
     removeFromKnownFiles,
@@ -358,6 +453,7 @@ const {
   createNew,
   createFromSnowflake,
   createFromScrivener,
+  createFromWord,
   openFile,
   deleteKnownFile,
   removeFromKnownFiles,
@@ -369,6 +465,7 @@ export {
   createNew,
   createFromSnowflake,
   createFromScrivener,
+  createFromWord,
   openFile,
   deleteKnownFile,
   removeFromKnownFiles,

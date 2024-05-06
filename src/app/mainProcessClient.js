@@ -278,6 +278,10 @@ const _makeMainProcessClient = () => {
     return ask('create-from-scrivener', importedPath, isLoggedIntoPro, destinationFile)
   }
 
+  const createFromWord = (importedPath, isLoggedIntoPro, destinationFile) => {
+    return ask('create-from-word', importedPath, isLoggedIntoPro, destinationFile)
+  }
+
   const listenersRegistered = () => {
     return ask('listeners-registered')
   }
@@ -492,6 +496,7 @@ const _makeMainProcessClient = () => {
     onReloadDarkMode,
     onImportScrivenerFile,
     createFromScrivener,
+    createFromWord,
     listenersRegistered,
     notify,
     openPath,

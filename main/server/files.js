@@ -2,6 +2,7 @@ import fs, { constants } from 'fs'
 import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
 import { lock } from 'proper-lockfile'
+import mammoth from 'mammoth'
 
 import { checkFileIntegrity, SYSTEM_REDUCER_KEYS, helpers } from 'pltr'
 
@@ -413,6 +414,12 @@ const fileModule = (userDataPath) => {
         })
     }
 
+      const convertDocxToHTML = (filePath) => {
+      return mammoth.convertToHtml({ path: filePath }).then(({ value }) => {
+        return value
+      })
+    }
+
     return {
       saveRawFile,
       saveFile,
@@ -438,6 +445,7 @@ const fileModule = (userDataPath) => {
       findUniqueNameInPath,
       filePathAsArray,
       directoryIsWritable,
+      convertDocxToHTML,
     }
   }
 }
