@@ -109,7 +109,7 @@
     "eslint-plugin-react": "^7.22.0",
     "fast-check": "^3.7.0",
     "file-loader": "^6.2.0",
-    "firebase": "^10.2.0",
+    "firebase": "^10.11.1",
     "firebase-admin": "^11.10.1",
     "firebase-tools": "^12.4.8",
     "firebaseui": "^6.1.0",
