@@ -414,7 +414,7 @@ const fileModule = (userDataPath) => {
         })
     }
 
-      const convertDocxToHTML = (filePath) => {
+    const convertDocxToHTML = (filePath) => {
       return mammoth.convertToHtml({ path: filePath }).then(({ value }) => {
         return value
       })

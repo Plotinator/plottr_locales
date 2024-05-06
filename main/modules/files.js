@@ -340,10 +340,7 @@ const makeFileModule = (errorReportingLogger) => {
                       })
                       .catch((error) => {
                         replyToWindow('error-importing-word', error)
-                        log.error(
-                          'Failed to open a known file after importing from word',
-                          error
-                        )
+                        log.error('Failed to open a known file after importing from word', error)
                         return Promise.reject(error)
                       })
                   })
