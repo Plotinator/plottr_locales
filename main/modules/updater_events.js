@@ -3,7 +3,6 @@ import { autoUpdater } from 'electron-updater'
 import log from 'electron-log'
 import semverGt from 'semver/functions/gt'
 import semverLte from 'semver/functions/lte'
-import { isDate } from 'lodash'
 
 import { broadcastToAllWindows } from './broadcast'
 import currentSettings from './settings'

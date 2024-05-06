@@ -3,7 +3,6 @@ import { helpers, reducers, emptyFile, migrateIfNeeded, addMissingKeys, errorCod
 import { actions, selectors } from 'wired-up-pltr'
 
 import { openExistingFile as _openExistingFile } from './common/utils/window_manager'
-import { closeDashboard } from './dashboard-events'
 import { store } from './app/store'
 import logger from '../shared/logger'
 import { uploadToFirebase } from './upload-to-firebase'
