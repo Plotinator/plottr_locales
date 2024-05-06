@@ -237,27 +237,6 @@ const rendererConfig = {
       'react-dom': path.resolve('./node_modules/react-dom'),
       'react-redux': path.resolve('./node_modules/react-redux'),
       redux: path.resolve('./node_modules/redux'),
-      // Force firebase to use the browser builds rather than node builds
-      '@firebase/auth/internal': path.resolve(
-        __dirname,
-        'node_modules/@firebase/auth/dist/esm2017/internal.js'
-      ),
-      '@firebase/auth': path.resolve(
-        __dirname,
-        'node_modules/@firebase/auth/dist/esm2017/index.js'
-      ),
-      '@firebase/app': path.resolve(
-        __dirname,
-        'node_modules/@firebase/app/dist/esm/index.esm2017.js'
-      ),
-      '@firebase/firestore': path.resolve(
-        __dirname,
-        'node_modules/@firebase/firestore/dist/index.esm2017.js'
-      ),
-      '@firebase/storage': path.resolve(
-        __dirname,
-        'node_modules/@firebase/storage/dist/index.esm2017.js'
-      ),
       'plottr_check-prop-types': path.resolve(
         __dirname,
         'lib',
@@ -362,27 +341,6 @@ const loginPopupConfig = {
       'react-dom': path.resolve('./node_modules/react-dom'),
       'react-redux': path.resolve('./node_modules/react-redux'),
       redux: path.resolve('./node_modules/redux'),
-      // Force firebase to use the browser builds rather than node builds
-      '@firebase/auth/internal': path.resolve(
-        __dirname,
-        'node_modules/@firebase/auth/dist/esm2017/internal.js'
-      ),
-      '@firebase/auth': path.resolve(
-        __dirname,
-        'node_modules/@firebase/auth/dist/esm2017/index.js'
-      ),
-      '@firebase/app': path.resolve(
-        __dirname,
-        'node_modules/@firebase/app/dist/esm/index.esm2017.js'
-      ),
-      '@firebase/firestore': path.resolve(
-        __dirname,
-        'node_modules/@firebase/firestore/dist/index.esm2017.js'
-      ),
-      '@firebase/storage': path.resolve(
-        __dirname,
-        'node_modules/@firebase/storage/dist/index.esm2017.js'
-      ),
       plottr_components: path.resolve(
         __dirname,
         'lib',
