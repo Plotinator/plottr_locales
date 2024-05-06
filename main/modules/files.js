@@ -283,7 +283,7 @@ const makeFileModule = (errorReportingLogger) => {
     )
   }
 
-  function createFromWord(importedPath, sender, isLoggedIntoPro, destinationFile) {
+  function createFromWord(importedPath, replyToWindow, isLoggedIntoPro, destinationFile) {
     const storyName = path.basename(importedPath, '.docx')
     const isScrivener = false
     const isWord = true
@@ -299,10 +299,10 @@ const makeFileModule = (errorReportingLogger) => {
     if (isLoggedIntoPro) {
       importedJsonPromise
         .then((importedJson) => {
-          sender.send('create-plottr-cloud-file', importedJson, storyName, isScrivener, isWord)
+          replyToWindow('create-plottr-cloud-file', importedJson, storyName, isScrivener, isWord)
         })
         .catch((error) => {
-          return sender.send('error-importing-scrivener', error)
+          return replyToWindow('error-importing-word', error)
         })
       return Promise.resolve()
     }
@@ -334,14 +334,14 @@ const makeFileModule = (errorReportingLogger) => {
                   return addToKnownFiles(fileURL).then(() => {
                     return openFile(fileURL)
                       .then(() => {
-                        log.info('Opened file from imported scrivener data', storyName)
-                        sender.send('finish-creating-local-scrivener-imported-file')
+                        log.info('Opened file from imported word data', storyName)
+                        replyToWindow('finish-creating-local-word-imported-file')
                         return true
                       })
                       .catch((error) => {
-                        sender.send('error-importing-scrivener', error)
+                        replyToWindow('error-importing-word', error)
                         log.error(
-                          'Failed to open a known file after importing from scrivener',
+                          'Failed to open a known file after importing from word',
                           error
                         )
                         return Promise.reject(error)
@@ -357,20 +357,20 @@ const makeFileModule = (errorReportingLogger) => {
               return addToKnownFiles(fileURL).then(() => {
                 return openFile(fileURL)
                   .then(() => {
-                    log.info('Opened file from imported scrivener data', storyName)
-                    sender.send('finish-creating-local-scrivener-imported-file')
+                    log.info('Opened file from imported word data', storyName)
+                    replyToWindow('finish-creating-local-word-imported-file')
                     return true
                   })
                   .catch((error) => {
-                    sender.send('error-importing-scrivener', error)
-                    log.error('Failed to open a known file after importing from scrivener', error)
+                    replyToWindow('error-importing-word', error)
+                    log.error('Failed to open a known file after importing from word', error)
                     return Promise.reject(error)
                   })
               })
             })
             .catch((error) => {
               log.error('Failed to save imported word file', error)
-              sender.send('error-importing-scrivener', error)
+              replyToWindow('error-importing-word', error)
             })
         }
       }

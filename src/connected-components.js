@@ -343,8 +343,8 @@ const platform = {
       createFromScrivener(importedPath, isLoggedIntoPro)
     },
     createFromWord: (importedPath) => {
-      const state = store.getState()
-      const isLoggedIntoPro = selectors.hasProSelector(state)
+      const state = store().getState()
+      const isLoggedIntoPro = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
       createFromWord(importedPath, isLoggedIntoPro)
     },
     joinPath: (...args) => {

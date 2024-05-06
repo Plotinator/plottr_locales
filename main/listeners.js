@@ -323,20 +323,20 @@ export const listenOnIPCMain = (
     }
   )
 
-    listen(
+  listen(
     'create-from-word',
-        ({ reply }, replyChannel, importedPath, isLoggedIntoPro, destinationFile) => {
-      createFromWord(importedPath, event.sender, isLoggedIntoPro, destinationFile)
+    ({ reply }, replyChannel, importedPath, isLoggedIntoPro, destinationFile) => {
+      createFromWord(importedPath, reply, isLoggedIntoPro, destinationFile)
         .then(() => {
-          event.sender.send(replyChannel, importedPath)
+          reply(replyChannel, importedPath)
         })
         .catch((error) => {
           log.error(`Error creating from scrivener (${importedPath}, ${destinationFile})`, error)
-          event.sender.send('error', {
+          reply('error', {
             message: error.message,
             source: 'create-new-file',
           })
-          event.sender.send(replyChannel, { error: error.message })
+          reply(replyChannel, { error: error.message })
         })
     }
   )
