@@ -140,6 +140,12 @@ export const redoNTimes = (n) => (dispatch, getState) => {
   }
 }
 
+export const dismissUndoRedoDialog = () => {
+  return {
+    type: DISMISS_RECENT_CHANGE_FLAG,
+  }
+}
+
 export const batch = (actionsThunk) => (dispatch, getState) => {
   reduxBatch(() => {
     dispatch({ type: FORCED_BATCH_START })

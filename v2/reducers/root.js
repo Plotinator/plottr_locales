@@ -594,8 +594,8 @@ const root = (dataRepairers) => {
             lastHierarchyLevel === null
               ? 0
               : level - lastHierarchyLevel > 1
-                ? lastHierarchyLevel + 1
-                : level
+              ? lastHierarchyLevel + 1
+              : level
           for (let i = startLevel; i < level; ++i) {
             const parentId = i === 0 ? null : lastBeatId
             const node = {
@@ -617,10 +617,10 @@ const root = (dataRepairers) => {
             startLevel === 0 && startLevel === level
               ? null
               : level === lastHierarchyLevel
-                ? tree.nodeParent(newBeatTree, lastBeatId)
-                : level < lastHierarchyLevel && level === 1
-                  ? tree.nodeParent(newBeatTree, tree.nodeParent(newBeatTree, lastBeatId))
-                  : lastBeatId
+              ? tree.nodeParent(newBeatTree, lastBeatId)
+              : level < lastHierarchyLevel && level === 1
+              ? tree.nodeParent(newBeatTree, tree.nodeParent(newBeatTree, lastBeatId))
+              : lastBeatId
 
           const position = tree.nextPosition(newBeatTree, parentId)
           newBeatTree = tree.addNode('id')(newBeatTree, parentId, {
