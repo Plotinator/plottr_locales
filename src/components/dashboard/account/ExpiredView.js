@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { PropTypes } from 'prop-types'
 
 import { t } from 'plottr_locales'
@@ -12,8 +12,6 @@ const ExpiredViewConnector = (connector) => {
   checkDependencies({ openExternal })
 
   const ExpiredView = ({ startSettingsWizard, startProOnboardingFromRoot }) => {
-    const [view, setView] = useState('chooser')
-
     const buy = () => {
       openExternal('https://plottr.com/pricing/')
     }
@@ -36,19 +34,14 @@ const ExpiredViewConnector = (connector) => {
       )
     }
 
-    if (view === 'chooser') {
-      return (
-        <div className="text-center">
-          <h1 className="expired">{t('Thanks for trying Plottr')}</h1>
-          <h2>{t('Your free trial has expired')} 😭</h2>
-          {renderChoices()}
-          <p>{t('Please contact us with any questions at support@plottr.com')}</p>
-        </div>
-      )
-    } else {
-      // Better than undefined! :P
-      return null
-    }
+    return (
+      <div className="text-center">
+        <h1 className="expired">{t('Thanks for trying Plottr')}</h1>
+        <h2>{t('Your free trial has expired')} 😭</h2>
+        {renderChoices()}
+        <p>{t('Please contact us with any questions at support@plottr.com')}</p>
+      </div>
+    )
   }
 
   ExpiredView.propTypes = {

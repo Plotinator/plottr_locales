@@ -487,6 +487,7 @@ const LineTitleCellConnector = (connector) => {
             if (mismatchInLevelCount) {
               return (
                 <ToolTip
+                  key={`${id}-${index}`}
                   id={`move-book-${book.id}-tooltip`}
                   placement="right"
                   text={t(

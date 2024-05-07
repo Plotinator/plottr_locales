@@ -68,18 +68,16 @@ const FileLocationConnector = (connector) => {
   if (redux) {
     const { connect } = redux
 
-    return connect(
-      (state) => {
-        return {
-          fileURL: selectors.fileURLSelector(state),
-          isLoggedIntoPro: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
-          // NOTE: In other places we call this selector with a given
-          // prop for the fileURL selector.  That's why fileURL isn't
-          // *inside* isTempFileSelector.
-          isTemp: selectors.isTempFileSelector(state, selectors.fileURLSelector(state)),
-        }
+    return connect((state) => {
+      return {
+        fileURL: selectors.fileURLSelector(state),
+        isLoggedIntoPro: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
+        // NOTE: In other places we call this selector with a given
+        // prop for the fileURL selector.  That's why fileURL isn't
+        // *inside* isTempFileSelector.
+        isTemp: selectors.isTempFileSelector(state, selectors.fileURLSelector(state)),
       }
-    )(FileLocation)
+    })(FileLocation)
   }
 
   throw new Error('Could not connect FileLocation')

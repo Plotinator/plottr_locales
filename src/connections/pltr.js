@@ -144,6 +144,7 @@ const pltrTypeSpecs = {
     rmRF: PropTypes.func.isRequired,
     createFromSnowflake: PropTypes.func.isRequired,
     createFromScrivener: PropTypes.func.isRequired,
+    createFromWord: PropTypes.func.isRequired,
     joinPath: PropTypes.func.isRequired,
     listOfflineFiles: PropTypes.func.isRequired,
     createAndOpenCopy: PropTypes.func.isRequired,

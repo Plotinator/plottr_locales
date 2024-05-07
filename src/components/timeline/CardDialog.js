@@ -100,17 +100,29 @@ const CardDialogConnector = (connector) => {
     }, [])
 
     useEffect(() => {
-      const updateTimeout = setTimeout(() => {
-        actions.editCardTitle(
-          cardMetaData.id,
-          newTitleAndSelection.value,
-          newTitleAndSelection.selection
-        )
-      }, 300)
-      return () => {
-        clearTimeout(updateTimeout)
+      if (
+        cardMetaData.value === newTitleAndSelection.value &&
+        cardMetaData.selection === newTitleAndSelection.selection
+      ) {
+        const updateTimeout = setTimeout(() => {
+          actions.editCardTitle(
+            cardMetaData.id,
+            newTitleAndSelection.value,
+            newTitleAndSelection.selection
+          )
+        }, 300)
+        return () => {
+          clearTimeout(updateTimeout)
+        }
       }
-    }, [newTitleAndSelection.value, newTitleAndSelection.selection, cardMetaData.id])
+      return () => {}
+    }, [
+      newTitleAndSelection.value,
+      newTitleAndSelection.selection,
+      cardMetaData.id,
+      cardMetaData.value,
+      cardMetaData.selection,
+    ])
 
     useEffect(() => {
       setNewTitleAndSelection({

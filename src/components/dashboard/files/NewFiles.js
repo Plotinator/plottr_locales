@@ -33,6 +33,7 @@ const NewFilesConnector = (connector) => {
     toggleView,
     doSnowflakeImport,
     doScrivenerImport,
+    doWordImport,
     isOnWeb,
     isInOfflineMode,
     doCreateNewProject,
@@ -122,6 +123,7 @@ const NewFilesConnector = (connector) => {
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
                     <MenuItem onSelect={doScrivenerImport}>{t('Scrivener')}</MenuItem>
+                    <MenuItem onSelect={doWordImport}>{t('Word (docx)')}</MenuItem>
                     <MenuItem onSelect={doSnowflakeImport}>{t('Snowflake Pro')}</MenuItem>
                   </Dropdown.Menu>
                 </Dropdown>
@@ -136,9 +138,10 @@ const NewFilesConnector = (connector) => {
   NewFiles.propTypes = {
     activeView: PropTypes.string,
     toggleView: PropTypes.func,
-    doSnowflakeImport: PropTypes.func,
-    doScrivenerImport: PropTypes.func,
-    doCreateNewProject: PropTypes.func,
+    doSnowflakeImport: PropTypes.func.isRequired,
+    doScrivenerImport: PropTypes.func.isRequired,
+    doCreateNewProject: PropTypes.func.isRequired,
+    doWordImport: PropTypes.func.isRequired,
     isOnWeb: PropTypes.bool,
     isInOfflineMode: PropTypes.bool,
   }
