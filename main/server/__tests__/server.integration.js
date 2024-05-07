@@ -25,6 +25,12 @@ const CONSOLE_LOGGER = {
     console.error(...args)
   },
 }
+const DUMMY_ENCRYPT = (x) => {
+  return Promise.resolve(x)
+}
+const DUMMY_DECRYPT = (x) => {
+  return Promise.resolve(x)
+}
 
 const baseTestDirectory = path.join(__dirname, '..', '..', '..', '.test-output')
 
@@ -49,7 +55,9 @@ describe('startServer', (describe, it) => {
             broadcastPort,
             userDataDirectory,
             onFatalError,
-            '2023.5.3' // dummy version
+            '2023.5.3', // dummy version
+            DUMMY_ENCRYPT,
+            DUMMY_DECRYPT
           ).then(({ port, killServer }) => {
             assertEqual(typeof killServer, 'function')
             assertGreaterThan(port, 0)
@@ -250,7 +258,9 @@ describe('startServer', (describe, it) => {
                                                                   broadcastPort,
                                                                   userDataDirectory,
                                                                   onFatalError,
-                                                                  '2023.5.3' // dummy version
+                                                                  '2023.5.3', // dummy version
+                                                                  DUMMY_ENCRYPT,
+                                                                  DUMMY_DECRYPT
                                                                 ).then((finalServer) => {
                                                                   return createClient(
                                                                     finalServer.port,
