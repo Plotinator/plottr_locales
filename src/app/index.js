@@ -591,7 +591,7 @@ tellMeWhatOSImOn()
           const emailAddress = selectors.emailAddressSelector(state)
           const userId = selectors.userIdSelector(state)
           const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
-          if (!isInProMode) {
+          if (isInProMode) {
             uploadToFirebase(emailAddress, userId, json, fileName)
               .then((response) => {
                 const fileId = response.data.fileId
