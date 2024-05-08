@@ -225,7 +225,6 @@
       "!docs${/*}",
       "!shared${/*}",
       "!.browserslistrc",
-      "!.env",
       "!.eslintrc.js",
       "!.firebaserc",
       "!.nvmrc",
