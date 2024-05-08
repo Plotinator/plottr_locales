@@ -41,7 +41,7 @@ if (process.env.NODE_ENV !== 'dev') {
   )
   plugins.push(
     new webpack.SourceMapDevToolPlugin({
-      append: `\n//# sourceMappingURL=https://raw.githubusercontent.com/Plotinator/pltr_sourcemaps/main/${packageJSON.version}/[url]`,
+      append: `\n//# sourceMappingURL=https://raw.githubusercontent.com/Plotinator/pltr_sourcemaps/${packageJSON.version}/[url]`,
       filename: '[name].map',
     })
   )
