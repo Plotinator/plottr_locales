@@ -20,6 +20,7 @@
     "compile": "cross-env NODE_ENV=production node_modules/.bin/webpack",
     "watch": "cross-env NODE_ENV=dev node_modules/.bin/webpack",
     "pack": "cross-env NODE_ENV=production node_modules/.bin/webpack",
+    "upload-sourcemaps": "./build/upload-sourcemaps.sh",
     "pack:windows": "cross-env NODE_ENV=production node_modules\\.bin\\webpack",
     "clean:sharp-modules": "rimraf node_modules/sharp/node_modules",
     "clean:sharp-vendor": "rimraf node_modules/sharp/vendor",
