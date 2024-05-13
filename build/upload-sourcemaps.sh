@@ -8,14 +8,14 @@ post_server_item=$ROLLBAR_POST_SERVER_ITEM
 
 echo "Uploading source maps for version $version!"
 
-for path in $(find dist -name "bin/*.map"); do
+for path in $(find bin -name "*.map"); do
   js_file=${path%.*}
-  url=https://raw.githubusercontent.com/Plotinator/pltr_sourcemaps/${js_file}
+  url=https://raw.githubusercontent.com/Plotinator/pltr_sourcemaps/${js_file}.js
   source_map=$path
 
   echo "Uploading source map for $url"
 
-  curl --silent --show-error https://api.rollbar.com/api/1/sourcemap \
+  echo curl --silent --show-error https://api.rollbar.com/api/1/sourcemap \
     -F access_token=$post_server_item \
     -F version=$version \
     -F minified_url=$url \
