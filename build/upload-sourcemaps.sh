@@ -21,4 +21,11 @@ for path in $(find bin -name "*.map"); do
     -F minified_url=$url \
     -F source_map=$source_map \
     > /dev/null
+
+  curl --silent --show-error https://api.rollbar.com/api/1/sourcemap \
+    -F access_token=$post_server_item \
+    -F version=$version \
+    -F minified_url=$url \
+    -F source_map=$source_map \
+    > /dev/null
 done
