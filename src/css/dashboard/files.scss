@@ -69,6 +69,7 @@
 }
 
 .dashboard__new-files__item {
+  user-select: none;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
