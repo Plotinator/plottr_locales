@@ -42,7 +42,7 @@ if (process.env.NODE_ENV !== 'dev') {
   plugins.push(
     new webpack.SourceMapDevToolPlugin({
       append: `\n//# sourceMappingURL=https://raw.githubusercontent.com/Plotinator/pltr_sourcemaps/${packageJSON.version}/[url]`,
-      filename: '[name].map',
+      filename: '[name].bundle.map',
     })
   )
 }
@@ -84,7 +84,7 @@ const mainConfig = {
   },
   output: {
     path: isForMaps ? sourceMapsPath : path.resolve(__dirname, 'bin'),
-    filename: 'electron_main.js',
+    filename: '[name].bundle.js',
   },
   resolve: {
     extensions: ['.js', '.json'],
@@ -138,7 +138,7 @@ const preloadConfig = {
   },
   output: {
     path: isForMaps ? sourceMapsPath : path.resolve(__dirname, 'bin'),
-    filename: 'preload.js',
+    filename: '[name].bundle.js',
   },
   resolve: {
     extensions: ['.js', '.json'],
