@@ -11,7 +11,7 @@
     "email": "cameronsutter0@gmail.com",
     "url": "https://twitter.com/camsutter"
   },
-  "main": "bin/electron_main.js",
+  "main": "bin/main.bundle.js",
   "scripts": {
     "analyse-bundle": "webpack --profile --json > bin/stats.json",
     "analyse-bundle:view": "webpack-bundle-analyzer bin/stats.json",
