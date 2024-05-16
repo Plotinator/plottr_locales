@@ -377,7 +377,7 @@ const root = (dataRepairers) => {
         const beats = allBeatsSelector(state)
         const bookId = currentTimeline
         let nextIdForBeats = nextBeatId(beats)
-        const lines = sortedLinesByBookSelector(state)
+        const lines = allLinesSelector(state)
         let beatTree = cloneDeep(beats[bookId])
         let createdNewBeats = false
         // make a card -> beatId mapping (beatId is from existing beats … augmented with new ones)

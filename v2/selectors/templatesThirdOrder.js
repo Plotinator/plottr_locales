@@ -2,17 +2,17 @@ import { sortBy } from 'lodash'
 import { createSelector } from 'reselect'
 
 // Other selector dependencies
-import { isLoggedInSelector } from './clientFirstOrder'
 import { allCustomTemplatesSelector, templatesSelector } from './templatesFirstOrder'
+import { isLoggedIntoProWithActiveLicenseSelector } from './secondOrder'
 
 export const customTemplatesSelector = createSelector(
   allCustomTemplatesSelector,
-  isLoggedInSelector,
-  (allCustomTemplates, isLoggedIn) => {
+  isLoggedIntoProWithActiveLicenseSelector,
+  (allCustomTemplates, isInProMode) => {
     // Produce cloud templates when logged in and non-cloud templates
     // when not logged in.
     return sortBy(
-      allCustomTemplates.filter(({ isCloudTemplate }) => !!isCloudTemplate === !!isLoggedIn),
+      allCustomTemplates.filter(({ isCloudTemplate }) => !!isCloudTemplate === !!isInProMode),
       'name'
     )
   }

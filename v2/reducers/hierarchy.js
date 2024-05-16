@@ -91,8 +91,8 @@ const hierarchy = (dataRepairers) => (state, action) => {
     case REDO_N_TIMES:
     case UNDO:
     case REDO: {
-      if (action?.state?.hierarchy && typeof action.state.hierarchy === 'object') {
-        return action.state.hierarchy
+      if (action?.state?.hierarchyLevels && typeof action.state.hierarchyLevels === 'object') {
+        return action.state.hierarchyLevels
       } else {
         return state
       }
