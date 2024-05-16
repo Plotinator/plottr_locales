@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'react-proptypes'
 import { Editor, Transforms } from 'slate'
+import { isEqual } from 'lodash'
 
 import Button from '../Button'
 import { LIST_TYPES, HEADING_TYPES } from './helpers'
@@ -52,7 +53,11 @@ export const handleList = (editor, inputFormat, logger) => {
   try {
     const isInList = Editor.isInList(editor, editor.selection)
 
-    if (isInList) {
+    if (
+      isInList &&
+      editor?.selection?.focus &&
+      isEqual(editor?.selection?.focus, editor?.selection?.anchor)
+    ) {
       const [parentElement, parentPath] = Editor.parentOfType(editor, editor.selection, {
         match: (n) => LIST_TYPES.includes(n.type),
       })

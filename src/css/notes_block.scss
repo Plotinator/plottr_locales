@@ -185,6 +185,7 @@
   align-items: flex-start;
 
   .note-list__note-view__left-side {
+    overflow: hidden;
     width: 18%;
     position: sticky;
     top: 0;

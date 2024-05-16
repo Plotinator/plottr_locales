@@ -233,7 +233,6 @@ const ActsConfigModalConnector = (connector) => {
                   <div className="acts-modal__levels-table-cell">{t('Level')}</div>
                   <div className="acts-modal__levels-table-cell">{t('Name')}</div>
                   <div className="acts-modal__levels-table-cell">{t('Text Color')}</div>
-                  <div className="acts-modal__levels-table-cell">{t('Text Size')}</div>
                   <div className="acts-modal__levels-table-cell">{t('Border Color')}</div>
                   <div className="acts-modal__levels-table-cell">{t('Border Style')}</div>
                   <div className="acts-modal__levels-table-cell">{t('Background Color')}</div>

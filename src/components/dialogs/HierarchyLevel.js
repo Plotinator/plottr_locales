@@ -85,15 +85,6 @@ const HierarchyLevelConnector = (connector) => {
           value={isDarkMode ? dark.textColor : light.textColor}
         />
         <EditOrDisplay
-          id={`hierarchy-level-auto-text-size-${level}`}
-          type="number"
-          setValue={setValue('textSize')}
-          setEditing={setEditingTextSize}
-          editing={editingTextSize}
-          value={textSize}
-          hideArrow={true}
-        />
-        <EditOrDisplay
           id={`hierarchy-level-auto-border-color-${level}`}
           type="color"
           setValue={setThemedValue('borderColor')}
