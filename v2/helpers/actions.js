@@ -33,7 +33,7 @@ export const entityModifiedByAction = (action) => {
       return `Character Template Attribute: ${action.name}`
     }
     default: {
-      return screamingSnakeCaseToHumanReadable(action.type)
+      return action.name ?? screamingSnakeCaseToHumanReadable(action.type)
     }
   }
 }

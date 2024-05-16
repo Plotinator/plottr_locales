@@ -146,11 +146,11 @@ export const dismissUndoRedoDialog = () => {
   }
 }
 
-export const batch = (actionsThunk) => (dispatch, getState) => {
+export const batch = (name, actionsThunk) => (dispatch, getState) => {
   reduxBatch(() => {
-    dispatch({ type: FORCED_BATCH_START })
+    dispatch({ type: FORCED_BATCH_START, name })
     actionsThunk()
-    dispatch({ type: FORCED_BATCH_END })
+    dispatch({ type: FORCED_BATCH_END, name })
   })
 }
 
@@ -160,9 +160,9 @@ export const batch = (actionsThunk) => (dispatch, getState) => {
 // action will lake a shadow state.  We add the shadow state here to
 // enable undo/redo to work as expected.
 
-export const forceBatchStart = (rawFullFileState) => {
+export const forceBatchStart = (name, rawFullFileState) => {
   const currentUserFileState = fullFileStateSelector(rawFullFileState)
-  return { type: FORCED_BATCH_START, _shadow: currentUserFileState }
+  return { type: FORCED_BATCH_START, _shadow: currentUserFileState, name }
 }
 
 export const forceBatchEnd = (rawFullFileState) => {

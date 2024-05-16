@@ -99,7 +99,7 @@ const lines = (dataRepairers) => (state, action) => {
           newLine.bookId = actionBookId // add it to the new/current book
           newLine.position = nextPosition + newLine.position // put it in the right position
           newLine.fromTemplateId = action.id || action.templateData.id
-          if (!newLine.color || newLine.color == nextColor(0)) {
+          if (!newLine.color) {
             newLine.color = nextColor(linesInBook.length + index)
           }
           return newLine

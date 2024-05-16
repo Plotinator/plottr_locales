@@ -128,7 +128,7 @@ export const removeBook = (id, bookId) => (dispatch, getState) => {
   const state = getState()
   const allCharactersByBook = allDisplayedCharactersForCurrentBookSelector(state)
 
-  batch(() => {
+  batch('Remove Book from Character', () => {
     dispatch({ type: REMOVE_BOOK_FROM_CHARACTER, id, bookId })
     if (allCharactersByBook.length === 1) {
       dispatch({ type: SELECT_CHARACTER_ATTRIBUTE_BOOK_TAB, bookId: 'all' })
@@ -218,7 +218,7 @@ export const editCharacterAttributeValue =
       if (legacyCustomAttribute) {
         const characterAttributes = characterAttributesForBookSelector(state)
         const nextAttributeId = nextId(characterAttributes)
-        batch(() => {
+        batch('Edit Character Attribute', () => {
           dispatch(
             createCharacterAttribute(legacyCustomAttribute.type, legacyCustomAttribute.name, true)
           )

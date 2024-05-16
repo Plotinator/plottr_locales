@@ -15,6 +15,14 @@ const sortManually = (items, attributeId, bookId) => {
   })
 }
 
+const lowercaseIfString = (x) => {
+  if (typeof x === 'string') {
+    return x.toLowerCase()
+  } else {
+    return x
+  }
+}
+
 export function sortEachCategory(visibleByCategory, sort, isManuallySorted, attributeId, bookId) {
   const sortOperands = sort.split('~')
   const attrName = sortOperands[0]
@@ -29,7 +37,10 @@ export function sortEachCategory(visibleByCategory, sort, isManuallySorted, attr
         }
       : attrName
   const direction = sortOperands[1]
-  const sortByOperand = attrName === 'name' ? [attrExtractor, 'id'] : [attrExtractor, 'name']
+  const sortByOperand =
+    attrName === 'name'
+      ? [(x) => lowercaseIfString(x[attrExtractor]), (x) => lowercaseIfString(x.id)]
+      : [(x) => lowercaseIfString(x[attrExtractor]), (x) => lowercaseIfString(x.name)]
 
   return Object.keys(visibleByCategory).reduce((acc, k) => {
     const itemByCategory = visibleByCategory[k]

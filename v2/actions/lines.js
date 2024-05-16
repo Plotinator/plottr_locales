@@ -155,7 +155,7 @@ export const duplicateLine = (id, position) => (dispatch, getState) => {
   const state = getState()
   const lines = sortedLinesByBookSelector(state)
 
-  batch(() => {
+  batch('Duplicate Line', () => {
     dispatch({ type: DUPLICATE_LINE, id, position })
 
     const selectedLine = lines.find((l) => l.id === id)

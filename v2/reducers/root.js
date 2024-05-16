@@ -60,7 +60,6 @@ import {
 import { reorderList } from '../helpers/lists'
 import { pinMovedLine } from '../actions/lines'
 import { forceBatchStart, forceBatchEnd } from '../actions/undo'
-import { sortedLinesByBookSelector } from '../selectors/timelineThirdOrder'
 
 const {
   selectedCharacterAttributeTabSelector,
@@ -270,7 +269,7 @@ const root = (dataRepairers) => {
               return mainReducer(state, { ...action, actTab: topLevelbeatIds[position - 1] })
             }
           } else {
-            const withBatchStart = mainReducer(state, forceBatchStart(state))
+            const withBatchStart = mainReducer(state, forceBatchStart('Delete Beat', state))
             const withDefaultView = mainReducer(withBatchStart, setTimelineView('default'))
             const withBeatDeleted = mainReducer(withDefaultView, {
               ...action,
@@ -535,7 +534,7 @@ const root = (dataRepairers) => {
         const { actions, newLineId } = moveLineActions(state, action.id, action.destinationBookId)
 
         // Start a batch
-        const withBatchStarted = mainReducer(state, forceBatchStart(state))
+        const withBatchStarted = mainReducer(state, forceBatchStart('Move Line', state))
 
         // Add the new line
         const withNewLine = actions.reduce((accState, nextAction) => {
@@ -657,7 +656,7 @@ const root = (dataRepairers) => {
         }
 
         // Open a batch
-        let finalState = mainReducer(state, forceBatchStart(state))
+        let finalState = mainReducer(state, forceBatchStart('Restructure Timeline', state))
         if (timelineViewIsStacked) {
           const allCards = allCardsSelector(state)
           const allBeats = sortedBeatsByBookSelector(state)
@@ -720,7 +719,8 @@ const root = (dataRepairers) => {
         const maxDepth = tree.maxDepth('id')(beats)
         const newBeatId = nextBeatId(allBeats)
         // Start a batch
-        const withOpenBatch = mainReducer(state, forceBatchStart(state))
+        const actionLable = action.type === ADD_CARD ? 'Add Card' : 'Reorder Cards'
+        const withOpenBatch = mainReducer(state, forceBatchStart(actionLable, state))
         // Make space for the card
         const [newState, finalBeatId, _nextBeatId] =
           action.addMissingBeats && depthOfBeat !== maxDepth
@@ -758,7 +758,7 @@ export const applyTemplate = (fileState, bookId, template, selectedIndex) => {
   const lines = allLinesSelector(fileState)
 
   // Start a batch
-  const withBatchStarted = rootReducer(fileState, forceBatchStart(fileState))
+  const withBatchStarted = rootReducer(fileState, forceBatchStart('Apply Template', fileState))
 
   // Create the lines from the template using the existing action.
   // NOTE: The old action adds the cards too.
