@@ -3,6 +3,8 @@ import PropTypes from 'react-proptypes'
 import { t as i18n } from 'plottr_locales'
 import { sortBy } from 'lodash'
 
+import { helpers } from 'pltr'
+
 function ProjectTemplateDetails({ template }) {
   const { templateData } = template
 
@@ -15,12 +17,22 @@ function ProjectTemplateDetails({ template }) {
     characters: i18n('Characters'),
   }
 
+  const beats = helpers.beats.beatsByPosition(() => true)(templateData.beats['1'])
+
+  const cardOrder = (card) => {
+    return (
+      beats.findIndex((beat) => {
+        return card.beatId === beat.id
+      }) ?? card.id
+    )
+  }
+
   const renderData = (type, data) => {
     switch (type) {
       case 'beats':
         return sortBy(data, 'position').map((beat) => <li key={beat.id}>{beat.title}</li>)
       case 'cards':
-        return sortBy(data, 'id').map((c) => <li key={c.id}>{c.title}</li>)
+        return sortBy(data, cardOrder).map((c) => <li key={c.id}>{c.title}</li>)
       case 'lines':
         return sortBy(data, 'position').map((l) => <li key={l.id}>{l.title}</li>)
       case 'tags':
@@ -39,6 +51,17 @@ function ProjectTemplateDetails({ template }) {
         return null
     }
   }
+
+  const beatsMarkup = beats ? (
+    <div key="beats">
+      <h5 className="text-center text-capitalize">Beats</h5>
+      <ol>
+        {beats.map((beat) => {
+          return <li key={beat.id}>{beat.title ?? 'Auto'}</li>
+        })}
+      </ol>
+    </div>
+  ) : null
 
   const arrayObjects = ['beats', 'cards', 'lines', 'notes', 'tags']
     .filter((type) => templateData[type] && templateData[type].length)
@@ -86,6 +109,7 @@ function ProjectTemplateDetails({ template }) {
 
   return (
     <div className="panel-body">
+      {beatsMarkup}
       {arrayObjects}
       {customAttributes.length ? (
         <h5 className="text-center text-capitalize">{i18n('Custom Attributes')}</h5>

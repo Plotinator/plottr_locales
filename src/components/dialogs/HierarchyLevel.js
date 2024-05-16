@@ -34,7 +34,6 @@ const HierarchyLevelConnector = (connector) => {
   }) => {
     const [editingName, setEditingName] = useState(false)
     const [editingTextColor, setEditingTextColor] = useState(false)
-    const [editingTextSize, setEditingTextSize] = useState(false)
     const [editingBorderColor, setEditingBorderColor] = useState(false)
     const [editingBorderStyle, setEditingBorderStyle] = useState(false)
     const [editingBackgroundColor, setEditingBackgroundColor] = useState(false)

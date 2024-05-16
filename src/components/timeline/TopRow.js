@@ -105,7 +105,7 @@ const TopRowConnector = (connector) => {
     const handleInsertChildBeat = useCallback(
       (beatToLeftId) => {
         const { currentTimeline, beatActions, undo } = props
-        undo.batch(() => {
+        undo.batch('Insert Child Beat', () => {
           beatActions.expandBeat(beatToLeftId, currentTimeline)
           beatActions.addBeat(currentTimeline, beatToLeftId)
         })

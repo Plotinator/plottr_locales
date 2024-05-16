@@ -62,6 +62,7 @@ const LineTitleCellConnector = (connector) => {
     currentTimeline,
     togglePinPlotline,
     undo,
+    recentlyUndidOrRedid,
   }) => {
     const [hovering, setHovering] = useState(false)
     const [dragging, setDragging] = useState(false)
@@ -76,6 +77,11 @@ const LineTitleCellConnector = (connector) => {
     const titleInputRef = useRef()
     const bookChoiceDropDown = useRef()
     const titleCellRef = useRef()
+
+    const recentlyUndidOrRedidRef = useRef(false)
+    useEffect(() => {
+      recentlyUndidOrRedidRef.current = !!recentlyUndidOrRedid
+    }, [recentlyUndidOrRedid])
 
     useEffect(() => {
       if (titleCellRef.current && zIndex) {
@@ -107,7 +113,7 @@ const LineTitleCellConnector = (connector) => {
     }
 
     useEffect(() => {
-      if (!editing && line.title === '') {
+      if (!editing && line.title === '' && !recentlyUndidOrRedid.current) {
         startEditing()
       }
     }, [])
@@ -136,7 +142,7 @@ const LineTitleCellConnector = (connector) => {
 
     const finalizeEdit = (newVal) => {
       var id = line.id
-      undo.batch(() => {
+      undo.batch(`Edit Line Title ${newVal}`, () => {
         actions.editLineTitle(id, newVal)
         uiActions.stopEditingPlotlineHeadingTitle()
       })
@@ -164,7 +170,7 @@ const LineTitleCellConnector = (connector) => {
 
     const handleDragStart = (e) => {
       e.dataTransfer.effectAllowed = 'move'
-      e.dataTransfer.setData('text/json', JSON.stringify(line))
+      e.dataTransfer.setData('text/json', JSON.stringify({ line, isLine: true }))
       setDragging(true)
     }
 
@@ -198,11 +204,14 @@ const LineTitleCellConnector = (connector) => {
       setInDropZone(false)
       setDropDepth(0)
 
-      var json = e.dataTransfer.getData('text/json')
-      var droppedLine = JSON.parse(json)
-      if (droppedLine.id == null) return
-
-      handleReorder(line.position, droppedLine.position)
+      const json = e.dataTransfer.getData('text/json')
+      const payload = JSON.parse(json)
+      const droppedLine = payload.line
+      if (!payload.isLine) {
+        return
+      } else {
+        handleReorder(line.position, droppedLine.position)
+      }
     }
 
     const handlePinPlotLine = () => {
@@ -458,7 +467,7 @@ const LineTitleCellConnector = (connector) => {
     }
 
     const moveToBook = (targetBookId) => {
-      undo.batch(() => {
+      undo.batch('Move Line to Another Book', () => {
         actions.moveLine(line.id, targetBookId)
         notifications.showToastNotification(true, null, targetBookId, 'move')
       })
@@ -679,6 +688,7 @@ const LineTitleCellConnector = (connector) => {
     allHierarchyLevels: PropTypes.object.isRequired,
     togglePinPlotline: PropTypes.func,
     undo: PropTypes.object.isRequired,
+    recentlyUndidOrRedid: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
   }
 
   const {
@@ -718,6 +728,7 @@ const LineTitleCellConnector = (connector) => {
           allHierarchyLevels: selectors.allHierarchyLevelsSelector(state),
           editing: selectors.editingGivenLinesTitleSelector(state, ownProps.line.id),
           timelineFoci: selectors.timelineFociSelector(state),
+          recentlyUndidOrRedid: selectors.recentlyUndidOrRedidSelector(state),
         }
       },
       (dispatch, ownProps) => {

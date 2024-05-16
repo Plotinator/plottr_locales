@@ -242,6 +242,10 @@
     justify-content: space-between;
     padding: 4px 0;
 
+    .place-list__left-side {
+      max-width: 70%;
+    }
+
     .place-list__right-side {
       display: flex;
       align-items: center;

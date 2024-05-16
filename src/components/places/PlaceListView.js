@@ -107,7 +107,7 @@ const PlaceListViewConnector = (connector) => {
     }
 
     const closeDialog = () => {
-      undo.batch(() => {
+      undo.batch('Close Place Attributes', () => {
         uiActions.hidePlaceAttributeDialog()
         uiActions.hidePlaceCategoryModal()
       })
@@ -115,7 +115,7 @@ const PlaceListViewConnector = (connector) => {
 
     const handleCreateNewPlace = () => {
       const id = nextId(places)
-      undo.batch(() => {
+      undo.batch('Create New Place', () => {
         actions.addPlace()
         uiActions.selectPlace(id)
         uiActions.startEditingSelectedPlace()

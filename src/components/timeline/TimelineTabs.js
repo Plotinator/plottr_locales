@@ -76,7 +76,7 @@ const TimelineTabsConnector = (connector) => {
     }
 
     const openActStructure = () => {
-      batch(() => {
+      batch('Open Structure Configuration', () => {
         setActConfigIsOpen(true)
         setFocussedTimelineTabBeat(null)
       })
@@ -84,7 +84,7 @@ const TimelineTabsConnector = (connector) => {
     }
 
     const editBeatName = () => {
-      batch(() => {
+      batch('Edit Beat Name', () => {
         setEditingBeatTitleId(focussedBeat)
         setFocussedTimelineTabBeat(null)
       })
@@ -138,14 +138,14 @@ const TimelineTabsConnector = (connector) => {
     }
 
     const insertPeerBeat = () => {
-      batch(() => {
+      batch('Insert Peer Beat', () => {
         insertBeat(bookId, focussedBeat)
         setFocussedTimelineTabBeat(null)
       })
     }
 
     const stageBeatForDeletion = () => {
-      batch(() => {
+      batch('Confirm Delete Beat', () => {
         setTimelineTabBeatToDelete(focussedBeat)
         setFocussedTimelineTabBeat(null)
       })
@@ -157,7 +157,7 @@ const TimelineTabsConnector = (connector) => {
       return (
         <DeleteConfirmModal
           onDelete={() => {
-            batch(() => {
+            batch('Delete Beat', () => {
               deleteBeat(beatToDelete, bookId)
               setTimelineTabBeatToDelete(null)
             })
@@ -174,8 +174,9 @@ const TimelineTabsConnector = (connector) => {
     }
 
     const setBeatTitle = (newVal) => {
-      batch(() => {
-        editBeatTitle(editingBeatTitleId, bookId, newVal || 'auto')
+      const newTitle = newVal || 'auto'
+      batch(`Set Beat Title ${newTitle}`, () => {
+        editBeatTitle(editingBeatTitleId, bookId, newTitle)
         setEditingBeatTitleId(null)
       })
     }

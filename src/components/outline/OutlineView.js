@@ -54,6 +54,7 @@ const OutlineViewConnector = (connector) => {
     card2Dmap,
     outlineSearchTerm,
     outlineScrollPosition,
+    recentlyUndidOrRedid,
   }) => {
     const [active, setActive] = useState(0)
     const [beatsToRender, setBeatsToRender] = useState(beats.length)
@@ -61,6 +62,12 @@ const OutlineViewConnector = (connector) => {
 
     const beatsRef = useRef(null)
     const scrollableRef = useRef(new Scrollable(() => beatsRef.current))
+    const scrollTimeoutRef = useRef(null)
+
+    const recentlyUndidOrRedidRef = useRef(false)
+    useEffect(() => {
+      recentlyUndidOrRedidRef.current = !!recentlyUndidOrRedid
+    }, [recentlyUndidOrRedid])
 
     useEffect(() => {
       if (beatsToRender >= beats.length) return
@@ -95,8 +102,15 @@ const OutlineViewConnector = (connector) => {
     }, [])
 
     const handleScroll = (e) => {
-      if (typeof beatsRef?.current?.scrollTop === 'number') {
-        actions.recordOutlineScrollPosition(beatsRef.current.scrollTop)
+      if (typeof beatsRef?.current?.scrollTop === 'number' && !recentlyUndidOrRedidRef.current) {
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current)
+        }
+        scrollTimeoutRef.current = setTimeout(() => {
+          if (!recentlyUndidOrRedidRef.current) {
+            actions.recordOutlineScrollPosition(beatsRef.current.scrollTop)
+          }
+        }, 500)
       }
     }
 
@@ -265,6 +279,7 @@ const OutlineViewConnector = (connector) => {
   }
 
   OutlineView.propTypes = {
+    recentlyUndidOrRedid: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]).isRequired,
     beats: PropTypes.array.isRequired,
     lines: PropTypes.array.isRequired,
     card2Dmap: PropTypes.object.isRequired,
@@ -290,6 +305,7 @@ const OutlineViewConnector = (connector) => {
     return connect(
       (state) => {
         return {
+          recentlyUndidOrRedid: selectors.recentlyUndidOrRedidSelector(state),
           beats: selectors.visibleSortedBeatsByBookIgnoringCollapsedSelector(state),
           lines: selectors.sortedLinesByBookSelector(state),
           beatMapping: selectors.sparceBeatMap(state),

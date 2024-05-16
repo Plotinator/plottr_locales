@@ -125,21 +125,21 @@ const CharacterListViewConnector = (connector) => {
     }
 
     const closeDialog = () => {
-      undo.batch(() => {
+      undo.batch('Hide Character Attributes', () => {
         uiActions.hideCharactersAttributesDialog()
         uiActions.hideCharactersCategoryDialog()
       })
     }
 
     const handleCreateNewCharacter = () => {
-      undo.batch(() => {
+      undo.batch('Create New Character', () => {
         actions.addCharacter()
         uiActions.startEditingSelectedCharacter()
       })
     }
 
     const handleChooseTemplate = (templateData) => {
-      undo.batch(() => {
+      undo.batch(`Choose Template ${templateData.name}`, () => {
         actions.addCharacterWithTemplate(null, templateData)
         uiActions.setCharacterTemplateData(templateData)
         uiActions.startEditingSelectedCharacter()
@@ -149,7 +149,7 @@ const CharacterListViewConnector = (connector) => {
 
     const handleFinishCreate = (name) => {
       const id = nextIdAcrossCategories(visibleCharactersByCategory)
-      undo.batch(() => {
+      undo.batch(`Add Character ${name}`, () => {
         if (templateData) {
           actions.addCharacterWithTemplate(name, templateData)
         } else {

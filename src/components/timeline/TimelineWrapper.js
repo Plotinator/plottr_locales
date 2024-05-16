@@ -79,6 +79,7 @@ const TimelineWrapperConnector = (connector) => {
   checkDependencies({ saveFile, mpq, exportDisabled, templatesDisabled, saveAsTemplate })
 
   const TimelineWrapper = ({
+    recentlyUndidOrRedid,
     timelineBundle,
     bookId,
     cardsExistOnTimeline,
@@ -118,6 +119,11 @@ const TimelineWrapperConnector = (connector) => {
         return timelineBundle.isSmall ? tableRef.current.parentElement : tableRef.current
       })
     )
+
+    const recentlyUndidOrRedidRef = useRef(false)
+    useEffect(() => {
+      recentlyUndidOrRedidRef.current = !!recentlyUndidOrRedid
+    }, [recentlyUndidOrRedid])
 
     useEffect(() => {
       if (
@@ -341,10 +347,16 @@ const TimelineWrapperConnector = (connector) => {
           x: e.currentTarget.scrollLeft,
           y: e.currentTarget.scrollTop,
         }
-        if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
-        scrollTimeoutRef.current = setTimeout(() => {
-          actions.recordTimelineScrollPosition(position)
-        }, 500)
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current)
+        }
+        if (!recentlyUndidOrRedidRef.current) {
+          scrollTimeoutRef.current = setTimeout(() => {
+            if (!recentlyUndidOrRedidRef.current) {
+              actions.recordTimelineScrollPosition(position)
+            }
+          }, 500)
+        }
       }
     }
 
@@ -550,7 +562,9 @@ const TimelineWrapperConnector = (connector) => {
               <DropdownButton
                 id="select-timeline-view"
                 className="toolbar__selecet_view"
-                title={hierarchyLevels.length < 2 ? 'Default' : timelineView}
+                title={
+                  hierarchyLevels.length < 2 || timelineBundle.isSmall ? 'Default' : timelineView
+                }
               >
                 <MenuItem key={'default'} onSelect={() => actions.setTimelineView('default')}>
                   <div className="toolbar__timeline-view-selector">{t('Default')}</div>
@@ -569,7 +583,7 @@ const TimelineWrapperConnector = (connector) => {
                     <div className="toolbar__timeline-view-selector">{t('Tabbed')}</div>
                   </MenuItem>
                 ) : null}
-                {hierarchyLevels.length > 1 ? (
+                {hierarchyLevels.length > 1 && !timelineBundle.isSmall ? (
                   <MenuItem key={'stacked'} onSelect={() => actions.setTimelineView('stacked')}>
                     <div className="toolbar__timeline-view-selector">{t('Stacked')}</div>
                   </MenuItem>
@@ -751,6 +765,7 @@ const TimelineWrapperConnector = (connector) => {
   }
 
   TimelineWrapper.propTypes = {
+    recentlyUndidOrRedid: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]).isRequired,
     cardsExistOnTimeline: PropTypes.bool,
     bookId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
     timelineBundle: PropTypes.object.isRequired,
@@ -791,6 +806,7 @@ const TimelineWrapperConnector = (connector) => {
     return connect(
       (state) => {
         return {
+          recentlyUndidOrRedid: selectors.recentlyUndidOrRedidSelector(state),
           cardsExistOnTimeline: selectors.cardsExistOnTimelineSelector(state),
           bookId: selectors.currentTimelineSelector(state),
           timelineBundle: selectors.timelineBundleSelector(state),

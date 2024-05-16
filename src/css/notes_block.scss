@@ -261,6 +261,7 @@
 
   &:not(.editing) {
     .slate-editor__wrapper {
+      word-break: break-word;
       .slate-editor__word-counter {
         display: none;
       }

@@ -261,6 +261,8 @@ const CardCellConnector = (connector) => {
         beatIsExpanded,
         isMedium,
         isPinned,
+        topCard,
+        cardBehind,
       } = this.props
       const numOfCards = cards.length
       const vertical = orientation == 'vertical'
@@ -274,7 +276,6 @@ const CardCellConnector = (connector) => {
         })
         return <div className={cellKlass}>{this.renderCards(true)}</div>
       } else {
-        const topCard = cards[0]
         const cardStyle = {
           borderColor: topCard?.color ? tinycolor(topCard.color).darken(10).toHslString() : color,
         }
@@ -288,8 +289,10 @@ const CardCellConnector = (connector) => {
         }
         const cardBehindStyle = {
           ...omit(cardStyle, ['borderColor', 'backgroundColor']),
-          ...(cards[1]?.color ? { backgroundColor: cards[1]?.color } : {}),
-          borderColor: cards[1]?.color ? tinycolor(cards[1].color).darken(10).toHslString() : color,
+          ...(cardBehind?.color ? { backgroundColor: cardBehind?.color } : {}),
+          borderColor: cardBehind?.color
+            ? tinycolor(cardBehind.color).darken(10).toHslString()
+            : color,
         }
         const bodyKlass = cx('card__body shadow', { 'medium-timeline': isMedium })
         const overviewKlass = cx('card__cell__overview-cell', {
@@ -324,7 +327,7 @@ const CardCellConnector = (connector) => {
                   draggable
                 >
                   <div className={bodyKlass} style={cardStyle}>
-                    <div className="card__title">{cards[0].title}</div>
+                    <div className="card__title">{topCard.title}</div>
                   </div>
                   <div className="card__behind" style={cardBehindStyle}></div>
                 </div>
@@ -417,6 +420,8 @@ const CardCellConnector = (connector) => {
     beatIsExpanded: PropTypes.bool,
     lineIsExpanded: PropTypes.bool.isRequired,
     isVisible: PropTypes.bool.isRequired,
+    topCard: PropTypes.object.isRequired,
+    cardBehind: PropTypes.object.isRequired,
     isSmall: PropTypes.bool.isRequired,
     isMedium: PropTypes.bool.isRequired,
     actions: PropTypes.object.isRequired,
@@ -437,11 +442,24 @@ const CardCellConnector = (connector) => {
       (state, ownProps) => {
         const visibleCards = selectors.visibleCardsSelector(state)
         const visible = ownProps.cards.some((c) => visibleCards[c.id])
+        const topCard =
+          ownProps.cards.find((c) => {
+            return visibleCards[c.id]
+          }) ?? ownProps.cards[0]
+        // The second card could be bumped to the top, don't bother
+        // being perfectly correct because this is a rare case.
+        // Instead just take the next card that isn't the top card.
+        const cardBehind =
+          ownProps.cards.filter((c) => {
+            return visibleCards[c.id]
+          })?.[1] ?? (ownProps.cards[1] === topCard ? ownProps.cards[0] : ownProps.cards[1])
         return {
           timelineSize: selectors.timelineSizeSelector(state),
           orientation: selectors.orientationSelector(state),
           lineIsExpanded: selectors.lineIsExpandedSelector(state)[ownProps.lineId],
           isVisible: visible,
+          topCard,
+          cardBehind,
           isSmall: selectors.isSmallSelector(state),
           isMedium: selectors.isMediumSelector(state),
           beatHeadingCount: selectors.bottomLevelBeatHeadingCountSelector(state),

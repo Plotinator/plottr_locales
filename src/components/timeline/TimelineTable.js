@@ -114,7 +114,7 @@ const TimelineTableConnector = (connector) => {
 
     handleInsertChildBeat = (beatToLeftId) => {
       const { currentTimeline, beatActions, undo } = this.props
-      undo.batch(() => {
+      undo.batch('Insert Child Beat', () => {
         beatActions.addBeat(currentTimeline, beatToLeftId)
         beatActions.expandBeat(beatToLeftId, currentTimeline)
       })

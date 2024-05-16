@@ -372,7 +372,7 @@ const BeatTitleCellConnector = (connector) => {
     const handleAddBeat = useCallback(
       (e) => {
         if (!readOnly) {
-          undo.batch(() => {
+          undo.batch('Add Peer Beat', () => {
             actions.insertBeat(currentTimeline, beat.id)
             actions.expandBeat(beat.id, currentTimeline)
           })
@@ -384,7 +384,7 @@ const BeatTitleCellConnector = (connector) => {
     const handleAddChild = useCallback(
       (e) => {
         if (!readOnly) {
-          undo.batch(() => {
+          undo.batch('Add Child Beat', () => {
             actions.expandBeat(beat.id, currentTimeline)
             actions.addBeat(currentTimeline, beat.id)
           })
@@ -408,8 +408,9 @@ const BeatTitleCellConnector = (connector) => {
 
     const finalizeEdit = useCallback(
       (newVal) => {
-        undo.batch(() => {
-          actions.editBeatTitle(beat.id, currentTimeline, newVal || 'auto') // if nothing, set to auto
+        const newTitle = newVal ?? 'auto'
+        undo.batch(`Edit Beat Title ${newTitle}`, () => {
+          actions.editBeatTitle(beat.id, currentTimeline, newTitle) // if nothing, set to auto
           uiActions.stopEditingBeatHeadingTitle()
         })
         setHovering(null)
@@ -503,7 +504,7 @@ const BeatTitleCellConnector = (connector) => {
         if (droppedBeat.type !== 'beat') return
         if (droppedBeat.id == beat.id) return
 
-        undo.batch(() => {
+        undo.batch('Reorder Beat', () => {
           if (!beat.expanded) {
             actions.expandBeat(beat.id, currentTimeline)
           }

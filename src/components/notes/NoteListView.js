@@ -110,7 +110,7 @@ const NoteListViewConnector = (connector) => {
 
     const handleCreateNewNote = () => {
       const id = nextId(notes)
-      undo.batch(() => {
+      undo.batch('Create new note', () => {
         actions.addNote()
         uiActions.selectNote(id)
         uiActions.startEditingSelectedNote()
@@ -126,7 +126,7 @@ const NoteListViewConnector = (connector) => {
     }
 
     const closeDialog = () => {
-      undo.batch(() => {
+      undo.batch('Close Notes Categories', () => {
         uiActions.hideNotesCategoryDialog()
         uiActions.hideNotesAttributesDialog()
       })

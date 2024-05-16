@@ -271,7 +271,7 @@ const PlaceViewConnector = (connector) => {
           <div className="place-list__place" onClick={startEditing}>
             <h4 className="secondary-text">{place.name || t('New Place')}</h4>
             <div className="place-list__place-inner">
-              <div>
+              <div className="place-list__left-side">
                 <dl className="dl-horizontal">
                   <dt>{t('Description')}</dt>
                   <dd>{place.description}</dd>

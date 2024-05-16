@@ -100,7 +100,11 @@ const UnconnectedToolBar = (connector) => {
               editor={editor}
               logger={errorReportingLogger}
             />
-            <FontSizeChooser editor={editor} defaultFontSize={defaultFontSize} />
+            <FontSizeChooser
+              editor={editor}
+              defaultFontSize={defaultFontSize}
+              logger={errorReportingLogger}
+            />
             <MarkButton mark="bold" icon={boldIcon} editor={editor} logger={errorReportingLogger} />
             <MarkButton
               mark="italic"

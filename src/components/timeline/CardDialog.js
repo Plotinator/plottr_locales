@@ -101,8 +101,8 @@ const CardDialogConnector = (connector) => {
 
     useEffect(() => {
       if (
-        cardMetaData.value === newTitleAndSelection.value &&
-        cardMetaData.selection === newTitleAndSelection.selection
+        cardMetaData.title !== newTitleAndSelection.value &&
+        cardMetaData.selection !== newTitleAndSelection.selection
       ) {
         const updateTimeout = setTimeout(() => {
           actions.editCardTitle(
@@ -184,7 +184,7 @@ const CardDialogConnector = (connector) => {
 
     const duplicateCard = (e) => {
       e.stopPropagation()
-      undo.batch(() => {
+      undo.batch(`Duplicate Card ${title ?? ''}`, () => {
         actions.duplicateCard(id)
         notificationActions.showToastNotification(true, 'duplicate')
       })
@@ -196,7 +196,7 @@ const CardDialogConnector = (connector) => {
 
     const finishRemoveTemplate = (e) => {
       e.stopPropagation()
-      undo.batch(() => {
+      undo.batch(`Remove Template`, () => {
         uiActions.setActiveTabOnCardDialog(activeTab - 1)
         actions.removeTemplateFromCard(cardId, removeWhichTemplate)
         uiActions.stopRemovingTemplateFromCardDialog()
@@ -240,7 +240,7 @@ const CardDialogConnector = (connector) => {
 
     const handleChooseTemplate = (templateData) => {
       const numTemplates = templates.length
-      undo.batch(() => {
+      undo.batch(`Choose Template ${templateData?.name}`, () => {
         actions.addTemplateToCard(id, templateData)
         uiActions.hideCardDialogTemplatePicker()
         uiActions.setActiveTabOnCardDialog(numTemplates + 3)
@@ -252,7 +252,7 @@ const CardDialogConnector = (connector) => {
     }
 
     const chooseCardColor = (color) => {
-      undo.batch(() => {
+      undo.batch(`Set Card Color to ${color}`, () => {
         actions.editCardAttributes(cardId, { color })
         uiActions.hideCardDialogColorPicker()
       })
@@ -289,7 +289,7 @@ const CardDialogConnector = (connector) => {
       if (key == 'new') {
         openTemplatePicker()
       } else if (typeof key === 'number') {
-        undo.batch(() => {
+        undo.batch('Select Card Tab', () => {
           uiActions.setActiveTabOnCardDialog(key)
           if (key === 2 && !customAttributes.length) {
             uiActions.openAttributesDialog()
@@ -564,7 +564,7 @@ const CardDialogConnector = (connector) => {
     }
 
     const moveCard = (bookId) => {
-      undo.batch(() => {
+      undo.batch('Move Card to Another Book', () => {
         actions.moveCardToBook(bookId, cardId)
         notificationActions.showToastNotification(true, 'move', bookId)
       })

@@ -122,7 +122,7 @@ const TagViewConnector = (connector) => {
 
       let { id } = tag
       var newTitle = title || tag.title
-      undo.batch(() => {
+      undo.batch(`Edit Tag ${title}`, () => {
         if (newTag) {
           actions.addCreatedTag({
             title: newTitle,

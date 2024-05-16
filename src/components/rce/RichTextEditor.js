@@ -6,6 +6,9 @@ import { t } from 'plottr_locales'
 import isHotkey from 'is-hotkey'
 import { Editor, Transforms } from 'slate'
 import { Slate, Editable, ReactEditor } from 'slate-react'
+
+import { helpers } from 'pltr'
+
 import UnconnectedToolBar from './ToolBar'
 import { toggleMark } from './MarkButton'
 import Leaf from './Leaf'
@@ -17,9 +20,10 @@ import { useEditState } from './useEditState'
 import { checkDependencies } from '../checkDependencies'
 import { indent } from './IndentParagraphButton'
 import { handleList } from './BlockButton'
-import { isEmpty } from './isEmpty'
 import { notOnFirstLine } from './notOnFirstLine'
 import WordCounter from './WordCounter'
+
+const { isEmpty } = helpers.text
 
 const HOTKEYS = {
   'mod+b': 'bold',

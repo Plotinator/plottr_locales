@@ -79,7 +79,7 @@ const BeatHeadingCellConnector = (connector) => {
 
       const droppedInThisContainer = headingContains(droppedBeat.coord)
       if (droppedInThisContainer) {
-        batch(() => {
+        batch('Reorder Beat', () => {
           collectBeat()
           if (!beat.expanded) {
             expandBeat(beat.id, currentTimeline)
@@ -137,7 +137,7 @@ const BeatHeadingCellConnector = (connector) => {
         if (droppedBeat.id == null) return
         if (droppedBeat.id == beat.id) return
 
-        batch(() => {
+        batch('Reorder Beat', () => {
           if (!beat.expanded) {
             expandBeat(beat.id, currentTimeline)
           }
@@ -156,7 +156,7 @@ const BeatHeadingCellConnector = (connector) => {
     )
 
     const stopEditing = useCallback(() => {
-      batch(() => {
+      batch(`Edit Beat Title ${beat?.title ?? 'auto'}`, () => {
         if (beat?.title === '') {
           editBeatTitle(beatId, currentTimeline, 'auto')
         }
@@ -262,12 +262,42 @@ const BeatHeadingCellConnector = (connector) => {
       )
     }, [deleting, hierarchyLevels, beatTitle, deleteThisBeat, stopDeleting])
 
+    const adjustedWidth = useCallback(() => {
+      return width - (span === 1 && beats.length <= 1 ? 0 : isMedium ? 7 : 27)
+    }, [width, span, beats.length, isMedium])
+
+    const rightControlsPosition = useCallback(() => {
+      const controlHeight = 25
+      const offset = Math.floor(controlHeight / 2)
+      const bodyElement = container.current.querySelector('.beat__heading-wrapper')
+      if (bodyElement) {
+        const { height, top } = bodyElement.getBoundingClientRect()
+        const containerRect = container.current.getBoundingClientRect()
+        return {
+          top: top + Math.floor(height / 2) - offset,
+          left: containerRect.left + adjustedWidth(),
+        }
+      } else {
+        const { height, left, top } = container.current.getBoundingClientRect()
+        return { top: top + Math.floor(height / 2) - offset, left: left + width - 27 }
+      }
+    }, [container, width, adjustedWidth])
+
     const rightControlsContentLocation = useCallback(() => {
       if (container.current) {
         return rightControlsPosition()
       }
       return { top: 0, left: 0 }
     }, [container, rightControlsPosition, width])
+
+    const bottomControlsPosition = useCallback(() => {
+      const controlWidth = 71
+      const { bottom, left } = container.current.getBoundingClientRect()
+      return {
+        top: bottom - 4,
+        left: left + (width - (isMedium ? 0 : spacerCellWidth || 0)) / 2 - controlWidth / 2,
+      }
+    }, [container, isMedium, spacerCellWidth, width])
 
     const bottomControlsContentLocation = useCallback(() => {
       if (container.current) {
@@ -367,10 +397,6 @@ const BeatHeadingCellConnector = (connector) => {
       )
     }
 
-    const adjustedWidth = useCallback(() => {
-      return width - (span === 1 && beats.length <= 1 ? 0 : isMedium ? 7 : 27)
-    }, [width, span, beats.length, isMedium])
-
     const handleEsc = useCallback(
       (event) => {
         if (event.which === 27 || event.which === 13) {
@@ -379,32 +405,6 @@ const BeatHeadingCellConnector = (connector) => {
       },
       [stopEditingBeatHeadingTitle]
     )
-
-    const rightControlsPosition = useCallback(() => {
-      const controlHeight = 25
-      const offset = Math.floor(controlHeight / 2)
-      const bodyElement = container.current.querySelector('.beat__heading-wrapper')
-      if (bodyElement) {
-        const { height, top } = bodyElement.getBoundingClientRect()
-        const containerRect = container.current.getBoundingClientRect()
-        return {
-          top: top + Math.floor(height / 2) - offset,
-          left: containerRect.left + adjustedWidth(),
-        }
-      } else {
-        const { height, left, top } = container.current.getBoundingClientRect()
-        return { top: top + Math.floor(height / 2) - offset, left: left + width - 27 }
-      }
-    }, [container, width, adjustedWidth])
-
-    const bottomControlsPosition = useCallback(() => {
-      const controlWidth = 71
-      const { bottom, left } = container.current.getBoundingClientRect()
-      return {
-        top: bottom - 4,
-        left: left + (width - (isMedium ? 0 : spacerCellWidth || 0)) / 2 - controlWidth / 2,
-      }
-    }, [container, isMedium, spacerCellWidth, width])
 
     if (editing) {
       const focusCandidate =

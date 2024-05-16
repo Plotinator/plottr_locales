@@ -45,6 +45,9 @@ export const handleHeadings = (editor, format, logger) => {
     return
   }
 
+  // Remove size styles that were applied to the heading
+  Editor.removePropertyOnSelectionOrCurrentElement(editor, 'fontSize')
+
   // wrap in the new heading type
   Transforms.wrapNodes(editor, { type: format })
 }
@@ -128,33 +131,38 @@ export const handleList = (editor, inputFormat, logger) => {
 
 export const handleBlockQuote = (editor, format, logger) => {
   const isActive = isBlockActive(editor, format, logger)
+  const isInList = Editor.isInList(editor, editor.selection)
+  if (isInList) {
+    return
+  } else {
+    try {
+      if (isActive) {
+        Transforms.unwrapNodes(editor, {
+          match: (n) => n.type === format,
+          split: true,
+        })
+        return
+      }
 
-  try {
-    if (isActive) {
-      Transforms.unwrapNodes(editor, {
-        match: (n) => n.type === format,
-        split: true,
+      // if the node is wrapped in a heading, we want the block quote around the heading
+      const [heading, headingPath] = Editor.parentOfType(editor, editor.selection, {
+        match: (n) => HEADING_TYPES.includes(n.type),
       })
+      if (heading != null) {
+        Transforms.wrapNodes(editor, { type: format }, { at: headingPath })
+      } else {
+        Transforms.wrapNodes(editor, { type: format })
+      }
+    } catch (error) {
+      logger.error('Error handling a block quote', error)
       return
     }
-
-    // if the node is wrapped in a heading, we want the block quote around the heading
-    const [heading, headingPath] = Editor.parentOfType(editor, editor.selection, {
-      match: (n) => HEADING_TYPES.includes(n.type),
-    })
-    if (heading != null) {
-      Transforms.wrapNodes(editor, { type: format }, { at: headingPath })
-    } else {
-      Transforms.wrapNodes(editor, { type: format })
-    }
-  } catch (error) {
-    logger.error('Error handling a block quote', error)
-    return
   }
 }
 
 const BlockButton = ({ editor, format, icon, logger }) => {
   const [blockIsActive, setBlockIsActive] = useState(false)
+  const [isDisabled, setIsDisabled] = useState(false)
 
   useEffect(() => {
     const timeout = setInterval(() => {
@@ -168,6 +176,20 @@ const BlockButton = ({ editor, format, icon, logger }) => {
       clearInterval(timeout)
     }
   }, [setBlockIsActive, blockIsActive, editor.selection, logger])
+
+  useEffect(() => {
+    const timeout = setInterval(() => {
+      const isInList = Editor.isInList(editor, editor.selection)
+      const newIsDisabled = isInList && format === 'block-quote'
+      if (newIsDisabled !== isDisabled) {
+        setIsDisabled(newIsDisabled)
+      }
+    }, 100)
+
+    return () => {
+      clearInterval(timeout)
+    }
+  }, [format, setIsDisabled, isDisabled, editor.selection, logger])
 
   const toggleBlock = (editor, format) => {
     if (LIST_TYPES.includes(format)) {
@@ -188,6 +210,7 @@ const BlockButton = ({ editor, format, icon, logger }) => {
 
   return (
     <Button
+      disabled={isDisabled}
       className={blockIsActive ? 'active' : ''}
       bsStyle={blockIsActive ? 'primary' : 'default'}
       onMouseDown={(event) => {

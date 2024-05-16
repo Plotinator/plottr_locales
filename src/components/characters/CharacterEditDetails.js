@@ -199,7 +199,7 @@ const CharacterEditDetailsConnector = (connector) => {
 
     const deleteCharacter = (e) => {
       e.stopPropagation()
-      undo.batch(() => {
+      undo.batch(`Delete Character ${character.name}`, () => {
         actions.deleteCharacter(character.id)
         uiActions.finishDeletingCharacter()
       })
@@ -216,7 +216,11 @@ const CharacterEditDetailsConnector = (connector) => {
     }
 
     const beginRemoveTemplate = (templateId) => {
-      undo.batch(() => {
+      const templateName =
+        character.templates.find((template) => {
+          return templateId === template?.id
+        })?.name ?? ''
+      undo.batch(`Start Removing Template ${templateName}`, () => {
         uiActions.startRemovingTemplateFromCharacter()
         uiActions.setTemplateToRemoveFromCharacter(templateId)
       })
@@ -224,7 +228,11 @@ const CharacterEditDetailsConnector = (connector) => {
 
     const finishRemoveTemplate = (e) => {
       e.stopPropagation()
-      undo.batch(() => {
+      const templateName =
+        character.templates.find((template) => {
+          return removeWhichTemplate === template?.id
+        })?.name ?? ''
+      undo.batch(`Finish Removing Template ${templateName}`, () => {
         uiActions.setActiveCharacterTab(activeTab - 1)
         actions.removeTemplateFromCharacter(character.id, removeWhichTemplate)
         uiActions.finishRemovingTemplateFromCharacter()
@@ -234,7 +242,11 @@ const CharacterEditDetailsConnector = (connector) => {
 
     const cancelRemoveTemplate = (e) => {
       e.stopPropagation()
-      undo.batch(() => {
+      const templateName =
+        character.templates.find((template) => {
+          return removeWhichTemplate === template?.id
+        })?.name ?? ''
+      undo.batch(`Cancel Removing Template ${templateName}`, () => {
         uiActions.finishRemovingTemplateFromCharacter()
         uiActions.setTemplateToRemoveFromCharacter(null)
       })
@@ -254,7 +266,7 @@ const CharacterEditDetailsConnector = (connector) => {
 
     const handleChooseTemplate = (templateData) => {
       const numTemplates = character.templates.length
-      undo.batch(() => {
+      undo.batch(`Choose Template ${templateData.name}`, () => {
         actions.addTemplateToCharacter(character.id, templateData)
         uiActions.hideCharacterEditorTemplatePicker()
         uiActions.setActiveCharacterTab(numTemplates + 3)
