@@ -31,7 +31,7 @@ describe('linesForBookSelector', () => {
             {
               bookId: 7,
               characterId: null,
-              color: '#e5554f',
+              color: '#6cace4',
               expanded: null,
               fromTemplateId: 'pl3',
               id: 18,
