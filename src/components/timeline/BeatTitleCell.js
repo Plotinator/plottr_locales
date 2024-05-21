@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import PropTypes from 'react-proptypes'
 import { t } from 'plottr_locales'
-import { FaExpandAlt, FaCompressAlt } from 'react-icons/fa'
-import { IoIosReturnRight } from 'react-icons/io'
+import { FaExpandAlt } from '@react-icons/all-files/fa/FaExpandAlt'
+import { FaCompressAlt } from '@react-icons/all-files/fa/FaCompressAlt'
+import { IoIosReturnRight } from '@react-icons/all-files/io/IoIosReturnRight'
 import { Cell } from 'react-sticky-table'
 import cx from 'classnames'
 
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import ButtonGroup from '../ButtonGroup'
 import Glyphicon from '../Glyphicon'
@@ -322,6 +323,7 @@ const BeatTitleCellConnector = (connector) => {
     selection,
     domEvents,
     uiActions,
+    undo,
   }) => {
     const [hovering, setHovering] = useState(false)
     const [dragging, setDragging] = useState(false)
@@ -369,18 +371,24 @@ const BeatTitleCellConnector = (connector) => {
 
     const handleAddBeat = useCallback(
       (e) => {
-        if (readOnly) return
-        actions.insertBeat(currentTimeline, beat.id)
-        actions.expandBeat(beat.id, currentTimeline)
+        if (!readOnly) {
+          undo.batch('Add Peer Beat', () => {
+            actions.insertBeat(currentTimeline, beat.id)
+            actions.expandBeat(beat.id, currentTimeline)
+          })
+        }
       },
       [readOnly, actions]
     )
 
     const handleAddChild = useCallback(
       (e) => {
-        if (readOnly) return
-        actions.expandBeat(beat.id, currentTimeline)
-        actions.addBeat(currentTimeline, beat.id)
+        if (!readOnly) {
+          undo.batch('Add Child Beat', () => {
+            actions.expandBeat(beat.id, currentTimeline)
+            actions.addBeat(currentTimeline, beat.id)
+          })
+        }
       },
       [actions]
     )
@@ -398,21 +406,24 @@ const BeatTitleCellConnector = (connector) => {
       [actions.collapseBeat, actions.expandBeat, beat?.id, beat?.expanded]
     )
 
+    const finalizeEdit = useCallback(
+      (newVal) => {
+        const newTitle = newVal ?? 'auto'
+        undo.batch(`Edit Beat Title ${newTitle}`, () => {
+          actions.editBeatTitle(beat.id, currentTimeline, newTitle) // if nothing, set to auto
+          uiActions.stopEditingBeatHeadingTitle()
+        })
+        setHovering(null)
+      },
+      [actions, uiActions, setHovering]
+    )
+
     const editTitle = useCallback(() => {
       const ref = titleInputRef.current
       if (!ref) return
 
       finalizeEdit(ref.value)
     }, [finalizeEdit, titleInputRef])
-
-    const finalizeEdit = useCallback(
-      (newVal) => {
-        actions.editBeatTitle(beat.id, currentTimeline, newVal || 'auto') // if nothing, set to auto
-        uiActions.stopEditingBeatHeadingTitle()
-        setHovering(null)
-      },
-      [actions, uiActions, setHovering]
-    )
 
     const handleFinishEditing = useCallback(
       (event) => {
@@ -493,10 +504,12 @@ const BeatTitleCellConnector = (connector) => {
         if (droppedBeat.type !== 'beat') return
         if (droppedBeat.id == beat.id) return
 
-        if (!beat.expanded) {
-          actions.expandBeat(beat.id, currentTimeline)
-        }
-        handleReorder(beat.id, droppedBeat.id)
+        undo.batch('Reorder Beat', () => {
+          if (!beat.expanded) {
+            actions.expandBeat(beat.id, currentTimeline)
+          }
+          handleReorder(beat.id, droppedBeat.id)
+        })
       },
       [setInDropZone, setDropDepth, beat, actions, handleReorder]
     )
@@ -513,7 +526,7 @@ const BeatTitleCellConnector = (connector) => {
     }, [readOnly, setHovering])
 
     const stopHovering = useCallback(() => {
-      if (readOnly) return
+      if (readOnly && !isSmall) return
       // Tune this to the mouse tracking timeout in TopRow.
       if (stopHoveringTimeout) {
         clearTimeout(stopHoveringTimeout)
@@ -765,6 +778,7 @@ const BeatTitleCellConnector = (connector) => {
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
+          onMouseLeave={stopHovering}
         >
           {renderHoverOptions()}
           <Delete
@@ -916,6 +930,7 @@ const BeatTitleCellConnector = (connector) => {
     selection: PropTypes.array.isRequired,
     domEvents: PropTypes.object.isRequired,
     uiActions: PropTypes.object.isRequired,
+    undo: PropTypes.object.isRequired,
   }
 
   const {
@@ -969,6 +984,7 @@ const BeatTitleCellConnector = (connector) => {
         actions: bindActionCreators(actions.beat, dispatch),
         domEvents: bindActionCreators(actions.domEvents, dispatch),
         uiActions: bindActionCreators(actions.ui, dispatch),
+        undo: bindActionCreators(actions.undo, dispatch),
       }
     }
 

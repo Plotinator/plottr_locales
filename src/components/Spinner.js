@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'react-proptypes'
 import { t as i18n } from 'plottr_locales'
-import { FaSpinner } from 'react-icons/fa'
+import { FaSpinner } from '@react-icons/all-files/fa/FaSpinner'
 
 export const Spinner = ({ style = {} }) => {
   return <FaSpinner className="fa-spinner" style={style} />

@@ -7,6 +7,8 @@ import { withValueAndSelection } from './withValueAndSelection'
 
 const TextFormControlConnector = (connector) => {
   const { EDITING, SEARCHING } = connector.pltr.editStates
+  const { undo, redo } = connector.platform
+  checkDependencies({ undo, redo })
 
   const TextFormControl = ({
     id,
@@ -41,8 +43,20 @@ const TextFormControlConnector = (connector) => {
       (event) => {
         if (!isEditing && !event.ctrlKey && !event.altKey && !event.metaKey) {
           startEditing()
-        }
-        if (onKeyDown) {
+        } else if (event.key === 'z' && (event.ctrlKey || event.metaKey)) {
+          event.preventDefault()
+          event.stopPropagation()
+          if (event.shiftKey) {
+            redo()
+          } else {
+            undo()
+          }
+        } else if (event.key === 'y' && event.ctrlKey) {
+          // On Linux, redo is CTRL+y
+          event.preventDefault()
+          event.stopPropagation()
+          redo()
+        } else if (onKeyDown) {
           onKeyDown(event)
         }
       },

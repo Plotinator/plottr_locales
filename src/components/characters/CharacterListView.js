@@ -3,7 +3,7 @@ import PropTypes from 'react-proptypes'
 import cx from 'classnames'
 
 import { t } from 'plottr_locales'
-import { newIds, helpers } from 'pltr/v2'
+import { newIds, helpers } from 'pltr'
 
 import Grid from '../Grid'
 import Alert from '../Alert'
@@ -104,6 +104,7 @@ const CharacterListViewConnector = (connector) => {
     detailsVisible,
     actions,
     uiActions,
+    undo,
   }) => {
     const [isMovingToNewCategory, setMovingToNewCategory] = useState(false)
     const [draggedCharacter, setDraggedCharacter] = useState()
@@ -124,34 +125,42 @@ const CharacterListViewConnector = (connector) => {
     }
 
     const closeDialog = () => {
-      uiActions.hideCharactersAttributesDialog()
-      uiActions.hideCharactersCategoryDialog()
+      undo.batch('Hide Character Attributes', () => {
+        uiActions.hideCharactersAttributesDialog()
+        uiActions.hideCharactersCategoryDialog()
+      })
     }
 
     const handleCreateNewCharacter = () => {
-      actions.addCharacter()
-      uiActions.startEditingSelectedCharacter()
+      undo.batch('Create New Character', () => {
+        actions.addCharacter()
+        uiActions.startEditingSelectedCharacter()
+      })
     }
 
     const handleChooseTemplate = (templateData) => {
-      actions.addCharacterWithTemplate(null, templateData)
-      uiActions.setCharacterTemplateData(templateData)
-      uiActions.startEditingSelectedCharacter()
-      uiActions.hideCharactersTemplatePicker()
+      undo.batch(`Choose Template ${templateData.name}`, () => {
+        actions.addCharacterWithTemplate(null, templateData)
+        uiActions.setCharacterTemplateData(templateData)
+        uiActions.startEditingSelectedCharacter()
+        uiActions.hideCharactersTemplatePicker()
+      })
     }
 
     const handleFinishCreate = (name) => {
       const id = nextIdAcrossCategories(visibleCharactersByCategory)
-      if (templateData) {
-        actions.addCharacterWithTemplate(name, templateData)
-      } else {
-        actions.addCharacter(name)
-      }
+      undo.batch(`Add Character ${name}`, () => {
+        if (templateData) {
+          actions.addCharacterWithTemplate(name, templateData)
+        } else {
+          actions.addCharacter(name)
+        }
 
-      uiActions.finishEditingSelectedCharacter()
-      uiActions.setCharacterTemplateData(null)
-      uiActions.selectCharacter(id)
-      uiActions.finishEditingSelectedCharacter()
+        uiActions.finishEditingSelectedCharacter()
+        uiActions.setCharacterTemplateData(null)
+        uiActions.selectCharacter(id)
+        uiActions.finishEditingSelectedCharacter()
+      })
     }
 
     const renderCreateInput = () => {
@@ -489,6 +498,7 @@ const CharacterListViewConnector = (connector) => {
     attributeTabId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     actions: PropTypes.object.isRequired,
     uiActions: PropTypes.object.isRequired,
+    undo: PropTypes.object.isRequired,
   }
 
   const {
@@ -535,6 +545,7 @@ const CharacterListViewConnector = (connector) => {
         return {
           actions: bindActionCreators(actions.character, dispatch),
           uiActions: bindActionCreators(actions.ui, dispatch),
+          undo: bindActionCreators(actions.undo, dispatch),
         }
       }
     )(CharacterListView)

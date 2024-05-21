@@ -14,7 +14,7 @@ const HelpHomeConnector = (connector) => {
   } = connector
   checkDependencies({ os, mpq, openExternal, createFullErrorReport, handleCustomerServiceCode })
 
-  const HelpHome = ({ withFullFileState }) => {
+  const HelpHome = () => {
     const serviceCodeRef = useRef(null)
 
     const submitCode = () => {
@@ -44,9 +44,7 @@ const HelpHomeConnector = (connector) => {
     }
 
     const handleCreateErrorReport = () => {
-      withFullFileState((state) => {
-        createFullErrorReport(state)
-      })
+      createFullErrorReport()
     }
 
     return (
@@ -115,26 +113,20 @@ const HelpHomeConnector = (connector) => {
 
   HelpHome.propTypes = {
     isOnWeb: PropTypes.bool,
-    withFullFileState: PropTypes.func,
   }
 
   const {
     redux,
-    pltr: { selectors, actions },
+    pltr: { selectors },
   } = connector
   checkDependencies({ redux })
 
   if (redux) {
     const { connect } = redux
 
-    return connect(
-      (state) => ({
-        isOnWeb: selectors.isOnWebSelector(state),
-      }),
-      {
-        withFullFileState: actions.project.withFullFileState,
-      }
-    )(HelpHome)
+    return connect((state) => ({
+      isOnWeb: selectors.isOnWebSelector(state),
+    }))(HelpHome)
   }
 
   throw new Error('Could not connect HelpHome')

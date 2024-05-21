@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import PropTypes from 'react-proptypes'
 
 import { t } from 'plottr_locales'
-import { removeSystemKeys } from 'pltr/v2'
 
 import NavItem from '../NavItem'
 import Popover from '../PlottrPopover'
@@ -62,7 +61,7 @@ const ExportNavItemConnector = (connector) => {
         bookId == 'series' ? seriesName + ' ' + t('(Series View)') : books[`${bookId}`].title
 
       withFullFileState((state) => {
-        const withoutSystemKeys = removeSystemKeys(state)
+        const withoutSystemKeys = connector?.pltr?.selectors?.fullFileStateSelector?.(state)
         askToExport(defaultPath, withoutSystemKeys, type, export_config[type], userId).catch(
           (error) => {
             getInstance().then((errorReporter) => {

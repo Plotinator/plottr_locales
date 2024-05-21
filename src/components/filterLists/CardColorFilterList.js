@@ -63,6 +63,7 @@ class CardColorFilterList extends Component {
       <GenericFilterList
         items={colorObjects}
         title={t('Colors')}
+        singleItemTitle={t('Color')}
         displayAttribute={'name'}
         updateItems={this.updateItems}
         filteredItems={this.props.filteredItems}

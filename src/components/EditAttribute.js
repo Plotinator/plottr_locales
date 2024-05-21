@@ -192,7 +192,7 @@ const EditAttributeConnector = (connector) => {
           />
         ) : null}
         {type === 'paragraph' ? (
-          <div className="card-dia<log__custom-attributes__wrapper">
+          <div className="card-dialog__custom-attributes__wrapper">
             <Label />
             <Description />
             <RichText

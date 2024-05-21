@@ -4,7 +4,7 @@ import cx from 'classnames'
 import { isEqual } from 'lodash'
 
 import { t as i18n } from 'plottr_locales'
-import { newIds } from 'pltr/v2'
+import { newIds } from 'pltr'
 
 import Form from '../Form'
 import UnconnectedPlottrModal from '../PlottrModal'

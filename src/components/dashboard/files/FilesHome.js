@@ -3,7 +3,7 @@ import PropTypes from 'react-proptypes'
 import { isObject } from 'lodash'
 
 import { t } from 'plottr_locales'
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import UnconnectedNewProjectInputModal from '../../dialogs/NewProjectInputModal'
 import UnconnectedNewFiles from './NewFiles'
@@ -15,7 +15,7 @@ import { checkDependencies } from '../../checkDependencies'
 const FilesHomeConnector = (connector) => {
   const {
     platform: {
-      file: { createNew, createFromSnowflake, createFromScrivener },
+      file: { createNew, createFromSnowflake, createFromScrivener, createFromWord },
       log,
       showErrorBox,
       showOpenDialog,
@@ -73,6 +73,25 @@ const FilesHomeConnector = (connector) => {
             return files[0]
           } else {
             errorActions.importError(t('Wrong file format'))
+            return null
+          }
+        }
+        return null
+      })
+    })
+  }
+
+  function wordImportDialog(errorActions) {
+    const title = t('Choose your Word file')
+    const filters = [{ name: 'Word Pro file', extensions: ['docx'] }]
+    const properties = ['openFile']
+    return userFilePickerDefaultFolder().then((defaultPath) => {
+      return showOpenDialog(title, filters, properties, defaultPath).then((files) => {
+        if (files && files[0]) {
+          if (files[0].toLowerCase().includes('.docx')) {
+            return files[0]
+          } else {
+            errorActions.importError('Wrong file format')
             return null
           }
         }
@@ -150,6 +169,27 @@ const FilesHomeConnector = (connector) => {
       }
     }
 
+    const createFromWordImport = () => {
+      if (isInOfflineMode) return
+
+      mpq.push('btn_create_from_import', { type: 'word' })
+      try {
+        wordImportDialog(errorActions).then((importedPath) => {
+          if (importedPath && typeof importedPath == 'string') {
+            createFromWord(importedPath)
+            // TODO: importActions.startWordImporter()
+          } else if (importedPath && importedPath.error) {
+            throw new Error(importedPath.error)
+          }
+        })
+      } catch (error) {
+        if (error) {
+          log.error(error)
+          showErrorBox(t('Error'), t('There was an error doing that. Try again'))
+        }
+      }
+    }
+
     const handleCreateNewProject = (template) => {
       if (isInOfflineMode) return
 
@@ -222,6 +262,7 @@ const FilesHomeConnector = (connector) => {
           }}
           doSnowflakeImport={createFromSnowflakeImport}
           doScrivenerImport={createFromScrivenerImport}
+          doWordImport={createFromWordImport}
           isOnWeb={isOnWeb}
           doCreateNewProject={handleCreateNewProject}
           isInOfflineMode={isInOfflineMode}

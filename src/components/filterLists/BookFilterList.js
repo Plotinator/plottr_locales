@@ -21,6 +21,7 @@ const BookFilterListConnector = (connector) => {
         <GenericFilterList
           items={books}
           title={i18n('Books')}
+          singleItemTitle={i18n('Book')}
           displayAttribute={'title'}
           updateItems={this.updateItems}
           filteredItems={this.props.filteredItems}

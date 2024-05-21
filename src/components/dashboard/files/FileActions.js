@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import PropTypes from 'react-proptypes'
-import { IoOpenOutline, IoCopyOutline } from 'react-icons/io5'
+import { IoOpenOutline } from '@react-icons/all-files/io5/IoOpenOutline'
+import { IoCopyOutline } from '@react-icons/all-files/io5/IoCopyOutline'
 
 import { t } from 'plottr_locales'
 

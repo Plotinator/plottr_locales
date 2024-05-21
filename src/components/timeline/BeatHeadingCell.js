@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { Cell } from 'react-sticky-table'
-import { FaGripLinesVertical } from 'react-icons/fa'
+import { FaGripLinesVertical } from '@react-icons/all-files/fa/FaGripLinesVertical'
 import cx from 'classnames'
 
 import { t } from 'plottr_locales'
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import UnconnectedFloater from '../PlottrFloater'
 import Glyphicon from '../Glyphicon'
@@ -53,6 +53,7 @@ const BeatHeadingCellConnector = (connector) => {
     timelineFoci,
     startEditingBeatHeadingTitle,
     stopEditingBeatHeadingTitle,
+    batch,
   }) => {
     const [width, setWidth] = useState(null)
     const [spacerCellWidth, setSpacerCellWidth] = useState(null)
@@ -78,11 +79,13 @@ const BeatHeadingCellConnector = (connector) => {
 
       const droppedInThisContainer = headingContains(droppedBeat.coord)
       if (droppedInThisContainer) {
-        collectBeat()
-        if (!beat.expanded) {
-          expandBeat(beat.id, currentTimeline)
-        }
-        handleReorder(beat.id, droppedBeat.id)
+        batch('Reorder Beat', () => {
+          collectBeat()
+          if (!beat.expanded) {
+            expandBeat(beat.id, currentTimeline)
+          }
+          handleReorder(beat.id, droppedBeat.id)
+        })
       }
     }, [droppedBeat])
 
@@ -134,10 +137,12 @@ const BeatHeadingCellConnector = (connector) => {
         if (droppedBeat.id == null) return
         if (droppedBeat.id == beat.id) return
 
-        if (!beat.expanded) {
-          expandBeat(beat.id, currentTimeline)
-        }
-        handleReorder(beat.id, droppedBeat.id)
+        batch('Reorder Beat', () => {
+          if (!beat.expanded) {
+            expandBeat(beat.id, currentTimeline)
+          }
+          handleReorder(beat.id, droppedBeat.id)
+        })
       },
       [setInDropZone, setDropDepth, beat?.id, beat?.expanded, expandBeat, handleReorder]
     )
@@ -151,10 +156,12 @@ const BeatHeadingCellConnector = (connector) => {
     )
 
     const stopEditing = useCallback(() => {
-      if (beat?.title === '') {
-        editBeatTitle(beatId, currentTimeline, 'auto')
-      }
-      stopEditingBeatHeadingTitle()
+      batch(`Edit Beat Title ${beat?.title ?? 'auto'}`, () => {
+        if (beat?.title === '') {
+          editBeatTitle(beatId, currentTimeline, 'auto')
+        }
+        stopEditingBeatHeadingTitle()
+      })
     }, [beat?.title, editBeatTitle, beatId, currentTimeline, stopEditingBeatHeadingTitle])
 
     const startDeleting = useCallback(
@@ -255,12 +262,42 @@ const BeatHeadingCellConnector = (connector) => {
       )
     }, [deleting, hierarchyLevels, beatTitle, deleteThisBeat, stopDeleting])
 
+    const adjustedWidth = useCallback(() => {
+      return width - (span === 1 && beats.length <= 1 ? 0 : isMedium ? 7 : 27)
+    }, [width, span, beats.length, isMedium])
+
+    const rightControlsPosition = useCallback(() => {
+      const controlHeight = 25
+      const offset = Math.floor(controlHeight / 2)
+      const bodyElement = container.current.querySelector('.beat__heading-wrapper')
+      if (bodyElement) {
+        const { height, top } = bodyElement.getBoundingClientRect()
+        const containerRect = container.current.getBoundingClientRect()
+        return {
+          top: top + Math.floor(height / 2) - offset,
+          left: containerRect.left + adjustedWidth(),
+        }
+      } else {
+        const { height, left, top } = container.current.getBoundingClientRect()
+        return { top: top + Math.floor(height / 2) - offset, left: left + width - 27 }
+      }
+    }, [container, width, adjustedWidth])
+
     const rightControlsContentLocation = useCallback(() => {
       if (container.current) {
         return rightControlsPosition()
       }
       return { top: 0, left: 0 }
     }, [container, rightControlsPosition, width])
+
+    const bottomControlsPosition = useCallback(() => {
+      const controlWidth = 71
+      const { bottom, left } = container.current.getBoundingClientRect()
+      return {
+        top: bottom - 4,
+        left: left + (width - (isMedium ? 0 : spacerCellWidth || 0)) / 2 - controlWidth / 2,
+      }
+    }, [container, isMedium, spacerCellWidth, width])
 
     const bottomControlsContentLocation = useCallback(() => {
       if (container.current) {
@@ -360,10 +397,6 @@ const BeatHeadingCellConnector = (connector) => {
       )
     }
 
-    const adjustedWidth = useCallback(() => {
-      return width - (span === 1 && beats.length <= 1 ? 0 : isMedium ? 7 : 27)
-    }, [width, span, beats.length, isMedium])
-
     const handleEsc = useCallback(
       (event) => {
         if (event.which === 27 || event.which === 13) {
@@ -372,32 +405,6 @@ const BeatHeadingCellConnector = (connector) => {
       },
       [stopEditingBeatHeadingTitle]
     )
-
-    const rightControlsPosition = useCallback(() => {
-      const controlHeight = 25
-      const offset = Math.floor(controlHeight / 2)
-      const bodyElement = container.current.querySelector('.beat__heading-wrapper')
-      if (bodyElement) {
-        const { height, top } = bodyElement.getBoundingClientRect()
-        const containerRect = container.current.getBoundingClientRect()
-        return {
-          top: top + Math.floor(height / 2) - offset,
-          left: containerRect.left + adjustedWidth(),
-        }
-      } else {
-        const { height, left, top } = container.current.getBoundingClientRect()
-        return { top: top + Math.floor(height / 2) - offset, left: left + width - 27 }
-      }
-    }, [container, width, adjustedWidth])
-
-    const bottomControlsPosition = useCallback(() => {
-      const controlWidth = 71
-      const { bottom, left } = container.current.getBoundingClientRect()
-      return {
-        top: bottom - 4,
-        left: left + (width - (isMedium ? 0 : spacerCellWidth || 0)) / 2 - controlWidth / 2,
-      }
-    }, [container, isMedium, spacerCellWidth, width])
 
     if (editing) {
       const focusCandidate =
@@ -539,6 +546,7 @@ const BeatHeadingCellConnector = (connector) => {
     collectBeat: PropTypes.func.isRequired,
     startEditingBeatHeadingTitle: PropTypes.func.isRequired,
     stopEditingBeatHeadingTitle: PropTypes.func.isRequired,
+    batch: PropTypes.func.isRequired,
   }
 
   const {
@@ -585,6 +593,7 @@ const BeatHeadingCellConnector = (connector) => {
         collectBeat: actions.domEvents.collectBeat,
         startEditingBeatHeadingTitle: actions.ui.startEditingBeatHeadingTitle,
         stopEditingBeatHeadingTitle: actions.ui.stopEditingBeatHeadingTitle,
+        batch: actions.undo.batch,
       }
     )(BeatHeadingCell)
   }

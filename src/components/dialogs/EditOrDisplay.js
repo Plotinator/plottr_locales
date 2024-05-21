@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { IoIosReturnRight } from 'react-icons/io'
+import { IoIosReturnRight } from '@react-icons/all-files/io/IoIosReturnRight'
 
 import { t } from 'plottr_locales'
 

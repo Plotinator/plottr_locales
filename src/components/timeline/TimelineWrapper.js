@@ -2,21 +2,20 @@ import React, { useEffect, useState, useRef, useCallback } from 'react'
 import PropTypes from 'react-proptypes'
 import { StickyTable } from 'react-sticky-table'
 import cx from 'classnames'
-import { VscSymbolStructure } from 'react-icons/vsc'
-import { CgArrowLongRight, CgArrowLongDown } from 'react-icons/cg'
-import {
-  HiOutlineChevronDoubleRight,
-  HiOutlineChevronDoubleLeft,
-  HiOutlineChevronLeft,
-  HiOutlineChevronRight,
-  HiOutlineChevronUp,
-  HiOutlineChevronDown,
-  HiOutlineChevronDoubleDown,
-  HiOutlineChevronDoubleUp,
-} from 'react-icons/hi'
+import { VscSymbolStructure } from '@react-icons/all-files/vsc/VscSymbolStructure'
+import { CgArrowLongRight } from '@react-icons/all-files/cg/CgArrowLongRight'
+import { CgArrowLongDown } from '@react-icons/all-files/cg/CgArrowLongDown'
+import { HiOutlineChevronDoubleRight } from '@react-icons/all-files/hi/HiOutlineChevronDoubleRight'
+import { HiOutlineChevronDoubleLeft } from '@react-icons/all-files/hi/HiOutlineChevronDoubleLeft'
+import { HiOutlineChevronLeft } from '@react-icons/all-files/hi/HiOutlineChevronLeft'
+import { HiOutlineChevronRight } from '@react-icons/all-files/hi/HiOutlineChevronRight'
+import { HiOutlineChevronUp } from '@react-icons/all-files/hi/HiOutlineChevronUp'
+import { HiOutlineChevronDown } from '@react-icons/all-files/hi/HiOutlineChevronDown'
+import { HiOutlineChevronDoubleDown } from '@react-icons/all-files/hi/HiOutlineChevronDoubleDown'
+import { HiOutlineChevronDoubleUp } from '@react-icons/all-files/hi/HiOutlineChevronDoubleUp'
 
 import { t } from 'plottr_locales'
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import UnconnectedPlottrFloater from '../PlottrFloater'
 import Popover from '../PlottrPopover'
@@ -80,6 +79,7 @@ const TimelineWrapperConnector = (connector) => {
   checkDependencies({ saveFile, mpq, exportDisabled, templatesDisabled, saveAsTemplate })
 
   const TimelineWrapper = ({
+    recentlyUndidOrRedid,
     timelineBundle,
     bookId,
     cardsExistOnTimeline,
@@ -93,7 +93,6 @@ const TimelineWrapperConnector = (connector) => {
     timelineViewIsStacked,
     timelineViewIsTabbed,
     hierarchyLevels,
-    beatActions,
     isCardDialogVisible,
     cardDialogBeatId,
     cardDialogCardId,
@@ -120,6 +119,11 @@ const TimelineWrapperConnector = (connector) => {
         return timelineBundle.isSmall ? tableRef.current.parentElement : tableRef.current
       })
     )
+
+    const recentlyUndidOrRedidRef = useRef(false)
+    useEffect(() => {
+      recentlyUndidOrRedidRef.current = !!recentlyUndidOrRedid
+    }, [recentlyUndidOrRedid])
 
     useEffect(() => {
       if (
@@ -343,10 +347,16 @@ const TimelineWrapperConnector = (connector) => {
           x: e.currentTarget.scrollLeft,
           y: e.currentTarget.scrollTop,
         }
-        if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
-        scrollTimeoutRef.current = setTimeout(() => {
-          actions.recordTimelineScrollPosition(position)
-        }, 500)
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current)
+        }
+        if (!recentlyUndidOrRedidRef.current) {
+          scrollTimeoutRef.current = setTimeout(() => {
+            if (!recentlyUndidOrRedidRef.current) {
+              actions.recordTimelineScrollPosition(position)
+            }
+          }, 500)
+        }
       }
     }
 
@@ -552,7 +562,9 @@ const TimelineWrapperConnector = (connector) => {
               <DropdownButton
                 id="select-timeline-view"
                 className="toolbar__selecet_view"
-                title={hierarchyLevels.length < 2 ? 'Default' : timelineView}
+                title={
+                  hierarchyLevels.length < 2 || timelineBundle.isSmall ? 'Default' : timelineView
+                }
               >
                 <MenuItem key={'default'} onSelect={() => actions.setTimelineView('default')}>
                   <div className="toolbar__timeline-view-selector">{t('Default')}</div>
@@ -571,7 +583,7 @@ const TimelineWrapperConnector = (connector) => {
                     <div className="toolbar__timeline-view-selector">{t('Tabbed')}</div>
                   </MenuItem>
                 ) : null}
-                {hierarchyLevels.length > 1 ? (
+                {hierarchyLevels.length > 1 && !timelineBundle.isSmall ? (
                   <MenuItem key={'stacked'} onSelect={() => actions.setTimelineView('stacked')}>
                     <div className="toolbar__timeline-view-selector">{t('Stacked')}</div>
                   </MenuItem>
@@ -753,6 +765,7 @@ const TimelineWrapperConnector = (connector) => {
   }
 
   TimelineWrapper.propTypes = {
+    recentlyUndidOrRedid: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]).isRequired,
     cardsExistOnTimeline: PropTypes.bool,
     bookId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
     timelineBundle: PropTypes.object.isRequired,
@@ -765,7 +778,6 @@ const TimelineWrapperConnector = (connector) => {
     timelineViewIsStacked: PropTypes.bool,
     timelineViewIsTabbed: PropTypes.bool,
     hierarchyLevels: PropTypes.array.isRequired,
-    beatActions: PropTypes.object.isRequired,
     cardDialogCardId: PropTypes.number,
     cardDialogLineId: PropTypes.number,
     cardDialogBeatId: PropTypes.number,
@@ -794,6 +806,7 @@ const TimelineWrapperConnector = (connector) => {
     return connect(
       (state) => {
         return {
+          recentlyUndidOrRedid: selectors.recentlyUndidOrRedidSelector(state),
           cardsExistOnTimeline: selectors.cardsExistOnTimelineSelector(state),
           bookId: selectors.currentTimelineSelector(state),
           timelineBundle: selectors.timelineBundleSelector(state),
@@ -823,7 +836,6 @@ const TimelineWrapperConnector = (connector) => {
         return {
           actions: bindActionCreators(actions.ui, dispatch),
           projectActions: bindActionCreators(actions.project, dispatch),
-          beatActions: bindActionCreators(actions.beat, dispatch),
           notificationActions: bindActionCreators(actions.notifications, dispatch),
         }
       }

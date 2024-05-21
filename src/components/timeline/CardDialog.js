@@ -1,13 +1,13 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react'
+import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import { isEqual } from 'lodash'
 import PropTypes from 'react-proptypes'
-import { FiCopy } from 'react-icons/fi'
+import { FiCopy } from '@react-icons/all-files/fi/FiCopy'
 import cx from 'classnames'
 import tinycolor from 'tinycolor2'
-import { IoIosWarning } from 'react-icons/io'
+import { IoIosWarning } from '@react-icons/all-files/io/IoIosWarning'
 
 import { t } from 'plottr_locales'
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import DropdownButton from '../DropdownButton'
 import MenuItem from '../MenuItem'
@@ -29,7 +29,6 @@ import UnconnectedCardDescriptionEditor from './CardDescriptionEditor'
 import TemplatePickerConnector from '../templates/TemplatePicker'
 import { checkDependencies } from '../checkDependencies'
 import { contains } from '../domHelpers'
-import { withArgs } from '../withArgs'
 
 const {
   card: { truncateTitle },
@@ -88,8 +87,49 @@ const CardDialogConnector = (connector) => {
     removeWhichTemplate,
     activeTab,
     foci,
+    undo,
   }) => {
     const [newTemplateTabPosition, setNewTemplateTabPosition] = useState(null)
+    const [newTitleAndSelection, setNewTitleAndSelection] = useState({
+      value: cardMetaData.title,
+      selection: null,
+    })
+
+    const handleTitleChange = useCallback((value, selection) => {
+      setNewTitleAndSelection({ value, selection })
+    }, [])
+
+    useEffect(() => {
+      if (
+        cardMetaData.title !== newTitleAndSelection.value &&
+        cardMetaData.selection !== newTitleAndSelection.selection
+      ) {
+        const updateTimeout = setTimeout(() => {
+          actions.editCardTitle(
+            cardMetaData.id,
+            newTitleAndSelection.value,
+            newTitleAndSelection.selection
+          )
+        }, 300)
+        return () => {
+          clearTimeout(updateTimeout)
+        }
+      }
+      return () => {}
+    }, [
+      newTitleAndSelection.value,
+      newTitleAndSelection.selection,
+      cardMetaData.id,
+      cardMetaData.value,
+      cardMetaData.selection,
+    ])
+
+    useEffect(() => {
+      setNewTitleAndSelection({
+        value: cardMetaData.title,
+        selection: newTitleAndSelection.selection,
+      })
+    }, [cardMetaData.title])
 
     const colourPickerButtonRef = useRef()
     const colourPickerPaletteListRef = useRef()
@@ -144,8 +184,10 @@ const CardDialogConnector = (connector) => {
 
     const duplicateCard = (e) => {
       e.stopPropagation()
-      actions.duplicateCard(id)
-      notificationActions.showToastNotification(true, 'duplicate')
+      undo.batch(`Duplicate Card ${title ?? ''}`, () => {
+        actions.duplicateCard(id)
+        notificationActions.showToastNotification(true, 'duplicate')
+      })
     }
 
     const beginRemoveTemplate = (templateId) => {
@@ -154,9 +196,11 @@ const CardDialogConnector = (connector) => {
 
     const finishRemoveTemplate = (e) => {
       e.stopPropagation()
-      uiActions.setActiveTabOnCardDialog(activeTab - 1)
-      actions.removeTemplateFromCard(cardId, removeWhichTemplate)
-      uiActions.stopRemovingTemplateFromCardDialog()
+      undo.batch(`Remove Template`, () => {
+        uiActions.setActiveTabOnCardDialog(activeTab - 1)
+        actions.removeTemplateFromCard(cardId, removeWhichTemplate)
+        uiActions.stopRemovingTemplateFromCardDialog()
+      })
     }
 
     const cancelRemoveTemplate = (e) => {
@@ -179,9 +223,9 @@ const CardDialogConnector = (connector) => {
     const handleTemplateAttrChange = (templateId, name) => (value, selection) => {
       if (!value && value !== '') {
         actions.editCardAttributes(cardId, {}, selection)
-        return
+      } else {
+        actions.editCardTemplateAttribute(cardId, templateId, name, value, selection)
       }
-      actions.editCardTemplateAttribute(cardId, templateId, name, value, selection)
     }
 
     const handleEnter = (event) => {
@@ -196,9 +240,11 @@ const CardDialogConnector = (connector) => {
 
     const handleChooseTemplate = (templateData) => {
       const numTemplates = templates.length
-      actions.addTemplateToCard(id, templateData)
-      uiActions.hideCardDialogTemplatePicker()
-      uiActions.setActiveTabOnCardDialog(numTemplates + 3)
+      undo.batch(`Choose Template ${templateData?.name}`, () => {
+        actions.addTemplateToCard(id, templateData)
+        uiActions.hideCardDialogTemplatePicker()
+        uiActions.setActiveTabOnCardDialog(numTemplates + 3)
+      })
     }
 
     const closeTemplatePicker = () => {
@@ -206,8 +252,10 @@ const CardDialogConnector = (connector) => {
     }
 
     const chooseCardColor = (color) => {
-      actions.editCardAttributes(cardId, { color })
-      uiActions.hideCardDialogColorPicker()
+      undo.batch(`Set Card Color to ${color}`, () => {
+        actions.editCardAttributes(cardId, { color })
+        uiActions.hideCardDialogColorPicker()
+      })
     }
 
     const changeBeat = (beatId) => {
@@ -241,10 +289,12 @@ const CardDialogConnector = (connector) => {
       if (key == 'new') {
         openTemplatePicker()
       } else if (typeof key === 'number') {
-        uiActions.setActiveTabOnCardDialog(key)
-        if (key === 2 && !customAttributes.length) {
-          uiActions.openAttributesDialog()
-        }
+        undo.batch('Select Card Tab', () => {
+          uiActions.setActiveTabOnCardDialog(key)
+          if (key === 2 && !customAttributes.length) {
+            uiActions.openAttributesDialog()
+          }
+        })
       }
     }
 
@@ -498,7 +548,6 @@ const CardDialogConnector = (connector) => {
     }
 
     const renderTitle = () => {
-      const title = cardMetaData.title
       return (
         <TextFormControl
           id={`card-${cardMetaData.id}-title`}
@@ -506,8 +555,8 @@ const CardDialogConnector = (connector) => {
           style={{ fontSize: '24px', textAlign: 'center', marginBottom: '6px' }}
           onKeyPress={handleEnter}
           type="text"
-          value={title}
-          onChange={withArgs(actions.editCardTitle, cardMetaData.id)}
+          value={newTitleAndSelection.value}
+          onChange={handleTitleChange}
           autoFocus={foci && foci[0] && foci[0].path[2] === 'title'}
           selection={selectionForMainCardElement('title')}
         />
@@ -515,8 +564,10 @@ const CardDialogConnector = (connector) => {
     }
 
     const moveCard = (bookId) => {
-      actions.moveCardToBook(bookId, cardId)
-      notificationActions.showToastNotification(true, 'move', bookId)
+      undo.batch('Move Card to Another Book', () => {
+        actions.moveCardToBook(bookId, cardId)
+        notificationActions.showToastNotification(true, 'move', bookId)
+      })
     }
 
     const renderChangeBookDropdown = () => {
@@ -724,6 +775,7 @@ const CardDialogConnector = (connector) => {
     removeWhichTemplate: PropTypes.number,
     activeTab: PropTypes.number.isRequired,
     foci: PropTypes.array.isRequired,
+    undo: PropTypes.object.isRequired,
   }
 
   const MemoizedCardDialog = React.memo(CardDialog)
@@ -770,6 +822,7 @@ const CardDialogConnector = (connector) => {
           actions: bindActionCreators(actions.card, dispatch),
           uiActions: bindActionCreators(actions.ui, dispatch),
           notificationActions: bindActionCreators(actions.notifications, dispatch),
+          undo: bindActionCreators(actions.undo, dispatch),
         }
       }
     )(MemoizedCardDialog)

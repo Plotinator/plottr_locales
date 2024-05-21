@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
-import { IoIosAlert } from 'react-icons/io'
+import { IoIosAlert } from '@react-icons/all-files/io/IoIosAlert'
 
 import { t as i18n } from 'plottr_locales'
 
@@ -80,7 +80,7 @@ const ErrorBoundaryConnector = (connector) => {
     }
 
     createReport = () => {
-      createErrorReport(this.error, this.errorInfo, this.props.proInfo, this.props.trialInfo)
+      createErrorReport(this.error, this.errorInfo, {}, this.props.trialInfo)
     }
 
     goToSupport = () => {
@@ -142,7 +142,6 @@ const ErrorBoundaryConnector = (connector) => {
   ErrorBoundary.propTypes = {
     children: PropTypes.node,
     darkMode: PropTypes.bool,
-    proInfo: PropTypes.object,
     trialInfo: PropTypes.object,
     user: PropTypes.object.isRequired,
     userId: PropTypes.string,
@@ -163,7 +162,6 @@ const ErrorBoundaryConnector = (connector) => {
     return connect((state) => {
       return {
         darkMode: selectors.isDarkModeSelector(state),
-        proInfo: selectors.proInfoSelector(state),
         trialInfo: selectors.trialInfoSelector(state),
         user: selectors.userSettingsSelector(state),
         userId: selectors.userIdSelector(state),

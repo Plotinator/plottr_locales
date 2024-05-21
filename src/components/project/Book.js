@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
-import { TbCopy } from 'react-icons/tb'
+import { TbCopy } from '@react-icons/all-files/tb/TbCopy'
 
 import { t } from 'plottr_locales'
 

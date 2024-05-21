@@ -16,6 +16,7 @@ const PlaceFilterListConnector = (connector) => {
         <GenericFilterList
           items={this.props.places}
           title={i18n('Places')}
+          singleItemTitle={i18n('Place')}
           displayAttribute={'name'}
           updateItems={this.updateItems}
           filteredItems={this.props.filteredItems}

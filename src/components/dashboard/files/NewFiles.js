@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react'
 import PropTypes from 'react-proptypes'
-import { IoIosBrowsers, IoIosDocument } from 'react-icons/io'
-import { BiImport } from 'react-icons/bi'
-import { VscCloudUpload } from 'react-icons/vsc'
+import { IoIosBrowsers } from '@react-icons/all-files/io/IoIosBrowsers'
+import { IoIosDocument } from '@react-icons/all-files/io/IoIosDocument'
+import { BiImport } from '@react-icons/all-files/bi/BiImport'
+import { VscCloudUpload } from '@react-icons/all-files/vsc/VscCloudUpload'
 import cx from 'classnames'
 
 import { t } from 'plottr_locales'
@@ -32,6 +33,7 @@ const NewFilesConnector = (connector) => {
     toggleView,
     doSnowflakeImport,
     doScrivenerImport,
+    doWordImport,
     isOnWeb,
     isInOfflineMode,
     doCreateNewProject,
@@ -121,6 +123,7 @@ const NewFilesConnector = (connector) => {
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
                     <MenuItem onSelect={doScrivenerImport}>{t('Scrivener')}</MenuItem>
+                    <MenuItem onSelect={doWordImport}>{t('Word (docx)')}</MenuItem>
                     <MenuItem onSelect={doSnowflakeImport}>{t('Snowflake Pro')}</MenuItem>
                   </Dropdown.Menu>
                 </Dropdown>
@@ -135,9 +138,10 @@ const NewFilesConnector = (connector) => {
   NewFiles.propTypes = {
     activeView: PropTypes.string,
     toggleView: PropTypes.func,
-    doSnowflakeImport: PropTypes.func,
-    doScrivenerImport: PropTypes.func,
-    doCreateNewProject: PropTypes.func,
+    doSnowflakeImport: PropTypes.func.isRequired,
+    doScrivenerImport: PropTypes.func.isRequired,
+    doCreateNewProject: PropTypes.func.isRequired,
+    doWordImport: PropTypes.func.isRequired,
     isOnWeb: PropTypes.bool,
     isInOfflineMode: PropTypes.bool,
   }

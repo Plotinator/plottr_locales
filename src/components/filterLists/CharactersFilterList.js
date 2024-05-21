@@ -16,6 +16,7 @@ const CharacterFilterListConnector = (connector) => {
         <GenericFilterList
           items={this.props.characters}
           title={i18n('Characters')}
+          singleItemTitle={i18n('Character')}
           displayAttribute={'name'}
           updateItems={this.updateItems}
           filteredItems={this.props.filteredItems}

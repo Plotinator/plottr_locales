@@ -1,10 +1,10 @@
 import React, { Component, createRef } from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
-import { FaCircle } from 'react-icons/fa'
+import { FaCircle } from '@react-icons/all-files/fa/FaCircle'
 import tinycolor from 'tinycolor2'
 
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import UnconnectedPlottrFloater from '../PlottrFloater'
 import Popover from '../PlottrPopover'
@@ -341,12 +341,10 @@ const CardConnector = (connector) => {
     redux,
     pltr: { selectors, actions },
   } = connector
-  const CardActions = actions.card
   checkDependencies({
     redux,
     selectors,
     actions,
-    CardActions,
   })
 
   if (redux) {
@@ -366,7 +364,6 @@ const CardConnector = (connector) => {
       },
       (dispatch) => {
         return {
-          actions: bindActionCreators(CardActions, dispatch),
           uiActions: bindActionCreators(actions.ui, dispatch),
         }
       }

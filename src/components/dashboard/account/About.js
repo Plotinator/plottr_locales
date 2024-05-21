@@ -89,9 +89,9 @@ const AboutConnector = (connector) => {
           </dl>
           <dl className="dl-horizontal">
             <dt>{t('Created By')}</dt>
-            <dd>{t('Fictional Devices LLC')}</dd>
-            <dd>Cameron Sutter</dd>
-            <dd>Ryan Zee</dd>
+            <dd>
+              Cameron Sutter and <a href="https://plottr.com/team">an awesome team</a>
+            </dd>
           </dl>
         </div>
       </div>

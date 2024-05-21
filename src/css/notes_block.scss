@@ -185,6 +185,7 @@
   align-items: flex-start;
 
   .note-list__note-view__left-side {
+    overflow: hidden;
     width: 18%;
     position: sticky;
     top: 0;
@@ -258,9 +259,12 @@
     flex-direction: row-reverse;
   }
 
-  .slate-editor__wrapper {
-    .slate-editor__word-counter {
-      display: none !important;
+  &:not(.editing) {
+    .slate-editor__wrapper {
+      word-break: break-word;
+      .slate-editor__word-counter {
+        display: none;
+      }
     }
   }
 }
@@ -333,7 +337,7 @@
       position: relative;
 
       .slate-editor__word-counter {
-        display: flex !important;
+        display: flex;
       }
     }
   }

@@ -3,7 +3,7 @@ import PropTypes from 'react-proptypes'
 import { defaultStyles } from 'react-modal'
 
 import { t as i18n } from 'plottr_locales'
-import { colors } from 'pltr/v2'
+import { colors } from 'pltr'
 
 import Col from './Col'
 import Row from './Row'

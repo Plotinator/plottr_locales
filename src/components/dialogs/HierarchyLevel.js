@@ -2,8 +2,7 @@ import React, { useState } from 'react'
 import { PropTypes } from 'prop-types'
 
 import { actions } from 'wired-up-pltr'
-import { borderStyle as borderStyles, helpers } from 'pltr/v2'
-import { getBorderColor } from 'pltr/v2/helpers/colors'
+import { borderStyle as borderStyles, helpers } from 'pltr'
 
 import UnconnectedEditOrDisplay from './EditOrDisplay'
 import { checkDependencies } from '../checkDependencies'
@@ -12,7 +11,7 @@ const {
   hierarchyLevels: { editHierarchyLevel },
 } = actions
 const {
-  colors: { getBackgroundColor },
+  colors: { getBackgroundColor, getBorderColor },
 } = helpers
 
 const HierarchyLevelConnector = (connector) => {
@@ -35,7 +34,6 @@ const HierarchyLevelConnector = (connector) => {
   }) => {
     const [editingName, setEditingName] = useState(false)
     const [editingTextColor, setEditingTextColor] = useState(false)
-    const [editingTextSize, setEditingTextSize] = useState(false)
     const [editingBorderColor, setEditingBorderColor] = useState(false)
     const [editingBorderStyle, setEditingBorderStyle] = useState(false)
     const [editingBackgroundColor, setEditingBackgroundColor] = useState(false)
@@ -84,15 +82,6 @@ const HierarchyLevelConnector = (connector) => {
           setEditing={setEditingTextColor}
           editing={editingTextColor}
           value={isDarkMode ? dark.textColor : light.textColor}
-        />
-        <EditOrDisplay
-          id={`hierarchy-level-auto-text-size-${level}`}
-          type="number"
-          setValue={setValue('textSize')}
-          setEditing={setEditingTextSize}
-          editing={editingTextSize}
-          value={textSize}
-          hideArrow={true}
         />
         <EditOrDisplay
           id={`hierarchy-level-auto-border-color-${level}`}

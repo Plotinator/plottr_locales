@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import PropTypes from 'react-proptypes'
 
 import { t } from 'plottr_locales'
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import HelpBlock from '../../HelpBlock'
 import Button from '../../Button'
@@ -39,7 +39,7 @@ const BackupSettingsConnector = (connector) => {
 
   const BackupOptions = UnconnectedBackupOptions(connector)
 
-  const BackupSettings = ({ hasCurrentProLicense, settings, newDefault }) => {
+  const BackupSettings = ({ isLoggedIntoPro, settings, newDefault }) => {
     const [defaultBackupPath, setDefaultBackupPath] = useState('')
     const [displayPath, setDisplayPath] = useState('')
 
@@ -114,7 +114,7 @@ const BackupSettingsConnector = (connector) => {
     // - not web
     // - not Pro, unless Pro & localBackups
     const showBackupLocation = () => {
-      return (!osIsUnknown && !hasCurrentProLicense) || (!osIsUnknown && settings.user.localBackups)
+      return (!osIsUnknown && !isLoggedIntoPro) || (!osIsUnknown && settings.user.localBackups)
     }
 
     const showRestoreButton = () => {
@@ -147,7 +147,7 @@ const BackupSettingsConnector = (connector) => {
             labelText={t('Automatically save daily backups')}
           />
         </div>
-        {!osIsUnknown && hasCurrentProLicense ? (
+        {!osIsUnknown && isLoggedIntoPro ? (
           <div className="dashboard__options__item">
             <h4>{t('Also save backups on this device')}</h4>
             <Switch
@@ -190,7 +190,7 @@ const BackupSettingsConnector = (connector) => {
   }
 
   BackupSettings.propTypes = {
-    hasCurrentProLicense: PropTypes.bool,
+    isLoggedIntoPro: PropTypes.bool,
     settings: PropTypes.object.isRequired,
     shouldBeInPro: PropTypes.bool,
     newDefault: PropTypes.bool,
@@ -206,7 +206,7 @@ const BackupSettingsConnector = (connector) => {
 
     return connect((state) => {
       return {
-        hasCurrentProLicense: selectors.hasProSelector(state),
+        isLoggedIntoPro: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
         settings: selectors.appSettingsSelector(state),
         shouldBeInPro: selectors.shouldBeInProSelector(state),
       }

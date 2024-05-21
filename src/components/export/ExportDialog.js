@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import PropTypes from 'react-proptypes'
 
 import { t } from 'plottr_locales'
-import { removeSystemKeys } from 'pltr/v2'
 
 import NavItem from '../NavItem'
 import Nav from '../Nav'
@@ -74,7 +73,7 @@ const ExportDialogConnector = (connector) => {
         bookId == 'series' ? seriesName + ' ' + t('(Series View)') : books[`${bookId}`].title
 
       projectActions.withFullFileState((state) => {
-        const withoutSystemKeys = removeSystemKeys(state)
+        const withoutSystemKeys = selectors.fullFileStateSelector(state)
         askToExport(defaultPath, withoutSystemKeys, type, options[type], userId)
           .then(() => {
             if (saveOptions) {
@@ -160,7 +159,6 @@ const ExportDialogConnector = (connector) => {
     bookId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     seriesName: PropTypes.string,
     books: PropTypes.object.isRequired,
-    actions: PropTypes.object.isRequired,
     projectActions: PropTypes.object.isRequired,
     userId: PropTypes.string,
   }
@@ -186,7 +184,6 @@ const ExportDialogConnector = (connector) => {
       },
       (dispatch) => {
         return {
-          actions: bindActionCreators(actions.ui, dispatch),
           projectActions: bindActionCreators(actions.project, dispatch),
         }
       }

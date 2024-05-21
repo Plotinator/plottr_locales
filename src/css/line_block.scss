@@ -102,6 +102,7 @@ $medium_width: 80px;
 }
 
 .line-title__hover-options {
+  background-color: white;
 }
 
 .line-list__insert-beat {
@@ -303,11 +304,12 @@ $medium_width: 80px;
 }
 
 .vertical-line-title__hover-options {
+  background-color: white;
   .btn-block {
     margin-top: 0;
   }
   &.small-timeline {
-    transform: translate(-8px);
+    transform: translate(-24px);
   }
 }
 

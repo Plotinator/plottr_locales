@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import tinycolor from 'tinycolor2'
 
 import { t } from 'plottr_locales'
-import { defaultSettings } from 'pltr/v2'
+import { defaultSettings } from 'pltr'
 
 import { checkDependencies } from '../../checkDependencies'
 import { addRecent } from '../../rce/fonts'
@@ -112,11 +112,26 @@ const RCESettingSectionConnector = (connector) => {
     }, [showDarkModeColourPicker])
 
     const toggleColorPicker = () => {
+      if (showDarkModeColourPicker) {
+        setShowDarkModeColourPicker(false)
+      }
       setShowColourPicker(!showColourPicker)
     }
 
     const toggleDarkModeColorPicker = () => {
+      if (showColourPicker) {
+        setShowColourPicker(false)
+      }
       setShowDarkModeColourPicker(!showDarkModeColourPicker)
+    }
+
+    const handleCloseColorPickers = () => {
+      if (showColourPicker) {
+        setShowColourPicker(false)
+      }
+      if (showDarkModeColourPicker) {
+        setShowDarkModeColourPicker(false)
+      }
     }
 
     return (
@@ -129,6 +144,7 @@ const RCESettingSectionConnector = (connector) => {
               fonts={fonts || []}
               recentFonts={[]}
               addRecent={addRecent}
+              onClick={handleCloseColorPickers}
               onChange={(newFont) => {
                 saveAppSetting(`user.fonts.rce.${sectionName}Font`, newFont)
               }}
@@ -138,12 +154,13 @@ const RCESettingSectionConnector = (connector) => {
             <span>{t('Font Size')}</span>
             <FontSizeSettingDropdown
               defaultFontSize={
-                Number(sectionFontSize?.replace('px', '')) ||
-                Number(defaultFontSize?.replace('px', ''))
+                Number(sectionFontSize?.replace('pt', '')) ||
+                Number(defaultFontSize?.replace('pt', ''))
               }
               onChange={(newSize) => {
-                saveAppSetting(`user.fonts.rce.${sectionName}FontSize`, `${newSize}px`)
+                saveAppSetting(`user.fonts.rce.${sectionName}FontSize`, `${newSize}pt`)
               }}
+              onClick={handleCloseColorPickers}
             />
           </div>
           {noFontWeight ? null : (
@@ -154,6 +171,7 @@ const RCESettingSectionConnector = (connector) => {
                 onChange={(newWeight) => {
                   saveAppSetting(`user.fonts.rce.${sectionName}FontWeight`, newWeight)
                 }}
+                onClick={handleCloseColorPickers}
               />
             </div>
           )}

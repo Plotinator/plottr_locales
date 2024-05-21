@@ -4,7 +4,12 @@ import { PropTypes } from 'prop-types'
 import DropdownButton from '../../DropdownButton'
 import MenuItem from '../../MenuItem'
 
-const UnMemoisedFontSizeSettingDropdown = ({ defaultFontSize, onChange, isMultiplier }) => {
+const UnMemoisedFontSizeSettingDropdown = ({
+  defaultFontSize,
+  onChange,
+  isMultiplier,
+  onClick,
+}) => {
   const title = defaultFontSize || 20
 
   const changeSize = (size) => {
@@ -146,7 +151,13 @@ const UnMemoisedFontSizeSettingDropdown = ({ defaultFontSize, onChange, isMultip
   }
 
   return (
-    <DropdownButton className="size-picker" title={title} onSelect={changeSize} id="size-dropdown">
+    <DropdownButton
+      className="size-picker"
+      title={title}
+      onSelect={changeSize}
+      id="size-dropdown"
+      onClick={onClick}
+    >
       {isMultiplier ? renderMultiplier() : renderSizes()}
     </DropdownButton>
   )
@@ -155,6 +166,7 @@ const UnMemoisedFontSizeSettingDropdown = ({ defaultFontSize, onChange, isMultip
 UnMemoisedFontSizeSettingDropdown.propTypes = {
   defaultFontSize: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   onChange: PropTypes.func.isRequired,
+  onClick: PropTypes.func.isRequired,
   isMultiplier: PropTypes.bool,
 }
 

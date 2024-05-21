@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import PropTypes from 'react-proptypes'
 
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 import { t } from 'plottr_locales'
 
 import OnboardingStep from '../../../onboarding/OnboardingStep'

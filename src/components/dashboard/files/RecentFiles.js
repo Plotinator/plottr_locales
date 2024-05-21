@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { AiOutlineTeam, AiOutlineRead } from 'react-icons/ai'
-import { GiQuillInk } from 'react-icons/gi'
-import { FaSignal } from 'react-icons/fa'
+import { AiOutlineTeam } from '@react-icons/all-files/ai/AiOutlineTeam'
+import { AiOutlineRead } from '@react-icons/all-files/ai/AiOutlineRead'
+import { GiQuillInk } from '@react-icons/all-files/gi/GiQuillInk'
+import { FaSignal } from '@react-icons/all-files/fa/FaSignal'
 import { isEqual, sortBy } from 'lodash'
 import { StickyTable, Row, Cell } from 'react-sticky-table'
 import cx from 'classnames'
 
 import { t } from 'plottr_locales'
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import MissingIndicator from './MissingIndicator'
 import UnconnectedFileActions from './FileActions'
@@ -87,7 +88,7 @@ const RecentFilesConnector = (connector) => {
     shouldBeInPro,
     offlineModeEnabled,
     isOnWeb,
-    hasCurrentProLicense,
+    isInProMode,
     settings,
     hasDefaultFolder,
   }) => {
@@ -160,7 +161,6 @@ const RecentFilesConnector = (connector) => {
     }
 
     const renderRecents = () => {
-      // TODO: if no files, show something different
       if (!isInOfflineMode && loadingFileList) return <Spinner />
       if (!sortedFiles.length) return <span>{t('No files found.')}</span>
 
@@ -278,11 +278,7 @@ const RecentFilesConnector = (connector) => {
 
     return (
       <div className="dashboard__recent-files">
-        <RecentsHeader
-          setSearchTerm={setSearchTerm}
-          hasCurrentProLicense={hasCurrentProLicense}
-          isOnWeb={isOnWeb}
-        />
+        <RecentsHeader setSearchTerm={setSearchTerm} isInProMode={isInProMode} isOnWeb={isOnWeb} />
         {renderRecents() || <Spinner />}
       </div>
     )
@@ -296,7 +292,7 @@ const RecentFilesConnector = (connector) => {
     shouldBeInPro: PropTypes.bool,
     offlineModeEnabled: PropTypes.bool,
     isOnWeb: PropTypes.bool,
-    hasCurrentProLicense: PropTypes.bool,
+    isInProMode: PropTypes.bool,
     settings: PropTypes.object,
     hasDefaultFolder: PropTypes.bool,
   }
@@ -317,7 +313,7 @@ const RecentFilesConnector = (connector) => {
       shouldBeInPro: selectors.shouldBeInProSelector(state),
       offlineModeEnabled: selectors.offlineModeEnabledSelector(state),
       isOnWeb: selectors.isOnWebSelector(state),
-      hasCurrentProLicense: selectors.hasProSelector(state),
+      isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
       settings: selectors.appSettingsSelector(state),
       hasDefaultFolder: selectors.hasDefaultFolderSelector(state),
     }))(RecentFiles)

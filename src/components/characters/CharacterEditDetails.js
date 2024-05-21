@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import PropTypes from 'react-proptypes'
 import { isEqual } from 'lodash'
 import cx from 'classnames'
-import { FiCopy } from 'react-icons/fi'
+import { FiCopy } from '@react-icons/all-files/fi/FiCopy'
 
 import { t } from 'plottr_locales'
 
@@ -47,6 +47,7 @@ const CharacterEditDetailsConnector = (connector) => {
     character,
     actions,
     uiActions,
+    undo,
     attributes,
     getTemplateById,
     darkMode,
@@ -198,8 +199,10 @@ const CharacterEditDetailsConnector = (connector) => {
 
     const deleteCharacter = (e) => {
       e.stopPropagation()
-      actions.deleteCharacter(character.id)
-      uiActions.finishDeletingCharacter()
+      undo.batch(`Delete Character ${character.name}`, () => {
+        actions.deleteCharacter(character.id)
+        uiActions.finishDeletingCharacter()
+      })
     }
 
     const cancelDelete = (e) => {
@@ -213,22 +216,40 @@ const CharacterEditDetailsConnector = (connector) => {
     }
 
     const beginRemoveTemplate = (templateId) => {
-      uiActions.startRemovingTemplateFromCharacter()
-      uiActions.setTemplateToRemoveFromCharacter(templateId)
+      const templateName =
+        character.templates.find((template) => {
+          return templateId === template?.id
+        })?.name ?? ''
+      undo.batch(`Start Removing Template ${templateName}`, () => {
+        uiActions.startRemovingTemplateFromCharacter()
+        uiActions.setTemplateToRemoveFromCharacter(templateId)
+      })
     }
 
     const finishRemoveTemplate = (e) => {
       e.stopPropagation()
-      uiActions.setActiveCharacterTab(activeTab - 1)
-      actions.removeTemplateFromCharacter(character.id, removeWhichTemplate)
-      uiActions.finishRemovingTemplateFromCharacter()
-      uiActions.setTemplateToRemoveFromCharacter(null)
+      const templateName =
+        character.templates.find((template) => {
+          return removeWhichTemplate === template?.id
+        })?.name ?? ''
+      undo.batch(`Finish Removing Template ${templateName}`, () => {
+        uiActions.setActiveCharacterTab(activeTab - 1)
+        actions.removeTemplateFromCharacter(character.id, removeWhichTemplate)
+        uiActions.finishRemovingTemplateFromCharacter()
+        uiActions.setTemplateToRemoveFromCharacter(null)
+      })
     }
 
     const cancelRemoveTemplate = (e) => {
       e.stopPropagation()
-      uiActions.finishRemovingTemplateFromCharacter()
-      uiActions.setTemplateToRemoveFromCharacter(null)
+      const templateName =
+        character.templates.find((template) => {
+          return removeWhichTemplate === template?.id
+        })?.name ?? ''
+      undo.batch(`Cancel Removing Template ${templateName}`, () => {
+        uiActions.finishRemovingTemplateFromCharacter()
+        uiActions.setTemplateToRemoveFromCharacter(null)
+      })
     }
 
     const handleEnter = (event) => {
@@ -244,10 +265,12 @@ const CharacterEditDetailsConnector = (connector) => {
     }
 
     const handleChooseTemplate = (templateData) => {
-      actions.addTemplateToCharacter(character.id, templateData)
       const numTemplates = character.templates.length
-      uiActions.hideCharacterEditorTemplatePicker()
-      uiActions.setActiveCharacterTab(numTemplates + 3)
+      undo.batch(`Choose Template ${templateData.name}`, () => {
+        actions.addTemplateToCharacter(character.id, templateData)
+        uiActions.hideCharacterEditorTemplatePicker()
+        uiActions.setActiveCharacterTab(numTemplates + 3)
+      })
     }
 
     const handleNotesChanged = (value, selection) => {
@@ -586,6 +609,7 @@ const CharacterEditDetailsConnector = (connector) => {
     character: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired,
     uiActions: PropTypes.object.isRequired,
+    undo: PropTypes.object.isRequired,
     attributes: PropTypes.array.isRequired,
     darkMode: PropTypes.bool,
     finishEditing: PropTypes.func.isRequired,
@@ -643,6 +667,7 @@ const CharacterEditDetailsConnector = (connector) => {
         return {
           actions: bindActionCreators(actions.character, dispatch),
           uiActions: bindActionCreators(actions.ui, dispatch),
+          undo: bindActionCreators(actions.undo, dispatch),
         }
       }
     )(CharacterEditDetails)

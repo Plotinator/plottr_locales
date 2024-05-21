@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import PropTypes from 'prop-types'
-import { FaOutdent } from 'react-icons/fa'
+import { FaOutdent } from '@react-icons/all-files/fa/FaOutdent'
 
 import Button from '../Button'
 import { isBlockActive, handleList } from './BlockButton'

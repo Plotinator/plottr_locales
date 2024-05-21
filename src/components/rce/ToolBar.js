@@ -1,14 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import PropTypes from 'react-proptypes'
-import {
-  FaBold,
-  FaItalic,
-  FaUnderline,
-  FaQuoteLeft,
-  FaListOl,
-  FaListUl,
-  FaStrikethrough,
-} from 'react-icons/fa'
+import { FaBold } from '@react-icons/all-files/fa/FaBold'
+import { FaItalic } from '@react-icons/all-files/fa/FaItalic'
+import { FaUnderline } from '@react-icons/all-files/fa/FaUnderline'
+import { FaQuoteLeft } from '@react-icons/all-files/fa/FaQuoteLeft'
+import { FaListOl } from '@react-icons/all-files/fa/FaListOl'
+import { FaListUl } from '@react-icons/all-files/fa/FaListUl'
+import { FaStrikethrough } from '@react-icons/all-files/fa/FaStrikethrough'
 import cx from 'classnames'
 
 import { t } from 'plottr_locales'
@@ -62,9 +60,10 @@ const UnconnectedToolBar = (connector) => {
   const strikeThroughIcon = <FaStrikethrough />
 
   const ToolBar = ({ editor, darkMode, settings, focusEditor }) => {
+    const currentFont = settings.user.fonts?.rce?.defaultFont
     const [showColorPicker, toggleColorPicker] = useState(false)
     const [fonts, setFonts] = useState(null)
-    const [recentFonts, setRecentFonts] = useState(settings.user.font ? [settings.user.font] : null)
+    const [recentFonts, setRecentFonts] = useState(currentFont ? [currentFont] : null)
     const defaultFontSize = settings.user.fontSize
 
     const changeColor = useCallback(
@@ -79,7 +78,7 @@ const UnconnectedToolBar = (connector) => {
     useEffect(() => {
       if (!fonts) setFonts(getFonts(os()))
       setRecentFonts(getRecent())
-    }, [settings.user.font])
+    }, [currentFont])
 
     const closeColorPicker = useCallback(() => {
       toggleColorPicker(false)
@@ -94,14 +93,18 @@ const UnconnectedToolBar = (connector) => {
         <ButtonToolbar>
           <ButtonGroup>
             <FontsButton
-              currentSetting={settings.user.font}
+              currentSetting={currentFont}
               fonts={fonts || []}
               recentFonts={recentFonts || []}
               addRecent={addRecent}
               editor={editor}
               logger={errorReportingLogger}
             />
-            <FontSizeChooser editor={editor} defaultFontSize={defaultFontSize} />
+            <FontSizeChooser
+              editor={editor}
+              defaultFontSize={defaultFontSize}
+              logger={errorReportingLogger}
+            />
             <MarkButton mark="bold" icon={boldIcon} editor={editor} logger={errorReportingLogger} />
             <MarkButton
               mark="italic"

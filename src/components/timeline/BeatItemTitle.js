@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import { checkDependencies } from '../checkDependencies'
 

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import PropTypes from 'react-proptypes'
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 import cx from 'classnames'
 
 const {

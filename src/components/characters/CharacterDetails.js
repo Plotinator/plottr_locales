@@ -114,7 +114,6 @@ const CharacterDetailsConnector = (connector) => {
     characterId: PropTypes.number.isRequired,
     character: PropTypes.object.isRequired,
     categories: PropTypes.array.isRequired,
-    actions: PropTypes.object.isRequired,
     customAttributes: PropTypes.array.isRequired,
     startEditing: PropTypes.func.isRequired,
     getTemplateById: PropTypes.func.isRequired,
@@ -125,40 +124,31 @@ const CharacterDetailsConnector = (connector) => {
     redux,
     pltr: { selectors },
   } = connector
-  const characterActions = connector.pltr.actions.character
 
   checkDependencies({
     redux,
-    characterActions,
     selectors,
   })
 
   if (redux) {
-    const { connect, bindActionCreators } = redux
+    const { connect } = redux
 
-    return connect(
-      (state, ownProps) => {
-        return {
-          character: selectors.displayedSingleCharacterSelector(state, ownProps.characterId),
-          categories: selectors.characterCategoriesSelector(state),
-          customAttributes: selectors.characterAttributesSelector(state, ownProps.characterId),
-          getTemplateById: (templateId) => selectors.templateByIdSelector(state, templateId),
-          templateAttributeValue: (templateId, attributeName) => {
-            return selectors.characterTemplateAttributeValueSelector(
-              state,
-              ownProps.characterId,
-              templateId,
-              attributeName
-            )
-          },
-        }
-      },
-      (dispatch) => {
-        return {
-          actions: bindActionCreators(characterActions, dispatch),
-        }
+    return connect((state, ownProps) => {
+      return {
+        character: selectors.displayedSingleCharacterSelector(state, ownProps.characterId),
+        categories: selectors.characterCategoriesSelector(state),
+        customAttributes: selectors.characterAttributesSelector(state, ownProps.characterId),
+        getTemplateById: (templateId) => selectors.templateByIdSelector(state, templateId),
+        templateAttributeValue: (templateId, attributeName) => {
+          return selectors.characterTemplateAttributeValueSelector(
+            state,
+            ownProps.characterId,
+            templateId,
+            attributeName
+          )
+        },
       }
-    )(CharacterDetails)
+    })(CharacterDetails)
   }
 
   throw new Error('Cannot connect CharacterDetails')

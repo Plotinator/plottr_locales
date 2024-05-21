@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react'
 import PropTypes from 'react-proptypes'
-import { FaPlus, FaMinus } from 'react-icons/fa'
+import { FaPlus } from '@react-icons/all-files/fa/FaPlus'
+import { FaMinus } from '@react-icons/all-files/fa/FaMinus'
 import cx from 'classnames'
 
 import { t } from 'plottr_locales'

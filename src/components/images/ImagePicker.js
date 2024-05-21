@@ -204,7 +204,12 @@ const ImagePickerConnector = (connector) => {
                   <Glyphicon glyph="upload" /> {i18n('Select a File')}
                 </div>
               </ControlLabel>
-              <FormControl id="fileUpload" type="file" onChange={this.uploadNewFile} />
+              <FormControl
+                id="fileUpload"
+                type="file"
+                onChange={this.uploadNewFile}
+                accept="image/png, image/jpeg image/webp"
+              />
             </div>
           </Col>
         </Row>

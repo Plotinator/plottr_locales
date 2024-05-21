@@ -3,7 +3,7 @@ import PropTypes from 'react-proptypes'
 import cx from 'classnames'
 
 import { t as i18n } from 'plottr_locales'
-import { colors } from 'pltr/v2'
+import { colors } from 'pltr'
 
 import Button from './Button'
 

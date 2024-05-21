@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import PropTypes from 'prop-types'
-import { FaIndent } from 'react-icons/fa'
+import { FaIndent } from '@react-icons/all-files/fa/FaIndent'
 import { Transforms, Editor } from 'slate'
 
 import Button from '../Button'
@@ -35,35 +35,37 @@ export const indent = (editor, inputListType, logger) => {
   const isInList = Editor.isInList(editor, editor.selection)
   if (!isInList) return false
 
-  const [, parentPath] = Editor.parentOfType(editor, editor.selection, {
+  const [, parentPath] = Editor.parentOfType(editor, Editor.start(editor, editor.selection), {
     match: (_) => true,
   })
   const listType = inputListType || parentElementType(editor, parentPath)
-  const hit = Editor.previousSibling(editor, parentPath)
-  // If the previous element was a list already, then just move this
-  // node into it at the end.
-  if (hit) {
-    const [previousElement, previousElementPath] = hit
-    if (previousElement.type === listType) {
-      Transforms.moveNodes(editor, {
-        at: parentPath,
-        to: [...previousElementPath, previousElement.children.length],
-      })
-      // If moving the node means that we have two lists abutting each
-      // other, merge them.  (Note that normalisation will happen
-      // between the previous step and this one to remove empty lists.)
-      const hit = Editor.next(editor, { at: previousElementPath })
-      if (hit) {
-        const [nextSibling, nextSiblingPath] = hit
-        if (nextSibling.type === listType) {
-          Transforms.mergeNodes(editor, { at: nextSiblingPath })
+  if (parentPath.length > 0) {
+    const hit = Editor.previousSibling(editor, parentPath)
+    // If the previous element was a list already, then just move this
+    // node into it at the end.
+    if (hit) {
+      const [previousElement, previousElementPath] = hit
+      if (previousElement.type === listType) {
+        Transforms.moveNodes(editor, {
+          at: parentPath,
+          to: [...previousElementPath, previousElement.children.length],
+        })
+        // If moving the node means that we have two lists abutting each
+        // other, merge them.  (Note that normalisation will happen
+        // between the previous step and this one to remove empty lists.)
+        const hit = Editor.next(editor, { at: previousElementPath })
+        if (hit) {
+          const [nextSibling, nextSiblingPath] = hit
+          if (nextSibling.type === listType) {
+            Transforms.mergeNodes(editor, { at: nextSiblingPath })
+          }
         }
+        return true
       }
-      return true
     }
   }
 
-  if (countNestedLists(editor, parentPath) >= MAX_DEPTH + 1) {
+  if (parentPath.length > 0 && countNestedLists(editor, parentPath) >= MAX_DEPTH + 1) {
     // Too deep
     return true
   }

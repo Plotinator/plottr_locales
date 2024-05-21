@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useRef, useEffect } from 'react'
 import PropTypes from 'react-proptypes'
-import { FaLock } from 'react-icons/fa'
+import { FaLock } from '@react-icons/all-files/fa/FaLock'
 import { createEditor } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
 import cx from 'classnames'

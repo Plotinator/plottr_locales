@@ -1,4 +1,5 @@
 import { Editor, Transforms, Element, Node } from 'slate'
+
 import { LIST_TYPES, HEADING_TYPES, IMAGE_TYPES, createEditor } from './helpers'
 
 const withNormalizer = (editor) => {
@@ -68,6 +69,7 @@ const withNormalizer = (editor) => {
       }
       if (allChildrenAreListTypes) {
         Transforms.setNodes(editor, { type: 'bulleted-list' }, { at: path })
+        return
       }
     }
 
@@ -97,6 +99,7 @@ const withNormalizer = (editor) => {
             },
           ]
         }
+        return
       }
     }
 
@@ -135,9 +138,62 @@ const withNormalizer = (editor) => {
             ],
           }
           Transforms.insertNodes(editor, emptyParagraph, { at: [parentNode.children.length] })
+          return
         }
       } else {
         console.warn("Silent invariant violated.  Image doesn't have a parent!")
+      }
+    }
+
+    // Don't allow paragraphs to contain lists as children, they
+    // should be peers.
+    if (Element.isElement(node) && LIST_TYPES.includes(node.type)) {
+      const [parentNode, _parentPath] = Editor.parent(editor, path)
+      if (parentNode?.type === 'paragraph') {
+        // We're a bulleted list in a paragraph.  We should raise this
+        // list out of the paragraph.
+        Transforms.liftNodes(editor, { at: path })
+        return
+      }
+    }
+
+    // If multiple lists of the same type are separated by empty
+    // paragraphs or abut each other.  Join them into a single list.
+    if (Element.isElement(node) && LIST_TYPES.includes(node.type)) {
+      const [parentNode, _parentPath] = Editor.parent(editor, path)
+      // Step 1: find the element that comes before this list.
+      const thisElementsIndex = parentNode?.children?.indexOf?.(node)
+      const previousElement = parentNode?.children?.[thisElementsIndex - 1]
+      if (Element.isElement(previousElement)) {
+        // Step 2: check whether that element is the same list type as
+        // this node and join their list items if that's the case.
+        if (previousElement.type === node.type) {
+          Transforms.mergeNodes(editor, {
+            at: path,
+          })
+          return
+        } else {
+          const previousPreviousElement = parentNode?.children?.[thisElementsIndex - 2]
+          // Alternative: if there's a blank paragraph in between two
+          // lists of the same type, delete the paragraph and merge
+          // the lists.
+          if (
+            Element.isElement(previousPreviousElement) &&
+            previousPreviousElement.type === node.type &&
+            previousElement.type === 'paragraph' &&
+            previousElement.children?.length === 1 &&
+            previousElement.children[0]?.text === ''
+          ) {
+            const pathToDelete = [...path.slice(0, -1), path[path.length - 1] - 1]
+            Transforms.removeNodes(editor, { at: pathToDelete })
+            // NOTE: that the list bumps one back to the position of
+            // the element we just deleted.
+            Transforms.mergeNodes(editor, {
+              at: pathToDelete,
+            })
+            return
+          }
+        }
       }
     }
 

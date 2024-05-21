@@ -113,9 +113,11 @@ const TimelineTableConnector = (connector) => {
     }
 
     handleInsertChildBeat = (beatToLeftId) => {
-      const { currentTimeline, beatActions } = this.props
-      beatActions.addBeat(currentTimeline, beatToLeftId)
-      beatActions.expandBeat(beatToLeftId, currentTimeline)
+      const { currentTimeline, beatActions, undo } = this.props
+      undo.batch('Insert Child Beat', () => {
+        beatActions.addBeat(currentTimeline, beatToLeftId)
+        beatActions.expandBeat(beatToLeftId, currentTimeline)
+      })
     }
 
     handleAppendBeat = () => {
@@ -449,9 +451,7 @@ const TimelineTableConnector = (connector) => {
     isMedium: PropTypes.bool,
     isLarge: PropTypes.bool,
     tableRef: PropTypes.object,
-    actions: PropTypes.object,
     lineActions: PropTypes.object,
-    cardActions: PropTypes.object,
     beatActions: PropTypes.object,
     books: PropTypes.object.isRequired,
     toast: PropTypes.object,
@@ -462,6 +462,7 @@ const TimelineTableConnector = (connector) => {
     activeTab: PropTypes.number,
     timelineViewIsTabbed: PropTypes.bool,
     timelineViewIsStacked: PropTypes.bool,
+    undo: PropTypes.object.isRequired,
   }
 
   const {
@@ -499,11 +500,10 @@ const TimelineTableConnector = (connector) => {
       },
       (dispatch) => {
         return {
-          actions: bindActionCreators(actions.ui, dispatch),
           lineActions: bindActionCreators(actions.line, dispatch),
-          cardActions: bindActionCreators(actions.card, dispatch),
           beatActions: bindActionCreators(actions.beat, dispatch),
           notificationActions: bindActionCreators(actions.notifications, dispatch),
+          undo: bindActionCreators(actions.undo, dispatch),
         }
       }
     )(TimelineTable)

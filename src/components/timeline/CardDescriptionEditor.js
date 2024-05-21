@@ -19,15 +19,7 @@ const CardDescriptionEditorConnector = (connector) => {
     pltr: { helpers, selectors },
   } = connector
 
-  const CardDescriptionEditor = ({
-    cardId,
-    description,
-    selection,
-    editCardDescription,
-    // Needed to trigger undo on child components
-    undoId,
-    foci,
-  }) => {
+  const CardDescriptionEditor = ({ cardId, description, selection, editCardDescription, foci }) => {
     const selectionForMainCardElement = (name) => {
       return foci?.find(({ path }) => {
         return isEqual(path, ['card', cardId, name])
@@ -58,7 +50,6 @@ const CardDescriptionEditorConnector = (connector) => {
     description: PropTypes.array.isRequired,
     selection: PropTypes.object,
     editCardDescription: PropTypes.func.isRequired,
-    undoId: PropTypes.number,
     foci: PropTypes.array.isRequired,
   }
 
@@ -73,7 +64,6 @@ const CardDescriptionEditorConnector = (connector) => {
 
     return connect(
       (state, ownProps) => ({
-        undoId: selectors.undoIdSelector(state),
         description: selectors.cardDescriptionByIdSelector(state, ownProps.cardId),
         foci: selectors.timelineCurrentFocusSelector(state),
       }),

@@ -2,12 +2,14 @@ import React, { useState, useRef, useEffect } from 'react'
 import PropTypes from 'react-proptypes'
 import { Cell } from 'react-sticky-table'
 import cx from 'classnames'
-import { FaBook, FaExpandAlt, FaCompressAlt } from 'react-icons/fa'
-import { FiCopy } from 'react-icons/fi'
-import { BsPinFill } from 'react-icons/bs'
-import { TbPinnedOff } from 'react-icons/tb'
+import { FaBook } from '@react-icons/all-files/fa/FaBook'
+import { FaExpandAlt } from '@react-icons/all-files/fa/FaExpandAlt'
+import { FaCompressAlt } from '@react-icons/all-files/fa/FaCompressAlt'
+import { FiCopy } from '@react-icons/all-files/fi/FiCopy'
+import { BsPinFill } from '@react-icons/all-files/bs/BsPinFill'
+import { TbPinnedOff } from '@react-icons/all-files/tb/TbPinnedOff'
 
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 import { t } from 'plottr_locales'
 
 import UnconnectedPlottrFloater from '../PlottrFloater'
@@ -59,6 +61,8 @@ const LineTitleCellConnector = (connector) => {
     allHierarchyLevels,
     currentTimeline,
     togglePinPlotline,
+    undo,
+    recentlyUndidOrRedid,
   }) => {
     const [hovering, setHovering] = useState(false)
     const [dragging, setDragging] = useState(false)
@@ -73,6 +77,11 @@ const LineTitleCellConnector = (connector) => {
     const titleInputRef = useRef()
     const bookChoiceDropDown = useRef()
     const titleCellRef = useRef()
+
+    const recentlyUndidOrRedidRef = useRef(false)
+    useEffect(() => {
+      recentlyUndidOrRedidRef.current = !!recentlyUndidOrRedid
+    }, [recentlyUndidOrRedid])
 
     useEffect(() => {
       if (titleCellRef.current && zIndex) {
@@ -104,7 +113,7 @@ const LineTitleCellConnector = (connector) => {
     }
 
     useEffect(() => {
-      if (!editing && line.title === '') {
+      if (!editing && line.title === '' && !recentlyUndidOrRedid.current) {
         startEditing()
       }
     }, [])
@@ -133,9 +142,11 @@ const LineTitleCellConnector = (connector) => {
 
     const finalizeEdit = (newVal) => {
       var id = line.id
-      actions.editLineTitle(id, newVal)
+      undo.batch(`Edit Line Title ${newVal}`, () => {
+        actions.editLineTitle(id, newVal)
+        uiActions.stopEditingPlotlineHeadingTitle()
+      })
       setMovingLine(false)
-      uiActions.stopEditingPlotlineHeadingTitle()
       setHovering(false)
       setSuppressScroll(false)
     }
@@ -159,7 +170,7 @@ const LineTitleCellConnector = (connector) => {
 
     const handleDragStart = (e) => {
       e.dataTransfer.effectAllowed = 'move'
-      e.dataTransfer.setData('text/json', JSON.stringify(line))
+      e.dataTransfer.setData('text/json', JSON.stringify({ line, isLine: true }))
       setDragging(true)
     }
 
@@ -193,11 +204,14 @@ const LineTitleCellConnector = (connector) => {
       setInDropZone(false)
       setDropDepth(0)
 
-      var json = e.dataTransfer.getData('text/json')
-      var droppedLine = JSON.parse(json)
-      if (droppedLine.id == null) return
-
-      handleReorder(line.position, droppedLine.position)
+      const json = e.dataTransfer.getData('text/json')
+      const payload = JSON.parse(json)
+      const droppedLine = payload.line
+      if (!payload.isLine) {
+        return
+      } else {
+        handleReorder(line.position, droppedLine.position)
+      }
     }
 
     const handlePinPlotLine = () => {
@@ -453,8 +467,10 @@ const LineTitleCellConnector = (connector) => {
     }
 
     const moveToBook = (targetBookId) => {
-      actions.moveLine(line.id, targetBookId)
-      notifications.showToastNotification(true, null, targetBookId, 'move')
+      undo.batch('Move Line to Another Book', () => {
+        actions.moveLine(line.id, targetBookId)
+        notifications.showToastNotification(true, null, targetBookId, 'move')
+      })
     }
 
     const renderBookOptions = () => {
@@ -480,6 +496,7 @@ const LineTitleCellConnector = (connector) => {
             if (mismatchInLevelCount) {
               return (
                 <ToolTip
+                  key={`${id}-${index}`}
                   id={`move-book-${book.id}-tooltip`}
                   placement="right"
                   text={t(
@@ -563,6 +580,7 @@ const LineTitleCellConnector = (connector) => {
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
+          onMouseLeave={stopHovering}
         >
           {renderColorPicker()}
           {renderDelete()}
@@ -669,6 +687,8 @@ const LineTitleCellConnector = (connector) => {
     currentTimeline: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     allHierarchyLevels: PropTypes.object.isRequired,
     togglePinPlotline: PropTypes.func,
+    undo: PropTypes.object.isRequired,
+    recentlyUndidOrRedid: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
   }
 
   const {
@@ -680,6 +700,7 @@ const LineTitleCellConnector = (connector) => {
   const LineActions = actions.line
   const uiActions = actions.ui
   const notifications = actions.notifications
+  const UndoActions = actions.undo
 
   const {
     lineIsExpandedSelector,
@@ -707,6 +728,7 @@ const LineTitleCellConnector = (connector) => {
           allHierarchyLevels: selectors.allHierarchyLevelsSelector(state),
           editing: selectors.editingGivenLinesTitleSelector(state, ownProps.line.id),
           timelineFoci: selectors.timelineFociSelector(state),
+          recentlyUndidOrRedid: selectors.recentlyUndidOrRedidSelector(state),
         }
       },
       (dispatch, ownProps) => {
@@ -714,6 +736,7 @@ const LineTitleCellConnector = (connector) => {
           actions: bindActionCreators(LineActions, dispatch),
           uiActions: bindActionCreators(uiActions, dispatch),
           notifications: bindActionCreators(notifications, dispatch),
+          undo: bindActionCreators(UndoActions, dispatch),
         }
       }
     )(LineTitleCell)

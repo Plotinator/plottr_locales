@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import { checkDependencies } from '../checkDependencies'
 
@@ -22,6 +22,7 @@ const MiniBeatConnector = (connector) => {
       beatIndex,
       beatTree,
       hierarchyLevels,
+      positionOffset,
     } = props
     const [sortedCards, setSortedCards] = useState([])
     // https://www.smashingmagazine.com/2020/02/html-drag-drop-api-react/
@@ -128,7 +129,7 @@ const MiniBeatConnector = (connector) => {
           <span className="accented-text">{`${idx + 1}.  `}</span>
           <span>
             {/* FIXME: not sure what the offset should be here */}
-            {beatTitle(beatIndex, beatTree, beat, hierarchyLevels)}
+            {beatTitle(beatIndex, beatTree, beat, hierarchyLevels, positionOffset)}
           </span>
         </span>
         <div className="outline__minimap__dots">{renderCardDots()}</div>
@@ -151,12 +152,18 @@ const MiniBeatConnector = (connector) => {
     handleActive: PropTypes.func.isRequired,
     beatTree: PropTypes.object.isRequired,
     hierarchyLevels: PropTypes.array.isRequired,
+    positionOffset: PropTypes.number.isRequired,
   }
 
   const {
     redux,
     pltr: {
-      selectors: { beatIndexSelector, beatsByBookSelector, sortedHierarchyLevels },
+      selectors: {
+        beatIndexSelector,
+        beatsByBookSelector,
+        sortedHierarchyLevels,
+        positionOffsetSelector,
+      },
     },
   } = connector
   checkDependencies({
@@ -164,6 +171,7 @@ const MiniBeatConnector = (connector) => {
     beatIndexSelector,
     beatsByBookSelector,
     sortedHierarchyLevels,
+    positionOffsetSelector,
   })
 
   if (redux) {
@@ -173,6 +181,7 @@ const MiniBeatConnector = (connector) => {
       beatIndex: beatIndexSelector(state, ownProps.beat.id),
       beatTree: beatsByBookSelector(state),
       hierarchyLevels: sortedHierarchyLevels(state),
+      positionOffset: positionOffsetSelector(state),
     }))(MiniBeat)
   }
 

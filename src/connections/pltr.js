@@ -93,6 +93,9 @@ import {
   NewProjectInputModal as UnconnectedNewProjectInputModal,
   SettingsWizard as UnconnectedSettingsWizard,
   RestructureTimelineModal as UnconnectedRestructureTimelineModal,
+  UndoRedo as UnconnectedUndoRedo,
+  ProLicenseExpired as UnconnectedProLicenseExpired,
+  PlottrLicenseExpired as UnconnectedPlottrLicenseExpired,
 } from '../components'
 
 const connector = {
@@ -141,6 +144,7 @@ const pltrTypeSpecs = {
     rmRF: PropTypes.func.isRequired,
     createFromSnowflake: PropTypes.func.isRequired,
     createFromScrivener: PropTypes.func.isRequired,
+    createFromWord: PropTypes.func.isRequired,
     joinPath: PropTypes.func.isRequired,
     listOfflineFiles: PropTypes.func.isRequired,
     createAndOpenCopy: PropTypes.func.isRequired,
@@ -159,13 +163,12 @@ const pltrTypeSpecs = {
   }),
   updateLanguage: PropTypes.func.isRequired,
   license: PropTypes.shape({
-    checkForActiveLicense: PropTypes.func.isRequired,
-    verifyLicense: PropTypes.func.isRequired,
-    trial90days: PropTypes.array.isRequired,
-    checkForPro: PropTypes.func.isRequired,
     startTrial: PropTypes.func.isRequired,
     deleteLicense: PropTypes.func.isRequired,
+    deletePlottrLicense: PropTypes.func.isRequired,
+    deleteProLicense: PropTypes.func.isRequired,
     saveLicenseInfo: PropTypes.func.isRequired,
+    checkForLicense: PropTypes.func.isRequired,
   }),
   reloadMenu: PropTypes.func.isRequired,
   template: PropTypes.shape({
@@ -224,6 +227,8 @@ const pltrTypeSpecs = {
   listenForRCELock: PropTypes.func.isRequired,
   lockRCE: PropTypes.func.isRequired,
   machineId: PropTypes.func.isRequired,
+  machineInfo: PropTypes.func.isRequired,
+  deleteMachineLicenseActivation: PropTypes.func.isRequired,
   extractImages: PropTypes.func.isRequired,
   firebase: PropTypes.shape({
     onSessionChange: PropTypes.func.isRequired,
@@ -348,5 +353,8 @@ export default (platform, pltr) => {
     NewProjectInputModal: UnconnectedNewProjectInputModal(connectorObject),
     SettingsWizard: UnconnectedSettingsWizard(connectorObject),
     RestructureTimelineModal: UnconnectedRestructureTimelineModal(connectorObject),
+    UndoRedo: UnconnectedUndoRedo(connectorObject),
+    ProLicenseExpired: UnconnectedProLicenseExpired(connectorObject),
+    PlottrLicenseExpired: UnconnectedPlottrLicenseExpired(connectorObject),
   }
 }

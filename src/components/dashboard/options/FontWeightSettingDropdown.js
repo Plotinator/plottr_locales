@@ -4,7 +4,7 @@ import { PropTypes } from 'prop-types'
 import DropdownButton from '../../DropdownButton'
 import MenuItem from '../../MenuItem'
 
-const UnMemoisedFontWeightSettingDropdown = ({ defaultFontWeight, onChange }) => {
+const UnMemoisedFontWeightSettingDropdown = ({ defaultFontWeight, onChange, onClick }) => {
   const title = defaultFontWeight || 500
 
   const changeWeight = (weight) => {
@@ -29,6 +29,7 @@ const UnMemoisedFontWeightSettingDropdown = ({ defaultFontWeight, onChange }) =>
       title={title}
       onSelect={changeWeight}
       id="fontWeight-dropdown"
+      onClick={onClick}
     >
       {renderWeights()}
     </DropdownButton>
@@ -38,6 +39,7 @@ const UnMemoisedFontWeightSettingDropdown = ({ defaultFontWeight, onChange }) =>
 UnMemoisedFontWeightSettingDropdown.propTypes = {
   defaultFontWeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   onChange: PropTypes.func.isRequired,
+  onClick: PropTypes.func.isRequired,
 }
 
 export const FontWeightSettingDropdown = React.memo(UnMemoisedFontWeightSettingDropdown)

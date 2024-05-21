@@ -5,8 +5,8 @@ import UnconnectedBook from './Book'
 import UnconnectedBookDialog from './BookDialog'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 import cx from 'classnames'
-import { chunk, flatten } from 'lodash'
-import { newIds } from 'pltr/v2'
+import { chunk, flatten, isEqual } from 'lodash'
+import { newIds } from 'pltr'
 
 import { checkDependencies } from '../checkDependencies'
 
@@ -41,21 +41,24 @@ const BookListConnector = (connector) => {
     }
 
     componentDidUpdate(previousProps) {
-      if (previousProps.books.allIds.length != this.props.books.allIds.length) {
+      if (!isEqual(previousProps.books.allIds, this.props.books.allIds)) {
+        this.setState({ rows: this.props.books.allIds })
         this.updateLayout()
       }
     }
 
     addBook = (template) => {
       const { actions, books } = this.props
-      if (template) return actions.addBookFromTemplate(template.templateData)
-
-      const newBookId = objectId(books.allIds)
-      const rows = this.state.rows.filter((row) => row)
-      this.setState({
-        rows: [...rows.slice(0, rows.length - 1), [...rows[rows.length - 1], newBookId]],
-      })
-      actions.addBook()
+      if (template) {
+        actions.addBookFromTemplate(template.templateData)
+      } else {
+        const newBookId = objectId(books.allIds)
+        const rows = this.state.rows.filter((row) => row)
+        this.setState({
+          rows: [...rows.slice(0, rows.length - 1), [...rows[rows.length - 1], newBookId]],
+        })
+        actions.addBook()
+      }
     }
 
     reorder = (bookIds, startIndex, endIndex) => {
@@ -191,9 +194,6 @@ const BookListConnector = (connector) => {
       lines: PropTypes.array.isRequired,
       cards: PropTypes.array.isRequired,
       actions: PropTypes.object,
-      lineActions: PropTypes.object,
-      beatActions: PropTypes.object,
-      uiActions: PropTypes.object,
       isBookDialogVisible: PropTypes.bool,
     }
   }
@@ -219,9 +219,6 @@ const BookListConnector = (connector) => {
       (dispatch) => {
         return {
           actions: bindActionCreators(actions.book, dispatch),
-          uiActions: bindActionCreators(actions.ui, dispatch),
-          lineActions: bindActionCreators(actions.line, dispatch),
-          beatActions: bindActionCreators(actions.beat, dispatch),
         }
       }
     )(BookList)

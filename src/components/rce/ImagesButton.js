@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react'
 import { PropTypes } from 'prop-types'
-import { FaImage } from 'react-icons/fa'
+import { FaImage } from '@react-icons/all-files/fa/FaImage'
 import { Editor, Transforms } from 'slate'
 
 import Button from '../Button'

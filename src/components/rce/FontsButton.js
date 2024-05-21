@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'react-proptypes'
-import { Editor } from 'slate'
+import { Editor, Text as SlateText } from 'slate'
 import { ReactEditor, useSlate } from 'slate-react'
+import { uniq } from 'lodash'
 
 import DropdownButton from '../DropdownButton'
 import MenuItem from '../MenuItem'
@@ -17,6 +18,9 @@ const UnMemoisedFontsButton = ({
   const [activeFont, setActiveFont] = useState(
     getCurrentFont(editor, logger, recentFonts, currentSetting)
   )
+  const [displayedFont, setDisplayedFont] = useState(
+    getDisplayedFont(editor, logger, recentFonts, currentSetting)
+  )
 
   // needs this so it gets changes to editor.selection
   // I don't know why
@@ -30,6 +34,10 @@ const UnMemoisedFontsButton = ({
           if (newFont !== activeFont) {
             setActiveFont(newFont)
           }
+          const newDisplayedFont = getDisplayedFont(editor, logger, recentFonts, currentSetting)
+          if (newDisplayedFont !== displayedFont) {
+            setDisplayedFont(newDisplayedFont)
+          }
         }, 100)
         return () => {
           clearTimeout(timer)
@@ -37,11 +45,15 @@ const UnMemoisedFontsButton = ({
       }
     }
     return () => {}
-  }, [editor.selection])
+  }, [editor.selection, setActiveFont, activeFont, displayedFont, setDisplayedFont])
 
   useEffect(() => {
     setActiveFont(getCurrentFont(editor, logger, recentFonts, currentSetting))
-  }, [recentFonts, currentSetting])
+  }, [recentFonts, currentSetting, setActiveFont])
+
+  useEffect(() => {
+    setDisplayedFont(getDisplayedFont(editor, logger, recentFonts, currentSetting))
+  }, [recentFonts, currentSetting, setDisplayedFont])
 
   const changeFont = (font) => {
     // The editor's never been focused.
@@ -50,6 +62,7 @@ const UnMemoisedFontsButton = ({
         ReactEditor.focus(editor)
         return new Promise((resolve) => setTimeout(resolve, 100)).then(() => {
           setActiveFont(font)
+          setDisplayedFont(font)
           addRecent(font)
           addFontMark(editor, font)
         })
@@ -63,7 +76,12 @@ const UnMemoisedFontsButton = ({
 
   const renderFont = (f, key) => {
     return (
-      <MenuItem key={`${f}-${key}`} eventKey={f} style={{ fontFamily: f }} active={activeFont == f}>
+      <MenuItem
+        key={`${f}-${key}`}
+        eventKey={f}
+        style={{ fontFamily: f }}
+        active={displayedFont == f}
+      >
         {f}
       </MenuItem>
     )
@@ -79,7 +97,7 @@ const UnMemoisedFontsButton = ({
   }
 
   return (
-    <DropdownButton title={activeFont} onSelect={changeFont} id="font-dropdown">
+    <DropdownButton title={displayedFont} onSelect={changeFont} id="font-dropdown">
       {renderFonts()}
     </DropdownButton>
   )
@@ -102,6 +120,28 @@ const getCurrentFont = (editor, logger, recentFonts, currentSetting) => {
     const [node] = Editor.nodes(editor, { match: (n) => n.font })
     if (node) {
       return node[0].font
+    } else {
+      if (currentSetting) return currentSetting
+      return recentFonts?.length ? recentFonts[0] : 'Forum'
+    }
+  } catch (error) {
+    logger.error('Error attempting to get current fonts.', error)
+    return 'Forum'
+  }
+}
+
+const getDisplayedFont = (editor, logger, recentFonts, currentSetting) => {
+  try {
+    const nodes = Array.from(Editor.nodes(editor, { match: SlateText.isText }))
+    const fonts = uniq(
+      nodes.map(([node]) => {
+        return node.font
+      })
+    )
+    if (fonts.length > 1) {
+      return '--'
+    } else if (nodes[0]?.[0]?.font && typeof nodes[0]?.[0]?.font === 'string') {
+      return nodes[0]?.[0].font
     } else {
       if (currentSetting) return currentSetting
       return recentFonts?.length ? recentFonts[0] : 'Forum'

@@ -38,9 +38,7 @@ const ActsConfigModalConnector = (connector) => {
 
   const {
     pltr: {
-      helpers: {
-        hierarchyLevels: { newHierarchyLevel },
-      },
+      initialState: { newHierarchyLevel },
     },
     platform: { isDevelopment },
   } = connector
@@ -158,9 +156,31 @@ const ActsConfigModalConnector = (connector) => {
                           </div>
                         </MenuItem>
                       )}
-                      <MenuItem key={'stacked'} onSelect={() => setTimelineView('stacked')}>
-                        <div className="acts-modal__timeline-view-selector">{t('Stacked')}</div>
-                      </MenuItem>
+                      {hierarchyLevels.length < 2 ? (
+                        <ToolTip
+                          id={`acts-modal-tabbed-tooltip`}
+                          placement="right"
+                          text={t('At least two levels of hierarchy required to view as stacked')}
+                        >
+                          <MenuItem
+                            disabled={hierarchyLevels.length < 2}
+                            key={'stacked'}
+                            onSelect={() => setTimelineView('stacked')}
+                          >
+                            <div
+                              className={cx(`acts-modal__timeline-view-selector`, {
+                                disabled: hierarchyLevels.length < 2,
+                              })}
+                            >
+                              {t('Stacked')}
+                            </div>
+                          </MenuItem>
+                        </ToolTip>
+                      ) : (
+                        <MenuItem key={'stacked'} onSelect={() => setTimelineView('stacked')}>
+                          <div className="acts-modal__timeline-view-selector">{t('Stacked')}</div>
+                        </MenuItem>
+                      )}
                     </DropdownButton>
                   </div>
                 </div>
@@ -213,7 +233,6 @@ const ActsConfigModalConnector = (connector) => {
                   <div className="acts-modal__levels-table-cell">{t('Level')}</div>
                   <div className="acts-modal__levels-table-cell">{t('Name')}</div>
                   <div className="acts-modal__levels-table-cell">{t('Text Color')}</div>
-                  <div className="acts-modal__levels-table-cell">{t('Text Size')}</div>
                   <div className="acts-modal__levels-table-cell">{t('Border Color')}</div>
                   <div className="acts-modal__levels-table-cell">{t('Border Style')}</div>
                   <div className="acts-modal__levels-table-cell">{t('Background Color')}</div>

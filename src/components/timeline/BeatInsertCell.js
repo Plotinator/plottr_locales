@@ -7,7 +7,7 @@ import { t as i18n } from 'plottr_locales'
 
 import Glyphicon from '../Glyphicon'
 import Button from '../Button'
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 import VisualLine from './VisualLine'
 import { checkDependencies } from '../checkDependencies'
 

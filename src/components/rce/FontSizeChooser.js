@@ -1,37 +1,49 @@
 import React, { useState, useEffect } from 'react'
 import { PropTypes } from 'prop-types'
-import { Editor } from 'slate'
+import { Editor, Text as SlateText } from 'slate'
 import { ReactEditor, useSlate } from 'slate-react'
+import { uniq } from 'lodash'
 
 import DropdownButton from '../DropdownButton'
 import MenuItem from '../MenuItem'
 
-const UnMemoisedFontSizeChooser = ({ editor, defaultFontSize }) => {
+const UnMemoisedFontSizeChooser = ({ editor, defaultFontSize, logger }) => {
   const [currentSize, setCurrentSize] = useState(getCurrentSize(editor, defaultFontSize))
+  const [displayedSize, setDisplayedSize] = useState(
+    getDisplayedSize(editor, defaultFontSize, logger)
+  )
+  const [disabled, setDisabled] = useState(false)
 
   const _editor = useSlate()
 
   useEffect(() => {
     if (ReactEditor.isFocused(editor)) {
       const timer = setTimeout(() => {
-        const newSize = getCurrentSize(editor)
+        const newSize = getCurrentSize(editor, defaultFontSize)
         if (newSize !== currentSize) {
           setCurrentSize(newSize)
         }
+        const newDisplayedSize = getDisplayedSize(editor, defaultFontSize, logger)
+        if (newDisplayedSize !== displayedSize) {
+          setDisplayedSize(newDisplayedSize)
+        }
       }, 100)
+      setDisabled(Editor.isInHeading(editor, editor.selection))
       return () => {
         clearTimeout(timer)
       }
     }
     return () => {}
-  }, [editor.selection])
+  }, [editor.selection, setDisabled, setCurrentSize, setDisplayedSize, currentSize, displayedSize])
 
   useEffect(() => {
     setCurrentSize(getCurrentSize(editor, defaultFontSize))
-  }, [defaultFontSize])
+    setDisplayedSize(getDisplayedSize(editor, defaultFontSize, logger))
+  }, [defaultFontSize, setCurrentSize, setDisplayedSize])
 
   const changeSize = (size) => {
     setCurrentSize(Number(size))
+    setDisplayedSize(Number(size))
     addFontSizeMark(editor, Number(size))
   }
 
@@ -40,7 +52,7 @@ const UnMemoisedFontSizeChooser = ({ editor, defaultFontSize }) => {
     let sizeArray = []
     for (let size = 4; size <= maxfontSize; size++) {
       sizeArray.push(
-        <MenuItem key={`fontSize-${size}`} eventKey={size} active={currentSize == size}>
+        <MenuItem key={`fontSize-${size}`} eventKey={size} active={displayedSize == size}>
           {size}
         </MenuItem>
       )
@@ -51,9 +63,10 @@ const UnMemoisedFontSizeChooser = ({ editor, defaultFontSize }) => {
   return (
     <DropdownButton
       className="size-picker"
-      title={currentSize}
+      title={displayedSize}
       onSelect={changeSize}
       id="size-dropdown"
+      disabled={disabled}
     >
       {renderSizes()}
     </DropdownButton>
@@ -63,9 +76,31 @@ const UnMemoisedFontSizeChooser = ({ editor, defaultFontSize }) => {
 UnMemoisedFontSizeChooser.propTypes = {
   editor: PropTypes.object.isRequired,
   defaultFontSize: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  logger: PropTypes.object.isRequired,
 }
 
 export const FontSizeChooser = React.memo(UnMemoisedFontSizeChooser)
+
+const getDisplayedSize = (editor, defaultFontSize, logger) => {
+  try {
+    const nodes = Array.from(Editor.nodes(editor, { match: SlateText.isText }))
+    const fontSizes = uniq(
+      nodes.map(([node]) => {
+        return node.fontSize
+      })
+    )
+    if (fontSizes.length > 1) {
+      return '--'
+    } else if (nodes[0]?.[0]?.fontSize && typeof nodes[0]?.[0]?.fontSize === 'number') {
+      return nodes[0]?.[0].fontSize
+    } else {
+      return defaultFontSize ?? 20
+    }
+  } catch (error) {
+    logger.error('Error attempting to get displayed font size.', error)
+    return 'Forum'
+  }
+}
 
 const getCurrentSize = (editor, defaultFontSize) => {
   const [node] = Editor.nodes(editor, { match: (n) => n.fontSize })

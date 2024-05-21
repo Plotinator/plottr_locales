@@ -47,7 +47,8 @@ export default class GenericFilterList extends Component {
     }
     return (
       <li key={item.id} onMouseDown={() => this.filterItem(item.id)}>
-        <Glyphicon glyph={checked} /> {item[attr]}
+        <Glyphicon glyph={checked} />{' '}
+        {item[attr] || t('New {type}', { type: this.props.singleItemTitle })}
       </li>
     )
   }
@@ -74,6 +75,7 @@ export default class GenericFilterList extends Component {
 GenericFilterList.propTypes = {
   items: PropTypes.array.isRequired,
   title: PropTypes.string.isRequired,
+  singleItemTitle: PropTypes.string.isRequired,
   displayAttribute: PropTypes.string.isRequired,
   updateItems: PropTypes.func.isRequired,
   filteredItems: PropTypes.array,

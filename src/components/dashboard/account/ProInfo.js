@@ -11,29 +11,21 @@ const ProInfoConnector = (connector) => {
   const {
     platform: {
       firebase: { logOut, currentUser },
+      license: { deleteProLicense },
       settings: { saveAppSetting },
     },
   } = connector
   checkDependencies({ logOut, saveAppSetting, currentUser })
 
-  const ProInfo = ({
-    emailAddress,
-    setHasPro,
-    setUserId,
-    setEmailAddress,
-    resetProLicenseInfo,
-    admin,
-    active,
-    expiration,
-    settings,
-  }) => {
+  const ProInfo = ({ emailAddress, expiration, settings, setUserId, setEmailAddress }) => {
     const [loggingOut, setLoggingOut] = useState(false)
 
     const expiresDate = () => {
-      if (!expiration) return null
-      return expiration == 'lifetime'
-        ? t('Never')
-        : t('{date, date, long}', { date: new Date(expiration) })
+      if (!expiration) {
+        return null
+      } else {
+        return t('{date, date, long}', { date: new Date(expiration) })
+      }
     }
 
     const handleLogOut = () => {
@@ -41,14 +33,13 @@ const ProInfoConnector = (connector) => {
       logOut().then(() => {
         // the order of these might matter
         saveAppSetting('user.frbId', null)
-        resetProLicenseInfo()
+        deleteProLicense()
         setLoggingOut(false)
         // Ordering is significant!  If you set has pro to false
         // before nuking the email address and user id then it might
         // re-launch the check for whether we have pro or not.
         setUserId(null)
         setEmailAddress(null)
-        setHasPro(false)
       })
     }
 
@@ -62,16 +53,8 @@ const ProInfoConnector = (connector) => {
           <dl className="dl-horizontal">
             <dt>{t('Purchase Email')}</dt>
             <dd className={blurClass}>{emailAddress}</dd>
-            {admin ? (
-              <>
-                <dt>Admin</dt>
-                <dd>woohoo</dd>
-              </>
-            ) : null}
           </dl>
           <dl className="dl-horizontal">
-            <dt>{t('Status')}</dt>
-            <dd>{active ? t('Active') : t('Not Active')}</dd>
             <dt>{t('Expires')}</dt>
             <dd>{expiresDate()}</dd>
           </dl>
@@ -86,16 +69,11 @@ const ProInfoConnector = (connector) => {
   }
 
   ProInfo.propTypes = {
-    licenseInfo: PropTypes.object,
     emailAddress: PropTypes.string,
-    admin: PropTypes.bool,
-    active: PropTypes.bool,
-    expiration: PropTypes.string,
     settings: PropTypes.object,
-    setHasPro: PropTypes.func.isRequired,
+    expiration: PropTypes.object,
     setUserId: PropTypes.func.isRequired,
     setEmailAddress: PropTypes.func.isRequired,
-    resetProLicenseInfo: PropTypes.func.isRequired,
   }
 
   const {
@@ -108,16 +86,12 @@ const ProInfoConnector = (connector) => {
     return connect(
       (state) => ({
         emailAddress: selectors.emailAddressSelector(state),
-        admin: selectors.proLicenseAdminSelector(state),
-        active: selectors.hasProSelector(state),
-        expiration: selectors.proLicenseExpirationSelector(state),
         settings: selectors.appSettingsSelector(state),
+        expiration: selectors.proLicenseExpirySelector(state),
       }),
       {
-        setHasPro: actions.client.setHasPro,
         setUserId: actions.client.setUserId,
         setEmailAddress: actions.client.setEmailAddress,
-        resetProLicenseInfo: actions.license.resetProLicenseInfo,
       }
     )(ProInfo)
   }

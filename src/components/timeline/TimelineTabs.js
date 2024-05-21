@@ -46,6 +46,7 @@ const TimelineTabsConnector = (connector) => {
     orientation,
     stickyHeaderCount,
     stickyLeftColumnCount,
+    batch,
   }) => {
     const [contextMenuAnchor, setContextMenuAnchor] = useState(null)
 
@@ -75,14 +76,18 @@ const TimelineTabsConnector = (connector) => {
     }
 
     const openActStructure = () => {
-      setActConfigIsOpen(true)
-      setFocussedTimelineTabBeat(null)
+      batch('Open Structure Configuration', () => {
+        setActConfigIsOpen(true)
+        setFocussedTimelineTabBeat(null)
+      })
       setContextMenuAnchor(null)
     }
 
     const editBeatName = () => {
-      setEditingBeatTitleId(focussedBeat)
-      setFocussedTimelineTabBeat(null)
+      batch('Edit Beat Name', () => {
+        setEditingBeatTitleId(focussedBeat)
+        setFocussedTimelineTabBeat(null)
+      })
       setContextMenuAnchor(null)
     }
 
@@ -133,13 +138,17 @@ const TimelineTabsConnector = (connector) => {
     }
 
     const insertPeerBeat = () => {
-      insertBeat(bookId, focussedBeat)
-      setFocussedTimelineTabBeat(null)
+      batch('Insert Peer Beat', () => {
+        insertBeat(bookId, focussedBeat)
+        setFocussedTimelineTabBeat(null)
+      })
     }
 
     const stageBeatForDeletion = () => {
-      setTimelineTabBeatToDelete(focussedBeat)
-      setFocussedTimelineTabBeat(null)
+      batch('Confirm Delete Beat', () => {
+        setTimelineTabBeatToDelete(focussedBeat)
+        setFocussedTimelineTabBeat(null)
+      })
     }
 
     const renderDeleteBeat = () => {
@@ -148,8 +157,10 @@ const TimelineTabsConnector = (connector) => {
       return (
         <DeleteConfirmModal
           onDelete={() => {
-            deleteBeat(beatToDelete, bookId)
-            setTimelineTabBeatToDelete(null)
+            batch('Delete Beat', () => {
+              deleteBeat(beatToDelete, bookId)
+              setTimelineTabBeatToDelete(null)
+            })
           }}
           onCancel={() => setTimelineTabBeatToDelete(null)}
           customText="Are you sure you want to delete this tab and all it's beats and cards?"
@@ -163,8 +174,11 @@ const TimelineTabsConnector = (connector) => {
     }
 
     const setBeatTitle = (newVal) => {
-      editBeatTitle(editingBeatTitleId, bookId, newVal || 'auto')
-      setEditingBeatTitleId(null)
+      const newTitle = newVal || 'auto'
+      batch(`Set Beat Title ${newTitle}`, () => {
+        editBeatTitle(editingBeatTitleId, bookId, newTitle)
+        setEditingBeatTitleId(null)
+      })
     }
 
     const renderInputModal = () => {
@@ -267,6 +281,7 @@ const TimelineTabsConnector = (connector) => {
     orientation: PropTypes.string.isRequired,
     stickyHeaderCount: PropTypes.number,
     stickyLeftColumnCount: PropTypes.number,
+    batch: PropTypes.func,
   }
 
   const {
@@ -305,6 +320,7 @@ const TimelineTabsConnector = (connector) => {
         setActConfigIsOpen: actions.ui.setActConfigIsOpen,
         editBeatTitle: actions.beat.editBeatTitle,
         setEditingBeatTitleId: actions.ui.setEditingBeatTitleId,
+        batch: actions.undo.batch,
       }
     )(TimelineTabs)
   }

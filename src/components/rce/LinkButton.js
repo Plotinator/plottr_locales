@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react'
 import { PropTypes } from 'prop-types'
 import isUrl from 'is-url'
-import { FaLink } from 'react-icons/fa'
+import { FaLink } from '@react-icons/all-files/fa/FaLink'
 import { Editor, Transforms, Range } from 'slate'
 
 import { t as i18n } from 'plottr_locales'
