@@ -33,7 +33,6 @@ const MiniMapConnector = (connector) => {
     uiActions,
   }) => {
     const [mouseOver, setMouseOver] = useState(false)
-    const [firstRender, setFirstRender] = useState(true)
 
     const itemRefs = useRef(new Map())
 
@@ -49,20 +48,6 @@ const MiniMapConnector = (connector) => {
 
     const firstBeatKey = beats.length ? beats[0].id : 0 // this works since they are sorted
 
-    useEffect(() => {
-      setTimeout(() => setFirstRender(false), 300)
-    }, [])
-
-    useEffect(() => {
-      setFirstRender(true)
-      const timeout = setTimeout(() => {
-        setFirstRender(false)
-      }, 500)
-      return () => {
-        clearTimeout(timeout)
-      }
-    }, [currentTimeline])
-
     // This replaces a `componentDidUpdate` so I've added almost all
     // the depnedencies there are to it.
     useEffect(() => {
@@ -73,17 +58,7 @@ const MiniMapConnector = (connector) => {
           domNode.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
         }
       }
-    }, [
-      beats,
-      lines,
-      activeFilter,
-      allCards,
-      cardMapping,
-      positionOffset,
-      active,
-      mouseOver,
-      firstRender,
-    ])
+    }, [beats, lines, activeFilter, allCards, cardMapping, positionOffset, active, mouseOver])
 
     const selectNav = (key) => {
       const elem = document.querySelector(`#beat-${key}`)
@@ -106,7 +81,6 @@ const MiniMapConnector = (connector) => {
       if (!beats.length) return null
       let beatsWithCards = allCards.map((card) => card.beatId)
       return beats.map((beat, idx) => {
-        if (firstRender && idx > 20) return null
         let hasCards = beatsWithCards.includes(beat.id)
         const beatCards = hasCards ? cardMapping[beat.id] : [emptyCard(idx, beat, lines[0])]
         if (activeFilter && !beatCards.length) return null

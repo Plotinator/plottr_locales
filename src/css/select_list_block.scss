@@ -136,6 +136,7 @@
 
 .tag-chip {
   display: inline-flex;
+  user-select: none;
   align-items: center;
   justify-content: space-between;
   margin: 2px;

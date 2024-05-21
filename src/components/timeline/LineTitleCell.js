@@ -113,7 +113,7 @@ const LineTitleCellConnector = (connector) => {
     }
 
     useEffect(() => {
-      if (!editing && line.title === '' && !recentlyUndidOrRedid.current) {
+      if (!editing && line.title === '' && !recentlyUndidOrRedidRef.current) {
         startEditing()
       }
     }, [])
