@@ -10,7 +10,7 @@ import { v4 as uuid } from 'uuid'
 import computerName from 'computer-name'
 import { userInfo } from 'os'
 
-import { helpers, selectors as pltrSelectors } from 'pltr/v2'
+import { helpers, selectors as pltrSelectors } from 'pltr'
 import { askToExport } from 'plottr_import_export'
 import { t } from 'plottr_locales'
 
@@ -33,6 +33,7 @@ import {
   deleteKnownFile,
   editKnownFilePath,
   createFromScrivener,
+  createFromWord,
 } from './modules/files'
 import { editWindowPath, setFilePathForWindowWithId } from './modules/windows/index'
 import { lastOpenedFile, setLastOpenedFilePath } from './modules/lastOpened'
@@ -318,6 +319,24 @@ export const listenOnIPCMain = (
             source: 'create-new-file',
           })
           replyWithError(replyChannel, error)
+        })
+    }
+  )
+
+  listen(
+    'create-from-word',
+    ({ reply }, replyChannel, importedPath, isLoggedIntoPro, destinationFile) => {
+      createFromWord(importedPath, reply, isLoggedIntoPro, destinationFile)
+        .then(() => {
+          reply(replyChannel, importedPath)
+        })
+        .catch((error) => {
+          log.error(`Error creating from scrivener (${importedPath}, ${destinationFile})`, error)
+          reply('error', {
+            message: error.message,
+            source: 'create-new-file',
+          })
+          reply(replyChannel, { error: error.message })
         })
     }
   )

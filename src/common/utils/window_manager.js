@@ -1,5 +1,5 @@
 import { t } from 'plottr_locales'
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import logger from '../../../shared/logger'
 import { makeMainProcessClient } from '../../app/mainProcessClient'

@@ -20,30 +20,36 @@ export function openLoginPopupWindow() {
   }
   const newWindow = new BrowserWindow(config)
 
-  newWindow.once('ready-to-show', () => {
-    newWindow.show()
-  })
+  if (typeof newWindow?.once === 'function') {
+    newWindow.once('ready-to-show', () => {
+      newWindow.show()
+    })
+  }
 
-  newWindow.webContents.on('did-finish-load', () => {
-    if (!newWindow.isVisible()) newWindow.show()
-  })
+  if (typeof newWindow?.webContents?.on === 'function') {
+    newWindow.webContents.on('did-finish-load', () => {
+      if (!newWindow.isVisible()) newWindow.show()
+    })
 
-  newWindow.webContents.on('unresponsive', () => {
-    log.warn('webContents became unresponsive')
-    newWindow.webContents.reload()
-  })
-  newWindow.webContents.on('responsive', () => {
-    log.info('webContents responsive again')
-  })
+    newWindow.webContents.on('unresponsive', () => {
+      log.warn('webContents became unresponsive')
+      newWindow.webContents.reload()
+    })
+    newWindow.webContents.on('responsive', () => {
+      log.info('webContents responsive again')
+    })
+  }
 
-  newWindow.on('unresponsive', () => {
-    log.warn('window became unresponsive')
-    newWindow.webContents.reload()
-  })
+  if (typeof newWindow?.on === 'function') {
+    newWindow.on('unresponsive', () => {
+      log.warn('window became unresponsive')
+      newWindow.webContents.reload()
+    })
 
-  newWindow.on('responsive', () => {
-    log.info('window responsive again')
-  })
+    newWindow.on('responsive', () => {
+      log.info('window responsive again')
+    })
+  }
 
   const entryFile = filePrefix(path.join(__dirname, 'login-popup.html'))
   newWindow.loadURL(entryFile)

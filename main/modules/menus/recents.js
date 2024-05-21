@@ -1,7 +1,7 @@
 import path from 'path'
 import log from 'electron-log'
 
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import { sortBy } from 'lodash'
 import { getKnownFilesInfo } from '../known_files'

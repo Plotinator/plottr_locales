@@ -1,6 +1,6 @@
 import { omit } from 'lodash'
 
-import { emptyFile } from 'pltr/v2'
+import { emptyFile } from 'pltr'
 import { actions, selectors } from 'wired-up-pltr'
 
 import { configureStore } from './fixtures/testStore'
@@ -18,7 +18,7 @@ const initialStore = () => {
   return store
 }
 const stateWithoutFileURL = () => {
-  return selectors.fullFileStateSelector(initialStore().getState())
+  return selectors.rawFileStateSelector(initialStore().getState())
 }
 const stateForDeviceFile = () => {
   const store = initialStore()
@@ -31,7 +31,7 @@ const stateForDeviceFile = () => {
       'device://tmp/dummy-url-test-file.pltr'
     )
   )
-  return selectors.fullFileStateSelector(store.getState())
+  return selectors.rawFileStateSelector(store.getState())
 }
 const stateForProFile = () => {
   const store = initialStore()
@@ -44,7 +44,7 @@ const stateForProFile = () => {
       'plottr://abcdefghowilovetowritethesetests'
     )
   )
-  return selectors.fullFileStateSelector(store.getState())
+  return selectors.rawFileStateSelector(store.getState())
 }
 const stateForProFileWithOfflineModeEnabled = () => {
   const store = initialStore()
@@ -67,7 +67,7 @@ const stateForProFileWithOfflineModeEnabled = () => {
       },
     })
   )
-  return selectors.fullFileStateSelector(store.getState())
+  return selectors.rawFileStateSelector(store.getState())
 }
 const stateForProFileWithOfflineModeDisabled = () => {
   const store = initialStore()
@@ -90,7 +90,7 @@ const stateForProFileWithOfflineModeDisabled = () => {
       },
     })
   )
-  return selectors.fullFileStateSelector(store.getState())
+  return selectors.rawFileStateSelector(store.getState())
 }
 const resumingState = () => {
   const store = initialStore()
@@ -104,7 +104,7 @@ const resumingState = () => {
     )
   )
   store.dispatch(actions.project.setResuming(true))
-  return selectors.fullFileStateSelector(store.getState())
+  return selectors.rawFileStateSelector(store.getState())
 }
 const offlineWithOfflineDisabledState = () => {
   const store = initialStore()
@@ -128,7 +128,7 @@ const offlineWithOfflineDisabledState = () => {
       },
     })
   )
-  return selectors.fullFileStateSelector(store.getState())
+  return selectors.rawFileStateSelector(store.getState())
 }
 const offlineLocalFileWithOfflineDisabledState = () => {
   const store = initialStore()
@@ -152,7 +152,7 @@ const offlineLocalFileWithOfflineDisabledState = () => {
       },
     })
   )
-  return selectors.fullFileStateSelector(store.getState())
+  return selectors.rawFileStateSelector(store.getState())
 }
 const offlineLocalFileWithOfflineEnabledState = () => {
   const store = initialStore()
@@ -176,7 +176,7 @@ const offlineLocalFileWithOfflineEnabledState = () => {
       },
     })
   )
-  return selectors.fullFileStateSelector(store.getState())
+  return selectors.rawFileStateSelector(store.getState())
 }
 const onlineWithOfflineDisabledAndLocalBackupDisabledState = () => {
   const store = initialStore()
@@ -230,7 +230,7 @@ const onlineWithOfflineDisabledAndLocalBackupDisabledState = () => {
       },
     })
   )
-  return selectors.fullFileStateSelector(store.getState())
+  return selectors.rawFileStateSelector(store.getState())
 }
 const onlineWithOfflineDisabledAndLocalBackupEnabledState = () => {
   const store = initialStore()
@@ -284,7 +284,7 @@ const onlineWithOfflineDisabledAndLocalBackupEnabledState = () => {
       },
     })
   )
-  return selectors.fullFileStateSelector(store.getState())
+  return selectors.rawFileStateSelector(store.getState())
 }
 const offlineWithOfflineEnabledState = () => {
   const store = initialStore()
@@ -308,7 +308,7 @@ const offlineWithOfflineEnabledState = () => {
       },
     })
   )
-  return selectors.fullFileStateSelector(store.getState())
+  return selectors.rawFileStateSelector(store.getState())
 }
 const localFileWithBackupsDisabled = () => {
   const store = initialStore()
@@ -328,7 +328,7 @@ const localFileWithBackupsDisabled = () => {
       backup: false,
     })
   )
-  return selectors.fullFileStateSelector(store.getState())
+  return selectors.rawFileStateSelector(store.getState())
 }
 const localFileWithBackupsEnabled = () => {
   const store = initialStore()
@@ -348,7 +348,7 @@ const localFileWithBackupsEnabled = () => {
       backup: true,
     })
   )
-  return selectors.fullFileStateSelector(store.getState())
+  return selectors.rawFileStateSelector(store.getState())
 }
 const localFileWithBackupsEnabledThatPointsAtOfflineModeFile = () => {
   const store = initialStore()
@@ -368,7 +368,7 @@ const localFileWithBackupsEnabledThatPointsAtOfflineModeFile = () => {
       backup: true,
     })
   )
-  return selectors.fullFileStateSelector(store.getState())
+  return selectors.rawFileStateSelector(store.getState())
 }
 
 describe('saveFile', () => {
@@ -387,7 +387,7 @@ describe('saveFile', () => {
         }
         let threw = false
         try {
-          await saveFile(whenClientIsReady, CONSOLE_LOGGER)(omit(EMPTY_FILE, 'file'))
+          await saveFile(whenClientIsReady, CONSOLE_LOGGER)(omit({ user: EMPTY_FILE }, 'user.file'))
         } catch (error) {
           threw = true
           expect(called).toBeFalsy()
@@ -642,6 +642,7 @@ describe('backupFile', () => {
   describe('given a whenClientIsReady that produces a dummy saveBackup', () => {
     describe('and a file that lacks the necessary keys', () => {
       it('should not call the dummy backup', async () => {
+        const state = stateForProFile()
         let called = false
         const _backupFile = () => {
           called = true
@@ -665,7 +666,7 @@ describe('backupFile', () => {
             backupOnFirebase,
             DUMMY_DOWNLOAD_IMAGE_FROM_STORAGE,
             CONSOLE_LOGGER
-          )(omit(EMPTY_FILE, 'file'))
+          )(omit(state, 'user.file'))
         } catch (error) {
           threw = true
           expect(called).toBeFalsy()

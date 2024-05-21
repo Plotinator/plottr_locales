@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 
 import { t } from 'plottr_locales'
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 const { lstat, mkdir } = fs.promises
 

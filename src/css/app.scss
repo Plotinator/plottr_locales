@@ -9,7 +9,7 @@
 @import 'error_boundary';
 @import 'login';
 
-@import 'plottr_components/components';
+@import '../../lib/plottr_components/src/css/components';
 @import 'dashboard/dashboard';
 
 @import 'busy_block';
@@ -149,6 +149,9 @@ body {
   // background: $gray-9 url("../../icons/grid_background.jpg");
   // background-image: url("../../icons/grid_background.jpg");
   // background-size: 3%;
+  p {
+    @include body-text-font;
+  }
 }
 
 h1,

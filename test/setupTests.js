@@ -22,6 +22,13 @@ ReactWrapper.prototype.findTypeWithTestId = ShallowWrapper.prototype.findTypeWit
 
 configure({ adapter: new Adapter() })
 
+const rtfjsModule = { loggingEnabled: () => {} }
+jest.mock('rtf.js', () => ({
+  RTFJS: rtfjsModule,
+  WMFJS: rtfjsModule,
+  EMFJS: rtfjsModule,
+}))
+
 jest.mock('electron-util', () => ({
   is: jest.fn(),
 }))
@@ -49,5 +56,15 @@ jest.mock('electron', () => ({
     getVersion: jest.fn(),
   },
 }))
+
+jest.mock('react-redux', () => {
+  const { connect, Provider } = jest.requireActual('react-redux')
+
+  return {
+    connect: connect,
+    Provider: Provider,
+    batch: (f) => f(),
+  }
+})
 
 jest.mock('wired-up-firebase', () => ({}))

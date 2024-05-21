@@ -91,7 +91,7 @@ export const useAskToSave = (
   useEffect(() => {
     const forceReload = () => {
       whenClientIsReady(({ saveOfflineFile, saveFile }) => {
-        const { present } = store().getState()
+        const present = selectors.fullFileStateSelector(store().getState())
         const fileLoaded = selectors.fileURLLoadedSelector(store().getState())
         const isCloudFile = selectors.isCloudFileSelector(store().getState())
         if (!fileLoaded) {
@@ -139,13 +139,10 @@ export const useAskToSave = (
   }, [applicationIsBusyAndCannotBeQuit, setWaitingForSaveDoneSignal])
 
   const saveAndClose = (saveFile, saveOfflineFile) => () => {
-    const { present } = store().getState()
+    const present = selectors.fullFileStateSelector(store().getState())
+    const fileURL = selectors.fileURLSelector(store().getState())
     setWaitingForSaveDoneSignal(true)
-    return (
-      isCloudFile && isOffline
-        ? saveOfflineFile(present)
-        : saveFile(present.project.fileURL, present)
-    )
+    return (isCloudFile && isOffline ? saveOfflineFile(present) : saveFile(fileURL, present))
       .then(() => {
         return new Promise((resolve) => {
           setTimeout(resolve, 1000)

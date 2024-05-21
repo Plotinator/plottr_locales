@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { PropTypes } from 'prop-types'
 import cx from 'classnames'
-import { VscChromeClose } from 'react-icons/vsc'
+import { VscChromeClose } from '@react-icons/all-files/vsc/VscChromeClose'
 
 import { selectors } from 'wired-up-pltr'
 import { PlottrModal, ErrorBoundary, DashboardBody, DashboardNav } from 'connected-components'

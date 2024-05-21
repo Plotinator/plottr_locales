@@ -9,14 +9,18 @@ function buildEditMenu() {
         label: t('Undo'),
         accelerator: 'CmdOrCtrl+Z',
         click: (event, focusedWindow) => {
-          focusedWindow.webContents.send('undo')
+          if (typeof focusedWindow?.webContents?.send === 'function') {
+            focusedWindow.webContents.send('undo')
+          }
         },
       },
       {
         label: t('Redo'),
         accelerator: is.macos ? 'Cmd+Shift+Z' : 'Ctrl+Y',
         click: (event, focusedWindow) => {
-          focusedWindow.webContents.send('redo')
+          if (typeof focusedWindow?.webContents?.send === 'function') {
+            focusedWindow.webContents.send('redo')
+          }
         },
       },
       {

@@ -11,18 +11,16 @@ import { setupI18n, t } from 'plottr_locales'
 
 import { store } from 'store'
 
-import { helpers, migrateIfNeeded, addMissingKeys } from 'pltr/v2'
+import { helpers, migrateIfNeeded, addMissingKeys } from 'pltr'
 import { actions, selectors } from 'wired-up-pltr'
 
-import { rtfToHTML } from 'pltr/v2/slate_serializers/to_html'
-import { convertHTMLNodeList } from 'pltr/v2/slate_deserializers/from_html'
+import { rtfSerialisersAndDeserialisers, slate } from 'pltr'
 import { imageToWebpDataURL } from 'plottr_import_export'
-import exportConfig from 'plottr_import_export/src/exporter/default_config'
 import world from 'world-api'
 
+import exportConfig from '../../lib/plottr_import_export/src/exporter/default_config'
 import MPQ from '../common/utils/MPQ'
 import initMixpanel from '../common/utils/mixpanel'
-import { ActionCreators } from 'redux-undo'
 import { addNewCustomTemplate } from '../common/utils/custom_templates'
 import { createFullErrorReport } from '../common/utils/full_error_report'
 import { openDashboard, closeDashboard, createFromTemplate } from '../dashboard-events'
@@ -42,6 +40,9 @@ import { makeMainProcessClient } from './mainProcessClient'
 import { downloadStorageImage } from '../common/downloadStorageImage'
 import createErrorReporter from '../../shared/error-reporter'
 import { getErrorReporterInstance } from '../../shared/error-reporter-instance'
+
+const { rtfToHTML } = rtfSerialisersAndDeserialisers
+const convertHTMLNodeList = slate.html.deserialiseHTMLNodeList
 
 const {
   showErrorBox,
@@ -503,11 +504,11 @@ tellMeWhatOSImOn()
         document.addEventListener('save-as', saveAsHandler)
 
         onUndo(() => {
-          store().dispatch(ActionCreators.undo())
+          store().dispatch(actions.undo.undo())
         })
 
         onRedu(() => {
-          store().dispatch(ActionCreators.redo())
+          store().dispatch(actions.undo.redo())
         })
 
         let lastError = null
@@ -590,7 +591,7 @@ tellMeWhatOSImOn()
           const emailAddress = selectors.emailAddressSelector(state)
           const userId = selectors.userIdSelector(state)
           const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
-          if (!isInProMode) {
+          if (isInProMode) {
             uploadToFirebase(emailAddress, userId, json, fileName)
               .then((response) => {
                 const fileId = response.data.fileId

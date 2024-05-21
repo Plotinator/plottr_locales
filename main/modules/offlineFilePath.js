@@ -1,7 +1,7 @@
 import { app } from 'electron'
 import path from 'path'
 
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 const OFFLINE_FILE_FILES_PATH = path.join(app.getPath('userData'), 'offline')
 

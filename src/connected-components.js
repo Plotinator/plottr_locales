@@ -1,11 +1,7 @@
-import { ActionCreators } from 'redux-undo'
-
 import { t } from 'plottr_locales'
 import { connections } from 'plottr_components'
-import export_config from 'plottr_import_export/src/exporter/default_config'
-import exportToSelfContainedPlottrFile from 'plottr_import_export/src/exporter/plottr'
-import { helpers } from 'pltr/v2'
-import * as pltr from 'pltr/v2'
+import { helpers } from 'pltr'
+import * as pltr from 'pltr'
 import { actions, selectors } from 'wired-up-pltr'
 import {
   backupPublicURL,
@@ -25,6 +21,9 @@ import {
   deleteProBackup,
   deleteMachineLicenseActivation,
 } from 'wired-up-firebase'
+
+import export_config from '../lib/plottr_import_export/src/exporter/default_config'
+import exportToSelfContainedPlottrFile from '../lib/plottr_import_export/src/exporter/plottr'
 
 import {
   renameFile,
@@ -81,6 +80,7 @@ const {
   deleteKnownFile,
   createFromSnowflake,
   createFromScrivener,
+  createFromWord,
   pleaseQuitAndInstall,
   pleaseDownloadUpdate,
   pleaseCheckForUpdates,
@@ -166,10 +166,10 @@ const { checkForAndSaveLicense } = licenseServerAPIs.makeLicenseServerAPIs(
 
 const platform = {
   undo: () => {
-    store().dispatch(ActionCreators.undo())
+    store().dispatch(actions.undo.undo())
   },
   redo: () => {
-    store().dispatch(ActionCreators.redo())
+    store().dispatch(actions.undo.redo())
   },
   hostLocale,
   appVersion: getVersion,
@@ -341,6 +341,11 @@ const platform = {
       const state = store().getState()
       const isLoggedIntoPro = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
       createFromScrivener(importedPath, isLoggedIntoPro)
+    },
+    createFromWord: (importedPath) => {
+      const state = store().getState()
+      const isLoggedIntoPro = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
+      createFromWord(importedPath, isLoggedIntoPro)
     },
     joinPath: (...args) => {
       return whenClientIsReady(({ join }) => {
@@ -676,8 +681,17 @@ const platform = {
   },
 }
 
+// Use in cases where we get something that looks roughly like the
+// user state and we want it to appear at the right place for
+// selectors to find it.
+const mountState = (state) => {
+  return {
+    user: state,
+  }
+}
+
 // Override the selectors and actions with the ones that are wired up.
-const components = connections.pltr(platform, { ...pltr, actions, selectors })
+const components = connections.pltr(platform, { ...pltr, actions, selectors, mountState })
 
 export const Navbar = components.Navbar
 export const Grid = components.Grid
@@ -768,3 +782,4 @@ export const UpdateNotifier = components.UpdateNotifier
 export const NewProjectInputModal = components.NewProjectInputModal
 export const SettingsWizard = components.SettingsWizard
 export const RestructureTimelineModal = components.RestructureTimelineModal
+export const UndoRedo = components.UndoRedo
