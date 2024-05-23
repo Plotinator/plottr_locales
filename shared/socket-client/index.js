@@ -26,6 +26,7 @@ import {
   EDIT_KNOWN_FILE_PATH,
   UPDATE_LAST_OPENED_DATE,
   DIRECTORY_IS_WRITABLE,
+  CONVERT_DOCX_TO_HTML,
 
   // Error reply types
   REMOVE_FROM_KNOWN_FILES_ERROR_REPLY,
@@ -160,12 +161,13 @@ import {
   DELETE_PRO_LICENSE,
   DELETE_PRO_LICENSE_ERROR_REPLY,
   DELETE_PLOTTR_LICENSE_ERROR_REPLY,
+  CONVERT_DOCX_TO_HTML_ERROR_REPLY,
 } from '../socket-server-message-types'
 import { setPort, getPort } from './workerPort'
 
 const FORCE_IDLE_WORK_TIMEOUT = 1000
 const defer =
-  typeof process === 'object' && process.type === 'renderer'
+  typeof process === 'object' && process?.type === 'renderer'
     ? (f) => window.requestIdleCallback(f, { timeout: FORCE_IDLE_WORK_TIMEOUT })
     : (f) => {
         setTimeout(f, 0)
@@ -284,6 +286,7 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
             return
           }
           // Normal replies
+          case CONVERT_DOCX_TO_HTML:
           case COPY_FILE:
           case CREATE_SHORTCUT:
           case REMOVE_FROM_KNOWN_FILES:
@@ -673,6 +676,10 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
       return sendPromise(DIRECTORY_IS_WRITABLE, { path })
     }
 
+    const convertDocxToHtml = (path) => {
+      return sendPromise(CONVERT_DOCX_TO_HTML, { path })
+    }
+
     // ===File System APIs===
 
     const backupBasePath = () => {
@@ -942,6 +949,7 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           currentProLicense,
           savePlottrLicense,
           saveProLicense,
+          convertDocxToHtml,
         })
       })
     })

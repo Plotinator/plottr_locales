@@ -92,11 +92,15 @@ function focusIfOpen(fileURL) {
     if (typeof win.browserWindow?.focus === 'function') {
       win.browserWindow.focus()
     }
-    win.browserWindow.webContents.send('close-dashboard')
+    if (typeof win?.webContents?.send === 'function') {
+      win.browserWindow.webContents.send('close-dashboard')
+    }
     // If it's this window and we're trying to open a new file, then
     // we need to refresh the contents.
     featureFlags().then((flags) => {
-      win.browserWindow.webContents.send('reload-from-file', fileURL, flags, numberOfWindows())
+      if (typeof win?.webContents?.send === 'function') {
+        win.browserWindow.webContents.send('reload-from-file', fileURL, flags, numberOfWindows())
+      }
     })
     return true
   } else {
@@ -105,7 +109,11 @@ function focusIfOpen(fileURL) {
 }
 
 function reloadAllWindows() {
-  windows.forEach((w) => w.browserWindow.webContents.send('force-reload'))
+  windows.forEach((w) => {
+    if (typeof w?.webContents?.send === 'function') {
+      w.browserWindow.webContents.send('force-reload')
+    }
+  })
 }
 
 function dereferenceWindow(winObj) {

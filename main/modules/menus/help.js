@@ -31,8 +31,11 @@ function buildHelpMenu() {
       },
       {
         label: t('Create an Error Report'),
-        click: (event, focusedWindow) =>
-          focusedWindow.webContents.send('create-error-report', null, true),
+        click: (event, focusedWindow) => {
+          if (typeof focusedWindow?.webContents?.send === 'function') {
+            focusedWindow.webContents.send('create-error-report', null, true)
+          }
+        },
       },
       {
         type: 'separator',

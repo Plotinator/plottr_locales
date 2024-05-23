@@ -1,11 +1,7 @@
-import { actions as pltrActions, selectors as pltrSelectors } from 'pltr/v2'
+import { actions as pltrActions, selectors as pltrSelectors } from 'pltr'
 
 export const selectPresentState = (fullState) => {
-  if (typeof fullState.present !== 'undefined') {
-    return fullState.present
-  } else {
-    return fullState
-  }
+  return fullState
 }
 export const actions = pltrActions(selectPresentState)
 export const selectors = pltrSelectors(selectPresentState)

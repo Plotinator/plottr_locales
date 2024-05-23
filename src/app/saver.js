@@ -1,7 +1,7 @@
 import { isEqual } from 'lodash'
 
 import { t } from 'plottr_locales'
-import { removeSystemKeys, errorCodes } from 'pltr/v2'
+import { removeSystemKeys, errorCodes } from 'pltr'
 
 const {
   FILE_LACKS_ALL_KEYS,

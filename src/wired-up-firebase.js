@@ -1,6 +1,6 @@
-import { firebaseWorker } from 'plottr_firebase/worker/firebase-worker'
-
 import { selectors } from 'wired-up-pltr'
+
+import { firebaseWorker } from '../lib/plottr_firebase/worker/firebase-worker'
 
 import logger from '../shared/logger'
 import { makeMainProcessClient } from './app/mainProcessClient'
@@ -47,6 +47,7 @@ export const loginWithEmailAndPassword = worker.loginWithEmailAndPassword
 export const getIdTokenResult = worker.getIdTokenResult
 export const isInitialised = worker.isInitialised
 export const deleteProBackup = worker.deleteProBackup
+export const writeUserOwnershipNote = worker.writeUserOwnershipNote
 export const deleteMachineLicenseActivation = worker.deleteMachineLicenseActivation
 
 // Duplicated utility functions

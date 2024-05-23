@@ -1,6 +1,6 @@
 import { onStoreChanges } from './app/store/onStoreChanges'
 
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import { bootFile } from './app/bootFile'
 import { makeMainProcessClient } from './app/mainProcessClient'

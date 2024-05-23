@@ -1,4 +1,4 @@
-import { middlewares, ARRAY_KEYS, SYSTEM_REDUCER_ACTION_TYPES } from 'pltr/v2'
+import { middlewares, ARRAY_KEYS, SYSTEM_REDUCER_ACTION_TYPES } from 'pltr'
 import { overwrite, deleteSingle, toFirestoreArray } from 'wired-up-firebase'
 import { selectors, selectPresentState } from 'wired-up-pltr'
 import { makeMainProcessClient } from '../mainProcessClient'

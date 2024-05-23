@@ -6,7 +6,7 @@ import { sortBy } from 'lodash'
 
 import { BACKUP_BASE_PATH, CUSTOM_TEMPLATES_PATH } from './stores'
 
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 const { readdir, mkdir, lstat, cp, symlink, link } = fs.promises
 

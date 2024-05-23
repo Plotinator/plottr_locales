@@ -1,4 +1,4 @@
-import { helpers, SYSTEM_REDUCER_KEYS, migrateIfNeeded, Migrator, emptyFile } from 'pltr/v2'
+import { helpers, SYSTEM_REDUCER_KEYS, migrateIfNeeded, Migrator, emptyFile } from 'pltr'
 import { actions, selectors } from 'wired-up-pltr'
 import { t } from 'plottr_locales'
 import { v4 as uuid } from 'uuid'
@@ -7,8 +7,9 @@ import {
   initialFetch,
   overwriteAllKeys,
   saveBackup as saveBackupOnFirebase,
+  writeUserOwnershipNote,
 } from 'wired-up-firebase'
-import exportToSelfContainedPlottrFile from 'plottr_import_export/src/exporter/plottr'
+import exportToSelfContainedPlottrFile from '../../lib/plottr_import_export/src/exporter/plottr'
 
 import { makeFileSystemAPIs } from '../api'
 import { offlineFileURLFromFile } from '../files'
@@ -422,6 +423,12 @@ export function bootFile(
             .then(migrate(fetchedFile, fileId))
             .then(afterLoading(userId, saveBackup))
         })
+        .then((result) => {
+          const permission = selectors.permissionSelector(store().getState())
+          return writeUserOwnershipNote(userId, fileId, permission).then(() => {
+            return result
+          })
+        })
         .catch((error) => {
           const errorMessage = `Error fetching ${fileId} for user: ${userId}, clientId: ${clientId}`
           logger.error(errorMessage, error)
@@ -707,7 +714,7 @@ export function bootFile(
         }
         saverRef.current = Saver(
           () => {
-            return selectors.fullFileStateSelector(store().getState())
+            return store().getState()
           },
           saveFile(whenClientIsReady, errorReportingLogger, postSaveHook),
           backupFile(

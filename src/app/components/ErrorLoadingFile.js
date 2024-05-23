@@ -1,10 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { IoIosAlert } from 'react-icons/io'
+import { IoIosAlert } from '@react-icons/all-files/io/IoIosAlert'
 import { connect } from 'react-redux'
 
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 import { actions, selectors } from 'wired-up-pltr'
 import { t } from 'plottr_locales'
 import { Button } from 'plottr_components'
