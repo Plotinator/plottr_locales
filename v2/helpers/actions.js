@@ -27,7 +27,7 @@ export const entityModifiedByAction = (action) => {
       return `Note Attribute: ${action.name}`
     }
     case EDIT_CHARACTER_ATTRIBUTE_VALUE: {
-      return `Character Attribute: ${action.name}`
+      return `Character Attribute${action.name ? `: ${action.name}` : ''}`
     }
     case EDIT_CHARACTER_TEMPLATE_ATTRIBUTE: {
       return `Character Template Attribute: ${action.name}`

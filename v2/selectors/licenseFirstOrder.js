@@ -66,7 +66,9 @@ const dateCheckedExistsAndIsWithinLimit = (inDateChecked) => {
 export const hasActivePlottrLicenseSelector = createSelector(
   plottrLicenseSelector,
   ({ dateChecked, expiresAt }) => {
-    if (dateCheckedExistsAndIsWithinLimit(dateChecked)) {
+    if (expiresAt === null) {
+      return true
+    } else if (dateCheckedExistsAndIsWithinLimit(dateChecked)) {
       if (expiresAt && typeof expiresAt === 'string') {
         const dateExpiresAt = new Date(expiresAt)
         if (isNaN(dateExpiresAt)) {
