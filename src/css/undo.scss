@@ -35,7 +35,7 @@
   cursor: pointer;
   padding: 5px;
   &:hover {
-    background-color: lighten(#e2e9f3, 20%);
+    background-color: lighten($darkmode-v2-darker-background, 20%);
   }
 }
 
@@ -43,5 +43,55 @@
   background-color: #f1f4f9;
   &:hover {
     background-color: lighten(#f1f4f9, 20%);
+  }
+}
+
+.darkmode {
+  .undo-redo__container {
+    position: fixed;
+    width: 300px;
+    top: calc(100vh - 450px);
+    left: calc(50vw - 100px);
+    background-color: $darkmode-v2-darker-background;
+    border-radius: 10px;
+    padding: 10px;
+  }
+
+  .undo-redo__heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: $darkmode-v2-darker-background;
+    color: $darkmode-v2-text;
+    padding: 5px;
+    font-weight: bold;
+    font-size: 20px;
+    user-select: none;
+    svg {
+      user-select: none;
+      cursor: pointer;
+      margin: 5px;
+    }
+  }
+
+  .undo-redo__no-further-changes {
+    user-select: none;
+    padding: 5px;
+  }
+
+  .undo-redo__history-item {
+    user-select: none;
+    cursor: pointer;
+    padding: 5px;
+    &:hover {
+      background-color: lighten($darkmode-v2-darker-background, 20%);
+    }
+  }
+
+  .undo-redo__history-item--highlight {
+    background-color: #24252c;
+    &:hover {
+      background-color: lighten(#24252c, 20%);
+    }
   }
 }
