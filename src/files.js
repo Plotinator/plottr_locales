@@ -362,8 +362,12 @@ export const importExistingFile = (fileUrl, properties) => {
                     logger.error('Error migrating file', error)
                     reject(error)
                     return
-                  } else if (didMigrate) {
-                    store().dispatch(actions.ui.openImportPltrModal(migratedState))
+                  } else {
+                    const fullSystemState = selectors.fullSystemStateSelector(store().getState())
+                    store().dispatch(
+                      actions.ui.openImportPltrModal(addMissingKeys(migratedState)),
+                      fullSystemState
+                    )
                     store().dispatch(actions.project.showLoader(false))
                   }
                 }
