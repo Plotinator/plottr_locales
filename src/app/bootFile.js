@@ -381,8 +381,8 @@ export function bootFile(
               return whenClientIsReady(({ readFile }) => {
                 return exists
                   ? readFile(offlinePath).then((file) => {
-                    return JSON.parse(file)
-                  })
+                      return JSON.parse(file)
+                    })
                   : Promise.resolve(null)
               })
             })
