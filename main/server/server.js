@@ -219,7 +219,7 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
     const logger = makeLogger(webSocket)
     const backupModule = makeBackupModule(settings, logger)
     const { defaultBackupPath, saveBackup, ensureBackupTodayPath } = backupModule
-    const fileModule = makeFileModule(backupModule, settings, logger)
+    const fileModule = makeFileModule(backupModule, settings, stores, logger)
     const {
       saveFile,
       saveRawFile,
