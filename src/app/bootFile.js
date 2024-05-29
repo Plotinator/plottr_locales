@@ -364,41 +364,43 @@ export function bootFile(
       if (!settings.user.enableOfflineMode) {
         return Promise.resolve(false)
       }
-      return offlineFileURLFromFile(json).then((offlineURL) => {
-        if (!offlineURL) {
-          logger.warn(`Could not compute an offline path for file: ${json?.file}`)
-          return Promise.resolve(false)
-        }
-        const offlinePath = helpers.file.withoutProtocol(offlineURL)
-        return whenClientIsReady(({ fileExists }) => {
-          return fileExists(offlinePath)
-        })
-          .then((exists) => {
-            return offlinePath && exists
+      return offlineFileURLFromFile(helpers.file.fileIdToPlottrCloudFileURL(fileId)).then(
+        (offlineURL) => {
+          if (!offlineURL) {
+            logger.warn(`Could not compute an offline path for file: ${json?.file}`)
+            return Promise.resolve(false)
+          }
+          const offlinePath = helpers.file.withoutProtocol(offlineURL)
+          return whenClientIsReady(({ fileExists }) => {
+            return fileExists(offlinePath)
           })
-          .then((exists) => {
-            return whenClientIsReady(({ readFile }) => {
-              return exists
-                ? readFile(offlinePath).then((file) => {
+            .then((exists) => {
+              return offlinePath && exists
+            })
+            .then((exists) => {
+              return whenClientIsReady(({ readFile }) => {
+                return exists
+                  ? readFile(offlinePath).then((file) => {
                     return JSON.parse(file)
                   })
-                : Promise.resolve(null)
+                  : Promise.resolve(null)
+              })
             })
-          })
-          .then((offlineFile) => {
-            if (!offlineFile) {
-              return false
-            }
-            if (!offlineFile.file) {
-              logger.warn(
-                `There's an offline backup of file with id ${fileId} at ${offlinePath}, but it appears to be broken or incomplete`
-              )
-              return Promise.resolve(false)
-            }
-            const [uploadOurs, backupOurs] = resumeDirective(offlineFile, json)
-            return handleOfflineBackup(backupOurs, uploadOurs, fileId, offlineFile, email, userId)
-          })
-      })
+            .then((offlineFile) => {
+              if (!offlineFile) {
+                return false
+              }
+              if (!offlineFile.file) {
+                logger.warn(
+                  `There's an offline backup of file with id ${fileId} at ${offlinePath}, but it appears to be broken or incomplete`
+                )
+                return Promise.resolve(false)
+              }
+              const [uploadOurs, backupOurs] = resumeDirective(offlineFile, json)
+              return handleOfflineBackup(backupOurs, uploadOurs, fileId, offlineFile, email, userId)
+            })
+        }
+      )
     })
   }
 

@@ -626,9 +626,9 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
           }
           case OFFLINE_FILE_URL: {
             const { fileURL } = payload
-            return handlePromise(
+            return handleSync(
               () => ['Computing the offline file URL of', fileURL],
-              () => statusManager.registerTask(offlineFileURL(fileURL), OFFLINE_FILE_URL),
+              () => offlineFileURL(fileURL),
               () => ['Error computing the offline file URL of', fileURL]
             )
           }

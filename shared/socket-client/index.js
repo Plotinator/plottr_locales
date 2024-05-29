@@ -299,6 +299,7 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           case SAVE_AS_TEMP_FILE:
           case ATTEMPT_TO_FETCH_TEMPLATES:
           case DELETE_CUSTOM_TEMPLATE:
+          case OFFLINE_FILE_URL:
           case OFFLINE_FILE_PATH:
           case DEFAULT_BACKUP_LOCATION:
           case SET_TEMPLATE:
