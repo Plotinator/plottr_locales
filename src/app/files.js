@@ -1,7 +1,7 @@
 const makeFileModule = (whenClientIsReady) => {
-  const saveOfflineFile = (jsonData) => {
+  const saveOfflineFile = (fileURL, jsonData) => {
     return whenClientIsReady(({ saveOfflineFile }) => {
-      return saveOfflineFile(jsonData)
+      return saveOfflineFile(fileURL, jsonData)
     })
   }
 
@@ -23,9 +23,9 @@ const makeFileModule = (whenClientIsReady) => {
     })
   }
 
-  const isTempFile = (file) => {
+  const isTempFile = (fileURL) => {
     return whenClientIsReady(({ isTempFile }) => {
-      return isTempFile(file)
+      return isTempFile(fileURL)
     })
   }
 

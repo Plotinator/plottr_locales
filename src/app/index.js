@@ -262,8 +262,9 @@ tellMeWhatOSImOn()
           const isOfflineModeEnabled = selectors.offlineModeEnabledSelector(state)
           const isCloudFile = selectors.isCloudFileSelector(state)
           const fileState = selectors.fullFileStateSelector(state)
+          const fileURL = selectors.fileURLSelector(state)
           if (isCloudFile && isOffline && isOfflineModeEnabled) {
-            saveOfflineFile(fileState)
+            saveOfflineFile(fileURL, fileState)
               .then(() => {
                 store().dispatch(actions.ui.fileSaved())
               })
@@ -440,14 +441,19 @@ tellMeWhatOSImOn()
         // default folder release because this was discovered on the
         // eve of releasing.
         const moveFromTempHandler = () => {
+          const forceCloseWindow = () => {
+            const event = new Event('force-close')
+            window.dispatchEvent(event)
+          }
           const state = store().getState()
           const file = selectors.fullFileStateSelector(state)
+          const fileURL = selectors.fileURLSelector(state)
           const isCloudFile = selectors.isCloudFileSelector(state)
           if (isCloudFile) {
             return
           }
 
-          isTempFile(file).then((isTemp) => {
+          isTempFile(fileURL).then((isTemp) => {
             const oldFileURL = selectors.fileURLSelector(state)
             if (!oldFileURL) {
               errorReportingLogger.error(
@@ -461,40 +467,63 @@ tellMeWhatOSImOn()
                 store().dispatch(actions.ui.fileSaved())
               })
               return
-            }
-            const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
-            showSaveDialog(filters, t('Where would you like to save this file?')).then(
-              (filePath) => {
-                const newFilePath = helpers.file.ensureEndsInPltr(filePath)
-                if (newFilePath) {
-                  // Point at the new file
-                  const newFileURL = helpers.file.filePathToFileURL(newFilePath)
-                  const oldFileURL = selectors.fileURLSelector(state)
-                  if (!newFilePath || !newFileURL) {
-                    errorReportingLogger.error(
-                      `Tried to move file at ${oldFileURL} to ${newFilePath} (path: ${newFilePath})`,
-                      new Error('Need destination and source to move a file')
-                    )
-                    return
-                  }
-                  copyFile(oldFileURL, newFileURL).then(() => {
-                    return basename(newFilePath).then((newFileName) => {
-                      // load the new file: the only way to set a new
-                      // `project.fileURL`(!)
-                      store().dispatch(
-                        actions.ui.loadFile(
-                          newFileName,
-                          false,
-                          removeSystemKeys(file),
-                          file.file.version,
-                          newFileURL
-                        )
+            } else {
+              const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
+              showSaveDialog(filters, t('Where would you like to save this file?')).then(
+                (filePath) => {
+                  const newFilePath = helpers.file.ensureEndsInPltr(filePath)
+                  if (newFilePath) {
+                    // Point at the new file
+                    const newFileURL = helpers.file.filePathToFileURL(newFilePath)
+                    const oldFileURL = selectors.fileURLSelector(state)
+                    if (!newFilePath || !newFileURL) {
+                      errorReportingLogger.error(
+                        `Tried to move file at ${oldFileURL} to ${newFilePath} (path: ${newFilePath})`,
+                        new Error('Need destination and source to move a file')
                       )
-                    })
-                  })
+                      return
+                    }
+                    copyFile(oldFileURL, newFileURL)
+                      .then(() => {
+                        return basename(newFilePath).then((newFileName) => {
+                          // load the new file: the only way to set a new
+                          // `project.fileURL`(!)
+                          store().dispatch(
+                            actions.ui.loadFile(
+                              newFileName,
+                              false,
+                              removeSystemKeys(file),
+                              file.file.version,
+                              newFileURL
+                            )
+                          )
+                        })
+                      })
+                      .then(() => {
+                        return addToKnownFilesAndOpen(newFileURL)
+                      })
+                      .then(() => {
+                        return saveFile(oldFileURL, file).then(() => {
+                          store().dispatch(actions.ui.fileSaved())
+                        })
+                      })
+                      .then(() => {
+                        return new Promise((resolve) => {
+                          setTimeout(resolve, 500)
+                        })
+                      })
+                      .then(() => {
+                        whenClientIsReady(({ removeFromKnownFiles }) => {
+                          return removeFromKnownFiles(oldFileURL)
+                        })
+                      })
+                      .then(() => {
+                        forceCloseWindow()
+                      })
+                  }
                 }
-              }
-            )
+              )
+            }
           })
         }
         const _unsubscribeFromMoveFromTemp = onMoveFromTemp(moveFromTempHandler)

@@ -259,7 +259,7 @@ const fileModule = (userDataPath) => {
     }
 
     function checkForFileRecord(file) {
-      if (!file || !file.file || !file.file.fileName || !file.project || !file.project.fileURL) {
+      if (!file || !file.file || !file.file.fileName) {
         logger.error('Trying to save a file but there is no file record on it.', file)
         return Promise.reject(
           new Error(`Trying to save a file (${file.file}) but there is no file record on it.`)
@@ -268,12 +268,12 @@ const fileModule = (userDataPath) => {
       return Promise.resolve(file)
     }
 
-    function saveOfflineFile(file) {
+    function saveOfflineFile(fileURL, file) {
       return ensureOfflineBackupPathExists().then(() => {
         return checkForFileRecord(file).then(() => {
-          const fileURL = offlineFileURL(file.project.fileURL)
+          const fileURL = offlineFileURL(fileURL)
           if (!fileURL) {
-            const message = `Attempting to save offline file but we couldn't compute the offline url: ${file.project.fileURL}`
+            const message = `Attempting to save offline file but we couldn't compute the offline url: ${fileURL}`
             logger.error(message)
             return Promise.reject(new Error(message))
           }
@@ -305,11 +305,9 @@ const fileModule = (userDataPath) => {
       })
     }
 
-    function isTempFile(file) {
-      logger.info(
-        `Does ${file.project.fileURL} include ${TEMP_FILES_PATH} when we strip the URL from it?`
-      )
-      return helpers.file.withoutProtocol(file.project.fileURL).includes(TEMP_FILES_PATH)
+    function isTempFile(fileURL) {
+      logger.info(`Does ${fileURL} include ${TEMP_FILES_PATH} when we strip the URL from it?`)
+      return helpers.file.withoutProtocol(fileURL).includes(TEMP_FILES_PATH)
     }
 
     function saveTempFile(file) {

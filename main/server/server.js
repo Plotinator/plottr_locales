@@ -468,7 +468,7 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
             )
           }
           case SAVE_OFFLINE_FILE: {
-            const { file } = payload
+            const { fileURL, file } = payload
             return handlePromise(
               () => [
                 'Saving offline file (reduced payload): ',
@@ -478,7 +478,7 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
                   },
                 },
               ],
-              () => statusManager.registerTask(saveOfflineFile(file), SAVE_OFFLINE_FILE),
+              () => statusManager.registerTask(saveOfflineFile(fileURL, file), SAVE_OFFLINE_FILE),
               (error) => [
                 'Error while saving offline ',
                 {
@@ -578,18 +578,11 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
             )
           }
           case IS_TEMP_FILE: {
-            const { file } = payload
+            const { fileURL } = payload
             return handleSync(
-              () => [
-                'Checking whether file is a temp file (reduced payload): ',
-                {
-                  file: {
-                    ...payload?.file?.file,
-                  },
-                },
-              ],
-              () => isTempFile(file),
-              () => ['Error checking where file is temp: ', file]
+              () => ['Checking whether file is a temp file (reduced payload): ', fileURL],
+              () => isTempFile(fileURL),
+              () => ['Error checking where file is temp: ', fileURL]
             )
           }
           case SET_TEMPLATE: {

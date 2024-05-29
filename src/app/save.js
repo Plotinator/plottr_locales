@@ -22,9 +22,10 @@ export const saveFile = (whenClientIsReady, logger, postSaveHook) => (state) => 
       return Promise.resolve()
     }
 
+    const fileURL = selectors.fileURLSelector(state)
     const shouldSaveOfflineFile = selectors.shouldSaveOfflineFileSelector(state)
     if (shouldSaveOfflineFile) {
-      return saveOfflineFile(fileJSON)
+      return saveOfflineFile(fileURL, fileJSON)
     }
 
     const isCloudFile = selectors.isCloudFileSelector(state)
@@ -33,7 +34,6 @@ export const saveFile = (whenClientIsReady, logger, postSaveHook) => (state) => 
       return Promise.resolve()
     }
 
-    const fileURL = selectors.fileURLSelector(state)
     return saveFile(fileURL, fileJSON)
   }).then(() => {
     if (postSaveHook) {

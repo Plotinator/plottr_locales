@@ -504,8 +504,8 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
       return sendPromise(SAVE_RAW_FILE, { filePath, data })
     }
 
-    const saveOfflineFile = (file) => {
-      return sendPromise(SAVE_OFFLINE_FILE, { file })
+    const saveOfflineFile = (fileURL, file) => {
+      return sendPromise(SAVE_OFFLINE_FILE, { file, fileURL })
     }
 
     const basename = (filePath) => {
@@ -540,8 +540,8 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
       return sendPromise(READ_OFFLINE_FILES)
     }
 
-    const isTempFile = (file) => {
-      return sendPromise(IS_TEMP_FILE, { file })
+    const isTempFile = (fileURL) => {
+      return sendPromise(IS_TEMP_FILE, { fileURL })
     }
 
     const setTemplate = (id, template) => {
