@@ -927,6 +927,20 @@ body.darkmode {
     }
   }
 
+  .import-dialog__body {
+    .import-dialog__option-lists {
+      .list-wrapper {
+        border-color: $darkmode-v2-border;
+        background: $darkmode-v2-card-background;
+      }
+
+      .list-title {
+        background-color: $darkmode-v2-background;
+        color: #ccc;
+      }
+    }
+  }
+
   .step__body {
     .jumbotron {
       background-color: #24252c;
