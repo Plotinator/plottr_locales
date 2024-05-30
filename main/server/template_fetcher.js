@@ -174,6 +174,7 @@ class TemplateFetcher {
     const templates = this.manifestStore.get('manifest.templates')
     const templateRequests = templates.map((template) => {
       if (force || this.templateIsNewer(template.id, template.version)) {
+        this.log('Fetching template', template.id, template.url)
         return this.fetchTemplate(template.id, template.url)
       }
       return Promise.resolve()
@@ -210,8 +211,11 @@ class TemplateFetcher {
 
   templateIsNewer = (templateId, manifestVersion) => {
     const storedTemplate = this.templatesStore.get(templateId)
-    if (!storedTemplate) return true
-    return semverGt(manifestVersion, storedTemplate.version) // is 1st param > 2nd?
+    if (!storedTemplate || !storedTemplate.version || storedTemplate.id !== templateId) {
+      return true
+    } else {
+      return semverGt(manifestVersion, storedTemplate.version) // is 1st param > 2nd?
+    }
   }
 }
 

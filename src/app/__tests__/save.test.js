@@ -214,7 +214,7 @@ const onlineWithOfflineDisabledAndLocalBackupDisabledState = () => {
           name: 'quiescent.home',
           localUserName: 'edward',
         },
-        dateChecked: '2024-04-22T13:35:48.429Z',
+        dateChecked: '2050-04-22T13:35:48.429Z',
         expiresAt: '2050-04-23T09:44:42.469Z',
       },
       proLicense: {
@@ -226,7 +226,7 @@ const onlineWithOfflineDisabledAndLocalBackupDisabledState = () => {
           localUserName: 'edward',
         },
         expiresAt: '2050-04-22T13:17:16.626Z',
-        dateChecked: '2024-04-26T11:12:49.682Z',
+        dateChecked: '2050-04-26T11:12:49.682Z',
       },
     })
   )
@@ -268,7 +268,7 @@ const onlineWithOfflineDisabledAndLocalBackupEnabledState = () => {
           name: 'quiescent.home',
           localUserName: 'edward',
         },
-        dateChecked: '2024-04-22T13:35:48.429Z',
+        dateChecked: '2050-04-22T13:35:48.429Z',
         expiresAt: '2050-04-23T09:44:42.469Z',
       },
       proLicense: {
@@ -280,7 +280,7 @@ const onlineWithOfflineDisabledAndLocalBackupEnabledState = () => {
           localUserName: 'edward',
         },
         expiresAt: '2050-04-22T13:17:16.626Z',
-        dateChecked: '2024-04-26T11:12:49.682Z',
+        dateChecked: '2050-04-26T11:12:49.682Z',
       },
     })
   )

@@ -28,9 +28,9 @@ export const renderFile = (root, whenClientIsReady) => {
   startupStateMachine(store, selectors, actions, saveBackupOnFirebase)
   listenToDarkMode(store, selectors)
 
-  const saveOfflineFile = (file) => {
+  const saveOfflineFile = (fileURL, file) => {
     return whenClientIsReady(({ saveOfflineFile }) => {
-      return saveOfflineFile(file)
+      return saveOfflineFile(fileURL, file)
     })
   }
 

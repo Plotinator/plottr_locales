@@ -59,7 +59,7 @@ const fileModule = (userDataPath) => {
       })
   }
 
-  return (backupModule, settingsModule, logger) => {
+  return (backupModule, settingsModule, stores, logger) => {
     const { backupBasePath } = backupModule
 
     const withLockedFile = (filePath, f) => {
@@ -206,30 +206,33 @@ const fileModule = (userDataPath) => {
       })
     }
 
-    function cleanOfflineBackups(knownFiles) {
-      const expectedOfflineFiles = knownFiles
-        .filter(({ isCloudFile, fileURL }) => isCloudFile && fileURL)
-        .map(({ fileURL }) => fileURL)
-        .filter((x) => x)
-      return listOfflineFiles().then((files) => {
-        const filesToClean = files.filter((filePath) => {
-          if (isResumeBackup(filePath)) {
-            logger.info(`Not cleaning file at ${filePath} because it's a resume backup.`)
-            return false
-          }
-          const fileURL = helpers.file.fileIdToPlottrCloudFileURL(basename(filePath))
-          return expectedOfflineFiles.indexOf(fileURL) === -1
-        })
-        return Promise.all(
-          filesToClean.map((filePath) => {
-            logger.info(
-              'Removing offline backup: "',
-              filePath,
-              '" because the online counterpart no longer exists'
-            )
-            return unlink(filePath)
+    // Not sure this makes valid assumptions anymore.
+    function _cleanOfflineBackups() {
+      return stores.knownFiles.currentValue().then((knownFilesIndex) => {
+        const expectedOfflineFiles = Object.values(knownFilesIndex)
+          .filter(({ isCloudFile, fileURL }) => isCloudFile && fileURL)
+          .map(({ fileURL }) => fileURL)
+          .filter((x) => x)
+        return listOfflineFiles().then((files) => {
+          const filesToClean = files.filter((filePath) => {
+            if (isResumeBackup(filePath)) {
+              logger.info(`Not cleaning file at ${filePath} because it's a resume backup.`)
+              return false
+            }
+            const fileURL = helpers.file.fileIdToPlottrCloudFileURL(basename(filePath))
+            return expectedOfflineFiles.indexOf(fileURL) === -1
           })
-        )
+          return Promise.all(
+            filesToClean.map((filePath) => {
+              logger.info(
+                'Removing offline backup: "',
+                filePath,
+                '" because the online counterpart no longer exists'
+              )
+              return unlink(filePath)
+            })
+          )
+        })
       })
     }
 
@@ -259,7 +262,7 @@ const fileModule = (userDataPath) => {
     }
 
     function checkForFileRecord(file) {
-      if (!file || !file.file || !file.file.fileName || !file.project || !file.project.fileURL) {
+      if (!file || !file.file || !file.file.fileName) {
         logger.error('Trying to save a file but there is no file record on it.', file)
         return Promise.reject(
           new Error(`Trying to save a file (${file.file}) but there is no file record on it.`)
@@ -268,18 +271,20 @@ const fileModule = (userDataPath) => {
       return Promise.resolve(file)
     }
 
-    function saveOfflineFile(file) {
+    function saveOfflineFile(originalFileURL, file) {
       return ensureOfflineBackupPathExists().then(() => {
         return checkForFileRecord(file).then(() => {
-          const fileURL = offlineFileURL(file.project.fileURL)
+          const fileURL = offlineFileURL(originalFileURL)
           if (!fileURL) {
-            const message = `Attempting to save offline file but we couldn't compute the offline url: ${file.project.fileURL}`
+            const message = `Attempting to save offline file but we couldn't compute the offline url: ${fileURL}`
             logger.error(message)
             return Promise.reject(new Error(message))
           }
-          return cleanOfflineBackups(file.knownFiles).then(() => {
-            return saveFile(fileURL, file)
-          })
+          return saveFile(fileURL, file)
+          // Not sure this is based on valid assumptions anymore.
+          //
+          // return cleanOfflineBackups().then(() => {
+          // })
         })
       })
     }
@@ -305,11 +310,9 @@ const fileModule = (userDataPath) => {
       })
     }
 
-    function isTempFile(file) {
-      logger.info(
-        `Does ${file.project.fileURL} include ${TEMP_FILES_PATH} when we strip the URL from it?`
-      )
-      return helpers.file.withoutProtocol(file.project.fileURL).includes(TEMP_FILES_PATH)
+    function isTempFile(fileURL) {
+      logger.info(`Does ${fileURL} include ${TEMP_FILES_PATH} when we strip the URL from it?`)
+      return helpers.file.withoutProtocol(fileURL).includes(TEMP_FILES_PATH)
     }
 
     function saveTempFile(file) {

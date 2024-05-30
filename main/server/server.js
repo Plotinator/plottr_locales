@@ -219,7 +219,7 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
     const logger = makeLogger(webSocket)
     const backupModule = makeBackupModule(settings, logger)
     const { defaultBackupPath, saveBackup, ensureBackupTodayPath } = backupModule
-    const fileModule = makeFileModule(backupModule, settings, logger)
+    const fileModule = makeFileModule(backupModule, settings, stores, logger)
     const {
       saveFile,
       saveRawFile,
@@ -468,7 +468,7 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
             )
           }
           case SAVE_OFFLINE_FILE: {
-            const { file } = payload
+            const { fileURL, file } = payload
             return handlePromise(
               () => [
                 'Saving offline file (reduced payload): ',
@@ -478,7 +478,7 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
                   },
                 },
               ],
-              () => statusManager.registerTask(saveOfflineFile(file), SAVE_OFFLINE_FILE),
+              () => statusManager.registerTask(saveOfflineFile(fileURL, file), SAVE_OFFLINE_FILE),
               (error) => [
                 'Error while saving offline ',
                 {
@@ -578,18 +578,11 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
             )
           }
           case IS_TEMP_FILE: {
-            const { file } = payload
+            const { fileURL } = payload
             return handleSync(
-              () => [
-                'Checking whether file is a temp file (reduced payload): ',
-                {
-                  file: {
-                    ...payload?.file?.file,
-                  },
-                },
-              ],
-              () => isTempFile(file),
-              () => ['Error checking where file is temp: ', file]
+              () => ['Checking whether file is a temp file (reduced payload): ', fileURL],
+              () => isTempFile(fileURL),
+              () => ['Error checking where file is temp: ', fileURL]
             )
           }
           case SET_TEMPLATE: {
@@ -633,9 +626,9 @@ const setupListeners = (port, userDataPath, isBetaOrAlpha) => {
           }
           case OFFLINE_FILE_URL: {
             const { fileURL } = payload
-            return handlePromise(
+            return handleSync(
               () => ['Computing the offline file URL of', fileURL],
-              () => statusManager.registerTask(offlineFileURL(fileURL), OFFLINE_FILE_URL),
+              () => offlineFileURL(fileURL),
               () => ['Error computing the offline file URL of', fileURL]
             )
           }

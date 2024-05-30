@@ -299,6 +299,7 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
           case SAVE_AS_TEMP_FILE:
           case ATTEMPT_TO_FETCH_TEMPLATES:
           case DELETE_CUSTOM_TEMPLATE:
+          case OFFLINE_FILE_URL:
           case OFFLINE_FILE_PATH:
           case DEFAULT_BACKUP_LOCATION:
           case SET_TEMPLATE:
@@ -504,8 +505,8 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
       return sendPromise(SAVE_RAW_FILE, { filePath, data })
     }
 
-    const saveOfflineFile = (file) => {
-      return sendPromise(SAVE_OFFLINE_FILE, { file })
+    const saveOfflineFile = (fileURL, file) => {
+      return sendPromise(SAVE_OFFLINE_FILE, { file, fileURL })
     }
 
     const basename = (filePath) => {
@@ -540,8 +541,8 @@ const connect = (port, logger, WebSocket, { onBusy, onDone }) => {
       return sendPromise(READ_OFFLINE_FILES)
     }
 
-    const isTempFile = (file) => {
-      return sendPromise(IS_TEMP_FILE, { file })
+    const isTempFile = (fileURL) => {
+      return sendPromise(IS_TEMP_FILE, { fileURL })
     }
 
     const setTemplate = (id, template) => {

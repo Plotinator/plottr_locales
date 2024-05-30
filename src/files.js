@@ -103,15 +103,14 @@ export const saveFile = (fileURL, file) => {
 
 export { editKnownFilePath }
 
-export const offlineFileURLFromFile = (file) => {
-  if (!file?.project?.fileURL) {
+export const offlineFileURLFromFile = (fileURL) => {
+  if (!fileURL || typeof fileURL !== 'string') {
     return Promise.resolve(null)
+  } else {
+    return whenClientIsReady(({ offlineFileURL }) => {
+      return offlineFileURL(fileURL)
+    })
   }
-
-  const fileURL = file?.project?.fileURL
-  return whenClientIsReady(({ offlineFileURL }) => {
-    return offlineFileURL(fileURL)
-  })
 }
 
 export const renameFile = (fileURL) => {
