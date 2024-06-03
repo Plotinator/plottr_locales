@@ -174,7 +174,6 @@ class TemplateFetcher {
     const templates = this.manifestStore.get('manifest.templates')
     const templateRequests = templates.map((template) => {
       if (force || this.templateIsNewer(template.id, template.version)) {
-        this.log('Fetching template', template.id, template.url)
         return this.fetchTemplate(template.id, template.url)
       }
       return Promise.resolve()
@@ -189,6 +188,7 @@ class TemplateFetcher {
 
   fetchTemplate = (id, url) => {
     const fullURL = `${this.baseURL}${url}`
+    this.log('Fetching template', id, fullURL)
     const controller = new AbortController()
     const _timeout = setTimeout(() => {
       controller.abort()
