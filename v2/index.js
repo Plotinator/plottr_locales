@@ -25,6 +25,7 @@ import * as templatesHelpers from './helpers/templates'
 import * as characterHelpers from './helpers/characters'
 import * as uiHelpers from './helpers/ui'
 import * as textHelpers from './helpers/text'
+import * as jsonHelpers from './helpers/json'
 
 import * as template from './template'
 
@@ -150,6 +151,7 @@ const helpers = {
   characters: characterHelpers,
   ui: uiHelpers,
   text: textHelpers,
+  json: jsonHelpers,
 }
 
 const slate = {
