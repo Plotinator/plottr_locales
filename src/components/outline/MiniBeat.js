@@ -57,13 +57,13 @@ const MiniBeatConnector = (connector) => {
       setInZone(false)
 
       const json = e.dataTransfer.getData('text/json')
-      const droppedData = JSON.parse(json)
-      if (droppedData.beat) {
+      const droppedData = helpers.json.safeParseJSON(json)
+      if (droppedData?.beat) {
         acceptBeat(droppedData.beat)
         return
       }
 
-      if (!droppedData.cardId) return
+      if (!droppedData?.cardId) return
 
       acceptCard(droppedData.cardId, droppedData.lineId)
     }

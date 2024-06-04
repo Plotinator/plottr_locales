@@ -5,6 +5,7 @@ import cx from 'classnames'
 import { FiCopy } from '@react-icons/all-files/fi/FiCopy'
 
 import { t } from 'plottr_locales'
+import { helpers } from 'pltr'
 
 import Tab from '../Tab'
 import Glyphicon from '../Glyphicon'
@@ -416,13 +417,15 @@ const CharacterEditDetailsConnector = (connector) => {
       event.stopPropagation()
 
       var json = event.dataTransfer.getData('text/json')
-      var droppedTab = JSON.parse(json)
-      actions.reorderCharacterTemplateAttribute(
-        droppedTab.position,
-        Number(newTemplateTabPosition),
-        character.id
-      )
-      setNewTemplateTabPosition(null)
+      var droppedTab = helpers.json.safeParseJSON(json)
+      if (droppedTab !== null) {
+        actions.reorderCharacterTemplateAttribute(
+          droppedTab.position,
+          Number(newTemplateTabPosition),
+          character.id
+        )
+        setNewTemplateTabPosition(null)
+      }
     }
 
     const renderEditingTemplates = () => {

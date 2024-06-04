@@ -74,26 +74,26 @@ const BlankCardConnector = (connector) => {
       this.setState({ inDropZone: false, dropDepth: 0 })
 
       const json = e.dataTransfer.getData('text/json')
-      const droppedData = JSON.parse(json)
+      const droppedData = helpers.json.safeParseJSON(json)
 
-      const { beatId, lineId, addMissingBeats } = this.props
-      if (droppedData.cardIds) {
-        this.props.actions.reorderCardsWithinLine(
-          beatId,
-          lineId,
-          [...droppedData.cardIds],
-          addMissingBeats
-        )
-      } else if (droppedData.cardId) {
-        this.props.actions.reorderCardsWithinLine(
-          beatId,
-          lineId,
-          [droppedData.cardId],
-          addMissingBeats
-        )
+      if (droppedData !== null) {
+        const { beatId, lineId, addMissingBeats } = this.props
+        if (droppedData.cardIds) {
+          this.props.actions.reorderCardsWithinLine(
+            beatId,
+            lineId,
+            [...droppedData.cardIds],
+            addMissingBeats
+          )
+        } else if (droppedData.cardId) {
+          this.props.actions.reorderCardsWithinLine(
+            beatId,
+            lineId,
+            [droppedData.cardId],
+            addMissingBeats
+          )
+        }
       }
-
-      return
     }
 
     saveCreate = () => {

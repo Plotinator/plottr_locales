@@ -398,13 +398,16 @@ const CardDialogConnector = (connector) => {
       event.stopPropagation()
 
       var json = event.dataTransfer.getData('text/json')
-      var droppedTab = JSON.parse(json)
-      actions.reorderCardTemplateAttribute(
-        droppedTab.position,
-        Number(newTemplateTabPosition),
-        cardId
-      )
-      setNewTemplateTabPosition(null)
+      var droppedTab = helpers.json.safeParseJSON(json)
+
+      if (droppedTab !== null) {
+        actions.reorderCardTemplateAttribute(
+          droppedTab.position,
+          Number(newTemplateTabPosition),
+          cardId
+        )
+        setNewTemplateTabPosition(null)
+      }
     }
 
     const renderEditingTemplates = () => {

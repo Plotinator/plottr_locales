@@ -116,42 +116,52 @@ UnMemoisedFontsButton.propTypes = {
 export const FontsButton = React.memo(UnMemoisedFontsButton)
 
 const getCurrentFont = (editor, logger, recentFonts, currentSetting) => {
-  try {
-    const [node] = Editor.nodes(editor, { match: (n) => n.font })
-    if (node) {
-      return node[0].font
-    } else {
-      if (currentSetting) return currentSetting
-      return recentFonts?.length ? recentFonts[0] : 'Forum'
+  if (Editor.validSelection(editor)) {
+    try {
+      const [node] = Editor.nodes(editor, { match: (n) => n.font })
+      if (node) {
+        return node[0].font
+      } else {
+        if (currentSetting) return currentSetting
+        return recentFonts?.length ? recentFonts[0] : 'Forum'
+      }
+    } catch (error) {
+      logger.error('Error attempting to get current fonts.', error)
+      return 'Forum'
     }
-  } catch (error) {
-    logger.error('Error attempting to get current fonts.', error)
+  } else {
     return 'Forum'
   }
 }
 
 const getDisplayedFont = (editor, logger, recentFonts, currentSetting) => {
-  try {
-    const nodes = Array.from(Editor.nodes(editor, { match: SlateText.isText }))
-    const fonts = uniq(
-      nodes.map(([node]) => {
-        return node.font
-      })
-    )
-    if (fonts.length > 1) {
-      return '--'
-    } else if (nodes[0]?.[0]?.font && typeof nodes[0]?.[0]?.font === 'string') {
-      return nodes[0]?.[0].font
-    } else {
-      if (currentSetting) return currentSetting
-      return recentFonts?.length ? recentFonts[0] : 'Forum'
+  if (Editor.validSelection(editor)) {
+    try {
+      const nodes = Array.from(Editor.nodes(editor, { match: SlateText.isText }))
+      const fonts = uniq(
+        nodes.map(([node]) => {
+          return node.font
+        })
+      )
+      if (fonts.length > 1) {
+        return '--'
+      } else if (nodes[0]?.[0]?.font && typeof nodes[0]?.[0]?.font === 'string') {
+        return nodes[0]?.[0].font
+      } else {
+        if (currentSetting) return currentSetting
+        return recentFonts?.length ? recentFonts[0] : 'Forum'
+      }
+    } catch (error) {
+      logger.error('Error attempting to get current fonts.', error)
+      return 'Forum'
     }
-  } catch (error) {
-    logger.error('Error attempting to get current fonts.', error)
+  } else {
     return 'Forum'
   }
 }
 
 const addFontMark = (editor, font) => {
-  Editor.addMark(editor, 'font', font)
+  if (Editor.validSelection(editor)) {
+    Editor.addMark(editor, 'font', font)
+  }
 }

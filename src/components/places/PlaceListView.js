@@ -147,7 +147,7 @@ const PlaceListViewConnector = (connector) => {
 
     const handleDragOver = (e, placeCategory) => {
       e.preventDefault()
-      if (placeCategory != draggedPlace.categoryId) {
+      if (placeCategory != draggedPlace?.categoryId) {
         setMovingToNewCategory(true)
       } else {
         setMovingToNewCategory(false)

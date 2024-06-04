@@ -3,6 +3,8 @@ import UnconnectedBlankCard from './BlankCard'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
 
+import { helpers } from 'pltr'
+
 import Glyphicon from '../Glyphicon'
 import { checkDependencies } from '../checkDependencies'
 
@@ -96,8 +98,9 @@ const CardAddConnector = (connector) => {
       this.setState({ dropping: false })
 
       const json = e.dataTransfer.getData('text/json')
-      const droppedData = JSON.parse(json)
-      if (!droppedData.cardId) return
+      const droppedData = helpers.json.safeParseJSON(json)
+
+      if (!droppedData?.cardId) return
 
       this.props.moveCard(
         droppedData.cardId,

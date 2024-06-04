@@ -82,35 +82,45 @@ UnMemoisedFontSizeChooser.propTypes = {
 export const FontSizeChooser = React.memo(UnMemoisedFontSizeChooser)
 
 const getDisplayedSize = (editor, defaultFontSize, logger) => {
-  try {
-    const nodes = Array.from(Editor.nodes(editor, { match: SlateText.isText }))
-    const fontSizes = uniq(
-      nodes.map(([node]) => {
-        return node.fontSize
-      })
-    )
-    if (fontSizes.length > 1) {
-      return '--'
-    } else if (nodes[0]?.[0]?.fontSize && typeof nodes[0]?.[0]?.fontSize === 'number') {
-      return nodes[0]?.[0].fontSize
-    } else {
+  if (Editor.validSelection(editor)) {
+    try {
+      const nodes = Array.from(Editor.nodes(editor, { match: SlateText.isText }))
+      const fontSizes = uniq(
+        nodes.map(([node]) => {
+          return node.fontSize
+        })
+      )
+      if (fontSizes.length > 1) {
+        return '--'
+      } else if (nodes[0]?.[0]?.fontSize && typeof nodes[0]?.[0]?.fontSize === 'number') {
+        return nodes[0]?.[0].fontSize
+      } else {
+        return defaultFontSize ?? 20
+      }
+    } catch (error) {
+      logger.error('Error attempting to get displayed font size.', error)
       return defaultFontSize ?? 20
     }
-  } catch (error) {
-    logger.error('Error attempting to get displayed font size.', error)
-    return 'Forum'
+  } else {
+    return defaultFontSize ?? 20
   }
 }
 
 const getCurrentSize = (editor, defaultFontSize) => {
-  const [node] = Editor.nodes(editor, { match: (n) => n.fontSize })
-  if (node) {
-    return node[0].fontSize
+  if (Editor.validSelection(editor)) {
+    const [node] = Editor.nodes(editor, { match: (n) => n.fontSize })
+    if (node) {
+      return node[0].fontSize
+    } else {
+      return defaultFontSize || 20
+    }
   } else {
     return defaultFontSize || 20
   }
 }
 
 const addFontSizeMark = (editor, size) => {
-  Editor.addMark(editor, 'fontSize', size)
+  if (Editor.validSelection(editor)) {
+    Editor.addMark(editor, 'fontSize', size)
+  }
 }

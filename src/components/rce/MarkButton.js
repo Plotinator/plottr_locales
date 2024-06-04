@@ -54,8 +54,12 @@ export const MarkButton = React.memo(UnMemoisedMarkButton, areEqual)
 
 const isMarkActive = (editor, mark, logger) => {
   try {
-    const marks = Editor.marks(editor)
-    return marks ? marks[mark] === true : false
+    if (!Editor.validSelection(editor)) {
+      return false
+    } else {
+      const marks = Editor.marks(editor)
+      return marks ? marks[mark] === true : false
+    }
   } catch (error) {
     logger.error('Error finding whether the mark is active', error)
     return false

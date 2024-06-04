@@ -4,6 +4,7 @@ import cx from 'classnames'
 import { FaSave } from '@react-icons/all-files/fa/FaSave'
 
 import { t } from 'plottr_locales'
+import { helpers } from 'pltr'
 
 import Glyphicon from '../Glyphicon'
 import ControlLabel from '../ControlLabel'
@@ -193,8 +194,10 @@ export function ListItem({
     e.stopPropagation()
 
     const json = e.dataTransfer.getData('text/json')
-    const droppedItem = JSON.parse(json)
-    reorderItem(droppedItem, index)
+    const droppedItem = helpers.json.safeParseJSON(json)
+    if (droppedItem !== null) {
+      reorderItem(droppedItem, index)
+    }
   }
 
   const updateName = () => {

@@ -89,18 +89,22 @@ Editor.nextSibling = (editor, path) => {
 }
 
 Editor.isInBlock = (editor, types, givenSelection = null) => {
-  const selection = givenSelection ?? editor.selection
-  if (!(typeof selection?.anchor === 'object' && typeof selection?.focus === 'object')) {
-    return false
-  } else {
-    const [match] = Array.from(
-      Editor.nodes(editor, {
-        match: (node) =>
-          !Editor.isEditor(node) && SlateElement.isElement(node) && types.includes(node.type),
-      })
-    )
+  if (givenSelection || Editor.validSelection(editor)) {
+    const selection = givenSelection ?? editor.selection
+    if (!(typeof selection?.anchor === 'object' && typeof selection?.focus === 'object')) {
+      return false
+    } else {
+      const [match] = Array.from(
+        Editor.nodes(editor, {
+          match: (node) =>
+            !Editor.isEditor(node) && SlateElement.isElement(node) && types.includes(node.type),
+        })
+      )
 
-    return !!match
+      return !!match
+    }
+  } else {
+    return false
   }
 }
 
@@ -126,14 +130,44 @@ Editor.parentOfType = (editor, path, { match }) => {
 }
 
 Editor.removePropertyOnSelectionOrCurrentElement = (editor, property) => {
-  const { selection } = editor
-  if (typeof selection?.anchor === 'object' && typeof selection?.focus === 'object') {
-    // There is a point, and not a selection.  So operate on the
-    // current element.
-    const [_node, path] = Editor.parent(editor, selection.anchor.path)
-    Transforms.unsetNodes(editor, property, {
-      match: SlateText.isText,
-      at: Editor.range(editor, path),
-    })
+  if (Editor.validSelection(editor)) {
+    const { selection } = editor
+    if (typeof selection?.anchor === 'object' && typeof selection?.focus === 'object') {
+      // There is a point, and not a selection.  So operate on the
+      // current element.
+      const [_node, path] = Editor.parent(editor, selection.anchor.path)
+      Transforms.unsetNodes(editor, property, {
+        match: SlateText.isText,
+        at: Editor.range(editor, path),
+      })
+    }
   }
+}
+
+const isValidPath = (node, path) => {
+  if (!Array.isArray(path)) {
+    return false
+  } else if (!path.length) {
+    return true
+  } else {
+    const nextNode = node?.children?.[path[0]]
+    if (typeof nextNode === 'undefined') {
+      return false
+    } else {
+      return isValidPath(nextNode, path.slice(1))
+    }
+  }
+}
+
+const validSelection = (editor) => {
+  if (!Array.isArray(editor?.selection?.anchor) || !Array.isArray(editor?.selection?.focus)) {
+    return false
+  } else {
+    const { anchor, focus } = editor.selection
+    return isValidPath(editor, anchor.path) && isValidPath(editor, focus.path)
+  }
+}
+
+Editor.validSelection = (editor) => {
+  return validSelection(editor)
 }

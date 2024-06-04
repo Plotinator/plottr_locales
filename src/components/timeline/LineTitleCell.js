@@ -205,12 +205,15 @@ const LineTitleCellConnector = (connector) => {
       setDropDepth(0)
 
       const json = e.dataTransfer.getData('text/json')
-      const payload = JSON.parse(json)
-      const droppedLine = payload.line
-      if (!payload.isLine) {
-        return
-      } else {
-        handleReorder(line.position, droppedLine.position)
+      const payload = helpers.json.safeParseJSON(json)
+
+      if (payload !== null) {
+        const droppedLine = payload.line
+        if (!payload.isLine) {
+          return
+        } else {
+          handleReorder(line.position, droppedLine.position)
+        }
       }
     }
 

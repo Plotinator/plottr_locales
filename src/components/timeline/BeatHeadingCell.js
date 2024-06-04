@@ -140,10 +140,11 @@ const BeatHeadingCellConnector = (connector) => {
         setDropDepth(0)
 
         var json = e.dataTransfer.getData('text/json')
-        var droppedBeat = JSON.parse(json)
-        if (droppedBeat.type !== 'beat') return
-        if (droppedBeat.id == null) return
-        if (droppedBeat.id == beat.id) return
+        var droppedBeat = helpers.json.safeParseJSON(json)
+
+        if (droppedBeat?.type !== 'beat') return
+        if (droppedBeat?.id == null) return
+        if (droppedBeat?.id == beat.id) return
 
         batch('Reorder Beat', () => {
           if (!beat.expanded) {

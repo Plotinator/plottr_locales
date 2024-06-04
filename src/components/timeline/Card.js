@@ -86,9 +86,11 @@ const CardConnector = (connector) => {
       this.setState({ inDropZone: false, dropDepth: 0 })
 
       const json = e.dataTransfer.getData('text/json')
-      const droppedData = JSON.parse(json)
+      const droppedData = helpers.json.safeParseJSON(json)
 
-      if (droppedData.cardIds) {
+      if (droppedData === null) {
+        return
+      } else if (droppedData.cardIds) {
         this.props.moveCardAbove(droppedData.cardIds, this.props.positionWithinLine)
       } else if (droppedData.cardId) {
         this.props.moveCard(droppedData.cardId, this.props.positionWithinLine)
