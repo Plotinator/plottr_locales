@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { FaIndent } from '@react-icons/all-files/fa/FaIndent'
 import { Transforms, Editor } from 'slate'
+import { isEqual } from 'lodash'
 
 import Button from '../Button'
 import { isBlockActive } from './BlockButton'
@@ -21,60 +22,68 @@ const countNestedLists = (editor, path) => {
   const isInList = Editor.isInList(editor, path)
   if (!isInList) {
     return 0
+  } else {
+    const [, parentPath] = Editor.parentOfType(editor, path, {
+      match: (n) => LIST_TYPES.includes(n.type),
+    })
+    if (isEqual(parentPath, path)) {
+      return 0
+    } else {
+      return 1 + countNestedLists(editor, parentPath)
+    }
   }
-
-  const [, parentPath] = Editor.parentOfType(editor, path, {
-    match: (n) => LIST_TYPES.includes(n.type),
-  })
-  return 1 + countNestedLists(editor, parentPath)
 }
 
 const MAX_DEPTH = 5
 
 export const indent = (editor, inputListType, logger) => {
-  const isInList = Editor.isInList(editor, editor.selection)
-  if (!isInList) return false
+  if (Editor.validSelection(editor)) {
+    const isInList = Editor.isInList(editor, editor.selection)
+    if (!isInList) return false
 
-  const [, parentPath] = Editor.parentOfType(editor, Editor.start(editor, editor.selection), {
-    match: (_) => true,
-  })
-  const listType = inputListType || parentElementType(editor, parentPath)
-  if (parentPath.length > 0) {
-    const hit = Editor.previousSibling(editor, parentPath)
-    // If the previous element was a list already, then just move this
-    // node into it at the end.
-    if (hit) {
-      const [previousElement, previousElementPath] = hit
-      if (previousElement.type === listType) {
-        Transforms.moveNodes(editor, {
-          at: parentPath,
-          to: [...previousElementPath, previousElement.children.length],
-        })
-        // If moving the node means that we have two lists abutting each
-        // other, merge them.  (Note that normalisation will happen
-        // between the previous step and this one to remove empty lists.)
-        const hit = Editor.next(editor, { at: previousElementPath })
-        if (hit) {
-          const [nextSibling, nextSiblingPath] = hit
-          if (nextSibling.type === listType) {
-            Transforms.mergeNodes(editor, { at: nextSiblingPath })
+    const [, parentPath] = Editor.parentOfType(editor, Editor.start(editor, editor.selection), {
+      match: (_) => true,
+    })
+    const listType = inputListType || parentElementType(editor, parentPath)
+    if (parentPath.length > 0) {
+      const hit = Editor.previousSibling(editor, parentPath)
+      // If the previous element was a list already, then just move this
+      // node into it at the end.
+      if (hit) {
+        const [previousElement, previousElementPath] = hit
+        if (previousElement.type === listType) {
+          Transforms.moveNodes(editor, {
+            at: parentPath,
+            to: [...previousElementPath, previousElement.children.length],
+          })
+          // If moving the node means that we have two lists abutting each
+          // other, merge them.  (Note that normalisation will happen
+          // between the previous step and this one to remove empty lists.)
+          const hit = Editor.next(editor, { at: previousElementPath })
+          if (hit) {
+            const [nextSibling, nextSiblingPath] = hit
+            if (nextSibling.type === listType) {
+              Transforms.mergeNodes(editor, { at: nextSiblingPath })
+            }
           }
+          return true
         }
-        return true
       }
     }
-  }
 
-  if (parentPath.length > 0 && countNestedLists(editor, parentPath) >= MAX_DEPTH + 1) {
-    // Too deep
+    if (parentPath.length > 0 && countNestedLists(editor, parentPath) >= MAX_DEPTH + 1) {
+      // Too deep
+      return true
+    }
+    Editor.withoutNormalizing(editor, () => {
+      const block = { type: listType, children: [] }
+      Transforms.wrapNodes(editor, block, { at: parentPath })
+    })
+    Editor.normalize(editor)
     return true
+  } else {
+    return false
   }
-  Editor.withoutNormalizing(editor, () => {
-    const block = { type: listType, children: [] }
-    Transforms.wrapNodes(editor, block, { at: parentPath })
-  })
-  Editor.normalize(editor)
-  return true
 }
 
 const IndentParagraphButton = ({ editor, logger }) => {

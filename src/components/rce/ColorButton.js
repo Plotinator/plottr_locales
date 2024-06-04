@@ -41,8 +41,12 @@ export const ColorButton = React.forwardRef(UnforwardedColorButton)
 
 const isColorActive = (editor, logger) => {
   try {
-    const marks = Editor.marks(editor)
-    return marks ? marks.color !== undefined : false
+    if (!Editor.validSelection(editor)) {
+      return false
+    } else {
+      const marks = Editor.marks(editor)
+      return marks ? marks.color !== undefined : false
+    }
   } catch (error) {
     logger.error('Error trying to detect if a color is active', error)
     return false

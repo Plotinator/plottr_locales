@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react'
 import { PropTypes } from 'prop-types'
 import { Editor, Text as SlateText } from 'slate'
 import { ReactEditor, useSlate } from 'slate-react'
-import { uniq } from 'lodash'
+import { uniq, range } from 'lodash'
 
-import DropdownButton from '../DropdownButton'
-import MenuItem from '../MenuItem'
+import DropdownButton from '../DropdownButtonV2'
 
 const UnMemoisedFontSizeChooser = ({ editor, defaultFontSize, logger }) => {
   const [currentSize, setCurrentSize] = useState(getCurrentSize(editor, defaultFontSize))
@@ -47,17 +46,11 @@ const UnMemoisedFontSizeChooser = ({ editor, defaultFontSize, logger }) => {
     addFontSizeMark(editor, Number(size))
   }
 
-  const renderSizes = () => {
+  const renderSizes = (renderMenuItem) => {
     const maxfontSize = 96
-    let sizeArray = []
-    for (let size = 4; size <= maxfontSize; size++) {
-      sizeArray.push(
-        <MenuItem key={`fontSize-${size}`} eventKey={size} active={displayedSize == size}>
-          {size}
-        </MenuItem>
-      )
-    }
-    return sizeArray
+    return range(4, maxfontSize + 1).map((size) => {
+      return renderMenuItem(false, size === currentSize, `${size}`, {}, `size-${size}`)
+    })
   }
 
   return (
@@ -65,11 +58,11 @@ const UnMemoisedFontSizeChooser = ({ editor, defaultFontSize, logger }) => {
       className="size-picker"
       title={displayedSize}
       onSelect={changeSize}
+      activeKey={currentSize}
       id="size-dropdown"
       disabled={disabled}
-    >
-      {renderSizes()}
-    </DropdownButton>
+      renderChildren={renderSizes}
+    />
   )
 }
 
@@ -82,35 +75,45 @@ UnMemoisedFontSizeChooser.propTypes = {
 export const FontSizeChooser = React.memo(UnMemoisedFontSizeChooser)
 
 const getDisplayedSize = (editor, defaultFontSize, logger) => {
-  try {
-    const nodes = Array.from(Editor.nodes(editor, { match: SlateText.isText }))
-    const fontSizes = uniq(
-      nodes.map(([node]) => {
-        return node.fontSize
-      })
-    )
-    if (fontSizes.length > 1) {
-      return '--'
-    } else if (nodes[0]?.[0]?.fontSize && typeof nodes[0]?.[0]?.fontSize === 'number') {
-      return nodes[0]?.[0].fontSize
-    } else {
+  if (Editor.validSelection(editor)) {
+    try {
+      const nodes = Array.from(Editor.nodes(editor, { match: SlateText.isText }))
+      const fontSizes = uniq(
+        nodes.map(([node]) => {
+          return node.fontSize
+        })
+      )
+      if (fontSizes.length > 1) {
+        return '--'
+      } else if (nodes[0]?.[0]?.fontSize && typeof nodes[0]?.[0]?.fontSize === 'number') {
+        return nodes[0]?.[0].fontSize
+      } else {
+        return defaultFontSize ?? 20
+      }
+    } catch (error) {
+      logger.error('Error attempting to get displayed font size.', error)
       return defaultFontSize ?? 20
     }
-  } catch (error) {
-    logger.error('Error attempting to get displayed font size.', error)
-    return 'Forum'
+  } else {
+    return defaultFontSize ?? 20
   }
 }
 
 const getCurrentSize = (editor, defaultFontSize) => {
-  const [node] = Editor.nodes(editor, { match: (n) => n.fontSize })
-  if (node) {
-    return node[0].fontSize
+  if (Editor.validSelection(editor)) {
+    const [node] = Editor.nodes(editor, { match: (n) => n.fontSize })
+    if (node) {
+      return node[0].fontSize
+    } else {
+      return defaultFontSize || 20
+    }
   } else {
     return defaultFontSize || 20
   }
 }
 
 const addFontSizeMark = (editor, size) => {
-  Editor.addMark(editor, 'fontSize', size)
+  if (Editor.validSelection(editor)) {
+    Editor.addMark(editor, 'fontSize', size)
+  }
 }

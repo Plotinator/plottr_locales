@@ -145,14 +145,16 @@ const CharacterItemConnector = (connector) => {
       const { character, actions, absolutePosition } = this.props
 
       const json = e.dataTransfer.getData('text/json')
-      const droppedData = JSON.parse(json)
-      actions.reorderCharacter(
-        droppedData.id,
-        absolutePosition,
-        character.categoryId || null,
-        this.state.moveUp ? 'up' : 'down'
-      )
-      this.setState({ newCharacterIdPosition: null, moveUp: null, isDragging: false })
+      const droppedData = helpers.json.safeParseJSON(json)
+      if (droppedData !== null) {
+        actions.reorderCharacter(
+          droppedData.id,
+          absolutePosition,
+          character.categoryId || null,
+          this.state.moveUp ? 'up' : 'down'
+        )
+        this.setState({ newCharacterIdPosition: null, moveUp: null, isDragging: false })
+      }
     }
 
     handleDragStart = (e) => {

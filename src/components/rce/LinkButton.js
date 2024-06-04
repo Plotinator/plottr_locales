@@ -89,48 +89,56 @@ export const withLinks = (editor, logger) => {
 }
 
 const insertLink = (editor, url, logger) => {
-  if (editor.selection) {
+  if (Editor.validSelection(editor)) {
     wrapLink(editor, url, logger)
   }
 }
 
 const isLinkActive = (editor, logger) => {
-  try {
-    const [link] = Editor.nodes(editor, { match: (n) => n.type === 'link' })
-    return !!link
-  } catch (error) {
-    if (logger) {
-      logger.error('Error checking whether link is active', error)
+  if (Editor.validSelection(editor)) {
+    try {
+      const [link] = Editor.nodes(editor, { match: (n) => n.type === 'link' })
+      return !!link
+    } catch (error) {
+      if (logger) {
+        logger.error('Error checking whether link is active', error)
+      }
+      return false
     }
+  } else {
     return false
   }
 }
 
 const unwrapLink = (editor) => {
-  Transforms.unwrapNodes(editor, { match: (n) => n.type === 'link' })
+  if (Editor.validSelection(editor)) {
+    Transforms.unwrapNodes(editor, { match: (n) => n.type === 'link' })
+  }
 }
 
 const wrapLink = (editor, url, logger) => {
-  if (isLinkActive(editor, logger)) {
-    unwrapLink(editor)
-  }
+  if (Editor.validSelection(editor)) {
+    if (isLinkActive(editor, logger)) {
+      unwrapLink(editor)
+    }
 
-  const { selection } = editor
-  const isCollapsed = selection && Range.isCollapsed(selection)
-  const link = {
-    type: 'link',
-    url,
-    children: isCollapsed ? [{ text: url }] : [],
-  }
-  const textAfterLink = {
-    type: 'text',
-    text: '',
-  }
+    const { selection } = editor
+    const isCollapsed = selection && Range.isCollapsed(selection)
+    const link = {
+      type: 'link',
+      url,
+      children: isCollapsed ? [{ text: url }] : [],
+    }
+    const textAfterLink = {
+      type: 'text',
+      text: '',
+    }
 
-  if (isCollapsed) {
-    Transforms.insertNodes(editor, [link, textAfterLink])
-  } else {
-    Transforms.wrapNodes(editor, link, { split: true })
-    Transforms.collapse(editor, { edge: 'end' })
+    if (isCollapsed) {
+      Transforms.insertNodes(editor, [link, textAfterLink])
+    } else {
+      Transforms.wrapNodes(editor, link, { split: true })
+      Transforms.collapse(editor, { edge: 'end' })
+    }
   }
 }

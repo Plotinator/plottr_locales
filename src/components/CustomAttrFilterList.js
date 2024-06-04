@@ -291,12 +291,7 @@ const CustomAttrFilterListConnector = (connector) => {
           return uiActions.setNoteFilter
         default:
           return (newFilter) => {
-            getInstance().then((errorReporter) => {
-              errorReporter.error(
-                `Trying to update filter to ${newFilter} for unsuported type: ${type}`,
-                new Error('Unsupported filter type')
-              )
-            })
+            log.error(`Trying to update filter to ${newFilter} for unsuported type: ${type}`)
           }
       }
     }

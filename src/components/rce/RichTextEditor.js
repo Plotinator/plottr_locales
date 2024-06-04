@@ -78,13 +78,13 @@ const RichTextEditorConnector = (connector) => {
     },
   } = connector
   checkDependencies({
-    getInstance,
     resolveToPublicUrl,
     isStorageURL,
     log,
     openExternal,
     undo,
     redo,
+    getInstance,
   })
 
   const errorReportingLogger = {
@@ -361,7 +361,7 @@ const RichTextEditorConnector = (connector) => {
           Transforms.collapse(editor, { edge: 'anchor' })
         }
       } catch (error) {
-        errorReportingLogger.warn(error)
+        log.warn(error)
       }
     }
 

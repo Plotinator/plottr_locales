@@ -186,8 +186,8 @@ const CardViewConnector = (connector) => {
 
       const json = e.dataTransfer.getData('text/json')
       try {
-        const droppedData = JSON.parse(json)
-        if (!droppedData.cardId) return
+        const droppedData = helpers.json.safeParseJSON(json)
+        if (!droppedData?.cardId) return
 
         this.props.reorder({
           current: this.props.card,

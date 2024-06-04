@@ -145,19 +145,22 @@ const NoteItemConnector = (connector) => {
       const { moveUp } = this.state
 
       const json = e.dataTransfer.getData('text/json')
-      const droppedData = JSON.parse(json)
-      this.props.actions.reorderNotes(
-        droppedData.id,
-        droppedData.position,
-        note.position,
-        note.categoryId || null,
-        moveUp ? 'up' : 'down'
-      )
-      this.setState({
-        newNoteIdPosition: null,
-        moveUp: null,
-        isDragging: false,
-      })
+      const droppedData = helpers.json.safeParseJSON(json)
+
+      if (droppedData !== null) {
+        this.props.actions.reorderNotes(
+          droppedData.id,
+          droppedData.position,
+          note.position,
+          note.categoryId || null,
+          moveUp ? 'up' : 'down'
+        )
+        this.setState({
+          newNoteIdPosition: null,
+          moveUp: null,
+          isDragging: false,
+        })
+      }
     }
 
     handleDragStart = (e) => {

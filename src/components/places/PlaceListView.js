@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
 import { flatten } from 'lodash'
@@ -87,13 +87,19 @@ const PlaceListViewConnector = (connector) => {
     categoriesOpen,
     attributeDialogOpen,
     isJumping,
+    recentlyUndidOrRedid,
   }) => {
     const [isMovingToNewCategory, setMovingToNewCategory] = useState(false)
     const [draggedPlace, setDraggedPlace] = useState()
 
+    const recentlyUndidOrRedidRef = useRef(false)
+    useEffect(() => {
+      recentlyUndidOrRedidRef.current = !!recentlyUndidOrRedid
+    }, [recentlyUndidOrRedid])
+
     useEffect(() => {
       const placeToSelect = detailID(visiblePlacesByCategory, selectedPlaceId)
-      if (!isJumping && placeToSelect !== selectedPlaceId) {
+      if (!recentlyUndidOrRedid.current && !isJumping && placeToSelect !== selectedPlaceId) {
         uiActions.selectPlace(placeToSelect)
       }
     }, [visiblePlacesByCategory])
@@ -141,7 +147,7 @@ const PlaceListViewConnector = (connector) => {
 
     const handleDragOver = (e, placeCategory) => {
       e.preventDefault()
-      if (placeCategory != draggedPlace.categoryId) {
+      if (placeCategory != draggedPlace?.categoryId) {
         setMovingToNewCategory(true)
       } else {
         setMovingToNewCategory(false)
@@ -399,6 +405,7 @@ const PlaceListViewConnector = (connector) => {
     categoriesOpen: PropTypes.bool,
     attributeDialogOpen: PropTypes.bool,
     isJumping: PropTypes.bool,
+    recentlyUndidOrRedid: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
   }
 
   const {
@@ -437,6 +444,7 @@ const PlaceListViewConnector = (connector) => {
           attributeDialogOpen: selectors.placeAttributeDialogIsOpenSelector(state),
           isPlacesManuallySorted: selectors.isPlacesManuallySortedSelector(state),
           isJumping: selectors.isJumpingSelector(state),
+          recentlyUndidOrRedid: selectors.recentlyUndidOrRedidSelector(state),
         }
       },
       (dispatch) => {

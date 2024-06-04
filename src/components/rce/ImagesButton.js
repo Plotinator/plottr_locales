@@ -102,25 +102,33 @@ export const withImages = (editor, addImage) => {
 }
 
 const isImageActive = (editor, log) => {
-  try {
-    const [link] = Editor.nodes(editor, {
-      match: (n) => n.type === 'image-link' || n.type === 'image-data',
-    })
-    return !!link
-  } catch (error) {
-    log.error('Error finding whether image is active', error)
+  if (Editor.validSelection(editor)) {
+    try {
+      const [link] = Editor.nodes(editor, {
+        match: (n) => n.type === 'image-link' || n.type === 'image-data',
+      })
+      return !!link
+    } catch (error) {
+      log.error('Error finding whether image is active', error)
+      return false
+    }
+  } else {
     return false
   }
 }
 
 const insertImageData = (editor, data) => {
-  const text = { text: '' }
-  const image = { type: 'image-data', data, children: [text] }
-  Transforms.insertNodes(editor, image)
+  if (Editor.validSelection(editor)) {
+    const text = { text: '' }
+    const image = { type: 'image-data', data, children: [text] }
+    Transforms.insertNodes(editor, image)
+  }
 }
 
 const insertImageLink = (editor, storageUrl) => {
-  const text = { text: '' }
-  const image = { type: 'image-link', storageUrl, children: [text] }
-  Transforms.insertNodes(editor, image)
+  if (Editor.validSelection(editor)) {
+    const text = { text: '' }
+    const image = { type: 'image-link', storageUrl, children: [text] }
+    Transforms.insertNodes(editor, image)
+  }
 }

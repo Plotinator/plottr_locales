@@ -55,7 +55,7 @@ function ProjectTemplateDetails({ template }) {
   const beatsMarkup = beats ? (
     <div key="beats">
       <h5 className="text-center text-capitalize">Beats</h5>
-      <ol>
+      <ol start={beats[0].title === 'Prologue' ? 0 : 1}>
         {beats.map((beat) => {
           return <li key={beat.id}>{beat.title ?? 'Auto'}</li>
         })}

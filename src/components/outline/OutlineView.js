@@ -107,7 +107,10 @@ const OutlineViewConnector = (connector) => {
           clearTimeout(scrollTimeoutRef.current)
         }
         scrollTimeoutRef.current = setTimeout(() => {
-          if (!recentlyUndidOrRedidRef.current) {
+          if (
+            typeof beatsRef?.current?.scrollTop === 'number' &&
+            !recentlyUndidOrRedidRef.current
+          ) {
             actions.recordOutlineScrollPosition(beatsRef.current.scrollTop)
           }
         }, 500)

@@ -88,6 +88,7 @@ const CardDialogConnector = (connector) => {
     activeTab,
     foci,
     undo,
+    recentlyUndidOrRedid,
   }) => {
     const [newTemplateTabPosition, setNewTemplateTabPosition] = useState(null)
     const [newTitleAndSelection, setNewTitleAndSelection] = useState({
@@ -99,8 +100,14 @@ const CardDialogConnector = (connector) => {
       setNewTitleAndSelection({ value, selection })
     }, [])
 
+    const recentlyUndidOrRedidRef = useRef(false)
+    useEffect(() => {
+      recentlyUndidOrRedidRef.current = !!recentlyUndidOrRedid
+    }, [recentlyUndidOrRedid])
+
     useEffect(() => {
       if (
+        !recentlyUndidOrRedidRef.current &&
         cardMetaData.title !== newTitleAndSelection.value &&
         cardMetaData.selection !== newTitleAndSelection.selection
       ) {
@@ -391,13 +398,16 @@ const CardDialogConnector = (connector) => {
       event.stopPropagation()
 
       var json = event.dataTransfer.getData('text/json')
-      var droppedTab = JSON.parse(json)
-      actions.reorderCardTemplateAttribute(
-        droppedTab.position,
-        Number(newTemplateTabPosition),
-        cardId
-      )
-      setNewTemplateTabPosition(null)
+      var droppedTab = helpers.json.safeParseJSON(json)
+
+      if (droppedTab !== null) {
+        actions.reorderCardTemplateAttribute(
+          droppedTab.position,
+          Number(newTemplateTabPosition),
+          cardId
+        )
+        setNewTemplateTabPosition(null)
+      }
     }
 
     const renderEditingTemplates = () => {
@@ -776,6 +786,7 @@ const CardDialogConnector = (connector) => {
     activeTab: PropTypes.number.isRequired,
     foci: PropTypes.array.isRequired,
     undo: PropTypes.object.isRequired,
+    recentlyUndidOrRedid: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
   }
 
   const MemoizedCardDialog = React.memo(CardDialog)
@@ -815,6 +826,7 @@ const CardDialogConnector = (connector) => {
           removeWhichTemplate: selectors.whichTemplateIsBeingRemovedViaCardDialogSelector(state),
           activeTab: selectors.cardDialogTabSelector(state),
           foci: selectors.timelineCurrentFocusSelector(state),
+          recentlyUndidOrRedid: selectors.recentlyUndidOrRedidSelector(state),
         }
       },
       (dispatch) => {

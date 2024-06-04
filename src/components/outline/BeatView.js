@@ -170,8 +170,8 @@ const BeatViewConnector = (connector) => {
       this.setState({ inDropZone: false, dropDepth: 0 })
 
       const json = e.dataTransfer.getData('text/json')
-      const droppedData = JSON.parse(json)
-      if (!droppedData.cardId) return
+      const droppedData = helpers.json.safeParseJSON(json)
+      if (!droppedData?.cardId) return
 
       this.reorderCards({
         current: droppedData,

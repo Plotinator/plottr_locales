@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
 
@@ -64,13 +64,19 @@ const TagListViewConnector = (connector) => {
     uiActions,
     isTagTabFocusing,
     isJumping,
+    recentlyUndidOrRedid,
   }) => {
     const [appending, setAppending] = useState(false)
     const [categoriesDialogOpen, setCategoriesDialogOpen] = useState(false)
     const [newCategoryId, setNewCategoryId] = useState(null)
 
+    const recentlyUndidOrRedidRef = useRef(false)
     useEffect(() => {
-      if (!isTagTabFocusing && !isJumping) {
+      recentlyUndidOrRedidRef.current = !!recentlyUndidOrRedid
+    }, [recentlyUndidOrRedid])
+
+    useEffect(() => {
+      if (!recentlyUndidOrRedid.current && !isTagTabFocusing && !isJumping) {
         uiActions.selectTag(detailID(tagsByCategory, tags, categories, selectedTagId))
       }
     }, [tags, tagsByCategory, categories])
@@ -217,6 +223,7 @@ const TagListViewConnector = (connector) => {
     uiActions: PropTypes.object.isRequired,
     isTagTabFocusing: PropTypes.bool,
     isJumping: PropTypes.bool,
+    recentlyUndidOrRedid: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
   }
 
   const { redux } = connector
@@ -244,6 +251,7 @@ const TagListViewConnector = (connector) => {
           selectedTagId: selectors.selectedTagSelector(state),
           isTagTabFocusing: selectors.isTagTabFocusingSelector(state),
           isJumping: selectors.isJumpingSelector(state),
+          recentlyUndidOrRedid: selectors.recentlyUndidOrRedidSelector(state),
         }
       },
       (dispatch) => {

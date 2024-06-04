@@ -54,6 +54,7 @@ const BeatHeadingCellConnector = (connector) => {
     startEditingBeatHeadingTitle,
     stopEditingBeatHeadingTitle,
     batch,
+    recentlyUndidOrRedid,
   }) => {
     const [width, setWidth] = useState(null)
     const [spacerCellWidth, setSpacerCellWidth] = useState(null)
@@ -67,6 +68,11 @@ const BeatHeadingCellConnector = (connector) => {
     const bottomButtons = useRef(null)
     const rightButtons = useRef(null)
 
+    const recentlyUndidOrRedidRef = useRef(false)
+    useEffect(() => {
+      recentlyUndidOrRedidRef.current = !!recentlyUndidOrRedid
+    }, [recentlyUndidOrRedid])
+
     useEffect(() => {
       if (lastClick && lastClick.x && lastClick.y && headingContains(lastClick) && !editing) {
         // Dummy event
@@ -75,17 +81,19 @@ const BeatHeadingCellConnector = (connector) => {
     }, [lastClick])
 
     useEffect(() => {
-      if (!droppedBeat || !droppedBeat.id) return
-
-      const droppedInThisContainer = headingContains(droppedBeat.coord)
-      if (droppedInThisContainer) {
-        batch('Reorder Beat', () => {
-          collectBeat()
-          if (!beat.expanded) {
-            expandBeat(beat.id, currentTimeline)
-          }
-          handleReorder(beat.id, droppedBeat.id)
-        })
+      if (recentlyUndidOrRedidRef.current || !droppedBeat || !droppedBeat.id) {
+        return
+      } else {
+        const droppedInThisContainer = headingContains(droppedBeat.coord)
+        if (droppedInThisContainer) {
+          batch('Reorder Beat', () => {
+            collectBeat()
+            if (!beat.expanded) {
+              expandBeat(beat.id, currentTimeline)
+            }
+            handleReorder(beat.id, droppedBeat.id)
+          })
+        }
       }
     }, [droppedBeat])
 
@@ -132,10 +140,11 @@ const BeatHeadingCellConnector = (connector) => {
         setDropDepth(0)
 
         var json = e.dataTransfer.getData('text/json')
-        var droppedBeat = JSON.parse(json)
-        if (droppedBeat.type !== 'beat') return
-        if (droppedBeat.id == null) return
-        if (droppedBeat.id == beat.id) return
+        var droppedBeat = helpers.json.safeParseJSON(json)
+
+        if (droppedBeat?.type !== 'beat') return
+        if (droppedBeat?.id == null) return
+        if (droppedBeat?.id == beat.id) return
 
         batch('Reorder Beat', () => {
           if (!beat.expanded) {
@@ -547,6 +556,7 @@ const BeatHeadingCellConnector = (connector) => {
     startEditingBeatHeadingTitle: PropTypes.func.isRequired,
     stopEditingBeatHeadingTitle: PropTypes.func.isRequired,
     batch: PropTypes.func.isRequired,
+    recentlyUndidOrRedid: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
   }
 
   const {
@@ -581,6 +591,7 @@ const BeatHeadingCellConnector = (connector) => {
           droppedBeat: selectors.droppedBeatSelector(state),
           editing: selectors.editingGivenBeatsTitleSelector(state, ownProps.beatId),
           timelineFoci: selectors.timelineFociSelector(state),
+          recentlyUndidOrRedid: selectors.recentlyUndidOrRedidSelector(state),
         }
       },
       {

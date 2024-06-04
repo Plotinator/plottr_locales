@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
 
@@ -102,6 +102,7 @@ const CharacterListViewConnector = (connector) => {
     filterVisible,
     sortVisible,
     detailsVisible,
+    recentlyUndidOrRedid,
     actions,
     uiActions,
     undo,
@@ -109,9 +110,14 @@ const CharacterListViewConnector = (connector) => {
     const [isMovingToNewCategory, setMovingToNewCategory] = useState(false)
     const [draggedCharacter, setDraggedCharacter] = useState()
 
+    const recentlyUndidOrRedidRef = useRef(false)
+    useEffect(() => {
+      recentlyUndidOrRedidRef.current = !!recentlyUndidOrRedid
+    }, [recentlyUndidOrRedid])
+
     useEffect(() => {
       const id = selectedId(visibleCharactersByCategory, categories, selectedCharacteId)
-      if (id !== selectedCharacteId) {
+      if (!recentlyUndidOrRedidRef.current && id !== selectedCharacteId) {
         uiActions.selectCharacter(id)
       }
     }, [visibleCharactersByCategory, categories])
@@ -499,6 +505,7 @@ const CharacterListViewConnector = (connector) => {
     actions: PropTypes.object.isRequired,
     uiActions: PropTypes.object.isRequired,
     undo: PropTypes.object.isRequired,
+    recentlyUndidOrRedid: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
   }
 
   const {
@@ -539,6 +546,7 @@ const CharacterListViewConnector = (connector) => {
           filterVisible: selectors.characterFilterVisibleSelector(state),
           sortVisible: selectors.characterSortVisibleSelector(state),
           detailsVisible: selectors.characterDetailsVisible(state),
+          recentlyUndidOrRedid: selectors.recentlyUndidOrRedidSelector(state),
         }
       },
       (dispatch) => {

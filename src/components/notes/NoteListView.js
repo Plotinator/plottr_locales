@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
 
@@ -95,12 +95,18 @@ const NoteListViewConnector = (connector) => {
     filterVisible,
     sortVisible,
     isJumping,
+    recentlyUndidOrRedid,
   }) => {
     const [draggedNote, setDraggedNote] = useState()
     const [isMovingToNewCategory, setMovingToNewCategory] = useState(false)
 
+    const recentlyUndidOrRedidRef = useRef(false)
     useEffect(() => {
-      if (!isJumping) {
+      recentlyUndidOrRedidRef.current = !!recentlyUndidOrRedid
+    }, [recentlyUndidOrRedid])
+
+    useEffect(() => {
+      if (!isJumping && !recentlyUndidOrRedidRef.current) {
         const noteToJumpTo = detailID(visibleNotesByCategory, notes, categories, selectedNoteId)
         if (noteToJumpTo !== selectedNoteId) {
           uiActions.selectNote(noteToJumpTo)
@@ -401,6 +407,7 @@ const NoteListViewConnector = (connector) => {
     filterVisible: PropTypes.bool,
     sortVisible: PropTypes.bool,
     isJumping: PropTypes.bool,
+    recentlyUndidOrRedid: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
   }
 
   const {
@@ -437,6 +444,7 @@ const NoteListViewConnector = (connector) => {
           filterVisible: selectors.noteFilterVisibleSelector(state),
           sortVisible: selectors.noteSortVisibleSelector(state),
           isJumping: selectors.isJumpingSelector(state),
+          recentlyUndidOrRedid: selectors.recentlyUndidOrRedidSelector(state),
         }
       },
       (dispatch) => {

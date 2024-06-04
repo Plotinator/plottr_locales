@@ -168,17 +168,20 @@ const PlaceItemConnector = (connector) => {
       e.preventDefault()
 
       const json = e.dataTransfer.getData('text/json')
-      const droppedData = JSON.parse(json)
-      actions.reorderPlaces(
-        droppedData.id,
-        droppedData.position,
-        place.position,
-        place.categoryId || null,
-        moveUp ? 'up' : 'down'
-      )
-      setNewPlaceIdPosition(null)
-      setMoveUp(null)
-      setDragging(false)
+      const droppedData = helpers.json.safeParseJSON(json)
+
+      if (droppedData !== null) {
+        actions.reorderPlaces(
+          droppedData.id,
+          droppedData.position,
+          place.position,
+          place.categoryId || null,
+          moveUp ? 'up' : 'down'
+        )
+        setNewPlaceIdPosition(null)
+        setMoveUp(null)
+        setDragging(false)
+      }
     }
 
     const handleDragStart = (e) => {
