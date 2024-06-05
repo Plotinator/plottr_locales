@@ -9,6 +9,7 @@ import { uploadToFirebase } from './upload-to-firebase'
 import { whenClientIsReady } from '../shared/socket-client'
 import { makeMainProcessClient } from './app/mainProcessClient'
 import { getErrorReporterInstance } from '../shared/error-reporter-instance'
+import extractImages from './common/extract_images'
 
 const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
 
@@ -341,7 +342,6 @@ export const importExistingFile = (fileUrl, properties) => {
     }
 
     return whenClientIsReady(({ readFile }) => {
-      store().dispatch(actions.project.showLoader(true))
       return readFile(helpers.file.withoutProtocol(filePath), 'utf-8').then((rawFile) => {
         const contents = JSON.parse(rawFile)
 
@@ -362,12 +362,39 @@ export const importExistingFile = (fileUrl, properties) => {
                     reject(error)
                     return
                   } else {
-                    const fullSystemState = selectors.fullSystemStateSelector(store().getState())
-                    store().dispatch(
-                      actions.ui.openImportPltrModal(addMissingKeys(migratedState)),
-                      fullSystemState
-                    )
-                    store().dispatch(actions.project.showLoader(false))
+                    const fileState = addMissingKeys(migratedState)
+                    const state = store().getState()
+                    const fullSystemState = selectors.fullSystemStateSelector(state)
+                    const userId = selectors.userIdSelector(state)
+                    const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
+                    const isCloudFile = selectors.isCloudFileSelector({
+                      user: fileState,
+                      system: fullSystemState,
+                    })
+                    if (isCloudFile || isInProMode) {
+                      store().dispatch(actions.project.showLoader(true))
+                      extractImages(migratedState, userId)
+                        .then((patchedData) => {
+                          store().dispatch(
+                            actions.ui.openImportPltrModal(addMissingKeys(patchedData)),
+                            fullSystemState
+                          )
+                        })
+                        .catch((err) => {
+                          getErrorReporterInstance().then((errorReporter) => {
+                            errorReporter.error('Failed to upload project', fileUrl, err)
+                          })
+                          logger.error('Failed to upload project', fileUrl, err)
+                          reject(err)
+                        })
+                        .finally(() => {
+                          store().dispatch(actions.project.showLoader(false))
+                          resolve()
+                        })
+                    } else {
+                      store().dispatch(actions.ui.openImportPltrModal(fileState), fullSystemState)
+                      resolve()
+                    }
                   }
                 }
               )
