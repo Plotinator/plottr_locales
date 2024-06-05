@@ -82,7 +82,7 @@ export const patchImages = (rceImages, imageDataIndex, urlIndex, file) => {
   const newFile = cloneDeep(file)
 
   const imagesOnStorage = ((file.images && Object.values(file.images)) || []).filter(({ path }) =>
-    path.startsWith('storage://')
+    path?.startsWith('storage://')
   )
 
   rceImages.forEach(({ path, data }) => {
