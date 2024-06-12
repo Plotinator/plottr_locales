@@ -16,7 +16,6 @@ const { openExternal, showItemInFolder } = makeMainProcessClient()
 const ErrorLoadingFile = ({
   isInProMode,
   errorIsUpdateError,
-  setFirstTimeBooting,
   setOpenDashboardTo,
   pathToProject,
   setCurrentAppStateToDashboard,
@@ -31,7 +30,6 @@ const ErrorLoadingFile = ({
   }
 
   const viewBackups = () => {
-    setFirstTimeBooting(false)
     setOpenDashboardTo('backups')
     setCurrentAppStateToDashboard()
     clearErrorLoadingFile()
@@ -111,7 +109,6 @@ const ErrorLoadingFile = ({
 ErrorLoadingFile.propTypes = {
   isInProMode: PropTypes.bool,
   errorIsUpdateError: PropTypes.bool,
-  setFirstTimeBooting: PropTypes.func.isRequired,
   setOpenDashboardTo: PropTypes.func.isRequired,
   setCurrentAppStateToDashboard: PropTypes.func.isRequired,
   pathToProject: PropTypes.string.isRequired,
