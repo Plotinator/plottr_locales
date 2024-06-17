@@ -365,36 +365,8 @@ export const importExistingFile = (fileUrl, properties) => {
                     const fileState = addMissingKeys(migratedState)
                     const state = store().getState()
                     const fullSystemState = selectors.fullSystemStateSelector(state)
-                    const userId = selectors.userIdSelector(state)
-                    const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
-                    const isCloudFile = selectors.isCloudFileSelector({
-                      user: fileState,
-                      system: fullSystemState,
-                    })
-                    if (isCloudFile || isInProMode) {
-                      store().dispatch(actions.project.showLoader(true))
-                      extractImages(migratedState, userId)
-                        .then((patchedData) => {
-                          store().dispatch(
-                            actions.ui.openImportPltrModal(addMissingKeys(patchedData)),
-                            fullSystemState
-                          )
-                        })
-                        .catch((err) => {
-                          getErrorReporterInstance().then((errorReporter) => {
-                            errorReporter.error('Failed to upload project', fileUrl, err)
-                          })
-                          logger.error('Failed to upload project', fileUrl, err)
-                          reject(err)
-                        })
-                        .finally(() => {
-                          store().dispatch(actions.project.showLoader(false))
-                          resolve()
-                        })
-                    } else {
-                      store().dispatch(actions.ui.openImportPltrModal(fileState), fullSystemState)
-                      resolve()
-                    }
+                    store().dispatch(actions.ui.openImportPltrModal(fileState, fullSystemState))
+                    resolve()
                   }
                 }
               )
