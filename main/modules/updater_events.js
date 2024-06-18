@@ -113,6 +113,10 @@ const oneOfTheGivenLicensesHasStarted = (plottrLicense, proLicense) => {
   return hasActivePlottrLicense || hasActiveProLicense
 }
 
+const dateToVersion = (date) => {
+  return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`
+}
+
 autoUpdater.on('update-available', (info) => {
   if (typeof info?.version === 'string') {
     const currentVersion = app.getVersion()
@@ -121,7 +125,7 @@ autoUpdater.on('update-available', (info) => {
         ([plottrLicense, proLicense]) => {
           const plottrExpiry = plottrLicense.expiresAt
           const proExpiry = proLicense.expiresAt
-          const latestExpiryDate = latestExpiry(plottrExpiry, proExpiry)
+          const latestExpiryDate = dateToVersion(new Date(latestExpiry(plottrExpiry, proExpiry)))
           const hasALicenseThatHasStarted = oneOfTheGivenLicensesHasStarted(
             plottrLicense,
             proLicense
