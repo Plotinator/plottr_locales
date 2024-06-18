@@ -88,16 +88,20 @@ const isoStringToDateOrNull = (isoDateString) => {
 const latestExpiry = (plottrLicenseExpiryISOString, proLicenseExpiryISOString) => {
   const plottrLicenseExpiry = isoStringToDateOrNull(plottrLicenseExpiryISOString)
   const proLicenseExpiry = isoStringToDateOrNull(proLicenseExpiryISOString)
-  if (proLicenseExpiry && plottrLicenseExpiry) {
-    if (proLicenseExpiry > plottrLicenseExpiry) {
+  if (proLicenseExpiry === null || plottrLicenseExpiry === null) {
+    return null
+  } else {
+    if (proLicenseExpiry && plottrLicenseExpiry) {
+      if (proLicenseExpiry > plottrLicenseExpiry) {
+        return proLicenseExpiry
+      } else {
+        return plottrLicenseExpiry
+      }
+    } else if (proLicenseExpiry) {
       return proLicenseExpiry
     } else {
       return plottrLicenseExpiry
     }
-  } else if (proLicenseExpiry) {
-    return proLicenseExpiry
-  } else {
-    return plottrLicenseExpiry
   }
 }
 
@@ -113,6 +117,10 @@ const oneOfTheGivenLicensesHasStarted = (plottrLicense, proLicense) => {
   return hasActivePlottrLicense || hasActiveProLicense
 }
 
+const dateToVersion = (date) => {
+  return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`
+}
+
 autoUpdater.on('update-available', (info) => {
   if (typeof info?.version === 'string') {
     const currentVersion = app.getVersion()
@@ -121,15 +129,19 @@ autoUpdater.on('update-available', (info) => {
         ([plottrLicense, proLicense]) => {
           const plottrExpiry = plottrLicense.expiresAt
           const proExpiry = proLicense.expiresAt
-          const latestExpiryDate = latestExpiry(plottrExpiry, proExpiry)
+          const latestExpiryValue = latestExpiry(plottrExpiry, proExpiry)
+          const latestExpiryDate = dateToVersion(new Date(latestExpiryValue))
           const hasALicenseThatHasStarted = oneOfTheGivenLicensesHasStarted(
             plottrLicense,
             proLicense
           )
           if (hasALicenseThatHasStarted) {
+            log.info(
+              `Updater current version: ${currentVersion}.  Latest expiry: ${latestExpiryValue}`
+            )
             if (semverGt(info.version, currentVersion)) {
-              if (semverLte(currentVersion, latestExpiryDate)) {
-                log.info('License expires after update.  Informing windows that we can update.')
+              if (latestExpiryValue === null || semverLte(currentVersion, latestExpiryDate)) {
+                log.info(`License expires after update.  Informing windows that we can update.`)
                 broadcastToAllWindows('updater-update-available', info)
               } else {
                 log.warn(
