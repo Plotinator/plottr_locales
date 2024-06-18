@@ -4,8 +4,7 @@ import { Editor, Text as SlateText } from 'slate'
 import { ReactEditor, useSlate } from 'slate-react'
 import { uniq } from 'lodash'
 
-import DropdownButton from '../DropdownButton'
-import MenuItem from '../MenuItem'
+import DropdownButton from '../DropdownButtonV2'
 
 const UnMemoisedFontsButton = ({
   editor,
@@ -74,32 +73,27 @@ const UnMemoisedFontsButton = ({
     }
   }
 
-  const renderFont = (f, key) => {
-    return (
-      <MenuItem
-        key={`${f}-${key}`}
-        eventKey={f}
-        style={{ fontFamily: f }}
-        active={displayedFont == f}
-      >
-        {f}
-      </MenuItem>
-    )
+  const renderFont = (f, key, renderMenuItem) => {
+    return renderMenuItem(false, displayedFont === f, f, { style: { fontFamily: f } }, key)
   }
 
-  const renderFonts = () => {
-    let fontItems = recentFonts.map((f) => renderFont(f, 'recents'))
+  const renderFonts = (renderMenuItem) => {
+    let fontItems = recentFonts.map((f) => renderFont(f, `${f}-recents`, renderMenuItem))
     if (fontItems.length) {
-      fontItems.push(<MenuItem divider key="divider" />)
+      fontItems.push(renderMenuItem(true, null, null, null, 'fonts-button-divider'))
     }
-    fontItems = [...fontItems, ...fonts.map((f) => renderFont(f, ''))]
+    fontItems = [...fontItems, ...fonts.map((f) => renderFont(f, `${f}-original`, renderMenuItem))]
     return fontItems
   }
 
   return (
-    <DropdownButton title={displayedFont} onSelect={changeFont} id="font-dropdown">
-      {renderFonts()}
-    </DropdownButton>
+    <DropdownButton
+      title={displayedFont}
+      onSelect={changeFont}
+      id="font-dropdown"
+      activeKey={activeFont}
+      renderChildren={renderFonts}
+    />
   )
 }
 
@@ -148,8 +142,14 @@ const getDisplayedFont = (editor, logger, recentFonts, currentSetting) => {
       } else if (nodes[0]?.[0]?.font && typeof nodes[0]?.[0]?.font === 'string') {
         return nodes[0]?.[0].font
       } else {
-        if (currentSetting) return currentSetting
-        return recentFonts?.length ? recentFonts[0] : 'Forum'
+        if (currentSetting) {
+          return currentSetting
+        } else {
+          const validRecentFonts = recentFonts.filter((recentFont) => {
+            return typeof recentFont === 'string'
+          })
+          return validRecentFonts?.length ? validRecentFonts[0] : 'Forum'
+        }
       }
     } catch (error) {
       logger.error('Error attempting to get current fonts.', error)

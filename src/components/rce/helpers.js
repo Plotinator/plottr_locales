@@ -160,7 +160,10 @@ const isValidPath = (node, path) => {
 }
 
 const validSelection = (editor) => {
-  if (!Array.isArray(editor?.selection?.anchor) || !Array.isArray(editor?.selection?.focus)) {
+  if (
+    !Array.isArray(editor?.selection?.anchor?.path) ||
+    !Array.isArray(editor?.selection?.focus?.path)
+  ) {
     return false
   } else {
     const { anchor, focus } = editor.selection

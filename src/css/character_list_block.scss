@@ -60,14 +60,13 @@
       transition: 0.01s;
       visibility: hidden;
     }
-  
     &:not(.dragging) {
       visibility: visible;
     }
   }
   .dropzone-indicator {
     height: 0px;
-    transition: height .25s linear;
+    transition: height 0.25s linear;
     background-color: transparent;
     &.display {
       height: 50px;
@@ -135,7 +134,6 @@
       visibility: hidden;
       height: 0px;
     }
-  
     &:not(.dragging) {
       visibility: visible;
       height: 100%;

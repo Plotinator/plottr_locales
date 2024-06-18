@@ -117,7 +117,7 @@ const FilesHomeConnector = (connector) => {
     errorActions,
     importActions,
     isOnWeb,
-    isLoggedIn,
+    isInProMode,
     projectActions,
     isInOfflineMode,
     settings,
@@ -202,7 +202,7 @@ const FilesHomeConnector = (connector) => {
           projectActions.startCreatingNewProject()
         }
       } else {
-        if (isOnWeb || isLoggedIn) {
+        if (isOnWeb || isInProMode) {
           if (isObject(template)) {
             projectActions.startCreatingNewProject(template)
           } else {
@@ -277,7 +277,7 @@ const FilesHomeConnector = (connector) => {
     importActions: PropTypes.object,
     projectActions: PropTypes.object,
     isOnWeb: PropTypes.bool,
-    isLoggedIn: PropTypes.bool,
+    isInProMode: PropTypes.bool,
     isInOfflineMode: PropTypes.bool,
     settings: PropTypes.object.isRequired,
   }
@@ -298,7 +298,7 @@ const FilesHomeConnector = (connector) => {
 
     return connect(
       (state) => ({
-        isLoggedIn: selectors.isLoggedInSelector(state),
+        isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
         isOnWeb: selectors.isOnWebSelector(state),
         isInOfflineMode: selectors.isInOfflineModeSelector(state),
         settings: selectors.appSettingsSelector(state),

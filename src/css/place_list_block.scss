@@ -56,15 +56,15 @@
 
 .list-group-item__wrapper {
   &.dragging {
-      transition: 0.01s;
-      visibility: hidden;
-      height: 0px;
-    }
-  
-    &:not(.dragging) {
-      visibility: visible;
-      height: 100%;
-    }
+    transition: 0.01s;
+    visibility: hidden;
+    height: 0px;
+  }
+
+  &:not(.dragging) {
+    visibility: visible;
+    height: 100%;
+  }
 }
 
 .place-list__list {
@@ -75,7 +75,7 @@
 
   .dropzone-indicator {
     background-color: transparent;
-    transition: height .25s linear;
+    transition: height 0.25s linear;
     height: 0px;
     &.display {
       height: 50px;
