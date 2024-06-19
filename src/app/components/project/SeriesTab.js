@@ -1,12 +1,5 @@
 import React from 'react'
-import {
-  Nav,
-  EditSeries,
-  ErrorBoundary,
-  BookList,
-  FileLocation,
-  SubNav,
-} from 'connected-components'
+import { Nav, EditSeries, ErrorBoundary, BookList, FileLocation, SubNav } from 'plottr_components'
 
 export default function SeriesTab() {
   const SubNavigation = () => {

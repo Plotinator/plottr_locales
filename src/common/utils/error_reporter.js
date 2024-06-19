@@ -2,7 +2,6 @@ import { ActionTypes } from 'pltr'
 import { t as i18n } from 'plottr_locales'
 
 import log from '../../../shared/logger'
-import { whenClientIsReady } from '../../../shared/socket-client/index'
 import { makeMainProcessClient } from '../../app/mainProcessClient'
 
 let previousAction = null
@@ -24,36 +23,35 @@ export function getPreviousAction() {
 const { userDocumentsPath, getVersion, showItemInFolder, notify, pleaseTellMeWhatPlatformIAmOn } =
   makeMainProcessClient()
 
-export function createErrorReport(error, errorInfo) {
+export function createErrorReport(localClient, error, errorInfo) {
   return userDocumentsPath().then((documentsPath) => {
-    return prepareErrorReport(error, errorInfo).then((body) => {
-      return whenClientIsReady(({ join, writeFile }) => {
-        return join(documentsPath, `plottr_error_report_${Date.now()}.txt`).then((filePath) => {
-          return writeFile(filePath, body)
+    return prepareErrorReport(localClient, error, errorInfo).then((body) => {
+      return localClient
+        .join(documentsPath, `plottr_error_report_${Date.now()}.txt`)
+        .then((filePath) => {
+          return localClient
+            .writeFile(filePath, body)
             .then(() => {
-              notifyUser(filePath)
+              notifyUser(localClient, filePath)
             })
             .catch((error) => {
               log.warn(error)
             })
         })
-      })
     })
   })
 }
 
-function prepareErrorReport(error, errorInfo) {
+function prepareErrorReport(localClient, error, errorInfo) {
   return Promise.all([getVersion(), pleaseTellMeWhatPlatformIAmOn]).then(([version, platform]) => {
     // TODO
     return Promise.resolve({ payment_id: 'blarg' }).then((user) => {
-      const hasLicense = !!user.licenseKey
       const report = `
 ----------------------------------
 INFO
 ----------------------------------
 DATE: ${new Date().toString()}
 VERSION: ${version}
-USER HAS LICENSE: ${hasLicense}
 PLATFORM: ${platform}
 ----------------------------------
 ERROR
@@ -72,16 +70,14 @@ ${JSON.stringify(previousAction)}
   })
 }
 
-function notifyUser(filePath) {
-  return whenClientIsReady(({ basename }) => {
-    return basename(filePath).then((fileName) => {
-      notify(
-        i18n('Error Report created'),
-        i18n('Plottr created a file named {filePath} in your Documents folder', {
-          filePath: fileName,
-        })
-      )
-      return showItemInFolder(filePath)
-    })
+function notifyUser(localClient, filePath) {
+  return localClient.basename(filePath).then((fileName) => {
+    notify(
+      i18n('Error Report created'),
+      i18n('Plottr created a file named {filePath} in your Documents folder', {
+        filePath: fileName,
+      })
+    )
+    return showItemInFolder(filePath)
   })
 }

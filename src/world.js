@@ -54,21 +54,27 @@ const afterSettingsLoad = (store, fn) => {
 }
 
 const combineCloudAndFileSystemSources =
-  (fileSystemSource, cloudSource, mergeSources, forceIncludeLocal = false) =>
+  (fileSystemSource, cloudSource, mergeSources, logger, forceIncludeLocal = false) =>
   (store, cb) => {
     let _currentFileSystemResult = null
     let _currentCloudResult = null
 
-    const unsubscribeFromFileSystemSourceResult = fileSystemSource((fileSystemResult) => {
-      _currentFileSystemResult = fileSystemResult
-      afterSettingsLoad(store, () => {
-        const previouslyLoggedIntoPro = selectors.previouslyLoggedIntoProSelector(store.getState())
-        if (_currentCloudResult) {
-          cb(mergeSources(_currentFileSystemResult, _currentCloudResult))
-        } else if (forceIncludeLocal || !previouslyLoggedIntoPro) {
-          cb(_currentFileSystemResult)
-        }
-      })
+    const unsubscribeFromFileSystemSourceResult = fileSystemSource((error, fileSystemResult) => {
+      if (error) {
+        logger.error(`Failed to receive updated values`, error)
+      } else {
+        _currentFileSystemResult = fileSystemResult
+        afterSettingsLoad(store, () => {
+          const previouslyLoggedIntoPro = selectors.previouslyLoggedIntoProSelector(
+            store.getState()
+          )
+          if (_currentCloudResult) {
+            cb(null, mergeSources(_currentFileSystemResult, _currentCloudResult))
+          } else if (forceIncludeLocal || !previouslyLoggedIntoPro) {
+            cb(null, _currentFileSystemResult)
+          }
+        })
+      }
     })
 
     const unsubscribeFromCloudSource = cloudSource((cloudResult) => {
@@ -76,9 +82,9 @@ const combineCloudAndFileSystemSources =
       afterSettingsLoad(store, () => {
         const previouslyLoggedIntoPro = selectors.previouslyLoggedIntoProSelector(store.getState())
         if (_currentFileSystemResult) {
-          cb(mergeSources(_currentFileSystemResult, _currentCloudResult))
+          cb(null, mergeSources(_currentFileSystemResult, _currentCloudResult))
         } else if (previouslyLoggedIntoPro) {
-          cb(_currentCloudResult)
+          cb(null, _currentCloudResult)
         }
       })
     })
@@ -119,13 +125,14 @@ const mergeBackups = (firebaseFolders, localFolders) => {
 }
 const ignoringStore = (fn) => (store, cb) => fn(cb)
 
-const theWorld = (socketClient) => {
-  const fileSystemAPIs = makeFileSystemAPIs(socketClient)
+const theWorld = (localClient) => {
+  const fileSystemAPIs = makeFileSystemAPIs(localClient)
 
   const listenToknownFilesChanges = combineCloudAndFileSystemSources(
     fileSystemAPIs.listenToknownFilesChanges,
     firebaseAPIs.listenToKnownFiles,
-    mergeWithConcat
+    mergeWithConcat,
+    errorReportingLogger
   )
 
   const currentKnownFiles = () => {
@@ -137,7 +144,8 @@ const theWorld = (socketClient) => {
   const listenToCustomTemplatesChanges = combineCloudAndFileSystemSources(
     fileSystemAPIs.listenToCustomTemplatesChanges,
     firebaseAPIs.listenToCustomTemplates,
-    mergeWithConcat
+    mergeWithConcat,
+    errorReportingLogger
   )
   const currentCustomTemplates = () => {
     return fileSystemAPIs.currentCustomTemplates().then((fileSystemCustomTemplates) => {
@@ -149,6 +157,7 @@ const theWorld = (socketClient) => {
     fileSystemAPIs.listenToBackupsChanges,
     firebaseAPIs.listenToBackupsChanges,
     mergeBackups,
+    errorReportingLogger,
     true
   )
 
@@ -158,7 +167,7 @@ const theWorld = (socketClient) => {
     })
   }
 
-  const { checkForAndSaveLicense } = licenseServerAPIs.makeLicenseServerAPIs(socketClient, logger)
+  const { checkForAndSaveLicense } = licenseServerAPIs.makeLicenseServerAPIs(localClient, logger)
 
   return {
     logger: errorReportingLogger,
@@ -204,6 +213,6 @@ const theWorld = (socketClient) => {
   }
 }
 
-const makeWorldAPI = (socketClient) => plottrWorldAPI(theWorld(socketClient))
+const makeWorldAPI = (localClient) => plottrWorldAPI(theWorld(localClient))
 
 export default makeWorldAPI

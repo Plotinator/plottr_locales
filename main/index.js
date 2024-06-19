@@ -1,13 +1,9 @@
 import electron, { dialog } from 'electron'
-import WebSocket from 'ws'
-import SETTINGS from './modules/settings'
 import { setupI18n } from 'plottr_locales'
 import yargs from 'yargs/yargs'
 import { hideBin } from 'yargs/helpers'
+import { v4 as uuid } from 'uuid'
 
-setupI18n(SETTINGS, { locale: electron.app.getLocale() })
-
-const { app, BrowserWindow, globalShortcut } = electron
 import path from 'path'
 import log from 'electron-log'
 import { is } from 'electron-util'
@@ -15,24 +11,35 @@ import contextMenu from 'electron-context-menu'
 
 import { helpers } from 'pltr'
 
-import './modules/updater_events'
 import createErrorReporter from '../shared/error-reporter'
 import { loadMenu } from './modules/menus'
 import { focusFirstWindow, hasWindows } from './modules/windows'
-import { openProjectWindow } from './modules/windows/projects'
 import { gracefullyQuit } from './modules/utils'
-import { addToKnown } from './modules/known_files'
 import { startServer } from './server'
 import { listenOnIPCMain } from './listeners'
-import { createClient, resetInitialised, setPort, getPort } from '../shared/socket-client'
+import { createClient } from '../shared/local-client'
 import ProcessSwitches from './modules/processSwitches'
 import { encryptStringToBase64, decryptStringFromBase64 } from './modules/encrypt'
 import makeSafelyExitModule from './modules/safelyExit'
 import replyWithError from './lib/replyWithError'
 import { currentSettings } from './lib/current_settings'
 import { currentLicense } from './lib/current_license'
+import { makeKnownFilesModule } from './modules/known_files'
+import { makeFileModule } from './modules/files'
+import { makeLastOpenedModule } from './modules/lastOpened'
+import { makeProjectModule } from './modules/windows/projects'
+import { makeSettingsModule } from './modules/settings'
+import { makeFeatureFlagsModule } from './modules/feature_flags'
+import { makeThemeModule } from './modules/theme'
+import { initialiseUpdater } from './modules/updater_events'
 
-const { ipcMain } = electron
+const { app, BrowserWindow, globalShortcut, ipcMain } = electron
+
+// There's a limit on the number of connections Electron will launch.
+// We need to disable it for long polling to the local server.
+app.commandLine.appendSwitch('ignore-connections-limit', '127.0.0.1')
+
+log.transports.file.level = 'info'
 
 ////////////////////////////////
 ////       Arguments      //////
@@ -59,7 +66,6 @@ log.info(`--------Init (${app.getVersion()})--------`)
 const ENV_FILE_PATH = path.resolve('.env')
 import { config } from 'dotenv'
 import { broadcastToAllWindows } from './modules/broadcast'
-import { setDarkMode } from './modules/theme'
 config({ path: ENV_FILE_PATH })
 
 const readUserId = () => {
@@ -155,29 +161,9 @@ app.userAgentFallback =
 // app boots, it only opens a window corresponding to that event.
 let openedFile = false
 
-const broadcastPortChange = (port) => {
-  createClient(
-    port,
-    log,
-    WebSocket,
-    (error) => {
-      errorReportingLogger.error(
-        `Failed to connect to socket server on port: <${port}>.  Killing the app.`,
-        error
-      )
-      app.quit()
-    },
-    {
-      onBusy: () => {
-        safelyExitModule.busy()
-      },
-      onDone: () => {
-        safelyExitModule.done()
-      },
-    }
-  )
+const broadcastPortChange = (setPort) => (port) => {
   setPort(port)
-  broadcastToAllWindows('update-worker-port', port)
+  broadcastToAllWindows('update-local-port', port)
 }
 
 const loadMenuFailureHandler = (error) => {
@@ -185,15 +171,24 @@ const loadMenuFailureHandler = (error) => {
   return Promise.reject(error)
 }
 
-app.whenReady().then(() => {
-  const startSocketServer = () => {
+app.whenReady().then(async () => {
+  const secret = uuid()
+  const client = createClient(null, errorReportingLogger, secret, {
+    onBusy: () => {
+      safelyExitModule.busy()
+    },
+    onDone: () => {
+      safelyExitModule.done()
+    },
+  })
+  const startLocalServer = () => {
     return startServer(
       errorReportingLogger,
-      broadcastPortChange,
+      broadcastPortChange((port) => client.setPort(port)),
       app.getPath('userData'),
       (error) => {
         errorReportingLogger.error(
-          'FATAL ERROR: Failed to start the socket server.  Killing the app.',
+          'FATAL ERROR: Failed to start the server.  Killing the app.',
           error
         )
         dialog.showErrorBox(
@@ -206,15 +201,16 @@ app.whenReady().then(() => {
       },
       app.getVersion(),
       encryptStringToBase64,
-      decryptStringFromBase64
+      decryptStringFromBase64,
+      secret
     )
       .then(({ port, killServer }) => {
-        log.info(`Socket worker started on ${port}`)
+        log.info(`Local server started on ${port}`)
         return { port, killServer }
       })
       .catch((error) => {
         errorReportingLogger.error(
-          'FATAL ERROR: Failed to start the socket server.  Killing the app.',
+          'FATAL ERROR: Failed to start the server.  Killing the app.',
           error
         )
         dialog.showErrorBox(
@@ -227,15 +223,46 @@ app.whenReady().then(() => {
       })
   }
 
-  startSocketServer()
+  const settingsModule = makeSettingsModule(client)
+  const knownFilesModule = makeKnownFilesModule(client)
+  const lastOpenedModule = makeLastOpenedModule(client)
+  const featureFlagsModule = makeFeatureFlagsModule(client, errorReportingLogger)
+  const projectModule = makeProjectModule(
+    lastOpenedModule,
+    featureFlagsModule,
+    settingsModule,
+    knownFilesModule,
+    client,
+    errorReportingLogger
+  )
+  const fileModule = makeFileModule(
+    settingsModule,
+    knownFilesModule,
+    projectModule,
+    client,
+    errorReportingLogger
+  )
+  const themeModule = makeThemeModule(settingsModule, errorReportingLogger)
+
+  startLocalServer()
+    // @ts-ignore
     .then(({ port, killServer }) => {
-      return loadMenu(safelyExitModule)
+      return loadMenu(
+        safelyExitModule,
+        projectModule,
+        featureFlagsModule,
+        settingsModule,
+        knownFilesModule,
+        client
+      )
         .then(() => {
           return { port, killServer }
         })
         .catch(loadMenuFailureHandler)
     })
     .then(({ port, killServer }) => {
+      client.setPort(port)
+      initialiseUpdater(settingsModule, client)
       const yargv = parseArguments(process.argv)
       log.info('yargv', yargv)
       const processSwitches = ProcessSwitches(yargv)
@@ -249,18 +276,18 @@ app.whenReady().then(() => {
             log.warn('Instructed to restart the server, but we are killing the app.')
             return Promise.resolve()
           } else {
-            resetInitialised()
             return restartServerRef
               .killServer()
               .then(() => {
-                return startSocketServer().then(({ port, killServer }) => {
-                  setPort(port)
+                // @ts-ignore
+                return startLocalServer().then(({ port, killServer }) => {
+                  client.setPort(port)
                   restartServerRef.killServer = killServer
                 })
               })
               .catch((error) => {
                 errorReportingLogger.error(
-                  'Failed to restart the socket server.  Killing the app.',
+                  'Failed to restart the local server.  Killing the app.',
                   error
                 )
                 dialog.showErrorBox(
@@ -275,19 +302,59 @@ app.whenReady().then(() => {
         },
       }
 
+      settingsModule.currentSettings().then((settings) => {
+        setupI18n(settings, { locale: electron.app.getLocale() })
+      })
+
       listenOnIPCMain(
-        () => getPort(),
+        fileModule,
+        lastOpenedModule,
+        projectModule,
+        settingsModule,
+        featureFlagsModule,
+        themeModule,
+        knownFilesModule,
+        client,
+        () => client.getPort(),
         processSwitches,
         safelyExitModule,
         restartServerRef,
-        errorReportingLogger
+        errorReportingLogger,
+        () => secret
       )
+
+      // macOS only.  Open file from finder.
+      app.on('open-file', (event, filePath) => {
+        // Convert to a Plottr URL.
+        const fileURL = helpers.file.filePathToFileURL(filePath)
+        // Prevent the app from opening a default window as well as the file.
+        openedFile = true
+        log.info(`Opening <${fileURL}> from open file`)
+        event.preventDefault()
+        // mac/linux open-file event handler
+        app.whenReady().then(() => {
+          projectModule
+            .openProjectWindow(fileURL)
+            .then(() => {
+              log.info('Project window opened for ', fileURL)
+              knownFilesModule.addToKnown(fileURL)
+            })
+            .catch((error) => {
+              errorReportingLogger.error(
+                'Failed to open a project window the second instance',
+                fileURL,
+                error
+              )
+            })
+        })
+      })
 
       const importFromScrivener = processSwitches.importFromScrivener()
       if (importFromScrivener) {
         const { sourceFile, destinationFile } = importFromScrivener
         log.info(`Importing ${sourceFile} to ${destinationFile}`)
-        openProjectWindow(null)
+        projectModule
+          .openProjectWindow(null)
           .then((newWindow) => {
             if (!newWindow) {
               throw new Error('Could not create window to export with.')
@@ -319,10 +386,13 @@ app.whenReady().then(() => {
             openedFile = true
             log.info(`Opening <${fileLaunchedOnURL}> from primary whenReady`)
             try {
-              openProjectWindow(fileLaunchedOnURL)
+              projectModule
+                .openProjectWindow(fileLaunchedOnURL)
                 .then((newWindow) => {
                   log.info(`Created the project window for ${fileLaunchedOnURL}`)
-                  if (fileLaunchedOnURL) addToKnown(fileLaunchedOnURL)
+                  if (fileLaunchedOnURL) {
+                    knownFilesModule.addToKnown(fileLaunchedOnURL)
+                  }
                 })
                 .catch((error) => {
                   errorReportingLogger.error(
@@ -340,6 +410,7 @@ app.whenReady().then(() => {
         globalShortcut.register('CommandOrControl+Alt+R', () => {
           try {
             let win = BrowserWindow.getFocusedWindow()
+            // @ts-ignore
             if (win) win.toggleDevTools()
           } catch (error) {
             log.warn("Couldn't activate dev tools", error)
@@ -347,7 +418,7 @@ app.whenReady().then(() => {
         })
 
         // When given no argument, it'll look up the current one.
-        setDarkMode().catch((error) => {
+        themeModule.setDarkMode().catch((error) => {
           errorReportingLogger.error('Error setting initial theme', error)
         })
 
@@ -360,7 +431,8 @@ app.whenReady().then(() => {
             focusFirstWindow()
           } else {
             log.info('Opening project window for', fileLaunchedOnURL)
-            openProjectWindow(fileLaunchedOnURL)
+            projectModule
+              .openProjectWindow(fileLaunchedOnURL)
               .then(() => {
                 log.info('Opened a project window for', fileLaunchedOnURL)
               })
@@ -375,12 +447,22 @@ app.whenReady().then(() => {
 
         app.on('second-instance', (_event, argv) => {
           log.info('second-instance')
-          loadMenu(safelyExitModule)
+          loadMenu(
+            safelyExitModule,
+            projectModule,
+            featureFlagsModule,
+            settingsModule,
+            knownFilesModule,
+            client
+          )
             .then(() => {
               const newFileToLoad = fileToLoad(argv)
               const newFileToLoadURL = helpers.file.filePathToFileURL(newFileToLoad)
-              if (newFileToLoadURL) addToKnown(newFileToLoadURL)
-              openProjectWindow(newFileToLoadURL)
+              if (newFileToLoadURL) {
+                knownFilesModule.addToKnown(newFileToLoadURL)
+              }
+              projectModule
+                .openProjectWindow(newFileToLoadURL)
                 .then(() => {
                   log.info('Opened a second instance for a file', newFileToLoadURL)
                 })
@@ -427,31 +509,6 @@ function fileToLoad(argv) {
   log.info(`Opening Plottr without booting a file and arguments: ${argv}`)
   return null
 }
-
-// macOS only.  Open file from finder.
-app.on('open-file', (event, filePath) => {
-  // Convert to a Plottr URL.
-  const fileURL = helpers.file.filePathToFileURL(filePath)
-  // Prevent the app from opening a default window as well as the file.
-  openedFile = true
-  log.info(`Opening <${fileURL}> from open file`)
-  event.preventDefault()
-  // mac/linux open-file event handler
-  app.whenReady().then(() => {
-    openProjectWindow(fileURL)
-      .then(() => {
-        log.info('Project window opened for ', fileURL)
-        addToKnown(fileURL)
-      })
-      .catch((error) => {
-        errorReportingLogger.error(
-          'Failed to open a project window the second instance',
-          fileURL,
-          error
-        )
-      })
-  })
-})
 
 app.on('open-url', function (event, url) {
   event.preventDefault()

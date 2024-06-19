@@ -5,7 +5,7 @@ const logger = (store) => (next) => (action) => {
   if (!action.type) return next(action)
 
   // eslint-disable-next-line
-  if (LOGGER === 'true') {
+  if (process.env.LOGGER === 'true') {
     console.info('----------START Redux Change Logger START----------')
     console.info(`action: ${action.type}, payload: `, action)
     const oldState = selectors.fullFileStateSelector(store.getState())

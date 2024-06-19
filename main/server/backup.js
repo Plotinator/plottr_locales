@@ -71,23 +71,26 @@ const BackupModule = (userDataPath) => (settings, logger) => {
               const startBaseName = `(start-session)-${fileBaseName}`
               const startFilePath = path.join(partialPath, startBaseName)
               const SAVED_START_OF_SESSION_BACKUP = 'saved-start-of-session-backup'
-              return lstat(startFilePath)
-                .catch((error) => {
-                  if (error.code === 'ENOENT') {
-                    return saveFile(startFilePath, data).then(() => {
-                      return SAVED_START_OF_SESSION_BACKUP
-                    })
-                  }
-                  return Promise.reject(error)
-                })
-                .then((result) => {
-                  if (result === SAVED_START_OF_SESSION_BACKUP) {
-                    return result
-                  }
+              return (
+                lstat(startFilePath)
+                  .catch((error) => {
+                    if (error.code === 'ENOENT') {
+                      return saveFile(startFilePath, data).then(() => {
+                        return SAVED_START_OF_SESSION_BACKUP
+                      })
+                    }
+                    return Promise.reject(error)
+                  })
+                  // @ts-ignore
+                  .then((result) => {
+                    if (result === SAVED_START_OF_SESSION_BACKUP) {
+                      return result
+                    }
 
-                  const backupFilePath = path.join(partialPath, fileBaseName)
-                  return saveFile(backupFilePath, data)
-                })
+                    const backupFilePath = path.join(partialPath, fileBaseName)
+                    return saveFile(backupFilePath, data)
+                  })
+              )
             })
         } catch (error) {
           return Promise.reject(error)
@@ -219,7 +222,7 @@ const BackupModule = (userDataPath) => (settings, logger) => {
   function deleteEmptyFolders() {
     return backupBasePath()
       .then((basePath) => {
-        return readdir().then((elems) =>
+        return readdir(basePath).then((elems) =>
           Promise.all(
             elems.map((elem) =>
               lstat(path.join(basePath, elem)).then((fileStats) =>

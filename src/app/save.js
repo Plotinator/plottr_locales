@@ -4,9 +4,9 @@ import exportToSelfContainedPlottrFile from '../../lib/plottr_import_export/src/
 import { helpers, SYSTEM_REDUCER_KEYS, emptyFile } from 'pltr'
 import { selectors } from 'wired-up-pltr'
 
-export const saveFile = (whenClientIsReady, logger, postSaveHook) => (state) => {
+export const saveFile = (localClient, logger, postSaveHook) => (state) => {
   const emptyFileState = emptyFile('DummyFile', '2022.11.2')
-  return whenClientIsReady(({ saveFile, saveOfflineFile }) => {
+  return (() => {
     const hasAllKeys = selectors.hasAllKeysSelector(state)
     const fileJSON = selectors.fullFileStateSelector(state)
     if (!hasAllKeys) {
@@ -22,10 +22,11 @@ export const saveFile = (whenClientIsReady, logger, postSaveHook) => (state) => 
       return Promise.resolve()
     }
 
-    const fileURL = selectors.fileURLSelector(state)
     const shouldSaveOfflineFile = selectors.shouldSaveOfflineFileSelector(state)
     if (shouldSaveOfflineFile) {
-      return saveOfflineFile(fileURL, fileJSON)
+      const onlineFileURL = selectors.fileURLSelector(state)
+      const knownFiles = selectors.knownFilesSelector(state)
+      return localClient.saveOfflineFile(fileJSON, knownFiles, onlineFileURL)
     }
 
     const isCloudFile = selectors.isCloudFileSelector(state)
@@ -34,8 +35,9 @@ export const saveFile = (whenClientIsReady, logger, postSaveHook) => (state) => 
       return Promise.resolve()
     }
 
-    return saveFile(fileURL, fileJSON)
-  }).then(() => {
+    const fileURL = selectors.fileURLSelector(state)
+    return localClient.saveFile(fileURL, fileJSON)
+  })().then(() => {
     if (postSaveHook) {
       postSaveHook()
     }
@@ -43,7 +45,7 @@ export const saveFile = (whenClientIsReady, logger, postSaveHook) => (state) => 
 }
 
 export const backupFile = (
-  whenClientIsReady,
+  localClient,
   saveBackupOnFirebase,
   downloadStorageImage,
   logger,
@@ -75,14 +77,14 @@ export const backupFile = (
         return Promise.reject(message)
       }
       return cloudBackup.then(() => {
-        return whenClientIsReady(({ saveBackup, offlineFileBasePath }) => {
+        return (() => {
           const canBackup = selectors.canBackupSelector(state)
           if (!canBackup) {
             logger.warn('File is in a state that prohibits backing up.  Refusing to backup.')
             return Promise.resolve()
           }
 
-          return offlineFileBasePath().then((offlineFilePath) => {
+          return localClient.offlineFileBasePath().then((offlineFilePath) => {
             const fileURL = selectors.fileURLSelector(state)
             if (helpers.file.withoutProtocol(fileURL).startsWith(offlineFilePath)) {
               logger.warn(
@@ -91,7 +93,7 @@ export const backupFile = (
               return Promise.resolve()
             }
 
-            return offlineFileBasePath().then((offlineFilePath) => {
+            return localClient.offlineFileBasePath().then((offlineFilePath) => {
               const fileURL = selectors.fileURLSelector(state)
               if (helpers.file.withoutProtocol(fileURL).startsWith(offlineFilePath)) {
                 logger.warn(
@@ -108,11 +110,11 @@ export const backupFile = (
                 const filePath = isCloudFile
                   ? `${selfContainedFile.file.fileName}.pltr`
                   : helpers.file.withoutProtocol(fileURL)
-                return saveBackup(filePath, selfContainedFile)
+                return localClient.saveBackup(filePath, selfContainedFile)
               })
             })
           })
-        }).then(() => {
+        })().then(() => {
           if (postBackupHook) {
             postBackupHook()
           }

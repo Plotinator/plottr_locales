@@ -76,8 +76,11 @@ const ErrorReporter = (
       },
     },
     transform: function (payload) {
+      // @ts-ignore
       payload.request.url = requestURL(payload.request.url, appVersion)
+      // @ts-ignore
       if (payload.body.trace) {
+        // @ts-ignore
         payload.body.trace.frames = payload.body.trace.frames.map((fr) => {
           fr.filename = requestURL(fr.filename, appVersion)
           return fr
@@ -85,6 +88,7 @@ const ErrorReporter = (
       }
     },
   })
+  // @ts-ignore
   Rollbar.global({
     itemsPerMinute: MAX_ERROR_REPORTS_PER_MINUTE,
   })
@@ -151,8 +155,9 @@ const ErrorReporter = (
         return Promise.resolve()
       } else {
         return new Promise((resolve) => {
+          // @ts-ignore
           Rollbar.error(message, error, extraContext, () => {
-            resolve()
+            resolve(null)
           })
         })
       }

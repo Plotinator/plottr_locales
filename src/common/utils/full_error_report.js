@@ -5,7 +5,6 @@ import { isDevelopment } from '../../isDevelopment'
 import { isWindows } from '../../isOS'
 import makeFileSystemAPIs from '../../api/file-system-apis'
 import { makeMainProcessClient } from '../../app/mainProcessClient'
-import { whenClientIsReady } from '../../../shared/socket-client/index'
 
 const {
   userDocumentsPath,
@@ -18,24 +17,27 @@ const {
   pleaseTellMeWhatPlatformIAmOn,
 } = makeMainProcessClient()
 
-export function createFullErrorReport() {
-  Promise.all([prepareErrorReport(), userDocumentsPath()]).then(([body, userDocumentsPath]) => {
-    return whenClientIsReady(({ writeFile, join }) => {
-      return join(userDocumentsPath, `plottr_error_report_${Date.now()}.txt`).then((filePath) => {
-        return writeFile(filePath, body)
-          .then(() => {
-            notifyUser(filePath)
-          })
-          .catch((error) => {
-            log.warn(error)
-            showErrorBox(t('Error'), t('Error Creating Error Report'))
-          })
-      })
-    })
-  })
+export function createFullErrorReport(localClient) {
+  Promise.all([prepareErrorReport(localClient), userDocumentsPath()]).then(
+    ([body, userDocumentsPath]) => {
+      return localClient
+        .join(userDocumentsPath, `plottr_error_report_${Date.now()}.txt`)
+        .then((filePath) => {
+          return localClient
+            .writeFile(filePath, body)
+            .then(() => {
+              notifyUser(localClient, filePath)
+            })
+            .catch((error) => {
+              log.warn(error)
+              showErrorBox(t('Error'), t('Error Creating Error Report'))
+            })
+        })
+    }
+  )
 }
 
-function prepareErrorReport() {
+function prepareErrorReport(localClient) {
   return logsPath().then((appLogPath) => {
     if (isDevelopment()) {
       appLogPath = appLogPath.replace('Electron', 'plottr')
@@ -46,27 +48,28 @@ function prepareErrorReport() {
       appLogPath = appLogPath.replace('Plottr\\', '')
     }
     log.info('appLogPath', appLogPath)
-    return whenClientIsReady(({ join, readFile }) => {
-      return Promise.all([
-        join(appLogPath, 'main.log'),
-        join(appLogPath, 'renderer.log'),
-        machineId(),
-        pleaseTellMeWhatPlatformIAmOn(),
-      ]).then(([mainLogFile, rendererLogFile, generatedMachineID, platform]) => {
-        return readFile(mainLogFile)
-          .catch(() => null)
-          .then((mainLogContents) => {
-            return readFile(rendererLogFile)
-              .catch(() => null)
-              .then((rendererLogContents) => {
-                const fileSystemAPIs = makeFileSystemAPIs(whenClientIsReady)
-                return Promise.all([
-                  Promise.resolve({ payment_id: 'blarg' }),
-                  fileSystemAPIs.currentTrial(),
-                  fileSystemAPIs.currentAppSettings(),
-                  getVersion(),
-                ]).then(([user, trial, settings, version]) => {
-                  const report = `
+    return Promise.all([
+      localClient.join(appLogPath, 'main.log'),
+      localClient.join(appLogPath, 'renderer.log'),
+      machineId(),
+      pleaseTellMeWhatPlatformIAmOn(),
+    ]).then(([mainLogFile, rendererLogFile, generatedMachineID, platform]) => {
+      return localClient
+        .readFile(mainLogFile)
+        .catch(() => null)
+        .then((mainLogContents) => {
+          return localClient
+            .readFile(rendererLogFile)
+            .catch(() => null)
+            .then((rendererLogContents) => {
+              const fileSystemAPIs = makeFileSystemAPIs(localClient)
+              return Promise.all([
+                Promise.resolve({ payment_id: 'blarg' }),
+                fileSystemAPIs.currentTrial(),
+                fileSystemAPIs.currentAppSettings(),
+                getVersion(),
+              ]).then(([user, trial, settings, version]) => {
+                const report = `
 ----------------------------------
 INFO
 ----------------------------------
@@ -94,25 +97,22 @@ ERROR LOG - RENDERER
 ----------------------------------
 ${rendererLogContents}
   `
-                  return report
-                })
+                return report
               })
-          })
-      })
+            })
+        })
     })
   })
 }
 
-function notifyUser(filePath) {
-  return whenClientIsReady(({ basename }) => {
-    return basename(filePath).then((basenamedFilePath) => {
-      notify(
-        t('Error Report created'),
-        t('Plottr created a file named {filePath} in your Documents folder', {
-          filePath: basenamedFilePath,
-        })
-      )
-      return showItemInFolder(filePath)
-    })
+function notifyUser(localClient, filePath) {
+  return localClient.basename(filePath).then((basenamedFilePath) => {
+    notify(
+      t('Error Report created'),
+      t('Plottr created a file named {filePath} in your Documents folder', {
+        filePath: basenamedFilePath,
+      })
+    )
+    return showItemInFolder(filePath)
   })
 }

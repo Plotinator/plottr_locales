@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { SettingsWizard as OnboardingSettingsWizard } from 'connected-components'
+import { SettingsWizard as OnboardingSettingsWizard } from 'plottr_components'
 
 const SettingsWizard = () => {
   return (

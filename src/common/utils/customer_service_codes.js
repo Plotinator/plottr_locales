@@ -1,12 +1,11 @@
 import { makeFileSystemAPIs } from '../../api'
-import { whenClientIsReady } from '../../../shared/socket-client'
 import { makeMainProcessClient } from '../../app/mainProcessClient'
 
 const { userDataPath, showMessageBox, openPath, showItemInFolder } = makeMainProcessClient()
 
 // generate with `Math.random().toString(16)`
-export function handleCustomerServiceCode(code) {
-  const fileSystemAPIs = makeFileSystemAPIs(whenClientIsReady)
+export function handleCustomerServiceCode(localClient, code) {
+  const fileSystemAPIs = makeFileSystemAPIs(localClient)
   const { saveAppSetting } = fileSystemAPIs
 
   switch (code) {

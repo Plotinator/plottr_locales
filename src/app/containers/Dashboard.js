@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { PropTypes } from 'prop-types'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import cx from 'classnames'
 
 import { t } from 'plottr_locales'
 import { helpers } from 'pltr'
 import { selectors, actions } from 'wired-up-pltr'
-import { DashboardBody, DashboardNav, FullPageSpinner as Spinner } from 'connected-components'
+import { DashboardBody, DashboardNav, FullPageSpinner as Spinner } from 'plottr_components'
 
 import PreventExittingWithoutSaving from './PreventExittingWithoutSaving'
 import OfflineBanner from '../components/OfflineBanner'
@@ -32,7 +32,13 @@ const Dashboard = ({
   useEffect(() => {
     getVersion().then((version) => {
       const dateBooted = helpers.date.versionToDate(version)
-      if (!inTrialMode && latestExpiryDate !== null && latestExpiryDate < dateBooted) {
+      if (dateBooted === null) {
+        showErrorBox(t('Error'), t('There was a problem starting Plottr.  Please contact Support.'))
+        // Never resolve, because we'd rather just quit.
+        setTimeout(() => {
+          window.close()
+        }, 3000)
+      } else if (!inTrialMode && latestExpiryDate !== null && latestExpiryDate < dateBooted) {
         showErrorBox(
           t('Error'),
           t('Your license expired before this version of Plottr was released')
@@ -55,6 +61,7 @@ const Dashboard = ({
     })
 
     return () => {
+      // @ts-ignore
       document.removeEventListener('close-dashboard', closeListener)
       unsubscribeFromReload()
     }
@@ -85,20 +92,19 @@ Dashboard.propTypes = {
   inTrialMode: PropTypes.bool,
 }
 
+const mapStateToProps = (state) => ({
+  darkMode: selectors.isDarkModeSelector(state),
+  busy: selectors.manipulatingAFileSelector(state),
+  isOffline: selectors.isOfflineSelector(state),
+  latestExpiryDate: selectors.latestExpiryDateSelector(state),
+  openTo: selectors.dashboardViewToOpenToSelector(state),
+  cantShowFile: selectors.cantShowFileSelector(state),
+  inTrialMode: selectors.isInTrialModeSelector(state),
+})
+
 export default React.memo(
-  connect(
-    (state) => ({
-      darkMode: selectors.isDarkModeSelector(state),
-      busy: selectors.manipulatingAFileSelector(state),
-      isOffline: selectors.isOfflineSelector(state),
-      latestExpiryDate: selectors.latestExpiryDateSelector(state),
-      openTo: selectors.dashboardViewToOpenToSelector(state),
-      cantShowFile: selectors.cantShowFileSelector(state),
-      inTrialMode: selectors.isInTrialModeSelector(state),
-    }),
-    {
-      closeDashboard: actions.applicationState.dashboardClosed,
-      setCurrentAppStateToApplication: actions.client.setCurrentAppStateToApplication,
-    }
-  )(Dashboard)
+  connect(mapStateToProps, {
+    closeDashboard: actions.applicationState.dashboardClosed,
+    setCurrentAppStateToApplication: actions.client.setCurrentAppStateToApplication,
+  })(Dashboard)
 )

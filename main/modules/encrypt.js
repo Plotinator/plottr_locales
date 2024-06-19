@@ -1,6 +1,9 @@
 import Cryptr from 'cryptr'
 
-const fallbackEncryptionKey = process.env.FALLBACK_ENCRYPTION_KEY
+const fallbackEncryptionKey = process.env.FALLBACK_ENCRYPTION_KEY ?? ''
+if (fallbackEncryptionKey === '') {
+  throw new Error('Invalid fallback encryption key supplied')
+}
 const cryptr = new Cryptr(fallbackEncryptionKey, { encoding: 'base64' })
 
 // Based on the node documentation at: https://nodejs.org/api/crypto.html#class-cipher

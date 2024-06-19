@@ -1,6 +1,6 @@
 import React from 'react'
-import { PropTypes } from 'prop-types'
-import { PlottrModal, FirebaseLogin } from 'connected-components'
+import PropTypes from 'prop-types'
+import { PlottrModal, FirebaseLogin } from 'plottr_components'
 
 const modalStyles = {
   overlay: {

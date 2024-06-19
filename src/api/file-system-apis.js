@@ -1,219 +1,161 @@
 import { cloneDeep } from 'lodash'
 
-const makeFileSystemAPIs = (socketClient) => {
+const makeFileSystemAPIs = (localClient) => {
   function customTemplatesPath() {
-    return socketClient(({ customTemplatesPath }) => {
-      return customTemplatesPath()
-    })
+    return localClient.customTemplatesPath()
   }
 
   function backupBasePath() {
-    return socketClient(({ backupBasePath }) => {
-      return backupBasePath()
-    })
+    return localClient.backupBasePath()
   }
 
   const listenToTrialChanges = (cb) => {
-    return socketClient(({ listenToTrialChanges }) => {
-      return listenToTrialChanges(cb)
-    })
+    return localClient.listenToTrialChanges(cb)
   }
   const currentTrial = () => {
-    return socketClient(({ currentTrial }) => {
-      return currentTrial()
-    })
+    return localClient.currentTrial()
   }
   const startTrial = (numDays = null) => {
-    return socketClient(({ startTrial }) => {
-      return startTrial(numDays)
-    })
+    return localClient.startTrial(numDays)
   }
   const extendTrialWithReset = (days) => {
-    return socketClient(({ extendTrialWithReset }) => {
-      return extendTrialWithReset(days)
-    })
+    return localClient.extendTrialWithReset(days)
   }
 
   const currentLicense = () => {
-    return socketClient(({ currentPlottrLicense, currentProLicense }) => {
-      return Promise.all([currentPlottrLicense(), currentProLicense()]).then(
-        ([plottrLicense, proLicense]) => {
-          return {
-            plottrLicense,
-            proLicense,
-          }
+    return Promise.all([localClient.currentPlottrLicense(), localClient.currentProLicense()]).then(
+      ([plottrLicense, proLicense]) => {
+        return {
+          plottrLicense,
+          proLicense,
         }
-      )
-    })
+      }
+    )
   }
 
   const listenToLicenseChanges = (cb) => {
-    return socketClient(({ listenToPlottrLicenseChanges, listenToProLicenseChanges }) => {
-      let license = {
-        plottrLicense: null,
-        proLicense: null,
-      }
-      currentLicense().then((initialLicense) => {
-        license = cloneDeep(initialLicense)
-        cb(license)
-      })
-      const plottrListener = listenToPlottrLicenseChanges((newPlottrLicense) => {
+    let license = {
+      plottrLicense: null,
+      proLicense: null,
+    }
+    currentLicense().then((initialLicense) => {
+      license = cloneDeep(initialLicense)
+      cb(null, license)
+    })
+    const plottrListener = localClient.listenToPlottrLicenseChanges((error, newPlottrLicense) => {
+      if (error) {
+        cb(error)
+      } else {
         license = {
           ...license,
           plottrLicense: newPlottrLicense,
         }
-        cb(license)
-      })
-      const proListener = listenToProLicenseChanges((newProLicense) => {
+        cb(null, license)
+      }
+    })
+    const proListener = localClient.listenToProLicenseChanges((error, newProLicense) => {
+      if (error) {
+        cb(error)
+      } else {
         license = {
           ...license,
           proLicense: newProLicense,
         }
-        cb(license)
-      })
-      return () => {
-        if (typeof plottrListener === 'function') {
-          plottrListener()
-        }
-        if (typeof proListener === 'function') {
-          proListener()
-        }
+        cb(null, license)
       }
     })
+    return () => {
+      if (typeof plottrListener === 'function') {
+        plottrListener()
+      }
+      if (typeof proListener === 'function') {
+        proListener()
+      }
+    }
   }
 
   const deleteLicense = () => {
-    return socketClient(({ deleteLicense }) => {
-      return deleteLicense()
-    })
+    return localClient.deleteLicense()
   }
   const saveLicenseInfo = (newLicense) => {
-    return socketClient(({ saveLicenseInfo }) => {
-      return saveLicenseInfo(newLicense)
-    })
+    return localClient.saveLicenseInfo(newLicense)
   }
 
   const listenToknownFilesChanges = (cb) => {
-    return socketClient(({ listenToknownFilesChanges }) => {
-      return listenToknownFilesChanges(cb)
-    })
+    return localClient.listenToknownFilesChanges(cb)
   }
   const currentKnownFiles = () => {
-    return socketClient(({ currentKnownFiles }) => {
-      return currentKnownFiles()
-    })
+    return localClient.currentKnownFiles()
   }
 
   const listenToTemplatesChanges = (cb) => {
-    return socketClient(({ listenToTemplatesChanges }) => {
-      return listenToTemplatesChanges(cb)
-    })
+    return localClient.listenToTemplatesChanges(cb)
   }
   const currentTemplates = () => {
-    return socketClient(({ currentTemplates }) => {
-      return currentTemplates()
-    })
+    return localClient.currentTemplates()
   }
 
   const listenToCustomTemplatesChanges = (cb) => {
-    return socketClient(({ listenToCustomTemplatesChanges }) => {
-      return listenToCustomTemplatesChanges(cb)
-    })
+    return localClient.listenToCustomTemplatesChanges(cb)
   }
   const currentCustomTemplates = () => {
-    return socketClient(({ currentCustomTemplates }) => {
-      return currentCustomTemplates()
-    })
+    return localClient.currentCustomTemplates()
   }
 
   const listenToTemplateManifestChanges = (cb) => {
-    return socketClient(({ listenToTemplateManifestChanges }) => {
-      return listenToTemplateManifestChanges(cb)
-    })
+    return localClient.listenToTemplateManifestChanges(cb)
   }
   const currentTemplateManifest = () => {
-    return socketClient(({ currentTemplateManifest }) => {
-      return currentTemplateManifest()
-    })
+    return localClient.currentTemplateManifest()
   }
 
   const listenToExportConfigSettingsChanges = (cb) => {
-    return socketClient(({ listenToExportConfigSettingsChanges }) => {
-      return listenToExportConfigSettingsChanges(cb)
-    })
+    return localClient.listenToExportConfigSettingsChanges(cb)
   }
   const currentExportConfigSettings = () => {
-    return socketClient(({ currentExportConfigSettings }) => {
-      return currentExportConfigSettings()
-    })
+    return localClient.currentExportConfigSettings()
   }
   const saveExportConfigSettings = (key, value) => {
-    return socketClient(({ saveExportConfigSettings }) => {
-      return saveExportConfigSettings(key, value)
-    })
+    return localClient.saveExportConfigSettings(key, value)
   }
 
   const listenToAppSettingsChanges = (cb) => {
-    return socketClient(({ listenToAppSettingsChanges }) => {
-      return listenToAppSettingsChanges(cb)
-    })
+    return localClient.listenToAppSettingsChanges(cb)
   }
   const currentAppSettings = () => {
-    return socketClient(({ currentAppSettings }) => {
-      return currentAppSettings()
-    })
+    return localClient.currentAppSettings()
   }
   const saveAppSetting = (key, value) => {
-    return socketClient(({ saveAppSetting }) => {
-      return saveAppSetting(key, value)
-    })
+    return localClient.saveAppSetting(key, value)
   }
 
   const listenToBackupsChanges = (cb) => {
-    return socketClient(({ listenToBackupsChanges }) => {
-      return listenToBackupsChanges(cb)
-    })
+    return localClient.listenToBackupsChanges(cb)
   }
   const currentBackups = () => {
-    return socketClient(({ currentBackups }) => {
-      return currentBackups()
-    })
+    return localClient.currentBackups()
   }
   const lastOpenedFile = () => {
-    return socketClient(({ lastOpenedFile }) => {
-      return lastOpenedFile()
-    })
+    return localClient.lastOpenedFile()
   }
   const setLastOpenedFilePath = (filePath) => {
-    return socketClient(({ setLastOpenedFilePath }) => {
-      return setLastOpenedFilePath(filePath)
-    })
+    return localClient.setLastOpenedFilePath(filePath)
   }
   const persistUserId = (uid) => {
-    return socketClient(({ saveAppSetting }) => {
-      return saveAppSetting('user.frbId', uid)
-    })
+    return localClient.saveAppSetting('user.frbId', uid)
   }
   const persistLicenseMode = (isInProMode) => {
-    return socketClient(({ saveAppSetting }) => {
-      return saveAppSetting('user.choseProMode', isInProMode)
-    })
+    return localClient.saveAppSetting('user.choseProMode', isInProMode)
   }
   const persistEmailAddress = (email) => {
-    return socketClient(({ saveAppSetting }) => {
-      return saveAppSetting('user.email', email)
-    })
+    return localClient.saveAppSetting('user.email', email)
   }
   const deletePlottrLicense = () => {
-    return socketClient(({ deletePlottrLicense }) => {
-      return deletePlottrLicense()
-    })
+    return localClient.deletePlottrLicense()
   }
 
   const deleteProLicense = () => {
-    return socketClient(({ deleteProLicense }) => {
-      return deleteProLicense()
-    })
+    return localClient.deleteProLicense()
   }
 
   return {

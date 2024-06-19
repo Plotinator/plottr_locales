@@ -1,5 +1,5 @@
 import React from 'react'
-import { ErrorBoundary, PlaceListView } from 'connected-components'
+import { ErrorBoundary, PlaceListView } from 'plottr_components'
 
 export default function PlacesTab() {
   return (

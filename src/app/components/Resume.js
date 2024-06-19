@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react'
-import { PropTypes } from 'prop-types'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Spinner } from 'connected-components'
+import { Spinner } from 'plottr_components'
 
 import { t } from 'plottr_locales'
 import { selectors, actions } from 'wired-up-pltr'
 import { SYSTEM_REDUCER_KEYS } from 'pltr'
-import { MessageModal } from 'connected-components'
+import { MessageModal } from 'plottr_components'
 import { initialFetch, overwriteAllKeys } from 'wired-up-firebase'
 
 import logger from '../../../shared/logger'
@@ -36,6 +36,7 @@ const Resume = ({
   backupOfflineBackupForResume,
   getVersion,
   showErrorBox,
+  localClient,
 }) => {
   useEffect(() => {
     if (!offlineModeEnabled || !previouslyLoggedIntoPro) {
@@ -109,19 +110,22 @@ const Resume = ({
                         )
                         const date = new Date()
                         const withoutSystemKeys = selectors.fullFileStateSelector(offlineFile)
-                        uploadProject({
-                          ...withoutSystemKeys,
-                          file: {
-                            ...withoutSystemKeys.file,
-                            fileName: `${decodeURI(
-                              withoutSystemKeys.file.fileName
-                            )} - Resume Backup - ${
-                              date.getMonth() + 1
-                            }-${date.getDate()}-${date.getFullYear()}`,
+                        uploadProject(
+                          localClient,
+                          {
+                            ...withoutSystemKeys,
+                            file: {
+                              ...withoutSystemKeys.file,
+                              fileName: `${decodeURI(
+                                withoutSystemKeys.file.fileName
+                              )} - Resume Backup - ${
+                                date.getMonth() + 1
+                              }-${date.getDate()}-${date.getFullYear()}`,
+                            },
                           },
                           email,
-                          userId,
-                        }).then(() => {
+                          userId
+                        ).then(() => {
                           setBackingUpOfflineFile(true)
                           setCheckingForOfflineDrift(false)
                           setResuming(false)
@@ -223,28 +227,28 @@ Resume.propTypes = {
   backupOfflineBackupForResume: PropTypes.func.isRequired,
   getVersion: PropTypes.func.isRequired,
   showErrorBox: PropTypes.func.isRequired,
+  localClient: PropTypes.object.isRequired,
 }
 
-export default connect(
-  (state) => ({
-    isResuming: selectors.isResumingSelector(state),
-    overwritingCloudWithBackup: selectors.isOverwritingCloudWithBackupSelector(state),
-    checkingOfflineDrift: selectors.isCheckingForOfflineDriftSelector(state),
-    showResumeMessageDialog: selectors.showResumeMessageDialogSelector(state),
-    backingUpOfflineFile: selectors.backingUpOfflineFileSelector(state),
-    previouslyLoggedIntoPro: selectors.previouslyLoggedIntoProSelector(state),
-    userId: selectors.userIdSelector(state),
-    email: selectors.emailAddressSelector(state),
-    fileId: selectors.fileIdSelector(state),
-    clientId: selectors.clientIdSelector(state),
-    offlineModeEnabled: selectors.offlineModeEnabledSelector(state),
-  }),
-  {
-    withFullFileState: actions.project.withFullFileState,
-    setResuming: actions.project.setResuming,
-    setCheckingForOfflineDrift: actions.project.setCheckingForOfflineDrift,
-    setOverwritingCloudWithBackup: actions.project.setOverwritingCloudWithBackup,
-    setShowResumeMessageDialog: actions.project.setShowResumeMessageDialog,
-    setBackingUpOfflineFile: actions.project.setBackingUpOfflineFile,
-  }
-)(Resume)
+const mapStateToProps = (state) => ({
+  isResuming: selectors.isResumingSelector(state),
+  overwritingCloudWithBackup: selectors.isOverwritingCloudWithBackupSelector(state),
+  checkingOfflineDrift: selectors.isCheckingForOfflineDriftSelector(state),
+  showResumeMessageDialog: selectors.showResumeMessageDialogSelector(state),
+  backingUpOfflineFile: selectors.backingUpOfflineFileSelector(state),
+  previouslyLoggedIntoPro: selectors.previouslyLoggedIntoProSelector(state),
+  userId: selectors.userIdSelector(state),
+  email: selectors.emailAddressSelector(state),
+  fileId: selectors.fileIdSelector(state),
+  clientId: selectors.clientIdSelector(state),
+  offlineModeEnabled: selectors.offlineModeEnabledSelector(state),
+})
+
+export default connect(mapStateToProps, {
+  withFullFileState: actions.project.withFullFileState,
+  setResuming: actions.project.setResuming,
+  setCheckingForOfflineDrift: actions.project.setCheckingForOfflineDrift,
+  setOverwritingCloudWithBackup: actions.project.setOverwritingCloudWithBackup,
+  setShowResumeMessageDialog: actions.project.setShowResumeMessageDialog,
+  setBackingUpOfflineFile: actions.project.setBackingUpOfflineFile,
+})(Resume)

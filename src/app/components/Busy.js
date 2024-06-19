@@ -12,8 +12,10 @@ Busy.propTypes = {
   applicationIsBusyAndCannotBeQuit: PropTypes.bool,
 }
 
-export default connect((state) => {
+const mapStateToProps = (state) => {
   return {
     applicationIsBusyAndCannotBeQuit: selectors.busyWithWorkThatPreventsQuittingSelector(state),
   }
-})(Busy)
+}
+
+export default connect(mapStateToProps)(Busy)

@@ -38,7 +38,7 @@ const { machineId, pleaseTellMeWhatPlatformIAmOn, machineName, localUserName } =
  * We're expected to record the license payload so that we can decrypt
  * the local license and check it's running on the right machine.
  */
-function checkForLicense(whenClientIsReady, persistLicenseMode, logger) {
+function checkForLicense(localClient, persistLicenseMode, logger) {
   return Promise.all([
     machineId(),
     pleaseTellMeWhatPlatformIAmOn(),
@@ -65,45 +65,37 @@ function checkForLicense(whenClientIsReady, persistLicenseMode, logger) {
         } = response.data
         logger.info('Got back the response', response.data)
         const dateChecked = new Date().toISOString()
-        return whenClientIsReady(
-          ({
-            deletePlottrLicense,
-            deleteProLicense,
-            savePlottrLicense,
-            saveProLicense,
-            saveAppSetting,
-          }) => {
-            return (
-              hasPlottr || (plottrExpiresAt && typeof plottrExpiresAt === 'string')
-                ? savePlottrLicense(
-                    plottrLicensePayload?.secret ?? '',
-                    machineInfo,
-                    plottrExpiresAt,
-                    dateChecked
-                  ).then(() => {
-                    if (!hasPro) {
-                      return persistLicenseMode(false)
-                    } else {
-                      return Promise.resolve()
-                    }
-                  })
-                : deletePlottrLicense()
-            ).then(() => {
-              if (hasPro || (proExpiresAt && typeof proExpiresAt === 'string')) {
-                return persistLicenseMode(true).then(() => {
-                  return saveProLicense(
-                    proLicensePayload?.secret ?? '',
-                    machineInfo,
-                    proExpiresAt,
-                    dateChecked
-                  )
+        return (
+          hasPlottr || (plottrExpiresAt && typeof plottrExpiresAt === 'string')
+            ? localClient
+                .savePlottrLicense(
+                  plottrLicensePayload?.secret ?? '',
+                  machineInfo,
+                  plottrExpiresAt,
+                  dateChecked
+                )
+                .then(() => {
+                  if (!hasPro) {
+                    return persistLicenseMode(false)
+                  } else {
+                    return Promise.resolve()
+                  }
                 })
-              } else {
-                return deleteProLicense()
-              }
+            : localClient.deletePlottrLicense()
+        ).then(() => {
+          if (hasPro || (proExpiresAt && typeof proExpiresAt === 'string')) {
+            return persistLicenseMode(true).then(() => {
+              return localClient.saveProLicense(
+                proLicensePayload?.secret ?? '',
+                machineInfo,
+                proExpiresAt,
+                dateChecked
+              )
             })
+          } else {
+            return localClient.deleteProLicense()
           }
-        )
+        })
       })
       .catch((error) => {
         if (error.response) {
@@ -119,9 +111,9 @@ function checkForLicense(whenClientIsReady, persistLicenseMode, logger) {
   })
 }
 
-export const makeLicenseServerAPIs = (whenClientIsReady, logger) => {
+export const makeLicenseServerAPIs = (localClient, logger) => {
   return {
     checkForAndSaveLicense: (persistLicenseMode) =>
-      checkForLicense(whenClientIsReady, persistLicenseMode, logger),
+      checkForLicense(localClient, persistLicenseMode, logger),
   }
 }

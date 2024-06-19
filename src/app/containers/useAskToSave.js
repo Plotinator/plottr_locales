@@ -1,13 +1,13 @@
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useContext } from 'react'
 
 import { t } from 'plottr_locales'
 import { selectors } from 'wired-up-pltr'
 
-import { whenClientIsReady } from '../../../shared/socket-client/index'
 import { store } from '../store'
 import logger from '../../../shared/logger'
 import { inflightFirebaseRequests } from '../store'
 import { makeMainProcessClient } from '../mainProcessClient'
+import MainIntegrationContext from '../../mainIntegrationContext'
 
 const { onReload, showMessageBox, listenToForceReload } = makeMainProcessClient()
 
@@ -33,7 +33,9 @@ export const useAskToSave = (
 
   const removeReloadListeners = () => {
     if (unsubscribeFromUnloadRef.current) {
+      // @ts-ignore
       unsubscribeFromUnloadRef.current()
+      // @ts-ignore
       unsubscribeFromUnloadRef.current = null
     }
   }
@@ -62,8 +64,8 @@ export const useAskToSave = (
       event.returnValue = 'nope'
       setShowAskToSave(true)
     } else if (applicationIsBusyAndCannotBeQuit) {
-      // Socket server is busy
-      logger.info('The socket server is busy and we cannot quit')
+      // local server is busy
+      logger.info('The local server is busy and we cannot quit')
       showMessageBox(t('Plottr is Busy'), t("Plottr is busy and can't quit"))
       if (event.preventDefault && typeof event.preventDefault === 'function') {
         event.preventDefault()
@@ -88,9 +90,11 @@ export const useAskToSave = (
     }
   }, [])
 
+  const { localClient } = useContext(MainIntegrationContext)
+
   useEffect(() => {
     const forceReload = () => {
-      whenClientIsReady(({ saveOfflineFile, saveFile }) => {
+      ;(() => {
         const present = selectors.fullFileStateSelector(store().getState())
         const fileLoaded = selectors.fileURLLoadedSelector(store().getState())
         const isCloudFile = selectors.isCloudFileSelector(store().getState())
@@ -99,10 +103,13 @@ export const useAskToSave = (
           return Promise.resolve()
         } else {
           return isCloudFile && isOffline
-            ? saveOfflineFile(fileURL, present)
-            : saveFile(fileURL, present)
+            ? // TODO: use the components definitions for better types
+              // @ts-ignore
+              localClient.saveOfflineFile(fileURL, present)
+            : // @ts-ignore
+              localClient.saveFile(fileURL, present)
         }
-      })
+      })()
         .then(() => {
           return new Promise((resolve) => {
             setTimeout(resolve, 1000)
@@ -114,11 +121,11 @@ export const useAskToSave = (
         })
     }
     return listenToForceReload(forceReload)
-  }, [])
+  }, [localClient])
 
   useEffect(() => {
     const unsubscribeFromReload = onReload(() => {
-      askToSave({}, true, false)
+      askToSave({}, true)
     })
     window.addEventListener('beforeunload', askToSave)
     const unsubscribeFromUnload = () => {
@@ -129,6 +136,7 @@ export const useAskToSave = (
       unsubscribeFromUnload()
     }
 
+    // @ts-ignore
     unsubscribeFromUnloadRef.current = unsubscribeAll
     return unsubscribeAll
   }, [applicationIsBusyAndCannotBeQuit, fileLoaded, unsavedChanges, isCloudFile])
@@ -142,9 +150,12 @@ export const useAskToSave = (
   const saveAndClose = (saveFile, saveOfflineFile) => () => {
     const present = selectors.fullFileStateSelector(store().getState())
     const fileURL = selectors.fileURLSelector(store().getState())
+    const knownFiles = selectors.knownFilesSelector(store().getState())
     setWaitingForSaveDoneSignal(true)
     return (
-      isCloudFile && isOffline ? saveOfflineFile(fileURL, present) : saveFile(fileURL, present)
+      isCloudFile && isOffline
+        ? saveOfflineFile(present, knownFiles, fileURL)
+        : saveFile(fileURL, present)
     )
       .then(() => {
         return new Promise((resolve) => {

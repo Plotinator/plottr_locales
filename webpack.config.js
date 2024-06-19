@@ -24,14 +24,18 @@ const defineConfig = [
 //   plugins.push(new BundleAnalyzerPlugin())
 // }
 
+// @ts-ignore
 defineConfig.LOGGER = JSON.stringify('false')
 
 if (process.env.NODE_ENV === 'dev' && process.env.LOGGER === 'true') {
   console.log('[Define Plugin] Adding LOGGER to process.env.')
+  // @ts-ignore
   defineConfig.LOGGER = JSON.stringify('true')
 }
 
 if (process.env.NODE_ENV !== 'dev') {
+  // The docs disagree with Typescript here.
+  // @ts-ignore
   defineConfig.push({ 'process.env.NODE_ENV': JSON.stringify('production') })
   plugins.push(
     new webpack.IgnorePlugin({
@@ -47,6 +51,8 @@ if (process.env.NODE_ENV !== 'dev') {
   )
 }
 
+// The docs disagree with Typescript here.
+// @ts-ignore
 plugins.push(new webpack.DefinePlugin(defineConfig))
 
 const mainCircularDependencyChecker = new CircularDependencyPlugin({

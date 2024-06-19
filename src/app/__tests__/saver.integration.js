@@ -710,7 +710,7 @@ describe('Saver', (describe, it) => {
         })
         describe('and a save function that takes 200ms to complete', (describe, it) => {
           describe('and we cancel saving after 1 second', (describe, it) => {
-            it('should still attempt 10 saves in 1 second (the lockfile in the socket server handles concurrent access errors)', () => {
+            it('should still attempt 10 saves in 1 second (the lockfile in the local server handles concurrent access errors)', () => {
               let counter = 0
               const getState = () => {
                 counter++
@@ -1630,7 +1630,7 @@ describe('Saver', (describe, it) => {
         })
         describe('and a backup function that takes 200ms to complete', (describe, it) => {
           describe('and we cancel saving after 1 second', (describe, it) => {
-            it('should still backup 5 times in 1 second (the socket server handles concurrent access errors)', () => {
+            it('should still backup 5 times in 1 second (the local server handles concurrent access errors)', () => {
               let counter = 0
               const getState = () => {
                 counter++

@@ -7,7 +7,9 @@ export const listenToOfflineState = (getStore, selectors, actions) => {
     getStore().dispatch(actions.project.setOffline(true))
   })
   return () => {
+    // @ts-ignore
     window.removeEventListener('online', onlineListener)
+    // @ts-ignore
     window.removeEventListener('offline', offlineListener)
   }
 }

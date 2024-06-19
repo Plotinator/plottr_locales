@@ -6,49 +6,40 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { t } from 'plottr_locales'
 
-import { addToKnownFiles, addToKnown } from './known_files'
-import currentSettings from './settings'
 import { importFromSnowflake, importFromScrivener, importFromWord } from 'plottr_import_export'
 
 import { helpers, emptyFile, tree, SYSTEM_REDUCER_KEYS, specialCaseFixes } from 'pltr'
-import { openProjectWindow } from './windows/projects'
 import { broadcastToAllWindows } from './broadcast'
 import { OFFLINE_FILE_FILES_PATH, isOfflineFile } from './offlineFilePath'
-import { whenClientIsReady } from '../../shared/socket-client'
-import createErrorReporter from '../../shared/error-reporter'
 
 const { writeFile } = fs.promises
 const { addUITimelineOrHierarchiesStateIfMissing } = specialCaseFixes
 
-const makeFileModule = (errorReportingLogger) => {
+export const makeFileModule = (
+  settingsModule,
+  knownFilesModule,
+  projectModule,
+  localClient,
+  errorReportingLogger
+) => {
   const saveFile = (fileURL, jsonData) => {
-    return whenClientIsReady(({ saveFile }) => {
-      return saveFile(fileURL, jsonData)
-    })
+    return localClient.saveFile(fileURL, jsonData)
   }
 
   function removeFromKnownFiles(fileURL) {
-    return whenClientIsReady(({ removeFromKnownFiles }) => {
-      return removeFromKnownFiles(fileURL)
-    })
+    return localClient.removeFromKnownFiles(fileURL)
   }
 
   function deleteKnownFile(fileURL) {
-    return whenClientIsReady(({ deleteKnownFile }) => {
-      return deleteKnownFile(fileURL)
-    })
+    return localClient.deleteKnownFile(fileURL)
   }
 
   function editKnownFilePath(oldPath, newPath) {
-    return whenClientIsReady(({ editKnownFilePath }) => {
-      return editKnownFilePath(oldPath, newPath)
-    })
+    return localClient.editKnownFilePath(oldPath, newPath)
   }
 
   function saveToDefaultLocation(json, name) {
-    return whenClientIsReady(({ saveToDefaultLocation }) => {
-      return saveToDefaultLocation(json, name)
-    })
+    return localClient.saveToDefaultLocation(json, name)
   }
 
   function newFileFromTemplate(template, name) {
@@ -66,7 +57,7 @@ const makeFileModule = (errorReportingLogger) => {
   }
 
   async function createNew(template, name) {
-    return currentSettings().then(async (settings) => {
+    return settingsModule.currentSettings().then(async (settings) => {
       let projectName = name || t('Untitled')
       if (!settings.user.defaultFolder) {
         projectName = path.basename(name, '.pltr')
@@ -82,7 +73,7 @@ const makeFileModule = (errorReportingLogger) => {
 
       try {
         const fileURL = await saveToDefaultLocation(fileJSON, name)
-        await addToKnownFiles(fileURL)
+        await knownFilesModule.addToKnownFiles(fileURL)
         await openFile(fileURL)
       } catch (error) {
         errorReportingLogger.error('Failed to create a new file', name, error)
@@ -95,69 +86,68 @@ const makeFileModule = (errorReportingLogger) => {
     const storyName = path.basename(importedPath, '.snowXML')
     let json = emptyFile(storyName, app.getVersion())
     // clear beats and lines
+    // @ts-ignore
     json.beats = {
       series: tree.newTree('id'),
     }
     json.lines = []
-    return whenClientIsReady(({ readFile }) => {
-      return Promise.all([
-        currentSettings(),
-        importFromSnowflake(importedPath, true, json, readFile),
-      ]).then(([settings, importedJson]) => {
-        if (isLoggedIntoPro) {
-          replyToWindow('create-plottr-cloud-file', importedJson, storyName)
-          return Promise.resolve()
-        }
+    return Promise.all([
+      settingsModule.currentSettings(),
+      importFromSnowflake(importedPath, true, json, localClient.readFile),
+    ]).then(([settings, importedJson]) => {
+      if (isLoggedIntoPro) {
+        replyToWindow('create-plottr-cloud-file', importedJson, storyName)
+        return Promise.resolve()
+      }
 
-        if (!settings.user.defaultFolder) {
-          const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
-          const title = t('Where would you like to save the imported file?')
-          const destinationPath = dialog.showSaveDialog({
-            filters,
-            title,
-            defaultPath: app.getPath('documents'),
-          })
-          return destinationPath.then(({ filePath, canceled }) => {
-            if (canceled) {
-              return Promise.resolve()
-            } else {
-              const finalPath = helpers.file.ensureEndsInPltr(filePath)
-              return writeFile(finalPath, JSON.stringify(importedJson, null, 2)).then(() => {
-                // Right now, this is only used for testing so we want to quit when we're done.
-                log.info(`Finished importing from ${importedPath} to ${finalPath}`)
-                const fileURL = helpers.file.filePathToFileURL(finalPath)
-                return addToKnownFiles(fileURL).then(() => {
-                  return openFile(fileURL)
-                    .then(() => {
-                      log.info('Opened file from imported snowflake data', storyName)
-                      replyToWindow('finish-creating-local-scrivener-imported-file')
-                      return true
-                    })
-                    .catch((error) => {
-                      replyToWindow('error-importing-scrivener', error)
-                      errorReportingLogger.error(
-                        'Failed to open a known file after importing from Snowflake',
-                        error
-                      )
-                      return Promise.reject(error)
-                    })
-                })
-              })
-            }
-          })
-        } else {
-          return saveToDefaultLocation(importedJson, storyName)
-            .then((fileURL) => {
-              return addToKnownFiles(fileURL).then(() => {
+      if (!settings.user.defaultFolder) {
+        const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
+        const title = t('Where would you like to save the imported file?')
+        const destinationPath = dialog.showSaveDialog({
+          filters,
+          title,
+          defaultPath: app.getPath('documents'),
+        })
+        return destinationPath.then(({ filePath, canceled }) => {
+          if (canceled) {
+            return Promise.resolve()
+          } else {
+            const finalPath = helpers.file.ensureEndsInPltr(filePath)
+            return writeFile(finalPath, JSON.stringify(importedJson, null, 2)).then(() => {
+              // Right now, this is only used for testing so we want to quit when we're done.
+              log.info(`Finished importing from ${importedPath} to ${finalPath}`)
+              const fileURL = helpers.file.filePathToFileURL(finalPath)
+              return knownFilesModule.addToKnownFiles(fileURL).then(() => {
                 return openFile(fileURL)
+                  .then(() => {
+                    log.info('Opened file from imported snowflake data', storyName)
+                    replyToWindow('finish-creating-local-scrivener-imported-file')
+                    return true
+                  })
+                  .catch((error) => {
+                    replyToWindow('error-importing-scrivener', error)
+                    errorReportingLogger.error(
+                      'Failed to open a known file after importing from Snowflake',
+                      error
+                    )
+                    return Promise.reject(error)
+                  })
               })
             })
-            .catch((error) => {
-              errorReportingLogger.error('Failed to create file from snowflake', error)
-              return Promise.reject(error)
+          }
+        })
+      } else {
+        return saveToDefaultLocation(importedJson, storyName)
+          .then((fileURL) => {
+            return knownFilesModule.addToKnownFiles(fileURL).then(() => {
+              return openFile(fileURL)
             })
-        }
-      })
+          })
+          .catch((error) => {
+            errorReportingLogger.error('Failed to create file from snowflake', error)
+            return Promise.reject(error)
+          })
+      }
     })
   }
 
@@ -178,25 +168,22 @@ const makeFileModule = (errorReportingLogger) => {
     const storyName = path.basename(importedPath, '.scriv')
     let json = emptyFile(storyName, app.getVersion())
     const isScrivener = true
+    // @ts-ignore
     json.beats = {
       series: tree.newTree('id'),
     }
     json.lines = []
-    const importedJsonPromise = whenClientIsReady(
-      ({ readFile, readdir, stat, extname, basename, join }) => {
-        return importFromScrivener(
-          importedPath,
-          true,
-          json,
-          createRTFConversionFunction(replyToWindow),
-          readFile,
-          readdir,
-          stat,
-          extname,
-          basename,
-          join
-        )
-      }
+    const importedJsonPromise = importFromScrivener(
+      importedPath,
+      true,
+      json,
+      createRTFConversionFunction(replyToWindow),
+      localClient.readFile,
+      localClient.readdir,
+      localClient.stat,
+      localClient.extname,
+      localClient.basename,
+      localClient.join
     )
 
     if (isLoggedIntoPro) {
@@ -210,7 +197,7 @@ const makeFileModule = (errorReportingLogger) => {
       return Promise.resolve()
     }
 
-    return Promise.all([currentSettings(), importedJsonPromise]).then(
+    return Promise.all([settingsModule.currentSettings(), importedJsonPromise]).then(
       ([settings, importedJson]) => {
         if (!settings.user.defaultFolder) {
           const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
@@ -234,7 +221,7 @@ const makeFileModule = (errorReportingLogger) => {
                   return Promise.resolve()
                 } else {
                   const fileURL = helpers.file.filePathToFileURL(finalPath)
-                  return addToKnownFiles(fileURL).then(() => {
+                  return knownFilesModule.addToKnownFiles(fileURL).then(() => {
                     return openFile(fileURL)
                       .then(() => {
                         log.info('Opened file from imported scrivener data', storyName)
@@ -257,7 +244,7 @@ const makeFileModule = (errorReportingLogger) => {
         } else {
           return saveToDefaultLocation(importedJson, storyName)
             .then((fileURL) => {
-              return addToKnownFiles(fileURL).then(() => {
+              return knownFilesModule.addToKnownFiles(fileURL).then(() => {
                 return openFile(fileURL)
                   .then(() => {
                     log.info('Opened file from imported scrivener data', storyName)
@@ -288,13 +275,17 @@ const makeFileModule = (errorReportingLogger) => {
     const isScrivener = false
     const isWord = true
     let json = emptyFile(storyName, app.getVersion())
+    // @ts-ignore
     json.beats = {
       series: tree.newTree('id'),
     }
     json.lines = []
-    const importedJsonPromise = whenClientIsReady(({ convertDocxToHtml }) => {
-      return importFromWord(importedPath, convertDocxToHtml, storyName, app.getVersion())
-    })
+    const importedJsonPromise = importFromWord(
+      importedPath,
+      localClient.convertDocxToHtml,
+      storyName,
+      app.getVersion()
+    )
 
     if (isLoggedIntoPro) {
       importedJsonPromise
@@ -307,7 +298,7 @@ const makeFileModule = (errorReportingLogger) => {
       return Promise.resolve()
     }
 
-    return Promise.all([currentSettings(), importedJsonPromise]).then(
+    return Promise.all([settingsModule.currentSettings(), importedJsonPromise]).then(
       ([settings, importedJson]) => {
         if (!settings.user.defaultFolder) {
           const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
@@ -331,7 +322,7 @@ const makeFileModule = (errorReportingLogger) => {
                   return Promise.resolve()
                 } else {
                   const fileURL = helpers.file.filePathToFileURL(finalPath)
-                  return addToKnownFiles(fileURL).then(() => {
+                  return knownFilesModule.addToKnownFiles(fileURL).then(() => {
                     return openFile(fileURL)
                       .then(() => {
                         log.info('Opened file from imported word data', storyName)
@@ -351,7 +342,7 @@ const makeFileModule = (errorReportingLogger) => {
         } else {
           return saveToDefaultLocation(importedJson, storyName)
             .then((fileURL) => {
-              return addToKnownFiles(fileURL).then(() => {
+              return knownFilesModule.addToKnownFiles(fileURL).then(() => {
                 return openFile(fileURL)
                   .then(() => {
                     log.info('Opened file from imported word data', storyName)
@@ -380,26 +371,29 @@ const makeFileModule = (errorReportingLogger) => {
       setTimeout(() => {
         if (isOfflineFile(fileURL)) {
           log.info('Opening offline file', fileURL)
-          return
+          return null
+        } else {
+          return localClient
+            .updateLastOpenedDate(fileURL)
+            .then(() => {
+              broadcastToAllWindows('reload-recents')
+            })
+            .catch((error) => {
+              errorReportingLogger.error(
+                `Failed to update a known files last opened date: ${fileURL}`,
+                error
+              )
+            })
         }
-        whenClientIsReady(({ updateLastOpenedDate }) => {
-          return updateLastOpenedDate(fileURL)
-        })
-          .then(() => {
-            broadcastToAllWindows('reload-recents')
-          })
-          .catch((error) => {
-            errorReportingLogger.error(
-              `Failed to update a known files last opened date: ${fileURL}`,
-              error
-            )
-          })
       }, 500)
     }
-    return openProjectWindow(fileURL)
+    return projectModule
+      .openProjectWindow(fileURL)
       .then(() => {
         log.info('Opened known file for', fileURL)
-        if (unknown) addToKnown(fileURL)
+        if (unknown) {
+          knownFilesModule.addToKnown(fileURL)
+        }
       })
       .catch((error) => {
         errorReportingLogger.error(
@@ -421,49 +415,4 @@ const makeFileModule = (errorReportingLogger) => {
     deleteKnownFile,
     removeFromKnownFiles,
   }
-}
-
-const environment = process.env.NODE_ENV === 'development' ? 'development' : 'production'
-const errorReporterAccessToken = process.env.ROLLBAR_ACCESS_TOKEN
-const errorReporter = createErrorReporter(
-  errorReporterAccessToken,
-  app.getVersion(),
-  environment,
-  log,
-  'MainProcess',
-  process.platform,
-  'not-knowable-from-main',
-  'not-knowable-from-main'
-)
-const errorReportingLogger = {
-  info: log.info,
-  warn: log.warn,
-  error: (...args) => {
-    log.error(...args)
-    errorReporter.error(...args)
-  },
-}
-
-const {
-  saveFile,
-  editKnownFilePath,
-  createNew,
-  createFromSnowflake,
-  createFromScrivener,
-  createFromWord,
-  openFile,
-  deleteKnownFile,
-  removeFromKnownFiles,
-} = makeFileModule(errorReportingLogger)
-
-export {
-  saveFile,
-  editKnownFilePath,
-  createNew,
-  createFromSnowflake,
-  createFromScrivener,
-  createFromWord,
-  openFile,
-  deleteKnownFile,
-  removeFromKnownFiles,
 }

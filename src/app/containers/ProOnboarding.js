@@ -1,9 +1,9 @@
 import React from 'react'
-import { PropTypes } from 'prop-types'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import { selectors, actions } from 'wired-up-pltr'
-import { ProOnboarding as ProOnboardingWizard } from 'connected-components'
+import { ProOnboarding as ProOnboardingWizard } from 'plottr_components'
 
 const ProOnboarding = ({ isOnboarding, finishProOnboarding }) => {
   return (
@@ -18,11 +18,10 @@ ProOnboarding.propTypes = {
   finishProOnboarding: PropTypes.func.isRequired,
 }
 
-export default connect(
-  (state) => ({
-    isOnboarding: selectors.isOnboardingToProFromRootSelector(state),
-  }),
-  {
-    finishProOnboarding: actions.applicationState.finishProOnboarding,
-  }
-)(ProOnboarding)
+const mapStateToProps = (state) => ({
+  isOnboarding: selectors.isOnboardingToProFromRootSelector(state),
+})
+
+export default connect(mapStateToProps, {
+  finishProOnboarding: actions.applicationState.finishProOnboarding,
+})(ProOnboarding)

@@ -1,7 +1,7 @@
 import React from 'react'
-import { PropTypes } from 'prop-types'
+import PropTypes from 'prop-types'
 
-import { FirebaseLogin } from 'connected-components'
+import { FirebaseLogin } from 'plottr_components'
 
 const Login = ({ darkMode }) => {
   return (

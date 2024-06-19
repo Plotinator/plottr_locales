@@ -8,7 +8,7 @@ import { getErrorReporterInstance } from '../../../shared/error-reporter-instanc
 
 const { getVersion } = makeMainProcessClient()
 
-export const uploadProject = (file, email, userId) => {
+export const uploadProject = (localClient, file, email, userId) => {
   return getVersion().then((appVersion) => {
     return new Promise((resolve, reject) => {
       migrateIfNeeded(
@@ -32,7 +32,7 @@ export const uploadProject = (file, email, userId) => {
           }
           extractImages(data, userId)
             .then((patchedData) => {
-              return uploadExisting(email, userId, patchedData)
+              return uploadExisting(localClient, email, userId, patchedData)
             })
             .then((result) => {
               logger.info('successful upload', file.file.fileName)

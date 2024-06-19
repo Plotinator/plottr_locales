@@ -11,6 +11,7 @@ exports.default = async function notarizing(context) {
   const appName = context.packager.appInfo.productFilename
 
   await notarize({
+    // @ts-ignore
     appBundleId: 'com.plottr.app',
     appPath: `${appOutDir}/${appName}.app`,
     appleId: process.env.APPLEID,

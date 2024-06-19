@@ -2,7 +2,6 @@ import { ipcMain } from 'electron'
 import log from 'electron-log'
 import { openBuyWindow } from './buy'
 import { offlineFileURL } from '../offlineFilePath'
-import { featureFlags } from '../feature_flags'
 import replyWithError from '../../lib/replyWithError'
 
 ipcMain.on('open-buy-window', (event, replyChannel) => {
@@ -81,7 +80,7 @@ function editWindowPath(oldFileURL, newFileURL) {
   }
 }
 
-function focusIfOpen(fileURL) {
+function focusIfOpen(fileURL, featureFlagsModule) {
   if (!fileURL) return false
 
   const offlineURL = offlineFileURL(fileURL)
@@ -97,7 +96,7 @@ function focusIfOpen(fileURL) {
     }
     // If it's this window and we're trying to open a new file, then
     // we need to refresh the contents.
-    featureFlags().then((flags) => {
+    featureFlagsModule.featureFlags().then((flags) => {
       if (typeof win?.webContents?.send === 'function') {
         win.browserWindow.webContents.send('reload-from-file', fileURL, flags, numberOfWindows())
       }

@@ -11,13 +11,13 @@ import shadow from '../middlewares/shadow'
 import dataRepairers from './dataRepairers'
 import log from '../../../shared/logger'
 
-export function configureStore(whenClientIsReady, initialState) {
+export function configureStore(localClient, initialState) {
   const reducer = rootReducer(dataRepairers)
   const middlewareWithInflightRequestTracker = firebaseSync(log)
   const middlewares = applyMiddleware(
     thunk,
     middlewareWithInflightRequestTracker.firebaseMiddleware,
-    tracker(whenClientIsReady),
+    tracker(),
     logger,
     reporter,
     shadow

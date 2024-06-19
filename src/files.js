@@ -6,7 +6,6 @@ import { openExistingFile as _openExistingFile } from './common/utils/window_man
 import { store } from './app/store'
 import logger from '../shared/logger'
 import { uploadToFirebase } from './upload-to-firebase'
-import { whenClientIsReady } from '../shared/socket-client'
 import { makeMainProcessClient } from './app/mainProcessClient'
 import { getErrorReporterInstance } from '../shared/error-reporter-instance'
 
@@ -75,44 +74,40 @@ export const newFile = (
   })
 }
 
-export const uploadExisting = (emailAddress, userId, fullState) => {
+export const uploadExisting = (localClient, emailAddress, userId, fullState) => {
   const filePath = fullState.file.fileName
-  return whenClientIsReady(({ basename, extname }) => {
-    return extname(filePath).then((extension) => {
-      return basename(filePath, extension)
+  return localClient
+    .extname(filePath)
+    .then((extension) => {
+      return localClient.basename(filePath, extension)
     })
-  }).then((fileName) => {
-    return uploadToFirebase(emailAddress, userId, fullState, fileName)
-  })
+    .then((fileName) => {
+      return uploadToFirebase(emailAddress, userId, fullState, fileName)
+    })
 }
 
 export const messageRenameFile = (fileId) => {
   const renameEvent = new Event('rename-file', { bubbles: true, cancelable: false })
+  // @ts-ignore
   renameEvent.fileId = fileId
   document.dispatchEvent(renameEvent)
 }
 
-// FIXME: we should get to a point where `whenClientIsReady` is
-// injected everywhere.
-export const saveFile = (fileURL, file) => {
-  return whenClientIsReady(({ saveFile }) => {
-    return saveFile(fileURL, file)
-  })
+export const saveFile = (localClient, fileURL, file) => {
+  return localClient.saveFile(fileURL, file)
 }
 
 export { editKnownFilePath }
 
-export const offlineFileURLFromFile = (fileURL) => {
+export const offlineFileURLFromFile = (localClient, fileURL) => {
   if (!fileURL || typeof fileURL !== 'string') {
     return Promise.resolve(null)
   } else {
-    return whenClientIsReady(({ offlineFileURL }) => {
-      return offlineFileURL(fileURL)
-    })
+    return localClient.offlineFileURL(fileURL)
   }
 }
 
-export const renameFile = (fileURL) => {
+export const renameFile = (localClient, fileURL) => {
   const state = store().getState()
   const isCloudFile = selectors.isCloudFileSelector(state)
   const isOffline = selectors.isOfflineSelector(state)
@@ -136,42 +131,41 @@ export const renameFile = (fileURL) => {
     if (fileId) messageRenameFile(fileId)
     return Promise.resolve()
   }
-  return whenClientIsReady(({ currentAppSettings, basename, join }) => {
-    return basename(helpers.file.withoutProtocol(fileURL))
-      .then((basenameWithExtension) => {
-        return currentAppSettings().then((settings) => {
-          const basePath = settings?.user?.defaultFolder
-            ? Promise.resolve(settings?.user?.defaultFolderLocation)
-            : userDocumentsPath()
-          return basePath.then((path) => {
-            return join(path, basenameWithExtension)
-          })
+  return localClient
+    .basename(helpers.file.withoutProtocol(fileURL))
+    .then((basenameWithExtension) => {
+      return localClient.currentAppSettings().then((settings) => {
+        const basePath = settings?.user?.defaultFolder
+          ? Promise.resolve(settings?.user?.defaultFolderLocation)
+          : userDocumentsPath()
+        return basePath.then((path) => {
+          return localClient.join(path, basenameWithExtension)
         })
       })
-      .then((defaultPath) => {
-        return showSaveDialog(filters, t('Give this file a new name'), defaultPath).then(
-          (fileName) => {
-            if (fileName) {
-              try {
-                const newFilePath = fileName.includes('.pltr') ? fileName : `${fileName}.pltr`
-                const newFileURL = `device://${newFilePath}`
-                return whenClientIsReady(({ readFile, trash }) => {
-                  return readFile(helpers.file.withoutProtocol(fileURL), 'utf-8').then(
-                    (rawFile) => {
-                      const contents = JSON.parse(rawFile)
-                      return saveFile(newFileURL, contents)
-                        .then(() => {
-                          return trash(fileURL, true)
-                        })
-                        .then(() => {
-                          return editKnownFilePath(fileURL, newFileURL)
-                        })
-                        .then(() => {
-                          store().dispatch(actions.applicationState.finishRenamingFile())
-                        })
-                    }
-                  )
-                }).catch((error) => {
+    })
+    .then((defaultPath) => {
+      return showSaveDialog(filters, t('Give this file a new name'), defaultPath).then(
+        (fileName) => {
+          if (fileName) {
+            try {
+              const newFilePath = fileName.includes('.pltr') ? fileName : `${fileName}.pltr`
+              const newFileURL = `device://${newFilePath}`
+              return localClient
+                .readFile(helpers.file.withoutProtocol(fileURL), 'utf-8')
+                .then((rawFile) => {
+                  const contents = JSON.parse(rawFile)
+                  return saveFile(localClient, newFileURL, contents)
+                    .then(() => {
+                      return localClient.trash(fileURL, true)
+                    })
+                    .then(() => {
+                      return editKnownFilePath(fileURL, newFileURL)
+                    })
+                    .then(() => {
+                      store().dispatch(actions.applicationState.finishRenamingFile())
+                    })
+                })
+                .catch((error) => {
                   logger.error('Error renaming file', error)
                   getErrorReporterInstance().then((errorReporter) => {
                     errorReporter.error('Error renaming file', error)
@@ -186,39 +180,36 @@ export const renameFile = (fileURL) => {
                     return showErrorBox(t('Error'), t('There was an error doing that. Try again'))
                   }
                 })
-              } catch (error) {
-                logger.error('Error renaming file', error)
-                getErrorReporterInstance().then((errorReporter) => {
-                  errorReporter.error('Error renaming file', error)
-                })
-                store().dispatch(actions.applicationState.finishRenamingFile())
-                return showErrorBox(t('Error'), t('There was an error doing that. Try again'))
-              }
+            } catch (error) {
+              logger.error('Error renaming file', error)
+              getErrorReporterInstance().then((errorReporter) => {
+                errorReporter.error('Error renaming file', error)
+              })
+              store().dispatch(actions.applicationState.finishRenamingFile())
+              return showErrorBox(t('Error'), t('There was an error doing that. Try again'))
             }
-            return Promise.resolve()
           }
-        )
-      })
-  })
+          return Promise.resolve()
+        }
+      )
+    })
 }
 
-export const deleteCloudBackupFile = (fileURL) => {
-  return whenClientIsReady(({ offlineFileBasePath, rmRf }) => {
-    return offlineFileBasePath().then((offlineFileFilesPath) => {
-      if (
-        !helpers.file.isDeviceFileURL(fileURL) ||
-        !helpers.file.withoutProtocol(fileURL).startsWith(offlineFileFilesPath)
-      ) {
-        return Promise.reject(
-          new Error(`Attempted to delete an offline file for non-offline file: ${fileURL}`)
-        )
-      }
+export const deleteCloudBackupFile = (localClient, fileURL) => {
+  return localClient.offlineFileBasePath().then((offlineFileFilesPath) => {
+    if (
+      !helpers.file.isDeviceFileURL(fileURL) ||
+      !helpers.file.withoutProtocol(fileURL).startsWith(offlineFileFilesPath)
+    ) {
+      return Promise.reject(
+        new Error(`Attempted to delete an offline file for non-offline file: ${fileURL}`)
+      )
+    }
 
-      const filePath = helpers.file.withoutProtocol(fileURL)
-      return rmRf(filePath).catch((error) => {
-        // Ignore errors deleting the backup file.
-        return true
-      })
+    const filePath = helpers.file.withoutProtocol(fileURL)
+    return localClient.rmRf(filePath).catch((error) => {
+      // Ignore errors deleting the backup file.
+      return true
     })
   })
 }
@@ -240,46 +231,43 @@ export const migrateSaveAndOpen = (json, oldUrl, newFileURL) => {
   })
 }
 
-export const createAndOpenCopy = (oldFilePathSegments, newFileName) => {
-  return whenClientIsReady(({ join, findUniqueNameInPath, currentAppSettings, readFile }) => {
-    return currentAppSettings().then((settings) => {
-      return join(...oldFilePathSegments).then((oldFilePath) => {
-        return readFile(oldFilePath).then((fileText) => {
-          const fileJSON = JSON.parse(fileText)
-          if (settings.user.defaultFolder && settings.user.defaultFolderLocation) {
-            return join(
-              settings.user.defaultFolderLocation,
-              helpers.file.ensureEndsInPltr(newFileName)
-            ).then((newFullPath) => {
-              return findUniqueNameInPath(newFullPath).then((uniquePath) => {
+export const createAndOpenCopy = (localClient, oldFilePathSegments, newFileName) => {
+  return localClient.currentAppSettings().then((settings) => {
+    return localClient.join(...oldFilePathSegments).then((oldFilePath) => {
+      return localClient.readFile(oldFilePath).then((fileText) => {
+        const fileJSON = JSON.parse(fileText)
+        if (settings.user.defaultFolder && settings.user.defaultFolderLocation) {
+          return localClient
+            .join(settings.user.defaultFolderLocation, helpers.file.ensureEndsInPltr(newFileName))
+            .then((newFullPath) => {
+              return localClient.findUniqueNameInPath(newFullPath).then((uniquePath) => {
                 const newFileURL = helpers.file.filePathToFileURL(uniquePath)
                 return migrateSaveAndOpen(fileJSON, oldFilePath, newFileURL)
               })
             })
-          } else {
-            return userDocumentsPath().then((docPath) => {
-              return join(docPath, helpers.file.ensureEndsInPltr(newFileName)).then(
-                (newFullPath) => {
-                  const title = t('Where would you like to save this copy?')
-                  const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
-                  return showSaveDialog(filters, title, newFullPath).then((fileName) => {
-                    if (fileName) {
-                      const newFilePath = helpers.file.ensureEndsInPltr(fileName)
-                      const newFileURL = helpers.file.filePathToFileURL(newFilePath)
-                      return migrateSaveAndOpen(fileJSON, oldFilePath, newFileURL)
-                    } else {
-                      return Promise.reject(
-                        new Error(
-                          `Failed to create new file name for creating and opening a copy: ${newFileName}`
-                        )
+        } else {
+          return userDocumentsPath().then((docPath) => {
+            return localClient
+              .join(docPath, helpers.file.ensureEndsInPltr(newFileName))
+              .then((newFullPath) => {
+                const title = t('Where would you like to save this copy?')
+                const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
+                return showSaveDialog(filters, title, newFullPath).then((fileName) => {
+                  if (fileName) {
+                    const newFilePath = helpers.file.ensureEndsInPltr(fileName)
+                    const newFileURL = helpers.file.filePathToFileURL(newFilePath)
+                    return migrateSaveAndOpen(fileJSON, oldFilePath, newFileURL)
+                  } else {
+                    return Promise.reject(
+                      new Error(
+                        `Failed to create new file name for creating and opening a copy: ${newFileName}`
                       )
-                    }
-                  })
-                }
-              )
-            })
-          }
-        })
+                    )
+                  }
+                })
+              })
+          })
+        }
       })
     })
   })
@@ -294,7 +282,7 @@ export const userFilePickerDefaultFolder = () => {
   }
 }
 
-export const openExistingFile = () => {
+export const openExistingFile = (localClient) => {
   const state = store().getState()
   const isInOfflineMode = selectors.isInOfflineModeSelector(state)
   if (!isInOfflineMode) {
@@ -307,7 +295,7 @@ export const openExistingFile = () => {
 
     store().dispatch(actions.project.showLoader(true))
     userFilePickerDefaultFolder().then((defaultPath) => {
-      _openExistingFile(isInProMode, userId, emailAddress, defaultPath)
+      _openExistingFile(localClient, isInProMode, userId, emailAddress, defaultPath)
         .then(() => {
           logger.info('Opened existing file')
           store().dispatch(actions.project.showLoader(false))
@@ -336,10 +324,15 @@ export const duplicateFile = (fileUrl, suggestedNewName, forceCloseWhenDone) => 
   const isLoggedIntoPro = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
 
   const event = isLoggedIntoPro
-    ? new Event('save-as--pro', { fileUrl, suggestedNewName })
-    : new Event('save-as', { fileUrl })
+    ? // @ts-ignore
+      new Event('save-as--pro', { fileUrl, suggestedNewName })
+    : // @ts-ignore
+      new Event('save-as', { fileUrl })
+  // @ts-ignore
   event.fileUrl = fileUrl
+  // @ts-ignore
   event.suggestedNewName = suggestedNewName
+  // @ts-ignore
   event.forceCloseWhenDone = forceCloseWhenDone
   document.dispatchEvent(event)
 }

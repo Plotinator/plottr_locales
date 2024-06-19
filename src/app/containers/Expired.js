@@ -1,10 +1,10 @@
 import React from 'react'
-import { PropTypes } from 'prop-types'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import cx from 'classnames'
 
 import { selectors } from 'wired-up-pltr'
-import { ExpiredView } from 'connected-components'
+import { ExpiredView } from 'plottr_components'
 
 const Expired = ({ darkMode }) => {
   return (
@@ -22,4 +22,6 @@ Expired.propTypes = {
   darkMode: PropTypes.bool,
 }
 
-export default connect((state) => ({ darkMode: selectors.isDarkModeSelector(state) }))(Expired)
+const mapStateToProps = (state) => ({ darkMode: selectors.isDarkModeSelector(state) })
+
+export default connect(mapStateToProps)(Expired)

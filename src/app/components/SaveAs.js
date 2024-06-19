@@ -1,12 +1,12 @@
 import React from 'react'
 import { useState, useEffect, useRef } from 'react'
-import { PropTypes } from 'prop-types'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import { helpers } from 'pltr'
 import { selectors, actions } from 'wired-up-pltr'
 import { t } from 'plottr_locales'
-import { InputModal } from 'connected-components'
+import { InputModal } from 'plottr_components'
 import { initialFetch } from 'wired-up-firebase'
 
 import { uploadToFirebase } from '../../upload-to-firebase'
@@ -25,7 +25,6 @@ const SaveAs = ({
   emailAddress,
   clientId,
   userId,
-  fileList,
   isOfflineMode,
   startSavingFileAs,
   finishSavingFileAs,
@@ -108,18 +107,25 @@ const SaveAs = ({
     })
     // this event comes from the dashboard
     const saveAsPro = document.addEventListener('save-as--pro', (event) => {
-      const fileId = helpers.file.withoutProtocol(event.fileUrl)
+      const fileId = helpers.file.withoutProtocol(
+        // @ts-ignore
+        event.fileUrl
+      )
       if (isOfflineMode) {
         return
       } else {
         setVisible(true)
         setFileId(fileId)
-        setSuggestedName(event.suggestedNewName ?? '')
+        setSuggestedName(
+          // @ts-ignore
+          event.suggestedNewName ?? ''
+        )
         saveFileAs.current = true
       }
     })
     return () => {
       unsubscribe()
+      // @ts-ignore
       document.removeEventListener('save-as--pro', saveAsPro)
     }
   }, [isOfflineMode])
@@ -149,23 +155,20 @@ SaveAs.propTypes = {
   emailAddress: PropTypes.string,
   userId: PropTypes.string,
   clientId: PropTypes.string,
-  fileList: PropTypes.array.isRequired,
   isOfflineMode: PropTypes.bool,
   startSavingFileAs: PropTypes.func.isRequired,
   finishSavingFileAs: PropTypes.func.isRequired,
 }
 
-export default connect(
-  (state) => ({
-    isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
-    emailAddress: selectors.emailAddressSelector(state),
-    userId: selectors.userIdSelector(state),
-    clientId: selectors.clientIdSelector(state),
-    fileList: selectors.knownFilesSelector(state),
-    isOfflineMode: selectors.offlineModeEnabledSelector(state),
-  }),
-  {
-    startSavingFileAs: actions.applicationState.startSavingFileAs,
-    finishSavingFileAs: actions.applicationState.finishSavingFileAs,
-  }
-)(SaveAs)
+const mapStateToProps = (state) => ({
+  isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
+  emailAddress: selectors.emailAddressSelector(state),
+  userId: selectors.userIdSelector(state),
+  clientId: selectors.clientIdSelector(state),
+  isOfflineMode: selectors.offlineModeEnabledSelector(state),
+})
+
+export default connect(mapStateToProps, {
+  startSavingFileAs: actions.applicationState.startSavingFileAs,
+  finishSavingFileAs: actions.applicationState.finishSavingFileAs,
+})(SaveAs)

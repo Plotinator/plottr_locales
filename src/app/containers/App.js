@@ -7,8 +7,8 @@ import { selectors, actions } from 'wired-up-pltr'
 
 import PreventExittingWithoutSaving from './PreventExittingWithoutSaving'
 import log from '../../../shared/logger'
-import Navigation from 'containers/Navigation'
-import Body from 'containers/Body'
+import Navigation from './Navigation'
+import Body from './Body'
 import Spinner from '../components/Spinner'
 import {
   TemplateCreate,
@@ -19,7 +19,7 @@ import {
   SearchModal,
   ImagePicker,
   UndoRedo,
-} from 'connected-components'
+} from 'plottr_components'
 import { makeMainProcessClient } from '../mainProcessClient'
 
 const { onAdvancedExportFileFromMenu, pleaseReloadMenu, onOpenImagePickerFromMenu } =

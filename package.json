@@ -41,6 +41,7 @@
     "test:watch": "jest \"(src.*)|(lib.*)|(main.*)\" --watch",
     "test:debug": "node --inspect node_modules/.bin/jest --runInBand lib/plottr_components/src/components/rce/__tests__/Normalizer.test.js",
     "lint": "eslint .",
+    "typecheck": "tsc",
     "format:check": "prettier . --check",
     "format:write": "prettier . --write",
     "validate": "npm-run-all format:check lint test",
@@ -54,8 +55,7 @@
   },
   "dependencies": {
     "cryptr": "^6.3.0",
-    "utf-8-validate": "^5.0.9",
-    "ws": "^8.5.0"
+    "utf-8-validate": "^5.0.9"
   },
   "devDependencies": {
     "@babel/cli": "^7.24.1",
@@ -68,6 +68,7 @@
     "@babel/runtime": "^7.21.0",
     "@electron/notarize": "^2.1.0",
     "@react-icons/all-files": "https://github.com/react-icons/react-icons/releases/download/v5.2.0/react-icons-all-files-5.2.0.tgz",
+    "@types/jest": "^29.5.12",
     "@welldone-software/why-did-you-render": "^6.2.3",
     "animated-scroll-to": "^2.3.0",
     "assert": "^2.0.0",
@@ -111,6 +112,7 @@
     "eslint-config-prettier": "^7.1.0",
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-react": "^7.22.0",
+    "express": "^4.19.2",
     "fast-check": "^3.7.0",
     "file-loader": "^6.2.0",
     "firebase": "^10.11.1",
@@ -192,6 +194,7 @@
     "tiny-invariant": "^1.3.1",
     "tinycolor2": "^1.6.0",
     "tls": "^0.0.1",
+    "typescript": "^5.5.2",
     "uncontrollable": "^7.2.1",
     "url": "^0.11.0",
     "url-loader": "^4.1.1",

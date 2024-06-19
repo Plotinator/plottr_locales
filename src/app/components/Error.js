@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { PropTypes } from 'prop-types'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import { t } from 'plottr_locales'
@@ -22,11 +22,10 @@ Error.propTypes = {
   showErrorBox: PropTypes.func.isRequired,
 }
 
-export default connect(
-  (state) => ({
-    errorMessage: selectors.errorMessageSelector(state),
-  }),
-  {
-    clearError: actions.error.clearError,
-  }
-)(Error)
+const mapStateToProps = (state) => ({
+  errorMessage: selectors.errorMessageSelector(state),
+})
+
+export default connect(mapStateToProps, {
+  clearError: actions.error.clearError,
+})(Error)

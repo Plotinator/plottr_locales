@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
-import { PropTypes } from 'prop-types'
+import PropTypes from 'prop-types'
 import cx from 'classnames'
 import { VscChromeClose } from '@react-icons/all-files/vsc/VscChromeClose'
 
 import { selectors } from 'wired-up-pltr'
-import { PlottrModal, ErrorBoundary, DashboardBody, DashboardNav } from 'connected-components'
+import { PlottrModal, ErrorBoundary, DashboardBody, DashboardNav } from 'plottr_components'
 
 const modalStyles = {
   overlay: {
@@ -32,6 +32,7 @@ const DashboardModal = ({ activeView, darkMode, closeDashboard, setActiveView })
   const [body, setBody] = useState(null)
   useEffect(() => {
     setBody(
+      // @ts-ignore
       <ErrorBoundary>
         <div id="dashboard__react__root">
           <div className={cx('dashboard__main', { darkmode: darkMode })}>
@@ -61,6 +62,8 @@ DashboardModal.propTypes = {
   darkMode: PropTypes.bool,
 }
 
-export default connect((state) => ({
+const mapStateToProps = (state) => ({
   darkMode: selectors.isDarkModeSelector(state),
-}))(DashboardModal)
+})
+
+export default connect(mapStateToProps)(DashboardModal)

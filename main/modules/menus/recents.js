@@ -4,11 +4,10 @@ import log from 'electron-log'
 import { helpers } from 'pltr'
 
 import { sortBy } from 'lodash'
-import { getKnownFilesInfo } from '../known_files'
-import { openProjectWindow } from '../windows/projects'
 
-export function buildRecents() {
-  return getKnownFilesInfo()
+export function buildRecents(projectModule, knownFilesModule) {
+  return knownFilesModule
+    .getKnownFilesInfo()
     .then((knownFiles) => {
       const sortedFiles = sortBy(
         Object.values(knownFiles).filter((f) => !!f.fileURL),
@@ -24,7 +23,8 @@ export function buildRecents() {
           toolTip: filePath,
           click: () => {
             log.info('Opening recent file from menu', f.fileURL)
-            openProjectWindow(f.fileURL)
+            projectModule
+              .openProjectWindow(f.fileURL)
               .then(() => {
                 log.info('Opened recent file from menu', f.fileURL)
               })

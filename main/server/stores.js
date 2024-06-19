@@ -63,6 +63,10 @@ export const migrateTempFilesStoreObject = (tempFiles) => {
   }, {})
 }
 
+/**
+ * @param {any} s
+ * @returns {Promise<string>}
+ */
 const noEncryptionService = (s) => Promise.reject(new Error('No encryption service available'))
 
 const makeStores = (
@@ -208,7 +212,7 @@ const makeStores = (
               'Migrating the temp files store because we found a key that is not a file URL.'
             )
             return tempFilesStore.currentStore().then((currentStore) => {
-              return tempFilesStore.set(migrateTempFilesStore(currentStore))
+              return tempFilesStore.set(migrateTempFilesStoreObject(currentStore))
             })
           }
           return true

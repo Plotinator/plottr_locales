@@ -85,7 +85,6 @@ module.exports = {
     '^.+\\.(css|less)$': '<rootDir>/test/cssStub.js',
     '^app(.*)$': '<rootDir>/src/app/$1',
     '^dashboard(.*)$': '<rootDir>/src/dashboard/$1',
-    '^store(.*)$': '<rootDir>/src/app/store/$1',
     '^test(.*)$': '<rootDir>/test/$1',
     '^connected-components$': '<rootDir>/src/connected-components.js',
     '^wired-up-firebase$': '<rootDir>/src/wired-up-firebase.js',

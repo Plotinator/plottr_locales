@@ -1,5 +1,5 @@
 import React from 'react'
-import { ErrorBoundary, OutlineView } from 'connected-components'
+import { ErrorBoundary, OutlineView } from 'plottr_components'
 
 export default function OutlineTab() {
   return (

@@ -15,6 +15,6 @@ export const currentSettings = () => {
   const suffix = isDevelopment ? '_dev' : isAlphaOrBeta ? '_test' : ''
   const configStorePath = `config${suffix}.json`
   return readFile(path.join(app.getPath('userData'), configStorePath)).then((result) => {
-    return JSON.parse(result)
+    return JSON.parse(result.toString('utf8'))
   })
 }

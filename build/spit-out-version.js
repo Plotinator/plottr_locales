@@ -8,6 +8,6 @@ const fs = require('fs')
 fs.writeFileSync(
   './build/version.js',
   `module.exports = {
-  appVersion: '${JSON.parse(fs.readFileSync('./package.json')).version}'
+  appVersion: '${JSON.parse(fs.readFileSync('./package.json').toString('utf8')).version}'
 }`
 )

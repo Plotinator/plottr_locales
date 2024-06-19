@@ -2,7 +2,6 @@ import electron from 'electron'
 import log from 'electron-log'
 import { is } from 'electron-util'
 import { t, localeNames, setupI18n } from 'plottr_locales'
-import currentSettings, { saveAppSetting } from '../settings'
 
 import { reloadAllWindows } from '../windows'
 
@@ -16,10 +15,11 @@ const reloadMenuForLanguageChangeFailureHandler = (error) => {
   return Promise.reject(error)
 }
 
-const setLocale = (locale) => {
-  return saveAppSetting('locale', locale)
+const setLocale = (settingsModule, locale) => {
+  return settingsModule
+    .saveAppSetting('locale', locale)
     .then(() => {
-      return currentSettings().then((settings) => {
+      return settingsModule.currentSettings().then((settings) => {
         setupI18n(settings, { locale: electron.app.getLocale() })
       })
     })
@@ -29,18 +29,35 @@ const setLocale = (locale) => {
     })
 }
 
-function buildPlottrMenu(loadMenu, safelyExit) {
-  return currentSettings()
+function buildPlottrMenu(
+  loadMenu,
+  safelyExit,
+  projectModule,
+  featureFlagsModule,
+  settingsModule,
+  knownFilesModule,
+  client
+) {
+  return settingsModule
+    .currentSettings()
     .then((settings) => {
       const isPro = settings.user?.isInProMode
       const notEnglish = { ...localeNames }
+      // @ts-ignore
       delete notEnglish.en
       const englishFirst = [
         {
           label: 'English',
           click: () => {
-            setLocale('en').then(() => {
-              return loadMenu(safelyExit)
+            setLocale(settingsModule, 'en').then(() => {
+              return loadMenu(
+                safelyExit,
+                projectModule,
+                featureFlagsModule,
+                settingsModule,
+                knownFilesModule,
+                client
+              )
                 .then(reloadMenuForLanguageChangeSuccessHandler)
                 .catch(reloadMenuForLanguageChangeFailureHandler)
             })
@@ -52,8 +69,15 @@ function buildPlottrMenu(loadMenu, safelyExit) {
         ...Object.entries(notEnglish).map(([locale, name]) => ({
           label: name,
           click: () => {
-            setLocale(locale).then(() => {
-              return loadMenu(safelyExit)
+            setLocale(settingsModule, locale).then(() => {
+              return loadMenu(
+                safelyExit,
+                projectModule,
+                featureFlagsModule,
+                settingsModule,
+                knownFilesModule,
+                client
+              )
                 .then(reloadMenuForLanguageChangeSuccessHandler)
                 .catch(reloadMenuForLanguageChangeFailureHandler)
             })
@@ -70,6 +94,7 @@ function buildPlottrMenu(loadMenu, safelyExit) {
 
       if (is.macos) {
         submenu.push(
+          // @ts-ignore
           {
             label: t('Hide Plottr'),
             accelerator: 'Command+H',
@@ -96,6 +121,7 @@ function buildPlottrMenu(loadMenu, safelyExit) {
           }
         )
       } else {
+        // @ts-ignore
         submenu.push({
           label: t('Close'),
           accelerator: 'Alt+F4',

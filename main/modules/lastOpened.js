@@ -1,15 +1,11 @@
-import { whenClientIsReady } from '../../shared/socket-client'
+export const makeLastOpenedModule = (localClient) => {
+  const lastOpenedFile = () => {
+    return localClient.lastOpenedFile()
+  }
 
-const lastOpenedFile = () => {
-  return whenClientIsReady(({ lastOpenedFile }) => {
-    return lastOpenedFile()
-  })
+  const setLastOpenedFilePath = (filePath) => {
+    return localClient.setLastOpenedFilePath(filePath)
+  }
+
+  return { lastOpenedFile, setLastOpenedFilePath }
 }
-
-const setLastOpenedFilePath = (filePath) => {
-  return whenClientIsReady(({ setLastOpenedFilePath }) => {
-    return setLastOpenedFilePath(filePath)
-  })
-}
-
-export { lastOpenedFile, setLastOpenedFilePath }

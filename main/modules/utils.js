@@ -2,30 +2,30 @@ import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
 import { dialog, app, screen, BrowserWindow, nativeTheme } from 'electron'
 import windowStateKeeper from 'electron-window-state'
-import i18n from 'plottr_locales'
+import { t } from 'plottr_locales'
 import log from 'electron-log'
 
 import { hasWindows } from './windows'
 import { is } from 'electron-util'
-import currentSettings from './settings'
 
 function gracefullyNotSave() {
-  dialog.showErrorBox(i18n('Saving failed'), i18n("Saving your file didn't work. Try again."))
+  // @ts-ignore
+  dialog.showErrorBox(t('Saving failed'), t("Saving your file didn't work. Try again."))
 }
 
 function gracefullyQuit(safelyExit) {
   if (!app.isReady() || !hasWindows()) {
     dialog.showMessageBoxSync({
       type: 'info',
-      buttons: [i18n('ok')],
-      message: i18n('Plottr ran into a problem. Try opening Plottr again.'),
-      detail: i18n('If you keep seeing this problem, email us at support@plottr.com'),
+      buttons: [t('ok')],
+      message: t('Plottr ran into a problem. Try opening Plottr again.'),
+      detail: t('If you keep seeing this problem, email us at support@plottr.com'),
     })
     safelyExit.quitWhenDone()
   }
 }
 
-function makeBrowserWindow(fileURL) {
+function makeBrowserWindow(settingsModule, fileURL) {
   // Load the previous state with fallback to defaults
   const { width, height } = screen.getPrimaryDisplay().workAreaSize
 
@@ -36,13 +36,14 @@ function makeBrowserWindow(fileURL) {
   let multiplier = 0.9
 
   let stateKeeper = windowStateKeeper({
-    defaultWidth: parseInt(width * multiplier),
-    defaultHeight: parseInt(height * multiplier),
+    defaultWidth: width * multiplier,
+    defaultHeight: height * multiplier,
     path: path.join(app.getPath('userData'), 'stateKeeper'),
     file: stateKeeprFile.slice(-numFileLetters),
   })
 
-  return currentSettings()
+  return settingsModule
+    .currentSettings()
     .then((settings) => {
       const backgroundColor =
         (settings.user?.dark === 'system' && nativeTheme.shouldUseDarkColors) ||
@@ -69,6 +70,7 @@ function makeBrowserWindow(fileURL) {
       }
 
       // Create the browser window
+      // @ts-ignore
       let newWindow = new BrowserWindow(config)
       newWindow.setBackgroundColor(backgroundColor)
 
@@ -103,6 +105,7 @@ function makeBrowserWindow(fileURL) {
         })
 
         newWindow.webContents.on(
+          // @ts-ignore
           'new-window',
           (event, url, frameName, disposition, options, additionalFeatures) => {
             event.preventDefault()
@@ -111,6 +114,7 @@ function makeBrowserWindow(fileURL) {
       }
 
       if (is.development || settings.forceDevTools) {
+        // @ts-ignore
         newWindow.openDevTools()
       }
 

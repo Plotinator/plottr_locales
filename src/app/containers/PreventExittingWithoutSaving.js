@@ -1,9 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { PropTypes } from 'prop-types'
+import PropTypes from 'prop-types'
 
 import { actions, selectors } from 'wired-up-pltr'
-import { AskToSaveModal } from 'connected-components'
+import { AskToSaveModal } from 'plottr_components'
 
 import MainIntegrationContext from '../../mainIntegrationContext'
 import { useAskToSave } from './useAskToSave'
@@ -51,17 +51,16 @@ PreventExitingWithoutSaving.propTypes = {
   fileLoaded: PropTypes.bool,
 }
 
-export default connect(
-  (state) => {
-    return {
-      unsavedChanges: selectors.unsavedChangesSelector(state),
-      isCloudFile: selectors.isCloudFileSelector(state),
-      applicationIsBusyAndCannotBeQuit: selectors.busyWithWorkThatPreventsQuittingSelector(state),
-      isOffline: selectors.isOfflineSelector(state),
-      fileLoaded: selectors.fileURLLoadedSelector(state),
-    }
-  },
-  {
-    fileSaved: actions.ui.fileSaved,
+const mapStateToProps = (state) => {
+  return {
+    unsavedChanges: selectors.unsavedChangesSelector(state),
+    isCloudFile: selectors.isCloudFileSelector(state),
+    applicationIsBusyAndCannotBeQuit: selectors.busyWithWorkThatPreventsQuittingSelector(state),
+    isOffline: selectors.isOfflineSelector(state),
+    fileLoaded: selectors.fileURLLoadedSelector(state),
   }
-)(PreventExitingWithoutSaving)
+}
+
+export default connect(mapStateToProps, {
+  fileSaved: actions.ui.fileSaved,
+})(PreventExitingWithoutSaving)

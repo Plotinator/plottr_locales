@@ -72,7 +72,7 @@ export const saveCustomTemplatesToStorage = (templates) => {
 
 export const deleteCustomTemplate = (templateId, userId) => {
   window.sessionStorage.removeItem(customTemplateKey(templateId))
-  deleteCustomTemplateOnFirestore(userId, templateId)
+  return deleteCustomTemplateOnFirestore(userId, templateId)
 }
 
 export const editCustomTemplate = (userId, template) => {
@@ -81,24 +81,28 @@ export const editCustomTemplate = (userId, template) => {
 
 export const startSaveAsTemplate = (type) => {
   const saveEvent = new Event('start-save-as-template', { bubbles: true, cancelable: false })
+  // @ts-ignore
   saveEvent.templateType = type
   document.dispatchEvent(saveEvent)
 }
 
 export const messageToSaveNewTemplate = (payload) => {
   const saveEvent = new Event('save-template', { bubbles: true, cancelable: false })
+  // @ts-ignore
   saveEvent.payload = payload
   document.dispatchEvent(saveEvent)
 }
 
 export const messageToEditTemplate = (_templateId, template) => {
   const editEvent = new Event('edit-template', { bubbles: true, cancelable: false })
+  // @ts-ignore
   editEvent.template = template
   document.dispatchEvent(editEvent)
 }
 
 export const messageToDeleteTemplate = (templateId) => {
   const deleteEvent = new Event('delete-template', { bubbles: true, cancelable: false })
+  // @ts-ignore
   deleteEvent.templateId = templateId
   document.dispatchEvent(deleteEvent)
 }

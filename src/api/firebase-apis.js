@@ -34,7 +34,7 @@ export const listenToKnownFiles = (cb) => {
   window.addEventListener('offline', () => {
     if (unsubscribeFromSessionChanges) {
       unsubscribeFromSessionChanges()
-      unsubscribeFromSessionChanges = null
+      unsubscribeFromSessionChanges = () => {}
     }
   })
 
@@ -68,7 +68,7 @@ export const listenForSessionChange = (cb) => {
     cb(user)
     if (!navigator.onLine) {
       listener()
-      listener = null
+      listener = () => {}
     }
   })
 
@@ -119,7 +119,7 @@ export const listenToCustomTemplates = (cb) => {
   window.addEventListener('offline', () => {
     if (unsubscribeFromSessionChanges) {
       unsubscribeFromSessionChanges()
-      unsubscribeFromSessionChanges = null
+      unsubscribeFromSessionChanges = () => {}
     }
   })
 
@@ -139,7 +139,7 @@ const dedupBackups = (backups) => {
       backups.filter(({ startOfSession }) => {
         return startOfSession
       }),
-      ({ backupTime }) => backupTime?.seconds || Math.POSITIVE_INFINITY
+      ({ backupTime }) => backupTime?.seconds || Number.POSITIVE_INFINITY
     ),
     ({ fileId }) => {
       return fileId
@@ -150,7 +150,7 @@ const dedupBackups = (backups) => {
       backups.filter(({ startOfSession }) => {
         return !startOfSession
       }),
-      ({ backupTime }) => backupTime?.seconds || Math.POSITIVE_INFINITY
+      ({ backupTime }) => backupTime?.seconds || Number.POSITIVE_INFINITY
     ),
     ({ fileId }) => {
       return fileId
@@ -201,7 +201,7 @@ export const listenToBackupsChanges = (cb) => {
   window.addEventListener('offline', () => {
     if (unsubscribeFromSessionChanges) {
       unsubscribeFromSessionChanges()
-      unsubscribeFromSessionChanges = null
+      unsubscribeFromSessionChanges = () => {}
     }
   })
 

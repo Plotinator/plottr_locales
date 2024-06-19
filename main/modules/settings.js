@@ -1,15 +1,11 @@
-import { whenClientIsReady } from '../../shared/socket-client/index'
+export const makeSettingsModule = (localClient) => {
+  const currentSettings = () => {
+    return localClient.currentAppSettings()
+  }
 
-const currentSettings = () => {
-  return whenClientIsReady(({ currentAppSettings }) => {
-    return currentAppSettings()
-  })
+  const saveAppSetting = (key, value) => {
+    return localClient.saveAppSetting(key, value)
+  }
+
+  return { currentSettings, saveAppSetting }
 }
-
-export const saveAppSetting = (key, value) => {
-  return whenClientIsReady(({ saveAppSetting }) => {
-    return saveAppSetting(key, value)
-  })
-}
-
-export default currentSettings

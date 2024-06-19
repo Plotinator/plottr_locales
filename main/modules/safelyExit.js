@@ -14,11 +14,11 @@ const makeSafelyExitModule = (logger) => {
   const quit = () => {
     if (isBusy) {
       logger.warn(
-        'Quit requested, but the socket server indicated that it was busy and has not indicated that it is done yet.'
+        'Quit requested, but the local server indicated that it was busy and has not indicated that it is done yet.'
       )
       return false
     }
-    logger.info('Socket server is not busy.  Quitting Plottr now!')
+    logger.info('local server is not busy.  Quitting Plottr now!')
     app.quit()
     return true
   }

@@ -16,7 +16,7 @@ import { offlineFileURLFromFile } from '../files'
 import { uploadProject } from '../common/utils/upload_project'
 import { resumeDirective } from '../resume'
 import logger from '../../shared/logger'
-import { store } from 'store'
+import { store } from './store'
 import MPQ from '../common/utils/MPQ'
 import { makeFileModule } from './files'
 import { offlineFileURL } from '../common/utils/files'
@@ -110,11 +110,25 @@ const MAX_FILE_BOOT_TIME_MS = 60000
 
 const SAVE_INTERVAL_MS = 10000
 const BACKUP_INTERVAL_MS = 60000
+/**
+ * @type {SaverRef}
+ * @typedef Saver
+ * @property {function(): void} start
+ * @property {function(): void} stop
+ * @property {function(): void} cancelAllRemainingRequests
+ * @typedef SaverRef
+ * @property {Saver | null} current
+ */
 const saverRef = { current: null }
+/**
+ * @type {BootFileRef}
+ * @typedef BootFileRef
+ * @property {null | Number} current
+ */
 const bootingFile = { current: null }
 
 export function bootFile(
-  whenClientIsReady,
+  localClient,
   fileURL,
   options,
   numOpenFiles,
@@ -139,7 +153,7 @@ export function bootFile(
   const recordedErrorsDuringStartup = []
 
   function offerSaveAsThenQuit() {
-    saverRef.current.stop()
+    saverRef?.current?.stop?.()
     const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
     return showErrorBox(
       t('Error'),
@@ -157,35 +171,29 @@ export function bootFile(
             )
           } else {
             const newFilePath = helpers.file.ensureEndsInPltr(fileName)
-            return whenClientIsReady(({ saveRawFile }) => {
-              return saveRawFile(
-                newFilePath,
-                JSON.stringify(removeSystemKeys(store().getState()))
-              ).then(() => {
+            return localClient
+              .saveRawFile(newFilePath, JSON.stringify(removeSystemKeys(store().getState())))
+              .then(() => {
                 setTimeout(() => {
                   const event = new Event('force-close')
                   window.dispatchEvent(event)
                 }, 3000)
               })
-            })
           }
         } else {
-          return whenClientIsReady(({ saveRawFile, join }) => {
-            return userDocumentsPath().then((documentsPath) => {
-              return join(documentsPath, `Plottr-fatal-exit-backup-${uuid()}.pltr`).then(
-                (newFilePath) => {
-                  return saveRawFile(
-                    newFilePath,
-                    JSON.stringify(removeSystemKeys(store().getState()))
-                  ).then(() => {
+          return userDocumentsPath().then((documentsPath) => {
+            return localClient
+              .join(documentsPath, `Plottr-fatal-exit-backup-${uuid()}.pltr`)
+              .then((newFilePath) => {
+                return localClient
+                  .saveRawFile(newFilePath, JSON.stringify(removeSystemKeys(store().getState())))
+                  .then(() => {
                     setTimeout(() => {
                       const event = new Event('force-close')
                       window.dispatchEvent(event)
                     }, 3000)
                   })
-                }
-              )
-            })
+              })
           })
         }
       })
@@ -254,14 +262,11 @@ export function bootFile(
     })
   }
 
-  const nukeLastKnown = () =>
-    whenClientIsReady(({ nukeLastOpenedFileURL }) => {
-      return nukeLastOpenedFileURL()
-    })
+  const nukeLastKnown = localClient.nukeLastOpenedFileURL
 
-  const fileSystemAPIs = makeFileSystemAPIs(whenClientIsReady)
+  const fileSystemAPIs = makeFileSystemAPIs(localClient)
 
-  const { backupOfflineBackupForResume } = makeFileModule(whenClientIsReady)
+  const { backupOfflineBackupForResume } = makeFileModule(localClient)
 
   const cachedDowloadStorageImage = makeCachedDownloadStorageImage(downloadStorageImage)
 
@@ -290,7 +295,7 @@ export function bootFile(
             }-${date.getDate()}-${date.getFullYear()}`,
           },
         }
-        return uploadProject(file, email, userId)
+        return uploadProject(localClient, file, email, userId)
           .then((result) => ({
             ...offlineFile,
             file: {
@@ -364,27 +369,25 @@ export function bootFile(
       if (!settings.user.enableOfflineMode) {
         return Promise.resolve(false)
       }
-      return offlineFileURLFromFile(helpers.file.fileIdToPlottrCloudFileURL(fileId)).then(
-        (offlineURL) => {
+      const fileURL = helpers.file.fileIdToPlottrCloudFileURL(fileId)
+      return offlineFileURLFromFile(localClient, fileURL).then((offlineURL) => {
+        ;(offlineURL) => {
           if (!offlineURL) {
-            logger.warn(`Could not compute an offline path for file: ${json?.file}`)
+            logger.warn(`Could not compute an offline path for file: ${JSON.stringify(json?.file)}`)
             return Promise.resolve(false)
           }
           const offlinePath = helpers.file.withoutProtocol(offlineURL)
-          return whenClientIsReady(({ fileExists }) => {
-            return fileExists(offlinePath)
-          })
+          return localClient
+            .fileExists(offlinePath)
             .then((exists) => {
               return offlinePath && exists
             })
             .then((exists) => {
-              return whenClientIsReady(({ readFile }) => {
-                return exists
-                  ? readFile(offlinePath).then((file) => {
-                      return JSON.parse(file)
-                    })
-                  : Promise.resolve(null)
-              })
+              return exists
+                ? localClient.readFile(offlinePath).then((file) => {
+                    return JSON.parse(file)
+                  })
+                : Promise.resolve(null)
             })
             .then((offlineFile) => {
               if (!offlineFile) {
@@ -400,7 +403,7 @@ export function bootFile(
               return handleOfflineBackup(backupOurs, uploadOurs, fileId, offlineFile, email, userId)
             })
         }
-      )
+      })
     })
   }
 
@@ -481,14 +484,13 @@ export function bootFile(
         return setRepresentedFileName(helpers.file.withoutProtocol(fileURL))
       })
       .then(() => {
-        return offlineFileURL(fileURL)
+        return offlineFileURL(localClient, fileURL)
           .then((offlineFileURL) => {
             const filePath = helpers.file.withoutProtocol(
-              bootingOfflineFile ? offlineFileURL(fileURL) : fileURL
+              bootingOfflineFile ? offlineFileURL : fileURL
             )
-            return whenClientIsReady(({ readFile }) => {
-              return readFile(filePath)
-            })
+            return localClient
+              .readFile(filePath)
               .then((rawFile) => {
                 return JSON.parse(rawFile)
               })
@@ -575,7 +577,7 @@ export function bootFile(
                     return machineId().then((clientId) => {
                       store().dispatch(actions.client.setClientId(clientId))
 
-                      resolve()
+                      resolve(null)
                     })
                   },
                   logger
@@ -591,7 +593,16 @@ export function bootFile(
     const inTrialMode = selectors.isInTrialModeSelector(store().getState())
     return getVersion().then((version) => {
       const dateBooted = helpers.date.versionToDate(version)
-      if (!inTrialMode && latestExpiryDate !== null && latestExpiryDate < dateBooted) {
+      if (dateBooted === null) {
+        const message = `Invalid file version: ${version}`
+        recordedErrorsDuringStartup.push({
+          message,
+          error: new Error('Invalid file version'),
+        })
+        logger.error(message)
+        store().dispatch(actions.applicationState.errorLoadingFile())
+        return Promise.reject(new Error(message))
+      } else if (!inTrialMode && latestExpiryDate !== null && latestExpiryDate < dateBooted) {
         showErrorBox(
           t('Error'),
           t('Your license expired before this version of Plottr was released')
@@ -718,9 +729,9 @@ export function bootFile(
           () => {
             return store().getState()
           },
-          saveFile(whenClientIsReady, errorReportingLogger, postSaveHook),
+          saveFile(localClient, errorReportingLogger, postSaveHook),
           backupFile(
-            whenClientIsReady,
+            localClient,
             saveBackupOnFirebase,
             cachedDowloadStorageImage.downloadStorageImage,
             errorReportingLogger,

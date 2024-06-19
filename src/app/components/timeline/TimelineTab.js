@@ -1,5 +1,5 @@
 import React from 'react'
-import { ErrorBoundary, TimelineWrapper } from 'connected-components'
+import { ErrorBoundary, TimelineWrapper } from 'plottr_components'
 
 const TimelineTab = () => {
   return (

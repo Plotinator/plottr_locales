@@ -372,7 +372,7 @@ const localFileWithBackupsEnabledThatPointsAtOfflineModeFile = () => {
 }
 
 describe('saveFile', () => {
-  describe('given a whenClientIsReady that produces a dummy saveFile', () => {
+  describe('given a local client with a dummy saveFile', () => {
     describe('and a file that lacks the necessary keys', () => {
       it('should not call the dummy save', async () => {
         let called = false
@@ -380,14 +380,12 @@ describe('saveFile', () => {
           called = true
           return Promise.resolve()
         }
-        const whenClientIsReady = (f) => {
-          return f({
-            saveFile: _saveFile,
-          })
+        const localClient = {
+          savefile: _saveFile,
         }
         let threw = false
         try {
-          await saveFile(whenClientIsReady, CONSOLE_LOGGER)(omit({ user: EMPTY_FILE }, 'user.file'))
+          await saveFile(localClient, CONSOLE_LOGGER)(omit({ user: EMPTY_FILE }, 'user.file'))
         } catch (error) {
           threw = true
           expect(called).toBeFalsy()
@@ -403,12 +401,10 @@ describe('saveFile', () => {
           called = true
           return Promise.resolve()
         }
-        const whenClientIsReady = (f) => {
-          return f({
-            saveFile: _saveFile,
-          })
+        const localClient = {
+          saveFile: _saveFile,
         }
-        await saveFile(whenClientIsReady, CONSOLE_LOGGER)(state)
+        await saveFile(localClient, CONSOLE_LOGGER)(state)
         expect(called).toBeFalsy()
       })
     })
@@ -421,12 +417,10 @@ describe('saveFile', () => {
             called = true
             return Promise.resolve()
           }
-          const whenClientIsReady = (f) => {
-            return f({
-              saveFile: _saveFile,
-            })
+          const localClient = {
+            saveFile: _saveFile,
           }
-          await saveFile(whenClientIsReady, CONSOLE_LOGGER)(state)
+          await saveFile(localClient, CONSOLE_LOGGER)(state)
           expect(called).toBeFalsy()
         })
       })
@@ -444,13 +438,11 @@ describe('saveFile', () => {
               calledSaveOfflineFile = true
               return Promise.resolve()
             }
-            const whenClientIsReady = (f) => {
-              return f({
-                saveFile: _saveFile,
-                saveOfflineFile,
-              })
+            const localClient = {
+              saveFile: _saveFile,
+              saveOfflineFile,
             }
-            await saveFile(whenClientIsReady, CONSOLE_LOGGER)(state)
+            await saveFile(localClient, CONSOLE_LOGGER)(state)
             expect(calledSaveOfflineFile).toBeFalsy()
             expect(called).toBeFalsy()
           })
@@ -468,13 +460,11 @@ describe('saveFile', () => {
               calledSaveOfflineFile = true
               return Promise.resolve()
             }
-            const whenClientIsReady = (f) => {
-              return f({
-                saveFile: _saveFile,
-                saveOfflineFile,
-              })
+            const localClient = {
+              saveFile: _saveFile,
+              saveOfflineFile,
             }
-            await saveFile(whenClientIsReady, CONSOLE_LOGGER)(state)
+            await saveFile(localClient, CONSOLE_LOGGER)(state)
             expect(calledSaveFile).toBeFalsy()
             expect(calledSaveOfflineFile).toBeTruthy()
           })
@@ -488,12 +478,10 @@ describe('saveFile', () => {
             called = true
             return Promise.resolve()
           }
-          const whenClientIsReady = (f) => {
-            return f({
-              saveFile: _saveFile,
-            })
+          const localClient = {
+            saveFile: _saveFile,
           }
-          await saveFile(whenClientIsReady, CONSOLE_LOGGER)(state)
+          await saveFile(localClient, CONSOLE_LOGGER)(state)
           expect(called).toBeFalsy()
         })
         describe('and offline mode is enabled', () => {
@@ -509,13 +497,11 @@ describe('saveFile', () => {
               calledSaveOfflineFile = true
               return Promise.resolve()
             }
-            const whenClientIsReady = (f) => {
-              return f({
-                saveFile: _saveFile,
-                saveOfflineFile,
-              })
+            const localClient = {
+              saveFile: _saveFile,
+              saveOfflineFile,
             }
-            await saveFile(whenClientIsReady, CONSOLE_LOGGER)(state)
+            await saveFile(localClient, CONSOLE_LOGGER)(state)
             expect(called).toBeFalsy()
             expect(calledSaveOfflineFile).toBeTruthy()
           })
@@ -533,13 +519,11 @@ describe('saveFile', () => {
               calledSaveOfflineFile = true
               return Promise.resolve()
             }
-            const whenClientIsReady = (f) => {
-              return f({
-                saveFile: _saveFile,
-                saveOfflineFile,
-              })
+            const localClient = {
+              saveFile: _saveFile,
+              saveOfflineFile,
             }
-            await saveFile(whenClientIsReady, CONSOLE_LOGGER)(state)
+            await saveFile(localClient, CONSOLE_LOGGER)(state)
             expect(called).toBeFalsy()
             expect(calledSaveOfflineFile).toBeFalsy()
           })
@@ -554,12 +538,10 @@ describe('saveFile', () => {
           called = true
           return Promise.resolve()
         }
-        const whenClientIsReady = (f) => {
-          return f({
-            saveFile: _saveFile,
-          })
+        const localClient = {
+          saveFile: _saveFile,
         }
-        await saveFile(whenClientIsReady, CONSOLE_LOGGER)(state)
+        await saveFile(localClient, CONSOLE_LOGGER)(state)
         expect(called).toBeTruthy()
       })
       describe('and we supply a post-save hook', () => {
@@ -573,12 +555,10 @@ describe('saveFile', () => {
             called = true
             return true
           }
-          const whenClientIsReady = (f) => {
-            return f({
-              saveFile: _saveFile,
-            })
+          const localClient = {
+            saveFile: _saveFile,
           }
-          await saveFile(whenClientIsReady, CONSOLE_LOGGER, postSaveHook)(state)
+          await saveFile(localClient, CONSOLE_LOGGER, postSaveHook)(state)
           expect(called).toBeTruthy()
         })
       })
@@ -596,13 +576,11 @@ describe('saveFile', () => {
               calledSaveOfflineFile = true
               return Promise.resolve()
             }
-            const whenClientIsReady = (f) => {
-              return f({
-                saveFile: _saveFile,
-                saveOfflineFile,
-              })
+            const localClient = {
+              saveFile: _saveFile,
+              saveOfflineFile,
             }
-            await saveFile(whenClientIsReady, CONSOLE_LOGGER)(state)
+            await saveFile(localClient, CONSOLE_LOGGER)(state)
             expect(calledSaveOfflineFile).toBeFalsy()
             expect(called).toBeTruthy()
           })
@@ -620,13 +598,11 @@ describe('saveFile', () => {
               calledSaveOfflineFile = true
               return Promise.resolve()
             }
-            const whenClientIsReady = (f) => {
-              return f({
-                saveFile: _saveFile,
-                saveOfflineFile,
-              })
+            const localClient = {
+              saveFile: _saveFile,
+              saveOfflineFile,
             }
-            await saveFile(whenClientIsReady, CONSOLE_LOGGER)(state)
+            await saveFile(localClient, CONSOLE_LOGGER)(state)
             expect(calledSaveOfflineFile).toBeFalsy()
             expect(calledSaveFile).toBeTruthy()
           })
@@ -639,7 +615,7 @@ describe('saveFile', () => {
 const DUMMY_DOWNLOAD_IMAGE_FROM_STORAGE = () => {}
 
 describe('backupFile', () => {
-  describe('given a whenClientIsReady that produces a dummy saveBackup', () => {
+  describe('given a localClient that produces a dummy saveBackup', () => {
     describe('and a file that lacks the necessary keys', () => {
       it('should not call the dummy backup', async () => {
         const state = stateForProFile()
@@ -653,16 +629,14 @@ describe('backupFile', () => {
           savedOnFirebase = true
           return Promise.resolve()
         }
-        const whenClientIsReady = (f) => {
-          return f({
-            saveBackup: _backupFile,
-            offlineFileBasePath: () => Promise.resolve('/offline/'),
-          })
+        const localClient = {
+          saveBackup: _backupFile,
+          offlineFileBasePath: () => Promise.resolve('/offline/'),
         }
         let threw = false
         try {
           await backupFile(
-            whenClientIsReady,
+            localClient,
             backupOnFirebase,
             DUMMY_DOWNLOAD_IMAGE_FROM_STORAGE,
             CONSOLE_LOGGER
@@ -688,14 +662,12 @@ describe('backupFile', () => {
           savedOnFirebase = true
           return Promise.resolve()
         }
-        const whenClientIsReady = (f) => {
-          return f({
-            saveBackup: _backupFile,
-            offlineFileBasePath: () => Promise.resolve('/offline/'),
-          })
+        const localClient = {
+          saveBackup: _backupFile,
+          offlineFileBasePath: () => Promise.resolve('/offline/'),
         }
         await backupFile(
-          whenClientIsReady,
+          localClient,
           backupOnFirebase,
           DUMMY_DOWNLOAD_IMAGE_FROM_STORAGE,
           CONSOLE_LOGGER
@@ -719,14 +691,12 @@ describe('backupFile', () => {
               savedOnFirebase = true
               return Promise.resolve()
             }
-            const whenClientIsReady = (f) => {
-              return f({
-                saveBackup: _backupFile,
-                offlineFileBasePath: () => Promise.resolve('/offline/'),
-              })
+            const localClient = {
+              saveBackup: _backupFile,
+              offlineFileBasePath: () => Promise.resolve('/offline/'),
             }
             await backupFile(
-              whenClientIsReady,
+              localClient,
               backupOnFirebase,
               DUMMY_DOWNLOAD_IMAGE_FROM_STORAGE,
               CONSOLE_LOGGER
@@ -748,14 +718,12 @@ describe('backupFile', () => {
               savedOnFirebase = true
               return Promise.resolve()
             }
-            const whenClientIsReady = (f) => {
-              return f({
-                saveBackup: _backupFile,
-                offlineFileBasePath: () => Promise.resolve('/offline/'),
-              })
+            const localClient = {
+              saveBackup: _backupFile,
+              offlineFileBasePath: () => Promise.resolve('/offline/'),
             }
             await backupFile(
-              whenClientIsReady,
+              localClient,
               backupOnFirebase,
               DUMMY_DOWNLOAD_IMAGE_FROM_STORAGE,
               CONSOLE_LOGGER
@@ -780,14 +748,12 @@ describe('backupFile', () => {
                 savedOnFirebase = true
                 return Promise.resolve()
               }
-              const whenClientIsReady = (f) => {
-                return f({
-                  saveBackup: _backupFile,
-                  offlineFileBasePath: () => Promise.resolve('/offline/'),
-                })
+              const localClient = {
+                saveBackup: _backupFile,
+                offlineFileBasePath: () => Promise.resolve('/offline/'),
               }
               await backupFile(
-                whenClientIsReady,
+                localClient,
                 backupOnFirebase,
                 DUMMY_DOWNLOAD_IMAGE_FROM_STORAGE,
                 CONSOLE_LOGGER
@@ -809,14 +775,12 @@ describe('backupFile', () => {
                 savedOnFirebase = true
                 return Promise.resolve()
               }
-              const whenClientIsReady = (f) => {
-                return f({
-                  saveBackup: _backupFile,
-                  offlineFileBasePath: () => Promise.resolve('/offline/'),
-                })
+              const localClient = {
+                saveBackup: _backupFile,
+                offlineFileBasePath: () => Promise.resolve('/offline/'),
               }
               await backupFile(
-                whenClientIsReady,
+                localClient,
                 backupOnFirebase,
                 DUMMY_DOWNLOAD_IMAGE_FROM_STORAGE,
                 CONSOLE_LOGGER
@@ -840,14 +804,12 @@ describe('backupFile', () => {
                 savedOnFirebase = true
                 return Promise.resolve()
               }
-              const whenClientIsReady = (f) => {
-                return f({
-                  saveBackup: _backupFile,
-                  offlineFileBasePath: () => Promise.resolve('/offline/'),
-                })
+              const localClient = {
+                saveBackup: _backupFile,
+                offlineFileBasePath: () => Promise.resolve('/offline/'),
               }
               await backupFile(
-                whenClientIsReady,
+                localClient,
                 backupOnFirebase,
                 DUMMY_DOWNLOAD_IMAGE_FROM_STORAGE,
                 CONSOLE_LOGGER
@@ -869,14 +831,12 @@ describe('backupFile', () => {
                 savedOnFirebase = true
                 return Promise.resolve()
               }
-              const whenClientIsReady = (f) => {
-                return f({
-                  saveBackup: _backupFile,
-                  offlineFileBasePath: () => Promise.resolve('/offline/'),
-                })
+              const localClient = {
+                saveBackup: _backupFile,
+                offlineFileBasePath: () => Promise.resolve('/offline/'),
               }
               await backupFile(
-                whenClientIsReady,
+                localClient,
                 backupOnFirebase,
                 DUMMY_DOWNLOAD_IMAGE_FROM_STORAGE,
                 CONSOLE_LOGGER
@@ -902,14 +862,12 @@ describe('backupFile', () => {
             savedOnFirebase = true
             return Promise.resolve()
           }
-          const whenClientIsReady = (f) => {
-            return f({
-              saveBackup: _backupFile,
-              offlineFileBasePath: () => Promise.resolve('/offline/'),
-            })
+          const localClient = {
+            saveBackup: _backupFile,
+            offlineFileBasePath: () => Promise.resolve('/offline/'),
           }
           await backupFile(
-            whenClientIsReady,
+            localClient,
             backupOnFirebase,
             DUMMY_DOWNLOAD_IMAGE_FROM_STORAGE,
             CONSOLE_LOGGER
@@ -931,14 +889,12 @@ describe('backupFile', () => {
             savedOnFirebase = true
             return Promise.resolve()
           }
-          const whenClientIsReady = (f) => {
-            return f({
-              saveBackup: _backupFile,
-              offlineFileBasePath: () => Promise.resolve('/offline/'),
-            })
+          const localClient = {
+            saveBackup: _backupFile,
+            offlineFileBasePath: () => Promise.resolve('/offline/'),
           }
           await backupFile(
-            whenClientIsReady,
+            localClient,
             backupOnFirebase,
             DUMMY_DOWNLOAD_IMAGE_FROM_STORAGE,
             CONSOLE_LOGGER
@@ -960,14 +916,12 @@ describe('backupFile', () => {
             savedOnFirebase = true
             return Promise.resolve()
           }
-          const whenClientIsReady = (f) => {
-            return f({
-              saveBackup: _backupFile,
-              offlineFileBasePath: () => Promise.resolve('/offline/'),
-            })
+          const localClient = {
+            saveBackup: _backupFile,
+            offlineFileBasePath: () => Promise.resolve('/offline/'),
           }
           await backupFile(
-            whenClientIsReady,
+            localClient,
             backupOnFirebase,
             DUMMY_DOWNLOAD_IMAGE_FROM_STORAGE,
             CONSOLE_LOGGER
@@ -990,14 +944,12 @@ describe('backupFile', () => {
             const backupOnFirebase = () => {
               return Promise.resolve()
             }
-            const whenClientIsReady = (f) => {
-              return f({
-                saveBackup: _backupFile,
-                offlineFileBasePath: () => Promise.resolve('/offline/'),
-              })
+            const localClient = {
+              saveBackup: _backupFile,
+              offlineFileBasePath: () => Promise.resolve('/offline/'),
             }
             await backupFile(
-              whenClientIsReady,
+              localClient,
               backupOnFirebase,
               DUMMY_DOWNLOAD_IMAGE_FROM_STORAGE,
               CONSOLE_LOGGER,

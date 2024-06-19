@@ -1,9 +1,9 @@
 import React from 'react'
-import { PropTypes } from 'prop-types'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import { selectors } from 'wired-up-pltr'
-import { ProLicenseExpired, PlottrLicenseExpired } from 'connected-components'
+import { ProLicenseExpired, PlottrLicenseExpired } from 'plottr_components'
 
 import MainIntegrationContext from '../../mainIntegrationContext'
 import App from './App'
@@ -27,7 +27,6 @@ const Main = ({
   darkMode,
   isOnboardingFromRoot,
   isOnboarding,
-  saveBackup,
   isInSettingsWizard,
   firstTimeBooting,
   showChoiceView,
@@ -61,7 +60,7 @@ const Main = ({
   } else if (showLoginSelector) {
     return <Login darkMode={darkMode} />
   } else if (fileToUpload) {
-    return <UploadLastOpenedFileToPro saveBackup={saveBackup} />
+    return <UploadLastOpenedFileToPro />
   } else if (errorLoadingFile) {
     return <ErrorLoadingFile />
   } else if (firstTimeBooting) {
@@ -109,7 +108,6 @@ Main.propTypes = {
   darkMode: PropTypes.bool.isRequired,
   isOnboardingFromRoot: PropTypes.bool,
   isOnboarding: PropTypes.bool,
-  saveBackup: PropTypes.func.isRequired,
   isInSettingsWizard: PropTypes.bool,
   firstTimeBooting: PropTypes.bool,
   showChoiceView: PropTypes.bool,
@@ -120,7 +118,7 @@ Main.propTypes = {
   showLoginSelector: PropTypes.bool,
 }
 
-export default connect((state) => ({
+const mapStateToProps = (state) => ({
   showConnectToTheInternet: selectors.displayConnectToTheInternetSelector(state),
   showExpiredProLicense: selectors.displayExpiredProLicenseSelector(state),
   showExpiredPlottrLicense: selectors.displayExpiredPlottrLicenseSelector(state),
@@ -138,4 +136,6 @@ export default connect((state) => ({
   fileToUpload: selectors.filePathToUploadSelector(state),
   isInSettingsWizard: selectors.isInSettingsWizardSelector(state),
   firstTimeBooting: selectors.firstTimeBootingSelector(state),
-}))(Main)
+})
+
+export default connect(mapStateToProps)(Main)

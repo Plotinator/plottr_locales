@@ -2,7 +2,6 @@
 .dir-locals.el
 .dumbjump
 setup.el
-jsconfig.json
 
 # Built/bundled
 bin/*LICENSE.txt

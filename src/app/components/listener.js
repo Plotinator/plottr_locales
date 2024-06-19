@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { PropTypes } from 'prop-types'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import { helpers } from 'pltr'
@@ -9,7 +9,6 @@ import { t } from 'plottr_locales'
 
 import { store } from '../store'
 import { makeFileSystemAPIs } from '../../api'
-import { whenClientIsReady } from '../../../shared/socket-client'
 import { duplicateFile } from '../../files'
 import { makeMainProcessClient } from '../mainProcessClient'
 
@@ -34,8 +33,9 @@ const Listener = ({
   unsavedChanges,
   isDeviceFile,
   isInProMode,
+  localClient,
 }) => {
-  const fileSystemAPIs = makeFileSystemAPIs(whenClientIsReady)
+  const fileSystemAPIs = makeFileSystemAPIs(localClient)
 
   // ====Prevent Users from Opening Backups===
 
@@ -48,38 +48,8 @@ const Listener = ({
           if (helpers.file.withoutProtocol(fileURL).startsWith(backupPath)) {
             if (hasDefaultFolder) {
               withFullFileState((state) => {
-                whenClientIsReady(({ saveToDefaultLocation, basename, addKnownFile }) => {
-                  return basename(fileName)
-                    .then((name) => {
-                      return name.replace(/\.pltr$/, '')
-                    })
-                    .then((name) => {
-                      const backupText = t('Backup')
-                      const date = new Date()
-                      const month = date.getMonth() + 1
-                      const day = date.getDate()
-                      const year = date.getUTCFullYear()
-                      const backupDate = `${t('Resumed at')}:${month}-${day}-${year}`
-                      const withoutSystemKeys = selectors.fullFileStateSelector(state)
-                      return saveToDefaultLocation(
-                        withoutSystemKeys,
-                        `${name} [${backupText} ${backupDate}]`
-                      ).then((newFileURL) => {
-                        return pleaseOpenWindow(newFileURL)
-                          .then(() => {
-                            return addKnownFile(newFileURL)
-                          })
-                          .then(() => {
-                            const event = new Event('force-close')
-                            window.dispatchEvent(event)
-                          })
-                      })
-                    })
-                }).then(resolve, reject)
-              })
-            } else {
-              whenClientIsReady(({ basename }) => {
-                return basename(fileName)
+                return localClient
+                  .basename(fileName)
                   .then((name) => {
                     return name.replace(/\.pltr$/, '')
                   })
@@ -90,9 +60,40 @@ const Listener = ({
                     const day = date.getDate()
                     const year = date.getUTCFullYear()
                     const backupDate = `${t('Resumed at')}:${month}-${day}-${year}`
-                    duplicateFile(fileURL, `${name} [${backupText} ${backupDate}].pltr`, true)
+                    const withoutSystemKeys = selectors.fullFileStateSelector(state)
+                    return localClient
+                      .saveToDefaultLocation(
+                        withoutSystemKeys,
+                        `${name} [${backupText} ${backupDate}]`
+                      )
+                      .then((newFileURL) => {
+                        return pleaseOpenWindow(newFileURL)
+                          .then(() => {
+                            return localClient.addKnownFile(newFileURL)
+                          })
+                          .then(() => {
+                            const event = new Event('force-close')
+                            window.dispatchEvent(event)
+                          })
+                      })
                   })
               }).then(resolve, reject)
+            } else {
+              localClient
+                .basename(fileName)
+                .then((name) => {
+                  return name.replace(/\.pltr$/, '')
+                })
+                .then((name) => {
+                  const backupText = t('Backup')
+                  const date = new Date()
+                  const month = date.getMonth() + 1
+                  const day = date.getDate()
+                  const year = date.getUTCFullYear()
+                  const backupDate = `${t('Resumed at')}:${month}-${day}-${year}`
+                  duplicateFile(fileURL, `${name} [${backupText} ${backupDate}].pltr`, true)
+                })
+                .then(resolve, reject)
             }
           }
         })
@@ -186,29 +187,29 @@ Listener.propTypes = {
   showErrorBox: PropTypes.func.isRequired,
   startCreatingNewProject: PropTypes.func.isRequired,
   isInProMode: PropTypes.bool,
+  localClient: PropTypes.object.isRequired,
 }
 
-export default connect(
-  (state) => ({
-    selectedFile: selectors.selectedFileSelector(state),
-    userId: selectors.userIdSelector(state),
-    clientId: selectors.clientIdSelector(state),
-    fileLoaded: selectors.fileLoadedSelector(state),
-    isOffline: selectors.isOfflineSelector(state),
-    fileURL: selectors.fileURLSelector(state),
-    fileName: selectors.fileNameSelector(state),
-    resuming: selectors.isResumingSelector(state),
-    offlineModeIsEnabled: selectors.offlineModeEnabledSelector(state),
-    fileVersion: selectors.fileVersionSelector(state),
-    hasDefaultFolder: selectors.hasDefaultFolderSelector(state),
-    unsavedChanges: selectors.unsavedChangesSelector(state),
-    isDeviceFile: selectors.isDeviceFileSelector(state),
-    isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
-  }),
-  {
-    setPermission: actions.permission.setPermission,
-    setFileLoaded: actions.project.setFileLoaded,
-    withFullFileState: actions.project.withFullFileState,
-    startCreatingNewProject: actions.project.startCreatingNewProject,
-  }
-)(Listener)
+const mapStateToProps = (state) => ({
+  selectedFile: selectors.selectedFileSelector(state),
+  userId: selectors.userIdSelector(state),
+  clientId: selectors.clientIdSelector(state),
+  fileLoaded: selectors.fileLoadedSelector(state),
+  isOffline: selectors.isOfflineSelector(state),
+  fileURL: selectors.fileURLSelector(state),
+  fileName: selectors.fileNameSelector(state),
+  resuming: selectors.isResumingSelector(state),
+  offlineModeIsEnabled: selectors.offlineModeEnabledSelector(state),
+  fileVersion: selectors.fileVersionSelector(state),
+  hasDefaultFolder: selectors.hasDefaultFolderSelector(state),
+  unsavedChanges: selectors.unsavedChangesSelector(state),
+  isDeviceFile: selectors.isDeviceFileSelector(state),
+  isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
+})
+
+export default connect(mapStateToProps, {
+  setPermission: actions.permission.setPermission,
+  setFileLoaded: actions.project.setFileLoaded,
+  withFullFileState: actions.project.withFullFileState,
+  startCreatingNewProject: actions.project.startCreatingNewProject,
+})(Listener)

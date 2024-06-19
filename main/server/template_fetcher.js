@@ -99,9 +99,31 @@ class TemplateFetcher {
 
     const ids = Object.keys(templatesById)
     return ids.reduce((acc, id) => {
-      if (templatesById[id].type === type) acc.push(templatesById[id])
+      if (templatesById[id].type === type) {
+        // @ts-ignore
+        acc.push(templatesById[id])
+      }
       return acc
     }, [])
+  }
+
+  /**
+   * @typedef Manifest
+   * @property {String} version
+   * @param {Manifest} fetchedManifest
+   * @param {boolean} force
+   * @returns
+   */
+  handleManifest = (fetchedManifest, force) => {
+    if (force || this.fetchedIsNewer(fetchedManifest.version)) {
+      this.log('New templates to fetch', fetchedManifest.version)
+      return this.manifestStore.setRawKey(MANIFEST_ROOT, fetchedManifest).then(() => {
+        return this.fetchTemplates(force)
+      })
+    } else {
+      this.log('No new templates', fetchedManifest.version)
+      return Promise.resolve()
+    }
   }
 
   fetch = (force) => {
@@ -115,17 +137,13 @@ class TemplateFetcher {
         }
         return resp.json()
       })
-      .then((fetchedManifest) => {
-        if (force || this.fetchedIsNewer(fetchedManifest.version)) {
-          this.log('New templates to fetch', fetchedManifest.version)
-          return this.manifestStore.setRawKey(MANIFEST_ROOT, fetchedManifest).then(() => {
-            return this.fetchTemplates(force)
-          })
-        } else {
-          this.log('No new templates', fetchedManifest.version)
-          return Promise.resolve()
-        }
-      })
+      .then((manifest) =>
+        this.handleManifest(
+          // @ts-ignore
+          manifest,
+          force
+        )
+      )
       .then(this.removeDeprecatedTemplates)
   }
 

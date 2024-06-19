@@ -1,5 +1,5 @@
 import React from 'react'
-import { PropTypes } from 'prop-types'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { FaSignal } from '@react-icons/all-files/fa/FaSignal'
 
@@ -21,7 +21,9 @@ OfflineBanner.propTypes = {
   shouldBeInPro: PropTypes.bool,
 }
 
-export default connect((state) => ({
+const mapStateToProps = (state) => ({
   isOffline: selectors.isOfflineSelector(state),
   shouldBeInPro: selectors.shouldBeInProSelector(state),
-}))(OfflineBanner)
+})
+
+export default connect(mapStateToProps)(OfflineBanner)

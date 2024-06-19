@@ -1,56 +1,38 @@
-const makeFileModule = (whenClientIsReady) => {
-  const saveOfflineFile = (fileURL, jsonData) => {
-    return whenClientIsReady(({ saveOfflineFile }) => {
-      return saveOfflineFile(fileURL, jsonData)
-    })
+const makeFileModule = (localClient) => {
+  const saveOfflineFile = (jsonData, knownFiles, onlineFileURL) => {
+    return localClient.saveOfflineFile(jsonData, knownFiles, onlineFileURL)
   }
 
   const saveFile = (fileURL, jsonData) => {
-    return whenClientIsReady(({ saveFile }) => {
-      return saveFile(fileURL, jsonData)
-    })
+    return localClient.saveFile(fileURL, jsonData)
   }
 
   const backupOfflineBackupForResume = (file) => {
-    return whenClientIsReady(({ backupOfflineBackupForResume }) => {
-      return backupOfflineBackupForResume(file)
-    })
+    return localClient.backupOfflineBackupForResume(file)
   }
 
   const readOfflineFiles = () => {
-    return whenClientIsReady(({ readOfflineFiles }) => {
-      return readOfflineFiles()
-    })
+    return localClient.readOfflineFiles()
   }
 
   const isTempFile = (fileURL) => {
-    return whenClientIsReady(({ isTempFile }) => {
-      return isTempFile(fileURL)
-    })
+    return localClient.isTempFile(fileURL)
   }
 
   const saveAsTempFile = (file) => {
-    return whenClientIsReady(({ saveAsTempFile }) => {
-      return saveAsTempFile(file)
-    })
+    return localClient.saveAsTempFile(file)
   }
 
   const copyFile = (sourceFileURL, newFileURL) => {
-    return whenClientIsReady(({ copyFile }) => {
-      return copyFile(sourceFileURL, newFileURL)
-    })
+    return localClient.copyFile(sourceFileURL, newFileURL)
   }
 
   const createFileShortcut = (sourceFileURL, newFileURL) => {
-    return whenClientIsReady(({ createFileShortcut }) => {
-      return createFileShortcut(sourceFileURL, newFileURL)
-    })
+    return localClient.createFileShortcut(sourceFileURL, newFileURL)
   }
 
-  const basename = (fileURL) => {
-    return whenClientIsReady(({ basename }) => {
-      return basename(fileURL)
-    })
+  const basename = (fileURL, ext) => {
+    return localClient.basename(fileURL, ext)
   }
 
   return {

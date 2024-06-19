@@ -4,35 +4,38 @@ import { helpers } from 'pltr'
 
 import { bootFile } from './app/bootFile'
 import { makeMainProcessClient } from './app/mainProcessClient'
-import { whenClientIsReady } from '../shared/socket-client'
 import logger from '../shared/logger'
 
 const { onReloadFromFile, pleaseFetchState, setWindowTitle } = makeMainProcessClient()
 
-function displayFileName(fileName, fileURL, displayFilePath) {
+function displayFileName(localClient, fileName, fileURL, displayFilePath) {
   const isOnCloud = helpers.file.urlPointsToPlottrCloud(fileURL)
   const withoutProtocol = helpers.file.withoutProtocol(fileURL)
-  return whenClientIsReady(({ basename }) => {
-    const fileNamePromise = isOnCloud
-      ? Promise.resolve(fileName)
-      : withoutProtocol
-      ? basename(withoutProtocol)
-      : Promise.resolve('')
-    return fileNamePromise.then((computedFileName) => {
-      const devMessage = process.env.NODE_ENV == 'development' ? ' - DEV' : ''
-      const baseFileName = displayFilePath ? ` - ${computedFileName}` : ''
-      const plottr = isOnCloud ? 'Plottr Pro' : 'Plottr'
-      try {
-        const decodedFileName = decodeURIComponent(baseFileName)
-        return `${plottr}${decodedFileName}${devMessage}`
-      } catch (error) {
-        return `${plottr}${baseFileName}${devMessage}`
-      }
-    })
+  const fileNamePromise = isOnCloud
+    ? Promise.resolve(fileName)
+    : withoutProtocol
+    ? localClient.basename(withoutProtocol)
+    : Promise.resolve('')
+  return fileNamePromise.then((computedFileName) => {
+    const devMessage = process.env.NODE_ENV == 'development' ? ' - DEV' : ''
+    const baseFileName = displayFilePath ? ` - ${computedFileName}` : ''
+    const plottr = isOnCloud ? 'Plottr Pro' : 'Plottr'
+    try {
+      const decodedFileName = decodeURIComponent(baseFileName)
+      return `${plottr}${decodedFileName}${devMessage}`
+    } catch (error) {
+      return `${plottr}${baseFileName}${devMessage}`
+    }
   })
 }
 
-export const startupStateMachine = (getStore, selectors, actions, saveBackupOnFirebase) => {
+export const startupStateMachine = (
+  localClient,
+  getStore,
+  selectors,
+  actions,
+  saveBackupOnFirebase
+) => {
   const saveBackup = (filePath, file) => {
     const state = getStore().getState()
     const onCloud = selectors.isCloudFileSelector(state)
@@ -44,12 +47,10 @@ export const startupStateMachine = (getStore, selectors, actions, saveBackupOnFi
       isInProMode && onCloud ? saveBackupOnFirebase(userId, file) : Promise.resolve(true)
 
     return result.then(() => {
-      return whenClientIsReady(({ saveBackup }) => {
-        if (!onCloud || (onCloud && localBackupsEnabled)) {
-          return saveBackup(filePath, file)
-        }
-        return Promise.resolve(false)
-      })
+      if (!onCloud || (onCloud && localBackupsEnabled)) {
+        return localClient.saveBackup(filePath, file)
+      }
+      return Promise.resolve(false)
     })
   }
 
@@ -85,13 +86,13 @@ export const startupStateMachine = (getStore, selectors, actions, saveBackupOnFi
         // mode enabled, in which case we use convention to determine
         // the offline file counterpart.
         if (!!isInProMode === !!helpers.file.urlPointsToPlottrCloud(fileURL)) {
-          return bootFile(whenClientIsReady, fileURL, options, numOpenFiles, saveBackup)
+          return bootFile(localClient, fileURL, options, numOpenFiles, saveBackup)
             .then(() => {
               getStore().dispatch(actions.applicationState.finishCheckingFileToLoad())
             })
             .then(closeDashboard)
         } else if (isInOfflineMode && helpers.file.urlPointsToPlottrCloud(fileURL)) {
-          return bootFile(whenClientIsReady, fileURL, options, numOpenFiles, saveBackup, true)
+          return bootFile(localClient, fileURL, options, numOpenFiles, saveBackup, true)
             .then(() => {
               getStore().dispatch(actions.applicationState.finishCheckingFileToLoad())
             })
@@ -205,14 +206,14 @@ export const startupStateMachine = (getStore, selectors, actions, saveBackupOnFi
     (showDashboard, fileName, fileURL, dashboardClosed) => {
       if (showDashboard && !dashboardClosed) {
         if (fileName && fileName.length > 0) {
-          displayFileName(fileName, fileURL, false).then((fileName) => {
+          displayFileName(localClient, fileName, fileURL, false).then((fileName) => {
             setWindowTitle(fileName)
           })
         }
         getStore().dispatch(actions.client.setCurrentAppStateToDashboard())
       } else {
         if (fileName && fileName.length > 0) {
-          displayFileName(fileName, fileURL, true).then((fileName) => {
+          displayFileName(localClient, fileName, fileURL, true).then((fileName) => {
             setWindowTitle(fileName)
           })
         }

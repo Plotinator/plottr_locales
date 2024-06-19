@@ -21,7 +21,7 @@ const WHITE_LIST = [
   ADD_CARD,
 ]
 
-const tracker = (whenClientIsReady) => {
+const tracker = () => {
   return (store) => (next) => (action) => {
     const result = next(action)
     // Support redux-thunk and friends where non-objects are dispatched.

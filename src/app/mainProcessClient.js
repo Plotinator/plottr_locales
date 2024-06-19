@@ -6,6 +6,7 @@ const ask = (channel, ...args) => {
   return new Promise((resolve, reject) => {
     try {
       const listener = (event, ...args) => {
+        // @ts-ignore
         window.api.stopListening(listenToken, listener)
         if (args[0] && typeof args[0].error === 'string') {
           reject(new Error(args[0].error))
@@ -15,7 +16,9 @@ const ask = (channel, ...args) => {
           resolve(args)
         }
       }
+      // @ts-ignore
       window.api.listen(listenToken, listener)
+      // @ts-ignore
       window.api.send(channel, listenToken, ...args)
     } catch (error) {
       reject(error)
@@ -24,20 +27,24 @@ const ask = (channel, ...args) => {
 }
 
 const tell = (channel, ...args) => {
+  // @ts-ignore
   window.api.send(channel, ...args)
   return Promise.resolve()
 }
 
 const subscribeTo = (channel, cb) => {
+  // @ts-ignore
   window.api.listen(channel, (event, ...args) => {
     cb(...args)
   })
   return () => {
+    // @ts-ignore
     window.api.stopListening(channel, cb)
   }
 }
 
 const subscribeToWithReply = (channel, cb) => {
+  // @ts-ignore
   window.api.listen(channel, (event, replyChannel, ...args) => {
     const reply = (...replyArgs) => {
       event.sender.send(replyChannel, ...replyArgs)
@@ -45,6 +52,7 @@ const subscribeToWithReply = (channel, cb) => {
     cb(reply, ...args)
   })
   return () => {
+    // @ts-ignore
     window.api.stopListening(channel, cb)
   }
 }
@@ -173,8 +181,8 @@ const _makeMainProcessClient = () => {
     return ask('tell-me-what-os-i-am-on')
   }
 
-  const pleaseTellMeTheSocketServerPort = () => {
-    return ask('pls-tell-me-the-socket-worker-port')
+  const pleaseTellMeTheLocalServerPort = () => {
+    return ask('pls-tell-me-the-local-server-port')
   }
 
   const getLocale = () => {
@@ -263,7 +271,7 @@ const _makeMainProcessClient = () => {
   }
 
   const onUpdateWorkerPort = (cb) => {
-    return subscribeTo('update-worker-port', cb)
+    return subscribeTo('update-local-port', cb)
   }
 
   const onReloadDarkMode = (cb) => {
@@ -470,7 +478,7 @@ const _makeMainProcessClient = () => {
     updateLastOpenedFile,
     openBuyWindow,
     tellMeWhatOSImOn,
-    pleaseTellMeTheSocketServerPort,
+    pleaseTellMeTheLocalServerPort,
     getLocale,
     onExportFileFromMenu,
     onSave,

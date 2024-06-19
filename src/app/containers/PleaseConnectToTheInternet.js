@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { PropTypes } from 'prop-types'
+import PropTypes from 'prop-types'
 import cx from 'classnames'
 
 import { t } from 'plottr_locales'
@@ -28,6 +28,6 @@ PleaseConnectToTheInternet.propTypes = {
   darkMode: PropTypes.bool,
 }
 
-export default connect((state) => ({ darkMode: selectors.isDarkModeSelector(state) }))(
-  PleaseConnectToTheInternet
-)
+const mapStateToProps = (state) => ({ darkMode: selectors.isDarkModeSelector(state) })
+
+export default connect(mapStateToProps)(PleaseConnectToTheInternet)

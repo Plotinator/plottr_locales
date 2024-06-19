@@ -2,8 +2,6 @@ import mixpanel from 'mixpanel-browser'
 import { helpers } from 'pltr'
 
 import log from '../../../shared/logger'
-import { whenClientIsReady } from '../../../shared/socket-client/index'
-import makeFileSystemAPIs from '../../api/file-system-apis'
 import { makeMainProcessClient } from '../../app/mainProcessClient'
 
 const { pleaseTellMeWhatPlatformIAmOn } = makeMainProcessClient()
@@ -21,10 +19,6 @@ export function setTrialInfo(isTrialMode, num) {
 
 class MixpanelQueue {
   queue = []
-
-  constructor() {
-    this.fileSystemAPIs = makeFileSystemAPIs(whenClientIsReady)
-  }
 
   projectEventStats(event, basicAttrs = {}, state) {
     if (!event || process.env.NODE_ENV == 'development') return

@@ -1,22 +1,20 @@
 import { v4 as uuid } from 'uuid'
 
-import { BUSY, DONE } from '../../shared/socket-server-message-types'
-
 class StatusManager {
-  activeConnections = new Set()
+  generation = 0
   tasks = []
+  nextWatchers = []
+  busy = false
   logger = {
     info: () => {},
     warn: () => {},
-    error: () => {},
+    error: (_error) => {},
   }
 
   constructor(logger) {
-    if (logger) this.logger = logger
-  }
-
-  acceptConnection(webSocket) {
-    this.activeConnections.add(webSocket)
+    if (logger) {
+      this.logger = logger
+    }
   }
 
   registerTask(work, name) {
@@ -43,28 +41,39 @@ class StatusManager {
       })
   }
 
-  broadcast(message) {
-    this.activeConnections.forEach((connection) => {
-      try {
-        connection.send(
-          JSON.stringify({ type: message, payload: {}, messageId: uuid(), result: null })
-        )
-      } catch (error) {
-        this.logger.error(
-          `Removing a connection from the status manager because it errored out with`,
-          error
-        )
-        this.activeConnections.delete(connection)
-      }
+  nextGeneration(currentGeneration) {
+    if (!currentGeneration || currentGeneration < this.generation) {
+      return Promise.resolve({
+        busy: this.busy,
+        generation: this.generation,
+      })
+    } else {
+      return new Promise((resolve) => {
+        this.nextWatchers.push(resolve)
+      })
+    }
+  }
+
+  notifyNextWatchers() {
+    this.nextWatchers.forEach((resolve) => {
+      resolve({
+        busy: this.busy,
+        generation: this.generation,
+      })
     })
+    this.nextWatchers = []
   }
 
   notifyBusy() {
-    this.broadcast(BUSY)
+    this.busy = true
+    this.generation++
+    this.notifyNextWatchers()
   }
 
   notifyDone() {
-    this.broadcast(DONE)
+    this.busy = false
+    this.generation++
+    this.notifyNextWatchers()
   }
 }
 

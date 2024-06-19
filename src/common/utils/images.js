@@ -20,6 +20,7 @@ export function isImageUrl(url) {
   if (!url) return false
   if (!isUrl(url)) return false
   const ext = new URL(url).pathname.split('.').pop()
+  // @ts-ignore
   return imageExtensions.includes(ext)
 }
 

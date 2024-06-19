@@ -51,13 +51,34 @@ const Saver = (
   isLoggedInThunk,
   offerSaveAsThenQuit
 ) => {
+  /**
+   * @type {SaverRef}
+   * @typedef SaverRef
+   * @property {number | null} current
+   */
   const saveInterval = { current: null }
+  /**
+   * @type {BackupRef}
+   * @typedef BackupRef
+   * @property {number | null} current
+   */
   const backupInterval = { current: null }
   const failedSaveCount = { current: 0 }
   const failedBackupCount = { current: 0 }
   const lastStateBackedUp = { current: {} }
   const lastStateSaved = { current: {} }
 
+  // TODO: use setTimeout instead!
+  /**
+   * @param {String} name
+   * @param {function(any): Promise<void>} f
+   * @param {number} intervalMS
+   * @param {{ current: any }} lastStateRef
+   * @param {{ current: number }} failedCountRef
+   * @param {function(): void} onSuccessThisTime
+   * @param {function(Error): Promise<boolean>} onFailed
+   * @returns {number}
+   */
   const startJob = (
     name,
     f,
@@ -67,6 +88,7 @@ const Saver = (
     onSuccessThisTime,
     onFailed
   ) => {
+    // @ts-ignore
     return setInterval(() => {
       const state = getState()
       if (!stateDidntChange(lastStateRef.current, state)) {

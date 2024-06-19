@@ -6,7 +6,7 @@ import { FaKey } from '@react-icons/all-files/fa/FaKey'
 import { FaSearch } from '@react-icons/all-files/fa/FaSearch'
 
 import { t } from 'plottr_locales'
-import { Navbar, NavItem, Nav, Beamer, BookChooser, Button } from 'connected-components'
+import { Navbar, NavItem, Nav, Beamer, BookChooser, Button } from 'plottr_components'
 import { selectors, actions } from 'wired-up-pltr'
 
 import DashboardModal from './DashboardModal'
@@ -34,7 +34,9 @@ const Navigation = ({
       setDashboardModalView(null)
     })
     return () => {
+      // @ts-ignore
       document.removeEventListener('open-dashboard', openListener)
+      // @ts-ignore
       document.removeEventListener('close-dashboard', closeListener)
     }
   }, [])

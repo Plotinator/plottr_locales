@@ -115,17 +115,16 @@ ErrorLoadingFile.propTypes = {
   clearErrorLoadingFile: PropTypes.func.isRequired,
 }
 
-export default connect(
-  (state) => {
-    return {
-      isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
-      errorIsUpdateError: selectors.errorIsUpdateErrorSelector(state) || false,
-      pathToProject: selectors.filePathToProjectDuringBootSelector(state),
-    }
-  },
-  {
-    setCurrentAppStateToDashboard: actions.client.setCurrentAppStateToDashboard,
-    clearErrorLoadingFile: actions.applicationState.clearErrorLoadingFile,
-    setOpenDashboardTo: actions.applicationState.setOpenDashboardTo,
+const mapStateToProps = (state) => {
+  return {
+    isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
+    errorIsUpdateError: selectors.errorIsUpdateErrorSelector(state) || false,
+    pathToProject: selectors.filePathToProjectDuringBootSelector(state),
   }
-)(ErrorLoadingFile)
+}
+
+export default connect(mapStateToProps, {
+  setCurrentAppStateToDashboard: actions.client.setCurrentAppStateToDashboard,
+  clearErrorLoadingFile: actions.applicationState.clearErrorLoadingFile,
+  setOpenDashboardTo: actions.applicationState.setOpenDashboardTo,
+})(ErrorLoadingFile)

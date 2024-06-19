@@ -1,16 +1,17 @@
-import log from 'electron-log'
+export const makeFeatureFlagsModule = (localClient, log) => {
+  const featureFlags = () => {
+    return localClient
+      .currentAppSettings()
+      .then((settings) => {
+        return {}
+      })
+      .catch((error) => {
+        log.error('Could not read current settings for feature flags', error)
+        return Promise.reject(error)
+      })
+  }
 
-import currentSettings from './settings'
-
-const featureFlags = () => {
-  return currentSettings()
-    .then((settings) => {
-      return {}
-    })
-    .catch((error) => {
-      log.error('Could not read current settings for feature flags', error)
-      return Promise.reject(error)
-    })
+  return {
+    featureFlags,
+  }
 }
-
-export { featureFlags }

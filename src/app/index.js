@@ -9,7 +9,7 @@
 
 import { setupI18n, t } from 'plottr_locales'
 
-import { store } from 'store'
+import { store, initialiseStore } from './store'
 
 import { helpers, migrateIfNeeded, addMissingKeys } from 'pltr'
 import { actions, selectors } from 'wired-up-pltr'
@@ -28,12 +28,11 @@ import { makeFileSystemAPIs } from '../api'
 import { renderFile } from '../renderFile'
 import { setOS, isWindows } from '../isOS'
 import { uploadToFirebase } from '../upload-to-firebase'
-import { openFile } from 'connected-components'
 // import { instrumentLongRunningTasks } from './longRunning'
 import { rootComponent } from './rootComponent'
 import { makeFileModule } from './files'
 import { openExistingFile } from '../files'
-import { createClient, getPort, whenClientIsReady, setPort } from '../../shared/socket-client'
+import { createClient } from '../../shared/local-client'
 import logger from '../../shared/logger'
 import { removeSystemKeys } from './bootFile'
 import { makeMainProcessClient } from './mainProcessClient'
@@ -41,7 +40,7 @@ import { downloadStorageImage } from '../common/downloadStorageImage'
 import createErrorReporter from '../../shared/error-reporter'
 import { getErrorReporterInstance } from '../../shared/error-reporter-instance'
 
-const { rtfToHTML } = rtfSerialisersAndDeserialisers
+const { toHTML } = rtfSerialisersAndDeserialisers
 const convertHTMLNodeList = slate.html.deserialiseHTMLNodeList
 
 const {
@@ -49,7 +48,7 @@ const {
   showSaveDialog,
   getEnvObject,
   tellMeWhatOSImOn,
-  pleaseTellMeTheSocketServerPort,
+  pleaseTellMeTheLocalServerPort,
   getLocale,
   onExportFileFromMenu,
   onSave,
@@ -89,6 +88,7 @@ const {
   createNewFile,
   pleaseTellMeWhatPlatformIAmOn,
   markProjectAsSaved,
+  openKnownFile,
 } = makeMainProcessClient()
 
 const errorReportingLogger = {
@@ -102,7 +102,7 @@ const errorReportingLogger = {
   },
 }
 
-const connectToSocketServer = (port) => {
+const connectToLocalServer = (port, secret) => {
   let doneTimeout = null
   const socketServerEventHandlers = {
     onBusy: () => {
@@ -118,25 +118,7 @@ const connectToSocketServer = (port) => {
       }, 2000)
     },
   }
-  createClient(
-    getPort(),
-    logger,
-    WebSocket,
-    (error) => {
-      errorReportingLogger.error(
-        `Failed to reconnect to socket server on port: <${port}>.  Killing the window.`,
-        error
-      )
-      showErrorBox(
-        t('Error'),
-        t("Plottr ran into a problem and can't start.  Please contact support.")
-      ).then(() => {
-        window.close()
-      })
-    },
-    socketServerEventHandlers,
-    restartSocketServer
-  )
+  return createClient(port, logger, secret, socketServerEventHandlers)
 }
 
 const IGNORED_ERRORS = [
@@ -145,19 +127,23 @@ const IGNORED_ERRORS = [
   "Cannot read properties of undefined (reading 'childNodes')",
 ]
 let errorReporter = null
+let localClient = null
 tellMeWhatOSImOn()
   .then((osIAmOn) => {
     setOS(osIAmOn)
     onUpdateWorkerPort((newPort) => {
-      logger.info(`Updating the socket server port to: ${newPort}`)
-      setPort(newPort)
-      connectToSocketServer(newPort)
+      logger.info(`Updating the local server port to: ${newPort}`)
+      localClient?.setPort?.(newPort)
     })
-    return pleaseTellMeTheSocketServerPort()
+    return pleaseTellMeTheLocalServerPort()
   })
-  .then((socketWorkerPort) => {
-    setPort(socketWorkerPort)
-    return connectToSocketServer(socketWorkerPort)
+  .then(({ localServerPort, localServerSecret }) => {
+    localClient = connectToLocalServer(localServerPort, localServerSecret)
+    // =======================================================
+    // N.B. This line is incredibly important because we still
+    // statically import the store all over the show.
+    // =======================================================
+    initialiseStore(localClient)
   })
   .then(() => {
     const state = store().getState()
@@ -193,9 +179,9 @@ tellMeWhatOSImOn()
   })
   .then(() => {
     const { saveOfflineFile, saveFile, isTempFile, basename, copyFile, createFileShortcut } =
-      makeFileModule(whenClientIsReady)
+      makeFileModule(localClient)
 
-    const fileSystemAPIs = makeFileSystemAPIs(whenClientIsReady)
+    const fileSystemAPIs = makeFileSystemAPIs(localClient)
 
     // instrumentLongRunningTasks()
 
@@ -209,10 +195,14 @@ tellMeWhatOSImOn()
       })
       .then(() => {
         getEnvObject().then((envObject) => {
+          // @ts-ignore
           if (!window.env) {
+            // @ts-ignore
             window.env = {}
           }
+          // @ts-ignore
           Object.entries(envObject).forEach(([key, value]) => {
+            // @ts-ignore
             window.env[key] = value
           })
         })
@@ -221,13 +211,10 @@ tellMeWhatOSImOn()
         // Secondary SETUP //
         window.requestIdleCallback(
           () => {
-            whenClientIsReady(
-              ({ ensureBackupFullPath, ensureBackupTodayPath, attemptToFetchTemplates }) => {
-                return ensureBackupFullPath()
-                  .then(ensureBackupTodayPath)
-                  .then(attemptToFetchTemplates)
-              }
-            )
+            localClient
+              .ensureBackupFullPath()
+              .then(localClient.ensureBackupTodayPath)
+              .then(localClient.attemptToFetchTemplates)
             initMixpanel()
           },
           { timeout: 1000 }
@@ -235,8 +222,9 @@ tellMeWhatOSImOn()
 
         document.addEventListener('save-custom-template', (event) => {
           const currentState = store().getState()
+          // @ts-ignore
           const options = event.payload
-          addNewCustomTemplate(currentState, options)
+          addNewCustomTemplate(localClient, currentState, options)
         })
 
         onExportFileFromMenu(({ type }) => {
@@ -262,9 +250,10 @@ tellMeWhatOSImOn()
           const isOfflineModeEnabled = selectors.offlineModeEnabledSelector(state)
           const isCloudFile = selectors.isCloudFileSelector(state)
           const fileState = selectors.fullFileStateSelector(state)
-          const fileURL = selectors.fileURLSelector(state)
+          const onlineFileURL = selectors.fileURLSelector(state)
+          const knownFiles = selectors.knownFilesSelector(state)
           if (isCloudFile && isOffline && isOfflineModeEnabled) {
-            saveOfflineFile(fileURL, fileState)
+            saveOfflineFile(fileState, knownFiles, onlineFileURL)
               .then(() => {
                 store().dispatch(actions.ui.fileSaved())
               })
@@ -297,143 +286,134 @@ tellMeWhatOSImOn()
             window.dispatchEvent(event)
           }
 
-          whenClientIsReady(({ basename, join, saveToDefaultLocation }) => {
-            return fileSystemAPIs.currentAppSettings().then((settings) => {
-              const useUserDefault =
-                settings.user.defaultFolder && settings.user.defaultFolderLocation
-              let defaultPath = settings.user.defaultFolderLocation
-              if (fileUrl) {
-                const fileUrlSansProto = helpers.file.withoutProtocol(fileUrl)
-                return basename(fileUrlSansProto)
-                  .then((fileBaseName) => {
-                    defaultPath = useUserDefault ? defaultPath : fileUrlSansProto
-                    const defaultBaseName = suggestedNewName || (useUserDefault ? fileBaseName : '')
-                    return useUserDefault
-                      ? defaultBaseName
-                      : userDocumentsPath().then((documentsPath) => {
-                          return join(documentsPath, fileBaseName)
-                        })
-                  })
-                  .then((defaultBaseName) => {
-                    return join(defaultPath, defaultBaseName).then((finalDefaultPath) => {
-                      return getVersion()
-                        .then((version) => {
-                          return whenClientIsReady(({ readFile }) => {
-                            return readFile(helpers.file.withoutProtocol(fileUrl), 'utf-8').then(
-                              (rawFile) => {
-                                const contents = JSON.parse(rawFile)
-                                return new Promise((resolve, reject) => {
-                                  migrateIfNeeded(
-                                    version,
-                                    contents,
-                                    fileUrl,
-                                    null,
-                                    (err, didMigrate, migratedState) => {
-                                      if (err) {
-                                        errorReportingLogger.error('Error migrating a file', err)
-                                        if (err === 'Plottr behind file') {
-                                          showErrorBox(t('Error'), t('Please update Plottr'))
-                                          reject(new Error('Need to update Plottr'))
-                                        } else {
-                                          reject(err)
-                                        }
-                                      } else {
-                                        resolve(contents)
-                                      }
-                                    }
-                                  )
-                                })
-                              }
-                            )
-                          })
-                        })
-                        .then((migratedState) => {
-                          return showSaveDialog(filters, title, finalDefaultPath).then(
-                            (fileName) => {
-                              if (fileName) {
-                                const backupFolder = selectors.backupFolderPathSelector(
-                                  store().getState()
-                                )
-                                if (fileName.startsWith(backupFolder)) {
-                                  return showErrorBox(
-                                    t('Error'),
-                                    t('Please choose a destination other than your backup folder')
-                                  )
-                                } else {
-                                  const newFilePath = helpers.file.ensureEndsInPltr(fileName)
-                                  const newFileURL = helpers.file.filePathToFileURL(newFilePath)
-                                  return saveFile(newFileURL, addMissingKeys(migratedState))
-                                    .then(() => {
-                                      store().dispatch(
-                                        actions.applicationState.finishRenamingFile()
-                                      )
-                                      return addToKnownFilesAndOpen(newFileURL)
-                                    })
-                                    .then(() => {
-                                      if (forceCloseWhenDone) {
-                                        forceCloseWindow()
-                                      }
-                                    })
-                                }
-                              } else {
-                                return Promise.resolve()
-                              }
-                            }
-                          )
-                        })
-                    })
-                  })
-              } else {
-                const currentState = store().getState()
-                const isInOfflineMode = selectors.isInOfflineModeSelector(currentState)
-                const fileState = selectors.fullFileStateSelector(currentState)
-                if (isInOfflineMode) {
-                  logger.info('Tried to save-as a file, but it is offline')
-                  return Promise.resolve()
-                }
-                return basename(fileState.file.fileName, '.pltr').then((fileBaseName) => {
-                  defaultPath = useUserDefault ? defaultPath : fileState.file.fileName
-                  let defaultBaseName = suggestedNewName || (useUserDefault ? fileBaseName : '')
-                  return join(defaultPath, defaultBaseName)
-                    .then((defaultPath) => {
-                      return useUserDefault
-                        ? defaultPath
-                        : userDocumentsPath().then((documentsPath) => {
-                            return join(documentsPath, fileBaseName)
-                          })
-                    })
-                    .then((finalDefaultPath) => {
-                      return showSaveDialog(filters, title, finalDefaultPath).then((fileName) => {
-                        if (fileName) {
-                          const backupFolder = selectors.backupFolderPathSelector(
-                            store().getState()
-                          )
-                          if (fileName.startsWith(backupFolder)) {
-                            return showErrorBox(
-                              t('Error'),
-                              t('Please choose a destination other than your backup folder')
-                            )
-                          } else {
-                            const newFilePath = helpers.file.ensureEndsInPltr(fileName)
-                            const newFileURL = helpers.file.filePathToFileURL(newFilePath)
-                            return saveFile(newFileURL, fileState)
-                              .then(() => {
-                                return addToKnownFilesAndOpen(newFileURL)
-                              })
-                              .then(() => {
-                                if (forceCloseWhenDone) {
-                                  forceCloseWindow()
-                                }
-                              })
-                          }
-                        } else {
-                          return Promise.resolve()
-                        }
+          return fileSystemAPIs.currentAppSettings().then((settings) => {
+            const useUserDefault =
+              settings.user.defaultFolder && settings.user.defaultFolderLocation
+            let defaultPath = settings.user.defaultFolderLocation
+            if (fileUrl) {
+              const fileUrlSansProto = helpers.file.withoutProtocol(fileUrl)
+              return basename(fileUrlSansProto)
+                .then((fileBaseName) => {
+                  defaultPath = useUserDefault ? defaultPath : fileUrlSansProto
+                  const defaultBaseName = suggestedNewName || (useUserDefault ? fileBaseName : '')
+                  return useUserDefault
+                    ? defaultBaseName
+                    : userDocumentsPath().then((documentsPath) => {
+                        return localClient.join(documentsPath, fileBaseName)
                       })
-                    })
                 })
+                .then((defaultBaseName) => {
+                  return localClient.join(defaultPath, defaultBaseName).then((finalDefaultPath) => {
+                    return getVersion()
+                      .then((version) => {
+                        return localClient
+                          .readFile(helpers.file.withoutProtocol(fileUrl), 'utf-8')
+                          .then((rawFile) => {
+                            const contents = JSON.parse(rawFile)
+                            return new Promise((resolve, reject) => {
+                              migrateIfNeeded(
+                                version,
+                                contents,
+                                fileUrl,
+                                null,
+                                (err, didMigrate, migratedState) => {
+                                  if (err) {
+                                    errorReportingLogger.error('Error migrating a file', err)
+                                    if (err === 'Plottr behind file') {
+                                      showErrorBox(t('Error'), t('Please update Plottr'))
+                                      reject(new Error('Need to update Plottr'))
+                                    } else {
+                                      reject(err)
+                                    }
+                                  } else {
+                                    resolve(contents)
+                                  }
+                                }
+                              )
+                            })
+                          })
+                      })
+                      .then((migratedState) => {
+                        return showSaveDialog(filters, title, finalDefaultPath).then((fileName) => {
+                          if (fileName) {
+                            const backupFolder = selectors.backupFolderPathSelector(
+                              store().getState()
+                            )
+                            if (fileName.startsWith(backupFolder)) {
+                              return showErrorBox(
+                                t('Error'),
+                                t('Please choose a destination other than your backup folder')
+                              )
+                            } else {
+                              const newFilePath = helpers.file.ensureEndsInPltr(fileName)
+                              const newFileURL = helpers.file.filePathToFileURL(newFilePath)
+                              return saveFile(newFileURL, addMissingKeys(migratedState))
+                                .then(() => {
+                                  store().dispatch(actions.applicationState.finishRenamingFile())
+                                  return addToKnownFilesAndOpen(newFileURL)
+                                })
+                                .then(() => {
+                                  if (forceCloseWhenDone) {
+                                    forceCloseWindow()
+                                  }
+                                })
+                            }
+                          } else {
+                            return Promise.resolve()
+                          }
+                        })
+                      })
+                  })
+                })
+            } else {
+              const currentState = store().getState()
+              const isInOfflineMode = selectors.isInOfflineModeSelector(currentState)
+              const fileState = selectors.fullFileStateSelector(currentState)
+              if (isInOfflineMode) {
+                logger.info('Tried to save-as a file, but it is offline')
+                return Promise.resolve()
               }
-            })
+              return basename(fileState.file.fileName, '.pltr').then((fileBaseName) => {
+                defaultPath = useUserDefault ? defaultPath : fileState.file.fileName
+                let defaultBaseName = suggestedNewName || (useUserDefault ? fileBaseName : '')
+                return localClient
+                  .join(defaultPath, defaultBaseName)
+                  .then((defaultPath) => {
+                    return useUserDefault
+                      ? defaultPath
+                      : userDocumentsPath().then((documentsPath) => {
+                          return localClient.join(documentsPath, fileBaseName)
+                        })
+                  })
+                  .then((finalDefaultPath) => {
+                    return showSaveDialog(filters, title, finalDefaultPath).then((fileName) => {
+                      if (fileName) {
+                        const backupFolder = selectors.backupFolderPathSelector(store().getState())
+                        if (fileName.startsWith(backupFolder)) {
+                          return showErrorBox(
+                            t('Error'),
+                            t('Please choose a destination other than your backup folder')
+                          )
+                        } else {
+                          const newFilePath = helpers.file.ensureEndsInPltr(fileName)
+                          const newFileURL = helpers.file.filePathToFileURL(newFilePath)
+                          return saveFile(newFileURL, fileState)
+                            .then(() => {
+                              return addToKnownFilesAndOpen(newFileURL)
+                            })
+                            .then(() => {
+                              if (forceCloseWhenDone) {
+                                forceCloseWindow()
+                              }
+                            })
+                        }
+                      } else {
+                        return Promise.resolve()
+                      }
+                    })
+                  })
+              })
+            }
           })
         }
 
@@ -486,8 +466,9 @@ tellMeWhatOSImOn()
                     copyFile(oldFileURL, newFileURL)
                       .then(() => {
                         return basename(newFilePath).then((newFileName) => {
-                          // load the new file: the only way to set a new
-                          // `project.fileURL`(!)
+                          // load the new file: the only way to set the current
+                          // `fileURL`(!)
+
                           store().dispatch(
                             actions.ui.loadFile(
                               newFileName,
@@ -513,9 +494,7 @@ tellMeWhatOSImOn()
                         })
                       })
                       .then(() => {
-                        whenClientIsReady(({ removeFromKnownFiles }) => {
-                          return removeFromKnownFiles(oldFileURL)
-                        })
+                        return localClient.removeFromKnownFiles(oldFileURL)
                       })
                       .then(() => {
                         forceCloseWindow()
@@ -530,6 +509,7 @@ tellMeWhatOSImOn()
         document.addEventListener('move-from-temp', moveFromTempHandler)
 
         const _unsubscribeFromSaveAs = onSaveAs(saveAsHandler)
+        // @ts-ignore
         document.addEventListener('save-as', saveAsHandler)
 
         onUndo(() => {
@@ -564,6 +544,7 @@ tellMeWhatOSImOn()
           const searchModalIsOpen = selectors.searchDialogIsOpenSelector(state)
           if (!cardDialogIsOpen) {
             const table = document.querySelector('.sticky-table')
+            // @ts-ignore
             const targetIsEditable = e.target.isContentEditable || e.target.nodeName === 'INPUT'
             // No redux state for a few.  Here's a catch all for modals.
             const aModalIsOpen = document.querySelector('.ReactModalPortal')
@@ -605,12 +586,13 @@ tellMeWhatOSImOn()
           }
         })
 
+        // @ts-ignore
         window.logger = function (which) {
           process.env.LOGGER = which.toString()
         }
 
         onCreateErrorReport(() => {
-          createFullErrorReport()
+          createFullErrorReport(localClient)
         })
 
         onCloseDashboard(closeDashboard)
@@ -630,7 +612,7 @@ tellMeWhatOSImOn()
                   return Promise.reject(new Error(message))
                 }
                 const fileURL = helpers.file.fileIdToPlottrCloudFileURL(fileId)
-                openFile(fileURL, false)
+                openKnownFile(fileURL, false)
 
                 if (isScrivenerFile) {
                   store().dispatch(actions.applicationState.finishScrivenerImporter())
@@ -661,7 +643,7 @@ tellMeWhatOSImOn()
         })
 
         onConvertRTFStringToSlate((rtfString, conversionId) => {
-          rtfToHTML(rtfString).then((html) => {
+          toHTML(rtfString).then((html) => {
             return replyToConvertRTFStringToSlateRequest(conversionId, convertHTMLNodeList(html))
           })
         })
@@ -723,7 +705,7 @@ tellMeWhatOSImOn()
           }
         })
 
-        onOpenExisting(() => openExistingFile())
+        onOpenExisting(() => openExistingFile(localClient))
         onFromTemplate(() => {
           openDashboard()
           setTimeout(createFromTemplate, 300)
@@ -751,11 +733,11 @@ tellMeWhatOSImOn()
         //
         // Could be important to do so because it might set up inotify
         // listeners and too many of those cause slow-downs.
-        const _unsubscribeToPublishers = world(whenClientIsReady).publishChangesToStore(store())
+        const _unsubscribeToPublishers = world(localClient).publishChangesToStore(store())
 
         const root = rootComponent()
 
-        renderFile(root, whenClientIsReady)
+        renderFile(root, localClient)
 
         listenersRegistered()
       })

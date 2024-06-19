@@ -8,10 +8,14 @@ import { buildHelpMenu } from './help'
 import { buildFileMenu } from './file'
 import { buildViewMenu } from './view'
 import { getWindowById } from '../windows'
-import { whenClientIsReady } from '../../../shared/socket-client/index'
 import replyWithError from '../../lib/replyWithError'
 
 let safelyExitModule = null
+let projectModule = null
+let featureFlagsModule = null
+let settingsModule = null
+let knownFilesModule = null
+let localClient = null
 
 ipcMain.on('please-reload-menu', (event, replyChannel) => {
   log.info('Menu reload requested.')
@@ -20,7 +24,14 @@ ipcMain.on('please-reload-menu', (event, replyChannel) => {
     event.sender.send(replyChannel, 'not-ready')
     return
   }
-  loadMenu(safelyExitModule)
+  loadMenu(
+    safelyExitModule,
+    projectModule,
+    featureFlagsModule,
+    settingsModule,
+    knownFilesModule,
+    localClient
+  )
     .then(() => {
       log.info('Reloaded menu')
       event.sender.send(replyChannel, 'done')
@@ -40,8 +51,13 @@ function getFocussedWindow() {
   }
 }
 
-function buildMenu(safelyExit) {
+function buildMenu(safelyExit, project, featureFlags, settings, knownFiles, client) {
   safelyExitModule = safelyExit
+  projectModule = project
+  featureFlagsModule = featureFlags
+  settingsModule = settings
+  knownFilesModule = knownFiles
+  localClient = client
   const win = getFocussedWindow()
   let fileURL = null
   if (win) {
@@ -51,14 +67,26 @@ function buildMenu(safelyExit) {
     }
   }
 
-  const getTrialInfo = () =>
-    whenClientIsReady(({ currentTrial }) => {
-      return currentTrial()
-    })
+  const getTrialInfo = client.currentTrial
 
   return Promise.all([
-    buildPlottrMenu(buildMenu, safelyExit),
-    buildFileMenu(fileURL, getTrialInfo),
+    buildPlottrMenu(
+      buildMenu,
+      safelyExit,
+      projectModule,
+      featureFlagsModule,
+      settingsModule,
+      knownFilesModule,
+      client
+    ),
+    buildFileMenu(
+      fileURL,
+      getTrialInfo,
+      projectModule,
+      featureFlagsModule,
+      settingsModule,
+      knownFilesModule
+    ),
   ]).then(([plottrMenu, fileMenu]) => {
     return [
       plottrMenu,
@@ -71,11 +99,13 @@ function buildMenu(safelyExit) {
   })
 }
 
-function loadMenu(safelyExit) {
-  return buildMenu(safelyExit).then((template) => {
-    const menu = Menu.buildFromTemplate(template)
-    Menu.setApplicationMenu(menu)
-  })
+function loadMenu(safelyExit, project, featureFlags, settings, knownFiles, localClient) {
+  return buildMenu(safelyExit, project, featureFlags, settings, knownFiles, localClient).then(
+    (template) => {
+      const menu = Menu.buildFromTemplate(template)
+      Menu.setApplicationMenu(menu)
+    }
+  )
 }
 
 export { loadMenu }

@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { cloneDeep, set, get } from 'lodash'
+import { v4 as uuid } from 'uuid'
 
 const { readFile, open, writeFile, lstat, mkdir } = fs.promises
 
@@ -11,7 +12,26 @@ const promiseIdentity = (s) => {
 class Store {
   store = {}
   watchers = new Set()
+  nextWatchers = []
 
+  /**
+   * @param {String} userDataPath
+   * @typedef Logger
+   * @property {function(String, Error): void} error
+   * @property {function(String): void} warn
+   * @property {function(String): void} info
+   * @param {Logger} logger
+   * @typedef Encryption
+   * @property {function(String): Promise<string>} encryptString
+   * @property {function(String): Promise<String>} decryptString
+   * @typedef Options
+   * @property {String} name
+   * @property {boolean} [watch]
+   * @property {any} [defaults]
+   * @property {(function(): void)} [onInvalidStore]
+   * @property {Encryption} [encryption]
+   * @param {Options} param2
+   */
   constructor(userDataPath, logger, { name, watch, defaults, onInvalidStore, encryption }) {
     logger.info(`Constructing store for: ${name}`)
 
@@ -29,6 +49,7 @@ class Store {
       typeof encryption?.decryptString === 'function'
     this.preprocessForWrite = encryption?.encryptString || promiseIdentity
     this.preprocessForRead = encryption?.decryptString || promiseIdentity
+    this.generation = 0
 
     this._readStore().then(() => {
       this.initialReadComplete = true
@@ -38,12 +59,40 @@ class Store {
     })
   }
 
+  getNextGeneration = (currentGeneration) => {
+    if ((!currentGeneration && currentGeneration !== 0) || currentGeneration < this.generation) {
+      return {
+        cancel: null,
+        result: this.currentStore().then((data) => {
+          return {
+            generation: this.generation,
+            data,
+          }
+        }),
+      }
+    } else {
+      const id = uuid()
+      return {
+        cancel: () => {
+          this.nextWatchers = this.nextWatchers.filter((watcher) => {
+            return id !== watcher.id
+          })
+        },
+        result: new Promise((resolve) => {
+          this.nextWatchers.push({ resolve, id })
+        }),
+      }
+    }
+  }
+
   isInitialReadComplete = () => {
     return this.initialReadComplete
   }
 
   stop = () => {
+    // @ts-ignore
     if (this.watcher && typeof this.watcher.close === 'function') {
+      // @ts-ignore
       this.watcher.close()
     }
   }
@@ -75,6 +124,17 @@ class Store {
   }
 
   publishChangesToWatchers = () => {
+    this.generation++
+    this.nextWatchers.forEach(({ resolve }) => {
+      resolve({
+        generation: this.generation,
+        data: {
+          ...this.defaults,
+          ...this.store,
+        },
+      })
+    })
+    this.nextWatchers = []
     this.watchers.forEach((cb) => {
       cb({
         ...this.defaults,
@@ -145,7 +205,7 @@ class Store {
                 return mkdir(this.userDataPath, { recursive: true })
                   .then(() => {
                     return new Promise((resolve) => {
-                      setTimeout(resolve, Math.random(1000) + 1000)
+                      setTimeout(resolve, Math.random() * 1000 + 1000)
                     })
                   })
                   .then(createStore)
@@ -155,7 +215,7 @@ class Store {
             .then(createStore)
         }
         this.logger.error(`Failed to construct store for ${this.name} at ${this.path}`, error)
-        throw new Error(`Failed to construct store for ${this.name} at ${this.path}`, error)
+        throw new Error(`Failed to construct store for ${this.name} at ${this.path}`)
       })
       .then((rawStoreContents) => {
         const rawContentsAsString = rawStoreContents.toString()
@@ -195,8 +255,7 @@ class Store {
           }
 
           throw new Error(
-            `Contents of store for ${this.name} at ${this.path} are invalid: <${storeContents}>`,
-            error
+            `Contents of store for ${this.name} at ${this.path} are invalid: <${storeContents}>`
           )
         }
       })
@@ -239,7 +298,7 @@ class Store {
             error
           )
           return Promise.reject(
-            new Error(`Failed to write ${JSON.stringify(this.store)} store for ${this.path}`, error)
+            new Error(`Failed to write ${JSON.stringify(this.store)} store for ${this.path}`)
           )
         })
         .finally(() => {
@@ -279,7 +338,7 @@ class Store {
   setRawKey = (key, value) => {
     if (!key) {
       const message = `Attempted to set key: ${key} to ${value} but (as you can see, there's no key)`
-      this.logger.error(message)
+      this.logger.error(message, new Error(message))
       return Promise.reject(new Error(message))
     }
     return this.afterActiveWrite(() => {

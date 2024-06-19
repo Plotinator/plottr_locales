@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { PropTypes } from 'prop-types'
+import PropTypes from 'prop-types'
 
 import { helpers } from 'pltr'
 import { t } from 'plottr_locales'
@@ -14,7 +14,7 @@ import {
   Form,
   Button,
   FunSpinner,
-} from 'connected-components'
+} from 'plottr_components'
 
 const modalStyles = {
   overlay: {

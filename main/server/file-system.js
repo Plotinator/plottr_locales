@@ -1,10 +1,11 @@
 import path from 'path'
 import fs from 'fs'
 import os from 'os'
+import { isEqual } from 'lodash'
 
 import { sortBy } from 'lodash'
 
-import { BACKUP_BASE_PATH, CUSTOM_TEMPLATES_PATH } from './stores'
+import { CUSTOM_TEMPLATES_PATH } from './stores'
 
 import { helpers } from 'pltr'
 
@@ -123,9 +124,8 @@ const fileSystemModule = (userDataPath) => {
       return customTemplatesStore.delete(id)
     }
 
-    const listenToTrialChanges = (cb) => {
-      cb(trialStore.store)
-      return trialStore.onDidAnyChange.bind(trialStore)(cb)
+    const listenToTrialChanges = (generation) => {
+      return trialStore.getNextGeneration(generation)
     }
     const currentTrial = () => {
       return trialStore.currentStore()
@@ -155,9 +155,8 @@ const fileSystemModule = (userDataPath) => {
       })
     }
 
-    const listenToLicenseChanges = (cb) => {
-      cb(licenseStore.store)
-      return licenseStore.onDidAnyChange.bind(licenseStore)(cb)
+    const listenToLicenseChanges = (generation) => {
+      return licenseStore.getNextGeneration(generation)
     }
     const currentLicense = () => {
       return licenseStore.currentStore()
@@ -173,7 +172,7 @@ const fileSystemModule = (userDataPath) => {
       return typeof file.fileURL === 'string' && typeof file.lastOpened !== 'undefined'
     }
 
-    const listenToknownFilesChanges = (cb) => {
+    const listenToknownFilesChanges = (generation) => {
       const transformStore = (store) => {
         return Object.entries(store)
           .filter(([key, file]) => {
@@ -196,12 +195,16 @@ const fileSystemModule = (userDataPath) => {
           })
       }
 
-      const withFileSystemAsSource = (files) => {
-        return cb(transformStore(files))
+      const { cancel, result } = knownFilesStore.getNextGeneration(generation)
+      return {
+        cancel,
+        result: result.then(({ generation, data }) => {
+          return {
+            generation,
+            data: transformStore(data),
+          }
+        }),
       }
-
-      cb(transformStore(knownFilesStore.store))
-      return knownFilesStore.onDidAnyChange.bind(knownFilesStore)(withFileSystemAsSource)
     }
 
     const currentKnownFiles = () => {
@@ -228,36 +231,38 @@ const fileSystemModule = (userDataPath) => {
       })
     }
 
-    const listenToTemplatesChanges = (cb) => {
-      cb(templatesStore.store)
-      return templatesStore.onDidAnyChange.bind(templatesStore)(cb)
+    const listenToTemplatesChanges = (generation) => {
+      return templatesStore.getNextGeneration(generation)
     }
     const currentTemplates = () => {
       return templatesStore.currentStore()
     }
 
-    const listenToCustomTemplatesChanges = (cb) => {
-      const withTemplatesAsArray = (templates) => {
-        return cb(Object.values(templates))
+    const listenToCustomTemplatesChanges = (generation) => {
+      const { cancel, result } = customTemplatesStore.getNextGeneration(generation)
+      return {
+        cancel,
+        result: result.then(({ generation, data }) => {
+          return {
+            generation,
+            data: Object.values(data),
+          }
+        }),
       }
-      cb(Object.values(customTemplatesStore.store))
-      return customTemplatesStore.onDidAnyChange.bind(customTemplatesStore)(withTemplatesAsArray)
     }
     const currentCustomTemplates = () => {
       return customTemplatesStore.currentStore()
     }
 
-    const listenToTemplateManifestChanges = (cb) => {
-      cb(manifestStore.store)
-      return manifestStore.onDidAnyChange.bind(manifestStore)(cb)
+    const listenToTemplateManifestChanges = (generation) => {
+      return manifestStore.getNextGeneration(generation)
     }
     const currentTemplateManifest = () => {
       return manifestStore.currentStore()
     }
 
-    const listenToExportConfigSettingsChanges = (cb) => {
-      cb(exportConfigStore.store)
-      return exportConfigStore.onDidAnyChange.bind(exportConfigStore)(cb)
+    const listenToExportConfigSettingsChanges = (generation) => {
+      return exportConfigStore.getNextGeneration(generation)
     }
     const currentExportConfigSettings = () => {
       return exportConfigStore.currentStore()
@@ -266,9 +271,8 @@ const fileSystemModule = (userDataPath) => {
       return exportConfigStore.set(key, value)
     }
 
-    const listenToAppSettingsChanges = (cb) => {
-      cb(SETTINGS.store)
-      return SETTINGS.onDidAnyChange.bind(SETTINGS)(cb)
+    const listenToAppSettingsChanges = (generation) => {
+      return SETTINGS.getNextGeneration(generation)
     }
     const saveAppSetting = (key, value) => {
       return SETTINGS.set(key, value)
@@ -309,49 +313,51 @@ const fileSystemModule = (userDataPath) => {
       })
     }
 
-    const listenToBackupsChanges = (cb) => {
-      let stopWatching = () => {}
-      ensureBackupDirExists().then(() => {
-        readBackupsDirectory((error, initialBackups) => {
-          if (error) {
-            logger.error('Error listening to backups changes', error)
-            cb([])
-          } else {
-            cb(initialBackups)
-          }
-          const intervalId = setInterval(() => {
-            readBackupsDirectory((error, newBackups) => {
-              if (error) {
-                logger.error('Failed to read backups directory', error)
-                return
+    const listenToBackupsChanges = (lastGeneration) => {
+      const cancelledRef = { current: false }
+      function iter() {
+        if (cancelledRef.current) {
+          return Promise.resolve()
+        } else {
+          return readBackupsDirectory(lastGeneration)
+            .then(({ backups, generation }) => {
+              if (generation === lastGeneration) {
+                return new Promise((resolve, reject) => {
+                  setTimeout(resolve, BACKUP_WATCH_INTERVAL_MILLISECONDS)
+                }).then(() => {
+                  return iter()
+                })
+              } else {
+                return Promise.resolve({ generation, data: backups })
               }
-              cb(newBackups)
             })
-          }, BACKUP_WATCH_INTERVAL_MILLISECONDS)
-          stopWatching = () => {
-            clearInterval(intervalId)
-          }
-        })
-      })
-
-      return stopWatching
+            .catch((error) => {
+              logger.error('Error listening to backups changes', error)
+              return Promise.reject(error)
+            })
+        }
+      }
+      return {
+        cancel: () => {
+          cancelledRef.current = true
+        },
+        result: iter(),
+      }
     }
     const currentBackups = () => {
-      return new Promise((resolve, reject) => {
-        logger.info('Reading current backups')
-        readBackupsDirectory((error, newBackups) => {
-          if (error) {
-            logger.error('Error reading the current backups', error)
-            reject(error)
-            return
-          }
-          resolve(newBackups.map(withFromFileSystem))
+      return readBackupsDirectory()
+        .then(({ backups }) => {
+          return Promise.resolve(backups.map(withFromFileSystem))
         })
-      })
+        .catch((error) => {
+          logger.error('Error listening to backups changes', error)
+          return Promise.reject(error)
+        })
     }
 
-    function readBackupsDirectory(cb) {
-      ensureBackupDirExists()
+    const lastBackupsRef = { current: {}, generation: 0 }
+    function readBackupsDirectory(lastGeneration) {
+      return ensureBackupDirExists()
         .then(() => {
           return backupBasePath().then((basePath) => {
             return readdir(basePath)
@@ -406,12 +412,19 @@ const fileSystemModule = (userDataPath) => {
           })
         })
         .then((results) => {
-          cb(null, sortBy(results, (folder) => new Date(folder.date.replace(/_/g, '-'))).reverse())
+          const nextBackups = sortBy(
+            results,
+            (folder) => new Date(folder.date.replace(/_/g, '-'))
+          ).reverse()
+          if (!isEqual(nextBackups, lastBackupsRef.current)) {
+            lastBackupsRef.current = nextBackups
+            lastBackupsRef.generation = lastBackupsRef.generation + 1
+          }
+          return { backups: lastBackupsRef.current, generation: lastBackupsRef.generation }
         })
         .catch((error) => {
           logger.error('Error reading backup directory.', error)
-          cb(error, [])
-          return
+          return error
         })
     }
 
@@ -610,18 +623,16 @@ const fileSystemModule = (userDataPath) => {
       return proLicenseStore.clear()
     }
 
-    const listenToPlottrLicenseChanges = (cb) => {
-      cb(plottrLicenseStore.store)
-      return plottrLicenseStore.onDidAnyChange.bind(plottrLicenseStore)(cb)
+    const listenToPlottrLicenseChanges = (generation) => {
+      return plottrLicenseStore.getNextGeneration(generation)
     }
 
     const currentProLicense = () => {
       return proLicenseStore.currentStore()
     }
 
-    const listenToProLicenseChanges = (cb) => {
-      cb(proLicenseStore.store)
-      return proLicenseStore.onDidAnyChange.bind(proLicenseStore)(cb)
+    const listenToProLicenseChanges = (generation) => {
+      return proLicenseStore.getNextGeneration(generation)
     }
 
     return {

@@ -1,31 +1,25 @@
 import { helpers } from 'pltr'
 
 import { makeFileModule } from '../../app/files'
-import { whenClientIsReady } from '../../../shared/socket-client'
 import { makeMainProcessClient } from '../../app/mainProcessClient'
-
-const { readOfflineFiles } = makeFileModule(whenClientIsReady)
 
 const { removeFromKnownFiles } = makeMainProcessClient()
 
-export function doesFileExist(fileURL) {
-  return whenClientIsReady(({ fileExists }) => {
-    return fileExists(helpers.file.withoutProtocol(fileURL))
-  })
+export function doesFileExist(localClient, fileURL) {
+  return localClient.fileExists(helpers.file.withoutProtocol(fileURL))
 }
 
 export { removeFromKnownFiles }
 
-export function listOfflineFiles() {
-  return readOfflineFiles()
-}
+const readOfflineFiles = (localClient) => makeFileModule(localClient).readOfflineFiles()
+export const listOfflineFiles = readOfflineFiles
 
-export function offlineFileURL(fileURL) {
-  return whenClientIsReady(({ join, offlineFileBasePath }) => {
-    return offlineFileBasePath().then((offlineFileFilesPath) => {
-      return join(offlineFileFilesPath, helpers.file.withoutProtocol(fileURL)).then((filePath) => {
+export function offlineFileURL(localClient, fileURL) {
+  return localClient.offlineFileBasePath().then((offlineFileFilesPath) => {
+    return localClient
+      .join(offlineFileFilesPath, helpers.file.withoutProtocol(fileURL))
+      .then((filePath) => {
         return helpers.file.filePathToFileURL(filePath)
       })
-    })
   })
 }

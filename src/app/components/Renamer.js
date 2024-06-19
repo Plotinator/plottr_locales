@@ -1,11 +1,11 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
-import { PropTypes } from 'prop-types'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import { selectors, actions } from 'wired-up-pltr'
 import { t } from 'plottr_locales'
-import { InputModal } from 'connected-components'
+import { InputModal } from 'plottr_components'
 import { editFileName as editFileNameOnFirebase } from 'wired-up-firebase'
 
 import logger from '../../../shared/logger'
@@ -14,7 +14,6 @@ import { getErrorReporterInstance } from '../../../shared/error-reporter-instanc
 const Renamer = ({
   isInProMode,
   showLoader,
-  fileList,
   startRenamingFile,
   finishRenamingFile,
   isOffline,
@@ -57,9 +56,11 @@ const Renamer = ({
   useEffect(() => {
     const renameListener = document.addEventListener('rename-file', (event) => {
       setVisible(true)
+      // @ts-ignore
       setFileId(event.fileId)
     })
     return () => {
+      // @ts-ignore
       document.removeEventListener('rename-file', renameListener)
     }
   }, [])
@@ -84,24 +85,21 @@ const Renamer = ({
 Renamer.propTypes = {
   isInProMode: PropTypes.bool,
   showLoader: PropTypes.func.isRequired,
-  fileList: PropTypes.array.isRequired,
   startRenamingFile: PropTypes.func.isRequired,
   finishRenamingFile: PropTypes.func.isRequired,
   isOffline: PropTypes.bool.isRequired,
   editFileName: PropTypes.func.isRequired,
 }
 
-export default connect(
-  (state) => ({
-    isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
-    isCloudFile: selectors.isCloudFileSelector(state),
-    fileList: selectors.knownFilesSelector(state),
-    isOffline: selectors.isOfflineSelector(state),
-  }),
-  {
-    showLoader: actions.project.showLoader,
-    startRenamingFile: actions.applicationState.startRenamingFile,
-    finishRenamingFile: actions.applicationState.finishRenamingFile,
-    editFileName: actions.ui.editFileName,
-  }
-)(Renamer)
+const mapStateToProps = (state) => ({
+  isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
+  isCloudFile: selectors.isCloudFileSelector(state),
+  isOffline: selectors.isOfflineSelector(state),
+})
+
+export default connect(mapStateToProps, {
+  showLoader: actions.project.showLoader,
+  startRenamingFile: actions.applicationState.startRenamingFile,
+  finishRenamingFile: actions.applicationState.finishRenamingFile,
+  editFileName: actions.ui.editFileName,
+})(Renamer)

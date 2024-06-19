@@ -8,6 +8,6 @@ const { readFile } = fs.promises
 export const currentLicense = () => {
   const licenesInfoPath = 'license_info.json'
   return readFile(path.join(app.getPath('userData'), licenesInfoPath)).then((result) => {
-    return JSON.parse(result)
+    return JSON.parse(result.toString('utf8'))
   })
 }

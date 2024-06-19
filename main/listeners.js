@@ -1,5 +1,4 @@
 import electron, { shell, Notification, dialog } from 'electron'
-import currentSettings, { saveAppSetting } from './modules/settings'
 import { setupI18n } from 'plottr_locales'
 import { identity } from 'lodash'
 import https from 'https'
@@ -19,25 +18,10 @@ import { is } from 'electron-util'
 import './modules/updater_events'
 import { loadMenu } from './modules/menus'
 import { getWindowById, numberOfWindows } from './modules/windows'
-import { setDarkMode } from './modules/theme'
-import { addToKnownFiles } from './modules/known_files'
-import { featureFlags } from './modules/feature_flags'
 import { reloadAllWindows } from './modules/windows'
 import { openLoginPopupWindow } from './modules/windows/login'
 import { broadcastToAllWindows } from './modules/broadcast'
-import {
-  openFile,
-  createNew,
-  createFromSnowflake,
-  removeFromKnownFiles,
-  deleteKnownFile,
-  editKnownFilePath,
-  createFromScrivener,
-  createFromWord,
-} from './modules/files'
 import { editWindowPath, setFilePathForWindowWithId } from './modules/windows/index'
-import { lastOpenedFile, setLastOpenedFilePath } from './modules/lastOpened'
-import { whenClientIsReady } from '../shared/socket-client/index'
 import replyWithError from './lib/replyWithError'
 
 const selectors = pltrSelectors(identity)
@@ -145,11 +129,20 @@ class ReplyChannel {
 // to call to restart the server.  That function gets updated by
 // itself when it's called
 export const listenOnIPCMain = (
-  getSocketWorkerPort,
+  fileModule,
+  lastOpenedModule,
+  projectModule,
+  settingsModule,
+  featureFlagsModule,
+  themeModule,
+  knownFilesModule,
+  localClient,
+  getLocalServerPort,
   processSwitches,
   safelyExitModule,
   restartServerRef,
-  log
+  log,
+  getLocalServerSecret
 ) => {
   const listen = (name, cb) => {
     return ipcMain.on(name, (event, ...args) => {
@@ -158,13 +151,34 @@ export const listenOnIPCMain = (
     })
   }
 
+  ipcMain.on('pls-open-window', (event, replyChannel, fileURL, unknown) => {
+    log.info('Received command to open window for', fileURL)
+    projectModule
+      .openProjectWindow(fileURL)
+      .then(() => {
+        if (unknown) {
+          return knownFilesModule.addToKnown(fileURL)
+        } else {
+          return true
+        }
+      })
+      .then(() => {
+        event.sender.send(replyChannel, fileURL)
+      })
+      .catch((error) => {
+        log.error('Error opening a new window', error)
+        replyWithError(replyChannel, error)
+      })
+  })
+
   listen('pls-fetch-state', ({ reply, getOwnerBrowserWindow }, replyChannel, proMode) => {
-    lastOpenedFile()
+    lastOpenedModule
+      .lastOpenedFile()
       .catch((error) => {
         return null
       })
       .then((lastFile) => {
-        return currentSettings().then((settings) => {
+        return settingsModule.currentSettings().then((settings) => {
           // If the user asked for dashboard first, then never reply
           // with the last known file.
           return (
@@ -181,7 +195,7 @@ export const listenOnIPCMain = (
         const win = getWindowById(getOwnerBrowserWindow()?.id)
         if (win) {
           const fileURL = win.fileURL || lastFileURL
-          featureFlags().then((flags) => {
+          featureFlagsModule.featureFlags().then((flags) => {
             reply(
               replyChannel,
               fileURL,
@@ -199,9 +213,12 @@ export const listenOnIPCMain = (
       })
   })
 
-  listen('pls-tell-me-the-socket-worker-port', ({ reply }, replyChannel) => {
+  listen('pls-tell-me-the-local-server-port', ({ reply }, replyChannel) => {
     try {
-      reply(replyChannel, getSocketWorkerPort())
+      reply(replyChannel, {
+        localServerPort: getLocalServerPort(),
+        localServerSecret: getLocalServerSecret(),
+      })
     } catch (error) {
       log.error('Error retrieving the current worker socket port', error)
       replyWithError(replyChannel, error)
@@ -209,9 +226,10 @@ export const listenOnIPCMain = (
   })
 
   listen('pls-set-dark-setting', ({ reply }, replyChannel, newValue) => {
-    setDarkMode(newValue)
+    themeModule
+      .setDarkMode(newValue)
       .then(() => {
-        return currentSettings().then((settings) => {
+        return settingsModule.currentSettings().then((settings) => {
           return broadcastToAllWindows('reload-dark-mode', settings.user.dark)
         })
       })
@@ -225,11 +243,19 @@ export const listenOnIPCMain = (
   })
 
   listen('pls-update-language', ({ reply }, replyChannel, newLanguage) => {
-    saveAppSetting('locale', newLanguage)
+    settingsModule
+      .saveAppSetting('locale', newLanguage)
       .then(() => {
-        currentSettings().then((settings) => {
+        settingsModule.currentSettings().then((settings) => {
           setupI18n(settings, { locale: electron.app.getLocale() })
-          return loadMenu(safelyExitModule).then(() => {
+          return loadMenu(
+            safelyExitModule,
+            projectModule,
+            featureFlagsModule,
+            settingsModule,
+            knownFilesModule,
+            localClient
+          ).then(() => {
             reloadAllWindows()
           })
         })
@@ -254,29 +280,35 @@ export const listenOnIPCMain = (
   })
 
   listen('add-to-known-files-and-open', ({ reply }, replyChannel, fileURL) => {
-    if (!fileURL || fileURL === '') return
-    addToKnownFiles(fileURL)
-      .then(() => {
-        log.info('Adding to known files and opening', fileURL)
-        openFile(fileURL, false)
-          .then(() => {
-            log.info('Opened file', fileURL)
-          })
-          .catch((error) => {
-            log.error('Error opening file and adding to known', fileURL, error)
-          })
-      })
-      .then(() => {
-        reply(replyChannel, fileURL)
-      })
-      .catch((error) => {
-        log.error(`Error adding ${fileURL} to known files and opening it`, error)
-        reply(replyChannel, { error: error.mesasge })
-      })
+    if (!fileURL || fileURL === '') {
+      return
+    } else {
+      knownFilesModule
+        .addToKnownFiles(fileURL)
+        .then(() => {
+          log.info('Adding to known files and opening', fileURL)
+          fileModule
+            .openFile(fileURL, false)
+            .then(() => {
+              log.info('Opened file', fileURL)
+            })
+            .catch((error) => {
+              log.error('Error opening file and adding to known', fileURL, error)
+            })
+        })
+        .then(() => {
+          reply(replyChannel, fileURL)
+        })
+        .catch((error) => {
+          log.error(`Error adding ${fileURL} to known files and opening it`, error)
+          reply(replyChannel, { error: error.mesasge })
+        })
+    }
   })
 
   listen('create-new-file', ({ reply }, replyChannel, template, name) => {
-    createNew(template, name)
+    fileModule
+      .createNew(template, name)
       .then(() => {
         reply(replyChannel, name)
       })
@@ -291,7 +323,8 @@ export const listenOnIPCMain = (
   })
 
   listen('create-from-snowflake', ({ reply }, replyChannel, importedPath, isLoggedIntoPro) => {
-    createFromSnowflake(importedPath, reply, isLoggedIntoPro)
+    fileModule
+      .createFromSnowflake(importedPath, reply, isLoggedIntoPro)
       .then(() => {
         reply(replyChannel, importedPath)
       })
@@ -308,7 +341,8 @@ export const listenOnIPCMain = (
   listen(
     'create-from-scrivener',
     ({ reply }, replyChannel, importedPath, isLoggedIntoPro, destinationFile) => {
-      createFromScrivener(importedPath, reply, isLoggedIntoPro, destinationFile)
+      fileModule
+        .createFromScrivener(importedPath, reply, isLoggedIntoPro, destinationFile)
         .then(() => {
           reply(replyChannel, importedPath)
         })
@@ -326,7 +360,8 @@ export const listenOnIPCMain = (
   listen(
     'create-from-word',
     ({ reply }, replyChannel, importedPath, isLoggedIntoPro, destinationFile) => {
-      createFromWord(importedPath, reply, isLoggedIntoPro, destinationFile)
+      fileModule
+        .createFromWord(importedPath, reply, isLoggedIntoPro, destinationFile)
         .then(() => {
           reply(replyChannel, importedPath)
         })
@@ -343,7 +378,8 @@ export const listenOnIPCMain = (
 
   listen('open-known-file', ({ reply }, replyChannel, fileURL, unknown) => {
     log.info('Opening known file', fileURL, unknown)
-    openFile(fileURL, unknown)
+    fileModule
+      .openFile(fileURL, unknown)
       .then(() => {
         log.info('Opened file', fileURL)
         reply(replyChannel, fileURL)
@@ -355,7 +391,8 @@ export const listenOnIPCMain = (
   })
 
   listen('remove-from-known-files', ({ reply }, replyChannel, fileURL) => {
-    removeFromKnownFiles(fileURL)
+    fileModule
+      .removeFromKnownFiles(fileURL)
       .then(() => {
         reply(replyChannel, fileURL)
       })
@@ -367,7 +404,8 @@ export const listenOnIPCMain = (
   })
 
   listen('delete-known-file', ({ reply }, replyChannel, fileURL) => {
-    deleteKnownFile(fileURL)
+    fileModule
+      .deleteKnownFile(fileURL)
       .then(() => {
         broadcastToAllWindows('reload-recents')
         reply(replyChannel, fileURL)
@@ -379,7 +417,8 @@ export const listenOnIPCMain = (
   })
 
   listen('edit-known-file-path', ({ reply }, replyChannel, oldFileURL, newFileURL) => {
-    editKnownFilePath(oldFileURL, newFileURL)
+    fileModule
+      .editKnownFilePath(oldFileURL, newFileURL)
       .then(() => {
         editWindowPath(oldFileURL, newFileURL)
         broadcastToAllWindows('reload-recents')
@@ -417,6 +456,7 @@ export const listenOnIPCMain = (
     log.info(`Downloading ${url} to ${downloadDirectory}`)
     https
       .get(url, (response) => {
+        // @ts-ignore
         if (Math.floor(response.statusCode / 200) !== 1) {
           log.error(`Error downloading file from ${url}`)
           return
@@ -448,6 +488,7 @@ export const listenOnIPCMain = (
     log.info(`Downloading ${url} to ${downloadDirectory}`)
     https
       .get(url, (response) => {
+        // @ts-ignore
         if (Math.floor(response.statusCode / 200) !== 1) {
           log.error(`Error downloading file from ${url}`)
           return
@@ -462,7 +503,7 @@ export const listenOnIPCMain = (
             } else {
               readFile(fullPath).then((fileBytes) => {
                 try {
-                  const file = JSON.parse(fileBytes)
+                  const file = JSON.parse(fileBytes.toString('utf8'))
                   reply(replyChannel, JSON.stringify(file))
                 } catch (error) {
                   log.error(`Error deserialising file from ${url}`, error)
@@ -528,7 +569,8 @@ export const listenOnIPCMain = (
     }
   })
   listen('update-last-opened-file', ({ reply }, replyChannel, newFileURL) => {
-    setLastOpenedFilePath(newFileURL)
+    lastOpenedModule
+      .setLastOpenedFilePath(newFileURL)
       .then(() => {
         reply(replyChannel, newFileURL)
       })
@@ -776,35 +818,33 @@ export const listenOnIPCMain = (
       options,
       userId
     ) => {
-      whenClientIsReady(({ rmRf, join, stat, mkdir, basename }) => {
-        return askToExport(
-          defaultPath,
-          fullState,
-          type,
-          options,
-          is.windows,
-          notifyUser,
-          log,
-          makeSaveDialog(getOwnerBrowserWindow),
-          makeMPQ(reply),
-          rmRf,
-          userId,
-          makeDownloadStorageImage(reply),
-          fs.promises.writeFile,
-          join,
-          stat,
-          mkdir,
-          basename,
-          selectors,
-          (error, success) => {
-            if (error) {
-              replyWithError(replyChannel, error)
-              return
-            }
-            reply(replyChannel, defaultPath)
+      return askToExport(
+        defaultPath,
+        fullState,
+        type,
+        options,
+        is.windows,
+        notifyUser,
+        log,
+        makeSaveDialog(getOwnerBrowserWindow),
+        makeMPQ(reply),
+        localClient.rmRf,
+        userId,
+        makeDownloadStorageImage(reply),
+        fs.promises.writeFile,
+        localClient.join,
+        localClient.stat,
+        localClient.mkdir,
+        localClient.basename,
+        selectors,
+        (error, success) => {
+          if (error) {
+            replyWithError(replyChannel, error)
+            return
           }
-        )
-      })
+          reply(replyChannel, defaultPath)
+        }
+      )
     }
   )
 
@@ -814,23 +854,28 @@ export const listenOnIPCMain = (
   }
   listen('restart-server', ({ reply }, replyChannel) => {
     log.warn('Restart request received', JSON.stringify(restartingServerStateRef))
-    if (restartingServerStateRef.restarting) {
+    if (
+      restartingServerStateRef.restarting &&
+      // @ts-ignore
+      typeof restartingServerStateRef?.restartTask?.then === 'function'
+    ) {
       log.warn("A client requested that the server restart, but it's already doing so.")
+      // @ts-ignore
       restartingServerStateRef.restartTask.then(() => {
         reply(replyChannel, 'done')
       })
       return
     }
     restartingServerStateRef.restarting = true
-    log.warn('Restarting the socket server after request by client to do so')
+    log.warn('Restarting the local server after request by client to do so')
     restartingServerStateRef.restartTask = restartServerRef
       .restartServer()
       .then(() => {
-        log.info('Restarted the socket server as per client request')
+        log.info('Restarted the local server as per client request')
         reply(replyChannel, 'done')
       })
       .catch((error) => {
-        log.error('Error restarting the socket server', error)
+        log.error('Error restarting the local server', error)
         replyWithError(replyChannel, error)
       })
       .finally(() => {

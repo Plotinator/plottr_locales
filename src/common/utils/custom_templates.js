@@ -5,12 +5,11 @@ import { tree, helpers } from 'pltr'
 import { selectors } from 'wired-up-pltr'
 
 import { saveCustomTemplate } from './templates_from_firestore'
-import { whenClientIsReady } from '../../../shared/socket-client/index'
 import { makeMainProcessClient } from '../../app/mainProcessClient'
 
 const { getVersion, notify } = makeMainProcessClient()
 
-export function addNewCustomTemplate(pltrData, { type, data }) {
+export function addNewCustomTemplate(localClient, pltrData, { type, data }) {
   let templatePromise = null
   if (type === 'plotlines') {
     templatePromise = createPlotlineTemplate(pltrData, data)
@@ -26,9 +25,7 @@ export function addNewCustomTemplate(pltrData, { type, data }) {
     if (isInProMode) {
       saveCustomTemplate(userId, template)
     } else {
-      whenClientIsReady(({ setCustomTemplate }) => {
-        return setCustomTemplate(template.id, template)
-      })
+      localClient.setCustomTemplate(template.id, template)
     }
 
     notify(t('Template Saved'), t('Your template has been saved and is ready to use'))

@@ -4,8 +4,10 @@ import { Provider } from 'react-redux'
 
 import { selectors, actions } from 'wired-up-pltr'
 import { saveBackup as saveBackupOnFirebase } from 'wired-up-firebase'
+import { plottrComponentsContextObject } from 'connected-components'
+import { connections } from 'plottr_components'
 
-import Main from 'containers/Main'
+import Main from './app/containers/Main'
 import Listener from './app/components/listener'
 import Renamer from './app/components/Renamer'
 import SaveAs from './app/components/SaveAs'
@@ -22,34 +24,28 @@ import { keepGlobalFontVariablesUpToDate } from './keepGlobalFontVariablesUpToDa
 import { startupStateMachine } from './startupStateMachine'
 import { listenToDarkMode } from './darkModeListener'
 
-export const renderFile = (root, whenClientIsReady) => {
+const { PlottrComponentsContext } = connections
+
+export const renderFile = (root, localClient) => {
   listenToOfflineState(store, selectors, actions)
   keepGlobalFontVariablesUpToDate(store, selectors)
-  startupStateMachine(store, selectors, actions, saveBackupOnFirebase)
+  startupStateMachine(localClient, store, selectors, actions, saveBackupOnFirebase)
   listenToDarkMode(store, selectors)
 
-  const saveOfflineFile = (fileURL, file) => {
-    return whenClientIsReady(({ saveOfflineFile }) => {
-      return saveOfflineFile(fileURL, file)
-    })
+  const saveOfflineFile = (file, knownFiles, onlineFileURL) => {
+    return localClient.saveOfflineFile(file, knownFiles, onlineFileURL)
   }
 
   const saveFile = (fileURL, file) => {
-    return whenClientIsReady(({ saveFile }) => {
-      return saveFile(fileURL, file)
-    })
+    return localClient.saveFile(fileURL, file)
   }
 
   const basename = (filePath) => {
-    return whenClientIsReady(({ basename }) => {
-      return basename(filePath)
-    })
+    return localClient.basename(filePath)
   }
 
   const readFile = (filePath) => {
-    return whenClientIsReady(({ readFile }) => {
-      return readFile(filePath)
-    })
+    return localClient.readFile(filePath)
   }
 
   const saveBackup = (filePath, file) => {
@@ -63,51 +59,51 @@ export const renderFile = (root, whenClientIsReady) => {
       isInProMode && onCloud ? saveBackupOnFirebase(userId, file) : Promise.resolve(true)
 
     return result.then(() => {
-      return whenClientIsReady(({ saveBackup }) => {
-        if (!onCloud || (onCloud && localBackupsEnabled)) {
-          return saveBackup(filePath, file)
-        }
-        return Promise.resolve(false)
-      })
+      if (!onCloud || (onCloud && localBackupsEnabled)) {
+        return localClient.saveBackup(filePath, file)
+      }
+      return Promise.resolve(false)
     })
   }
 
   const backupOfflineBackupForResume = (file) => {
-    return whenClientIsReady(({ backupOfflineBackupForResume }) => {
-      return backupOfflineBackupForResume(file)
-    })
+    return localClient.backupOfflineBackupForResume(file)
   }
 
-  const { showErrorBox, getVersion, windowId } = makeMainProcessClient()
+  const { showErrorBox, getVersion } = makeMainProcessClient()
 
-  const { saveAppSetting } = makeFileSystemAPIs(whenClientIsReady)
+  const { saveAppSetting } = makeFileSystemAPIs(localClient)
 
   render(
     <Provider store={store()}>
-      <MainIntegrationContext.Provider
-        value={{
-          saveOfflineFile,
-          saveFile,
-          basename,
-          readFile,
-          saveBackup,
-          backupOfflineBackupForResume,
-          saveAppSetting,
-          showErrorBox,
-        }}
-      >
-        <Listener showErrorBox={showErrorBox} />
-        <Renamer />
-        <SaveAs />
-        <Error showErrorBox={showErrorBox} />
-        <Resume
-          backupOfflineBackupForResume={backupOfflineBackupForResume}
-          getVersion={getVersion}
-          showErrorBox={showErrorBox}
-        />
-        <Busy />
-        <Main saveBackup={saveBackup} windowId={windowId} />
-      </MainIntegrationContext.Provider>
+      <PlottrComponentsContext.Provider value={plottrComponentsContextObject(localClient)}>
+        <MainIntegrationContext.Provider
+          value={{
+            saveOfflineFile,
+            saveFile,
+            basename,
+            readFile,
+            saveBackup,
+            backupOfflineBackupForResume,
+            saveAppSetting,
+            showErrorBox,
+            localClient,
+          }}
+        >
+          <Listener showErrorBox={showErrorBox} localClient={localClient} />
+          <Renamer />
+          <SaveAs />
+          <Error showErrorBox={showErrorBox} />
+          <Resume
+            localClient={localClient}
+            backupOfflineBackupForResume={backupOfflineBackupForResume}
+            getVersion={getVersion}
+            showErrorBox={showErrorBox}
+          />
+          <Busy />
+          <Main />
+        </MainIntegrationContext.Provider>
+      </PlottrComponentsContext.Provider>
     </Provider>,
     root
   )

@@ -1,5 +1,5 @@
 import React from 'react'
-import { ErrorBoundary, TagListView } from 'connected-components'
+import { ErrorBoundary, TagListView } from 'plottr_components'
 
 export default function TagsTab() {
   return (

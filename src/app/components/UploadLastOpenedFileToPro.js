@@ -10,7 +10,6 @@ import LoadingSplash from './LoadingSplash'
 import { uploadProject } from '../../common/utils/upload_project'
 import logger from '../../../shared/logger'
 import { getErrorReporterInstance } from '../../../shared/error-reporter-instance'
-import { whenClientIsReady } from '../../../shared/socket-client'
 import { makeMainProcessClient } from '../mainProcessClient'
 import MainIntegrationContext from '../../mainIntegrationContext'
 
@@ -27,24 +26,16 @@ const UploadLastOpenedFileToPro = ({
   emailAddress,
   userId,
   finishUploadingFileToCloud,
-  saveBackup,
   setCurrentAppStateToApplication,
   uploadingFileToCloud,
 }) => {
-  const dismissUploadPromptHandlingLastOpened = useCallback(() => {
-    dismissPromptToUploadFile()
-    whenClientIsReady(({ nukeLastOpenedFileURL }) => {
-      return nukeLastOpenedFileURL()
-    })
-  }, [dismissPromptToUploadFile])
-
   const closeDashboard = useCallback(() => {
     setCurrentAppStateToApplication()
   }, [])
 
   return (
     <MainIntegrationContext.Consumer>
-      {({ readFile }) => {
+      {({ readFile, localClient }) => {
         return (
           <>
             <LoadingSplash darkMode={darkMode} />
@@ -64,7 +55,7 @@ const UploadLastOpenedFileToPro = ({
                     return
                   }
                   startUploadingFileToCloud()
-                  uploadProject(file, emailAddress, userId)
+                  uploadProject(localClient, file, emailAddress, userId)
                     .then((response) => {
                       const { fileId } = response.data || {}
                       if (!fileId) {
@@ -79,7 +70,7 @@ const UploadLastOpenedFileToPro = ({
                       //
                       // FIXME: where should the options come from?
                       const newFileURL = helpers.file.fileIdToPlottrCloudFileURL(fileId)
-                      bootFile(whenClientIsReady, newFileURL, {}, 2, saveBackup)
+                      bootFile(localClient, newFileURL, {}, 2, localClient.saveBackup)
                         .then(() => {
                           closeDashboard()
                         })
@@ -90,7 +81,10 @@ const UploadLastOpenedFileToPro = ({
                     .catch((error) => {})
                 })
               }}
-              onCancel={dismissUploadPromptHandlingLastOpened}
+              onCancel={() => {
+                dismissPromptToUploadFile()
+                localClient.nukeLastOpenedFileURL()
+              }}
               busy={uploadingFileToCloud}
             />
           </>
@@ -109,27 +103,25 @@ UploadLastOpenedFileToPro.propTypes = {
   emailAddress: PropTypes.string,
   userId: PropTypes.string,
   finishUploadingFileToCloud: PropTypes.func.isRequired,
-  saveBackup: PropTypes.func.isRequired,
   setCurrentAppStateToApplication: PropTypes.func.isRequired,
   uploadingFileToCloud: PropTypes.bool,
 }
 
-export default connect(
-  (state) => {
-    return {
-      darkMode: selectors.isDarkModeSelector(state),
-      fileToUpload: selectors.filePathToUploadSelector(state),
-      startUploadingFileToCloud: PropTypes.func.isRequired,
-      emailAddress: selectors.emailAddressSelector(state),
-      userId: selectors.userIdSelector(state),
-      uploadingFileToCloud: selectors.uploadingFileToCloudSelector(state),
-    }
-  },
-  {
-    dismissPromptToUploadFile: actions.applicationState.dismissPromptToUploadFile,
-    generalError: actions.error.generalError,
-    startUploadingFileToCloud: actions.applicationState.startUploadingFileToCloud,
-    finishUploadingFileToCloud: actions.applicationState.finishUploadingFileToCloud,
-    setCurrentAppStateToApplication: actions.client.setCurrentAppStateToApplication,
+const mapStateToProps = (state) => {
+  return {
+    darkMode: selectors.isDarkModeSelector(state),
+    fileToUpload: selectors.filePathToUploadSelector(state),
+    startUploadingFileToCloud: PropTypes.func.isRequired,
+    emailAddress: selectors.emailAddressSelector(state),
+    userId: selectors.userIdSelector(state),
+    uploadingFileToCloud: selectors.uploadingFileToCloudSelector(state),
   }
-)(UploadLastOpenedFileToPro)
+}
+
+export default connect(mapStateToProps, {
+  dismissPromptToUploadFile: actions.applicationState.dismissPromptToUploadFile,
+  generalError: actions.error.generalError,
+  startUploadingFileToCloud: actions.applicationState.startUploadingFileToCloud,
+  finishUploadingFileToCloud: actions.applicationState.finishUploadingFileToCloud,
+  setCurrentAppStateToApplication: actions.client.setCurrentAppStateToApplication,
+})(UploadLastOpenedFileToPro)
