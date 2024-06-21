@@ -37,6 +37,8 @@ import {
   duplicateFile,
   userFilePickerDefaultFolder,
   importExistingFile,
+  showRecentFilesInImportModal,
+  importExistingCloudFile,
 } from './files'
 import logger from '../shared/logger'
 import { closeDashboard } from './dashboard-events'
@@ -505,6 +507,8 @@ const platform = {
   },
   duplicateFile,
   importExistingFile,
+  importExistingCloudFile,
+  showRecentFilesInImportModal,
   showItemInFolder: (fileURL, fileName) => {
     isStorageURL(fileURL).then((storageURL) => {
       if (!storageURL) {

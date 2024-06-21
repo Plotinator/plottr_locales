@@ -1,6 +1,7 @@
 import { t } from 'plottr_locales'
 import { helpers, reducers, emptyFile, migrateIfNeeded, addMissingKeys, errorCodes } from 'pltr'
 import { actions, selectors } from 'wired-up-pltr'
+import { fetchFileJson } from 'wired-up-firebase'
 
 import { openExistingFile as _openExistingFile } from './common/utils/window_manager'
 import { store } from './app/store'
@@ -9,7 +10,6 @@ import { uploadToFirebase } from './upload-to-firebase'
 import { whenClientIsReady } from '../shared/socket-client'
 import { makeMainProcessClient } from './app/mainProcessClient'
 import { getErrorReporterInstance } from '../shared/error-reporter-instance'
-import extractImages from './common/extract_images'
 
 const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
 
@@ -333,6 +333,64 @@ export const openExistingFile = () => {
   }
 }
 
+export const showRecentFilesInImportModal = () => {
+  const state = store().getState()
+  const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
+  if (isInProMode) {
+    return store().dispatch(actions.ui.showProAccountRecentFiles())
+  }
+}
+
+export const importExistingCloudFile = (file) => {
+  const state = store().getState()
+  store().dispatch(actions.applicationState.startProjectImporter())
+  const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
+  const userId = selectors.userIdSelector(state)
+  const clientId = selectors.clientIdSelector(state)
+
+  if (isInProMode && !!file?.isCloudFile) {
+    return getVersion()
+      .then((version) => {
+        return fetchFileJson(userId, file.id, clientId, version).then((fetchedFile) => {
+          return new Promise((resolve, reject) => {
+            migrateIfNeeded(
+              version,
+              fetchedFile,
+              file.fileUrl,
+              null,
+              (error, didMigrate, migratedState) => {
+                if (error) {
+                  getErrorReporterInstance().then((errorReporter) => {
+                    errorReporter.error('Error migrating file', error)
+                  })
+                  logger.error('Error migrating file', error)
+                  reject(error)
+                  return
+                } else {
+                  const fileState = addMissingKeys(migratedState)
+                  const state = store().getState()
+                  const fullSystemState = selectors.fullSystemStateSelector(state)
+                  store().dispatch(actions.ui.showImportDataPicker(fileState, fullSystemState))
+                  store().dispatch(actions.applicationState.finishProjectImporter())
+                  resolve()
+                }
+              }
+            )
+          })
+        })
+      })
+      .catch((error) => {
+        store().dispatch(actions.applicationState.finishProjectImporter())
+        return showErrorBox(t('Error'), t('There was an error doing that. Try again')).then(() => {
+          return Promise.reject(error)
+        })
+      })
+  } else if (!isInProMode && !!file?.isCloudFile) {
+    store().dispatch(actions.applicationState.finishProjectImporter())
+    showErrorBox(t('Error importing file'), t("Attempted to import pro file, but we're not in Pro"))
+  }
+}
+
 export const importExistingFile = (fileUrl, properties) => {
   return showOpenDialog('Choose file to import', filters, properties, fileUrl).then((files) => {
     const filePath = files && files.length && files[0]
@@ -342,6 +400,7 @@ export const importExistingFile = (fileUrl, properties) => {
     }
 
     return whenClientIsReady(({ readFile }) => {
+      store().dispatch(actions.applicationState.startProjectImporter())
       return readFile(helpers.file.withoutProtocol(filePath), 'utf-8').then((rawFile) => {
         const contents = JSON.parse(rawFile)
 
@@ -365,7 +424,8 @@ export const importExistingFile = (fileUrl, properties) => {
                     const fileState = addMissingKeys(migratedState)
                     const state = store().getState()
                     const fullSystemState = selectors.fullSystemStateSelector(state)
-                    store().dispatch(actions.ui.openImportPltrModal(fileState, fullSystemState))
+                    store().dispatch(actions.ui.showImportDataPicker(fileState, fullSystemState))
+                    store().dispatch(actions.applicationState.finishProjectImporter())
                     resolve()
                   }
                 }

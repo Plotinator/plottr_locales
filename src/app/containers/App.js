@@ -41,6 +41,7 @@ const App = ({
   openSearch,
   startSearching,
   isImportModalOpen,
+  shouldShowRecentFiles,
 }) => {
   const [showTemplateCreate, setShowTemplateCreate] = useState(false)
   const [type, setType] = useState(null)
@@ -145,7 +146,7 @@ const App = ({
         {renderAdvanceExportModal()}
         {renderImagePickerModal()}
         {searchDialogIsOpen ? <SearchModal /> : null}
-        {isImportModalOpen ? <ImportModal /> : null}
+        {isImportModalOpen || shouldShowRecentFiles ? <ImportModal /> : null}
       </React.StrictMode>
     </ErrorBoundary>
   )
@@ -166,6 +167,7 @@ App.propTypes = {
   openSearch: PropTypes.func.isRequired,
   startSearching: PropTypes.func.isRequired,
   isImportModalOpen: PropTypes.bool,
+  shouldShowRecentFiles: PropTypes.bool,
 }
 
 function mapStateToProps(state) {
@@ -179,6 +181,7 @@ function mapStateToProps(state) {
     searchDialogIsOpen: selectors.searchDialogIsOpenSelector(state),
     isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
     isImportModalOpen: selectors.isImportModalOpenSelector(state),
+    shouldShowRecentFiles: selectors.shouldShowProAccountRecentFilesSelector(state),
   }
 }
 
