@@ -9,7 +9,7 @@
 
 import { setupI18n, t } from 'plottr_locales'
 
-import { store, initialiseStore } from './store'
+import { store } from './store'
 
 import { helpers, migrateIfNeeded, addMissingKeys } from 'pltr'
 import { actions, selectors } from 'wired-up-pltr'
@@ -77,7 +77,6 @@ const {
   onMPQMessage,
   onDownloadStorageImage,
   onMoveFromTemp,
-  restartSocketServer,
   onCreateFileShortcut,
   showItemInFolder,
   userDesktopPath,
@@ -139,11 +138,6 @@ tellMeWhatOSImOn()
   })
   .then(({ localServerPort, localServerSecret }) => {
     localClient = connectToLocalServer(localServerPort, localServerSecret)
-    // =======================================================
-    // N.B. This line is incredibly important because we still
-    // statically import the store all over the show.
-    // =======================================================
-    initialiseStore(localClient)
   })
   .then(() => {
     const state = store().getState()

@@ -2,10 +2,9 @@ import { configureStore } from './configureStore'
 
 let _store = null
 let _inflightFirebaseRequests = null
-let _localClient = null
 const store = () => {
   if (!_store) {
-    const configured = configureStore(_localClient)
+    const configured = configureStore()
     _store = configured.store
     _inflightFirebaseRequests = configured.inflightFirebaseRequests
   }
@@ -14,15 +13,14 @@ const store = () => {
 
 const inflightFirebaseRequests = () => {
   if (!_store) {
-    const configured = configureStore(_localClient)
+    const configured = configureStore()
     _store = configured.store
     _inflightFirebaseRequests = configured.inflightFirebaseRequests
   }
   return _inflightFirebaseRequests
 }
 
-const initialiseStore = (localClient) => {
-  _localClient = localClient
+const initialiseStore = () => {
   store()
 }
 

@@ -11,7 +11,7 @@ import shadow from '../middlewares/shadow'
 import dataRepairers from './dataRepairers'
 import log from '../../../shared/logger'
 
-export function configureStore(localClient, initialState) {
+export function configureStore(initialState) {
   const reducer = rootReducer(dataRepairers)
   const middlewareWithInflightRequestTracker = firebaseSync(log)
   const middlewares = applyMiddleware(
