@@ -2,6 +2,7 @@ import { isEqual } from 'lodash'
 
 import { t } from 'plottr_locales'
 import { removeSystemKeys, errorCodes } from 'pltr'
+import { selectors } from 'wired-up-pltr'
 
 const {
   FILE_LACKS_ALL_KEYS,
@@ -91,11 +92,12 @@ const Saver = (
     // @ts-ignore
     return setInterval(() => {
       const state = getState()
-      if (!stateDidntChange(lastStateRef.current, state)) {
+      const comparableState = selectors.fullFileStateSelector(state)
+      if (!stateDidntChange(lastStateRef.current, comparableState)) {
         logger.info(`Starting ${name}...`)
         f(state)
           .then(() => {
-            lastStateRef.current = state
+            lastStateRef.current = comparableState
             if (failedCountRef.current > 0) {
               if (failedCountRef.current > 1) {
                 onSuccessThisTime()
