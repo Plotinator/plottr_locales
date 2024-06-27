@@ -14,8 +14,17 @@ ipcMain.on('open-buy-window', (event, replyChannel) => {
   }
 })
 
-let windows = []
 let lastClosed = null
+
+/**
+ * @type {Array<WindowRecord>}
+ * @typedef WindowRecord
+ * @property {any} browserWindow
+ * @property {String | null} fileURL
+ * @property {number} id
+ * @property {String | null} [oldFileURL]
+ */
+const windows = []
 
 function lastClosedWasDashboard() {
   return lastClosed && !lastClosed.fileURL
@@ -91,13 +100,13 @@ function focusIfOpen(fileURL, featureFlagsModule) {
     if (typeof win.browserWindow?.focus === 'function') {
       win.browserWindow.focus()
     }
-    if (typeof win?.webContents?.send === 'function') {
+    if (typeof win?.browserWindow?.webContents?.send === 'function') {
       win.browserWindow.webContents.send('close-dashboard')
     }
     // If it's this window and we're trying to open a new file, then
     // we need to refresh the contents.
     featureFlagsModule.featureFlags().then((flags) => {
-      if (typeof win?.webContents?.send === 'function') {
+      if (typeof win?.browserWindow?.webContents?.send === 'function') {
         win.browserWindow.webContents.send('reload-from-file', fileURL, flags, numberOfWindows())
       }
     })
@@ -109,7 +118,7 @@ function focusIfOpen(fileURL, featureFlagsModule) {
 
 function reloadAllWindows() {
   windows.forEach((w) => {
-    if (typeof w?.webContents?.send === 'function') {
+    if (typeof w?.browserWindow?.webContents?.send === 'function') {
       w.browserWindow.webContents.send('force-reload')
     }
   })
