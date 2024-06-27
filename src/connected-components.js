@@ -201,7 +201,7 @@ export const plottrComponentsContextObject = (localClient) => {
         }
       },
       openExistingFile: () => {
-        openExistingFile()
+        openExistingFile(localClient)
       },
       doesFileExist: (fileURL) => doesFileExist(localClient, fileURL),
       pathSep: () => {
