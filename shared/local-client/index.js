@@ -114,14 +114,10 @@ function routeFunctions(suppliedPort, secret, logger) {
         )
       }
     },
-    delete: (path, body, queryParams, logArgs = {}) => {
+    delete: (path, queryParams) => {
       return handleResponse(
         _clientRef.current.delete(path, {
           ...(isObject(queryParams) && !isEmpty(queryParams) ? { params: queryParams } : {}),
-          data: {
-            ...body,
-            logArgs,
-          },
         })
       )
     },
@@ -211,7 +207,7 @@ function routeFunctions(suppliedPort, secret, logger) {
   }
 
   const rmRf = (path) => {
-    return client.delete('/fileSystem/file', { path }, { path })
+    return client.delete('/fileSystem/file', { path })
   }
 
   const saveFile = (fileURL, file) => {
@@ -296,7 +292,7 @@ function routeFunctions(suppliedPort, secret, logger) {
   }
 
   const deleteKnownFile = (fileURL) => {
-    return client.delete('/knownFiles/data', { fileURL }, { fileURL })
+    return client.delete('/knownFiles/data', { fileURL })
   }
 
   const updateKnownFileName = (fileURL, newName) => {
@@ -308,7 +304,7 @@ function routeFunctions(suppliedPort, secret, logger) {
   }
 
   const removeFromKnownFiles = (fileURL) => {
-    return client.delete('/knownFiles', { fileURL }, { fileURL })
+    return client.delete('/knownFiles', { fileURL })
   }
 
   const addKnownFile = (fileURL) => {

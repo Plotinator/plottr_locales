@@ -524,7 +524,7 @@ const knownFilesRoutes = (app, knownFilesModule, logger, statusManager) => {
 
   const removeKnownFilePath = '/knownFiles'
   app.delete(removeKnownFilePath, (req, res) => {
-    const { fileURL } = req.body.data
+    const { fileURL } = req.query
     replyRecordingBusy(knownFilesModule.removeFromKnownFiles(fileURL), res, removeKnownFilePath)
   })
 
