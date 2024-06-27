@@ -2,6 +2,8 @@ import { basename } from 'path'
 
 import { helpers } from 'pltr'
 
+import { isParentPathOfFile } from './isParentPath'
+
 const makeKnownFilesModule = (stores, fileModule, trashModule, backupModule, logger) => {
   const { knownFilesStore } = stores
   const { offlineFilesFilesPath } = fileModule
@@ -16,7 +18,7 @@ const makeKnownFilesModule = (stores, fileModule, trashModule, backupModule, log
     const filePath = helpers.file.withoutProtocol(fileURL)
     // We don't want to delete backup files
     return backupBasePath().then((backupPath) => {
-      if (helpers.file.withoutProtocol(fileURL).startsWith(backupPath)) {
+      if (isParentPathOfFile(fileURL, helpers.file.filePathToFileURL(backupPath))) {
         logger.info('Refusing delete a known file that is a backup')
         return Promise.resolve()
       }

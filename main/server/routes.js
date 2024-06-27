@@ -90,6 +90,11 @@ const backupRoutes = (app, backupModule, logger, statusManager) => {
     replyRecordingBusy(backupModule.saveBackup(filePath, file), res, saveBackupPath)
   })
 
+  app.get('/backups/isInBackupFolder', (req, res) => {
+    const { fileURL } = req.query
+    replyWithResult(backupModule.isInBackupFolder(fileURL), res)
+  })
+
   app.get('/backups/today', (req, res) => {
     replyWithResult(backupModule.ensureBackupTodayPath(), res)
   })

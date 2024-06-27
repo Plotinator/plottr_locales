@@ -8,7 +8,6 @@ import { listen } from 'wired-up-firebase'
 import { t } from 'plottr_locales'
 
 import { store } from '../store'
-import { makeFileSystemAPIs } from '../../api'
 import { duplicateFile } from '../../files'
 import { makeMainProcessClient } from '../mainProcessClient'
 
@@ -35,51 +34,17 @@ const Listener = ({
   isInProMode,
   localClient,
 }) => {
-  const fileSystemAPIs = makeFileSystemAPIs(localClient)
-
   // ====Prevent Users from Opening Backups===
 
   // Prevent users from changing backups by closing the backup and
   // opening a temp version instead.
   useEffect(() => {
     if (fileURL) {
-      fileSystemAPIs.backupBasePath().then((backupPath) => {
-        return new Promise((resolve, reject) => {
-          if (helpers.file.withoutProtocol(fileURL).startsWith(backupPath)) {
-            if (hasDefaultFolder) {
-              withFullFileState((state) => {
-                return localClient
-                  .basename(fileName)
-                  .then((name) => {
-                    return name.replace(/\.pltr$/, '')
-                  })
-                  .then((name) => {
-                    const backupText = t('Backup')
-                    const date = new Date()
-                    const month = date.getMonth() + 1
-                    const day = date.getDate()
-                    const year = date.getUTCFullYear()
-                    const backupDate = `${t('Resumed at')}:${month}-${day}-${year}`
-                    const withoutSystemKeys = selectors.fullFileStateSelector(state)
-                    return localClient
-                      .saveToDefaultLocation(
-                        withoutSystemKeys,
-                        `${name} [${backupText} ${backupDate}]`
-                      )
-                      .then((newFileURL) => {
-                        return pleaseOpenWindow(newFileURL)
-                          .then(() => {
-                            return localClient.addKnownFile(newFileURL)
-                          })
-                          .then(() => {
-                            const event = new Event('force-close')
-                            window.dispatchEvent(event)
-                          })
-                      })
-                  })
-              }).then(resolve, reject)
-            } else {
-              localClient
+      localClient.isInBackupFolder(fileURL).then((isInBackupFolder) => {
+        if (isInBackupFolder) {
+          if (hasDefaultFolder) {
+            return withFullFileState((state) => {
+              return localClient
                 .basename(fileName)
                 .then((name) => {
                   return name.replace(/\.pltr$/, '')
@@ -91,12 +56,41 @@ const Listener = ({
                   const day = date.getDate()
                   const year = date.getUTCFullYear()
                   const backupDate = `${t('Resumed at')}:${month}-${day}-${year}`
-                  duplicateFile(fileURL, `${name} [${backupText} ${backupDate}].pltr`, true)
+                  const withoutSystemKeys = selectors.fullFileStateSelector(state)
+                  return localClient
+                    .saveToDefaultLocation(
+                      withoutSystemKeys,
+                      `${name} [${backupText} ${backupDate}]`
+                    )
+                    .then((newFileURL) => {
+                      return pleaseOpenWindow(newFileURL)
+                        .then(() => {
+                          return localClient.addKnownFile(newFileURL)
+                        })
+                        .then(() => {
+                          const event = new Event('force-close')
+                          window.dispatchEvent(event)
+                        })
+                    })
                 })
-                .then(resolve, reject)
-            }
+            })
+          } else {
+            return localClient
+              .basename(fileName)
+              .then((name) => {
+                return name.replace(/\.pltr$/, '')
+              })
+              .then((name) => {
+                const backupText = t('Backup')
+                const date = new Date()
+                const month = date.getMonth() + 1
+                const day = date.getDate()
+                const year = date.getUTCFullYear()
+                const backupDate = `${t('Resumed at')}:${month}-${day}-${year}`
+                duplicateFile(fileURL, `${name} [${backupText} ${backupDate}].pltr`, true)
+              })
           }
-        })
+        }
       })
     }
   }, [fileURL, hasDefaultFolder, fileName])

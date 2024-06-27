@@ -6,6 +6,8 @@ import mammoth from 'mammoth'
 
 import { checkFileIntegrity, SYSTEM_REDUCER_KEYS, helpers } from 'pltr'
 
+import { isParentPathOfFile } from './isParentPath'
+
 const { readFile, lstat, writeFile, open, unlink, readdir, mkdir, access } = fs.promises
 
 const basename = path.basename
@@ -135,7 +137,7 @@ const fileModule = (userDataPath) => {
       }
       return backupBasePath().then((backupPath) => {
         const filePath = helpers.file.withoutProtocol(fileURL)
-        if (path.normalize(filePath).startsWith(path.normalize(backupPath))) {
+        if (isParentPathOfFile(fileURL, helpers.file.filePathToFileURL(backupPath))) {
           const message = `Attempting to save a file that's in the backup folder (${filePath})!  Backups are in ${backupPath}`
           logger.error(message)
           return Promise.reject(message)

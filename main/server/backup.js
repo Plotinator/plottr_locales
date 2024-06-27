@@ -2,6 +2,10 @@ import path from 'path'
 import fs from 'fs'
 import { DateTime, Duration } from 'luxon'
 
+import { helpers } from 'pltr'
+
+import { isParentPathOfFile } from './isParentPath'
+
 const { writeFile, readdir, lstat, rmdir, unlink, mkdir } = fs.promises
 
 const BackupModule = (userDataPath) => (settings, logger) => {
@@ -22,10 +26,17 @@ const BackupModule = (userDataPath) => (settings, logger) => {
     })
   }
 
+  function isInBackupFolder(fileURL) {
+    return backupBasePath().then((basePath) => {
+      return isParentPathOfFile(fileURL, helpers.file.filePathToFileURL(backupPath))
+    })
+  }
+
   function saveBackup(filePath, data) {
     logger.info(`Saving backup of: ${filePath}`)
     return backupBasePath().then((basePath) => {
-      if (path.normalize(filePath).startsWith(path.normalize(basePath))) {
+      const fileURL = helpers.file.filePathToFileURL(filePath)
+      if (isParentPathOfFile(fileURL, helpers.file.filePathToFileURL(backupPath))) {
         const message = `Attempting to save a backup of a file that's already a backup (${filePath})!  Backups are in ${basePath}`
         logger.error(message)
         return Promise.reject(message)
@@ -338,6 +349,7 @@ const BackupModule = (userDataPath) => (settings, logger) => {
   return {
     defaultBackupPath,
     backupBasePath,
+    isInBackupFolder,
     saveBackup,
     ensureBackupTodayPath,
     ensureBackupFullPath,

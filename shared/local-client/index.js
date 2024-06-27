@@ -234,6 +234,10 @@ function routeFunctions(suppliedPort, secret, logger) {
     return client.get('/file', { filePath })
   }
 
+  const isInBackupFolder = (fileURL) => {
+    return client.get('/backups/isInBackupFolder', { fileURL })
+  }
+
   const saveBackup = (filePath, file) => {
     return client.post('/backups', { filePath, file }, { filePath, file: file.file })
   }
@@ -615,6 +619,7 @@ function routeFunctions(suppliedPort, secret, logger) {
     saveOfflineFile,
     basename,
     readFile,
+    isInBackupFolder,
     saveBackup,
     ensureBackupFullPath,
     ensureBackupTodayPath,
