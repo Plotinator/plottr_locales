@@ -53,17 +53,17 @@ const Saver = (
   offerSaveAsThenQuit
 ) => {
   /**
-   * @type {SaverRef}
+   * @type {{ current: SaverRef }}
    * @typedef SaverRef
    * @property {number | null} current
    */
-  const saveInterval = { current: null }
+  const saveInterval = { current: { current: null } }
   /**
-   * @type {BackupRef}
+   * @type {{ current: SaverRef }}
    * @typedef BackupRef
    * @property {number | null} current
    */
-  const backupInterval = { current: null }
+  const backupInterval = { current: { current: null } }
   const failedSaveCount = { current: 0 }
   const failedBackupCount = { current: 0 }
   const lastStateBackedUp = { current: {} }
@@ -78,7 +78,7 @@ const Saver = (
    * @param {{ current: number }} failedCountRef
    * @param {function(): void} onSuccessThisTime
    * @param {function(Error): Promise<boolean>} onFailed
-   * @returns {number}
+   * @returns {{ current: null | number }}
    */
   const startJob = (
     name,
@@ -89,31 +89,44 @@ const Saver = (
     onSuccessThisTime,
     onFailed
   ) => {
-    // @ts-ignore
-    return setInterval(() => {
-      const state = getState()
-      const comparableState = selectors.fullFileStateSelector(state)
-      if (!stateDidntChange(lastStateRef.current, comparableState)) {
-        logger.info(`Starting ${name}...`)
-        f(state)
-          .then(() => {
-            lastStateRef.current = comparableState
-            if (failedCountRef.current > 0) {
-              if (failedCountRef.current > 1) {
-                onSuccessThisTime()
-              }
-              failedCountRef.current = 0
-            }
-          })
-          .catch((error) => {
-            onFailed(error).then((shouldMarkAsFailed) => {
-              if (shouldMarkAsFailed) {
-                failedCountRef.current++
+    // @type {{ current: null | number }}
+    const timeoutRef = {
+      current: null,
+    }
+
+    function iter() {
+      const newId = setTimeout(() => {
+        const state = getState()
+        const comparableState = selectors.fullFileStateSelector(state)
+        if (!stateDidntChange(lastStateRef.current, comparableState)) {
+          logger.info(`Starting ${name}...`)
+          f(state)
+            .then(() => {
+              lastStateRef.current = comparableState
+              if (failedCountRef.current > 0) {
+                if (failedCountRef.current > 1) {
+                  onSuccessThisTime()
+                }
+                failedCountRef.current = 0
               }
             })
-          })
-      }
-    }, intervalMS)
+            .catch((error) => {
+              onFailed(error).then((shouldMarkAsFailed) => {
+                if (shouldMarkAsFailed) {
+                  failedCountRef.current++
+                }
+              })
+            })
+        }
+
+        iter()
+      }, intervalMS)
+      // @ts-ignore
+      timeoutRef.current = newId
+      return timeoutRef
+    }
+
+    return iter()
   }
 
   const onSaveBackupError = (error) => {
@@ -193,15 +206,15 @@ const Saver = (
   }
 
   const stop = () => {
-    if (saveInterval.current) {
+    if (saveInterval.current.current) {
       logger.info('Stopping the auto-saver per request.')
-      clearInterval(saveInterval.current)
-      saveInterval.current = null
+      clearInterval(saveInterval.current.current)
+      saveInterval.current.current = null
     }
-    if (backupInterval.current) {
+    if (backupInterval.current.current) {
       logger.info('Stopping the auto-backup process per request.')
-      clearInterval(backupInterval.current)
-      backupInterval.current = null
+      clearInterval(backupInterval.current.current)
+      backupInterval.current.current = null
     }
   }
 
