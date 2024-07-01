@@ -19,7 +19,6 @@ import PleaseConnectToTheInternet from './PleaseConnectToTheInternet'
 
 const Main = ({
   showDashboard,
-  cantShowFile,
   loadingState,
   errorLoadingFile,
   loadingProgress,
@@ -45,7 +44,7 @@ const Main = ({
   // past `firstTimeBooting` then we know that settings etc. are
   // loaded and we can check things like the user's local and pro
   // licenses.
-  if (isOnboardingFromRoot || (cantShowFile && isOnboarding)) {
+  if (isOnboardingFromRoot || isOnboarding) {
     return <ProOnboarding />
   } else if (showChoiceView) {
     return <Choice />
@@ -100,7 +99,6 @@ const Main = ({
 Main.propTypes = {
   forceProjectDashboard: PropTypes.bool,
   showDashboard: PropTypes.bool,
-  cantShowFile: PropTypes.bool,
   loadingState: PropTypes.string.isRequired,
   loadingProgress: PropTypes.number.isRequired,
   fileToUpload: PropTypes.string,
@@ -126,7 +124,6 @@ const mapStateToProps = (state) => ({
   showTrialExpired: selectors.displayTrialExpiredSelector(state),
   showLoginSelector: selectors.displayLoginSelector(state),
   showDashboard: selectors.displayDashboardSelector(state),
-  cantShowFile: selectors.cantShowFileSelector(state),
   loadingState: selectors.loadingStateSelector(state),
   errorLoadingFile: selectors.errorLoadingFileSelector(state),
   loadingProgress: selectors.loadingProgressSelector(state),
