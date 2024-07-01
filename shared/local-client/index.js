@@ -595,7 +595,7 @@ function routeFunctions(suppliedPort, secret, logger) {
   }
 
   const listenToStatus = (cb) => {
-    return client.longPoll('/system/busy')
+    return client.longPoll('/system/busy', cb)
   }
 
   const setPort = (port) => {
@@ -703,7 +703,17 @@ function routeFunctions(suppliedPort, secret, logger) {
 // See the destructured argument of the connect function for the
 // structure of `eventHandlers`.
 const createClient = (suppliedPort, suppliedLogger, suppliedSecret, { onBusy, onDone }) => {
-  return routeFunctions(suppliedPort, suppliedSecret, suppliedLogger)
+  const client = routeFunctions(suppliedPort, suppliedSecret, suppliedLogger)
+  client.listenToStatus((error, result) => {
+    if (error) {
+      suppliedLogger.error('Error listening to busy status', error)
+    } else if (result?.busy) {
+      onBusy()
+    } else {
+      onDone()
+    }
+  })
+  return client
 }
 
 export { createClient }

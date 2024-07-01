@@ -32,6 +32,13 @@ const replyWithResult = (promise, res) => {
     })
 }
 
+/**
+ * @typedef LongPoll
+ * @property {function(): void} cancel
+ * @property {Promise<any>} result
+ * @param {LongPoll} param0
+ * @returns {Promise<void>}
+ */
 const replyToLongPollWithResult = ({ cancel, result }, req, res) => {
   req.on('close', () => {
     if (typeof cancel === 'function') {
@@ -39,8 +46,8 @@ const replyToLongPollWithResult = ({ cancel, result }, req, res) => {
     }
   })
   return result
-    .then((result) => {
-      res.json(result)
+    .then((value) => {
+      res.json(value)
       res.end()
     })
     .catch((error) => {
@@ -60,7 +67,12 @@ const replyWithResultRegisteringBusy = (statusManager) => (promise, res, path) =
 const systemRoutes = (app, statusManager) => {
   app.get('/system/busy', (req, res) => {
     const generation = safeParseGeneration(req.query)
-    replyWithResult(statusManager.nextGeneration(generation), res)
+    replyWithResult(
+      statusManager.nextGeneration(generation).then((result) => {
+        return { generation: result.generation, data: { busy: result.busy } }
+      }),
+      res
+    )
   })
 
   app.get('/system/ping', (req, res) => {

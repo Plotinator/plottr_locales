@@ -103,7 +103,7 @@ const errorReportingLogger = {
 
 const connectToLocalServer = (port, secret) => {
   let doneTimeout = null
-  const socketServerEventHandlers = {
+  const localServerEventHandlers = {
     onBusy: () => {
       store().dispatch(actions.applicationState.startWorkThatPreventsQuitting())
     },
@@ -117,7 +117,7 @@ const connectToLocalServer = (port, secret) => {
       }, 2000)
     },
   }
-  return createClient(port, logger, secret, socketServerEventHandlers)
+  return createClient(port, logger, secret, localServerEventHandlers)
 }
 
 const IGNORED_ERRORS = [
