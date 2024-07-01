@@ -22,7 +22,6 @@ const Navigation = ({
   dashboardView,
   changeCurrentView,
   clickOnDom,
-  appIsBusyWithWork,
   openSearch,
   setDashboardModalView,
 }) => {
@@ -123,7 +122,6 @@ Navigation.propTypes = {
   dashboardView: PropTypes.string,
   changeCurrentView: PropTypes.func.isRequired,
   forceProjectDashboard: PropTypes.bool,
-  appIsBusyWithWork: PropTypes.bool,
   clickOnDom: PropTypes.func.isRequired,
   openSearch: PropTypes.func.isRequired,
   setDashboardModalView: PropTypes.func.isRequired,
@@ -134,7 +132,6 @@ function mapStateToProps(state) {
     isInTrialMode: selectors.isInTrialModeSelector(state),
     currentView: selectors.currentViewSelector(state),
     darkMode: selectors.isDarkModeSelector(state),
-    appIsBusyWithWork: selectors.busyWithWorkThatPreventsQuittingSelector(state),
     dashboardView: selectors.dashboardModalViewSelector(state),
   }
 }

@@ -91,7 +91,7 @@ export const makeProjectModule = (
                   e.sender.send('wants-to-close')
                 })
 
-                newWindow.on('closed', function (e) {
+                newWindow.on('closed', function (_e) {
                   const win = getWindowByObjectEq(this)
                   dereferenceWindow(win)
                 })

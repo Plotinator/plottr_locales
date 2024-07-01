@@ -581,7 +581,7 @@ const knownFilesRoutes = (app, knownFilesModule, logger, statusManager) => {
   return Promise.resolve()
 }
 
-const templatesRoutes = (app, templateFetcher, logger, statusManager) => {
+const templatesRoutes = (app, templateFetcher, _logger, _statusManager) => {
   app.get('/templates/hydrate', (req, res) => {
     replyWithResult(templateFetcher.fetch(), res)
   })

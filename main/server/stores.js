@@ -22,7 +22,7 @@ export const LAST_OPENED_PATH = 'last_opened'
 export const CONFIG_STORE_PATH = 'config'
 
 export const migrateKnownFilesStoreObject = (knownFiles) => {
-  return Object.entries(knownFiles).reduce((acc, [key, value]) => {
+  return Object.entries(knownFiles).reduce((acc, [_key, value]) => {
     if (!value.path && !value.fileURL) {
       return acc
     }
@@ -44,7 +44,7 @@ export const migrateKnownFilesStoreObject = (knownFiles) => {
 }
 
 export const migrateTempFilesStoreObject = (tempFiles) => {
-  return Object.entries(tempFiles).reduce((acc, [key, value]) => {
+  return Object.entries(tempFiles).reduce((acc, [_key, value]) => {
     if (!value.path && !value.fileURL) {
       return acc
     }
@@ -67,7 +67,7 @@ export const migrateTempFilesStoreObject = (tempFiles) => {
  * @param {any} s
  * @returns {Promise<string>}
  */
-const noEncryptionService = (s) => Promise.reject(new Error('No encryption service available'))
+const noEncryptionService = (_s) => Promise.reject(new Error('No encryption service available'))
 
 const makeStores = (
   userDataPath,

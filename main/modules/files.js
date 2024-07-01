@@ -153,7 +153,8 @@ export const makeFileModule = (
 
   function createRTFConversionFunction(replyToWindow) {
     return function (rtfString) {
-      return new Promise((resolve, reject) => {
+      // FIXME: how does this fail?
+      return new Promise((resolve, _reject) => {
         const conversionId = uuidv4()
         ipcMain.once(conversionId, (event, replyChannel, slate) => {
           event.sender.send(replyChannel, conversionId)

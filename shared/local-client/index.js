@@ -16,7 +16,7 @@ function createAbortSignal(timeoutMS) {
   return { signal: controller.signal, timeoutId, abort: () => controller.abort() }
 }
 
-function routeFunctions(suppliedPort, secret, logger) {
+function routeFunctions(suppliedPort, secret, _logger) {
   const createClient = (suppliedPort) => {
     return axios.create({
       baseURL: `http://127.0.0.1:${suppliedPort}`,
@@ -409,7 +409,7 @@ function routeFunctions(suppliedPort, secret, logger) {
     return client.put('/fileSystem/trial', { numDays }, { numDays })
   }
 
-  const extendTrialWithReset = (days) => {
+  const extendTrialWithReset = (_days) => {
     return client.put('/fileSystem/extendedTrial')
   }
 

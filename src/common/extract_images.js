@@ -65,11 +65,11 @@ export const imageIndex = (imagesInRCEContent, file) => {
 
   const index = {}
   let maxId = 0
-  indexedImages.forEach(({ id, name, path, data }) => {
+  indexedImages.forEach(({ id, data }) => {
     index[data] = id
     maxId = Math.max(id, maxId)
   })
-  imagesInRCEContent.forEach(({ path, data }) => {
+  imagesInRCEContent.forEach(({ data }) => {
     if (!index[data]) {
       index[data] = ++maxId
     }
@@ -102,7 +102,7 @@ export const patchImages = (rceImages, imageDataIndex, urlIndex, file) => {
 
   delete newFile.images
   newFile.images = {}
-  Object.entries(imageDataIndex).forEach(([data, imageId]) => {
+  Object.entries(imageDataIndex).forEach(([_data, imageId]) => {
     const imageStorageURL = urlIndex[imageId]
     if (!imageStorageURL) {
       throw new Error(

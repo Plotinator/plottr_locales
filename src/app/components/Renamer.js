@@ -11,14 +11,7 @@ import { editFileName as editFileNameOnFirebase } from 'wired-up-firebase'
 import logger from '../../../shared/logger'
 import { getErrorReporterInstance } from '../../../shared/error-reporter-instance'
 
-const Renamer = ({
-  isInProMode,
-  showLoader,
-  startRenamingFile,
-  finishRenamingFile,
-  isOffline,
-  editFileName,
-}) => {
+const Renamer = ({ isInProMode, showLoader, startRenamingFile, finishRenamingFile, isOffline }) => {
   const [visible, setVisible] = useState(false)
   const [fileId, setFileId] = useState(null)
 
@@ -88,7 +81,6 @@ Renamer.propTypes = {
   startRenamingFile: PropTypes.func.isRequired,
   finishRenamingFile: PropTypes.func.isRequired,
   isOffline: PropTypes.bool.isRequired,
-  editFileName: PropTypes.func.isRequired,
 }
 
 const mapStateToProps = (state) => ({
@@ -101,5 +93,4 @@ export default connect(mapStateToProps, {
   showLoader: actions.project.showLoader,
   startRenamingFile: actions.applicationState.startRenamingFile,
   finishRenamingFile: actions.applicationState.finishRenamingFile,
-  editFileName: actions.ui.editFileName,
 })(Renamer)

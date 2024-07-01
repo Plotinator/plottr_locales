@@ -114,7 +114,7 @@ const errorReportingLogger = {
 
 // https://github.com/sindresorhus/electron-context-menu
 contextMenu({
-  prepend: (defaultActions, params, browserWindow) => [],
+  prepend: (_defaultActions, _params, _browserWindow) => [],
 })
 
 const safelyExitModule = makeSafelyExitModule(log)
@@ -388,7 +388,7 @@ app.whenReady().then(async () => {
             try {
               projectModule
                 .openProjectWindow(fileLaunchedOnURL)
-                .then((newWindow) => {
+                .then((_newWindow) => {
                   log.info(`Created the project window for ${fileLaunchedOnURL}`)
                   if (fileLaunchedOnURL) {
                     knownFilesModule.addToKnown(fileLaunchedOnURL)

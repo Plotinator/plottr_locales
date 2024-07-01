@@ -20,9 +20,7 @@ const Dashboard = ({
   darkMode,
   closeDashboard,
   setCurrentAppStateToApplication,
-  cantShowFile,
   busy,
-  isOffline,
   openTo,
   latestExpiryDate,
   inTrialMode,
@@ -84,9 +82,7 @@ Dashboard.propTypes = {
   darkMode: PropTypes.bool,
   closeDashboard: PropTypes.func.isRequired,
   setCurrentAppStateToApplication: PropTypes.func.isRequired,
-  cantShowFile: PropTypes.bool,
   busy: PropTypes.bool,
-  isOffline: PropTypes.bool,
   openTo: PropTypes.string,
   latestExpiryDate: PropTypes.object,
   inTrialMode: PropTypes.bool,
@@ -95,10 +91,8 @@ Dashboard.propTypes = {
 const mapStateToProps = (state) => ({
   darkMode: selectors.isDarkModeSelector(state),
   busy: selectors.manipulatingAFileSelector(state),
-  isOffline: selectors.isOfflineSelector(state),
   latestExpiryDate: selectors.latestExpiryDateSelector(state),
   openTo: selectors.dashboardViewToOpenToSelector(state),
-  cantShowFile: selectors.cantShowFileSelector(state),
   inTrialMode: selectors.isInTrialModeSelector(state),
 })
 

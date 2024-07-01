@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import { selectors } from 'wired-up-pltr'
 
-const Busy = ({ applicationIsBusyAndCannotBeQuit }) => {
+const Busy = () => {
   // We've decided to disable this component until further notice.
   return null
 }

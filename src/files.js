@@ -207,7 +207,7 @@ export const deleteCloudBackupFile = (localClient, fileURL) => {
     }
 
     const filePath = helpers.file.withoutProtocol(fileURL)
-    return localClient.rmRf(filePath).catch((error) => {
+    return localClient.rmRf(filePath).catch((_error) => {
       // Ignore errors deleting the backup file.
       return true
     })

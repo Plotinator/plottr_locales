@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
@@ -13,9 +13,7 @@ import { getErrorReporterInstance } from '../../../shared/error-reporter-instanc
 import { makeMainProcessClient } from '../mainProcessClient'
 import MainIntegrationContext from '../../mainIntegrationContext'
 
-import { bootFile } from '../bootFile'
-
-const { updateLastOpenedFile, openKnownFile } = makeMainProcessClient()
+const { openKnownFile } = makeMainProcessClient()
 
 const UploadLastOpenedFileToPro = ({
   fileToUpload,
@@ -26,13 +24,8 @@ const UploadLastOpenedFileToPro = ({
   emailAddress,
   userId,
   finishUploadingFileToCloud,
-  setCurrentAppStateToApplication,
   uploadingFileToCloud,
 }) => {
-  const closeDashboard = useCallback(() => {
-    setCurrentAppStateToApplication()
-  }, [])
-
   return (
     <MainIntegrationContext.Consumer>
       {({ readFile, localClient }) => {
@@ -107,7 +100,6 @@ UploadLastOpenedFileToPro.propTypes = {
   emailAddress: PropTypes.string,
   userId: PropTypes.string,
   finishUploadingFileToCloud: PropTypes.func.isRequired,
-  setCurrentAppStateToApplication: PropTypes.func.isRequired,
   uploadingFileToCloud: PropTypes.bool,
 }
 
@@ -127,5 +119,4 @@ export default connect(mapStateToProps, {
   generalError: actions.error.generalError,
   startUploadingFileToCloud: actions.applicationState.startUploadingFileToCloud,
   finishUploadingFileToCloud: actions.applicationState.finishUploadingFileToCloud,
-  setCurrentAppStateToApplication: actions.client.setCurrentAppStateToApplication,
 })(UploadLastOpenedFileToPro)

@@ -310,7 +310,7 @@ tellMeWhatOSImOn()
                                 contents,
                                 fileUrl,
                                 null,
-                                (err, didMigrate, migratedState) => {
+                                (err, _didMigrate, _migratedState) => {
                                   if (err) {
                                     errorReportingLogger.error('Error migrating a file', err)
                                     if (err === 'Plottr behind file') {

@@ -107,7 +107,7 @@ function makeBrowserWindow(settingsModule, fileURL) {
         newWindow.webContents.on(
           // @ts-ignore
           'new-window',
-          (event, url, frameName, disposition, options, additionalFeatures) => {
+          (event, _url, _frameName, _disposition, _options, _additionalFeatures) => {
             event.preventDefault()
           }
         )

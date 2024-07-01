@@ -7,8 +7,8 @@ const CONSOLE_LOGGER = {
   error: (...args) => console.error(...args),
 }
 
-describe('StatusManager', (describe, it) => {
-  describe('given one connection', (describe, it) => {
+describe('StatusManager', (describe) => {
+  describe('given one connection', (describe) => {
     describe('and one task', (describe, it) => {
       it('should notify that connection that work is done when the task completes', () => {
         const statusManager = new StatusManager(CONSOLE_LOGGER)
@@ -85,7 +85,7 @@ describe('StatusManager', (describe, it) => {
         })
       })
     })
-    describe('and two tasks', (describe, it) => {
+    describe('and two tasks', (describe) => {
       describe('that overlap in time', (describe, it) => {
         it('should notify that connection that work is done when both tasks complete but not in between', () => {
           const statusManager = new StatusManager(CONSOLE_LOGGER)
@@ -194,7 +194,7 @@ describe('StatusManager', (describe, it) => {
       })
     })
   })
-  describe('given two connections', (describe, it) => {
+  describe('given two connections', (describe) => {
     describe('and one task', (describe, it) => {
       it('should notify both connections that work is done when the task completes', () => {
         const statusManager = new StatusManager(CONSOLE_LOGGER)
@@ -248,7 +248,7 @@ describe('StatusManager', (describe, it) => {
           })
       })
     })
-    describe('and two tasks', (describe, it) => {
+    describe('and two tasks', (describe) => {
       describe('that overlap in time', (describe, it) => {
         it('should notify both connections that work is done when both tasks complete but not in between', () => {
           const statusManager = new StatusManager(CONSOLE_LOGGER)

@@ -20,7 +20,7 @@ function americanToYearFirst(dateString) {
 }
 
 function addDays(date, days) {
-  var result = new Date(date)
+  const result = new Date(date)
   result.setDate(result.getDate() + days)
   result.setHours(23, 59, 59, 999)
   return result
@@ -175,10 +175,10 @@ const fileSystemModule = (userDataPath) => {
     const listenToknownFilesChanges = (generation) => {
       const transformStore = (store) => {
         return Object.entries(store)
-          .filter(([key, file]) => {
+          .filter(([_key, file]) => {
             return isValidKnownFile(file)
           })
-          .map(([key, file]) => {
+          .map(([_key, file]) => {
             const withoutProtocol = helpers.file.withoutProtocol(file.fileURL)
             const fileBasename = path.basename(withoutProtocol)
             const pathToContainingFolder = withoutProtocol
@@ -210,10 +210,10 @@ const fileSystemModule = (userDataPath) => {
     const currentKnownFiles = () => {
       return knownFilesStore.currentStore().then((fileIndex) => {
         return Object.entries(fileIndex)
-          .filter(([key, file]) => {
+          .filter(([_key, file]) => {
             return isValidKnownFile(file)
           })
-          .map(([key, file]) => {
+          .map(([_key, file]) => {
             const withoutProtocol = helpers.file.withoutProtocol(file.fileURL)
             const fileBasename = path.basename(withoutProtocol)
             const pathToContainingFolder = withoutProtocol
@@ -322,7 +322,7 @@ const fileSystemModule = (userDataPath) => {
           return readBackupsDirectory(lastGeneration)
             .then(({ backups, generation }) => {
               if (generation === lastGeneration) {
-                return new Promise((resolve, reject) => {
+                return new Promise((resolve) => {
                   setTimeout(resolve, BACKUP_WATCH_INTERVAL_MILLISECONDS)
                 }).then(() => {
                   return iter()
@@ -356,7 +356,8 @@ const fileSystemModule = (userDataPath) => {
     }
 
     const lastBackupsRef = { current: {}, generation: 0 }
-    function readBackupsDirectory(lastGeneration) {
+    // FIXME: figure out generational backup listening
+    function readBackupsDirectory(_lastGeneration) {
       return ensureBackupDirExists()
         .then(() => {
           return backupBasePath().then((basePath) => {
@@ -493,7 +494,7 @@ const fileSystemModule = (userDataPath) => {
           timeout = setTimeout(listenWhenSettingsReady, 1000)
         } else {
           clearTimeout(timeout)
-          stopListeningToSettings = SETTINGS.onDidAnyChange((settings) => {
+          stopListeningToSettings = SETTINGS.onDidAnyChange((_settings) => {
             const newDefaultFolder = SETTINGS.getKeyWithoutDefault('user.defaultFolder')
             const newDefaultFolderLocation = SETTINGS.getKeyWithoutDefault(
               'user.defaultFolderLocation'

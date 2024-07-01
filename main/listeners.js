@@ -171,10 +171,10 @@ export const listenOnIPCMain = (
       })
   })
 
-  listen('pls-fetch-state', ({ reply, getOwnerBrowserWindow }, replyChannel, proMode) => {
+  listen('pls-fetch-state', ({ reply, getOwnerBrowserWindow }, replyChannel, _proMode) => {
     lastOpenedModule
       .lastOpenedFile()
-      .catch((error) => {
+      .catch((_error) => {
         return null
       })
       .then((lastFile) => {
@@ -580,15 +580,15 @@ export const listenOnIPCMain = (
       })
   })
 
-  listen('log-info', ({ reply }, ...args) => {
+  listen('log-info', (_event, ...args) => {
     log.info(...args)
   })
 
-  listen('log-warn', ({ reply }, ...args) => {
+  listen('log-warn', (_event, ...args) => {
     log.warn(...args)
   })
 
-  listen('log-error', ({ reply }, ...args) => {
+  listen('log-error', (_event, ...args) => {
     log.localError(...args)
   })
 
@@ -837,7 +837,7 @@ export const listenOnIPCMain = (
         localClient.mkdir,
         localClient.basename,
         selectors,
-        (error, success) => {
+        (error, _success) => {
           if (error) {
             replyWithError(replyChannel, error)
             return
@@ -940,7 +940,7 @@ export const listenOnIPCMain = (
     reply(replyChannel, app.getPath('downloads'))
   })
 
-  listen('please-mark-my-window-as-unsaved', ({ reply, getOwnerBrowserWindow }, replyChannel) => {
+  listen('please-mark-my-window-as-unsaved', ({ getOwnerBrowserWindow }, replyChannel) => {
     try {
       const window = getOwnerBrowserWindow()
       if (window && !window.title?.endsWith('*')) {
@@ -955,7 +955,7 @@ export const listenOnIPCMain = (
     }
   })
 
-  listen('please-mark-my-window-as-saved', ({ reply, getOwnerBrowserWindow }, replyChannel) => {
+  listen('please-mark-my-window-as-saved', ({ getOwnerBrowserWindow }, replyChannel) => {
     try {
       const window = getOwnerBrowserWindow()
       if (window && window.title?.endsWith('*')) {

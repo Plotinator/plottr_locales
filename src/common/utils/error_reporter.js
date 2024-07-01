@@ -45,7 +45,7 @@ export function createErrorReport(localClient, error, errorInfo) {
 function prepareErrorReport(localClient, error, errorInfo) {
   return Promise.all([getVersion(), pleaseTellMeWhatPlatformIAmOn]).then(([version, platform]) => {
     // TODO
-    return Promise.resolve({ payment_id: 'blarg' }).then((user) => {
+    return Promise.resolve({ payment_id: 'blarg' }).then((_user) => {
       const report = `
 ----------------------------------
 INFO

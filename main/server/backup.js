@@ -28,7 +28,7 @@ const BackupModule = (userDataPath) => (settings, logger) => {
 
   function isInBackupFolder(fileURL) {
     return backupBasePath().then((basePath) => {
-      return isParentPathOfFile(fileURL, helpers.file.filePathToFileURL(backupPath))
+      return isParentPathOfFile(fileURL, helpers.file.filePathToFileURL(basePath))
     })
   }
 
@@ -36,7 +36,7 @@ const BackupModule = (userDataPath) => (settings, logger) => {
     logger.info(`Saving backup of: ${filePath}`)
     return backupBasePath().then((basePath) => {
       const fileURL = helpers.file.filePathToFileURL(filePath)
-      if (isParentPathOfFile(fileURL, helpers.file.filePathToFileURL(backupPath))) {
+      if (isParentPathOfFile(fileURL, helpers.file.filePathToFileURL(basePath))) {
         const message = `Attempting to save a backup of a file that's already a backup (${filePath})!  Backups are in ${basePath}`
         logger.error(message)
         return Promise.reject(message)
@@ -111,7 +111,7 @@ const BackupModule = (userDataPath) => (settings, logger) => {
   }
 
   function saveFile(filePath, data) {
-    var stringState = JSON.stringify(data)
+    const stringState = JSON.stringify(data)
     return writeFile(filePath, stringState)
   }
 
@@ -120,9 +120,9 @@ const BackupModule = (userDataPath) => (settings, logger) => {
   function backupPath() {
     const today = new Date()
 
-    var day = today.getDate()
-    var month = today.getMonth() + 1
-    var year = today.getFullYear()
+    const day = today.getDate()
+    const month = today.getMonth() + 1
+    const year = today.getFullYear()
 
     return backupBasePath().then((basePath) => {
       return path.join(basePath, `${month}_${day}_${year}`)

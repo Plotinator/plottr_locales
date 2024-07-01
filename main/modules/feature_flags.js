@@ -2,7 +2,7 @@ export const makeFeatureFlagsModule = (localClient, log) => {
   const featureFlags = () => {
     return localClient
       .currentAppSettings()
-      .then((settings) => {
+      .then((_settings) => {
         return {}
       })
       .catch((error) => {

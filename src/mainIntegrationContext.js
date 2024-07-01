@@ -5,10 +5,10 @@ const NO_DEFAULT = () => {
 }
 
 /**
- * @param {string} filePath
+ * @param {string} _filePath
  * @returns {Promise<String>}
  */
-const readFile = (filePath) => {
+const readFile = (_filePath) => {
   return Promise.resolve('unimplemented')
 }
 

@@ -6,7 +6,7 @@ describe('makeCachedDownloadStorageImage', () => {
       describe('given the same url twice', () => {
         it('should only call the dummy function once', async () => {
           let called = 0
-          const dummyDownloadStorageImage = (storageURL, fileId, userId) => {
+          const dummyDownloadStorageImage = (storageURL, _fileId, _userId) => {
             called++
             return Promise.resolve(storageURL)
           }
@@ -32,7 +32,7 @@ describe('makeCachedDownloadStorageImage', () => {
         describe('and then a different URL', () => {
           it('should only call the dummy function twice', async () => {
             let called = 0
-            const dummyDownloadStorageImage = (storageURL, fileId, userId) => {
+            const dummyDownloadStorageImage = (storageURL, _fileId, _userId) => {
               called++
               return Promise.resolve(storageURL)
             }

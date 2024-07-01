@@ -371,38 +371,36 @@ export function bootFile(
       }
       const fileURL = helpers.file.fileIdToPlottrCloudFileURL(fileId)
       return offlineFileURLFromFile(localClient, fileURL).then((offlineURL) => {
-        ;(offlineURL) => {
-          if (!offlineURL) {
-            logger.warn(`Could not compute an offline path for file: ${JSON.stringify(json?.file)}`)
-            return Promise.resolve(false)
-          }
-          const offlinePath = helpers.file.withoutProtocol(offlineURL)
-          return localClient
-            .fileExists(offlinePath)
-            .then((exists) => {
-              return offlinePath && exists
-            })
-            .then((exists) => {
-              return exists
-                ? localClient.readFile(offlinePath).then((file) => {
-                    return JSON.parse(file)
-                  })
-                : Promise.resolve(null)
-            })
-            .then((offlineFile) => {
-              if (!offlineFile) {
-                return false
-              }
-              if (!offlineFile.file) {
-                logger.warn(
-                  `There's an offline backup of file with id ${fileId} at ${offlinePath}, but it appears to be broken or incomplete`
-                )
-                return Promise.resolve(false)
-              }
-              const [uploadOurs, backupOurs] = resumeDirective(offlineFile, json)
-              return handleOfflineBackup(backupOurs, uploadOurs, fileId, offlineFile, email, userId)
-            })
+        if (!offlineURL) {
+          logger.warn(`Could not compute an offline path for file: ${JSON.stringify(json?.file)}`)
+          return Promise.resolve(false)
         }
+        const offlinePath = helpers.file.withoutProtocol(offlineURL)
+        return localClient
+          .fileExists(offlinePath)
+          .then((exists) => {
+            return offlinePath && exists
+          })
+          .then((exists) => {
+            return exists
+              ? localClient.readFile(offlinePath).then((file) => {
+                  return JSON.parse(file)
+                })
+              : Promise.resolve(null)
+          })
+          .then((offlineFile) => {
+            if (!offlineFile) {
+              return false
+            }
+            if (!offlineFile.file) {
+              logger.warn(
+                `There's an offline backup of file with id ${fileId} at ${offlinePath}, but it appears to be broken or incomplete`
+              )
+              return Promise.resolve(false)
+            }
+            const [uploadOurs, backupOurs] = resumeDirective(offlineFile, json)
+            return handleOfflineBackup(backupOurs, uploadOurs, fileId, offlineFile, email, userId)
+          })
       })
     })
   }
@@ -754,7 +752,7 @@ export function bootFile(
         )
       })
       .catch((error) => {
-        logger.error('Could not set up auto saver.  Bailing.')
+        logger.error(`Could not set up auto saver.  Bailing.  ${error.message}`)
         return showErrorBox(t('Error'), t('There was an error doing that. Try again')).then(() => {
           setTimeout(() => {
             window.close()

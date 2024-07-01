@@ -230,7 +230,7 @@ const _makeMainProcessClient = () => {
     return subscribeTo('create-plottr-cloud-file', cb)
   }
 
-  const errorImportingScrivener = (error) => {
+  const errorImportingScrivener = (_error) => {
     throw new Error('Implement!  errorImportingScrivener')
   }
 

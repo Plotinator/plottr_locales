@@ -13,4 +13,4 @@ const SettingsWizard = () => {
 
 SettingsWizard.propTypes = {}
 
-export default connect((state) => ({}), {})(SettingsWizard)
+export default connect(() => ({}), {})(SettingsWizard)

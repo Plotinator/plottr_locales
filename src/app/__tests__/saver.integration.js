@@ -14,9 +14,9 @@ const CONSOLE_LOGGER = {
 }
 
 const NOP_LOGGER = {
-  info: (...args) => {},
-  warn: (...args) => {},
-  error: (...args) => {},
+  info: (..._args) => {},
+  warn: (..._args) => {},
+  error: (..._args) => {},
 }
 
 function expectToMatchArrayLoosely(received, expected, allowedMissing = 1, allowedAdditional = 1) {
@@ -77,9 +77,9 @@ const DUMMY_OFFER_SAVE_AND_QUIT = () => {
   return Promise.resolve()
 }
 
-describe('Saver', (describe, it) => {
-  describe('save', (describe, it) => {
-    describe('given a dummy getState function', (describe, it) => {
+describe('Saver', (describe) => {
+  describe('save', (describe) => {
+    describe('given a dummy getState function', (describe) => {
       describe('and a 100ms interval', (describe, it) => {
         it('should attempt to save the same thing 10 times in one second', () => {
           let stateCounter = 1
@@ -614,7 +614,7 @@ describe('Saver', (describe, it) => {
         })
       })
     })
-    describe('given a getState function that produces a sequence of values', (describe, it) => {
+    describe('given a getState function that produces a sequence of values', (describe) => {
       describe('and a 100ms interval', (desrcribe, it) => {
         it('should attempt to save ten different items in the right order', () => {
           let counter = 0
@@ -708,7 +708,7 @@ describe('Saver', (describe, it) => {
             saver.cancelAllRemainingRequests()
           })
         })
-        describe('and a save function that takes 200ms to complete', (describe, it) => {
+        describe('and a save function that takes 200ms to complete', (describe) => {
           describe('and we cancel saving after 1 second', (describe, it) => {
             it('should still attempt 10 saves in 1 second (the lockfile in the local server handles concurrent access errors)', () => {
               let counter = 0
@@ -804,7 +804,7 @@ describe('Saver', (describe, it) => {
                 )
               })
             })
-            it('should not save after cancel is called', (desrcibe, it) => {
+            it('should not save after cancel is called', () => {
               let counter = 0
               const getState = () => {
                 counter++
@@ -943,7 +943,7 @@ describe('Saver', (describe, it) => {
         const getState = () => {
           return THE_STATE
         }
-        const backupFile = (...args) => {
+        const backupFile = (..._args) => {
           return Promise.resolve()
         }
         const saveCalls = []
@@ -955,13 +955,13 @@ describe('Saver', (describe, it) => {
         let loggedWarnings = 0
         let loggedInfos = 0
         const countingLogger = {
-          info: (...args) => {
+          info: (..._args) => {
             loggedInfos++
           },
-          warn: (...args) => {
+          warn: (..._args) => {
             loggedWarnings++
           },
-          error: (...args) => {
+          error: (..._args) => {
             loggedErrors++
           },
         }
@@ -994,7 +994,7 @@ describe('Saver', (describe, it) => {
         })
       })
     })
-    describe('given a state that doesnt change', (describe, it) => {
+    describe('given a state that doesnt change', (describe) => {
       describe('and given  a save function that always fails', (describe, it) => {
         it('should report failure every other time', () => {
           const THE_STATE = {
@@ -1003,7 +1003,7 @@ describe('Saver', (describe, it) => {
           const getState = () => {
             return THE_STATE
           }
-          const backupFile = (...args) => {
+          const backupFile = (..._args) => {
             return Promise.resolve()
           }
           const saveFile = () => {
@@ -1013,13 +1013,13 @@ describe('Saver', (describe, it) => {
           let loggedWarnings = 0
           let loggedInfos = 0
           const countingLogger = {
-            info: (...args) => {
+            info: (..._args) => {
               loggedInfos++
             },
-            warn: (...args) => {
+            warn: (..._args) => {
               loggedWarnings++
             },
-            error: (...args) => {
+            error: (..._args) => {
               loggedErrors++
             },
           }
@@ -1081,8 +1081,8 @@ describe('Saver', (describe, it) => {
       })
     })
   })
-  describe('backup', (describe, it) => {
-    describe('given a dummy getState function', (describe, it) => {
+  describe('backup', (describe) => {
+    describe('given a dummy getState function', (describe) => {
       describe('and a 100ms interval', (describe, it) => {
         it('should attempt to backup the same thing 10 times in one second', () => {
           let stateCounter = 1
@@ -1282,13 +1282,13 @@ describe('Saver', (describe, it) => {
             let loggedWarnings = 0
             let loggedInfos = 0
             const countingLogger = {
-              info: (...args) => {
+              info: (..._args) => {
                 loggedInfos++
               },
-              warn: (...args) => {
+              warn: (..._args) => {
                 loggedWarnings++
               },
-              error: (...args) => {
+              error: (..._args) => {
                 loggedErrors++
               },
             }
@@ -1391,13 +1391,13 @@ describe('Saver', (describe, it) => {
               let loggedWarnings = 0
               let loggedInfos = 0
               const countingLogger = {
-                info: (...args) => {
+                info: (..._args) => {
                   loggedInfos++
                 },
-                warn: (...args) => {
+                warn: (..._args) => {
                   loggedWarnings++
                 },
-                error: (...args) => {
+                error: (..._args) => {
                   loggedErrors++
                 },
               }
@@ -1534,7 +1534,7 @@ describe('Saver', (describe, it) => {
         })
       })
     })
-    describe('given a getState function that produces a sequence of values', (describe, it) => {
+    describe('given a getState function that produces a sequence of values', (describe) => {
       describe('and a 100ms interval', (describe, it) => {
         it('should attempt to backup ten different items in the right order', () => {
           let counter = 0
@@ -1628,7 +1628,7 @@ describe('Saver', (describe, it) => {
             saver.cancelAllRemainingRequests()
           })
         })
-        describe('and a backup function that takes 200ms to complete', (describe, it) => {
+        describe('and a backup function that takes 200ms to complete', (describe) => {
           describe('and we cancel saving after 1 second', (describe, it) => {
             it('should still backup 5 times in 1 second (the local server handles concurrent access errors)', () => {
               let counter = 0
