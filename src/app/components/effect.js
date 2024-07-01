@@ -15,7 +15,9 @@ export const retryWithBackOff = (
   function attempt() {
     return thunk().catch((error) => {
       ++attemptsSoFar
-      log.warn(`Attempted an effect ${attemptsSoFar} times and it's just failed again`)
+      log.warn(
+        `Attempted an effect ${attemptsSoFar} times and it's just failed again.  Error: ${error.message}`
+      )
       if (attemptsSoFar > maxAttempts) {
         return Promise.reject(new Error(`Failed effect after ${maxAttempts} attempts`))
       }

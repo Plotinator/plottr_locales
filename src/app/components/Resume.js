@@ -70,7 +70,8 @@ const Resume = ({
                       return initialFetch(userId, fileId, clientId, version)
                     })
                   })
-                  .then((cloudFile) => {
+                  .then((unmountedCloudFile) => {
+                    const cloudFile = { user: unmountedCloudFile }
                     return new Promise((resolve, reject) => {
                       const [uploadOurs, backupOurs, doNothing] = resumeDirective(
                         offlineFile,
@@ -88,7 +89,6 @@ const Resume = ({
                           `Detected that the online version of file with id: ${fileId} didn't cahnge, but we changed ours.  Uploading our version.`
                         )
                         retryWithBackOff(() => {
-                          const withoutSystemKeys = selectors.fullFileStateSelector(offlineFile)
                           return overwriteAllKeys(fileId, clientId, {
                             ...withoutSystemKeys,
                             file: {
@@ -109,7 +109,6 @@ const Resume = ({
                           `Detected that file ${fileId} has changes.  Backing up the offline file and switching to the online file.`
                         )
                         const date = new Date()
-                        const withoutSystemKeys = selectors.fullFileStateSelector(offlineFile)
                         uploadProject(
                           localClient,
                           {
@@ -125,12 +124,14 @@ const Resume = ({
                           },
                           email,
                           userId
-                        ).then(() => {
-                          setBackingUpOfflineFile(true)
-                          setCheckingForOfflineDrift(false)
-                          setResuming(false)
-                          resolve(true)
-                        })
+                        )
+                          .then(() => {
+                            setBackingUpOfflineFile(true)
+                            setCheckingForOfflineDrift(false)
+                            setResuming(false)
+                            resolve(true)
+                          })
+                          .catch(reject)
                       }
                     })
                   })
