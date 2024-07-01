@@ -15,7 +15,7 @@ import MainIntegrationContext from '../../mainIntegrationContext'
 
 import { bootFile } from '../bootFile'
 
-const { updateLastOpenedFile } = makeMainProcessClient()
+const { updateLastOpenedFile, openKnownFile } = makeMainProcessClient()
 
 const UploadLastOpenedFileToPro = ({
   fileToUpload,
@@ -70,15 +70,19 @@ const UploadLastOpenedFileToPro = ({
                       //
                       // FIXME: where should the options come from?
                       const newFileURL = helpers.file.fileIdToPlottrCloudFileURL(fileId)
-                      bootFile(localClient, newFileURL, {}, 2, localClient.saveBackup)
-                        .then(() => {
-                          closeDashboard()
-                        })
-                        .then(() => {
-                          updateLastOpenedFile(newFileURL)
-                        })
+                      openKnownFile(newFileURL).then(() => {
+                        setTimeout(() => {
+                          const event = new Event('force-close')
+                          window.dispatchEvent(event)
+                        }, 2000)
+                      })
                     })
-                    .catch((error) => {})
+                    .catch((error) => {
+                      logger.error(
+                        'Error opening last opened local file uploaded to Pro',
+                        error.message
+                      )
+                    })
                 })
               }}
               onCancel={() => {
