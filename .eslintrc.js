@@ -37,11 +37,12 @@ module.exports = {
     'lib/pltr/template/**/*',
   ],
   rules: {
+    'no-shadow': 'warn',
+    'no-var': 'error',
     'no-unused-vars': [
-      'warn',
+      'error',
       {
-        args: 'none',
-        argsIgnorePattern: 'req|res|next|val',
+        argsIgnorePattern: '_',
         varsIgnorePattern: '_',
       },
     ],
