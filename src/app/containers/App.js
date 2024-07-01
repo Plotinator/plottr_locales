@@ -39,6 +39,8 @@ const App = ({
   searchDialogIsOpen,
   openSearch,
   startSearching,
+  dashboardModalView,
+  setDashboardModalView,
 }) => {
   const [showTemplateCreate, setShowTemplateCreate] = useState(false)
   const [type, setType] = useState(null)
@@ -63,8 +65,24 @@ const App = ({
         "Window belongs to a pro file, but we're not logged in.  We could have just logged out."
       )
       showErrorBox(t('Error'), t('This appears to be a Plottr Pro file.  Please log in.'))
+    } else if (isInProMode && !isCloudFile && !dashboardModalView) {
+      log.warn("Window belongs to a Plottr file, but we're in Pro.")
+      showErrorBox(
+        t('Error'),
+        t('This appears to be a non-Plottr-Pro file.  Please save and close it.')
+      )
+      setDashboardModalView('files')
     }
-  }, [isResuming, userId, isCloudFile, userNeedsToLogin, isOffline, sessionChecked, isInProMode])
+  }, [
+    isResuming,
+    userId,
+    isCloudFile,
+    userNeedsToLogin,
+    isOffline,
+    sessionChecked,
+    isInProMode,
+    dashboardModalView,
+  ])
 
   useEffect(() => {
     const saveAsTemplateListener = (event) => {
@@ -162,6 +180,8 @@ App.propTypes = {
   showErrorBox: PropTypes.func.isRequired,
   openSearch: PropTypes.func.isRequired,
   startSearching: PropTypes.func.isRequired,
+  setDashboardModalView: PropTypes.func.isRequired,
+  dashboardModalView: PropTypes.string,
 }
 
 function mapStateToProps(state) {
@@ -174,6 +194,7 @@ function mapStateToProps(state) {
     sessionChecked: selectors.sessionCheckedSelector(state),
     searchDialogIsOpen: selectors.searchDialogIsOpenSelector(state),
     isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
+    dashboardModalView: selectors.dashboardModalViewSelector(state),
   }
 }
 
@@ -181,4 +202,5 @@ export default connect(mapStateToProps, {
   clickOnDom: actions.domEvents.clickOnDom,
   openSearch: actions.ui.openSearch,
   startSearching: actions.applicationState.startSearching,
+  setDashboardModalView: actions.ui.setDashboardModalView,
 })(App)
