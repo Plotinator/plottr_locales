@@ -271,11 +271,14 @@ app.whenReady().then(async () => {
       const restartServerRef = {
         killServer: killServer,
         killingApp: false,
+        attempts: 0,
         restartServer: () => {
-          if (restartServerRef.killingApp) {
+          if (restartServerRef.killingApp && restartServerRef.attempts < 10) {
             log.warn('Instructed to restart the server, but we are killing the app.')
+            restartServerRef.attempts++
             return Promise.resolve()
           } else {
+            restartServerRef.attempts = 0
             return restartServerRef
               .killServer()
               .then(() => {
