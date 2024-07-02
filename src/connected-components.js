@@ -348,7 +348,12 @@ export const plottrComponentsContextObject = (localClient) => {
         pleaseDownloadUpdate()
       },
       checkForUpdates: () => {
-        pleaseCheckForUpdates()
+        const canReceiveUpdates = selectors.canReceiveUpdatesSelector(store().getState())
+        if (canReceiveUpdates) {
+          pleaseCheckForUpdates()
+        } else {
+          showErrorBox(t('Error'), t('You cannot receive updates with an inactive subscription.'))
+        }
       },
       onUpdateError: (cb) => {
         unsubscribeFromUpdateError = onUpdateError(cb)

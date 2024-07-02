@@ -593,7 +593,11 @@ export function bootFile(
         logger.error(message)
         store().dispatch(actions.applicationState.errorLoadingFile())
         return Promise.reject(new Error(message))
-      } else if (!inTrialMode && latestExpiryDate !== null && latestExpiryDate < dateBooted) {
+      } else if (
+        !inTrialMode &&
+        latestExpiryDate !== null &&
+        latestExpiryDate < helpers.date.subtractMonths(dateBooted, 3)
+      ) {
         showErrorBox(
           t('Error'),
           t('Your license expired before this version of Plottr was released')

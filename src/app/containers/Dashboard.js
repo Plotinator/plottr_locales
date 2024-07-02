@@ -36,15 +36,18 @@ const Dashboard = ({
         setTimeout(() => {
           window.close()
         }, 3000)
-      } else if (!inTrialMode && latestExpiryDate !== null && latestExpiryDate < dateBooted) {
-        showErrorBox(
-          t('Error'),
-          t('Your license expired before this version of Plottr was released')
-        )
-        // Never resolve, because we'd rather just quit.
-        setTimeout(() => {
-          window.close()
-        }, 3000)
+      } else {
+        const versionGraceDate = helpers.date.subtractMonths(dateBooted, 3)
+        if (!inTrialMode && latestExpiryDate !== null && latestExpiryDate < versionGraceDate) {
+          showErrorBox(
+            t('Error'),
+            t('Your license expired before this version of Plottr was released')
+          )
+          // Never resolve, because we'd rather just quit.
+          setTimeout(() => {
+            window.close()
+          }, 3000)
+        }
       }
     })
   }, [])
