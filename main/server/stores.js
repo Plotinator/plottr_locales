@@ -64,7 +64,7 @@ export const migrateTempFilesStoreObject = (tempFiles) => {
 }
 
 /**
- * @param {any} s
+ * @param {any} _s
  * @returns {Promise<string>}
  */
 const noEncryptionService = (_s) => Promise.reject(new Error('No encryption service available'))
