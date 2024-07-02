@@ -539,14 +539,7 @@ export function bootFile(
                       actions.ui.loadFile(
                         state.file.fileName || helpers.file.withoutProtocol(fileURL),
                         didMigrate,
-                        {
-                          ...state,
-                          file: {
-                            ...state.file,
-                            originalVersionStamp:
-                              state.file.originalVersionStamp || state.file.versionStamp,
-                          },
-                        },
+                        state,
                         state.file.version,
                         fileURL
                       )

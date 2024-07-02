@@ -1,6 +1,6 @@
 const makeFileModule = (localClient) => {
-  const saveOfflineFile = (jsonData, knownFiles, onlineFileURL) => {
-    return localClient.saveOfflineFile(jsonData, knownFiles, onlineFileURL)
+  const saveOfflineFile = (jsonData, knownFiles, onlineFileURL, isOffline) => {
+    return localClient.saveOfflineFile(jsonData, knownFiles, onlineFileURL, isOffline)
   }
 
   const saveFile = (fileURL, jsonData) => {

@@ -218,8 +218,12 @@ function routeFunctions(suppliedPort, secret, _logger) {
     return client.post('/file/raw', { filePath, data }, { filePath })
   }
 
-  const saveOfflineFile = (file, knownFiles, onlineFileURL) => {
-    return client.post('/file/offline', { file, knownFiles, onlineFileURL }, { file: file.file })
+  const saveOfflineFile = (file, knownFiles, onlineFileURL, isOffline) => {
+    return client.post(
+      `/file/offline?isOffline=${isOffline}`,
+      { file, knownFiles, onlineFileURL },
+      { file: file.file, isOffline }
+    )
   }
 
   const basename = (filePath, ext) => {

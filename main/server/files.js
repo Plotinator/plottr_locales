@@ -270,7 +270,17 @@ const fileModule = (userDataPath) => {
       return Promise.resolve(file)
     }
 
-    function saveOfflineFile(file, knownFiles, onlineFileURL) {
+    function copyVersionStampToOriginalFileStamp(file) {
+      return {
+        ...file,
+        file: {
+          ...file.file,
+          originalVersionStamp: file.file.versionStamp,
+        },
+      }
+    }
+
+    function saveOfflineFile(file, knownFiles, onlineFileURL, isOffline) {
       return ensureOfflineBackupPathExists().then(() => {
         return checkForFileRecord(file).then(() => {
           const fileURL = offlineFileURL(onlineFileURL)
@@ -280,7 +290,10 @@ const fileModule = (userDataPath) => {
             return Promise.reject(new Error(message))
           }
           return cleanOfflineBackups(knownFiles).then(() => {
-            return saveFile(fileURL, file)
+            // N.B. While we're online, the original version stamp should
+            // always match the version stamp.
+            const fileToSave = isOffline ? file : copyVersionStampToOriginalFileStamp(file)
+            return saveFile(fileURL, fileToSave)
           })
         })
       })

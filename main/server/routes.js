@@ -132,8 +132,9 @@ const fileRoutes = (app, fileModule, logger, statusManager) => {
   const offlineFilePath = '/file/offline'
   app.post(offlineFilePath, (req, res) => {
     const { file, onlineFileURL, knownFiles } = req.body.data
+    const { isOffline } = req.query
     replyRecordingBusy(
-      fileModule.saveOfflineFile(file, knownFiles, onlineFileURL),
+      fileModule.saveOfflineFile(file, knownFiles, onlineFileURL, isOffline === 'true'),
       res,
       offlineFilePath
     )

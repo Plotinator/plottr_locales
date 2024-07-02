@@ -104,13 +104,14 @@ export const useAskToSave = (
         const fileLoaded = selectors.fileURLLoadedSelector(store().getState())
         const isCloudFile = selectors.isCloudFileSelector(store().getState())
         const fileURL = selectors.fileURLSelector(store().getState())
+        const knownFiles = selectors.knownFilesSelector(store().getState())
         if (!fileLoaded) {
           return Promise.resolve()
         } else {
           return isCloudFile && isOffline
             ? // TODO: use the components definitions for better types
               // @ts-ignore
-              localClient.saveOfflineFile(fileURL, present)
+              localClient.saveOfflineFile(present, knownFiles, fileURL, isOffline)
             : // @ts-ignore
               localClient.saveFile(fileURL, present)
         }
@@ -159,7 +160,7 @@ export const useAskToSave = (
     setWaitingForSaveDoneSignal(true)
     return (
       isCloudFile && isOffline
-        ? saveOfflineFile(present, knownFiles, fileURL)
+        ? saveOfflineFile(present, knownFiles, fileURL, isOffline)
         : saveFile(fileURL, present)
     )
       .then(() => {

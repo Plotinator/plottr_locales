@@ -26,7 +26,8 @@ export const saveFile = (localClient, logger, postSaveHook) => (state) => {
     if (shouldSaveOfflineFile) {
       const onlineFileURL = selectors.fileURLSelector(state)
       const knownFiles = selectors.knownFilesSelector(state)
-      return localClient.saveOfflineFile(fileJSON, knownFiles, onlineFileURL)
+      const isOffline = selectors.isOfflineSelector(state)
+      return localClient.saveOfflineFile(fileJSON, knownFiles, onlineFileURL, isOffline)
     }
 
     const isCloudFile = selectors.isCloudFileSelector(state)

@@ -247,7 +247,7 @@ tellMeWhatOSImOn()
           const onlineFileURL = selectors.fileURLSelector(state)
           const knownFiles = selectors.knownFilesSelector(state)
           if (isCloudFile && isOffline && isOfflineModeEnabled) {
-            saveOfflineFile(fileState, knownFiles, onlineFileURL)
+            saveOfflineFile(fileState, knownFiles, onlineFileURL, isOffline)
               .then(() => {
                 store().dispatch(actions.ui.fileSaved())
               })
