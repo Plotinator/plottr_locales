@@ -1,6 +1,7 @@
 import { t } from 'plottr_locales'
 import { helpers, reducers, emptyFile, migrateIfNeeded, addMissingKeys, errorCodes } from 'pltr'
 import { actions, selectors } from 'wired-up-pltr'
+import { fetchFileJson } from 'wired-up-firebase'
 
 import { openExistingFile as _openExistingFile } from './common/utils/window_manager'
 import { store } from './app/store'
@@ -18,6 +19,7 @@ const {
   editKnownFilePath,
   userDocumentsPath,
   addToKnownFilesAndOpen,
+  showOpenDialog,
 } = makeMainProcessClient()
 
 export const newEmptyFile = (fileName, appVersion, currentFile) => {
@@ -317,6 +319,115 @@ export const openExistingFile = (localClient) => {
         })
     })
   }
+}
+
+export const showRecentFilesInImportModal = () => {
+  const state = store().getState()
+  const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
+  if (isInProMode) {
+    return store().dispatch(actions.ui.showProAccountRecentFiles())
+  }
+}
+
+export const importExistingCloudFile = (file) => {
+  const state = store().getState()
+  store().dispatch(actions.applicationState.startProjectImporter())
+  const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
+  const userId = selectors.userIdSelector(state)
+  const clientId = selectors.clientIdSelector(state)
+
+  if (isInProMode && !!file?.isCloudFile) {
+    return getVersion()
+      .then((version) => {
+        return fetchFileJson(userId, file.id, clientId, version).then((fetchedFile) => {
+          return new Promise((resolve, reject) => {
+            migrateIfNeeded(
+              version,
+              fetchedFile,
+              file.fileUrl,
+              null,
+              (error, didMigrate, migratedState) => {
+                if (error) {
+                  getErrorReporterInstance().then((errorReporter) => {
+                    errorReporter.error('Error migrating file', error)
+                  })
+                  logger.error('Error migrating file', error)
+                  reject(error)
+                  return
+                } else {
+                  const fileState = addMissingKeys(migratedState)
+                  const state = store().getState()
+                  const fullSystemState = selectors.fullSystemStateSelector(state)
+                  store().dispatch(actions.ui.showImportDataPicker(fileState, fullSystemState))
+                  store().dispatch(actions.applicationState.finishProjectImporter())
+                  resolve()
+                }
+              }
+            )
+          })
+        })
+      })
+      .catch((error) => {
+        store().dispatch(actions.applicationState.finishProjectImporter())
+        return showErrorBox(t('Error'), t('There was an error doing that. Try again')).then(() => {
+          return Promise.reject(error)
+        })
+      })
+  } else if (!isInProMode && !!file?.isCloudFile) {
+    store().dispatch(actions.applicationState.finishProjectImporter())
+    showErrorBox(t('Error importing file'), t("Attempted to import pro file, but we're not in Pro"))
+  }
+}
+
+export const importExistingFile = (fileUrl, properties) => {
+  return showOpenDialog('Choose file to import', filters, properties, fileUrl).then((files) => {
+    const filePath = files && files.length && files[0]
+
+    if (typeof filePath !== 'string') {
+      return Promise.resolve('No file selected')
+    }
+
+    return whenClientIsReady(({ readFile }) => {
+      store().dispatch(actions.applicationState.startProjectImporter())
+      return readFile(helpers.file.withoutProtocol(filePath), 'utf-8').then((rawFile) => {
+        const contents = JSON.parse(rawFile)
+
+        return getVersion()
+          .then((version) => {
+            return new Promise((resolve, reject) => {
+              migrateIfNeeded(
+                version,
+                contents,
+                fileUrl,
+                null,
+                (error, didMigrate, migratedState) => {
+                  if (error) {
+                    getErrorReporterInstance().then((errorReporter) => {
+                      errorReporter.error('Error migrating file', error)
+                    })
+                    logger.error('Error migrating file', error)
+                    reject(error)
+                    return
+                  } else {
+                    const fileState = addMissingKeys(migratedState)
+                    const state = store().getState()
+                    const fullSystemState = selectors.fullSystemStateSelector(state)
+                    store().dispatch(actions.ui.showImportDataPicker(fileState, fullSystemState))
+                    store().dispatch(actions.applicationState.finishProjectImporter())
+                    resolve()
+                  }
+                }
+              )
+            })
+          })
+          .catch((error) => {
+            getErrorReporterInstance().then((errorReporter) => {
+              errorReporter.error('Error importing project', error)
+            })
+          })
+      })
+    })
+  })
 }
 
 export const duplicateFile = (fileUrl, suggestedNewName, forceCloseWhenDone) => {

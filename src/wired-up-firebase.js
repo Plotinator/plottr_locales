@@ -17,6 +17,7 @@ export const updateAuthFileName = worker.updateAuthFileName
 export const listen = worker.listen
 export const overwriteAllKeys = worker.overwriteAllKeys
 export const initialFetch = worker.initialFetch
+export const fetchFileJson = worker.fetchFileJson
 export const deleteFile = worker.deleteFile
 export const listenToFiles = worker.listenToFiles
 export const fetchFiles = worker.fetchFiles

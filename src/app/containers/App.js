@@ -18,6 +18,7 @@ import {
   NewProjectInputModal,
   SearchModal,
   ImagePicker,
+  ImportModal,
   UndoRedo,
 } from 'plottr_components'
 import { makeMainProcessClient } from '../mainProcessClient'
@@ -41,6 +42,8 @@ const App = ({
   startSearching,
   dashboardModalView,
   setDashboardModalView,
+  isImportModalOpen,
+  shouldShowRecentFiles,
 }) => {
   const [showTemplateCreate, setShowTemplateCreate] = useState(false)
   const [type, setType] = useState(null)
@@ -161,6 +164,7 @@ const App = ({
         {renderAdvanceExportModal()}
         {renderImagePickerModal()}
         {searchDialogIsOpen ? <SearchModal /> : null}
+        {isImportModalOpen || shouldShowRecentFiles ? <ImportModal /> : null}
       </React.StrictMode>
     </ErrorBoundary>
   )
@@ -182,6 +186,8 @@ App.propTypes = {
   startSearching: PropTypes.func.isRequired,
   setDashboardModalView: PropTypes.func.isRequired,
   dashboardModalView: PropTypes.string,
+  isImportModalOpen: PropTypes.bool,
+  shouldShowRecentFiles: PropTypes.bool,
 }
 
 function mapStateToProps(state) {
@@ -195,6 +201,8 @@ function mapStateToProps(state) {
     searchDialogIsOpen: selectors.searchDialogIsOpenSelector(state),
     isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
     dashboardModalView: selectors.dashboardModalViewSelector(state),
+    isImportModalOpen: selectors.isImportModalOpenSelector(state),
+    shouldShowRecentFiles: selectors.shouldShowProAccountRecentFilesSelector(state),
   }
 }
 

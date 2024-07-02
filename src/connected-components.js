@@ -34,6 +34,9 @@ import {
   openExistingFile,
   duplicateFile,
   userFilePickerDefaultFolder,
+  importExistingFile,
+  showRecentFilesInImportModal,
+  importExistingCloudFile,
 } from './files'
 import logger from '../shared/logger'
 import { closeDashboard } from './dashboard-events'
@@ -489,6 +492,9 @@ export const plottrComponentsContextObject = (localClient) => {
       document.dispatchEvent(event)
     },
     duplicateFile,
+    importExistingFile,
+    importExistingCloudFile,
+    showRecentFilesInImportModal,
     showItemInFolder: (fileURL, fileName) => {
       isStorageURL(fileURL).then((storageURL) => {
         if (!storageURL) {

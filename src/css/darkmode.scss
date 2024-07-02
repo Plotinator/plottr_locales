@@ -522,6 +522,7 @@ body.darkmode {
     }
   }
 
+  .pro-import__known-files__table,
   .dashboard__recent-files__table {
     .sticky-table-table {
       .sticky-table-row:first-child .sticky-table-cell {
@@ -915,6 +916,20 @@ body.darkmode {
   // Advanced Export
   .export-dialog__body {
     .export-dialog__option-lists {
+      .list-wrapper {
+        border-color: $darkmode-v2-border;
+        background: $darkmode-v2-card-background;
+      }
+
+      .list-title {
+        background-color: $darkmode-v2-background;
+        color: #ccc;
+      }
+    }
+  }
+
+  .import-dialog__body {
+    .import-dialog__option-lists {
       .list-wrapper {
         border-color: $darkmode-v2-border;
         background: $darkmode-v2-card-background;
