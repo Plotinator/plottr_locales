@@ -15,6 +15,7 @@ const PreventExitingWithoutSaving = ({
   isOffline,
   fileSaved,
   fileLoaded,
+  offlineModeEnabled,
 }) => {
   const { showAskToSave, dismissAskToSave, saveAndClose, waitingForSaveDoneSignal } = useAskToSave(
     unsavedChanges,
@@ -22,10 +23,15 @@ const PreventExitingWithoutSaving = ({
     applicationIsBusyAndCannotBeQuit,
     isOffline,
     fileSaved,
-    fileLoaded
+    fileLoaded,
+    offlineModeEnabled
   )
 
-  if (!waitingForSaveDoneSignal && (!showAskToSave || isCloudFile)) return null
+  if (
+    !waitingForSaveDoneSignal &&
+    (!showAskToSave || (isCloudFile && !isOffline && !offlineModeEnabled))
+  )
+    return null
 
   return (
     <MainIntegrationContext.Consumer>
@@ -49,6 +55,7 @@ PreventExitingWithoutSaving.propTypes = {
   isOffline: PropTypes.bool,
   fileSaved: PropTypes.func.isRequired,
   fileLoaded: PropTypes.bool,
+  offlineModeEnabled: PropTypes.bool,
 }
 
 const mapStateToProps = (state) => {
@@ -58,6 +65,7 @@ const mapStateToProps = (state) => {
     applicationIsBusyAndCannotBeQuit: selectors.busyWithWorkThatPreventsQuittingSelector(state),
     isOffline: selectors.isOfflineSelector(state),
     fileLoaded: selectors.fileURLLoadedSelector(state),
+    offlineModeEnabled: selectors.offlineModeEnabledSelector(state),
   }
 }
 

@@ -17,7 +17,8 @@ export const useAskToSave = (
   applicationIsBusyAndCannotBeQuit,
   isOffline,
   fileSaved,
-  fileLoaded
+  fileLoaded,
+  offlineModeEnabled
 ) => {
   const [showAskToSave, setShowAskToSave] = useState(false)
   const [waitingForSaveDoneSignal, setWaitingForSaveDoneSignal] = useState(false)
@@ -57,7 +58,11 @@ export const useAskToSave = (
           "We can't reach our servers.  Please check your network connection, and don't close Plottr."
         )
       )
-    } else if (fileLoaded && unsavedChanges && !isCloudFile) {
+    } else if (
+      fileLoaded &&
+      unsavedChanges &&
+      (!isCloudFile || (isCloudFile && isOffline && offlineModeEnabled))
+    ) {
       // There are unsaved changes to a classic file
       logger.info("There are unsaved changes so we're not quitting")
       event.preventDefault()
