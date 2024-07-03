@@ -16,7 +16,7 @@ function createAbortSignal(timeoutMS) {
   return { signal: controller.signal, timeoutId, abort: () => controller.abort() }
 }
 
-function routeFunctions(suppliedPort, secret, _logger) {
+function routeFunctions(suppliedPort, secret, logger) {
   const createClient = (suppliedPort) => {
     return axios.create({
       baseURL: `http://127.0.0.1:${suppliedPort}`,
@@ -35,6 +35,7 @@ function routeFunctions(suppliedPort, secret, _logger) {
         }
       })
       .catch((error) => {
+        logger.error('Error communicating with local client', error)
         // Derived from Axios's config: https://axios-http.com/docs/handling_errors
         if (error.response) {
           // The request was made and the server responded with a status code
