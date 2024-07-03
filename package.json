@@ -44,7 +44,7 @@
     "typecheck": "tsc",
     "format:check": "prettier . --check",
     "format:write": "prettier . --write",
-    "validate": "npm-run-all format:check lint test",
+    "validate": "npm-run-all format:check lint typecheck test",
     "import-test": "npm run test:aCoronersTale && npm run test:fractureTest && npm run test:theTurn && npm run test:import-scrivener",
     "clean": "rimraf node_modules/",
     "seed-firestore": "node lib/plottr_firebase/seed/seed.js",
