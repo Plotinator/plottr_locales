@@ -85,7 +85,7 @@ describe('Saver', (describe) => {
           let stateCounter = 1
           const getState = () => {
             return {
-              stateCounter: stateCounter++,
+              user: { stateCounter: stateCounter++ },
             }
           }
           const saveCalls = []
@@ -180,12 +180,14 @@ describe('Saver', (describe) => {
               getStateCounter++
               if (getStateCounter % 2 === 0) {
                 return {
-                  stateCounter,
+                  user: { stateCounter },
                 }
-              }
-
-              return {
-                stateCounter: stateCounter++,
+              } else {
+                return {
+                  user: {
+                    stateCounter: stateCounter++,
+                  },
+                }
               }
             }
             const saveCalls = []
@@ -258,7 +260,9 @@ describe('Saver', (describe) => {
             let stateCounter = 1
             const getState = () => {
               return {
-                stateCounter: stateCounter++,
+                user: {
+                  stateCounter: stateCounter++,
+                },
               }
             }
             const saveCalls = []
@@ -356,7 +360,9 @@ describe('Saver', (describe) => {
               let stateCounter = 1
               const getState = () => {
                 return {
-                  stateCounter: stateCounter++,
+                  user: {
+                    stateCounter: stateCounter++,
+                  },
                 }
               }
               const saveCalls = []
@@ -459,7 +465,9 @@ describe('Saver', (describe) => {
             let stateCounter = 1
             const getState = () => {
               return {
-                stateCounter: stateCounter++,
+                user: {
+                  stateCounter: stateCounter++,
+                },
               }
             }
             const saveCalls = []
@@ -565,7 +573,9 @@ describe('Saver', (describe) => {
           let stateCounter = 1
           const getState = () => {
             return {
-              stateCounter: stateCounter++,
+              user: {
+                stateCounter: stateCounter++,
+              },
             }
           }
           const saveCalls = []
@@ -621,7 +631,9 @@ describe('Saver', (describe) => {
           const getState = () => {
             counter++
             return {
-              counter,
+              user: {
+                counter,
+              },
             }
           }
           const saveCalls = []
@@ -715,7 +727,9 @@ describe('Saver', (describe) => {
               const getState = () => {
                 counter++
                 return {
-                  counter,
+                  user: {
+                    counter,
+                  },
                 }
               }
               const saveCalls = []
@@ -809,7 +823,9 @@ describe('Saver', (describe) => {
               const getState = () => {
                 counter++
                 return {
-                  counter,
+                  user: {
+                    counter,
+                  },
                 }
               }
               const saveCalls = []
@@ -886,7 +902,9 @@ describe('Saver', (describe) => {
           const getState = () => {
             counter++
             return {
-              counter,
+              user: {
+                counter,
+              },
             }
           }
           const saveCalls = []
@@ -938,7 +956,7 @@ describe('Saver', (describe) => {
     describe('given a state that doesnt change', (describe, it) => {
       it('should only save once', () => {
         const THE_STATE = {
-          a: 'haha',
+          user: { a: 'haha' },
         }
         const getState = () => {
           return THE_STATE
@@ -994,13 +1012,16 @@ describe('Saver', (describe) => {
         })
       })
     })
-    describe('given a state that doesnt change', (describe) => {
+    describe('given a state that changes', (describe) => {
       describe('and given  a save function that always fails', (describe, it) => {
         it('should report failure every other time', () => {
           const THE_STATE = {
-            a: 'haha',
+            user: {
+              stateCounter: 0,
+            },
           }
           const getState = () => {
+            THE_STATE.user.stateCounter++
             return THE_STATE
           }
           const backupFile = (..._args) => {
@@ -1080,6 +1101,203 @@ describe('Saver', (describe) => {
         })
       })
     })
+    describe('given a state that doesnt change', (describe) => {
+      describe('and given  a save function that always fails', (describe, it) => {
+        it('should never report a failure (because it never saves)', () => {
+          const THE_STATE = {
+            user: { a: 'haha' },
+          }
+          const getState = () => {
+            return THE_STATE
+          }
+          const backupFile = (..._args) => {
+            return Promise.resolve()
+          }
+          let saved = false
+          const saveFile = () => {
+            if (saved) {
+              return Promise.reject(new Error('Boom'))
+            } else {
+              saved = true
+              return Promise.resolve()
+            }
+          }
+          let loggedErrors = 0
+          let loggedWarnings = 0
+          let loggedInfos = 0
+          const countingLogger = {
+            info: (..._args) => {
+              loggedInfos++
+            },
+            warn: (..._args) => {
+              loggedWarnings++
+            },
+            error: (..._args) => {
+              loggedErrors++
+            },
+          }
+          let notifierCount = 0
+          const trackingErrorNotifier = () => {
+            notifierCount++
+          }
+          const saver = Saver(
+            getState,
+            saveFile,
+            backupFile,
+            100,
+            10000,
+            countingLogger,
+            DUMMY_SHOW_MESSAGE_BOX,
+            trackingErrorNotifier,
+            DUMMY_SERVER_IS_BUSY_RESTARTING,
+            isNotLoggedInThunk,
+            DUMMY_OFFER_SAVE_AND_QUIT
+          )
+          assertGreaterThan(loggedInfos, 0)
+          assertEqual(loggedWarnings, 0)
+          assertEqual(loggedErrors, 0)
+          assertEqual(notifierCount, 0)
+          new Promise((resolve) => {
+            // We need one initial save to set the state to it's
+            // initial value, otherwise we always get a first attempt
+            // to save.
+            setTimeout(resolve, 110)
+          }).then(() => {
+            new Promise((resolve) => {
+              setTimeout(resolve, 110)
+            }).then(() => {
+              assertGreaterThan(loggedInfos, 0)
+              assertEqual(loggedWarnings, 0)
+              assertEqual(loggedErrors, 0)
+              assertEqual(notifierCount, 0)
+              new Promise((resolve) => {
+                setTimeout(resolve, 110)
+              }).then(() => {
+                assertGreaterThan(loggedInfos, 0)
+                assertEqual(loggedWarnings, 0)
+                assertEqual(loggedErrors, 0)
+                assertEqual(notifierCount, 0)
+                new Promise((resolve) => {
+                  setTimeout(resolve, 110)
+                }).then(() => {
+                  assertGreaterThan(loggedInfos, 0)
+                  assertEqual(loggedWarnings, 0)
+                  assertEqual(loggedErrors, 0)
+                  assertEqual(notifierCount, 0)
+                  new Promise((resolve) => {
+                    setTimeout(resolve, 110)
+                  }).then(() => {
+                    assertGreaterThan(loggedInfos, 0)
+                    assertEqual(loggedWarnings, 0)
+                    assertEqual(loggedErrors, 0)
+                    assertEqual(notifierCount, 0)
+                    saver.cancelAllRemainingRequests()
+                  })
+                })
+              })
+            })
+          })
+        })
+      })
+      describe('and the saver is started twice', (describe, it) => {
+        it('should still finish the test', () => {
+          const THE_STATE = {
+            user: { a: 'haha' },
+          }
+          const getState = () => {
+            return THE_STATE
+          }
+          const backupFile = (..._args) => {
+            return Promise.resolve()
+          }
+          let saved = false
+          const saveFile = () => {
+            if (saved) {
+              return Promise.reject(new Error('Boom'))
+            } else {
+              saved = true
+              return Promise.resolve()
+            }
+          }
+          let loggedErrors = 0
+          let loggedWarnings = 0
+          let loggedInfos = 0
+          const countingLogger = {
+            info: (..._args) => {
+              loggedInfos++
+            },
+            warn: (..._args) => {
+              loggedWarnings++
+            },
+            error: (..._args) => {
+              loggedErrors++
+            },
+          }
+          let notifierCount = 0
+          const trackingErrorNotifier = () => {
+            notifierCount++
+          }
+          const saver = Saver(
+            getState,
+            saveFile,
+            backupFile,
+            100,
+            10000,
+            countingLogger,
+            DUMMY_SHOW_MESSAGE_BOX,
+            trackingErrorNotifier,
+            DUMMY_SERVER_IS_BUSY_RESTARTING,
+            isNotLoggedInThunk,
+            DUMMY_OFFER_SAVE_AND_QUIT
+          )
+          saver.start()
+          assertGreaterThan(loggedInfos, 0)
+          assertEqual(loggedWarnings, 0)
+          assertEqual(loggedErrors, 0)
+          assertEqual(notifierCount, 0)
+          new Promise((resolve) => {
+            // We need one initial save to set the state to it's
+            // initial value, otherwise we always get a first attempt
+            // to save.
+            setTimeout(resolve, 110)
+          }).then(() => {
+            new Promise((resolve) => {
+              setTimeout(resolve, 110)
+            }).then(() => {
+              assertGreaterThan(loggedInfos, 0)
+              assertEqual(loggedWarnings, 0)
+              assertEqual(loggedErrors, 0)
+              assertEqual(notifierCount, 0)
+              new Promise((resolve) => {
+                setTimeout(resolve, 110)
+              }).then(() => {
+                assertGreaterThan(loggedInfos, 0)
+                assertEqual(loggedWarnings, 0)
+                assertEqual(loggedErrors, 0)
+                assertEqual(notifierCount, 0)
+                new Promise((resolve) => {
+                  setTimeout(resolve, 110)
+                }).then(() => {
+                  assertGreaterThan(loggedInfos, 0)
+                  assertEqual(loggedWarnings, 0)
+                  assertEqual(loggedErrors, 0)
+                  assertEqual(notifierCount, 0)
+                  new Promise((resolve) => {
+                    setTimeout(resolve, 110)
+                  }).then(() => {
+                    assertGreaterThan(loggedInfos, 0)
+                    assertEqual(loggedWarnings, 0)
+                    assertEqual(loggedErrors, 0)
+                    assertEqual(notifierCount, 0)
+                    saver.cancelAllRemainingRequests()
+                  })
+                })
+              })
+            })
+          })
+        })
+      })
+    })
   })
   describe('backup', (describe) => {
     describe('given a dummy getState function', (describe) => {
@@ -1088,7 +1306,9 @@ describe('Saver', (describe) => {
           let stateCounter = 1
           const getState = () => {
             return {
-              stateCounter: stateCounter++,
+              user: {
+                stateCounter: stateCounter++,
+              },
             }
           }
           const backupCalls = []
@@ -1183,12 +1403,16 @@ describe('Saver', (describe) => {
               getStateCounter++
               if (getStateCounter % 2 === 0) {
                 return {
-                  stateCounter,
+                  user: {
+                    stateCounter,
+                  },
                 }
-              }
-
-              return {
-                stateCounter: stateCounter++,
+              } else {
+                return {
+                  user: {
+                    stateCounter: stateCounter++,
+                  },
+                }
               }
             }
             const backupCalls = []
@@ -1261,7 +1485,9 @@ describe('Saver', (describe) => {
             let stateCounter = 1
             const getState = () => {
               return {
-                stateCounter: stateCounter++,
+                user: {
+                  stateCounter: stateCounter++,
+                },
               }
             }
             const backupCalls = []
@@ -1370,7 +1596,9 @@ describe('Saver', (describe) => {
               let stateCounter = 1
               const getState = () => {
                 return {
-                  stateCounter: stateCounter++,
+                  user: {
+                    stateCounter: stateCounter++,
+                  },
                 }
               }
               const backupCalls = []
@@ -1485,7 +1713,9 @@ describe('Saver', (describe) => {
           let stateCounter = 1
           const getState = () => {
             return {
-              stateCounter: stateCounter++,
+              user: {
+                stateCounter: stateCounter++,
+              },
             }
           }
           const backupCalls = []
@@ -1541,7 +1771,9 @@ describe('Saver', (describe) => {
           const getState = () => {
             counter++
             return {
-              counter,
+              user: {
+                counter,
+              },
             }
           }
           const backupCalls = []
@@ -1635,7 +1867,9 @@ describe('Saver', (describe) => {
               const getState = () => {
                 counter++
                 return {
-                  counter,
+                  user: {
+                    counter,
+                  },
                 }
               }
               const backupCalls = []
@@ -1729,7 +1963,9 @@ describe('Saver', (describe) => {
               const getState = () => {
                 counter++
                 return {
-                  counter,
+                  user: {
+                    counter,
+                  },
                 }
               }
               const backupCalls = []
@@ -1806,7 +2042,9 @@ describe('Saver', (describe) => {
           const getState = () => {
             counter++
             return {
-              counter,
+              user: {
+                counter,
+              },
             }
           }
           const backupCalls = []

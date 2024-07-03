@@ -193,7 +193,7 @@ function routeFunctions(suppliedPort, secret, _logger) {
         if (typeof subscription.abort === 'function') {
           subscription.abort()
         }
-        if (typeof subscription.timeoutId === 'number') {
+        if (subscription.timeoutId) {
           clearTimeout(subscription.timeoutId)
         }
       }

@@ -14,6 +14,7 @@ module.exports = {
           plottr_locales: './lib/plottr_locales/src',
           plottr_components: './lib/plottr_components/src/components',
           pltr: './lib/pltr/v2',
+          'wired-up-pltr': './src/wired-up-pltr.js',
         },
       },
     ],

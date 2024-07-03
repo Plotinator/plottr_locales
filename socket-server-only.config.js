@@ -8,7 +8,9 @@ const [
   // @ts-ignore
   _loginPopupConfig,
   // @ts-ignore
-  socketServerConfig,
+  localServerConfig,
 ] = require('./webpack.config')
 
-module.exports = [socketServerConfig]
+localServerConfig
+
+module.exports = [localServerConfig]

@@ -53,17 +53,17 @@ const Saver = (
   offerSaveAsThenQuit
 ) => {
   /**
-   * @type {{ current: SaverRef }}
+   * @type SaverRef
    * @typedef SaverRef
    * @property {number | null} current
    */
-  const saveInterval = { current: { current: null } }
+  const saveInterval = { current: null }
   /**
-   * @type {{ current: SaverRef }}
+   * @type SaverRef
    * @typedef BackupRef
    * @property {number | null} current
    */
-  const backupInterval = { current: { current: null } }
+  const backupInterval = { current: null }
   const failedSaveCount = { current: 0 }
   const failedBackupCount = { current: 0 }
   const lastStateBackedUp = { current: {} }
@@ -71,6 +71,7 @@ const Saver = (
 
   // TODO: use setTimeout instead!
   /**
+   * @param {{ current: null | number }} timeoutRef
    * @param {String} name
    * @param {function(any): Promise<void>} f
    * @param {number} intervalMS
@@ -78,9 +79,9 @@ const Saver = (
    * @param {{ current: number }} failedCountRef
    * @param {function(): void} onSuccessThisTime
    * @param {function(Error): Promise<boolean>} onFailed
-   * @returns {{ current: null | number }}
    */
   const startJob = (
+    timeoutRef,
     name,
     f,
     intervalMS,
@@ -89,11 +90,6 @@ const Saver = (
     onSuccessThisTime,
     onFailed
   ) => {
-    // @type {{ current: null | number }}
-    const timeoutRef = {
-      current: null,
-    }
-
     function iter() {
       const newId = setTimeout(() => {
         const state = getState()
@@ -123,7 +119,6 @@ const Saver = (
       }, intervalMS)
       // @ts-ignore
       timeoutRef.current = newId
-      return timeoutRef
     }
 
     return iter()
@@ -183,8 +178,14 @@ const Saver = (
   }
 
   const start = () => {
+    if (saveInterval.current) {
+      // @ts-ignore
+      clearTimeout(saveInterval.current)
+    }
+
     logger.info('Starting auto-saver...')
-    saveInterval.current = startJob(
+    startJob(
+      saveInterval,
       'Save',
       saveFile,
       saveIntervalMS,
@@ -194,7 +195,13 @@ const Saver = (
       onAutoSaveError
     )
 
-    backupInterval.current = startJob(
+    if (backupInterval.current) {
+      // @ts-ignore
+      clearTimeout(backupInterval.current)
+    }
+
+    startJob(
+      backupInterval,
       'Backup',
       backupFile,
       backupIntervalMS,
@@ -206,15 +213,15 @@ const Saver = (
   }
 
   const stop = () => {
-    if (saveInterval.current.current) {
+    if (saveInterval.current) {
       logger.info('Stopping the auto-saver per request.')
-      clearInterval(saveInterval.current.current)
-      saveInterval.current.current = null
+      clearTimeout(saveInterval.current)
+      saveInterval.current = null
     }
-    if (backupInterval.current.current) {
+    if (backupInterval.current) {
       logger.info('Stopping the auto-backup process per request.')
-      clearInterval(backupInterval.current.current)
-      backupInterval.current.current = null
+      clearTimeout(backupInterval.current)
+      backupInterval.current = null
     }
   }
 

@@ -369,7 +369,7 @@ const loginPopupConfig = {
   },
 }
 
-const socketServerConfig = {
+const localServerConfig = {
   mode: process.env.NODE_ENV === 'dev' ? 'development' : 'production',
   watch: process.env.NODE_ENV === 'dev',
   context: path.resolve(__dirname, 'main'),
@@ -414,4 +414,4 @@ const socketServerConfig = {
   },
 }
 
-module.exports = [rendererConfig, mainConfig, preloadConfig, loginPopupConfig, socketServerConfig]
+module.exports = [rendererConfig, mainConfig, preloadConfig, loginPopupConfig, localServerConfig]
