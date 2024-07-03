@@ -250,6 +250,7 @@ describe('startServer', (describe, it) => {
                                                                   console.log(
                                                                     '[Server Integration Test]: Does the shutdown from cleanup work?'
                                                                   )
+                                                                  localClient.destroy()
                                                                   return startServer(
                                                                     CONSOLE_LOGGER,
                                                                     broadcastPort,
@@ -272,6 +273,7 @@ describe('startServer', (describe, it) => {
                                                                     console.log(
                                                                       '[Server Integration Test]: Yes, we can shutdown from cleanup!'
                                                                     )
+                                                                    _client.destroy()
                                                                   })
                                                                 })
                                                               })
@@ -308,7 +310,8 @@ describe('startServer', (describe, it) => {
               onDone: () => {},
             })
             success()
-            return localClient.shutdown()
+            localClient.shutdown()
+            localClient.destroy()
           } catch (error) {
             console.error('Failed to shut down the server!', error)
             throw error

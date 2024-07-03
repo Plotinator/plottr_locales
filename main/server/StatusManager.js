@@ -42,7 +42,7 @@ class StatusManager {
   }
 
   nextGeneration(currentGeneration) {
-    if (!currentGeneration || currentGeneration < this.generation) {
+    if ((!currentGeneration && currentGeneration !== 0) || currentGeneration < this.generation) {
       return Promise.resolve({
         busy: this.busy,
         generation: this.generation,

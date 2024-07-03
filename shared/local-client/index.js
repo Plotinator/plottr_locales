@@ -24,7 +24,7 @@ function routeFunctions(suppliedPort, secret, _logger) {
     })
   }
 
-  const _clientRef = { current: createClient(suppliedPort), port: suppliedPort }
+  const _clientRef = { current: createClient(suppliedPort), port: suppliedPort, destroyed: false }
   const handleResponse = (requestPromise) => {
     return requestPromise
       .then((response) => {
@@ -143,7 +143,9 @@ function routeFunctions(suppliedPort, secret, _logger) {
         close: () => {},
       }
       function poll() {
-        if (subscription.canceled) {
+        if (_clientRef.destroyed) {
+          return
+        } else if (subscription.canceled) {
           return
         } else {
           const { timeoutId, signal, abort } = createAbortSignal(LONG_POLL_TIMEOUT_MS)
@@ -611,6 +613,10 @@ function routeFunctions(suppliedPort, secret, _logger) {
     return _clientRef.port
   }
 
+  const destroy = () => {
+    _clientRef.destroyed = true
+  }
+
   return {
     ping,
     rmRf,
@@ -701,6 +707,7 @@ function routeFunctions(suppliedPort, secret, _logger) {
     listenToStatus,
     setPort,
     getPort,
+    destroy,
   }
 }
 
