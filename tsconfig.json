@@ -28,5 +28,5 @@
       "plottr_import_export": ["lib/plottr_import_export/src/index.js"]
     }
   },
-  "exclude": ["node_modules", "bin", "dist", "lib/format-message-cli/node_modules", "lib/babel-plugin-extract-format-message/node_modules", "lib/pltr/docs", "lib/pltr/template"]
+  "exclude": ["node_modules", "bin", "dist", "lib/format-message-cli/node_modules", "lib/babel-plugin-extract-format-message/node_modules", "lib/pltr/docs", "lib/pltr/template", "build"]
 }
