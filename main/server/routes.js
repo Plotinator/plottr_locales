@@ -80,10 +80,10 @@ const systemRoutes = (app, statusManager) => {
   })
 
   app.get('/system/shutdown', (req, res) => {
+    replyWithResultSync(null, res)
     if (typeof process.send === 'function') {
       process.send('shutdown')
     }
-    replyWithResultSync(null, res)
   })
 
   return Promise.resolve()
