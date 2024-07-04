@@ -10,7 +10,7 @@ import { featureFlags } from '../store/initialState'
 const INITIAL_STATE = featureFlags
 
 const featureFlagsReducer =
-  (dataRepairers) =>
+  (_dataRepairers) =>
   (state = INITIAL_STATE, action) => {
     switch (action.type) {
       case SET_FEATURE_FLAG:

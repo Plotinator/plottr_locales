@@ -57,15 +57,17 @@ export const rootParentId = (tree, nodeId) => {
 }
 
 export const depth = ({ heap, index }, nodeId) => {
-  if (index[nodeId] === undefined && nodeId !== null) return undefined
-
-  let depth = 0
-  let current = heap[nodeId]
-  while (current !== undefined && current !== null) {
-    ++depth
-    current = heap[current]
+  if (index[nodeId] === undefined && nodeId !== null) {
+    throw new Error(`Beat with id ${nodeId} does not exist in tree`)
+  } else {
+    let depth = 0
+    let current = heap[nodeId]
+    while (current !== undefined && current !== null) {
+      ++depth
+      current = heap[current]
+    }
+    return depth
   }
-  return depth
 }
 
 export const deleteNode = (tree, nodeId) => {

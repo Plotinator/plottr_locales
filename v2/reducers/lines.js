@@ -27,6 +27,7 @@ import {
   UNPIN_PLOTLINE,
   DUPLICATE_BOOK,
   REPLACE_MARKED_HITS,
+  ADD_BOOK_FROM_PLTR,
   UNDO,
   REDO,
   UNDO_N_TIMES,
@@ -47,7 +48,7 @@ import { replacePlainTextHit, replaceInSlateDatastructure } from './replace'
 //  - bookId: Number,
 //  - "series": String literal,
 
-const lines = (dataRepairers) => (state, action) => {
+const lines = (_dataRepairers) => (state, action) => {
   const actionBookId = associateWithBroadestScope(action.bookId || action.newBookId)
 
   switch (action.type) {
@@ -113,10 +114,11 @@ const lines = (dataRepairers) => (state, action) => {
       }
     }
 
+    case ADD_BOOK_FROM_PLTR:
     case DUPLICATE_BOOK: {
       const newLines = action.newLines
         .filter(({ bookId }) => bookId !== 'series') // this is to protect against a bad template that unnecessarily had a series line
-        .map((l, index) => {
+        .map((l, _index) => {
           const newLine = cloneDeep(l)
           newLine.id = action.nextLineId + newLine.id // give it a new id
           newLine.bookId = action.newBookId // add it to the new/current book

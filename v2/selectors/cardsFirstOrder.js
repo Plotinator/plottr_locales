@@ -106,11 +106,23 @@ export const cardMetaDataSelector = createDeepEqualSelector(_cardMetaDataSelecto
 })
 
 export const attributeValueSelector = (cardId, attributeName) =>
-  createSelector(identity, (state) => cardByIdSelector(state, cardId)[attributeName])
+  createSelector(
+    identity,
+    (state) =>
+      cardByIdSelector(
+        state,
+        // @ts-ignore
+        cardId
+      )[attributeName]
+  )
 
 export const templateAttributeValueSelector = (cardId, templateId, attributeName) =>
   createSelector(identity, (state) => {
-    const card = cardByIdSelector(state, cardId)
+    const card = cardByIdSelector(
+      state,
+      // @ts-ignore
+      cardId
+    )
     const templateOnCard = card && card.templates.find(({ id }) => id === templateId)
     const valueInAttributes =
       templateOnCard && templateOnCard.attributes.find(({ name }) => name === attributeName).value

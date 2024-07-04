@@ -19,7 +19,11 @@ describe('editCardAttributes', () => {
     describe('a card id of 35', () => {
       describe('and the attribute name "title"', () => {
         const store = storeWithZelda()
-        const originalTitle = singleCardSelector(store.getState(), 35).title
+        const originalTitle = singleCardSelector(
+          store.getState(),
+          // @ts-ignore
+          35
+        ).title
         const originalTimelineFoci = timelineFociSelector(store.getState())
         const newValue = {
           value: 'A brand new title',
@@ -31,7 +35,11 @@ describe('editCardAttributes', () => {
         }
         store.dispatch(editCardAttributes(35, { title: newValue }))
         it('should modify the title of the card', () => {
-          const newTitle = singleCardSelector(store.getState(), 35).title
+          const newTitle = singleCardSelector(
+            store.getState(),
+            // @ts-ignore
+            35
+          ).title
           expect(newTitle).not.toEqual(originalTitle)
           expect(newTitle).toEqual('A brand new title')
         })
@@ -148,7 +156,11 @@ describe('editCardCustomAttribute', () => {
       describe('and a custom attribute name of "attr 1"', () => {
         const store = storeWithZelda()
         const attributeName = 'attr 1'
-        const originalValue = singleCardSelector(store.getState(), 35)[attributeName]
+        const originalValue = singleCardSelector(
+          store.getState(),
+          // @ts-ignore
+          35
+        )[attributeName]
         const originalTimelineFoci = timelineFociSelector(store.getState())
         store.dispatch(
           editCardCustomAttribute(19, attributeName, 'A new value with stuff', {
@@ -158,7 +170,11 @@ describe('editCardCustomAttribute', () => {
           })
         )
         it('should edit the attribute value', () => {
-          const newValue = singleCardSelector(store.getState(), 19)[attributeName]
+          const newValue = singleCardSelector(
+            store.getState(),
+            // @ts-ignore
+            19
+          )[attributeName]
           expect(newValue).not.toEqual(originalValue)
           expect(newValue).toEqual('A new value with stuff')
         })
@@ -265,7 +281,11 @@ describe('editCardDescription', () => {
   describe('given an initial file', () => {
     describe('and a card id of 35', () => {
       const store = storeWithZelda()
-      const originalDescription = singleCardSelector(store.getState(), 35).description
+      const originalDescription = singleCardSelector(
+        store.getState(),
+        // @ts-ignore
+        35
+      ).description
       const originalTimelineFoci = timelineFociSelector(store.getState())
       const newValue = 'A brand new description'
       store.dispatch(
@@ -276,7 +296,11 @@ describe('editCardDescription', () => {
         })
       )
       it('should edit the custom attribute', () => {
-        const newDescription = singleCardSelector(store.getState(), 35).description
+        const newDescription = singleCardSelector(
+          store.getState(),
+          // @ts-ignore
+          35
+        ).description
         expect(newDescription).not.toEqual(originalDescription)
         expect(newDescription).toEqual('A brand new description')
       })
@@ -390,7 +414,11 @@ describe('editCardTitle', () => {
   describe('given an initial file', () => {
     describe('and a card id of 35', () => {
       const store = storeWithZelda()
-      const originalTitle = singleCardSelector(store.getState(), 35).title
+      const originalTitle = singleCardSelector(
+        store.getState(),
+        // @ts-ignore
+        35
+      ).title
       const originalTimelineFoci = timelineFociSelector(store.getState())
       const newValue = 'A brand new title'
       store.dispatch(
@@ -401,7 +429,11 @@ describe('editCardTitle', () => {
         })
       )
       it('should edit the custom attribute', () => {
-        const newTitle = singleCardSelector(store.getState(), 35).title
+        const newTitle = singleCardSelector(
+          store.getState(),
+          // @ts-ignore
+          35
+        ).title
         expect(newTitle).not.toEqual(originalTitle)
         expect(newTitle).toEqual('A brand new title')
       })
@@ -529,7 +561,13 @@ describe('editCardTemplateAttribute', () => {
             })
           )
           it('should edit the attribute value', () => {
-            const newValue = selector(store.getState(), 19, 'sc4', 'Goal')
+            const newValue = selector(
+              store.getState(),
+              // @ts-ignore
+              19,
+              'sc4',
+              'Goal'
+            )
             expect(newValue).not.toEqual(originalValue)
             expect(newValue).toEqual('A brand new value')
           })

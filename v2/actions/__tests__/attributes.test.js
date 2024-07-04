@@ -60,22 +60,32 @@ describe('reorderCharacter', () => {
 
       const character1InitialState = displayedSingleCharacterSelector(
         initialState,
+
+        // @ts-ignore
         allCharacters.find(({ id }) => id == 1).id
       )
       const character3InitialState = displayedSingleCharacterSelector(
         initialState,
+
+        // @ts-ignore
         allCharacters.find(({ id }) => id == 3).id
       )
       const character4InitialState = displayedSingleCharacterSelector(
         initialState,
+
+        // @ts-ignore
         allCharacters.find(({ id }) => id == 4).id
       )
       const character7InitialState = displayedSingleCharacterSelector(
         initialState,
+
+        // @ts-ignore
         allCharacters.find(({ id }) => id == 7).id
       )
       const character8InitialState = displayedSingleCharacterSelector(
         initialState,
+
+        // @ts-ignore
         allCharacters.find(({ id }) => id == 8).id
       )
       const character3AbsolutePosition = getCharacterAbsolutePositionFromGroupedCategory(

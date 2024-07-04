@@ -382,7 +382,7 @@ export const timelineSearchHitsSelector = createSelector(
 
     return cards
       .flatMap((card) => {
-        return cardMatch(card, 'card')
+        return cardMatch(card)
       })
       .filter((hit) => {
         return hit.hit.length > 0
@@ -1051,3 +1051,30 @@ const dashboardModalSelector = createSelector(uiSelector, ({ dashboardModal }) =
 export const dashboardModalViewSelector = createSelector(dashboardModalSelector, ({ view }) => {
   return view ?? null
 })
+
+export const importPltrModalSelector = createSelector(uiSelector, ({ importModal }) => {
+  return importModal
+})
+
+export const importPltrDataSelector = createSelector(importPltrModalSelector, (importModal) => {
+  return importModal.data || {}
+})
+
+export const shouldShowProAccountRecentFilesSelector = createSelector(
+  importPltrModalSelector,
+  (importModal) => {
+    return Boolean(importModal?.showProRecentFiles) || false
+  }
+)
+
+export const importModalBookDataSelector = createSelector(
+  importPltrModalSelector,
+  (importModal) => {
+    return importModal.bookData || {}
+  }
+)
+
+export const isImportModalOpenSelector = createSelector(
+  importPltrModalSelector,
+  (importModal) => Boolean(importModal?.open) || false
+)

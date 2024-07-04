@@ -54,6 +54,8 @@ import {
   DASHBOARD_CLOSED,
   FINISH_FIRST_TIME_BOOTING,
   NO_FILE_TO_SHOW,
+  START_FILE_IMPORT,
+  FINISH_FILE_IMPORT,
 } from '../constants/ActionTypes'
 
 // Project states
@@ -185,8 +187,16 @@ export const startScrivenerImporter = () => ({
   type: START_IMPORTING_SCRIVENER,
 })
 
+export const startProjectImporter = () => ({
+  type: START_FILE_IMPORT,
+})
+
 export const finishScrivenerImporter = () => ({
   type: FINISH_IMPORTING_SCRIVENER,
+})
+
+export const finishProjectImporter = () => ({
+  type: FINISH_FILE_IMPORT,
 })
 
 export const promptToUploadFile = (filePath) => ({

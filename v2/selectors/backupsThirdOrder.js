@@ -17,7 +17,7 @@ const groupableName = (fileObj) => {
   if (fileObj.storagePath) {
     return fileObj.fileId
   } else {
-    return fileObj.name.replace('(start-session)-', '').replace('.pltr', '')
+    return fileObj.name.replace('(start-session)-', '')
   }
 }
 const makeDateString = (dateObj, makeShort) => {
@@ -41,7 +41,7 @@ const addFileNameToCloudFile = (folderPath, cloudFiles) => (fileObject) => {
       name: proFile?.name || fileObject.id,
     }
   } else {
-    const name = fileObject.name.replace('(start-session)-', '').replace('.pltr', '')
+    const name = fileObject.name.replace('(start-session)-', '').replace(/\.pltr$/, '')
     return {
       ...fileObject,
       name,

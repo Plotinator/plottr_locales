@@ -5,7 +5,6 @@ import actions from './actions'
 import * as ActionTypes from './constants/ActionTypes'
 import * as LoadActions from './constants/loadActions'
 import * as colors from './constants/CSScolors'
-import * as featureFlags from './constants/featureFlags'
 import * as errorCodes from './constants/errorCodes'
 
 import * as lineHelpers from './helpers/lines'
@@ -15,9 +14,7 @@ import * as bookHelpers from './helpers/books'
 import * as listHelpers from './helpers/lists'
 import * as orientedClassNameHelpers from './helpers/orientedClassName'
 import * as hierarchyHelpers from './helpers/hierarchy'
-import * as featureFlagHelpers from './helpers/featureFlags'
 import * as colorHelpers from './helpers/colors'
-import * as editorHelpers from './helpers/editors'
 import * as timeHelpers from './helpers/time'
 import * as dateHelpers from './helpers/date'
 import * as fileHelpers from './helpers/file'
@@ -141,9 +138,7 @@ const helpers = {
   orientedClassName: orientedClassNameHelpers,
   lines: lineHelpers,
   hierarchyLevels: hierarchyHelpers,
-  featureFlags: featureFlagHelpers,
   colors: colorHelpers,
-  editors: editorHelpers,
   time: timeHelpers,
   date: dateHelpers,
   file: fileHelpers,
@@ -181,7 +176,6 @@ export {
   LoadActions,
   helpers,
   colors,
-  featureFlags,
   errorCodes,
   migrateIfNeeded,
   Migrator,

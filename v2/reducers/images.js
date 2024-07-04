@@ -9,11 +9,12 @@ import {
   REDO,
   UNDO_N_TIMES,
   REDO_N_TIMES,
+  ADD_IMAGE_FROM_PLTR,
 } from '../constants/ActionTypes'
 import { newFileImages } from '../store/newFileState'
 import { imageId } from '../store/newIds'
 
-const cards = (dataRepairers) => (state, action) => {
+const cards = (_dataRepairers) => (state, action) => {
   switch (action.type) {
     case ADD_IMAGE: {
       const newId = imageId(state)
@@ -22,6 +23,18 @@ const cards = (dataRepairers) => (state, action) => {
         ...state,
         [newId]: newImage,
       }
+    }
+
+    case ADD_IMAGE_FROM_PLTR: {
+      const { newId, image } = action
+      if (newId) {
+        const newImage = Object.assign({}, image, { id: newId })
+        return {
+          ...state,
+          [newId]: newImage,
+        }
+      }
+      return state
     }
 
     case RENAME_IMAGE:

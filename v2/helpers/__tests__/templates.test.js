@@ -64,6 +64,7 @@ describe('applyTemplate', () => {
       describe('and the template is biased to the "top"', () => {
         const result = applyTemplate(file_with_one_level, 1, one_level_biased_top_plotline_template)
         const resultCards = allCardsSelector(result)
+        // @ts-ignore
         const originalCards = allCardsSelector(file_with_one_level)
         it('should have more cards', () => {
           expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -84,7 +85,13 @@ describe('applyTemplate', () => {
           const templateNumberOfBeats = beatsLength(
             one_level_biased_top_plotline_template.templateData.beats['1']
           )
-          const resultNumberOfBeats = beatsLength(beatsForAnotherBookSelector(result, '1'))
+          const resultNumberOfBeats = beatsLength(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            )
+          )
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
         const resultLines = allLinesSelector(result)
@@ -97,6 +104,7 @@ describe('applyTemplate', () => {
             )
           )
         })
+        // @ts-ignore
         const originalLines = allLinesSelector(file_with_one_level)
         it('should have the plotlines that were there originally', () => {
           expect(resultLines.map(withoutPositions)).toEqual(
@@ -140,6 +148,7 @@ describe('applyTemplate', () => {
           one_level_biased_middle_plotline_template
         )
         const resultCards = allCardsSelector(result)
+        // @ts-ignore
         const originalCards = allCardsSelector(file_with_one_level)
         it('should have more cards', () => {
           expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -160,7 +169,13 @@ describe('applyTemplate', () => {
           const templateNumberOfBeats = beatsLength(
             one_level_biased_middle_plotline_template.templateData.beats['1']
           )
-          const resultNumberOfBeats = beatsLength(beatsForAnotherBookSelector(result, '1'))
+          const resultNumberOfBeats = beatsLength(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            )
+          )
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
         const resultLines = allLinesSelector(result)
@@ -173,6 +188,7 @@ describe('applyTemplate', () => {
             )
           )
         })
+        // @ts-ignore
         const originalLines = allLinesSelector(file_with_one_level)
         it('should have the plotlines that were there originally', () => {
           expect(resultLines.map(withoutPositions)).toEqual(
@@ -215,6 +231,7 @@ describe('applyTemplate', () => {
           one_level_biased_bottom_plotline_template
         )
         const resultCards = allCardsSelector(result)
+        // @ts-ignore
         const originalCards = allCardsSelector(file_with_one_level)
         it('should have more cards', () => {
           expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -235,7 +252,11 @@ describe('applyTemplate', () => {
           const templateNumberOfBeats = beatsLength(
             one_level_biased_bottom_plotline_template.templateData.beats['1']
           )
-          const resultBeats = beatsForAnotherBookSelector(result, '1')
+          const resultBeats = beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          )
           const resultNumberOfBeats = beatsLength(resultBeats)
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
@@ -249,6 +270,7 @@ describe('applyTemplate', () => {
             )
           )
         })
+        // @ts-ignore
         const originalLines = allLinesSelector(file_with_one_level)
         it('should have the plotlines that were there originally', () => {
           expect(resultLines.map(withoutPositions)).toEqual(
@@ -293,6 +315,7 @@ describe('applyTemplate', () => {
           null
         )
         const resultCards = allCardsSelector(result)
+        // @ts-ignore
         const originalCards = allCardsSelector(file_with_one_level)
         it('should have more cards', () => {
           expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -313,7 +336,13 @@ describe('applyTemplate', () => {
         })
         it('should have at least as many beats as the top level of the template', () => {
           const templateNumberOfBeats = topLevelBeats.length
-          const resultNumberOfBeats = beatsLength(beatsForAnotherBookSelector(result, '1'))
+          const resultNumberOfBeats = beatsLength(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            )
+          )
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
         const resultLines = allLinesSelector(result)
@@ -326,6 +355,7 @@ describe('applyTemplate', () => {
             )
           )
         })
+        // @ts-ignore
         const originalLines = allLinesSelector(file_with_one_level)
         it('should have the plotlines that were there originally', () => {
           expect(resultLines.map(withoutPositions)).toEqual(
@@ -373,6 +403,7 @@ describe('applyTemplate', () => {
           null
         )
         const resultCards = allCardsSelector(result)
+        // @ts-ignore
         const originalCards = allCardsSelector(file_with_one_level)
         it('should have more cards', () => {
           expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -392,7 +423,13 @@ describe('applyTemplate', () => {
         })
         it('should have at least as many beats as the bottom level of the template', () => {
           const templateNumberOfBeats = bottomLevelBeats.length
-          const resultNumberOfBeats = beatsLength(beatsForAnotherBookSelector(result, '1'))
+          const resultNumberOfBeats = beatsLength(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            )
+          )
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
         const resultLines = allLinesSelector(result)
@@ -405,6 +442,7 @@ describe('applyTemplate', () => {
             )
           )
         })
+        // @ts-ignore
         const originalLines = allLinesSelector(file_with_one_level)
         it('should have the plotlines that were there originally', () => {
           expect(resultLines.map(withoutPositions)).toEqual(
@@ -455,6 +493,7 @@ describe('applyTemplate', () => {
           topLevelBeats[0].id
         )
         const resultCards = allCardsSelector(result)
+        // @ts-ignore
         const originalCards = allCardsSelector(file_with_one_level)
         it('should have more cards', () => {
           expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -474,7 +513,13 @@ describe('applyTemplate', () => {
         })
         it('should have at least as many beats as the bottom level of the template', () => {
           const templateNumberOfBeats = bottomLevelBeats.length
-          const resultNumberOfBeats = beatsLength(beatsForAnotherBookSelector(result, '1'))
+          const resultNumberOfBeats = beatsLength(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            )
+          )
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
         const resultLines = allLinesSelector(result)
@@ -487,6 +532,7 @@ describe('applyTemplate', () => {
             )
           )
         })
+        // @ts-ignore
         const originalLines = allLinesSelector(file_with_one_level)
         it('should have the plotlines that were there originally', () => {
           expect(resultLines.map(withoutPositions)).toEqual(
@@ -535,6 +581,7 @@ describe('applyTemplate', () => {
           null
         )
         const resultCards = allCardsSelector(result)
+        // @ts-ignore
         const originalCards = allCardsSelector(file_with_one_level)
         it('should have more cards', () => {
           expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -554,7 +601,13 @@ describe('applyTemplate', () => {
         })
         it('should have at least as many beats as the top level of the template', () => {
           const templateNumberOfBeats = topLevelBeats.length
-          const resultNumberOfBeats = beatsLength(beatsForAnotherBookSelector(result, '1'))
+          const resultNumberOfBeats = beatsLength(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            )
+          )
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
         const resultLines = allLinesSelector(result)
@@ -567,6 +620,7 @@ describe('applyTemplate', () => {
             )
           )
         })
+        // @ts-ignore
         const originalLines = allLinesSelector(file_with_one_level)
         it('should have the plotlines that were there originally', () => {
           expect(resultLines.map(withoutPositions)).toEqual(
@@ -618,6 +672,7 @@ describe('applyTemplate', () => {
           topLevelBeats[0].id
         )
         const resultCards = allCardsSelector(result)
+        // @ts-ignore
         const originalCards = allCardsSelector(file_with_one_level)
         it('should have more cards', () => {
           expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -637,7 +692,13 @@ describe('applyTemplate', () => {
         })
         it('should have at least as many beats as the middle level of the template', () => {
           const templateNumberOfBeats = middleLevelBeats.length
-          const resultNumberOfBeats = beatsLength(beatsForAnotherBookSelector(result, '1'))
+          const resultNumberOfBeats = beatsLength(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            )
+          )
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
         const resultLines = allLinesSelector(result)
@@ -650,6 +711,7 @@ describe('applyTemplate', () => {
             )
           )
         })
+        // @ts-ignore
         const originalLines = allLinesSelector(file_with_one_level)
         it('should have the plotlines that were there originally', () => {
           expect(resultLines.map(withoutPositions)).toEqual(
@@ -703,6 +765,7 @@ describe('applyTemplate', () => {
           middleLevelBeats[0].id
         )
         const resultCards = allCardsSelector(result)
+        // @ts-ignore
         const originalCards = allCardsSelector(file_with_one_level)
         it('should have more cards', () => {
           expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -724,7 +787,13 @@ describe('applyTemplate', () => {
         })
         it('should have at least as many beats as the bottom level of the template', () => {
           const templateNumberOfBeats = bottomLevelBeats.length
-          const resultNumberOfBeats = beatsLength(beatsForAnotherBookSelector(result, '1'))
+          const resultNumberOfBeats = beatsLength(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            )
+          )
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
         const resultLines = allLinesSelector(result)
@@ -737,6 +806,7 @@ describe('applyTemplate', () => {
             )
           )
         })
+        // @ts-ignore
         const originalLines = allLinesSelector(file_with_one_level)
         it('should have the plotlines that were there originally', () => {
           expect(resultLines.map(withoutPositions)).toEqual(
@@ -786,6 +856,7 @@ describe('applyTemplate', () => {
           null
         )
         const resultCards = allCardsSelector(result)
+        // @ts-ignore
         const originalCards = allCardsSelector(file_with_two_levels)
         it('should have more cards', () => {
           expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -807,10 +878,17 @@ describe('applyTemplate', () => {
         })
         it('should have at least as many beats as the top level of the template', () => {
           const templateNumberOfBeats = templateBeats.length
-          const resultNumberOfBeats = beatsLength(beatsForAnotherBookSelector(result, '1'))
+          const resultNumberOfBeats = beatsLength(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            )
+          )
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
         const resultLines = allLinesSelector(result)
+        // @ts-ignore
         const originalLines = allLinesSelector(file_with_two_levels)
         it('should have the plotlines that were there originally', () => {
           expect(resultLines.map(withoutPositions)).toEqual(
@@ -858,6 +936,7 @@ describe('applyTemplate', () => {
           null
         )
         const resultCards = allCardsSelector(result)
+        // @ts-ignore
         const originalCards = allCardsSelector(file_with_two_levels)
         it('should have more cards', () => {
           expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -876,10 +955,17 @@ describe('applyTemplate', () => {
         })
         it('should have at least as many beats as the top level of the template', () => {
           const templateNumberOfBeats = templateBeats.length
-          const resultNumberOfBeats = beatsLength(beatsForAnotherBookSelector(result, '1'))
+          const resultNumberOfBeats = beatsLength(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            )
+          )
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
         const resultLines = allLinesSelector(result)
+        // @ts-ignore
         const originalLines = allLinesSelector(file_with_two_levels)
         it('should have the plotlines that were there originally', () => {
           expect(resultLines.map(withoutPositions)).toEqual(
@@ -926,6 +1012,7 @@ describe('applyTemplate', () => {
           null
         )
         const resultCards = allCardsSelector(result)
+        // @ts-ignore
         const originalCards = allCardsSelector(file_with_two_levels)
         it('should have more cards', () => {
           expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -943,6 +1030,7 @@ describe('applyTemplate', () => {
           )
         })
         const resultLines = allLinesSelector(result)
+        // @ts-ignore
         const originalLines = allLinesSelector(file_with_two_levels)
         it('should have the plotlines that were there originally', () => {
           expect(resultLines.map(withoutPositions)).toEqual(
@@ -991,6 +1079,7 @@ describe('applyTemplate', () => {
             null
           )
           const resultCards = allCardsSelector(result)
+          // @ts-ignore
           const originalCards = allCardsSelector(file_with_two_levels)
           it('should have more cards', () => {
             expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -1008,6 +1097,7 @@ describe('applyTemplate', () => {
             )
           })
           const resultLines = allLinesSelector(result)
+          // @ts-ignore
           const originalLines = allLinesSelector(file_with_two_levels_but_no_chapter)
           it('should have the plotlines that were there originally', () => {
             expect(resultLines.map(withoutPositions)).toEqual(
@@ -1027,7 +1117,11 @@ describe('applyTemplate', () => {
             })
             expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
           })
-          const resultBeats = beatsForAnotherBookSelector(result, '1')
+          const resultBeats = beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          )
           it('should add the missing chapter', () => {
             expect(resultBeats.children[resultBeats.children[null][0]]).toEqual([
               10, 11, 12, 13, 14, 15, 16, 17, 18,
@@ -1067,11 +1161,26 @@ describe('applyTemplate', () => {
             beat.id
           )
         })
-        const resultTopBeats = tree.children(beatsForAnotherBookSelector(result, '1'), null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultBottomBeats = resultTopBeats.flatMap((beat) => {
-          return tree.children(beatsForAnotherBookSelector(result, '1'), beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
         const resultCards = allCardsSelector(result)
+        // @ts-ignore
         const originalCards = allCardsSelector(file_with_two_levels)
         it('should have more cards', () => {
           expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -1099,6 +1208,7 @@ describe('applyTemplate', () => {
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
         const resultLines = allLinesSelector(result)
+        // @ts-ignore
         const originalLines = allLinesSelector(file_with_two_levels)
         it('should have the plotlines that were there originally', () => {
           expect(resultLines.map(withoutPositions)).toEqual(
@@ -1151,11 +1261,26 @@ describe('applyTemplate', () => {
             beat.id
           )
         })
-        const resultTopBeats = tree.children(beatsForAnotherBookSelector(result, '1'), null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultBottomBeats = resultTopBeats.flatMap((beat) => {
-          return tree.children(beatsForAnotherBookSelector(result, '1'), beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
         const resultCards = allCardsSelector(result)
+        // @ts-ignore
         const originalCards = allCardsSelector(file_with_two_levels)
         it('should have more cards', () => {
           expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -1174,6 +1299,7 @@ describe('applyTemplate', () => {
           expect(templateNumberOfBeats).toBeGreaterThanOrEqual(resultNumberOfBeats)
         })
         const resultLines = allLinesSelector(result)
+        // @ts-ignore
         const originalLines = allLinesSelector(file_with_two_levels)
         it('should have the plotlines that were there originally', () => {
           expect(resultLines.map(withoutPositions)).toEqual(
@@ -1225,11 +1351,26 @@ describe('applyTemplate', () => {
             beat.id
           )
         })
-        const resultTopBeats = tree.children(beatsForAnotherBookSelector(result, '1'), null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultBottomBeats = resultTopBeats.flatMap((beat) => {
-          return tree.children(beatsForAnotherBookSelector(result, '1'), beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
         const resultCards = allCardsSelector(result)
+        // @ts-ignore
         const originalCards = allCardsSelector(file_with_two_levels)
         it('should have more cards', () => {
           expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -1313,11 +1454,26 @@ describe('applyTemplate', () => {
             beat.id
           )
         })
-        const resultTopBeats = tree.children(beatsForAnotherBookSelector(result, '1'), null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultBottomBeats = resultTopBeats.flatMap((beat) => {
-          return tree.children(beatsForAnotherBookSelector(result, '1'), beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
         const resultCards = allCardsSelector(result)
+        // @ts-ignore
         const originalCards = allCardsSelector(file_with_two_levels)
         it('should have more cards', () => {
           expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -1389,11 +1545,26 @@ describe('applyTemplate', () => {
             beat.id
           )
         })
-        const resultTopBeats = tree.children(beatsForAnotherBookSelector(result, '1'), null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultBottomBeats = resultTopBeats.flatMap((beat) => {
-          return tree.children(beatsForAnotherBookSelector(result, '1'), beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
         const resultCards = allCardsSelector(result)
+        // @ts-ignore
         const originalCards = allCardsSelector(file_with_two_levels)
         it('should have more cards', () => {
           expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -1469,11 +1640,26 @@ describe('applyTemplate', () => {
             beat.id
           )
         })
-        const resultTopBeats = tree.children(beatsForAnotherBookSelector(result, '1'), null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultBottomBeats = resultTopBeats.flatMap((beat) => {
-          return tree.children(beatsForAnotherBookSelector(result, '1'), beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
         const resultCards = allCardsSelector(result)
+        // @ts-ignore
         const originalCards = allCardsSelector(file_with_two_levels)
         it('should have more cards', () => {
           expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -1545,8 +1731,16 @@ describe('applyTemplate', () => {
           one_level_biased_top_plotline_template.templateData.beats['1'],
           null
         )
-        const resultTopBeats = tree.children(beatsForAnotherBookSelector(result, '1'), null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultCards = allCardsSelector(result)
+        // @ts-ignore
         const originalCards = allCardsSelector(file_with_three_levels)
         it('should have more cards', () => {
           expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -1616,11 +1810,26 @@ describe('applyTemplate', () => {
           one_level_biased_middle_plotline_template.templateData.beats['1'],
           null
         )
-        const resultTopBeats = tree.children(beatsForAnotherBookSelector(result, '1'), null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultMiddleBeats = resultTopBeats.flatMap((beat) => {
-          return tree.children(beatsForAnotherBookSelector(result, '1'), beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
         const resultCards = allCardsSelector(result)
+        // @ts-ignore
         const originalCards = allCardsSelector(file_with_three_levels)
         it('should have more cards', () => {
           expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -1691,14 +1900,36 @@ describe('applyTemplate', () => {
           one_level_biased_bottom_plotline_template.templateData.beats['1'],
           null
         )
-        const resultTopBeats = tree.children(beatsForAnotherBookSelector(result, '1'), null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultMiddleBeats = resultTopBeats.flatMap((beat) => {
-          return tree.children(beatsForAnotherBookSelector(result, '1'), beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
         const resultBottomBeats = resultMiddleBeats.flatMap((beat) => {
-          return tree.children(beatsForAnotherBookSelector(result, '1'), beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
         const resultCards = allCardsSelector(result)
+        // @ts-ignore
         const originalCards = allCardsSelector(file_with_three_levels)
         it('should have more cards', () => {
           expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -1772,6 +2003,7 @@ describe('applyTemplate', () => {
             null
           )
           const resultCards = allCardsSelector(result)
+          // @ts-ignore
           const originalCards = allCardsSelector(file_with_three_levels_but_no_chapter)
           it('should have more cards', () => {
             expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -1789,6 +2021,7 @@ describe('applyTemplate', () => {
             )
           })
           const resultLines = allLinesSelector(result)
+          // @ts-ignore
           const originalLines = allLinesSelector(file_with_three_levels_but_no_chapter)
           it('should have the plotlines that were there originally', () => {
             expect(resultLines.map(withoutPositions)).toEqual(
@@ -1808,7 +2041,11 @@ describe('applyTemplate', () => {
             })
             expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
           })
-          const resultBeats = beatsForAnotherBookSelector(result, '1')
+          const resultBeats = beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          )
           it('should add the missing chapter', () => {
             expect(resultBeats.children[resultBeats.children[null][0]]).toEqual([
               8, 9, 10, 11, 12, 13, 14, 15, 16,
@@ -1843,6 +2080,7 @@ describe('applyTemplate', () => {
             null
           )
           const resultCards = allCardsSelector(result)
+          // @ts-ignore
           const originalCards = allCardsSelector(file_with_three_levels_but_no_scene)
           it('should have more cards', () => {
             expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -1860,6 +2098,7 @@ describe('applyTemplate', () => {
             )
           })
           const resultLines = allLinesSelector(result)
+          // @ts-ignore
           const originalLines = allLinesSelector(file_with_three_levels_but_no_scene)
           it('should have the plotlines that were there originally', () => {
             expect(resultLines.map(withoutPositions)).toEqual(
@@ -1879,7 +2118,11 @@ describe('applyTemplate', () => {
             })
             expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
           })
-          const resultBeats = beatsForAnotherBookSelector(result, '1')
+          const resultBeats = beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          )
           it('should add the missing chapter', () => {
             expect(
               resultBeats.children[resultBeats.children[resultBeats.children[null][0]][0]]
@@ -1919,11 +2162,26 @@ describe('applyTemplate', () => {
             beat.id
           )
         })
-        const resultTopBeats = tree.children(beatsForAnotherBookSelector(result, '1'), null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultMiddleBeats = resultTopBeats.flatMap((beat) => {
-          return tree.children(beatsForAnotherBookSelector(result, '1'), beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
         const resultCards = allCardsSelector(result)
+        // @ts-ignore
         const originalCards = allCardsSelector(file_with_three_levels)
         it('should have more cards', () => {
           expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -2003,14 +2261,36 @@ describe('applyTemplate', () => {
             beat.id
           )
         })
-        const resultTopBeats = tree.children(beatsForAnotherBookSelector(result, '1'), null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultMiddleBeats = resultTopBeats.flatMap((beat) => {
-          return tree.children(beatsForAnotherBookSelector(result, '1'), beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
         const resultBottomBeats = resultMiddleBeats.flatMap((beat) => {
-          return tree.children(beatsForAnotherBookSelector(result, '1'), beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
         const resultCards = allCardsSelector(result)
+        // @ts-ignore
         const originalCards = allCardsSelector(file_with_three_levels)
         it('should have more cards', () => {
           expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -2089,14 +2369,36 @@ describe('applyTemplate', () => {
             beat.id
           )
         })
-        const resultTopBeats = tree.children(beatsForAnotherBookSelector(result, '1'), null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultMiddleBeats = resultTopBeats.flatMap((beat) => {
-          return tree.children(beatsForAnotherBookSelector(result, '1'), beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
         const resultBottomBeats = resultMiddleBeats.flatMap((beat) => {
-          return tree.children(beatsForAnotherBookSelector(result, '1'), beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
         const resultCards = allCardsSelector(result)
+        // @ts-ignore
         const originalCards = allCardsSelector(file_with_three_levels)
         it('should have more cards', () => {
           expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -2183,14 +2485,36 @@ describe('applyTemplate', () => {
             beat.id
           )
         })
-        const resultTopBeats = tree.children(beatsForAnotherBookSelector(result, '1'), null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultMiddleBeats = resultTopBeats.flatMap((beat) => {
-          return tree.children(beatsForAnotherBookSelector(result, '1'), beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
         const resultBottomBeats = resultMiddleBeats.flatMap((beat) => {
-          return tree.children(beatsForAnotherBookSelector(result, '1'), beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
         const resultCards = allCardsSelector(result)
+        // @ts-ignore
         const originalCards = allCardsSelector(file_with_three_levels)
         it('should have more cards', () => {
           expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -2284,14 +2608,36 @@ describe('applyTemplate', () => {
             beat.id
           )
         })
-        const resultTopBeats = tree.children(beatsForAnotherBookSelector(result, '1'), null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultMiddleBeats = resultTopBeats.flatMap((beat) => {
-          return tree.children(beatsForAnotherBookSelector(result, '1'), beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
         const resultBottomBeats = resultMiddleBeats.flatMap((beat) => {
-          return tree.children(beatsForAnotherBookSelector(result, '1'), beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
         const resultCards = allCardsSelector(result)
+        // @ts-ignore
         const originalCards = allCardsSelector(file_with_three_levels)
         it('should have more cards', () => {
           expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -2321,6 +2667,7 @@ describe('applyTemplate', () => {
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
         const resultLines = allLinesSelector(result)
+        // @ts-ignore
         const originalLines = allLinesSelector(file_with_three_levels)
         it('should have the plotlines that were there originally', () => {
           expect(resultLines.map(withoutPositions)).toEqual(
@@ -2380,14 +2727,36 @@ describe('applyTemplate', () => {
             beat.id
           )
         })
-        const resultTopBeats = tree.children(beatsForAnotherBookSelector(result, '1'), null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultMiddleBeats = resultTopBeats.flatMap((beat) => {
-          return tree.children(beatsForAnotherBookSelector(result, '1'), beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
         const resultBottomBeats = resultMiddleBeats.flatMap((beat) => {
-          return tree.children(beatsForAnotherBookSelector(result, '1'), beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
         const resultCards = allCardsSelector(result)
+        // @ts-ignore
         const originalCards = allCardsSelector(file_with_three_levels)
         it('should have more cards', () => {
           expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
@@ -2417,6 +2786,7 @@ describe('applyTemplate', () => {
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
         const resultLines = allLinesSelector(result)
+        // @ts-ignore
         const originalLines = allLinesSelector(file_with_three_levels)
         it('should have the plotlines that were there originally', () => {
           expect(resultLines.map(withoutPositions)).toEqual(
@@ -2463,6 +2833,7 @@ describe('moveLineActions', () => {
     describe('and a valid source and target', () => {
       it('should maintain the original lines colour', () => {
         const result = moveLineActions(zelda, 16, 9)
+        // @ts-ignore
         const changeColourAction = result.actions.find(({ type }) => {
           return type === EDIT_LINE_COLOR
         })

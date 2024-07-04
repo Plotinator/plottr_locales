@@ -1,3 +1,5 @@
+import { DateTime } from 'luxon'
+
 // Expect a string of the form: YYYY_MM?_DD? to a date.
 // This is necessary because date parsing is *browser specific*!
 export const parseStringDate = (stringDate) => {
@@ -45,4 +47,28 @@ export const versionToDate = (version) => {
   } else {
     return null
   }
+}
+
+/**
+ * Produce a new JS Date that is MONTHS months in the past from the
+ * given DATE.
+ *
+ * @param {Date} date
+ * @param {number} months
+ * @returns {Date}
+ */
+export const subtractMonths = (date, months) => {
+  return DateTime.fromJSDate(date).minus({ months }).toJSDate()
+}
+
+/**
+ * Produce a new JS Date that is MONTHS months in the future from the
+ * given DATE.
+ *
+ * @param {Date} date
+ * @param {number} months
+ * @returns {Date}
+ */
+export const addMonths = (date, months) => {
+  return DateTime.fromJSDate(date).plus({ months }).toJSDate()
 }

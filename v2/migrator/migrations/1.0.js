@@ -3,7 +3,7 @@ import { cloneDeep } from 'lodash'
 export default function migrate(data) {
   if (data.file && data.file.version === '1.0.0') return data
 
-  var obj = cloneDeep(data)
+  const obj = cloneDeep(data)
 
   const note = {
     id: 0,

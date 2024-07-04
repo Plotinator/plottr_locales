@@ -61,6 +61,8 @@ import {
   START_FETCHING_A_LICENSE_TYPE,
   FINISH_FETCHING_A_LICENSE_TYPE,
   NO_FILE_TO_SHOW,
+  START_FILE_IMPORT,
+  FINISH_FILE_IMPORT,
 } from '../constants/ActionTypes'
 import { EDITING, VIEWING, SEARCHING } from '../constants/editStates'
 
@@ -756,22 +758,24 @@ function applicationStateReducer(state = INITIAL_STATE, action) {
       }
     }
 
+    case START_FILE_IMPORT:
     case START_IMPORTING_SCRIVENER: {
       return {
         ...state,
         project: {
           ...state.project,
-          isImportingNewProject: true,
+          isImportingAProject: true,
         },
       }
     }
 
+    case FINISH_FILE_IMPORT:
     case FINISH_IMPORTING_SCRIVENER: {
       return {
         ...state,
         project: {
           ...state.project,
-          isImportingNewProject: false,
+          isImportingAProject: false,
         },
       }
     }

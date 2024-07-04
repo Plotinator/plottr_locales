@@ -24,7 +24,12 @@ export function addTag() {
  * @returns {Array} test something
  */
 export function addTagWithValues(title, color) {
-  return { type: ADD_TAG_WITH_VALUES, title, color }
+  return {
+    // @ts-ignore
+    type: ADD_TAG_WITH_VALUES,
+    title,
+    color,
+  }
 }
 
 /**

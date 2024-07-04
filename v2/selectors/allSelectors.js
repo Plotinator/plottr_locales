@@ -27,7 +27,6 @@ import * as settingsFirstOrder from './settingsFirstOrder'
 import * as tagsFirstOrder from './tagsFirstOrder'
 import * as templatesFirstOrder from './templatesFirstOrder'
 import * as testingAndDiagnosisFirstOrder from './testingAndDiagnosisFirstOrder'
-import * as filterFirstOrder from './filterFirstOrder'
 import * as seriesFirstOrder from './seriesFirstOrder'
 import * as undoFirstOrder from './undoFirstOrder'
 import * as secondOrder from './secondOrder'
@@ -77,7 +76,6 @@ const allSelectors = {
   ...tagsFirstOrder,
   ...templatesFirstOrder,
   ...testingAndDiagnosisFirstOrder,
-  ...filterFirstOrder,
   ...seriesFirstOrder,
   ...undoFirstOrder,
   ...secondOrder,

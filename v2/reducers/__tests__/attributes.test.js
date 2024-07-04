@@ -134,7 +134,11 @@ describe('editCharacterAttributeMetadata', () => {
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(createCharacterAttribute('text', 'strength'))
         const initialState = store.getState()
-        const initialAttributes = characterAttributesSelector(initialState, 1)
+        const initialAttributes = characterAttributesSelector(
+          initialState,
+          // @ts-ignore
+          1
+        )
         expect(initialAttributes).toEqual([
           {
             bookId: 'all',
@@ -146,7 +150,11 @@ describe('editCharacterAttributeMetadata', () => {
         ])
         store.dispatch(editCharacterAttributeMetadata(1, 'height', 'text', 'strength'))
         const resultState = store.getState()
-        const resultAttributes = characterAttributesSelector(resultState, 1)
+        const resultAttributes = characterAttributesSelector(
+          resultState,
+          // @ts-ignore
+          1
+        )
         expect(resultAttributes).toEqual([
           {
             bookId: 'all',
@@ -162,7 +170,11 @@ describe('editCharacterAttributeMetadata', () => {
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(createCharacterAttribute('text', 'strength'))
         const initialState = store.getState()
-        const initialAttributes = characterAttributesSelector(initialState, 1)
+        const initialAttributes = characterAttributesSelector(
+          initialState,
+          // @ts-ignore
+          1
+        )
         expect(initialAttributes).toEqual([
           {
             bookId: 'all',
@@ -174,7 +186,11 @@ describe('editCharacterAttributeMetadata', () => {
         ])
         store.dispatch(editCharacterAttributeMetadata(2, 'height', 'text', 'strength'))
         const resultState = store.getState()
-        const resultAttributes = characterAttributesSelector(resultState, 1)
+        const resultAttributes = characterAttributesSelector(
+          resultState,
+          // @ts-ignore
+          1
+        )
         expect(resultAttributes).toEqual([
           {
             bookId: 'all',
@@ -271,7 +287,11 @@ describe('deleteCharacterAttribute', () => {
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(createCharacterAttribute('text', 'strength'))
         const initialState = store.getState()
-        const initialAttributes = characterAttributesSelector(initialState, 1)
+        const initialAttributes = characterAttributesSelector(
+          initialState,
+          // @ts-ignore
+          1
+        )
         expect(initialAttributes).toEqual([
           {
             bookId: 'all',
@@ -283,7 +303,11 @@ describe('deleteCharacterAttribute', () => {
         ])
         store.dispatch(deleteCharacterAttribute(1))
         const resultState = store.getState()
-        const resultAttributes = characterAttributesSelector(resultState, 1)
+        const resultAttributes = characterAttributesSelector(
+          resultState,
+          // @ts-ignore
+          1
+        )
         expect(resultAttributes).toEqual([])
       })
       it('should not delete that attribute if the id is different', () => {
@@ -291,7 +315,11 @@ describe('deleteCharacterAttribute', () => {
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(createCharacterAttribute('text', 'strength'))
         const initialState = store.getState()
-        const initialAttributes = characterAttributesSelector(initialState, 1)
+        const initialAttributes = characterAttributesSelector(
+          initialState,
+          // @ts-ignore
+          1
+        )
         expect(initialAttributes).toEqual([
           {
             bookId: 'all',
@@ -303,7 +331,11 @@ describe('deleteCharacterAttribute', () => {
         ])
         store.dispatch(deleteCharacterAttribute(2))
         const resultState = store.getState()
-        const resultAttributes = characterAttributesSelector(resultState, 1)
+        const resultAttributes = characterAttributesSelector(
+          resultState,
+          // @ts-ignore
+          1
+        )
         expect(resultAttributes).toEqual([
           {
             bookId: 'all',
@@ -349,7 +381,11 @@ describe('reorderCharacterAttribute', () => {
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(createCharacterAttribute('text', 'strength'))
         const initialState = store.getState()
-        const initialAttributes = characterAttributesSelector(initialState, 1)
+        const initialAttributes = characterAttributesSelector(
+          initialState,
+          // @ts-ignore
+          1
+        )
         expect(initialAttributes).toEqual([
           {
             bookId: 'all',
@@ -361,7 +397,11 @@ describe('reorderCharacterAttribute', () => {
         ])
         store.dispatch(reorderCharacterAttribute(1, 0))
         const resultState = store.getState()
-        const resultAttributes = characterAttributesSelector(resultState, 1)
+        const resultAttributes = characterAttributesSelector(
+          resultState,
+          // @ts-ignore
+          1
+        )
         expect(resultAttributes).toEqual([
           {
             bookId: 'all',
@@ -377,7 +417,11 @@ describe('reorderCharacterAttribute', () => {
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(createCharacterAttribute('text', 'strength'))
         const initialState = store.getState()
-        const initialAttributes = characterAttributesSelector(initialState, 1)
+        const initialAttributes = characterAttributesSelector(
+          initialState,
+          // @ts-ignore
+          1
+        )
         expect(initialAttributes).toEqual([
           {
             bookId: 'all',
@@ -389,7 +433,11 @@ describe('reorderCharacterAttribute', () => {
         ])
         store.dispatch(reorderCharacterAttribute(1, 1))
         const resultState = store.getState()
-        const resultAttributes = characterAttributesSelector(resultState, 1)
+        const resultAttributes = characterAttributesSelector(
+          resultState,
+          // @ts-ignore
+          1
+        )
         expect(resultAttributes).toEqual([
           {
             bookId: 'all',
@@ -405,7 +453,11 @@ describe('reorderCharacterAttribute', () => {
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(createCharacterAttribute('text', 'strength'))
         const initialState = store.getState()
-        const initialAttributes = characterAttributesSelector(initialState, 1)
+        const initialAttributes = characterAttributesSelector(
+          initialState,
+          // @ts-ignore
+          1
+        )
         expect(initialAttributes).toEqual([
           {
             bookId: 'all',
@@ -417,7 +469,11 @@ describe('reorderCharacterAttribute', () => {
         ])
         store.dispatch(reorderCharacterAttribute(1, -1))
         const resultState = store.getState()
-        const resultAttributes = characterAttributesSelector(resultState, 1)
+        const resultAttributes = characterAttributesSelector(
+          resultState,
+          // @ts-ignore
+          1
+        )
         expect(resultAttributes).toEqual([
           {
             bookId: 'all',
@@ -433,7 +489,11 @@ describe('reorderCharacterAttribute', () => {
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(createCharacterAttribute('text', 'strength'))
         const initialState = store.getState()
-        const initialAttributes = characterAttributesSelector(initialState, 1)
+        const initialAttributes = characterAttributesSelector(
+          initialState,
+          // @ts-ignore
+          1
+        )
         expect(initialAttributes).toEqual([
           {
             bookId: 'all',
@@ -445,7 +505,11 @@ describe('reorderCharacterAttribute', () => {
         ])
         store.dispatch(reorderCharacterAttribute(1, 1))
         const resultState = store.getState()
-        const resultAttributes = characterAttributesSelector(resultState, 1)
+        const resultAttributes = characterAttributesSelector(
+          resultState,
+          // @ts-ignore
+          1
+        )
         expect(resultAttributes).toEqual([
           {
             bookId: 'all',
@@ -464,7 +528,11 @@ describe('reorderCharacterAttribute', () => {
         store.dispatch(createCharacterAttribute('text', 'strength'))
         store.dispatch(createCharacterAttribute('text', 'height'))
         const initialState = store.getState()
-        const initialAttributes = characterAttributesSelector(initialState, 1)
+        const initialAttributes = characterAttributesSelector(
+          initialState,
+          // @ts-ignore
+          1
+        )
         expect(initialAttributes).toEqual([
           {
             bookId: 'all',
@@ -483,7 +551,11 @@ describe('reorderCharacterAttribute', () => {
         ])
         store.dispatch(reorderCharacterAttribute(1, 0))
         const resultState = store.getState()
-        const resultAttributes = characterAttributesSelector(resultState, 1)
+        const resultAttributes = characterAttributesSelector(
+          resultState,
+          // @ts-ignore
+          1
+        )
         expect(resultAttributes).toEqual([
           {
             bookId: 'all',
@@ -507,7 +579,11 @@ describe('reorderCharacterAttribute', () => {
         store.dispatch(createCharacterAttribute('text', 'strength'))
         store.dispatch(createCharacterAttribute('text', 'height'))
         const initialState = store.getState()
-        const initialAttributes = characterAttributesSelector(initialState, 1)
+        const initialAttributes = characterAttributesSelector(
+          initialState,
+          // @ts-ignore
+          1
+        )
         expect(initialAttributes).toEqual([
           {
             bookId: 'all',
@@ -526,7 +602,11 @@ describe('reorderCharacterAttribute', () => {
         ])
         store.dispatch(reorderCharacterAttribute(1, 1))
         const resultState = store.getState()
-        const resultAttributes = characterAttributesSelector(resultState, 1)
+        const resultAttributes = characterAttributesSelector(
+          resultState,
+          // @ts-ignore
+          1
+        )
         expect(resultAttributes).toEqual([
           {
             bookId: 'all',
@@ -550,7 +630,11 @@ describe('reorderCharacterAttribute', () => {
         store.dispatch(createCharacterAttribute('text', 'strength'))
         store.dispatch(createCharacterAttribute('text', 'height'))
         const initialState = store.getState()
-        const initialAttributes = characterAttributesSelector(initialState, 1)
+        const initialAttributes = characterAttributesSelector(
+          initialState,
+          // @ts-ignore
+          1
+        )
         expect(initialAttributes).toEqual([
           {
             bookId: 'all',
@@ -569,7 +653,11 @@ describe('reorderCharacterAttribute', () => {
         ])
         store.dispatch(reorderCharacterAttribute(1, -1))
         const resultState = store.getState()
-        const resultAttributes = characterAttributesSelector(resultState, 1)
+        const resultAttributes = characterAttributesSelector(
+          resultState,
+          // @ts-ignore
+          1
+        )
         expect(resultAttributes).toEqual([
           {
             bookId: 'all',
@@ -593,7 +681,11 @@ describe('reorderCharacterAttribute', () => {
         store.dispatch(createCharacterAttribute('text', 'strength'))
         store.dispatch(createCharacterAttribute('text', 'height'))
         const initialState = store.getState()
-        const initialAttributes = characterAttributesSelector(initialState, 1)
+        const initialAttributes = characterAttributesSelector(
+          initialState,
+          // @ts-ignore
+          1
+        )
         expect(initialAttributes).toEqual([
           {
             bookId: 'all',
@@ -612,7 +704,11 @@ describe('reorderCharacterAttribute', () => {
         ])
         store.dispatch(reorderCharacterAttribute(3, 1))
         const resultState = store.getState()
-        const resultAttributes = characterAttributesSelector(resultState, 1)
+        const resultAttributes = characterAttributesSelector(
+          resultState,
+          // @ts-ignore
+          1
+        )
         expect(resultAttributes).toEqual([
           {
             bookId: 'all',
@@ -665,7 +761,11 @@ describe('deleteBook', () => {
           store.dispatch(addBookToCharacter(1, 1))
           store.dispatch(selectCharacterAttributeBookTab(1))
           store.dispatch(editCharacterAttributeValue(1, 1, 'New value'))
-          const originalCharacter = singleCharacterSelector(store.getState(), 1)
+          const originalCharacter = singleCharacterSelector(
+            store.getState(),
+            // @ts-ignore
+            1
+          )
           expect(originalCharacter.attributes).toEqual(
             expect.arrayContaining([
               {
@@ -682,7 +782,11 @@ describe('deleteBook', () => {
           )
           store.dispatch(deleteBook(1))
           const resultState = store.getState()
-          const character = singleCharacterSelector(resultState, 1)
+          const character = singleCharacterSelector(
+            resultState,
+            // @ts-ignore
+            1
+          )
           expect(character.attributes).toEqual([
             {
               id: 1,
@@ -702,10 +806,18 @@ describe('deleteBook', () => {
           store.dispatch(addBookToCharacter(1, 1))
           store.dispatch(selectCharacterAttributeBookTab(1))
           store.dispatch(editCharacterAttributeValue(1, 1, 'New value'))
-          const originalCharacter = singleCharacterSelector(store.getState(), 1)
+          const originalCharacter = singleCharacterSelector(
+            store.getState(),
+            // @ts-ignore
+            1
+          )
           store.dispatch(deleteBook(2))
           const resultState = store.getState()
-          const character = singleCharacterSelector(resultState, 1)
+          const character = singleCharacterSelector(
+            resultState,
+            // @ts-ignore
+            1
+          )
           expect(character).toBe(originalCharacter)
         })
       })

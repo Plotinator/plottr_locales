@@ -44,7 +44,7 @@ describe('2021.2.8', () => {
       })
       it('should produce unique ids for the beats', () => {
         const allIds = migration(stateWithOneChapter).beats.map(({ id }) => id)
-        expect([...new Set(allIds)]).toEqual(allIds)
+        expect(Array.from(new Set(allIds).values())).toEqual(allIds)
       })
     })
     describe('and cards which refer to that chapter', () => {

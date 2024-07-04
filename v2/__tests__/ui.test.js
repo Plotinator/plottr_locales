@@ -875,7 +875,7 @@ describe('showPlaceAttributeDialog', () => {
       const store = storeWithZelda()
       const initiallyShown = placeAttributeDialogIsOpenSelector(store.getState())
       store.dispatch(showPlaceAttributeDialog())
-      const shownAfterShowing = hidePlaceAttributeDialog(store.getState())
+      const shownAfterShowing = hidePlaceAttributeDialog()
       store.dispatch(hidePlaceAttributeDialog())
       it('should set it to true', () => {
         const shownAtEnd = placeAttributeDialogIsOpenSelector(store.getState())
@@ -1358,13 +1358,25 @@ describe('editSelectedTag', () => {
       })
       describe('when a tag is selected', () => {
         const store = storeWithZelda()
-        const initiallyEditing = isEditingTagSelector(store.getState(), 1)
+        const initiallyEditing = isEditingTagSelector(
+          store.getState(),
+          // @ts-ignore
+          1
+        )
         store.dispatch(selectTag(1))
         store.dispatch(editSelectedTag())
-        const editingAfterEditing = isEditingTagSelector(store.getState(), 1)
+        const editingAfterEditing = isEditingTagSelector(
+          store.getState(),
+          // @ts-ignore
+          1
+        )
         store.dispatch(finishEditingSelectedTag())
         it('should indicate that it is editing', () => {
-          const editingAtEnd = isEditingTagSelector(store.getState(), 1)
+          const editingAtEnd = isEditingTagSelector(
+            store.getState(),
+            // @ts-ignore
+            1
+          )
           expect(initiallyEditing).toBeFalsy()
           expect(editingAfterEditing).toBeTruthy()
           expect(editingAtEnd).toBeFalsy()
@@ -5808,6 +5820,7 @@ describe('pushFocus', () => {
       })
     )
     store.dispatch(
+      // @ts-ignore
       pushFocus(null, ['project', 'book', 3, 'title'], {
         start: 3,
         end: 5,
@@ -5815,6 +5828,7 @@ describe('pushFocus', () => {
       })
     )
     store.dispatch(
+      // @ts-ignore
       pushFocus(undefined, ['project', 'book', 3, 'title'], {
         start: 3,
         end: 5,
@@ -5830,11 +5844,30 @@ describe('pushFocus', () => {
     describe('and an invalid path', () => {
       const store = storeWithZelda()
       const fileState = fullFileStateSelector(store.getState())
-      store.dispatch(pushFocus('project', undefined, { start: 3, end: 5, direction: 'forward' }))
-      store.dispatch(pushFocus('project', null, { start: 3, end: 5, direction: 'forward' }))
+      store.dispatch(
+        pushFocus(
+          'project',
+          // @ts-ignore
+          undefined,
+          { start: 3, end: 5, direction: 'forward' }
+        )
+      )
+      store.dispatch(
+        pushFocus(
+          'project',
+          // @ts-ignore
+          null,
+          { start: 3, end: 5, direction: 'forward' }
+        )
+      )
       store.dispatch(pushFocus('project', ['unknown'], { start: 3, end: 5, direction: 'forward' }))
       store.dispatch(
-        pushFocus('place', '/place/3/name', { start: 3, end: 5, direction: 'forward' })
+        pushFocus(
+          'place',
+          // @ts-ignore
+          '/place/3/name',
+          { start: 3, end: 5, direction: 'forward' }
+        )
       )
       it('should not change the state', () => {
         const finalFileState = fullFileStateSelector(store.getState())
@@ -5845,21 +5878,42 @@ describe('pushFocus', () => {
       describe('and an invalid selection', () => {
         const store = storeWithZelda()
         const fileState = fullFileStateSelector(store.getState())
-        store.dispatch(pushFocus('project', ['project', 'book', 3, 'title'], null))
-        store.dispatch(pushFocus('project', ['project', 'book', 3, 'title'], undefined))
         store.dispatch(
-          pushFocus('project', ['project', 'book', 3, 'title'], {
-            end: 5,
-            direction: 'forward',
-          })
+          pushFocus(
+            'project',
+            ['project', 'book', 3, 'title'],
+            // @ts-ignore
+            null
+          )
         )
         store.dispatch(
+          pushFocus(
+            'project',
+            ['project', 'book', 3, 'title'],
+            // @ts-ignore
+            undefined
+          )
+        )
+        store.dispatch(
+          pushFocus(
+            'project',
+            ['project', 'book', 3, 'title'],
+            // @ts-ignore
+            {
+              end: 5,
+              direction: 'forward',
+            }
+          )
+        )
+        store.dispatch(
+          // @ts-ignore
           pushFocus('project', ['project', 'book', 3, 'title'], {
             start: 3,
             end: 5,
           })
         )
         store.dispatch(
+          // @ts-ignore
           pushFocus('project', ['project', 'book', 3, 'title'], {
             start: 3,
             direction: 'forward',
@@ -5867,6 +5921,31 @@ describe('pushFocus', () => {
         )
         store.dispatch(
           pushFocus('project', ['project', 'book', 3, 'title'], {
+            // @ts-ignore
+            anchor: {
+              path: [1, 0],
+            },
+            focus: {
+              path: [1, 0],
+              offset: 72,
+            },
+          })
+        )
+        store.dispatch(
+          pushFocus('project', ['project', 'book', 3, 'title'], {
+            // @ts-ignore
+            anchor: {
+              offset: 72,
+            },
+            focus: {
+              path: [1, 0],
+              offset: 72,
+            },
+          })
+        )
+        store.dispatch(
+          pushFocus('project', ['project', 'book', 3, 'title'], {
+            // @ts-ignore
             anchor: {
               path: [1, 0],
             },
@@ -5879,51 +5958,40 @@ describe('pushFocus', () => {
         store.dispatch(
           pushFocus('project', ['project', 'book', 3, 'title'], {
             anchor: {
-              offset: 72,
-            },
-            focus: {
               path: [1, 0],
               offset: 72,
             },
-          })
-        )
-        store.dispatch(
-          pushFocus('project', ['project', 'book', 3, 'title'], {
-            anchor: {
-              path: [1, 0],
-            },
-            focus: {
-              path: [1, 0],
-              offset: 72,
-            },
-          })
-        )
-        store.dispatch(
-          pushFocus('project', ['project', 'book', 3, 'title'], {
-            anchor: {
-              path: [1, 0],
-              offset: 72,
-            },
+            // @ts-ignore
             focus: {
               offset: 72,
             },
           })
         )
         store.dispatch(
-          pushFocus('project', ['project', 'book', 3, 'title'], {
-            anchor: {
-              path: [1, 0],
-              offset: 72,
-            },
-          })
+          pushFocus(
+            'project',
+            ['project', 'book', 3, 'title'],
+            // @ts-ignore
+            {
+              anchor: {
+                path: [1, 0],
+                offset: 72,
+              },
+            }
+          )
         )
         store.dispatch(
-          pushFocus('project', ['project', 'book', 3, 'title'], {
-            focus: {
-              path: [1, 0],
-              offset: 72,
-            },
-          })
+          pushFocus(
+            'project',
+            ['project', 'book', 3, 'title'],
+            // @ts-ignore
+            {
+              focus: {
+                path: [1, 0],
+                offset: 72,
+              },
+            }
+          )
         )
         it('should not change the state', () => {
           const finalFileState = fullFileStateSelector(store.getState())
@@ -6116,7 +6184,11 @@ describe('replaceMarkedHits', () => {
   describe('given a state with hits in the title of a book and the series', () => {
     const store = storeWithZelda()
     const fileState = fullFileStateSelector(store.getState())
-    const initialBook8 = singleBookSelector(store.getState(), 8)
+    const initialBook8 = singleBookSelector(
+      store.getState(),
+      // @ts-ignore
+      8
+    )
     const initialSeries = seriesSelector(store.getState())
     store.dispatch(openSearch())
     store.dispatch(toggleReplaceSearch())
@@ -6145,7 +6217,11 @@ describe('replaceMarkedHits', () => {
           omit(fileState, ['books.8', 'series'])
         )
       )
-      const finalBook8 = singleBookSelector(store.getState(), 8)
+      const finalBook8 = singleBookSelector(
+        store.getState(),
+        // @ts-ignore
+        8
+      )
       const finalSeries = seriesSelector(store.getState())
       expect(finalBook8.title).not.toEqual(initialBook8.title)
       expect(finalBook8.title).toEqual('The Legend of Bob the Bob the Builder')
@@ -6231,7 +6307,11 @@ describe('replaceMarkedHits', () => {
   describe('given a state with a hit in the premise of a book', () => {
     const store = storeWithZelda()
     const fileState = fullFileStateSelector(store.getState())
-    const initialBook8 = singleBookSelector(store.getState(), 8)
+    const initialBook8 = singleBookSelector(
+      store.getState(),
+      // @ts-ignore
+      8
+    )
     store.dispatch(openSearch())
     store.dispatch(toggleReplaceSearch())
     store.dispatch(setReplacementText('escape reality'))
@@ -6248,7 +6328,11 @@ describe('replaceMarkedHits', () => {
       expect(
         withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(finalState, 'books.8'))
       ).toEqual(withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(fileState, 'books.8')))
-      const finalBook8 = singleBookSelector(store.getState(), 8)
+      const finalBook8 = singleBookSelector(
+        store.getState(),
+        // @ts-ignore
+        8
+      )
       expect(finalBook8.premise).not.toEqual(initialBook8.premise)
       expect(finalBook8.premise).toEqual('escape reality')
     })
@@ -6256,7 +6340,11 @@ describe('replaceMarkedHits', () => {
   describe('given a state with a hit in the genre of a book', () => {
     const store = storeWithZelda()
     const fileState = fullFileStateSelector(store.getState())
-    const initialBook8 = singleBookSelector(store.getState(), 8)
+    const initialBook8 = singleBookSelector(
+      store.getState(),
+      // @ts-ignore
+      8
+    )
     store.dispatch(openSearch())
     store.dispatch(toggleReplaceSearch())
     store.dispatch(setReplacementText('escape reality'))
@@ -6273,7 +6361,11 @@ describe('replaceMarkedHits', () => {
       expect(
         withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(finalState, 'books.8'))
       ).toEqual(withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(fileState, 'books.8')))
-      const finalBook8 = singleBookSelector(store.getState(), 8)
+      const finalBook8 = singleBookSelector(
+        store.getState(),
+        // @ts-ignore
+        8
+      )
       expect(finalBook8.genre).not.toEqual(initialBook8.genre)
       expect(finalBook8.genre).toEqual('escape reality')
     })
@@ -6281,7 +6373,11 @@ describe('replaceMarkedHits', () => {
   describe('given a state with a hit in the theme of a book', () => {
     const store = storeWithZelda()
     const fileState = fullFileStateSelector(store.getState())
-    const initialBook8 = singleBookSelector(store.getState(), 8)
+    const initialBook8 = singleBookSelector(
+      store.getState(),
+      // @ts-ignore
+      8
+    )
     store.dispatch(openSearch())
     store.dispatch(toggleReplaceSearch())
     store.dispatch(setReplacementText('escape reality'))
@@ -6298,7 +6394,11 @@ describe('replaceMarkedHits', () => {
       expect(
         withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(finalState, 'books.8'))
       ).toEqual(withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(fileState, 'books.8')))
-      const finalBook8 = singleBookSelector(store.getState(), 8)
+      const finalBook8 = singleBookSelector(
+        store.getState(),
+        // @ts-ignore
+        8
+      )
       expect(finalBook8.theme).not.toEqual(initialBook8.theme)
       expect(finalBook8.theme).toEqual('escape reality')
     })
@@ -6306,7 +6406,11 @@ describe('replaceMarkedHits', () => {
   describe('given a state with a hit on a timeline card title', () => {
     const store = storeWithZelda()
     const initialState = fullFileStateSelector(store.getState())
-    const initialCard = singleCardSelector(store.getState(), 19)
+    const initialCard = singleCardSelector(
+      store.getState(),
+      // @ts-ignore
+      19
+    )
     store.dispatch(openSearch())
     store.dispatch(toggleReplaceSearch())
     store.dispatch(setSearchTerm('Intro-'))
@@ -6320,7 +6424,11 @@ describe('replaceMarkedHits', () => {
     store.dispatch(replaceMarkedHits())
     it('should replace that hit', () => {
       const finalState = fullFileStateSelector(store.getState())
-      const finalCard = singleCardSelector(store.getState(), 19)
+      const finalCard = singleCardSelector(
+        store.getState(),
+        // @ts-ignore
+        19
+      )
       expect(
         withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(initialState, 'cards'))
       ).toEqual(withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(finalState, 'cards')))
@@ -6331,7 +6439,11 @@ describe('replaceMarkedHits', () => {
   describe('given a state with a hit on a timeline card description', () => {
     const store = storeWithZelda()
     const initialState = fullFileStateSelector(store.getState())
-    const initialCard = singleCardSelector(store.getState(), 19)
+    const initialCard = singleCardSelector(
+      store.getState(),
+      // @ts-ignore
+      19
+    )
     store.dispatch(openSearch())
     store.dispatch(toggleReplaceSearch())
     store.dispatch(setSearchTerm('The old'))
@@ -6345,7 +6457,11 @@ describe('replaceMarkedHits', () => {
     store.dispatch(replaceMarkedHits())
     it('should replace that hit', () => {
       const finalState = fullFileStateSelector(store.getState())
-      const finalCard = singleCardSelector(store.getState(), 19)
+      const finalCard = singleCardSelector(
+        store.getState(),
+        // @ts-ignore
+        19
+      )
       expect(
         withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(initialState, 'cards'))
       ).toEqual(withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(finalState, 'cards')))
@@ -6373,7 +6489,11 @@ describe('replaceMarkedHits', () => {
   describe('given a state with a hit on a timeline card custom attribute', () => {
     const store = storeWithZelda()
     const initialState = fullFileStateSelector(store.getState())
-    const initialCard = singleCardSelector(store.getState(), 19)
+    const initialCard = singleCardSelector(
+      store.getState(),
+      // @ts-ignore
+      19
+    )
     store.dispatch(openSearch())
     store.dispatch(toggleReplaceSearch())
     store.dispatch(setSearchTerm("Here's"))
@@ -6387,7 +6507,11 @@ describe('replaceMarkedHits', () => {
     store.dispatch(replaceMarkedHits())
     it('should replace that hit', () => {
       const finalState = fullFileStateSelector(store.getState())
-      const finalCard = singleCardSelector(store.getState(), 19)
+      const finalCard = singleCardSelector(
+        store.getState(),
+        // @ts-ignore
+        19
+      )
       expect(
         withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(initialState, 'cards'))
       ).toEqual(withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(finalState, 'cards')))
@@ -6423,7 +6547,11 @@ describe('replaceMarkedHits', () => {
   describe('given a state with hits on the outline tab', () => {
     const store = storeWithZelda()
     const initialState = fullFileStateSelector(store.getState())
-    const initialCard = singleCardSelector(store.getState(), 19)
+    const initialCard = singleCardSelector(
+      store.getState(),
+      // @ts-ignore
+      19
+    )
     store.dispatch(openSearch())
     store.dispatch(toggleReplaceSearch())
     store.dispatch(setSearchTerm('Intro-'))
@@ -6437,7 +6565,11 @@ describe('replaceMarkedHits', () => {
     store.dispatch(replaceMarkedHits())
     it('should replace that hit', () => {
       const finalState = fullFileStateSelector(store.getState())
-      const finalCard = singleCardSelector(store.getState(), 19)
+      const finalCard = singleCardSelector(
+        store.getState(),
+        // @ts-ignore
+        19
+      )
       expect(
         withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(initialState, 'cards'))
       ).toEqual(withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(finalState, 'cards')))
@@ -6448,7 +6580,11 @@ describe('replaceMarkedHits', () => {
   describe('given a state with a hit on a outline card description', () => {
     const store = storeWithZelda()
     const initialState = fullFileStateSelector(store.getState())
-    const initialCard = singleCardSelector(store.getState(), 19)
+    const initialCard = singleCardSelector(
+      store.getState(),
+      // @ts-ignore
+      19
+    )
     store.dispatch(openSearch())
     store.dispatch(toggleReplaceSearch())
     store.dispatch(setSearchTerm('The old'))
@@ -6462,7 +6598,11 @@ describe('replaceMarkedHits', () => {
     store.dispatch(replaceMarkedHits())
     it('should replace that hit', () => {
       const finalState = fullFileStateSelector(store.getState())
-      const finalCard = singleCardSelector(store.getState(), 19)
+      const finalCard = singleCardSelector(
+        store.getState(),
+        // @ts-ignore
+        19
+      )
       expect(
         withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(initialState, 'cards'))
       ).toEqual(withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(finalState, 'cards')))
@@ -6490,7 +6630,11 @@ describe('replaceMarkedHits', () => {
   describe('given a state with hits on a note title', () => {
     const store = storeWithZelda()
     const initialState = fullFileStateSelector(store.getState())
-    const initialNote = singleNoteSelector(store.getState(), 1)
+    const initialNote = singleNoteSelector(
+      store.getState(),
+      // @ts-ignore
+      1
+    )
     store.dispatch(openSearch())
     store.dispatch(toggleReplaceSearch())
     store.dispatch(setSearchTerm('Yo, this'))
@@ -6504,7 +6648,11 @@ describe('replaceMarkedHits', () => {
     store.dispatch(replaceMarkedHits())
     it('should replace that hit', () => {
       const finalState = fullFileStateSelector(store.getState())
-      const finalNote = singleNoteSelector(store.getState(), 1)
+      const finalNote = singleNoteSelector(
+        store.getState(),
+        // @ts-ignore
+        1
+      )
       expect(
         withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(initialState, 'notes'))
       ).toEqual(withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(finalState, 'notes')))
@@ -6515,7 +6663,11 @@ describe('replaceMarkedHits', () => {
   describe('given a state with hits on a note description', () => {
     const store = storeWithZelda()
     const initialState = fullFileStateSelector(store.getState())
-    const initialNote = singleNoteSelector(store.getState(), 1)
+    const initialNote = singleNoteSelector(
+      store.getState(),
+      // @ts-ignore
+      1
+    )
     store.dispatch(openSearch())
     store.dispatch(toggleReplaceSearch())
     store.dispatch(setSearchTerm('heres a note'))
@@ -6529,7 +6681,11 @@ describe('replaceMarkedHits', () => {
     store.dispatch(replaceMarkedHits())
     it('should replace that hit', () => {
       const finalState = fullFileStateSelector(store.getState())
-      const finalNote = singleNoteSelector(store.getState(), 1)
+      const finalNote = singleNoteSelector(
+        store.getState(),
+        // @ts-ignore
+        1
+      )
       expect(
         withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(initialState, 'notes'))
       ).toEqual(withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(finalState, 'notes')))
@@ -6549,7 +6705,11 @@ describe('replaceMarkedHits', () => {
   describe('given a state with hits on a place title', () => {
     const store = storeWithZelda()
     const initialState = fullFileStateSelector(store.getState())
-    const initialPlace = singlePlaceSelector(store.getState(), 1)
+    const initialPlace = singlePlaceSelector(
+      store.getState(),
+      // @ts-ignore
+      1
+    )
     store.dispatch(openSearch())
     store.dispatch(toggleReplaceSearch())
     store.dispatch(setSearchTerm('Hyrule Castle'))
@@ -6563,7 +6723,11 @@ describe('replaceMarkedHits', () => {
     store.dispatch(replaceMarkedHits())
     it('should replace that hit', () => {
       const finalState = fullFileStateSelector(store.getState())
-      const finalPlace = singlePlaceSelector(store.getState(), 1)
+      const finalPlace = singlePlaceSelector(
+        store.getState(),
+        // @ts-ignore
+        1
+      )
       expect(
         withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(initialState, 'places'))
       ).toEqual(withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(finalState, 'places')))
@@ -6574,7 +6738,11 @@ describe('replaceMarkedHits', () => {
   describe('given a state with hits on a place notes', () => {
     const store = storeWithZelda()
     const initialState = fullFileStateSelector(store.getState())
-    const initialPlace = singlePlaceSelector(store.getState(), 1)
+    const initialPlace = singlePlaceSelector(
+      store.getState(),
+      // @ts-ignore
+      1
+    )
     store.dispatch(openSearch())
     store.dispatch(toggleReplaceSearch())
     store.dispatch(setSearchTerm('The castle'))
@@ -6588,7 +6756,11 @@ describe('replaceMarkedHits', () => {
     store.dispatch(replaceMarkedHits())
     it('should replace that hit', () => {
       const finalState = fullFileStateSelector(store.getState())
-      const finalPlace = singlePlaceSelector(store.getState(), 1)
+      const finalPlace = singlePlaceSelector(
+        store.getState(),
+        // @ts-ignore
+        1
+      )
       expect(
         withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(initialState, 'places'))
       ).toEqual(withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(finalState, 'places')))
@@ -6608,7 +6780,11 @@ describe('replaceMarkedHits', () => {
   describe('given a state with hits on a place description', () => {
     const store = storeWithZelda()
     const initialState = fullFileStateSelector(store.getState())
-    const initialPlace = singlePlaceSelector(store.getState(), 1)
+    const initialPlace = singlePlaceSelector(
+      store.getState(),
+      // @ts-ignore
+      1
+    )
     store.dispatch(openSearch())
     store.dispatch(toggleReplaceSearch())
     store.dispatch(setSearchTerm('A cool place'))
@@ -6622,7 +6798,11 @@ describe('replaceMarkedHits', () => {
     store.dispatch(replaceMarkedHits())
     it('should replace that hit', () => {
       const finalState = fullFileStateSelector(store.getState())
-      const finalPlace = singlePlaceSelector(store.getState(), 1)
+      const finalPlace = singlePlaceSelector(
+        store.getState(),
+        // @ts-ignore
+        1
+      )
       expect(
         withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(initialState, 'places'))
       ).toEqual(withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(finalState, 'places')))
@@ -6633,7 +6813,11 @@ describe('replaceMarkedHits', () => {
   describe('given a state with hits in a tag title', () => {
     const store = storeWithZelda()
     const initialState = fullFileStateSelector(store.getState())
-    const initialPlace = singleTagSelector(store.getState(), 1)
+    const initialPlace = singleTagSelector(
+      store.getState(),
+      // @ts-ignore
+      1
+    )
     store.dispatch(openSearch())
     store.dispatch(toggleReplaceSearch())
     store.dispatch(setSearchTerm('its a tag'))
@@ -6647,7 +6831,11 @@ describe('replaceMarkedHits', () => {
     store.dispatch(replaceMarkedHits())
     it('should replace that hit', () => {
       const finalState = fullFileStateSelector(store.getState())
-      const finalPlace = singleTagSelector(store.getState(), 1)
+      const finalPlace = singleTagSelector(
+        store.getState(),
+        // @ts-ignore
+        1
+      )
       expect(
         withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(initialState, 'tags'))
       ).toEqual(withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(finalState, 'tags')))
@@ -6658,7 +6846,11 @@ describe('replaceMarkedHits', () => {
   describe('given a state with hits on a character name', () => {
     const store = storeWithZelda()
     const initialState = fullFileStateSelector(store.getState())
-    const initialCharacter = singleCharacterSelector(store.getState(), 1)
+    const initialCharacter = singleCharacterSelector(
+      store.getState(),
+      // @ts-ignore
+      1
+    )
     store.dispatch(openSearch())
     store.dispatch(toggleReplaceSearch())
     store.dispatch(setSearchTerm('Link'))
@@ -6672,7 +6864,11 @@ describe('replaceMarkedHits', () => {
     store.dispatch(replaceMarkedHits())
     it('should replace that hit', () => {
       const finalState = fullFileStateSelector(store.getState())
-      const finalCharacter = singleCharacterSelector(store.getState(), 1)
+      const finalCharacter = singleCharacterSelector(
+        store.getState(),
+        // @ts-ignore
+        1
+      )
       expect(
         withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(initialState, 'characters'))
       ).toEqual(
@@ -6685,7 +6881,11 @@ describe('replaceMarkedHits', () => {
   describe('given a state with hits on a character description', () => {
     const store = storeWithZelda()
     const initialState = fullFileStateSelector(store.getState())
-    const initialCharacter = displayedSingleCharacterSelector(store.getState(), 1)
+    const initialCharacter = displayedSingleCharacterSelector(
+      store.getState(),
+      // @ts-ignore
+      1
+    )
     store.dispatch(openSearch())
     store.dispatch(toggleReplaceSearch())
     store.dispatch(setSearchTerm('Hi there'))
@@ -6699,7 +6899,11 @@ describe('replaceMarkedHits', () => {
     store.dispatch(replaceMarkedHits())
     it('should replace that hit', () => {
       const finalState = fullFileStateSelector(store.getState())
-      const finalCharacter = displayedSingleCharacterSelector(store.getState(), 1)
+      const finalCharacter = displayedSingleCharacterSelector(
+        store.getState(),
+        // @ts-ignore
+        1
+      )
       expect(
         withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(initialState, 'characters'))
       ).toEqual(
@@ -6712,7 +6916,11 @@ describe('replaceMarkedHits', () => {
   describe('given a state with hits on a character legacy attribute', () => {
     const store = storeWithZelda()
     const initialState = fullFileStateSelector(store.getState())
-    const initialCharacter = displayedSingleCharacterSelector(store.getState(), 3)
+    const initialCharacter = displayedSingleCharacterSelector(
+      store.getState(),
+      // @ts-ignore
+      3
+    )
     store.dispatch(openSearch())
     store.dispatch(toggleReplaceSearch())
     store.dispatch(setSearchTerm("she's got lazer eyes(!)"))
@@ -6726,7 +6934,11 @@ describe('replaceMarkedHits', () => {
     store.dispatch(replaceMarkedHits())
     it('should replace that hit', () => {
       const finalState = fullFileStateSelector(store.getState())
-      const finalCharacter = displayedSingleCharacterSelector(store.getState(), 3)
+      const finalCharacter = displayedSingleCharacterSelector(
+        store.getState(),
+        // @ts-ignore
+        3
+      )
       expect(
         withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(initialState, 'characters'))
       ).toEqual(
@@ -6749,7 +6961,11 @@ describe('replaceMarkedHits', () => {
     const store = storeWithZelda()
     const initialState = fullFileStateSelector(store.getState())
     store.dispatch(setActiveCharacterTab(5))
-    const initialCharacter = displayedSingleCharacterSelector(store.getState(), 1)
+    const initialCharacter = displayedSingleCharacterSelector(
+      store.getState(),
+      // @ts-ignore
+      1
+    )
     store.dispatch(openSearch())
     store.dispatch(toggleReplaceSearch())
     store.dispatch(setSearchTerm("I'm some notes"))
@@ -6763,7 +6979,11 @@ describe('replaceMarkedHits', () => {
     store.dispatch(replaceMarkedHits())
     it('should replace that hit', () => {
       const finalState = fullFileStateSelector(store.getState())
-      const finalCharacter = displayedSingleCharacterSelector(store.getState(), 1)
+      const finalCharacter = displayedSingleCharacterSelector(
+        store.getState(),
+        // @ts-ignore
+        1
+      )
       expect(
         withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(initialState, 'characters'))
       ).toEqual(
@@ -6788,6 +7008,8 @@ describe('replaceMarkedHits', () => {
     store.dispatch(setActiveCharacterTab(5))
     const initialValue = characterTemplateAttributeValueSelector(
       store.getState(),
+
+      // @ts-ignore
       3,
       'ch3',
       'Birth Order'
@@ -6807,6 +7029,8 @@ describe('replaceMarkedHits', () => {
       const finalState = fullFileStateSelector(store.getState())
       const finalValue = characterTemplateAttributeValueSelector(
         store.getState(),
+
+        // @ts-ignore
         3,
         'ch3',
         'Birth Order'
@@ -6823,7 +7047,11 @@ describe('replaceMarkedHits', () => {
   describe('given a state with a hit in a line title', () => {
     const store = storeWithZelda()
     const initialState = fullFileStateSelector(store.getState())
-    const initialValue = singleLineSelector(store.getState(), 16)
+    const initialValue = singleLineSelector(
+      store.getState(),
+      // @ts-ignore
+      16
+    )
     store.dispatch(openSearch())
     store.dispatch(toggleReplaceSearch())
     store.dispatch(setSearchTerm('Memories'))
@@ -6837,7 +7065,11 @@ describe('replaceMarkedHits', () => {
     store.dispatch(replaceMarkedHits())
     it('should replace that hit', () => {
       const finalState = fullFileStateSelector(store.getState())
-      const finalValue = singleLineSelector(store.getState(), 16)
+      const finalValue = singleLineSelector(
+        store.getState(),
+        // @ts-ignore
+        16
+      )
       expect(
         withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(initialState, 'lines'))
       ).toEqual(withoutChangesWeDontCareAboutNorUIAndApplicationState(omit(finalState, 'lines')))

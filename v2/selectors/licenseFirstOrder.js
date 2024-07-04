@@ -4,6 +4,7 @@
 import { createSelector } from 'reselect'
 import { isEmpty } from 'lodash'
 
+import { subtractMonths } from '../helpers/date'
 import { fullSystemStateSelector } from './fullFileFirstOrder'
 
 export const licenseSelector = createSelector(fullSystemStateSelector, ({ license }) => {
@@ -13,7 +14,7 @@ export const trialInfoSelector = createSelector(licenseSelector, ({ trialInfo })
 export const trialEndSelector = createSelector(trialInfoSelector, ({ endsAt }) => endsAt)
 export const daysLeftOfTrialSelector = createSelector(trialEndSelector, (endsAt) => {
   let oneDay = 24 * 60 * 60 * 1000
-  var today = new Date()
+  const today = new Date()
   return Math.round((endsAt - today.getTime()) / oneDay)
 })
 export const trialExpiredSelector = createSelector(
@@ -52,6 +53,7 @@ const MAX_DAYS_WITHOUT_CHECKING_MILISECONDS = MAX_DAYS_WITHOUT_CHECKING * MILISE
 const dateCheckedExistsAndIsWithinLimit = (inDateChecked) => {
   if (inDateChecked && typeof inDateChecked === 'string') {
     const dateChecked = new Date(inDateChecked)
+    // @ts-ignore
     if (isNaN(dateChecked)) {
       return false
     } else {
@@ -71,11 +73,14 @@ export const hasActivePlottrLicenseSelector = createSelector(
     } else if (dateCheckedExistsAndIsWithinLimit(dateChecked)) {
       if (expiresAt && typeof expiresAt === 'string') {
         const dateExpiresAt = new Date(expiresAt)
+        // @ts-ignore
         if (isNaN(dateExpiresAt)) {
+          // Don't allow folks in if the data is invalid.
           return false
         } else {
-          const dateToday = new Date()
-          return dateToday < dateExpiresAt
+          // But let anyone who once had a Plottr subscription in but
+          // without updates.  See: hasNonExpiredPlottrLicenseSelector
+          return true
         }
       } else {
         return expiresAt === null
@@ -100,6 +105,7 @@ export const hasActiveProLicenseSelector = createSelector(
     if (dateCheckedExistsAndIsWithinLimit(dateChecked)) {
       if (expiresAt && typeof expiresAt === 'string') {
         const dateExpiresAt = new Date(expiresAt)
+        // @ts-ignore
         if (isNaN(dateExpiresAt)) {
           return false
         } else {
@@ -119,6 +125,36 @@ export const hasAnActiveLicenseSelector = createSelector(
   hasActiveProLicenseSelector,
   (hasActivePlottrLicense, hasActiveProLicense) => {
     return hasActivePlottrLicense || hasActiveProLicense
+  }
+)
+export const hasNonExpiredPlottrLicenseSelector = createSelector(
+  plottrLicenseSelector,
+  ({ dateChecked, expiresAt }) => {
+    if (expiresAt === null) {
+      return true
+    } else if (dateCheckedExistsAndIsWithinLimit(dateChecked)) {
+      if (expiresAt && typeof expiresAt === 'string') {
+        const dateExpiresAt = new Date(expiresAt)
+        // @ts-ignore
+        if (isNaN(dateExpiresAt)) {
+          return false
+        } else {
+          const dateTodayWithGracePeriod = subtractMonths(new Date(), 3)
+          return dateTodayWithGracePeriod < dateExpiresAt
+        }
+      } else {
+        return expiresAt === null
+      }
+    } else {
+      return false
+    }
+  }
+)
+export const canReceiveUpdatesSelector = createSelector(
+  hasActiveProLicenseSelector,
+  hasNonExpiredPlottrLicenseSelector,
+  (proHasNotExpired, plottrHasNotExpired) => {
+    return proHasNotExpired || plottrHasNotExpired
   }
 )
 export const proLicenseExpirySelector = createSelector(proLicenseSelector, ({ expiresAt }) => {

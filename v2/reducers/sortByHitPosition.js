@@ -13,6 +13,7 @@ const hitStart = (hit) => {
 
 export const sortByHitPosition = (hits) => {
   return hits.sort((hitOne, hitTwo) => {
+    // @ts-ignore
     return hitStart(hitTwo.path) - hitStart(hitOne.path)
   })
 }

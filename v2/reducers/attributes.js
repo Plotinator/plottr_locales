@@ -24,12 +24,12 @@ const INITIAL_STATE = {
   characters: EMPTY_ATTRIBUTE_STATE,
 }
 
-const initialStateIfEmpty = (newState, state) => {
+const initialStateIfEmpty = (newState, _state) => {
   return !newState || isEmpty(newState) ? INITIAL_STATE : newState
 }
 
 const attributesReducer =
-  (dataRepairers) =>
+  (_dataRepairers) =>
   (state = INITIAL_STATE, action) => {
     switch (action.type) {
       case CREATE_CHARACTER_ATTRIBUTE: {

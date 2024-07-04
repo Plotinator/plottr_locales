@@ -28,6 +28,11 @@ export const placeCategoriesSelector = createSelector(
 const typeSelector = (_state, type) => {
   return type
 }
+/**
+ * @param {object} state
+ * @param {object} ownProps
+ * @returns {[Object]}
+ */
 export const categoryByTypeSelector = createSelector(
   allCategoriesSelector,
   typeSelector,

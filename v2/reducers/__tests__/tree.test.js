@@ -23,7 +23,7 @@ describe('tree', () => {
         expect(filter(emptyTree, () => false)).toEqual(emptyTree)
       })
       it('reducing over it should produce the initial value', () => {
-        expect(reduce(emptyTree, (acc, next) => true, false)).toEqual(false)
+        expect(reduce(emptyTree, (_acc, _next) => true, false)).toEqual(false)
       })
       it('mapping a function to produce empty nodes should result in the empty tree', () => {
         expect(map(emptyTree, () => ({}))).toEqual(emptyTree)
@@ -105,7 +105,7 @@ describe('tree', () => {
       })
       describe("given a node id which isn't in the tree", () => {
         it('should produce undefined', () => {
-          expect(depth(tree, 2)).toBeUndefined()
+          expect(() => depth(tree, 2)).toThrow()
         })
         it('should have an undefined collection of children', () => {
           expect(children(tree, 2)).toBeUndefined()
@@ -214,7 +214,7 @@ describe('tree', () => {
       })
       describe('and a function which counts the number of nodes', () => {
         it('should produce 13', () => {
-          expect(reduce(tree, (acc, { id }) => acc + 1, 0)).toEqual(13)
+          expect(reduce(tree, (acc, _) => acc + 1, 0)).toEqual(13)
         })
       })
       describe('and the predicate which always produces true', () => {

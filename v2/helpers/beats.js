@@ -16,9 +16,13 @@ export function beatOneIsPrologue(sortedBookBeats) {
 
 export function beatName(beats, beat, sortedHierarchyLevels) {
   const depth = tree.depth(beats, beat.id)
-  const hierarchyLevel = sortedHierarchyLevels[depth]
-  const configuredName = hierarchyLevel && hierarchyLevel.name
-  return (configuredName === '' ? nextLevelName(depth) : configuredName) || `Level-${depth}`
+  if (typeof depth === 'number') {
+    const hierarchyLevel = sortedHierarchyLevels[depth]
+    const configuredName = hierarchyLevel && hierarchyLevel.name
+    return (configuredName === '' ? nextLevelName(depth) : configuredName) || `Level-${depth}`
+  } else {
+    throw new Error(`Could not copmute depth of beat: ${beat.id}`)
+  }
 }
 
 export function beatTitle(beatIndex, beats, beat, sortedHierarchyLevels, offset = 0) {
@@ -39,7 +43,7 @@ export function editingBeatLabel(beatIndex, beats, beat, sortedHierarchyLevels) 
 }
 
 export function insertBeat(position, beats, newId, bookId) {
-  var newBeat = Object.assign({}, beat, { id: newId, bookId: bookId })
+  const newBeat = Object.assign({}, beat, { id: newId, bookId: bookId })
 
   beats.splice(position, 0, newBeat)
   return beats

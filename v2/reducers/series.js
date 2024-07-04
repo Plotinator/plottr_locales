@@ -20,7 +20,7 @@ import { sortByHitPosition } from './sortByHitPosition'
 import { replacePlainTextHit } from './replace'
 
 const series =
-  (dataRepairers) =>
+  (_dataRepairers) =>
   (state = defaultSeries, action) => {
     switch (action.type) {
       case EDIT_SERIES: {

@@ -29,7 +29,6 @@ import {
   hierarchyLevelCount,
   isLargeSelector,
   isMediumSelector,
-  isSeriesSelector,
   isSmallSelector,
   outlineSearchTermSelector,
   sortedHierarchyLevels,
@@ -457,8 +456,7 @@ export const makeBeatTitleSelector = () =>
     beatIdSelector,
     sortedHierarchyLevels,
     positionOffsetSelector,
-    isSeriesSelector,
-    (beatIndex, beats, beatId, hierarchyLevels, positionOffset, isSeries) => {
+    (beatIndex, beats, beatId, hierarchyLevels, positionOffset) => {
       const beat = findNode(beats, beatId)
       if (!beat) return ''
       return beatTitle(beatIndex, beats, beat, hierarchyLevels, positionOffset)
@@ -472,20 +470,10 @@ export const makeFlatBeatTitleSelector = () =>
     beatIdSelector,
     sortedHierarchyLevels,
     positionOffsetSelector,
-    isSeriesSelector,
-    (beatIndex, beats, beatId, hierarchyLevels, positionOffset, isSeries) => {
-      const hierarchyEnabled = true
+    (beatIndex, beats, beatId, hierarchyLevels, positionOffset) => {
       const beat = findNode(beats, beatId)
       if (!beat) return ''
-      return beatTitle(
-        beatIndex,
-        beats,
-        beat,
-        hierarchyLevels,
-        positionOffset,
-        hierarchyEnabled,
-        isSeries
-      )
+      return beatTitle(beatIndex, beats, beat, hierarchyLevels, positionOffset)
     }
   )
 
@@ -517,9 +505,7 @@ export const timelineTabsSelector = createSelector(
 const visibleBeatsByPositionIgnoringCollapsed = (beats) =>
   beatsByPosition(() => {
     return true
-  })(beats).filter(({ id }) => {
-    return true
-  })
+  })(beats)
 export const visibleSortedBeatsByBookIgnoringCollapsedSelector = createSelector(
   beatsByBookSelector,
   visibleBeatsByPositionIgnoringCollapsed
@@ -582,7 +568,7 @@ const visibleBeatsForTopLevelParentByPosition = (
 ) => {
   const maximumDepth = hierarchyLevelCount - 1
 
-  return beatsByPosition(({ id, expanded }) => {
+  return beatsByPosition(({ expanded }) => {
     return expanded || timelineViewIsTabbed || timelineViewIsStacked
   })(beats)
     .filter(({ id }) => {
@@ -668,7 +654,11 @@ export const sortedBeatsHierachyLevels = createSelector(
   rawUnsafeFullStateSelector,
   (beats, state) => {
     return beats.map((beat) => {
-      return hierarchyLevelSelector(state, beat.id)
+      return hierarchyLevelSelector(
+        state,
+        // @ts-ignore
+        beat.id
+      )
     })
   }
 )
@@ -789,13 +779,17 @@ export const _searchedCardMetaDataMapSelector = createDeepEqualSelector(
 
     const filteredCards = (
       lowerCaseSearchTerms
-        ? cards.filter(({ id, beatId }) => {
+        ? cards.filter(({ id }) => {
             return outOfOrderSearch(lowerCaseSearchTerms, stringifiedCards[id])
           })
         : cards
     ).filter(({ beatId }) => {
-      const beatIsALeaf = depth(beats, beatId) === hierarchyLevelCount - 1
-      return !timelineViewIsStacked || beatIsALeaf
+      if (!beatIds.includes(beatId)) {
+        return false
+      } else {
+        const beatIsALeaf = depth(beats, beatId) === hierarchyLevelCount - 1
+        return !timelineViewIsStacked || beatIsALeaf
+      }
     })
 
     return filteredCards.reduce(
@@ -851,7 +845,7 @@ function cardIsVisible(card, filter, filterIsEmpty) {
       if (card[attr] !== undefined) {
         return card[attr] === val
       }
-      if (!val && !card[attr]) {
+      if (!val && val !== 0 && !card[attr]) {
         return true
       }
       if (attr == 'tag') {

@@ -1,4 +1,4 @@
-import exampleFile from '../v2/store/exampleFile'
+import exampleFile from '../v2/store/exampleFile.json'
 import { schema } from '../v2/store/fileSchema'
 
 function main() {

@@ -28,9 +28,10 @@ function stripListTable(rtfString) {
 
 // String -> Promise<NodeList>
 export const rtfToHTML = (string) => {
-  import('rtf.js').then(({ RTFJS }) => {
+  return import('rtf.js').then(({ RTFJS }) => {
     RTFJS.loggingEnabled(false)
 
+    // @ts-ignore
     const doc = new RTFJS.Document(stringToArrayBuffer(stripListTable(string)))
     return doc.render().catch((error) => {
       // FIXME: this wont work on the web :/

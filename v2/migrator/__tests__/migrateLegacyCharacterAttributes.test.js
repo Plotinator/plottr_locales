@@ -95,11 +95,15 @@ describe('migrateLegacyCharacterAttributes', () => {
                 return oldCharacter.id === character.id
               }
             )
+            // @ts-ignore
             if (typeof oldCharacter[legacyAttribute.name] !== 'undefined') {
               const newAttributeValue = character.attributes?.find((newAttribute) => {
                 return newAttribute.id === attributeId && newAttribute.bookId === 'all'
               })?.value
-              expect(newAttributeValue).toBe(oldCharacter[legacyAttribute.name])
+              expect(newAttributeValue).toBe(
+                // @ts-ignore
+                oldCharacter[legacyAttribute.name]
+              )
             }
           }
         }
@@ -168,11 +172,15 @@ describe('migrateLegacyCharacterAttributes', () => {
                 return oldCharacter.id === character.id
               }
             )
+            // @ts-ignore
             if (typeof oldCharacter[legacyAttribute.name] !== 'undefined') {
               const newAttributeValue = character.attributes.find((newAttribute) => {
                 return newAttribute.id === attributeId && newAttribute.bookId === 'all'
               })?.value
-              expect(newAttributeValue).toBe(oldCharacter[legacyAttribute.name])
+              expect(newAttributeValue).toBe(
+                // @ts-ignore
+                oldCharacter[legacyAttribute.name]
+              )
             }
           }
         }
@@ -289,7 +297,10 @@ describe('migrateLegacyCharacterAttributes', () => {
             const newAttribute = character?.attributes?.find(({ id }) => {
               return id === 3
             })
-            expect(newAttribute.value).toBe(legacyCharacter.attributes)
+            expect(newAttribute.value).toBe(
+              // @ts-ignore
+              legacyCharacter.attributes
+            )
           }
         }
       })

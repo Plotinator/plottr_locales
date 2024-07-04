@@ -270,7 +270,7 @@ function lines(state = [], action) {
   }
 }
 
-const customAttributes = (dataRepairers) =>
+const customAttributes = (_dataRepairers) =>
   combineReducers({
     characters,
     places,

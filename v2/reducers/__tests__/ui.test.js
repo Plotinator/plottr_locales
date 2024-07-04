@@ -31,6 +31,7 @@ const addCharacterToCard = wiredUpActions.card.addCharacter
 const { addCharacter, editCharacterAttributeValue } = wiredUpActions.character
 const { setAppSettings } = wiredUpActions.settings
 const { setPermission } = wiredUpActions.permission
+const { addBeat } = wiredUpActions.beat
 const loadLines = wiredUpActions.line.load
 
 const {
@@ -968,15 +969,16 @@ const exampleCard1 = {
   title: 'Card 1',
   description: 'Card 1 description',
   lineId: 1,
-  beatId: 1,
+  beatId: 2,
 }
 
 describe('moveCardToBook', () => {
   describe('when a card dialog is open', () => {
     it('should close the card dialog', () => {
       const store = initialStore()
+      store.dispatch(addBeat(1, null))
       store.dispatch(addCard(exampleCard1))
-      store.dispatch(setCardDialogOpen(1, 1, 1))
+      store.dispatch(setCardDialogOpen(1, 2, 1))
       const cardIsOpen = isCardDialogVisibleSelector(store.getState())
       expect(cardIsOpen).toBeTruthy()
       store.dispatch(moveCardToBook('series', 1))

@@ -4,7 +4,7 @@ import convert from '../from_html'
 export default function migrate(data) {
   if (data.file && data.file.version === '2020.5.5') return data
 
-  var obj = cloneDeep(data)
+  const obj = cloneDeep(data)
 
   // fix up characters
   // make sure noteIds & cards fields are not null

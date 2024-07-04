@@ -133,7 +133,7 @@ export const removeBook = (id, bookId) => (dispatch, getState) => {
     if (allCharactersByBook.length === 1) {
       dispatch({ type: SELECT_CHARACTER_ATTRIBUTE_BOOK_TAB, bookId: 'all' })
     }
-  })(dispatch, getState)
+  })(dispatch)
 }
 
 export function removeTemplateFromCharacter(id, templateId) {
@@ -214,7 +214,11 @@ export const editCharacterAttributeValue =
         })
       }
     } else {
-      const legacyCustomAttribute = legacyCustomCharacterAttributeByName(state, attributeId)
+      const legacyCustomAttribute = legacyCustomCharacterAttributeByName(
+        state,
+        // @ts-ignore
+        attributeId
+      )
       if (legacyCustomAttribute) {
         const characterAttributes = characterAttributesForBookSelector(state)
         const nextAttributeId = nextId(characterAttributes)
@@ -227,7 +231,7 @@ export const editCharacterAttributeValue =
             attributeName: attributeId,
           })
           editCharacterAttributeValue(characterId, nextAttributeId, value)(dispatch, getState)
-        })(dispatch, getState)
+        })(dispatch)
       }
     }
 
@@ -275,7 +279,7 @@ export const reorderCharacter =
       Object.entries(visibleSortedCharactersByCategorySelector(getState())),
       ([groupName, _characters]) => groupName
     )
-      .flatMap(([groupName, characters]) => {
+      .flatMap(([_groupName, characters]) => {
         return characters
       })
       .map(({ id }) => {

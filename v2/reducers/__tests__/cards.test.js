@@ -134,6 +134,7 @@ describe('cardsReducer', () => {
     expect(cardsReducer(emptyState, { type: 'herpa' })).toEqual(emptyState)
   })
   it('should produce a valid state when given no state object', () => {
+    // @ts-ignore
     expect(cardsReducer(null, { type: 'derp' })).toEqual(emptyState)
   })
   describe('add card', () => {
@@ -147,6 +148,7 @@ describe('cardsReducer', () => {
     })
     it('should produce a two card state from a one card state', () => {
       expect(
+        // @ts-ignore
         allCardsSelector(mountToState(cardsReducer(oneCardState, { type: ADD_CARD, card: {} })))
       ).toHaveLength(2)
     })
@@ -154,6 +156,7 @@ describe('cardsReducer', () => {
       expect(
         uniq(
           allCardsSelector(
+            // @ts-ignore
             mountToState(cardsReducer(oneCardState, { type: ADD_CARD, card: {} }))
           ).map(({ id }) => id)
         )
@@ -161,6 +164,7 @@ describe('cardsReducer', () => {
     })
     it('should produce a one card state from an undefined state object', () => {
       expect(
+        // @ts-ignore
         allCardsSelector(mountToState(cardsReducer(undefined, { type: ADD_CARD, card: {} })))
       ).toHaveLength(1)
     })
@@ -179,6 +183,7 @@ describe('cardsReducer', () => {
         it('should add a new card at positionWithinLine = 0', () => {
           expect(
             allCardsSelector(
+              // @ts-ignore
               mountToState(
                 cardsReducer(oneCardState, {
                   type: ADD_CARD_IN_BEAT,
@@ -197,6 +202,7 @@ describe('cardsReducer', () => {
         it('should add a new card at positionWithinLine = 1', () => {
           expect(
             allCardsSelector(
+              // @ts-ignore
               mountToState(
                 cardsReducer(oneCardState, {
                   type: ADD_CARD_IN_BEAT,
@@ -216,6 +222,7 @@ describe('cardsReducer', () => {
   describe('add lines from template', () => {
     it('should add all given cards to the state with correct ids', () => {
       const result = allCardsSelector(
+        // @ts-ignore
         mountToState(
           cardsReducer(emptyState, {
             type: ADD_LINES_FROM_TEMPLATE,
@@ -266,6 +273,7 @@ describe('cardsReducer', () => {
         it('should edit that card', () => {
           expect(
             allCardsSelector(
+              // @ts-ignore
               mountToState(
                 cardsReducer(oneCardState, {
                   type: EDIT_CARD_DETAILS,
@@ -322,6 +330,7 @@ describe('cardsReducer', () => {
         it('should add the attribute to those cards', () => {
           expect(
             allCardsSelector(
+              // @ts-ignore
               mountToState(
                 cardsReducer(fourCardState, {
                   type: EDIT_CARDS_ATTRIBUTE,
@@ -367,6 +376,7 @@ describe('reorderCardTemplateAttribute', () => {
     const template1SecondReorderNewPosition = 1 //cardtemplate1
 
     const withTemplate1 = allCardsSelector(
+      // @ts-ignore
       mountToState(
         cardsReducer(oneCardState, {
           type: ADD_TEMPLATE_TO_CARD,
@@ -376,6 +386,7 @@ describe('reorderCardTemplateAttribute', () => {
       )
     )
     const withTemplate2 = allCardsSelector(
+      // @ts-ignore
       mountToState(
         cardsReducer(withTemplate1, {
           type: ADD_TEMPLATE_TO_CARD,
@@ -385,6 +396,7 @@ describe('reorderCardTemplateAttribute', () => {
       )
     )
     const cardWithTemplates = allCardsSelector(
+      // @ts-ignore
       mountToState(
         cardsReducer(withTemplate2, {
           type: ADD_TEMPLATE_TO_CARD,
@@ -406,6 +418,7 @@ describe('reorderCardTemplateAttribute', () => {
       1
     )
     const allCardsAfterReorder = allCardsSelector(
+      // @ts-ignore
       mountToState(
         cardsReducer(cardWithTemplates, {
           type: REORDER_CARD_TEMPLATE_ATTRIBUTES,
@@ -439,6 +452,7 @@ describe('reorderCardTemplateAttribute', () => {
         1
       )
       const cardsAfterSecondReorder = allCardsSelector(
+        // @ts-ignore
         mountToState(
           cardsReducer(allCardsAfterReorder, {
             type: REORDER_CARD_TEMPLATE_ATTRIBUTES,

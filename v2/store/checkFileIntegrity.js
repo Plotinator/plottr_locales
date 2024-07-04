@@ -25,6 +25,7 @@ export const checkForMinimalSetOfKeys =
         actionTrail
       )}`
       const error = new Error(errorMessage)
+      // @ts-ignore
       error.code = FILE_LACKS_ALL_KEYS
       return Promise.reject(error)
     }
@@ -41,6 +42,7 @@ export const checkForMissingCharacterAttributes =
         actionTrail
       )}`
       const error = new Error(errorMessage)
+      // @ts-ignore
       error.code = FILE_HAS_NO_CHARACTER_ATTRIBUTES
       return Promise.reject(error)
     }
@@ -63,6 +65,7 @@ export const checkForMissingCharacterAttributes =
         actionTrail
       )}`
       const error = new Error(errorMessage)
+      // @ts-ignore
       error.code = FILE_LACKS_CHARACTER_ATTRIBUTE_METADATA
       return Promise.reject(error)
     }
@@ -79,6 +82,7 @@ export const checkForBrokenCharacterAttributesRelationships =
         actionTrail
       )}`
       const error = new Error(errorMessage)
+      // @ts-ignore
       error.code = FILE_HAS_NO_CHARACTER_ATTRIBUTES
       return Promise.reject(error)
     }
@@ -90,6 +94,7 @@ export const checkForBrokenCharacterAttributesRelationships =
         brokenAttributeMetadata
       )}.  Action trail: ${JSON.stringify(actionTrail)}`
       const error = new Error(errorMessage)
+      // @ts-ignore
       error.code = FILE_CONTAINS_INVALID_CHARACTER_ATTRIBUTE_METADATA
       return Promise.reject(error)
     }
@@ -111,6 +116,7 @@ export const checkForBrokenCharacterAttributesRelationships =
         brokenCharacterAttributes
       )}.  Action trail: ${JSON.stringify(actionTrail)}`
       const error = new Error(errorMessage)
+      // @ts-ignore
       error.code = FILE_CONTAINS_INVALID_CHARACTER_ATTRIBUTE_VALUES
       return Promise.reject(error)
     }
@@ -132,6 +138,7 @@ export const checkForBrokenCharacterAttributesRelationships =
         actionTrail
       )}`
       const error = new Error(errorMessage)
+      // @ts-ignore
       error.code = FILE_HAS_DUPLICATED_CHARACTER_ATTIRBUTES
       return Promise.reject(error)
     }

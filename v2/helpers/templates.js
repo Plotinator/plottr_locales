@@ -14,16 +14,16 @@ const children = (beatTree, id) => {
   return tree.children(beatTree, id)
 }
 
-export const maxDepthIncludingRoot = (beatTree, nodeId) => {
-  return 1 + tree.maxDepth('id')(beatTree, nodeId)
+export const maxDepthIncludingRoot = (beatTree) => {
+  return 1 + tree.maxDepth('id')(beatTree)
 }
 
 const depth = (beatTree, nodeId) => {
   if (nodeId === null) {
     return 0
+  } else {
+    return 1 + tree.depth(beatTree, nodeId)
   }
-
-  return 1 + tree.depth(beatTree, nodeId)
 }
 
 // Compute a two-element array that indicates at what depth to start
@@ -39,8 +39,8 @@ const depth = (beatTree, nodeId) => {
 //
 // Note: only the parent of a tree has a depth of 0.
 const computeMergeStart = (tree1, tree2, bias2, selectedIndex) => {
-  const depth1 = maxDepthIncludingRoot(tree1, null)
-  const depth2 = maxDepthIncludingRoot(tree2, null)
+  const depth1 = maxDepthIncludingRoot(tree1)
+  const depth2 = maxDepthIncludingRoot(tree2)
 
   const target1 =
     (selectedIndex || selectedIndex == 0) && depth2 <= depth1 - selectedIndex ? selectedIndex : null
@@ -182,7 +182,7 @@ export const mergeTrees = (
   selectedIndex,
   keepOnlyBeatsWithCards = false
 ) => {
-  const maxDepth1 = maxDepthIncludingRoot(tree1, null)
+  const maxDepth1 = maxDepthIncludingRoot(tree1)
   const [startDepth1, startDepth2] = computeMergeStart(tree1, tree2, bias2, selectedIndex)
 
   const mergeSubTree = (newTree, newBeatId, parent1, beat1, beat2) => {

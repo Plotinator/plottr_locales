@@ -146,7 +146,7 @@ export const dismissUndoRedoDialog = () => {
   }
 }
 
-export const batch = (name, actionsThunk) => (dispatch, getState) => {
+export const batch = (name, actionsThunk) => (dispatch) => {
   reduxBatch(() => {
     dispatch({ type: FORCED_BATCH_START, name })
     actionsThunk()

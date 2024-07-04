@@ -25,7 +25,7 @@ const noneIsTransparent = (borderStyle, borderColor) => {
 }
 
 export const hierarchyToStyles = (
-  { level, textSize, borderStyle, backgroundColor },
+  { textSize, borderStyle, backgroundColor },
   timelineSize,
   hovering,
   theme,

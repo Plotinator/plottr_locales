@@ -398,12 +398,23 @@ export const sortedHierarchyLevels = createSelector(
   }
 )
 const beatIdSelector = (state, beatId) => beatId
+export const beatExistsSelector = createSelector(
+  beatsByBookSelector,
+  beatIdSelector,
+  (beats, beatId) => {
+    return typeof beats.index[beatId] === 'object'
+  }
+)
 export const hierarchyLevelSelector = createSelector(
   beatsByBookSelector,
   beatIdSelector,
   sortedHierarchyLevels,
-  (beats, beatId, hierarchyLevels) => {
-    return hierarchyLevels[depth(beats, beatId)] || hierarchyLevels[hierarchyLevels.length - 1]
+  beatExistsSelector,
+  (beats, beatId, hierarchyLevels, beatExists) => {
+    return (
+      (beatExists && hierarchyLevels[depth(beats, beatId)]) ||
+      hierarchyLevels[hierarchyLevels.length - 1]
+    )
   }
 )
 export const hierarchyLevelsForAnotherBookSelector = createSelector(
@@ -418,8 +429,9 @@ export const atMaximumHierarchyDepthSelector = createSelector(
   beatsByBookSelector,
   beatIdSelector,
   sortedHierarchyLevels,
-  (beats, beatId, hierarchyLevels) => {
-    return depth(beats, beatId) === hierarchyLevels.length - 1
+  beatExistsSelector,
+  (beats, beatId, hierarchyLevels, beatExists) => {
+    return beatExists && depth(beats, beatId) === hierarchyLevels.length - 1
   }
 )
 
@@ -427,8 +439,9 @@ export const hierarchyLevelNameSelector = createSelector(
   beatsByBookSelector,
   beatIdSelector,
   sortedHierarchyLevels,
-  (beats, beatId, hierarchyLevels) => {
-    if (!beatId) return hierarchyLevels[0]?.name
+  beatExistsSelector,
+  (beats, beatId, hierarchyLevels, beatExists) => {
+    if (!beatId || !beatExists) return hierarchyLevels[0]?.name
     return (
       (hierarchyLevels[depth(beats, beatId)] || hierarchyLevels[hierarchyLevels.length - 1])
         ?.name ?? hierarchyLevels[0]?.name
@@ -442,16 +455,17 @@ export const beatInsertControlHierarchyLevelNameSelector = createSelector(
   sortedHierarchyLevels,
   timelineViewIsTabbedSelector,
   timelineViewIsDefaultSelector,
-  (beats, beatId, hierarchyLevels, timelineViewIsTabbed, timelineViewIsDefault) => {
+  beatExistsSelector,
+  (beats, beatId, hierarchyLevels, timelineViewIsTabbed, timelineViewIsDefault, beatExists) => {
     if (timelineViewIsTabbed) {
-      if (depth(beats, beatId) === 0) {
+      if (!beatExists || depth(beats, beatId) === 0) {
         return (hierarchyLevels[1] || hierarchyLevels[0]).name
       } else if (!beatId) {
         return (hierarchyLevels[2] || hierarchyLevels[1] || hierarchyLevels[0]).name
       }
     }
 
-    if (timelineViewIsDefault && !beatId) {
+    if (!beatExists || (timelineViewIsDefault && !beatId)) {
       return hierarchyLevels[0].name
     } else {
       return (hierarchyLevels[depth(beats, beatId)] || hierarchyLevels[hierarchyLevels.length - 1])
@@ -464,8 +478,9 @@ export const hierarchyChildLevelNameSelector = createSelector(
   beatsByBookSelector,
   beatIdSelector,
   sortedHierarchyLevels,
-  (beats, beatId, hierarchyLevels) => {
-    if (!beatId) return (hierarchyLevels[1] || hierarchyLevels[0]).name
+  beatExistsSelector,
+  (beats, beatId, hierarchyLevels, beatExists) => {
+    if (!beatId || !beatExists) return (hierarchyLevels[1] || hierarchyLevels[0]).name
     const newDepth = depth(beats, beatId) + 1
     const level = hierarchyLevels[newDepth]
     if (level) {

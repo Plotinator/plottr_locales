@@ -94,6 +94,7 @@ describe('updatePrevious', () => {
         updatePrevious(hamletKeyed, [{ path: ['file'], change: 'UPDATED', index: null }], state)
         for (const key of Object.keys(hamletKeyed)) {
           if (key === 'file') {
+            // @ts-ignore
             expect(hamletKeyed.file).toBe(state.file)
           } else {
             expect(hamletKeyed[key]).toBe(original[key])
@@ -112,6 +113,7 @@ describe('updatePrevious', () => {
           return id === 10
         })
         expect(indexOfCardWithId10).toBeGreaterThan(-1)
+        // @ts-ignore
         state.cards[indexOfCardWithId10].blargyBlargy = 'new stuff to test swap in'
         updatePrevious(
           hamletKeyed,
@@ -120,13 +122,18 @@ describe('updatePrevious', () => {
         )
         for (const key of Object.keys(hamletKeyed)) {
           if (key === 'cards') {
+            // @ts-ignore
             expect([...hamletKeyed.cards.keys()].length).toEqual([...original.cards.keys()].length)
+            // @ts-ignore
             expect([...hamletKeyed.cards.keys()].length).toEqual(state.cards.length)
             for (let index = 0; index < state.cards.length; ++index) {
               if (index === indexOfCardWithId10) {
+                // @ts-ignore
                 expect(hamletKeyed.cards.get(state.cards[index].id)).toBe(state.cards[index])
               } else {
+                // @ts-ignore
                 expect(hamletKeyed.cards.get(state.cards[index].id)).toBe(
+                  // @ts-ignore
                   original.cards.get(state.cards[index].id)
                 )
               }
@@ -166,6 +173,7 @@ describe('computeNewPaths', () => {
     describe('given an object that did not change', () => {
       it('should produce an empty array', () => {
         const hamletKeyed = keyFlatArraysById(
+          // @ts-ignore
           wiredSelectors.fullFileStateSelector(hamletWithSelectedFile)
         )
         const paths = computeNewPaths(hamletKeyed, hamletWithSelectedFile, wiredSelectors)
@@ -175,6 +183,7 @@ describe('computeNewPaths', () => {
     describe('given a single arbitrary change to the state object', () => {
       it('should compute the corresponding paths', () => {
         const hamletKeyed = keyFlatArraysById(
+          // @ts-ignore
           wiredSelectors.fullFileStateSelector(hamletWithSelectedFile)
         )
         const allPaths = Object.keys(hamlet).reduce((acc, key) => {
@@ -193,6 +202,7 @@ describe('computeNewPaths', () => {
           fc.property(fc.integer({ min: 0, max: allPaths.length - 1 }), (pathToChange) => {
             const path = allPaths[pathToChange]
             const key = path[0]
+            // @ts-ignore
             const fileStateWithChange = wiredSelectors.fullFileStateSelector(hamletWithSelectedFile)
             const toChange = clone(fileStateWithChange[key])
             if (path.length === 2) {
@@ -246,9 +256,11 @@ describe('computeNewPaths', () => {
             }),
             (rawPathIndicesToChange) => {
               const file = cloneDeep(hamletWithSelectedFile)
+              // @ts-ignore
               const hamletKeyed = keyFlatArraysById(wiredSelectors.fullFileStateSelector(file))
               const pathIndicesToChange = uniq(rawPathIndicesToChange)
               const stateWithChange = clone(file)
+              // @ts-ignore
               const fileStateWithChange = wiredSelectors.fullFileStateSelector(stateWithChange)
               for (const pathIndex of pathIndicesToChange) {
                 const path = allPaths[pathIndex % allPaths.length]
@@ -306,7 +318,9 @@ describe('computeNewPaths', () => {
           },
         }
         const file = cloneDeep(hamletWithSelectedFile)
+        // @ts-ignore
         const hamletKeyed = keyFlatArraysById(wiredSelectors.fullFileStateSelector(file))
+        // @ts-ignore
         const fileState = wiredSelectors.fullFileStateSelector(file)
         fileState.file = {
           ...fileState.file,
@@ -340,7 +354,9 @@ describe('computeNewPaths', () => {
           },
         }
         const file = cloneDeep(hamletWithSelectedFile)
+        // @ts-ignore
         const hamletKeyed = keyFlatArraysById(wiredSelectors.fullFileStateSelector(file))
+        // @ts-ignore
         const fileState = wiredSelectors.fullFileStateSelector(file)
         fileState.file = {
           ...fileState.file,
@@ -358,7 +374,9 @@ describe('computeNewPaths', () => {
     })
     describe('given that the project key changes', () => {
       const file = cloneDeep(hamletWithSelectedFile)
+      // @ts-ignore
       const hamletKeyed = keyFlatArraysById(wiredSelectors.fullFileStateSelector(file))
+      // @ts-ignore
       const systemState = wiredSelectors.fullSystemStateSelector(file)
       systemState.project = {
         ...systemState.project,

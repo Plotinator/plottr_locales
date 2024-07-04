@@ -33,6 +33,7 @@ describe('collapsedBeatSelector', () => {
       },
     }
     it('should produce an empty map', () => {
+      // @ts-ignore
       const collapsedBeats = collapsedBeatSelector(state)
       expect(collapsedBeats.size).toEqual(0)
     })
@@ -85,6 +86,7 @@ describe('collapsedBeatSelector', () => {
         },
       }
       it('should produce a single entry map, whose sole value is null', () => {
+        // @ts-ignore
         const collapsedBeats = collapsedBeatSelector(state)
         expect(collapsedBeats.size).toEqual(1)
         expect(collapsedBeats.get(1)).toEqual(null)
@@ -137,6 +139,7 @@ describe('collapsedBeatSelector', () => {
         },
       }
       it('should produce a single entry map, whose sole value is itself', () => {
+        // @ts-ignore
         const collapsedBeats = collapsedBeatSelector(state)
         expect(collapsedBeats.size).toEqual(1)
         expect(collapsedBeats.get(1)).toEqual(1)
@@ -205,6 +208,7 @@ describe('collapsedBeatSelector', () => {
           },
         }
         it('should produce a two entry map, whose values are both null', () => {
+          // @ts-ignore
           const collapsedBeats = collapsedBeatSelector(state)
           expect(collapsedBeats.size).toEqual(2)
           expect(collapsedBeats.get(1)).toEqual(null)
@@ -271,6 +275,7 @@ describe('collapsedBeatSelector', () => {
           },
         }
         it('should produce a two entry map, where only one beat is collapsed', () => {
+          // @ts-ignore
           const collapsedBeats = collapsedBeatSelector(state)
           expect(collapsedBeats.size).toEqual(2)
           expect(collapsedBeats.get(1)).toEqual(1)
@@ -339,6 +344,7 @@ describe('collapsedBeatSelector', () => {
           },
         }
         it('should produce a two entry map, whose values are both null', () => {
+          // @ts-ignore
           const collapsedBeats = collapsedBeatSelector(state)
           expect(collapsedBeats.size).toEqual(2)
           expect(collapsedBeats.get(1)).toEqual(null)
@@ -405,6 +411,7 @@ describe('collapsedBeatSelector', () => {
           },
         }
         it('should produce a two entry map, where only the child is collapsed', () => {
+          // @ts-ignore
           const collapsedBeats = collapsedBeatSelector(state)
           expect(collapsedBeats.size).toEqual(2)
           expect(collapsedBeats.get(1)).toEqual(null)
@@ -471,6 +478,7 @@ describe('collapsedBeatSelector', () => {
           },
         }
         it('should produce a two entry map, where the child and parent reference the parent', () => {
+          // @ts-ignore
           const collapsedBeats = collapsedBeatSelector(state)
           expect(collapsedBeats.size).toEqual(2)
           expect(collapsedBeats.get(1)).toEqual(1)
@@ -537,6 +545,7 @@ describe('collapsedBeatSelector', () => {
           },
         }
         it('should produce a two entry map, where the child and parent reference the parent', () => {
+          // @ts-ignore
           const collapsedBeats = collapsedBeatSelector(state)
           expect(collapsedBeats.size).toEqual(2)
           expect(collapsedBeats.get(1)).toEqual(1)
@@ -619,6 +628,7 @@ describe('collapsedBeatSelector', () => {
         },
       }
       it('should produce a three entry map, whose values are all null', () => {
+        // @ts-ignore
         const collapsedBeats = collapsedBeatSelector(state)
         expect(collapsedBeats.size).toEqual(3)
         expect(collapsedBeats.get(1)).toEqual(null)
@@ -699,6 +709,7 @@ describe('collapsedBeatSelector', () => {
         },
       }
       it('should produce a three entry map, where the leaf references itself', () => {
+        // @ts-ignore
         const collapsedBeats = collapsedBeatSelector(state)
         expect(collapsedBeats.size).toEqual(3)
         expect(collapsedBeats.get(1)).toEqual(null)
@@ -779,6 +790,7 @@ describe('collapsedBeatSelector', () => {
         },
       }
       it('should produce a three entry map, where the leaf references itself', () => {
+        // @ts-ignore
         const collapsedBeats = collapsedBeatSelector(state)
         expect(collapsedBeats.size).toEqual(3)
         expect(collapsedBeats.get(1)).toEqual(null)
@@ -859,6 +871,7 @@ describe('collapsedBeatSelector', () => {
         },
       }
       it('should produce a three entry map, where all nodes reference the parent', () => {
+        // @ts-ignore
         const collapsedBeats = collapsedBeatSelector(state)
         expect(collapsedBeats.size).toEqual(3)
         expect(collapsedBeats.get(1)).toEqual(1)
@@ -939,6 +952,7 @@ describe('collapsedBeatSelector', () => {
         },
       }
       it('should produce a three entry map, where the leaf and middle reference the middle', () => {
+        // @ts-ignore
         const collapsedBeats = collapsedBeatSelector(state)
         expect(collapsedBeats.size).toEqual(3)
         expect(collapsedBeats.get(1)).toEqual(null)
@@ -1019,6 +1033,7 @@ describe('collapsedBeatSelector', () => {
         },
       }
       it('should produce a three entry map, where all nodes reference the root', () => {
+        // @ts-ignore
         const collapsedBeats = collapsedBeatSelector(state)
         expect(collapsedBeats.size).toEqual(3)
         expect(collapsedBeats.get(1)).toEqual(1)
@@ -1140,6 +1155,7 @@ describe('collapsedBeatSelector', () => {
         },
       }
       it('produce a map containing all nodes where only the collapsed branch is collapsed', () => {
+        // @ts-ignore
         const collapsedBeats = collapsedBeatSelector(state)
         expect(collapsedBeats.size).toEqual(6)
         expect(collapsedBeats.get(1)).toEqual(null)

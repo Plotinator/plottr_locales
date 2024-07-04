@@ -8,7 +8,7 @@ const parser = new DomParser()
 export default function migrate(data) {
   if (data.file && data.file.version === '2020.3.26') return data
 
-  var obj = cloneDeep(data)
+  const obj = cloneDeep(data)
 
   // convert all descriptions (where markdown was possible) to slate
 

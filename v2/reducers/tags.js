@@ -10,6 +10,7 @@ import {
   LOAD_TAGS,
   DUPLICATE_TAG,
   REPLACE_MARKED_HITS,
+  ADD_TAG_FROM_PLTR,
   UNDO,
   REDO,
   UNDO_N_TIMES,
@@ -25,7 +26,7 @@ import { replacePlainTextHit } from './replace'
 const initialState = [tag]
 
 const tags =
-  (dataRepairers) =>
+  (_dataRepairers) =>
   (state = initialState, action) => {
     switch (action.type) {
       case ADD_TAG:
@@ -133,6 +134,15 @@ const tags =
           id: nextId(state),
         }
         return [...state, { ...duplicated }]
+      }
+
+      case ADD_TAG_FROM_PLTR: {
+        const newTag = {
+          ...cloneDeep(action.tag),
+          id: nextId(state),
+          isChecked: undefined,
+        }
+        return [...state, { ...newTag }]
       }
 
       case UNDO_N_TIMES:

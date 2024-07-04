@@ -14,7 +14,7 @@ import * as seriesActions from './series'
 import * as tagActions from './tags'
 import * as uiActions from './ui'
 import * as hierarchyActions from './hierarchy'
-import * as featureFlagActions from './featureFlags'
+import * as featureFlagsActions from './featureFlags'
 import * as errorActions from './error'
 import * as permissionActions from './permission'
 import * as projectActions from './project'
@@ -26,10 +26,10 @@ import * as settingsActions from './settings'
 import * as backupsActions from './backups'
 import * as applicationStateActions from './applicationState'
 import * as imageCacheActions from './imageCache'
-import * as notificationActions from './notifications'
-import * as domEventActions from './domEvents'
+import * as notificationsActions from './notifications'
+import * as domEventsActions from './domEvents'
 import * as testingAndDiagnosisActions from './testingAndDiagnosis'
-import * as attributeActions from './attributes'
+import * as attributesActions from './attributes'
 import * as undoActions from './undo'
 
 const actions = (selectState) => {
@@ -109,7 +109,7 @@ const actions = (selectState) => {
     tag: tagActions,
     ui: uiActions,
     hierarchyLevels: hierarchyActions,
-    featureFlags: featureFlagActions,
+    featureFlags: featureFlagsActions,
     error: errorActions,
     permission: permissionActions,
     project: projectActions,
@@ -121,18 +121,53 @@ const actions = (selectState) => {
     backups: backupsActions,
     applicationState: applicationStateActions,
     imageCache: imageCacheActions,
-    notifications: notificationActions,
-    domEvents: domEventActions,
+    notifications: notificationsActions,
+    domEvents: domEventsActions,
     testingAndDiagnosis: testingAndDiagnosisActions,
-    attributes: attributeActions,
+    attributes: attributesActions,
     undo: undoActions,
-  }).reduce((actionsAcc, nextEntry) => {
-    const [name, actionBundle] = nextEntry
-    return {
-      ...actionsAcc,
-      [name]: wiredActions(actionBundle),
+  }).reduce(
+    (actionsAcc, nextEntry) => {
+      const [name, actionBundle] = nextEntry
+      return {
+        ...actionsAcc,
+        [name]: wiredActions(actionBundle),
+      }
+    },
+    {
+      beat: beatActions,
+      book: bookActions,
+      card: cardActions,
+      category: categoryActions,
+      character: characterActions,
+      customAttribute: customAttributeActions,
+      image: imageActions,
+      line: lineActions,
+      note: noteActions,
+      place: placeActions,
+      series: seriesActions,
+      tag: tagActions,
+      ui: uiActions,
+      hierarchyLevels: hierarchyActions,
+      featureFlags: featureFlagsActions,
+      error: errorActions,
+      permission: permissionActions,
+      project: projectActions,
+      client: clientActions,
+      license: licenseActions,
+      knownFiles: knownFilesActions,
+      templates: templatesActions,
+      settings: settingsActions,
+      backups: backupsActions,
+      applicationState: applicationStateActions,
+      imageCache: imageCacheActions,
+      notifications: notificationsActions,
+      domEvents: domEventsActions,
+      testingAndDiagnosis: testingAndDiagnosisActions,
+      attributes: attributesActions,
+      undo: undoActions,
     }
-  }, {})
+  )
 }
 
 export default actions

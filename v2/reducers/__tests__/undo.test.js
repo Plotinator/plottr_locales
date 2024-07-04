@@ -66,7 +66,7 @@ describe('isAttributeEditThatShouldntBeBatched', () => {
       const dispatch = (dispatchedAction) => {
         action = dispatchedAction
       }
-      editCharacterAttributeValue(1, 1, 'test', 'blah', null)(dispatch, getState)
+      editCharacterAttributeValue(1, 1, 'test', 'blah')(dispatch, getState)
       expect(isAttributeEditThatShouldntBeBatched(action)).toBeFalsy()
     })
     it('editCharacterTemplateAttribute: should produce false', () => {
@@ -118,8 +118,7 @@ describe('isAttributeEditThatShouldntBeBatched', () => {
         1,
         2,
         [{ children: [{ text: 'blah' }] }],
-        'test',
-        null
+        'test'
       )(dispatch, getState)
       expect(isAttributeEditThatShouldntBeBatched(action)).toBeTruthy()
     })

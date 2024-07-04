@@ -419,7 +419,13 @@ export const characterBookCategoriesSelector = createSelector(
             },
           ]
         : [],
-    ].flatMap((x) => x)
+    ].flatMap(
+      // @ts-ignore
+      (x) => {
+        // @ts-ignore
+        return x
+      }
+    )
   }
 )
 

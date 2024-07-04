@@ -26,7 +26,7 @@ export const fileListIsLoadingSelector = createSelector(
 
 export const importingNewProjectSelector = createSelector(
   projectStateSelector,
-  ({ isImportingNewProject }) => isImportingNewProject
+  ({ isImportingAProject }) => isImportingAProject
 )
 
 export const applicationSettingsSelector = createSelector(

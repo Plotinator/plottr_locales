@@ -20,9 +20,9 @@ export const singleTagSelector = createSelector(allTagsSelector, selectId, (tags
 
 export const tagsByCategorySelector = createSelector(allTagsSelector, (tags) => {
   const grouped = groupBy(tags, 'categoryId')
-  if (grouped[undefined] !== undefined) {
-    grouped[null] = grouped[undefined].concat(grouped[null] || [])
-    delete grouped[undefined]
+  if (grouped['undefined'] !== undefined) {
+    grouped['null'] = grouped['undefined'].concat(grouped['null'] || [])
+    delete grouped['undefined']
   }
   return grouped
 })

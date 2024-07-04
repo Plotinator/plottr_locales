@@ -162,7 +162,7 @@ export const duplicateLine = (id, position) => (dispatch, getState) => {
     if (selectedLine?.isPinned) {
       pinDuplicatedPlotline(id, position)(dispatch, getState)
     }
-  })(dispatch, getState)
+  })(dispatch)
 }
 
 export function load(patching, lines) {

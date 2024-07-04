@@ -24,6 +24,7 @@ import {
   UNSAFE_SET_BEATS,
   DUPLICATE_BOOK,
   REPLACE_MARKED_HITS,
+  ADD_BOOK_FROM_PLTR,
   UNDO,
   REDO,
   UNDO_N_TIMES,
@@ -73,7 +74,7 @@ const addNodeToState = (state, bookId, position, title, parentId) => {
 }
 
 const beats =
-  (dataReparires) =>
+  (_dataReparires) =>
   (state = INITIAL_STATE, action) => {
     const actionBookId = associateWithBroadestScope(action.bookId || action.newBookId)
 
@@ -108,6 +109,31 @@ const beats =
         const beats = action.newBeats
         const idMap = {}
         // this recreates the template's tree but with new ids
+        const newBeats = tree.reduce('id')(
+          beats,
+          (newBeatTree, nextBeat, parentId) => {
+            const newId = action.nextBeatId + nextBeat.id // give it a new id
+            idMap[nextBeat.id] = newId
+            const newParentId = idMap[parentId] || null
+            const newBeat = {
+              ...clone(nextBeat),
+              id: newId,
+              bookId: action.newBookId, // add it to the new book
+            }
+            return tree.addNode('id')(newBeatTree, newParentId, newBeat)
+          },
+          clone(newTree)
+        )
+
+        return {
+          ...state,
+          [action.newBookId]: newBeats,
+        }
+      }
+
+      case ADD_BOOK_FROM_PLTR: {
+        const beats = action.newBeats
+        const idMap = {}
         const newBeats = tree.reduce('id')(
           beats,
           (newBeatTree, nextBeat, parentId) => {
@@ -246,7 +272,7 @@ const beats =
           const depthOfPeer = tree.depth(newState, action.peerBeatId)
           const depthOfTree = tree.maxDepth('id')(newState)
           const [_finalBeatId, finalState] = range(depthOfTree - depthOfPeer).reduce(
-            (acc, next) => {
+            (acc, _next) => {
               const [lastBeatId, currentState] = acc
               const node = {
                 autoOutlineSort: true,
@@ -394,8 +420,8 @@ const beats =
         return sortByHitPosition(applicableHits).reduce((acc, nextHit) => {
           const { path, hit } = nextHit
           const [_, _beats, rawBookId, rawBeatId, type, ...rest] = path.split('/')
-          const bookId = safeParseInt(rawBookId)
-          const beatId = safeParseInt(rawBeatId)
+          const bookId = String(safeParseInt(rawBookId))
+          const beatId = String(safeParseInt(rawBeatId))
           const beat = acc[bookId].index[beatId]
           const [rawFocusStart] = rest
           const attributeName = type

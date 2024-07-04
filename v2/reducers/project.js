@@ -17,6 +17,7 @@ import {
   FILE_LOADED,
   FILE_SAVED,
   SET_KNOWN_FILES,
+  SAVE_IMPORT_PLTR_DATA,
   UNDO,
   REDO,
   UNDO_N_TIMES,
@@ -148,6 +149,7 @@ const projectReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         selectedFile: {
+          // @ts-ignore
           ...state.selectedFile,
           fileName: action.newName,
         },
@@ -160,6 +162,7 @@ const projectReducer = (state = INITIAL_STATE, action) => {
       }
     }
     case SET_KNOWN_FILES: {
+      // @ts-ignore
       const selectedFileURL = state.selectedFile?.fileURL
       const foundInList =
         (typeof selectedFileURL !== 'undefined' &&
@@ -170,6 +173,13 @@ const projectReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         selectedFile: foundInList,
+      }
+    }
+
+    case SAVE_IMPORT_PLTR_DATA: {
+      return {
+        ...state,
+        importModal: undefined,
       }
     }
     case UNDO_N_TIMES:

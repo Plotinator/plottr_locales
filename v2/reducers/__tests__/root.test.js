@@ -44,8 +44,11 @@ const rootReducer = rootReducerWithoutRepairers({
 
 describe('rootReducer', () => {
   describe('ADD_LINES_FROM_TEMPLATE', () => {
+    // @ts-ignore
     const enoughBeats = { user: require('./fixtures/enough_beats.json') }
+    // @ts-ignore
     const notEnoughBeats = { user: require('./fixtures/not_enough_beats.json') }
+    // @ts-ignore
     const templateData = require('./fixtures/7_point_template.json')
     const action = { type: ADD_LINES_FROM_TEMPLATE, templateData }
     describe('enough beats', () => {
@@ -53,12 +56,14 @@ describe('rootReducer', () => {
       const resultBeats = allBeatsSelector(result)
       const beatsAfter = beatsByPosition(() => true)(resultBeats['1']).map(({ id }) => id)
       it('doesnt add more beats', () => {
+        // @ts-ignore
         const enoughBeatsBeats = allBeatsSelector(enoughBeats)
         const beatsBefore = beatsByPosition(() => true)(enoughBeatsBeats['1']).map(({ id }) => id)
         expect(beatsBefore.length).toEqual(beatsAfter.length)
       })
       it('adds one line', () => {
         const resultLines = allLinesSelector(result)
+        // @ts-ignore
         const enoughBeatsLines = allLinesSelector(enoughBeats)
         expect(resultLines.length).toEqual(enoughBeatsLines.length + 1)
       })
@@ -77,6 +82,7 @@ describe('rootReducer', () => {
       const resultBeats = allBeatsSelector(result)
       const beatsAfter = beatsByPosition(() => true)(resultBeats['1']).map(({ id }) => id)
       it('adds more beats', () => {
+        // @ts-ignore
         const notEnoughBeatsBeats = allBeatsSelector(notEnoughBeats)
         const beatsBefore = beatsByPosition(() => true)(notEnoughBeatsBeats['1']).map(
           ({ id }) => id
@@ -85,6 +91,7 @@ describe('rootReducer', () => {
       })
       it('adds one line', () => {
         const resultLines = allLinesSelector(result)
+        // @ts-ignore
         const notEnoughBeatsLines = allLinesSelector(notEnoughBeats)
         expect(resultLines.length).toEqual(notEnoughBeatsLines.length + 1)
       })
@@ -135,20 +142,24 @@ describe('rootReducer', () => {
         expect(newLines.filter(({ bookId }) => bookId === 7).length).toEqual(3)
       })
       const newBeats = allBeatsSelector(newState)
+      // @ts-ignore
       const originalBeats = allBeatsSelector(zelda)
       it('should move the plotline without creating more beats', () => {
         expect(newBeats).toBe(originalBeats)
       })
       it('should move the cards to their corresponding beats', () => {
+        // @ts-ignore
         const oldCards = allCardsSelector(zelda)
         const cardsOnOriginalLine = oldCards.filter(({ lineId }) => lineId === 1)
         const newCards = allCardsSelector(newState)
         const cardsOnNewline = newCards.filter(({ lineId }) => lineId === 1)
-        const beatsInDestinationBook = sortedBeatsForAnotherBookSelector(newState, 7).map(
-          ({ id }) => {
-            return id
-          }
-        )
+        const beatsInDestinationBook = sortedBeatsForAnotherBookSelector(
+          newState,
+          // @ts-ignore
+          7
+        ).map(({ id }) => {
+          return id
+        })
         for (let i = 0; i < cardsOnNewline.length; ++i) {
           expect(beatsInDestinationBook.indexOf(cardsOnNewline[i].beatId)).toBeGreaterThan(-1)
         }
@@ -170,19 +181,23 @@ describe('rootReducer', () => {
           expect(newStateLines.filter(({ bookId }) => bookId === 'series').length).toEqual(2)
         })
         it('should move the plotline without creating more beats', () => {
+          // @ts-ignore
           const zeldaBeats = allBeatsSelector(zelda)
           expect(newStateBeats).toBe(zeldaBeats)
         })
         it('should move the cards to their corresponding beats', () => {
+          // @ts-ignore
           const zeldaCards = allCardsSelector(zelda)
           const cardsOnOriginalLine = zeldaCards.filter(({ lineId }) => lineId === 1)
           const newStateCards = allCardsSelector(newState)
           const cardsOnNewline = newStateCards.filter(({ lineId }) => lineId === 1)
-          const beatsInDestinationBook = sortedBeatsForAnotherBookSelector(newState, 'series').map(
-            ({ id }) => {
-              return id
-            }
-          )
+          const beatsInDestinationBook = sortedBeatsForAnotherBookSelector(
+            newState,
+            // @ts-ignore
+            'series'
+          ).map(({ id }) => {
+            return id
+          })
           for (let i = 0; i < cardsOnNewline.length; ++i) {
             expect(beatsInDestinationBook.indexOf(cardsOnNewline[i].beatId)).toBeGreaterThan(-1)
           }
@@ -207,19 +222,23 @@ describe('rootReducer', () => {
           expect(newStateLines.filter(({ bookId }) => bookId === 9).length).toEqual(2)
         })
         it('should move the plotline without creating more beats', () => {
+          // @ts-ignore
           const zeldaBeats = allBeatsSelector(zelda)
           expect(newStateBeats).toBe(zeldaBeats)
         })
         it('should move the cards to their corresponding beats', () => {
+          // @ts-ignore
           const zeldaCards = allCardsSelector(zelda)
           const cardsOnOriginalLine = zeldaCards.filter(({ lineId }) => lineId === 16)
           const newStateCards = allCardsSelector(newState)
           const cardsOnNewline = newStateCards.filter(({ lineId }) => lineId === 17)
-          const beatsInDestinationBook = sortedBeatsForAnotherBookSelector(newState, 9).map(
-            ({ id }) => {
-              return id
-            }
-          )
+          const beatsInDestinationBook = sortedBeatsForAnotherBookSelector(
+            newState,
+            // @ts-ignore
+            9
+          ).map(({ id }) => {
+            return id
+          })
           for (let i = 0; i < cardsOnNewline.length; ++i) {
             expect(beatsInDestinationBook.indexOf(cardsOnNewline[i].beatId)).toBeGreaterThan(-1)
           }
@@ -245,15 +264,18 @@ describe('rootReducer', () => {
           expect(beatsByPosition(() => true)(newStateBeats[1]).length).toBe(7)
         })
         it('should move the cards to their corresponding beats', () => {
+          // @ts-ignore
           const zeldaCards = allCardsSelector(zelda)
           const cardsOnOriginalLine = zeldaCards.filter(({ lineId }) => lineId === 16)
           const newStateCards = allCardsSelector(newState)
           const cardsOnNewline = newStateCards.filter(({ lineId }) => lineId === 17)
-          const beatsInDestinationBook = sortedBeatsForAnotherBookSelector(newState, 1).map(
-            ({ id }) => {
-              return id
-            }
-          )
+          const beatsInDestinationBook = sortedBeatsForAnotherBookSelector(
+            newState,
+            // @ts-ignore
+            1
+          ).map(({ id }) => {
+            return id
+          })
           for (let i = 0; i < cardsOnNewline.length; ++i) {
             expect(beatsInDestinationBook.indexOf(cardsOnNewline[i].beatId)).toBeGreaterThan(-1)
           }
@@ -282,6 +304,7 @@ describe('rootReducer', () => {
         })
         it('should move the cards to their corresponding beats', () => {
           const zelda_2_levels_in_books_6_and_7_cards = allCardsSelector(
+            // @ts-ignore
             zelda_2_levels_in_books_6_and_7
           )
           const cardsOnOriginalLine = zelda_2_levels_in_books_6_and_7_cards.filter(
@@ -289,11 +312,13 @@ describe('rootReducer', () => {
           )
           const newStateCards = allCardsSelector(newState)
           const cardsOnNewline = newStateCards.filter(({ lineId }) => lineId === 17)
-          const beatsInDestinationBook = sortedBeatsForAnotherBookSelector(newState, 6).map(
-            ({ id }) => {
-              return id
-            }
-          )
+          const beatsInDestinationBook = sortedBeatsForAnotherBookSelector(
+            newState,
+            // @ts-ignore
+            6
+          ).map(({ id }) => {
+            return id
+          })
           for (let i = 0; i < cardsOnNewline.length; ++i) {
             expect(beatsInDestinationBook.indexOf(cardsOnNewline[i].beatId)).toBeGreaterThan(-1)
           }
@@ -321,7 +346,9 @@ describe('rootReducer', () => {
       })
       describe('given the same beats and hierarchy levels as for the current book', () => {
         it('should produce the same beat tree', () => {
+          // @ts-ignore
           const timeline = currentTimelineSelector(multi_tier_zelda)
+          // @ts-ignore
           const multi_tier_zelda_beats = allBeatsSelector(multi_tier_zelda)
           const originalBeatTree = multi_tier_zelda_beats[timeline]
           const beatHierarchyLevels = sortedBeatsHierachyLevels(multi_tier_zelda).map(
@@ -329,6 +356,7 @@ describe('rootReducer', () => {
               return hierarchyLevel.level
             }
           )
+          // @ts-ignore
           const originalBeats = visibleSortedBeatsForTimelineByBookSelector(multi_tier_zelda)
           const newState = rootReducer(
             multi_tier_zelda,
@@ -350,6 +378,7 @@ describe('rootReducer', () => {
       describe('given a collection of new levels', () => {
         describe('where all the levels are "act"', () => {
           it('should produce a valid tree', () => {
+            // @ts-ignore
             const originalBeats = visibleSortedBeatsForTimelineByBookSelector(multi_tier_zelda)
             const newState = rootReducer(
               multi_tier_zelda,
@@ -361,6 +390,7 @@ describe('rootReducer', () => {
             const finalBeatHierarchyLevels = Object.values(newStateBeats['7'].index).map((beat) => {
               return tree.depth(newStateBeats['7'], beat.id)
             })
+            // @ts-ignore
             const multi_tier_zelda_beats = allBeatsSelector(multi_tier_zelda)
             const oldBeatTree = multi_tier_zelda_beats['7']
             expect(finalBeatHierarchyLevels).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
@@ -398,6 +428,7 @@ describe('rootReducer', () => {
       describe('given arbitrary re-orderings of beats', () => {
         it('should produce valid beat trees', () => {
           const beatHierarchyLevels = sortedBeatsHierachyLevels(multi_tier_zelda)
+          // @ts-ignore
           const beatArray = visibleSortedBeatsForTimelineByBookSelector(multi_tier_zelda)
           const indices = beatArray.map((_beat, index) => {
             return index
@@ -466,7 +497,9 @@ describe('rootReducer', () => {
       })
       describe('given arbitrary re-assignment of beat depths', () => {
         it('should produce valid beat trees', () => {
+          // @ts-ignore
           const beatArray = visibleSortedBeatsForTimelineByBookSelector(multi_tier_zelda)
+          // @ts-ignore
           const hierarchyLevels = sortedHierarchyLevels(multi_tier_zelda)
 
           fc.assert(
@@ -562,6 +595,7 @@ describe('rootReducer', () => {
               return hierarchyLevel.level
             }
           )
+          // @ts-ignore
           const originalBeats = sortedBeatsByBookSelector(stacked_multi_tier_zelda)
           const newState = rootReducer(
             stacked_multi_tier_zelda,
@@ -592,6 +626,7 @@ describe('rootReducer', () => {
       describe('given arbitrary re-orderings of beats', () => {
         it('should produce valid beat trees', () => {
           const beatHierarchyLevels = sortedBeatsHierachyLevels(stacked_multi_tier_zelda)
+          // @ts-ignore
           const beatArray = sortedBeatsByBookSelector(stacked_multi_tier_zelda)
           const indices = beatArray.map((_beat, index) => {
             return index
@@ -663,7 +698,9 @@ describe('rootReducer', () => {
       })
       describe('given a re-assignment of beats all to act', () => {
         it('should ensure that the cards are all transfered down to scenes per act', () => {
+          // @ts-ignore
           const beatArray = sortedBeatsByBookSelector(stacked_multi_tier_zelda)
+          // @ts-ignore
           const stacked_multi_tier_zelda_beats = allBeatsSelector(stacked_multi_tier_zelda)
           const sceneBeats = beatArray
             .filter((beat) => {
@@ -672,10 +709,12 @@ describe('rootReducer', () => {
             .map((beat) => {
               return beat.id
             })
+          // @ts-ignore
           const allCards = allCardsSelector(stacked_multi_tier_zelda)
           const sceneBeatCards = allCards.filter((card) => {
             return sceneBeats.indexOf(card.beatId) !== -1
           })
+          // @ts-ignore
           const hierarchyLevels = sortedHierarchyLevels(stacked_multi_tier_zelda)
           const newHeights = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
           // Two properties:
@@ -751,7 +790,9 @@ describe('rootReducer', () => {
       })
       describe('given arbitrary re-assignment of beat depths', () => {
         it('should produce valid beat trees', () => {
+          // @ts-ignore
           const beatArray = sortedBeatsByBookSelector(stacked_multi_tier_zelda)
+          // @ts-ignore
           const stacked_multi_tier_zelda_beats = allBeatsSelector(stacked_multi_tier_zelda)
           const sceneBeats = beatArray
             .filter((beat) => {
@@ -760,10 +801,12 @@ describe('rootReducer', () => {
             .map((beat) => {
               return beat.id
             })
+          // @ts-ignore
           const allCards = allCardsSelector(stacked_multi_tier_zelda)
           const sceneBeatCards = allCards.filter((card) => {
             return sceneBeats.indexOf(card.beatId) !== -1
           })
+          // @ts-ignore
           const hierarchyLevels = sortedHierarchyLevels(stacked_multi_tier_zelda)
 
           fc.assert(
@@ -864,6 +907,7 @@ describe('ADD_CARD', () => {
             lineId: 16,
             positionWithinLine: 0,
           }
+          // @ts-ignore
           const allBeats = allBeatsSelector(multi_tier_zelda)
           const oldBeats = allBeats['7']
           const newState = rootReducer(multi_tier_zelda, addCard(newCard, true))
@@ -872,6 +916,7 @@ describe('ADD_CARD', () => {
           const newBeats = newStateBeats[newCurrentTimeline]
           const newChapters = difference(tree.children(newBeats, 35), tree.children(oldBeats, 35))
           const newStateCards = allCardsSelector(newState)
+          // @ts-ignore
           const multi_tier_zelda_cards = allCardsSelector(multi_tier_zelda)
           const newCards = difference(newStateCards, multi_tier_zelda_cards)
           it('should add the missing chapter', () => {
@@ -902,6 +947,7 @@ describe('ADD_CARD', () => {
             lineId: 16,
             positionWithinLine: 0,
           }
+          // @ts-ignore
           const multi_tier_zelda_beats = allBeatsSelector(multi_tier_zelda)
           const oldBeats = multi_tier_zelda_beats['7']
           const newState = rootReducer(multi_tier_zelda, addCard(newCard))
@@ -909,6 +955,7 @@ describe('ADD_CARD', () => {
           const newCurrentTimeline = currentTimelineSelector(newState)
           const newBeats = newStateBeats[newCurrentTimeline]
           const newStateCards = allCardsSelector(newState)
+          // @ts-ignore
           const multi_tier_zelda_cards = allCardsSelector(multi_tier_zelda)
           const newCards = difference(newStateCards, multi_tier_zelda_cards)
           it('should not change the beats', () => {
@@ -930,6 +977,7 @@ describe('ADD_CARD', () => {
             lineId: 16,
             positionWithinLine: 0,
           }
+          // @ts-ignore
           const multi_tier_zelda_beats = allBeatsSelector(multi_tier_zelda)
           const oldBeats = multi_tier_zelda_beats['7']
           const newState = rootReducer(multi_tier_zelda, addCard(newCard, true))
@@ -938,6 +986,7 @@ describe('ADD_CARD', () => {
           const newBeats = newStateBeats[newCurrentTimeline]
           const newScenes = difference(tree.children(newBeats, 34), tree.children(oldBeats, 34))
           const newStateCards = allCardsSelector(newState)
+          // @ts-ignore
           const multi_tier_zelda_cards = allCardsSelector(multi_tier_zelda)
           const newCards = difference(newStateCards, multi_tier_zelda_cards)
           it('should add the missing scene', () => {
@@ -960,6 +1009,7 @@ describe('ADD_CARD', () => {
             lineId: 16,
             positionWithinLine: 0,
           }
+          // @ts-ignore
           const multi_tier_zelda_beats = allBeatsSelector(multi_tier_zelda)
           const oldBeats = multi_tier_zelda_beats['7']
           const newState = rootReducer(multi_tier_zelda, addCard(newCard))
@@ -967,6 +1017,7 @@ describe('ADD_CARD', () => {
           const newCurrentTimeline = currentTimelineSelector(newState)
           const newBeats = newStateBeats[newCurrentTimeline]
           const newStateCards = allCardsSelector(newState)
+          // @ts-ignore
           const multi_tier_zelda_cards = allCardsSelector(multi_tier_zelda)
           const newCards = difference(newStateCards, multi_tier_zelda_cards)
           it('should not change the beats', () => {
@@ -988,6 +1039,7 @@ describe('ADD_CARD', () => {
             lineId: 16,
             positionWithinLine: 0,
           }
+          // @ts-ignore
           const multi_tier_zelda_beats = allBeatsSelector(multi_tier_zelda)
           const oldBeats = multi_tier_zelda_beats['7']
           const newState = rootReducer(multi_tier_zelda, addCard(newCard, true))
@@ -995,6 +1047,7 @@ describe('ADD_CARD', () => {
           const newCurrentTimeline = currentTimelineSelector(newState)
           const newBeats = newStateBeats[newCurrentTimeline]
           const newStateCards = allCardsSelector(newState)
+          // @ts-ignore
           const multi_tier_zelda_cards = allCardsSelector(multi_tier_zelda)
           const newCards = difference(newStateCards, multi_tier_zelda_cards)
           it('should not change the beats', () => {
@@ -1014,6 +1067,7 @@ describe('ADD_CARD', () => {
             lineId: 16,
             positionWithinLine: 0,
           }
+          // @ts-ignore
           const multi_tier_zelda_beats = allBeatsSelector(multi_tier_zelda)
           const oldBeats = multi_tier_zelda_beats['7']
           const newState = rootReducer(multi_tier_zelda, addCard(newCard))
@@ -1021,6 +1075,7 @@ describe('ADD_CARD', () => {
           const newCurrentTimeline = currentTimelineSelector(newState)
           const newBeats = newStateBeats[newCurrentTimeline]
           const newStateCards = allCardsSelector(newState)
+          // @ts-ignore
           const multi_tier_zelda_cards = allCardsSelector(multi_tier_zelda)
           const newCards = difference(newStateCards, multi_tier_zelda_cards)
           it('should not change the beats', () => {
@@ -1043,6 +1098,7 @@ describe('REORDER_CARDS_WITHIN_LINE', () => {
     describe('and a beat id', () => {
       describe('that points at the root', () => {
         describe('and we signal to add missing beats', () => {
+          // @ts-ignore
           const multi_tier_zelda_beats = allBeatsSelector(multi_tier_zelda)
           const oldBeats = multi_tier_zelda_beats['7']
           const newState = rootReducer(multi_tier_zelda, reorderCardsWithinLine(35, 16, [31], true))
@@ -1051,6 +1107,7 @@ describe('REORDER_CARDS_WITHIN_LINE', () => {
           const newBeats = newStateBeats[newCurrentTimeline]
           const newChapters = difference(tree.children(newBeats, 35), tree.children(oldBeats, 35))
           const newStateCards = allCardsSelector(newState)
+          // @ts-ignore
           const multi_tier_zelda_cards = allCardsSelector(multi_tier_zelda)
           const newCards = difference(newStateCards, multi_tier_zelda_cards)
           it('should add the missing chapter', () => {
@@ -1075,6 +1132,7 @@ describe('REORDER_CARDS_WITHIN_LINE', () => {
           })
         })
         describe('and we signal not to add missing beats', () => {
+          // @ts-ignore
           const multi_tier_zelda_beats = allBeatsSelector(multi_tier_zelda)
           const oldBeats = multi_tier_zelda_beats['7']
           const newState = rootReducer(multi_tier_zelda, reorderCardsWithinLine(35, 16, [31]))
@@ -1082,6 +1140,7 @@ describe('REORDER_CARDS_WITHIN_LINE', () => {
           const newCurrentTimeline = currentTimelineSelector(newState)
           const newBeats = newStateBeats[newCurrentTimeline]
           const newStateCards = allCardsSelector(newState)
+          // @ts-ignore
           const multi_tier_zelda_cards = allCardsSelector(multi_tier_zelda)
           const newCards = difference(newStateCards, multi_tier_zelda_cards)
           it('should not change the beats', () => {
@@ -1097,6 +1156,7 @@ describe('REORDER_CARDS_WITHIN_LINE', () => {
       })
       describe('that points at a chapter', () => {
         describe('and we signal to add missing beats', () => {
+          // @ts-ignore
           const multi_tier_zelda_beats = allBeatsSelector(multi_tier_zelda)
           const oldBeats = multi_tier_zelda_beats['7']
           const newState = rootReducer(multi_tier_zelda, reorderCardsWithinLine(34, 16, [31], true))
@@ -1105,6 +1165,7 @@ describe('REORDER_CARDS_WITHIN_LINE', () => {
           const newBeats = newStateBeats[newCurrentTimeline]
           const newScenes = difference(tree.children(newBeats, 34), tree.children(oldBeats, 34))
           const newStateCards = allCardsSelector(newState)
+          // @ts-ignore
           const multi_tier_zelda_cards = allCardsSelector(multi_tier_zelda)
           const newCards = difference(newStateCards, multi_tier_zelda_cards)
           it('should add the missing scene', () => {
@@ -1121,6 +1182,7 @@ describe('REORDER_CARDS_WITHIN_LINE', () => {
           })
         })
         describe('and we signal not to add missing beats', () => {
+          // @ts-ignore
           const multi_tier_zelda_beats = allBeatsSelector(multi_tier_zelda)
           const oldBeats = multi_tier_zelda_beats['7']
           const newState = rootReducer(multi_tier_zelda, reorderCardsWithinLine(34, 16, [31]))
@@ -1128,6 +1190,7 @@ describe('REORDER_CARDS_WITHIN_LINE', () => {
           const newCurrentTimeline = currentTimelineSelector(newState)
           const newBeats = newStateBeats[newCurrentTimeline]
           const newStateCards = allCardsSelector(newState)
+          // @ts-ignore
           const multi_tier_zelda_cards = allCardsSelector(multi_tier_zelda)
           const newCards = difference(newStateCards, multi_tier_zelda_cards)
           it('should not change the beats', () => {
@@ -1143,6 +1206,7 @@ describe('REORDER_CARDS_WITHIN_LINE', () => {
       })
       describe('that points at a scene', () => {
         describe('and we signal to add missing beats', () => {
+          // @ts-ignore
           const multi_tier_zelda_beats = allBeatsSelector(multi_tier_zelda)
           const oldBeats = multi_tier_zelda_beats['7']
           const newState = rootReducer(multi_tier_zelda, reorderCardsWithinLine(26, 16, [31], true))
@@ -1150,6 +1214,7 @@ describe('REORDER_CARDS_WITHIN_LINE', () => {
           const newCurrentTimeline = currentTimelineSelector(newState)
           const newBeats = newStateBeats[newCurrentTimeline]
           const newStateCards = allCardsSelector(newState)
+          // @ts-ignore
           const multi_tier_zelda_cards = allCardsSelector(multi_tier_zelda)
           const newCards = difference(newStateCards, multi_tier_zelda_cards)
           it('should not change the beats', () => {
@@ -1163,6 +1228,7 @@ describe('REORDER_CARDS_WITHIN_LINE', () => {
           })
         })
         describe('and we signal not to add missing beats', () => {
+          // @ts-ignore
           const multi_tier_zelda_beats = allBeatsSelector(multi_tier_zelda)
           const oldBeats = multi_tier_zelda_beats['7']
           const newState = rootReducer(multi_tier_zelda, reorderCardsWithinLine(26, 16, [31]))
@@ -1170,6 +1236,7 @@ describe('REORDER_CARDS_WITHIN_LINE', () => {
           const newCurrentTimeline = currentTimelineSelector(newState)
           const newBeats = newStateBeats[newCurrentTimeline]
           const newStateCards = allCardsSelector(newState)
+          // @ts-ignore
           const multi_tier_zelda_cards = allCardsSelector(multi_tier_zelda)
           const newCards = difference(newStateCards, multi_tier_zelda_cards)
           it('should not change the beats', () => {

@@ -231,6 +231,7 @@ describe('displayedSingleCharacterSelector', () => {
       })
 
       const goldilocks = allCharacters.find((character) => character.name === 'Goldilocks')
+      // @ts-ignore
       const goldilocksProperties = displayedSingleCharacterSelector(state, goldilocks.id)
       it('should have a character named Goldilocks', () => {
         expect(goldilocks).toBeDefined()
@@ -296,10 +297,12 @@ describe('visibleSortedCharactersByCategorySelector', () => {
       describe('given the user reorder the characters manually', () => {
         const character1InitialState = displayedSingleCharacterSelector(
           initialState,
+          // @ts-ignore
           allCharacters.find(({ id }) => id == 1).id
         )
         const character3InitialState = displayedSingleCharacterSelector(
           initialState,
+          // @ts-ignore
           allCharacters.find(({ id }) => id == 3).id
         )
         const character3AbsolutePosition = getCharacterAbsolutePositionFromGroupedCategory(
@@ -407,10 +410,12 @@ describe('visibleSortedCharactersByCategorySelector', () => {
               describe(`given the user move character2 to character8's position`, () => {
                 const character2AfterChangeSortState = displayedSingleCharacterSelector(
                   afterChangeSortState,
+                  // @ts-ignore
                   allCharacters.find(({ id }) => id == 2).id
                 )
                 const character8AfterChangeSortState = displayedSingleCharacterSelector(
                   afterChangeSortState,
+                  // @ts-ignore
                   allCharacters.find(({ id }) => id == 8).id
                 )
                 const character8AbsolutePosition = getCharacterAbsolutePositionFromGroupedCategory(
@@ -484,10 +489,12 @@ describe('visibleSortedCharactersByCategorySelector', () => {
                 describe(`given the user move character10 to character2's position`, () => {
                   const character2AfterSecondReorderState = displayedSingleCharacterSelector(
                     afterSecondReorderState,
+                    // @ts-ignore
                     allCharacters.find(({ id }) => id == 2).id
                   )
                   const character10AfterSecondReorderState = displayedSingleCharacterSelector(
                     afterSecondReorderState,
+                    // @ts-ignore
                     allCharacters.find(({ id }) => id == 10).id
                   )
                   const character2AbsolutePosition =

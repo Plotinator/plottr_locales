@@ -187,9 +187,9 @@ describe('migrate', () => {
           ).toEqual(1)
           expect(countBy(Object.values(migrated.beats[1].heap), (x) => x === null).true).toEqual(2)
           expect(countBy(Object.values(migrated.beats[2].heap), (x) => x === null).true).toEqual(2)
-          expect(migrated.beats.series.children[null]).toEqual(expect.arrayContaining([10]))
-          expect(migrated.beats[1].children[null]).toEqual(expect.arrayContaining([6, 7]))
-          expect(migrated.beats[2].children[null]).toEqual(expect.arrayContaining([40, 41]))
+          expect(migrated.beats.series.children['null']).toEqual(expect.arrayContaining([10]))
+          expect(migrated.beats[1].children['null']).toEqual(expect.arrayContaining([6, 7]))
+          expect(migrated.beats[2].children['null']).toEqual(expect.arrayContaining([40, 41]))
         })
         it('should add the "expanded" attribute to all those beats', () => {
           expect(

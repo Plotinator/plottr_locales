@@ -30,6 +30,7 @@ import {
   EDIT_NOTE_CUSTOM_ATTRIBUTE,
   REPLACE_MARKED_HITS,
   REORDER_NOTE_MANUALLY,
+  ADD_NOTE_FROM_PLTR,
   UNDO,
   REDO,
   UNDO_N_TIMES,
@@ -110,6 +111,7 @@ const notes =
         const { id, oldPosition, newPosition, newCategoryId, direction, notesByCategory } = action
         const moveUp = direction === 'up'
         const originalNote = state.find((note) => note.id == id)
+        // @ts-ignore
         const isNewcategory = originalNote.categoryId != newCategoryId
         const reorderedList = Object.values(notesByCategory).flatMap((group) => {
           const groupCategory = group[0].categoryId
@@ -129,6 +131,7 @@ const notes =
             } else {
               return moveItemToPosition(newPosition, group, newNote, moveUp)
             }
+            // @ts-ignore
           } else if (isNewcategory && originalNote.categoryId == groupCategory) {
             const filteredGroup = group.filter((grp) => grp.id != id)
             return positionReset(filteredGroup)
@@ -151,6 +154,21 @@ const notes =
         return [...state, { ...duplicated, lastEdited: action.lastEdited }]
       }
 
+      case ADD_NOTE_FROM_PLTR: {
+        const newNote = {
+          ...cloneDeep(action.note),
+          id: nextId(state),
+          lastEdited: action.lastEdited,
+          isChecked: undefined,
+        }
+        return [
+          ...state,
+          {
+            ...newNote,
+          },
+        ]
+      }
+
       case EDIT_NOTE_TEMPLATE_ATTRIBUTE: {
         return state.map((note) => {
           if (note.id === action.id) {
@@ -158,8 +176,10 @@ const notes =
               ...state,
               lastEdited: new Date().getTime(),
               templates: note.templates.map((template) => {
+                // @ts-ignore
                 if (template.id === action.templateId) {
                   return {
+                    // @ts-ignore
                     ...template,
                     [action.name]: action.value,
                   }
@@ -206,6 +226,7 @@ const notes =
 
       case ATTACH_CHARACTER_TO_NOTE: {
         return state.map((note) => {
+          // @ts-ignore
           if (note.id === action.id && !note.characters.includes(action.characterId)) {
             return {
               ...note,
@@ -220,6 +241,7 @@ const notes =
 
       case REMOVE_CHARACTER_FROM_NOTE: {
         return state.map((note) => {
+          // @ts-ignore
           if (note.id === action.id && note.characters.includes(action.characterId)) {
             return {
               ...note,
@@ -236,6 +258,7 @@ const notes =
 
       case ATTACH_PLACE_TO_NOTE: {
         return state.map((note) => {
+          // @ts-ignore
           if (note.id === action.id && !note.places.includes(action.placeId)) {
             return {
               ...note,
@@ -264,6 +287,7 @@ const notes =
 
       case REMOVE_PLACE_FROM_NOTE: {
         return state.map((note) => {
+          // @ts-ignore
           if (note.id === action.id && note.places.includes(action.placeId)) {
             return {
               ...note,
@@ -280,6 +304,7 @@ const notes =
 
       case ATTACH_TAG_TO_NOTE: {
         return state.map((note) => {
+          // @ts-ignore
           if (note.id === action.id && !note.tags.includes(action.tagId)) {
             return {
               ...note,
@@ -294,6 +319,7 @@ const notes =
 
       case REMOVE_TAG_FROM_NOTE: {
         return state.map((note) => {
+          // @ts-ignore
           if (note.id === action.id && note.tags.includes(action.tagId)) {
             return {
               ...note,
@@ -310,6 +336,7 @@ const notes =
 
       case ATTACH_BOOK_TO_NOTE: {
         return state.map((note) => {
+          // @ts-ignore
           if (note.id === action.id && !note.bookIds.includes(action.bookId)) {
             return {
               ...note,
@@ -324,6 +351,7 @@ const notes =
 
       case REMOVE_BOOK_FROM_NOTE: {
         return state.map((note) => {
+          // @ts-ignore
           if (note.id === action.id && note.bookIds.includes(action.bookId)) {
             return {
               ...note,
@@ -340,6 +368,7 @@ const notes =
 
       case DELETE_TAG:
         return state.map((note) => {
+          // @ts-ignore
           if (note.tags.includes(action.id)) {
             let tags = cloneDeep(note.tags)
             tags.splice(tags.indexOf(action.id), 1)
@@ -351,6 +380,7 @@ const notes =
 
       case DELETE_CHARACTER:
         return state.map((note) => {
+          // @ts-ignore
           if (note.characters.includes(action.id)) {
             let characters = cloneDeep(note.characters)
             characters.splice(characters.indexOf(action.id), 1)
@@ -362,6 +392,7 @@ const notes =
 
       case DELETE_PLACE:
         return state.map((note) => {
+          // @ts-ignore
           if (note.places.includes(action.id)) {
             let places = cloneDeep(note.places)
             places.splice(places.indexOf(action.id), 1)

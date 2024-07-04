@@ -279,9 +279,9 @@ describe('numberOfPriorChildrenAtSameDepth', () => {
     const singletonSortedBeats = [beat]
     describe('and a beat id which is not it', () => {
       it('should produce null', () => {
-        expect(numberOfPriorChildrenAtSameDepth(singletonTree, singletonSortedBeats, 0)).toEqual(
-          null
-        )
+        expect(() =>
+          numberOfPriorChildrenAtSameDepth(singletonTree, singletonSortedBeats, 0)
+        ).toThrow()
       })
     })
     describe('and a beat id which is it', () => {

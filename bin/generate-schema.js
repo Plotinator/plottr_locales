@@ -1,20 +1,14 @@
 import fs from 'fs'
-import {
-  uniqWith,
-  identity,
-  uniq,
-  isObject,
-  isEqual,
-  isNull,
-  repeat,
-  pick,
-  always,
-  isEmpty,
-} from 'lodash'
+import { uniqWith, identity, uniq, isObject, isEqual, isNull, repeat, pick, isEmpty } from 'lodash'
 import { compose, lensPath, lensProp, over } from 'ramda'
 
-import exampleFile from '../v2/store/exampleFile'
-import exampleProFile from '../v2/store/exampleProFile'
+import exampleFile from '../v2/store/exampleFile.json'
+import exampleProFile from '../v2/store/exampleProFile.json'
+
+const always =
+  (x) =>
+  (..._args) =>
+    x
 
 const { writeFile } = fs.promises
 

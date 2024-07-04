@@ -29,7 +29,7 @@ import { nextId } from '../store/newIds'
 import { positionReset } from '../helpers/lists'
 
 const categories =
-  (dataRepairers) =>
+  (_dataRepairers) =>
   (state = defaultCategories, action) => {
     switch (action.type) {
       case FILE_LOADED:

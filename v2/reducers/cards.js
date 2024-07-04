@@ -47,6 +47,7 @@ import {
   DUPLICATE_BOOK,
   REORDER_CARD_TEMPLATE_ATTRIBUTES,
   REPLACE_MARKED_HITS,
+  ADD_BOOK_FROM_PLTR,
   UNDO,
   REDO,
   UNDO_N_TIMES,
@@ -126,6 +127,7 @@ const cards =
         }
       }
 
+      case ADD_BOOK_FROM_PLTR:
       case DUPLICATE_BOOK: {
         const newCards = action.newCards.map((c) => {
           const newCard = cloneDeep(c)
@@ -568,7 +570,7 @@ const cards =
       case DUPLICATE_LINE: {
         const cardsOnLine = state.filter(({ lineId }) => lineId === action.id)
         const newState = cloneDeep(cardsOnLine)
-          .map((card, index) => ({
+          .map((card, _index) => ({
             ...card,
             lineId: action.newLineId,
           }))

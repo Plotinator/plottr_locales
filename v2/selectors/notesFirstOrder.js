@@ -26,9 +26,11 @@ export const notesByCategorySelector = createSelector(allNotesSelector, (notes) 
     return note
   })
   const grouped = groupBy(notesWithCategory, 'categoryId')
+  // @ts-ignore
   if (grouped[undefined] !== undefined) {
-    grouped[null] = grouped[undefined].concat(grouped[null] || [])
-    delete grouped[undefined]
+    // @ts-ignore
+    grouped['null'] = grouped[undefined].concat(grouped['null'] || [])
+    delete grouped['undefined']
   }
 
   const groupWithPosition = Object.values(grouped).map((group) => {

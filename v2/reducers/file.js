@@ -29,7 +29,7 @@ const ACTIONS_NOT_TO_UPDATE_ON = [
 ]
 
 const file =
-  (dataRepairers) =>
+  (_dataRepairers) =>
   (stateWithoutVersionStamp = defaultFile, action) => {
     const shouldNotUpdateVersionStamp =
       action.type?.startsWith('@') ||
@@ -52,6 +52,8 @@ const file =
           initialVersion: action.data.file.initialVersion || action.version,
           isCloudFile: action.data.file.isCloudFile || false,
           shareRecords: action.data.file.shareRecords ?? [],
+          versionStamp: action.data.file.versionStamp,
+          originalVersionStamp: action.data.file.originalVersionStamp,
         }
 
       case FILE_SAVED:

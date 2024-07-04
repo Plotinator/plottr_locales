@@ -46,7 +46,6 @@ import {
   isResumingSelector,
   fileURLSelector,
   hasAllKeysSelector,
-  projectSelector,
 } from './projectFirstOrder'
 import {
   hasActivePlottrLicenseSelector,
@@ -193,7 +192,7 @@ export const applicationIsBusyAndUninterruptableSelector = createSelector(
     applicationSettingsAreLoaded,
     checkingSessionOrNeedToCheckSession,
     isOnboardingToPro,
-    isImportingNewProject,
+    isImportingAProject,
     isLoggedIn,
     shouldBeInPro,
     checkedProSubscription,
@@ -206,7 +205,7 @@ export const applicationIsBusyAndUninterruptableSelector = createSelector(
       manipulatingAFile ||
       !applicationSettingsAreLoaded ||
       (checkingSessionOrNeedToCheckSession && !isOnboardingToPro) ||
-      isImportingNewProject ||
+      isImportingAProject ||
       (isLoggedIn && shouldBeInPro && !checkedProSubscription) ||
       // TODO: Web doesn't have trials or licenses to load.
       !checkedLicense ||
@@ -398,10 +397,10 @@ export const loadingProgressSelector = createSelector(
 )
 
 export const isCloudFileSelector = createSelector(
-  projectSelector,
+  fileURLSelector,
   isOnWebSelector,
-  (project, isOnWeb) => {
-    return isOnWeb || (project && project.fileURL && urlPointsToPlottrCloud(project.fileURL))
+  (fileURL, isOnWeb) => {
+    return isOnWeb || urlPointsToPlottrCloud(fileURL)
   }
 )
 

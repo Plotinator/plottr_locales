@@ -32,6 +32,7 @@ import {
   EDIT_PLACE_CUSTOM_ATTRIBUTE,
   REPLACE_MARKED_HITS,
   REORDER_PLACE_MANUALLY,
+  ADD_PLACE_FROM_PLTR,
   UNDO,
   REDO,
   UNDO_N_TIMES,
@@ -95,8 +96,10 @@ const places =
             return {
               ...place,
               templates: place.templates.map((template) => {
+                // @ts-ignore
                 if (template.id === action.templateId) {
                   return {
+                    // @ts-ignore
                     ...template,
                     [action.name]: action.value,
                   }
@@ -182,6 +185,7 @@ const places =
 
       case DELETE_TAG:
         return state.map((place) => {
+          // @ts-ignore
           if (place.tags.includes(action.id)) {
             let tags = cloneDeep(place.tags)
             tags.splice(tags.indexOf(action.id), 1)
@@ -341,6 +345,15 @@ const places =
         return [...state, { ...duplicated }]
       }
 
+      case ADD_PLACE_FROM_PLTR: {
+        const newPlace = {
+          ...cloneDeep(action.place),
+          id: nextId(state),
+          isChecked: undefined,
+        }
+        return [...state, { ...newPlace }]
+      }
+
       case EDIT_PLACE_NAME: {
         return state.map((place) => {
           if (place.id === action.id) {
@@ -433,6 +446,7 @@ const places =
         const { id, oldPosition, newPosition, newCategoryId, direction, placesByCategory } = action
         const moveUp = direction === 'up'
         const originalPlace = state.find((place) => place.id == id)
+        // @ts-ignore
         const isNewcategory = originalPlace.categoryId != newCategoryId
         const reorderedList = Object.values(placesByCategory).flatMap((group) => {
           const groupCategory = group[0].categoryId
@@ -452,6 +466,7 @@ const places =
             } else {
               return moveItemToPosition(newPosition, group, newPlace, moveUp)
             }
+            // @ts-ignore
           } else if (isNewcategory && originalPlace.categoryId == groupCategory) {
             const filteredGroup = group.filter((grp) => grp.id != id)
             return positionReset(filteredGroup)

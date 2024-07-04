@@ -18,6 +18,7 @@ import {
   SET_BOOK_GENRE,
   DUPLICATE_BOOK,
   REPLACE_MARKED_HITS,
+  ADD_BOOK_FROM_PLTR,
   UNDO,
   REDO,
   UNDO_N_TIMES,
@@ -37,7 +38,7 @@ const initialState = {
 }
 
 const books =
-  (dataRepairers) =>
+  (_dataRepairers) =>
   (state = initialState, action) => {
     switch (action.type) {
       case EDIT_BOOK: {
@@ -99,11 +100,28 @@ const books =
         }
       }
 
+      case ADD_BOOK_FROM_PLTR: {
+        const newIds = [...state.allIds, action.newBookId]
+
+        return {
+          ...state,
+          allIds: newIds,
+          [action.newBookId]: {
+            ...action.book,
+            id: action.newBookId,
+            imageId: action.imageId,
+            isChecked: undefined,
+          },
+        }
+      }
+
       case DUPLICATE_BOOK: {
+        // @ts-ignore
         const duplicatedBook = find(state, (book) => book.id === action.id)
         const duplicatedIndex = state.allIds.indexOf(action.id)
         const titleWithCopy = getCopyName(
           Object.values(state),
+          // @ts-ignore
           `${duplicatedBook.title} - copy`,
           'title'
         )
@@ -209,7 +227,7 @@ const books =
         }
 
       case DELETE_IMAGE:
-        return mapValues(state, (value, key) => {
+        return mapValues(state, (value, _key) => {
           if (
             !Array.isArray(value) &&
             value instanceof Object &&
@@ -225,7 +243,7 @@ const books =
         })
 
       case SET_BOOK_TITLE: {
-        return mapValues(state, (value, key) => {
+        return mapValues(state, (value, _key) => {
           if (!Array.isArray(value) && value instanceof Object && value.id === action.id) {
             return {
               ...value,
@@ -237,7 +255,7 @@ const books =
       }
 
       case SET_BOOK_PREMISE: {
-        return mapValues(state, (value, key) => {
+        return mapValues(state, (value, _key) => {
           if (!Array.isArray(value) && value instanceof Object && value.id === action.id) {
             return {
               ...value,
@@ -249,7 +267,7 @@ const books =
       }
 
       case SET_BOOK_GENRE: {
-        return mapValues(state, (value, key) => {
+        return mapValues(state, (value, _key) => {
           if (!Array.isArray(value) && value instanceof Object && value.id === action.id) {
             return {
               ...value,
@@ -261,7 +279,7 @@ const books =
       }
 
       case SET_BOOK_THEME: {
-        return mapValues(state, (value, key) => {
+        return mapValues(state, (value, _key) => {
           if (!Array.isArray(value) && value instanceof Object && value.id === action.id) {
             return {
               ...value,
