@@ -16,12 +16,113 @@ function createAbortSignal(timeoutMS) {
   return { signal: controller.signal, timeoutId, abort: () => controller.abort() }
 }
 
+const INVALID_OR_UNSET_PORT = 'INVALID_OR_UNSET_PORT'
+
 function routeFunctions(suppliedPort, secret, logger) {
   const createClient = (suppliedPort) => {
-    return axios.create({
+    const client = axios.create({
       baseURL: `http://127.0.0.1:${suppliedPort}`,
       headers: { 'X-Secret': secret },
     })
+    return {
+      get: getCheckingPort(client),
+      post: postCheckingPort(client),
+      put: putCheckingPort(client),
+      delete: deleteCheckingPort(client),
+    }
+  }
+
+  /**
+   * @typedef {import('axios').Axios} Axios
+   * @param {Axios} client
+   */
+  const getCheckingPort = (client) => {
+    /**
+     * A proxied get that first checks whether we have a valid port.
+     *
+     * @typedef {import('axios').AxiosResponse} AxiosResponse
+     * @param {string} path
+     * @param {any} queryParams
+     * @returns {Promise<AxiosResponse>}
+     */
+    const get = (path, queryParams) => {
+      if (typeof _clientRef.port !== 'number') {
+        return Promise.reject(new Error(INVALID_OR_UNSET_PORT))
+      } else {
+        return client.get(path, queryParams)
+      }
+    }
+    return get
+  }
+
+  /**
+   * @param {Axios} client
+   */
+  const postCheckingPort = (client) => {
+    /**
+     * A proxied post that first checks whether we have a valid port.
+     *
+     * @typedef {import('axios').AxiosResponse} AxiosResponse
+     * @typedef {import('axios').AxiosRequestConfig} AxiosRequestConfig
+     * @param {string} path
+     * @param {any} body
+     * @param {AxiosRequestConfig} [config]
+     * @returns {Promise<AxiosResponse>}
+     */
+    const post = (path, body, config = {}) => {
+      if (typeof _clientRef.port !== 'number') {
+        return Promise.reject(new Error(INVALID_OR_UNSET_PORT))
+      } else {
+        return client.post(path, body, config)
+      }
+    }
+    return post
+  }
+
+  /**
+   * @param {Axios} client
+   */
+  const putCheckingPort = (client) => {
+    /**
+     * A proxied put that first checks whether we have a valid port.
+     *
+     * @typedef {import('axios').AxiosResponse} AxiosResponse
+     * @typedef {import('axios').AxiosRequestConfig} AxiosRequestConfig
+     * @param {string} path
+     * @param {any} body
+     * @param {AxiosRequestConfig} [config]
+     * @returns {Promise<AxiosResponse>}
+     */
+    const put = (path, body, config = {}) => {
+      if (typeof _clientRef.port !== 'number') {
+        return Promise.reject(new Error(INVALID_OR_UNSET_PORT))
+      } else {
+        return client.put(path, body, config)
+      }
+    }
+    return put
+  }
+
+  /**
+   * @param {Axios} client
+   */
+  const deleteCheckingPort = (client) => {
+    /**
+     * A proxied put that first checks whether we have a valid port.
+     *
+     * @typedef {import('axios').AxiosResponse} AxiosResponse
+     * @param {string} path
+     * @param {any} queryParams
+     * @returns {Promise<AxiosResponse>}
+     */
+    const put = (path, queryParams) => {
+      if (typeof _clientRef.port !== 'number') {
+        return Promise.reject(new Error(INVALID_OR_UNSET_PORT))
+      } else {
+        return client.put(path, queryParams)
+      }
+    }
+    return put
   }
 
   const _clientRef = { current: createClient(suppliedPort), port: suppliedPort, destroyed: false }
@@ -592,8 +693,8 @@ function routeFunctions(suppliedPort, secret, logger) {
   }
 
   const close = () => {
-    return Array.from(client.pollers.values()).forEach(({ close }) => {
-      close()
+    return Array.from(client.pollers.values()).forEach((poller) => {
+      poller.close()
     })
   }
 
@@ -718,7 +819,11 @@ const createClient = (suppliedPort, suppliedLogger, suppliedSecret, { onBusy, on
   const client = routeFunctions(suppliedPort, suppliedSecret, suppliedLogger)
   client.listenToStatus((error, result) => {
     if (error) {
-      suppliedLogger.error('Error listening to busy status', error)
+      if (error.message === INVALID_OR_UNSET_PORT) {
+        suppliedLogger.info('Client port not yet set, but we tried to listen to busy status.')
+      } else {
+        suppliedLogger.error('Error listening to busy status', error)
+      }
     } else if (result?.busy) {
       onBusy()
     } else {
