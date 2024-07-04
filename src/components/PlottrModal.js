@@ -1,67 +1,59 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useContext } from 'react'
 import PropTypes from 'react-proptypes'
+import { connect } from 'react-redux'
 import Modal from 'react-modal'
 import cx from 'classnames'
 import { first } from 'lodash'
 
-import { checkDependencies } from './checkDependencies'
+import { selectors } from 'wired-up-pltr'
+
+import { PlottrComponentsContext } from '../connections/pltrContext'
 
 // prevents the useMemo from getting a new object reference
 // on each render if no styles is passed in
 const defaultStyles = {}
 
-const PlottrModalConnector = (connector) => {
-  const PlottrModal = ({ isDarkMode, children, styles = defaultStyles, ...props }) => {
-    const selector = first(
-      connector.platform.rootElementSelectors.filter((selector) => {
-        return document.querySelector(selector)
-      })
-    )
-    if (selector) Modal.setAppElement(selector)
-
-    const mergedStyles = useMemo(() => {
-      return {
-        overlay: {
-          ...Modal.defaultStyles.overlay,
-          ...styles.overlay,
-        },
-        content: {
-          ...Modal.defaultStyles.content,
-          ...styles.content,
-        },
-      }
-    }, [styles])
-
-    return (
-      <Modal {...props} styles={mergedStyles} classNames={cx({ darkmode: isDarkMode })}>
-        {children}
-      </Modal>
-    )
-  }
-
-  PlottrModal.propTypes = {
-    isDarkMode: PropTypes.bool,
-    children: PropTypes.node,
-    styles: PropTypes.object,
-    isOpen: PropTypes.bool,
-  }
-
+const PlottrModal = ({ isDarkMode, children, styles = defaultStyles, ...props }) => {
   const {
-    redux,
-    pltr: { selectors },
-  } = connector
+    platform: { rootElementSelectors },
+  } = useContext(PlottrComponentsContext)
 
-  checkDependencies({ redux })
+  const selector = first(
+    rootElementSelectors.filter((selector) => {
+      return document.querySelector(selector)
+    })
+  )
+  if (selector) Modal.setAppElement(selector)
 
-  if (redux) {
-    const { connect } = redux
+  const mergedStyles = useMemo(() => {
+    return {
+      overlay: {
+        ...Modal.defaultStyles.overlay,
+        ...styles.overlay,
+      },
+      content: {
+        ...Modal.defaultStyles.content,
+        ...styles.content,
+      },
+    }
+  }, [styles])
 
-    return connect((state) => ({
-      isDarkMode: selectors.isDarkModeSelector(state),
-    }))(PlottrModal)
-  }
-
-  throw new Error('No connector found for PlottrModal')
+  return (
+    <Modal {...props} styles={mergedStyles} classNames={cx({ darkmode: isDarkMode })}>
+      {children}
+    </Modal>
+  )
 }
 
-export default PlottrModalConnector
+PlottrModal.propTypes = {
+  isDarkMode: PropTypes.bool,
+  children: PropTypes.node,
+  styles: PropTypes.object,
+  isOpen: PropTypes.bool,
+}
+
+const mapStateToProps = (state) => ({
+  isDarkMode: selectors.isDarkModeSelector(state),
+})
+
+export default connect(mapStateToProps)(PlottrModal)

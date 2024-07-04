@@ -24,6 +24,7 @@ const RichTextViewer = ({
   ...props
 }) => {
   const editor = useMemo(() => {
+    // @ts-ignore
     return withReact(createEditor(props.log))
   }, [])
   const genKey = () => {
@@ -53,12 +54,12 @@ const RichTextViewer = ({
   const isLocked = props.lock && props.lock.clientId && props.lock?.clientId !== props.clientId
 
   return (
-    <Slate editor={editor} value={initialValue} key={key.current} id={id}>
+    <Slate editor={editor} value={initialValue} key={key.current}>
       {!props.disabled && isLocked ? (
-        <div className="lock-icon__wrapper" disabled={stealingLock} onClick={stealLock}>
+        <button className="lock-icon__wrapper" disabled={stealingLock} onClick={stealLock}>
           <span>{t('Take Control')}</span>
           <FaLock />
-        </div>
+        </button>
       ) : null}
       <div className={cx('slate-editor__wrapper', props.className, { readonly: true })}>
         <div

@@ -4,7 +4,7 @@
  * Will only create a new function if needed,
  * otherwise will pass back existing functions or null.
  *
- * @param {function} functions to chain
+ * @param {...function} funcs functions to chain
  * @returns {function|null}
  */
 function createChainedFunction(...funcs) {
@@ -20,6 +20,7 @@ function createChainedFunction(...funcs) {
       }
 
       return function chainedFunction(...args) {
+        // @ts-ignore
         acc.apply(this, args)
         f.apply(this, args)
       }

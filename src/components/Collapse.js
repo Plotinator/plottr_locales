@@ -165,7 +165,9 @@ class Collapse extends React.Component {
     const { onEnter, onEntering, onEntered, onExit, onExiting, className, children, ...props } =
       this.props
 
+    // @ts-ignore
     delete props.dimension
+    // @ts-ignore
     delete props.getDimensionValue
 
     const handleEnter = createChainedFunction(this.handleEnter, onEnter)

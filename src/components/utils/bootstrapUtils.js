@@ -49,6 +49,7 @@ export const bsSizes = curry((sizes, defaultSize, Component) => {
   })
 
   const propType = PropTypes.oneOf(values)
+  // @ts-ignore
   propType._values = values
 
   // expose the values on the propType function for documentation
@@ -88,6 +89,7 @@ export const bsStyles = curry((styles, defaultStyle, Component) => {
 
   // expose the values on the propType function for documentation
   Component.STYLES = existing
+  // @ts-ignore
   propType._values = existing
 
   Component.propTypes = {

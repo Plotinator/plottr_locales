@@ -1,41 +1,29 @@
 import React from 'react'
 import PropTypes from 'react-proptypes'
+import { connect } from 'react-redux'
 import cx from 'classnames'
 
+import { selectors } from 'wired-up-pltr'
+
 import Navbar from '../Navbar'
-import { checkDependencies } from '../checkDependencies'
 
-const SubNavConnector = (connector) => {
-  function SubNav({ darkMode, children }) {
-    return (
-      <Navbar fluid className={cx('subnav__container', { darkmode: darkMode })}>
-        {children}
-      </Navbar>
-    )
-  }
-
-  SubNav.propTypes = {
-    darkMode: PropTypes.bool,
-    children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element)]),
-  }
-
-  const {
-    redux,
-    pltr: { selectors },
-  } = connector
-  checkDependencies({ redux })
-
-  if (redux) {
-    const { connect } = redux
-
-    return connect((state) => {
-      return {
-        darkMode: selectors.isDarkModeSelector(state),
-      }
-    })(SubNav)
-  }
-
-  throw new Error('Could not connect SubNav.js')
+function SubNav({ darkMode, children }) {
+  return (
+    <Navbar fluid className={cx('subnav__container', { darkmode: darkMode })}>
+      {children}
+    </Navbar>
+  )
 }
 
-export default SubNavConnector
+SubNav.propTypes = {
+  darkMode: PropTypes.bool,
+  children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element)]),
+}
+
+const mapStateToProps = (state) => {
+  return {
+    darkMode: selectors.isDarkModeSelector(state),
+  }
+}
+
+export default connect(mapStateToProps)(SubNav)

@@ -8,10 +8,13 @@ import { LIST_TYPES, HEADING_TYPES } from './helpers'
 
 export const isBlockActive = (editor, format, logger) => {
   try {
+    // @ts-ignore
     if (!Editor.validSelection(editor)) {
       return false
     } else {
+      // @ts-ignore
       const [match] = Editor.nodes(editor, {
+        // @ts-ignore
         match: (n) => n.type === format,
       })
 
@@ -24,6 +27,7 @@ export const isBlockActive = (editor, format, logger) => {
 }
 
 export const handleHeadings = (editor, format, logger) => {
+  // @ts-ignore
   if (Editor.validSelection(editor)) {
     const isActive = isBlockActive(editor, format, logger)
 
@@ -31,12 +35,15 @@ export const handleHeadings = (editor, format, logger) => {
     // was pressed so we should toggle it out of the heading
     if (isActive) {
       Transforms.setNodes(editor, {
+        // @ts-ignore
         type: 'paragraph',
       })
       return
     }
 
+    // @ts-ignore
     const [isInHeading] = Editor.nodes(editor, {
+      // @ts-ignore
       match: (n) => HEADING_TYPES.includes(n.type),
     })
 
@@ -45,22 +52,29 @@ export const handleHeadings = (editor, format, logger) => {
     // to the new heading type
     if (isInHeading) {
       Transforms.setNodes(editor, {
+        // @ts-ignore
         type: format,
       })
       return
     }
 
     // Remove size styles that were applied to the heading
+    // @ts-ignore
     Editor.removePropertyOnSelectionOrCurrentElement(editor, 'fontSize')
 
     // wrap in the new heading type
-    Transforms.wrapNodes(editor, { type: format })
+    Transforms.wrapNodes(editor, {
+      // @ts-ignore
+      type: format,
+    })
   }
 }
 
 export const handleList = (editor, inputFormat, logger) => {
+  // @ts-ignore
   if (Editor.validSelection(editor)) {
     try {
+      // @ts-ignore
       const isInList = Editor.isInList(editor, editor.selection)
 
       if (
@@ -68,6 +82,7 @@ export const handleList = (editor, inputFormat, logger) => {
         editor?.selection?.focus &&
         isEqual(editor?.selection?.focus, editor?.selection?.anchor)
       ) {
+        // @ts-ignore
         const [parentElement, parentPath] = Editor.parentOfType(editor, editor.selection, {
           match: (n) => LIST_TYPES.includes(n.type),
         })
@@ -76,6 +91,7 @@ export const handleList = (editor, inputFormat, logger) => {
           Transforms.setNodes(
             editor,
             {
+              // @ts-ignore
               type: format,
             },
             {
@@ -91,11 +107,13 @@ export const handleList = (editor, inputFormat, logger) => {
       // to implement.
       Editor.withoutNormalizing(editor, () => {
         Transforms.unwrapNodes(editor, {
+          // @ts-ignore
           match: (n) => LIST_TYPES.includes(n.type),
           split: true,
         })
 
         Transforms.setNodes(editor, {
+          // @ts-ignore
           type: 'paragraph',
         })
       })
@@ -108,6 +126,7 @@ export const handleList = (editor, inputFormat, logger) => {
         Transforms.wrapNodes(editor, block)
 
         // all the nodes should have the same parent since we wrapped them
+        // @ts-ignore
         const [, parentPath] = Editor.parentOfType(editor, editor.selection, {
           match: (n) => LIST_TYPES.includes(n.type),
         })
@@ -115,6 +134,7 @@ export const handleList = (editor, inputFormat, logger) => {
         // if the next sibling is the same kind of list we want to merge them
         // this has to be first because the next operation has the potential of
         // changing the parent path
+        // @ts-ignore
         const nextSibling = Editor.nextSibling(editor, parentPath)
         if (nextSibling != null && nextSibling[0].type === format) {
           Transforms.mergeNodes(editor, {
@@ -123,6 +143,7 @@ export const handleList = (editor, inputFormat, logger) => {
         }
 
         // if the previous sibling is the same kind of list we want to merge them
+        // @ts-ignore
         const previousSibling = Editor.previousSibling(editor, parentPath)
         if (previousSibling != null && previousSibling[0].type === format) {
           Transforms.mergeNodes(editor, {
@@ -138,8 +159,10 @@ export const handleList = (editor, inputFormat, logger) => {
 }
 
 export const handleBlockQuote = (editor, format, logger) => {
+  // @ts-ignore
   if (Editor.validSelection(editor)) {
     const isActive = isBlockActive(editor, format, logger)
+    // @ts-ignore
     const isInList = Editor.isInList(editor, editor.selection)
     if (isInList) {
       return
@@ -147,6 +170,7 @@ export const handleBlockQuote = (editor, format, logger) => {
       try {
         if (isActive) {
           Transforms.unwrapNodes(editor, {
+            // @ts-ignore
             match: (n) => n.type === format,
             split: true,
           })
@@ -154,13 +178,24 @@ export const handleBlockQuote = (editor, format, logger) => {
         }
 
         // if the node is wrapped in a heading, we want the block quote around the heading
+        // @ts-ignore
         const [heading, headingPath] = Editor.parentOfType(editor, editor.selection, {
           match: (n) => HEADING_TYPES.includes(n.type),
         })
         if (heading != null) {
-          Transforms.wrapNodes(editor, { type: format }, { at: headingPath })
+          Transforms.wrapNodes(
+            editor,
+            {
+              // @ts-ignore
+              type: format,
+            },
+            { at: headingPath }
+          )
         } else {
-          Transforms.wrapNodes(editor, { type: format })
+          Transforms.wrapNodes(editor, {
+            // @ts-ignore
+            type: format,
+          })
         }
       } catch (error) {
         logger.error('Error handling a block quote', error)
@@ -189,6 +224,7 @@ const BlockButton = ({ editor, format, icon, logger }) => {
 
   useEffect(() => {
     const timeout = setInterval(() => {
+      // @ts-ignore
       const isInList = Editor.isInList(editor, editor.selection)
       const newIsDisabled = isInList && format === 'block-quote'
       if (newIsDisabled !== isDisabled) {

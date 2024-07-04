@@ -1,5 +1,5 @@
 // Connections
-import connections from '../connections'
+import * as connections from '../connections'
 
 // Basic components (from react-bootstrap)
 import Button from './Button'
@@ -71,6 +71,7 @@ import BookList from './project/BookList'
 import EditSeries from './project/EditSeries'
 import FileLocation from './project/FileLocation'
 import BookChooser from './project/BookChooser'
+import ImportModal from './project/ImportModal'
 
 // Tag
 import TagView from './tag/TagView'
@@ -226,6 +227,7 @@ export {
   NewProjectInputModal,
   SettingsWizard,
   RestructureTimelineModal,
+  ImportModal,
   UndoRedo,
   connections,
 }

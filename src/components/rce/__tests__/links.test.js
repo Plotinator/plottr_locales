@@ -1,35 +1,37 @@
 import React from 'react'
 import { mount } from 'enzyme'
 
-import RichTextEditorConnector from '../RichTextEditor'
-import connector from '../../__fixtures__/pltr-connector'
-
-const RichTextEditor = RichTextEditorConnector(connector)
+import RichTextEditor from '../RichTextEditor'
+import { connect } from '../../__fixtures__/pltr-connector'
 
 describe('links', () => {
   it('should be rendered with href attributes', () => {
     const html = mount(
-      <div id="react-root">
-        <RichTextEditor
-          id="test-editor"
-          editorKey="test-editor"
-          recentFonts={['Forum']}
-          fonts={['Forum', 'IBM Plex Serif', 'Lato', 'Yellowtail']}
-          text={[
-            {
-              children: [
-                { text: '"A single man in possession of good fortune must be in want of a wife."' },
-              ],
-              type: 'paragraph',
-            },
-            {
-              children: [{ text: 'https://www.google.com' }],
-              type: 'link',
-              url: 'https://www.google.com',
-            },
-          ]}
-        />
-      </div>
+      connect(() => (
+        <div id="react-root">
+          <RichTextEditor
+            id="test-editor"
+            editorKey="test-editor"
+            recentFonts={['Forum']}
+            fonts={['Forum', 'IBM Plex Serif', 'Lato', 'Yellowtail']}
+            text={[
+              {
+                children: [
+                  {
+                    text: '"A single man in possession of good fortune must be in want of a wife."',
+                  },
+                ],
+                type: 'paragraph',
+              },
+              {
+                children: [{ text: 'https://www.google.com' }],
+                type: 'link',
+                url: 'https://www.google.com',
+              },
+            ]}
+          />
+        </div>
+      ))
     )
 
     expect(

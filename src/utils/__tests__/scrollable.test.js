@@ -13,6 +13,7 @@ describe('Scrollable', () => {
           const dummyGetRef = () => {
             return dummyRef
           }
+          // @ts-ignore
           const scrollable = new Scrollable(dummyGetRef, (...options) => {
             callsToScrollTo.push(options)
           })
@@ -31,6 +32,7 @@ describe('Scrollable', () => {
         const dummyGetRef = () => {
           return dummyRef
         }
+        // @ts-ignore
         const scrollable = new Scrollable(dummyGetRef, (...options) => {
           callsToScrollTo.push(options)
         })
@@ -48,6 +50,7 @@ describe('Scrollable', () => {
         const dummyGetRef = () => {
           return dummyRef
         }
+        // @ts-ignore
         const scrollable = new Scrollable(dummyGetRef, (...options) => {
           callsToScrollTo.push(options)
         })
@@ -69,6 +72,7 @@ describe('Scrollable', () => {
         const dummyGetRef = () => {
           return dummyRef
         }
+        // @ts-ignore
         const scrollable = new Scrollable(dummyGetRef, (...options) => {
           callsToScrollTo.push(options)
         })
@@ -85,6 +89,7 @@ describe('Scrollable', () => {
           const dummyGetRef = () => {
             return dummyRef
           }
+          // @ts-ignore
           const scrollable = new Scrollable(dummyGetRef, (...options) => {
             callsToScrollTo.push(options)
           })
@@ -106,6 +111,7 @@ describe('Scrollable', () => {
           const dummyGetRef = () => {
             return dummyRef
           }
+          // @ts-ignore
           const scrollable = new Scrollable(dummyGetRef, (...options) => {
             callsToScrollTo.push(options)
           })
@@ -126,6 +132,7 @@ describe('Scrollable', () => {
             const dummyGetRef = () => {
               return dummyRef
             }
+            // @ts-ignore
             const scrollable = new Scrollable(dummyGetRef, (...options) => {
               callsToScrollTo.push(options)
             })

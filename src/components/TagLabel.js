@@ -21,6 +21,7 @@ class TagLabel extends Component {
     if (tag.color) {
       const [useBlack, value] = getContrastYIQ(tag.color)
       if (useBlack) style.backgroundColor = tag.color
+      // @ts-ignore
       else style = { backgroundColor: tag.color }
 
       if (value < 200) style.border = 'none'

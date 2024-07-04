@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import PropTypes from 'react-proptypes'
+import { connect } from 'react-redux'
 
+import { selectors } from 'wired-up-pltr'
 import { t } from 'plottr_locales'
 
-import { checkDependencies } from '../../checkDependencies'
 import Button from '../../Button'
 import { Spinner } from '../../Spinner'
+import { PlottrComponentsContext } from '../../../connections/pltrContext'
 
-const LicenseInfoConnector = (connector) => {
+const LicenseInfo = ({ customerEmail, settings, hasLicense, isInProMode, emailFromLastLogin }) => {
   const {
     platform: {
       machineId,
@@ -17,107 +19,89 @@ const LicenseInfoConnector = (connector) => {
       machineInfo,
       deleteMachineLicenseActivation,
     },
-  } = connector
-  checkDependencies({ machineId, os, machineInfo })
+  } = useContext(PlottrComponentsContext)
 
-  const LicenseInfo = ({
-    customerEmail,
-    settings,
-    hasLicense,
-    isInProMode,
-    emailFromLastLogin,
-  }) => {
-    const [deviceId, setDeviceId] = useState(null)
-    const [loggingOut, setLoggingOut] = useState(false)
+  const [deviceId, setDeviceId] = useState(null)
+  const [loggingOut, setLoggingOut] = useState(false)
 
-    const handleLogOut = () => {
-      setLoggingOut(true)
-      machineInfo().then((info) => {
-        const { id, name, localUserName, os } = info
-        return deleteMachineLicenseActivation(id, os, name, localUserName).then(() => {
-          // the order of these might matter
-          return saveAppSetting('user.frbId', null).then(() => {
-            return logOut().then(() => {
-              setLoggingOut(false)
-            })
+  const handleLogOut = () => {
+    setLoggingOut(true)
+    machineInfo().then((info) => {
+      const { id, name, localUserName, os } = info
+      return deleteMachineLicenseActivation(id, os, name, localUserName).then(() => {
+        // the order of these might matter
+        return saveAppSetting('user.frbId', null).then(() => {
+          return logOut().then(() => {
+            setLoggingOut(false)
           })
         })
       })
+    })
+  }
+
+  useEffect(() => {
+    if (!deviceId && !loggingOut) {
+      machineId().then((id) => {
+        // @ts-ignore
+        setDeviceId(id)
+      })
     }
+  }, [deviceId, setDeviceId, loggingOut])
 
-    useEffect(() => {
-      if (!deviceId && !loggingOut) {
-        machineId().then((id) => {
-          setDeviceId(id)
-        })
-      }
-    }, [deviceId, setDeviceId, loggingOut])
+  const usableDeviceID = os() == 'unknown' ? t('Browser') : deviceId
 
-    const usableDeviceID = os == 'unknown' ? t('Browser') : deviceId
+  const blurClass = settings.user.streamFriendly ? 'blurred' : ''
 
-    const blurClass = settings.user.streamFriendly ? 'blurred' : ''
-
-    return (
-      <div className="dashboard__user-info">
-        <div className="dashboard__user-info license-info__label">
-          <h2>{t('License Information')}</h2>
-        </div>
-        <hr />
-        <div className="dashboard__user-info__wrapper">
-          <dl className="dl-horizontal">
-            {customerEmail || emailFromLastLogin ? (
-              <>
-                <dt>{t('Purchase Email')}</dt>
-                <dd className={blurClass}>{customerEmail ?? emailFromLastLogin}</dd>
-              </>
-            ) : null}
-            {usableDeviceID ? (
-              <>
-                <dt>{t('Device ID')}</dt>
-                <dd className={blurClass}>{usableDeviceID}</dd>
-              </>
-            ) : null}
-            {hasLicense && !isInProMode ? (
-              <>
-                <dt></dt>
-                <dd>
-                  <Button bsStyle="danger" bsSize="small" onClick={handleLogOut}>
-                    {t('Log Out')} {loggingOut ? <Spinner /> : null}
-                  </Button>
-                </dd>
-              </>
-            ) : null}
-          </dl>
-        </div>
+  return (
+    <div className="dashboard__user-info">
+      <div className="dashboard__user-info license-info__label">
+        <h2>{t('License Information')}</h2>
       </div>
-    )
-  }
-
-  LicenseInfo.propTypes = {
-    customerEmail: PropTypes.string,
-    emailFromLastLogin: PropTypes.string,
-    settings: PropTypes.object,
-    hasLicense: PropTypes.bool,
-    isInProMode: PropTypes.bool,
-  }
-
-  const {
-    pltr: { selectors },
-    redux,
-  } = connector
-
-  if (redux) {
-    const { connect } = redux
-    return connect((state) => ({
-      customerEmail: selectors.emailAddressSelector(state),
-      emailFromLastLogin: selectors.emailFromLastLoginSelector(state),
-      settings: selectors.appSettingsSelector(state),
-      hasLicense: selectors.hasActivePlottrLicenseSelector(state),
-      isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
-    }))(LicenseInfo)
-  }
-
-  return LicenseInfo
+      <hr />
+      <div className="dashboard__user-info__wrapper">
+        <dl className="dl-horizontal">
+          {customerEmail || emailFromLastLogin ? (
+            <>
+              <dt>{t('Purchase Email')}</dt>
+              <dd className={blurClass}>{customerEmail ?? emailFromLastLogin}</dd>
+            </>
+          ) : null}
+          {usableDeviceID ? (
+            <>
+              <dt>{t('Device ID')}</dt>
+              <dd className={blurClass}>{usableDeviceID}</dd>
+            </>
+          ) : null}
+          {hasLicense && !isInProMode ? (
+            <>
+              <dt></dt>
+              <dd>
+                <Button bsStyle="danger" bsSize="small" onClick={handleLogOut}>
+                  {t('Log Out')} {loggingOut ? <Spinner /> : null}
+                </Button>
+              </dd>
+            </>
+          ) : null}
+        </dl>
+      </div>
+    </div>
+  )
 }
 
-export default LicenseInfoConnector
+LicenseInfo.propTypes = {
+  customerEmail: PropTypes.string,
+  emailFromLastLogin: PropTypes.string,
+  settings: PropTypes.object,
+  hasLicense: PropTypes.bool,
+  isInProMode: PropTypes.bool,
+}
+
+const mapStateToProps = (state) => ({
+  customerEmail: selectors.emailAddressSelector(state),
+  emailFromLastLogin: selectors.emailFromLastLoginSelector(state),
+  settings: selectors.appSettingsSelector(state),
+  hasLicense: selectors.hasActivePlottrLicenseSelector(state),
+  isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
+})
+
+export default connect(mapStateToProps)(LicenseInfo)

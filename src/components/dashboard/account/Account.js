@@ -1,102 +1,83 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'react-proptypes'
+import { connect } from 'react-redux'
 
+import { selectors } from 'wired-up-pltr'
 import { t } from 'plottr_locales'
 
 import Button from '../../Button'
-import UnconnectedAbout from './About'
-import UnconnectedExpiredView from './ExpiredView'
-import UnconnectedLicenseInfo from './LicenseInfo'
-import UnconnectedProInfo from './ProInfo'
-import UnconnectedTrialInfo from './TrialInfo'
-import { checkDependencies } from '../../checkDependencies'
+import About from './About'
+import ExpiredView from './ExpiredView'
+import LicenseInfo from './LicenseInfo'
+import ProInfo from './ProInfo'
+import TrialInfo from './TrialInfo'
+import { PlottrComponentsContext } from '../../../connections/pltrContext'
 
-const AccountConnector = (connector) => {
+const Account = ({
+  startProOnboarding,
+  isInProMode,
+  hasLicense,
+  isInTrialMode,
+  isInTrialModeWithExpiredTrial,
+}) => {
   const {
     platform: {
       license: { deleteLicense },
-      openExternal,
       os,
-      mpq,
     },
-  } = connector
-  checkDependencies({ openExternal, os, mpq })
+  } = useContext(PlottrComponentsContext)
 
-  const About = UnconnectedAbout(connector)
-  const TrialInfo = UnconnectedTrialInfo(connector)
-  const ExpiredView = UnconnectedExpiredView(connector)
-  const LicenseInfo = UnconnectedLicenseInfo(connector)
-  const ProInfo = UnconnectedProInfo(connector)
+  const hideProButton = os() == 'unknown' || isInProMode
+  const loginButtonText = isInTrialMode ? t('Log in') : t('Log into Plottr Pro')
 
-  const Account = ({
-    startProOnboarding,
-    isInProMode,
-    hasLicense,
-    isInTrialMode,
-    isInTrialModeWithExpiredTrial,
-  }) => {
-    const hideProButton = os() == 'unknown' || isInProMode
-    const loginButtonText = isInTrialMode ? t('Log in') : t('Log into Plottr Pro')
+  const _deleteLicense = () => {
+    // mpq.push('btn_remove_license_confirm')
+    return deleteLicense()
+  }
 
-    const _deleteLicense = () => {
-      // mpq.push('btn_remove_license_confirm')
-      return deleteLicense()
+  const AllAccountInfo = () => {
+    if (isInTrialMode) return <TrialInfo />
+    if (isInTrialModeWithExpiredTrial) return <ExpiredView />
+
+    const body = []
+    if (isInProMode) body.push(<ProInfo key="pro" />)
+
+    if (hasLicense) {
+      body.push(<LicenseInfo key="license" deleteLicense={_deleteLicense} />)
     }
 
-    const AllAccountInfo = () => {
-      if (isInTrialMode) return <TrialInfo />
-      if (isInTrialModeWithExpiredTrial) return <ExpiredView />
+    return <>{body}</>
+  }
 
-      const body = []
-      if (isInProMode) body.push(<ProInfo key="pro" />)
-
-      if (hasLicense) {
-        body.push(<LicenseInfo key="license" deleteLicense={_deleteLicense} />)
-      }
-
-      return <>{body}</>
-    }
-
-    return (
-      <div className="dashboard__account__body">
-        <div className="dashboard__acount__top">
-          <h1>{t('Account')}</h1>
-          {hideProButton ? null : (
-            <div className="start_plottr_pro__button">
-              <Button onClick={startProOnboarding}>{loginButtonText}</Button>
-            </div>
-          )}
-        </div>
-        <AllAccountInfo />
-        <About />
+  return (
+    <div className="dashboard__account__body">
+      <div className="dashboard__acount__top">
+        <h1>{t('Account')}</h1>
+        {hideProButton ? null : (
+          <div className="start_plottr_pro__button">
+            <Button onClick={startProOnboarding}>{loginButtonText}</Button>
+          </div>
+        )}
       </div>
-    )
-  }
-
-  Account.propTypes = {
-    startProOnboarding: PropTypes.func,
-    isInProMode: PropTypes.bool,
-    hasLicense: PropTypes.bool,
-    isInTrialMode: PropTypes.bool,
-    isInTrialModeWithExpiredTrial: PropTypes.bool,
-  }
-
-  const {
-    redux,
-    pltr: { selectors },
-  } = connector
-
-  if (redux) {
-    const { connect } = redux
-    return connect((state) => ({
-      isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
-      hasLicense: selectors.hasActivePlottrLicenseSelector(state),
-      isInTrialMode: selectors.isInTrialModeSelector(state),
-      isInTrialModeWithExpiredTrial: selectors.isInTrialModeWithExpiredTrialSelector(state),
-    }))(Account)
-  }
-
-  throw new Error('Could not connect Account')
+      <AllAccountInfo />
+      <About />
+    </div>
+  )
 }
 
-export default AccountConnector
+Account.propTypes = {
+  startProOnboarding: PropTypes.func,
+  isInProMode: PropTypes.bool,
+  hasLicense: PropTypes.bool,
+  isInTrialMode: PropTypes.bool,
+  isInTrialModeWithExpiredTrial: PropTypes.bool,
+}
+
+const mapStateToProps = (state) => ({
+  isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
+  hasLicense: selectors.hasActivePlottrLicenseSelector(state),
+  isInTrialMode: selectors.isInTrialModeSelector(state),
+  isInTrialModeWithExpiredTrial: selectors.isInTrialModeWithExpiredTrialSelector(state),
+})
+
+export default connect(mapStateToProps)(Account)

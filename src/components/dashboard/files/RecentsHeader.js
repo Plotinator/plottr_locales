@@ -8,12 +8,14 @@ import Col from '../../Col'
 import Row from '../../Row'
 import FormControl from '../../FormControl'
 
-export default function RecentsHeader({ setSearchTerm, isInProMode, isOnWeb }) {
+export default function RecentsHeader({ setSearchTerm, isInProMode, isOnWeb, isImportView }) {
   return (
     <Grid fluid>
       <Row>
         <Col xs={4} sm={8}>
-          {isInProMode && !isOnWeb ? (
+          {isImportView ? (
+            <></>
+          ) : isInProMode && !isOnWeb ? (
             <div className="dashboard__recent-project">
               <h1>{t('Recent Projects')}</h1>
               <h6 className="accented-text">({t('Saved in the Cloud')})</h6>
@@ -39,4 +41,5 @@ RecentsHeader.propTypes = {
   setSearchTerm: PropTypes.func,
   isInProMode: PropTypes.bool,
   isOnWeb: PropTypes.bool,
+  isImportView: PropTypes.bool,
 }

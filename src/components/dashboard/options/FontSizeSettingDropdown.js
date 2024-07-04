@@ -1,5 +1,5 @@
 import React from 'react'
-import { PropTypes } from 'prop-types'
+import PropTypes from 'prop-types'
 
 import DropdownButton from '../../DropdownButton'
 import MenuItem from '../../MenuItem'
@@ -166,7 +166,7 @@ const UnMemoisedFontSizeSettingDropdown = ({
 UnMemoisedFontSizeSettingDropdown.propTypes = {
   defaultFontSize: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   onChange: PropTypes.func.isRequired,
-  onClick: PropTypes.func.isRequired,
+  onClick: PropTypes.func,
   isMultiplier: PropTypes.bool,
 }
 

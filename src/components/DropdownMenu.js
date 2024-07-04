@@ -15,6 +15,7 @@ const defaultProps = {
 
 const UnforwardedDropdownMenu = (
   { open, pullRight, labelledBy, onSelect, className, children, onClose, ...props },
+  // eslint-disable-next-line
   forwardedRef
 ) => {
   const ref = useRef()
@@ -25,13 +26,19 @@ const UnforwardedDropdownMenu = (
     onClose(event, { source: 'rootClose' })
   }
 
-  useRootClose(ref, handleRootClose, { disabled: !open })
+  useRootClose(
+    // @ts-ignore
+    ref,
+    handleRootClose,
+    { disabled: !open }
+  )
 
   const getFocusableMenuItems = () => {
     if (!ref.current) {
       return []
     }
 
+    // @ts-ignore
     return Array.from(ref.current.querySelectorAll('[tabIndex="-1"]'))
   }
 
@@ -94,11 +101,13 @@ const UnforwardedDropdownMenu = (
   return (
     <ul
       {...elementProps}
+      // @ts-ignore
       ref={ref}
       role="menu"
       className={classNames(className, classes)}
       aria-labelledby={labelledBy}
     >
+      {/* @ts-ignore */}
       {ValidComponentChildren.map(children, (child) =>
         React.cloneElement(child, {
           onKeyDown: createChainedFunction(child.props.onKeyDown, handleKeyDown),
@@ -119,6 +128,7 @@ UnforwardedDropdownMenu.propTypes = {
   onClose: PropTypes.func,
 }
 
+// @ts-ignore
 const DropdownMenu = React.forwardRef(UnforwardedDropdownMenu)
 
 DropdownMenu.defaultProps = defaultProps

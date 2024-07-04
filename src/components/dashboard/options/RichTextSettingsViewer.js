@@ -15,6 +15,7 @@ import WordCounter from '../../rce/WordCounter'
 
 const RichTextSettingsViewer = (props) => {
   const editor = useMemo(() => {
+    // @ts-ignore
     return withReact(createEditor(props.log))
   }, [])
   const renderLeaf = useCallback((props) => <Leaf {...props} />, [])

@@ -1,216 +1,183 @@
 import React, { Component } from 'react'
 import PropTypes from 'react-proptypes'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import cx from 'classnames'
 import { TbCopy } from '@react-icons/all-files/tb/TbCopy'
 
 import { t } from 'plottr_locales'
+import { selectors, actions } from 'wired-up-pltr'
 
 import ButtonGroup from '../ButtonGroup'
 import Glyphicon from '../Glyphicon'
 import Button from '../Button'
 import DeleteConfirmModal from '../dialogs/DeleteConfirmModal'
-import UnconnectedImage from '../images/Image'
-import UnconnectedImagePicker from '../images/ImagePicker'
-import UnconnectedTemplatePicker from '../templates/TemplatePicker'
+import Image from '../images/Image'
+import ImagePicker from '../images/ImagePicker'
+import TemplatePicker from '../templates/TemplatePicker'
+import { PlottrComponentsContext } from '../../connections/pltrContext'
 
-import { checkDependencies } from '../checkDependencies'
+class Book extends Component {
+  static contextType = PlottrComponentsContext
 
-const BookConnector = (connector) => {
-  const Image = UnconnectedImage(connector)
-  const ImagePicker = UnconnectedImagePicker(connector)
-  const TemplatePicker = UnconnectedTemplatePicker(connector)
+  // @type {PlottrComponentsContext}
+  context
 
-  const templatesDisabled = connector.platform.templatesDisabled
-  checkDependencies({ templatesDisabled })
+  state = {
+    hovering: false,
+    deleting: false,
+    showTemplatePicker: false,
+    showImagePicker: false,
+  }
 
-  const {
-    platform: { inBrowser, browserHistory },
-  } = connector
+  chooseImage = (newId) => {
+    const imageId = newId == -1 ? null : newId
+    this.props.actions.editBookImage(this.props.book.id, imageId)
+  }
 
-  class Book extends Component {
-    state = {
-      hovering: false,
-      deleting: false,
-      showTemplatePicker: false,
-      showImagePicker: false,
-    }
+  deleteBook = (e) => {
+    e.stopPropagation()
+    this.props.actions.deleteBook(this.props.book.id)
+  }
 
-    chooseImage = (newId) => {
-      const imageId = newId == -1 ? null : newId
-      this.props.actions.editBookImage(this.props.book.id, imageId)
-    }
+  cancelDelete = (e) => {
+    e.stopPropagation()
+    this.setState({ deleting: false, hovering: false })
+  }
 
-    deleteBook = (e) => {
-      e.stopPropagation()
-      this.props.actions.deleteBook(this.props.book.id)
-    }
+  handleDelete = (e) => {
+    e.stopPropagation()
+    this.setState({ deleting: true })
+  }
 
-    cancelDelete = (e) => {
-      e.stopPropagation()
-      this.setState({ deleting: false, hovering: false })
-    }
+  navigateToBook = () => {
+    this.props.uiActions.navigateToBookTimeline(
+      this.props.book.id,
+      this.context.platform.inBrowser,
+      this.context.platform.browserHistory
+    )
+  }
 
-    handleDelete = (e) => {
-      e.stopPropagation()
-      this.setState({ deleting: true })
-    }
+  handleChooseTemplate = (template) => {
+    this.props.addBook(template)
+    this.setState({ showTemplatePicker: false })
+  }
 
-    navigateToBook = () => {
-      this.props.uiActions.navigateToBookTimeline(this.props.book.id, inBrowser, browserHistory)
-    }
+  cancelPickImage = () => {
+    this.setState({ hovering: false })
+  }
 
-    handleChooseTemplate = (template) => {
-      this.props.addBook(template)
-      this.setState({ showTemplatePicker: false })
-    }
+  handleDuplicate = () => {
+    this.props.actions.duplicateBook(this.props.book.id)
+  }
 
-    cancelPickImage = () => {
-      this.setState({ hovering: false })
-    }
+  renderDelete() {
+    if (!this.state.deleting) return null
 
-    handleDuplicate = () => {
-      this.props.actions.duplicateBook(this.props.book.id)
-    }
+    return (
+      <DeleteConfirmModal
+        name={this.props.book.title || t('Untitled')}
+        onDelete={this.deleteBook}
+        onCancel={this.cancelDelete}
+      />
+    )
+  }
 
-    renderDelete() {
-      if (!this.state.deleting) return null
+  handleOpenBookDialog = () => {
+    const { uiActions, book } = this.props
+    uiActions.openEditBookDialog(book.id)
+  }
 
-      return (
-        <DeleteConfirmModal
-          name={this.props.book.title || t('Untitled')}
-          onDelete={this.deleteBook}
-          onCancel={this.cancelDelete}
-        />
-      )
-    }
-
-    handleOpenBookDialog = () => {
-      const { uiActions, book } = this.props
-      uiActions.openEditBookDialog(book.id)
-    }
-
-    renderHoverOptions() {
-      return (
-        <div className={cx('hover-options', { hovering: this.state.hovering })}>
-          <ButtonGroup>
-            <Button title={t('Edit')} onClick={this.handleOpenBookDialog}>
-              <Glyphicon glyph="edit" />
+  renderHoverOptions() {
+    return (
+      <div className={cx('hover-options', { hovering: this.state.hovering })}>
+        <ButtonGroup>
+          <Button title={t('Edit')} onClick={this.handleOpenBookDialog}>
+            <Glyphicon glyph="edit" />
+          </Button>
+          <Button title={t('Duplicate')} onClick={this.handleDuplicate}>
+            <TbCopy />
+          </Button>
+          <ImagePicker
+            chooseImage={this.chooseImage}
+            selectedId={this.props.book.imageId}
+            onClose={this.cancelPickImage}
+            iconOnly
+            deleteButton
+          />
+          {this.props.canDelete ? (
+            <Button bsStyle="danger" onClick={this.handleDelete}>
+              <Glyphicon glyph="trash" />
             </Button>
-            <Button title={t('Duplicate')} onClick={this.handleDuplicate}>
-              <TbCopy />
-            </Button>
-            <ImagePicker
-              chooseImage={this.chooseImage}
-              selectedId={this.props.book.imageId}
-              onClose={this.cancelPickImage}
-              iconOnly
-              deleteButton
-            />
-            {this.props.canDelete ? (
-              <Button bsStyle="danger" onClick={this.handleDelete}>
-                <Glyphicon glyph="trash" />
-              </Button>
-            ) : null}
-          </ButtonGroup>
-        </div>
-      )
-    }
+          ) : null}
+        </ButtonGroup>
+      </div>
+    )
+  }
 
-    renderTemplatePicker() {
-      if (!this.state.showTemplatePicker) return null
+  renderTemplatePicker() {
+    if (!this.state.showTemplatePicker) return null
 
+    return (
+      <TemplatePicker
+        newBook
+        types={['plotlines']}
+        modal={true}
+        isOpen={this.state.showTemplatePicker}
+        close={() => this.setState({ showTemplatePicker: false })}
+        onChooseTemplate={this.handleChooseTemplate}
+      />
+    )
+  }
+
+  renderImage() {
+    const { book } = this.props
+    if (!book.imageId) return null
+
+    return <Image responsive imageId={book.imageId} />
+  }
+
+  renderTitle() {
+    const { book } = this.props
+    if (book.imageId) return null
+    const maxTitleLength = 320
+
+    return <h6>{book.title?.slice?.(0, maxTitleLength) || t('Untitled')}</h6>
+  }
+
+  handleClickAddBook = () => {
+    const { uiActions } = this.props
+    uiActions.openNewBookDialog()
+  }
+
+  render() {
+    const { book, darkMode } = this.props
+
+    if (!book) {
       return (
-        <TemplatePicker
-          newBook
-          types={['plotlines']}
-          modal={true}
-          isOpen={this.state.showTemplatePicker}
-          close={() => this.setState({ showTemplatePicker: false })}
-          onChooseTemplate={this.handleChooseTemplate}
-        />
-      )
-    }
-
-    renderImage() {
-      const { book } = this.props
-      if (!book.imageId) return null
-
-      return <Image responsive imageId={book.imageId} />
-    }
-
-    renderTitle() {
-      const { book } = this.props
-      if (book.imageId) return null
-      const maxTitleLength = 320
-
-      return <h6>{book.title?.slice?.(0, maxTitleLength) || t('Untitled')}</h6>
-    }
-
-    handleClickAddBook = () => {
-      const { uiActions } = this.props
-      uiActions.openNewBookDialog()
-    }
-
-    render() {
-      const { book, darkMode } = this.props
-
-      if (!book) {
-        return (
-          <div className={cx('book-container', 'add', { darkmode: darkMode })}>
-            {this.renderTemplatePicker()}
-            <div className="book add">
-              <div className="front">
-                <div className="cover add">
-                  <div className="book-container__add">
-                    <div onClick={this.handleClickAddBook}>
-                      <Glyphicon glyph="plus" />
-                    </div>
-                    <div
-                      className={cx('use-template', { disabled: templatesDisabled })}
-                      onClick={() => this.setState({ showTemplatePicker: true })}
-                    >
-                      {t('Start with Template')}
-                    </div>
+        <div className={cx('book-container', 'add', { darkmode: darkMode })}>
+          {this.renderTemplatePicker()}
+          <div className="book add">
+            <div className="front">
+              <div className="cover add">
+                <div className="book-container__add">
+                  <div onClick={this.handleClickAddBook}>
+                    <Glyphicon glyph="plus" />
+                  </div>
+                  <div
+                    className={cx('use-template', {
+                      disabled: this.context.platform.templatesDisabled,
+                    })}
+                    onClick={() => this.setState({ showTemplatePicker: true })}
+                  >
+                    {t('Start with Template')}
                   </div>
                 </div>
               </div>
-              <div className="left-side add">
-                <h2>
-                  <span>{t('New Book')}</span>
-                </h2>
-              </div>
             </div>
-          </div>
-        )
-      }
-
-      const titleLength = book?.title?.length ?? 0
-      return (
-        <div
-          className={cx('book-container', { darkmode: darkMode })}
-          onMouseEnter={() => this.setState({ hovering: true })}
-          onMouseLeave={() => this.setState({ hovering: false })}
-        >
-          {this.renderHoverOptions()}
-          {this.renderDelete()}
-          <div
-            className={cx('book', { hovering: this.state.hovering })}
-            onClick={this.navigateToBook}
-          >
-            <div className="front">
-              <div
-                className={cx('cover', {
-                  'smaller-font': titleLength <= 140 && titleLength > 80,
-                  'very-small-font': titleLength > 140,
-                })}
-              >
-                {this.renderTitle()}
-                <div className="book-container__cover-image-wrapper">{this.renderImage()}</div>
-              </div>
-            </div>
-            <div className="left-side">
+            <div className="left-side add">
               <h2>
-                <span>{book.title?.slice?.(0, 48) || t('Untitled')}</span>
+                <span>{t('New Book')}</span>
               </h2>
             </div>
           </div>
@@ -218,47 +185,69 @@ const BookConnector = (connector) => {
       )
     }
 
-    static propTypes = {
-      bookId: PropTypes.number,
-      bookNumber: PropTypes.number,
-      addBook: PropTypes.func,
-      darkMode: PropTypes.bool,
-      canDelete: PropTypes.bool,
-      book: PropTypes.object,
-      actions: PropTypes.object,
-      uiActions: PropTypes.object,
-      books: PropTypes.object,
-    }
+    const titleLength = book?.title?.length ?? 0
+    return (
+      <div
+        className={cx('book-container', { darkmode: darkMode })}
+        onMouseEnter={() => this.setState({ hovering: true })}
+        onMouseLeave={() => this.setState({ hovering: false })}
+      >
+        {this.renderHoverOptions()}
+        {this.renderDelete()}
+        <div
+          className={cx('book', { hovering: this.state.hovering })}
+          onClick={this.navigateToBook}
+        >
+          <div className="front">
+            <div
+              className={cx('cover', {
+                'smaller-font': titleLength <= 140 && titleLength > 80,
+                'very-small-font': titleLength > 140,
+              })}
+            >
+              {this.renderTitle()}
+              <div className="book-container__cover-image-wrapper">{this.renderImage()}</div>
+            </div>
+          </div>
+          <div className="left-side">
+            <h2>
+              <span>{book.title?.slice?.(0, 48) || t('Untitled')}</span>
+            </h2>
+          </div>
+        </div>
+      </div>
+    )
   }
 
-  const {
-    redux,
-    pltr: { actions, selectors },
-  } = connector
-  checkDependencies({ redux, actions, selectors })
-
-  if (redux) {
-    const { connect, bindActionCreators } = redux
-
-    return connect(
-      (state, ownProps) => {
-        return {
-          darkMode: selectors.isDarkModeSelector(state),
-          book: selectors.bookByIdSelector(state, ownProps.bookId),
-          books: selectors.allBooksSelector(state),
-          canDelete: selectors.canDeleteBookSelector(state),
-        }
-      },
-      (dispatch) => {
-        return {
-          actions: bindActionCreators(actions.book, dispatch),
-          uiActions: bindActionCreators(actions.ui, dispatch),
-        }
-      }
-    )(Book)
+  static propTypes = {
+    bookId: PropTypes.number,
+    bookNumber: PropTypes.number,
+    addBook: PropTypes.func,
+    darkMode: PropTypes.bool,
+    canDelete: PropTypes.bool,
+    book: PropTypes.object,
+    actions: PropTypes.object,
+    uiActions: PropTypes.object,
+    books: PropTypes.object,
   }
-
-  throw new Error('Could not connect Book')
 }
 
-export default BookConnector
+const mapStateToProps = (state, ownProps) => {
+  return {
+    darkMode: selectors.isDarkModeSelector(state),
+    book: selectors.bookByIdSelector(
+      state,
+      // @ts-ignore
+      ownProps.bookId
+    ),
+    books: selectors.allBooksSelector(state),
+    canDelete: selectors.canDeleteBookSelector(state),
+  }
+}
+
+export default connect(mapStateToProps, (dispatch) => {
+  return {
+    actions: bindActionCreators(actions.book, dispatch),
+    uiActions: bindActionCreators(actions.ui, dispatch),
+  }
+})(Book)

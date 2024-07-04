@@ -1,40 +1,15 @@
 import React from 'react'
-import { identity } from 'lodash'
+import { Provider } from 'react-redux'
+import { createStore } from 'redux'
 
-import * as rawPltr from 'pltr'
+import { rootReducer } from 'pltr'
 
 import fileState from './example-state'
-
-const selectors = rawPltr.selectors(identity)
-const actions = rawPltr.actions(identity)
-
-const pltr = {
-  ...rawPltr,
-  selectors,
-  actions,
-}
+import { PlottrComponentsContext } from '../../connections/'
 
 const state = fileState
 
 const connector = {
-  redux: {
-    connect: (mapStateToProps, mapDispatchToProps) => (Component) => {
-      const TheComponent = (props) => {
-        return (
-          <Component
-            {...(mapStateToProps ? mapStateToProps(state, props) : {})}
-            {...(mapDispatchToProps && typeof mapDispatchToProps === 'function'
-              ? mapDispatchToProps(identity, props)
-              : mapDispatchToProps)}
-            {...props}
-          />
-        )
-      }
-      return TheComponent
-    },
-    bindActionCreators: identity,
-  },
-  pltr,
   platform: {
     os: () => 'unknown',
     undo: () => {},
@@ -73,6 +48,25 @@ const connector = {
       },
     },
   },
+}
+
+export const connect = (Component) => {
+  const reducer = rootReducer({ normalizeRCEContent: () => {} })
+
+  return (
+    <Provider
+      store={createStore(reducer, {
+        // @ts-ignore
+        user: state,
+        system: {},
+      })}
+    >
+      {/* @ts-ignore */}
+      <PlottrComponentsContext.Provider value={connector}>
+        {Component()}
+      </PlottrComponentsContext.Provider>
+    </Provider>
+  )
 }
 
 export default connector

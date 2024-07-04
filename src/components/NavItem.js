@@ -62,19 +62,26 @@ class NavItem extends React.Component {
 
     const extraClasses = this.props.tabClasses ? this.props.tabClasses(this.props.eventKey) : {}
 
+    // @ts-ignore
     delete props.tabClasses
+    // @ts-ignore
     delete props.onSelect
+    // @ts-ignore
     delete props.eventKey
 
     // These are injected down by `<Nav>` for building `<SubNav>`s.
+    // @ts-ignore
     delete props.activeKey
+    // @ts-ignore
     delete props.activeHref
 
     if (!props.role) {
       if (props.href === '#') {
+        // @ts-ignore
         props.role = 'button'
       }
     } else if (props.role === 'tab') {
+      // @ts-ignore
       props['aria-selected'] = active
     }
 

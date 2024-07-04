@@ -88,6 +88,7 @@ class Overlay extends React.Component {
     }
 
     return (
+      // @ts-ignore
       <BaseOverlay {...props} transition={transition}>
         {child}
       </BaseOverlay>

@@ -9,8 +9,11 @@ const withNormalizer = (editor) => {
     const [node, path] = entry
 
     // Only allow text in headings (no other elements as children)
+    // @ts-ignore
     if (Element.isElement(node) && HEADING_TYPES.includes(node.type)) {
+      // @ts-ignore
       for (const [child, childPath] of Node.children(editor, path)) {
+        // @ts-ignore
         if (Element.isElement(child) && child.type) {
           Transforms.unwrapNodes(editor, { at: childPath })
           return
@@ -19,8 +22,11 @@ const withNormalizer = (editor) => {
     }
 
     // If the element is a paragraph, ensure its children are not paragraphs
+    // @ts-ignore
     if (Element.isElement(node) && node.type == 'paragraph') {
+      // @ts-ignore
       for (const [child, childPath] of Node.children(editor, path)) {
+        // @ts-ignore
         if (Element.isElement(child) && child.type == 'paragraph') {
           Transforms.unwrapNodes(editor, { at: childPath })
           return
@@ -29,21 +35,34 @@ const withNormalizer = (editor) => {
     }
 
     // Only allow list-items and list types as children of lists
+    // @ts-ignore
     if (Element.isElement(node) && LIST_TYPES.includes(node.type)) {
+      // @ts-ignore
       for (const [child, childPath] of Node.children(editor, path)) {
         if (
           Element.isElement(child) &&
+          // @ts-ignore
           !(child.type === 'list-item' || LIST_TYPES.includes(child.type))
         ) {
-          Transforms.setNodes(editor, { type: 'list-item' }, { at: childPath })
+          Transforms.setNodes(
+            editor,
+            {
+              // @ts-ignore
+              type: 'list-item',
+            },
+            { at: childPath }
+          )
           return
         }
       }
     }
 
     // Don't allow list-items to be children of other list-items
+    // @ts-ignore
     if (Element.isElement(node) && node.type == 'list-item') {
+      // @ts-ignore
       for (const [child, childPath] of Node.children(editor, path)) {
+        // @ts-ignore
         if (Element.isElement(child) && child.type == 'list-item') {
           Transforms.liftNodes(editor, { at: childPath })
           return
@@ -52,8 +71,10 @@ const withNormalizer = (editor) => {
     }
 
     // Don't allow image-links to be children of paragraphs
+    // @ts-ignore
     if (Element.isElement(node) && node.type == 'image-link') {
       const parent = Node.parent(editor, path)
+      // @ts-ignore
       if (parent && Element.isElement(parent) && parent.type == 'paragraph') {
         Transforms.liftNodes(editor, { at: path })
         return
@@ -61,14 +82,24 @@ const withNormalizer = (editor) => {
     }
 
     // Don't allow a collection of list items to not have a parent of a list type
+    // @ts-ignore
     if (Element.isElement(node) && !LIST_TYPES.includes(node.type)) {
       let allChildrenAreListTypes =
         node.children && node.children.length && node.children.length > 0
+      // @ts-ignore
       for (const [child] of Node.children(editor, path)) {
+        // @ts-ignore
         allChildrenAreListTypes &= Element.isElement(child) && child.type === 'list-item'
       }
       if (allChildrenAreListTypes) {
-        Transforms.setNodes(editor, { type: 'bulleted-list' }, { at: path })
+        Transforms.setNodes(
+          editor,
+          {
+            // @ts-ignore
+            type: 'bulleted-list',
+          },
+          { at: path }
+        )
         return
       }
     }
@@ -78,18 +109,31 @@ const withNormalizer = (editor) => {
       let allChildrenAreListTypes = node.children.length !== 0
       let allChildrenAreEmpty = node.children.length !== 0
       for (const child of node.children) {
-        allChildrenAreListTypes &= Element.isElement(child) && child.type === 'list-item'
-        allChildrenAreEmpty &=
+        allChildrenAreListTypes =
+          allChildrenAreListTypes &&
+          Element.isElement(child) &&
+          // @ts-ignore
+          child.type === 'list-item'
+        allChildrenAreEmpty =
+          allChildrenAreEmpty &&
           Element.isElement(child) &&
           Array.isArray(child.children) &&
           child.children.every((subChild) => {
+            // @ts-ignore
             return subChild.text === ''
           })
       }
       if (allChildrenAreListTypes) {
         if (allChildrenAreEmpty) {
           node.children.forEach((child, index) => {
-            Transforms.setNodes(editor, { type: 'paragraph' }, { at: [...path, index] })
+            Transforms.setNodes(
+              editor,
+              {
+                // @ts-ignore
+                type: 'paragraph',
+              },
+              { at: [...path, index] }
+            )
           })
         } else {
           node.children = [
@@ -104,19 +148,35 @@ const withNormalizer = (editor) => {
     }
 
     // If a paragraph is missing the "paragraph" type, then add it.
-    if (Element.isElement(node) && node.type === undefined) {
+    if (
+      Element.isElement(node) &&
+      // @ts-ignore
+      node.type === undefined
+    ) {
       let allChildrenAreText = true
+      // @ts-ignore
       for (const [child, _childPath] of Node.children(editor, path)) {
-        allChildrenAreText &= child.text !== undefined
+        allChildrenAreText =
+          allChildrenAreText &&
+          // @ts-ignore
+          child.text !== undefined
       }
       if (allChildrenAreText) {
-        Transforms.setNodes(editor, { type: 'paragraph' }, { at: path })
+        Transforms.setNodes(
+          editor,
+          {
+            // @ts-ignore
+            type: 'paragraph',
+          },
+          { at: path }
+        )
         return
       }
     }
 
     // Ensure that there's always something (by default a paragraph)
     // after an image at the end of a document.
+    // @ts-ignore
     if (Element.isElement(node) && IMAGE_TYPES.includes(node.type)) {
       const parent = Editor.parent(editor, path)
       // If we don't have a parent for an image then something's gone
@@ -147,8 +207,13 @@ const withNormalizer = (editor) => {
 
     // Don't allow paragraphs to contain lists as children, they
     // should be peers.
-    if (Element.isElement(node) && LIST_TYPES.includes(node.type)) {
+    if (
+      Element.isElement(node) &&
+      // @ts-ignore
+      LIST_TYPES.includes(node.type)
+    ) {
       const [parentNode, _parentPath] = Editor.parent(editor, path)
+      // @ts-ignore
       if (parentNode?.type === 'paragraph') {
         // We're a bulleted list in a paragraph.  We should raise this
         // list out of the paragraph.
@@ -159,7 +224,11 @@ const withNormalizer = (editor) => {
 
     // If multiple lists of the same type are separated by empty
     // paragraphs or abut each other.  Join them into a single list.
-    if (Element.isElement(node) && LIST_TYPES.includes(node.type)) {
+    if (
+      Element.isElement(node) &&
+      // @ts-ignore
+      LIST_TYPES.includes(node.type)
+    ) {
       const [parentNode, _parentPath] = Editor.parent(editor, path)
       // Step 1: find the element that comes before this list.
       const thisElementsIndex = parentNode?.children?.indexOf?.(node)
@@ -167,6 +236,7 @@ const withNormalizer = (editor) => {
       if (Element.isElement(previousElement)) {
         // Step 2: check whether that element is the same list type as
         // this node and join their list items if that's the case.
+        // @ts-ignore
         if (previousElement.type === node.type) {
           Transforms.mergeNodes(editor, {
             at: path,
@@ -179,9 +249,12 @@ const withNormalizer = (editor) => {
           // the lists.
           if (
             Element.isElement(previousPreviousElement) &&
+            // @ts-ignore
             previousPreviousElement.type === node.type &&
+            // @ts-ignore
             previousElement.type === 'paragraph' &&
             previousElement.children?.length === 1 &&
+            // @ts-ignore
             previousElement.children[0]?.text === ''
           ) {
             const pathToDelete = [...path.slice(0, -1), path[path.length - 1] - 1]

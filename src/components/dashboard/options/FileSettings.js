@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import PropTypes from 'react-proptypes'
+import { connect } from 'react-redux'
 
+import { selectors } from 'wired-up-pltr'
 import { t } from 'plottr_locales'
 import { helpers } from 'pltr'
 
 import HelpBlock from '../../HelpBlock'
 import Button from '../../Button'
 import Switch from '../../Switch'
-import { checkDependencies } from '../../checkDependencies'
+import { PlottrComponentsContext } from '../../../connections/pltrContext'
 
-const FileSettingsConnector = (connector) => {
+const FileSettings = ({ settings }) => {
   const {
     platform: {
       settings: { saveAppSetting },
@@ -19,144 +21,127 @@ const FileSettingsConnector = (connector) => {
       userDocumentsPath,
       showErrorBox,
     },
-  } = connector
-  checkDependencies({
-    saveAppSetting,
-    showOpenDialog,
-    showItemInFolder,
-    userDocumentsPath,
-    joinPath,
-    filePathAsArray,
-    showErrorBox,
-    directoryIsWritable,
-  })
+  } = useContext(PlottrComponentsContext)
 
-  const FileSettings = ({ settings }) => {
-    const [defaultPath, setDefaultPath] = useState('')
-    const [displayPath, setDisplayPath] = useState('')
+  const [defaultPath, setDefaultPath] = useState('')
+  const [displayPath, setDisplayPath] = useState('')
 
-    useEffect(() => {
-      userDocumentsPath().then((docPath) => {
-        joinPath(docPath, 'Plottr').then((filePath) => setDefaultPath(filePath))
-      })
-    }, [])
+  useEffect(() => {
+    userDocumentsPath().then((docPath) => {
+      joinPath(docPath, 'Plottr').then((filePath) => setDefaultPath(filePath))
+    })
+  }, [])
 
-    useEffect(() => {
-      // we got the defaultPath, the defaultFolder setting is on, but no location set
-      if (defaultPath && settings.user.defaultFolder && !settings.user.defaultFolderLocation) {
-        saveAppSetting('user.defaultFolderLocation', folderPath())
-      }
-    }, [settings, defaultPath])
-
-    useEffect(() => {
-      createDisplayPath(folderPath()).then(setDisplayPath)
-    }, [defaultPath, settings.user.defaultFolderLocation])
-
-    const createDisplayPath = (pathStr) => {
-      return filePathAsArray(pathStr).then((pathArr) => {
-        if (pathArr[0] == '') pathArr.shift()
-        return pathArr.join(' » ')
-      })
+  useEffect(() => {
+    // we got the defaultPath, the defaultFolder setting is on, but no location set
+    if (defaultPath && settings.user.defaultFolder && !settings.user.defaultFolderLocation) {
+      saveAppSetting('user.defaultFolderLocation', folderPath())
     }
+  }, [settings, defaultPath])
 
-    const onChangeDefaultFolderLocation = () => {
-      const title = t('Choose your default folder location')
-      const properties = ['openDirectory', 'createDirectory']
-      showOpenDialog(title, [], properties, folderPath()).then((files) => {
-        if (files && files.length) {
-          const folderPath = files[0]
-          if (!helpers.file.neitherPathContainsTheOther(settings.user.backupLocation, folderPath)) {
-            showErrorBox(
-              t('Invalid default folder location'),
-              t('Please set your default folder to a different location from your backups')
-            )
-          } else {
-            directoryIsWritable(folderPath)
-              .then((isWritable) => {
-                if (isWritable) {
-                  return saveAppSetting('user.defaultFolderLocation', folderPath)
-                } else {
-                  return showErrorBox(
-                    t('Invalid default folder location'),
-                    t("Plottr can't write to that directory.  Please choose another")
-                  ).catch((_error) => {
-                    // Ignore
-                  })
-                }
-              })
-              .catch((error) => {
+  useEffect(() => {
+    createDisplayPath(folderPath()).then(setDisplayPath)
+  }, [defaultPath, settings.user.defaultFolderLocation])
+
+  const createDisplayPath = (pathStr) => {
+    return filePathAsArray(pathStr).then((pathArr) => {
+      if (pathArr[0] == '') pathArr.shift()
+      return pathArr.join(' » ')
+    })
+  }
+
+  const onChangeDefaultFolderLocation = () => {
+    const title = t('Choose your default folder location')
+    const properties = ['openDirectory', 'createDirectory']
+    showOpenDialog(
+      title,
+      // @ts-ignore
+      [],
+      properties,
+      folderPath()
+    ).then((files) => {
+      if (files && files.length) {
+        const folderPath = files[0]
+        if (!helpers.file.neitherPathContainsTheOther(settings.user.backupLocation, folderPath)) {
+          showErrorBox(
+            t('Invalid default folder location'),
+            t('Please set your default folder to a different location from your backups')
+          )
+        } else {
+          directoryIsWritable(folderPath)
+            .then((isWritable) => {
+              if (isWritable) {
+                return saveAppSetting('user.defaultFolderLocation', folderPath)
+              } else {
                 return showErrorBox(
-                  t('Something went wrong'),
-                  t('Plottr ran into an error saving that setting')
-                )
-              })
-          }
-        }
-      })
-    }
-
-    const folderPath = () => {
-      return settings.user.defaultFolderLocation || defaultPath
-    }
-
-    return (
-      <>
-        <div className="dashboard__options__item">
-          <h4>{t('Default Folder')}</h4>
-          <Switch
-            isOn={!!settings.user.defaultFolder}
-            handleToggle={() => {
-              saveAppSetting('user.defaultFolder', !settings.user.defaultFolder)
-              // set a default for the defaultFolderLocation immediately
-              // as it's toggled to on
-              if (!settings.user.defaultFolder && !settings.user.defaultFolderLocation) {
-                saveAppSetting('user.defaultFolderLocation', folderPath())
+                  t('Invalid default folder location'),
+                  t("Plottr can't write to that directory.  Please choose another")
+                ).catch((_error) => {
+                  // Ignore
+                })
               }
-            }}
-            labelText={
-              settings.user.defaultFolder
-                ? t('Your project files will be saved to the folder chosen below')
-                : t('Your project files will be saved to a folder chosen manually')
+            })
+            .catch((_error) => {
+              return showErrorBox(
+                t('Something went wrong'),
+                t('Plottr ran into an error saving that setting')
+              )
+            })
+        }
+      }
+    })
+  }
+
+  const folderPath = () => {
+    return settings.user.defaultFolderLocation || defaultPath
+  }
+
+  return (
+    <>
+      <div className="dashboard__options__item">
+        <h4>{t('Default Folder')}</h4>
+        <Switch
+          isOn={!!settings.user.defaultFolder}
+          handleToggle={() => {
+            saveAppSetting('user.defaultFolder', !settings.user.defaultFolder)
+            // set a default for the defaultFolderLocation immediately
+            // as it's toggled to on
+            if (!settings.user.defaultFolder && !settings.user.defaultFolderLocation) {
+              saveAppSetting('user.defaultFolderLocation', folderPath())
             }
-          />
+          }}
+          labelText={
+            settings.user.defaultFolder
+              ? t('Your project files will be saved to the folder chosen below')
+              : t('Your project files will be saved to a folder chosen manually')
+          }
+        />
+      </div>
+      {settings.user.defaultFolder ? (
+        <div className="dashboard__options__item">
+          <h4>{t('Default Folder Location')}</h4>
+          <HelpBlock className="dashboard__options-item-help">
+            {t('Folder where all your projects get created')}
+          </HelpBlock>
+          <p>
+            <Button onClick={onChangeDefaultFolderLocation}>{t('Choose...')}</Button>
+            {'  '}
+            <Button bsStyle="link" onClick={() => showItemInFolder(folderPath(), '')}>
+              {displayPath}
+            </Button>
+          </p>
         </div>
-        {settings.user.defaultFolder ? (
-          <div className="dashboard__options__item">
-            <h4>{t('Default Folder Location')}</h4>
-            <HelpBlock className="dashboard__options-item-help">
-              {t('Folder where all your projects get created')}
-            </HelpBlock>
-            <p>
-              <Button onClick={onChangeDefaultFolderLocation}>{t('Choose...')}</Button>
-              {'  '}
-              <Button bsStyle="link" onClick={() => showItemInFolder(folderPath())}>
-                {displayPath}
-              </Button>
-            </p>
-          </div>
-        ) : null}
-      </>
-    )
-  }
-
-  FileSettings.propTypes = {
-    settings: PropTypes.object.isRequired,
-  }
-
-  const {
-    pltr: { selectors },
-    redux,
-  } = connector
-
-  if (redux) {
-    const { connect } = redux
-
-    return connect((state) => ({
-      settings: selectors.appSettingsSelector(state),
-    }))(FileSettings)
-  }
-
-  throw new Error('Could not connect FileSettings')
+      ) : null}
+    </>
+  )
 }
 
-export default FileSettingsConnector
+FileSettings.propTypes = {
+  settings: PropTypes.object.isRequired,
+}
+
+const mapStateToProps = (state) => ({
+  settings: selectors.appSettingsSelector(state),
+})
+
+export default connect(mapStateToProps)(FileSettings)

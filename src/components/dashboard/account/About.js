@@ -1,126 +1,118 @@
-import React, { useEffect, useState } from 'react'
-import { PropTypes } from 'prop-types'
+import React, { useEffect, useState, useContext } from 'react'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 
+import { selectors, actions } from 'wired-up-pltr'
 import { t } from 'plottr_locales'
 
 import Button from '../../Button'
+import { PlottrComponentsContext } from '../../../connections/pltrContext'
 
-import { checkDependencies } from '../../checkDependencies'
-
-const AboutConnector = (connector) => {
+const About = ({ settings, inValidLicenseState, requestCheckForUpdates, canReceiveUpdates }) => {
   const {
     platform: {
       update: { checkForUpdates },
-      isDevelopment,
       appVersion,
       openExternal,
       mpq,
       os,
+      showErrorBox,
     },
-  } = connector
-  checkDependencies({
-    checkForUpdates,
-    isDevelopment,
-    appVersion,
-    openExternal,
-    mpq,
-    os,
-  })
+  } = useContext(PlottrComponentsContext)
 
-  const About = ({ settings, inValidLicenseState, requestCheckForUpdates }) => {
-    const [version, setVersion] = useState('')
+  const [version, setVersion] = useState('')
 
-    useEffect(() => {
-      appVersion().then(setVersion)
-    }, [])
+  useEffect(() => {
+    appVersion().then(setVersion)
+  }, [])
 
-    const osIsUnknown = os() === 'unknown'
+  const osIsUnknown = os() === 'unknown'
 
-    const _checkForUpdates = () => {
-      if (isDevelopment) return
+  const _checkForUpdates = () => {
+    if (canReceiveUpdates) {
       mpq.push('btn_check_for_updates')
       requestCheckForUpdates()
       checkForUpdates()
+    } else {
+      showErrorBox(t('Error'), t('You cannot receive updates with an inactive subscription.'))
     }
+  }
 
-    const seeChangelog = () => {
-      mpq.push('btn_see_changelog')
-      openExternal('https://plottr.com/changelog')
+  const seeChangelog = () => {
+    mpq.push('btn_see_changelog')
+    openExternal('https://plottr.com/changelog')
+  }
+
+  const seeAwesomeTeam = () => {
+    openExternal('https://plottr.com/team')
+  }
+
+  const UpdateButton = () => {
+    // Can't update an application on an unknown OS (e.g. OS is unknown on web)
+    if (osIsUnknown) return null
+
+    if (inValidLicenseState || settings.canGetUpdates) {
+      // in the free trial or valid license
+      return (
+        <dd>
+          <Button bsSize="small" onClick={_checkForUpdates}>
+            {t('Check for Updates')}
+          </Button>
+        </dd>
+      )
+    } else {
+      return (
+        <dd>
+          <span className="text-danger">{t('Not Receiving Updates')}</span>
+        </dd>
+      )
     }
+  }
 
-    const UpdateButton = () => {
-      // Can't update an application on an unknown OS (e.g. OS is unknown on web)
-      if (osIsUnknown) return null
-
-      if (inValidLicenseState || settings.canGetUpdates) {
-        // in the free trial or valid license
-        return (
+  return (
+    <div className="dashboard__about">
+      <h1>{t('About Plottr')}</h1>
+      <hr />
+      <div className="dashboard__about__wrapper">
+        <dl className="dl-horizontal">
+          <dt>{t('Version')}</dt>
+          <dd>{version}</dd>
+          {osIsUnknown ? null : <dt>{t('Updates')}</dt>}
+          <UpdateButton />
+          <dt>{t('Changelog')}</dt>
           <dd>
-            <Button bsSize="small" onClick={_checkForUpdates}>
-              {t('Check for Updates')}
-            </Button>
+            <a href="#" onClick={seeChangelog} draggable={false}>
+              {t("See What's New")}
+            </a>
           </dd>
-        )
-      } else {
-        return (
+        </dl>
+        <dl className="dl-horizontal">
+          <dt>{t('Created By')}</dt>
           <dd>
-            <span className="text-danger">{t('Not Receiving Updates')}</span>
+            Cameron Sutter and{' '}
+            <a href="#" onClick={seeAwesomeTeam}>
+              an awesome team
+            </a>
           </dd>
-        )
-      }
-    }
-
-    return (
-      <div className="dashboard__about">
-        <h1>{t('About Plottr')}</h1>
-        <hr />
-        <div className="dashboard__about__wrapper">
-          <dl className="dl-horizontal">
-            <dt>{t('Version')}</dt>
-            <dd>{version}</dd>
-            {osIsUnknown ? null : <dt>{t('Updates')}</dt>}
-            <UpdateButton />
-            <dt>{t('Changelog')}</dt>
-            <dd>
-              <a href="#" onClick={seeChangelog} draggable={false}>
-                {t("See What's New")}
-              </a>
-            </dd>
-          </dl>
-          <dl className="dl-horizontal">
-            <dt>{t('Created By')}</dt>
-            <dd>
-              Cameron Sutter and <a href="https://plottr.com/team">an awesome team</a>
-            </dd>
-          </dl>
-        </div>
+        </dl>
       </div>
-    )
-  }
-
-  About.propTypes = {
-    requestCheckForUpdates: PropTypes.func.isRequired,
-    settings: PropTypes.object.isRequired,
-    inValidLicenseState: PropTypes.bool,
-  }
-
-  const {
-    pltr: { selectors, actions },
-    redux,
-  } = connector
-
-  if (redux) {
-    const { connect } = redux
-    return connect(
-      (state) => ({
-        settings: selectors.appSettingsSelector(state),
-        inValidLicenseState: selectors.isInSomeValidLicenseStateSelector(state),
-      }),
-      { requestCheckForUpdates: actions.applicationState.requestCheckForUpdates }
-    )(About)
-  }
-
-  throw new Error('Could not connect About')
+    </div>
+  )
 }
 
-export default AboutConnector
+About.propTypes = {
+  requestCheckForUpdates: PropTypes.func.isRequired,
+  settings: PropTypes.object.isRequired,
+  inValidLicenseState: PropTypes.bool,
+  canReceiveUpdates: PropTypes.bool,
+}
+
+const mapStateToProps = (state) => ({
+  settings: selectors.appSettingsSelector(state),
+  inValidLicenseState: selectors.isInSomeValidLicenseStateSelector(state),
+  canReceiveUpdates: selectors.canReceiveUpdatesSelector(state),
+})
+
+export default connect(mapStateToProps, {
+  requestCheckForUpdates: actions.applicationState.requestCheckForUpdates,
+})(About)

@@ -1,7 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useContext } from 'react'
 import PropTypes from 'react-proptypes'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import cx from 'classnames'
 
+import { selectors, actions } from 'wired-up-pltr'
 import { t as i18n } from 'plottr_locales'
 
 import NavItem from '../NavItem'
@@ -9,12 +12,12 @@ import Nav from '../Nav'
 import Glyphicon from '../Glyphicon'
 import FormControl from '../FormControl'
 import Button from '../Button'
-import UnconnectedSubNav from '../containers/SubNav'
-import UnconnectedTagView from './TagView'
-import UnconnectedTagCategoriesModal from './TagCategoriesModal'
-import UnconnectedExportNavItem from '../export/ExportNavItem'
-import { checkDependencies } from '../checkDependencies'
+import SubNav from '../containers/SubNav'
+import TagView from './TagView'
+import TagCategoriesModal from './TagCategoriesModal'
+import ExportNavItem from '../export/ExportNavItem'
 import { withEventTargetValue } from '../withEventTargetValue'
+import { PlottrComponentsContext } from '../../connections/pltrContext'
 
 const detailID = (tagsByCategory, tags, categories, tagDetailId) => {
   if (!tags.length) return null
@@ -42,227 +45,196 @@ const detailID = (tagsByCategory, tags, categories, tagDetailId) => {
   return null
 }
 
-const TagListViewConnector = (connector) => {
-  const SubNav = UnconnectedSubNav(connector)
-  const TagView = UnconnectedTagView(connector)
-  const TagCategoriesModal = UnconnectedTagCategoriesModal(connector)
-  const ExportNavItem = UnconnectedExportNavItem(connector)
-
+const TagListView = ({
+  tags,
+  selectedTagId,
+  darkMode,
+  tagsByCategory,
+  categories,
+  tagsSearchTerm,
+  uiActions,
+  isTagTabFocusing,
+  isJumping,
+  recentlyUndidOrRedid,
+}) => {
   const {
     platform: { exportDisabled },
-  } = connector
+  } = useContext(PlottrComponentsContext)
 
-  checkDependencies({ exportDisabled })
+  const [appending, setAppending] = useState(false)
+  const [categoriesDialogOpen, setCategoriesDialogOpen] = useState(false)
+  const [newCategoryId, setNewCategoryId] = useState(null)
 
-  const TagListView = ({
-    tags,
-    selectedTagId,
-    darkMode,
-    tagsByCategory,
-    categories,
-    tagsSearchTerm,
-    uiActions,
-    isTagTabFocusing,
-    isJumping,
-    recentlyUndidOrRedid,
-  }) => {
-    const [appending, setAppending] = useState(false)
-    const [categoriesDialogOpen, setCategoriesDialogOpen] = useState(false)
-    const [newCategoryId, setNewCategoryId] = useState(null)
+  const recentlyUndidOrRedidRef = useRef(false)
+  useEffect(() => {
+    recentlyUndidOrRedidRef.current = !!recentlyUndidOrRedid
+  }, [recentlyUndidOrRedid])
 
-    const recentlyUndidOrRedidRef = useRef(false)
-    useEffect(() => {
-      recentlyUndidOrRedidRef.current = !!recentlyUndidOrRedid
-    }, [recentlyUndidOrRedid])
-
-    useEffect(() => {
-      if (!recentlyUndidOrRedid.current && !isTagTabFocusing && !isJumping) {
-        uiActions.selectTag(detailID(tagsByCategory, tags, categories, selectedTagId))
-      }
-    }, [tags, tagsByCategory, categories])
-
-    const appendBlankTag = (categoryId) => {
-      setAppending(true)
-      setNewCategoryId(categoryId)
+  useEffect(() => {
+    if (!recentlyUndidOrRedid.current && !isTagTabFocusing && !isJumping) {
+      uiActions.selectTag(detailID(tagsByCategory, tags, categories, selectedTagId))
     }
+  }, [tags, tagsByCategory, categories])
 
-    const doneCreating = () => {
-      setAppending(false)
-      setNewCategoryId(null)
-    }
+  const appendBlankTag = (categoryId) => {
+    setAppending(true)
+    setNewCategoryId(categoryId)
+  }
 
-    const renderEditing = (categoryId) => {
-      if (!appending || categoryId !== newCategoryId) {
-        return (
-          <div
-            className={cx('tag-list__new', { darkmode: darkMode })}
-            onClick={() => appendBlankTag(categoryId)}
-          >
-            <Glyphicon glyph="plus" />
-          </div>
-        )
-      } else {
-        return (
-          <TagView
-            key={`tag-category-${categoryId}`}
-            newTag
-            tag={{ title: '', categoryId }}
-            doneCreating={doneCreating}
-          />
-        )
-      }
-    }
+  const doneCreating = () => {
+    setAppending(false)
+    setNewCategoryId(null)
+  }
 
-    const renderTags = () => {
-      return [...categories, { id: null, name: i18n('Uncategorized') }].map((cat) =>
-        renderCategory(cat)
-      )
-    }
-
-    const renderCategory = (category) => {
-      const tagsInCategory = renderVisibleTag(category)
+  const renderEditing = (categoryId) => {
+    if (!appending || categoryId !== newCategoryId) {
       return (
         <div
-          className={cx('tag-list__category-wrapper', { darkmode: darkMode })}
-          key={`category-${category.id}`}
+          className={cx('tag-list__new', { darkmode: darkMode })}
+          onClick={() => appendBlankTag(categoryId)}
         >
-          <h2>{i18n(category.name)}</h2>
-          {tagsInCategory}
-          <div className="tag-list__tag-wrapper">{renderEditing(category.id)}</div>
+          <Glyphicon glyph="plus" />
         </div>
       )
-    }
-
-    const renderVisibleTag = (category) => {
-      if (!tagsByCategory[category.id]) return []
-
-      return tagsByCategory[category.id].map((tag) => {
-        return <TagView key={tag.id} tag={tag} />
-      })
-    }
-
-    const closeDialog = () => {
-      setCategoriesDialogOpen(false)
-    }
-
-    const renderCategoriesModal = () => {
-      if (!categoriesDialogOpen) return null
-      return <TagCategoriesModal closeDialog={closeDialog} />
-    }
-
-    const insertSpace = (event) => {
-      const currentValue = event.target.value
-      const start = event.target.selectionStart
-      const end = event.target.selectionEnd
-      if (event.key === ' ') {
-        uiActions.setTagsSearchTerm(
-          currentValue.slice(0, start) + ' ' + currentValue.slice(end + 1)
-        )
-      }
-      event.preventDefault()
-      event.stopPropagation()
-    }
-
-    const renderSubNav = () => {
+    } else {
       return (
-        <SubNav>
-          <Nav bsStyle="pills">
-            <NavItem>
-              <Button bsSize="small" onClick={() => appendBlankTag(null)}>
-                <Glyphicon glyph="plus" /> {i18n('New')}
-              </Button>
-            </NavItem>
-            <NavItem>
-              <Button bsSize="small" onClick={() => setCategoriesDialogOpen(true)}>
-                <Glyphicon glyph="list" /> {i18n('Categories')}
-              </Button>
-            </NavItem>
-            <NavItem draggable="false">
-              <FormControl
-                onChange={withEventTargetValue(uiActions.setTagsSearchTerm)}
-                onKeyUp={insertSpace}
-                value={tagsSearchTerm || ''}
-                type="text"
-                placeholder="Search"
-                className="toolbar__search"
-              />
-            </NavItem>
-          </Nav>
-          {!exportDisabled && (
-            <Nav pullRight>
-              <ExportNavItem />
-            </Nav>
-          )}
-        </SubNav>
+        <TagView
+          key={`tag-category-${categoryId}`}
+          newTag
+          tag={{ title: '', categoryId }}
+          doneCreating={doneCreating}
+        />
       )
     }
+  }
 
+  const renderTags = () => {
+    return [...categories, { id: null, name: i18n('Uncategorized') }].map((cat) =>
+      renderCategory(cat)
+    )
+  }
+
+  const renderCategory = (category) => {
+    const tagsInCategory = renderVisibleTag(category)
     return (
-      <div className="tag-list__container container-with-sub-nav">
-        {renderSubNav()}
-        {renderCategoriesModal()}
-        <div className="tab-body">
-          <div className="tab-body__title">
-            <h1 className={cx('secondary-text', { darkmode: darkMode })}>{i18n('Tags')}</h1>
-          </div>
-          <div className="tag-list__wrapper">
-            <div className="tag-category-list">{renderTags()}</div>
-          </div>
-        </div>
+      <div
+        className={cx('tag-list__category-wrapper', { darkmode: darkMode })}
+        key={`category-${category.id}`}
+      >
+        <h2>{i18n(category.name)}</h2>
+        {tagsInCategory}
+        <div className="tag-list__tag-wrapper">{renderEditing(category.id)}</div>
       </div>
     )
   }
 
-  TagListView.propTypes = {
-    tags: PropTypes.array.isRequired,
-    darkMode: PropTypes.bool,
-    tagsByCategory: PropTypes.object.isRequired,
-    categories: PropTypes.array.isRequired,
-    tagsSearchTerm: PropTypes.string,
-    selectedTagId: PropTypes.number,
-    uiActions: PropTypes.object.isRequired,
-    isTagTabFocusing: PropTypes.bool,
-    isJumping: PropTypes.bool,
-    recentlyUndidOrRedid: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
+  const renderVisibleTag = (category) => {
+    if (!tagsByCategory[category.id]) return []
+
+    return tagsByCategory[category.id].map((tag) => {
+      return <TagView key={tag.id} tag={tag} />
+    })
   }
 
-  const { redux } = connector
-  const {
-    pltr: { selectors, actions },
-  } = connector
-  const UiActions = actions.ui
-  checkDependencies({
-    redux,
-    actions,
-    UiActions,
-  })
-
-  if (redux) {
-    const { connect, bindActionCreators } = redux
-
-    return connect(
-      (state) => {
-        return {
-          tags: selectors.sortedTagsSelector(state),
-          darkMode: selectors.isDarkModeSelector(state),
-          categories: selectors.sortedTagCategoriesSelector(state),
-          tagsByCategory: selectors.searchedTagsByCategorySelector(state),
-          tagsSearchTerm: selectors.tagsSearchTermSelector(state),
-          selectedTagId: selectors.selectedTagSelector(state),
-          isTagTabFocusing: selectors.isTagTabFocusingSelector(state),
-          isJumping: selectors.isJumpingSelector(state),
-          recentlyUndidOrRedid: selectors.recentlyUndidOrRedidSelector(state),
-        }
-      },
-      (dispatch) => {
-        return {
-          uiActions: bindActionCreators(UiActions, dispatch),
-        }
-      }
-    )(TagListView)
+  const closeDialog = () => {
+    setCategoriesDialogOpen(false)
   }
 
-  throw new Error('Could not connect TagListView')
+  const renderCategoriesModal = () => {
+    if (!categoriesDialogOpen) return null
+    return <TagCategoriesModal closeDialog={closeDialog} />
+  }
+
+  const insertSpace = (event) => {
+    const currentValue = event.target.value
+    const start = event.target.selectionStart
+    const end = event.target.selectionEnd
+    if (event.key === ' ') {
+      uiActions.setTagsSearchTerm(currentValue.slice(0, start) + ' ' + currentValue.slice(end + 1))
+    }
+    event.preventDefault()
+    event.stopPropagation()
+  }
+
+  const renderSubNav = () => {
+    return (
+      <SubNav>
+        <Nav bsStyle="pills">
+          <NavItem>
+            <Button bsSize="small" onClick={() => appendBlankTag(null)}>
+              <Glyphicon glyph="plus" /> {i18n('New')}
+            </Button>
+          </NavItem>
+          <NavItem>
+            <Button bsSize="small" onClick={() => setCategoriesDialogOpen(true)}>
+              <Glyphicon glyph="list" /> {i18n('Categories')}
+            </Button>
+          </NavItem>
+          <NavItem draggable="false">
+            <FormControl
+              onChange={withEventTargetValue(uiActions.setTagsSearchTerm)}
+              onKeyUp={insertSpace}
+              value={tagsSearchTerm || ''}
+              type="text"
+              placeholder="Search"
+              className="toolbar__search"
+            />
+          </NavItem>
+        </Nav>
+        {!exportDisabled && (
+          <Nav pullRight>
+            <ExportNavItem />
+          </Nav>
+        )}
+      </SubNav>
+    )
+  }
+
+  return (
+    <div className="tag-list__container container-with-sub-nav">
+      {renderSubNav()}
+      {renderCategoriesModal()}
+      <div className="tab-body">
+        <div className="tab-body__title">
+          <h1 className={cx('secondary-text', { darkmode: darkMode })}>{i18n('Tags')}</h1>
+        </div>
+        <div className="tag-list__wrapper">
+          <div className="tag-category-list">{renderTags()}</div>
+        </div>
+      </div>
+    </div>
+  )
 }
 
-export default TagListViewConnector
+TagListView.propTypes = {
+  tags: PropTypes.array.isRequired,
+  darkMode: PropTypes.bool,
+  tagsByCategory: PropTypes.object.isRequired,
+  categories: PropTypes.array.isRequired,
+  tagsSearchTerm: PropTypes.string,
+  selectedTagId: PropTypes.number,
+  uiActions: PropTypes.object.isRequired,
+  isTagTabFocusing: PropTypes.bool,
+  isJumping: PropTypes.bool,
+  recentlyUndidOrRedid: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
+}
+
+const mapStateToProps = (state) => {
+  return {
+    tags: selectors.sortedTagsSelector(state),
+    darkMode: selectors.isDarkModeSelector(state),
+    categories: selectors.sortedTagCategoriesSelector(state),
+    tagsByCategory: selectors.searchedTagsByCategorySelector(state),
+    tagsSearchTerm: selectors.tagsSearchTermSelector(state),
+    selectedTagId: selectors.selectedTagSelector(state),
+    isTagTabFocusing: selectors.isTagTabFocusingSelector(state),
+    isJumping: selectors.isJumpingSelector(state),
+    recentlyUndidOrRedid: selectors.recentlyUndidOrRedidSelector(state),
+  }
+}
+
+export default connect(mapStateToProps, (dispatch) => {
+  return {
+    uiActions: bindActionCreators(actions.ui, dispatch),
+  }
+})(TagListView)

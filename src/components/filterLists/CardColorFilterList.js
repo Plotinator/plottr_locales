@@ -9,7 +9,7 @@ class CardColorFilterList extends Component {
   }
 
   render() {
-    let colorObjects = this.props.colors.map((color, idx) => {
+    let colorObjects = this.props.colors.map((color) => {
       //switch to ensure the names (not the hex values) of the default colors display
       switch (color) {
         case '#6cace4':

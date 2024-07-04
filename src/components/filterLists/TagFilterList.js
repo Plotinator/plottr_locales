@@ -1,55 +1,41 @@
 import React, { Component } from 'react'
 import PropTypes from 'react-proptypes'
+import { connect } from 'react-redux'
+
 import { t as i18n } from 'plottr_locales'
+import { selectors } from 'wired-up-pltr'
+
 import GenericFilterList from './GenericFilterList'
 
-import { checkDependencies } from '../checkDependencies'
-
-const TagFilterListConnector = (connector) => {
-  class TagFilterList extends Component {
-    updateItems = (ids) => {
-      this.props.updateItems('tag', ids)
-    }
-
-    render() {
-      return (
-        <GenericFilterList
-          items={this.props.tags}
-          title={i18n('Tags')}
-          singleItemTitle={i18n('Tag')}
-          displayAttribute={'title'}
-          updateItems={this.updateItems}
-          filteredItems={this.props.filteredItems}
-        />
-      )
-    }
+class TagFilterList extends Component {
+  updateItems = (ids) => {
+    this.props.updateItems('tag', ids)
   }
 
-  TagFilterList.propTypes = {
-    tags: PropTypes.array.isRequired,
-    updateItems: PropTypes.func.isRequired,
-    filteredItems: PropTypes.array,
+  render() {
+    return (
+      <GenericFilterList
+        items={this.props.tags}
+        title={i18n('Tags')}
+        singleItemTitle={i18n('Tag')}
+        displayAttribute={'title'}
+        updateItems={this.updateItems}
+        filteredItems={this.props.filteredItems}
+      />
+    )
   }
-
-  const {
-    redux,
-    pltr: {
-      selectors: { tagsFilterItemsSelector },
-    },
-  } = connector
-  checkDependencies({ redux, tagsFilterItemsSelector })
-
-  if (redux) {
-    const { connect } = redux
-
-    return connect((state) => {
-      return {
-        tags: tagsFilterItemsSelector(state),
-      }
-    })(TagFilterList)
-  }
-
-  throw new Error('Could not connect TagFilterList.js')
 }
 
-export default TagFilterListConnector
+TagFilterList.propTypes = {
+  tags: PropTypes.array.isRequired,
+  updateItems: PropTypes.func.isRequired,
+  filteredItems: PropTypes.array,
+}
+
+const mapStateToProps = (state) => {
+  return {
+    tags: selectors.tagsFilterItemsSelector(state),
+  }
+}
+
+export default connect(mapStateToProps)(TagFilterList)

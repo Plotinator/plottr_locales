@@ -57,7 +57,8 @@ class ListGroup extends React.Component {
     return (
       <Component {...elementProps} className={classNames(className, classes)}>
         {useListItem
-          ? ValidComponentChildren.map(children, (child) => cloneElement(child, { listItem: true }))
+          ? // @ts-ignore
+            ValidComponentChildren.map(children, (child) => cloneElement(child, { listItem: true }))
           : children}
       </Component>
     )

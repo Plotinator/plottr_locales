@@ -40,7 +40,8 @@ function onlyProgressBar(props, propName, componentName) {
     if (child.type === element.type) return
 
     const childIdentifier = React.isValidElement(child)
-      ? child.type.displayName || child.type.name || child.type
+      ? // @ts-ignore
+        child.type.displayName || child.type.name || child.type
       : child
     error = new Error(
       `Children of ${componentName} can contain only ProgressBar ` +
@@ -110,6 +111,7 @@ class ProgressBar extends React.Component {
     const { isChild, ...props } = this.props
 
     if (isChild) {
+      // @ts-ignore
       return this.renderProgressBar(props)
     }
 
@@ -131,8 +133,10 @@ class ProgressBar extends React.Component {
     return (
       <div {...wrapperProps} className={classNames(className, 'progress')}>
         {children
-          ? ValidComponentChildren.map(children, (child) => cloneElement(child, { isChild: true }))
-          : this.renderProgressBar({
+          ? // @ts-ignore
+            ValidComponentChildren.map(children, (child) => cloneElement(child, { isChild: true }))
+          : // @ts-ignore
+            this.renderProgressBar({
               min,
               now,
               max,

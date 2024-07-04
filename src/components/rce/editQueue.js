@@ -20,28 +20,26 @@ export const enqueue = (editQueue, editorId, edit, editNumber) => {
 }
 
 export const drainQueue = (editorQueue) => {
-  const toConsume = Object.entries(editorQueue).reduce(
-    (toConsume, [editorId, { queue, anchor }]) => {
-      let index = 0
-      const first = queue[index]
-      if (!first) return toConsume
+  const toConsume = Object.entries(editorQueue).reduce((toConsume, [editorId, { queue }]) => {
+    let index = 0
+    const first = queue[index]
+    if (!first) return toConsume
 
-      let { editNumber, edit } = first
-      while (editNumber === editorQueue[editorId].anchor) {
-        toConsume.push(edit)
-        editorQueue[editorId].anchor = editNumber + 1
-        const next = queue[++index]
-        if (!next) break
-        editNumber = next.editNumber
-        edit = next.edit
-      }
+    let { editNumber, edit } = first
+    while (editNumber === editorQueue[editorId].anchor) {
+      // @ts-ignore
+      toConsume.push(edit)
+      editorQueue[editorId].anchor = editNumber + 1
+      const next = queue[++index]
+      if (!next) break
+      editNumber = next.editNumber
+      edit = next.edit
+    }
 
-      editorQueue[editorId].queue = editorQueue[editorId].queue.slice(index)
+    editorQueue[editorId].queue = editorQueue[editorId].queue.slice(index)
 
-      return toConsume
-    },
-    []
-  )
+    return toConsume
+  }, [])
 
   return toConsume
 }

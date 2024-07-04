@@ -52,7 +52,9 @@ class NavDropdown extends React.Component {
     const { title, activeKey, activeHref, className, style, children, ...props } = this.props
 
     const active = this.isActive(this, activeKey, activeHref)
+    // @ts-ignore
     delete props.active // Accessed via this.isActive().
+    // @ts-ignore
     delete props.eventKey // Accessed via this.isActive().
 
     const [dropdownProps, toggleProps] = splitComponentProps(props, Dropdown.ControlledComponent)
@@ -72,6 +74,7 @@ class NavDropdown extends React.Component {
         </Dropdown.Toggle>
 
         <Dropdown.Menu>
+          {/* @ts-ignore */}
           {ValidComponentChildren.map(children, (child) =>
             React.cloneElement(child, {
               active: this.isActive(child, activeKey, activeHref),

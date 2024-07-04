@@ -235,7 +235,9 @@ class Modal extends React.Component {
           transition={animation ? DialogTransition : undefined}
           backdrop={backdrop}
           backdropTransition={animation ? BackdropTransition : undefined}
+          // @ts-ignore
           onEntering={createChainedFunction(onEntering, this.handleEntering)}
+          // @ts-ignore
           onExited={createChainedFunction(onExited, this.handleExited)}
         >
           <Dialog

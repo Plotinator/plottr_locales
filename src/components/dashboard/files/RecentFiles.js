@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 import { AiOutlineTeam } from '@react-icons/all-files/ai/AiOutlineTeam'
 import { AiOutlineRead } from '@react-icons/all-files/ai/AiOutlineRead'
 import { GiQuillInk } from '@react-icons/all-files/gi/GiQuillInk'
@@ -8,16 +9,17 @@ import { isEqual, sortBy } from 'lodash'
 import { StickyTable, Row, Cell } from 'react-sticky-table'
 import cx from 'classnames'
 
+import { selectors } from 'wired-up-pltr'
 import { t } from 'plottr_locales'
 import { helpers } from 'pltr'
 
 import MissingIndicator from './MissingIndicator'
-import UnconnectedFileActions from './FileActions'
+import FileActions from './FileActions'
 import RecentsHeader from './RecentsHeader'
-import { checkDependencies } from '../../checkDependencies'
 import { Spinner } from '../../Spinner'
 import prettydate from 'pretty-date'
 import Grid from '../../Grid'
+import { PlottrComponentsContext } from '../../../connections/pltrContext'
 
 const oneDay = 1000 * 60 * 60 * 24
 
@@ -62,264 +64,252 @@ const formatFileName = (fileName) => {
   return safelyDecodeURI(formattedFileName)
 }
 
-const RecentFilesConnector = (connector) => {
+const RecentFiles = ({
+  isInOfflineMode,
+  resuming,
+  sortedKnownFiles,
+  loadingFileList,
+  shouldBeInPro,
+  offlineModeEnabled,
+  isOnWeb,
+  isInProMode,
+  settings,
+  hasDefaultFolder,
+  isImportView,
+}) => {
   const {
     platform: {
+      importExistingCloudFile,
       file: { doesFileExist, openKnownFile, listOfflineFiles },
-      log,
       errorReporter: { getInstance },
     },
-  } = connector
-  checkDependencies({
-    doesFileExist,
-    openKnownFile,
-    log,
-    listOfflineFiles,
-    getInstance,
-  })
+  } = useContext(PlottrComponentsContext)
 
-  const FileActions = UnconnectedFileActions(connector)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [sortedFiles, setSortedFiles] = useState(sortedKnownFiles)
+  const [missingFiles, setMissing] = useState([])
+  const [selectedFile, selectFile] = useState(null)
+  const today = new Date()
 
-  const RecentFiles = ({
-    isInOfflineMode,
-    resuming,
-    sortedKnownFiles,
-    loadingFileList,
-    shouldBeInPro,
-    offlineModeEnabled,
-    isOnWeb,
-    isInProMode,
-    settings,
-    hasDefaultFolder,
-  }) => {
-    const [searchTerm, setSearchTerm] = useState('')
-    const [sortedFiles, setSortedFiles] = useState(sortedKnownFiles)
-    const [missingFiles, setMissing] = useState([])
-    const [selectedFile, selectFile] = useState(null)
-    const today = new Date()
-
-    useEffect(() => {
-      setTimeout(() => {
-        Promise.all(
-          sortedFiles
-            .map((file) => {
-              const fileURL = file.fileURL
-              if (!fileURL) {
-                return null
-              }
-              if (helpers.file.isPlottrCloudFile(file)) {
-                return null
-              }
-              return doesFileExist(fileURL).then((exists) => {
-                if (!exists) {
-                  return fileURL
-                }
-                return null
-              })
-            })
-            .filter(Boolean)
-        ).then((newMissing) => {
-          setMissing(newMissing.filter(Boolean))
-        })
-      }, 2000)
-    }, [sortedFiles])
-
-    useEffect(() => {
-      if ((!isInOfflineMode && !resuming) || !shouldBeInPro) {
-        const newSortedFiles = sortedKnownFiles.filter((file) => {
-          return (file.fileName || '').toLowerCase().includes(searchTerm.toLowerCase())
-        })
-        if (!isEqual(newSortedFiles, sortedFiles)) {
-          setSortedFiles(newSortedFiles)
-        }
-      } else if (offlineModeEnabled && isInOfflineMode) {
-        listOfflineFiles()
-          .then((offlineFiles) => {
-            const sortedFilteredOfflineFiles = sortBy(
-              offlineFiles.filter((file) => {
-                return file.fileName.toLowerCase().includes(searchTerm)
-              }),
-              (file) => {
-                return helpers.file.getDateValue(file)
-              }
-            )
-            if (!isEqual(sortedFiles, sortedFilteredOfflineFiles)) {
-              setSortedFiles(sortedFilteredOfflineFiles)
+  useEffect(() => {
+    setTimeout(() => {
+      Promise.all(
+        sortedFiles
+          .map((file) => {
+            const fileURL = file.fileURL
+            if (!fileURL) {
+              return null
             }
-          })
-          .catch((error) => {
-            setSortedFiles([])
-            getInstance().then((errorReporter) => {
-              errorReporter.error('Failed to read offline files', error)
+            if (helpers.file.isPlottrCloudFile(file)) {
+              return null
+            }
+            return doesFileExist(fileURL).then((exists) => {
+              if (!exists) {
+                return fileURL
+              }
+              return null
             })
           })
-      }
-    }, [offlineModeEnabled, isInOfflineMode, resuming, searchTerm, sortedKnownFiles])
-
-    const openFile = (fileURL) => {
-      return openKnownFile(fileURL)
-    }
-
-    const renderRecents = () => {
-      if (!isInOfflineMode && loadingFileList) return <Spinner />
-      if (!sortedFiles.length) return <span>{t('No files found.')}</span>
-
-      const fileWithPermissionsExists = Object.values(sortedFiles).some(
-        ({ permission }) => permission
-      )
-
-      const renderLastOpenTime = (lastOpened) => {
-        try {
-          // less than a day, show something more helpful
-          if (today.getTime() - lastOpened.getTime() < oneDay) {
-            return prettydate.format(lastOpened)
-          }
-
-          // is exactly at 12 AM
-          if (lastOpened.getHours() == 0) return null
-
-          return t.time(lastOpened, 'medium')
-        } catch (error) {
-          getInstance().then((errorReporter) => {
-            errorReporter.error('Failed to compute last open time from', lastOpened, error)
-          })
-          // no time value, do nothing
-          return null
-        }
-      }
-
-      const renderedFiles = sortedFiles.map((f, idx) => {
-        if (!f) return null
-
-        const isProFile = helpers.file.isPlottrCloudFile(f)
-        const lastOpen = helpers.file.getDateValue(f)
-        const isInDefaultFolder =
-          hasDefaultFolder && f.fileURL.includes(settings.user.defaultFolderLocation)
-        let formattedPath = ''
-        if (!isProFile && f.fileURL && !f.isTempFile) {
-          formattedPath = f.pathToContainingFolder.join(' » ')
-        }
-        let missing = null
-        if (missingFiles.includes(f.fileURL)) {
-          missing = <MissingIndicator />
-        }
-        const selected = selectedFile == f.fileURL
-        return (
-          <Row
-            key={idx}
-            onDoubleClick={() => {
-              if (!missing) openFile(f.fileURL)
-            }}
-            onClick={() => selectFile(selected ? null : f.fileURL)}
-            className={cx({ selected: selected })}
-          >
-            <Cell className={cx({ disabled: !!missing })}>
-              <div className="dashboard__recent-files__file-cell">
-                <div>
-                  <div className="title">
-                    {missing}
-                    {f.isOfflineBackup ? (
-                      <>
-                        <FaSignal title="This is an offline backup of a Plottr cloud file" />{' '}
-                      </>
-                    ) : null}
-                    {formatFileName(f.fileName)}
-                  </div>
-                  <div className="secondary-text">{formattedPath}</div>
-                </div>
-                <FileActions
-                  missing={!!missing}
-                  offline={f.isOfflineBackup}
-                  id={f.fileURL}
-                  fileName={f.fileName}
-                  fileURL={f.fileURL}
-                  openFile={openFile}
-                  permission={f.permission}
-                  isCloudFile={f.isCloudFile}
-                  isInDefaultFolder={isInDefaultFolder}
-                />
-              </div>
-            </Cell>
-            {f.permission ? (
-              <Cell>{renderPermission(f.permission)}</Cell>
-            ) : fileWithPermissionsExists ? (
-              <Cell> </Cell>
-            ) : null}
-            <Cell className={cx({ disabled: !!missing })}>
-              {f.lastOpened !== null && lastOpen ? (
-                <div className="lastOpen">
-                  <span>{t.date(lastOpen, 'monthDay')}</span>
-                  <span> </span>
-                  <span>{renderLastOpenTime(lastOpen)}</span>
-                </div>
-              ) : (
-                t('Never opened')
-              )}
-            </Cell>
-          </Row>
-        )
+          .filter(Boolean)
+      ).then((newMissing) => {
+        // @ts-ignore
+        setMissing(newMissing.filter(Boolean))
       })
+    }, 2000)
+  }, [sortedFiles])
 
-      return (isInOfflineMode || !loadingFileList) && renderedFiles ? (
-        <Grid fluid className="dashboard__recent-files__table">
-          <StickyTable leftStickyColumnCount={0}>
-            <Row>
-              <Cell>{t('Name')}</Cell>
-              {fileWithPermissionsExists ? <Cell>{t('Permission')}</Cell> : null}
-              <Cell>{t('Last opened by you')}</Cell>
-            </Row>
-            {renderedFiles}
-          </StickyTable>
-        </Grid>
-      ) : (
-        <Spinner />
-      )
+  useEffect(() => {
+    if ((!isInOfflineMode && !resuming) || !shouldBeInPro) {
+      const newSortedFiles = sortedKnownFiles.filter((file) => {
+        return (file.fileName || '').toLowerCase().includes(searchTerm.toLowerCase())
+      })
+      if (!isEqual(newSortedFiles, sortedFiles)) {
+        setSortedFiles(newSortedFiles)
+      }
+    } else if (offlineModeEnabled && isInOfflineMode) {
+      listOfflineFiles()
+        .then((offlineFiles) => {
+          const sortedFilteredOfflineFiles = sortBy(
+            offlineFiles.filter((file) => {
+              return file.fileName.toLowerCase().includes(searchTerm)
+            }),
+            (file) => {
+              return helpers.file.getDateValue(file)
+            }
+          )
+          if (!isEqual(sortedFiles, sortedFilteredOfflineFiles)) {
+            setSortedFiles(sortedFilteredOfflineFiles)
+          }
+        })
+        .catch((error) => {
+          setSortedFiles([])
+          getInstance().then((errorReporter) => {
+            errorReporter.error('Failed to read offline files', error)
+          })
+        })
+    }
+  }, [offlineModeEnabled, isInOfflineMode, resuming, searchTerm, sortedKnownFiles])
+
+  const openFile = (file) => {
+    return isImportView ? importExistingCloudFile(file) : openKnownFile(file.fileURL, true)
+  }
+
+  const renderRecents = () => {
+    if (!isInOfflineMode && loadingFileList) return <Spinner />
+    if (!sortedFiles.length) return <span>{t('No files found.')}</span>
+
+    const fileWithPermissionsExists = Object.values(sortedFiles).some(
+      ({ permission }) => permission
+    )
+
+    const renderLastOpenTime = (lastOpened) => {
+      try {
+        // less than a day, show something more helpful
+        if (today.getTime() - lastOpened.getTime() < oneDay) {
+          return prettydate.format(lastOpened)
+        }
+
+        // is exactly at 12 AM
+        if (lastOpened.getHours() == 0) return null
+
+        return t.time(lastOpened, 'medium')
+      } catch (error) {
+        getInstance().then((errorReporter) => {
+          errorReporter.error(`Failed to compute last open time from. ${lastOpened}`, error)
+        })
+        // no time value, do nothing
+        return null
+      }
     }
 
-    return (
-      <div className="dashboard__recent-files">
-        <RecentsHeader setSearchTerm={setSearchTerm} isInProMode={isInProMode} isOnWeb={isOnWeb} />
-        {renderRecents() || <Spinner />}
-      </div>
+    const renderedFiles = sortedFiles.map((f, idx) => {
+      if (!f) return null
+
+      const isProFile = helpers.file.isPlottrCloudFile(f)
+      const lastOpen = helpers.file.getDateValue(f)
+      const isInDefaultFolder =
+        hasDefaultFolder && f.fileURL.includes(settings.user.defaultFolderLocation)
+      let formattedPath = ''
+      if (!isProFile && f.fileURL && !f.isTempFile) {
+        formattedPath = f.pathToContainingFolder.join(' » ')
+      }
+      let missing = null
+      // @ts-ignore
+      if (missingFiles.includes(f.fileURL)) {
+        missing = <MissingIndicator />
+      }
+      const selected = selectedFile == f.fileURL
+      return (
+        <Row
+          key={idx}
+          onDoubleClick={() => {
+            if (!missing) openFile(f)
+          }}
+          onClick={() => selectFile(selected ? null : f.fileURL)}
+          className={cx({ selected: selected })}
+        >
+          <Cell className={cx({ disabled: !!missing })}>
+            <div className="dashboard__recent-files__file-cell">
+              <div>
+                <div className="title">
+                  {missing}
+                  {f.isOfflineBackup ? (
+                    <>
+                      <FaSignal title="This is an offline backup of a Plottr cloud file" />{' '}
+                    </>
+                  ) : null}
+                  {formatFileName(f.fileName)}
+                </div>
+                <div className="secondary-text">{formattedPath}</div>
+              </div>
+              <FileActions
+                missing={!!missing}
+                offline={f.isOfflineBackup}
+                id={f.fileURL}
+                fileName={f.fileName}
+                fileURL={f.fileURL}
+                openFile={openFile}
+                permission={f.permission}
+                isCloudFile={f.isCloudFile}
+                isInDefaultFolder={isInDefaultFolder}
+                isImportView={isImportView}
+              />
+            </div>
+          </Cell>
+          {isImportView ? null : f.permission ? (
+            <Cell>{renderPermission(f.permission)}</Cell>
+          ) : fileWithPermissionsExists ? (
+            <Cell> </Cell>
+          ) : null}
+          <Cell className={cx({ disabled: !!missing })}>
+            {f.lastOpened !== null && lastOpen ? (
+              <div className="lastOpen">
+                <span>{t.date(lastOpen, 'monthDay')}</span>
+                <span> </span>
+                <span>{renderLastOpenTime(lastOpen)}</span>
+              </div>
+            ) : (
+              t('Never opened')
+            )}
+          </Cell>
+        </Row>
+      )
+    })
+
+    return (isInOfflineMode || !loadingFileList) && renderedFiles ? (
+      <Grid fluid className="dashboard__recent-files__table">
+        <StickyTable leftStickyColumnCount={0}>
+          <Row>
+            <Cell>{t('Name')}</Cell>
+            {fileWithPermissionsExists && !isImportView ? <Cell>{t('Permission')}</Cell> : null}
+            <Cell>{t('Last opened by you')}</Cell>
+          </Row>
+          {renderedFiles}
+        </StickyTable>
+      </Grid>
+    ) : (
+      <Spinner />
     )
   }
 
-  RecentFiles.propTypes = {
-    isInOfflineMode: PropTypes.bool,
-    resuming: PropTypes.bool,
-    sortedKnownFiles: PropTypes.array.isRequired,
-    loadingFileList: PropTypes.bool,
-    shouldBeInPro: PropTypes.bool,
-    offlineModeEnabled: PropTypes.bool,
-    isOnWeb: PropTypes.bool,
-    isInProMode: PropTypes.bool,
-    settings: PropTypes.object,
-    hasDefaultFolder: PropTypes.bool,
-  }
-
-  const {
-    pltr: { selectors },
-    redux,
-  } = connector
-
-  if (redux) {
-    const { connect } = redux
-
-    return connect((state) => ({
-      isInOfflineMode: selectors.isInOfflineModeSelector(state),
-      resuming: selectors.isResumingSelector(state),
-      sortedKnownFiles: selectors.flatSortedKnownFilesSelector(state),
-      loadingFileList: selectors.fileListIsLoadingSelector(state),
-      shouldBeInPro: selectors.shouldBeInProSelector(state),
-      offlineModeEnabled: selectors.offlineModeEnabledSelector(state),
-      isOnWeb: selectors.isOnWebSelector(state),
-      isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
-      settings: selectors.appSettingsSelector(state),
-      hasDefaultFolder: selectors.hasDefaultFolderSelector(state),
-    }))(RecentFiles)
-  }
-
-  throw new Error('Could not connect RecentFiles')
+  return (
+    <div className="dashboard__recent-files">
+      <RecentsHeader
+        setSearchTerm={setSearchTerm}
+        isInProMode={isInProMode}
+        isOnWeb={isOnWeb}
+        isImportView={isImportView}
+      />
+      {renderRecents() || <Spinner />}
+    </div>
+  )
 }
 
-export default RecentFilesConnector
+RecentFiles.propTypes = {
+  isInOfflineMode: PropTypes.bool,
+  resuming: PropTypes.bool,
+  sortedKnownFiles: PropTypes.array.isRequired,
+  loadingFileList: PropTypes.bool,
+  shouldBeInPro: PropTypes.bool,
+  offlineModeEnabled: PropTypes.bool,
+  isOnWeb: PropTypes.bool,
+  isInProMode: PropTypes.bool,
+  settings: PropTypes.object,
+  hasDefaultFolder: PropTypes.bool,
+  isImportView: PropTypes.bool,
+}
+
+const mapStateToProps = (state) => ({
+  isInOfflineMode: selectors.isInOfflineModeSelector(state),
+  resuming: selectors.isResumingSelector(state),
+  sortedKnownFiles: selectors.flatSortedKnownFilesSelector(state),
+  loadingFileList: selectors.fileListIsLoadingSelector(state),
+  shouldBeInPro: selectors.shouldBeInProSelector(state),
+  offlineModeEnabled: selectors.offlineModeEnabledSelector(state),
+  isOnWeb: selectors.isOnWebSelector(state),
+  isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
+  settings: selectors.appSettingsSelector(state),
+  hasDefaultFolder: selectors.hasDefaultFolderSelector(state),
+})
+
+export default connect(mapStateToProps)(RecentFiles)

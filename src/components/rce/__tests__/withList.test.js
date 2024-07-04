@@ -29,9 +29,21 @@ describe('withList', () => {
     })
 
     it('it inserts a break when inside a non list block', () => {
-      editor.insertNode(blockQuote([headingOne('Text')]))
+      editor.insertNode(
+        blockQuote([
+          // @ts-ignore
+          headingOne('Text'),
+        ])
+      )
       editor.insertBreak()
-      expect(editor.children).toEqual([blockQuote([headingOne('Text'), headingOne()])])
+      expect(editor.children).toEqual([
+        blockQuote([
+          // @ts-ignore
+          headingOne('Text'),
+          // @ts-ignore
+          headingOne(),
+        ]),
+      ])
     })
 
     it('it inserts a new list-item when the list-item has text', () => {
@@ -59,9 +71,19 @@ describe('withList', () => {
     })
 
     it('deletes backwards if we are in a non list block', () => {
-      editor.insertNode(blockQuote([paragraph('Text')]))
+      editor.insertNode(
+        blockQuote([
+          // @ts-ignore
+          paragraph('Text'),
+        ])
+      )
       editor.deleteBackward()
-      expect(editor.children).toEqual([blockQuote([paragraph('Tex')])])
+      expect(editor.children).toEqual([
+        blockQuote([
+          // @ts-ignore
+          paragraph('Tex'),
+        ]),
+      ])
     })
 
     it('deletes backwards if in a non empty list item', () => {

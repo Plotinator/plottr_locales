@@ -1,58 +1,46 @@
 import React, { Component } from 'react'
 import PropTypes from 'react-proptypes'
+import { connect } from 'react-redux'
+
 import { t as i18n } from 'plottr_locales'
+import { selectors } from 'wired-up-pltr'
+
 import GenericFilterList from './GenericFilterList'
 
-import { checkDependencies } from '../checkDependencies'
-
-const BookFilterListConnector = (connector) => {
-  class BookFilterList extends Component {
-    updateItems = (ids) => {
-      this.props.updateItems('book', ids)
-    }
-
-    render() {
-      let books = this.props.books.allIds.map((id) => {
-        let book = { ...this.props.books[id.toString()] }
-        book.title = book.title || i18n('Untitled')
-        return book
-      })
-      return (
-        <GenericFilterList
-          items={books}
-          title={i18n('Books')}
-          singleItemTitle={i18n('Book')}
-          displayAttribute={'title'}
-          updateItems={this.updateItems}
-          filteredItems={this.props.filteredItems}
-        />
-      )
-    }
+class BookFilterList extends Component {
+  updateItems = (ids) => {
+    this.props.updateItems('book', ids)
   }
 
-  BookFilterList.propTypes = {
-    books: PropTypes.object.isRequired,
-    updateItems: PropTypes.func.isRequired,
-    filteredItems: PropTypes.array,
+  render() {
+    let books = this.props.books.allIds.map((id) => {
+      let book = { ...this.props.books[id.toString()] }
+      book.title = book.title || i18n('Untitled')
+      return book
+    })
+    return (
+      <GenericFilterList
+        items={books}
+        title={i18n('Books')}
+        singleItemTitle={i18n('Book')}
+        displayAttribute={'title'}
+        updateItems={this.updateItems}
+        filteredItems={this.props.filteredItems}
+      />
+    )
   }
-
-  const {
-    redux,
-    pltr: { selectors },
-  } = connector
-  checkDependencies({ redux, selectors })
-
-  if (redux) {
-    const { connect } = redux
-
-    return connect((state) => {
-      return {
-        books: selectors.booksFilterItemsSelector(state),
-      }
-    })(BookFilterList)
-  }
-
-  throw new Error('Could not connect Book Filter List')
 }
 
-export default BookFilterListConnector
+BookFilterList.propTypes = {
+  books: PropTypes.object.isRequired,
+  updateItems: PropTypes.func.isRequired,
+  filteredItems: PropTypes.array,
+}
+
+const mapStateToProps = (state) => {
+  return {
+    books: selectors.booksFilterItemsSelector(state),
+  }
+}
+
+export default connect(mapStateToProps)(BookFilterList)

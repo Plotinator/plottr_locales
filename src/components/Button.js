@@ -76,6 +76,7 @@ const Button = (inputProps, ref) => {
     return renderAnchor(elementProps, fullClassName)
   }
 
+  // @ts-ignore
   return renderButton(elementProps, fullClassName)
 }
 
@@ -89,6 +90,7 @@ export default bsClass(
     bsStyles(
       [...Object.values(State), Style.DEFAULT, Style.PRIMARY, Style.LINK],
       Style.DEFAULT,
+      // @ts-ignore
       React.forwardRef(Button)
     )
   )

@@ -1,9 +1,8 @@
 import React from 'react'
 import { mount } from 'enzyme'
-import TemplateCreateConnector, { testIds } from '../TemplateCreate'
-import connector from '../../__fixtures__/pltr-connector'
+import TemplateCreate, { testIds } from '../TemplateCreate'
 
-const TemplateCreate = TemplateCreateConnector(connector)
+import { connect } from '../../__fixtures__/pltr-connector'
 
 describe('TemplateCreate', () => {
   const props = {
@@ -21,7 +20,7 @@ describe('TemplateCreate', () => {
   beforeEach(() => jest.clearAllMocks())
 
   it.skip('creates a template', () => {
-    const tree = mount(<TemplateCreate {...props} />)
+    const tree = mount(connect(() => <TemplateCreate {...props} />))
 
     tree.findTypeWithTestId('FormControl', testIds.name).simulate('change', event('Name'))
     tree
@@ -42,29 +41,30 @@ describe('TemplateCreate', () => {
   })
 
   it('closes on cancel', () => {
-    const tree = mount(<TemplateCreate {...props} />)
+    const tree = mount(connect(() => <TemplateCreate {...props} />))
 
     tree.findTypeWithTestId('button', testIds.cancel).simulate('click')
     expect(props.close).toHaveBeenCalled()
   })
 
   it('renders the correct title', () => {
-    const tree = mount(<TemplateCreate {...props} />)
-
-    expect(tree.findTypeWithTestId('ModalTitle', testIds.title).props().children).toContain(
+    const treeTimeline = mount(connect(() => <TemplateCreate {...props} />))
+    expect(treeTimeline.findTypeWithTestId('ModalTitle', testIds.title).props().children).toContain(
       'Timeline'
     )
 
-    tree.setProps({ type: 'characters' })
-    expect(tree.findTypeWithTestId('ModalTitle', testIds.title).props().children).toContain(
-      'Character'
+    const treeCharacters = mount(connect(() => <TemplateCreate {...props} type="characters" />))
+    expect(
+      treeCharacters.findTypeWithTestId('ModalTitle', testIds.title).props().children
+    ).toContain('Character')
+
+    const treeScenes = mount(connect(() => <TemplateCreate {...props} type="scenes" />))
+    expect(treeScenes.findTypeWithTestId('ModalTitle', testIds.title).props().children).toContain(
+      'Scene'
     )
 
-    tree.setProps({ type: 'scenes' })
-    expect(tree.findTypeWithTestId('ModalTitle', testIds.title).props().children).toContain('Scene')
-
-    tree.setProps({ type: 'other' })
-    expect(tree.findTypeWithTestId('ModalTitle', testIds.title).props().children).toContain(
+    const treeOther = mount(connect(() => <TemplateCreate {...props} type="other" />))
+    expect(treeOther.findTypeWithTestId('ModalTitle', testIds.title).props().children).toContain(
       'Character'
     )
   })

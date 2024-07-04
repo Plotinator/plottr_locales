@@ -37,14 +37,17 @@ UnforwardedColorButton.propTypes = {
   logger: PropTypes.object,
 }
 
+// @ts-ignore
 export const ColorButton = React.forwardRef(UnforwardedColorButton)
 
 const isColorActive = (editor, logger) => {
   try {
+    // @ts-ignore
     if (!Editor.validSelection(editor)) {
       return false
     } else {
       const marks = Editor.marks(editor)
+      // @ts-ignore
       return marks ? marks.color !== undefined : false
     }
   } catch (error) {

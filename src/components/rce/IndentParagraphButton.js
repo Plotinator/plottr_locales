@@ -12,6 +12,7 @@ const parentElementType = (editor, path) => {
   const hit = Editor.parent(editor, path)
   if (hit) {
     const [parentElement] = hit
+    // @ts-ignore
     return parentElement.type
   }
 
@@ -19,10 +20,12 @@ const parentElementType = (editor, path) => {
 }
 
 const countNestedLists = (editor, path) => {
+  // @ts-ignore
   const isInList = Editor.isInList(editor, path)
   if (!isInList) {
     return 0
   } else {
+    // @ts-ignore
     const [, parentPath] = Editor.parentOfType(editor, path, {
       match: (n) => LIST_TYPES.includes(n.type),
     })
@@ -36,16 +39,20 @@ const countNestedLists = (editor, path) => {
 
 const MAX_DEPTH = 5
 
-export const indent = (editor, inputListType, logger) => {
+export const indent = (editor, inputListType) => {
+  // @ts-ignore
   if (Editor.validSelection(editor)) {
+    // @ts-ignore
     const isInList = Editor.isInList(editor, editor.selection)
     if (!isInList) return false
 
+    // @ts-ignore
     const [, parentPath] = Editor.parentOfType(editor, Editor.start(editor, editor.selection), {
       match: (_) => true,
     })
     const listType = inputListType || parentElementType(editor, parentPath)
     if (parentPath.length > 0) {
+      // @ts-ignore
       const hit = Editor.previousSibling(editor, parentPath)
       // If the previous element was a list already, then just move this
       // node into it at the end.
@@ -62,6 +69,7 @@ export const indent = (editor, inputListType, logger) => {
           const hit = Editor.next(editor, { at: previousElementPath })
           if (hit) {
             const [nextSibling, nextSiblingPath] = hit
+            // @ts-ignore
             if (nextSibling.type === listType) {
               Transforms.mergeNodes(editor, { at: nextSiblingPath })
             }
@@ -87,7 +95,7 @@ export const indent = (editor, inputListType, logger) => {
 }
 
 const IndentParagraphButton = ({ editor, logger }) => {
-  const [listType, setListType] = useState(false)
+  const [listType, setListType] = useState(null)
   const [blockIsActive, setBlockIsActive] = useState(false)
 
   useEffect(() => {
@@ -106,6 +114,7 @@ const IndentParagraphButton = ({ editor, logger }) => {
         ? 'bulleted-list'
         : null
       if (newListType !== listType) {
+        // @ts-ignore
         setListType(newListType)
       }
     }, 100)
@@ -118,9 +127,9 @@ const IndentParagraphButton = ({ editor, logger }) => {
   const handleClick = useCallback(
     (event) => {
       event.preventDefault()
-      indent(editor, listType, logger)
+      indent(editor, listType)
     },
-    [editor, logger, listType]
+    [editor, listType]
   )
 
   return (

@@ -1,100 +1,91 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import PropTypes from 'react-proptypes'
+import { connect } from 'react-redux'
 import cx from 'classnames'
 
-import { checkDependencies } from '../checkDependencies'
-import { Spinner } from '../Spinner'
+import { actions, selectors } from 'wired-up-pltr'
 
-const ImageConnector = (connector) => {
+import { Spinner } from '../Spinner'
+import { PlottrComponentsContext } from '../../connections/pltrContext'
+
+const Image = ({ size, shape, image, responsive, className, imageCache, cacheImage }) => {
   const {
     platform: {
       storage: { resolveToPublicUrl },
     },
-  } = connector
-  checkDependencies({ resolveToPublicUrl })
+  } = useContext(PlottrComponentsContext)
 
-  const Image = ({ size, shape, image, responsive, className, imageCache, cacheImage }) => {
-    const [imageSrc, setImageSrc] = useState(null)
+  const [imageSrc, setImageSrc] = useState(null)
 
-    const publicImageUrl = imageCache[image?.path]?.publicUrl
+  const publicImageUrl = imageCache[image?.path]?.publicUrl
 
-    const isOnStorage = () => {
-      return image?.path?.startsWith('storage://')
+  const isOnStorage = () => {
+    return image?.path?.startsWith('storage://')
+  }
+
+  useEffect(() => {
+    if (!publicImageUrl && image?.path && isOnStorage()) {
+      resolveToPublicUrl(image?.path).then((imageUrl) => {
+        cacheImage(image?.path, imageUrl)
+        // @ts-ignore
+        setImageSrc(imageUrl)
+      })
     }
+  }, [cacheImage, imageCache, resolveToPublicUrl, publicImageUrl, image?.path])
 
-    useEffect(() => {
-      if (!publicImageUrl && image?.path && isOnStorage()) {
-        resolveToPublicUrl(image?.path).then((imageUrl) => {
-          cacheImage(image?.path, imageUrl)
-          setImageSrc(imageUrl)
-        })
-      }
-    }, [cacheImage, imageCache, resolveToPublicUrl, publicImageUrl, image?.path])
+  useEffect(() => {
+    setImageSrc(null)
+  }, [setImageSrc, image])
 
-    useEffect(() => {
-      setImageSrc(null)
-    }, [setImageSrc, image])
+  useEffect(() => {
+    if (!image || imageSrc) return
 
-    useEffect(() => {
-      if (!image || imageSrc) return
-
-      if (isOnStorage()) {
-        setImageSrc(publicImageUrl)
-      } else {
-        setImageSrc(image.data)
-      }
-    }, [image, setImageSrc, imageSrc])
-
-    useEffect(() => {
-      if (!image && imageSrc) {
-        setImageSrc(null)
-      }
-    }, [image, imageSrc])
-
-    if (!image && !imageSrc) return null
-    else if (!image || !imageSrc) return <Spinner />
-
-    if (responsive) {
-      return <img className={cx('img-responsive', className)} src={imageSrc} />
+    if (isOnStorage()) {
+      setImageSrc(publicImageUrl)
     } else {
-      let klasses = cx(`image-${shape}-${size}`, className)
-      return <div className={klasses} style={{ backgroundImage: `url(${imageSrc})` }} />
+      setImageSrc(image.data)
     }
+  }, [image, setImageSrc, imageSrc])
+
+  useEffect(() => {
+    if (!image && imageSrc) {
+      setImageSrc(null)
+    }
+  }, [image, imageSrc])
+
+  if (!image && !imageSrc) return null
+  else if (!image || !imageSrc) return <Spinner />
+
+  if (responsive) {
+    return <img className={cx('img-responsive', className)} src={imageSrc} />
+  } else {
+    let klasses = cx(`image-${shape}-${size}`, className)
+    return <div className={klasses} style={{ backgroundImage: `url(${imageSrc})` }} />
   }
-
-  Image.propTypes = {
-    imageId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    size: PropTypes.oneOf(['xl', 'large', 'small', 'xs']),
-    shape: PropTypes.oneOf(['circle', 'rounded', 'square']),
-    responsive: PropTypes.bool,
-    className: PropTypes.string,
-    image: PropTypes.object,
-    imageCache: PropTypes.object.isRequired,
-    cacheImage: PropTypes.func.isRequired,
-  }
-
-  const {
-    redux,
-    pltr: { selectors, actions },
-  } = connector
-  checkDependencies({ redux, selectors })
-  if (redux) {
-    const { connect } = redux
-
-    return connect(
-      (state, ownProps) => {
-        return {
-          image: selectors.imageByIdSelector(state, ownProps.imageId),
-          imageCache: selectors.imageCacheSelector(state),
-        }
-      },
-      {
-        cacheImage: actions.imageCache.cacheImage,
-      }
-    )(Image)
-  }
-
-  throw new Error('Couldnt find connector for Image.js')
 }
 
-export default ImageConnector
+Image.propTypes = {
+  imageId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  size: PropTypes.oneOf(['xl', 'large', 'small', 'xs']),
+  shape: PropTypes.oneOf(['circle', 'rounded', 'square']),
+  responsive: PropTypes.bool,
+  className: PropTypes.string,
+  image: PropTypes.object,
+  imageCache: PropTypes.object.isRequired,
+  cacheImage: PropTypes.func.isRequired,
+}
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+    image: selectors.imageByIdSelector(
+      state,
+      // @ts-ignore
+      ownProps.imageId
+    ),
+    imageCache: selectors.imageCacheSelector(state),
+  }
+}
+
+export default connect(mapStateToProps, {
+  cacheImage: actions.imageCache.cacheImage,
+})(Image)

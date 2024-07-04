@@ -26,6 +26,7 @@ class DropdownToggle extends React.Component {
   render() {
     const { noCaret, open, useAnchor, bsClass, className, children, ...props } = this.props
 
+    // @ts-ignore
     delete props.bsRole
 
     const Component = useAnchor ? SafeAnchor : Button

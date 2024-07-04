@@ -19,6 +19,7 @@ const propTypes = {
     let error = null
 
     if (!props.generateChildId) {
+      // @ts-ignore
       error = idPropType(props, ...args)
 
       if (!error && !props.id) {

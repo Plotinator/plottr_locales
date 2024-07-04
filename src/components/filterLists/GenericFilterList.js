@@ -7,7 +7,7 @@ import Glyphicon from '../Glyphicon'
 
 export default class GenericFilterList extends Component {
   filterItem = (id) => {
-    var filteredItems = this.props.filteredItems
+    const filteredItems = this.props.filteredItems
     if (!filteredItems.includes(id)) {
       filteredItems.push(id)
     } else {
@@ -18,7 +18,7 @@ export default class GenericFilterList extends Component {
   }
 
   filterList = (list) => {
-    var filteredItems = this.props.filteredItems
+    let filteredItems = this.props.filteredItems
     if (filteredItems.length) {
       filteredItems = []
     } else {
@@ -32,7 +32,7 @@ export default class GenericFilterList extends Component {
   }
 
   renderFilterList(items, attr) {
-    var renderedItems = items.map((i) => {
+    const renderedItems = items.map((i) => {
       return this.renderFilterItem(i, attr)
     })
     return <ul className="filter-list__list">{renderedItems}</ul>
@@ -41,10 +41,7 @@ export default class GenericFilterList extends Component {
   renderFilterItem(item, attr) {
     if (!item) return null
 
-    var checked = 'unchecked'
-    if (this.isChecked(item.id)) {
-      checked = 'eye-open'
-    }
+    const checked = this.isChecked(item.id) ? 'eye-open' : 'unchecked'
     return (
       <li key={item.id} onMouseDown={() => this.filterItem(item.id)}>
         <Glyphicon glyph={checked} />{' '}

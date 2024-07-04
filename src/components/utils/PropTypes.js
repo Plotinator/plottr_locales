@@ -32,6 +32,7 @@ export function exclusiveRoles(...roles) {
     let duplicate
 
     roles.every((role) => {
+      // @ts-ignore
       const childrenWithRole = ValidComponentChildren.filter(
         props.children,
         (child) => child.props.bsRole === role

@@ -1,102 +1,90 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import PropTypes from 'react-proptypes'
+import { connect } from 'react-redux'
 
+import { selectors, actions } from 'wired-up-pltr'
 import { t } from 'plottr_locales'
 
 import Button from '../../Button'
-import { checkDependencies } from '../../checkDependencies'
 import { Spinner } from '../../Spinner'
+import { PlottrComponentsContext } from '../../../connections/pltrContext'
 
-const ProInfoConnector = (connector) => {
+const ProInfo = ({ emailAddress, expiration, settings, setUserId, setEmailAddress }) => {
   const {
     platform: {
-      firebase: { logOut, currentUser },
+      firebase: { logOut },
       license: { deleteProLicense },
       settings: { saveAppSetting },
     },
-  } = connector
-  checkDependencies({ logOut, saveAppSetting, currentUser })
+  } = useContext(PlottrComponentsContext)
 
-  const ProInfo = ({ emailAddress, expiration, settings, setUserId, setEmailAddress }) => {
-    const [loggingOut, setLoggingOut] = useState(false)
+  const [loggingOut, setLoggingOut] = useState(false)
 
-    const expiresDate = () => {
-      if (!expiration) {
-        return null
-      } else {
-        return t('{date, date, long}', { date: new Date(expiration) })
-      }
+  const expiresDate = () => {
+    if (expiration === null) {
+      return t('Never')
+    } else if (!expiration) {
+      return null
+    } else {
+      return t('{date, date, long}', { date: new Date(expiration) })
     }
+  }
 
-    const handleLogOut = () => {
-      setLoggingOut(true)
-      logOut().then(() => {
-        // the order of these might matter
-        saveAppSetting('user.frbId', null)
-        deleteProLicense()
-        setLoggingOut(false)
-        // Ordering is significant!  If you set has pro to false
-        // before nuking the email address and user id then it might
-        // re-launch the check for whether we have pro or not.
-        setUserId(null)
-        setEmailAddress(null)
-      })
-    }
+  const handleLogOut = () => {
+    setLoggingOut(true)
+    logOut().then(() => {
+      // the order of these might matter
+      saveAppSetting('user.frbId', null)
+      deleteProLicense()
+      setLoggingOut(false)
+      // Ordering is significant!  If you set has pro to false
+      // before nuking the email address and user id then it might
+      // re-launch the check for whether we have pro or not.
+      setUserId(null)
+      setEmailAddress(null)
+    })
+  }
 
-    const blurClass = settings.user.streamFriendly ? 'blurred' : ''
+  const blurClass = settings.user.streamFriendly ? 'blurred' : ''
 
-    return (
-      <div className="dashboard__user-info">
-        <h2>{t('Pro Subscription')}</h2>
-        <hr />
-        <div className="dashboard__user-info__wrapper">
-          <dl className="dl-horizontal">
-            <dt>{t('Purchase Email')}</dt>
-            <dd className={blurClass}>{emailAddress}</dd>
-          </dl>
-          <dl className="dl-horizontal">
-            <dt>{t('Expires')}</dt>
-            <dd>{expiresDate()}</dd>
-          </dl>
-        </div>
-        <div className="text-right">
-          <Button bsStyle="danger" bsSize="small" onClick={handleLogOut}>
-            {t('Log Out')} {loggingOut ? <Spinner /> : null}
-          </Button>
-        </div>
+  return (
+    <div className="dashboard__user-info">
+      <h2>{t('Pro Subscription')}</h2>
+      <hr />
+      <div className="dashboard__user-info__wrapper">
+        <dl className="dl-horizontal">
+          <dt>{t('Purchase Email')}</dt>
+          <dd className={blurClass}>{emailAddress}</dd>
+        </dl>
+        <dl className="dl-horizontal">
+          <dt>{t('Expires')}</dt>
+          <dd>{expiresDate()}</dd>
+        </dl>
       </div>
-    )
-  }
-
-  ProInfo.propTypes = {
-    emailAddress: PropTypes.string,
-    settings: PropTypes.object,
-    expiration: PropTypes.object,
-    setUserId: PropTypes.func.isRequired,
-    setEmailAddress: PropTypes.func.isRequired,
-  }
-
-  const {
-    redux,
-    pltr: { selectors, actions },
-  } = connector
-
-  if (redux) {
-    const { connect } = redux
-    return connect(
-      (state) => ({
-        emailAddress: selectors.emailAddressSelector(state),
-        settings: selectors.appSettingsSelector(state),
-        expiration: selectors.proLicenseExpirySelector(state),
-      }),
-      {
-        setUserId: actions.client.setUserId,
-        setEmailAddress: actions.client.setEmailAddress,
-      }
-    )(ProInfo)
-  }
-
-  throw new Error('Could not connect ProInfo')
+      <div className="text-right">
+        <Button bsStyle="danger" bsSize="small" onClick={handleLogOut}>
+          {t('Log Out')} {loggingOut ? <Spinner /> : null}
+        </Button>
+      </div>
+    </div>
+  )
 }
 
-export default ProInfoConnector
+ProInfo.propTypes = {
+  emailAddress: PropTypes.string,
+  settings: PropTypes.object,
+  expiration: PropTypes.object,
+  setUserId: PropTypes.func.isRequired,
+  setEmailAddress: PropTypes.func.isRequired,
+}
+
+const mapStateToProps = (state) => ({
+  emailAddress: selectors.emailAddressSelector(state),
+  settings: selectors.appSettingsSelector(state),
+  expiration: selectors.proLicenseExpirySelector(state),
+})
+
+export default connect(mapStateToProps, {
+  setUserId: actions.client.setUserId,
+  setEmailAddress: actions.client.setEmailAddress,
+})(ProInfo)

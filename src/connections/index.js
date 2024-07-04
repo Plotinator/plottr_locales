@@ -1,8 +1,3 @@
-import pltr, { checkPltrConnector } from './pltr'
+import { PlottrComponentsContext } from './pltrContext'
 
-const connections = {
-  pltr,
-  checkPltrConnector,
-}
-
-export default connections
+export { PlottrComponentsContext }

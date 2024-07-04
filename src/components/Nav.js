@@ -267,6 +267,7 @@ class Nav extends React.Component {
               role={role}
               className={classNames(className, classes)}
             >
+              {/* @ts-ignore */}
               {ValidComponentChildren.map(children, (child) => {
                 const active = this.isActive(child, activeKey, activeHref)
                 const childOnSelect = createChainedFunction(

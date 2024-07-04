@@ -10,7 +10,7 @@ import React from 'react'
  * so an invalid component would not increase the index.
  *
  * @param {?*} children Children tree container.
- * @param {function(*, int)} func.
+ * @param {function(*, number): any} func
  * @param {*} context Context for func.
  * @return {object} Object containing the ordered map of results.
  */
@@ -33,7 +33,7 @@ function map(children, func, context) {
  * leaf child with the index reflecting the position relative to "valid components".
  *
  * @param {?*} children Children tree container.
- * @param {function(*, int)} func.
+ * @param {function(*, number): any} func
  * @param {*} context Context for context.
  */
 function forEach(children, func, context) {
@@ -76,7 +76,7 @@ function count(children) {
  * leaf child with the index reflecting the position relative to "valid components".
  *
  * @param {?*} children Children tree container.
- * @param {function(*, int)} func.
+ * @param {function(*, number): any} func
  * @param {*} context Context for func.
  * @returns {array} of children that meet the func return statement
  */

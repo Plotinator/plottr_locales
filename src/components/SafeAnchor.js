@@ -68,14 +68,18 @@ class SafeAnchor extends React.Component {
     const { componentClass: Component, disabled, onKeyDown, ...props } = this.props
 
     if (isTrivialHref(props.href)) {
+      // @ts-ignore
       props.role = props.role || 'button'
       // we want to make sure there is a href attribute on the node
       // otherwise, the cursor incorrectly styled (except with role='button')
+      // @ts-ignore
       props.href = props.href || '#'
     }
 
     if (disabled) {
+      // @ts-ignore
       props.tabIndex = -1
+      // @ts-ignore
       props.style = { pointerEvents: 'none', ...props.style }
     }
 

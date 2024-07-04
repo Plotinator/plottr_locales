@@ -1,8 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useContext } from 'react'
 import PropTypes from 'react-proptypes'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 
 import { t as i18n } from 'plottr_locales'
 import { helpers } from 'pltr'
+import { selectors, actions } from 'wired-up-pltr'
 
 import Grid from '../Grid'
 import Alert from '../Alert'
@@ -13,16 +16,16 @@ import Glyphicon from '../Glyphicon'
 import Row from '../Row'
 import FormControl from '../FormControl'
 import Button from '../Button'
-import UnconnectedBeatView from './BeatView'
-import UnconnectedMiniMap from './MiniMap'
-import UnconnectedErrorBoundary from '../containers/ErrorBoundary'
-import UnconnectedExportNavItem from '../export/ExportNavItem'
-import UnconnectedSubNav from '../containers/SubNav'
-import UnconnectedPlottrFloater from '../PlottrFloater'
-import { checkDependencies } from '../checkDependencies'
+import BeatView from './BeatView'
+import MiniMap from './MiniMap'
+import ErrorBoundary from '../containers/ErrorBoundary'
+import ExportNavItem from '../export/ExportNavItem'
+import SubNav from '../containers/SubNav'
+import Floater from '../PlottrFloater'
 import { withEventTargetValue } from '../withEventTargetValue'
 import Scrollable from '../../utils/scrollable'
 import { delay } from '../../utils/delay'
+import { PlottrComponentsContext } from '../../connections/pltrContext'
 
 const {
   card: { cardMapping },
@@ -30,306 +33,278 @@ const {
 
 const targetPosition = 115
 
-const OutlineViewConnector = (connector) => {
-  const BeatView = UnconnectedBeatView(connector)
-  const MiniMap = UnconnectedMiniMap(connector)
-  const ErrorBoundary = UnconnectedErrorBoundary(connector)
-  const ExportNavItem = UnconnectedExportNavItem(connector)
-  const SubNav = UnconnectedSubNav(connector)
-  const Floater = UnconnectedPlottrFloater(connector)
-
+const OutlineView = ({
+  outlineFilter,
+  actions,
+  lines,
+  beats,
+  allCards,
+  selectedCardId,
+  card2Dmap,
+  outlineSearchTerm,
+  outlineScrollPosition,
+  recentlyUndidOrRedid,
+}) => {
   const {
-    platform: { exportDisabled, log },
-  } = connector
-  checkDependencies({ exportDisabled, log })
+    platform: { exportDisabled },
+  } = useContext(PlottrComponentsContext)
 
-  const OutlineView = ({
-    currentTimeline,
-    outlineFilter,
-    actions,
-    lines,
-    beats,
-    allCards,
-    selectedCardId,
-    card2Dmap,
-    outlineSearchTerm,
-    outlineScrollPosition,
-    recentlyUndidOrRedid,
-  }) => {
-    const [active, setActive] = useState(0)
-    const [beatsToRender, setBeatsToRender] = useState(beats.length)
-    const [filterVisible, setFilterVisible] = useState(false)
+  const [active, setActive] = useState(0)
+  const [beatsToRender, setBeatsToRender] = useState(beats.length)
+  const [filterVisible, setFilterVisible] = useState(false)
 
-    const beatsRef = useRef(null)
-    const scrollableRef = useRef(new Scrollable(() => beatsRef.current))
-    const scrollTimeoutRef = useRef(null)
+  const beatsRef = useRef(null)
+  const scrollableRef = useRef(new Scrollable(() => beatsRef.current))
+  const scrollTimeoutRef = useRef(null)
 
-    const recentlyUndidOrRedidRef = useRef(false)
-    useEffect(() => {
-      recentlyUndidOrRedidRef.current = !!recentlyUndidOrRedid
-    }, [recentlyUndidOrRedid])
+  const recentlyUndidOrRedidRef = useRef(false)
+  useEffect(() => {
+    recentlyUndidOrRedidRef.current = !!recentlyUndidOrRedid
+  }, [recentlyUndidOrRedid])
 
-    useEffect(() => {
-      if (beatsToRender >= beats.length) return
-      delay(() => {
-        setBeatsToRender(beatsToRender + 1)
-      })
-    }, [beats, beatsToRender, setBeatsToRender])
+  useEffect(() => {
+    if (beatsToRender >= beats.length) return
+    delay(() => {
+      setBeatsToRender(beatsToRender + 1)
+    })
+  }, [beats, beatsToRender, setBeatsToRender])
 
-    useEffect(() => {
-      if (selectedCardId) {
-        setTimeout(() => {
-          const elem = document.querySelector(`#card-${selectedCardId}`)
-          if (elem) {
-            elem.scrollIntoView()
-            const container = document.querySelector('.outline__container')
-            const yPosition = elem.getBoundingClientRect().y
-            if (container) {
-              const finalDestination = yPosition - targetPosition
-              container.scrollBy(0, finalDestination)
-            }
+  useEffect(() => {
+    if (selectedCardId) {
+      setTimeout(() => {
+        const elem = document.querySelector(`#card-${selectedCardId}`)
+        if (elem) {
+          elem.scrollIntoView()
+          const container = document.querySelector('.outline__container')
+          const yPosition = elem.getBoundingClientRect().y
+          if (container) {
+            const finalDestination = yPosition - targetPosition
+            container.scrollBy(0, finalDestination)
           }
-        }, 100)
-      }
-    }, [selectedCardId])
-
-    useEffect(() => {
-      if (!selectedCardId && outlineScrollPosition && scrollableRef.current) {
-        setTimeout(() => {
-          scrollableRef.current.scrollTo(0, outlineScrollPosition, true)
-        }, 100)
-      }
-    }, [])
-
-    const handleScroll = (e) => {
-      if (typeof beatsRef?.current?.scrollTop === 'number' && !recentlyUndidOrRedidRef.current) {
-        if (scrollTimeoutRef.current) {
-          clearTimeout(scrollTimeoutRef.current)
         }
-        scrollTimeoutRef.current = setTimeout(() => {
-          if (
-            typeof beatsRef?.current?.scrollTop === 'number' &&
-            !recentlyUndidOrRedidRef.current
-          ) {
-            actions.recordOutlineScrollPosition(beatsRef.current.scrollTop)
-          }
-        }, 500)
+      }, 100)
+    }
+  }, [selectedCardId])
+
+  useEffect(() => {
+    if (!selectedCardId && outlineScrollPosition && scrollableRef.current) {
+      setTimeout(() => {
+        scrollableRef.current.scrollTo(0, outlineScrollPosition, true)
+      }, 100)
+    }
+  }, [])
+
+  const handleScroll = (_e) => {
+    // @ts-ignore
+    if (typeof beatsRef?.current?.scrollTop === 'number' && !recentlyUndidOrRedidRef.current) {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current)
       }
+      // @ts-ignore
+      scrollTimeoutRef.current = setTimeout(() => {
+        // @ts-ignore
+        if (typeof beatsRef?.current?.scrollTop === 'number' && !recentlyUndidOrRedidRef.current) {
+          // @ts-ignore
+          actions.recordOutlineScrollPosition(beatsRef.current.scrollTop)
+        }
+      }, 500)
     }
+  }
 
-    const filterItem = (id) => {
-      actions.setOutlineFilter(id)
+  const filterItem = (id) => {
+    actions.setOutlineFilter(id)
+  }
+
+  const removeFilter = () => {
+    actions.setOutlineFilter(null)
+  }
+
+  // ///////////////
+  //  rendering   //
+  // //////////////
+
+  const renderFilterItem = (item) => {
+    let placeholder = <span className="filter-list__placeholder"></span>
+    if (
+      (Array.isArray(outlineFilter) && outlineFilter.includes(item.id)) ||
+      (!Array.isArray(outlineFilter) && outlineFilter === item.id)
+    ) {
+      placeholder = <Glyphicon glyph="eye-open" />
     }
+    return (
+      <li key={item.id} onMouseDown={() => filterItem(item.id)}>
+        {placeholder} {item.title}
+      </li>
+    )
+  }
 
-    const removeFilter = () => {
-      actions.setOutlineFilter(null)
+  const renderFilterList = () => {
+    const items = lines.map((i) => {
+      return renderFilterItem(i)
+    })
+    return <ul className="filter-list__list">{items}</ul>
+  }
+
+  const insertSpace = (event) => {
+    const currentValue = event.target.value
+    const start = event.target.selectionStart
+    const end = event.target.selectionEnd
+    if (event.key === ' ') {
+      actions.setOutlineSearchTerm(currentValue.slice(0, start) + ' ' + currentValue.slice(end + 1))
     }
+    event.preventDefault()
+    event.stopPropagation()
+  }
 
-    // ///////////////
-    //  rendering   //
-    // //////////////
-
-    const renderFilterItem = (item) => {
-      var placeholder = <span className="filter-list__placeholder"></span>
-      if (
-        (Array.isArray(outlineFilter) && outlineFilter.includes(item.id)) ||
-        (!Array.isArray(outlineFilter) && outlineFilter === item.id)
-      ) {
-        placeholder = <Glyphicon glyph="eye-open" />
-      }
-      return (
-        <li key={item.id} onMouseDown={() => filterItem(item.id)}>
-          {placeholder} {item.title}
-        </li>
-      )
+  const renderSubNav = () => {
+    const popover = () => (
+      <Popover id="filter" noMaxWidth>
+        <div className="filter-list">{renderFilterList()}</div>
+      </Popover>
+    )
+    let filterDeclaration = (
+      <Alert onClick={removeFilter} bsStyle="warning">
+        <Glyphicon glyph="remove-sign" />
+        {'  '}
+        {i18n('Outline is filtered')}
+      </Alert>
+    )
+    if (!outlineFilter) {
+      filterDeclaration = <span></span>
     }
-
-    const renderFilterList = () => {
-      var items = lines.map((i) => {
-        return renderFilterItem(i)
-      })
-      return <ul className="filter-list__list">{items}</ul>
-    }
-
-    const insertSpace = (event) => {
-      const currentValue = event.target.value
-      const start = event.target.selectionStart
-      const end = event.target.selectionEnd
-      if (event.key === ' ') {
-        actions.setOutlineSearchTerm(
-          currentValue.slice(0, start) + ' ' + currentValue.slice(end + 1)
-        )
-      }
-      event.preventDefault()
-      event.stopPropagation()
-    }
-
-    const renderSubNav = () => {
-      const popover = () => (
-        <Popover id="filter" noMaxWidth>
-          <div className="filter-list">{renderFilterList()}</div>
-        </Popover>
-      )
-      let filterDeclaration = (
-        <Alert onClick={removeFilter} bsStyle="warning">
-          <Glyphicon glyph="remove-sign" />
-          {'  '}
-          {i18n('Outline is filtered')}
-        </Alert>
-      )
-      if (!outlineFilter) {
-        filterDeclaration = <span></span>
-      }
-      return (
-        <SubNav>
-          <Nav bsStyle="pills">
-            <NavItem>
-              <Floater
-                rootClose
-                onClose={() => {
-                  setFilterVisible(false)
+    return (
+      <SubNav>
+        <Nav bsStyle="pills">
+          <NavItem>
+            <Floater
+              rootClose
+              onClose={() => {
+                setFilterVisible(false)
+              }}
+              open={filterVisible}
+              placement="bottom"
+              component={popover}
+            >
+              <Button
+                bsSize="small"
+                onClick={() => {
+                  setFilterVisible(!filterVisible)
                 }}
-                open={filterVisible}
-                placement="bottom"
-                component={popover}
               >
-                <Button
-                  bsSize="small"
-                  onClick={() => {
-                    setFilterVisible(!filterVisible)
-                  }}
-                >
-                  <Glyphicon glyph="filter" />
-                  {i18n('Filter by Plotline')}
-                </Button>
-              </Floater>
-              {filterDeclaration}
-            </NavItem>
-            <NavItem draggable="false">
-              <FormControl
-                onChange={withEventTargetValue(actions.setOutlineSearchTerm)}
-                onKeyUp={insertSpace}
-                value={outlineSearchTerm || ''}
-                type="text"
-                placeholder="Search"
-                className="toolbar__search"
-              />
-            </NavItem>
+                <Glyphicon glyph="filter" />
+                {i18n('Filter by Plotline')}
+              </Button>
+            </Floater>
+            {filterDeclaration}
+          </NavItem>
+          <NavItem draggable="false">
+            <FormControl
+              onChange={withEventTargetValue(actions.setOutlineSearchTerm)}
+              onKeyUp={insertSpace}
+              value={outlineSearchTerm || ''}
+              type="text"
+              placeholder="Search"
+              className="toolbar__search"
+            />
+          </NavItem>
+        </Nav>
+        {!exportDisabled && (
+          <Nav pullRight>
+            <ExportNavItem />
           </Nav>
-          {!exportDisabled && (
-            <Nav pullRight>
-              <ExportNavItem />
-            </Nav>
-          )}
-        </SubNav>
-      )
-    }
+        )}
+      </SubNav>
+    )
+  }
 
-    const renderBeats = (cardMapping) => {
-      let beatsWithCards = allCards.map((card) => card.beatId)
-
-      return (
-        !!beats.length &&
-        beats.slice(0, beatsToRender).map((beat, idx) => {
-          let hasCards = beatsWithCards.includes(beat.id)
-          const beatCards = hasCards ? cardMapping[beat.id] : []
-          return (
-            <ErrorBoundary key={beat.id}>
-              <BeatView beat={beat} cards={beatCards} activeFilter={!!outlineFilter} />
-            </ErrorBoundary>
-          )
-        })
-      )
-    }
-
-    const renderBody = () => {
-      const cardMap = cardMapping(beats, lines, card2Dmap, outlineFilter)
-      return (
-        <div className="outline__container tab-body">
-          <Grid fluid className="outline__grid">
-            <Row>
-              <div className="outline__grid__minimap col-md-3 col-sm-4 hidden-xs">
-                <ErrorBoundary>
-                  {!!lines.length && (
-                    <MiniMap
-                      active={active}
-                      handleActive={setActive}
-                      cardMapping={cardMap}
-                      activeFilter={!!outlineFilter}
-                    />
-                  )}
-                </ErrorBoundary>
-              </div>
-              <div
-                className="outline__grid__beats col-xs-12 col-sm-8 col-md-9"
-                ref={beatsRef}
-                onScroll={handleScroll}
-              >
-                {!!beats.length && renderBeats(cardMap)}
-              </div>
-            </Row>
-          </Grid>
-        </div>
-      )
-    }
+  const renderBeats = (cardMapping) => {
+    let beatsWithCards = allCards.map((card) => card.beatId)
 
     return (
-      <div className="container-with-sub-nav">
-        {renderSubNav()}
-        {renderBody()}
+      !!beats.length &&
+      beats.slice(0, beatsToRender).map((beat) => {
+        let hasCards = beatsWithCards.includes(beat.id)
+        const beatCards = hasCards ? cardMapping[beat.id] : []
+        return (
+          <ErrorBoundary key={beat.id}>
+            <BeatView beat={beat} cards={beatCards} activeFilter={!!outlineFilter} />
+          </ErrorBoundary>
+        )
+      })
+    )
+  }
+
+  const renderBody = () => {
+    const cardMap = cardMapping(beats, lines, card2Dmap, outlineFilter)
+    return (
+      <div className="outline__container tab-body">
+        <Grid fluid className="outline__grid">
+          <Row>
+            <div className="outline__grid__minimap col-md-3 col-sm-4 hidden-xs">
+              <ErrorBoundary>
+                {!!lines.length && (
+                  <MiniMap
+                    active={active}
+                    handleActive={setActive}
+                    cardMapping={cardMap}
+                    activeFilter={!!outlineFilter}
+                  />
+                )}
+              </ErrorBoundary>
+            </div>
+            <div
+              className="outline__grid__beats col-xs-12 col-sm-8 col-md-9"
+              ref={beatsRef}
+              onScroll={handleScroll}
+            >
+              {!!beats.length && renderBeats(cardMap)}
+            </div>
+          </Row>
+        </Grid>
       </div>
     )
   }
 
-  OutlineView.propTypes = {
-    recentlyUndidOrRedid: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]).isRequired,
-    beats: PropTypes.array.isRequired,
-    lines: PropTypes.array.isRequired,
-    card2Dmap: PropTypes.object.isRequired,
-    allCards: PropTypes.array,
-    outlineFilter: PropTypes.array,
-    currentTimeline: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    isSeries: PropTypes.bool,
-    selectedCardId: PropTypes.number,
-    actions: PropTypes.object.isRequired,
-    outlineSearchTerm: PropTypes.string,
-    outlineScrollPosition: PropTypes.number,
-  }
-
-  const {
-    redux,
-    pltr: { selectors, actions },
-  } = connector
-  checkDependencies({ redux, selectors, actions })
-
-  if (redux) {
-    const { connect, bindActionCreators } = redux
-
-    return connect(
-      (state) => {
-        return {
-          recentlyUndidOrRedid: selectors.recentlyUndidOrRedidSelector(state),
-          beats: selectors.visibleSortedBeatsByBookIgnoringCollapsedSelector(state),
-          lines: selectors.sortedLinesByBookSelector(state),
-          beatMapping: selectors.sparceBeatMap(state),
-          card2Dmap: selectors.outlineSearchedCardMapSelector(state),
-          outlineFilter: selectors.outlineFilterSelector(state),
-          allCards: selectors.allCardsSelector(state),
-          isSeries: selectors.isSeriesSelector(state),
-          outlineSearchTerm: selectors.outlineSearchTermSelector(state),
-          outlineScrollPosition: selectors.outlineScrollPositionSelector(state),
-          selectedCardId: selectors.selectedOutlineCardSelector(state),
-        }
-      },
-      (dispatch) => {
-        return {
-          actions: bindActionCreators(actions.ui, dispatch),
-        }
-      }
-    )(OutlineView)
-  }
-
-  throw new Error('Could not connect OutlineView')
+  return (
+    <div className="container-with-sub-nav">
+      {renderSubNav()}
+      {renderBody()}
+    </div>
+  )
 }
 
-export default OutlineViewConnector
+OutlineView.propTypes = {
+  recentlyUndidOrRedid: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]).isRequired,
+  beats: PropTypes.array.isRequired,
+  lines: PropTypes.array.isRequired,
+  card2Dmap: PropTypes.object.isRequired,
+  allCards: PropTypes.array,
+  outlineFilter: PropTypes.array,
+  isSeries: PropTypes.bool,
+  selectedCardId: PropTypes.number,
+  actions: PropTypes.object.isRequired,
+  outlineSearchTerm: PropTypes.string,
+  outlineScrollPosition: PropTypes.number,
+}
+
+const mapStateToProps = (state) => {
+  return {
+    recentlyUndidOrRedid: selectors.recentlyUndidOrRedidSelector(state),
+    beats: selectors.visibleSortedBeatsByBookIgnoringCollapsedSelector(state),
+    lines: selectors.sortedLinesByBookSelector(state),
+    beatMapping: selectors.sparceBeatMap(state),
+    card2Dmap: selectors.outlineSearchedCardMapSelector(state),
+    outlineFilter: selectors.outlineFilterSelector(state),
+    allCards: selectors.allCardsSelector(state),
+    isSeries: selectors.isSeriesSelector(state),
+    outlineSearchTerm: selectors.outlineSearchTermSelector(state),
+    outlineScrollPosition: selectors.outlineScrollPositionSelector(state),
+    selectedCardId: selectors.selectedOutlineCardSelector(state),
+  }
+}
+
+export default connect(mapStateToProps, (dispatch) => {
+  return {
+    actions: bindActionCreators(actions.ui, dispatch),
+  }
+})(OutlineView)
