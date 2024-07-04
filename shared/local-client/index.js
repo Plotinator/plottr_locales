@@ -119,7 +119,7 @@ function routeFunctions(suppliedPort, secret, logger) {
       if (typeof _clientRef.port !== 'number') {
         return Promise.reject(new Error(INVALID_OR_UNSET_PORT))
       } else {
-        return client.put(path, queryParams)
+        return client.delete(path, queryParams)
       }
     }
     return put
