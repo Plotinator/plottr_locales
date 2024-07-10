@@ -14,10 +14,10 @@ if (!admin.apps.length) {
     process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099'
     admin.initializeApp({ projectId })
   } else if (process.env.FIREBASE_ENV === 'preview') {
-    const serviceAccount = JSON.parse(process.env.FIREBASE_KEY)
+    const serviceAccount = JSON.parse(process.env.FIREBASE_KEY ?? '')
     admin.initializeApp({ credential: admin.credential.cert(serviceAccount) })
   } else if (process.env.FIREBASE_ENV === 'production') {
-    const serviceAccount = JSON.parse(process.env.FIREBASE_KEY)
+    const serviceAccount = JSON.parse(process.env.FIREBASE_KEY ?? '')
     admin.initializeApp({ credential: admin.credential.cert(serviceAccount) })
   }
 }

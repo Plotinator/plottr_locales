@@ -121,6 +121,18 @@ import {
   GET_ID_TOKEN_RESULT_ERROR_REPLY,
   LOGIN_WITH_EMAIL_AND_PASSWORD_ERROR_REPLY,
   DELETE_PRO_BACKUP_ERROR_REPLY,
+  WRITE_USER_OWNERSHIP_NOTE,
+  WRITE_USER_OWNERSHIP_NOTE_REPLY,
+  WRITE_USER_OWNERSHIP_NOTE_ERROR_REPLY,
+  SEND_PASSWORD_RESET_EMAIL,
+  SEND_PASSWORD_RESET_EMAIL_REPLY,
+  SEND_PASSWORD_RESET_EMAIL_ERROR_REPLY,
+  DELETE_MACHINE_LICENSE_ACTIVATION,
+  DELETE_MACHINE_LICENSE_ACTIVATION_REPLY,
+  DELETE_MACHINE_LICENSE_ACTIVATION_ERROR_REPLY,
+  FETCH_FILE_JSON,
+  FETCH_FILE_JSON_REPLY,
+  FETCH_FILE_JSON_ERROR_REPLY,
 } from './firebase-messages'
 
 export const firebaseWorker = (logger, mintSessionClientId, selectors) => {
@@ -129,7 +141,13 @@ export const firebaseWorker = (logger, mintSessionClientId, selectors) => {
   let initialised = false
   let store = null
 
-  const worker = new Worker(new URL('./_firebase-worker.js', import.meta.url))
+  const worker = new Worker(
+    new URL(
+      './_firebase-worker.js',
+      // @ts-ignore
+      import.meta.url
+    )
+  )
   const promises = new Map()
   const callbacks = new Map()
 
@@ -234,6 +252,9 @@ export const firebaseWorker = (logger, mintSessionClientId, selectors) => {
   const initialFetch = (userId, fileId, clientId, version) => {
     return sendPromise(INITIAL_FETCH, { userId, fileId, clientId, version })
   }
+  const fetchFileJson = (userId, fileId, clientId, version) => {
+    return sendPromise(FETCH_FILE_JSON, { userId, fileId, clientId, version })
+  }
   const deleteFile = (fileId, userId, clientId) => {
     return sendPromise(DELETE_FILE, { fileId, userId, clientId })
   }
@@ -255,6 +276,12 @@ export const firebaseWorker = (logger, mintSessionClientId, selectors) => {
   const onSessionChange = (cb) => {
     return registerCallback(ON_SESSION_CHANGE, {}, cb)
   }
+  /**
+   * @typedef User
+   * @property {String} email
+   * @property {String} uid
+   * @returns {Promise<User>}
+   */
   const currentUser = () => {
     return sendPromise(CURRENT_USER, {})
   }
@@ -282,8 +309,8 @@ export const firebaseWorker = (logger, mintSessionClientId, selectors) => {
   const listenForRCELock = (fileId, editorId, clientId, cb) => {
     return registerCallback(LISTEN_FOR_RCE_LOCK, { fileId, editorId, clientId }, cb)
   }
-  const saveBackup = (userId, file) => {
-    return sendPromise(SAVE_BACKUP, { userId, file })
+  const saveBackup = (userId, fileId, file) => {
+    return sendPromise(SAVE_BACKUP, { userId, fileId, file })
   }
   const listenForBackups = (userId, onBackupsChanged) => {
     return registerCallback(LISTEN_FOR_BACKUPS, { userId }, onBackupsChanged)
@@ -323,6 +350,15 @@ export const firebaseWorker = (logger, mintSessionClientId, selectors) => {
   }
   const deleteProBackup = (userId, backupRecordId, storageProtocolURL) => {
     return sendPromise(DELETE_PRO_BACKUP, { userId, backupRecordId, storageProtocolURL })
+  }
+  const sendPasswordResetEmail = (email) => {
+    return sendPromise(SEND_PASSWORD_RESET_EMAIL, { email })
+  }
+  const deleteMachineLicenseActivation = (id, os, name, localUserName) => {
+    return sendPromise(DELETE_MACHINE_LICENSE_ACTIVATION, { id, os, name, localUserName })
+  }
+  const writeUserOwnershipNote = (userId, fileId, permission) => {
+    return sendPromise(WRITE_USER_OWNERSHIP_NOTE, { userId, fileId, permission })
   }
 
   worker.onmessage = (event) => {
@@ -374,6 +410,7 @@ export const firebaseWorker = (logger, mintSessionClientId, selectors) => {
         }
         return
       }
+      case WRITE_USER_OWNERSHIP_NOTE_REPLY:
       case IS_STORAGE_URL_REPLY:
       case DELETE_PRO_BACKUP_REPLY:
       case GET_ID_TOKEN_RESULT_REPLY:
@@ -398,9 +435,12 @@ export const firebaseWorker = (logger, mintSessionClientId, selectors) => {
       case FETCH_FILES_REPLY:
       case FETCH_FILE_REPLY:
       case INITIAL_FETCH_REPLY:
+      case FETCH_FILE_JSON_REPLY:
       case DELETE_FILE_REPLY:
       case EDIT_FILE_NAME_REPLY:
       case UPDATE_AUTH_FILE_NAME_REPLY:
+      case SEND_PASSWORD_RESET_EMAIL_REPLY:
+      case DELETE_MACHINE_LICENSE_ACTIVATION_REPLY:
       case OVERWRITE_ALL_KEYS_REPLY: {
         resolvePromise()
         return
@@ -427,9 +467,11 @@ export const firebaseWorker = (logger, mintSessionClientId, selectors) => {
         break
       }
       // Caught errors in promises
+      case WRITE_USER_OWNERSHIP_NOTE_ERROR_REPLY:
       case EDIT_FILE_NAME_ERROR_REPLY:
       case OVERWRITE_ALL_KEYS_ERROR_REPLY:
       case INITIAL_FETCH_ERROR_REPLY:
+      case FETCH_FILE_JSON_ERROR_REPLY:
       case DELETE_FILE_ERROR_REPLY:
       case FETCH_FILES_ERROR_REPLY:
       case LOG_OUT_ERROR_REPLY:
@@ -449,6 +491,8 @@ export const firebaseWorker = (logger, mintSessionClientId, selectors) => {
       case IMAGE_PUBLIC_URL_ERROR_REPLY:
       case GET_ID_TOKEN_RESULT_ERROR_REPLY:
       case DELETE_PRO_BACKUP_ERROR_REPLY:
+      case SEND_PASSWORD_RESET_EMAIL_ERROR_REPLY:
+      case DELETE_MACHINE_LICENSE_ACTIVATION_ERROR_REPLY:
       case LOGIN_WITH_EMAIL_AND_PASSWORD_ERROR_REPLY: {
         resolvePromiseWithError()
         return
@@ -475,6 +519,7 @@ export const firebaseWorker = (logger, mintSessionClientId, selectors) => {
     listen,
     overwriteAllKeys,
     initialFetch,
+    fetchFileJson,
     deleteFile,
     listenToFiles,
     fetchFiles,
@@ -505,6 +550,9 @@ export const firebaseWorker = (logger, mintSessionClientId, selectors) => {
     loginWithEmailAndPassword,
     getIdTokenResult,
     deleteProBackup,
+    writeUserOwnershipNote,
+    sendPasswordResetEmail,
+    deleteMachineLicenseActivation,
     isInitialised: () => initialised,
   }
 }

@@ -54,8 +54,12 @@ import {
   LISTEN_TO_FILES_UNSUBSCRIBE,
   LISTEN_UNSUBSCRIBE,
   LISTEN_FOR_RCE_LOCK_UNSUBSCRIBE,
+  WRITE_USER_OWNERSHIP_NOTE,
   LISTEN_TO_CUSTOM_TEMPLATES_UNSUBSCRIBE,
   LISTEN_FOR_BACKUPS_UNSUBSCRIBE,
+  SEND_PASSWORD_RESET_EMAIL,
+  DELETE_MACHINE_LICENSE_ACTIVATION,
+  FETCH_FILE_JSON,
 } from './firebase-messages'
 import { logger } from './worker-logger'
 
@@ -82,6 +86,7 @@ const listenToImages = wiredUp.listenToImages
 const listenToAttributes = wiredUp.listenToAttributes
 const overwriteAllKeys = wiredUp.overwriteAllKeys
 const initialFetch = wiredUp.initialFetch
+const fetchFileJson = wiredUp.fetchFileJson
 const deleteFile = wiredUp.deleteFile
 const listenToFiles = wiredUp.listenToFiles
 const fetchFiles = wiredUp.fetchFiles
@@ -111,6 +116,9 @@ const imagePublicURL = wiredUp.imagePublicURL
 const isStorageURL = wiredUp.isStorageURL
 const loginWithEmailAndPassword = wiredUp.loginWithEmailAndPassword
 const deleteProBackup = wiredUp.deleteProBackup
+const writeUserOwnershipNote = wiredUp.writeUserOwnershipNote
+const sendPasswordResetEmail = wiredUp.sendPasswordResetEmail
+const deleteMachineLicenseActivation = wiredUp.deleteMachineLicenseActivation
 
 const typeToReplyType = (type) => `${type}_REPLY`
 const errorTypeToReplyType = (type) => `${type}_ERROR_REPLY`
@@ -197,8 +205,6 @@ self.onmessage = (event) => {
 
   switch (type) {
     case INITIALISE_WORKER: {
-      const { clientId } = messagePayload
-      self.clientId = clientId
       try {
         self.postMessage({
           type: typeToReplyType(INITIALISE_WORKER),
@@ -373,6 +379,16 @@ self.onmessage = (event) => {
       const { userId, fileId, clientId, version } = messagePayload
       initialFetch(userId, fileId, clientId, version)
         .then(replyToPromise(INITIAL_FETCH))
+        .catch((error) => {
+          logger.error(`Failed to fetch file with id ${fileId}`, error.message)
+          replyToPromiseWithError(type, error.message)
+        })
+      return
+    }
+    case FETCH_FILE_JSON: {
+      const { userId, fileId, clientId, version } = messagePayload
+      fetchFileJson(userId, fileId, clientId, version)
+        .then(replyToPromise(FETCH_FILE_JSON))
         .catch((error) => {
           logger.error(`Failed to fetch file with id ${fileId}`, error.message)
           replyToPromiseWithError(type, error.message)
@@ -554,8 +570,8 @@ self.onmessage = (event) => {
       return
     }
     case SAVE_BACKUP: {
-      const { userId, file } = messagePayload
-      saveBackup(userId, file)
+      const { userId, fileId, file } = messagePayload
+      saveBackup(userId, fileId, file)
         .then(replyToPromise(SAVE_BACKUP))
         .catch((error) => {
           logger.error(`Error saving backup for <${file.id}> for user id ${userId}`, error.message)
@@ -708,6 +724,16 @@ self.onmessage = (event) => {
         })
       return
     }
+    case DELETE_MACHINE_LICENSE_ACTIVATION: {
+      const { id, os, name, localUserName } = messagePayload
+      deleteMachineLicenseActivation(id, os, name, localUserName)
+        .then(replyToPromise(DELETE_MACHINE_LICENSE_ACTIVATION, () => true))
+        .catch((error) => {
+          logger.error(`Error deleting license activation from your machine`, error?.message)
+          replyToPromiseWithError(type, error?.message ?? 'Error deleting license activation')
+        })
+      return
+    }
     case IS_STORAGE_URL: {
       const { string } = messagePayload
       try {
@@ -776,9 +802,22 @@ self.onmessage = (event) => {
     case LOGIN_WITH_EMAIL_AND_PASSWORD: {
       const { userName, password } = messagePayload
       loginWithEmailAndPassword(userName, password)
+        .then(replyToPromise(LOGIN_WITH_EMAIL_AND_PASSWORD))
+        .catch((error) => {
+          logger.error(
+            `Error logging in with email and password for user: ${userName}`,
+            error.message
+          )
+          replyToPromiseWithError(type, error.message)
+        })
+      return
+    }
+    case SEND_PASSWORD_RESET_EMAIL: {
+      const { email } = messagePayload
+      sendPasswordResetEmail(email)
         .then(
           replyToPromise(
-            LOGIN_WITH_EMAIL_AND_PASSWORD,
+            SEND_PASSWORD_RESET_EMAIL,
             (user) =>
               user && {
                 email: user.email,
@@ -787,8 +826,18 @@ self.onmessage = (event) => {
           )
         )
         .catch((error) => {
+          logger.error(`Error sending password reset link to: ${email}`, error.message)
+          replyToPromiseWithError(type, error.message)
+        })
+      return
+    }
+    case WRITE_USER_OWNERSHIP_NOTE: {
+      const { userId, fileId, permission } = messagePayload
+      writeUserOwnershipNote(userId, fileId, permission)
+        .then(replyToPromise(WRITE_USER_OWNERSHIP_NOTE))
+        .catch((error) => {
           logger.error(
-            `Error logging in with email and password for user: ${userName}`,
+            `Error writing user ownership note for ${userId} file: ${fileId} with permission: ${permission}`,
             error.message
           )
           replyToPromiseWithError(type, error.message)

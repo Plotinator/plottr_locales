@@ -1,9 +1,11 @@
 import semverGt from 'semver/functions/gt'
 import axios from 'axios'
 import { DateTime } from 'luxon'
-import { isEqual, identity, isObject, capitalize } from 'lodash'
+import { isEqual, identity, capitalize } from 'lodash'
 
-import { removeSystemKeys, ARRAY_KEYS, SYSTEM_REDUCER_KEYS, helpers } from 'pltr/v2'
+import { removeSystemKeys, ARRAY_KEYS, SYSTEM_REDUCER_KEYS, helpers } from 'pltr'
+
+import { withMetrics } from './metrics'
 
 const safeParseInt = (x) => {
   try {
@@ -36,13 +38,13 @@ const api = (
       ? ''
       : `https://${baseAPIDomain || ''}`
 
-  const defaultErrorHandler = (label) => (error) => {
+  const defaultErrorHandler = (label) => (message, error) => {
     if (!currentUser()) {
       log.info(
         `[${label}]: We're logged out and failed to communicate with Firebase.  ${error.message}`
       )
     } else {
-      log.error(`[${label}]: Error communicating with Firebase. ${error.message}`, error)
+      log.error(`[${label}]: Error communicating with Firebase. ${error?.message ?? ''}`, error)
     }
   }
 
@@ -52,7 +54,7 @@ const api = (
         userId,
         fileId,
       })
-      .then((response) => ({
+      .then((_response) => ({
         userId,
         fileId,
       }))
@@ -63,7 +65,7 @@ const api = (
           error
         )
         if (status === 401) {
-          return mintCookieToken(currentUser())
+          return mintCookieToken()
         } else {
           return Promise.reject(error)
         }
@@ -76,14 +78,14 @@ const api = (
         fileId,
         newName,
       })
-      .then((response) => ({
+      .then((_response) => ({
         fileId,
       }))
       .catch((error) => {
         const status = error && error.response && error.response.status
         log.error(`Error updating auth file name auth.  ${status}. ${error?.response}`, error)
         if (status === 401) {
-          return mintCookieToken(currentUser())
+          return mintCookieToken()
         } else {
           return Promise.reject(error)
         }
@@ -161,7 +163,7 @@ const api = (
     patching,
     clientId,
     loadFunctionKey = 'load',
-    usingFromDocRef = () => ({})
+    usingFromDocRef = (_doc) => ({})
   ) => {
     return {
       next: (documentRef) => {
@@ -261,7 +263,7 @@ const api = (
     fileId,
     clientId,
     withAction,
-    errorHandler = defaultErrorHandler('listenToFile')
+    _errorHandler = defaultErrorHandler('listenToFile')
   ) => {
     const withIsCloud = (x) => ({ ...x, isCloudFile: true, id: fileId, path: `plottr://${fileId}` })
     const { doc, onSnapshot } = database()
@@ -280,7 +282,7 @@ const api = (
       fileId,
       clientId,
       withAction,
-      errorHandler = defaultErrorHandler('listenForObjectAtPath')
+      _errorHandler = defaultErrorHandler('listenForObjectAtPath')
     ) => {
       const { doc, onSnapshot } = database()
       return onSnapshot(
@@ -296,7 +298,7 @@ const api = (
       fileId,
       clientId,
       withAction,
-      errorHandler = defaultErrorHandler('listenForArrayAtPath')
+      _errorHandler = defaultErrorHandler('listenForArrayAtPath')
     ) => {
       const values = (x) => Object.values(x)
       const { doc, onSnapshot } = database()
@@ -313,7 +315,7 @@ const api = (
       fileId,
       clientId,
       withAction,
-      errorHandler = defaultErrorHandler('listenForFlatArrayAtPath')
+      _errorHandler = defaultErrorHandler('listenForFlatArrayAtPath')
     ) => {
       const { collection, onSnapshot, query } = database()
       return onSnapshot(
@@ -330,7 +332,7 @@ const api = (
     clientId,
     version,
     withAction,
-    errorHandler = defaultErrorHandler('listenToBeats')
+    _errorHandler = defaultErrorHandler('listenToBeats')
   ) => {
     const transform = semverGt(version, WHEN_BEATS_BECAME_AN_OBJECT)
       ? (x) => x
@@ -362,7 +364,7 @@ const api = (
   const listenToFlatNotes = listenForFlatArrayAtPath('flatNotes', 'notes')
   const listenToFlatPlaces = listenForFlatArrayAtPath('flatPlaces', 'places')
 
-  const onFetched = (fileId, path, withData, clientId) => (documentRef) => {
+  const onFetched = (fileId, path, withData, _clientId) => (documentRef) => {
     const data = documentRef && documentRef.data()
     if (!data) {
       return [path, withData({})]
@@ -372,7 +374,7 @@ const api = (
     return [path, withData(data)]
   }
 
-  const onFetchedArray = (fileId, path, withData, clientId) => (documentRef) => {
+  const onFetchedArray = (fileId, path, withData, _clientId) => (documentRef) => {
     const documents = []
     documentRef.forEach((document) => {
       const data = document.data()
@@ -402,7 +404,6 @@ const api = (
   }
 
   const fetchObjectAtPath = (path) => (userId, fileId, clientId) => {
-    const identity = (x) => x
     const { doc, getDoc } = database()
     return getDoc(doc(`${path}/${fileId}`)).then(onFetched(fileId, path, identity, clientId))
   }
@@ -500,7 +501,7 @@ const api = (
       const newValue =
         typeof acc[key] === 'undefined'
           ? value
-          : Array.isArray(acc[key]) || isObject(acc[key])
+          : Array.isArray(acc[key])
           ? [...acc[key], ...value]
           : null
       if (newValue) {
@@ -548,7 +549,7 @@ const api = (
     })
   }
 
-  const initialFetch = (userId, fileId, clientId) => {
+  const fetchFileJson = (userId, fileId, clientId) => {
     return fetchFile(userId, fileId, clientId)
       .then((file) => {
         return Promise.all([
@@ -580,7 +581,7 @@ const api = (
       .then((results) => {
         const newOpenDate = new Date()
         return patch('file', fileId, { lastOpened: newOpenDate }, clientId)
-          .catch((error) => {
+          .catch((_error) => {
             return {
               results,
               newOpenDate: newOpenDate.getTime(),
@@ -595,19 +596,25 @@ const api = (
       })
       .then(({ results, newOpenDate }) => {
         const json = joinResults(results)
-        return pingAuth(userId, fileId).then(() => {
-          return {
-            ...json,
-            file: {
-              ...json.file,
-              lastOpened: newOpenDate,
-              timeStamp: helpers.time.convertFromNanosAndSecondsOrTimestampOrNull(
-                json.file.timeStamp
-              ),
-            },
-          }
-        })
+        return {
+          ...json,
+          file: {
+            ...json.file,
+            lastOpened: newOpenDate,
+            timeStamp: helpers.time.convertFromNanosAndSecondsOrTimestampOrNull(
+              json.file.timeStamp
+            ),
+          },
+        }
       })
+  }
+
+  const initialFetch = (userId, fileId, clientId) => {
+    return fetchFileJson(userId, fileId, clientId).then((resultFile) => {
+      return pingAuth(userId, fileId).then(() => {
+        return resultFile
+      })
+    })
   }
 
   const deleteFile = (fileId, userId, clientId) => {
@@ -683,7 +690,7 @@ const api = (
         const status = error && error.response && error.response.status
         log.error('Error deleting a file', error)
         if (status === 401) {
-          return mintCookieToken(currentUser())
+          return mintCookieToken()
         } else {
           return Promise.reject(error)
         }
@@ -738,8 +745,28 @@ const api = (
     })
   }
 
+  const clearToken = () => {
+    return fetch(`${BASE_API_URL}/api/clear-token`).then((response) => {
+      if (response.ok) {
+        return response
+      }
+      return response.text().then((body) => {
+        return Promise.reject(
+          new Error(`HTTP failure while minting a cookie: ${response.status}.  Body: ${body}`)
+        )
+      })
+    })
+  }
+
   const logOut = () => {
-    return auth().signOut()
+    return auth()
+      .signOut()
+      .then(() => {
+        return clearToken()
+      })
+      .then(() => {
+        return 'success'
+      })
   }
 
   const mintCookieToken = () => {
@@ -771,10 +798,12 @@ const api = (
   const onSessionChange = (cb, errorHandler = defaultErrorHandler('onSessionChange')) => {
     return auth().onAuthStateChanged((user) => {
       if (user) {
-        return mintCookieToken(user).then(() => {
-          cb(user)
-          return Promise.resolve(null)
-        })
+        return mintCookieToken()
+          .catch(errorHandler)
+          .then(() => {
+            cb(user)
+            return Promise.resolve(null)
+          })
       }
       cb(user)
       return Promise.resolve(null)
@@ -796,7 +825,7 @@ const api = (
         if (Array.isArray(value)) {
           return value.some(hasUndefinedValue)
         }
-        if (typeof value === 'object') {
+        if (value && typeof value === 'object') {
           return hasUndefinedValue(value)
         }
         return value === undefined
@@ -917,7 +946,7 @@ const api = (
         const status = error?.response?.status
         log.error(`Error sharing document.  ${message}. ${status}`, error, error)
         if (error?.response?.status === 401) {
-          return mintCookieToken(currentUser())
+          return mintCookieToken()
         } else {
           return Promise.reject(error)
         }
@@ -997,7 +1026,7 @@ const api = (
       error: (error) => {
         handleListenToRCELockError(
           `Error listening for a lock on ${clientId}/${fileId}/${editorId}`,
-          error.message
+          error
         )
       },
     })
@@ -1042,10 +1071,9 @@ const api = (
 
   const TEN_SECONDS_IN_MILISECONDS = 10000
 
-  const saveBackup = (userId, fullFile) => {
+  const saveBackup = (userId, fileId, fullFile) => {
     const startOfToday = DateTime.now().startOf('day').toJSDate()
     const lastModified = new Date()
-    const fileId = selectors.fileIdSelector(fullFile)
     const fileName = selectors.fileNameSelector(fullFile)
     const fileJSON = selectors.fullFileStateSelector(fullFile)
     const file = removeSystemKeys(fileJSON)
@@ -1059,11 +1087,11 @@ const api = (
             if (result) {
               // Update the current backup
               const { document, documentRef } = result
-              const delta = lastModified - document.lastModified.toDate()
+              const delta = lastModified.getTime() - document.lastModified.toDate().getTime()
               if (delta < TEN_SECONDS_IN_MILISECONDS || !documentRef) {
                 return Promise.resolve({ message: 'Not backed up', delta })
               }
-              return backupToStorage(userId, file, startOfToday, false).then((path) => {
+              return backupToStorage(userId, fileId, file, startOfToday, false).then((path) => {
                 if (path !== null) {
                   const { doc, updateDoc } = database()
                   return updateDoc(doc(`backup/${userId}/files/${documentRef.id}`), {
@@ -1078,7 +1106,7 @@ const api = (
               })
             }
             // Add a non-start-of-session backup.
-            return backupToStorage(userId, file, startOfToday, false).then((path) => {
+            return backupToStorage(userId, fileId, file, startOfToday, false).then((path) => {
               if (path !== null) {
                 const { addDoc, collection } = database()
                 return addDoc(collection(`backup/${userId}/files`), {
@@ -1096,7 +1124,7 @@ const api = (
           })
         }
         // Add a start-of-session backup
-        return backupToStorage(userId, file, startOfToday, true).then((path) => {
+        return backupToStorage(userId, fileId, file, startOfToday, true).then((path) => {
           if (path !== null) {
             const { addDoc, collection } = database()
             return addDoc(collection(`backup/${userId}/files`), {
@@ -1166,7 +1194,7 @@ const api = (
             `Failed to upload file for user ${userId} to ${storageURL}.  Unauthourised.`,
             error
           )
-          return mintCookieToken(currentUser()).then(() => {
+          return mintCookieToken().then(() => {
             return null
           })
         } else {
@@ -1176,8 +1204,7 @@ const api = (
       })
   }
 
-  const backupToStorage = (userId, file, date, startOfSession) => {
-    const fileId = selectors.fileIdSelector(file)
+  const backupToStorage = (userId, fileId, file, date, startOfSession) => {
     const storageURL = toBackupPath(userId, fileId, date, startOfSession)
     return saveFileToStorage(userId, storageURL, JSON.stringify(file))
   }
@@ -1208,13 +1235,14 @@ const api = (
     return axios
       .get(`${BASE_API_URL}/api/template-public-url?url=${storageURL}`)
       .then((response) => {
+        // @ts-ignore
         return response.data.publicURL
       })
       .catch((error) => {
         const status = error && error.response && error.response.status
         log.error(`Error getting template public url ${status} ${error?.response}`, error)
         if (status === 401) {
-          return mintCookieToken(currentUser())
+          return mintCookieToken()
         } else {
           return Promise.reject(error)
         }
@@ -1287,9 +1315,10 @@ const api = (
     return axios
       .post(`${BASE_API_URL}/api/delete-custom-template?url=${storageURL}`)
       .then((response) => {
+        // @ts-ignore
         return response.data.publicURL
       })
-      .then((result) => {
+      .then((_result) => {
         const { doc, deleteDoc } = database()
         return deleteDoc(doc(`templates/${userId}/userTemplates/${templateId}`))
       })
@@ -1297,7 +1326,7 @@ const api = (
         const status = error && error.response && error.response.status
         log.error(`Error getting template public url. ${status} ${error?.response}`, error)
         if (status === 401) {
-          return mintCookieToken(currentUser())
+          return mintCookieToken()
         } else {
           return Promise.reject(error)
         }
@@ -1327,7 +1356,7 @@ const api = (
         const status = error && error.response && error.response.status
         log.error(`Failed to upload image for user ${userId} to ${filePath}`, error)
         if (status === 401) {
-          return mintCookieToken(currentUser())
+          return mintCookieToken()
         } else {
           return Promise.reject(error)
         }
@@ -1342,13 +1371,14 @@ const api = (
     return axios
       .get(`${BASE_API_URL}/api/backup-public-url?url=${storageProtocolURL}`)
       .then((response) => {
+        // @ts-ignore
         return response.data.publicURL
       })
       .catch((error) => {
         const status = error && error.response && error.response.status
         log.error(`Error getting file public url.  ${status}.  ${error?.response}`, error)
         if (status === 401) {
-          return mintCookieToken(currentUser())
+          return mintCookieToken()
         } else {
           return Promise.reject(error)
         }
@@ -1363,13 +1393,14 @@ const api = (
         )}&fileId=${fileId}&userId=${userId}`
       )
       .then((response) => {
+        // @ts-ignore
         return response.data.publicURL
       })
       .catch((error) => {
         const status = error && error.response && error.response.status
         log.error(`Error getting file public url.  ${status}.  ${error?.response}`, error)
         if (status === 401) {
-          return mintCookieToken(currentUser())
+          return mintCookieToken()
         } else {
           return Promise.reject(error)
         }
@@ -1414,7 +1445,7 @@ const api = (
               error
             )
             if (status === 401) {
-              return mintCookieToken(currentUser())
+              return mintCookieToken()
             } else {
               return Promise.reject(error)
             }
@@ -1427,7 +1458,68 @@ const api = (
     return auth().sendPasswordResetEmail(email)
   }
 
-  return {
+  const deleteMachineLicenseActivation = (id, os, name, localUserName) => {
+    const machineInfo = {
+      id,
+      os,
+      name,
+      localUserName,
+    }
+    return axios
+      .post(`https://${process.env.API_BASE_DOMAIN}/api/delete-machine-license`, machineInfo)
+      .then((_response) => {
+        return Promise.resolve()
+      })
+      .catch((error) => {
+        if (error.response) {
+          if (error.response.status === 401) {
+            return Promise.resolve()
+          } else {
+            return Promise.reject()
+          }
+        } else {
+          return Promise.reject(error)
+        }
+      })
+  }
+
+  const writeUserOwnershipNote = (userId, fileId, permission) => {
+    const { doc, setDoc } = database()
+    if (
+      userId &&
+      typeof userId === 'string' &&
+      fileId &&
+      typeof fileId === 'string' &&
+      permission &&
+      typeof permission === 'string'
+    ) {
+      return setDoc(doc(`/owners/${fileId}`), { [userId]: permission }, { merge: true })
+    } else {
+      // It's not a train wreck if we fail to write the record
+      return Promise.resolve()
+    }
+  }
+
+  const writeMetrics = (userId, metrics, totalCalls) => {
+    return axios
+      .post(`${BASE_API_URL}/api/metrics`, {
+        userId,
+        metrics,
+        totalCalls,
+      })
+      .then((_response) => true)
+      .catch((error) => {
+        const status = error && error.response && error.response.status
+        log.error(`Error writing metrics. ${status}. ${error.response}`, error)
+        if (status === 401) {
+          return mintCookieToken()
+        } else {
+          return Promise.reject(error)
+        }
+      })
+  }
+
+  return withMetrics({
     editFileName,
     updateAuthFileName,
     listenToFile,
@@ -1454,6 +1546,7 @@ const api = (
     toFirestoreArray,
     overwriteAllKeys,
     initialFetch,
+    fetchFileJson,
     deleteFile,
     listenToFiles,
     fetchFiles,
@@ -1486,7 +1579,10 @@ const api = (
     loginWithEmailAndPassword,
     deleteProBackup,
     sendPasswordResetEmail,
-  }
+    deleteMachineLicenseActivation,
+    writeUserOwnershipNote,
+    writeMetrics,
+  })
 }
 
 export default api

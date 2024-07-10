@@ -115,35 +115,40 @@ const database = () => {
 
 let _auth = null
 const auth = () => {
-  if (!firebaseApp) return null
-  if (!_auth) {
-    if (process.env.NEXT_PUBLIC_NODE_ENV === 'development') {
-      console.log('Using auth local emulator for environment: ', process.env.NEXT_PUBLIC_NODE_ENV)
-      _auth = getAuth(firebaseApp)
-      connectAuthEmulator(_auth, 'https://plottr.local:9100')
-      setPersistence(_auth, indexedDBLocalPersistence)
-    } else {
-      _auth = getAuth(firebaseApp)
-      setPersistence(_auth, indexedDBLocalPersistence)
+  if (!firebaseApp) {
+    return {
+      instance: _auth,
     }
-  }
-  return {
-    instance: _auth,
-    onAuthStateChanged: (nextOrObserver, error, completed) => {
-      return onAuthStateChanged(_auth, nextOrObserver, error, completed)
-    },
-    signOut: () => {
-      return signOut(_auth)
-    },
-    currentUser: () => {
-      return _auth.currentUser
-    },
-    signInWithEmailAndPassword: (email, password) => {
-      return signInWithEmailAndPassword(_auth, email, password)
-    },
-    sendPasswordResetEmail: (email) => {
-      return sendPasswordResetEmail(_auth, email)
-    },
+  } else {
+    if (!_auth) {
+      if (process.env.NEXT_PUBLIC_NODE_ENV === 'development') {
+        console.log('Using auth local emulator for environment: ', process.env.NEXT_PUBLIC_NODE_ENV)
+        _auth = getAuth(firebaseApp)
+        connectAuthEmulator(_auth, 'https://plottr.local:9100')
+        setPersistence(_auth, indexedDBLocalPersistence)
+      } else {
+        _auth = getAuth(firebaseApp)
+        setPersistence(_auth, indexedDBLocalPersistence)
+      }
+    }
+    return {
+      instance: _auth,
+      onAuthStateChanged: (nextOrObserver, error, completed) => {
+        return onAuthStateChanged(_auth, nextOrObserver, error, completed)
+      },
+      signOut: () => {
+        return signOut(_auth)
+      },
+      currentUser: () => {
+        return _auth.currentUser
+      },
+      signInWithEmailAndPassword: (email, password) => {
+        return signInWithEmailAndPassword(_auth, email, password)
+      },
+      sendPasswordResetEmail: (email) => {
+        return sendPasswordResetEmail(_auth, email)
+      },
+    }
   }
 }
 
@@ -159,6 +164,7 @@ const storage = () => {
       _storage = getStorage(firebaseApp)
       connectStorageEmulator(_storage, 'localhost', 9200)
       // This doesn't work on the new version :/
+      // @ts-ignore
       _storage._protocol = 'https'
     } else {
       _storage = getStorage(firebaseApp)
@@ -249,6 +255,7 @@ export const wireUpAPI = (logger, actions, selectors) => {
     toFirestoreArray: wiredUp.toFirestoreArray,
     overwriteAllKeys: wiredUp.overwriteAllKeys,
     initialFetch: wiredUp.initialFetch,
+    fetchFileJson: wiredUp.fetchFileJson,
     deleteFile: wiredUp.deleteFile,
     listenToFiles: wiredUp.listenToFiles,
     fetchFiles: wiredUp.fetchFiles,
@@ -280,6 +287,8 @@ export const wireUpAPI = (logger, actions, selectors) => {
     isStorageURL: wiredUp.isStorageURL,
     deleteProBackup: wiredUp.deleteProBackup,
     loginWithEmailAndPassword: wiredUp.loginWithEmailAndPassword,
+    writeUserOwnershipNote: wiredUp.writeUserOwnershipNote,
     sendPasswordResetEmail: wiredUp.sendPasswordResetEmail,
+    deleteMachineLicenseActivation: wiredUp.deleteMachineLicenseActivation,
   }
 }

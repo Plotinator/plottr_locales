@@ -1,9 +1,10 @@
 const admin = require('firebase-admin')
+// @ts-ignore
 const files = require('./files.json')
 
 const projectId = 'plottr-ci'
-process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080'
-process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099'
+process.env.FIRESTORE_EMULATOR_HOST = '127.0.0.1:8080'
+process.env.FIREBASE_AUTH_EMULATOR_HOST = '127.0.0.1:9099'
 admin.initializeApp({ projectId })
 
 const database = admin.firestore()
@@ -45,6 +46,9 @@ function createExampleFiles() {
 }
 
 function createTestUser() {
+  const now = new Date()
+  const nextMonth = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
+
   admin
     .auth()
     .createUser({ email: 'test@test.com', password: 'tester' })
@@ -54,11 +58,19 @@ function createTestUser() {
         .auth()
         .getUserByEmail('test@test.com')
         .then((user) => {
-          return admin.auth().setCustomUserClaims(user.uid, { admin: true })
+          return database
+            .collection('licenseActivations')
+            .doc(user.uid)
+            .set({
+              proLicense: {
+                effectiveStartDate: now.toISOString(),
+                effectiveEndDate: nextMonth.toISOString(),
+              },
+            })
         })
     })
     .then(() => {
-      admin
+      return admin
         .auth()
         .createUser({ email: 'test2@test.com', password: 'tester' })
         .then(() => {
@@ -67,12 +79,21 @@ function createTestUser() {
             .auth()
             .getUserByEmail('test2@test.com')
             .then((user) => {
-              return admin.auth().setCustomUserClaims(user.uid, { admin: true })
+              return database
+                .collection('licenseActivations')
+                .doc(user.uid)
+                .set({
+                  proLicense: {
+                    effectiveStartDate: now.toISOString(),
+                    effectiveEndDate: nextMonth.toISOString(),
+                  },
+                })
             })
         })
     })
 }
 
 seedDatabase().then((results) => {
+  console.log('Results', results)
   createTestUser()
 })

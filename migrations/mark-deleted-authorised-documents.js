@@ -17,10 +17,10 @@ if (!admin.apps.length) {
     process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099'
     admin.initializeApp({ projectId })
   } else if (process.env.FIREBASE_ENV === 'preview') {
-    const serviceAccount = JSON.parse(process.env.FIREBASE_KEY)
+    const serviceAccount = JSON.parse(process.env.FIREBASE_KEY ?? '')
     admin.initializeApp({ credential: admin.credential.cert(serviceAccount) })
   } else if (process.env.FIREBASE_ENV === 'production') {
-    const serviceAccount = JSON.parse(process.env.FIREBASE_KEY)
+    const serviceAccount = JSON.parse(process.env.FIREBASE_KEY ?? '')
     admin.initializeApp({ credential: admin.credential.cert(serviceAccount) })
   }
 }
@@ -156,7 +156,11 @@ const deletedFiles = (userId) => {
     ).then((results) => {
       return results
         .filter(({ exists, document }) => {
-          return exists && document.deleted
+          return (
+            exists &&
+            // @ts-ignore
+            document?.deleted
+          )
         })
         .map(({ document }) => document)
     })
@@ -178,6 +182,7 @@ const markDeletedAuthorisedDocumentsAsDeleted = (userId, executingUserId, readOn
         return Promise.all(
           authorisedProjects.map((fileId) => {
             const fileIsDeleted = deletedFiles.some((file) => {
+              // @ts-ignore
               return file.id === fileId
             })
             if (fileIsDeleted) {

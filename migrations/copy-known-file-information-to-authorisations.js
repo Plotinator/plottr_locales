@@ -19,10 +19,10 @@ if (!admin.apps.length) {
     process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099'
     admin.initializeApp({ projectId })
   } else if (process.env.FIREBASE_ENV === 'preview') {
-    const serviceAccount = JSON.parse(process.env.FIREBASE_KEY)
+    const serviceAccount = JSON.parse(process.env.FIREBASE_KEY ?? '')
     admin.initializeApp({ credential: admin.credential.cert(serviceAccount) })
   } else if (process.env.FIREBASE_ENV === 'production') {
-    const serviceAccount = JSON.parse(process.env.FIREBASE_KEY)
+    const serviceAccount = JSON.parse(process.env.FIREBASE_KEY ?? '')
     admin.initializeApp({ credential: admin.credential.cert(serviceAccount) })
   }
 }
@@ -145,10 +145,13 @@ const allFiles = (userId) => {
               return {
                 ...document.data(),
                 id: document.id,
+                exists: true,
               }
-            }
-            return {
-              exists: false,
+            } else {
+              return {
+                exists: false,
+                id: null,
+              }
             }
           })
       })
@@ -179,41 +182,52 @@ const copyKnownFileInformationToAuthorisation = (userId, executingUserId, readOn
                 .get()
                 .then((ref) => ref.data())
                 .then((oldRecord) => {
-                  const change = {
-                    lastOpened:
-                      oldRecord.lastOpened ||
-                      correspondingFile.lastOpened ||
-                      correspondingFile.timeStamp ||
-                      null,
-                    fileURL: `plottr://${correspondingFile.id}`,
-                    fileName: correspondingFile.fileName || 'Untitled',
-                  }
-                  const newRecord = {
-                    ...oldRecord,
-                    ...change,
-                  }
-                  if (isEqual(oldRecord, newRecord)) {
-                    console.log('! Nothing would change.  Leaving the record alone.')
-                    return Promise.resolve()
+                  if (oldRecord) {
+                    const change = {
+                      lastOpened:
+                        oldRecord.lastOpened ||
+                        // @ts-ignore
+                        correspondingFile.lastOpened ||
+                        // @ts-ignore
+                        correspondingFile.timeStamp ||
+                        null,
+                      fileURL: `plottr://${correspondingFile.id}`,
+                      // @ts-ignore
+                      fileName: correspondingFile.fileName || 'Untitled',
+                    }
+                    const newRecord = {
+                      ...oldRecord,
+                      ...change,
+                    }
+                    if (isEqual(oldRecord, newRecord)) {
+                      console.log('! Nothing would change.  Leaving the record alone.')
+                      return Promise.resolve()
+                    } else {
+                      console.log(
+                        `Adding ${JSON.stringify(
+                          change,
+                          null,
+                          2
+                        )} to authorisation/${userId}/granted/${fileId} to produce: ${JSON.stringify(
+                          newRecord,
+                          null,
+                          2
+                        )}`
+                      )
+                      return runTransactionWithAuditing(
+                        userId,
+                        fileId,
+                        `authorisation/${userId}/granted`,
+                        oldRecord,
+                        newRecord
+                      )
+                    }
                   } else {
                     console.log(
-                      `Adding ${JSON.stringify(
-                        change,
-                        null,
-                        2
-                      )} to authorisation/${userId}/granted/${fileId} to produce: ${JSON.stringify(
-                        newRecord,
-                        null,
-                        2
-                      )}`
+                      'Record does not exist: ',
+                      `authorisation/${userId}/granted/${fileId}`
                     )
-                    return runTransactionWithAuditing(
-                      userId,
-                      fileId,
-                      `authorisation/${userId}/granted`,
-                      oldRecord,
-                      newRecord
-                    )
+                    return Promise.resolve()
                   }
                 })
             } else {
