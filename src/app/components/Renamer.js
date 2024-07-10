@@ -85,7 +85,6 @@ Renamer.propTypes = {
 
 const mapStateToProps = (state) => ({
   isInProMode: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
-  isCloudFile: selectors.isCloudFileSelector(state),
   isOffline: selectors.isOfflineSelector(state),
 })
 
