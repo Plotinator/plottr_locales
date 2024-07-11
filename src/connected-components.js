@@ -107,6 +107,12 @@ const {
   localUserName,
 } = makeMainProcessClient()
 
+export const mountState = (state) => {
+  return {
+    user: state,
+  }
+}
+
 export const plottrComponentsContextObject = (localClient) => {
   const writeFile = (filePath, data) => {
     return localClient.writeFile(filePath, data)
@@ -680,11 +686,7 @@ export const plottrComponentsContextObject = (localClient) => {
     // Use in cases where we get something that looks roughly like the
     // user state and we want it to appear at the right place for
     // selectors to find it.
-    mountState: (state) => {
-      return {
-        user: state,
-      }
-    },
+    mountState,
   }
 
   return { platform }

@@ -23,13 +23,14 @@ import { listenToOfflineState } from './listenToOfflineState'
 import { keepGlobalFontVariablesUpToDate } from './keepGlobalFontVariablesUpToDate'
 import { startupStateMachine } from './startupStateMachine'
 import { listenToDarkMode } from './darkModeListener'
+import { mountState } from './connected-components'
 
 const { PlottrComponentsContext } = connections
 
 export const renderFile = (root, localClient) => {
   listenToOfflineState(store, selectors, actions)
   keepGlobalFontVariablesUpToDate(store, selectors)
-  startupStateMachine(localClient, store, selectors, actions, saveBackupOnFirebase)
+  startupStateMachine(localClient, store, selectors, actions, saveBackupOnFirebase, mountState)
   listenToDarkMode(store, selectors)
 
   const saveOfflineFile = (file, knownFiles, onlineFileURL, isOffline) => {

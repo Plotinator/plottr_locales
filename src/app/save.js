@@ -60,13 +60,14 @@ export const backupFile = (
     const userId = selectors.userIdSelector(state)
     const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
     const fileJSON = selectors.fullFileStateSelector(state)
+    const fileId = selectors.fileIdSelector(state)
 
     if (!backupEnabled) {
       return Promise.resolve()
     } else {
       const cloudBackup =
         !isOffline && isInProMode && isCloudFile
-          ? saveBackupOnFirebase(userId, state)
+          ? saveBackupOnFirebase(userId, fileId, state)
           : Promise.resolve()
 
       const hasAllKeys = selectors.hasAllKeysSelector(state)

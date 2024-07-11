@@ -34,7 +34,8 @@ export const startupStateMachine = (
   getStore,
   selectors,
   actions,
-  saveBackupOnFirebase
+  saveBackupOnFirebase,
+  mountState
 ) => {
   const saveBackup = (filePath, file) => {
     const state = getStore().getState()
@@ -42,9 +43,10 @@ export const startupStateMachine = (
     const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
     const userId = selectors.userIdSelector(state)
     const localBackupsEnabled = selectors.localBackupsEnabledSelector(state)
+    const fileId = selectors.fileIdSelector(state)
 
     const result =
-      isInProMode && onCloud ? saveBackupOnFirebase(userId, file) : Promise.resolve(true)
+      isInProMode && onCloud ? saveBackupOnFirebase(userId, fileId, file) : Promise.resolve(true)
 
     return result.then(() => {
       if (!onCloud || (onCloud && localBackupsEnabled)) {
@@ -86,13 +88,13 @@ export const startupStateMachine = (
         // mode enabled, in which case we use convention to determine
         // the offline file counterpart.
         if (!!isInProMode === !!helpers.file.urlPointsToPlottrCloud(fileURL)) {
-          return bootFile(localClient, fileURL, options, numOpenFiles, saveBackup)
+          return bootFile(localClient, fileURL, options, numOpenFiles, saveBackup, mountState)
             .then(() => {
               getStore().dispatch(actions.applicationState.finishCheckingFileToLoad())
             })
             .then(closeDashboard)
         } else if (isInOfflineMode && helpers.file.urlPointsToPlottrCloud(fileURL)) {
-          return bootFile(localClient, fileURL, options, numOpenFiles, saveBackup, true)
+          return bootFile(localClient, fileURL, options, numOpenFiles, saveBackup, mountState, true)
             .then(() => {
               getStore().dispatch(actions.applicationState.finishCheckingFileToLoad())
             })

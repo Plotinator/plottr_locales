@@ -133,6 +133,7 @@ export function bootFile(
   options,
   numOpenFiles,
   saveBackup,
+  mountState,
   bootingOfflineFile
 ) {
   const now = new Date().getTime()
@@ -412,7 +413,7 @@ export function bootFile(
       userId,
       cachedDowloadStorageImage.downloadStorageImage
     ).then((selfContainedFile) => {
-      saveBackup(`${json.file.fileName}.pltr`, selfContainedFile)
+      saveBackup(`${json.file.fileName}.pltr`, mountState(selfContainedFile))
     })
   }
 
