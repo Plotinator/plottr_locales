@@ -382,52 +382,61 @@ export const importExistingCloudFile = (file) => {
   }
 }
 
-export const importExistingFile = (localClient, fileUrl, properties) => {
-  return showOpenDialog('Choose file to import', filters, properties, fileUrl).then((files) => {
-    const filePath = files && files.length && files[0]
+export const importExistingFile = (localClient) => {
+  return userFilePickerDefaultFolder().then((defaultPath) => {
+    return showOpenDialog('Choose file to import', filters, ['openFile'], defaultPath).then(
+      (files) => {
+        const filePath = files && files.length && files[0]
 
-    if (typeof filePath !== 'string') {
-      return Promise.resolve('No file selected')
-    }
+        if (typeof filePath !== 'string') {
+          return Promise.resolve('No file selected')
+        }
+        const fileUrl = helpers.file.filePathToFileURL(filePath)
 
-    store().dispatch(actions.applicationState.startProjectImporter())
-    return localClient.readFile(helpers.file.withoutProtocol(filePath), 'utf-8').then((rawFile) => {
-      const contents = JSON.parse(rawFile)
+        store().dispatch(actions.applicationState.startProjectImporter())
+        return localClient
+          .readFile(helpers.file.withoutProtocol(filePath), 'utf-8')
+          .then((rawFile) => {
+            const contents = JSON.parse(rawFile)
 
-      return getVersion()
-        .then((version) => {
-          return new Promise((resolve, reject) => {
-            migrateIfNeeded(
-              version,
-              contents,
-              fileUrl,
-              null,
-              (error, didMigrate, migratedState) => {
-                if (error) {
-                  getErrorReporterInstance().then((errorReporter) => {
-                    errorReporter.error('Error migrating file', error)
-                  })
-                  logger.error('Error migrating file', error)
-                  reject(error)
-                  return
-                } else {
-                  const fileState = addMissingKeys(migratedState)
-                  const state = store().getState()
-                  const fullSystemState = selectors.fullSystemStateSelector(state)
-                  store().dispatch(actions.ui.showImportDataPicker(fileState, fullSystemState))
-                  store().dispatch(actions.applicationState.finishProjectImporter())
-                  resolve(null)
-                }
-              }
-            )
+            return getVersion()
+              .then((version) => {
+                return new Promise((resolve, reject) => {
+                  migrateIfNeeded(
+                    version,
+                    contents,
+                    fileUrl,
+                    null,
+                    (error, didMigrate, migratedState) => {
+                      if (error) {
+                        getErrorReporterInstance().then((errorReporter) => {
+                          errorReporter.error('Error migrating file', error)
+                        })
+                        logger.error('Error migrating file', error)
+                        reject(error)
+                        return
+                      } else {
+                        const fileState = addMissingKeys(migratedState)
+                        const state = store().getState()
+                        const fullSystemState = selectors.fullSystemStateSelector(state)
+                        store().dispatch(
+                          actions.ui.showImportDataPicker(fileState, fullSystemState)
+                        )
+                        store().dispatch(actions.applicationState.finishProjectImporter())
+                        resolve(null)
+                      }
+                    }
+                  )
+                })
+              })
+              .catch((error) => {
+                getErrorReporterInstance().then((errorReporter) => {
+                  errorReporter.error('Error importing project', error)
+                })
+              })
           })
-        })
-        .catch((error) => {
-          getErrorReporterInstance().then((errorReporter) => {
-            errorReporter.error('Error importing project', error)
-          })
-        })
-    })
+      }
+    )
   })
 }
 

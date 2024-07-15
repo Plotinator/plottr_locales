@@ -498,8 +498,8 @@ export const plottrComponentsContextObject = (localClient) => {
       document.dispatchEvent(event)
     },
     duplicateFile,
-    importExistingFile: (fileURL, properties) => {
-      return importExistingFile(localClient, fileURL, properties)
+    importExistingFile: () => {
+      return importExistingFile(localClient)
     },
     importExistingCloudFile,
     showRecentFilesInImportModal,
