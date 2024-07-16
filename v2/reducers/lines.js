@@ -17,7 +17,6 @@ import {
   DELETE_LINE,
   FILE_LOADED,
   NEW_FILE,
-  RESET,
   DELETE_BOOK,
   LOAD_LINES,
   ADD_BOOK_FROM_TEMPLATE,
@@ -28,6 +27,11 @@ import {
   UNPIN_PLOTLINE,
   DUPLICATE_BOOK,
   REPLACE_MARKED_HITS,
+  ADD_BOOK_FROM_PLTR,
+  UNDO,
+  REDO,
+  UNDO_N_TIMES,
+  REDO_N_TIMES,
 } from '../constants/ActionTypes'
 import { line } from '../store/initialState'
 import { newFileLines, newFileSeriesLines } from '../store/newFileState'
@@ -44,7 +48,7 @@ import { replacePlainTextHit, replaceInSlateDatastructure } from './replace'
 //  - bookId: Number,
 //  - "series": String literal,
 
-const lines = (dataRepairers) => (state, action) => {
+const lines = (_dataRepairers) => (state, action) => {
   const actionBookId = associateWithBroadestScope(action.bookId || action.newBookId)
 
   switch (action.type) {
@@ -96,7 +100,7 @@ const lines = (dataRepairers) => (state, action) => {
           newLine.bookId = actionBookId // add it to the new/current book
           newLine.position = nextPosition + newLine.position // put it in the right position
           newLine.fromTemplateId = action.id || action.templateData.id
-          if (!newLine.color || newLine.color == nextColor(0)) {
+          if (!newLine.color) {
             newLine.color = nextColor(linesInBook.length + index)
           }
           return newLine
@@ -110,10 +114,11 @@ const lines = (dataRepairers) => (state, action) => {
       }
     }
 
+    case ADD_BOOK_FROM_PLTR:
     case DUPLICATE_BOOK: {
       const newLines = action.newLines
         .filter(({ bookId }) => bookId !== 'series') // this is to protect against a bad template that unnecessarily had a series line
-        .map((l, index) => {
+        .map((l, _index) => {
           const newLine = cloneDeep(l)
           newLine.id = action.nextLineId + newLine.id // give it a new id
           newLine.bookId = action.newBookId // add it to the new/current book
@@ -318,7 +323,17 @@ const lines = (dataRepairers) => (state, action) => {
       }, state)
     }
 
-    case RESET:
+    case UNDO_N_TIMES:
+    case REDO_N_TIMES:
+    case UNDO:
+    case REDO: {
+      if (Array.isArray(action.state.lines)) {
+        return action.state.lines
+      } else {
+        return state
+      }
+    }
+
     case FILE_LOADED:
       return action.data.lines
 

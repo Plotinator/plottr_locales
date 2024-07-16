@@ -31,6 +31,7 @@ const addCharacterToCard = wiredUpActions.card.addCharacter
 const { addCharacter, editCharacterAttributeValue } = wiredUpActions.character
 const { setAppSettings } = wiredUpActions.settings
 const { setPermission } = wiredUpActions.permission
+const { addBeat } = wiredUpActions.beat
 const loadLines = wiredUpActions.line.load
 
 const {
@@ -355,6 +356,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: null,
+              choseProMode: false,
             },
           })
         )
@@ -385,6 +387,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
+              choseProMode: true,
             },
           })
         )
@@ -412,6 +415,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
+              choseProMode: true,
             },
           })
         )
@@ -440,6 +444,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
+              choseProMode: true,
             },
           })
         )
@@ -467,6 +472,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
+              choseProMode: true,
             },
           })
         )
@@ -496,6 +502,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
+              choseProMode: true,
             },
           })
         )
@@ -523,6 +530,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
+              choseProMode: true,
             },
           })
         )
@@ -552,6 +560,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
+              choseProMode: true,
             },
           })
         )
@@ -584,6 +593,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
+              choseProMode: true,
             },
           })
         )
@@ -627,6 +637,7 @@ describe('ui-per-user', () => {
               user: {
                 ...appSettings.user,
                 frbId: 'dummy-id',
+                choseProMode: true,
               },
             })
           )
@@ -677,6 +688,7 @@ describe('ui-per-user', () => {
               user: {
                 ...appSettings.user,
                 frbId: 'dummy-id',
+                choseProMode: true,
               },
             })
           )
@@ -732,6 +744,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
+              choseProMode: true,
             },
           })
         )
@@ -764,6 +777,7 @@ describe('ui-per-user', () => {
             user: {
               ...appSettings.user,
               frbId: 'dummy-id',
+              choseProMode: true,
             },
           })
         )
@@ -807,6 +821,7 @@ describe('ui-per-user', () => {
               user: {
                 ...appSettings.user,
                 frbId: 'dummy-id',
+                choseProMode: true,
               },
             })
           )
@@ -856,6 +871,7 @@ describe('ui-per-user', () => {
               user: {
                 ...appSettings.user,
                 frbId: 'frb-dummy-owner-id',
+                choseProMode: true,
               },
             })
           )
@@ -886,6 +902,7 @@ describe('ui-per-user', () => {
               user: {
                 ...appSettings.user,
                 frbId: 'frb-dummy-collaborator-id',
+                choseProMode: true,
               },
             })
           )
@@ -915,7 +932,6 @@ describe('ui-per-user', () => {
 
       describe('given the permission is changed back to "owner"', () => {
         it('should read ui changes from both "owner" and "collaborator"', () => {
-          store
           const appSettings = appSettingsSelector(store.getState())
           store.dispatch(
             setAppSettings({
@@ -923,6 +939,7 @@ describe('ui-per-user', () => {
               user: {
                 ...appSettings.user,
                 frbId: 'frb-dummy-owner-id',
+                choseProMode: true,
               },
             })
           )
@@ -952,15 +969,16 @@ const exampleCard1 = {
   title: 'Card 1',
   description: 'Card 1 description',
   lineId: 1,
-  beatId: 1,
+  beatId: 2,
 }
 
 describe('moveCardToBook', () => {
   describe('when a card dialog is open', () => {
     it('should close the card dialog', () => {
       const store = initialStore()
+      store.dispatch(addBeat(1, null))
       store.dispatch(addCard(exampleCard1))
-      store.dispatch(setCardDialogOpen(1, 1, 1))
+      store.dispatch(setCardDialogOpen(1, 2, 1))
       const cardIsOpen = isCardDialogVisibleSelector(store.getState())
       expect(cardIsOpen).toBeTruthy()
       store.dispatch(moveCardToBook('series', 1))
@@ -1441,8 +1459,9 @@ describe('addCustomAttributeOrdering', () => {
     describe('when the file has no custom attribute order', () => {
       it('should add the custom attribute order', () => {
         expect(
-          addCustomAttributeOrdering(newFileWithCustomAttributes.ui, newFileWithCustomAttributes)
-            .customAttributeOrder.characters
+          addCustomAttributeOrdering(newFileWithCustomAttributes.ui, {
+            user: newFileWithCustomAttributes,
+          }).customAttributeOrder.characters
         ).toEqual([
           {
             type: 'customAttributes',
@@ -1485,7 +1504,9 @@ describe('addCustomAttributeOrdering', () => {
       }
       it('should leave the file as-is', () => {
         expect(
-          addCustomAttributeOrdering(fileWithCompleteOrdering.ui, fileWithCompleteOrdering)
+          addCustomAttributeOrdering(fileWithCompleteOrdering.ui, {
+            user: fileWithCompleteOrdering,
+          })
         ).toEqual(fileWithCompleteOrdering.ui)
       })
     })
@@ -1507,7 +1528,7 @@ describe('addCustomAttributeOrdering', () => {
       }
       it('should fill in the missing attributes', () => {
         expect(
-          addCustomAttributeOrdering(fileWithPartialOrdering.ui, fileWithPartialOrdering)
+          addCustomAttributeOrdering(fileWithPartialOrdering.ui, { user: fileWithPartialOrdering })
             .customAttributeOrder.characters
         ).toEqual([
           {
@@ -1561,10 +1582,9 @@ describe('addCustomAttributeOrdering', () => {
       }
       it('should remove them from the ordering', () => {
         expect(
-          addCustomAttributeOrdering(
-            fileWithCustomAttributesRemoved.ui,
-            fileWithCustomAttributesRemoved
-          ).customAttributeOrder.characters
+          addCustomAttributeOrdering(fileWithCustomAttributesRemoved.ui, {
+            user: fileWithCustomAttributesRemoved,
+          }).customAttributeOrder.characters
         ).toEqual([
           {
             type: 'customAttributes',
@@ -1606,10 +1626,9 @@ describe('addCustomAttributeOrdering', () => {
     describe('when the file has no custom attribute order', () => {
       it('should add the custom attribute order', () => {
         expect(
-          addCustomAttributeOrdering(
-            newFileWithNewCustomAttributes.ui,
-            newFileWithNewCustomAttributes
-          ).customAttributeOrder.characters
+          addCustomAttributeOrdering(newFileWithNewCustomAttributes.ui, {
+            user: newFileWithNewCustomAttributes,
+          }).customAttributeOrder.characters
         ).toEqual([
           {
             type: 'attributes',
@@ -1652,7 +1671,9 @@ describe('addCustomAttributeOrdering', () => {
       }
       it('should leave the file as-is', () => {
         expect(
-          addCustomAttributeOrdering(fileWithCompleteOrdering.ui, fileWithCompleteOrdering)
+          addCustomAttributeOrdering(fileWithCompleteOrdering.ui, {
+            user: fileWithCompleteOrdering,
+          })
         ).toEqual(fileWithCompleteOrdering.ui)
       })
     })
@@ -1674,7 +1695,7 @@ describe('addCustomAttributeOrdering', () => {
       }
       it('should fill in the missing attributes', () => {
         expect(
-          addCustomAttributeOrdering(fileWithPartialOrdering.ui, fileWithPartialOrdering)
+          addCustomAttributeOrdering(fileWithPartialOrdering.ui, { user: fileWithPartialOrdering })
             .customAttributeOrder.characters
         ).toEqual([
           {
@@ -1733,10 +1754,9 @@ describe('addCustomAttributeOrdering', () => {
       }
       it('should remove them from the ordering', () => {
         expect(
-          addCustomAttributeOrdering(
-            fileWithRemoveAttributesOrdering.ui,
-            fileWithRemoveAttributesOrdering
-          ).customAttributeOrder.characters
+          addCustomAttributeOrdering(fileWithRemoveAttributesOrdering.ui, {
+            user: fileWithRemoveAttributesOrdering,
+          }).customAttributeOrder.characters
         ).toEqual([
           {
             type: 'attributes',
@@ -1810,7 +1830,7 @@ describe('addCustomAttributeOrdering', () => {
       }
       it('should obey the aforementioned rules to construct a correct ordering', () => {
         expect(
-          addCustomAttributeOrdering(newFileWithMixOfIssues.ui, newFileWithMixOfIssues)
+          addCustomAttributeOrdering(newFileWithMixOfIssues.ui, { user: newFileWithMixOfIssues })
             .customAttributeOrder.characters
         ).toEqual([
           {

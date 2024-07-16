@@ -17,7 +17,7 @@ const filesByPosition = (filesArray) => {
 }
 const filesById = (filesArray) => {
   const byId = {}
-  filesArray.forEach((file, index) => {
+  filesArray.forEach((file, _index) => {
     byId[file.id] = file
   })
   return byId

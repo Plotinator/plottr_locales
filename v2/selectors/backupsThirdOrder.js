@@ -6,6 +6,7 @@ import { t } from 'plottr_locales'
 import { parseStringDate } from '../helpers/date'
 import { nonEmptyBackupFoldersSelector } from './backupsFirstOrder'
 import { cloudFileListSelector } from './knownFilesFirstOrder'
+import { isLoggedIntoProWithActiveLicenseSelector } from './secondOrder'
 
 const sortFolders = (folders) => {
   return sortBy(folders, (folder) => {
@@ -16,7 +17,7 @@ const groupableName = (fileObj) => {
   if (fileObj.storagePath) {
     return fileObj.fileId
   } else {
-    return fileObj.name.replace('(start-session)-', '').replace('.pltr', '')
+    return fileObj.name.replace('(start-session)-', '')
   }
 }
 const makeDateString = (dateObj, makeShort) => {
@@ -40,7 +41,7 @@ const addFileNameToCloudFile = (folderPath, cloudFiles) => (fileObject) => {
       name: proFile?.name || fileObject.id,
     }
   } else {
-    const name = fileObject.name.replace('(start-session)-', '').replace('.pltr', '')
+    const name = fileObject.name.replace('(start-session)-', '').replace(/\.pltr$/, '')
     return {
       ...fileObject,
       name,
@@ -51,20 +52,32 @@ const addFileNameToCloudFile = (folderPath, cloudFiles) => (fileObject) => {
 export const groupedSortedBackupFoldersSelector = createSelector(
   nonEmptyBackupFoldersSelector,
   cloudFileListSelector,
-  (backupFolders, cloudFiles) => {
+  isLoggedIntoProWithActiveLicenseSelector,
+  (backupFolders, cloudFiles, isInProMode) => {
     const sortedFolders = sortFolders(backupFolders)
-    return sortedFolders.map((f) => {
-      const groups = groupBy(
-        f.backups.map(addFileNameToCloudFile(f.path, cloudFiles)),
-        groupableName
-      )
-      // const groupsWithName = Object.entries(f.groups).map((group) => {})
-      return {
-        ...f,
-        groups,
-        longDateStr: makeDateString(f.date, false),
-        shortDateStr: makeDateString(f.date, true),
-      }
-    })
+    return sortedFolders
+      .map((f) => {
+        const filtered = f.backups.filter((backup) => {
+          return (
+            (backup?.storagePath && typeof backup?.storagePath === 'string' && isInProMode) ||
+            typeof backup?.storagePath === 'undefined'
+          )
+        })
+        const groups = groupBy(
+          filtered.map(addFileNameToCloudFile(f.path, cloudFiles)),
+          groupableName
+        )
+        // const groupsWithName = Object.entries(f.groups).map((group) => {})
+        return {
+          ...f,
+          backups: filtered,
+          groups,
+          longDateStr: makeDateString(f.date, false),
+          shortDateStr: makeDateString(f.date, true),
+        }
+      })
+      .filter(({ backups }) => {
+        return Array.isArray(backups) && backups.length > 0
+      })
   }
 )

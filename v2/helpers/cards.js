@@ -1,6 +1,7 @@
 import { sortBy, groupBy, isObject } from 'lodash'
 
 import { safeParseInt } from './safeParseInt'
+import { beatName } from './beats'
 
 export function sortCardsInBeat(autoSort, cards, sortedLines) {
   if (autoSort) {
@@ -23,6 +24,45 @@ export function cardMapping(sortedBeats, sortedLines, card2Dmap, currentLine) {
     acc[beat.id] = sortedBeatCards(sortedLines, beat.id, card2Dmap, currentLine)
     return acc
   }, {})
+}
+
+export function cardMappingWithBeatTitle(
+  allBeats,
+  cards,
+  allBooksAsArray,
+  linesByBook,
+  sortedHierarchyLevels
+) {
+  return allBooksAsArray
+    .flatMap((book) => {
+      const beats = Object.entries(allBeats[book.id].index).reduce(
+        (acc, [beatId, beat], beatIndex) => {
+          const beatTitle = beatName(allBeats[book.id], beat, sortedHierarchyLevels)
+          if (String(book.id) == String(beat.bookId)) {
+            acc[beatId] = {
+              title: beat.title === 'auto' ? `${beatTitle} ${beatIndex + 1}` : beatTitle,
+              cards: cards.filter((card) => String(card.beatId) === String(beatId)),
+            }
+          }
+          return acc
+        },
+        {}
+      )
+
+      return {
+        [book.id]: {
+          title: book.title,
+          beats,
+          lines: linesByBook[book.id].lines,
+        },
+      }
+    })
+    .reduce((acc, item) => {
+      return {
+        ...acc,
+        ...item,
+      }
+    }, {})
 }
 
 export function emptyCard(id, beat, line) {
@@ -101,7 +141,11 @@ export const richContentIsNonEmpty = (children) => {
 
 export const cardFocusPath = (
   rawCardId,
-  { baseAttributeName, customAttributeName, template } = {}
+  { baseAttributeName, customAttributeName, template } = {
+    baseAttributeName: undefined,
+    customAttributeName: undefined,
+    template: undefined,
+  }
 ) => {
   const cardId = safeParseInt(rawCardId)
   if (typeof rawCardId !== 'number' && `${cardId}` !== rawCardId) {

@@ -9,7 +9,7 @@ import { noEntityHasLegacyAttributeBound } from './noEntitiyHasValueBound'
 import { allCardsSelector, singleCardSelector } from './cardsFirstOrder'
 import { allBeatsSelector } from './beatsFirstOrder'
 import { previouslyLoggedIntoProSelector } from './settingsFirstOrder'
-import { isOnWebSelector, userIdSelector } from './clientFirstOrder'
+import { isLoggedInSelector, isOnWebSelector, userIdSelector } from './clientFirstOrder'
 import { permissionSelector } from './permissionFirstOrder'
 import { allBookIdsSelector } from './booksFirstOrder'
 import {
@@ -20,16 +20,21 @@ import {
 import { allNotesSelector } from './notesFirstOrder'
 import { allLinesSelector } from './linesFirstOrder'
 import { fullFileStateSelector } from './fullFileFirstOrder'
+import {
+  hasActiveProLicenseSelector,
+  needsToCheckPlottrLicense,
+  needsToCheckProLicense,
+} from './licenseFirstOrder'
 
 export const shouldBeInProSelector = createSelector(
   previouslyLoggedIntoProSelector,
   isOnWebSelector,
   (previouslyLoggedIntoPro, isOnWeb) => {
-    return !!(previouslyLoggedIntoPro || isOnWeb)
+    return previouslyLoggedIntoPro || isOnWeb
   }
 )
 
-export const rootUiSelector = createSelector(fullFileStateSelector, (state) => state.ui)
+export const rootUiSelector = createSelector(fullFileStateSelector, ({ ui }) => ui ?? {})
 export const uiCollaboratorsSelector = createSelector(rootUiSelector, (rootUi) => {
   return rootUi.collaborators
 })
@@ -47,22 +52,16 @@ export const uiSelector = createSelector(
       return ui
     } else if (permission === 'collaborator') {
       const existingUI = ui.collaborators?.collaborators?.find((collaborator) => {
-        if (collaborator.id === userId) {
-          return true
-        }
-        return false
+        return collaborator?.id === userId
       })
 
-      return existingUI || ui
+      return existingUI ?? ui
     } else if (permission === 'viewer') {
       const existingUI = ui.collaborators?.viewers?.find((viewer) => {
-        if (viewer.id === userId) {
-          return true
-        }
-        return false
+        return viewer?.id === userId
       })
 
-      return existingUI || ui
+      return existingUI ?? ui
     } else {
       return ui
     }
@@ -78,7 +77,7 @@ export const currentTimelineSelector = createSelector(
     if (bookIds.includes(currentTimeline)) {
       return currentTimeline
     } else {
-      return bookIds[0] || 1
+      return bookIds[0] ?? 1
     }
   }
 )
@@ -108,7 +107,7 @@ export const outlineFilterSelector = createSelector(uiSelector, ({ outlineFilter
   return outlineFilter
 })
 export const timelineSelector = createSelector(uiSelector, ({ timeline }) => {
-  return timeline
+  return timeline ?? {}
 })
 export const editingBeatTitleIdSelector = createSelector(timelineSelector, ({ editingBeatId }) => {
   return editingBeatId
@@ -168,44 +167,53 @@ export const timelineFilterIsEmptySelector = createSelector(
 )
 
 export const searchTermSelector = createSelector(uiSelector, ({ searchTerms }) => {
-  return searchTerms
+  return searchTerms ?? {}
 })
-export const notesSearchTermSelector = createSelector(searchTermSelector, (searchTerms) => {
-  return searchTerms?.notes
+export const notesSearchTermSelector = createSelector(searchTermSelector, ({ notes }) => {
+  return notes
 })
-export const charactersSearchTermSelector = createSelector(searchTermSelector, (searchTerms) => {
-  return searchTerms?.characters
+export const charactersSearchTermSelector = createSelector(searchTermSelector, ({ characters }) => {
+  return characters
 })
-export const placesSearchTermSelector = createSelector(searchTermSelector, (searchTerms) => {
-  return searchTerms?.places
+export const placesSearchTermSelector = createSelector(searchTermSelector, ({ places }) => {
+  return places
 })
-export const tagsSearchTermSelector = createSelector(searchTermSelector, (searchTerms) => {
-  return searchTerms?.tags
+export const tagsSearchTermSelector = createSelector(searchTermSelector, ({ tags }) => {
+  return tags
 })
-export const outlineSearchTermSelector = createSelector(searchTermSelector, (searchTerms) => {
-  return searchTerms?.outline
+export const outlineSearchTermSelector = createSelector(searchTermSelector, ({ outline }) => {
+  return outline
 })
-export const timelineSearchTermSelector = createSelector(searchTermSelector, (searchTerms) => {
-  return searchTerms?.timeline
+export const timelineSearchTermSelector = createSelector(searchTermSelector, ({ timeline }) => {
+  return timeline
 })
 
-export const selectedTimelineViewSelector = createSelector(timelineSelector, (timeline) => {
-  return timeline?.view || 'default'
+export const selectedTimelineViewSelector = createSelector(timelineSelector, ({ view }) => {
+  return view ?? 'default'
 })
+
+const countPinnedLines = (lines, bookId) => {
+  return lines.reduce((pinnedCount, line) => {
+    return pinnedCount + (line.bookId === bookId && line.isPinned ? 1 : 0)
+  }, 0)
+}
+
+const bookIdSelector = (_state, id) => id
+export const pinnedPlotlinesForAnotherBookSelector = createSelector(
+  allLinesSelector,
+  bookIdSelector,
+  countPinnedLines
+)
 
 export const pinnedPlotlinesSelector = createSelector(
   allLinesSelector,
   currentTimelineSelector,
-  (lines, bookId) => {
-    return lines.reduce((pinnedCount, line) => {
-      return pinnedCount + (line.bookId === bookId && line.isPinned ? 1 : 0)
-    }, 0)
-  }
+  countPinnedLines
 )
 
 export const allHierarchyLevelsSelector = createSelector(
   fullFileStateSelector,
-  (state) => state.hierarchyLevels
+  ({ hierarchyLevels }) => hierarchyLevels ?? {}
 )
 export const hierarchyLevelsSelector = createSelector(
   allHierarchyLevelsSelector,
@@ -215,7 +223,7 @@ export const hierarchyLevelsSelector = createSelector(
   }
 )
 export const hierarchyLevelCount = createSelector(hierarchyLevelsSelector, (hierarchyLevels) => {
-  return Object.keys(hierarchyLevels).length
+  return hierarchyLevels ? Object.keys(hierarchyLevels).length : 1
 })
 export const timelineViewSelector = createSelector(
   selectedTimelineViewSelector,
@@ -233,8 +241,8 @@ export const timelineViewIsTabbedSelector = createSelector(timelineViewSelector,
 export const timelineViewIsStackedSelector = createSelector(timelineViewSelector, (view) => {
   return view === 'stacked'
 })
-export const timelineSelectedTabSelector = createSelector(timelineSelector, (timeline) => {
-  return timeline?.actTab || 0
+export const timelineSelectedTabSelector = createSelector(timelineSelector, ({ actTab }) => {
+  return actTab ?? 0
 })
 export const timelineViewIsDefaultSelector = createSelector(timelineViewSelector, (view) => {
   return view === 'default'
@@ -243,7 +251,10 @@ export const timelineViewIsntDefaultSelector = createSelector(timelineViewSelect
   return view !== 'default'
 })
 
-const selectedOrientationSelector = (state) => state.ui.orientation
+const selectedOrientationSelector = createSelector(
+  uiSelector,
+  ({ orientation }) => orientation ?? 'horizontal'
+)
 
 export const stickyHeaderCountSelector = createSelector(
   pinnedPlotlinesSelector,
@@ -281,14 +292,14 @@ export const stickyLeftColumnCountSelector = createSelector(
 )
 
 export const actConfigModalSelector = createSelector(uiSelector, ({ actConfigModal }) => {
-  return actConfigModal || {}
+  return actConfigModal ?? {}
 })
 export const actConfigModalIsOpenSelector = createSelector(actConfigModalSelector, ({ open }) => {
   return open
 })
 
 export const characterTabSelector = createSelector(uiSelector, ({ characterTab }) => {
-  return characterTab || {}
+  return characterTab ?? {}
 })
 export const selectedCharacterSelector = createSelector(
   characterTabSelector,
@@ -303,16 +314,16 @@ export const selectedCharacterSelector = createSelector(
 export const customAttributeOrderSelector = createSelector(
   uiSelector,
   ({ customAttributeOrder }) => {
-    return customAttributeOrder || []
+    return customAttributeOrder ?? {}
   }
 )
 export const characterCustomAttributeOrderSelector = createSelector(
   customAttributeOrderSelector,
-  ({ characters }) => characters || []
+  ({ characters }) => characters ?? []
 )
 
 const templateModalSelector = createSelector(uiSelector, ({ templateModal }) => {
-  return templateModal || {}
+  return templateModal ?? {}
 })
 export const templateModalAdvancedPanelOpenSelector = createSelector(
   templateModalSelector,
@@ -352,7 +363,7 @@ export const whichTemplateIsBeingRemovedViaCardDialogSelector = createSelector(
   }
 )
 export const cardDialogTabSelector = createSelector(cardDialogSelector, ({ activeTab }) => {
-  return activeTab || 1
+  return activeTab ?? 1
 })
 
 export const cardsCustomAttributesThatCanChangeSelector = createSelector(
@@ -387,15 +398,25 @@ export const sortedHierarchyLevels = createSelector(
   }
 )
 const beatIdSelector = (state, beatId) => beatId
+export const beatExistsSelector = createSelector(
+  beatsByBookSelector,
+  beatIdSelector,
+  (beats, beatId) => {
+    return typeof beats.index[beatId] === 'object'
+  }
+)
 export const hierarchyLevelSelector = createSelector(
   beatsByBookSelector,
   beatIdSelector,
   sortedHierarchyLevels,
-  (beats, beatId, hierarchyLevels) => {
-    return hierarchyLevels[depth(beats, beatId)] || hierarchyLevels[hierarchyLevels.length - 1]
+  beatExistsSelector,
+  (beats, beatId, hierarchyLevels, beatExists) => {
+    return (
+      (beatExists && hierarchyLevels[depth(beats, beatId)]) ||
+      hierarchyLevels[hierarchyLevels.length - 1]
+    )
   }
 )
-const bookIdSelector = (_state, id) => id
 export const hierarchyLevelsForAnotherBookSelector = createSelector(
   allHierarchyLevelsSelector,
   bookIdSelector,
@@ -408,8 +429,9 @@ export const atMaximumHierarchyDepthSelector = createSelector(
   beatsByBookSelector,
   beatIdSelector,
   sortedHierarchyLevels,
-  (beats, beatId, hierarchyLevels) => {
-    return depth(beats, beatId) === hierarchyLevels.length - 1
+  beatExistsSelector,
+  (beats, beatId, hierarchyLevels, beatExists) => {
+    return beatExists && depth(beats, beatId) === hierarchyLevels.length - 1
   }
 )
 
@@ -417,8 +439,9 @@ export const hierarchyLevelNameSelector = createSelector(
   beatsByBookSelector,
   beatIdSelector,
   sortedHierarchyLevels,
-  (beats, beatId, hierarchyLevels) => {
-    if (!beatId) return hierarchyLevels[0]?.name
+  beatExistsSelector,
+  (beats, beatId, hierarchyLevels, beatExists) => {
+    if (!beatId || !beatExists) return hierarchyLevels[0]?.name
     return (
       (hierarchyLevels[depth(beats, beatId)] || hierarchyLevels[hierarchyLevels.length - 1])
         ?.name ?? hierarchyLevels[0]?.name
@@ -432,16 +455,17 @@ export const beatInsertControlHierarchyLevelNameSelector = createSelector(
   sortedHierarchyLevels,
   timelineViewIsTabbedSelector,
   timelineViewIsDefaultSelector,
-  (beats, beatId, hierarchyLevels, timelineViewIsTabbed, timelineViewIsDefault) => {
+  beatExistsSelector,
+  (beats, beatId, hierarchyLevels, timelineViewIsTabbed, timelineViewIsDefault, beatExists) => {
     if (timelineViewIsTabbed) {
-      if (depth(beats, beatId) === 0) {
+      if (!beatExists || depth(beats, beatId) === 0) {
         return (hierarchyLevels[1] || hierarchyLevels[0]).name
       } else if (!beatId) {
         return (hierarchyLevels[2] || hierarchyLevels[1] || hierarchyLevels[0]).name
       }
     }
 
-    if (timelineViewIsDefault && !beatId) {
+    if (!beatExists || (timelineViewIsDefault && !beatId)) {
       return hierarchyLevels[0].name
     } else {
       return (hierarchyLevels[depth(beats, beatId)] || hierarchyLevels[hierarchyLevels.length - 1])
@@ -454,8 +478,9 @@ export const hierarchyChildLevelNameSelector = createSelector(
   beatsByBookSelector,
   beatIdSelector,
   sortedHierarchyLevels,
-  (beats, beatId, hierarchyLevels) => {
-    if (!beatId) return (hierarchyLevels[1] || hierarchyLevels[0]).name
+  beatExistsSelector,
+  (beats, beatId, hierarchyLevels, beatExists) => {
+    if (!beatId || !beatExists) return (hierarchyLevels[1] || hierarchyLevels[0]).name
     const newDepth = depth(beats, beatId) + 1
     const level = hierarchyLevels[newDepth]
     if (level) {
@@ -545,5 +570,24 @@ export const cardsLineOrDefaultSelector = createSelector(
   allLinesSelector,
   (line, lines) => {
     return line || lines[0]
+  }
+)
+
+export const isLoggedIntoProWithActiveLicenseSelector = createSelector(
+  isLoggedInSelector,
+  previouslyLoggedIntoProSelector,
+  hasActiveProLicenseSelector,
+  isOnWebSelector,
+  (isLoggedIn, shouldBeInPro, hasActiveProLicense, isOnWeb) => {
+    return isLoggedIn && (isOnWeb || (shouldBeInPro && hasActiveProLicense))
+  }
+)
+
+export const needsToCheckALicenseType = createSelector(
+  needsToCheckPlottrLicense,
+  needsToCheckProLicense,
+  isLoggedInSelector,
+  (needsToCheckPlottr, needsToCheckPro, isLoggedIn) => {
+    return needsToCheckPlottr || needsToCheckPro || (!needsToCheckPro && !isLoggedIn)
   }
 )

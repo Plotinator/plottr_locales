@@ -66,7 +66,7 @@ export function getDateValue(fileObj) {
   // to a `seconds`, and `nanoseconds` object.  Now, we're back to a
   // timestamp because it plays better with mobile's use of Sagas.
   const lastOpenedIsString = typeof fileObj.lastOpened === 'string'
-  const lastOpenedIsObject = typeof fileObj.lastOpened === 'object'
+  const lastOpenedIsObject = fileObj.lastOpened && typeof fileObj.lastOpened === 'object'
   const lastOpenedIsNumber = typeof fileObj.lastOpened === 'number'
 
   if (!lastOpenedIsString && fileObj.lastOpened && lastOpenedIsObject) {

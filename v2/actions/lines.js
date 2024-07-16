@@ -1,5 +1,7 @@
 import { identity } from 'lodash'
 
+import { batch } from './undo'
+
 import {
   ADD_LINE,
   ADD_LINE_WITH_TITLE,
@@ -153,12 +155,14 @@ export const duplicateLine = (id, position) => (dispatch, getState) => {
   const state = getState()
   const lines = sortedLinesByBookSelector(state)
 
-  dispatch({ type: DUPLICATE_LINE, id, position })
+  batch('Duplicate Line', () => {
+    dispatch({ type: DUPLICATE_LINE, id, position })
 
-  const selectedLine = lines.find((l) => l.id === id)
-  if (selectedLine?.isPinned) {
-    pinDuplicatedPlotline(id, position)(dispatch, getState)
-  }
+    const selectedLine = lines.find((l) => l.id === id)
+    if (selectedLine?.isPinned) {
+      pinDuplicatedPlotline(id, position)(dispatch, getState)
+    }
+  })(dispatch)
 }
 
 export function load(patching, lines) {

@@ -2,18 +2,23 @@ import { cloneDeep, omit } from 'lodash'
 
 import {
   ADD_BOOK,
+  ADD_BOOK_FROM_PLTR,
   ADD_BOOK_FROM_TEMPLATE,
   DELETE_BOOK,
   DUPLICATE_BOOK,
   EDIT_HIERARCHY_LEVEL,
   LOAD_HIERARCHY,
   SET_HIERARCHY_LEVELS,
+  UNDO,
+  REDO,
+  UNDO_N_TIMES,
+  REDO_N_TIMES,
 } from '../constants/ActionTypes'
 import { newFileHierarchies } from '../store/newFileState'
-import { FILE_LOADED, NEW_FILE, RESET } from '../constants/ActionTypes'
+import { FILE_LOADED, NEW_FILE } from '../constants/ActionTypes'
 import { hierarchyLevel } from '../store/initialState'
 
-const hierarchy = (dataRepairers) => (state, action) => {
+const hierarchy = (_dataRepairers) => (state, action) => {
   switch (action.type) {
     case SET_HIERARCHY_LEVELS: {
       if (action.hierarchyLevels.length === 0 || action.hierarchyLevels.length > 3) return state
@@ -66,6 +71,13 @@ const hierarchy = (dataRepairers) => (state, action) => {
       return omit(state, action.id.toString())
     }
 
+    case ADD_BOOK_FROM_PLTR: {
+      return {
+        ...state,
+        [action.newBookId]: action.hierarchyLevels || { 0: hierarchyLevel() },
+      }
+    }
+
     case DUPLICATE_BOOK: {
       const duplicatedHierarchy = cloneDeep(state[action.id])
 
@@ -83,7 +95,17 @@ const hierarchy = (dataRepairers) => (state, action) => {
       }
     }
 
-    case RESET:
+    case UNDO_N_TIMES:
+    case REDO_N_TIMES:
+    case UNDO:
+    case REDO: {
+      if (action?.state?.hierarchyLevels && typeof action.state.hierarchyLevels === 'object') {
+        return action.state.hierarchyLevels
+      } else {
+        return state
+      }
+    }
+
     case FILE_LOADED:
       return action.data.hierarchyLevels || newFileHierarchies()
 

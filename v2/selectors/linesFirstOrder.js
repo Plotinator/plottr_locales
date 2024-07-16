@@ -9,11 +9,11 @@ import { nextId } from '../store/newIds'
 import { isSeries } from '../helpers/lines'
 import { fullFileStateSelector } from './fullFileFirstOrder'
 
-export const allSeriesLinesSelector = createSelector(fullFileStateSelector, (state) =>
-  state.lines.filter(isSeries)
-)
+export const allLinesSelector = createSelector(fullFileStateSelector, ({ lines }) => lines ?? [])
 
-export const allLinesSelector = createSelector(fullFileStateSelector, (state) => state.lines)
+export const allSeriesLinesSelector = createSelector(allLinesSelector, (lines) =>
+  lines.filter(isSeries)
+)
 
 export const allLinesByIdSelector = createSelector(allLinesSelector, (lines) => {
   return keyBy(lines, 'id')
@@ -21,7 +21,7 @@ export const allLinesByIdSelector = createSelector(allLinesSelector, (lines) => 
 
 export const nextLineIdSelector = createSelector(allLinesSelector, (lines) => nextId(lines))
 
-const bookIdSelector = (state, bookId) => bookId
+const bookIdSelector = (_state, bookId) => bookId
 export const linesForBookSelector = createSelector(
   allLinesSelector,
   bookIdSelector,

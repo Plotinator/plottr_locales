@@ -4,18 +4,22 @@
 import { createSelector } from 'reselect'
 import { sortBy } from 'lodash'
 
-import { fullFileStateSelector } from './fullFileFirstOrder'
+import { fullSystemStateSelector } from './fullFileFirstOrder'
+
+const allTemplatesSelector = createSelector(fullSystemStateSelector, ({ templates }) => {
+  return templates ?? {}
+})
 
 const unsortedStarterTemplatesSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.templates.templates
+  allTemplatesSelector,
+  ({ templates }) => templates ?? {}
 )
 export const templatesSelector = createSelector(unsortedStarterTemplatesSelector, (templates) =>
   sortBy(Object.values(templates), 'name')
 )
 export const allCustomTemplatesSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.templates.customTemplates
+  allTemplatesSelector,
+  ({ customTemplates }) => customTemplates
 )
 export const fileSystemCustomTemplatesSelector = createSelector(
   allCustomTemplatesSelector,
@@ -24,11 +28,11 @@ export const fileSystemCustomTemplatesSelector = createSelector(
   }
 )
 export const templateManifestSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.templates.templateManifets
+  allTemplatesSelector,
+  ({ templateManifest }) => templateManifest
 )
-const templateTypeSelector = (state, type) => type
-const templateSearchTermSelector = (state, _, searchTerm) => searchTerm
+const templateTypeSelector = (_state, type) => type
+const templateSearchTermSelector = (_state, _, searchTerm) => searchTerm
 export const filteredSortedStarterTemplatesSelector = createSelector(
   templatesSelector,
   templateTypeSelector,

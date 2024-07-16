@@ -3,7 +3,6 @@ import {
   SET_CLIENT_ID,
   SET_EMAIL_ADDRESS,
   SET_HAS_ONBOARDED,
-  SET_HAS_PRO,
   SET_IS_ON_WEB,
   SET_CURRENT_APP_STATE,
   RECORD_DATA_CLIENT_ID,
@@ -15,7 +14,6 @@ const INITIAL_STATE = {
   clientId: null,
   emailAddress: null,
   hasOnboarded: null,
-  hasPro: null,
   isOnWeb: null,
   currentAppState: null,
   // dataClientIds is: {
@@ -47,11 +45,6 @@ const clientReducer = (state = INITIAL_STATE, action) => {
         hasOnboarded: action.hasOnboarded,
       }
     }
-    case SET_HAS_PRO:
-      return {
-        ...state,
-        hasPro: action.hasPro,
-      }
     case SET_IS_ON_WEB: {
       return {
         ...state,

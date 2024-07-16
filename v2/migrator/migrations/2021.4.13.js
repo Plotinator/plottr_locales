@@ -18,7 +18,7 @@ export default function migrate(data) {
       : data.beats.map(({ bookId }) => bookId)
 
   const migratedBeats = data.beats.length
-    ? allBookIds.reduce((newBeats, nextBook, index) => {
+    ? allBookIds.reduce((newBeats, nextBook, _index) => {
         const nextBookId = parseInt(nextBook) || 'series'
         const tree = newTree('id')
 

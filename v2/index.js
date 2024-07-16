@@ -5,7 +5,6 @@ import actions from './actions'
 import * as ActionTypes from './constants/ActionTypes'
 import * as LoadActions from './constants/loadActions'
 import * as colors from './constants/CSScolors'
-import * as featureFlags from './constants/featureFlags'
 import * as errorCodes from './constants/errorCodes'
 
 import * as lineHelpers from './helpers/lines'
@@ -15,15 +14,15 @@ import * as bookHelpers from './helpers/books'
 import * as listHelpers from './helpers/lists'
 import * as orientedClassNameHelpers from './helpers/orientedClassName'
 import * as hierarchyHelpers from './helpers/hierarchy'
-import * as featureFlagHelpers from './helpers/featureFlags'
 import * as colorHelpers from './helpers/colors'
-import * as editorHelpers from './helpers/editors'
 import * as timeHelpers from './helpers/time'
 import * as dateHelpers from './helpers/date'
 import * as fileHelpers from './helpers/file'
 import * as templatesHelpers from './helpers/templates'
 import * as characterHelpers from './helpers/characters'
 import * as uiHelpers from './helpers/ui'
+import * as textHelpers from './helpers/text'
+import * as jsonHelpers from './helpers/json'
 
 import * as template from './template'
 
@@ -64,7 +63,6 @@ import featureFlagReducer from './reducers/featureFlags'
 import errorReducer from './reducers/error'
 import permissionReducer from './reducers/permission'
 import clientReducer from './reducers/client'
-import editorsReducer from './reducers/editors'
 import licenseReducer from './reducers/license'
 import knownFilesReducer from './reducers/knownFiles'
 import templatesReducer from './reducers/templates'
@@ -95,7 +93,8 @@ import {
   serialize as serializeToPlain,
   serializeNoFormatting,
 } from './slate_serializers/to_plain_text'
-import { convertHTMLString } from './slate_deserializers/from_html'
+import { convertHTMLString, convertHTMLNodeList } from './slate_deserializers/from_html'
+import { rtfToHTML } from './slate_serializers/to_html'
 
 import checkFileIntegrity from './store/checkFileIntegrity'
 
@@ -119,7 +118,6 @@ const reducers = {
   error: errorReducer,
   permission: permissionReducer,
   client: clientReducer,
-  editors: editorsReducer,
   license: licenseReducer,
   knownFiles: knownFilesReducer,
   templates: templatesReducer,
@@ -140,21 +138,25 @@ const helpers = {
   orientedClassName: orientedClassNameHelpers,
   lines: lineHelpers,
   hierarchyLevels: hierarchyHelpers,
-  featureFlags: featureFlagHelpers,
   colors: colorHelpers,
-  editors: editorHelpers,
   time: timeHelpers,
   date: dateHelpers,
   file: fileHelpers,
   template: templatesHelpers,
   characters: characterHelpers,
   ui: uiHelpers,
+  text: textHelpers,
+  json: jsonHelpers,
 }
 
 const slate = {
   rtf: { serialize: serializeToRTF },
   plain: { serialize: serializeToPlain, serializeNoFormatting },
-  html: { deserialise: convertHTMLString },
+  html: { deserialise: convertHTMLString, deserialiseHTMLNodeList: convertHTMLNodeList },
+}
+
+const rtfSerialisersAndDeserialisers = {
+  toHTML: rtfToHTML,
 }
 
 const middlewares = {
@@ -174,7 +176,6 @@ export {
   LoadActions,
   helpers,
   colors,
-  featureFlags,
   errorCodes,
   migrateIfNeeded,
   Migrator,
@@ -201,4 +202,5 @@ export {
   specialCaseFixes,
   editStates,
   rtf,
+  rtfSerialisersAndDeserialisers,
 }

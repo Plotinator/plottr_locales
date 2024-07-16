@@ -12,6 +12,10 @@ import {
   LOAD_ATTRIBUTES,
   FILE_LOADED,
   REORDER_CHARACTER_MANUALLY,
+  UNDO,
+  REDO,
+  UNDO_N_TIMES,
+  REDO_N_TIMES,
 } from '../constants/ActionTypes'
 
 const EMPTY_ATTRIBUTE_STATE = []
@@ -20,12 +24,12 @@ const INITIAL_STATE = {
   characters: EMPTY_ATTRIBUTE_STATE,
 }
 
-const initialStateIfEmpty = (newState, state) => {
+const initialStateIfEmpty = (newState, _state) => {
   return !newState || isEmpty(newState) ? INITIAL_STATE : newState
 }
 
 const attributesReducer =
-  (dataRepairers) =>
+  (_dataRepairers) =>
   (state = INITIAL_STATE, action) => {
     switch (action.type) {
       case CREATE_CHARACTER_ATTRIBUTE: {
@@ -211,6 +215,17 @@ const attributesReducer =
               id: action.attributeId,
             },
           ],
+        }
+      }
+
+      case UNDO_N_TIMES:
+      case REDO_N_TIMES:
+      case UNDO:
+      case REDO: {
+        if (action?.state?.attributes && typeof action.state.attributes === 'object') {
+          return action.state.attributes
+        } else {
+          return state
         }
       }
 

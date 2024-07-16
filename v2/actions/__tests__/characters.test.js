@@ -119,12 +119,20 @@ describe('editCharacterAttributeValue', () => {
         store.dispatch(
           loadFile('Goldilocks', false, goldilocks, '2020.7.30', 'device:///tmp.dummy.pltr')
         )
-        const otherCharacterBefore = singleCharacterSelector(store.getState(), 2)
+        const otherCharacterBefore = singleCharacterSelector(
+          store.getState(),
+          // @ts-ignore
+          2
+        )
         expect(otherCharacterBefore.Species).toEqual('Bear')
         store.dispatch(editCharacterAttributeValue(1, 'Species', 'Borg'))
         const legacyAttributes = characterCustomAttributesSelector(store.getState())
         expect(legacyAttributes).toEqual([])
-        const otherCharacterAfter = singleCharacterSelector(store.getState(), 2)
+        const otherCharacterAfter = singleCharacterSelector(
+          store.getState(),
+          // @ts-ignore
+          2
+        )
         expect(otherCharacterAfter.Species).toBeUndefined()
         expect(otherCharacterAfter.attributes).toEqual([
           {
@@ -133,9 +141,17 @@ describe('editCharacterAttributeValue', () => {
             value: 'Bear',
           },
         ])
-        const character = singleCharacterSelector(store.getState(), 1)
+        const character = singleCharacterSelector(
+          store.getState(),
+          // @ts-ignore
+          1
+        )
         expect(character.Species).toBeUndefined()
-        const characterAttributes = characterAttributesSelector(store.getState(), 1)
+        const characterAttributes = characterAttributesSelector(
+          store.getState(),
+          // @ts-ignore
+          1
+        )
         expect(characterAttributes).toEqual([
           {
             id: 1,
@@ -192,8 +208,16 @@ describe('characterDeleteBook', () => {
         store.dispatch(addBookToCharacter(2, 4))
         store.dispatch(addBookToCharacter(2, 5))
         const stateAfterAddingBooks = store.getState()
-        const character1 = singleCharacterSelector(stateAfterAddingBooks, 1)
-        const character2 = singleCharacterSelector(stateAfterAddingBooks, 2)
+        const character1 = singleCharacterSelector(
+          stateAfterAddingBooks,
+          // @ts-ignore
+          1
+        )
+        const character2 = singleCharacterSelector(
+          stateAfterAddingBooks,
+          // @ts-ignore
+          2
+        )
         const allBookIds = allBookIdsSelector(stateAfterAddingBooks)
         const allBooksWithCharactersOrdered =
           allBooksWithCharactersInThemSortedByPositionInAllBookIdsSelector(stateAfterAddingBooks)
@@ -267,22 +291,32 @@ describe('reorderCharacter', () => {
 
       const character1State = displayedSingleCharacterSelector(
         initialState,
+
+        // @ts-ignore
         allCharacters.find(({ id }) => id == 1).id
       )
       const character2State = displayedSingleCharacterSelector(
         initialState,
+
+        // @ts-ignore
         allCharacters.find(({ id }) => id == 2).id
       )
       const character3State = displayedSingleCharacterSelector(
         initialState,
+
+        // @ts-ignore
         allCharacters.find(({ id }) => id == 3).id
       )
       const character4State = displayedSingleCharacterSelector(
         initialState,
+
+        // @ts-ignore
         allCharacters.find(({ id }) => id == 4).id
       )
       const character8State = displayedSingleCharacterSelector(
         initialState,
+
+        // @ts-ignore
         allCharacters.find(({ id }) => id == 8).id
       )
 
@@ -319,14 +353,20 @@ describe('reorderCharacter', () => {
             visibleSortedCharactersByCategorySelector(afterFirstMove)
           const newCharacter1State = displayedSingleCharacterSelector(
             afterFirstMove,
+
+            // @ts-ignore
             charactersAfterFirstMove.find(({ id }) => id == 1).id
           )
           const newCharacter2State = displayedSingleCharacterSelector(
             afterFirstMove,
+
+            // @ts-ignore
             charactersAfterFirstMove.find(({ id }) => id == 2).id
           )
           const newCharacter3State = displayedSingleCharacterSelector(
             afterFirstMove,
+
+            // @ts-ignore
             charactersAfterFirstMove.find(({ id }) => id == 3).id
           )
 
@@ -375,10 +415,14 @@ describe('reorderCharacter', () => {
             visibleSortedCharactersByCategorySelector(afterFirstMove)
           const newCharacter1State = displayedSingleCharacterSelector(
             afterFirstMove,
+
+            // @ts-ignore
             charactersAfterFirstMove.find(({ id }) => id == 1).id
           )
           const newCharacter4State = displayedSingleCharacterSelector(
             afterFirstMove,
+
+            // @ts-ignore
             charactersAfterFirstMove.find(({ id }) => id == 4).id
           )
 
@@ -411,10 +455,14 @@ describe('reorderCharacter', () => {
             visibleSortedCharactersByCategorySelector(afterFirstMove)
           const character1StateAfterFirstMove = displayedSingleCharacterSelector(
             afterFirstMove,
+
+            // @ts-ignore
             charactersAfterFirstMove.find(({ id }) => id == 1).id
           )
           const character4StateAfterFirstMove = displayedSingleCharacterSelector(
             afterFirstMove,
+
+            // @ts-ignore
             charactersAfterFirstMove.find(({ id }) => id == 4).id
           )
 
@@ -449,18 +497,26 @@ describe('reorderCharacter', () => {
             visibleSortedCharactersByCategorySelector(afterSecondMove)
           const character1StateAfterSecondMove = displayedSingleCharacterSelector(
             afterSecondMove,
+
+            // @ts-ignore
             charactersAfterSecondMove.find(({ id }) => id == 1).id
           )
           const character2StateAfterSecondMove = displayedSingleCharacterSelector(
             afterSecondMove,
+
+            // @ts-ignore
             charactersAfterSecondMove.find(({ id }) => id == 2).id
           )
           const character3StateAfterSecondMove = displayedSingleCharacterSelector(
             afterSecondMove,
+
+            // @ts-ignore
             charactersAfterSecondMove.find(({ id }) => id == 3).id
           )
           const character4StateAfterSecondMove = displayedSingleCharacterSelector(
             afterSecondMove,
+
+            // @ts-ignore
             charactersAfterSecondMove.find(({ id }) => id == 4).id
           )
 
@@ -504,10 +560,14 @@ describe('reorderCharacter', () => {
               visibleSortedCharactersByCategorySelector(afterThirdMove)
             const character3StateAfterThirdMove = displayedSingleCharacterSelector(
               afterThirdMove,
+
+              // @ts-ignore
               charactersAfterThirdMove.find(({ id }) => id == 3).id
             )
             const character8StateAfterThirdMove = displayedSingleCharacterSelector(
               afterThirdMove,
+
+              // @ts-ignore
               charactersAfterThirdMove.find(({ id }) => id == 8).id
             )
 
@@ -566,23 +626,33 @@ describe('reorderCharacter', () => {
 
           const character1InBook2 = displayedSingleCharacterSelector(
             afterAddingCharactersToBook,
+
+            // @ts-ignore
             allCharacters.find(({ id }) => id == 1).id
           )
 
           const character2InBook2 = displayedSingleCharacterSelector(
             afterAddingCharactersToBook,
+
+            // @ts-ignore
             allCharacters.find(({ id }) => id == 2).id
           )
           const character3InBook2 = displayedSingleCharacterSelector(
             afterAddingCharactersToBook,
+
+            // @ts-ignore
             allCharacters.find(({ id }) => id == 3).id
           )
           const character4InBook2 = displayedSingleCharacterSelector(
             afterAddingCharactersToBook,
+
+            // @ts-ignore
             allCharacters.find(({ id }) => id == 4).id
           )
           const character8InBook2 = displayedSingleCharacterSelector(
             afterAddingCharactersToBook,
+
+            // @ts-ignore
             allCharacters.find(({ id }) => id == 8).id
           )
           const character4InBook2AbsolutePosition = getCharacterAbsolutePositionFromGroupedCategory(
@@ -620,19 +690,27 @@ describe('reorderCharacter', () => {
             const charactersInBook1 = allCharactersSelector(stateInBook1)
             const character1InBook1 = displayedSingleCharacterSelector(
               stateInBook1,
+
+              // @ts-ignore
               charactersInBook1.find(({ id }) => id == 1).id
             )
 
             const character2InBook1 = displayedSingleCharacterSelector(
               afterAddingCharactersToBook,
+
+              // @ts-ignore
               charactersInBook1.find(({ id }) => id == 2).id
             )
             const character4InBook1 = displayedSingleCharacterSelector(
               afterAddingCharactersToBook,
+
+              // @ts-ignore
               charactersInBook1.find(({ id }) => id == 4).id
             )
             const character8InBook1 = displayedSingleCharacterSelector(
               afterAddingCharactersToBook,
+
+              // @ts-ignore
               charactersInBook1.find(({ id }) => id == 8).id
             )
             const character1InBook1PositionAttribute = character1InBook1.attributes?.find(
@@ -678,10 +756,14 @@ describe('reorderCharacter', () => {
               visibleSortedCharactersByCategorySelector(afterFirstMove)
             const character1AfterFirstMove = displayedSingleCharacterSelector(
               afterFirstMove,
+
+              // @ts-ignore
               charactersAfterFirstMove.find(({ id }) => id == 1).id
             )
             const character2AfterFirstMove = displayedSingleCharacterSelector(
               afterFirstMove,
+
+              // @ts-ignore
               charactersAfterFirstMove.find(({ id }) => id == 2).id
             )
             const character2AbsolutePositionAfterFirstMove =
@@ -706,10 +788,14 @@ describe('reorderCharacter', () => {
               const charactersInBook1 = allCharactersSelector(stateInBook1)
               const character2InBook1 = displayedSingleCharacterSelector(
                 stateInBook1,
+
+                // @ts-ignore
                 charactersInBook1.find(({ id }) => id == 2).id
               )
               const character4InBook1 = displayedSingleCharacterSelector(
                 stateInBook1,
+
+                // @ts-ignore
                 charactersInBook1.find(({ id }) => id == 4).id
               )
               const character2InBook1PositionAttribute = character2InBook1.attributes.find(
@@ -724,10 +810,14 @@ describe('reorderCharacter', () => {
               const book2 = currentTimelineSelector(stateInBook2)
               const character2InBook2 = displayedSingleCharacterSelector(
                 stateInBook2,
+
+                // @ts-ignore
                 charactersInBook1.find(({ id }) => id == 2).id
               )
               const character4InBook2 = displayedSingleCharacterSelector(
                 stateInBook2,
+
+                // @ts-ignore
                 charactersInBook1.find(({ id }) => id == 4).id
               )
               const character2InBook2PositionAttribute = character2InBook2.attributes.find(
@@ -761,10 +851,14 @@ describe('reorderCharacter', () => {
                 visibleSortedCharactersByCategorySelector(afterSecondMove)
               const character2AfterSecondMove = displayedSingleCharacterSelector(
                 afterSecondMove,
+
+                // @ts-ignore
                 charactersAfterSecondafterSecondMove.find(({ id }) => id == 2).id
               )
               const character1AfterSecondMove = displayedSingleCharacterSelector(
                 afterSecondMove,
+
+                // @ts-ignore
                 charactersAfterSecondafterSecondMove.find(({ id }) => id == 1).id
               )
 
@@ -810,10 +904,14 @@ describe('reorderCharacter', () => {
                 const charactersInBook1 = allCharactersSelector(stateInBook1)
                 const character2InBook1 = displayedSingleCharacterSelector(
                   stateInBook1,
+
+                  // @ts-ignore
                   charactersInBook1.find(({ id }) => id == 2).id
                 )
                 const character1InBook1 = displayedSingleCharacterSelector(
                   stateInBook1,
+
+                  // @ts-ignore
                   charactersInBook1.find(({ id }) => id == 1).id
                 )
                 const character2InBook1PositionAttribute = character2InBook1.attributes.find(
@@ -849,14 +947,20 @@ describe('reorderCharacter', () => {
               visibleSortedCharactersByCategorySelector(afterFirstMove)
             const character3AfterFirstMove = displayedSingleCharacterSelector(
               afterFirstMove,
+
+              // @ts-ignore
               charactersAfterFirstMove.find(({ id }) => id == 3).id
             )
             const character8AfterFirstMove = displayedSingleCharacterSelector(
               afterFirstMove,
+
+              // @ts-ignore
               charactersAfterFirstMove.find(({ id }) => id == 8).id
             )
             const character11AfterFirstMove = displayedSingleCharacterSelector(
               afterFirstMove,
+
+              // @ts-ignore
               charactersAfterFirstMove.find(({ id }) => id == 11).id
             )
             const character3AbsolutePositionAfterFirstMove =
@@ -881,10 +985,14 @@ describe('reorderCharacter', () => {
               const charactersInBook1 = allCharactersSelector(stateInBook1)
               const character3InBook1 = displayedSingleCharacterSelector(
                 stateInBook1,
+
+                // @ts-ignore
                 charactersInBook1.find(({ id }) => id == 3).id
               )
               const character8InBook1 = displayedSingleCharacterSelector(
                 stateInBook1,
+
+                // @ts-ignore
                 charactersInBook1.find(({ id }) => id == 8).id
               )
               const character3InBook1PositionAttribute = character3InBook1.attributes.find(
@@ -899,10 +1007,14 @@ describe('reorderCharacter', () => {
               const book2 = currentTimelineSelector(stateInBook2)
               const character3InBook2 = displayedSingleCharacterSelector(
                 stateInBook2,
+
+                // @ts-ignore
                 charactersInBook1.find(({ id }) => id == 3).id
               )
               const character8InBook2 = displayedSingleCharacterSelector(
                 stateInBook2,
+
+                // @ts-ignore
                 charactersInBook1.find(({ id }) => id == 8).id
               )
               const character3InBook2PositionAttribute = character3InBook2.attributes.find(
@@ -936,10 +1048,14 @@ describe('reorderCharacter', () => {
                 visibleSortedCharactersByCategorySelector(afterSecondMove)
               const character3AfterSecondMove = displayedSingleCharacterSelector(
                 afterSecondMove,
+
+                // @ts-ignore
                 charactersAfterSecondafterSecondMove.find(({ id }) => id == 3).id
               )
               const character11AfterSecondMove = displayedSingleCharacterSelector(
                 afterSecondMove,
+
+                // @ts-ignore
                 charactersAfterSecondafterSecondMove.find(({ id }) => id == 11).id
               )
 
@@ -981,10 +1097,14 @@ describe('reorderCharacter', () => {
               it(`should not change the attributes of the characters from other books`, () => {
                 const character3AfterChangeBook = displayedSingleCharacterSelector(
                   stateAfterChangeBook,
+
+                  // @ts-ignore
                   charactersAfterChangeBook.find(({ id }) => id == 3).id
                 )
                 const character11AfterChangeBook = displayedSingleCharacterSelector(
                   stateAfterChangeBook,
+
+                  // @ts-ignore
                   charactersAfterChangeBook.find(({ id }) => id == 11).id
                 )
                 const character3AfterChangeBookPositionAttribute =

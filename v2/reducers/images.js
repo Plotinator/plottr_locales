@@ -4,13 +4,17 @@ import {
   DELETE_IMAGE,
   FILE_LOADED,
   NEW_FILE,
-  RESET,
   LOAD_IMAGES,
+  UNDO,
+  REDO,
+  UNDO_N_TIMES,
+  REDO_N_TIMES,
+  ADD_IMAGE_FROM_PLTR,
 } from '../constants/ActionTypes'
 import { newFileImages } from '../store/newFileState'
 import { imageId } from '../store/newIds'
 
-const cards = (dataRepairers) => (state, action) => {
+const cards = (_dataRepairers) => (state, action) => {
   switch (action.type) {
     case ADD_IMAGE: {
       const newId = imageId(state)
@@ -19,6 +23,18 @@ const cards = (dataRepairers) => (state, action) => {
         ...state,
         [newId]: newImage,
       }
+    }
+
+    case ADD_IMAGE_FROM_PLTR: {
+      const { newId, image } = action
+      if (newId) {
+        const newImage = Object.assign({}, image, { id: newId })
+        return {
+          ...state,
+          [newId]: newImage,
+        }
+      }
+      return state
     }
 
     case RENAME_IMAGE:
@@ -38,7 +54,17 @@ const cards = (dataRepairers) => (state, action) => {
         return acc
       }, {})
 
-    case RESET:
+    case UNDO_N_TIMES:
+    case REDO_N_TIMES:
+    case UNDO:
+    case REDO: {
+      if (action?.state?.images && typeof action.state.images === 'object') {
+        return action.state.images
+      } else {
+        return state
+      }
+    }
+
     case FILE_LOADED:
       return action.data.images
 

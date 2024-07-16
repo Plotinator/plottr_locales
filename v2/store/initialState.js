@@ -393,3 +393,22 @@ export const tour = {
   toursTaken: {},
   // key: new Date(), // may need this to restart tours when more tours are added
 }
+
+export const newHierarchyLevel = (allHierarchyLevels) => {
+  return {
+    ...hierarchyLevel(),
+    name: nextLevelName(allHierarchyLevels.length),
+    level: 0,
+    borderStyle: nextBorderStyle(allHierarchyLevels.length),
+    textColor: nextColor(allHierarchyLevels.length),
+    borderColor: nextColor(allHierarchyLevels.length),
+    dark: {
+      textColor: nextDarkColor(allHierarchyLevels.length),
+      borderColor: nextDarkColor(allHierarchyLevels.length),
+    },
+    light: {
+      textColor: nextColor(allHierarchyLevels.length),
+      borderColor: nextColor(allHierarchyLevels.length),
+    },
+  }
+}

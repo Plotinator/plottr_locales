@@ -10,7 +10,6 @@ import {
   EDIT_PLACES_ATTRIBUTE,
   EDIT_CARDS_ATTRIBUTE,
   EDIT_NOTES_ATTRIBUTE,
-  RESET,
   FILE_LOADED,
   NEW_FILE,
   REORDER_CHARACTER_ATTRIBUTE,
@@ -20,13 +19,16 @@ import {
   LOAD_CUSTOM_ATTRIBUTES,
   DELETE_CHARACTER_LEGACY_CUSTOM_ATTRIBUTE,
   EDIT_CHARACTER_ATTRIBUTE_METADATA,
+  UNDO,
+  REDO,
+  UNDO_N_TIMES,
+  REDO_N_TIMES,
 } from '../constants/ActionTypes'
 import { combineReducers } from 'redux'
 import { newFileCustomAttributes } from '../store/newFileState'
 
 function characters(state = [], action) {
   switch (action.type) {
-    case RESET:
     case NEW_FILE:
       return newFileCustomAttributes['characters']
 
@@ -67,6 +69,17 @@ function characters(state = [], action) {
       })
     }
 
+    case UNDO_N_TIMES:
+    case REDO_N_TIMES:
+    case UNDO:
+    case REDO: {
+      if (Array.isArray(action.state.customAttributes?.characters)) {
+        return action.state.customAttributes.characters
+      } else {
+        return state
+      }
+    }
+
     case LOAD_CUSTOM_ATTRIBUTES:
       return action.customAttributes.characters || []
 
@@ -89,7 +102,6 @@ function places(state = [], action) {
       return newState
     }
 
-    case RESET:
     case NEW_FILE:
       return newFileCustomAttributes['places']
 
@@ -103,6 +115,17 @@ function places(state = [], action) {
 
       copy.splice(toIndex, 0, attribute)
       return copy
+    }
+
+    case UNDO_N_TIMES:
+    case REDO_N_TIMES:
+    case UNDO:
+    case REDO: {
+      if (Array.isArray(action.state.customAttributes?.places)) {
+        return action.state.customAttributes.places
+      } else {
+        return state
+      }
     }
 
     case LOAD_CUSTOM_ATTRIBUTES:
@@ -140,12 +163,22 @@ function scenes(state = [], action) {
       return copy
     }
 
-    case RESET:
     case NEW_FILE:
       return newFileCustomAttributes['scenes']
 
     case FILE_LOADED:
       return action.data.customAttributes['scenes'] || []
+
+    case UNDO_N_TIMES:
+    case REDO_N_TIMES:
+    case UNDO:
+    case REDO: {
+      if (Array.isArray(action.state.customAttributes?.scenes)) {
+        return action.state.customAttributes.scenes
+      } else {
+        return state
+      }
+    }
 
     case LOAD_CUSTOM_ATTRIBUTES:
       return action.customAttributes.scenes || []
@@ -169,7 +202,6 @@ function notes(state = [], action) {
       return newState
     }
 
-    case RESET:
     case NEW_FILE:
       return newFileCustomAttributes['notes']
 
@@ -183,6 +215,17 @@ function notes(state = [], action) {
 
       copy.splice(toIndex, 0, attribute)
       return copy
+    }
+
+    case UNDO_N_TIMES:
+    case REDO_N_TIMES:
+    case UNDO:
+    case REDO: {
+      if (Array.isArray(action.state.customAttributes?.scenes)) {
+        return action.state.customAttributes.notes
+      } else {
+        return state
+      }
     }
 
     case LOAD_CUSTOM_ATTRIBUTES:
@@ -202,12 +245,22 @@ function lines(state = [], action) {
       state.splice(state.indexOf(action.attribute), 1)
       return [...state]
 
-    case RESET:
     case NEW_FILE:
       return newFileCustomAttributes['lines']
 
     case FILE_LOADED:
       return action.data.customAttributes['lines'] || []
+
+    case UNDO_N_TIMES:
+    case REDO_N_TIMES:
+    case UNDO:
+    case REDO: {
+      if (Array.isArray(action.state.customAttributes?.lines)) {
+        return action.state.customAttributes.lines
+      } else {
+        return state
+      }
+    }
 
     case LOAD_CUSTOM_ATTRIBUTES:
       return action.customAttributes.lines || []
@@ -217,7 +270,7 @@ function lines(state = [], action) {
   }
 }
 
-const customAttributes = (dataRepairers) =>
+const customAttributes = (_dataRepairers) =>
   combineReducers({
     characters,
     places,

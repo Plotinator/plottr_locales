@@ -217,7 +217,11 @@ describe('editCharacterTemplateAttribute', () => {
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(addTemplateToCharacter(1, A_CHARACTER_TEMPLATE))
           const initialState = store.getState()
-          const initialTemplate = singleCharacterSelector(initialState, 1).templates[0]
+          const initialTemplate = singleCharacterSelector(
+            initialState,
+            // @ts-ignore
+            1
+          ).templates[0]
           expect(initialTemplate).toEqual({
             attributes: [
               {
@@ -248,7 +252,11 @@ describe('editCharacterTemplateAttribute', () => {
             )
           )
           const resultState = store.getState()
-          const resultTemplate = singleCharacterSelector(resultState, 1).templates[0]
+          const resultTemplate = singleCharacterSelector(
+            resultState,
+            // @ts-ignore
+            1
+          ).templates[0]
           expect(resultTemplate).toEqual({
             attributes: [
               {
@@ -284,7 +292,11 @@ describe('editCharacterTemplateAttribute', () => {
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(addTemplateToCharacter(1, A_CHARACTER_TEMPLATE))
           const initialState = store.getState()
-          const initialTemplate = singleCharacterSelector(initialState, 1).templates[0]
+          const initialTemplate = singleCharacterSelector(
+            initialState,
+            // @ts-ignore
+            1
+          ).templates[0]
           expect(initialTemplate).toEqual({
             attributes: [
               {
@@ -315,7 +327,11 @@ describe('editCharacterTemplateAttribute', () => {
             )
           )
           const resultState = store.getState()
-          const resultTemplate = singleCharacterSelector(resultState, 1).templates[0]
+          const resultTemplate = singleCharacterSelector(
+            resultState,
+            // @ts-ignore
+            1
+          ).templates[0]
           expect(resultTemplate).toEqual(initialTemplate)
         })
       })
@@ -326,7 +342,11 @@ describe('editCharacterTemplateAttribute', () => {
             store.dispatch(addCharacter('John Doe'))
             store.dispatch(addTemplateToCharacter(1, A_CHARACTER_TEMPLATE))
             const initialState = store.getState()
-            const initialTemplate = singleCharacterSelector(initialState, 1).templates[0]
+            const initialTemplate = singleCharacterSelector(
+              initialState,
+              // @ts-ignore
+              1
+            ).templates[0]
             expect(initialTemplate).toEqual({
               attributes: [
                 {
@@ -357,7 +377,11 @@ describe('editCharacterTemplateAttribute', () => {
               )
             )
             const resultState = store.getState()
-            const resultTemplate = singleCharacterSelector(resultState, 1).templates[0]
+            const resultTemplate = singleCharacterSelector(
+              resultState,
+              // @ts-ignore
+              1
+            ).templates[0]
             expect(resultTemplate).toEqual({
               attributes: [
                 {
@@ -393,7 +417,11 @@ describe('editCharacterTemplateAttribute', () => {
             store.dispatch(addCharacter('John Doe'))
             store.dispatch(addTemplateToCharacter(1, A_CHARACTER_TEMPLATE))
             const initialState = store.getState()
-            const initialTemplate = singleCharacterSelector(initialState, 1).templates[0]
+            const initialTemplate = singleCharacterSelector(
+              initialState,
+              // @ts-ignore
+              1
+            ).templates[0]
             expect(initialTemplate).toEqual({
               attributes: [
                 {
@@ -433,7 +461,11 @@ describe('editCharacterTemplateAttribute', () => {
               )
             )
             const resultState = store.getState()
-            const resultTemplate = singleCharacterSelector(resultState, 1).templates[0]
+            const resultTemplate = singleCharacterSelector(
+              resultState,
+              // @ts-ignore
+              1
+            ).templates[0]
             expect(resultTemplate).toEqual({
               attributes: [
                 {
@@ -471,7 +503,11 @@ describe('editCharacterTemplateAttribute', () => {
               store.dispatch(addTemplateToCharacter(1, A_CHARACTER_TEMPLATE))
               store.dispatch(addBook())
               const initialState = store.getState()
-              const initialTemplate = singleCharacterSelector(initialState, 1).templates[0]
+              const initialTemplate = singleCharacterSelector(
+                initialState,
+                // @ts-ignore
+                1
+              ).templates[0]
               expect(initialTemplate).toEqual({
                 attributes: [
                   {
@@ -512,7 +548,11 @@ describe('editCharacterTemplateAttribute', () => {
                 )
               )
               const resultState = store.getState()
-              const resultTemplate = singleCharacterSelector(resultState, 1).templates[0]
+              const resultTemplate = singleCharacterSelector(
+                resultState,
+                // @ts-ignore
+                1
+              ).templates[0]
               expect(resultTemplate).toEqual({
                 attributes: [
                   {
@@ -550,7 +590,11 @@ describe('editCharacterTemplateAttribute', () => {
               store.dispatch(addBook())
               store.dispatch(addBookToCharacter(1, 1))
               const initialState = store.getState()
-              const initialTemplate = singleCharacterSelector(initialState, 1).templates[0]
+              const initialTemplate = singleCharacterSelector(
+                initialState,
+                // @ts-ignore
+                1
+              ).templates[0]
               expect(initialTemplate).toEqual({
                 attributes: [
                   {
@@ -591,7 +635,11 @@ describe('editCharacterTemplateAttribute', () => {
                 )
               )
               const resultState = store.getState()
-              const resultTemplate = singleCharacterSelector(resultState, 1).templates[0]
+              const resultTemplate = singleCharacterSelector(
+                resultState,
+                // @ts-ignore
+                1
+              ).templates[0]
               expect(resultTemplate).toEqual({
                 attributes: [
                   {
@@ -671,11 +719,23 @@ describe('addTag', () => {
           const store = initialStore()
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(addTag())
-          expect(singleCharacterSelector(store.getState(), 1).attributes).toBeUndefined()
+          expect(
+            singleCharacterSelector(
+              store.getState(),
+              // @ts-ignore
+              1
+            ).attributes
+          ).toBeUndefined()
           store.dispatch(selectCharacterAttributeBookTab('1'))
           store.dispatch(addTagToCharacter(1, 1))
           const resultState = store.getState()
-          expect(singleCharacterSelector(resultState, 1).attributes).toEqual([
+          expect(
+            singleCharacterSelector(
+              resultState,
+              // @ts-ignore
+              1
+            ).attributes
+          ).toEqual([
             {
               bookId: 'all',
               id: 1,
@@ -698,11 +758,23 @@ describe('addTag', () => {
           const store = initialStore()
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(addTag())
-          expect(singleCharacterSelector(store.getState(), 1).attributes).toBeUndefined()
+          expect(
+            singleCharacterSelector(
+              store.getState(),
+              // @ts-ignore
+              1
+            ).attributes
+          ).toBeUndefined()
           store.dispatch(selectCharacterAttributeBookTab('all'))
           store.dispatch(addTagToCharacter(1, 1))
           const resultState = store.getState()
-          expect(singleCharacterSelector(resultState, 1).attributes).toEqual([
+          expect(
+            singleCharacterSelector(
+              resultState,
+              // @ts-ignore
+              1
+            ).attributes
+          ).toEqual([
             {
               bookId: 'all',
               id: 1,
@@ -727,11 +799,23 @@ describe('addTag', () => {
           const store = initialStore()
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(addTag())
-          expect(singleCharacterSelector(store.getState(), 1).attributes).toBeUndefined()
+          expect(
+            singleCharacterSelector(
+              store.getState(),
+              // @ts-ignore
+              1
+            ).attributes
+          ).toBeUndefined()
           store.dispatch(selectCharacterAttributeBookTab('all'))
           store.dispatch(addTagToCharacter(1, 1))
           const resultState = store.getState()
-          expect(singleCharacterSelector(resultState, 1).attributes).toEqual([
+          expect(
+            singleCharacterSelector(
+              resultState,
+              // @ts-ignore
+              1
+            ).attributes
+          ).toEqual([
             {
               bookId: 'all',
               id: 1,
@@ -755,13 +839,25 @@ describe('addTag', () => {
             const store = initialStore()
             store.dispatch(addCharacter('John Doe'))
             store.dispatch(addTag())
-            expect(singleCharacterSelector(store.getState(), 1).attributes).toBeUndefined()
+            expect(
+              singleCharacterSelector(
+                store.getState(),
+                // @ts-ignore
+                1
+              ).attributes
+            ).toBeUndefined()
             store.dispatch(addBook())
             store.dispatch(addBookToCharacter(1, 1))
             store.dispatch(selectCharacterAttributeBookTab('all'))
             store.dispatch(addTagToCharacter(1, 1))
             const resultState = store.getState()
-            expect(singleCharacterSelector(resultState, 1).attributes).toEqual([
+            expect(
+              singleCharacterSelector(
+                resultState,
+                // @ts-ignore
+                1
+              ).attributes
+            ).toEqual([
               {
                 bookId: 'all',
                 id: 1,
@@ -784,13 +880,25 @@ describe('addTag', () => {
             const store = initialStore()
             store.dispatch(addCharacter('John Doe'))
             store.dispatch(addTag())
-            expect(singleCharacterSelector(store.getState(), 1).attributes).toBeUndefined()
+            expect(
+              singleCharacterSelector(
+                store.getState(),
+                // @ts-ignore
+                1
+              ).attributes
+            ).toBeUndefined()
             store.dispatch(addBook())
             store.dispatch(addBookToCharacter(1, 1))
             store.dispatch(selectCharacterAttributeBookTab('1'))
             store.dispatch(addTagToCharacter(1, 1))
             const resultState = store.getState()
-            expect(singleCharacterSelector(resultState, 1).attributes).toEqual([
+            expect(
+              singleCharacterSelector(
+                resultState,
+                // @ts-ignore
+                1
+              ).attributes
+            ).toEqual([
               {
                 bookId: '1',
                 id: 1,
@@ -824,11 +932,18 @@ describe('addTag', () => {
             'device://tmp/dummy-url-test-file.pltr'
           )
         )
-        const character1TagsBefore = displayedSingleCharacterSelector(store.getState(), 1).tags
+        const character1TagsBefore = displayedSingleCharacterSelector(
+          store.getState(),
+          // @ts-ignore
+          1
+        ).tags
         expect(character1TagsBefore).toEqual([1, 2, 3, 4, 5, 7, 9, 10, 8])
         store.dispatch(addTagToCharacter(1, 11))
-        const character1TagsAfter = displayedSingleCharacterSelector(store.getState(), 1)
-          .attributes[0].value
+        const character1TagsAfter = displayedSingleCharacterSelector(
+          store.getState(),
+          // @ts-ignore
+          1
+        ).attributes[0].value
         expect(character1TagsAfter).toEqual([11, 1, 2, 3, 4, 5, 7, 9, 10, 8])
       })
     })
@@ -852,7 +967,13 @@ describe('addBook', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(addBookToCharacter(2, 1))
-        expect(singleCharacterSelector(store.getState(), 1).bookIds).toEqual([])
+        expect(
+          singleCharacterSelector(
+            store.getState(),
+            // @ts-ignore
+            1
+          ).bookIds
+        ).toEqual([])
       })
     })
     describe('and that characters id', () => {
@@ -860,7 +981,13 @@ describe('addBook', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(addBookToCharacter(1, 1))
-        expect(singleCharacterSelector(store.getState(), 1).bookIds).toEqual([1])
+        expect(
+          singleCharacterSelector(
+            store.getState(),
+            // @ts-ignore
+            1
+          ).bookIds
+        ).toEqual([1])
       })
       describe('and a book id that does not exist', () => {
         it('should leave the state unchanged', () => {
@@ -878,7 +1005,13 @@ describe('addBook', () => {
           const store = initialStore()
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(addBookToCharacter(1, 'series'))
-          expect(singleCharacterSelector(store.getState(), 1).bookIds).toEqual(['series'])
+          expect(
+            singleCharacterSelector(
+              store.getState(),
+              // @ts-ignore
+              1
+            ).bookIds
+          ).toEqual(['series'])
         })
       })
     })
@@ -937,9 +1070,13 @@ describe('removeTag', () => {
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(addTagToCharacter(1, 1))
           store.dispatch(removeTagFromCharacter(1, 1))
-          expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
-            { id: 1, value: [], bookId: 'all' },
-          ])
+          expect(
+            singleCharacterSelector(
+              store.getState(),
+              // @ts-ignore
+              1
+            ).attributes
+          ).toEqual([{ id: 1, value: [], bookId: 'all' }])
           expect(attributesSelector(store.getState())).toEqual({
             characters: [{ id: 1, type: 'base-attribute', name: 'tags' }],
           })
@@ -955,12 +1092,24 @@ describe('removeTag', () => {
               store.dispatch(addBookToCharacter(1, 1))
               store.dispatch(selectCharacterAttributeBookTab('1'))
               store.dispatch(addTagToCharacter(1, 1))
-              expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
+              expect(
+                singleCharacterSelector(
+                  store.getState(),
+                  // @ts-ignore
+                  1
+                ).attributes
+              ).toEqual([
                 { id: 1, value: [1], bookId: 'all' },
                 { id: 1, value: [1], bookId: '1' },
               ])
               store.dispatch(removeTagFromCharacter(1, 1))
-              expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
+              expect(
+                singleCharacterSelector(
+                  store.getState(),
+                  // @ts-ignore
+                  1
+                ).attributes
+              ).toEqual([
                 { id: 1, value: [1], bookId: 'all' },
                 { id: 1, value: [], bookId: '1' },
               ])
@@ -979,13 +1128,25 @@ describe('removeTag', () => {
               store.dispatch(addBookToCharacter(1, 1))
               store.dispatch(selectCharacterAttributeBookTab('1'))
               store.dispatch(addTagToCharacter(1, 1))
-              expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
+              expect(
+                singleCharacterSelector(
+                  store.getState(),
+                  // @ts-ignore
+                  1
+                ).attributes
+              ).toEqual([
                 { id: 1, value: [1], bookId: 'all' },
                 { id: 1, value: [1], bookId: '1' },
               ])
               store.dispatch(selectCharacterAttributeBookTab('all'))
               store.dispatch(removeTagFromCharacter(1, 1))
-              expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
+              expect(
+                singleCharacterSelector(
+                  store.getState(),
+                  // @ts-ignore
+                  1
+                ).attributes
+              ).toEqual([
                 { id: 1, value: [], bookId: 'all' },
                 { id: 1, value: [1], bookId: '1' },
               ])
@@ -1011,7 +1172,11 @@ describe('removeTag', () => {
             'device://tmp/dummy-url-test-file.pltr'
           )
         )
-        const character1TagsBefore = displayedSingleCharacterSelector(store.getState(), 1).tags
+        const character1TagsBefore = displayedSingleCharacterSelector(
+          store.getState(),
+          // @ts-ignore
+          1
+        ).tags
         expect(character1TagsBefore).toEqual([1, 2, 3, 4, 5, 7, 9, 10, 8])
         store.dispatch(removeTagFromCharacter(1, 10))
         const attributesAfter = allCharacterAttributesSelector(store.getState())
@@ -1022,8 +1187,11 @@ describe('removeTag', () => {
             name: 'tags',
           },
         ])
-        const character1TagsAfter = displayedSingleCharacterSelector(store.getState(), 1)
-          .attributes[0].value
+        const character1TagsAfter = displayedSingleCharacterSelector(
+          store.getState(),
+          // @ts-ignore
+          1
+        ).attributes[0].value
         expect(character1TagsAfter).toEqual([1, 2, 3, 4, 5, 7, 9, 8])
       })
     })
@@ -1060,7 +1228,13 @@ describe('removeBook', () => {
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(addBookToCharacter(1, 1))
           store.dispatch(removeBookFromCharacter(1, 1))
-          expect(singleCharacterSelector(store.getState(), 1).bookIds).toEqual([])
+          expect(
+            singleCharacterSelector(
+              store.getState(),
+              // @ts-ignore
+              1
+            ).bookIds
+          ).toEqual([])
         })
       })
       describe('and a different book id', () => {
@@ -1068,9 +1242,21 @@ describe('removeBook', () => {
           const store = initialStore()
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(addBookToCharacter(1, 1))
-          expect(singleCharacterSelector(store.getState(), 1).bookIds).toEqual([1])
+          expect(
+            singleCharacterSelector(
+              store.getState(),
+              // @ts-ignore
+              1
+            ).bookIds
+          ).toEqual([1])
           store.dispatch(removeBookFromCharacter(1, 2))
-          expect(singleCharacterSelector(store.getState(), 1).bookIds).toEqual([1])
+          expect(
+            singleCharacterSelector(
+              store.getState(),
+              // @ts-ignore
+              1
+            ).bookIds
+          ).toEqual([1])
         })
       })
     })
@@ -1079,7 +1265,13 @@ describe('removeBook', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(addBookToCharacter(1, 1))
-        expect(singleCharacterSelector(store.getState(), 1).bookIds).toEqual([1])
+        expect(
+          singleCharacterSelector(
+            store.getState(),
+            // @ts-ignore
+            1
+          ).bookIds
+        ).toEqual([1])
       })
       describe('and a book id that does not exist', () => {
         it('should leave the state unchanged', () => {
@@ -1110,7 +1302,13 @@ describe('createCharacterAttribute', () => {
       const store = initialStore()
       store.dispatch(addCharacter('John Doe'))
       store.dispatch(createCharacterAttribute('text', 'strength'))
-      expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
+      expect(
+        singleCharacterSelector(
+          store.getState(),
+          // @ts-ignore
+          1
+        ).attributes
+      ).toEqual([
         {
           id: 1,
           value: undefined,
@@ -1123,7 +1321,13 @@ describe('createCharacterAttribute', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(createCharacterAttribute('text', 'id'))
-        expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
+        expect(
+          singleCharacterSelector(
+            store.getState(),
+            // @ts-ignore
+            1
+          ).attributes
+        ).toEqual([
           {
             id: 1,
             value: undefined,
@@ -1192,7 +1396,13 @@ describe('editCharacterAttributeValue', () => {
             store.dispatch(addCharacter('John Doe'))
             store.dispatch(createCharacterAttribute('text', 'strength'))
             store.dispatch(editCharacterAttributeValue(1, 1, 'New value'))
-            expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
+            expect(
+              singleCharacterSelector(
+                store.getState(),
+                // @ts-ignore
+                1
+              ).attributes
+            ).toEqual([
               {
                 id: 1,
                 value: 'New value',
@@ -1211,7 +1421,11 @@ describe('editCharacterAttributeValue', () => {
         store.dispatch(
           loadFile('Hamlet', false, hamlet, hamlet.file.version, 'device:///tmp.dummy.pltr')
         )
-        const attributesBefore = characterAttributesSelector(store.getState(), 1)
+        const attributesBefore = characterAttributesSelector(
+          store.getState(),
+          // @ts-ignore
+          1
+        )
         expect(attributesBefore).toEqual([
           {
             name: 'Role',
@@ -1268,7 +1482,11 @@ describe('editCharacterAttributeValue', () => {
           },
         ])
         editCharacterAttributeValue(1, 'Attended Wittenberg', 'No')(store.dispatch, store.getState)
-        const attributesAfter = characterAttributesSelector(store.getState(), 1)
+        const attributesAfter = characterAttributesSelector(
+          store.getState(),
+          // @ts-ignore
+          1
+        )
         expect(attributesAfter).toEqual([
           {
             name: 'Role',
@@ -1361,7 +1579,13 @@ describe('editShortDescription', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(editShortDescription(1, 'New value'))
-        expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
+        expect(
+          singleCharacterSelector(
+            store.getState(),
+            // @ts-ignore
+            1
+          ).attributes
+        ).toEqual([
           {
             bookId: 'all',
             id: 1,
@@ -1379,7 +1603,13 @@ describe('editShortDescription', () => {
             store.dispatch(addCharacter('John Doe'))
             store.dispatch(editShortDescription(1, 'New value'))
             store.dispatch(addBook())
-            expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
+            expect(
+              singleCharacterSelector(
+                store.getState(),
+                // @ts-ignore
+                1
+              ).attributes
+            ).toEqual([
               {
                 bookId: 'all',
                 id: 1,
@@ -1400,7 +1630,13 @@ describe('editShortDescription', () => {
               store.dispatch(addBookToCharacter(1, 1))
               store.dispatch(selectCharacterAttributeBookTab('all'))
               store.dispatch(editShortDescription(1, 'New value'))
-              expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
+              expect(
+                singleCharacterSelector(
+                  store.getState(),
+                  // @ts-ignore
+                  1
+                ).attributes
+              ).toEqual([
                 {
                   bookId: 'all',
                   id: 1,
@@ -1420,7 +1656,13 @@ describe('editShortDescription', () => {
               store.dispatch(addBookToCharacter(1, 1))
               store.dispatch(selectCharacterAttributeBookTab('1'))
               store.dispatch(editShortDescription(1, 'New value'))
-              expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
+              expect(
+                singleCharacterSelector(
+                  store.getState(),
+                  // @ts-ignore
+                  1
+                ).attributes
+              ).toEqual([
                 {
                   bookId: '1',
                   id: 1,
@@ -1468,7 +1710,13 @@ describe('editDescription', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(editDescription(1, 'New value'))
-        expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
+        expect(
+          singleCharacterSelector(
+            store.getState(),
+            // @ts-ignore
+            1
+          ).attributes
+        ).toEqual([
           {
             bookId: 'all',
             id: 1,
@@ -1486,7 +1734,13 @@ describe('editDescription', () => {
             store.dispatch(addCharacter('John Doe'))
             store.dispatch(editDescription(1, 'New value'))
             store.dispatch(addBook())
-            expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
+            expect(
+              singleCharacterSelector(
+                store.getState(),
+                // @ts-ignore
+                1
+              ).attributes
+            ).toEqual([
               {
                 bookId: 'all',
                 id: 1,
@@ -1507,7 +1761,13 @@ describe('editDescription', () => {
               store.dispatch(addBookToCharacter(1, 1))
               store.dispatch(selectCharacterAttributeBookTab('all'))
               store.dispatch(editDescription(1, 'New value'))
-              expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
+              expect(
+                singleCharacterSelector(
+                  store.getState(),
+                  // @ts-ignore
+                  1
+                ).attributes
+              ).toEqual([
                 {
                   bookId: 'all',
                   id: 1,
@@ -1527,7 +1787,13 @@ describe('editDescription', () => {
               store.dispatch(addBookToCharacter(1, 1))
               store.dispatch(selectCharacterAttributeBookTab('1'))
               store.dispatch(editDescription(1, 'New value'))
-              expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
+              expect(
+                singleCharacterSelector(
+                  store.getState(),
+                  // @ts-ignore
+                  1
+                ).attributes
+              ).toEqual([
                 {
                   bookId: '1',
                   id: 1,
@@ -1575,7 +1841,13 @@ describe('editCategory', () => {
         const store = initialStore()
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(editCategory(1, 'New value'))
-        expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
+        expect(
+          singleCharacterSelector(
+            store.getState(),
+            // @ts-ignore
+            1
+          ).attributes
+        ).toEqual([
           {
             bookId: 'all',
             id: 1,
@@ -1593,7 +1865,13 @@ describe('editCategory', () => {
             store.dispatch(addCharacter('John Doe'))
             store.dispatch(editCategory(1, 'New value'))
             store.dispatch(addBook())
-            expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
+            expect(
+              singleCharacterSelector(
+                store.getState(),
+                // @ts-ignore
+                1
+              ).attributes
+            ).toEqual([
               {
                 bookId: 'all',
                 id: 1,
@@ -1614,7 +1892,13 @@ describe('editCategory', () => {
               store.dispatch(addBookToCharacter(1, 1))
               store.dispatch(selectCharacterAttributeBookTab('all'))
               store.dispatch(editCategory(1, 'New value'))
-              expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
+              expect(
+                singleCharacterSelector(
+                  store.getState(),
+                  // @ts-ignore
+                  1
+                ).attributes
+              ).toEqual([
                 {
                   bookId: 'all',
                   id: 1,
@@ -1634,7 +1918,13 @@ describe('editCategory', () => {
               store.dispatch(addBookToCharacter(1, 1))
               store.dispatch(selectCharacterAttributeBookTab('1'))
               store.dispatch(editCategory(1, 'New value'))
-              expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
+              expect(
+                singleCharacterSelector(
+                  store.getState(),
+                  // @ts-ignore
+                  1
+                ).attributes
+              ).toEqual([
                 {
                   bookId: '1',
                   id: 1,
@@ -1672,7 +1962,13 @@ describe('deleteBook', () => {
           store.dispatch(addBook())
           store.dispatch(addBookToCharacter(1, 1))
           store.dispatch(deleteBook(1))
-          expect(singleCharacterSelector(store.getState(), 1).bookIds).toEqual([])
+          expect(
+            singleCharacterSelector(
+              store.getState(),
+              // @ts-ignore
+              1
+            ).bookIds
+          ).toEqual([])
         })
       })
       describe('and a different book id', () => {
@@ -1683,7 +1979,13 @@ describe('deleteBook', () => {
           store.dispatch(addBook())
           store.dispatch(addBookToCharacter(1, 1))
           store.dispatch(deleteBook(2))
-          expect(singleCharacterSelector(store.getState(), 1).bookIds).toEqual([1])
+          expect(
+            singleCharacterSelector(
+              store.getState(),
+              // @ts-ignore
+              1
+            ).bookIds
+          ).toEqual([1])
         })
       })
     })
@@ -1716,7 +2018,13 @@ describe('deleteCharacterCategory', () => {
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(editCategory(1, 1))
           store.dispatch(deleteCharacterCategory(1))
-          expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
+          expect(
+            singleCharacterSelector(
+              store.getState(),
+              // @ts-ignore
+              1
+            ).attributes
+          ).toEqual([
             {
               bookId: 'all',
               id: 1,
@@ -1733,7 +2041,13 @@ describe('deleteCharacterCategory', () => {
             store.dispatch(addBookToCharacter(1, 1))
             store.dispatch(selectCharacterAttributeBookTab('2'))
             store.dispatch(deleteCharacterCategory(1))
-            expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
+            expect(
+              singleCharacterSelector(
+                store.getState(),
+                // @ts-ignore
+                1
+              ).attributes
+            ).toEqual([
               {
                 bookId: 'all',
                 id: 1,
@@ -1749,7 +2063,13 @@ describe('deleteCharacterCategory', () => {
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(editCategory(1, 1))
           store.dispatch(deleteCharacterCategory(2))
-          expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
+          expect(
+            singleCharacterSelector(
+              store.getState(),
+              // @ts-ignore
+              1
+            ).attributes
+          ).toEqual([
             {
               bookId: 'all',
               id: 1,
@@ -1789,7 +2109,13 @@ describe('deleteTag', () => {
           store.dispatch(addTag())
           store.dispatch(addTagToCharacter(1, 1))
           store.dispatch(deleteTag(1))
-          expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
+          expect(
+            singleCharacterSelector(
+              store.getState(),
+              // @ts-ignore
+              1
+            ).attributes
+          ).toEqual([
             {
               bookId: 'all',
               id: 1,
@@ -1807,7 +2133,13 @@ describe('deleteTag', () => {
             store.dispatch(addBookToCharacter(1, 1))
             store.dispatch(selectCharacterAttributeBookTab('2'))
             store.dispatch(deleteTag(1))
-            expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
+            expect(
+              singleCharacterSelector(
+                store.getState(),
+                // @ts-ignore
+                1
+              ).attributes
+            ).toEqual([
               {
                 bookId: 'all',
                 id: 1,
@@ -1825,7 +2157,13 @@ describe('deleteTag', () => {
           store.dispatch(addTag())
           store.dispatch(addTagToCharacter(1, 1))
           store.dispatch(deleteTag(2))
-          expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
+          expect(
+            singleCharacterSelector(
+              store.getState(),
+              // @ts-ignore
+              1
+            ).attributes
+          ).toEqual([
             {
               bookId: 'all',
               id: 1,
@@ -1864,7 +2202,13 @@ describe('deleteCharacterAttribute', () => {
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(createCharacterAttribute('text', 'strength'))
           store.dispatch(deleteCharacterAttribute(1))
-          expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([])
+          expect(
+            singleCharacterSelector(
+              store.getState(),
+              // @ts-ignore
+              1
+            ).attributes
+          ).toEqual([])
         })
         describe('and a different book is selected', () => {
           it('should still remove the attribute for that custom attribute entirely', () => {
@@ -1874,7 +2218,13 @@ describe('deleteCharacterAttribute', () => {
             store.dispatch(createCharacterAttribute('text', 'strength'))
             store.dispatch(selectCharacterAttributeBookTab('2'))
             store.dispatch(deleteCharacterAttribute(1))
-            expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([])
+            expect(
+              singleCharacterSelector(
+                store.getState(),
+                // @ts-ignore
+                1
+              ).attributes
+            ).toEqual([])
           })
         })
       })
@@ -1884,7 +2234,13 @@ describe('deleteCharacterAttribute', () => {
           store.dispatch(addCharacter('John Doe'))
           store.dispatch(createCharacterAttribute('text', 'strength'))
           store.dispatch(deleteCharacterAttribute(2))
-          expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
+          expect(
+            singleCharacterSelector(
+              store.getState(),
+              // @ts-ignore
+              1
+            ).attributes
+          ).toEqual([
             {
               bookId: 'all',
               id: 1,
@@ -1924,7 +2280,13 @@ describe('addCharacter (to card)', () => {
         store.dispatch(addCharacter('John Doe'))
         store.dispatch(addCharacterToCard(1, 1))
         const resultState = store.getState()
-        expect(singleCharacterSelector(resultState, 1).bookIds).toEqual([1])
+        expect(
+          singleCharacterSelector(
+            resultState,
+            // @ts-ignore
+            1
+          ).bookIds
+        ).toEqual([1])
       })
       describe('and the character already has that book', () => {
         it('should not add the book id to the character a second time', () => {
@@ -1933,7 +2295,13 @@ describe('addCharacter (to card)', () => {
           store.dispatch(addCharacterToCard(1, 1))
           store.dispatch(addCharacterToCard(1, 1))
           const resultState = store.getState()
-          expect(singleCharacterSelector(resultState, 1).bookIds).toEqual([1])
+          expect(
+            singleCharacterSelector(
+              resultState,
+              // @ts-ignore
+              1
+            ).bookIds
+          ).toEqual([1])
         })
       })
     })
@@ -1954,7 +2322,11 @@ describe('editAttributeMetadata', () => {
             'device:///tmp.dummy.pltr'
           )
         )
-        const otherCharacterBefore = singleCharacterSelector(store.getState(), 2)
+        const otherCharacterBefore = singleCharacterSelector(
+          store.getState(),
+          // @ts-ignore
+          2
+        )
         expect(otherCharacterBefore.Species).toEqual('Bear')
         store.dispatch(editCharacterAttributeMetadata(null, 'NewName', 'text', 'Species'))
         const legacyAttributes = characterCustomAttributesSelector(store.getState())
@@ -1964,7 +2336,11 @@ describe('editAttributeMetadata', () => {
             name: 'NewName',
           },
         ])
-        const otherCharacterAfter = singleCharacterSelector(store.getState(), 2)
+        const otherCharacterAfter = singleCharacterSelector(
+          store.getState(),
+          // @ts-ignore
+          2
+        )
         expect(otherCharacterAfter.Species).toBeUndefined()
         expect(otherCharacterAfter.NewName).toEqual('Bear')
       })
@@ -1992,7 +2368,13 @@ describe('editAttributeMetadata', () => {
                   },
                 ])
               )
-              expect(singleCharacterSelector(store.getState(), 1).attributes).toEqual([
+              expect(
+                singleCharacterSelector(
+                  store.getState(),
+                  // @ts-ignore
+                  1
+                ).attributes
+              ).toEqual([
                 {
                   bookId: 'all',
                   id: 1,
@@ -2017,7 +2399,11 @@ describe('editAttributeMetadata', () => {
                 ])
               )
               store.dispatch(editCharacterAttributeMetadata(1, 'strength', 'text', 'strength'))
-              const johnDoe = singleCharacterSelector(store.getState(), 1)
+              const johnDoe = singleCharacterSelector(
+                store.getState(),
+                // @ts-ignore
+                1
+              )
               expect(johnDoe.attributes).toEqual([
                 {
                   bookId: 'all',
@@ -2053,7 +2439,11 @@ describe('reorderCharacterTemplateAttribute', () => {
             reorderCharacterTemplateAttribute(template1OldPosition, template1NewPosition, 1)
           )
           const resultState = store.getState()
-          const singleCharacter = singleCharacterSelector(resultState, 1)
+          const singleCharacter = singleCharacterSelector(
+            resultState,
+            // @ts-ignore
+            1
+          )
 
           singleCharacter.templates.forEach((template, idx) => {
             if (template.id === CHARACTER_TEMPLATES[0].id) {
@@ -2070,7 +2460,11 @@ describe('reorderCharacterTemplateAttribute', () => {
             reorderCharacterTemplateAttribute(template2OldPosition, template2NewPosition, 1)
           )
           const secondShuffleState = store.getState()
-          const singleCharacterAfterShuffle = singleCharacterSelector(secondShuffleState, 1)
+          const singleCharacterAfterShuffle = singleCharacterSelector(
+            secondShuffleState,
+            // @ts-ignore
+            1
+          )
 
           singleCharacterAfterShuffle.templates.forEach((template, idx) => {
             if (template.id === CHARACTER_TEMPLATES[1].id) {
@@ -2088,7 +2482,11 @@ describe('reorderCharacterTemplateAttribute', () => {
             )
           )
           const thirdShuffleState = store.getState()
-          const singleCharacterAfterThirdShuffle = singleCharacterSelector(thirdShuffleState, 1)
+          const singleCharacterAfterThirdShuffle = singleCharacterSelector(
+            thirdShuffleState,
+            // @ts-ignore
+            1
+          )
 
           singleCharacterAfterThirdShuffle.templates.forEach((template, idx) => {
             if (template.id === CHARACTER_TEMPLATES[0].id) {

@@ -1,7 +1,6 @@
 import {
   FILE_LOADED,
   NEW_FILE,
-  RESET,
   EDIT_SERIES,
   LOAD_SERIES,
   SET_SERIES_NAME,
@@ -9,6 +8,10 @@ import {
   SET_SERIES_GENRE,
   SET_SERIES_THEME,
   REPLACE_MARKED_HITS,
+  UNDO,
+  REDO,
+  UNDO_N_TIMES,
+  REDO_N_TIMES,
 } from '../constants/ActionTypes'
 import { series as defaultSeries } from '../store/initialState'
 import { newFileSeries } from '../store/newFileState'
@@ -17,7 +20,7 @@ import { sortByHitPosition } from './sortByHitPosition'
 import { replacePlainTextHit } from './replace'
 
 const series =
-  (dataRepairers) =>
+  (_dataRepairers) =>
   (state = defaultSeries, action) => {
     switch (action.type) {
       case EDIT_SERIES: {
@@ -95,7 +98,17 @@ const series =
         }, state)
       }
 
-      case RESET:
+      case UNDO_N_TIMES:
+      case REDO_N_TIMES:
+      case UNDO:
+      case REDO: {
+        if (action?.state?.series && typeof action.state.series === 'object') {
+          return action.state.series
+        } else {
+          return state
+        }
+      }
+
       case FILE_LOADED:
         return action.data.series
 

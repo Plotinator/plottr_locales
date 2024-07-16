@@ -37,7 +37,11 @@ const initialStore = () => {
 describe('addBook', () => {
   it('should add an appropriately keyed hierarchy level', () => {
     const store = initialStore()
-    const hierarchy = hierarchyLevelsForAnotherBookSelector(store.getState(), 2)
+    const hierarchy = hierarchyLevelsForAnotherBookSelector(
+      store.getState(),
+      // @ts-ignore
+      2
+    )
     expect(hierarchy).toEqual({ 0: hierarchyLevel() })
   })
 })
@@ -46,8 +50,16 @@ describe('deleteBook', () => {
   it('should remove the hierarchy levels for that book', () => {
     const store = initialStore()
     store.dispatch(deleteBook(1))
-    const hierarchiesForBookOne = hierarchyLevelsForAnotherBookSelector(store.getState(), 1)
-    const hierarchiesForBookTwo = hierarchyLevelsForAnotherBookSelector(store.getState(), 2)
+    const hierarchiesForBookOne = hierarchyLevelsForAnotherBookSelector(
+      store.getState(),
+      // @ts-ignore
+      1
+    )
+    const hierarchiesForBookTwo = hierarchyLevelsForAnotherBookSelector(
+      store.getState(),
+      // @ts-ignore
+      2
+    )
     expect(hierarchiesForBookOne).toBeUndefined()
     expect(hierarchiesForBookTwo).toBeDefined()
   })
@@ -64,11 +76,29 @@ describe('modifying the hierarchy', () => {
           color: 'blue',
         })
       )
-      expect(hierarchyLevelsForAnotherBookSelector(store.getState(), 2)).toEqual(
-        hierarchyLevelsForAnotherBookSelector(initialState, 2)
+      expect(
+        hierarchyLevelsForAnotherBookSelector(
+          store.getState(),
+          // @ts-ignore
+          2
+        )
+      ).toEqual(
+        hierarchyLevelsForAnotherBookSelector(
+          initialState,
+          // @ts-ignore
+          2
+        )
       )
-      const resultLevel = hierarchyLevelsForAnotherBookSelector(store.getState(), 1)[0]
-      const initialLevel = hierarchyLevelsForAnotherBookSelector(initialState, 1)[0]
+      const resultLevel = hierarchyLevelsForAnotherBookSelector(
+        store.getState(),
+        // @ts-ignore
+        1
+      )[0]
+      const initialLevel = hierarchyLevelsForAnotherBookSelector(
+        initialState,
+        // @ts-ignore
+        1
+      )[0]
       expect(omit(resultLevel, 'color')).toEqual(omit(initialLevel, 'color'))
       expect(resultLevel.color).toEqual('blue')
     })
@@ -83,11 +113,29 @@ describe('modifying the hierarchy', () => {
             color: 'blue',
           })
         )
-        expect(hierarchyLevelsForAnotherBookSelector(store.getState(), 1)).toEqual(
-          hierarchyLevelsForAnotherBookSelector(initialState, 1)
+        expect(
+          hierarchyLevelsForAnotherBookSelector(
+            store.getState(),
+            // @ts-ignore
+            1
+          )
+        ).toEqual(
+          hierarchyLevelsForAnotherBookSelector(
+            initialState,
+            // @ts-ignore
+            1
+          )
         )
-        const resultLevel = hierarchyLevelsForAnotherBookSelector(store.getState(), 2)[0]
-        const initialLevel = hierarchyLevelsForAnotherBookSelector(initialState, 2)[0]
+        const resultLevel = hierarchyLevelsForAnotherBookSelector(
+          store.getState(),
+          // @ts-ignore
+          2
+        )[0]
+        const initialLevel = hierarchyLevelsForAnotherBookSelector(
+          initialState,
+          // @ts-ignore
+          2
+        )[0]
         expect(omit(resultLevel, 'color')).toEqual(omit(initialLevel, 'color'))
         expect(resultLevel.color).toEqual('blue')
       })
@@ -103,11 +151,29 @@ describe('modifying the hierarchy', () => {
             color: 'blue',
           })
         )
-        expect(hierarchyLevelsForAnotherBookSelector(store.getState(), 2)).toEqual(
-          hierarchyLevelsForAnotherBookSelector(initialState, 2)
+        expect(
+          hierarchyLevelsForAnotherBookSelector(
+            store.getState(),
+            // @ts-ignore
+            2
+          )
+        ).toEqual(
+          hierarchyLevelsForAnotherBookSelector(
+            initialState,
+            // @ts-ignore
+            2
+          )
         )
-        const resultLevel = hierarchyLevelsForAnotherBookSelector(store.getState(), 1)[1]
-        const initialLevel = hierarchyLevelsForAnotherBookSelector(store.getState(), 1)[1]
+        const resultLevel = hierarchyLevelsForAnotherBookSelector(
+          store.getState(),
+          // @ts-ignore
+          1
+        )[1]
+        const initialLevel = hierarchyLevelsForAnotherBookSelector(
+          store.getState(),
+          // @ts-ignore
+          1
+        )[1]
         expect(omit(resultLevel, 'color')).toEqual(omit(initialLevel, 'color'))
         expect(resultLevel.color).toEqual('blue')
       })
@@ -145,11 +211,17 @@ describe('modifying the hierarchy', () => {
       const store = initialStore()
       const initialHierarchyLevelName = hierarchyLevelsForAnotherBookSelector(
         store.getState(),
+
+        // @ts-ignore
         1
       )[0].name
       expect(initialHierarchyLevelName).toEqual('Chapter')
       store.dispatch(setHierarchyLevels([hierarchyLevel(), hierarchyLevel()]))
-      const resultHierarcyhLevels = hierarchyLevelsForAnotherBookSelector(store.getState(), 1)
+      const resultHierarcyhLevels = hierarchyLevelsForAnotherBookSelector(
+        store.getState(),
+        // @ts-ignore
+        1
+      )
       expect(resultHierarcyhLevels[0].name).not.toEqual(resultHierarcyhLevels[1].name)
       expect(resultHierarcyhLevels[0].name).toEqual('Chapter')
       expect(resultHierarcyhLevels[1].name).toEqual('Scene')
@@ -170,7 +242,13 @@ describe('addBookFromTemplate', () => {
     })
     store.dispatch(addBookFromTemplate(template))
     it('should add the default hierarchy levels to the book', () => {
-      expect(hierarchyLevelsForAnotherBookSelector(store.getState(), 3)).toEqual({
+      expect(
+        hierarchyLevelsForAnotherBookSelector(
+          store.getState(),
+          // @ts-ignore
+          3
+        )
+      ).toEqual({
         0: {
           autoNumber: true,
           backgroundColor: 'none',
@@ -214,7 +292,13 @@ describe('addBookFromTemplate', () => {
 
     store.dispatch(addBookFromTemplate(template))
     it('should use those hierarchy levels for the new book', () => {
-      expect(hierarchyLevelsForAnotherBookSelector(store.getState(), 3)).toEqual(hierarchyLevels)
+      expect(
+        hierarchyLevelsForAnotherBookSelector(
+          store.getState(),
+          // @ts-ignore
+          3
+        )
+      ).toEqual(hierarchyLevels)
     })
   })
 })

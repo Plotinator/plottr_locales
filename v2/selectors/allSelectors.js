@@ -1,5 +1,4 @@
 import * as fullFileFirstOrder from './fullFileFirstOrder'
-import * as actionsFirstOrder from './actionsFirstOrder'
 import * as applicationStateFirstOrder from './applicationStateFirstOrder'
 import * as attributesFirstOrder from './attributesFirstOrder'
 import * as backupsFirstOrder from './backupsFirstOrder'
@@ -11,7 +10,6 @@ import * as charactersFirstOrder from './charactersFirstOrder'
 import * as clientFirstOrder from './clientFirstOrder'
 import * as customAttributesFirstOrder from './customAttributesFirstOrder'
 import * as domEventsFirstOrder from './domEventsFirstOrder'
-import * as editorsFirstOrder from './editorsFirstOrder'
 import * as errorFirstOrder from './errorFirstOrder'
 import * as featureFlagsFirstOrder from './featureFlagsFirstOrder'
 import * as fileFirstOrder from './fileFirstOrder'
@@ -29,8 +27,8 @@ import * as settingsFirstOrder from './settingsFirstOrder'
 import * as tagsFirstOrder from './tagsFirstOrder'
 import * as templatesFirstOrder from './templatesFirstOrder'
 import * as testingAndDiagnosisFirstOrder from './testingAndDiagnosisFirstOrder'
-import * as filterFirstOrder from './filterFirstOrder'
 import * as seriesFirstOrder from './seriesFirstOrder'
+import * as undoFirstOrder from './undoFirstOrder'
 import * as secondOrder from './secondOrder'
 import * as applicationStateThirdOrder from './applicationStateThirdOrder'
 import * as charactersThirdOrder from './charactersThirdOrder'
@@ -46,10 +44,10 @@ import * as categoriesThirdOrder from './categoriesThirdOrder'
 import * as booksThirdOrder from './booksThirdOrder'
 import * as backupsThirdOrder from './backupsThirdOrder'
 import * as cardsThirdOrder from './cardsThirdOrder'
+import * as filterThirdOrder from './filterThirdOrder'
 
 const allSelectors = {
   ...fullFileFirstOrder,
-  ...actionsFirstOrder,
   ...applicationStateFirstOrder,
   ...attributesFirstOrder,
   ...backupsFirstOrder,
@@ -61,7 +59,6 @@ const allSelectors = {
   ...clientFirstOrder,
   ...customAttributesFirstOrder,
   ...domEventsFirstOrder,
-  ...editorsFirstOrder,
   ...errorFirstOrder,
   ...featureFlagsFirstOrder,
   ...fileFirstOrder,
@@ -79,8 +76,8 @@ const allSelectors = {
   ...tagsFirstOrder,
   ...templatesFirstOrder,
   ...testingAndDiagnosisFirstOrder,
-  ...filterFirstOrder,
   ...seriesFirstOrder,
+  ...undoFirstOrder,
   ...secondOrder,
   ...applicationStateThirdOrder,
   ...charactersThirdOrder,
@@ -96,6 +93,7 @@ const allSelectors = {
   ...booksThirdOrder,
   ...backupsThirdOrder,
   ...cardsThirdOrder,
+  ...filterThirdOrder,
 }
 
 export default allSelectors

@@ -1,7 +1,6 @@
 import {
   FILE_LOADED,
   NEW_FILE,
-  RESET,
   ADD_CHARACTER_CATEGORY,
   DELETE_CHARACTER_CATEGORY,
   UPDATE_CHARACTER_CATEGORY,
@@ -19,6 +18,10 @@ import {
   UPDATE_PLACE_CATEGORY,
   REORDER_PLACE_CATEGORY,
   LOAD_CATEGORIES,
+  UNDO,
+  REDO,
+  UNDO_N_TIMES,
+  REDO_N_TIMES,
 } from '../constants/ActionTypes'
 import { newFileCategories } from '../store/newFileState'
 import { categories as defaultCategories } from '../store/initialState'
@@ -26,10 +29,9 @@ import { nextId } from '../store/newIds'
 import { positionReset } from '../helpers/lists'
 
 const categories =
-  (dataRepairers) =>
+  (_dataRepairers) =>
   (state = defaultCategories, action) => {
     switch (action.type) {
-      case RESET:
       case FILE_LOADED:
         return action.data.categories
 
@@ -83,6 +85,17 @@ const categories =
 
       case REORDER_PLACE_CATEGORY:
         return reorderCategory('places', state, action)
+
+      case UNDO_N_TIMES:
+      case REDO_N_TIMES:
+      case UNDO:
+      case REDO: {
+        if (action?.state?.categories && typeof action.state.categories === 'object') {
+          return action.state.categories
+        } else {
+          return state
+        }
+      }
 
       case LOAD_CATEGORIES:
         return action.categories

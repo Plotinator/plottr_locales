@@ -3,7 +3,7 @@ import { cloneDeep } from 'lodash'
 export default function migrate(data) {
   if (data.file && data.file.version === '2020.4.3') return data
 
-  var obj = cloneDeep(data)
+  const obj = cloneDeep(data)
 
   // data structure going from ['name:#:type'] to [{name: 'name', type: 'type'}]
   if (obj.customAttributes) {

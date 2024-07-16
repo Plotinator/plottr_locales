@@ -23,5 +23,15 @@ export function nextIdAcrossCategories(categories) {
 
 // TODO: when you change images to have an allIds key, use the objectId function above
 export function imageId(images) {
-  return Object.keys(images).reduce((maxId, id) => Math.max(id, maxId), 0) + 1
+  return (
+    Object.keys(images).reduce(
+      (maxId, id) =>
+        Math.max(
+          // @ts-ignore
+          id,
+          maxId
+        ),
+      0
+    ) + 1
+  )
 }

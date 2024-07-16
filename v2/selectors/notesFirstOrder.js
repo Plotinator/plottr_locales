@@ -7,9 +7,9 @@ import { groupBy } from 'lodash'
 import { fullFileStateSelector } from './fullFileFirstOrder'
 import { positionReset } from '../helpers/lists'
 
-export const allNotesSelector = createSelector(fullFileStateSelector, (state) => state.notes)
+export const allNotesSelector = createSelector(fullFileStateSelector, ({ notes }) => notes ?? [])
 
-const selectId = (state, id) => id
+const selectId = (_state, id) => id
 
 export const singleNoteSelector = createSelector(allNotesSelector, selectId, (notes, propId) =>
   notes.find((n) => n.id == propId)
@@ -26,9 +26,11 @@ export const notesByCategorySelector = createSelector(allNotesSelector, (notes) 
     return note
   })
   const grouped = groupBy(notesWithCategory, 'categoryId')
+  // @ts-ignore
   if (grouped[undefined] !== undefined) {
-    grouped[null] = grouped[undefined].concat(grouped[null] || [])
-    delete grouped[undefined]
+    // @ts-ignore
+    grouped['null'] = grouped[undefined].concat(grouped['null'] || [])
+    delete grouped['undefined']
   }
 
   const groupWithPosition = Object.values(grouped).map((group) => {

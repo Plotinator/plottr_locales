@@ -9,7 +9,7 @@ import { positionReset } from '../helpers/lists'
 
 export const allCharactersSelector = createSelector(
   fullFileStateSelector,
-  (state) => state.characters
+  ({ characters }) => characters ?? []
 )
 
 // this one also lives in ./customAttributes.js but it causes a circular dependency to import it here

@@ -6,29 +6,31 @@ import migrators from './migrations'
 import { toSemver } from './toSemver'
 import { withoutProtocol } from '../helpers/file'
 
-export default function Migrator(data, fileURL, fileVersion, appVersion, backupFunction, logger) {
-  const logError = (...args) => (logger ? logger.error(...args) : console.error(...args))
+export default class Migrator {
+  constructor(data, fileURL, fileVersion, appVersion, backupFunction, logger) {
+    this.fileURL = fileURL
+    this.logError = (...args) => (logger ? logger.error(...args) : console.error(...args))
+    this.data = cloneDeep(data)
+    this.fileVersion = fileVersion
+    this.appVersion = appVersion
+    this.migrations = []
+    this.migrationsChecked = false
+    this.backupFunction = backupFunction
 
-  this.data = cloneDeep(data)
-  this.fileVersion = fileVersion
-  this.appVersion = appVersion
-  this.migrations = []
-  this.migrationsChecked = false
-  this.backupFunction = backupFunction
-
-  if (!this.data.file.initialVersion) {
-    this.data.file.initialVersion = this.fileVersion
+    if (!this.data.file.initialVersion) {
+      this.data.file.initialVersion = this.fileVersion
+    }
   }
 
-  this.migrate = function (callback) {
+  migrate = (callback) => {
     // save a backup file
     if (this.backupFunction) {
       this.backupFunction(
-        `${withoutProtocol(fileURL).replace('.pltr', '')}-${this.fileVersion}-backup.pltr`,
+        `${withoutProtocol(this.fileURL).replace('.pltr', '')}-${this.fileVersion}-backup.pltr`,
         JSON.stringify(this.data, null, 2),
         (err) => {
           if (err) {
-            logError(err)
+            this.logError(err)
             callback('backup', false)
           } else {
             this.startMigrations(callback)
@@ -40,7 +42,7 @@ export default function Migrator(data, fileURL, fileVersion, appVersion, backupF
     }
   }
 
-  this.startMigrations = function (callback) {
+  startMigrations = (callback) => {
     let migrations = this.getMigrations()
     migrations.forEach((m) => {
       const cleaned = m.replace('*', '')
@@ -54,12 +56,12 @@ export default function Migrator(data, fileURL, fileVersion, appVersion, backupF
     callback(null, this.data)
   }
 
-  this.needsToMigrate = function () {
+  needsToMigrate = () => {
     if (!this.fileVersion) return false
     return this.getMigrations().length
   }
 
-  this.plottrBehindFile = function () {
+  plottrBehindFile = () => {
     // file version is greater than app
     if (semverGt(this.fileVersion, this.appVersion)) {
       // check if the file has a breaking migration that is ahead of the current version
@@ -71,7 +73,7 @@ export default function Migrator(data, fileURL, fileVersion, appVersion, backupF
     }
   }
 
-  this.getMigrations = function () {
+  getMigrations = () => {
     if (this.migrationsChecked) {
       return this.migrations
     }
@@ -85,7 +87,10 @@ export default function Migrator(data, fileURL, fileVersion, appVersion, backupF
     const appliedMigrations = this.data.file.appliedMigrations
     this.migrations = difference(this.migrations, appliedMigrations)
     if (appliedMigrations && appliedMigrations.length && this.migrations.length) {
-      const latestAppliedMigration = toSemver(last(appliedMigrations))
+      const latestAppliedMigration = toSemver(
+        // @ts-ignore
+        last(appliedMigrations)
+      )
       const firstMigrationToApply = toSemver(first(this.migrations))
       if (semverGt(latestAppliedMigration, firstMigrationToApply)) {
         throw new Error(

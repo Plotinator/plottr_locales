@@ -2,7 +2,6 @@ import { find, mapValues } from 'lodash'
 import {
   FILE_LOADED,
   NEW_FILE,
-  RESET,
   EDIT_BOOK,
   ADD_BOOK,
   DELETE_BOOK,
@@ -19,6 +18,11 @@ import {
   SET_BOOK_GENRE,
   DUPLICATE_BOOK,
   REPLACE_MARKED_HITS,
+  ADD_BOOK_FROM_PLTR,
+  UNDO,
+  REDO,
+  UNDO_N_TIMES,
+  REDO_N_TIMES,
 } from '../constants/ActionTypes'
 import { getCopyName, isSeries } from '../helpers/books'
 import { book as defaultBook } from '../store/initialState'
@@ -34,7 +38,7 @@ const initialState = {
 }
 
 const books =
-  (dataRepairers) =>
+  (_dataRepairers) =>
   (state = initialState, action) => {
     switch (action.type) {
       case EDIT_BOOK: {
@@ -96,11 +100,28 @@ const books =
         }
       }
 
+      case ADD_BOOK_FROM_PLTR: {
+        const newIds = [...state.allIds, action.newBookId]
+
+        return {
+          ...state,
+          allIds: newIds,
+          [action.newBookId]: {
+            ...action.book,
+            id: action.newBookId,
+            imageId: action.imageId,
+            isChecked: undefined,
+          },
+        }
+      }
+
       case DUPLICATE_BOOK: {
+        // @ts-ignore
         const duplicatedBook = find(state, (book) => book.id === action.id)
         const duplicatedIndex = state.allIds.indexOf(action.id)
         const titleWithCopy = getCopyName(
           Object.values(state),
+          // @ts-ignore
           `${duplicatedBook.title} - copy`,
           'title'
         )
@@ -206,7 +227,7 @@ const books =
         }
 
       case DELETE_IMAGE:
-        return mapValues(state, (value, key) => {
+        return mapValues(state, (value, _key) => {
           if (
             !Array.isArray(value) &&
             value instanceof Object &&
@@ -222,7 +243,7 @@ const books =
         })
 
       case SET_BOOK_TITLE: {
-        return mapValues(state, (value, key) => {
+        return mapValues(state, (value, _key) => {
           if (!Array.isArray(value) && value instanceof Object && value.id === action.id) {
             return {
               ...value,
@@ -234,7 +255,7 @@ const books =
       }
 
       case SET_BOOK_PREMISE: {
-        return mapValues(state, (value, key) => {
+        return mapValues(state, (value, _key) => {
           if (!Array.isArray(value) && value instanceof Object && value.id === action.id) {
             return {
               ...value,
@@ -246,7 +267,7 @@ const books =
       }
 
       case SET_BOOK_GENRE: {
-        return mapValues(state, (value, key) => {
+        return mapValues(state, (value, _key) => {
           if (!Array.isArray(value) && value instanceof Object && value.id === action.id) {
             return {
               ...value,
@@ -258,7 +279,7 @@ const books =
       }
 
       case SET_BOOK_THEME: {
-        return mapValues(state, (value, key) => {
+        return mapValues(state, (value, _key) => {
           if (!Array.isArray(value) && value instanceof Object && value.id === action.id) {
             return {
               ...value,
@@ -269,12 +290,22 @@ const books =
         })
       }
 
-      case RESET:
       case FILE_LOADED:
         return action.data.books
 
       case NEW_FILE:
         return newFileBooks
+
+      case UNDO_N_TIMES:
+      case REDO_N_TIMES:
+      case UNDO:
+      case REDO: {
+        if (action?.state?.books && typeof action.state.books === 'object') {
+          return action.state.books
+        } else {
+          return state
+        }
+      }
 
       case LOAD_BOOKS:
         return action.books

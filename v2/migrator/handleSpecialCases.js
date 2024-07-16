@@ -18,7 +18,7 @@ export const handle2021_07_07 = (file) => {
 
   const newFile = clone(file)
 
-  sortBy(Object.entries(newFile.hierarchyLevels), '0').forEach(([index, levelConfig]) => {
+  sortBy(Object.entries(newFile.hierarchyLevels), '0').forEach(([index, _levelConfig]) => {
     newFile.hierarchyLevels[index].dark = {
       borderColor: nextDarkColor(0),
       textColor: nextDarkColor(0),
@@ -163,6 +163,7 @@ export const insertBreakingVersionsPriorToBreakingVersionChange = (file) => {
   const appliedMigrations = file.file.appliedMigrations || []
   const missingBreakingMigrations = difference(breakingMigrations, appliedMigrations).filter(
     (missingVersion) => {
+      // @ts-ignore
       return semverLte(toSemver(missingVersion), toSemver(file.file.version))
     }
   )
@@ -330,6 +331,7 @@ export const migrateLegacyCharacterAttributes = (file) => {
     const newCharacters = aCharacterHasALegacyAttributeDefined
       ? file.characters.map((character) => {
           const hasALegacyAttributeDefined = characterHasLegacyAttributeDefined
+          // @ts-ignore
           if (hasALegacyAttributeDefined) {
             return file.customAttributes.characters.reduce((characterAcc, nextLegacyAttribute) => {
               const legacyAttributeValue = character[nextLegacyAttribute.name]

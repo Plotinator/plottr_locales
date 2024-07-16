@@ -6,7 +6,7 @@ import {
   LOAD_ATTRIBUTES,
 } from '../constants/ActionTypes'
 
-export const editCharacterAttributeMetadata = (id, name, type, oldName) => (dispatch, getState) => {
+export const editCharacterAttributeMetadata = (id, name, type, oldName) => (dispatch) => {
   dispatch({
     type: EDIT_CHARACTER_ATTRIBUTE_METADATA,
     id,
@@ -16,13 +16,13 @@ export const editCharacterAttributeMetadata = (id, name, type, oldName) => (disp
   })
 }
 export const editCharacterAttributeMetadataAdaptor =
-  (index, oldAttribute, newAttribute) => (dispatch, getState) => {
+  (index, oldAttribute, newAttribute) => (dispatch) => {
     editCharacterAttributeMetadata(
       oldAttribute.id,
       newAttribute.name,
       newAttribute.type,
       oldAttribute.name
-    )(dispatch, getState)
+    )(dispatch)
   }
 
 export const deleteCharacterAttribute = (id, name) => {

@@ -1,10 +1,11 @@
-import { mapValues } from 'lodash'
+import { isPlainObject, mapValues, omit } from 'lodash'
 
 import selectors from '../../selectors'
 import { emptyFile } from '../../store/newFileState'
 import { configureStore, pltrAdaptor } from './fixtures/testStore'
 import actions from '../'
 import { hamlet_with_attribute_mix } from './fixtures'
+import { uiState } from '../../store/initialState'
 
 const {
   allBookIdsSelector,
@@ -25,6 +26,15 @@ const {
   isCharactersManuallySortedSelector,
   sortedCharacterCategoriesSelector,
   characterAttributsForBookByIdSelector,
+  fullSystemStateSelector,
+  importPltrDataSelector,
+  importPltrModalSelector,
+  importModalBookDataSelector,
+  allNotesSelector,
+  allPlacesSelector,
+  allTagsSelector,
+  allBooksAsArraySelector,
+  isImportModalOpenSelector,
 } = selectors(pltrAdaptor)
 
 const wiredUpActions = actions(pltrAdaptor)
@@ -34,6 +44,7 @@ const { reorderCharacter } = wiredUpActions.character
 const { addBook, editBook } = wiredUpActions.book
 const { addCard, changeBeat, changeLine } = wiredUpActions.card
 const { addLine } = wiredUpActions.line
+const { saveImportPltrData } = wiredUpActions.project
 const {
   loadFile,
   openNewBookDialog,
@@ -42,6 +53,11 @@ const {
   setCardDialogOpen,
   closeBookDialog,
   setCharacterSort,
+  showImportDataPicker,
+  closeImportPltrModal,
+  toggleBookToImport,
+  toggleAllSectionMarkedToImport,
+  toggleIdMarkedToImport,
 } = wiredUpActions.ui
 
 const EMPTY_FILE = emptyFile('Test file')
@@ -57,6 +73,7 @@ const initialStore = () => {
       'device://tmp/dummy-url-test-file.pltr'
     )
   )
+  store.dispatch(addBeat(1, null))
   return store
 }
 
@@ -76,7 +93,7 @@ const exampleCard1 = {
   title: 'Card 1',
   description: 'Card 1 description',
   lineId: 1,
-  beatId: 1,
+  beatId: 2,
 }
 
 const exampleBookAttributes = {
@@ -150,7 +167,7 @@ describe('cardDialog', () => {
         describe('and the cardId exists', () => {
           store.dispatch(addCard(exampleCard1))
           const cardId = 1
-          const beatId = 1
+          const beatId = 2
           const lineId = 1
           store.dispatch(setCardDialogOpen(cardId, beatId, lineId))
           const presentState = store.getState()
@@ -185,7 +202,7 @@ describe('cardDialog', () => {
             it('should not change the values for cardId, lineId, beatId and isOpen', () => {
               expect(cardId).toEqual(1)
               expect(lineId).toEqual(1)
-              expect(beatId).toEqual(1)
+              expect(beatId).toEqual(2)
               expect(isOpen).toBeTruthy()
             })
             describe('and setCardDialogClose is dispatched', () => {
@@ -226,7 +243,7 @@ describe('cardDialog', () => {
       store.dispatch(addBeat(currentBookId))
       store.dispatch(addCard(exampleCard1))
       const cardId = 1
-      const beatId = 1
+      const beatId = 2
       const lineId = 1
       store.dispatch(setCardDialogOpen(cardId, beatId, lineId))
 
@@ -260,7 +277,7 @@ describe('cardDialog', () => {
       store.dispatch(addLine(currentBookId))
       store.dispatch(addCard(exampleCard1))
       const cardId = 1
-      const beatId = 1
+      const beatId = 2
       const lineId = 1
       store.dispatch(setCardDialogOpen(cardId, beatId, lineId))
 
@@ -340,7 +357,7 @@ describe('bookDialog', () => {
         it('should work as before and save the book without passing any params', () => {
           expect(totalBooks).toBeGreaterThan(initialTotalNumberOfBooks)
 
-          const book = mapValues(allBooks, (value, key, obj) => {
+          const book = mapValues(allBooks, (value, _key, _obj) => {
             if (isAnObject(value) && !value.title) {
               return value
             }
@@ -371,7 +388,7 @@ describe('bookDialog', () => {
         it('should save the book with its attributes', () => {
           expect(totalBooks).toBeGreaterThan(initialTotalNumberOfBooks)
 
-          const book = mapValues(allBooks, (value, key) => {
+          const book = mapValues(allBooks, (value, _key) => {
             if (typeof value == 'object' && value.title == exampleBookAttributes.title) {
               return value
             }
@@ -439,7 +456,7 @@ describe('bookDialog', () => {
         it('should edit the book with the new values', () => {
           expect(totalBooks).toEqual(initialTotalNumberOfBooks)
 
-          const book = mapValues(allBooks, (value, key) => {
+          const book = mapValues(allBooks, (value, _key) => {
             if (typeof value == 'object' && value.title == newTitle) {
               return value
             }
@@ -517,10 +534,14 @@ describe('reorderCharacter', () => {
       describe('given the user reorder the characters manually', () => {
         const character1InitialState = displayedSingleCharacterSelector(
           initialState,
+
+          // @ts-ignore
           allCharacters.find(({ id }) => id == 1).id
         )
         const character3InitialState = displayedSingleCharacterSelector(
           initialState,
+
+          // @ts-ignore
           allCharacters.find(({ id }) => id == 3).id
         )
         const character3AbsolutePosition = getCharacterAbsolutePositionFromGroupedCategory(
@@ -619,10 +640,14 @@ describe('reorderCharacter', () => {
               describe(`given the user move character2 to character8's position`, () => {
                 const character2AfterChangeSortState = displayedSingleCharacterSelector(
                   afterChangeSortState,
+
+                  // @ts-ignore
                   allCharacters.find(({ id }) => id == 2).id
                 )
                 const character8AfterChangeSortState = displayedSingleCharacterSelector(
                   afterChangeSortState,
+
+                  // @ts-ignore
                   allCharacters.find(({ id }) => id == 8).id
                 )
                 const character8AbsolutePosition = getCharacterAbsolutePositionFromGroupedCategory(
@@ -693,10 +718,14 @@ describe('reorderCharacter', () => {
                 describe(`given the user move character10 to character2's position`, () => {
                   const character2AfterSecondReorderState = displayedSingleCharacterSelector(
                     afterSecondReorderState,
+
+                    // @ts-ignore
                     allCharacters.find(({ id }) => id == 2).id
                   )
                   const character10AfterSecondReorderState = displayedSingleCharacterSelector(
                     afterSecondReorderState,
+
+                    // @ts-ignore
                     allCharacters.find(({ id }) => id == 10).id
                   )
                   const character2AbsolutePosition =
@@ -777,6 +806,762 @@ describe('reorderCharacter', () => {
                       }
                     )
                   })
+                })
+              })
+            })
+          })
+        })
+      })
+    })
+  })
+})
+
+const propsThatHaveBeenModified = [
+  'attributes',
+  'cards',
+  'categoryId',
+  'isChecked',
+  'places',
+  'notes',
+  'characters',
+  'tags',
+  'lastEdited',
+  'imageId',
+  'bookIds',
+  'noteIds',
+]
+
+describe('showImportDataPicker', () => {
+  describe('given the initial state store', () => {
+    const store = initialStore()
+    const initialState = store.getState()
+    describe('given the user loads an empty project', () => {
+      it('should produce an initial importModal state', () => {
+        const importModalData = importPltrModalSelector(initialState)
+        expect(importModalData).toEqual(uiState.importModal)
+      })
+      const allCharacters = allCharactersSelector(initialState)
+      const allPlaces = allPlacesSelector(initialState)
+      const allNotes = allNotesSelector(initialState)
+      const allTags = allTagsSelector(initialState)
+
+      it('should have no characters, notes, places and tags', () => {
+        expect(allCharacters).toHaveLength(0)
+        expect(allPlaces).toHaveLength(0)
+        expect(allNotes).toHaveLength(0)
+        expect(allTags).toHaveLength(0)
+      })
+
+      describe('given the user performs import from project tab', () => {
+        describe('and choose an existing pltr project', () => {
+          describe('and import', () => {
+            const fullSystemState = fullSystemStateSelector(initialState)
+            store.dispatch(showImportDataPicker(hamlet_with_attribute_mix, fullSystemState))
+            const stateAfterSecondImport = store.getState()
+            const importModalData = importPltrModalSelector(stateAfterSecondImport)
+            const bookData = importModalBookDataSelector(stateAfterSecondImport)
+            const importData = importPltrDataSelector(stateAfterSecondImport)
+            const allCharacters = allCharactersSelector(stateAfterSecondImport)
+            const allPlaces = allPlacesSelector(stateAfterSecondImport)
+            const allNotes = allNotesSelector(stateAfterSecondImport)
+            const allTags = allTagsSelector(stateAfterSecondImport)
+
+            it('should change the import modal state to open', () => {
+              const isImportModalOpen = isImportModalOpenSelector(stateAfterSecondImport)
+              expect(isImportModalOpen).toBeTruthy()
+            })
+
+            it('should have `data` and `bookData` object', () => {
+              expect(importData).toBeDefined()
+              expect(bookData).toBeDefined()
+              expect(importModalData.data).toEqual(importData)
+              expect(importModalData.bookData).toEqual(bookData)
+            })
+
+            it('should still have the same number of characters, notes, places, and tags after the first import', () => {
+              expect(allCharacters).toHaveLength(0)
+              expect(allPlaces).toHaveLength(0)
+              expect(allNotes).toHaveLength(0)
+              expect(allTags).toHaveLength(0)
+            })
+
+            it('should have characters, notes, places, tags, images and books from importModal state', () => {
+              const importCharacters = importData['characters']
+              const importNotes = importData['notes']
+              const importPlaces = importData['places']
+              const importTags = importData['tags']
+              const importImages = importData['images']
+              const importBooks = importData['books']
+              expect(importCharacters).toBeDefined()
+              expect(importNotes).toBeDefined()
+              expect(importPlaces).toBeDefined()
+              expect(importTags).toBeDefined()
+              expect(importImages).toBeDefined()
+              expect(importBooks).toBeDefined()
+            })
+
+            it('should have `isChecked` prop for each characters, notes, places, tags and books from importModal state', () => {
+              const importCharacters = importData['characters']
+              const importNotes = importData['notes']
+              const importPlaces = importData['places']
+              const importTags = importData['tags']
+              const importBooks = importData['books']
+              importCharacters.forEach((i) => {
+                expect(i.isChecked).toBeDefined()
+              })
+              importNotes.forEach((i) => {
+                expect(i.isChecked).toBeDefined()
+              })
+              importPlaces.forEach((i) => {
+                expect(i.isChecked).toBeDefined()
+              })
+              importTags.forEach((i) => {
+                expect(i.isChecked).toBeDefined()
+              })
+              Object.values(importBooks).forEach((i) => {
+                expect(i.isChecked).toBeDefined()
+              })
+            })
+          })
+
+          describe('given the user cancelled the import', () => {
+            store.dispatch(closeImportPltrModal())
+            const stateAfterSecondImportFileSaved = store.getState()
+            const importModalData = importPltrModalSelector(stateAfterSecondImportFileSaved)
+
+            it('should not have saved anything from the import file', () => {
+              expect(allCharacters).toHaveLength(0)
+              expect(allPlaces).toHaveLength(0)
+              expect(allNotes).toHaveLength(0)
+              expect(allTags).toHaveLength(0)
+            })
+
+            it('should revert the importModal to its initial state', () => {
+              expect(importModalData).toEqual(uiState.importModal)
+            })
+          })
+        })
+      })
+    })
+  })
+})
+
+describe('toggleBookToImport', () => {
+  describe('given the initial state store', () => {
+    const store = initialStore()
+    const initialState = store.getState()
+    describe('given the user loads an empty project', () => {
+      it('should produce an initial importModal state', () => {
+        const importModalData = importPltrModalSelector(initialState)
+        expect(importModalData).toEqual(uiState.importModal)
+      })
+
+      describe('given the user performs import from project tab', () => {
+        describe('and choose an existing pltr project', () => {
+          describe('and import', () => {
+            const fullSystemState = fullSystemStateSelector(initialState)
+            store.dispatch(showImportDataPicker(hamlet_with_attribute_mix, fullSystemState))
+            const stateAfterSecondImport = store.getState()
+            const importModalData = importPltrModalSelector(stateAfterSecondImport)
+            const bookData = importModalBookDataSelector(stateAfterSecondImport)
+            const importData = importPltrDataSelector(stateAfterSecondImport)
+            const allCharacters = allCharactersSelector(stateAfterSecondImport)
+            const allPlaces = allPlacesSelector(stateAfterSecondImport)
+            const allNotes = allNotesSelector(stateAfterSecondImport)
+            const allTags = allTagsSelector(stateAfterSecondImport)
+            const BOOKID_TO_TOGGLE = 1
+
+            it('should change the import modal state to open', () => {
+              const isImportModalOpen = isImportModalOpenSelector(stateAfterSecondImport)
+              expect(isImportModalOpen).toBeTruthy()
+            })
+
+            it('should have `data` and `bookData` object', () => {
+              expect(importData).toBeDefined()
+              expect(bookData).toBeDefined()
+              expect(importModalData.data).toEqual(importData)
+              expect(importModalData.bookData).toEqual(bookData)
+            })
+
+            it('should still have the same number of characters, notes, places, and tags after the first import', () => {
+              expect(allCharacters).toHaveLength(0)
+              expect(allPlaces).toHaveLength(0)
+              expect(allNotes).toHaveLength(0)
+              expect(allTags).toHaveLength(0)
+            })
+
+            it('should have characters, notes, places, tags, images and books from importModal state', () => {
+              const importCharacters = importData['characters']
+              const importNotes = importData['notes']
+              const importPlaces = importData['places']
+              const importTags = importData['tags']
+              const importImages = importData['images']
+              const importBooks = importData['books']
+              expect(importCharacters).toBeDefined()
+              expect(importNotes).toBeDefined()
+              expect(importPlaces).toBeDefined()
+              expect(importTags).toBeDefined()
+              expect(importImages).toBeDefined()
+              expect(importBooks).toBeDefined()
+            })
+
+            it('should have `isChecked` prop for each characters, notes, places, tags and books from importModal state', () => {
+              const importCharacters = importData['characters']
+              const importNotes = importData['notes']
+              const importPlaces = importData['places']
+              const importTags = importData['tags']
+              const importBooks = importData['books']
+              importCharacters.forEach((i) => {
+                expect(i.isChecked).toBeDefined()
+              })
+              importNotes.forEach((i) => {
+                expect(i.isChecked).toBeDefined()
+              })
+              importPlaces.forEach((i) => {
+                expect(i.isChecked).toBeDefined()
+              })
+              importTags.forEach((i) => {
+                expect(i.isChecked).toBeDefined()
+              })
+              Object.values(importBooks).forEach((i) => {
+                expect(i.isChecked).toBeDefined()
+              })
+            })
+
+            describe('given the user deselect a book (the book in this case)', () => {
+              const isChecked = true
+              store.dispatch(toggleBookToImport(BOOKID_TO_TOGGLE, !isChecked))
+              const stateAfterFirstToggle = store.getState()
+              const importDataAfterFirstToggle = importPltrDataSelector(stateAfterFirstToggle)
+
+              it('should change the `isChecked` prop to false for the selected book', () => {
+                const importBooks = importDataAfterFirstToggle['books']
+                Object.values(importBooks).forEach((i) => {
+                  if (i.id == BOOKID_TO_TOGGLE) {
+                    expect(i.isChecked).toBeFalsy()
+                  } else {
+                    expect(i.isChecked).toBeTruthy()
+                  }
+                })
+              })
+
+              describe('given the user saved the import file ', () => {
+                store.dispatch(saveImportPltrData())
+                const stateAfterSaving = store.getState()
+                const importModalData = importPltrModalSelector(stateAfterSaving)
+                const allBooksAfterImport = allBooksAsArraySelector(stateAfterSaving)
+
+                it('should revert the import modal state to its initialState', () => {
+                  expect(importModalData).toEqual(uiState.importModal)
+                })
+
+                it('should still save characters, places, notes, and tags from the imported file', () => {
+                  const allCharacters = allCharactersSelector(stateAfterSaving)
+                  const allPlaces = allPlacesSelector(stateAfterSaving)
+                  const allNotes = allNotesSelector(stateAfterSaving)
+                  const allTags = allTagsSelector(stateAfterSaving)
+
+                  expect(allCharacters.length).toEqual(hamlet_with_attribute_mix.characters.length)
+                  expect(allPlaces.length).toEqual(hamlet_with_attribute_mix.places.length)
+                  expect(allNotes.length).toEqual(hamlet_with_attribute_mix.notes.length)
+                  expect(allTags.length).toEqual(hamlet_with_attribute_mix.tags.length)
+                  expect(allBooksAfterImport.length).toEqual(1)
+
+                  allCharacters.forEach((char) => {
+                    const currentCharacter = hamlet_with_attribute_mix.characters.find(
+                      (i) => i.name === char.name
+                    )
+                    if (currentCharacter) {
+                      expect(
+                        omit(
+                          {
+                            ...currentCharacter,
+                            id: char.id,
+                          },
+                          propsThatHaveBeenModified
+                        )
+                      ).toEqual(omit(char, propsThatHaveBeenModified))
+                    }
+                  })
+                  allPlaces.forEach((place) => {
+                    const curentPlace = hamlet_with_attribute_mix.places.find(
+                      (i) => i.name === place.name
+                    )
+                    if (curentPlace) {
+                      expect(
+                        omit(
+                          {
+                            ...curentPlace,
+                            id: place.id,
+                          },
+                          propsThatHaveBeenModified
+                        )
+                      ).toEqual(omit(place, propsThatHaveBeenModified))
+                    }
+                  })
+                  allNotes.forEach((note) => {
+                    const currentNote = hamlet_with_attribute_mix.notes.find(
+                      (i) => i.title === note.title
+                    )
+                    if (currentNote) {
+                      expect(
+                        omit(
+                          {
+                            ...currentNote,
+                            id: note.id,
+                          },
+                          propsThatHaveBeenModified
+                        )
+                      ).toEqual(omit(note, propsThatHaveBeenModified))
+                    }
+                  })
+                  allTags.forEach((tag) => {
+                    const currentTag = hamlet_with_attribute_mix.tags.find(
+                      (i) => i.title === tag.title
+                    )
+                    if (currentTag) {
+                      expect(
+                        omit(
+                          {
+                            ...currentTag,
+                            id: tag.id,
+                          },
+                          propsThatHaveBeenModified
+                        )
+                      ).toEqual(omit(tag, propsThatHaveBeenModified))
+                    }
+                  })
+                })
+
+                it('should not have saved the deselected book', () => {
+                  expect(
+                    allBooksAfterImport.some(
+                      (book) =>
+                        book.title === hamlet_with_attribute_mix.books[BOOKID_TO_TOGGLE].title
+                    )
+                  ).toBeFalsy()
+                })
+              })
+            })
+          })
+        })
+      })
+    })
+  })
+})
+
+describe('toggleAllSectionMarkedToImport', () => {
+  describe('given the initial state store', () => {
+    const store = initialStore()
+    const initialState = store.getState()
+    describe('given the user loads an empty project', () => {
+      it('should produce an initial importModal state', () => {
+        const importModalData = importPltrModalSelector(initialState)
+        expect(importModalData).toEqual(uiState.importModal)
+      })
+
+      describe('given the user performs import from project tab', () => {
+        describe('and choose an existing pltr project', () => {
+          describe('and import', () => {
+            const fullSystemState = fullSystemStateSelector(initialState)
+            store.dispatch(showImportDataPicker(hamlet_with_attribute_mix, fullSystemState))
+            const stateAfterSecondImport = store.getState()
+            const importModalData = importPltrModalSelector(stateAfterSecondImport)
+            const bookData = importModalBookDataSelector(stateAfterSecondImport)
+            const importData = importPltrDataSelector(stateAfterSecondImport)
+            const allCharacters = allCharactersSelector(stateAfterSecondImport)
+            const allPlaces = allPlacesSelector(stateAfterSecondImport)
+            const allNotes = allNotesSelector(stateAfterSecondImport)
+            const allTags = allTagsSelector(stateAfterSecondImport)
+            const SECTION_TO_TOGGLE_1 = 'places'
+            const SECTION_TO_TOGGLE_2 = 'tags'
+
+            it('should change the import modal state to open', () => {
+              const isImportModalOpen = isImportModalOpenSelector(stateAfterSecondImport)
+              expect(isImportModalOpen).toBeTruthy()
+            })
+
+            it('should have `data` and `bookData` object', () => {
+              expect(importData).toBeDefined()
+              expect(bookData).toBeDefined()
+              expect(importModalData.data).toEqual(importData)
+              expect(importModalData.bookData).toEqual(bookData)
+            })
+
+            it('should still have the same number of characters, notes, places, and tags after the first import', () => {
+              expect(allCharacters).toHaveLength(0)
+              expect(allPlaces).toHaveLength(0)
+              expect(allNotes).toHaveLength(0)
+              expect(allTags).toHaveLength(0)
+            })
+
+            it('should have characters, notes, places, tags, images and books from importModal state', () => {
+              const importCharacters = importData['characters']
+              const importNotes = importData['notes']
+              const importPlaces = importData['places']
+              const importTags = importData['tags']
+              const importImages = importData['images']
+              const importBooks = importData['books']
+              expect(importCharacters).toBeDefined()
+              expect(importNotes).toBeDefined()
+              expect(importPlaces).toBeDefined()
+              expect(importTags).toBeDefined()
+              expect(importImages).toBeDefined()
+              expect(importBooks).toBeDefined()
+            })
+
+            it('should have `isChecked` prop for each characters, notes, places, tags and books from importModal state', () => {
+              const importCharacters = importData['characters']
+              const importNotes = importData['notes']
+              const importPlaces = importData['places']
+              const importTags = importData['tags']
+              const importBooks = importData['books']
+              importCharacters.forEach((i) => {
+                expect(i.isChecked).toBeDefined()
+              })
+              importNotes.forEach((i) => {
+                expect(i.isChecked).toBeDefined()
+              })
+              importPlaces.forEach((i) => {
+                expect(i.isChecked).toBeDefined()
+              })
+              importTags.forEach((i) => {
+                expect(i.isChecked).toBeDefined()
+              })
+              Object.values(importBooks).forEach((i) => {
+                expect(i.isChecked).toBeDefined()
+              })
+            })
+
+            describe('given the user deselect a section', () => {
+              const isChecked = true
+              store.dispatch(toggleAllSectionMarkedToImport(SECTION_TO_TOGGLE_1, !isChecked))
+              const stateAfterFirstToggle = store.getState()
+              const importDataAfterFirstToggle = importPltrDataSelector(stateAfterFirstToggle)
+
+              it('should change the `isChecked` prop to false for all the items on the section', () => {
+                const deselectedSection = importDataAfterFirstToggle[SECTION_TO_TOGGLE_1]
+                deselectedSection.forEach((i) => {
+                  expect(i.isChecked).toBe(!isChecked)
+                })
+              })
+
+              it('should not change the `isChecked` prop for other sections', () => {
+                Object.values(
+                  omit(importDataAfterFirstToggle, ['images', SECTION_TO_TOGGLE_1])
+                ).forEach((section) => {
+                  if (Array.isArray(section)) {
+                    expect(section.every((i) => i.isChecked)).toBeTruthy()
+                  } else if (isPlainObject(section)) {
+                    expect(Object.values(section).every((i) => i.isChecked)).toBeTruthy()
+                  }
+                })
+              })
+            })
+
+            describe('given the user deselect another section', () => {
+              const isChecked = true
+              store.dispatch(toggleAllSectionMarkedToImport(SECTION_TO_TOGGLE_2, !isChecked))
+              const stateAfterSecondToggle = store.getState()
+              const importDataAfterSecondToggle = importPltrDataSelector(stateAfterSecondToggle)
+
+              it('should change the `isChecked` prop to false for all the items on the section', () => {
+                const deselectedSection2 = importDataAfterSecondToggle[SECTION_TO_TOGGLE_2]
+                deselectedSection2.forEach((i) => {
+                  expect(i.isChecked).toBe(!isChecked)
+                })
+              })
+
+              it('should not change the `isChecked` prop for other sections', () => {
+                Object.values(
+                  omit(importDataAfterSecondToggle, [
+                    'images',
+                    SECTION_TO_TOGGLE_1,
+                    SECTION_TO_TOGGLE_2,
+                  ])
+                ).forEach((section) => {
+                  if (Array.isArray(section)) {
+                    expect(section.every((i) => i.isChecked)).toBeTruthy()
+                  } else if (isPlainObject(section)) {
+                    expect(Object.values(section).every((i) => i.isChecked)).toBeTruthy()
+                  }
+                })
+              })
+
+              describe('given the user saved the import file ', () => {
+                store.dispatch(saveImportPltrData())
+                const stateAfterSaving = store.getState()
+                const importModalData = importPltrModalSelector(stateAfterSaving)
+                const allBooksAfterImport = allBooksAsArraySelector(stateAfterSaving)
+
+                it('should revert the import modal state to its initialState', () => {
+                  expect(importModalData).toEqual(uiState.importModal)
+                })
+
+                it('should save the selected sections from the imported file', () => {
+                  const allCharacters = allCharactersSelector(stateAfterSaving)
+                  const allBooksAsArray = allBooksAsArraySelector(stateAfterSaving)
+                  const allNotes = allNotesSelector(stateAfterSaving)
+
+                  expect(allCharacters.length).toEqual(hamlet_with_attribute_mix.characters.length)
+                  expect(allNotes.length).toEqual(hamlet_with_attribute_mix.notes.length)
+                  expect(allBooksAfterImport.length).toEqual(2)
+
+                  allCharacters.forEach((char) => {
+                    const currentCharacter = hamlet_with_attribute_mix.characters.find(
+                      (i) => i.name === char.name
+                    )
+                    if (currentCharacter) {
+                      expect(
+                        omit(
+                          {
+                            ...currentCharacter,
+                            id: char.id,
+                          },
+                          propsThatHaveBeenModified
+                        )
+                      ).toEqual(omit(char, propsThatHaveBeenModified))
+                    }
+                  })
+                  allNotes.forEach((note) => {
+                    const currentNote = hamlet_with_attribute_mix.notes.find(
+                      (i) => i.title === note.title
+                    )
+                    if (currentNote) {
+                      expect(
+                        omit(
+                          {
+                            ...currentNote,
+                            id: note.id,
+                          },
+                          propsThatHaveBeenModified
+                        )
+                      ).toEqual(omit(note, propsThatHaveBeenModified))
+                    }
+                  })
+                  allBooksAsArray.forEach((book) => {
+                    const currentBook = Object.values(hamlet_with_attribute_mix.books).find(
+                      // @ts-ignore
+                      (i) => i.title === book.title
+                    )
+                    if (currentBook) {
+                      expect(
+                        omit(
+                          {
+                            ...currentBook,
+                            id: book.id,
+                          },
+                          propsThatHaveBeenModified
+                        )
+                      ).toEqual(omit(book, propsThatHaveBeenModified))
+                    }
+                  })
+                })
+
+                it('should not saved the deselected sections', () => {
+                  const allTags = allTagsSelector(stateAfterSaving)
+                  const allPlaces = allPlacesSelector(stateAfterSaving)
+
+                  expect(allTags.length).toBe(0)
+                  expect(allPlaces.length).toBe(0)
+                })
+              })
+            })
+          })
+        })
+      })
+    })
+  })
+})
+
+describe('toggleIdMarkedToImport', () => {
+  describe('given the initial state store', () => {
+    const store = initialStore()
+    const initialState = store.getState()
+
+    describe('given the user loads an empty project', () => {
+      it('should produce an initial importModal state', () => {
+        const importModalData = importPltrModalSelector(initialState)
+        expect(importModalData).toEqual(uiState.importModal)
+      })
+
+      describe('given the user performs import from project tab', () => {
+        describe('and choose an existing pltr project', () => {
+          describe('and import', () => {
+            const fullSystemState = fullSystemStateSelector(initialState)
+            store.dispatch(showImportDataPicker(hamlet_with_attribute_mix, fullSystemState))
+            const stateAfterSecondImport = store.getState()
+            const importModalData = importPltrModalSelector(stateAfterSecondImport)
+            const bookData = importModalBookDataSelector(stateAfterSecondImport)
+            const importData = importPltrDataSelector(stateAfterSecondImport)
+            const allCharacters = allCharactersSelector(stateAfterSecondImport)
+            const allPlaces = allPlacesSelector(stateAfterSecondImport)
+            const allNotes = allNotesSelector(stateAfterSecondImport)
+            const allTags = allTagsSelector(stateAfterSecondImport)
+            const SECTION_TO_TOGGLE_1 = 'characters'
+            const SECTION_TO_TOGGLE_2 = 'notes'
+            const SECTION_1_ID_TO_TOGGLE_1 = 2
+            const SECTION_1_ID_TO_TOGGLE_2 = 5
+            const SECTION_2_ID_TO_TOGGLE_1 = 3
+
+            it('should change the import modal state to open', () => {
+              const isImportModalOpen = isImportModalOpenSelector(stateAfterSecondImport)
+              expect(isImportModalOpen).toBeTruthy()
+            })
+
+            it('should have `data` and `bookData` object', () => {
+              expect(importData).toBeDefined()
+              expect(bookData).toBeDefined()
+              expect(importModalData.data).toEqual(importData)
+              expect(importModalData.bookData).toEqual(bookData)
+            })
+
+            it('should still have the same number of characters, notes, places, and tags after the first import', () => {
+              expect(allCharacters).toHaveLength(0)
+              expect(allPlaces).toHaveLength(0)
+              expect(allNotes).toHaveLength(0)
+              expect(allTags).toHaveLength(0)
+            })
+
+            it('should have characters, notes, places, tags, images and books from importModal state', () => {
+              const importCharacters = importData['characters']
+              const importNotes = importData['notes']
+              const importPlaces = importData['places']
+              const importTags = importData['tags']
+              const importImages = importData['images']
+              const importBooks = importData['books']
+              expect(importCharacters).toBeDefined()
+              expect(importNotes).toBeDefined()
+              expect(importPlaces).toBeDefined()
+              expect(importTags).toBeDefined()
+              expect(importImages).toBeDefined()
+              expect(importBooks).toBeDefined()
+            })
+
+            it('should have `isChecked` prop for each characters, notes, places, tags and books from importModal state', () => {
+              const importCharacters = importData['characters']
+              const importNotes = importData['notes']
+              const importPlaces = importData['places']
+              const importTags = importData['tags']
+              const importBooks = importData['books']
+              importCharacters.forEach((i) => {
+                expect(i.isChecked).toBeDefined()
+              })
+              importNotes.forEach((i) => {
+                expect(i.isChecked).toBeDefined()
+              })
+              importPlaces.forEach((i) => {
+                expect(i.isChecked).toBeDefined()
+              })
+              importTags.forEach((i) => {
+                expect(i.isChecked).toBeDefined()
+              })
+              Object.values(importBooks).forEach((i) => {
+                expect(i.isChecked).toBeDefined()
+              })
+            })
+
+            describe('given the user deselect another section', () => {
+              const isChecked = true
+              store.dispatch(
+                toggleIdMarkedToImport(SECTION_TO_TOGGLE_1, SECTION_1_ID_TO_TOGGLE_1, !isChecked)
+              )
+              store.dispatch(
+                toggleIdMarkedToImport(SECTION_TO_TOGGLE_1, SECTION_1_ID_TO_TOGGLE_2, !isChecked)
+              )
+              store.dispatch(
+                toggleIdMarkedToImport(SECTION_TO_TOGGLE_2, SECTION_2_ID_TO_TOGGLE_1, !isChecked)
+              )
+              const stateAfterConsecutiveDeselect = store.getState()
+              const importDataAfterConsecutiveDeselect = importPltrDataSelector(
+                stateAfterConsecutiveDeselect
+              )
+
+              it('should change the `isChecked` prop to false for only for items on the sections with items deselected', () => {
+                mapValues(
+                  omit(importDataAfterConsecutiveDeselect, ['images']),
+                  (section, sectionName) => {
+                    if ([SECTION_TO_TOGGLE_1, SECTION_TO_TOGGLE_2].includes(sectionName)) {
+                      if (sectionName === SECTION_TO_TOGGLE_1) {
+                        section.forEach((char) => {
+                          if (
+                            [SECTION_1_ID_TO_TOGGLE_1, SECTION_1_ID_TO_TOGGLE_2].includes(char.id)
+                          ) {
+                            expect(char.isChecked).toBeFalsy()
+                          } else {
+                            expect(char.isChecked).toBeTruthy()
+                          }
+                        })
+                      } else if (sectionName === SECTION_TO_TOGGLE_2) {
+                        section.forEach((char) => {
+                          if ([SECTION_2_ID_TO_TOGGLE_1].includes(char.id)) {
+                            expect(char.isChecked).toBeFalsy()
+                          } else {
+                            expect(char.isChecked).toBeTruthy()
+                          }
+                        })
+                      }
+                    } else if (Array.isArray(section)) {
+                      expect(section.every((i) => i.isChecked)).toBeTruthy()
+                    } else if (isPlainObject(section)) {
+                      expect(Object.values(section).every((i) => i.isChecked)).toBeTruthy()
+                    }
+                  }
+                )
+              })
+            })
+
+            describe('given the user saved the import file ', () => {
+              store.dispatch(saveImportPltrData())
+              const stateAfterSaving = store.getState()
+              const importModalData = importPltrModalSelector(stateAfterSaving)
+
+              it('should revert the import modal state to its initialState', () => {
+                expect(importModalData).toEqual(uiState.importModal)
+              })
+
+              it('should save the selected items for each section from the imported file', () => {
+                const allCharacters = allCharactersSelector(stateAfterSaving)
+                const allNotes = allNotesSelector(stateAfterSaving)
+                const allImportFileCharacters = hamlet_with_attribute_mix.characters
+                const allImportFileNotes = hamlet_with_attribute_mix.notes
+                const deselectedChar1FromImportFile = allImportFileCharacters.find(
+                  (ch) => ch.id == SECTION_1_ID_TO_TOGGLE_1
+                )
+                const deselectedChar2FromImportFile = allImportFileCharacters.find(
+                  (ch) => ch.id == SECTION_1_ID_TO_TOGGLE_2
+                )
+                const deselectedNote1FromFile = allImportFileNotes.find(
+                  (ch) => ch.id == SECTION_1_ID_TO_TOGGLE_1
+                )
+
+                expect(allCharacters.length).toEqual(
+                  hamlet_with_attribute_mix.characters.length - 2
+                )
+                expect(allNotes.length).toEqual(hamlet_with_attribute_mix.notes.length - 1)
+
+                const theDeselected1 = allCharacters.findIndex(
+                  (char) => char.name == deselectedChar1FromImportFile?.name
+                )
+                const theDeselected2 = allCharacters.findIndex(
+                  (char) => char.name == deselectedChar2FromImportFile?.name
+                )
+                const theDeselectedNote = allNotes.findIndex(
+                  (note) => note.title == deselectedNote1FromFile?.title
+                )
+                expect(theDeselected1).toBeLessThan(0)
+                expect(theDeselected2).toBeLessThan(0)
+                expect(theDeselectedNote).toBeLessThan(0)
+
+                allCharacters.forEach((ch) => {
+                  expect(
+                    allImportFileCharacters.some((importedCh) => importedCh.name === ch.name)
+                  ).toBeTruthy()
+                })
+                allNotes.forEach((note) => {
+                  expect(
+                    allImportFileNotes.some((importedNote) => importedNote.title === note.title)
+                  ).toBeTruthy()
                 })
               })
             })

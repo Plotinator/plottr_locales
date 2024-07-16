@@ -4,9 +4,11 @@
 
 import { createSelector } from 'reselect'
 
-const settingsSelector = (state) => {
-  return state.settings || {}
-}
+import { fullSystemStateSelector } from './fullFileFirstOrder'
+
+const settingsSelector = createSelector(fullSystemStateSelector, ({ settings }) => {
+  return settings ?? {}
+})
 export const exportSettingsSelector = createSelector(
   settingsSelector,
   ({ exportSettings }) => exportSettings
@@ -15,34 +17,41 @@ export const userSettingsSelector = createSelector(
   settingsSelector,
   ({ userSettings }) => userSettings
 )
-export const appSettingsSelector = createSelector(settingsSelector, (settings) => {
-  return settings.appSettings
+export const appSettingsSelector = createSelector(settingsSelector, ({ appSettings }) => {
+  return appSettings ?? {}
 })
 
-export const appUserSettingsSelector = createSelector(appSettingsSelector, ({ user }) => user || {})
+export const appUserSettingsSelector = createSelector(appSettingsSelector, ({ user }) => user ?? {})
 
 export const fontSettingsSelector = createSelector(appUserSettingsSelector, ({ fonts }) => {
-  return fonts || {}
+  return fonts ?? {}
 })
 
 export const globalFontsSettingsSelector = createSelector(
   fontSettingsSelector,
-  ({ global }) => global || {}
+  ({ global }) => global ?? {}
 )
 
 export const timelineFontsSettingsSelector = createSelector(
   fontSettingsSelector,
-  ({ timeline }) => timeline || {}
+  ({ timeline }) => timeline ?? {}
 )
 
-export const rceFontsSettingsSelector = createSelector(fontSettingsSelector, ({ rce }) => rce || {})
+export const rceFontsSettingsSelector = createSelector(fontSettingsSelector, ({ rce }) => rce ?? {})
 
 export const previouslyLoggedIntoProSelector = createSelector(
   appSettingsSelector,
   (appSettings) => {
-    return appSettings && appSettings && appSettings.user && appSettings.user.frbId
+    return !!appSettings?.user?.choseProMode
   }
 )
+export const choseProModeSelector = previouslyLoggedIntoProSelector
+export const choseTrialModeSelector = createSelector(appSettingsSelector, (appSettings) => {
+  return !!appSettings?.user?.choseTrialMode
+})
+export const emailFromLastLoginSelector = createSelector(appUserSettingsSelector, ({ email }) => {
+  return email ?? ''
+})
 export const backupEnabledSelector = createSelector(appSettingsSelector, ({ backup }) => {
   return backup
 })
@@ -94,3 +103,6 @@ export const hasDefaultFolderSelector = createSelector(
     )
   }
 )
+export const localeSelector = createSelector(appSettingsSelector, ({ locale }) => {
+  return locale
+})

@@ -72,10 +72,12 @@ describe('isCharactersManuallySorted', () => {
       describe('given the user reorder the characters manually', () => {
         const character1InitialState = displayedSingleCharacterSelector(
           initialState,
+          // @ts-ignore
           allCharacters.find(({ id }) => id == 1).id
         )
         const character3InitialState = displayedSingleCharacterSelector(
           initialState,
+          // @ts-ignore
           allCharacters.find(({ id }) => id == 3).id
         )
         const character3AbsolutePosition = getCharacterAbsolutePositionFromGroupedCategory(
@@ -188,10 +190,12 @@ describe('isCharactersManuallySorted', () => {
               describe(`given the user move character2 to character8's position`, () => {
                 const character2AfterChangeSortState = displayedSingleCharacterSelector(
                   afterChangeSortState,
+                  // @ts-ignore
                   allCharacters.find(({ id }) => id == 2).id
                 )
                 const character8AfterChangeSortState = displayedSingleCharacterSelector(
                   afterChangeSortState,
+                  // @ts-ignore
                   allCharacters.find(({ id }) => id == 8).id
                 )
                 const character8AbsolutePosition = getCharacterAbsolutePositionFromGroupedCategory(
@@ -255,10 +259,12 @@ describe('isCharactersManuallySorted', () => {
                 describe(`given the user move character10 to character2's position`, () => {
                   const character2AfterSecondReorderState = displayedSingleCharacterSelector(
                     afterSecondReorderState,
+                    // @ts-ignore
                     allCharacters.find(({ id }) => id == 2).id
                   )
                   const character10AfterSecondReorderState = displayedSingleCharacterSelector(
                     afterSecondReorderState,
+                    // @ts-ignore
                     allCharacters.find(({ id }) => id == 10).id
                   )
                   const character2AbsolutePosition =
@@ -333,8 +339,8 @@ const getCategoryPosition = (visibleSortedItemsByCategory, id, categoryId = null
   const items =
     categoryId === null
       ? [
-          ...(visibleSortedItemsByCategory[null] || []),
-          ...(visibleSortedItemsByCategory[undefined] || []),
+          ...(visibleSortedItemsByCategory['null'] || []),
+          ...(visibleSortedItemsByCategory['undefined'] || []),
         ]
       : visibleSortedItemsByCategory[categoryId]
   const match = items.find((item) => item.id == id)

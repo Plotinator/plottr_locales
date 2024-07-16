@@ -49,6 +49,13 @@ import {
   START_VIEWING,
   START_SEARCHING,
   STAGE_LANGUAGE,
+  SET_PATH_TO_PROJECT,
+  OPEN_DASHBOARD_TO,
+  DASHBOARD_CLOSED,
+  FINISH_FIRST_TIME_BOOTING,
+  NO_FILE_TO_SHOW,
+  START_FILE_IMPORT,
+  FINISH_FILE_IMPORT,
 } from '../constants/ActionTypes'
 
 // Project states
@@ -108,6 +115,9 @@ export const startSavingFileAs = () => ({
 })
 export const finishSavingFileAs = () => ({
   type: FINISH_SAVING_FILE_AS,
+})
+export const noFileToShow = () => ({
+  type: NO_FILE_TO_SHOW,
 })
 
 // Session states
@@ -177,8 +187,16 @@ export const startScrivenerImporter = () => ({
   type: START_IMPORTING_SCRIVENER,
 })
 
+export const startProjectImporter = () => ({
+  type: START_FILE_IMPORT,
+})
+
 export const finishScrivenerImporter = () => ({
   type: FINISH_IMPORTING_SCRIVENER,
+})
+
+export const finishProjectImporter = () => ({
+  type: FINISH_FILE_IMPORT,
 })
 
 export const promptToUploadFile = (filePath) => ({
@@ -251,3 +269,29 @@ export const stageLanguage = (language) => ({
   type: STAGE_LANGUAGE,
   language,
 })
+
+export const setPathToProject = (filePath) => {
+  return {
+    type: SET_PATH_TO_PROJECT,
+    filePath,
+  }
+}
+
+export const setOpenDashboardTo = (view) => {
+  return {
+    type: OPEN_DASHBOARD_TO,
+    view,
+  }
+}
+
+export const dashboardClosed = () => {
+  return {
+    type: DASHBOARD_CLOSED,
+  }
+}
+
+export const finishFirstTimeBooting = () => {
+  return {
+    type: FINISH_FIRST_TIME_BOOTING,
+  }
+}

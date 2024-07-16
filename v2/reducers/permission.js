@@ -3,7 +3,7 @@ import { SET_PERMISSION } from '../constants/ActionTypes'
 const INITIAL_STATE = { permission: 'owner' }
 
 const permissionReducer =
-  (dataRepairers) =>
+  (_dataRepairers) =>
   (state = INITIAL_STATE, action) => {
     switch (action.type) {
       case SET_PERMISSION:

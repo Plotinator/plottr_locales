@@ -3,13 +3,13 @@
 // dependencies.
 import { createSelector } from 'reselect'
 
-import { fullFileStateSelector } from './fullFileFirstOrder'
+import { fullSystemStateSelector } from './fullFileFirstOrder'
 
 export const errorMessageSelector = createSelector(
-  fullFileStateSelector,
+  fullSystemStateSelector,
   (state) => state.error && state.error.error
 )
 export const partOfStoreWhereErrorOccured = createSelector(
-  fullFileStateSelector,
+  fullSystemStateSelector,
   (state) => state.error && state.error.storeKey
 )

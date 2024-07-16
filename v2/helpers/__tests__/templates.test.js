@@ -1,9 +1,10 @@
-import { omit } from 'lodash'
+import { omit, identity } from 'lodash'
 
 import { tree } from '../../index'
 import { EDIT_LINE_COLOR } from '../../constants/ActionTypes'
 
-import { applyTemplate, moveLineActions } from '../templates'
+import { applyTemplate } from '../../reducers/root'
+import { moveLineActions } from '../templates'
 import {
   // Templates
   one_level_plotline_template,
@@ -20,14 +21,25 @@ import {
   three_level_biased_bottom_plotline_template,
 
   // Files
-  file_with_one_level,
-  file_with_two_levels,
-  file_with_three_levels,
-  file_with_two_levels_but_no_chapter,
-  file_with_three_levels_but_no_chapter,
-  file_with_three_levels_but_no_scene,
-  zelda,
+  file_with_one_level as raw_file_with_one_level,
+  file_with_two_levels as raw_file_with_two_levels,
+  file_with_three_levels as raw_file_with_three_levels,
+  file_with_two_levels_but_no_chapter as raw_file_with_two_levels_but_no_chapter,
+  file_with_three_levels_but_no_chapter as raw_file_with_three_levels_but_no_chapter,
+  file_with_three_levels_but_no_scene as raw_file_with_three_levels_but_no_scene,
+  zelda as raw_zelda,
 } from './fixtures'
+import selectors from '../../selectors'
+
+const file_with_one_level = { user: raw_file_with_one_level }
+const file_with_two_levels = { user: raw_file_with_two_levels }
+const file_with_three_levels = { user: raw_file_with_three_levels }
+const file_with_two_levels_but_no_chapter = { user: raw_file_with_two_levels_but_no_chapter }
+const file_with_three_levels_but_no_chapter = { user: raw_file_with_three_levels_but_no_chapter }
+const file_with_three_levels_but_no_scene = { user: raw_file_with_three_levels_but_no_scene }
+const zelda = { user: raw_zelda }
+
+const { allCardsSelector, beatsForAnotherBookSelector, allLinesSelector } = selectors(identity)
 
 const withoutLineBeatOrCardIds = (x) => omit(x, 'id', 'lineId', 'beatId')
 const withoutIdsPositionsOrColor = (x) => omit(x, 'id', 'position', 'color')
@@ -51,14 +63,17 @@ describe('applyTemplate', () => {
     describe('and a template with one level', () => {
       describe('and the template is biased to the "top"', () => {
         const result = applyTemplate(file_with_one_level, 1, one_level_biased_top_plotline_template)
+        const resultCards = allCardsSelector(result)
+        // @ts-ignore
+        const originalCards = allCardsSelector(file_with_one_level)
         it('should have more cards', () => {
-          expect(result.cards.length).toBeGreaterThanOrEqual(file_with_one_level.cards.length)
+          expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
         })
         it('should have the cards it used to have', () => {
-          expect(result.cards).toEqual(expect.arrayContaining(file_with_one_level.cards))
+          expect(resultCards).toEqual(expect.arrayContaining(originalCards))
         })
         it('should have the cards in the template', () => {
-          expect(result.cards.map(withoutLineBeatOrCardIds)).toEqual(
+          expect(resultCards.map(withoutLineBeatOrCardIds)).toEqual(
             expect.arrayContaining(
               one_level_biased_top_plotline_template.templateData.cards.map(
                 withoutLineBeatOrCardIds
@@ -70,11 +85,18 @@ describe('applyTemplate', () => {
           const templateNumberOfBeats = beatsLength(
             one_level_biased_top_plotline_template.templateData.beats['1']
           )
-          const resultNumberOfBeats = beatsLength(result.beats['1'])
+          const resultNumberOfBeats = beatsLength(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            )
+          )
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
+        const resultLines = allLinesSelector(result)
         it('should add the plotlines from the template', () => {
-          expect(result.lines.map(withoutIdsPositionsOrColor)).toEqual(
+          expect(resultLines.map(withoutIdsPositionsOrColor)).toEqual(
             expect.arrayContaining(
               one_level_biased_top_plotline_template.templateData.lines
                 .map(withoutIdsPositionsOrColor)
@@ -82,9 +104,11 @@ describe('applyTemplate', () => {
             )
           )
         })
+        // @ts-ignore
+        const originalLines = allLinesSelector(file_with_one_level)
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines.map(withoutPositions)).toEqual(
-            expect.arrayContaining(file_with_one_level.lines.map(withoutPositions))
+          expect(resultLines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(originalLines.map(withoutPositions))
           )
         })
         it('should only add cards to the new plotlines', () => {
@@ -93,8 +117,8 @@ describe('applyTemplate', () => {
               return id
             }
           )
-          const addedCards = result.cards.filter((card) => {
-            return file_with_one_level.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
             return existingPlotlines.indexOf(lineId) === -1
@@ -102,8 +126,8 @@ describe('applyTemplate', () => {
           expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
         })
         it('should insert cards on the plotlines from the template', () => {
-          const addedCards = result.cards.filter((card) => {
-            return file_with_one_level.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           expect(one_level_biased_top_plotline_template.templateData.cards.length).toEqual(
             addedCards.length
@@ -123,14 +147,17 @@ describe('applyTemplate', () => {
           1,
           one_level_biased_middle_plotline_template
         )
+        const resultCards = allCardsSelector(result)
+        // @ts-ignore
+        const originalCards = allCardsSelector(file_with_one_level)
         it('should have more cards', () => {
-          expect(result.cards.length).toBeGreaterThanOrEqual(file_with_one_level.cards.length)
+          expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
         })
         it('should have the cards it used to have', () => {
-          expect(result.cards).toEqual(expect.arrayContaining(file_with_one_level.cards))
+          expect(resultCards).toEqual(expect.arrayContaining(originalCards))
         })
         it('should have the cards in the template', () => {
-          expect(result.cards.map(withoutLineBeatOrCardIds)).toEqual(
+          expect(resultCards.map(withoutLineBeatOrCardIds)).toEqual(
             expect.arrayContaining(
               one_level_biased_middle_plotline_template.templateData.cards.map(
                 withoutLineBeatOrCardIds
@@ -142,11 +169,18 @@ describe('applyTemplate', () => {
           const templateNumberOfBeats = beatsLength(
             one_level_biased_middle_plotline_template.templateData.beats['1']
           )
-          const resultNumberOfBeats = beatsLength(result.beats['1'])
+          const resultNumberOfBeats = beatsLength(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            )
+          )
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
+        const resultLines = allLinesSelector(result)
         it('should add the plotlines from the template', () => {
-          expect(result.lines.map(withoutIdsPositionsOrColor)).toEqual(
+          expect(resultLines.map(withoutIdsPositionsOrColor)).toEqual(
             expect.arrayContaining(
               one_level_biased_middle_plotline_template.templateData.lines
                 .map(withoutIdsPositionsOrColor)
@@ -154,9 +188,11 @@ describe('applyTemplate', () => {
             )
           )
         })
+        // @ts-ignore
+        const originalLines = allLinesSelector(file_with_one_level)
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines.map(withoutPositions)).toEqual(
-            expect.arrayContaining(file_with_one_level.lines.map(withoutPositions))
+          expect(resultLines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(originalLines.map(withoutPositions))
           )
         })
         it('should only add cards to the new plotlines', () => {
@@ -164,8 +200,8 @@ describe('applyTemplate', () => {
             one_level_biased_middle_plotline_template.templateData.lines.map(({ id }) => {
               return id
             })
-          const addedCards = result.cards.filter((card) => {
-            return file_with_one_level.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
             return existingPlotlines.indexOf(lineId) === -1
@@ -173,8 +209,8 @@ describe('applyTemplate', () => {
           expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
         })
         it('should insert cards on the plotlines from the template', () => {
-          const addedCards = result.cards.filter((card) => {
-            return file_with_one_level.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           expect(one_level_biased_middle_plotline_template.templateData.cards.length).toEqual(
             addedCards.length
@@ -194,14 +230,17 @@ describe('applyTemplate', () => {
           1,
           one_level_biased_bottom_plotline_template
         )
+        const resultCards = allCardsSelector(result)
+        // @ts-ignore
+        const originalCards = allCardsSelector(file_with_one_level)
         it('should have more cards', () => {
-          expect(result.cards.length).toBeGreaterThanOrEqual(file_with_one_level.cards.length)
+          expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
         })
         it('should have the cards it used to have', () => {
-          expect(result.cards).toEqual(expect.arrayContaining(file_with_one_level.cards))
+          expect(resultCards).toEqual(expect.arrayContaining(originalCards))
         })
         it('should have the cards in the template', () => {
-          expect(result.cards.map(withoutLineBeatOrCardIds)).toEqual(
+          expect(resultCards.map(withoutLineBeatOrCardIds)).toEqual(
             expect.arrayContaining(
               one_level_biased_bottom_plotline_template.templateData.cards.map(
                 withoutLineBeatOrCardIds
@@ -213,11 +252,17 @@ describe('applyTemplate', () => {
           const templateNumberOfBeats = beatsLength(
             one_level_biased_bottom_plotline_template.templateData.beats['1']
           )
-          const resultNumberOfBeats = beatsLength(result.beats['1'])
+          const resultBeats = beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          )
+          const resultNumberOfBeats = beatsLength(resultBeats)
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
+        const resultLines = allLinesSelector(result)
         it('should add the plotlines from the template', () => {
-          expect(result.lines.map(withoutIdsPositionsOrColor)).toEqual(
+          expect(resultLines.map(withoutIdsPositionsOrColor)).toEqual(
             expect.arrayContaining(
               one_level_biased_bottom_plotline_template.templateData.lines
                 .map(withoutIdsPositionsOrColor)
@@ -225,9 +270,11 @@ describe('applyTemplate', () => {
             )
           )
         })
+        // @ts-ignore
+        const originalLines = allLinesSelector(file_with_one_level)
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines.map(withoutPositions)).toEqual(
-            expect.arrayContaining(file_with_one_level.lines.map(withoutPositions))
+          expect(resultLines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(originalLines.map(withoutPositions))
           )
         })
         it('should only add cards to the new plotlines', () => {
@@ -235,8 +282,8 @@ describe('applyTemplate', () => {
             one_level_biased_bottom_plotline_template.templateData.lines.map(({ id }) => {
               return id
             })
-          const addedCards = result.cards.filter((card) => {
-            return file_with_one_level.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
             return existingPlotlines.indexOf(lineId) === -1
@@ -244,8 +291,8 @@ describe('applyTemplate', () => {
           expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
         })
         it('should insert cards on the plotlines from the template', () => {
-          const addedCards = result.cards.filter((card) => {
-            return file_with_one_level.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           expect(one_level_biased_bottom_plotline_template.templateData.cards.length).toEqual(
             addedCards.length
@@ -267,11 +314,14 @@ describe('applyTemplate', () => {
           two_level_biased_top_plotline_template.templateData.beats['1'],
           null
         )
+        const resultCards = allCardsSelector(result)
+        // @ts-ignore
+        const originalCards = allCardsSelector(file_with_one_level)
         it('should have more cards', () => {
-          expect(result.cards.length).toBeGreaterThanOrEqual(file_with_one_level.cards.length)
+          expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
         })
         it('should have the cards it used to have', () => {
-          expect(result.cards).toEqual(expect.arrayContaining(file_with_one_level.cards))
+          expect(resultCards).toEqual(expect.arrayContaining(originalCards))
         })
         it('should have the cards in the template', () => {
           const topLevelBeatIds = topLevelBeats.map(({ id }) => id)
@@ -280,17 +330,24 @@ describe('applyTemplate', () => {
               return topLevelBeatIds.indexOf(card.beatId) !== -1
             }
           )
-          expect(result.cards.map(withoutLineBeatOrCardIds)).toEqual(
+          expect(resultCards.map(withoutLineBeatOrCardIds)).toEqual(
             expect.arrayContaining(cardsInTemplate.map(withoutLineBeatOrCardIds))
           )
         })
         it('should have at least as many beats as the top level of the template', () => {
           const templateNumberOfBeats = topLevelBeats.length
-          const resultNumberOfBeats = beatsLength(result.beats['1'])
+          const resultNumberOfBeats = beatsLength(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            )
+          )
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
+        const resultLines = allLinesSelector(result)
         it('should add the plotlines from the template', () => {
-          expect(result.lines.map(withoutIdsPositionsOrColor)).toEqual(
+          expect(resultLines.map(withoutIdsPositionsOrColor)).toEqual(
             expect.arrayContaining(
               two_level_biased_top_plotline_template.templateData.lines
                 .map(withoutIdsPositionsOrColor)
@@ -298,9 +355,11 @@ describe('applyTemplate', () => {
             )
           )
         })
+        // @ts-ignore
+        const originalLines = allLinesSelector(file_with_one_level)
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines.map(withoutPositions)).toEqual(
-            expect.arrayContaining(file_with_one_level.lines.map(withoutPositions))
+          expect(resultLines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(originalLines.map(withoutPositions))
           )
         })
         it('should only add cards to the new plotlines', () => {
@@ -309,8 +368,8 @@ describe('applyTemplate', () => {
               return id
             }
           )
-          const addedCards = result.cards.filter((card) => {
-            return file_with_one_level.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
             return existingPlotlines.indexOf(lineId) === -1
@@ -318,8 +377,8 @@ describe('applyTemplate', () => {
           expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
         })
         it('should insert cards on the plotlines from the template', () => {
-          const addedCards = result.cards.filter((card) => {
-            return file_with_one_level.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const topLevelBeatIds = topLevelBeats.map(({ id }) => id)
           const templateCards = two_level_biased_top_plotline_template.templateData.cards.filter(
@@ -343,11 +402,14 @@ describe('applyTemplate', () => {
           two_level_biased_middle_plotline_template.templateData.beats['1'],
           null
         )
+        const resultCards = allCardsSelector(result)
+        // @ts-ignore
+        const originalCards = allCardsSelector(file_with_one_level)
         it('should have more cards', () => {
-          expect(result.cards.length).toBeGreaterThanOrEqual(file_with_one_level.cards.length)
+          expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
         })
         it('should have the cards it used to have', () => {
-          expect(result.cards).toEqual(expect.arrayContaining(file_with_one_level.cards))
+          expect(resultCards).toEqual(expect.arrayContaining(originalCards))
         })
         it('should have the cards in the template from the bottom level', () => {
           const bottomLevelBeatIds = bottomLevelBeats.map(({ id }) => id)
@@ -355,17 +417,24 @@ describe('applyTemplate', () => {
             two_level_biased_middle_plotline_template.templateData.cards.filter((card) => {
               return bottomLevelBeatIds.indexOf(card.beatId) !== -1
             })
-          expect(result.cards.map(withoutLineBeatOrCardIds)).toEqual(
+          expect(resultCards.map(withoutLineBeatOrCardIds)).toEqual(
             expect.arrayContaining(cardsInBookFromTemplate.map(withoutLineBeatOrCardIds))
           )
         })
         it('should have at least as many beats as the bottom level of the template', () => {
           const templateNumberOfBeats = bottomLevelBeats.length
-          const resultNumberOfBeats = beatsLength(result.beats['1'])
+          const resultNumberOfBeats = beatsLength(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            )
+          )
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
+        const resultLines = allLinesSelector(result)
         it('should add the plotlines from the template', () => {
-          expect(result.lines.map(withoutIdsPositionsOrColor)).toEqual(
+          expect(resultLines.map(withoutIdsPositionsOrColor)).toEqual(
             expect.arrayContaining(
               two_level_biased_middle_plotline_template.templateData.lines
                 .map(withoutIdsPositionsOrColor)
@@ -373,9 +442,11 @@ describe('applyTemplate', () => {
             )
           )
         })
+        // @ts-ignore
+        const originalLines = allLinesSelector(file_with_one_level)
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines.map(withoutPositions)).toEqual(
-            expect.arrayContaining(file_with_one_level.lines.map(withoutPositions))
+          expect(resultLines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(originalLines.map(withoutPositions))
           )
         })
         it('should only add cards to the new plotlines', () => {
@@ -383,8 +454,8 @@ describe('applyTemplate', () => {
             two_level_biased_middle_plotline_template.templateData.lines.map(({ id }) => {
               return id
             })
-          const addedCards = result.cards.filter((card) => {
-            return file_with_one_level.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
             return existingPlotlines.indexOf(lineId) === -1
@@ -392,8 +463,8 @@ describe('applyTemplate', () => {
           expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
         })
         it('should insert cards on the plotlines from the template', () => {
-          const addedCards = result.cards.filter((card) => {
-            return file_with_one_level.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const bottomLevelBeatIds = bottomLevelBeats.map(({ id }) => id)
           const templateCards = two_level_biased_middle_plotline_template.templateData.cards.filter(
@@ -421,11 +492,14 @@ describe('applyTemplate', () => {
           two_level_biased_bottom_plotline_template.templateData.beats['1'],
           topLevelBeats[0].id
         )
+        const resultCards = allCardsSelector(result)
+        // @ts-ignore
+        const originalCards = allCardsSelector(file_with_one_level)
         it('should have more cards', () => {
-          expect(result.cards.length).toBeGreaterThanOrEqual(file_with_one_level.cards.length)
+          expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
         })
         it('should have the cards it used to have', () => {
-          expect(result.cards).toEqual(expect.arrayContaining(file_with_one_level.cards))
+          expect(resultCards).toEqual(expect.arrayContaining(originalCards))
         })
         it('should have the cards in the template from the bottom level', () => {
           const bottomLevelBeatIds = bottomLevelBeats.map(({ id }) => id)
@@ -433,17 +507,24 @@ describe('applyTemplate', () => {
             two_level_biased_middle_plotline_template.templateData.cards.filter((card) => {
               return bottomLevelBeatIds.indexOf(card.beatId) !== -1
             })
-          expect(result.cards.map(withoutLineBeatOrCardIds)).toEqual(
+          expect(resultCards.map(withoutLineBeatOrCardIds)).toEqual(
             expect.arrayContaining(cardsInBookFromTemplate.map(withoutLineBeatOrCardIds))
           )
         })
         it('should have at least as many beats as the bottom level of the template', () => {
           const templateNumberOfBeats = bottomLevelBeats.length
-          const resultNumberOfBeats = beatsLength(result.beats['1'])
+          const resultNumberOfBeats = beatsLength(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            )
+          )
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
+        const resultLines = allLinesSelector(result)
         it('should add the plotlines from the template', () => {
-          expect(result.lines.map(withoutIdsPositionsOrColor)).toEqual(
+          expect(resultLines.map(withoutIdsPositionsOrColor)).toEqual(
             expect.arrayContaining(
               two_level_biased_bottom_plotline_template.templateData.lines
                 .map(withoutIdsPositionsOrColor)
@@ -451,9 +532,11 @@ describe('applyTemplate', () => {
             )
           )
         })
+        // @ts-ignore
+        const originalLines = allLinesSelector(file_with_one_level)
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines.map(withoutPositions)).toEqual(
-            expect.arrayContaining(file_with_one_level.lines.map(withoutPositions))
+          expect(resultLines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(originalLines.map(withoutPositions))
           )
         })
         it('should only add cards to the new plotlines', () => {
@@ -461,8 +544,8 @@ describe('applyTemplate', () => {
             two_level_biased_bottom_plotline_template.templateData.lines.map(({ id }) => {
               return id
             })
-          const addedCards = result.cards.filter((card) => {
-            return file_with_one_level.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
             return existingPlotlines.indexOf(lineId) === -1
@@ -470,8 +553,8 @@ describe('applyTemplate', () => {
           expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
         })
         it('should insert cards on the plotlines from the template', () => {
-          const addedCards = result.cards.filter((card) => {
-            return file_with_one_level.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const bottomLevelBeatIds = bottomLevelBeats.map(({ id }) => id)
           const templateCards = two_level_biased_bottom_plotline_template.templateData.cards.filter(
@@ -497,11 +580,14 @@ describe('applyTemplate', () => {
           three_level_biased_top_plotline_template.templateData.beats['1'],
           null
         )
+        const resultCards = allCardsSelector(result)
+        // @ts-ignore
+        const originalCards = allCardsSelector(file_with_one_level)
         it('should have more cards', () => {
-          expect(result.cards.length).toBeGreaterThanOrEqual(file_with_one_level.cards.length)
+          expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
         })
         it('should have the cards it used to have', () => {
-          expect(result.cards).toEqual(expect.arrayContaining(file_with_one_level.cards))
+          expect(resultCards).toEqual(expect.arrayContaining(originalCards))
         })
         it('should have the cards in the template', () => {
           const topLevelBeatIds = topLevelBeats.map(({ id }) => id)
@@ -509,17 +595,24 @@ describe('applyTemplate', () => {
             three_level_biased_top_plotline_template.templateData.cards.filter((card) => {
               return topLevelBeatIds.indexOf(card.beatId) !== -1
             })
-          expect(result.cards.map(withoutLineBeatOrCardIds)).toEqual(
+          expect(resultCards.map(withoutLineBeatOrCardIds)).toEqual(
             expect.arrayContaining(cardsInBookFromTemplate.map(withoutLineBeatOrCardIds))
           )
         })
         it('should have at least as many beats as the top level of the template', () => {
           const templateNumberOfBeats = topLevelBeats.length
-          const resultNumberOfBeats = beatsLength(result.beats['1'])
+          const resultNumberOfBeats = beatsLength(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            )
+          )
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
+        const resultLines = allLinesSelector(result)
         it('should add the plotlines from the template', () => {
-          expect(result.lines.map(withoutIdsPositionsOrColor)).toEqual(
+          expect(resultLines.map(withoutIdsPositionsOrColor)).toEqual(
             expect.arrayContaining(
               three_level_biased_top_plotline_template.templateData.lines
                 .map(withoutIdsPositionsOrColor)
@@ -527,9 +620,11 @@ describe('applyTemplate', () => {
             )
           )
         })
+        // @ts-ignore
+        const originalLines = allLinesSelector(file_with_one_level)
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines.map(withoutPositions)).toEqual(
-            expect.arrayContaining(file_with_one_level.lines.map(withoutPositions))
+          expect(resultLines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(originalLines.map(withoutPositions))
           )
         })
         it('should only add cards to the new plotlines', () => {
@@ -538,8 +633,8 @@ describe('applyTemplate', () => {
               return id
             }
           )
-          const addedCards = result.cards.filter((card) => {
-            return file_with_one_level.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
             return existingPlotlines.indexOf(lineId) === -1
@@ -547,8 +642,8 @@ describe('applyTemplate', () => {
           expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
         })
         it('should insert cards on the plotlines from the template', () => {
-          const addedCards = result.cards.filter((card) => {
-            return file_with_one_level.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const topLevelBeatIds = topLevelBeats.map(({ id }) => id)
           const templateCards = three_level_biased_top_plotline_template.templateData.cards.filter(
@@ -576,11 +671,14 @@ describe('applyTemplate', () => {
           three_level_biased_middle_plotline_template.templateData.beats['1'],
           topLevelBeats[0].id
         )
+        const resultCards = allCardsSelector(result)
+        // @ts-ignore
+        const originalCards = allCardsSelector(file_with_one_level)
         it('should have more cards', () => {
-          expect(result.cards.length).toBeGreaterThanOrEqual(file_with_one_level.cards.length)
+          expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
         })
         it('should have the cards it used to have', () => {
-          expect(result.cards).toEqual(expect.arrayContaining(file_with_one_level.cards))
+          expect(resultCards).toEqual(expect.arrayContaining(originalCards))
         })
         it('should have the cards in the template', () => {
           const middleLevelBeatIds = middleLevelBeats.map(({ id }) => id)
@@ -588,17 +686,24 @@ describe('applyTemplate', () => {
             three_level_biased_middle_plotline_template.templateData.cards.filter((card) => {
               return middleLevelBeatIds.indexOf(card.beatId) !== -1
             })
-          expect(result.cards.map(withoutLineBeatOrCardIds)).toEqual(
+          expect(resultCards.map(withoutLineBeatOrCardIds)).toEqual(
             expect.arrayContaining(cardsInBookFromTemplate.map(withoutLineBeatOrCardIds))
           )
         })
         it('should have at least as many beats as the middle level of the template', () => {
           const templateNumberOfBeats = middleLevelBeats.length
-          const resultNumberOfBeats = beatsLength(result.beats['1'])
+          const resultNumberOfBeats = beatsLength(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            )
+          )
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
+        const resultLines = allLinesSelector(result)
         it('should add the plotlines from the template', () => {
-          expect(result.lines.map(withoutIdsPositionsOrColor)).toEqual(
+          expect(resultLines.map(withoutIdsPositionsOrColor)).toEqual(
             expect.arrayContaining(
               three_level_biased_middle_plotline_template.templateData.lines
                 .map(withoutIdsPositionsOrColor)
@@ -606,9 +711,11 @@ describe('applyTemplate', () => {
             )
           )
         })
+        // @ts-ignore
+        const originalLines = allLinesSelector(file_with_one_level)
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines.map(withoutPositions)).toEqual(
-            expect.arrayContaining(file_with_one_level.lines.map(withoutPositions))
+          expect(resultLines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(originalLines.map(withoutPositions))
           )
         })
         it('should only add cards to the new plotlines', () => {
@@ -616,8 +723,8 @@ describe('applyTemplate', () => {
             three_level_biased_middle_plotline_template.templateData.lines.map(({ id }) => {
               return id
             })
-          const addedCards = result.cards.filter((card) => {
-            return file_with_one_level.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
             return existingPlotlines.indexOf(lineId) === -1
@@ -625,8 +732,8 @@ describe('applyTemplate', () => {
           expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
         })
         it('should insert cards on the plotlines from the template', () => {
-          const addedCards = result.cards.filter((card) => {
-            return file_with_one_level.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const middleLevelBeatIds = middleLevelBeats.map(({ id }) => id)
           const templateCards =
@@ -657,11 +764,14 @@ describe('applyTemplate', () => {
           three_level_biased_bottom_plotline_template.templateData.beats['1'],
           middleLevelBeats[0].id
         )
+        const resultCards = allCardsSelector(result)
+        // @ts-ignore
+        const originalCards = allCardsSelector(file_with_one_level)
         it('should have more cards', () => {
-          expect(result.cards.length).toBeGreaterThanOrEqual(file_with_one_level.cards.length)
+          expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
         })
         it('should have the cards it used to have', () => {
-          expect(result.cards).toEqual(expect.arrayContaining(file_with_one_level.cards))
+          expect(resultCards).toEqual(expect.arrayContaining(originalCards))
         })
         it('should have the cards in the template', () => {
           const bottomLevelBeatIds = bottomLevelBeats.map(({ id }) => {
@@ -671,17 +781,24 @@ describe('applyTemplate', () => {
             three_level_biased_bottom_plotline_template.templateData.cards.filter(({ beatId }) => {
               return bottomLevelBeatIds.indexOf(beatId) !== -1
             })
-          expect(result.cards.map(withoutLineBeatOrCardIds)).toEqual(
+          expect(resultCards.map(withoutLineBeatOrCardIds)).toEqual(
             expect.arrayContaining(cardsInBookFromTemplate.map(withoutLineBeatOrCardIds))
           )
         })
         it('should have at least as many beats as the bottom level of the template', () => {
           const templateNumberOfBeats = bottomLevelBeats.length
-          const resultNumberOfBeats = beatsLength(result.beats['1'])
+          const resultNumberOfBeats = beatsLength(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            )
+          )
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
+        const resultLines = allLinesSelector(result)
         it('should add the plotlines from the template', () => {
-          expect(result.lines.map(withoutIdsPositionsOrColor)).toEqual(
+          expect(resultLines.map(withoutIdsPositionsOrColor)).toEqual(
             expect.arrayContaining(
               three_level_biased_bottom_plotline_template.templateData.lines
                 .map(withoutIdsPositionsOrColor)
@@ -689,9 +806,11 @@ describe('applyTemplate', () => {
             )
           )
         })
+        // @ts-ignore
+        const originalLines = allLinesSelector(file_with_one_level)
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines.map(withoutPositions)).toEqual(
-            expect.arrayContaining(file_with_one_level.lines.map(withoutPositions))
+          expect(resultLines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(originalLines.map(withoutPositions))
           )
         })
         it('should only add cards to the new plotlines', () => {
@@ -699,8 +818,8 @@ describe('applyTemplate', () => {
             three_level_biased_middle_plotline_template.templateData.lines.map(({ id }) => {
               return id
             })
-          const addedCards = result.cards.filter((card) => {
-            return file_with_one_level.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
             return existingPlotlines.indexOf(lineId) === -1
@@ -708,8 +827,8 @@ describe('applyTemplate', () => {
           expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
         })
         it('should insert cards on teh plotlines from the template', () => {
-          const addedCards = result.cards.filter((card) => {
-            return file_with_one_level.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const bottomLevelBeatIds = bottomLevelBeats.map(({ id }) => id)
           const templateCards =
@@ -736,11 +855,14 @@ describe('applyTemplate', () => {
           one_level_biased_top_plotline_template.templateData.beats['1'],
           null
         )
+        const resultCards = allCardsSelector(result)
+        // @ts-ignore
+        const originalCards = allCardsSelector(file_with_two_levels)
         it('should have more cards', () => {
-          expect(result.cards.length).toBeGreaterThanOrEqual(file_with_two_levels.cards.length)
+          expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
         })
         it('should have the cards it used to have', () => {
-          expect(result.cards).toEqual(expect.arrayContaining(file_with_two_levels.cards))
+          expect(resultCards).toEqual(expect.arrayContaining(originalCards))
         })
         it('should have the cards in the template', () => {
           const templateBeatIds = templateBeats.map(({ beatId }) => {
@@ -750,18 +872,27 @@ describe('applyTemplate', () => {
             one_level_biased_top_plotline_template.templateData.cards.filter((card) => {
               return templateBeatIds.indexOf(card.beatId) !== -1
             })
-          expect(result.cards.map(withoutLineBeatOrCardIds)).toEqual(
+          expect(resultCards.map(withoutLineBeatOrCardIds)).toEqual(
             expect.arrayContaining(cardsInBookFromTemplate.map(withoutLineBeatOrCardIds))
           )
         })
         it('should have at least as many beats as the top level of the template', () => {
           const templateNumberOfBeats = templateBeats.length
-          const resultNumberOfBeats = beatsLength(result.beats['1'])
+          const resultNumberOfBeats = beatsLength(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            )
+          )
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
+        const resultLines = allLinesSelector(result)
+        // @ts-ignore
+        const originalLines = allLinesSelector(file_with_two_levels)
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines.map(withoutPositions)).toEqual(
-            expect.arrayContaining(file_with_two_levels.lines.map(withoutPositions))
+          expect(resultLines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(originalLines.map(withoutPositions))
           )
         })
         it('should only add cards to the new plotlines', () => {
@@ -770,8 +901,8 @@ describe('applyTemplate', () => {
               return id
             }
           )
-          const addedCards = result.cards.filter((card) => {
-            return file_with_two_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
             return existingPlotlines.indexOf(lineId) === -1
@@ -779,8 +910,8 @@ describe('applyTemplate', () => {
           expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
         })
         it('should insert cards on the plotlines from the template', () => {
-          const addedCards = result.cards.filter((card) => {
-            return file_with_two_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const templateBeatIds = templateBeats.map(({ id }) => id)
           const templateCards = one_level_biased_top_plotline_template.templateData.cards.filter(
@@ -804,14 +935,17 @@ describe('applyTemplate', () => {
           one_level_biased_middle_plotline_template.templateData.beats['1'],
           null
         )
+        const resultCards = allCardsSelector(result)
+        // @ts-ignore
+        const originalCards = allCardsSelector(file_with_two_levels)
         it('should have more cards', () => {
-          expect(result.cards.length).toBeGreaterThanOrEqual(file_with_two_levels.cards.length)
+          expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
         })
         it('should have the cards it used to have', () => {
-          expect(result.cards).toEqual(expect.arrayContaining(file_with_two_levels.cards))
+          expect(resultCards).toEqual(expect.arrayContaining(originalCards))
         })
         it('should have the cards in the template', () => {
-          expect(result.cards.map(withoutLineBeatOrCardIds)).toEqual(
+          expect(resultCards.map(withoutLineBeatOrCardIds)).toEqual(
             expect.arrayContaining(
               one_level_biased_middle_plotline_template.templateData.cards.map(
                 withoutLineBeatOrCardIds
@@ -821,12 +955,21 @@ describe('applyTemplate', () => {
         })
         it('should have at least as many beats as the top level of the template', () => {
           const templateNumberOfBeats = templateBeats.length
-          const resultNumberOfBeats = beatsLength(result.beats['1'])
+          const resultNumberOfBeats = beatsLength(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            )
+          )
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
+        const resultLines = allLinesSelector(result)
+        // @ts-ignore
+        const originalLines = allLinesSelector(file_with_two_levels)
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines.map(withoutPositions)).toEqual(
-            expect.arrayContaining(file_with_two_levels.lines.map(withoutPositions))
+          expect(resultLines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(originalLines.map(withoutPositions))
           )
         })
         it('should only add cards to the new plotlines', () => {
@@ -834,8 +977,8 @@ describe('applyTemplate', () => {
             one_level_biased_middle_plotline_template.templateData.lines.map(({ id }) => {
               return id
             })
-          const addedCards = result.cards.filter((card) => {
-            return file_with_two_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
             return existingPlotlines.indexOf(lineId) === -1
@@ -843,8 +986,8 @@ describe('applyTemplate', () => {
           expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
         })
         it('should insert cards on the plotlines from the template', () => {
-          const addedCards = result.cards.filter((card) => {
-            return file_with_two_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const templateBeatIds = templateBeats.map(({ id }) => id)
           const templateCards = one_level_biased_middle_plotline_template.templateData.cards.filter(
@@ -868,14 +1011,17 @@ describe('applyTemplate', () => {
           one_level_biased_bottom_plotline_template.templateData.beats['1'],
           null
         )
+        const resultCards = allCardsSelector(result)
+        // @ts-ignore
+        const originalCards = allCardsSelector(file_with_two_levels)
         it('should have more cards', () => {
-          expect(result.cards.length).toBeGreaterThanOrEqual(file_with_two_levels.cards.length)
+          expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
         })
         it('should have the cards it used to have', () => {
-          expect(result.cards).toEqual(expect.arrayContaining(file_with_two_levels.cards))
+          expect(resultCards).toEqual(expect.arrayContaining(originalCards))
         })
         it('should have the cards in the template', () => {
-          expect(result.cards.map(withoutLineBeatOrCardIds)).toEqual(
+          expect(resultCards.map(withoutLineBeatOrCardIds)).toEqual(
             expect.arrayContaining(
               one_level_biased_bottom_plotline_template.templateData.cards.map(
                 withoutLineBeatOrCardIds
@@ -883,9 +1029,12 @@ describe('applyTemplate', () => {
             )
           )
         })
+        const resultLines = allLinesSelector(result)
+        // @ts-ignore
+        const originalLines = allLinesSelector(file_with_two_levels)
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines.map(withoutPositions)).toEqual(
-            expect.arrayContaining(file_with_two_levels.lines.map(withoutPositions))
+          expect(resultLines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(originalLines.map(withoutPositions))
           )
         })
         it('should only add cards to the new plotlines', () => {
@@ -893,8 +1042,8 @@ describe('applyTemplate', () => {
             one_level_biased_bottom_plotline_template.templateData.lines.map(({ id }) => {
               return id
             })
-          const addedCards = result.cards.filter((card) => {
-            return file_with_two_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
             return existingPlotlines.indexOf(lineId) === -1
@@ -902,8 +1051,8 @@ describe('applyTemplate', () => {
           expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
         })
         it('should insert cards on the plotlines from the template', () => {
-          const addedCards = result.cards.filter((card) => {
-            return file_with_two_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const templateBeatIds = templateBeats.map(({ id }) => id)
           const templateCards = one_level_biased_bottom_plotline_template.templateData.cards.filter(
@@ -929,18 +1078,17 @@ describe('applyTemplate', () => {
             one_level_biased_bottom_plotline_template.templateData.beats['1'],
             null
           )
+          const resultCards = allCardsSelector(result)
+          // @ts-ignore
+          const originalCards = allCardsSelector(file_with_two_levels)
           it('should have more cards', () => {
-            expect(result.cards.length).toBeGreaterThanOrEqual(
-              file_with_two_levels_but_no_chapter.cards.length
-            )
+            expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
           })
           it('should have the cards it used to have', () => {
-            expect(result.cards).toEqual(
-              expect.arrayContaining(file_with_two_levels_but_no_chapter.cards)
-            )
+            expect(resultCards).toEqual(expect.arrayContaining(originalCards))
           })
           it('should have the cards in the template', () => {
-            expect(result.cards.map(withoutLineBeatOrCardIds)).toEqual(
+            expect(resultCards.map(withoutLineBeatOrCardIds)).toEqual(
               expect.arrayContaining(
                 one_level_biased_bottom_plotline_template.templateData.cards.map(
                   withoutLineBeatOrCardIds
@@ -948,11 +1096,12 @@ describe('applyTemplate', () => {
               )
             )
           })
+          const resultLines = allLinesSelector(result)
+          // @ts-ignore
+          const originalLines = allLinesSelector(file_with_two_levels_but_no_chapter)
           it('should have the plotlines that were there originally', () => {
-            expect(result.lines.map(withoutPositions)).toEqual(
-              expect.arrayContaining(
-                file_with_two_levels_but_no_chapter.lines.map(withoutPositions)
-              )
+            expect(resultLines.map(withoutPositions)).toEqual(
+              expect.arrayContaining(originalLines.map(withoutPositions))
             )
           })
           it('should only add cards to the new plotlines', () => {
@@ -960,28 +1109,27 @@ describe('applyTemplate', () => {
               one_level_biased_bottom_plotline_template.templateData.lines.map(({ id }) => {
                 return id
               })
-            const addedCards = result.cards.filter((card) => {
-              return (
-                file_with_two_levels_but_no_chapter.cards.map(({ id }) => id).indexOf(card.id) ===
-                -1
-              )
+            const addedCards = resultCards.filter((card) => {
+              return originalCards.map(({ id }) => id).indexOf(card.id) === -1
             })
             const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
               return existingPlotlines.indexOf(lineId) === -1
             })
             expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
           })
+          const resultBeats = beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          )
           it('should add the missing chapter', () => {
-            expect(result.beats[1].children[result.beats[1].children[null][0]]).toEqual([
+            expect(resultBeats.children[resultBeats.children[null][0]]).toEqual([
               10, 11, 12, 13, 14, 15, 16, 17, 18,
             ])
           })
           it('should insert cards on the plotlines from the template', () => {
-            const addedCards = result.cards.filter((card) => {
-              return (
-                file_with_two_levels_but_no_chapter.cards.map(({ id }) => id).indexOf(card.id) ===
-                -1
-              )
+            const addedCards = resultCards.filter((card) => {
+              return originalCards.map(({ id }) => id).indexOf(card.id) === -1
             })
             const templateBeatIds = templateBeats.map(({ id }) => id)
             const templateCards =
@@ -1013,18 +1161,35 @@ describe('applyTemplate', () => {
             beat.id
           )
         })
-        const resultTopBeats = tree.children(result.beats['1'], null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultBottomBeats = resultTopBeats.flatMap((beat) => {
-          return tree.children(result.beats['1'], beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
+        const resultCards = allCardsSelector(result)
+        // @ts-ignore
+        const originalCards = allCardsSelector(file_with_two_levels)
         it('should have more cards', () => {
-          expect(result.cards.length).toBeGreaterThanOrEqual(file_with_two_levels.cards.length)
+          expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
         })
         it('should have the cards it used to have', () => {
-          expect(result.cards).toEqual(expect.arrayContaining(file_with_two_levels.cards))
+          expect(resultCards).toEqual(expect.arrayContaining(originalCards))
         })
         it('should have the cards in the template', () => {
-          expect(result.cards.map(withoutLineBeatOrCardIds)).toEqual(
+          expect(resultCards.map(withoutLineBeatOrCardIds)).toEqual(
             expect.arrayContaining(
               two_level_biased_top_plotline_template.templateData.cards.map(
                 withoutLineBeatOrCardIds
@@ -1042,9 +1207,12 @@ describe('applyTemplate', () => {
           const resultNumberOfBeats = resultBottomBeats.length
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
+        const resultLines = allLinesSelector(result)
+        // @ts-ignore
+        const originalLines = allLinesSelector(file_with_two_levels)
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines.map(withoutPositions)).toEqual(
-            expect.arrayContaining(file_with_two_levels.lines.map(withoutPositions))
+          expect(resultLines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(originalLines.map(withoutPositions))
           )
         })
         it('should only add cards to the new plotlines', () => {
@@ -1053,8 +1221,8 @@ describe('applyTemplate', () => {
               return id
             }
           )
-          const addedCards = result.cards.filter((card) => {
-            return file_with_two_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
             return existingPlotlines.indexOf(lineId) === -1
@@ -1062,8 +1230,8 @@ describe('applyTemplate', () => {
           expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
         })
         it('should insert cards on the plotlines from the template', () => {
-          const addedCards = result.cards.filter((card) => {
-            return file_with_two_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const templateBeatIds = templateTopBeats.concat(templateBottomBeats).map(({ id }) => id)
           const templateCards = two_level_biased_top_plotline_template.templateData.cards.filter(
@@ -1093,15 +1261,32 @@ describe('applyTemplate', () => {
             beat.id
           )
         })
-        const resultTopBeats = tree.children(result.beats['1'], null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultBottomBeats = resultTopBeats.flatMap((beat) => {
-          return tree.children(result.beats['1'], beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
+        const resultCards = allCardsSelector(result)
+        // @ts-ignore
+        const originalCards = allCardsSelector(file_with_two_levels)
         it('should have more cards', () => {
-          expect(result.cards.length).toBeGreaterThanOrEqual(file_with_two_levels.cards.length)
+          expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
         })
         it('should have the cards it used to have', () => {
-          expect(result.cards).toEqual(expect.arrayContaining(file_with_two_levels.cards))
+          expect(resultCards).toEqual(expect.arrayContaining(originalCards))
         })
         it('should have at least as many beats as the template at the top level', () => {
           const templateNumberOfBeats = templateTopBeats.length
@@ -1113,9 +1298,12 @@ describe('applyTemplate', () => {
           const resultNumberOfBeats = resultBottomBeats.length
           expect(templateNumberOfBeats).toBeGreaterThanOrEqual(resultNumberOfBeats)
         })
+        const resultLines = allLinesSelector(result)
+        // @ts-ignore
+        const originalLines = allLinesSelector(file_with_two_levels)
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines.map(withoutPositions)).toEqual(
-            expect.arrayContaining(file_with_two_levels.lines.map(withoutPositions))
+          expect(resultLines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(originalLines.map(withoutPositions))
           )
         })
         it('should only add cards to the new plotlines', () => {
@@ -1123,8 +1311,8 @@ describe('applyTemplate', () => {
             two_level_biased_middle_plotline_template.templateData.lines.map(({ id }) => {
               return id
             })
-          const addedCards = result.cards.filter((card) => {
-            return file_with_two_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
             return existingPlotlines.indexOf(lineId) === -1
@@ -1132,8 +1320,8 @@ describe('applyTemplate', () => {
           expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
         })
         it('should insert cards on the plotlines from the template', () => {
-          const addedCards = result.cards.filter((card) => {
-            return file_with_two_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const templateBeatIds = templateTopBeats.concat(templateBottomBeats).map(({ id }) => id)
           const templateCards = two_level_biased_middle_plotline_template.templateData.cards.filter(
@@ -1163,18 +1351,35 @@ describe('applyTemplate', () => {
             beat.id
           )
         })
-        const resultTopBeats = tree.children(result.beats['1'], null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultBottomBeats = resultTopBeats.flatMap((beat) => {
-          return tree.children(result.beats['1'], beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
+        const resultCards = allCardsSelector(result)
+        // @ts-ignore
+        const originalCards = allCardsSelector(file_with_two_levels)
         it('should have more cards', () => {
-          expect(result.cards.length).toBeGreaterThanOrEqual(file_with_two_levels.cards.length)
+          expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
         })
         it('should have the cards it used to have', () => {
-          expect(result.cards).toEqual(expect.arrayContaining(file_with_two_levels.cards))
+          expect(resultCards).toEqual(expect.arrayContaining(originalCards))
         })
         it('should have the cards in the template', () => {
-          expect(result.cards.map(withoutLineBeatOrCardIds)).toEqual(
+          expect(resultCards.map(withoutLineBeatOrCardIds)).toEqual(
             expect.arrayContaining(
               two_level_biased_bottom_plotline_template.templateData.cards.map(
                 withoutLineBeatOrCardIds
@@ -1192,8 +1397,9 @@ describe('applyTemplate', () => {
           const resultNumberOfBeats = resultBottomBeats.length
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
+        const resultLines = allLinesSelector(result)
         it('should have the plotlines from the template', () => {
-          expect(result.lines.map(withoutIdsPositionsOrColor)).toEqual(
+          expect(resultLines.map(withoutIdsPositionsOrColor)).toEqual(
             expect.arrayContaining(
               two_level_biased_bottom_plotline_template.templateData.lines
                 .map(withoutIdsPositionsOrColor)
@@ -1206,8 +1412,8 @@ describe('applyTemplate', () => {
             two_level_biased_bottom_plotline_template.templateData.lines.map(({ id }) => {
               return id
             })
-          const addedCards = result.cards.filter((card) => {
-            return file_with_two_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
             return existingPlotlines.indexOf(lineId) === -1
@@ -1215,8 +1421,8 @@ describe('applyTemplate', () => {
           expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
         })
         it('should insert cards on the plotlines from the template', () => {
-          const addedCards = result.cards.filter((card) => {
-            return file_with_two_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const templateBeatIds = templateTopBeats.concat(templateBottomBeats).map(({ id }) => id)
           const templateCards = two_level_biased_bottom_plotline_template.templateData.cards.filter(
@@ -1248,15 +1454,32 @@ describe('applyTemplate', () => {
             beat.id
           )
         })
-        const resultTopBeats = tree.children(result.beats['1'], null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultBottomBeats = resultTopBeats.flatMap((beat) => {
-          return tree.children(result.beats['1'], beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
+        const resultCards = allCardsSelector(result)
+        // @ts-ignore
+        const originalCards = allCardsSelector(file_with_two_levels)
         it('should have more cards', () => {
-          expect(result.cards.length).toBeGreaterThanOrEqual(file_with_two_levels.cards.length)
+          expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
         })
         it('should have the cards it used to have', () => {
-          expect(result.cards).toEqual(expect.arrayContaining(file_with_two_levels.cards))
+          expect(resultCards).toEqual(expect.arrayContaining(originalCards))
         })
         it('should have at least as many beats as the template at the top level', () => {
           const templateNumberOfBeats = templateTopBeats.length
@@ -1268,8 +1491,9 @@ describe('applyTemplate', () => {
           const resultNumberOfBeats = resultBottomBeats.length
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
+        const resultLines = allLinesSelector(result)
         it('should have the plotlines from the template', () => {
-          expect(result.lines.map(withoutIdsPositionsOrColor)).toEqual(
+          expect(resultLines.map(withoutIdsPositionsOrColor)).toEqual(
             expect.arrayContaining(
               three_level_biased_top_plotline_template.templateData.lines
                 .map(withoutIdsPositionsOrColor)
@@ -1282,8 +1506,8 @@ describe('applyTemplate', () => {
             three_level_biased_bottom_plotline_template.templateData.lines.map(({ id }) => {
               return id
             })
-          const addedCards = result.cards.filter((card) => {
-            return file_with_two_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
             return existingPlotlines.indexOf(lineId) === -1
@@ -1291,8 +1515,8 @@ describe('applyTemplate', () => {
           expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
         })
         it('should insert cards on the plotlines from the template', () => {
-          const addedCards = result.cards.filter((card) => {
-            return file_with_two_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const templateBeatIds = templateTopBeats.concat(templateMiddleBeats).map(({ id }) => id)
           const templateCards =
@@ -1321,15 +1545,32 @@ describe('applyTemplate', () => {
             beat.id
           )
         })
-        const resultTopBeats = tree.children(result.beats['1'], null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultBottomBeats = resultTopBeats.flatMap((beat) => {
-          return tree.children(result.beats['1'], beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
+        const resultCards = allCardsSelector(result)
+        // @ts-ignore
+        const originalCards = allCardsSelector(file_with_two_levels)
         it('should have more cards', () => {
-          expect(result.cards.length).toBeGreaterThanOrEqual(file_with_two_levels.cards.length)
+          expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
         })
         it('should have the cards it used to have', () => {
-          expect(result.cards).toEqual(expect.arrayContaining(file_with_two_levels.cards))
+          expect(resultCards).toEqual(expect.arrayContaining(originalCards))
         })
         it('should have at least as many beats as the template at the top level', () => {
           const templateNumberOfBeats = templateTopBeats.length
@@ -1341,8 +1582,9 @@ describe('applyTemplate', () => {
           const resultNumberOfBeats = resultBottomBeats.length
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
+        const resultLines = allLinesSelector(result)
         it('should have the plotlines from the template', () => {
-          expect(result.lines.map(withoutIdsPositionsOrColor)).toEqual(
+          expect(resultLines.map(withoutIdsPositionsOrColor)).toEqual(
             expect.arrayContaining(
               three_level_biased_middle_plotline_template.templateData.lines
                 .map(withoutIdsPositionsOrColor)
@@ -1355,8 +1597,8 @@ describe('applyTemplate', () => {
             three_level_biased_middle_plotline_template.templateData.lines.map(({ id }) => {
               return id
             })
-          const addedCards = result.cards.filter((card) => {
-            return file_with_two_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
             return existingPlotlines.indexOf(lineId) === -1
@@ -1364,8 +1606,8 @@ describe('applyTemplate', () => {
           expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
         })
         it('should insert cards on the plotlines from the template', () => {
-          const addedCards = result.cards.filter((card) => {
-            return file_with_two_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const templateBeatIds = templateTopBeats.concat(templateMiddleBeats).map(({ id }) => id)
           const templateCards =
@@ -1398,15 +1640,32 @@ describe('applyTemplate', () => {
             beat.id
           )
         })
-        const resultTopBeats = tree.children(result.beats['1'], null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultBottomBeats = resultTopBeats.flatMap((beat) => {
-          return tree.children(result.beats['1'], beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
+        const resultCards = allCardsSelector(result)
+        // @ts-ignore
+        const originalCards = allCardsSelector(file_with_two_levels)
         it('should have more cards', () => {
-          expect(result.cards.length).toBeGreaterThanOrEqual(file_with_two_levels.cards.length)
+          expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
         })
         it('should have the cards it used to have', () => {
-          expect(result.cards).toEqual(expect.arrayContaining(file_with_two_levels.cards))
+          expect(resultCards).toEqual(expect.arrayContaining(originalCards))
         })
         it('should have at least as many top beats as the middle level of the template', () => {
           const templateNumberOfBeats = templateMiddleBeats.length
@@ -1418,8 +1677,9 @@ describe('applyTemplate', () => {
           const resultNumberOfBeats = resultBottomBeats.length
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
+        const resultLines = allLinesSelector(result)
         it('should have the plotlines from the template', () => {
-          expect(result.lines.map(withoutIdsPositionsOrColor)).toEqual(
+          expect(resultLines.map(withoutIdsPositionsOrColor)).toEqual(
             expect.arrayContaining(
               three_level_biased_bottom_plotline_template.templateData.lines
                 .map(withoutIdsPositionsOrColor)
@@ -1432,8 +1692,8 @@ describe('applyTemplate', () => {
             three_level_biased_bottom_plotline_template.templateData.lines.map(({ id }) => {
               return id
             })
-          const addedCards = result.cards.filter((card) => {
-            return file_with_two_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
             return existingPlotlines.indexOf(lineId) === -1
@@ -1441,8 +1701,8 @@ describe('applyTemplate', () => {
           expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
         })
         it('should insert cards on the plotlines from the template', () => {
-          const addedCards = result.cards.filter((card) => {
-            return file_with_two_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const templateBeatIds = templateMiddleBeats
             .concat(templateBottomBeats)
@@ -1471,15 +1731,25 @@ describe('applyTemplate', () => {
           one_level_biased_top_plotline_template.templateData.beats['1'],
           null
         )
-        const resultTopBeats = tree.children(result.beats['1'], null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
+        const resultCards = allCardsSelector(result)
+        // @ts-ignore
+        const originalCards = allCardsSelector(file_with_three_levels)
         it('should have more cards', () => {
-          expect(result.cards.length).toBeGreaterThanOrEqual(file_with_three_levels.cards.length)
+          expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
         })
         it('should have the cards it used to have', () => {
-          expect(result.cards).toEqual(expect.arrayContaining(file_with_three_levels.cards))
+          expect(resultCards).toEqual(expect.arrayContaining(originalCards))
         })
         it('should have the cards in the template', () => {
-          expect(result.cards.map(withoutLineBeatOrCardIds)).toEqual(
+          expect(resultCards.map(withoutLineBeatOrCardIds)).toEqual(
             expect.arrayContaining(
               one_level_biased_top_plotline_template.templateData.cards.map(
                 withoutLineBeatOrCardIds
@@ -1492,8 +1762,9 @@ describe('applyTemplate', () => {
           const resultNumberOfBeats = resultTopBeats.length
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
+        const resultLines = allLinesSelector(result)
         it('should have the plotlines from the template', () => {
-          expect(result.lines.map(withoutIdsPositionsOrColor)).toEqual(
+          expect(resultLines.map(withoutIdsPositionsOrColor)).toEqual(
             expect.arrayContaining(
               one_level_biased_top_plotline_template.templateData.lines
                 .map(withoutIdsPositionsOrColor)
@@ -1506,8 +1777,8 @@ describe('applyTemplate', () => {
             three_level_biased_bottom_plotline_template.templateData.lines.map(({ id }) => {
               return id
             })
-          const addedCards = result.cards.filter((card) => {
-            return file_with_two_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
             return existingPlotlines.indexOf(lineId) === -1
@@ -1515,8 +1786,8 @@ describe('applyTemplate', () => {
           expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
         })
         it('should insert cards on the plotlines from the template', () => {
-          const addedCards = result.cards.filter((card) => {
-            return file_with_two_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const templateBeatIds = templateBeats.map(({ id }) => id)
           const templateCards =
@@ -1539,18 +1810,35 @@ describe('applyTemplate', () => {
           one_level_biased_middle_plotline_template.templateData.beats['1'],
           null
         )
-        const resultTopBeats = tree.children(result.beats['1'], null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultMiddleBeats = resultTopBeats.flatMap((beat) => {
-          return tree.children(result.beats['1'], beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
+        const resultCards = allCardsSelector(result)
+        // @ts-ignore
+        const originalCards = allCardsSelector(file_with_three_levels)
         it('should have more cards', () => {
-          expect(result.cards.length).toBeGreaterThanOrEqual(file_with_three_levels.cards.length)
+          expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
         })
         it('should have the cards it used to have', () => {
-          expect(result.cards).toEqual(expect.arrayContaining(file_with_three_levels.cards))
+          expect(resultCards).toEqual(expect.arrayContaining(originalCards))
         })
         it('should have the cards in the template', () => {
-          expect(result.cards.map(withoutLineBeatOrCardIds)).toEqual(
+          expect(resultCards.map(withoutLineBeatOrCardIds)).toEqual(
             expect.arrayContaining(
               one_level_biased_middle_plotline_template.templateData.cards.map(
                 withoutLineBeatOrCardIds
@@ -1563,8 +1851,9 @@ describe('applyTemplate', () => {
           const resultNumberOfBeats = resultMiddleBeats.length
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
+        const resultLines = allLinesSelector(result)
         it('should have the plotlines from the template', () => {
-          expect(result.lines.map(withoutIdsPositionsOrColor)).toEqual(
+          expect(resultLines.map(withoutIdsPositionsOrColor)).toEqual(
             expect.arrayContaining(
               one_level_biased_middle_plotline_template.templateData.lines
                 .map(withoutIdsPositionsOrColor)
@@ -1577,8 +1866,8 @@ describe('applyTemplate', () => {
             one_level_biased_middle_plotline_template.templateData.lines.map(({ id }) => {
               return id
             })
-          const addedCards = result.cards.filter((card) => {
-            return file_with_three_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
             return existingPlotlines.indexOf(lineId) === -1
@@ -1586,8 +1875,8 @@ describe('applyTemplate', () => {
           expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
         })
         it('should insert cards on the plotlines from the template', () => {
-          const addedCards = result.cards.filter((card) => {
-            return file_with_three_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const templateBeatIds = templateBeats.map(({ id }) => id)
           const templateCards = one_level_biased_middle_plotline_template.templateData.cards.filter(
@@ -1611,21 +1900,45 @@ describe('applyTemplate', () => {
           one_level_biased_bottom_plotline_template.templateData.beats['1'],
           null
         )
-        const resultTopBeats = tree.children(result.beats['1'], null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultMiddleBeats = resultTopBeats.flatMap((beat) => {
-          return tree.children(result.beats['1'], beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
         const resultBottomBeats = resultMiddleBeats.flatMap((beat) => {
-          return tree.children(result.beats['1'], beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
+        const resultCards = allCardsSelector(result)
+        // @ts-ignore
+        const originalCards = allCardsSelector(file_with_three_levels)
         it('should have more cards', () => {
-          expect(result.cards.length).toBeGreaterThanOrEqual(file_with_three_levels.cards.length)
+          expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
         })
         it('should have the cards it used to have', () => {
-          expect(result.cards).toEqual(expect.arrayContaining(file_with_three_levels.cards))
+          expect(resultCards).toEqual(expect.arrayContaining(originalCards))
         })
         it('should have the cards in the template', () => {
-          expect(result.cards.map(withoutLineBeatOrCardIds)).toEqual(
+          expect(resultCards.map(withoutLineBeatOrCardIds)).toEqual(
             expect.arrayContaining(
               one_level_biased_bottom_plotline_template.templateData.cards.map(
                 withoutLineBeatOrCardIds
@@ -1638,8 +1951,9 @@ describe('applyTemplate', () => {
           const resultNumberOfBeats = resultBottomBeats.length
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
+        const resultLines = allLinesSelector(result)
         it('should have the plotlines from the template', () => {
-          expect(result.lines.map(withoutIdsPositionsOrColor)).toEqual(
+          expect(resultLines.map(withoutIdsPositionsOrColor)).toEqual(
             expect.arrayContaining(
               one_level_biased_bottom_plotline_template.templateData.lines
                 .map(withoutIdsPositionsOrColor)
@@ -1652,8 +1966,8 @@ describe('applyTemplate', () => {
             one_level_biased_bottom_plotline_template.templateData.lines.map(({ id }) => {
               return id
             })
-          const addedCards = result.cards.filter((card) => {
-            return file_with_three_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
             return existingPlotlines.indexOf(lineId) === -1
@@ -1661,8 +1975,8 @@ describe('applyTemplate', () => {
           expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
         })
         it('should insert cards on the plotlines from the template', () => {
-          const addedCards = result.cards.filter((card) => {
-            return file_with_three_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const templateBeatIds = templateBeats.map(({ id }) => id)
           const templateCards = one_level_biased_bottom_plotline_template.templateData.cards.filter(
@@ -1688,18 +2002,17 @@ describe('applyTemplate', () => {
             one_level_biased_bottom_plotline_template.templateData.beats['1'],
             null
           )
+          const resultCards = allCardsSelector(result)
+          // @ts-ignore
+          const originalCards = allCardsSelector(file_with_three_levels_but_no_chapter)
           it('should have more cards', () => {
-            expect(result.cards.length).toBeGreaterThanOrEqual(
-              file_with_three_levels_but_no_chapter.cards.length
-            )
+            expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
           })
           it('should have the cards it used to have', () => {
-            expect(result.cards).toEqual(
-              expect.arrayContaining(file_with_three_levels_but_no_chapter.cards)
-            )
+            expect(resultCards).toEqual(expect.arrayContaining(originalCards))
           })
           it('should have the cards in the template', () => {
-            expect(result.cards.map(withoutLineBeatOrCardIds)).toEqual(
+            expect(resultCards.map(withoutLineBeatOrCardIds)).toEqual(
               expect.arrayContaining(
                 one_level_biased_bottom_plotline_template.templateData.cards.map(
                   withoutLineBeatOrCardIds
@@ -1707,11 +2020,12 @@ describe('applyTemplate', () => {
               )
             )
           })
+          const resultLines = allLinesSelector(result)
+          // @ts-ignore
+          const originalLines = allLinesSelector(file_with_three_levels_but_no_chapter)
           it('should have the plotlines that were there originally', () => {
-            expect(result.lines.map(withoutPositions)).toEqual(
-              expect.arrayContaining(
-                file_with_three_levels_but_no_chapter.lines.map(withoutPositions)
-              )
+            expect(resultLines.map(withoutPositions)).toEqual(
+              expect.arrayContaining(originalLines.map(withoutPositions))
             )
           })
           it('should only add cards to the new plotlines', () => {
@@ -1719,28 +2033,27 @@ describe('applyTemplate', () => {
               one_level_biased_bottom_plotline_template.templateData.lines.map(({ id }) => {
                 return id
               })
-            const addedCards = result.cards.filter((card) => {
-              return (
-                file_with_three_levels_but_no_chapter.cards.map(({ id }) => id).indexOf(card.id) ===
-                -1
-              )
+            const addedCards = resultCards.filter((card) => {
+              return originalCards.map(({ id }) => id).indexOf(card.id) === -1
             })
             const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
               return existingPlotlines.indexOf(lineId) === -1
             })
             expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
           })
+          const resultBeats = beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          )
           it('should add the missing chapter', () => {
-            expect(result.beats[1].children[result.beats[1].children[null][0]]).toEqual([
+            expect(resultBeats.children[resultBeats.children[null][0]]).toEqual([
               8, 9, 10, 11, 12, 13, 14, 15, 16,
             ])
           })
           it('should insert cards on the plotlines from the template', () => {
-            const addedCards = result.cards.filter((card) => {
-              return (
-                file_with_three_levels_but_no_chapter.cards.map(({ id }) => id).indexOf(card.id) ===
-                -1
-              )
+            const addedCards = resultCards.filter((card) => {
+              return originalCards.map(({ id }) => id).indexOf(card.id) === -1
             })
             const templateBeatIds = templateBeats.map(({ id }) => id)
             const templateCards =
@@ -1766,18 +2079,17 @@ describe('applyTemplate', () => {
             one_level_biased_bottom_plotline_template.templateData.beats['1'],
             null
           )
+          const resultCards = allCardsSelector(result)
+          // @ts-ignore
+          const originalCards = allCardsSelector(file_with_three_levels_but_no_scene)
           it('should have more cards', () => {
-            expect(result.cards.length).toBeGreaterThanOrEqual(
-              file_with_three_levels_but_no_scene.cards.length
-            )
+            expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
           })
           it('should have the cards it used to have', () => {
-            expect(result.cards).toEqual(
-              expect.arrayContaining(file_with_three_levels_but_no_scene.cards)
-            )
+            expect(resultCards).toEqual(expect.arrayContaining(originalCards))
           })
           it('should have the cards in the template', () => {
-            expect(result.cards.map(withoutLineBeatOrCardIds)).toEqual(
+            expect(resultCards.map(withoutLineBeatOrCardIds)).toEqual(
               expect.arrayContaining(
                 one_level_biased_bottom_plotline_template.templateData.cards.map(
                   withoutLineBeatOrCardIds
@@ -1785,11 +2097,12 @@ describe('applyTemplate', () => {
               )
             )
           })
+          const resultLines = allLinesSelector(result)
+          // @ts-ignore
+          const originalLines = allLinesSelector(file_with_three_levels_but_no_scene)
           it('should have the plotlines that were there originally', () => {
-            expect(result.lines.map(withoutPositions)).toEqual(
-              expect.arrayContaining(
-                file_with_three_levels_but_no_scene.lines.map(withoutPositions)
-              )
+            expect(resultLines.map(withoutPositions)).toEqual(
+              expect.arrayContaining(originalLines.map(withoutPositions))
             )
           })
           it('should only add cards to the new plotlines', () => {
@@ -1797,30 +2110,27 @@ describe('applyTemplate', () => {
               one_level_biased_bottom_plotline_template.templateData.lines.map(({ id }) => {
                 return id
               })
-            const addedCards = result.cards.filter((card) => {
-              return (
-                file_with_three_levels_but_no_scene.cards.map(({ id }) => id).indexOf(card.id) ===
-                -1
-              )
+            const addedCards = resultCards.filter((card) => {
+              return originalCards.map(({ id }) => id).indexOf(card.id) === -1
             })
             const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
               return existingPlotlines.indexOf(lineId) === -1
             })
             expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
           })
+          const resultBeats = beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          )
           it('should add the missing chapter', () => {
             expect(
-              result.beats[1].children[
-                result.beats[1].children[result.beats[1].children[null][0]][0]
-              ]
+              resultBeats.children[resultBeats.children[resultBeats.children[null][0]][0]]
             ).toEqual([8, 9, 10, 11, 12, 13, 14, 15, 16])
           })
           it('should insert cards on the plotlines from the template', () => {
-            const addedCards = result.cards.filter((card) => {
-              return (
-                file_with_three_levels_but_no_scene.cards.map(({ id }) => id).indexOf(card.id) ===
-                -1
-              )
+            const addedCards = resultCards.filter((card) => {
+              return originalCards.map(({ id }) => id).indexOf(card.id) === -1
             })
             const templateBeatIds = templateBeats.map(({ id }) => id)
             const templateCards =
@@ -1852,15 +2162,32 @@ describe('applyTemplate', () => {
             beat.id
           )
         })
-        const resultTopBeats = tree.children(result.beats['1'], null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultMiddleBeats = resultTopBeats.flatMap((beat) => {
-          return tree.children(result.beats['1'], beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
+        const resultCards = allCardsSelector(result)
+        // @ts-ignore
+        const originalCards = allCardsSelector(file_with_three_levels)
         it('should have more cards', () => {
-          expect(result.cards.length).toBeGreaterThanOrEqual(file_with_three_levels.cards.length)
+          expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
         })
         it('should have the cards in the template', () => {
-          expect(result.cards.map(withoutLineBeatOrCardIds)).toEqual(
+          expect(resultCards.map(withoutLineBeatOrCardIds)).toEqual(
             expect.arrayContaining(
               two_level_biased_top_plotline_template.templateData.cards.map(
                 withoutLineBeatOrCardIds
@@ -1878,8 +2205,9 @@ describe('applyTemplate', () => {
           const resultNumberOfBeats = resultMiddleBeats.length
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
+        const resultLines = allLinesSelector(result)
         it('should have the plotlines from the template', () => {
-          expect(result.lines.map(withoutIdsPositionsOrColor)).toEqual(
+          expect(resultLines.map(withoutIdsPositionsOrColor)).toEqual(
             expect.arrayContaining(
               two_level_biased_top_plotline_template.templateData.lines
                 .map(withoutIdsPositionsOrColor)
@@ -1893,8 +2221,8 @@ describe('applyTemplate', () => {
               return id
             }
           )
-          const addedCards = result.cards.filter((card) => {
-            return file_with_three_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
             return existingPlotlines.indexOf(lineId) === -1
@@ -1902,8 +2230,8 @@ describe('applyTemplate', () => {
           expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
         })
         it('should insert cards on the plotlines from the template', () => {
-          const addedCards = result.cards.filter((card) => {
-            return file_with_three_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const templateBeatIds = templateTopBeats.concat(templateBottomBeats).map(({ id }) => id)
           const templateCards = two_level_biased_top_plotline_template.templateData.cards.filter(
@@ -1933,18 +2261,42 @@ describe('applyTemplate', () => {
             beat.id
           )
         })
-        const resultTopBeats = tree.children(result.beats['1'], null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultMiddleBeats = resultTopBeats.flatMap((beat) => {
-          return tree.children(result.beats['1'], beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
         const resultBottomBeats = resultMiddleBeats.flatMap((beat) => {
-          return tree.children(result.beats['1'], beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
+        const resultCards = allCardsSelector(result)
+        // @ts-ignore
+        const originalCards = allCardsSelector(file_with_three_levels)
         it('should have more cards', () => {
-          expect(result.cards.length).toBeGreaterThanOrEqual(file_with_three_levels.cards.length)
+          expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
         })
         it('should have the cards in the template', () => {
-          expect(result.cards.map(withoutLineBeatOrCardIds)).toEqual(
+          expect(resultCards.map(withoutLineBeatOrCardIds)).toEqual(
             expect.arrayContaining(
               two_level_biased_middle_plotline_template.templateData.cards.map(
                 withoutLineBeatOrCardIds
@@ -1962,8 +2314,9 @@ describe('applyTemplate', () => {
           const resultNumberOfBeats = resultBottomBeats.length
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
+        const resultLines = allLinesSelector(result)
         it('should have the plotlines from the template', () => {
-          expect(result.lines.map(withoutIdsPositionsOrColor)).toEqual(
+          expect(resultLines.map(withoutIdsPositionsOrColor)).toEqual(
             expect.arrayContaining(
               two_level_biased_middle_plotline_template.templateData.lines
                 .map(withoutIdsPositionsOrColor)
@@ -1976,8 +2329,8 @@ describe('applyTemplate', () => {
             two_level_biased_middle_plotline_template.templateData.lines.map(({ id }) => {
               return id
             })
-          const addedCards = result.cards.filter((card) => {
-            return file_with_three_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
             return existingPlotlines.indexOf(lineId) === -1
@@ -1985,8 +2338,8 @@ describe('applyTemplate', () => {
           expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
         })
         it('should insert cards on the plotlines from the template', () => {
-          const addedCards = result.cards.filter((card) => {
-            return file_with_three_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const templateBeatIds = templateTopBeats.concat(templateBottomBeats).map(({ id }) => id)
           const templateCards = two_level_biased_middle_plotline_template.templateData.cards.filter(
@@ -2016,18 +2369,42 @@ describe('applyTemplate', () => {
             beat.id
           )
         })
-        const resultTopBeats = tree.children(result.beats['1'], null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultMiddleBeats = resultTopBeats.flatMap((beat) => {
-          return tree.children(result.beats['1'], beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
         const resultBottomBeats = resultMiddleBeats.flatMap((beat) => {
-          return tree.children(result.beats['1'], beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
+        const resultCards = allCardsSelector(result)
+        // @ts-ignore
+        const originalCards = allCardsSelector(file_with_three_levels)
         it('should have more cards', () => {
-          expect(result.cards.length).toBeGreaterThanOrEqual(file_with_three_levels.cards.length)
+          expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
         })
         it('should have the cards in the template', () => {
-          expect(result.cards.map(withoutLineBeatOrCardIds)).toEqual(
+          expect(resultCards.map(withoutLineBeatOrCardIds)).toEqual(
             expect.arrayContaining(
               two_level_biased_bottom_plotline_template.templateData.cards.map(
                 withoutLineBeatOrCardIds
@@ -2045,8 +2422,9 @@ describe('applyTemplate', () => {
           const resultNumberOfBeats = resultBottomBeats.length
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
+        const resultLines = allLinesSelector(result)
         it('should have the plotlines from the template', () => {
-          expect(result.lines.map(withoutIdsPositionsOrColor)).toEqual(
+          expect(resultLines.map(withoutIdsPositionsOrColor)).toEqual(
             expect.arrayContaining(
               two_level_biased_bottom_plotline_template.templateData.lines
                 .map(withoutIdsPositionsOrColor)
@@ -2059,8 +2437,8 @@ describe('applyTemplate', () => {
             two_level_biased_bottom_plotline_template.templateData.lines.map(({ id }) => {
               return id
             })
-          const addedCards = result.cards.filter((card) => {
-            return file_with_three_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
             return existingPlotlines.indexOf(lineId) === -1
@@ -2068,8 +2446,8 @@ describe('applyTemplate', () => {
           expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
         })
         it('should insert cards on the plotlines from the template', () => {
-          const addedCards = result.cards.filter((card) => {
-            return file_with_three_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const templateBeatIds = templateTopBeats.concat(templateBottomBeats).map(({ id }) => id)
           const templateCards = two_level_biased_bottom_plotline_template.templateData.cards.filter(
@@ -2107,18 +2485,42 @@ describe('applyTemplate', () => {
             beat.id
           )
         })
-        const resultTopBeats = tree.children(result.beats['1'], null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultMiddleBeats = resultTopBeats.flatMap((beat) => {
-          return tree.children(result.beats['1'], beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
         const resultBottomBeats = resultMiddleBeats.flatMap((beat) => {
-          return tree.children(result.beats['1'], beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
+        const resultCards = allCardsSelector(result)
+        // @ts-ignore
+        const originalCards = allCardsSelector(file_with_three_levels)
         it('should have more cards', () => {
-          expect(result.cards.length).toBeGreaterThanOrEqual(file_with_three_levels.cards.length)
+          expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
         })
         it('should have the cards in the template', () => {
-          expect(result.cards.map(withoutLineBeatOrCardIds)).toEqual(
+          expect(resultCards.map(withoutLineBeatOrCardIds)).toEqual(
             expect.arrayContaining(
               three_level_biased_top_plotline_template.templateData.cards.map(
                 withoutLineBeatOrCardIds
@@ -2141,8 +2543,9 @@ describe('applyTemplate', () => {
           const resultNumberOfBeats = resultBottomBeats.length
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
+        const resultLines = allLinesSelector(result)
         it('should have the plotlines from the template', () => {
-          expect(result.lines.map(withoutIdsPositionsOrColor)).toEqual(
+          expect(resultLines.map(withoutIdsPositionsOrColor)).toEqual(
             expect.arrayContaining(
               three_level_biased_top_plotline_template.templateData.lines
                 .map(withoutIdsPositionsOrColor)
@@ -2156,8 +2559,8 @@ describe('applyTemplate', () => {
               return id
             }
           )
-          const addedCards = result.cards.filter((card) => {
-            return file_with_three_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
             return existingPlotlines.indexOf(lineId) === -1
@@ -2165,8 +2568,8 @@ describe('applyTemplate', () => {
           expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
         })
         it('should insert cards on the plotlines from the template', () => {
-          const addedCards = result.cards.filter((card) => {
-            return file_with_three_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const templateBeatIds = templateTopBeats
             .concat(templateMiddleBeats)
@@ -2205,18 +2608,42 @@ describe('applyTemplate', () => {
             beat.id
           )
         })
-        const resultTopBeats = tree.children(result.beats['1'], null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultMiddleBeats = resultTopBeats.flatMap((beat) => {
-          return tree.children(result.beats['1'], beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
         const resultBottomBeats = resultMiddleBeats.flatMap((beat) => {
-          return tree.children(result.beats['1'], beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
+        const resultCards = allCardsSelector(result)
+        // @ts-ignore
+        const originalCards = allCardsSelector(file_with_three_levels)
         it('should have more cards', () => {
-          expect(result.cards.length).toBeGreaterThanOrEqual(file_with_three_levels.cards.length)
+          expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
         })
         it('should have the cards in the template', () => {
-          expect(result.cards.map(withoutLineBeatOrCardIds)).toEqual(
+          expect(resultCards.map(withoutLineBeatOrCardIds)).toEqual(
             expect.arrayContaining(
               three_level_biased_middle_plotline_template.templateData.cards.map(
                 withoutLineBeatOrCardIds
@@ -2239,9 +2666,12 @@ describe('applyTemplate', () => {
           const resultNumberOfBeats = resultBottomBeats.length
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
+        const resultLines = allLinesSelector(result)
+        // @ts-ignore
+        const originalLines = allLinesSelector(file_with_three_levels)
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines.map(withoutPositions)).toEqual(
-            expect.arrayContaining(file_with_three_levels.lines.map(withoutPositions))
+          expect(resultLines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(originalLines.map(withoutPositions))
           )
         })
         it('should only add cards to the new plotlines', () => {
@@ -2249,8 +2679,8 @@ describe('applyTemplate', () => {
             three_level_biased_middle_plotline_template.templateData.lines.map(({ id }) => {
               return id
             })
-          const addedCards = result.cards.filter((card) => {
-            return file_with_three_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
             return existingPlotlines.indexOf(lineId) === -1
@@ -2258,8 +2688,8 @@ describe('applyTemplate', () => {
           expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
         })
         it('should insert cards on the plotlines from the template', () => {
-          const addedCards = result.cards.filter((card) => {
-            return file_with_three_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const templateBeatIds = templateTopBeats
             .concat(templateMiddleBeats)
@@ -2297,18 +2727,42 @@ describe('applyTemplate', () => {
             beat.id
           )
         })
-        const resultTopBeats = tree.children(result.beats['1'], null)
+        const resultTopBeats = tree.children(
+          beatsForAnotherBookSelector(
+            result,
+            // @ts-ignore
+            '1'
+          ),
+          null
+        )
         const resultMiddleBeats = resultTopBeats.flatMap((beat) => {
-          return tree.children(result.beats['1'], beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
         const resultBottomBeats = resultMiddleBeats.flatMap((beat) => {
-          return tree.children(result.beats['1'], beat.id)
+          return tree.children(
+            beatsForAnotherBookSelector(
+              result,
+              // @ts-ignore
+              '1'
+            ),
+            beat.id
+          )
         })
+        const resultCards = allCardsSelector(result)
+        // @ts-ignore
+        const originalCards = allCardsSelector(file_with_three_levels)
         it('should have more cards', () => {
-          expect(result.cards.length).toBeGreaterThanOrEqual(file_with_three_levels.cards.length)
+          expect(resultCards.length).toBeGreaterThanOrEqual(originalCards.length)
         })
         it('should have the cards in the template', () => {
-          expect(result.cards.map(withoutLineBeatOrCardIds)).toEqual(
+          expect(resultCards.map(withoutLineBeatOrCardIds)).toEqual(
             expect.arrayContaining(
               three_level_biased_bottom_plotline_template.templateData.cards.map(
                 withoutLineBeatOrCardIds
@@ -2331,9 +2785,12 @@ describe('applyTemplate', () => {
           const resultNumberOfBeats = resultBottomBeats.length
           expect(resultNumberOfBeats).toBeGreaterThanOrEqual(templateNumberOfBeats)
         })
+        const resultLines = allLinesSelector(result)
+        // @ts-ignore
+        const originalLines = allLinesSelector(file_with_three_levels)
         it('should have the plotlines that were there originally', () => {
-          expect(result.lines.map(withoutPositions)).toEqual(
-            expect.arrayContaining(file_with_three_levels.lines.map(withoutPositions))
+          expect(resultLines.map(withoutPositions)).toEqual(
+            expect.arrayContaining(originalLines.map(withoutPositions))
           )
         })
         it('should only add cards to the new plotlines', () => {
@@ -2341,8 +2798,8 @@ describe('applyTemplate', () => {
             three_level_biased_bottom_plotline_template.templateData.lines.map(({ id }) => {
               return id
             })
-          const addedCards = result.cards.filter((card) => {
-            return file_with_three_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const addedCardsOnNewLines = addedCards.filter(({ lineId }) => {
             return existingPlotlines.indexOf(lineId) === -1
@@ -2350,8 +2807,8 @@ describe('applyTemplate', () => {
           expect(addedCardsOnNewLines).toEqual(expect.arrayContaining(addedCards))
         })
         it('should insert cards on the plotlines from the template', () => {
-          const addedCards = result.cards.filter((card) => {
-            return file_with_three_levels.cards.map(({ id }) => id).indexOf(card.id) === -1
+          const addedCards = resultCards.filter((card) => {
+            return originalCards.map(({ id }) => id).indexOf(card.id) === -1
           })
           const templateBeatIds = templateTopBeats
             .concat(templateMiddleBeats)
@@ -2376,6 +2833,7 @@ describe('moveLineActions', () => {
     describe('and a valid source and target', () => {
       it('should maintain the original lines colour', () => {
         const result = moveLineActions(zelda, 16, 9)
+        // @ts-ignore
         const changeColourAction = result.actions.find(({ type }) => {
           return type === EDIT_LINE_COLOR
         })

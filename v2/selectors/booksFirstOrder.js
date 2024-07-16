@@ -9,27 +9,26 @@ import { createAggressiveDeepEqualSelector } from './createDeepEqualSelector'
 
 import { fullFileStateSelector } from './fullFileFirstOrder'
 
+export const allBooksSelector = createSelector(fullFileStateSelector, ({ books }) => books ?? {})
+
 /**
  * Selects an array of bookIds
  * @function allBookIdsSelector
  * @returns {Array} bookIds (numbers)
  * @example [1, 2, 6]
  */
-export const allBookIdsSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.books.allIds
-)
+export const allBookIdsSelector = createSelector(allBooksSelector, ({ allIds }) => allIds ?? [])
+
 /**
  * Selects an array of books
  * @function allBooksSelector
  * @returns {Array} book data objects
  * @example [{ ...<bookData> }, { ...<bookData> }]
  */
-export const allBooksSelector = createSelector(fullFileStateSelector, (state) => state.books)
 export const allBooksAsArraySelector = createAggressiveDeepEqualSelector(
-  fullFileStateSelector,
-  (state) => {
-    return [...Object.values(omit(state.books, 'allIds'))]
+  allBooksSelector,
+  (books) => {
+    return [...Object.values(omit(books, 'allIds'))]
   }
 )
 

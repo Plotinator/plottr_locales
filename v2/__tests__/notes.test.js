@@ -12,7 +12,11 @@ describe('editNote', () => {
     describe('and a note id of 1', () => {
       describe('and an attribute named "title"', () => {
         const store = storeWithZelda()
-        const originalTitle = singleNoteSelector(store.getState(), 1).title
+        const originalTitle = singleNoteSelector(
+          store.getState(),
+          // @ts-ignore
+          1
+        ).title
         const originalFoci = noteFociSelector(store.getState())
         store.dispatch(
           editNote(1, {
@@ -27,7 +31,11 @@ describe('editNote', () => {
           })
         )
         it('should edit the title', () => {
-          const newTitle = singleNoteSelector(store.getState(), 1).title
+          const newTitle = singleNoteSelector(
+            store.getState(),
+            // @ts-ignore
+            1
+          ).title
           expect(newTitle).not.toEqual(originalTitle)
           expect(newTitle).toEqual("This note didn't have a title")
         })
@@ -94,7 +102,11 @@ describe('editNoteTitle', () => {
   describe('given an initial file', () => {
     describe('and a note id of 1', () => {
       const store = storeWithZelda()
-      const originalTitle = singleNoteSelector(store.getState(), 1).title
+      const originalTitle = singleNoteSelector(
+        store.getState(),
+        // @ts-ignore
+        1
+      ).title
       const originalFoci = noteFociSelector(store.getState())
       store.dispatch(
         editNoteTitle(1, 'This note did not have a title', {
@@ -104,7 +116,11 @@ describe('editNoteTitle', () => {
         })
       )
       it('should edit the note title', () => {
-        const newTitle = singleNoteSelector(store.getState(), 1).title
+        const newTitle = singleNoteSelector(
+          store.getState(),
+          // @ts-ignore
+          1
+        ).title
         expect(newTitle).not.toEqual(originalTitle)
         expect(newTitle).toEqual('This note did not have a title')
       })
@@ -170,7 +186,11 @@ describe('editNoteContent', () => {
   describe('given an initial file', () => {
     describe('and an id of 1', () => {
       const store = storeWithZelda()
-      const originalContent = singleNoteSelector(store.getState(), 1).content
+      const originalContent = singleNoteSelector(
+        store.getState(),
+        // @ts-ignore
+        1
+      ).content
       const originalFoci = noteFociSelector(store.getState())
       const valueToChangeTo = [{ type: 'paragraph', children: [{ text: 'yippeee!' }] }]
       store.dispatch(
@@ -181,7 +201,11 @@ describe('editNoteContent', () => {
         })
       )
       it('should edit the descrription', () => {
-        const newContent = singleNoteSelector(store.getState(), 1).content
+        const newContent = singleNoteSelector(
+          store.getState(),
+          // @ts-ignore
+          1
+        ).content
         expect(newContent).not.toEqual(originalContent)
         expect(newContent).toEqual(valueToChangeTo)
       })
@@ -248,7 +272,11 @@ describe('editNoteCustomAttribute', () => {
     describe('and an id of 1', () => {
       describe('and an attribute named "here"', () => {
         const store = storeWithZelda()
-        const originalValue = singleNoteSelector(store.getState(), 1).here
+        const originalValue = singleNoteSelector(
+          store.getState(),
+          // @ts-ignore
+          1
+        ).here
         const originalFoci = noteFociSelector(store.getState())
         store.dispatch(
           editNoteCustomAttribute(
@@ -263,7 +291,11 @@ describe('editNoteCustomAttribute', () => {
           )
         )
         it('should edit the attribute value', () => {
-          const newValue = singleNoteSelector(store.getState(), 1).here
+          const newValue = singleNoteSelector(
+            store.getState(),
+            // @ts-ignore
+            1
+          ).here
           expect(newValue).not.toEqual(originalValue)
           expect(newValue).toEqual('A brand new value, with all the bells and whistles!')
         })

@@ -5,17 +5,17 @@ import { createSelector } from 'reselect'
 import { fullFileStateSelector } from './fullFileFirstOrder'
 
 export const seriesSelector = createSelector(fullFileStateSelector, ({ series }) => {
-  return series || {}
+  return series ?? {}
 })
 export const seriesNameSelector = createSelector(seriesSelector, ({ name }) => {
-  return name
+  return name ?? 'Untitled'
 })
 export const seriesPremiseSelector = createSelector(seriesSelector, ({ premise }) => {
-  return premise
+  return premise ?? ''
 })
 export const seriesGenreSelector = createSelector(seriesSelector, ({ genre }) => {
-  return genre
+  return genre ?? ''
 })
 export const seriesThemeSelector = createSelector(seriesSelector, ({ theme }) => {
-  return theme
+  return theme ?? ''
 })

@@ -7,9 +7,9 @@ import { createSelector } from 'reselect'
 
 import { fullFileStateSelector } from './fullFileFirstOrder'
 
-export const allTagsSelector = createSelector(fullFileStateSelector, (state) => state.tags)
-const selectId = (state, id) => id
+export const allTagsSelector = createSelector(fullFileStateSelector, ({ tags }) => tags ?? [])
 
+const selectId = (_state, id) => id
 export const sortedTagsSelector = createSelector(allTagsSelector, (tags) =>
   sortBy(tags, ['title', 'id'])
 )
@@ -20,9 +20,9 @@ export const singleTagSelector = createSelector(allTagsSelector, selectId, (tags
 
 export const tagsByCategorySelector = createSelector(allTagsSelector, (tags) => {
   const grouped = groupBy(tags, 'categoryId')
-  if (grouped[undefined] !== undefined) {
-    grouped[null] = grouped[undefined].concat(grouped[null] || [])
-    delete grouped[undefined]
+  if (grouped['undefined'] !== undefined) {
+    grouped['null'] = grouped['undefined'].concat(grouped['null'] || [])
+    delete grouped['undefined']
   }
   return grouped
 })

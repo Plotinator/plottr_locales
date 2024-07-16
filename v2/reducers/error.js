@@ -13,7 +13,7 @@ const INITIAL_STATE = {
 }
 
 const errorReducer =
-  (dataRepairers) =>
+  (_dataRepairers) =>
   (state = INITIAL_STATE, action) => {
     switch (action.type) {
       case PERMISSION_ERROR: {

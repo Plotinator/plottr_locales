@@ -6,11 +6,15 @@ import {
   DELETE_TAG,
   FILE_LOADED,
   NEW_FILE,
-  RESET,
   DELETE_TAG_CATEGORY,
   LOAD_TAGS,
   DUPLICATE_TAG,
   REPLACE_MARKED_HITS,
+  ADD_TAG_FROM_PLTR,
+  UNDO,
+  REDO,
+  UNDO_N_TIMES,
+  REDO_N_TIMES,
 } from '../constants/ActionTypes'
 import { tag } from '../store/initialState'
 import { newFileTags } from '../store/newFileState'
@@ -22,7 +26,7 @@ import { replacePlainTextHit } from './replace'
 const initialState = [tag]
 
 const tags =
-  (dataRepairers) =>
+  (_dataRepairers) =>
   (state = initialState, action) => {
     switch (action.type) {
       case ADD_TAG:
@@ -59,7 +63,6 @@ const tags =
       case DELETE_TAG:
         return state.filter((tag) => tag.id !== action.id)
 
-      case RESET:
       case FILE_LOADED:
         return action.data.tags
 
@@ -131,6 +134,26 @@ const tags =
           id: nextId(state),
         }
         return [...state, { ...duplicated }]
+      }
+
+      case ADD_TAG_FROM_PLTR: {
+        const newTag = {
+          ...cloneDeep(action.tag),
+          id: nextId(state),
+          isChecked: undefined,
+        }
+        return [...state, { ...newTag }]
+      }
+
+      case UNDO_N_TIMES:
+      case REDO_N_TIMES:
+      case UNDO:
+      case REDO: {
+        if (Array.isArray(action.state.tags)) {
+          return action.state.tags
+        } else {
+          return state
+        }
       }
 
       default:

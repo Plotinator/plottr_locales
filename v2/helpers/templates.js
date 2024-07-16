@@ -1,27 +1,29 @@
-import { sortBy, range } from 'lodash'
+import { sortBy, identity } from 'lodash'
 
 import * as tree from '../reducers/tree'
 import { addCard } from '../actions/cards'
 import { addBeat } from '../actions/beats'
-import root from '../reducers/root'
-import { addLinesFromTemplate, addLineWithTitle, deleteLine, editLineColor } from '../actions/lines'
+import { addLineWithTitle, deleteLine, editLineColor } from '../actions/lines'
 import { nextId } from './nextBeatId'
 import { nextId as nextLineId } from '../store/newIds'
+import selectors from '../selectors'
+
+const { allLinesSelector, allBeatsSelector, allCardsSelector } = selectors(identity)
 
 const children = (beatTree, id) => {
   return tree.children(beatTree, id)
 }
 
-const maxDepthIncludingRoot = (beatTree, nodeId) => {
-  return 1 + tree.maxDepth('id')(beatTree, nodeId)
+export const maxDepthIncludingRoot = (beatTree) => {
+  return 1 + tree.maxDepth('id')(beatTree)
 }
 
 const depth = (beatTree, nodeId) => {
   if (nodeId === null) {
     return 0
+  } else {
+    return 1 + tree.depth(beatTree, nodeId)
   }
-
-  return 1 + tree.depth(beatTree, nodeId)
 }
 
 // Compute a two-element array that indicates at what depth to start
@@ -37,8 +39,8 @@ const depth = (beatTree, nodeId) => {
 //
 // Note: only the parent of a tree has a depth of 0.
 const computeMergeStart = (tree1, tree2, bias2, selectedIndex) => {
-  const depth1 = maxDepthIncludingRoot(tree1, null)
-  const depth2 = maxDepthIncludingRoot(tree2, null)
+  const depth1 = maxDepthIncludingRoot(tree1)
+  const depth2 = maxDepthIncludingRoot(tree2)
 
   const target1 =
     (selectedIndex || selectedIndex == 0) && depth2 <= depth1 - selectedIndex ? selectedIndex : null
@@ -169,7 +171,7 @@ const beatOrChildrenHasCard = (cardsToAdd, tree, beat) => {
 //
 // Everything suffixed 1 refers to the target, and everything suffixd
 // 2 refers to the template (source).
-const mergeTrees = (
+export const mergeTrees = (
   firstAvailableBeatId,
   bookId,
   tree1,
@@ -180,7 +182,7 @@ const mergeTrees = (
   selectedIndex,
   keepOnlyBeatsWithCards = false
 ) => {
-  const maxDepth1 = maxDepthIncludingRoot(tree1, null)
+  const maxDepth1 = maxDepthIncludingRoot(tree1)
   const [startDepth1, startDepth2] = computeMergeStart(tree1, tree2, bias2, selectedIndex)
 
   const mergeSubTree = (newTree, newBeatId, parent1, beat1, beat2) => {
@@ -291,7 +293,7 @@ const mergeTrees = (
   return [finalTree, finalNextBeatId, addCardActions, addBeatActions]
 }
 
-const findFirstLeaf = (treeToTraverse) => {
+export const findFirstLeaf = (treeToTraverse) => {
   function iter(key) {
     const nodeChildren = sortBy(children(treeToTraverse, key), 'position')
     if (Array.isArray(nodeChildren) && nodeChildren.length === 0) {
@@ -305,104 +307,25 @@ const findFirstLeaf = (treeToTraverse) => {
   return iter(null)
 }
 
-// ASSUME: that there's one book in the template(!)
-export const applyTemplate = (fileState, bookId, template, selectedIndex) => {
-  // Create a reducer to do some heavy lifting.
-  const rootReducer = root({})
-
-  // Create the lines from the template using the existing action.
-  // NOTE: The old action adds the cards too.
-  const addLinesAction = addLinesFromTemplate(
-    { ...template.templateData, cards: [] },
-    template.id,
-    [...fileState.lines, ...template.templateData.lines]
-  )
-  const withNewLines = rootReducer(fileState, addLinesAction)
-
-  const initialDestinationTree = withNewLines.beats[bookId]
-  const maxDestinationDepth = maxDepthIncludingRoot(initialDestinationTree, null)
-
-  const destinationConfiguredHierarchyLevels = withNewLines.hierarchyLevels[bookId]
-  const destinationConfiguredHierarchyLevelCount = Object.keys(
-    destinationConfiguredHierarchyLevels
-  ).length
-  const beatsToAdd =
-    selectedIndex >= maxDestinationDepth &&
-    selectedIndex <= destinationConfiguredHierarchyLevelCount
-      ? Math.min(
-          destinationConfiguredHierarchyLevelCount - maxDestinationDepth,
-          selectedIndex + 1 - maxDestinationDepth
-        )
-      : 0
-  const adjustedState =
-    beatsToAdd > 0
-      ? range(0, beatsToAdd).reduce((newState, _idx) => {
-          const currentTree = newState.beats[bookId]
-          const deepestFirstBeat = findFirstLeaf(currentTree)
-          return rootReducer(newState, addBeat(bookId, deepestFirstBeat))
-        }, withNewLines)
-      : withNewLines
-  const destinationTree = adjustedState.beats[bookId]
-  const sourceTree = Object.values(template.templateData.beats)[0]
-
-  // Compute a mapping function to place new cards onto lines by their
-  // new ids.
-  //
-  // ASSUME:
-  //  - that lines are added to new state in the same order as they
-  //    appear in the template, and
-  const templateDataLines = template.templateData.lines
-  // NOTE: Here, we want the id of the state without lines added.
-  const maxLineId = nextLineId(fileState.lines)
-  const lineMapping = templateDataLines.reduce(
-    // Added lines
-    (acc, nextLine) => {
-      return {
-        ...acc,
-        [nextLine.id]: maxLineId + nextLine.id,
-      }
-    },
-    {}
-  )
-  const nextAvailableBeatId = nextId(adjustedState.beats)
-  // Recursively process the source and destination trees, expanding
-  // the destination tree when required to accomodate as many beats at
-  // the same path that the source has.
-  const [_mergedTree, _nextBeatId, addCardActions, addBeatActions] = mergeTrees(
-    nextAvailableBeatId,
-    bookId,
-    destinationTree,
-    sourceTree,
-    template.templateData.cards,
-    lineMapping,
-    template.mergeBias || 'top',
-    selectedIndex
-  )
-
-  // Apply the actions to add beats and cards.
-  const withNewBeatsAndCards = addBeatActions.concat(addCardActions).reduce((acc, nextAction) => {
-    return rootReducer(acc, nextAction)
-  }, adjustedState)
-
-  return withNewBeatsAndCards
-}
-
 export const moveLineActions = (file, sourceLineId, destinationBookId) => {
-  const sourceLine = file.lines.find((line) => {
+  const lines = allLinesSelector(file)
+  const beats = allBeatsSelector(file)
+  const sourceLine = lines.find((line) => {
     return line.id === sourceLineId
   })
   if (!sourceLine) {
     return []
   }
 
-  const newLineId = nextLineId(file.lines)
+  const newLineId = nextLineId(lines)
   const addLineAction = addLineWithTitle(sourceLine.title, destinationBookId)
   const changeLineColourAction = editLineColor(newLineId, sourceLine.color)
   const bookId = sourceLine.bookId
   // Also deletes the old cards
   const removeOldLineAction = deleteLine(sourceLineId, bookId, sourceLine?.isPinned)
-  const nextAvailableBeatId = nextId(file.beats)
-  const linesCards = file.cards.filter((card) => {
+  const nextAvailableBeatId = nextId(beats)
+  const cards = allCardsSelector(file)
+  const linesCards = cards.filter((card) => {
     return card.lineId === sourceLineId
   })
   const lineMapping = {
@@ -412,8 +335,8 @@ export const moveLineActions = (file, sourceLineId, destinationBookId) => {
   const [_mergedTree, _nextBeatId, addCardActions, addBeatActions] = mergeTrees(
     nextAvailableBeatId,
     destinationBookId,
-    file.beats[destinationBookId],
-    file.beats[bookId],
+    beats[destinationBookId],
+    beats[bookId],
     linesCards,
     lineMapping,
     'top',
@@ -442,8 +365,9 @@ export const levelsDiffer = (selectors) => (destinationFile, templateData) => {
 export const levelToApplyTo = (selectors) => (destinationFile, template) => {
   const { currentTimelineSelector } = selectors
   const currentTimeline = currentTimelineSelector(destinationFile)
+  const beats = allBeatsSelector(destinationFile)
   const [startDepth] = computeMergeStart(
-    destinationFile.beats[currentTimeline],
+    beats[currentTimeline],
     template.templateData.beats['1'],
     template.mergeBias || 'top'
   )

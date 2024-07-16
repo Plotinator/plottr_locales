@@ -9,7 +9,10 @@ import {
 describe('addHierarchiesIfMissing', () => {
   describe('given a file with missing series hierarchy levels', () => {
     it('should add that missing level', () => {
-      expect(file_without_series_hierarchy_levels.hierarchyLevels.series).toBeUndefined()
+      expect(
+        // @ts-ignore
+        file_without_series_hierarchy_levels.hierarchyLevels.series
+      ).toBeUndefined()
       const result = addHierarchiesIfMissing(file_without_series_hierarchy_levels)
       for (const key of Object.keys(result)) {
         const value = result[key]
@@ -23,7 +26,10 @@ describe('addHierarchiesIfMissing', () => {
   })
   describe('given a file with missing hierarchy levels', () => {
     it('should add all missing levels', () => {
-      expect(file_without_hierarchy_levels.hierarchyLevels).toBeUndefined()
+      expect(
+        // @ts-ignore
+        file_without_hierarchy_levels.hierarchyLevels
+      ).toBeUndefined()
       const result = addHierarchiesIfMissing(file_without_hierarchy_levels)
       const bookIds = file_without_hierarchy_levels.books.allIds
       for (const id of bookIds) {

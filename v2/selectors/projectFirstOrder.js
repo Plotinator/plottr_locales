@@ -8,12 +8,15 @@ import { difference } from 'lodash'
 import { isDeviceFileURL } from '../helpers/file'
 import { emptyFile } from '../store/newFileState'
 import { SYSTEM_REDUCER_KEYS } from '../reducers/systemReducers'
-import { fullFileStateSelector } from './fullFileFirstOrder'
+import { fullSystemStateSelector, fullFileStateSelector } from './fullFileFirstOrder'
 
-export const projectSelector = createSelector(fullFileStateSelector, ({ project }) => project)
+export const projectSelector = createSelector(
+  fullSystemStateSelector,
+  ({ project }) => project ?? {}
+)
 export const selectedFileSelector = createSelector(
   projectSelector,
-  ({ selectedFile }) => selectedFile || {}
+  ({ selectedFile }) => selectedFile ?? {}
 )
 export const projectNamingModalIsVisibleSelector = createSelector(
   projectSelector,
@@ -49,15 +52,14 @@ export const backingUpOfflineFileSelector = createSelector(
 )
 export const fileURLSelector = createSelector(projectSelector, ({ fileURL }) => fileURL)
 export const fileURLLoadedSelector = createSelector(fileURLSelector, (fileURL) => {
-  return fileURL && typeof fileURL === 'string' && fileURL.length && fileURL
+  return !!(fileURL && typeof fileURL === 'string' && fileURL.length && fileURL)
 })
 export const isDeviceFileSelector = createSelector(fileURLSelector, (fileURL) =>
   isDeviceFileURL(fileURL)
 )
-export const hasAllKeysSelector = createSelector(fullFileStateSelector, (state) => {
+export const hasAllKeysSelector = createSelector(fullFileStateSelector, (fileState) => {
   const emptyFileState = emptyFile('DummyFile', '2022.11.2')
-  const withoutSystemKeys = difference(Object.keys(state), SYSTEM_REDUCER_KEYS)
-  return difference(Object.keys(emptyFileState), withoutSystemKeys).length === 0
+  return difference(Object.keys(emptyFileState), Object.keys(fileState)).length === 0
 })
 
 export const unsavedChangesSelector = createSelector(projectSelector, ({ unsavedChanges }) => {

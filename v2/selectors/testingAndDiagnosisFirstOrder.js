@@ -4,9 +4,14 @@
 
 import { createSelector } from 'reselect'
 
-const testingAndDiagnosisSelector = ({ testingAndDiagnosis }) => {
-  return testingAndDiagnosis
-}
+import { fullSystemStateSelector } from './fullFileFirstOrder'
+
+const testingAndDiagnosisSelector = createSelector(
+  fullSystemStateSelector,
+  ({ testingAndDiagnosis }) => {
+    return testingAndDiagnosis ?? {}
+  }
+)
 
 export const testingAndDiagnosisEnabledSelector = createSelector(
   testingAndDiagnosisSelector,

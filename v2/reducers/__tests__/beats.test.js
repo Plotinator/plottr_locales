@@ -74,9 +74,17 @@ describe('modifying the hierarchy (and its impact on beats)', () => {
     describe('and the current timeline is book 1', () => {
       it('should adjust the number of levels of beats in book 1', () => {
         const store = initialStore()
-        const initialBeats = beatsForAnotherBookSelector(store.getState(), 1)
+        const initialBeats = beatsForAnotherBookSelector(
+          store.getState(),
+          // @ts-ignore
+          1
+        )
         store.dispatch(setHierarchyLevels([{ 0: hierarchyLevel() }, { 0: hierarchyLevel() }]))
-        const beatsAfter = beatsForAnotherBookSelector(store.getState(), 1)
+        const beatsAfter = beatsForAnotherBookSelector(
+          store.getState(),
+          // @ts-ignore
+          1
+        )
         expect(maxDepth('id')(beatsAfter)).toBeGreaterThan(maxDepth('id')(initialBeats))
         expect(maxDepth('id')(beatsAfter)).toEqual(1)
       })
@@ -84,10 +92,18 @@ describe('modifying the hierarchy (and its impact on beats)', () => {
     describe('and the current timeline is book 2', () => {
       it('should adjust the number of levels of beats in book 2', () => {
         const store = initialStore()
-        const initialBeats = beatsForAnotherBookSelector(store.getState(), 2)
+        const initialBeats = beatsForAnotherBookSelector(
+          store.getState(),
+          // @ts-ignore
+          2
+        )
         store.dispatch(changeCurrentTimeline(2))
         store.dispatch(setHierarchyLevels([{ 0: hierarchyLevel() }, { 0: hierarchyLevel() }]))
-        const beatsAfter = beatsForAnotherBookSelector(store.getState(), 2)
+        const beatsAfter = beatsForAnotherBookSelector(
+          store.getState(),
+          // @ts-ignore
+          2
+        )
         expect(maxDepth('id')(beatsAfter)).toBeGreaterThan(maxDepth('id')(initialBeats))
         expect(maxDepth('id')(beatsAfter)).toEqual(1)
       })
@@ -133,8 +149,16 @@ describe('insertBeat', () => {
             withoutStateWeDontCareAbout(omit(fullFileStateSelector(initialState), 'beats'))
           )
         })
-        const initialBeats = beatsForAnotherBookSelector(initialState, 7)
-        const beatsAfter = beatsForAnotherBookSelector(result, 7)
+        const initialBeats = beatsForAnotherBookSelector(
+          initialState,
+          // @ts-ignore
+          7
+        )
+        const beatsAfter = beatsForAnotherBookSelector(
+          result,
+          // @ts-ignore
+          7
+        )
         it('should only add the act', () => {
           const newBeats = difference(
             Object.values(beatsAfter.index).map(omitPosition),
@@ -154,8 +178,16 @@ describe('insertBeat', () => {
             withoutStateWeDontCareAbout(omit(fullFileStateSelector(initialState), 'beats'))
           )
         })
-        const initialBeats = beatsForAnotherBookSelector(initialState, 7)
-        const beatsAfter = beatsForAnotherBookSelector(result, 7)
+        const initialBeats = beatsForAnotherBookSelector(
+          initialState,
+          // @ts-ignore
+          7
+        )
+        const beatsAfter = beatsForAnotherBookSelector(
+          result,
+          // @ts-ignore
+          7
+        )
         it('should only add the act', () => {
           const newBeats = difference(
             Object.values(beatsAfter.index).map(omitPosition),
@@ -175,8 +207,16 @@ describe('insertBeat', () => {
             withoutStateWeDontCareAbout(omit(fullFileStateSelector(initialState), 'beats'))
           )
         })
-        const initialBeats = beatsForAnotherBookSelector(initialState, 7)
-        const beatsAfter = beatsForAnotherBookSelector(result, 7)
+        const initialBeats = beatsForAnotherBookSelector(
+          initialState,
+          // @ts-ignore
+          7
+        )
+        const beatsAfter = beatsForAnotherBookSelector(
+          result,
+          // @ts-ignore
+          7
+        )
         it('should only add the act', () => {
           const newBeats = difference(
             Object.values(beatsAfter.index).map(omitPosition),
@@ -199,8 +239,16 @@ describe('insertBeat', () => {
             withoutStateWeDontCareAbout(omit(fullFileStateSelector(initialState), 'beats'))
           )
         })
-        const initialBeats = beatsForAnotherBookSelector(initialState, 7)
-        const beatsAfter = beatsForAnotherBookSelector(result, 7)
+        const initialBeats = beatsForAnotherBookSelector(
+          initialState,
+          // @ts-ignore
+          7
+        )
+        const beatsAfter = beatsForAnotherBookSelector(
+          result,
+          // @ts-ignore
+          7
+        )
         const newBeats = difference(
           Object.values(beatsAfter.index).map(omitPosition),
           Object.values(initialBeats.index).map(omitPosition)
@@ -232,8 +280,16 @@ describe('insertBeat', () => {
             withoutStateWeDontCareAbout(omit(fullFileStateSelector(initialState), 'beats'))
           )
         })
-        const initialBeats = beatsForAnotherBookSelector(initialState, 7)
-        const beatsAfter = beatsForAnotherBookSelector(result, 7)
+        const initialBeats = beatsForAnotherBookSelector(
+          initialState,
+          // @ts-ignore
+          7
+        )
+        const beatsAfter = beatsForAnotherBookSelector(
+          result,
+          // @ts-ignore
+          7
+        )
         const newBeats = difference(
           Object.values(beatsAfter.index).map(omitPosition),
           Object.values(initialBeats.index).map(omitPosition)
@@ -266,8 +322,16 @@ describe('insertBeat', () => {
             withoutStateWeDontCareAbout(omit(fullFileStateSelector(initialState), 'beats'))
           )
         })
-        const initialBeats = beatsForAnotherBookSelector(initialState, 7)
-        const beatsAfter = beatsForAnotherBookSelector(result, 7)
+        const initialBeats = beatsForAnotherBookSelector(
+          initialState,
+          // @ts-ignore
+          7
+        )
+        const beatsAfter = beatsForAnotherBookSelector(
+          result,
+          // @ts-ignore
+          7
+        )
         const newBeats = difference(
           Object.values(beatsAfter.index).map(omitPosition),
           Object.values(initialBeats.index).map(omitPosition)

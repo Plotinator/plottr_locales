@@ -1,4 +1,17 @@
-import { omit, isEqual, isEmpty, identity, uniqWith, groupBy, countBy } from 'lodash'
+import {
+  omit,
+  isEqual,
+  isEmpty,
+  identity,
+  uniqWith,
+  groupBy,
+  countBy,
+  mapValues,
+  isPlainObject,
+  startCase,
+  pickBy,
+  isNumber,
+} from 'lodash'
 
 import {
   ADD_PLACES_ATTRIBUTE,
@@ -186,6 +199,18 @@ import {
   SET_REPLACE_WORD,
   ADD_CHARACTER_WITH_TEMPLATE,
   SET_DASHBOARD_MODAL_VIEW,
+  SHOW_IMPORT_DATA_PICKER,
+  CLOSE_IMPORT_PLOTTR_MODAL,
+  TOGGLE_ID_MARKED_TO_IMPORT,
+  TOGGLE_ALL_SECTION_MARKED_TO_IMPORT,
+  TOGGLE_BOOK_TO_IMPORT,
+  // TODO!  How do we handle collaborators?
+  UNDO,
+  REDO,
+  UNDO_N_TIMES,
+  REDO_N_TIMES,
+  TOGGLE_CUSTOM_ATTRIBUTE_TO_IMPORT,
+  SHOW_PRO_ACCOUNT_RECENT_FILES,
 } from '../constants/ActionTypes'
 import {
   ui as defaultUI,
@@ -229,7 +254,9 @@ export const addCustomAttributeOrdering = (state, fullState) => {
 
   // Case 1: there is no custom attribute ordering
   if (!state.customAttributeOrder) {
-    const attributes = fullState?.ui ? characterAttributesForCurrentBookSelector(fullState) : []
+    const attributes = fullState?.user?.ui
+      ? characterAttributesForCurrentBookSelector(fullState)
+      : []
     return {
       ...state,
       customAttributeOrder: {
@@ -241,18 +268,18 @@ export const addCustomAttributeOrdering = (state, fullState) => {
   const existingOrder = state.customAttributeOrder.characters.filter(({ type, id, name }) => {
     return (
       (type === 'customAttributes' &&
-        fullState.customAttributes.characters.some((customAttribute) => {
+        fullState?.user?.customAttributes?.characters?.some((customAttribute) => {
           return customAttribute?.name === name
         })) ||
       (type === 'attributes' &&
-        fullState.attributes.characters.some((attribute) => {
+        fullState?.user?.attributes?.characters?.some((attribute) => {
           return attribute?.id === id
         }))
     )
   })
 
   // Case 2: there is an incomplete custom attribute ordering
-  const attributes = fullState?.ui ? characterAttributesForCurrentBookSelector(fullState) : []
+  const attributes = fullState?.user?.ui ? characterAttributesForCurrentBookSelector(fullState) : []
   const notOrdered = attributes.filter((attribute) => {
     return !state.customAttributeOrder.characters.some((orderEntry) => {
       if (attribute.id) {
@@ -319,7 +346,7 @@ const updateUI = (state, action) => {
       const pinnedPlotlines = {}
 
       Object.entries(linesPerBook).forEach(([bookId, group]) => {
-        const pinnedCount = countBy(group, 'isPinned')[true] || 0
+        const pinnedCount = countBy(group, 'isPinned')['true'] || 0
         if (pinnedCount > 0) {
           pinnedPlotlines[String(bookId)] = pinnedCount
         }
@@ -398,7 +425,7 @@ const updateUI = (state, action) => {
     case SET_OUTLINE_FILTER: {
       if (!action.filter || !Object.values(action.filter)) {
         filter = null
-      } else if (typeof action.filter === 'object') {
+      } else if (action.filter && typeof action.filter === 'object') {
         filter = action.filter
       } else if (
         Array.isArray(state.outlineFilter) &&
@@ -419,7 +446,7 @@ const updateUI = (state, action) => {
 
     case FILE_LOADED: {
       const initialState = (!isEmpty(action.data.ui) && action.data.ui) || newFileUI
-      return addCustomAttributeOrdering(initialState, action.data)
+      return addCustomAttributeOrdering(initialState, { user: action.data })
     }
 
     case CREATE_CHARACTER_ATTRIBUTE: {
@@ -1237,6 +1264,7 @@ const updateUI = (state, action) => {
       return attributesToUpdate.reduce((acc, nextAttributeKey) => {
         const baseAttributeName = nextAttributeKey
         const pathToSet = cardFocusPath(action.id, {
+          // @ts-ignore
           baseAttributeName,
         })
         const key =
@@ -1299,8 +1327,10 @@ const updateUI = (state, action) => {
             }
           : null
       const pathToSet = cardFocusPath(action.id, {
+        // @ts-ignore
         baseAttributeName,
         customAttributeName,
+        // @ts-ignore
         template,
       })
       const newFocus = {
@@ -2386,13 +2416,219 @@ const updateUI = (state, action) => {
       }
     }
 
+    case SHOW_PRO_ACCOUNT_RECENT_FILES: {
+      return {
+        ...state,
+        importModal: {
+          showProRecentFiles: true,
+        },
+      }
+    }
+
+    case SHOW_IMPORT_DATA_PICKER: {
+      const {
+        lines,
+        customAttributes,
+        notes,
+        characters,
+        places,
+        tags,
+        fileType,
+        beats,
+        books,
+        cards,
+        hierarchyLevels,
+        images,
+      } = action
+      const adjustedCustomAttributes = Object.entries(customAttributes)
+        .map(([key, attributes]) => {
+          if (!isEmpty(attributes)) {
+            return {
+              [key]: {
+                attributes,
+                isChecked: true,
+                id: key,
+                name: startCase(key),
+              },
+            }
+          }
+        })
+        .reduce((acc, obj) => {
+          if (!isEmpty(obj)) {
+            // I don't agree with typescript here.  acc must allways
+            // be defined.
+            //
+            // @ts-ignore
+            acc[Object.keys(obj)[0]] = Object.values(obj)[0]
+          }
+          return acc
+        }, {})
+
+      return {
+        ...state,
+        importModal: {
+          type: fileType || 'ptlr',
+          data: {
+            books: mapValues(omit(books, 'allIds', 'deleted'), (val, _key) => {
+              if (val.id) {
+                return {
+                  ...val,
+                  isChecked: true,
+                }
+              }
+            }),
+            notes: notes.filter(({ id }) => id).map((i) => ({ ...i, isChecked: true })),
+            characters: characters.filter(({ id }) => id).map((i) => ({ ...i, isChecked: true })),
+            places: places.filter(({ id }) => id).map((i) => ({ ...i, isChecked: true })),
+            tags: tags.filter(({ id }) => id).map((i) => ({ ...i, isChecked: true })),
+            customAttributes: adjustedCustomAttributes,
+            images,
+          },
+          bookData: {
+            allIds: books['allIds'],
+            lines: lines.filter(({ id }) => id),
+            beats: pickBy(omit(beats, 'deleted'), (val, key) => {
+              return isNumber(Number(key))
+            }),
+            cards: cards.filter(({ id }) => id),
+            hierarchyLevels: pickBy(omit(hierarchyLevels, 'deleted'), (val, key) => {
+              return isNumber(Number(key))
+            }),
+          },
+          open: true,
+        },
+      }
+    }
+
+    case CLOSE_IMPORT_PLOTTR_MODAL: {
+      return {
+        ...state,
+        importModal: undefined,
+      }
+    }
+
+    case TOGGLE_ID_MARKED_TO_IMPORT: {
+      const { section, id, checked } = action
+      const importModal = state.importModal ?? {}
+      const dataToImport = importModal.data
+      const sectionToImport = dataToImport[section]
+
+      const matchIndex = sectionToImport.findIndex((data) => data.id === id)
+      const modifiedSection =
+        matchIndex !== -1
+          ? sectionToImport.map((section) => {
+              if (section.id === id) {
+                return {
+                  ...section,
+                  isChecked: checked,
+                }
+              }
+              return section
+            })
+          : sectionToImport
+
+      return {
+        ...state,
+        importModal: {
+          ...importModal,
+          data: {
+            ...importModal.data,
+            [section]: modifiedSection,
+          },
+        },
+      }
+    }
+
+    case TOGGLE_ALL_SECTION_MARKED_TO_IMPORT: {
+      const { section, checked } = action
+      const importModal = state.importModal ?? {}
+      const data = importModal.data ?? {}
+      const allSectionData = data[section]
+      const modifiedSection =
+        section === 'books' || isPlainObject(section)
+          ? mapValues(allSectionData, (val) => ({
+              ...val,
+              isChecked: checked,
+            }))
+          : allSectionData.map((val) => ({
+              ...val,
+              isChecked: checked,
+            }))
+
+      return {
+        ...state,
+        importModal: {
+          ...importModal,
+          data: {
+            ...importModal.data,
+            [section]: modifiedSection,
+          },
+        },
+      }
+    }
+
+    case TOGGLE_BOOK_TO_IMPORT: {
+      const { bookId, checked } = action
+      const importModal = state.importModal ?? {}
+
+      return {
+        ...state,
+        importModal: {
+          ...importModal,
+          data: {
+            ...importModal.data,
+            ['books']: {
+              ...importModal.data['books'],
+              [bookId]: {
+                ...importModal.data['books'][bookId],
+                isChecked: checked,
+              },
+            },
+          },
+        },
+      }
+    }
+
+    case TOGGLE_CUSTOM_ATTRIBUTE_TO_IMPORT: {
+      const { section, checked } = action
+      const importModal = state.importModal ?? {}
+
+      return {
+        ...state,
+        importModal: {
+          ...importModal,
+          data: {
+            ...importModal.data,
+            ['customAttributes']: {
+              ...importModal.data['customAttributes'],
+              [section]: {
+                ...importModal.data['customAttributes'][section],
+                isChecked: checked,
+              },
+            },
+          },
+        },
+      }
+    }
+
+    case UNDO_N_TIMES:
+    case REDO_N_TIMES:
+    case UNDO:
+    case REDO: {
+      if (action?.state?.ui && typeof action.state.ui === 'object') {
+        return action.state.ui
+      } else {
+        return state
+      }
+    }
+
     default:
       return state
   }
 }
 
 const ui =
-  (dataRepairers) =>
+  (_dataRepairers) =>
   (state = defaultUI, action) => {
     if (action.type === 'LOAD_UI') {
       return action.ui
@@ -2428,6 +2664,7 @@ const ui =
         }
 
         const collaboratorExists = state?.collaborators?.collaborators?.some((uiState) => {
+          // @ts-ignore
           return uiState.id === action.currentUserId
         })
 
@@ -2436,7 +2673,9 @@ const ui =
             ...state,
             collaborators: {
               ...state.collaborators,
+              // @ts-ignore
               collaborators: state.collaborators.collaborators.map((collaboratorUI) => {
+                // @ts-ignore
                 if (collaboratorUI.id === action.currentUserId) {
                   return updateUI(collaboratorUI, action)
                 } else {
@@ -2477,6 +2716,7 @@ const ui =
         }
 
         const collaboratorExists = state?.collaborators?.viewers?.some((uiState) => {
+          // @ts-ignore
           return uiState.id === action.currentUserId
         })
 
@@ -2486,6 +2726,7 @@ const ui =
             collaborators: {
               ...state.collaborators,
               viewers: state.collaborators.viewers.map((collaboratorUI) => {
+                // @ts-ignore
                 if (collaboratorUI.id === action.currentUserId) {
                   return updateUI(collaboratorUI, action)
                 } else {

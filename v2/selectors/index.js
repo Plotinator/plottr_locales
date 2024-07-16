@@ -4,6 +4,10 @@ const selectors = (selectSubState) => {
   return Object.entries(allSelectors).reduce((selectorsAcc, nextEntry) => {
     const [name, initialSelector] = nextEntry
 
+    /**
+     * @param {any} selector
+     * @returns {function(...any): any}
+     */
     function thunkUntilSelector(selector) {
       return function applyArgs(...args) {
         if (typeof selector.memoizedResultFunc === 'undefined') {
@@ -26,7 +30,7 @@ const selectors = (selectSubState) => {
       ...selectorsAcc,
       [name]: thunkUntilSelector(initialSelector),
     }
-  }, {})
+  }, allSelectors)
 }
 
 export default selectors

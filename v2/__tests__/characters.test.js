@@ -23,7 +23,11 @@ describe('editCharacterName', () => {
   describe('given an initial file', () => {
     describe('and a character id of 1', () => {
       const store = storeWithZelda()
-      const originalName = singleCharacterSelector(store.getState(), 1).name
+      const originalName = singleCharacterSelector(
+        store.getState(),
+        // @ts-ignore
+        1
+      ).name
       const originalCharacterFoci = characterFociSelector(store.getState())
       store.dispatch(
         editCharacterName(1, 'Zelborg', {
@@ -33,7 +37,11 @@ describe('editCharacterName', () => {
         })
       )
       it('should update the character name', () => {
-        const newName = singleCharacterSelector(store.getState(), 1).name
+        const newName = singleCharacterSelector(
+          store.getState(),
+          // @ts-ignore
+          1
+        ).name
         expect(newName).not.toEqual(originalName)
         expect(newName).toEqual('Zelborg')
       })
@@ -137,6 +145,7 @@ describe('editCharacterTemplateAttribute', () => {
           const store = storeWithZelda()
           const originalValue = characterTemplateAttributeValueSelector(
             store.getState(),
+            // @ts-ignore
             3,
             'ch3',
             'Birth Order'
@@ -152,6 +161,8 @@ describe('editCharacterTemplateAttribute', () => {
           it('should edit the value of "Birth Order"', () => {
             const newValue = characterTemplateAttributeValueSelector(
               store.getState(),
+
+              // @ts-ignore
               3,
               'ch3',
               'Birth Order'
@@ -250,9 +261,11 @@ describe('editCharacterAttributeValue', () => {
     describe('and a character id of 3', () => {
       describe('and an attribute id of 2', () => {
         const store = storeWithZelda()
-        const originalValue = characterAttributeValuesForCurrentBookSelector(store.getState(), 3)[
-          '2'
-        ][0]
+        const originalValue = characterAttributeValuesForCurrentBookSelector(
+          store.getState(),
+          // @ts-ignore
+          3
+        )['2'][0]
         const originalFoci = characterFociSelector(store.getState())
         store.dispatch(
           editCharacterAttributeValue(3, 2, 'Woah there, horsey!', {
@@ -262,9 +275,11 @@ describe('editCharacterAttributeValue', () => {
           })
         )
         it('should edit the value of the custom attribute', () => {
-          const newValue = characterAttributeValuesForCurrentBookSelector(store.getState(), 3)[
-            '2'
-          ][0]
+          const newValue = characterAttributeValuesForCurrentBookSelector(
+            store.getState(),
+            // @ts-ignore
+            3
+          )['2'][0]
           expect(newValue).not.toEqual(originalValue)
           expect(newValue).toEqual('Woah there, horsey!')
         })
@@ -357,7 +372,11 @@ describe('editShortDescription', () => {
   describe('given an initial file', () => {
     describe('and a character id of 3', () => {
       const store = storeWithZelda()
-      const originalValue = displayedSingleCharacterSelector(store.getState(), 3).description
+      const originalValue = displayedSingleCharacterSelector(
+        store.getState(),
+        // @ts-ignore
+        3
+      ).description
       const originalFoci = characterFociSelector(store.getState())
       store.dispatch(
         editShortDescription(3, 'Dude, where is my turbuencabulator', {
@@ -367,7 +386,11 @@ describe('editShortDescription', () => {
         })
       )
       it('should edit the character description', () => {
-        const newValue = displayedSingleCharacterSelector(store.getState(), 3).description
+        const newValue = displayedSingleCharacterSelector(
+          store.getState(),
+          // @ts-ignore
+          3
+        ).description
         expect(newValue).not.toEqual(originalValue)
         expect(newValue).toEqual('Dude, where is my turbuencabulator')
       })
@@ -467,7 +490,11 @@ describe('editDescription', () => {
   describe('given an initial file', () => {
     describe('and a character id of 3', () => {
       const store = storeWithZelda()
-      const originalValue = displayedSingleCharacterSelector(store.getState(), 3).notes
+      const originalValue = displayedSingleCharacterSelector(
+        store.getState(),
+        // @ts-ignore
+        3
+      ).notes
       const originalFoci = characterFociSelector(store.getState())
       const valueToChangeTo = [{ type: 'paragraph', children: [{ text: 'yippeee!' }] }]
       store.dispatch(
@@ -478,7 +505,11 @@ describe('editDescription', () => {
         })
       )
       it('should modify the description', () => {
-        const newValue = displayedSingleCharacterSelector(store.getState(), 3).notes
+        const newValue = displayedSingleCharacterSelector(
+          store.getState(),
+          // @ts-ignore
+          3
+        ).notes
         expect(newValue).not.toEqual(originalValue)
         expect(newValue).toEqual(valueToChangeTo)
       })

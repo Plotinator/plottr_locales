@@ -8,11 +8,11 @@ import { sortBy, groupBy } from 'lodash'
 import { fullFileStateSelector } from './fullFileFirstOrder'
 import { positionReset } from '../helpers/lists'
 
-export const allPlacesSelector = createSelector(fullFileStateSelector, (state) => state.places)
+export const allPlacesSelector = createSelector(fullFileStateSelector, ({ places }) => places ?? [])
 
-const selectId = (state, id) => id
-export const singlePlaceSelector = createSelector(allPlacesSelector, selectId, (places, propId) =>
-  places.find(({ id }) => id === propId)
+const selectId = (_state, id) => id
+export const singlePlaceSelector = createSelector(allPlacesSelector, selectId, (places, placeId) =>
+  places.find(({ id }) => id === placeId)
 )
 
 export const placesSortedAtoZSelector = createSelector(allPlacesSelector, (places) =>

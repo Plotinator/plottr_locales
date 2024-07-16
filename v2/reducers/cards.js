@@ -27,7 +27,6 @@ import {
   REMOVE_TAG_FROM_CARD,
   REORDER_CARDS_IN_BEAT,
   REORDER_CARDS_WITHIN_LINE,
-  RESET,
   RESET_TIMELINE,
   DELETE_BOOK,
   LOAD_CARDS,
@@ -48,6 +47,11 @@ import {
   DUPLICATE_BOOK,
   REORDER_CARD_TEMPLATE_ATTRIBUTES,
   REPLACE_MARKED_HITS,
+  ADD_BOOK_FROM_PLTR,
+  UNDO,
+  REDO,
+  UNDO_N_TIMES,
+  REDO_N_TIMES,
 } from '../constants/ActionTypes'
 import { newFileCards } from '../store/newFileState'
 import { card as defaultCard } from '../store/initialState'
@@ -123,6 +127,7 @@ const cards =
         }
       }
 
+      case ADD_BOOK_FROM_PLTR:
       case DUPLICATE_BOOK: {
         const newCards = action.newCards.map((c) => {
           const newCard = cloneDeep(c)
@@ -436,7 +441,6 @@ const cards =
         // they are ones that are NOT being removed
         return state.filter((card) => action.beatIds[card.beatId] || action.lineIds[card.lineId])
 
-      case RESET:
       case FILE_LOADED:
         return action.data.cards.map((card) => {
           const normalizeRCEContent = repair('normalizeRCEContent')
@@ -566,7 +570,7 @@ const cards =
       case DUPLICATE_LINE: {
         const cardsOnLine = state.filter(({ lineId }) => lineId === action.id)
         const newState = cloneDeep(cardsOnLine)
-          .map((card, index) => ({
+          .map((card, _index) => ({
             ...card,
             lineId: action.newLineId,
           }))
@@ -723,6 +727,17 @@ const cards =
             }
           })
         }, state)
+      }
+
+      case UNDO_N_TIMES:
+      case REDO_N_TIMES:
+      case UNDO:
+      case REDO: {
+        if (Array.isArray(action.state.cards)) {
+          return action.state.cards
+        } else {
+          return state
+        }
       }
 
       default:

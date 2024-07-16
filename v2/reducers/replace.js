@@ -23,7 +23,9 @@ export const replaceInSlateDatastructure = (data, start, hit, replacement) => {
         }
       }
     } else if (isObject(node)) {
+      // @ts-ignore
       if (typeof node.text === 'string') {
+        // @ts-ignore
         const positionAtEndOfText = position + node.text.length
         const isInThisText =
           positionAtEndOfText > start && start + hit.length <= positionAtEndOfText
@@ -32,14 +34,18 @@ export const replaceInSlateDatastructure = (data, start, hit, replacement) => {
             positionAtEndOfText,
             {
               ...node,
+              // @ts-ignore
               text: replacePlainTextHit(node.text, start - position, hit, replacement),
             },
           ]
         } else {
           return [positionAtEndOfText, { ...node }]
         }
+        // @ts-ignore
       } else if (Array.isArray(node.children)) {
+        // @ts-ignore
         const [newPosition, replaced] = iter(position, node.children)
+        // @ts-ignore
         const positionAdjustment = typeof node.children[0]?.text === 'string' ? 1 : 0
         return [
           newPosition + positionAdjustment,

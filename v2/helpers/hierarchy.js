@@ -1,6 +1,4 @@
-import { nextColor, nextDarkColor } from '../../v2/store/lineColors'
-import { DASHED, DOTTED, nextBorderStyle, NONE, SOLID } from '../store/borderStyle'
-import { hierarchyLevel } from '../store/initialState'
+import { DASHED, DOTTED, NONE, SOLID } from '../store/borderStyle'
 import { t } from 'plottr_locales'
 
 import { getTextColor } from './colors'
@@ -27,7 +25,7 @@ const noneIsTransparent = (borderStyle, borderColor) => {
 }
 
 export const hierarchyToStyles = (
-  { level, textSize, borderStyle, backgroundColor },
+  { textSize, borderStyle, backgroundColor },
   timelineSize,
   hovering,
   theme,
@@ -57,23 +55,4 @@ export const nextLevelName = (depth) => {
   const LEVEL_NAMES = [t('Scene'), t('Chapter'), t('Act')]
   if (depth == 'default') return t('Chapter')
   return LEVEL_NAMES[depth] || `Level-${depth + 1}`
-}
-
-export const newHierarchyLevel = (allHierarchyLevels) => {
-  return {
-    ...hierarchyLevel(),
-    name: nextLevelName(allHierarchyLevels.length),
-    level: 0,
-    borderStyle: nextBorderStyle(allHierarchyLevels.length),
-    textColor: nextColor(allHierarchyLevels.length),
-    borderColor: nextColor(allHierarchyLevels.length),
-    dark: {
-      textColor: nextDarkColor(allHierarchyLevels.length),
-      borderColor: nextDarkColor(allHierarchyLevels.length),
-    },
-    light: {
-      textColor: nextColor(allHierarchyLevels.length),
-      borderColor: nextColor(allHierarchyLevels.length),
-    },
-  }
 }

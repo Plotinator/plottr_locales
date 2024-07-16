@@ -4,7 +4,6 @@ import {
   ADD_CHARACTER_WITH_TEMPLATE,
   FILE_LOADED,
   NEW_FILE,
-  RESET,
   ATTACH_CHARACTER_TO_CARD,
   REMOVE_CHARACTER_FROM_CARD,
   ATTACH_CHARACTER_TO_NOTE,
@@ -41,6 +40,11 @@ import {
   REORDER_CHARACTER_TEMPLATES,
   REPLACE_MARKED_HITS,
   REORDER_CHARACTER_MANUALLY,
+  ADD_CHARACTER_FROM_PLTR,
+  UNDO,
+  REDO,
+  UNDO_N_TIMES,
+  REDO_N_TIMES,
 } from '../constants/ActionTypes'
 import { character as defaultCharacter } from '../store/initialState'
 import { newFileCharacters } from '../store/newFileState'
@@ -278,7 +282,9 @@ const characters =
             return {
               ...character,
               templates: character.templates.map((template) => {
+                // @ts-ignore
                 if (template.id === action.templateId) {
+                  // @ts-ignore
                   const templateHasAttribute = template.attributes.some((attribute) => {
                     return attribute.name === action.name
                   })
@@ -288,11 +294,14 @@ const characters =
                   const isAttributeValue = (attribute) => {
                     return attribute.bookId === action.bookId && attribute.name === action.name
                   }
+                  // @ts-ignore
                   const hasAttributeValue = (template.values || []).some(isAttributeValue)
                   return {
+                    // @ts-ignore
                     ...template,
                     values: hasAttributeValue
-                      ? (template.values || []).map((attribute) => {
+                      ? // @ts-ignore
+                        (template.values || []).map((attribute) => {
                           if (isAttributeValue(attribute))
                             return {
                               ...attribute,
@@ -302,6 +311,7 @@ const characters =
                           return attribute
                         })
                       : [
+                          // @ts-ignore
                           ...(template.values || []),
                           { name: action.name, value: action.value, bookId: action.bookId },
                         ],
@@ -322,6 +332,7 @@ const characters =
               return character
             }
             const newCharacter = cloneDeep(character)
+            // @ts-ignore
             newCharacter.templates.push({
               id: action.templateData.id,
               version: action.templateData.version,
@@ -587,6 +598,7 @@ const characters =
       case REMOVE_TEMPLATE_FROM_CHARACTER:
         return state.map((character) => {
           if (character.id !== action.id) return character
+          // @ts-ignore
           const newTemplates = character.templates.filter((t) => t.id != action.templateId)
           return Object.assign({}, character, { templates: newTemplates })
         })
@@ -613,6 +625,7 @@ const characters =
 
       case DELETE_CARD:
         return state.map((character) => {
+          // @ts-ignore
           if (character.cards.indexOf(action.id) === -1) {
             return character
           } else {
@@ -637,7 +650,6 @@ const characters =
           }
         })
 
-      case RESET:
       case FILE_LOADED:
         return action.data.characters.map((character) => {
           const normalizeRCEContent = repair('normalizeRCEContent')
@@ -665,6 +677,7 @@ const characters =
           // Problem is here.  Also take a look at whether deleting
           // tags works now.
           const character =
+            // @ts-ignore
             rawCharacter?.categoryId?.toString() === action.categoryId.toString()
               ? {
                   ...rawCharacter,
@@ -762,6 +775,15 @@ const characters =
           id: nextId(state),
         }
         return [...state, { ...duplicated }]
+      }
+
+      case ADD_CHARACTER_FROM_PLTR: {
+        const newCharacter = {
+          ...cloneDeep(action.character),
+          id: nextId(state),
+          isChecked: undefined,
+        }
+        return [...state, { ...newCharacter }]
       }
 
       case CREATE_CHARACTER_ATTRIBUTE: {
@@ -1036,6 +1058,17 @@ const characters =
             }
           })
         }, state)
+      }
+
+      case UNDO_N_TIMES:
+      case REDO_N_TIMES:
+      case UNDO:
+      case REDO: {
+        if (Array.isArray(action.state.characters)) {
+          return action.state.characters
+        } else {
+          return state
+        }
       }
 
       default:

@@ -4,9 +4,7 @@
   "name": "12 Step Mystery Formula",
   "description": "An outline formula for writing a traditional mystery",
   "version": "2021.10.15",
-  "categories": [
-    "mystery"
-  ],
+  "categories": ["mystery"],
   "templateData": {
     "cards": [
       {
@@ -1415,20 +1413,7 @@
           "13": [],
           "14": [],
           "16": [],
-          "null": [
-            1,
-            2,
-            3,
-            8,
-            9,
-            10,
-            12,
-            13,
-            14,
-            16,
-            5,
-            6
-          ]
+          "null": [1, 2, 3, 8, 9, 10, 12, 13, 14, 16, 5, 6]
         },
         "heap": {
           "1": null,
@@ -1582,9 +1567,7 @@
       "series": {
         "children": {
           "17": [],
-          "null": [
-            17
-          ]
+          "null": [17]
         },
         "heap": {
           "17": null
@@ -1648,9 +1631,5 @@
     }
   },
   "initialVersion": "2021.2.19",
-  "appliedMigrations": [
-    "m2021_4_13",
-    "m2021_6_9",
-    "m2021_8_1"
-  ]
+  "appliedMigrations": ["m2021_4_13", "m2021_6_9", "m2021_8_1"]
 }

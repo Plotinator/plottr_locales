@@ -3,8 +3,8 @@
 // dependencies.
 import { createSelector } from 'reselect'
 
-import { fullFileStateSelector } from './fullFileFirstOrder'
+import { fullSystemStateSelector } from './fullFileFirstOrder'
 
-export const imageCacheSelector = createSelector(fullFileStateSelector, ({ imageCache }) => {
-  return imageCache || {}
+export const imageCacheSelector = createSelector(fullSystemStateSelector, ({ imageCache }) => {
+  return imageCache ?? {}
 })

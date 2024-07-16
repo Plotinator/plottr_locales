@@ -3,17 +3,21 @@
 // dependencies.
 import { createSelector } from 'reselect'
 
-import { fullFileStateSelector } from './fullFileFirstOrder'
+import { fullSystemStateSelector } from './fullFileFirstOrder'
+
+const notificationSelector = createSelector(fullSystemStateSelector, ({ notifications }) => {
+  return notifications ?? {}
+})
 
 export const toastNotificationSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.notifications.toast
+  notificationSelector,
+  (notifications) => notifications.toast
 )
 export const messageSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.notifications.message
+  notificationSelector,
+  (notifications) => notifications.message
 )
 export const timeoutSelector = createSelector(
-  fullFileStateSelector,
-  (state) => state.notifications.timeout
+  notificationSelector,
+  (notifications) => notifications.timeout
 )

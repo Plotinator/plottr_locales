@@ -4,9 +4,11 @@
 
 import { createSelector } from 'reselect'
 
-const domEventsSelector = (state) => {
-  return state.domEvents
-}
+import { fullSystemStateSelector } from './fullFileFirstOrder'
+
+const domEventsSelector = createSelector(fullSystemStateSelector, ({ domEvents }) => {
+  return domEvents ?? {}
+})
 
 export const lastClickSelector = createSelector(domEventsSelector, ({ lastClick }) => {
   return lastClick

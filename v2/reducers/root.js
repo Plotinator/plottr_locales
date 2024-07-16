@@ -1,6 +1,6 @@
 /** @module Reducers */
 
-import { identity, omit } from 'lodash'
+import { identity, isEmpty, omit } from 'lodash'
 
 import unrepairedMainReducer from './main'
 import {
@@ -40,6 +40,7 @@ import {
   REORDER_CHARACTER_MANUALLY,
   ADD_CHARACTER_WITH_TEMPLATE,
   CHANGE_CURRENT_TIMELINE,
+  ADD_BOOK_FROM_PLTR,
 } from '../constants/ActionTypes'
 import selectors from '../selectors'
 import { reduce, beatsByPosition, nextId as nextBeatId } from '../helpers/beats'
@@ -49,12 +50,17 @@ import { beat as defaultBeat } from '../store/initialState'
 import { cloneDeep, zip, range } from 'lodash'
 import { addBeat } from '../actions/beats'
 import { setTimelineView } from '../actions/ui'
-import { deleteLine } from '../actions/lines'
+import { deleteLine, addLinesFromTemplate } from '../actions/lines'
 import { reorderCardsWithinLine } from '../actions/cards'
-import { applyTemplate, moveLineActions } from '../helpers/templates'
+import {
+  moveLineActions,
+  mergeTrees,
+  maxDepthIncludingRoot,
+  findFirstLeaf,
+} from '../helpers/templates'
 import { reorderList } from '../helpers/lists'
 import { pinMovedLine } from '../actions/lines'
-import { sortedLinesByBookSelector } from '../selectors/timelineThirdOrder'
+import { forceBatchStart, forceBatchEnd } from '../actions/undo'
 
 const {
   selectedCharacterAttributeTabSelector,
@@ -75,6 +81,14 @@ const {
   allCardsSelector,
   sortedBeatsByBookSelector,
   hierarchyLevelsForAnotherBookSelector,
+  allCharactersSelector,
+  allBooksSelector,
+  allBeatsSelector,
+  allLinesSelector,
+  seriesSelector,
+  allHierarchyLevelsSelector,
+  pinnedPlotlinesForAnotherBookSelector,
+  beatsForAnotherBookSelector,
 } = selectors(identity)
 
 const addCharacterAttributeDataForModifyingBaseAttribute = (baseAttributeName, state, action) => {
@@ -152,12 +166,19 @@ const root = (dataRepairers) => {
       case CHANGE_CURRENT_TIMELINE: {
         const oldTimelineId = currentTimelineSelector(state)
         const oldHierarchyLevelCount = Object.values(
+          // @ts-ignore
           hierarchyLevelsForAnotherBookSelector(state, oldTimelineId)
         ).length
         const newTimelineId = action.id
-        const rawLevelsForNewBook = hierarchyLevelsForAnotherBookSelector(state, newTimelineId)
+        const rawLevelsForNewBook = hierarchyLevelsForAnotherBookSelector(
+          state,
+          // @ts-ignore
+          newTimelineId
+        )
         const newHierarchyLevelCount =
-          typeof rawLevelsForNewBook === 'object' ? Object.values(rawLevelsForNewBook).length : 9
+          rawLevelsForNewBook && typeof rawLevelsForNewBook === 'object'
+            ? Object.values(rawLevelsForNewBook).length
+            : 9
         if (oldHierarchyLevelCount !== newHierarchyLevelCount && newHierarchyLevelCount === 1) {
           return mainReducer(state, { ...action, timelineView: 'default' })
         } else {
@@ -179,7 +200,8 @@ const root = (dataRepairers) => {
       case ADD_CHARACTER_WITH_TEMPLATE:
       case ADD_CHARACTER: {
         const currentBookId = selectedCharacterAttributeTabSelector(state)
-        const nextCharacterId = nextId(state.characters)
+        const characters = allCharactersSelector(state)
+        const nextCharacterId = nextId(characters)
         return mainReducer(state, {
           ...action,
           currentBookId,
@@ -253,14 +275,17 @@ const root = (dataRepairers) => {
               return mainReducer(state, { ...action, actTab: topLevelbeatIds[position - 1] })
             }
           } else {
-            const withDefaultView = mainReducer(state, setTimelineView('default'))
-            return mainReducer(withDefaultView, {
+            const withBatchStart = mainReducer(state, forceBatchStart('Delete Beat', state))
+            const withDefaultView = mainReducer(withBatchStart, setTimelineView('default'))
+            const withBeatDeleted = mainReducer(withDefaultView, {
               ...action,
               actTab: topLevelbeatIds[position - 1],
             })
+            return mainReducer(withBeatDeleted, forceBatchEnd(withBeatDeleted))
           }
+        } else {
+          return mainReducer(state, action)
         }
-        return mainReducer(state, action)
       }
 
       case INSERT_BEAT: {
@@ -268,50 +293,103 @@ const root = (dataRepairers) => {
         if (timelineViewIsTabbed) {
           const activeParentId = timelineActiveTabSelector(state)
           return mainReducer(state, { ...action, parentId: activeParentId })
+        } else {
+          const timelineViewIsStacked = timelineViewIsStackedSelector(state)
+          return mainReducer(state, { ...action, timelineViewIsStacked })
         }
-
-        const timelineViewIsStacked = timelineViewIsStackedSelector(state)
-        return mainReducer(state, { ...action, timelineViewIsStacked })
       }
 
-      case ADD_BOOK:
-        return mainReducer(state, { ...action, newBookId: objectId(state.books.allIds) })
+      case ADD_BOOK: {
+        const books = allBooksSelector(state)
+        return mainReducer(state, { ...action, newBookId: objectId(books.allIds) })
+      }
 
-      case DUPLICATE_BOOK: {
-        const beatsInNewBook = cloneDeep(state.beats[action.id])
+      case ADD_BOOK_FROM_PLTR: {
+        const currentBooks = allBooksSelector(state)
+        const currentBeats = allBeatsSelector(state)
+        const currentLines = allLinesSelector(state)
+        const currentCards = allCardsSelector(state)
+        const beatsInNewBook = cloneDeep(action.beats)
+        const copiedLines = cloneDeep(action.lines)
         const copiedCards = cloneDeep(
-          state.cards.filter((card) =>
+          action.cards.filter((card) =>
             Object.keys(beatsInNewBook.index).includes(String(card.beatId))
           )
+        ).map((card) => {
+          return {
+            ...card,
+            imageId: !isEmpty(card.imageId)
+              ? String(action.images[String(card.imageId)]?.newId)
+              : null,
+          }
+        })
+        return mainReducer(state, {
+          ...action,
+          newBookId: objectId(currentBooks.allIds),
+          nextLineId: nextId(currentLines),
+          nextBeatId: nextBeatId(currentBeats),
+          nextCardId: nextId(currentCards),
+          newBeats: beatsInNewBook,
+          newCards: copiedCards,
+          newLines: copiedLines,
+          imageId: !isEmpty(action.book?.imageId)
+            ? String(action.images[String(action.book.imageId)]?.newId)
+            : null,
+        })
+      }
+
+      case DUPLICATE_BOOK: {
+        const beats = allBeatsSelector(state)
+        const beatsInNewBook = cloneDeep(beats[action.id])
+        const cards = allCardsSelector(state)
+        const copiedCards = cloneDeep(
+          cards.filter((card) => Object.keys(beatsInNewBook.index).includes(String(card.beatId)))
         )
-        const copiedLines = cloneDeep(state.lines.filter((line) => action.id == line.bookId))
+        const lines = allLinesSelector(state)
+        const copiedLines = cloneDeep(lines.filter((line) => action.id == line.bookId))
+        const books = allBooksSelector(state)
 
         return mainReducer(state, {
           ...action,
-          newBookId: objectId(state.books.allIds),
-          nextLineId: nextId(state.lines),
-          nextBeatId: nextBeatId(state.beats),
-          nextCardId: nextId(state.cards),
+          newBookId: objectId(books.allIds),
+          nextLineId: nextId(lines),
+          nextBeatId: nextBeatId(beats),
+          nextCardId: nextId(cards),
           newBeats: beatsInNewBook,
           newCards: copiedCards,
           newLines: copiedLines,
         })
       }
-      case ADD_BOOK_FROM_TEMPLATE:
+
+      case ADD_BOOK_FROM_TEMPLATE: {
         // cards from the template need to know the new ids of lines and beats from the template
         // the strategy here is to use the state's next id value + the template id's current value
         // the card reducer will have access to the state's next id value so it will be able to determine the correct id
+        const lines = allLinesSelector(state)
+        const books = allBooksSelector(state)
+        const cards = allCardsSelector(state)
+        const beats = allBeatsSelector(state)
+
         return mainReducer(state, {
           ...action,
-          newBookId: objectId(state.books.allIds),
-          nextLineId: nextId(state.lines),
-          nextBeatId: nextBeatId(state.beats),
-          nextCardId: nextId(state.cards),
+          newBookId: objectId(books.allIds),
+          nextLineId: nextId(lines),
+          nextBeatId: nextBeatId(beats),
+          nextCardId: nextId(cards),
         })
+      }
 
       case MOVE_CARD_TO_BOOK: {
-        const destinationLineId = firstLineForBookSelector(state, action.bookId).id
-        const destinationBeatId = firstVisibleBeatForBookSelector(state, action.bookId).id
+        const destinationLineId = firstLineForBookSelector(
+          state,
+          // @ts-ignore
+          action.bookId
+        ).id
+        const destinationBeatId = firstVisibleBeatForBookSelector(
+          state,
+          // @ts-ignore
+          action.bookId
+        ).id
 
         const newAction = {
           ...action,
@@ -323,7 +401,8 @@ const root = (dataRepairers) => {
       }
 
       case DUPLICATE_LINE: {
-        const newLineId = nextId(state.lines)
+        const lines = allLinesSelector(state)
+        const newLineId = nextId(lines)
         const newAction = {
           ...action,
           newLineId,
@@ -340,10 +419,13 @@ const root = (dataRepairers) => {
         // FOR BEATS:
         // cards will use the cardToBeatIdMap to use the current book's beat ids
         // but if more beats are needed, they will be created with subsequent ids
-        const bookId = state.ui.currentTimeline
-        let nextIdForBeats = nextBeatId(state.beats)
-        const lines = sortedLinesByBookSelector(state)
-        let beatTree = cloneDeep(state.beats[bookId])
+        const currentTimeline = currentTimelineSelector(state)
+        const cards = allCardsSelector(state)
+        const beats = allBeatsSelector(state)
+        const bookId = currentTimeline
+        let nextIdForBeats = nextBeatId(beats)
+        const lines = allLinesSelector(state)
+        let beatTree = cloneDeep(beats[bookId])
         let createdNewBeats = false
         // make a card -> beatId mapping (beatId is from existing beats … augmented with new ones)
         const beatPositions = beatsByPosition(() => true)(beatTree).map(({ id }) => id)
@@ -370,8 +452,8 @@ const root = (dataRepairers) => {
         return mainReducer(state, {
           ...action,
           bookId,
-          nextLineId: nextId(state.lines),
-          nextCardId: nextId(state.cards),
+          nextLineId: nextId(lines),
+          nextCardId: nextId(cards),
           createdNewBeats,
           newTree: beatTree,
           cardToBeatIdMap,
@@ -380,15 +462,20 @@ const root = (dataRepairers) => {
       }
 
       case DELETE_BOOK: {
-        const linesToDelete = state.lines.filter((l) => l.bookId == action.id).map((l) => l.id)
+        const books = allBooksSelector(state)
+        const lines = allLinesSelector(state)
+        const currentTimeline = currentTimelineSelector(state)
+        const linesToDelete = lines.filter((l) => l.bookId == action.id).map((l) => l.id)
         const newAction = {
           ...action,
           linesToDelete: linesToDelete,
         }
-        if (state.ui.currentTimeline == action.id) {
-          const nextBookId = state.books.allIds.find((id) => id != action.id)
+        if (currentTimeline == action.id) {
+          const nextBookId = books.allIds.find((id) => id != action.id)
           let newState = { ...state }
-          newState.ui.currentTimeline = nextBookId
+          // Fixme: this feels a little meh :/ We shouldn't access the
+          // file state directly.
+          newState.user.ui.currentTimeline = nextBookId
           return mainReducer(newState, newAction)
         } else {
           return mainReducer(state, newAction)
@@ -396,9 +483,11 @@ const root = (dataRepairers) => {
       }
 
       case CLEAR_TEMPLATE_FROM_TIMELINE: {
+        const beats = allBeatsSelector(state)
+        const lines = allLinesSelector(state)
         // finding beats that will NOT be removed
         const beatIdsToClear = reduce(
-          state.beats,
+          beats,
           (acc, beat) => {
             if (beat.bookId != action.bookId || beat.fromTemplateId != action.templateId) {
               acc[beat.id] = true
@@ -408,7 +497,7 @@ const root = (dataRepairers) => {
           {}
         )
         // finding lines that will NOT be removed
-        const lineIdsToClear = state.lines.reduce((acc, l) => {
+        const lineIdsToClear = lines.reduce((acc, l) => {
           if (l.bookId != action.bookId || l.fromTemplateId != action.templateId) {
             acc[l.id] = true
           }
@@ -419,10 +508,12 @@ const root = (dataRepairers) => {
       }
 
       case RESET_TIMELINE: {
-        if (typeof state.beats[action.bookId] === 'object') {
+        const beats = allBeatsSelector(state)
+        const lines = allLinesSelector(state)
+        if (beats[action.bookId] && typeof beats[action.bookId] === 'object') {
           let newResetAction = { ...action, isSeries }
           // finding beats that will NOT be removed
-          const beatIdsToKeep = Object.values(omit(state.beats, action.bookId))
+          const beatIdsToKeep = Object.values(omit(beats, action.bookId))
             .flatMap((beatTree) => {
               return Object.values(beatTree.index)
             })
@@ -433,7 +524,7 @@ const root = (dataRepairers) => {
               }
             }, {})
           // finding lines that will NOT be removed
-          const lineIdsToReset = state.lines.reduce((acc, l) => {
+          const lineIdsToReset = lines.reduce((acc, l) => {
             if (l.bookId != action.bookId) {
               acc[l.id] = true
             }
@@ -451,21 +542,24 @@ const root = (dataRepairers) => {
       }
 
       case MOVE_LINE: {
-        const line = state.lines.find((line) => {
+        const lines = allLinesSelector(state)
+        const books = allBooksSelector(state)
+        const series = seriesSelector(state)
+        const line = lines.find((line) => {
           return line.id === action.id
         })
         // No such line or book
         if (
           !line ||
           (action.destinationBookId !== 'series' &&
-            typeof state.books[action.destinationBookId] === 'undefined')
+            typeof books[action.destinationBookId] === 'undefined')
         ) {
           return state
         }
 
         const sourceBookId = line.bookId
 
-        const book = line.bookId === 'series' ? state.series : state.books[line.bookId]
+        const book = line.bookId === 'series' ? series : books[line.bookId]
         if (typeof book === 'undefined') {
           return state
         }
@@ -474,28 +568,41 @@ const root = (dataRepairers) => {
           return state
         }
 
-        const sourceLevelsOfHierarchy = Object.values(state.hierarchyLevels[sourceBookId]).length
+        const hierarchyLevels = allHierarchyLevelsSelector(state)
+
+        const sourceLevelsOfHierarchy = Object.values(hierarchyLevels[sourceBookId]).length
         const destinationLevelsOfHierarchy = Object.values(
-          state.hierarchyLevels[action.destinationBookId]
+          hierarchyLevels[action.destinationBookId]
         ).length
         // We don't move lines between books with different levels of hierarchy.
         if (sourceLevelsOfHierarchy !== destinationLevelsOfHierarchy) {
           return state
         }
 
-        const { actions, newLineId } = moveLineActions(state, action.id, action.destinationBookId)
+        const {
+          // @ts-ignore
+          actions,
+          // @ts-ignore
+          newLineId,
+        } = moveLineActions(state, action.id, action.destinationBookId)
+
+        // Start a batch
+        const withBatchStarted = mainReducer(state, forceBatchStart('Move Line', state))
 
         // Add the new line
         const withNewLine = actions.reduce((accState, nextAction) => {
           return mainReducer(accState, nextAction)
-        }, state)
+        }, withBatchStarted)
 
         if (line.isPinned) {
-          const destinationBookLines = withNewLine.lines.filter(
+          const destinationBookLines = allLinesSelector(withNewLine).filter(
             (l) => l.bookId === action.destinationBookId
           )
-          const destinationBookPinnedPlotlines = Number(
-            withNewLine.ui?.timeline?.pinnedPlotlines[action.destinationBookId] || 0
+          const destinationBookPinnedPlotlines = pinnedPlotlinesForAnotherBookSelector(
+            // @ts-ignore
+            withNewLine,
+            // @ts-ignore
+            action.destinationBookId
           )
           const totalPinnedPlotlines = Math.max(1, destinationBookPinnedPlotlines + 1)
           const reorderedLines = reorderList(
@@ -508,20 +615,26 @@ const root = (dataRepairers) => {
             withNewLine,
             pinMovedLine(newLineId, action.destinationBookId, reorderedLines, totalPinnedPlotlines)
           )
-          return mainReducer(withLinePinned, deleteLine(action.id))
+          // Remove the old line
+          const withLineRemoved = mainReducer(withLinePinned, deleteLine(action.id))
+          // Close the batch
+          return mainReducer(withLineRemoved, forceBatchEnd(withLineRemoved))
+        } else {
+          // Remove the old line & cards
+          const withLineRemoved = mainReducer(withNewLine, deleteLine(action.id))
+          // Close the batch
+          return mainReducer(withLineRemoved, forceBatchEnd(withLineRemoved))
         }
-
-        // Remove the old line & cards
-        return mainReducer(withNewLine, deleteLine(action.id))
       }
 
       case RESTRUCTURE_TIMELINE: {
         const { flatBeats, beatHierarchyLevels } = action
         const bookId = currentTimelineSelector(state)
         const timelineViewIsStacked = timelineViewIsStackedSelector(state)
-        const maxDepth = tree.maxDepth('id')(state.beats[bookId])
+        const beats = allBeatsSelector(state)
+        const maxDepth = tree.maxDepth('id')(beats[bookId])
 
-        let newBeatId = nextBeatId(state.beats)
+        let newBeatId = nextBeatId(beats)
         let newBeatTree = tree.newTree('id')
         let lastHierarchyLevel = null
         let lastBeatId = null
@@ -558,8 +671,10 @@ const root = (dataRepairers) => {
             startLevel === 0 && startLevel === level
               ? null
               : level === lastHierarchyLevel
-              ? tree.nodeParent(newBeatTree, lastBeatId)
-              : level < lastHierarchyLevel && level === 1
+              ? // @ts-ignore
+                tree.nodeParent(newBeatTree, lastBeatId)
+              : // @ts-ignore
+              level < lastHierarchyLevel && level === 1
               ? tree.nodeParent(newBeatTree, tree.nodeParent(newBeatTree, lastBeatId))
               : lastBeatId
 
@@ -572,7 +687,9 @@ const root = (dataRepairers) => {
           lastHierarchyLevel = tree.depth(newBeatTree, lastBeatId)
 
           if (timelineViewIsStacked) {
+            // @ts-ignore
             const nextBeat = flatBeats[index + 1]
+            // @ts-ignore
             const nextLevel = beatHierarchyLevels[index + 1]
             const finalLevel = tree.depth(newBeatTree, lastBeatId)
             if (finalLevel !== maxDepth && (!nextBeat || nextLevel <= finalLevel)) {
@@ -597,13 +714,14 @@ const root = (dataRepairers) => {
           }
         }
 
-        let finalState = state
+        // Open a batch
+        let finalState = mainReducer(state, forceBatchStart('Restructure Timeline', state))
         if (timelineViewIsStacked) {
           const allCards = allCardsSelector(state)
           const allBeats = sortedBeatsByBookSelector(state)
           const sceneBeatsThatMovedUp = allBeats
             .filter((beat, index) => {
-              const isSceneBeat = tree.depth(state.beats[bookId], beat.id) === maxDepth
+              const isSceneBeat = tree.depth(beats[bookId], beat.id) === maxDepth
               const endedHigherThanScene = beatHierarchyLevels[index] < maxDepth
               return isSceneBeat && endedHigherThanScene
             })
@@ -633,7 +751,14 @@ const root = (dataRepairers) => {
           }
         }
 
-        return mainReducer(finalState, { type: UNSAFE_SET_BEATS, bookId, beats: newBeatTree })
+        // Update the beats
+        const withForceUpdatedBeats = mainReducer(finalState, {
+          type: UNSAFE_SET_BEATS,
+          bookId,
+          beats: newBeatTree,
+        })
+        // Close the batch
+        return mainReducer(withForceUpdatedBeats, forceBatchEnd(withForceUpdatedBeats))
       }
 
       case SET_HIERARCHY_LEVELS: {
@@ -646,11 +771,16 @@ const root = (dataRepairers) => {
       case ADD_CARD:
       case REORDER_CARDS_WITHIN_LINE: {
         const bookId = currentTimelineSelector(state)
-        const beats = state.beats[bookId]
+        const allBeats = allBeatsSelector(state)
+        const beats = allBeats[bookId]
         const beatId = action.beatId || action.card.beatId
         const depthOfBeat = tree.depth(beats, beatId)
         const maxDepth = tree.maxDepth('id')(beats)
-        const newBeatId = nextBeatId(state.beats)
+        const newBeatId = nextBeatId(allBeats)
+        // Start a batch
+        const actionLable = action.type === ADD_CARD ? 'Add Card' : 'Reorder Cards'
+        const withOpenBatch = mainReducer(state, forceBatchStart(actionLable, state))
+        // Make space for the card
         const [newState, finalBeatId, _nextBeatId] =
           action.addMissingBeats && depthOfBeat !== maxDepth
             ? range(maxDepth, depthOfBeat).reduce(
@@ -659,20 +789,133 @@ const root = (dataRepairers) => {
                   const newState = mainReducer(currentState, addBeat(bookId, beatId))
                   return [newState, newBeatId, newBeatId + 1]
                 },
-                [state, beatId, newBeatId]
+                [withOpenBatch, beatId, newBeatId]
               )
-            : [state, beatId, newBeatId]
-        return mainReducer(newState, {
+            : [withOpenBatch, beatId, newBeatId]
+        // Move the card
+        const afterMovingBeat = mainReducer(newState, {
           ...action,
           ...(action.beatId ? { beatId: finalBeatId } : {}),
           ...(action.card ? { card: { ...action.card, beatId: finalBeatId } } : {}),
         })
+        // Close the batch
+        return mainReducer(afterMovingBeat, forceBatchEnd(afterMovingBeat))
       }
 
-      default:
+      default: {
         return mainReducer(state, action)
+      }
     }
   }
+}
+
+// ASSUME: that there's one book in the template(!)
+export const applyTemplate = (fileState, bookId, template, selectedIndex) => {
+  // Create a reducer to do some heavy lifting.
+  const rootReducer = root({})
+
+  const lines = allLinesSelector(fileState)
+
+  // Start a batch
+  const withBatchStarted = rootReducer(fileState, forceBatchStart('Apply Template', fileState))
+
+  // Create the lines from the template using the existing action.
+  // NOTE: The old action adds the cards too.
+  const addLinesAction = addLinesFromTemplate(
+    { ...template.templateData, cards: [] },
+    template.id,
+    [...lines, ...template.templateData.lines]
+  )
+  const withNewLines = rootReducer(withBatchStarted, addLinesAction)
+
+  const initialDestinationTree = beatsForAnotherBookSelector(
+    withNewLines,
+    // @ts-ignore
+    bookId
+  )
+  const maxDestinationDepth = maxDepthIncludingRoot(
+    initialDestinationTree,
+    // @ts-ignore
+    null
+  )
+
+  const destinationConfiguredHierarchyLevels = hierarchyLevelsForAnotherBookSelector(
+    withNewLines,
+
+    // @ts-ignore
+    bookId
+  )
+  const destinationConfiguredHierarchyLevelCount = Object.keys(
+    destinationConfiguredHierarchyLevels
+  ).length
+  const beatsToAdd =
+    selectedIndex >= maxDestinationDepth &&
+    selectedIndex <= destinationConfiguredHierarchyLevelCount
+      ? Math.min(
+          destinationConfiguredHierarchyLevelCount - maxDestinationDepth,
+          selectedIndex + 1 - maxDestinationDepth
+        )
+      : 0
+  const adjustedState =
+    beatsToAdd > 0
+      ? range(0, beatsToAdd).reduce((newState, _idx) => {
+          const currentTree = beatsForAnotherBookSelector(
+            newState,
+            // @ts-ignore
+            bookId
+          )
+          const deepestFirstBeat = findFirstLeaf(currentTree)
+          return rootReducer(newState, addBeat(bookId, deepestFirstBeat))
+        }, withNewLines)
+      : withNewLines
+  const destinationTree = beatsForAnotherBookSelector(
+    adjustedState,
+    // @ts-ignore
+    bookId
+  )
+  const sourceTree = Object.values(template.templateData.beats)[0]
+
+  // Compute a mapping function to place new cards onto lines by their
+  // new ids.
+  //
+  // ASSUME:
+  //  - that lines are added to new state in the same order as they
+  //    appear in the template, and
+  const templateDataLines = template.templateData.lines
+  // NOTE: Here, we want the id of the state without lines added.
+  const maxLineId = nextId(lines)
+  const lineMapping = templateDataLines.reduce(
+    // Added lines
+    (acc, nextLine) => {
+      return {
+        ...acc,
+        [nextLine.id]: maxLineId + nextLine.id,
+      }
+    },
+    {}
+  )
+  const nextAvailableBeatId = nextBeatId(allBeatsSelector(adjustedState))
+  // Recursively process the source and destination trees, expanding
+  // the destination tree when required to accomodate as many beats at
+  // the same path that the source has.
+  const [_mergedTree, _nextBeatId, addCardActions, addBeatActions] = mergeTrees(
+    nextAvailableBeatId,
+    bookId,
+    destinationTree,
+    sourceTree,
+    template.templateData.cards,
+    lineMapping,
+    template.mergeBias || 'top',
+    selectedIndex
+  )
+
+  // Apply the actions to add beats and cards.
+  const withNewBeatsAndCards = addBeatActions.concat(addCardActions).reduce((acc, nextAction) => {
+    return rootReducer(acc, nextAction)
+  }, adjustedState)
+
+  // End the batch
+  return rootReducer(withNewBeatsAndCards, forceBatchEnd(withNewBeatsAndCards))
 }
 
 export default root
