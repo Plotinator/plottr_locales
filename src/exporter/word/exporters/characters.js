@@ -1,14 +1,16 @@
 import { t } from 'plottr_locales'
 import { Paragraph, AlignmentType, HeadingLevel, ImageRun } from 'docx'
-import { selectors } from 'pltr/v2'
+import { uniqWith, isEqual } from 'lodash'
+
+import { helpers } from 'pltr'
 
 import exportItemTemplates from './itemTemplates'
 import { serialize } from './to_word'
 
-const { characterCategoriesSelector } = selectors
+const { isEmpty } = helpers.text
 
-export default function exportCharacters(state, options) {
-  const directives = characterDataExportDirectives(state, options)
+export default function exportCharacters(state, options, selectors) {
+  const directives = characterDataExportDirectives(state, options, selectors)
   const images = selectors.imagesSelector(state)
   return [{ children: interpret(directives, images) }]
 }
@@ -20,7 +22,9 @@ const seriesToAll = (timelineName) => {
   return timelineName
 }
 
-export function characterDataExportDirectives(state, options) {
+export function characterDataExportDirectives(state, options, selectors) {
+  const { characterCategoriesSelector } = selectors
+
   if (!options.characters.export) {
     return []
   }
@@ -37,6 +41,8 @@ export function characterDataExportDirectives(state, options) {
   )
   const attributesSelector = (characterId) =>
     selectors.characterAttributesSelector(state, characterId, bookToExport)
+  const defaultAttributesSelector = (characterId) =>
+    selectors.characterAttributesSelector(state, characterId, 'all')
 
   if (options.characters.heading) {
     paragraphs.push({
@@ -83,7 +89,14 @@ export function characterDataExportDirectives(state, options) {
       paragraphs = [...paragraphs, { type: 'rce', data: ch.notes }]
     }
     if (options.characters.customAttributes) {
-      paragraphs = [...paragraphs, { type: 'custom-atttributes', data: attributesSelector(ch.id) }]
+      paragraphs = [
+        ...paragraphs,
+        {
+          type: 'custom-atttributes',
+          data: attributesSelector(ch.id),
+          defaults: defaultAttributesSelector(ch.id),
+        },
+      ]
     }
     if (options.characters.templates) {
       paragraphs = [...paragraphs, { type: 'templates', character: ch }]
@@ -91,6 +104,32 @@ export function characterDataExportDirectives(state, options) {
   })
 
   return paragraphs
+}
+
+function valueNotEmpty(attributeValue) {
+  return (
+    (typeof attributeValue === 'string' && attributeValue) ||
+    (Array.isArray(attributeValue) && !isEmpty(attributeValue))
+  )
+}
+
+function withDefaultedValues(attributes, attributeDefaults) {
+  const allAttributeNames = uniqWith(
+    attributes.concat(attributeDefaults).map(({ name }) => {
+      return name
+    }),
+    isEqual
+  )
+  const findByName = (xs, searchName) => {
+    return xs.find(({ name, value }) => {
+      return name === searchName && valueNotEmpty(value)
+    })
+  }
+  return allAttributeNames
+    .reduce((acc, next) => {
+      return [...acc, findByName(attributes, next) ?? findByName(attributeDefaults, next)]
+    }, [])
+    .filter(Boolean)
 }
 
 export function interpret(paragraphs, images) {
@@ -122,10 +161,13 @@ export function interpret(paragraphs, images) {
         return serialize(props.data)
       }
       case 'custom-atttributes': {
-        return exportAttributes(props.data, HeadingLevel.HEADING_3)
+        return exportAttributes(
+          withDefaultedValues(props.data, props.defaults),
+          HeadingLevel.HEADING_3
+        )
       }
       case 'templates': {
-        return exportItemTemplates(props.character, HeadingLevel.HEADING_3)
+        return exportItemTemplates(props.character)
       }
       default: {
         return []

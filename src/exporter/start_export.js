@@ -19,10 +19,11 @@ export default function askToExport(
   stat,
   mkdir,
   basename,
+  selectors,
   cb
 ) {
-  const fileNamePromise = saveDialog ? saveDialog(defaultPath, type) : Promise.resolve(defaultPath)
-  fileNamePromise.then((fileName) => {
+  const fileNamePromise = saveDialog ? saveDialog(defaultPath) : Promise.resolve(defaultPath)
+  return fileNamePromise.then((fileName) => {
     console.log('In exporter...')
     if (fileName) {
       console.log('MPQ event about to be logged...')
@@ -43,7 +44,8 @@ export default function askToExport(
               writeFile,
               stat,
               mkdir,
-              basename
+              basename,
+              selectors
             )
               .then(() => {
                 cb(null, true)
@@ -63,13 +65,14 @@ export default function askToExport(
               notifyUser,
               userId,
               downloadStorageImage,
-              writeFile
+              writeFile,
+              selectors
             )
               .then((filePath) => {
                 cb(null, filePath)
               })
               .catch((error) => {
-                logger.error('error', error)
+                logger.error('Error exporting to Word', error)
                 cb(error, false)
               })
             return

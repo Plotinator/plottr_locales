@@ -124,8 +124,8 @@ describe('imageIndex', () => {
         },
       }
       expect(imageIndex(extractImages(file), file)).toEqual({
-        haha: 7,
-        blah: 1,
+        haha: [7],
+        blah: [1],
       })
     })
   })
@@ -148,7 +148,7 @@ describe('imageIndex', () => {
           ],
         }
         expect(imageIndex(extractImages(file), file)).toEqual({
-          'This is some data.': Number.NEGATIVE_INFINITY + 1,
+          'This is some data.': [Number.MIN_VALUE + 1],
         })
       })
       describe('and the RCE image is a link', () => {
@@ -169,7 +169,7 @@ describe('imageIndex', () => {
             ],
           }
           expect(imageIndex(extractImages(file), file)).toEqual({
-            'This is some data.': Number.NEGATIVE_INFINITY + 1,
+            'This is some data.': [Number.MIN_VALUE + 1],
           })
         })
       })
@@ -204,9 +204,9 @@ describe('imageIndex', () => {
           },
         }
         expect(imageIndex(extractImages(file), file)).toEqual({
-          blah: 1,
-          haha: 7,
-          'This is some data.': 8,
+          blah: [1],
+          haha: [7],
+          'This is some data.': [8],
         })
       })
       describe('when there are duplicate images by their content', () => {
@@ -244,9 +244,55 @@ describe('imageIndex', () => {
             },
           }
           expect(imageIndex(extractImages(file), file)).toEqual({
-            blah: 1,
-            haha: 7,
-            'This is some data.': 9,
+            blah: [1],
+            haha: [7],
+            'This is some data.': [9],
+          })
+        })
+      })
+      describe('when there are duplicated images by their content in the index', () => {
+        it('should produce duplicate images by their id in the index', () => {
+          const file = {
+            characters: [
+              {
+                id: 1,
+                name: 'Link',
+                description: 'Protagnist',
+                notes: [
+                  {
+                    type: 'image-data',
+                    data: 'This is some data.',
+                  },
+                ],
+              },
+            ],
+            images: {
+              1: {
+                id: 1,
+                data: 'blah',
+                path: 'some/image.jpg',
+              },
+              7: {
+                id: 7,
+                data: 'haha',
+                path: 'some/image.jpg',
+              },
+              9: {
+                id: 9,
+                data: 'This is some data.',
+                path: 'some/image.jpg',
+              },
+              11: {
+                id: 11,
+                data: 'This is some data.',
+                path: 'some/image.jpg',
+              },
+            },
+          }
+          expect(imageIndex(extractImages(file), file)).toEqual({
+            blah: [1],
+            haha: [7],
+            'This is some data.': [9, 11],
           })
         })
       })
@@ -383,7 +429,7 @@ describe('patchImages', () => {
           extractedImages,
           imageIndex(extractedImages, file),
           {
-            [Number.NEGATIVE_INFINITY + 1]: 'This is some jpeg data.',
+            [1]: 'This is some jpeg data.',
           },
           file
         )
@@ -402,8 +448,8 @@ describe('patchImages', () => {
           },
         ],
         images: {
-          [Number.NEGATIVE_INFINITY + 1]: {
-            id: Number.NEGATIVE_INFINITY + 1,
+          [Number.MIN_VALUE + 1]: {
+            id: Number.MIN_VALUE + 1,
             name: '',
             data: 'This is some jpeg data.',
             path: '',

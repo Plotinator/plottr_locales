@@ -2,10 +2,12 @@ import { t } from 'plottr_locales'
 import { Paragraph, AlignmentType, HeadingLevel, ImageRun } from 'docx'
 
 import exportItemAttachments from './itemAttachments'
-
+import exportCustomAttributes from './customAttributes'
 import { serialize } from './to_word'
 
-export default function exportNotes(state, namesMapping, options) {
+export default function exportNotes(state, namesMapping, options, selectors) {
+  const { noteCategoriesSelector, allNotesSelector, imagesSelector, noteCustomAttributesSelector } =
+    selectors
   let children = [new Paragraph({ text: '', pageBreakBefore: true })]
 
   if (options.notes.heading) {
@@ -18,16 +20,32 @@ export default function exportNotes(state, namesMapping, options) {
     )
   }
 
-  const paragraphs = notes(state.notes, namesMapping, state.images, options)
+  const allNoteCategories = Object.values(noteCategoriesSelector(state))
+  const allNotes = allNotesSelector(state)
+  const allImages = imagesSelector(state)
+  const placeCutsomAttributes = noteCustomAttributesSelector(state)
+
+  const paragraphs = notes(
+    allNotes,
+    namesMapping,
+    allImages,
+    options,
+    placeCutsomAttributes,
+    allNoteCategories
+  )
 
   return [{ children: children.concat(paragraphs) }]
 }
 
-function notes(notes, namesMapping, images, options) {
+function notes(notes, namesMapping, images, options, customAttributes, allNoteCategories) {
   let paragraphs = []
   notes.forEach(function (n) {
     paragraphs.push(new Paragraph({ text: '' }))
     paragraphs.push(new Paragraph({ text: n.title, heading: HeadingLevel.HEADING_2 }))
+    if (options.notes.category) {
+      const category = allNoteCategories.find((category) => String(category.id) === n.categoryId)
+      if (category) paragraphs.push(new Paragraph({ text: category.name }))
+    }
     if (options.notes.images && n.imageId) {
       const imgData = images[n.imageId] && images[n.imageId].data
       if (imgData) {
@@ -51,6 +69,9 @@ function notes(notes, namesMapping, images, options) {
     }
     if (options.notes.content) {
       paragraphs = [...paragraphs, ...serialize(n.content)]
+    }
+    if (options.notes.customAttributes) {
+      paragraphs = [...paragraphs, ...exportCustomAttributes(n, customAttributes)]
     }
   })
 

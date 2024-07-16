@@ -1,7 +1,7 @@
 import { Paragraph, TextRun, HeadingLevel, ImageRun, ExternalHyperlink } from 'docx'
 import tinycolor from 'tinycolor2'
 
-import { helpers } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 /* NONE of this works
 const numbering = new Numbering({

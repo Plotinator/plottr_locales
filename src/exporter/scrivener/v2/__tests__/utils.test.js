@@ -1,3 +1,7 @@
+import { identity } from 'lodash'
+
+import { selectors as pltrSelectors } from 'pltr'
+
 import {
   convertUnicode,
   addToScrivx,
@@ -10,6 +14,8 @@ import {
   buildDescriptionFromObject,
   isPropertyEmpty,
 } from '../utils'
+
+const selectors = pltrSelectors(identity)
 
 describe('scrivener export utils', () => {
   describe('convertUnicode', () => {
@@ -70,26 +76,28 @@ describe('scrivener export utils', () => {
 
   describe('buildTagsString', () => {
     const state = {
-      tags: [
-        {
-          color: 'firebrick',
-          id: 0,
-          title: 'awesomeness',
-        },
-        {
-          color: 'crimson',
-          id: 1,
-          title: 'sad',
-        },
-      ],
+      user: {
+        tags: [
+          {
+            color: 'firebrick',
+            id: 0,
+            title: 'awesomeness',
+          },
+          {
+            color: 'crimson',
+            id: 1,
+            title: 'sad',
+          },
+        ],
+      },
     }
     it('builds a string of tag titles', () => {
       // 1 intentionally included even though there is no tag
-      expect(buildTagsString([0, 1], state)).toEqual('awesomeness, sad')
+      expect(buildTagsString([0, 1], state, selectors)).toEqual('awesomeness, sad')
     })
 
     it('gracefully handles missing tags', () => {
-      expect(buildTagsString([1, 2], state)).toEqual('sad')
+      expect(buildTagsString([1, 2], state, selectors)).toEqual('sad')
     })
   })
 

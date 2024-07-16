@@ -54,15 +54,16 @@ export const imageIndex = (imagesInRCEContent, file) => {
   const indexedImages = (file.images && Object.values(file.images)) || []
 
   const index = {}
-  let maxId = Number.NEGATIVE_INFINITY
-  indexedImages.forEach(({ id, name, path, data }) => {
-    index[(data.length > 0 && data) || path] = id
+  let maxId = Number.MIN_VALUE
+  indexedImages.forEach(({ id, path, data }) => {
+    const existingIds = index[(data?.length > 0 && data) || path] ?? []
+    index[(data?.length > 0 && data) || path] = [...existingIds, id]
     maxId = Math.max(id, maxId)
   })
-  imagesInRCEContent.forEach(({ path, data, storageUrl }) => {
+  imagesInRCEContent.forEach(({ data, storageUrl }) => {
     const key = data || storageUrl
     if (!index[key]) {
-      index[key] = ++maxId
+      index[key] = [++maxId]
     }
   })
 
@@ -73,8 +74,8 @@ export const patchImages = (rceImages, imageIndex, dataIndex, file) => {
   const newFile = cloneDeep(file)
 
   rceImages.forEach(({ path, storageUrl, data }) => {
-    const imageId = imageIndex[data] || imageIndex[storageUrl]
-    const imageData = dataIndex[imageId]
+    const imageIds = imageIndex[data] || imageIndex[storageUrl]
+    const imageData = dataIndex[imageIds[0]]
 
     let rceImage = newFile
     cloneDeep(path).forEach((key) => {
@@ -87,14 +88,16 @@ export const patchImages = (rceImages, imageIndex, dataIndex, file) => {
 
   delete newFile.images
   newFile.images = {}
-  Object.entries(imageIndex).forEach(([data, imageId]) => {
-    const imageData = dataIndex[imageId]
-    newFile.images[imageId] = {
-      data: imageData,
-      id: imageId,
-      name: (file.images && file.images[imageId]?.name) || '',
-      path: '',
-    }
+  Object.entries(imageIndex).forEach(([_data, imageIds]) => {
+    const imageData = dataIndex[imageIds[0]]
+    imageIds.forEach((imageId) => {
+      newFile.images[imageId] = {
+        data: imageData,
+        id: imageId,
+        name: (file.images && file.images[imageId]?.name) || '',
+        path: '',
+      }
+    })
   })
 
   return newFile
@@ -111,10 +114,15 @@ export const fileNameIndex = (file) => {
 function webpURLToJpeg(url) {
   if (typeof window === 'undefined') {
     return axios.get(url).then((response) => {
-      return response.data
+      const sharp = require('sharp')
+      return sharp(response.data).toFormat('jpeg').toBuffer()
     })
   }
-  return dataURLtoFile(url, 'image/jpeg')
+  return dataURLtoFile(
+    url,
+    // @ts-ignore
+    'image/jpeg'
+  )
 }
 
 function imageBlobToJpeg(imageBlob) {
@@ -152,11 +160,11 @@ const fetchAndConvertImages = (
   downloadStorageImage,
   convertToBlob = true
 ) => {
-  const imagesOnFirebase = Object.entries(imageIndex).filter(([key, id]) => {
+  const imagesOnFirebase = Object.entries(imageIndex).filter(([key, _ids]) => {
     return key.startsWith('storage://')
   })
   const downloadedImagesFromFirebase = Promise.all(
-    imagesOnFirebase.map(([key, id]) => {
+    imagesOnFirebase.map(([key, ids]) => {
       return downloadStorageImage(key, fileId, userId)
         .then((image) => {
           if (typeof image === 'string') {
@@ -167,26 +175,32 @@ const fetchAndConvertImages = (
         .then((image) => {
           const convertedImage = convertToBlob ? imageBlobToJpeg(image) : imageToWebpDataURL(image)
           return convertedImage.then((jpeg) => {
-            return [jpeg, id]
+            return ids.map((id) => {
+              return [jpeg, id]
+            })
           })
         })
     })
-  )
-  const localImages = Object.entries(imageIndex).filter(([key, id]) => {
+  ).then((arrays) => {
+    return arrays.flat()
+  })
+  const localImages = Object.entries(imageIndex).filter(([key, _ids]) => {
     return !key.startsWith('storage://') && key.startsWith('data:image')
   })
   return downloadedImagesFromFirebase
     .then((downloadedImages) => {
       return Promise.all(
-        localImages.map(([key, id]) => {
+        localImages.map(([key, ids]) => {
           return convertToBlob
             ? webpURLToJpeg(key).then((jpeg) => {
-                return [jpeg, id]
+                return ids.map((id) => {
+                  return [jpeg, id]
+                })
               })
-            : key
+            : ids.map((id) => [key, id])
         })
       ).then((localImages) => {
-        return [...downloadedImages, ...localImages]
+        return [...downloadedImages, ...localImages.flat()]
       })
     })
     .then((imageDataWithKeys) => {

@@ -1,21 +1,41 @@
-import { emptyFile } from 'pltr/v2'
+import { identity } from 'lodash'
+
+import { selectors as pltrSelectors, emptyFile } from 'pltr'
 
 import exportCharacters from '../characters'
 import { resetId } from '../../utils'
 import {
-  state,
-  goldilocks,
-  file_with_two_characters_and_two_books_with_book_associations,
+  state as raw_state,
+  goldilocks as raw_goldilocks,
+  file_with_two_characters_and_two_books_with_book_associations as raw_file_with_two_characters_and_two_books_with_book_associations,
+  file_with_templates_characters_and_books as raw_file_with_templates_characters_and_books,
+  headingTwo,
+  paragraph,
 } from './fixtures'
-import { headingTwo, paragraph } from 'components/__fixtures__'
 import default_config from '../../../../default_config'
+
+const selectors = pltrSelectors(identity)
+
+const state = { user: raw_state }
+const goldilocks = { user: raw_goldilocks }
+const file_with_two_characters_and_two_books_with_book_associations = {
+  user: raw_file_with_two_characters_and_two_books_with_book_associations,
+}
+const file_with_templates_characters_and_books = {
+  user: raw_file_with_templates_characters_and_books,
+}
 
 describe('exportCharacters', () => {
   beforeEach(() => resetId())
 
   it('exports characters binder from state', () => {
     const documentContents = {}
-    const binderItem = exportCharacters(state, documentContents, default_config.scrivener)
+    const binderItem = exportCharacters(
+      state,
+      documentContents,
+      default_config.scrivener,
+      selectors
+    )
     // there are 2 characters in the test state but the second one is part of book 2
     // so it shouldn't show up here
     expect(binderItem).toMatchObject({
@@ -42,7 +62,12 @@ describe('exportCharacters', () => {
 
   it('exports the documentContents', () => {
     const documentContents = {}
-    const _binderItem = exportCharacters(state, documentContents, default_config.scrivener)
+    const _binderItem = exportCharacters(
+      state,
+      documentContents,
+      default_config.scrivener,
+      selectors
+    )
     // NOTE: description and notes are no longer in this test because
     // we changed how descriptions and notes are exported per book
     // with the new feature.  The root-level legacy attributes only
@@ -70,7 +95,7 @@ describe('exportCharacters', () => {
       const EMPTY_FILE = emptyFile('Test file')
 
       const documentContents = {}
-      exportCharacters(EMPTY_FILE, documentContents, default_config.scrivener)
+      exportCharacters(EMPTY_FILE, documentContents, default_config.scrivener, selectors)
       expect(documentContents).toEqual({})
     })
     describe('with characters turn off', () => {
@@ -78,13 +103,18 @@ describe('exportCharacters', () => {
         const EMPTY_FILE = emptyFile('Test file')
 
         const documentContents = {}
-        exportCharacters(EMPTY_FILE, documentContents, {
-          ...default_config.scrivener,
-          characers: {
-            ...default_config.scrivener.characters,
-            export: false,
+        exportCharacters(
+          EMPTY_FILE,
+          documentContents,
+          {
+            ...default_config.scrivener,
+            characers: {
+              ...default_config.scrivener.characters,
+              export: false,
+            },
           },
-        })
+          selectors
+        )
         expect(documentContents).toEqual({})
       })
     })
@@ -94,7 +124,7 @@ describe('exportCharacters', () => {
       describe('nor does it have multiple books', () => {
         it('should nevertheless export all characters as though they were all associated with the only book', () => {
           const documentContents = {}
-          exportCharacters(goldilocks, documentContents, default_config.scrivener)
+          exportCharacters(goldilocks, documentContents, default_config.scrivener, selectors)
           expect(documentContents).toEqual({
             4: {
               body: {
@@ -325,7 +355,8 @@ describe('exportCharacters', () => {
           exportCharacters(
             file_with_two_characters_and_two_books_with_book_associations,
             documentContents,
-            default_config.scrivener
+            default_config.scrivener,
+            selectors
           )
           expect(documentContents).toEqual({
             4: {
@@ -479,6 +510,38 @@ describe('exportCharacters', () => {
                     ],
                     type: 'paragraph',
                   },
+                  {
+                    children: [
+                      {
+                        text: 'Birth Order',
+                      },
+                    ],
+                    type: 'heading-two',
+                  },
+                  {
+                    children: [
+                      {
+                        text: 'birth order character 2 test_project',
+                      },
+                    ],
+                    type: 'paragraph',
+                  },
+                  {
+                    children: [
+                      {
+                        text: 'Description',
+                      },
+                    ],
+                    type: 'heading-two',
+                  },
+                  {
+                    children: [
+                      {
+                        text: 'description character 2 test_project',
+                      },
+                    ],
+                    type: 'paragraph',
+                  },
                 ],
                 docTitle: 'character 2',
               },
@@ -492,13 +555,17 @@ describe('exportCharacters', () => {
           exportCharacters(
             {
               ...file_with_two_characters_and_two_books_with_book_associations,
-              ui: {
-                ...file_with_two_characters_and_two_books_with_book_associations.ui,
-                currentTimeline: 2,
+              user: {
+                ...file_with_two_characters_and_two_books_with_book_associations.user,
+                ui: {
+                  ...file_with_two_characters_and_two_books_with_book_associations.ui,
+                  currentTimeline: 2,
+                },
               },
             },
             documentContents,
-            default_config.scrivener
+            default_config.scrivener,
+            selectors
           )
           expect(documentContents).toEqual({
             4: {
@@ -657,6 +724,83 @@ describe('exportCharacters', () => {
               },
             },
           })
+        })
+      })
+    })
+  })
+  describe('given a file with multiple characters, templates and books', () => {
+    describe('where there values for the template on a character in the current book', () => {
+      it('should export the current values of the template attributes', () => {
+        const documentContents = {}
+        exportCharacters(
+          file_with_templates_characters_and_books,
+          documentContents,
+          default_config.scrivener,
+          selectors
+        )
+        expect(documentContents).toEqual({
+          4: {
+            body: {
+              description: [
+                { children: [{ text: 'Species' }], type: 'heading-two' },
+                { children: [{ text: 'Human' }], type: 'paragraph' },
+                { children: [{ text: 'Category' }], type: 'heading-two' },
+                { children: [{ text: 'Main' }], type: 'paragraph' },
+              ],
+              docTitle: 'Goldilocks',
+            },
+          },
+          5: {
+            body: {
+              description: [
+                { children: [{ text: 'Species' }], type: 'heading-two' },
+                { children: [{ text: 'Bear' }], type: 'paragraph' },
+                { children: [{ text: 'Category' }], type: 'heading-two' },
+                { children: [{ text: 'Main' }], type: 'paragraph' },
+                { children: [{ text: 'Openness' }], type: 'heading-two' },
+                { children: [{ text: 'Openness' }], type: 'paragraph' },
+                { children: [{ text: 'Conscientiousness' }], type: 'heading-two' },
+                { children: [{ text: 'conscientiousness' }], type: 'paragraph' },
+                { children: [{ text: 'Extraversion' }], type: 'heading-two' },
+                { children: [{ text: 'extraversion' }], type: 'paragraph' },
+                { children: [{ text: 'Agreeableness' }], type: 'heading-two' },
+                { children: [{ text: 'agreeableness' }], type: 'paragraph' },
+                { children: [{ text: 'Neuroticism' }], type: 'heading-two' },
+                { children: [{ text: 'neuroticism' }], type: 'paragraph' },
+                { children: [{ text: 'Birth Order' }], type: 'heading-two' },
+                { children: [{ text: 'First' }], type: 'paragraph' },
+                { children: [{ text: 'Description' }], type: 'heading-two' },
+                { children: [{ text: 'With more text.' }], type: 'paragraph' },
+              ],
+              docTitle: 'Baby Bear',
+            },
+          },
+          6: {
+            body: {
+              description: [
+                { children: [{ text: 'Species' }], type: 'heading-two' },
+                { children: [{ text: 'Bear' }], type: 'paragraph' },
+                { children: [{ text: 'Category' }], type: 'heading-two' },
+                { children: [{ text: 'Supporting' }], type: 'paragraph' },
+              ],
+              docTitle: 'Papa Bear',
+            },
+          },
+          7: {
+            body: {
+              description: [
+                { children: [{ text: 'Species' }], type: 'heading-two' },
+                { children: [{ text: 'Bear' }], type: 'paragraph' },
+                { children: [{ text: 'Category' }], type: 'heading-two' },
+                { children: [{ text: 'Supporting' }], type: 'paragraph' },
+                { children: [{ text: 'Birth Order' }], type: 'heading-two' },
+                { children: [{ text: 'Birth ORder' }], type: 'paragraph' },
+                { children: [{ text: 'Description' }], type: 'heading-two' },
+                { children: [{ text: 'birth - order description' }], type: 'paragraph' },
+              ],
+              docTitle: 'Mama Bear',
+            },
+          },
         })
       })
     })

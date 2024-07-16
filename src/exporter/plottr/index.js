@@ -1,4 +1,4 @@
-import { removeSystemKeys } from 'pltr/v2'
+import { removeSystemKeys } from 'pltr'
 
 import extractConvertAndPatch from '../word/exporters/convertImages'
 

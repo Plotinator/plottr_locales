@@ -1,31 +1,46 @@
-import { emptyFile } from 'pltr/v2'
+import { identity } from 'lodash'
+
+import { emptyFile, selectors as pltrSelectors } from 'pltr'
+
 import default_export_config from '../../../default_config'
 
 import {
-  goldilocks,
-  file_with_two_characters_and_two_books_with_book_associations,
+  goldilocks as raw_goldilocks,
+  file_with_two_characters_and_two_books_with_book_associations as raw_file_with_two_characters_and_two_books_with_book_associations,
 } from './fixtures'
 import { characterDataExportDirectives, interpret } from '../characters'
 
-const EMPTY_FILE = emptyFile('Test file')
+const selectors = pltrSelectors(identity)
+
+const goldilocks = { user: raw_goldilocks }
+const file_with_two_characters_and_two_books_with_book_associations = {
+  user: raw_file_with_two_characters_and_two_books_with_book_associations,
+}
+const EMPTY_FILE = { user: emptyFile('Test file') }
 
 describe('characterDataExportDirectives', () => {
   describe('given an empty new file', () => {
     it('should produce an empty category', () => {
-      expect(characterDataExportDirectives(EMPTY_FILE, default_export_config.word)).toEqual([
+      expect(
+        characterDataExportDirectives(EMPTY_FILE, default_export_config.word, selectors)
+      ).toEqual([
         { alignment: 'center', heading: 'Heading1', type: 'paragraph', text: 'Characters' },
       ])
     })
     describe('with characters turned off', () => {
       it('should not export anything', () => {
         expect(
-          characterDataExportDirectives(EMPTY_FILE, {
-            ...default_export_config.word,
-            characters: {
-              ...default_export_config.word.characters,
-              export: false,
+          characterDataExportDirectives(
+            EMPTY_FILE,
+            {
+              ...default_export_config.word,
+              characters: {
+                ...default_export_config.word.characters,
+                export: false,
+              },
             },
-          })
+            selectors
+          )
         ).toEqual([])
       })
     })
@@ -34,7 +49,9 @@ describe('characterDataExportDirectives', () => {
     describe('which does not have characters associated to books', () => {
       describe('nor does it have multiple books', () => {
         it('should nevertheless export all characters as though they were all associated with the only book', () => {
-          expect(characterDataExportDirectives(goldilocks, default_export_config.word)).toEqual([
+          expect(
+            characterDataExportDirectives(goldilocks, default_export_config.word, selectors)
+          ).toEqual([
             { alignment: 'center', heading: 'Heading1', type: 'paragraph', text: 'Characters' },
             {
               text: '',
@@ -86,6 +103,13 @@ describe('characterDataExportDirectives', () => {
             },
             {
               data: [
+                {
+                  name: 'Species',
+                  type: 'text',
+                  value: 'Human',
+                },
+              ],
+              defaults: [
                 {
                   name: 'Species',
                   type: 'text',
@@ -176,6 +200,13 @@ describe('characterDataExportDirectives', () => {
                   value: 'Bear',
                 },
               ],
+              defaults: [
+                {
+                  name: 'Species',
+                  type: 'text',
+                  value: 'Bear',
+                },
+              ],
               type: 'custom-atttributes',
             },
             {
@@ -254,6 +285,13 @@ describe('characterDataExportDirectives', () => {
             },
             {
               data: [
+                {
+                  name: 'Species',
+                  type: 'text',
+                  value: 'Bear',
+                },
+              ],
+              defaults: [
                 {
                   name: 'Species',
                   type: 'text',
@@ -344,6 +382,13 @@ describe('characterDataExportDirectives', () => {
                   value: 'Bear',
                 },
               ],
+              defaults: [
+                {
+                  name: 'Species',
+                  type: 'text',
+                  value: 'Bear',
+                },
+              ],
               type: 'custom-atttributes',
             },
             {
@@ -384,7 +429,8 @@ describe('characterDataExportDirectives', () => {
           expect(
             characterDataExportDirectives(
               file_with_two_characters_and_two_books_with_book_associations,
-              default_export_config.word
+              default_export_config.word,
+              selectors
             )
           ).toEqual([
             {
@@ -453,6 +499,31 @@ describe('characterDataExportDirectives', () => {
                       children: [
                         {
                           text: 'attr2 char2 in test_project',
+                        },
+                      ],
+                      type: 'paragraph',
+                    },
+                  ],
+                },
+              ],
+              defaults: [
+                {
+                  bookId: 'all',
+                  id: 3,
+                  name: 'attr1',
+                  type: 'text',
+                  value: 'text 2',
+                },
+                {
+                  bookId: 'all',
+                  id: 4,
+                  name: 'attr2',
+                  type: 'paragraph',
+                  value: [
+                    {
+                      children: [
+                        {
+                          text: 'other text 2',
                         },
                       ],
                       type: 'paragraph',
@@ -607,17 +678,21 @@ describe('characterDataExportDirectives', () => {
         })
       })
       describe('and book 2 is selected', () => {
-        it('should only export the character for book 1', () => {
+        it('should only export the character for book 2', () => {
           expect(
             characterDataExportDirectives(
               {
                 ...file_with_two_characters_and_two_books_with_book_associations,
-                ui: {
-                  ...file_with_two_characters_and_two_books_with_book_associations.ui,
-                  currentTimeline: 2,
+                user: {
+                  ...file_with_two_characters_and_two_books_with_book_associations.user,
+                  ui: {
+                    ...file_with_two_characters_and_two_books_with_book_associations.user.ui,
+                    currentTimeline: 2,
+                  },
                 },
               },
-              default_export_config.word
+              default_export_config.word,
+              selectors
             )
           ).toEqual([
             { alignment: 'center', heading: 'Heading1', text: 'Characters', type: 'paragraph' },
@@ -656,6 +731,31 @@ describe('characterDataExportDirectives', () => {
                   type: 'paragraph',
                   value: [
                     { children: [{ text: 'attr2 character 1 second book' }], type: 'paragraph' },
+                  ],
+                },
+              ],
+              defaults: [
+                {
+                  bookId: 'all',
+                  id: 3,
+                  name: 'attr1',
+                  type: 'text',
+                  value: 'text',
+                },
+                {
+                  bookId: 'all',
+                  id: 4,
+                  name: 'attr2',
+                  type: 'paragraph',
+                  value: [
+                    {
+                      children: [
+                        {
+                          text: 'other text',
+                        },
+                      ],
+                      type: 'paragraph',
+                    },
                   ],
                 },
               ],
@@ -745,12 +845,16 @@ describe('characterDataExportDirectives', () => {
 describe('interpret', () => {
   describe('given an empty array', () => {
     it('should produce an empty array', () => {
-      expect(interpret([], {}, default_export_config.word)).toEqual([])
+      expect(interpret([], {})).toEqual([])
     })
   })
   describe('given an array created from the goldilocks file', () => {
     it('should contain the correct docx elements', () => {
-      const directives = characterDataExportDirectives(goldilocks, default_export_config.word)
+      const directives = characterDataExportDirectives(
+        goldilocks,
+        default_export_config.word,
+        selectors
+      )
       const interpretted = interpret(directives, {})
       // There's other stuff in there and it's difficult to verify it all.
       expect(JSON.parse(JSON.stringify(interpretted))).toEqual([

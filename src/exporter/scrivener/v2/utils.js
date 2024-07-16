@@ -1,10 +1,7 @@
-import { cloneDeep } from 'lodash'
+import { cloneDeep, isObject } from 'lodash'
 import { t as i18n } from 'plottr_locales'
 import binderItem from './binderItem.json'
 import bareScrivx from './bare_scrivx.json'
-import { selectors } from 'pltr/v2'
-
-const { allTagsSelector } = selectors
 
 // RTF documents can not properly render characters that are represented by unicode values
 // greater than 255. As such we must convert any unicode characters into the proper RTF
@@ -49,7 +46,8 @@ export function addToScrivx(scrivx, binderItems, place) {
 // A character/place has an array of tag ids associated with it
 // This method will get the titles of each of the tags associated with
 // the object and return them as a comma delimited string
-export function buildTagsString(tags, state) {
+export function buildTagsString(tags, state, selectors) {
+  const { allTagsSelector } = selectors
   const allTags = allTagsSelector(state)
   return tags
     .map((tagId) => allTags.find(({ id }) => id === tagId))
@@ -66,6 +64,25 @@ export function buildTemplateProperties(templates) {
   return templates.reduce((acc, { attributes }) => {
     attributes.forEach((attribute) => (acc[attribute.name] = attribute.value))
     return acc
+  }, {})
+}
+
+export function buildCharacterTemplateProperties(state, templates, selectors, characterId) {
+  return templates.reduce((acc, { id, attributes }) => {
+    return {
+      ...acc,
+      ...attributes.reduce((attributesAcc, attribute) => {
+        return {
+          ...attributesAcc,
+          [attribute.name]: selectors.characterTemplateAttributeValueSelector(
+            state,
+            characterId,
+            id,
+            attribute.name
+          ),
+        }
+      }, {}),
+    }
   }, {})
 }
 
@@ -138,10 +155,17 @@ export function buildDescriptionFromObject(object, options) {
       })
     }
 
+    if (key === 'content' && (options.notesHeading || options === true)) {
+      description.push({
+        type: 'heading-two',
+        children: [{ text: i18n('Content') }],
+      })
+    }
+
     if (key === 'Tags' && (options.tags || options === true)) {
       description.push({
         type: 'heading-two',
-        children: [{ text: key }],
+        children: [{ text: i18n('Tags') }],
       })
     }
 
@@ -149,6 +173,7 @@ export function buildDescriptionFromObject(object, options) {
       key !== 'description' &&
       key !== 'notes' &&
       key !== 'Tags' &&
+      key !== 'content' &&
       (options.customAttributes || options === true)
     ) {
       description.push({
@@ -160,6 +185,7 @@ export function buildDescriptionFromObject(object, options) {
     if (
       (key === 'description' && options.description) ||
       (key === 'notes' && options.notes) ||
+      (key === 'content' && options.content) ||
       (key === 'Tags' && options.tags) ||
       options.customAttributes ||
       options === true
@@ -169,8 +195,10 @@ export function buildDescriptionFromObject(object, options) {
           type: 'paragraph',
           children: [{ text: value }],
         })
-      } else {
+      } else if (Array.isArray(value)) {
         description.push(...value)
+      } else if (isObject(value)) {
+        description.push(value)
       }
     }
   }

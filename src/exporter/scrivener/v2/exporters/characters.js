@@ -1,14 +1,12 @@
 import { t as i18n } from 'plottr_locales'
+
 import {
   createFolderBinderItem,
   createTextBinderItem,
   buildTagsString,
-  buildTemplateProperties,
+  buildCharacterTemplateProperties,
   buildDescriptionFromObject,
 } from '../utils'
-import { selectors } from 'pltr/v2'
-
-const { characterCategoriesSelector } = selectors
 
 const seriesToAll = (timelineName) => {
   if (timelineName === 'series') {
@@ -17,7 +15,8 @@ const seriesToAll = (timelineName) => {
   return timelineName
 }
 
-export default function exportCharacters(state, documentContents, options) {
+export default function exportCharacters(state, documentContents, options, selectors) {
+  const { characterCategoriesSelector } = selectors
   const { binderItem } = createFolderBinderItem(i18n('Characters'))
   const showBookTabs = selectors.showBookTabsSelector(state)
   const bookToExport = !showBookTabs ? 'all' : seriesToAll(selectors.currentTimelineSelector(state))
@@ -37,6 +36,10 @@ export default function exportCharacters(state, documentContents, options) {
       imageId,
       noteIds,
       bookIds,
+      clientId,
+      fileId,
+      fileURL,
+      isCloudFile,
       /* eslint-enable */
 
       // used for the export
@@ -54,11 +57,14 @@ export default function exportCharacters(state, documentContents, options) {
       }
     }, remainingCharacterProperties)
     const { id, binderItem: characterBinderItem } = createTextBinderItem(name)
-    binderItem.Children.BinderItem.push(characterBinderItem)
+    binderItem.Children.BinderItem.push(
+      // @ts-ignore
+      characterBinderItem
+    )
 
     // handle tags
     if (options.characters.tags) {
-      characterProperties.Tags = buildTagsString(tags, state)
+      characterProperties.Tags = buildTagsString(tags, state, selectors)
     }
 
     // handle categories
@@ -77,7 +83,10 @@ export default function exportCharacters(state, documentContents, options) {
     if (options.characters.templates) {
       description = [
         ...description,
-        ...buildDescriptionFromObject(buildTemplateProperties(templates), true),
+        ...buildDescriptionFromObject(
+          buildCharacterTemplateProperties(state, templates, selectors, characterId),
+          true
+        ),
       ]
     }
 

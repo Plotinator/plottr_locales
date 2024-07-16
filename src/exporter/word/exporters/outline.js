@@ -1,25 +1,69 @@
 import { keyBy, includes } from 'lodash'
 import { t } from 'plottr_locales'
-import { helpers, selectors } from 'pltr/v2'
-import { Paragraph, AlignmentType, HeadingLevel } from 'docx'
+import { helpers } from 'pltr'
+import { Paragraph, AlignmentType, HeadingLevel, TextRun } from 'docx'
 
-import exportCustomAttributes from './customAttributes'
-import exportItemTemplates from './itemTemplates'
-import exportItemAttachments from './itemAttachments'
+import { exportCustomAttributesDirectives } from './customAttributes'
+import { exportItemTemplatesDirectives } from './itemTemplates'
+import { exportItemAttachmentsDirectives } from './itemAttachments'
 import { serialize } from './to_word'
 
-const {
-  sortedLinesByBookSelector,
-  cardMapSelector,
-  sortedBeatsByBookSelector,
-  makeBeatTitleSelector,
-  cardsCustomAttributesSelector,
-} = selectors
 const {
   card: { sortCardsInBeat, cardMapping },
 } = helpers
 
-export default function exportOutline(state, namesMapping, options) {
+export default function exportOutline(state, namesMapping, options, selectors) {
+  return [{ children: interpret(exportOutlineDirectives(state, namesMapping, options, selectors)) }]
+}
+
+function interpret(directives) {
+  return directives.flatMap(({ type, ...props }) => {
+    switch (type) {
+      case 'paragraph': {
+        if (props.bold || props.italics) {
+          return [
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: props.text,
+                  italics: props.italics,
+                  bold: props.bold,
+                }),
+              ],
+            }),
+          ]
+        } else {
+          return [
+            new Paragraph({
+              text: props.text,
+              ...(props.heading ? { heading: props.heading } : {}),
+              ...(props.alignment ? { alignment: props.alignment } : {}),
+            }),
+          ]
+        }
+      }
+
+      case 'function': {
+        return props.func()
+      }
+
+      default: {
+        return []
+      }
+    }
+  })
+}
+
+export function exportOutlineDirectives(state, namesMapping, options, selectors) {
+  const {
+    sortedLinesByBookSelector,
+    cardMapSelector,
+    sortedBeatsByBookSelector,
+    makeBeatTitleSelector,
+    cardsCustomAttributesSelector,
+    hierarchyLevelSelector,
+  } = selectors
+
   // get current book id and select only those beats/lines/cards
   const beats = sortedBeatsByBookSelector(state)
   const lines = sortedLinesByBookSelector(state)
@@ -32,16 +76,15 @@ export default function exportOutline(state, namesMapping, options) {
   let children = []
 
   if (options.outline.heading) {
-    children.push(
-      new Paragraph({
-        text: t('Outline'),
-        heading: HeadingLevel.HEADING_1,
-        alignment: AlignmentType.CENTER,
-      })
-    )
+    children.push({
+      type: 'paragraph',
+      text: t('Outline'),
+      heading: HeadingLevel.HEADING_1,
+      alignment: AlignmentType.CENTER,
+    })
   }
 
-  if (!beats.length) return { children: children }
+  if (!beats.length) return children
 
   const getFilteredCards = (cards) => {
     if (outlineExportFilter) {
@@ -55,11 +98,27 @@ export default function exportOutline(state, namesMapping, options) {
 
   const beatParagraphs = (beats || []).flatMap((beat) => {
     const uniqueBeatTitleSelector = makeBeatTitleSelector(state)
+    const hierarchyLevel = hierarchyLevelSelector(state, beat.id)
     const title = uniqueBeatTitleSelector(state, beat.id)
-    let paragraphs = [new Paragraph({ text: '' })]
+    let paragraphs = [{ type: 'paragraph', text: '' }]
+
+    const level = hierarchyLevel.level
+    const heading =
+      level === 0
+        ? HeadingLevel.HEADING_2
+        : level === 1
+        ? HeadingLevel.HEADING_3
+        : HeadingLevel.HEADING_4
+
+    const cardHeadingLevel =
+      level === 0
+        ? HeadingLevel.HEADING_3
+        : level === 1
+        ? HeadingLevel.HEADING_4
+        : HeadingLevel.HEADING_5
 
     if (!options.outline.sceneCards) {
-      paragraphs.push(new Paragraph({ text: title, heading: HeadingLevel.HEADING_2 }))
+      paragraphs.push({ type: 'paragraph', text: title, heading })
     } else {
       const cards = beatCardMapping[beat.id]
       const customAttrs = cardsCustomAttributesSelector(state)
@@ -67,10 +126,10 @@ export default function exportOutline(state, namesMapping, options) {
 
       const filteredCards = getFilteredCards(sortedCards)
 
-      paragraphs.push(new Paragraph({ text: title, heading: HeadingLevel.HEADING_2 }))
+      paragraphs.push({ type: 'paragraph', text: title, heading })
 
       const cardParagraphs = (filteredCards || []).flatMap((c) => {
-        return card(c, linesById, namesMapping, customAttrs, options)
+        return card(c, linesById, namesMapping, customAttrs, options, cardHeadingLevel)
       })
       paragraphs = [...paragraphs, ...cardParagraphs]
     }
@@ -78,11 +137,11 @@ export default function exportOutline(state, namesMapping, options) {
     return paragraphs
   })
 
-  return [{ children: [...children, ...beatParagraphs] }]
+  return [...children, ...beatParagraphs]
 }
 
-function card(card, linesById, namesMapping, customAttrs, options) {
-  let paragraphs = [new Paragraph({ text: '' })]
+function card(card, linesById, namesMapping, customAttrs, options, cardHeadingLevel) {
+  let paragraphs = [{ type: 'paragraph', text: '' }]
   let line = linesById[card.lineId]
   let titleString = card.title
   if (line) {
@@ -92,23 +151,34 @@ function card(card, linesById, namesMapping, customAttrs, options) {
       titleString = card.title
     }
   }
-  paragraphs.push(new Paragraph({ text: titleString, heading: HeadingLevel.HEADING_3 }))
+  paragraphs.push({ type: 'paragraph', text: titleString, heading: cardHeadingLevel })
+
+  paragraphs = [...paragraphs, { type: 'paragraph', text: 'Begin Summary' }]
 
   if (options.outline.attachments) {
-    paragraphs = [...paragraphs, ...exportItemAttachments(card, namesMapping)]
+    paragraphs = [...paragraphs, ...exportItemAttachmentsDirectives(card, namesMapping)]
   }
   if (options.outline.description) {
-    paragraphs = [...paragraphs, ...serialize(card.description)]
-  }
-  if (options.outline.customAttributes) {
     paragraphs = [
+      // @ts-ignore
       ...paragraphs,
-      ...exportCustomAttributes(card, customAttrs, HeadingLevel.HEADING_4),
+      // @ts-ignore
+      { type: 'function', func: () => serialize(card.description) },
     ]
   }
-  if (options.outline.templates) {
-    paragraphs = [...paragraphs, ...exportItemTemplates(card, HeadingLevel.HEADING_4)]
+  if (options.outline.customAttributes) {
+    paragraphs = [...paragraphs, ...exportCustomAttributesDirectives(card, customAttrs)]
   }
+  if (options.outline.templates) {
+    paragraphs = [...paragraphs, ...exportItemTemplatesDirectives(card)]
+  }
+
+  paragraphs = [
+    ...paragraphs,
+    { type: 'paragraph', text: 'End Summary' },
+    { type: 'paragraph', text: '' },
+    { type: 'paragraph', text: '' },
+  ]
 
   return paragraphs
 }

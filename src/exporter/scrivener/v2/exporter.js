@@ -1,6 +1,5 @@
 import xml from 'xml-js'
-import rtf from 'jsrtf'
-import { slate } from 'pltr/v2'
+import { slate, rtf } from 'pltr'
 import exportBeats from './exporters/beats'
 import exportCharacters from './exporters/characters'
 import exportNotes from './exporters/notes'
@@ -22,22 +21,29 @@ export default function Exporter(
   writeFile,
   stat,
   mkdir,
-  basename
+  basename,
+  selectors
 ) {
   const realPath = exportPath.includes('.scriv') ? exportPath : `${exportPath}.scriv`
 
   return createProjectStructure(realPath, rm, stat, mkdir, join)
     .then(() => {
       // create the .scrivx
-      return createScrivx(state, realPath, options, basename, join, writeFile).then(
-        (documentContents) => {
-          // create the rtf documents for each scene card
-          return createRTFDocuments(documentContents, realPath, isWindows, log, join, writeFile)
-        }
-      )
+      return createScrivx(
+        { user: state },
+        realPath,
+        options,
+        basename,
+        join,
+        writeFile,
+        selectors
+      ).then((documentContents) => {
+        // create the rtf documents for each scene card
+        return createRTFDocuments(documentContents, realPath, isWindows, log, join, writeFile)
+      })
     })
     .catch((error) => {
-      log.error(error)
+      log.error('Error exporting to Scrivener', error)
       // move anything we've made to the trash
       return remove(realPath, rm).then(() => {
         // don't go any further
@@ -88,31 +94,35 @@ function createProjectStructure(exportPath, rm, stat, mkdir, join) {
     })
 }
 
-function createScrivx(state, basePath, options, basename, join, writeFile) {
+function createScrivx(state, basePath, options, basename, join, writeFile, selectors) {
   let scrivx = startNewScrivx()
   let documentContents = {}
 
   if (options.outline.export) {
-    const beatBinderItems = exportBeats(state, documentContents, options)
+    const beatBinderItems = exportBeats(state, documentContents, options, selectors)
     addToScrivx(scrivx, beatBinderItems, 'main')
   }
 
   if (options.characters.export) {
-    const charactersBinderItem = exportCharacters(state, documentContents, options)
+    const charactersBinderItem = exportCharacters(state, documentContents, options, selectors)
     addToScrivx(scrivx, charactersBinderItem, 'research')
   }
 
   if (options.places.export) {
-    const placesBinderItem = exportPlaces(state, documentContents, options)
+    const placesBinderItem = exportPlaces(state, documentContents, options, selectors)
     addToScrivx(scrivx, placesBinderItem, 'research')
   }
 
   if (options.notes.export) {
-    const notesBinderItem = exportNotes(state, documentContents, options)
+    const notesBinderItem = exportNotes(state, documentContents, options, selectors)
     addToScrivx(scrivx, notesBinderItem, 'research')
   }
 
-  const data = xml.json2xml(scrivx, { compact: true, ignoreComment: true, spaces: 2 })
+  const data = xml.json2xml(JSON.stringify(scrivx), {
+    compact: true,
+    ignoreComment: true,
+    spaces: 2,
+  })
   return basename(basePath)
     .then((baseName) => {
       return baseName.replace('.scriv', '')
@@ -185,12 +195,12 @@ function createRTF(docID, document, realBasePath, isNotes, log, join, writeFile)
         return writeFile(filePath, data)
       })
       .catch((error) => {
-        log.error(error)
+        log.error('Error creating RTF', error)
         // do nothing, just don't blow up
         return Promise.resolve()
       })
   } catch (error) {
-    log.error(error)
+    log.error('Error creating RTF', error)
     // do nothing, just don't blow up
     return Promise.resolve()
   }
@@ -205,10 +215,10 @@ function createSynopsis(docID, document, realBasePath, isWindows, log, join, wri
         return writeFile(synopsisPath, data)
       })
       .catch((error) => {
-        log.error(error)
+        log.error('Error creating synopsis file', error)
       })
   } catch (error) {
-    log.error(error)
+    log.error('Error creating synopsis file', error)
     // do nothing, just don't blow up
     return Promise.resolve()
   }

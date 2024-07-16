@@ -1,7 +1,7 @@
 import { Document, Packer, Paragraph, AlignmentType, HeadingLevel } from 'docx'
 
 import { t as t } from 'plottr_locales'
-import { helpers, selectors } from 'pltr/v2'
+import { helpers } from 'pltr'
 
 import exportOutline from './exporters/outline'
 import exportCharacters from './exporters/characters'
@@ -20,17 +20,26 @@ export default function Exporter(
   notifyUser,
   userId,
   downloadStorageImage,
-  writeFile
+  writeFile,
+  selectors
 ) {
-  return convertImages(rawData, userId, downloadStorageImage).then((data) => {
-    const names = namesMapping(data)
+  return convertImages(rawData, userId, downloadStorageImage).then((user) => {
+    const data = { user }
+
+    const names = namesMapping(data, selectors)
     const bookId = selectors.currentTimelineSelector(data)
 
-    const titlePageSections = options.general.titlePage ? seriesNameSection(data, bookId) : []
-    const outlineSections = options.outline.export ? exportOutline(data, names, options) : []
-    const charactersSections = options.characters.export ? exportCharacters(data, options) : []
-    const placesSections = options.places.export ? exportPlaces(data, options) : []
-    const notesSections = options.notes.export ? exportNotes(data, names, options) : []
+    const titlePageSections = options.general.titlePage
+      ? seriesNameSection(data, bookId, selectors)
+      : []
+    const outlineSections = options.outline.export
+      ? exportOutline(data, names, options, selectors)
+      : []
+    const charactersSections = options.characters.export
+      ? exportCharacters(data, options, selectors)
+      : []
+    const placesSections = options.places.export ? exportPlaces(data, options, selectors) : []
+    const notesSections = options.notes.export ? exportNotes(data, names, options, selectors) : []
 
     console.log('About to add sections...')
     const doc = new Document({
@@ -64,16 +73,19 @@ export default function Exporter(
 /////   Support Functions   ////////
 ////////////////////////////////////
 
-function namesMapping(data) {
-  let characterNames = data.characters.reduce(function (mapping, char) {
+export function namesMapping(data, selectors) {
+  const characters = selectors.allCharactersSelector(data)
+  let characterNames = characters.reduce(function (mapping, char) {
     mapping[char.id] = char.name
     return mapping
   }, {})
-  let placeNames = data.places.reduce(function (mapping, place) {
+  const places = selectors.allPlacesSelector(data)
+  let placeNames = places.reduce(function (mapping, place) {
     mapping[place.id] = place.name
     return mapping
   }, {})
-  let tagTitles = data.tags.reduce(function (mapping, tag) {
+  const tags = selectors.allTagsSelector(data)
+  let tagTitles = tags.reduce(function (mapping, tag) {
     mapping[tag.id] = tag.title
     return mapping
   }, {})
@@ -85,10 +97,12 @@ function namesMapping(data) {
   }
 }
 
-function seriesNameSection(data, bookId) {
+function seriesNameSection(data, bookId, selectors) {
+  const series = selectors.seriesSelector(data)
+  const books = selectors.allBooksSelector(data)
   let titleText = isSeries(bookId)
-    ? data.series.name + ' ' + t('(Series View)')
-    : data.books[`${bookId}`].title
+    ? series.name + ' ' + t('(Series View)')
+    : books[`${bookId}`].title
   const paragraph = new Paragraph({
     text: titleText,
     heading: HeadingLevel.TITLE,

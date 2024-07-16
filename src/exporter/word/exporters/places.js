@@ -4,7 +4,13 @@ import { Paragraph, AlignmentType, HeadingLevel, ImageRun } from 'docx'
 import exportCustomAttributes from './customAttributes'
 import { serialize } from './to_word'
 
-export default function exportPlaces(state, options) {
+export default function exportPlaces(state, options, selectors) {
+  const {
+    placeCategoriesSelector,
+    allPlacesSelector,
+    imagesSelector,
+    placeCustomAttributesSelector,
+  } = selectors
   let children = [new Paragraph({ text: '', pageBreakBefore: true })]
 
   if (options.places.heading) {
@@ -17,16 +23,31 @@ export default function exportPlaces(state, options) {
     )
   }
 
-  const paragraphs = places(state.places, state.customAttributes['places'], state.images, options)
+  const allPlaceCategories = placeCategoriesSelector(state)
+  const allPlaces = allPlacesSelector(state)
+  const allImages = imagesSelector(state)
+  const placeCutsomAttributes = placeCustomAttributesSelector(state)
+
+  const paragraphs = places(
+    allPlaces,
+    placeCutsomAttributes,
+    allImages,
+    options,
+    allPlaceCategories
+  )
 
   return [{ children: children.concat(paragraphs) }]
 }
 
-function places(places, customAttributes, images, options) {
+function places(places, customAttributes, images, options, allPlaceCategories) {
   let paragraphs = []
   places.forEach((pl) => {
     paragraphs.push(new Paragraph({ text: '' }))
     paragraphs.push(new Paragraph({ text: pl.name, heading: HeadingLevel.HEADING_2 }))
+    if (options.places.category) {
+      const category = allPlaceCategories.find((category) => String(category.id) === pl.categoryId)
+      if (category) paragraphs.push(new Paragraph({ text: category.name }))
+    }
     if (options.places.images && pl.imageId) {
       const imgData = images[pl.imageId] && images[pl.imageId].data
       if (imgData) {
@@ -58,10 +79,7 @@ function places(places, customAttributes, images, options) {
       paragraphs = [...paragraphs, ...serialize(pl.notes)]
     }
     if (options.places.customAttributes) {
-      paragraphs = [
-        ...paragraphs,
-        ...exportCustomAttributes(pl, customAttributes, HeadingLevel.HEADING_3),
-      ]
+      paragraphs = [...paragraphs, ...exportCustomAttributes(pl, customAttributes)]
     }
   })
 

@@ -148,7 +148,6 @@ export const uuidsToIntegerIds = (jsonFile) => {
               id: integerId(character.id, 'characterIds'),
               cards: character.cards.map((cardId) => integerId(cardId, 'cardIds')),
               noteIds: character.noteIds.map((noteId) => integerId(noteId, 'noteIds')),
-              tags: character.tags.map((tagId) => integerId(tagId, 'tagIds')),
               bookIds: character.bookIds.map((bookId) => integerId(bookId, 'bookIds')),
             }
           }),

@@ -1,9 +1,12 @@
 {
   "_attributes": {
-    "ID": "",
+    "ID": -1,
     "Type": "Text"
   },
   "Title": {
     "_text": ""
+  },
+  "Children": {
+    "BinderItem": []
   }
 }

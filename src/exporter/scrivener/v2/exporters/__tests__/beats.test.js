@@ -1,15 +1,22 @@
+import { identity } from 'lodash'
+
+import { selectors as pltrSelectors } from 'pltr'
+
 import exportBeats from '../beats'
 import { resetId } from '../../utils'
-import { state } from './fixtures'
-import { paragraph, headingTwo } from 'components/__fixtures__'
+import { state as raw_state, paragraph, headingTwo } from './fixtures'
 import default_config from '../../../../default_config'
+
+const selectors = pltrSelectors(identity)
+
+const state = { user: raw_state }
 
 describe('exportBeats', () => {
   let documentContents = {}
   beforeEach(() => resetId())
 
   it('exports beat binders from state', () => {
-    const binderItems = exportBeats(state, documentContents, default_config.scrivener)
+    const binderItems = exportBeats(state, documentContents, default_config.scrivener, selectors)
     expect(binderItems).toMatchObject([
       {
         _attributes: {
@@ -71,7 +78,7 @@ describe('exportBeats', () => {
       4: {
         notes: {
           docTitle: 'Plotline: Main Story Arc',
-          description: [],
+          description: [headingTwo('plotline'), paragraph('Main Story Arc')],
         },
         synopsis: {
           description: [headingTwo('Description'), paragraph('So paragraph')],
@@ -80,7 +87,7 @@ describe('exportBeats', () => {
       5: {
         notes: {
           docTitle: 'Plotline: Main Story Arc',
-          description: [],
+          description: [headingTwo('plotline'), paragraph('Main Story Arc')],
         },
         synopsis: {
           description: [headingTwo('Description'), paragraph('Moar paragraph')],
@@ -89,7 +96,7 @@ describe('exportBeats', () => {
       7: {
         notes: {
           docTitle: 'Plotline: Main Story Arc',
-          description: [],
+          description: [headingTwo('plotline'), paragraph('Main Story Arc')],
         },
         synopsis: {
           description: [headingTwo('Description'), paragraph('A paragraph')],

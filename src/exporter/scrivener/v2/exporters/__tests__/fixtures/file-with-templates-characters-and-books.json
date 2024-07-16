@@ -1,6 +1,30 @@
 {
+  "file": {
+    "fileName": "/Users/ryanzee/Downloads/Goldilocks and The Three Bears.pltr",
+    "loaded": true,
+    "dirty": true,
+    "version": "2023.3.31",
+    "id": null,
+    "appliedMigrations": [
+      "m2020_8_28",
+      "m2020_11_16",
+      "m2021_1_15",
+      "m2021_2_4",
+      "m2021_2_8",
+      "m2021_4_13",
+      "m2021_6_9",
+      "m2021_8_1",
+      "m2022_5_17_1",
+      "m2022_5_17",
+      "*m2023_1_7",
+      "*m2023_3_29"
+    ],
+    "initialVersion": "2020.7.30",
+    "isCloudFile": false,
+    "versionStamp": "b4332259-2a9c-4ba7-a4e8-35f555763880"
+  },
   "ui": {
-    "currentView": "story",
+    "currentView": "characters",
     "currentTimeline": 1,
     "orientation": "horizontal",
     "darkMode": false,
@@ -12,16 +36,62 @@
     "placeFilter": null,
     "noteSort": "title~asc",
     "noteFilter": null,
-    "zoomState": null,
-    "zoomIndex": 4,
     "timelineIsExpanded": true,
-    "timelineFilter": null
+    "timelineFilter": null,
+    "timelineScrollPosition": {
+      "x": 0,
+      "y": 0
+    },
+    "timeline": {
+      "size": "large"
+    },
+    "searchTerms": {
+      "notes": null,
+      "characters": null,
+      "places": null,
+      "tags": null,
+      "outline": null,
+      "timeline": null
+    },
+    "customAttributeOrder": {
+      "characters": [
+        {
+          "type": "customAttributes",
+          "name": "Species"
+        }
+      ]
+    },
+    "outlineFilter": null,
+    "attributeTabs": {
+      "characters": null
+    },
+    "characterTab": {
+      "selectedCharacter": 2
+    },
+    "cardDialog": {
+      "isOpen": false,
+      "cardId": null,
+      "lineId": null,
+      "beatId": null
+    },
+    "collaborators": {},
+    "bookDialog": {
+      "bookId": null,
+      "isOpen": false
+    },
+    "outlineScrollPosition": 0,
+    "templateModal": {
+      "expanded": false
+    },
+    "actConfigModal": {
+      "open": false
+    },
+    "resturctureTimelineModal": {
+      "open": false
+    }
   },
-  "file": {
-    "fileName": "/Users/ryanzee/Downloads/Goldilocks and The Three Bears.pltr",
-    "loaded": true,
-    "dirty": true,
-    "version": "2020.7.30"
+  "featureFlags": {
+    "BEAT_HIERARCHY": false
   },
   "series": {
     "name": "Goldilocks and The Three Bears",
@@ -38,153 +108,201 @@
       "genre": "",
       "theme": "",
       "templates": [],
-      "imageId": "7"
+      "imageId": "7",
+      "timelineTemplates": []
     },
-    "allIds": [1]
+    "2": {
+      "id": 2,
+      "title": "Book 2",
+      "premise": "",
+      "genre": "",
+      "theme": "",
+      "templates": [],
+      "timelineTemplates": [],
+      "imageId": null
+    },
+    "3": {
+      "id": 3,
+      "title": "Book 3",
+      "premise": "",
+      "genre": "",
+      "theme": "",
+      "templates": [],
+      "timelineTemplates": [],
+      "imageId": null
+    },
+    "allIds": [1, 2, 3]
   },
-  "characters": [
-    {
-      "id": 1,
-      "name": "Goldilocks",
-      "description": "",
-      "notes": [
-        {
-          "children": [
-            {
-              "text": ""
-            }
-          ]
+  "beats": {
+    "1": {
+      "children": {
+        "2": [],
+        "3": [],
+        "4": [],
+        "5": [],
+        "6": [],
+        "null": [2, 3, 4, 5, 6]
+      },
+      "heap": {
+        "2": null,
+        "3": null,
+        "4": null,
+        "5": null,
+        "6": null
+      },
+      "index": {
+        "2": {
+          "id": 2,
+          "bookId": 1,
+          "position": 0,
+          "title": "Exposition",
+          "time": 0,
+          "templates": [],
+          "autoOutlineSort": true,
+          "fromTemplateId": null,
+          "expanded": true
+        },
+        "3": {
+          "id": 3,
+          "bookId": 1,
+          "position": 1,
+          "title": "Rising Action",
+          "time": 0,
+          "templates": [],
+          "autoOutlineSort": true,
+          "fromTemplateId": null,
+          "expanded": true
+        },
+        "4": {
+          "id": 4,
+          "bookId": 1,
+          "position": 2,
+          "title": "Climax",
+          "time": 0,
+          "templates": [],
+          "autoOutlineSort": true,
+          "fromTemplateId": null,
+          "expanded": true
+        },
+        "5": {
+          "id": 5,
+          "bookId": 1,
+          "position": 3,
+          "title": "Falling Action",
+          "time": 0,
+          "templates": [],
+          "autoOutlineSort": true,
+          "fromTemplateId": null,
+          "expanded": true
+        },
+        "6": {
+          "id": 6,
+          "bookId": 1,
+          "position": 4,
+          "title": "Resolution",
+          "time": 0,
+          "templates": [],
+          "autoOutlineSort": true,
+          "fromTemplateId": null,
+          "expanded": true
         }
-      ],
-      "color": null,
-      "cards": [1, 2, 6, 7, 3, 4, 5, 11],
-      "noteIds": [],
-      "templates": [],
-      "tags": [],
-      "categoryId": "1",
-      "imageId": "1",
-      "bookIds": [],
-      "Species": "Human"
+      }
     },
-    {
-      "id": 2,
-      "name": "Baby Bear",
-      "description": "",
-      "notes": [
-        {
-          "children": [
-            {
-              "text": ""
-            }
-          ]
+    "2": {
+      "children": {
+        "7": [],
+        "null": [7]
+      },
+      "heap": {
+        "7": null
+      },
+      "index": {
+        "7": {
+          "autoOutlineSort": true,
+          "bookId": 2,
+          "fromTemplateId": null,
+          "id": 7,
+          "position": 0,
+          "time": 0,
+          "title": "auto",
+          "expanded": true
         }
-      ],
-      "color": null,
-      "cards": [3, 4, 11],
-      "noteIds": [],
-      "templates": [],
-      "tags": [],
-      "categoryId": "1",
-      "imageId": "2",
-      "bookIds": [],
-      "Species": "Bear"
+      }
     },
-    {
-      "id": 3,
-      "name": "Papa Bear",
-      "description": "",
-      "notes": [
-        {
-          "children": [
-            {
-              "text": ""
-            }
-          ]
+    "3": {
+      "children": {
+        "8": [],
+        "null": [8]
+      },
+      "heap": {
+        "8": null
+      },
+      "index": {
+        "8": {
+          "autoOutlineSort": true,
+          "bookId": 3,
+          "fromTemplateId": null,
+          "id": 8,
+          "position": 0,
+          "time": 0,
+          "title": "auto",
+          "expanded": true
         }
-      ],
-      "color": null,
-      "cards": [3, 4, 11],
-      "noteIds": [],
-      "templates": [],
-      "tags": [],
-      "categoryId": "2",
-      "imageId": "4",
-      "bookIds": [],
-      "Species": "Bear"
+      }
     },
-    {
-      "id": 4,
-      "name": "Mama Bear",
-      "description": "",
-      "notes": [
-        {
-          "children": [
-            {
-              "text": ""
-            }
-          ]
+    "series": {
+      "children": {
+        "1": [],
+        "null": [1]
+      },
+      "heap": {
+        "1": null
+      },
+      "index": {
+        "1": {
+          "id": 1,
+          "position": 0,
+          "title": "Beat 1",
+          "time": 0,
+          "templates": [],
+          "autoOutlineSort": true,
+          "bookId": "series",
+          "expanded": true
         }
-      ],
-      "color": null,
-      "cards": [3, 4, 11],
-      "noteIds": [],
-      "templates": [],
-      "tags": [],
-      "categoryId": "2",
-      "imageId": "3",
-      "bookIds": [],
-      "Species": "Bear"
+      }
     }
-  ],
-  "chapters": [
-    {
-      "id": 1,
-      "bookId": 1,
-      "position": 0,
-      "title": "Exposition",
-      "time": 0,
-      "templates": [],
-      "autoOutlineSort": true
-    },
-    {
-      "id": 2,
-      "bookId": 1,
-      "position": 1,
-      "title": "Rising Action",
-      "time": 0,
-      "autoOutlineSort": true
-    },
-    {
-      "id": 3,
-      "bookId": 1,
-      "position": 2,
-      "title": "Climax",
-      "time": 0,
-      "autoOutlineSort": true
-    },
-    {
-      "id": 4,
-      "bookId": 1,
-      "position": 3,
-      "title": "Falling Action",
-      "time": 0,
-      "autoOutlineSort": true
-    },
-    {
-      "id": 5,
-      "bookId": 1,
-      "position": 4,
-      "title": "Resolution",
-      "time": 0,
-      "autoOutlineSort": true
-    }
-  ],
+  },
   "cards": [
+    {
+      "id": 12,
+      "lineId": 2,
+      "beatId": 5,
+      "bookId": null,
+      "positionWithinLine": 0,
+      "positionInBeat": 0,
+      "title": "new scene card",
+      "description": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "text": ""
+            }
+          ]
+        }
+      ],
+      "tags": [],
+      "characters": [],
+      "places": [],
+      "templates": [],
+      "imageId": null,
+      "fromTemplateId": null,
+      "color": null
+    },
     {
       "id": 11,
       "lineId": 4,
-      "chapterId": 3,
-      "beatId": null,
+      "beatId": 4,
       "seriesLineId": null,
       "bookId": null,
       "positionWithinLine": 0,
@@ -196,20 +314,21 @@
             {
               "text": ""
             }
-          ]
+          ],
+          "type": "paragraph"
         }
       ],
       "tags": [7, 1],
       "characters": [2, 1, 4, 3],
       "places": [2],
       "templates": [],
-      "imageId": null
+      "imageId": null,
+      "fromTemplateId": null
     },
     {
       "id": 10,
       "lineId": 3,
-      "chapterId": 3,
-      "beatId": null,
+      "beatId": 4,
       "seriesLineId": null,
       "bookId": null,
       "positionWithinLine": 0,
@@ -221,20 +340,21 @@
             {
               "text": ""
             }
-          ]
+          ],
+          "type": "paragraph"
         }
       ],
       "tags": [6, 1],
       "characters": [],
       "places": [],
       "templates": [],
-      "imageId": null
+      "imageId": null,
+      "fromTemplateId": null
     },
     {
       "id": 9,
       "lineId": 2,
-      "chapterId": 3,
-      "beatId": null,
+      "beatId": 4,
       "seriesLineId": null,
       "bookId": null,
       "positionWithinLine": 1,
@@ -246,20 +366,21 @@
             {
               "text": ""
             }
-          ]
+          ],
+          "type": "paragraph"
         }
       ],
       "tags": [8, 1],
       "characters": [],
       "places": [],
       "templates": [],
-      "imageId": null
+      "imageId": null,
+      "fromTemplateId": null
     },
     {
       "id": 8,
       "lineId": 4,
-      "chapterId": 2,
-      "beatId": null,
+      "beatId": 3,
       "seriesLineId": null,
       "bookId": null,
       "position": 0,
@@ -270,7 +391,8 @@
             {
               "text": "Very tired, Goldilocks goes upstairs to the bedroom..."
             }
-          ]
+          ],
+          "type": "paragraph"
         },
         {
           "type": "paragraph",
@@ -311,13 +433,13 @@
       "templates": [],
       "imageId": null,
       "positionWithinLine": 0,
-      "positionInChapter": null
+      "positionInChapter": null,
+      "fromTemplateId": null
     },
     {
       "id": 7,
       "lineId": 3,
-      "chapterId": 2,
-      "beatId": null,
+      "beatId": 3,
       "seriesLineId": null,
       "bookId": null,
       "position": 0,
@@ -328,7 +450,8 @@
             {
               "text": "Tired, Golidocks decides to sit on a chair..."
             }
-          ]
+          ],
+          "type": "paragraph"
         },
         {
           "type": "paragraph",
@@ -369,13 +492,13 @@
       "templates": [],
       "imageId": null,
       "positionWithinLine": 0,
-      "positionInChapter": null
+      "positionInChapter": null,
+      "fromTemplateId": null
     },
     {
       "id": 6,
       "lineId": 2,
-      "chapterId": 2,
-      "beatId": null,
+      "beatId": 3,
       "seriesLineId": null,
       "bookId": null,
       "position": 0,
@@ -412,13 +535,13 @@
       "templates": [],
       "imageId": null,
       "positionWithinLine": 0,
-      "positionInChapter": null
+      "positionInChapter": null,
+      "fromTemplateId": null
     },
     {
       "id": 5,
       "lineId": 1,
-      "chapterId": 5,
-      "beatId": null,
+      "beatId": 6,
       "seriesLineId": null,
       "bookId": null,
       "position": 0,
@@ -429,7 +552,8 @@
             {
               "text": "She runs out the door, into the forest."
             }
-          ]
+          ],
+          "type": "paragraph"
         }
       ],
       "tags": [1, 4],
@@ -438,13 +562,13 @@
       "templates": [],
       "imageId": null,
       "positionWithinLine": 0,
-      "positionInChapter": null
+      "positionInChapter": null,
+      "fromTemplateId": null
     },
     {
       "id": 4,
       "lineId": 1,
-      "chapterId": 4,
-      "beatId": null,
+      "beatId": 5,
       "seriesLineId": null,
       "bookId": null,
       "position": 0,
@@ -455,7 +579,8 @@
             {
               "text": "She sees the bears, screams for help, and runs out of the room."
             }
-          ]
+          ],
+          "type": "paragraph"
         }
       ],
       "tags": [1],
@@ -464,13 +589,13 @@
       "templates": [],
       "imageId": null,
       "positionWithinLine": 0,
-      "positionInChapter": null
+      "positionInChapter": null,
+      "fromTemplateId": null
     },
     {
       "id": 3,
       "lineId": 1,
-      "chapterId": 3,
-      "beatId": null,
+      "beatId": 4,
       "seriesLineId": null,
       "bookId": null,
       "position": 0,
@@ -481,7 +606,8 @@
             {
               "text": "They are not pleased by what they discover."
             }
-          ]
+          ],
+          "type": "paragraph"
         }
       ],
       "tags": [1],
@@ -490,13 +616,13 @@
       "templates": [],
       "imageId": null,
       "positionWithinLine": 0,
-      "positionInChapter": null
+      "positionInChapter": null,
+      "fromTemplateId": null
     },
     {
       "id": 2,
       "lineId": 1,
-      "chapterId": 2,
-      "beatId": null,
+      "beatId": 3,
       "seriesLineId": null,
       "bookId": null,
       "position": 0,
@@ -507,7 +633,8 @@
             {
               "text": "Goldilocks is hungry."
             }
-          ]
+          ],
+          "type": "paragraph"
         }
       ],
       "tags": [3, 8],
@@ -516,13 +643,13 @@
       "templates": [],
       "imageId": null,
       "positionWithinLine": 0,
-      "positionInChapter": null
+      "positionInChapter": null,
+      "fromTemplateId": null
     },
     {
       "id": 1,
       "lineId": 1,
-      "chapterId": 1,
-      "beatId": null,
+      "beatId": 2,
       "seriesLineId": null,
       "bookId": null,
       "position": 0,
@@ -533,7 +660,8 @@
             {
               "text": "She knocks on the door and walks right in when nobody answers."
             }
-          ]
+          ],
+          "type": "paragraph"
         }
       ],
       "tags": [2, 5],
@@ -542,42 +670,306 @@
       "templates": [],
       "imageId": null,
       "positionWithinLine": 0,
-      "positionInChapter": null
+      "positionInChapter": null,
+      "fromTemplateId": null
     }
   ],
-  "lines": [
+  "categories": {
+    "characters": [
+      {
+        "id": 1,
+        "name": "Main",
+        "position": 0
+      },
+      {
+        "id": 2,
+        "name": "Supporting",
+        "position": 1
+      },
+      {
+        "id": 3,
+        "name": "Other",
+        "position": 2
+      }
+    ],
+    "places": [],
+    "notes": [],
+    "tags": []
+  },
+  "characters": [
     {
-      "id": 4,
-      "bookId": 1,
-      "title": "Scene 4",
-      "color": "#ff7f32",
-      "position": 3,
-      "expanded": null
-    },
-    {
-      "id": 3,
-      "bookId": 1,
-      "title": "Scene 3",
-      "color": "#e5554f",
-      "position": 2,
-      "expanded": true
+      "id": 1,
+      "name": "Goldilocks",
+      "description": "",
+      "notes": [
+        {
+          "children": [
+            {
+              "text": ""
+            }
+          ],
+          "type": "paragraph"
+        }
+      ],
+      "color": null,
+      "cards": [1, 2, 6, 7, 3, 4, 5, 11],
+      "noteIds": [],
+      "templates": [],
+      "tags": [],
+      "categoryId": "1",
+      "imageId": "1",
+      "bookIds": [],
+      "Species": "Human"
     },
     {
       "id": 2,
-      "bookId": 1,
-      "title": "Scene 2",
-      "color": "#78be20",
-      "position": 1,
-      "expanded": null
+      "name": "Baby Bear",
+      "description": "",
+      "notes": [
+        {
+          "children": [
+            {
+              "text": ""
+            }
+          ],
+          "type": "paragraph"
+        }
+      ],
+      "color": null,
+      "cards": [3, 4, 11],
+      "noteIds": [],
+      "templates": [
+        {
+          "id": "ch10",
+          "version": "2022.8.11",
+          "attributes": [
+            {
+              "name": "Openness",
+              "description": "The degree to which they are creative, curious, and eager to learn or experience life (e.g. high or low)",
+              "type": "paragraph"
+            },
+            {
+              "name": "Conscientiousness",
+              "description": "The degree to which they are thoughtful, organized, detail-oriented, or goal-directed (e.g. high or low)",
+              "type": "paragraph"
+            },
+            {
+              "name": "Extraversion",
+              "description": "The degree to which they are talkative, assertive, expressive, or thrive in social situations (e.g. high or low)",
+              "type": "paragraph"
+            },
+            {
+              "name": "Agreeableness",
+              "description": "The degree to which they are trustworthy, kind, altruistic, helpful, or empathetic (e.g. high or low)",
+              "type": "paragraph"
+            },
+            {
+              "name": "Neuroticism",
+              "description": "The degree to which they are sad, moody, anxious, irritable, or emotionally unstable (e.g. high or low)",
+              "type": "paragraph"
+            }
+          ],
+          "value": "",
+          "values": [
+            {
+              "name": "Openness",
+              "value": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "text": "Openness"
+                    }
+                  ]
+                }
+              ],
+              "bookId": "all"
+            },
+            {
+              "name": "Conscientiousness",
+              "value": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "text": "conscientiousness"
+                    }
+                  ]
+                }
+              ],
+              "bookId": "all"
+            },
+            {
+              "name": "Extraversion",
+              "value": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "text": "extraversion"
+                    }
+                  ]
+                }
+              ],
+              "bookId": "all"
+            },
+            {
+              "name": "Agreeableness",
+              "value": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "text": "agreeableness"
+                    }
+                  ]
+                }
+              ],
+              "bookId": "all"
+            },
+            {
+              "name": "Neuroticism",
+              "value": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "text": "neuroticism"
+                    }
+                  ]
+                }
+              ],
+              "bookId": "all"
+            }
+          ]
+        },
+        {
+          "id": "ch3",
+          "version": "2020.5.27",
+          "attributes": [
+            {
+              "name": "Birth Order",
+              "type": "text"
+            },
+            {
+              "name": "Description",
+              "type": "paragraph"
+            }
+          ],
+          "value": "",
+          "values": [
+            {
+              "name": "Birth Order",
+              "value": "First",
+              "bookId": "all"
+            },
+            {
+              "name": "Description",
+              "value": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "text": "With more text."
+                    }
+                  ]
+                }
+              ],
+              "bookId": "all"
+            }
+          ]
+        }
+      ],
+      "tags": [],
+      "categoryId": "1",
+      "imageId": "2",
+      "bookIds": [],
+      "Species": "Bear"
     },
     {
-      "id": 1,
-      "bookId": 1,
-      "color": "#6cace4",
-      "title": "Scene 1",
-      "position": 0,
-      "characterId": null,
-      "expanded": true
+      "id": 3,
+      "name": "Papa Bear",
+      "description": "",
+      "notes": [
+        {
+          "children": [
+            {
+              "text": ""
+            }
+          ],
+          "type": "paragraph"
+        }
+      ],
+      "color": null,
+      "cards": [3, 4, 11],
+      "noteIds": [],
+      "templates": [],
+      "tags": [],
+      "categoryId": "2",
+      "imageId": "4",
+      "bookIds": [],
+      "Species": "Bear"
+    },
+    {
+      "id": 4,
+      "name": "Mama Bear",
+      "description": "",
+      "notes": [
+        {
+          "children": [
+            {
+              "text": ""
+            }
+          ],
+          "type": "paragraph"
+        }
+      ],
+      "color": null,
+      "cards": [3, 4, 11],
+      "noteIds": [],
+      "templates": [
+        {
+          "id": "ch3",
+          "version": "2020.5.27",
+          "attributes": [
+            {
+              "name": "Birth Order",
+              "type": "text"
+            },
+            {
+              "name": "Description",
+              "type": "paragraph"
+            }
+          ],
+          "value": "",
+          "values": [
+            {
+              "name": "Birth Order",
+              "value": "Birth ORder",
+              "bookId": "all"
+            },
+            {
+              "name": "Description",
+              "value": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "text": "birth - order description"
+                    }
+                  ]
+                }
+              ],
+              "bookId": "all"
+            }
+          ]
+        }
+      ],
+      "tags": [],
+      "categoryId": "2",
+      "imageId": "3",
+      "bookIds": [],
+      "Species": "Bear"
     }
   ],
   "customAttributes": {
@@ -588,94 +980,82 @@
       }
     ],
     "places": [],
-    "cards": [],
     "scenes": [],
-    "lines": []
+    "lines": [],
+    "notes": []
   },
-  "places": [
+  "attributes": {
+    "characters": []
+  },
+  "lines": [
     {
-      "id": 1,
-      "name": "Forest",
-      "description": "Surrounds the bear cottage",
-      "notes": [
-        {
-          "children": [
-            {
-              "text": ""
-            }
-          ]
-        }
-      ],
-      "color": null,
-      "cards": [1, 5],
-      "noteIds": [],
-      "templates": [],
-      "tags": [],
-      "imageId": "5",
-      "bookIds": []
-    },
-    {
-      "id": 2,
-      "name": "Bear Cottage",
-      "description": "Where the bears live",
-      "notes": [
-        {
-          "children": [
-            {
-              "text": "The home Goldilocks enters"
-            }
-          ]
-        }
-      ],
-      "color": null,
-      "cards": [7, 2, 8, 3, 4, 5, 11],
-      "noteIds": [],
-      "templates": [],
-      "tags": [],
-      "imageId": "6",
-      "bookIds": []
-    }
-  ],
-  "tags": [
-    {
-      "id": 1,
-      "title": "Theme: Stranger Danger",
-      "color": "MediumAquaMarine"
-    },
-    {
-      "id": 2,
-      "title": "Theme: Trust",
-      "color": "MediumAquaMarine"
-    },
-    {
-      "id": 3,
-      "title": "Theme: Greed",
-      "color": "MediumAquaMarine"
-    },
-    {
-      "id": 4,
-      "title": "Status: Completed",
-      "color": "DarkOrange"
-    },
-    {
-      "id": 5,
-      "title": "Status: To Do",
-      "color": "DarkOrange"
+      "id": 7,
+      "bookId": 3,
+      "color": "#6cace4",
+      "title": "Book 3",
+      "position": 0,
+      "characterId": null,
+      "expanded": null,
+      "fromTemplateId": null,
+      "isPinned": false
     },
     {
       "id": 6,
-      "title": "Item: Chair",
-      "color": "#0b1117"
+      "bookId": 2,
+      "color": "#6cace4",
+      "title": "Book 2",
+      "position": 0,
+      "characterId": null,
+      "expanded": null,
+      "fromTemplateId": null,
+      "isPinned": false
     },
     {
-      "id": 7,
-      "title": "Item: Bed",
-      "color": "#0b1117"
+      "id": 4,
+      "bookId": 1,
+      "title": "Scene 4",
+      "color": "#ff7f32",
+      "position": 3,
+      "expanded": null,
+      "fromTemplateId": null
     },
     {
-      "id": 8,
-      "title": "Item: Porridge",
-      "color": "#0b1117"
+      "id": 3,
+      "bookId": 1,
+      "title": "Scene 3",
+      "color": "#e5554f",
+      "position": 2,
+      "expanded": true,
+      "fromTemplateId": null
+    },
+    {
+      "id": 2,
+      "bookId": 1,
+      "title": "Scene 2",
+      "color": "#78be20",
+      "position": 1,
+      "expanded": null,
+      "fromTemplateId": null
+    },
+    {
+      "id": 1,
+      "bookId": 1,
+      "color": "#6cace4",
+      "title": "Scene 1",
+      "position": 0,
+      "characterId": null,
+      "expanded": true,
+      "fromTemplateId": null
+    },
+    {
+      "id": 5,
+      "bookId": "series",
+      "color": "#6cace4",
+      "title": "Main Plot",
+      "position": 0,
+      "characterId": null,
+      "expanded": null,
+      "fromTemplateId": null
     }
   ],
   "notes": [
@@ -780,7 +1160,8 @@
             {
               "text": "Strangers can be dangerous: "
             }
-          ]
+          ],
+          "type": "paragraph"
         },
         {
           "type": "bulleted-list",
@@ -889,57 +1270,175 @@
       "bookIds": []
     }
   ],
-  "beats": {
+  "places": [
+    {
+      "id": 1,
+      "name": "Forest",
+      "description": "Surrounds the bear cottage",
+      "notes": [
+        {
+          "children": [
+            {
+              "text": ""
+            }
+          ],
+          "type": "paragraph"
+        }
+      ],
+      "color": null,
+      "cards": [1, 5],
+      "noteIds": [],
+      "templates": [],
+      "tags": [],
+      "imageId": "5",
+      "bookIds": []
+    },
+    {
+      "id": 2,
+      "name": "Bear Cottage",
+      "description": "Where the bears live",
+      "notes": [
+        {
+          "children": [
+            {
+              "text": "The home Goldilocks enters"
+            }
+          ],
+          "type": "paragraph"
+        }
+      ],
+      "color": null,
+      "cards": [7, 2, 8, 3, 4, 5, 11],
+      "noteIds": [],
+      "templates": [],
+      "tags": [],
+      "imageId": "6",
+      "bookIds": []
+    }
+  ],
+  "tags": [
+    {
+      "id": 1,
+      "title": "Theme: Stranger Danger",
+      "color": "MediumAquaMarine"
+    },
+    {
+      "id": 2,
+      "title": "Theme: Trust",
+      "color": "MediumAquaMarine"
+    },
+    {
+      "id": 3,
+      "title": "Theme: Greed",
+      "color": "MediumAquaMarine"
+    },
+    {
+      "id": 4,
+      "title": "Status: Completed",
+      "color": "DarkOrange"
+    },
+    {
+      "id": 5,
+      "title": "Status: To Do",
+      "color": "DarkOrange"
+    },
+    {
+      "id": 6,
+      "title": "Item: Chair",
+      "color": "#0b1117"
+    },
+    {
+      "id": 7,
+      "title": "Item: Bed",
+      "color": "#0b1117"
+    },
+    {
+      "id": 8,
+      "title": "Item: Porridge",
+      "color": "#0b1117"
+    }
+  ],
+  "hierarchyLevels": {
+    "1": {
+      "0": {
+        "name": "Chapter",
+        "level": 0,
+        "autoNumber": true,
+        "textSize": 24,
+        "borderStyle": "NONE",
+        "backgroundColor": "none",
+        "textColor": "#0b1117",
+        "borderColor": "#6cace4",
+        "dark": {
+          "borderColor": "#c9e6ff",
+          "textColor": "#c9e6ff"
+        },
+        "light": {
+          "borderColor": "#6cace4",
+          "textColor": "#0b1117"
+        }
+      }
+    },
+    "2": {
+      "0": {
+        "name": "Chapter",
+        "level": 0,
+        "autoNumber": true,
+        "textSize": 24,
+        "borderStyle": "NONE",
+        "backgroundColor": "none",
+        "textColor": "#0b1117",
+        "borderColor": "#6cace4",
+        "dark": {
+          "borderColor": "#c9e6ff",
+          "textColor": "#c9e6ff"
+        },
+        "light": {
+          "borderColor": "#6cace4",
+          "textColor": "#0b1117"
+        }
+      }
+    },
+    "3": {
+      "0": {
+        "name": "Chapter",
+        "level": 0,
+        "autoNumber": true,
+        "textSize": 24,
+        "borderStyle": "NONE",
+        "backgroundColor": "none",
+        "textColor": "#0b1117",
+        "borderColor": "#6cace4",
+        "dark": {
+          "borderColor": "#c9e6ff",
+          "textColor": "#c9e6ff"
+        },
+        "light": {
+          "borderColor": "#6cace4",
+          "textColor": "#0b1117"
+        }
+      }
+    },
     "series": {
-      "children": {
-        "1": [],
-        "null": [1]
-      },
-      "heap": {
-        "1": null
-      },
-      "index": {
-        "1": {
-          "id": 1,
-          "position": 0,
-          "title": "Beat 1",
-          "time": 0,
-          "templates": [],
-          "autoOutlineSort": true
+      "0": {
+        "name": "Chapter",
+        "level": 0,
+        "autoNumber": true,
+        "textSize": 24,
+        "borderStyle": "NONE",
+        "backgroundColor": "none",
+        "textColor": "#0b1117",
+        "borderColor": "#6cace4",
+        "dark": {
+          "borderColor": "#c9e6ff",
+          "textColor": "#c9e6ff"
+        },
+        "light": {
+          "borderColor": "#6cace4",
+          "textColor": "#0b1117"
         }
       }
     }
-  },
-  "seriesLines": [
-    {
-      "id": 1,
-      "color": "#6cace4",
-      "title": "Main Plot",
-      "position": 0,
-      "expanded": null
-    }
-  ],
-  "categories": {
-    "characters": [
-      {
-        "id": 1,
-        "name": "Main",
-        "position": 0
-      },
-      {
-        "id": 2,
-        "name": "Supporting",
-        "position": 1
-      },
-      {
-        "id": 3,
-        "name": "Other",
-        "position": 2
-      }
-    ],
-    "places": [],
-    "notes": [],
-    "tags": []
   },
   "images": {
     "1": {

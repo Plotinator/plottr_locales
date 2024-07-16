@@ -2,7 +2,7 @@ import xml from 'xml-js'
 import { t } from 'plottr_locales'
 const i18n = t
 import { cloneDeep, groupBy } from 'lodash'
-import { newIds, helpers, lineColors, initialState, tree } from 'pltr/v2'
+import { newIds, helpers, lineColors, initialState, tree } from 'pltr'
 
 const { nextColor } = lineColors
 const defaultBook = initialState.book
@@ -334,7 +334,7 @@ function cards(currentState, json, bookId) {
 
     sceneListNode['GContainer'].forEach((sNode) => {
       // each one is a card in a beat
-      let beatId = null
+      let beatId = 'null'
       let characterName = ''
       let sentence = ''
       let wordCountExpected = 0
