@@ -822,7 +822,7 @@ const createClient = (suppliedPort, suppliedLogger, suppliedSecret, { onBusy, on
       if (error.message === INVALID_OR_UNSET_PORT) {
         suppliedLogger.info('Client port not yet set, but we tried to listen to busy status.')
       } else {
-        suppliedLogger.error('Error listening to busy status', error)
+        suppliedLogger.warn('Error listening to busy status', error)
       }
     } else if (result?.busy) {
       onBusy()

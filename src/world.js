@@ -61,7 +61,7 @@ const combineCloudAndFileSystemSources =
 
     const unsubscribeFromFileSystemSourceResult = fileSystemSource((error, fileSystemResult) => {
       if (error) {
-        logger.error(`Failed to receive updated values`, error)
+        logger.warn(`Failed to receive updated values`, error)
       } else {
         _currentFileSystemResult = fileSystemResult
         afterSettingsLoad(store, () => {

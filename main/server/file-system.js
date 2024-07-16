@@ -332,7 +332,7 @@ const fileSystemModule = (userDataPath) => {
               }
             })
             .catch((error) => {
-              logger.error('Error listening to backups changes', error)
+              logger.warn('Error listening to backups changes', error)
               return Promise.reject(error)
             })
         }
@@ -350,7 +350,7 @@ const fileSystemModule = (userDataPath) => {
           return Promise.resolve(backups.map(withFromFileSystem))
         })
         .catch((error) => {
-          logger.error('Error listening to backups changes', error)
+          logger.warn('Error listening to backups changes', error)
           return Promise.reject(error)
         })
     }
