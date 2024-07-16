@@ -40,3 +40,5 @@ lib/plottr_components/src/css/components.css.map
 /bin/443.bundle.js.LICENSE.txt
 /bin/486.bundle.js.LICENSE.txt
 /bin/stats.json
+/bin/preload.js
+/bin/electron_main.js
