@@ -44,7 +44,12 @@ const defaultProps = {
 }
 
 class FormControl extends React.Component {
-  component = null
+  constructor(props) {
+    super(props)
+    // @type {null|HTMLElement}
+    this.component = null
+  }
+
   focussing = false
 
   handleMouseDown = (event) => {
@@ -146,7 +151,7 @@ class FormControl extends React.Component {
           )
 
           // input[type="file"] should not have .form-control.
-          let classes
+          let classes = {}
           if (type !== 'file') {
             classes = getClassSet(bsProps)
           }

@@ -33,6 +33,7 @@ class ModalDialog extends React.Component {
     return (
       <div
         {...elementProps}
+        // @ts-ignore
         tabIndex="-1"
         role="dialog"
         style={modalStyle}

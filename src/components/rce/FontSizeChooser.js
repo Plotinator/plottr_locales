@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { PropTypes } from 'prop-types'
+import PropTypes from 'prop-types'
 import { Editor, Text as SlateText } from 'slate'
 import { ReactEditor, useSlate } from 'slate-react'
 import { uniq, range } from 'lodash'
@@ -27,7 +27,8 @@ const UnMemoisedFontSizeChooser = ({ editor, defaultFontSize, logger }) => {
           setDisplayedSize(newDisplayedSize)
         }
       }, 100)
-      setDisabled(Editor.isInHeading(editor, editor.selection))
+      // @ts-ignore
+      setDisabled(Editor.isInHeading(editor))
       return () => {
         clearTimeout(timer)
       }
@@ -56,9 +57,8 @@ const UnMemoisedFontSizeChooser = ({ editor, defaultFontSize, logger }) => {
   return (
     <DropdownButton
       className="size-picker"
-      title={displayedSize}
+      title={`${displayedSize}`}
       onSelect={changeSize}
-      activeKey={currentSize}
       id="size-dropdown"
       disabled={disabled}
       renderChildren={renderSizes}
@@ -75,17 +75,21 @@ UnMemoisedFontSizeChooser.propTypes = {
 export const FontSizeChooser = React.memo(UnMemoisedFontSizeChooser)
 
 const getDisplayedSize = (editor, defaultFontSize, logger) => {
+  // @ts-ignore
   if (Editor.validSelection(editor)) {
     try {
       const nodes = Array.from(Editor.nodes(editor, { match: SlateText.isText }))
       const fontSizes = uniq(
         nodes.map(([node]) => {
+          // @ts-ignore
           return node.fontSize
         })
       )
       if (fontSizes.length > 1) {
         return '--'
+        // @ts-ignore
       } else if (nodes[0]?.[0]?.fontSize && typeof nodes[0]?.[0]?.fontSize === 'number') {
+        // @ts-ignore
         return nodes[0]?.[0].fontSize
       } else {
         return defaultFontSize ?? 20
@@ -100,9 +104,12 @@ const getDisplayedSize = (editor, defaultFontSize, logger) => {
 }
 
 const getCurrentSize = (editor, defaultFontSize) => {
+  // @ts-ignore
   if (Editor.validSelection(editor)) {
+    // @ts-ignore
     const [node] = Editor.nodes(editor, { match: (n) => n.fontSize })
     if (node) {
+      // @ts-ignore
       return node[0].fontSize
     } else {
       return defaultFontSize || 20
@@ -113,6 +120,7 @@ const getCurrentSize = (editor, defaultFontSize) => {
 }
 
 const addFontSizeMark = (editor, size) => {
+  // @ts-ignore
   if (Editor.validSelection(editor)) {
     Editor.addMark(editor, 'fontSize', size)
   }

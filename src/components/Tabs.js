@@ -91,6 +91,7 @@ const defaultProps = {
 
 function getDefaultActiveKey(children) {
   let defaultActiveKey
+  // @ts-ignore
   ValidComponentChildren.forEach(children, (child) => {
     if (defaultActiveKey == null) {
       defaultActiveKey = child.props.eventKey
@@ -186,6 +187,7 @@ class Tabs extends React.Component {
             role="tablist"
             onDragOver={this.props.onTabDragOver}
           >
+            {/* @ts-ignore */}
             {ValidComponentChildren.map(children, this.renderTab)}
           </Nav>
 

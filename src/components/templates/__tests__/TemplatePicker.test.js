@@ -3,7 +3,6 @@ import { shallow } from 'enzyme'
 import TemplatePicker, { testIds } from '../TemplatePicker'
 // import { customTemplateStore } from '../../../../common/utils/templates'
 import { customTemplate } from '../__fixtures__/template'
-import { shell } from 'electron'
 
 describe.skip('TemplatePicker', () => {
   const props = {
@@ -37,7 +36,6 @@ describe.skip('TemplatePicker', () => {
     expect(tree.findByTestId(testIds[`description-${template.id}`]).text()).toContain('Description')
 
     tree.findByTestId(testIds.link).simulate('click')
-    expect(shell.openExternal).toHaveBeenCalledWith('https://google.com')
   })
 
   describe('save template button', () => {

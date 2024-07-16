@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef } from 'react'
-import { PropTypes } from 'prop-types'
+import PropTypes from 'prop-types'
 import cx from 'classnames'
 import { useRootClose } from 'react-overlays'
 
@@ -19,7 +19,7 @@ const MenuItem = ({ divider, active, title, extraProps, key, onSelect }) => {
         onClick={handleClick}
         {...(extraProps ?? {})}
       >
-        <a draggable="false" role="menuitem" tabIndex="-1" href="#">
+        <a draggable="false" role="menuitem" tabIndex={-1} href="#">
           {title}
         </a>
       </li>
@@ -36,15 +36,7 @@ MenuItem.propTypes = {
   onSelect: PropTypes.func,
 }
 
-const DropdownButton = ({
-  className,
-  title,
-  onSelect,
-  id,
-  disabled,
-  activeKey,
-  renderChildren,
-}) => {
+const DropdownButton = ({ title, onSelect, id, renderChildren, className, disabled }) => {
   const [isOpen, setIsOpen] = useState(false)
 
   const toggleOpen = useCallback(() => {
@@ -62,6 +54,7 @@ const DropdownButton = ({
   const ref = useRef()
 
   useRootClose(
+    // @ts-ignore
     ref,
     (event) => {
       event.preventDefault()
@@ -72,7 +65,7 @@ const DropdownButton = ({
   )
 
   return (
-    <div className={cx('dropdown btn-group', { open: isOpen })}>
+    <div className={cx(`dropdown btn-group ${className}`, { open: isOpen })}>
       <button
         id={id}
         role="button"
@@ -81,13 +74,21 @@ const DropdownButton = ({
         type="button"
         className="dropdown-toggle btn btn-default"
         onClick={toggleOpen}
+        disabled={disabled}
       >
         {title}
         <span className="caret"></span>
       </button>
-      <ul ref={ref} role="menu" className="dropdown-menu" aria-labelledby="font-dropdown">
+      <ul
+        // @ts-ignore
+        ref={ref}
+        role="menu"
+        className="dropdown-menu"
+        aria-labelledby="font-dropdown"
+      >
         {renderChildren((divider, active, title, extraProps, key) => (
           <MenuItem
+            key={key}
             divider={divider}
             active={active}
             title={title}
@@ -101,13 +102,12 @@ const DropdownButton = ({
 }
 
 DropdownButton.propTypes = {
-  className: PropTypes.string,
   title: PropTypes.string.isRequired,
   onSelect: PropTypes.func.isRequired,
   id: PropTypes.string.isRequired,
-  disabled: PropTypes.bool,
-  activeKey: PropTypes.string.isRequired,
   renderChildren: PropTypes.func.isRequired,
+  className: PropTypes.string,
+  disabled: PropTypes.bool,
 }
 
 export default DropdownButton

@@ -200,7 +200,7 @@
     .slate-editor__word-counter {
       background-color: #fff;
       border: 1px solid $new-item-border-color;
-      color: #102A42;
+      color: #102a42;
     }
   }
 }
@@ -495,7 +495,6 @@
         @include rce-subtitle-font;
         @include rce-subtitle-darkmode-font-color;
       }
-      
     }
 
     .card-dialog__left-side {

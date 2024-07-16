@@ -1,114 +1,99 @@
 import React, { Component } from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
-import UnconnectedErrorBoundary from '../containers/ErrorBoundary'
-import UnconnectedCharacterEditDetails from './CharacterEditDetails'
-import UnconnectedCharacterDetails from './CharacterDetails'
-import UnconnectedSelectList from '../SelectList'
-import UnconnectedBookSelectList from '../project/BookSelectList'
-import { checkDependencies } from '../checkDependencies'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 
-const CharacterViewConnector = (connector) => {
-  const ErrorBoundary = UnconnectedErrorBoundary(connector)
-  const CharacterEditDetails = UnconnectedCharacterEditDetails(connector)
-  const CharacterDetails = UnconnectedCharacterDetails(connector)
-  const SelectList = UnconnectedSelectList(connector)
-  const BookSelectList = UnconnectedBookSelectList(connector)
+import { selectors, actions } from 'wired-up-pltr'
 
-  class CharacterView extends Component {
-    render() {
-      const {
-        character,
-        tags,
-        actions,
-        darkMode,
-        editing,
-        stopEditing,
-        startEditing,
-        openAttributes,
-      } = this.props
+import ErrorBoundary from '../containers/ErrorBoundary'
+import CharacterEditDetails from './CharacterEditDetails'
+import CharacterDetails from './CharacterDetails'
+import SelectList from '../SelectList'
+import BookSelectList from '../project/BookSelectList'
 
-      if (!character) {
-        return null
-      } else {
-        return (
-          <div className={cx('character-list__character-view', { darkmode: darkMode })}>
-            <div className="character-list__character-view__left-side">
-              <BookSelectList
-                selectedBooks={character.bookIds}
-                parentId={character.id}
-                add={actions.addBook}
-                remove={actions.removeBook}
-              />
-              <SelectList
-                parentId={character.id}
-                type={'Tags'}
-                selectedItems={character.tags}
-                allItems={tags}
-                add={actions.addTag}
-                remove={actions.removeTag}
-              />
-            </div>
-            <div className="character-list__character-view__right-side">
-              <ErrorBoundary>
-                {editing ? (
-                  <CharacterEditDetails
-                    characterId={character.id}
-                    finishEditing={stopEditing}
-                    openAttributes={openAttributes}
-                  />
-                ) : (
-                  <CharacterDetails characterId={character.id} startEditing={startEditing} />
-                )}
-              </ErrorBoundary>
-            </div>
+class CharacterView extends Component {
+  render() {
+    const {
+      character,
+      tags,
+      actions,
+      darkMode,
+      editing,
+      stopEditing,
+      startEditing,
+      openAttributes,
+    } = this.props
+
+    if (!character) {
+      return null
+    } else {
+      return (
+        <div className={cx('character-list__character-view', { darkmode: darkMode })}>
+          <div className="character-list__character-view__left-side">
+            <BookSelectList
+              selectedBooks={character.bookIds}
+              parentId={character.id}
+              add={actions.addBook}
+              remove={actions.removeBook}
+            />
+            <SelectList
+              parentId={character.id}
+              type={'Tags'}
+              selectedItems={character.tags}
+              allItems={tags}
+              add={actions.addTag}
+              remove={actions.removeTag}
+            />
           </div>
-        )
-      }
-    }
-
-    static propTypes = {
-      characterId: PropTypes.number.isRequired,
-      editing: PropTypes.bool.isRequired,
-      startEditing: PropTypes.func.isRequired,
-      stopEditing: PropTypes.func.isRequired,
-      openAttributes: PropTypes.func,
-      character: PropTypes.object.isRequired,
-      actions: PropTypes.object.isRequired,
-      tags: PropTypes.array.isRequired,
-      darkMode: PropTypes.bool,
+          <div className="character-list__character-view__right-side">
+            <ErrorBoundary>
+              {editing ? (
+                <CharacterEditDetails
+                  characterId={character.id}
+                  finishEditing={stopEditing}
+                  openAttributes={openAttributes}
+                />
+              ) : (
+                <CharacterDetails characterId={character.id} startEditing={startEditing} />
+              )}
+            </ErrorBoundary>
+          </div>
+        </div>
+      )
     }
   }
 
-  const {
-    redux,
-    pltr: { actions, selectors },
-  } = connector
-  checkDependencies({ redux, actions, selectors })
-
-  if (redux) {
-    const { connect, bindActionCreators } = redux
-
-    return connect(
-      (state, ownProps) => {
-        return {
-          character: selectors.displayedSingleCharacterSelector(state, ownProps.characterId),
-          darkMode: selectors.isDarkModeSelector(state),
-          tags: selectors.sortedTagsSelector(state),
-        }
-      },
-      (dispatch) => {
-        return {
-          actions: bindActionCreators(actions.character, dispatch),
-        }
-      }
-    )(CharacterView)
+  static propTypes = {
+    characterId: PropTypes.number.isRequired,
+    editing: PropTypes.bool.isRequired,
+    startEditing: PropTypes.func.isRequired,
+    stopEditing: PropTypes.func.isRequired,
+    openAttributes: PropTypes.func,
+    character: PropTypes.object.isRequired,
+    actions: PropTypes.object.isRequired,
+    tags: PropTypes.array.isRequired,
+    darkMode: PropTypes.bool,
   }
-
-  throw new Error('Could not connect CharacterView.js')
 }
 
-export default CharacterViewConnector
+const mapStateToProps = (state, ownProps) => {
+  return {
+    character: selectors.displayedSingleCharacterSelector(
+      state,
+      // @ts-ignore
+      ownProps.characterId
+    ),
+    darkMode: selectors.isDarkModeSelector(state),
+    tags: selectors.sortedTagsSelector(state),
+  }
+}
+
+export default connect(mapStateToProps, (dispatch) => {
+  return {
+    actions: bindActionCreators(actions.character, dispatch),
+  }
+})(CharacterView)
 
 // renderAssociations () {
 //   let cards = null

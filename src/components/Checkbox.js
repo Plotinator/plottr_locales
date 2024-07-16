@@ -6,6 +6,7 @@ export function Checkbox({ children, checked, disabled, onChange, inline }) {
   const inputRef = useRef(null)
 
   const valueChange = () => {
+    // @ts-ignore
     onChange(inputRef.current.checked)
   }
 

@@ -1,7 +1,10 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useContext } from 'react'
 import PropTypes from 'react-proptypes'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import cx from 'classnames'
 
+import { selectors, actions } from 'wired-up-pltr'
 import { t as i18n } from 'plottr_locales'
 import { newIds } from 'pltr'
 
@@ -15,18 +18,18 @@ import Col from '../Col'
 import Row from '../Row'
 import FormControl from '../FormControl'
 import Button from '../Button'
-import UnconnectedPlottrFloater from '../PlottrFloater'
-import UnconnectedNoteView from './NoteView'
-import UnconnectedErrorBoundary from '../containers/ErrorBoundary'
-import UnconnectedCustomAttrFilterList from '../CustomAttrFilterList'
-import UnconnectedSubNav from '../containers/SubNav'
-import UnconnectedNoteItem from './NoteItem'
-import UnconnectedCustomAttributeModal from '../dialogs/CustomAttributeModal'
-import UnconnectedNoteCategoriesModal from './NoteCategoriesModal'
-import UnconnectedSortList from '../SortList'
-import UnconnectedExportNavItem from '../export/ExportNavItem'
-import { checkDependencies } from '../checkDependencies'
+import PlottrFloater from '../PlottrFloater'
+import NoteView from './NoteView'
+import ErrorBoundary from '../containers/ErrorBoundary'
+import CustomAttrFilterList from '../CustomAttrFilterList'
+import SubNav from '../containers/SubNav'
+import NoteItem from './NoteItem'
+import CustomAttributeModal from '../dialogs/CustomAttributeModal'
+import NoteCategoriesModal from './NoteCategoriesModal'
+import SortList from '../SortList'
+import ExportNavItem from '../export/ExportNavItem'
 import { withEventTargetValue } from '../withEventTargetValue'
+import { PlottrComponentsContext } from '../../connections/pltrContext'
 
 const { nextId } = newIds
 
@@ -57,407 +60,368 @@ const detailID = (notesByCategory, notes, categories, noteDetailId) => {
   return null
 }
 
-const NoteListViewConnector = (connector) => {
-  const Floater = UnconnectedPlottrFloater(connector)
-  const SortList = UnconnectedSortList(connector)
-  const ErrorBoundary = UnconnectedErrorBoundary(connector)
-  const NoteView = UnconnectedNoteView(connector)
-  const NoteCategoriesModal = UnconnectedNoteCategoriesModal(connector)
-  const SubNav = UnconnectedSubNav(connector)
-  const NoteItem = UnconnectedNoteItem(connector)
-  const CustomAttrFilterList = UnconnectedCustomAttrFilterList(connector)
-  const CustomAttributeModal = UnconnectedCustomAttributeModal(connector)
-  const ExportNavItem = UnconnectedExportNavItem(connector)
-
+const NoteListView = ({
+  categories,
+  visibleNotesByCategory,
+  notes,
+  actions,
+  darkMode,
+  selectedNoteId,
+  uiActions,
+  undo,
+  filterIsEmpty,
+  noteSort,
+  notesSearchTerm,
+  editingSelected,
+  categoriesDialogOpen,
+  attributesDialogOpen,
+  filterVisible,
+  sortVisible,
+  isJumping,
+  recentlyUndidOrRedid,
+}) => {
   const {
     platform: { exportDisabled },
-  } = connector
-  checkDependencies({ exportDisabled })
+  } = useContext(PlottrComponentsContext)
 
-  const NoteListView = ({
-    categories,
-    visibleNotesByCategory,
-    notes,
-    actions,
-    characters,
-    places,
-    tags,
-    darkMode,
-    selectedNoteId,
-    uiActions,
-    undo,
-    filterIsEmpty,
-    noteSort,
-    notesSearchTerm,
-    editingSelected,
-    categoriesDialogOpen,
-    attributesDialogOpen,
-    filterVisible,
-    sortVisible,
-    isJumping,
-    recentlyUndidOrRedid,
-  }) => {
-    const [draggedNote, setDraggedNote] = useState()
-    const [isMovingToNewCategory, setMovingToNewCategory] = useState(false)
+  const [draggedNote, setDraggedNote] = useState(null)
+  const [isMovingToNewCategory, setMovingToNewCategory] = useState(false)
 
-    const recentlyUndidOrRedidRef = useRef(false)
-    useEffect(() => {
-      recentlyUndidOrRedidRef.current = !!recentlyUndidOrRedid
-    }, [recentlyUndidOrRedid])
+  const recentlyUndidOrRedidRef = useRef(false)
+  useEffect(() => {
+    recentlyUndidOrRedidRef.current = !!recentlyUndidOrRedid
+  }, [recentlyUndidOrRedid])
 
-    useEffect(() => {
-      if (!isJumping && !recentlyUndidOrRedidRef.current) {
-        const noteToJumpTo = detailID(visibleNotesByCategory, notes, categories, selectedNoteId)
-        if (noteToJumpTo !== selectedNoteId) {
-          uiActions.selectNote(noteToJumpTo)
-        }
+  useEffect(() => {
+    if (!isJumping && !recentlyUndidOrRedidRef.current) {
+      const noteToJumpTo = detailID(visibleNotesByCategory, notes, categories, selectedNoteId)
+      if (noteToJumpTo !== selectedNoteId) {
+        uiActions.selectNote(noteToJumpTo)
       }
-    }, [notes, visibleNotesByCategory, categories])
-
-    const handleCreateNewNote = () => {
-      const id = nextId(notes)
-      undo.batch('Create new note', () => {
-        actions.addNote()
-        uiActions.selectNote(id)
-        uiActions.startEditingSelectedNote()
-      })
     }
+  }, [notes, visibleNotesByCategory, categories])
 
-    const startEditing = () => {
+  const handleCreateNewNote = () => {
+    const id = nextId(notes)
+    undo.batch('Create new note', () => {
+      actions.addNote()
+      uiActions.selectNote(id)
       uiActions.startEditingSelectedNote()
+    })
+  }
+
+  const startEditing = () => {
+    uiActions.startEditingSelectedNote()
+  }
+
+  const stopEditing = () => {
+    uiActions.finishEditingSelectedNote()
+  }
+
+  const closeDialog = () => {
+    undo.batch('Close Notes Categories', () => {
+      uiActions.hideNotesCategoryDialog()
+      uiActions.hideNotesAttributesDialog()
+    })
+  }
+
+  const renderCustomAttributes = () => {
+    if (!attributesDialogOpen) return null
+
+    return <CustomAttributeModal type="notes" closeDialog={closeDialog} hideSaveAsTemplate />
+  }
+
+  const renderCategoriesModal = () => {
+    if (!categoriesDialogOpen) return null
+    return <NoteCategoriesModal closeDialog={closeDialog} />
+  }
+
+  const handleDragStart = (e, note) => {
+    setDraggedNote(note)
+  }
+
+  const handleDragOver = (e, noteCategory) => {
+    e.preventDefault()
+    // @ts-ignore
+    if (noteCategory !== draggedNote?.categoryId) {
+      setMovingToNewCategory(true)
+    } else {
+      setMovingToNewCategory(false)
     }
+  }
 
-    const stopEditing = () => {
-      uiActions.finishEditingSelectedNote()
-    }
+  const handleDrop = () => {
+    setDraggedNote(null)
+  }
 
-    const closeDialog = () => {
-      undo.batch('Close Notes Categories', () => {
-        uiActions.hideNotesCategoryDialog()
-        uiActions.hideNotesAttributesDialog()
-      })
-    }
+  const renderVisibleNotes = (categoryId, startingIndex) => {
+    const notes =
+      categoryId === null
+        ? [
+            ...(visibleNotesByCategory['null'] || []),
+            ...(visibleNotesByCategory['undefined'] || []),
+          ]
+        : visibleNotesByCategory[categoryId]
 
-    const renderCustomAttributes = () => {
-      if (!attributesDialogOpen) return null
+    if (!notes) return []
 
-      return <CustomAttributeModal type="notes" closeDialog={closeDialog} hideSaveAsTemplate />
-    }
-
-    const renderCategoriesModal = () => {
-      if (!categoriesDialogOpen) return null
-      return <NoteCategoriesModal closeDialog={closeDialog} />
-    }
-
-    const handleDragStart = (e, note) => {
-      setDraggedNote(note)
-    }
-
-    const handleDragOver = (e, noteCategory) => {
-      e.preventDefault()
-      if (noteCategory !== draggedNote.categoryId) {
-        setMovingToNewCategory(true)
-      } else {
-        setMovingToNewCategory(false)
-      }
-    }
-
-    const handleDrop = () => {
-      setDraggedNote()
-    }
-
-    const renderVisibleNotes = (categoryId, startingIndex) => {
-      const notes =
-        categoryId === null
-          ? [...(visibleNotesByCategory[null] || []), ...(visibleNotesByCategory[undefined] || [])]
-          : visibleNotesByCategory[categoryId]
-
-      if (!notes) return []
-
-      return notes.map((n, idx) => {
-        return (
-          <div
-            key={n.id}
-            onDragOver={(e) => handleDragOver(e, n.categoryId)}
-            onDragStart={(e) => handleDragStart(e, { ...n, position: startingIndex + idx })}
-            onDrop={handleDrop}
-          >
-            <NoteItem
-              editing={editingSelected}
-              key={n.id}
-              note={n}
-              absolutePosition={startingIndex + idx}
-              selected={n.id == selectedNoteId}
-              startEdit={startEditing}
-              stopEdit={stopEditing}
-              select={() => uiActions.selectNote(n.id)}
-              draggedPosition={
-                Number.isInteger(draggedNote?.position) ? Number(draggedNote.position) : null
-              }
-              isMovingToNewCategory={isMovingToNewCategory}
-            />
-          </div>
-        )
-      })
-    }
-
-    const renderNotes = () => {
-      let startingIndex = 0
-      return [...categories, { id: null, name: i18n('Uncategorized') }].map((cat) => {
-        const result = renderCategory(cat, startingIndex)
-        startingIndex += (visibleNotesByCategory[cat.id] || []).length
-        return result
-      })
-    }
-
-    const renderCategory = (category, startingIndex) => {
-      const notesInCategory = renderVisibleNotes(category.id, startingIndex)
-      if (!notesInCategory.length) return null
+    return notes.map((n, idx) => {
       return (
-        <div key={`category-${category.id}`}>
-          <h2 className="note-list__category-title">{category.name}</h2>
-          <div className={cx('note-list__list', 'list-group', { darkmode: darkMode })}>
-            {notesInCategory}
-          </div>
+        <div
+          key={n.id}
+          onDragOver={(e) => handleDragOver(e, n.categoryId)}
+          onDragStart={(e) => handleDragStart(e, { ...n, position: startingIndex + idx })}
+          onDrop={handleDrop}
+        >
+          <NoteItem
+            editing={editingSelected}
+            key={n.id}
+            note={n}
+            absolutePosition={startingIndex + idx}
+            selected={n.id == selectedNoteId}
+            startEdit={startEditing}
+            stopEdit={stopEditing}
+            select={() => uiActions.selectNote(n.id)}
+            draggedPosition={
+              // @ts-ignore
+              Number.isInteger(draggedNote?.position) ? Number(draggedNote.position) : null
+            }
+            isMovingToNewCategory={isMovingToNewCategory}
+          />
         </div>
       )
-    }
+    })
+  }
 
-    const renderNoteDetails = () => {
-      let note = notes.find((n) => n.id === selectedNoteId)
-      if (!note) return null
-      return (
-        <ErrorBoundary>
-          <NoteView
-            key={`note-${note.id}`}
-            noteId={note.id}
-            editing={editingSelected}
-            stopEditing={stopEditing}
-            startEditing={startEditing}
-          />
-        </ErrorBoundary>
-      )
-    }
+  const renderNotes = () => {
+    let startingIndex = 0
+    return [...categories, { id: null, name: i18n('Uncategorized') }].map((cat) => {
+      const result = renderCategory(cat, startingIndex)
+      startingIndex += (visibleNotesByCategory[cat.id] || []).length
+      return result
+    })
+  }
 
-    const insertSpace = (event) => {
-      const currentValue = event.target.value
-      const start = event.target.selectionStart
-      const end = event.target.selectionEnd
-      if (event.key === ' ') {
-        uiActions.setNotesSearchTerm(
-          currentValue.slice(0, start) + ' ' + currentValue.slice(end + 1)
-        )
-      }
-      event.preventDefault()
-      event.stopPropagation()
-    }
-
-    const renderSubNav = () => {
-      const popover = () => (
-        <Popover id="filter" noMaxWidth>
-          <CustomAttrFilterList type="notes" />
-        </Popover>
-      )
-      let filterDeclaration = (
-        <Alert onClick={() => uiActions.setNoteFilter(null)} bsStyle="warning">
-          <Glyphicon glyph="remove-sign" />
-          {'  '}
-          {i18n('Notes are filtered')}
-        </Alert>
-      )
-
-      if (filterIsEmpty) {
-        filterDeclaration = <span></span>
-      }
-
-      const sortPopover = () => (
-        <Popover id="sort">
-          <SortList type={'notes'} />
-        </Popover>
-      )
-      let sortGlyph = 'sort-by-attributes'
-      if (noteSort.includes('~desc')) sortGlyph = 'sort-by-attributes-alt'
-
-      return (
-        <SubNav>
-          <Nav bsStyle="pills">
-            <NavItem>
-              <Button bsSize="small" onClick={handleCreateNewNote}>
-                <Glyphicon glyph="plus" /> {i18n('New')}
-              </Button>
-            </NavItem>
-            <NavItem>
-              <Button bsSize="small" onClick={uiActions.showNotesAttributesDialog}>
-                <Glyphicon glyph="list" /> {i18n('Attributes')}
-              </Button>
-            </NavItem>
-            <NavItem>
-              <Button bsSize="small" onClick={uiActions.showNotesCategoryDialog}>
-                <Glyphicon glyph="list" /> {i18n('Categories')}
-              </Button>
-            </NavItem>
-            <NavItem>
-              <Floater
-                trigger="click"
-                rootClose
-                open={filterVisible}
-                onClose={uiActions.hideNotesFilterList}
-                placement="bottom"
-                component={popover}
-              >
-                <Button
-                  bsSize="small"
-                  onClick={() => {
-                    if (!filterVisible) {
-                      uiActions.showNotesFilterList()
-                    } else {
-                      uiActions.hideNotesFilterList()
-                    }
-                  }}
-                >
-                  <Glyphicon glyph="filter" /> {i18n('Filter')}
-                </Button>
-              </Floater>
-              {filterDeclaration}
-            </NavItem>
-            <NavItem>
-              <Floater
-                trigger="click"
-                rootClose
-                open={sortVisible}
-                onClose={uiActions.hideNotesSort}
-                placement="bottom"
-                component={sortPopover}
-              >
-                <Button
-                  bsSize="small"
-                  onClick={() => {
-                    if (!sortVisible) {
-                      uiActions.showNotesSort()
-                    } else {
-                      uiActions.hideNotesSort()
-                    }
-                  }}
-                >
-                  <Glyphicon glyph={sortGlyph} /> {i18n('Sort')}
-                </Button>
-              </Floater>
-            </NavItem>
-            <NavItem draggable="false">
-              <FormControl
-                onChange={withEventTargetValue(uiActions.setNotesSearchTerm)}
-                onKeyUp={insertSpace}
-                value={notesSearchTerm || ''}
-                type="text"
-                placeholder="Search"
-                className="toolbar__search"
-              />
-            </NavItem>
-          </Nav>
-          {!exportDisabled && (
-            <Nav pullRight>
-              <ExportNavItem />
-            </Nav>
-          )}
-        </SubNav>
-      )
-    }
-
+  const renderCategory = (category, startingIndex) => {
+    const notesInCategory = renderVisibleNotes(category.id, startingIndex)
+    if (!notesInCategory.length) return null
     return (
-      <div className="note-list container-with-sub-nav">
-        {renderSubNav()}
-        {renderCustomAttributes()}
-        {renderCategoriesModal()}
-        <Grid fluid className="tab-body">
-          <Row>
-            <Col sm={3} onDoubleClick={stopEditing}>
-              <h1 className={cx('secondary-text', { darkmode: darkMode })}>
-                {i18n('Notes')}{' '}
-                <Button onClick={handleCreateNewNote}>
-                  <Glyphicon glyph="plus" />
-                </Button>
-              </h1>
-              <div className="note-list__category-list">{renderNotes()}</div>
-            </Col>
-            <Col sm={9}>{renderNoteDetails()}</Col>
-          </Row>
-        </Grid>
+      <div key={`category-${category.id}`}>
+        <h2 className="note-list__category-title">{category.name}</h2>
+        <div className={cx('note-list__list', 'list-group', { darkmode: darkMode })}>
+          {notesInCategory}
+        </div>
       </div>
     )
   }
 
-  NoteListView.propTypes = {
-    categories: PropTypes.array.isRequired,
-    visibleNotesByCategory: PropTypes.object.isRequired,
-    notes: PropTypes.array.isRequired,
-    actions: PropTypes.object.isRequired,
-    characters: PropTypes.array.isRequired,
-    places: PropTypes.array.isRequired,
-    tags: PropTypes.array.isRequired,
-    darkMode: PropTypes.bool,
-    uiActions: PropTypes.object.isRequired,
-    undo: PropTypes.object.isRequired,
-    filterIsEmpty: PropTypes.bool.isRequired,
-    noteSort: PropTypes.string.isRequired,
-    notesSearchTerm: PropTypes.string,
-    selectedNoteId: PropTypes.number,
-    editingSelected: PropTypes.bool,
-    categoriesDialogOpen: PropTypes.bool,
-    attributesDialogOpen: PropTypes.bool,
-    filterVisible: PropTypes.bool,
-    sortVisible: PropTypes.bool,
-    isJumping: PropTypes.bool,
-    recentlyUndidOrRedid: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
+  const renderNoteDetails = () => {
+    let note = notes.find((n) => n.id === selectedNoteId)
+    if (!note) return null
+    return (
+      <ErrorBoundary>
+        <NoteView
+          key={`note-${note.id}`}
+          noteId={note.id}
+          editing={editingSelected}
+          stopEditing={stopEditing}
+          startEditing={startEditing}
+        />
+      </ErrorBoundary>
+    )
   }
 
-  const {
-    redux,
-    pltr: { actions, selectors },
-  } = connector
-  checkDependencies({
-    redux,
-    actions,
-    selectors,
-  })
-
-  if (redux) {
-    const { connect, bindActionCreators } = redux
-
-    return connect(
-      (state) => {
-        return {
-          notes: selectors.allNotesSelector(state),
-          characters: selectors.allCharactersSelector(state),
-          places: selectors.allPlacesSelector(state),
-          tags: selectors.allTagsSelector(state),
-          darkMode: selectors.isDarkModeSelector(state),
-          categories: selectors.sortedNoteCategoriesSelector(state),
-          visibleNotesByCategory: selectors.visibleSortedSearchedNotesByCategorySelector(state),
-          filterIsEmpty: selectors.noteFilterIsEmptySelector(state),
-          customAttributes: selectors.characterCustomAttributesSelector(state),
-          noteSort: selectors.noteSortSelector(state),
-          notesSearchTerm: selectors.notesSearchTermSelector(state),
-          selectedNoteId: selectors.selectedNoteSelector(state),
-          editingSelected: selectors.editingSelectedNoteSelector(state),
-          categoriesDialogOpen: selectors.noteCategoriesDialogOpenSelector(state),
-          attributesDialogOpen: selectors.noteAttributesDialogOpenSelector(state),
-          filterVisible: selectors.noteFilterVisibleSelector(state),
-          sortVisible: selectors.noteSortVisibleSelector(state),
-          isJumping: selectors.isJumpingSelector(state),
-          recentlyUndidOrRedid: selectors.recentlyUndidOrRedidSelector(state),
-        }
-      },
-      (dispatch) => {
-        return {
-          actions: bindActionCreators(actions.note, dispatch),
-          uiActions: bindActionCreators(actions.ui, dispatch),
-          undo: bindActionCreators(actions.undo, dispatch),
-        }
-      }
-    )(NoteListView)
+  const insertSpace = (event) => {
+    const currentValue = event.target.value
+    const start = event.target.selectionStart
+    const end = event.target.selectionEnd
+    if (event.key === ' ') {
+      uiActions.setNotesSearchTerm(currentValue.slice(0, start) + ' ' + currentValue.slice(end + 1))
+    }
+    event.preventDefault()
+    event.stopPropagation()
   }
 
-  throw new Error('Could not connect NoteListView')
+  const renderSubNav = () => {
+    const popover = () => (
+      <Popover id="filter" noMaxWidth>
+        {/* @ts-ignore */}
+        <CustomAttrFilterList type="notes" />
+      </Popover>
+    )
+    let filterDeclaration = (
+      <Alert onClick={() => uiActions.setNoteFilter(null)} bsStyle="warning">
+        <Glyphicon glyph="remove-sign" />
+        {'  '}
+        {i18n('Notes are filtered')}
+      </Alert>
+    )
+
+    if (filterIsEmpty) {
+      filterDeclaration = <span></span>
+    }
+
+    const sortPopover = () => (
+      <Popover id="sort">
+        {/* @ts-ignore */}
+        <SortList type={'notes'} />
+      </Popover>
+    )
+    let sortGlyph = 'sort-by-attributes'
+    if (noteSort.includes('~desc')) sortGlyph = 'sort-by-attributes-alt'
+
+    return (
+      <SubNav>
+        <Nav bsStyle="pills">
+          <NavItem>
+            <Button bsSize="small" onClick={handleCreateNewNote}>
+              <Glyphicon glyph="plus" /> {i18n('New')}
+            </Button>
+          </NavItem>
+          <NavItem>
+            <Button bsSize="small" onClick={uiActions.showNotesAttributesDialog}>
+              <Glyphicon glyph="list" /> {i18n('Attributes')}
+            </Button>
+          </NavItem>
+          <NavItem>
+            <Button bsSize="small" onClick={uiActions.showNotesCategoryDialog}>
+              <Glyphicon glyph="list" /> {i18n('Categories')}
+            </Button>
+          </NavItem>
+          <NavItem>
+            <PlottrFloater
+              rootClose
+              open={filterVisible}
+              onClose={uiActions.hideNotesFilterList}
+              placement="bottom"
+              component={popover}
+            >
+              <Button
+                bsSize="small"
+                onClick={() => {
+                  if (!filterVisible) {
+                    uiActions.showNotesFilterList()
+                  } else {
+                    uiActions.hideNotesFilterList()
+                  }
+                }}
+              >
+                <Glyphicon glyph="filter" /> {i18n('Filter')}
+              </Button>
+            </PlottrFloater>
+            {filterDeclaration}
+          </NavItem>
+          <NavItem>
+            <PlottrFloater
+              rootClose
+              open={sortVisible}
+              onClose={uiActions.hideNotesSort}
+              placement="bottom"
+              component={sortPopover}
+            >
+              <Button
+                bsSize="small"
+                onClick={() => {
+                  if (!sortVisible) {
+                    uiActions.showNotesSort()
+                  } else {
+                    uiActions.hideNotesSort()
+                  }
+                }}
+              >
+                <Glyphicon glyph={sortGlyph} /> {i18n('Sort')}
+              </Button>
+            </PlottrFloater>
+          </NavItem>
+          <NavItem draggable="false">
+            <FormControl
+              onChange={withEventTargetValue(uiActions.setNotesSearchTerm)}
+              onKeyUp={insertSpace}
+              value={notesSearchTerm || ''}
+              type="text"
+              placeholder="Search"
+              className="toolbar__search"
+            />
+          </NavItem>
+        </Nav>
+        {!exportDisabled && (
+          <Nav pullRight>
+            <ExportNavItem />
+          </Nav>
+        )}
+      </SubNav>
+    )
+  }
+
+  return (
+    <div className="note-list container-with-sub-nav">
+      {renderSubNav()}
+      {renderCustomAttributes()}
+      {renderCategoriesModal()}
+      <Grid fluid className="tab-body">
+        <Row>
+          <Col sm={3} onDoubleClick={stopEditing}>
+            <h1 className={cx('secondary-text', { darkmode: darkMode })}>
+              {i18n('Notes')}{' '}
+              <Button onClick={handleCreateNewNote}>
+                <Glyphicon glyph="plus" />
+              </Button>
+            </h1>
+            <div className="note-list__category-list">{renderNotes()}</div>
+          </Col>
+          <Col sm={9}>{renderNoteDetails()}</Col>
+        </Row>
+      </Grid>
+    </div>
+  )
 }
 
-export default NoteListViewConnector
+NoteListView.propTypes = {
+  categories: PropTypes.array.isRequired,
+  visibleNotesByCategory: PropTypes.object.isRequired,
+  notes: PropTypes.array.isRequired,
+  actions: PropTypes.object.isRequired,
+  darkMode: PropTypes.bool,
+  uiActions: PropTypes.object.isRequired,
+  undo: PropTypes.object.isRequired,
+  filterIsEmpty: PropTypes.bool.isRequired,
+  noteSort: PropTypes.string.isRequired,
+  notesSearchTerm: PropTypes.string,
+  selectedNoteId: PropTypes.number,
+  editingSelected: PropTypes.bool,
+  categoriesDialogOpen: PropTypes.bool,
+  attributesDialogOpen: PropTypes.bool,
+  filterVisible: PropTypes.bool,
+  sortVisible: PropTypes.bool,
+  isJumping: PropTypes.bool,
+  recentlyUndidOrRedid: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
+}
+
+const mapStateToProps = (state) => {
+  return {
+    notes: selectors.allNotesSelector(state),
+    darkMode: selectors.isDarkModeSelector(state),
+    categories: selectors.sortedNoteCategoriesSelector(state),
+    visibleNotesByCategory: selectors.visibleSortedSearchedNotesByCategorySelector(state),
+    filterIsEmpty: selectors.noteFilterIsEmptySelector(state),
+    customAttributes: selectors.characterCustomAttributesSelector(state),
+    noteSort: selectors.noteSortSelector(state),
+    notesSearchTerm: selectors.notesSearchTermSelector(state),
+    selectedNoteId: selectors.selectedNoteSelector(state),
+    editingSelected: selectors.editingSelectedNoteSelector(state),
+    categoriesDialogOpen: selectors.noteCategoriesDialogOpenSelector(state),
+    attributesDialogOpen: selectors.noteAttributesDialogOpenSelector(state),
+    filterVisible: selectors.noteFilterVisibleSelector(state),
+    sortVisible: selectors.noteSortVisibleSelector(state),
+    isJumping: selectors.isJumpingSelector(state),
+    recentlyUndidOrRedid: selectors.recentlyUndidOrRedidSelector(state),
+  }
+}
+
+export default connect(mapStateToProps, (dispatch) => {
+  return {
+    actions: bindActionCreators(actions.note, dispatch),
+    uiActions: bindActionCreators(actions.ui, dispatch),
+    undo: bindActionCreators(actions.undo, dispatch),
+  }
+})(NoteListView)

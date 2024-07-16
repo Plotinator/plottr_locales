@@ -56,6 +56,17 @@
       background-color: $darkmode-background;
       color: $darkmode-text;
     }
+
+    button {
+      &.file-location__button-with-icon {
+        display: flex;
+        align-items: center;
+
+        svg {
+          margin-right: 5px;
+        }
+      }
+    }
   }
 }
 
@@ -77,8 +88,18 @@
       margin-left: 7px;
     }
 
+    .file-actions-wrapper {
+      display: flex;
+    }
+
     .file-actions-wrapper button {
       margin-right: 5px;
+      align-items: center;
+      display: flex;
+
+      svg {
+        margin-right: 3px;
+      }
     }
   }
 

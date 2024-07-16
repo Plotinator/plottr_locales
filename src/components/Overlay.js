@@ -80,15 +80,22 @@ class Overlay extends React.Component {
     let child
 
     if (!transition) {
+      // @ts-ignore
       child = cloneElement(children, {
-        className: classNames(children.props.className, 'in'),
+        className: classNames(
+          // @ts-ignore
+          children.props.className,
+          'in'
+        ),
       })
     } else {
       child = children
     }
 
     return (
+      // @ts-ignore
       <BaseOverlay {...props} transition={transition}>
+        {/* @ts-ignore */}
         {child}
       </BaseOverlay>
     )

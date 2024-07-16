@@ -1,125 +1,114 @@
-import React, { Component } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import PropTypes from 'react-proptypes'
 import { t } from 'plottr_locales'
 import _ from 'lodash'
-import { template } from 'pltr'
 import { isEmpty } from 'lodash'
 
-import { checkDependencies } from '../checkDependencies'
+import { template } from 'pltr'
+import { selectors } from 'wired-up-pltr'
+
+import { PlottrComponentsContext } from '../../connections/pltrContext'
 
 const { lineFromTemplate } = template
 
-const PlotlineTemplateDetailsConnector = (connector) => {
+const PlotlineTemplateDetails = ({ template }) => {
   const {
-    platform: { appVersion, log },
-    pltr: {
-      selectors: { templateBeatsForBookOne },
-      mountState,
-    },
-  } = connector
-  checkDependencies({ appVersion, log, templateBeatsForBookOne })
+    platform: { appVersion, log, mountState },
+  } = useContext(PlottrComponentsContext)
 
-  class PlotlineTemplateDetails extends Component {
-    headingMap = {
-      lines: t('Plotlines'),
-      cards: t('Scene Cards'),
-      beats: t('Chapters'),
-    }
-
-    constructor(props) {
-      super(props)
-
-      this.state = {
-        template: {},
-        migrating: false,
-      }
-    }
-
-    migrateTemplate = () => {
-      appVersion().then((version) => {
-        lineFromTemplate(
-          this.props.template,
-          version,
-          '',
-          (error, template) => {
-            if (error) {
-              // Allow the top level ErrorBoundary to handle the error
-              throw new Error(error)
-            }
-            this.setState({
-              template: {
-                id: template.id,
-                lines: template.lines,
-                cards: template.cards,
-                beats: template.beats,
-              },
-            })
-          },
-          log
-        )
-      })
-    }
-
-    renderData(type, data) {
-      switch (type) {
-        case 'beats':
-          return _.sortBy(data, 'position').map((beat) => <li key={beat.id}>{beat.title}</li>)
-        case 'cards':
-          return _.sortBy(data, 'id').map((c) => <li key={c.id}>{c.title}</li>)
-        case 'lines':
-          return _.sortBy(data, 'position').map((l) => <li key={l.id}>{l.title}</li>)
-        default:
-          return null
-      }
-    }
-
-    componentDidMount() {
-      this.migrateTemplate()
-    }
-
-    componentDidUpdate() {
-      if (this.state.template.id === this.props.template.id || isEmpty(this.state.template)) return
-
-      this.setState({
-        template: {},
-      })
-
-      this.migrateTemplate()
-    }
-
-    render() {
-      const { template } = this.state
-      const beatsToRender = isEmpty(template) ? null : templateBeatsForBookOne(mountState(template))
-      const beatEntry = (
-        <div key="beats">
-          <h5 className="text-center text-capitalize">{t('Beats')}</h5>
-          <ol>{this.renderData('beats', beatsToRender)}</ol>
-        </div>
+  const migrateTemplate = () => {
+    appVersion().then((version) => {
+      lineFromTemplate(
+        template,
+        version,
+        '',
+        (error, template) => {
+          if (error) {
+            // Allow the top level ErrorBoundary to handle the error
+            throw new Error(error)
+          }
+          setStateTemplate({
+            id: template.id,
+            lines: template.lines,
+            cards: template.cards,
+            beats: template.beats,
+          })
+        },
+        log
       )
-      const body = Object.keys(template)
-        .filter((heading) => heading !== 'id' && heading !== 'beats')
-        .filter((heading) => !template[heading].every((item) => item.title == 'auto'))
-        .map((heading) => {
-          let headingText = this.headingMap[heading] || heading
+    })
+  }
 
-          return (
-            <div key={heading}>
-              <h5 className="text-center text-capitalize">{headingText}</h5>
-              <ol>{this.renderData(heading, template[heading])}</ol>
-            </div>
-          )
-        })
-        .concat([beatEntry])
+  useEffect(() => {
+    migrateTemplate()
+  }, [])
 
-      return <div className="panel-body">{body}</div>
-    }
+  const [stateTemplate, setStateTemplate] = useState({})
 
-    static propTypes = {
-      template: PropTypes.object.isRequired,
+  useEffect(() => {
+    if (
+      // @ts-ignore
+      stateTemplate.id === template.id ||
+      isEmpty(template)
+    )
+      return
+
+    setStateTemplate({})
+
+    migrateTemplate()
+  }, [template?.id])
+
+  const headingMap = {
+    lines: t('Plotlines'),
+    cards: t('Scene Cards'),
+    beats: t('Chapters'),
+  }
+
+  const renderData = (type, data) => {
+    switch (type) {
+      case 'beats':
+        return _.sortBy(data, 'position').map((beat) => <li key={beat.id}>{beat.title}</li>)
+      case 'cards':
+        return _.sortBy(data, 'id').map((c) => <li key={c.id}>{c.title}</li>)
+      case 'lines':
+        return _.sortBy(data, 'position').map((l) => <li key={l.id}>{l.title}</li>)
+      default:
+        return null
     }
   }
 
-  return PlotlineTemplateDetails
+  const beatsToRender = isEmpty(stateTemplate)
+    ? null
+    : selectors.templateBeatsForBookOne(
+        // @ts-ignore
+        mountState(stateTemplate)
+      )
+  const beatEntry = (
+    <div key="beats">
+      <h5 className="text-center text-capitalize">{t('Beats')}</h5>
+      <ol>{renderData('beats', beatsToRender)}</ol>
+    </div>
+  )
+  const body = Object.keys(stateTemplate)
+    .filter((heading) => heading !== 'id' && heading !== 'beats')
+    .filter((heading) => !stateTemplate[heading].every((item) => item.title == 'auto'))
+    .map((heading) => {
+      let headingText = headingMap[heading] || heading
+
+      return (
+        <div key={heading}>
+          <h5 className="text-center text-capitalize">{headingText}</h5>
+          <ol>{renderData(heading, stateTemplate[heading])}</ol>
+        </div>
+      )
+    })
+    .concat([beatEntry])
+
+  return <div className="panel-body">{body}</div>
 }
 
-export default PlotlineTemplateDetailsConnector
+PlotlineTemplateDetails.propTypes = {
+  template: PropTypes.object.isRequired,
+}
+
+export default PlotlineTemplateDetails

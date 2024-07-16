@@ -1,56 +1,42 @@
 import React, { Component } from 'react'
 import PropTypes from 'react-proptypes'
+import { connect } from 'react-redux'
 import { t as i18n } from 'plottr_locales'
+
+import { selectors } from 'wired-up-pltr'
+
 import GenericFilterList from './GenericFilterList'
 
-import { checkDependencies } from '../checkDependencies'
-
-const CharacterNoteCategoryFilterListConnector = (connector) => {
-  class CharacterNoteCategoryFilterList extends Component {
-    updateItems = (ids) => {
-      this.props.updateItems('noteCategory', ids)
-    }
-
-    render() {
-      const categoryFilterItems = [...this.props.categories]
-      return (
-        <GenericFilterList
-          items={categoryFilterItems}
-          title={i18n('Categories')}
-          singleItemTitle={i18n('Category')}
-          displayAttribute={'name'}
-          updateItems={this.updateItems}
-          filteredItems={this.props.filteredItems}
-        />
-      )
-    }
+class CharacterNoteCategoryFilterList extends Component {
+  updateItems = (ids) => {
+    this.props.updateItems('noteCategory', ids)
   }
 
-  CharacterNoteCategoryFilterList.propTypes = {
-    categories: PropTypes.array.isRequired,
-    updateItems: PropTypes.func.isRequired,
-    filteredItems: PropTypes.array,
+  render() {
+    const categoryFilterItems = [...this.props.categories]
+    return (
+      <GenericFilterList
+        items={categoryFilterItems}
+        title={i18n('Categories')}
+        singleItemTitle={i18n('Category')}
+        displayAttribute={'name'}
+        updateItems={this.updateItems}
+        filteredItems={this.props.filteredItems}
+      />
+    )
   }
-
-  const {
-    redux,
-    pltr: {
-      selectors: { categoriesFilterItemsSelector },
-    },
-  } = connector
-  checkDependencies({ redux, categoriesFilterItemsSelector })
-
-  if (redux) {
-    const { connect } = redux
-
-    return connect((state) => {
-      return {
-        categories: categoriesFilterItemsSelector(state),
-      }
-    })(CharacterNoteCategoryFilterList)
-  }
-
-  throw new Error('Could not connect CharacterNoteCategoryFilterList')
 }
 
-export default CharacterNoteCategoryFilterListConnector
+CharacterNoteCategoryFilterList.propTypes = {
+  categories: PropTypes.array.isRequired,
+  updateItems: PropTypes.func.isRequired,
+  filteredItems: PropTypes.array,
+}
+
+const mapStateToProps = (state) => {
+  return {
+    categories: selectors.categoriesFilterItemsSelector(state),
+  }
+}
+
+export default connect(mapStateToProps)(CharacterNoteCategoryFilterList)

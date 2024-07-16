@@ -1,215 +1,187 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useContext } from 'react'
 import PropTypes from 'react-proptypes'
+import { connect } from 'react-redux'
 
 import { t, setupI18n } from 'plottr_locales'
+import { selectors } from 'wired-up-pltr'
 
 import Tab from '../../Tab'
 import Tabs from '../../Tabs'
 import Button from '../../Button'
 import Switch from '../../Switch'
-import UnconnectedLanguagePicker from '../../LanguagePicker'
-import UnconnectedDarkOptionsSelect from './DarkOptionsSelect'
-import UnconnectedBackupSettings from './BackupSettings'
-import UnconnectedFileSettings from './FileSettings'
-import UnconnectedFontSettings from './FontSettings'
-import { checkDependencies } from '../../checkDependencies'
+import LanguagePicker from '../../LanguagePicker'
+import DarkOptionsSelect from './DarkOptionsSelect'
+import BackupSettings from './BackupSettings'
+import FileSettings from './FileSettings'
+import FontSettings from './FontSettings'
+import { PlottrComponentsContext } from '../../../connections/pltrContext'
 
-const OptionsHomeConnector = (connector) => {
+const OptionsHome = ({ settings, shouldBeInPro }) => {
   const {
     platform: {
       hostLocale,
       openExternal,
       updateLanguage,
       os,
-      log,
       settings: { saveAppSetting },
     },
-  } = connector
-  checkDependencies({
-    hostLocale,
-    openExternal,
-    updateLanguage,
-    os,
-    log,
-    saveAppSetting,
-  })
+  } = useContext(PlottrComponentsContext)
 
-  const LanguagePicker = UnconnectedLanguagePicker(connector)
-  const DarkOptionsSelect = UnconnectedDarkOptionsSelect(connector)
-  const BackupSettings = UnconnectedBackupSettings(connector)
-  const FileSettings = UnconnectedFileSettings(connector)
-  const FontSettings = UnconnectedFontSettings(connector)
+  const [activeTab, setActiveTab] = useState(1)
 
-  const OptionsHome = ({ settings, shouldBeInPro }) => {
-    const [activeTab, setActiveTab] = useState(1)
+  useEffect(() => {
+    hostLocale().then((locale) => {
+      setupI18n(settings, { locale })
+    })
+  }, [settings.locale])
 
-    useEffect(() => {
-      hostLocale().then((locale) => {
-        setupI18n(settings, { locale })
-      })
-    }, [settings.locale])
-
-    const handleSetActiveTab = (x) => {
-      if (typeof x === 'number') {
-        setActiveTab(x)
-      }
+  const handleSetActiveTab = (x) => {
+    if (typeof x === 'number') {
+      setActiveTab(x)
     }
+  }
 
-    const osIsUnknown = os() === 'unknown'
+  const osIsUnknown = os() === 'unknown'
 
-    const toggleEnableOfflineMode = () => {
-      const newValue = !settings.user.enableOfflineMode
-      saveAppSetting('user.enableOfflineMode', newValue)
-    }
+  const toggleEnableOfflineMode = () => {
+    const newValue = !settings.user.enableOfflineMode
+    saveAppSetting('user.enableOfflineMode', newValue)
+  }
 
-    const dashboardAtFirstIsOn =
-      settings.user.openDashboardFirst === undefined ? true : settings.user.openDashboardFirst
+  const dashboardAtFirstIsOn =
+    settings.user.openDashboardFirst === undefined ? true : settings.user.openDashboardFirst
 
-    const dashboardFirstText = dashboardAtFirstIsOn
-      ? t("When Plottr opens, the first thing you'll see is the dashboard")
-      : t('Plottr opens your most recent project at start')
+  const dashboardFirstText = dashboardAtFirstIsOn
+    ? t("When Plottr opens, the first thing you'll see is the dashboard")
+    : t('Plottr opens your most recent project at start')
 
-    const spellCheckAtFirstIsOn =
-      settings.user.useSpellcheck === undefined ? true : settings.user.useSpellcheck
+  const spellCheckAtFirstIsOn =
+    settings.user.useSpellcheck === undefined ? true : settings.user.useSpellcheck
 
-    const spellCheckText = spellCheckAtFirstIsOn ? t('Enabled') : t('Disabled')
+  const spellCheckText = spellCheckAtFirstIsOn ? t('Enabled') : t('Disabled')
 
-    const handleSelectLanguage = useCallback(
-      (newLanguage) => {
-        saveAppSetting('locale', newLanguage)
-        updateLanguage(newLanguage)
-      },
-      [saveAppSetting, updateLanguage]
-    )
+  const handleSelectLanguage = useCallback(
+    (newLanguage) => {
+      saveAppSetting('locale', newLanguage)
+      updateLanguage(newLanguage)
+    },
+    [saveAppSetting, updateLanguage]
+  )
 
-    return (
-      <div className="dashboard__options">
-        <h1>{t('Settings')}</h1>
-        <div>
-          <Tabs activeKey={activeTab} onSelect={handleSetActiveTab} id="settings-tabs">
-            <Tab eventKey={1} title={t('General')}>
-              {!osIsUnknown ? (
-                <div className="dashboard__options__item">
-                  <h4>{t('Update Automatically')}</h4>
-                  <Switch
-                    isOn={!!settings.user.autoDownloadUpdate}
-                    handleToggle={() =>
-                      saveAppSetting('user.autoDownloadUpdate', !settings.user.autoDownloadUpdate)
-                    }
-                    labelText={t('Download updates automatically')}
-                  />
-                </div>
-              ) : null}
+  return (
+    <div className="dashboard__options">
+      <h1>{t('Settings')}</h1>
+      <div>
+        <Tabs activeKey={activeTab} onSelect={handleSetActiveTab} id="settings-tabs">
+          <Tab eventKey={1} title={t('General')}>
+            {!osIsUnknown ? (
               <div className="dashboard__options__item">
-                <h4>{t('Appearance: Dark/Light')}</h4>
-                <DarkOptionsSelect />
-              </div>
-              <div className="dashboard__options__item">
-                <h4>{t('Language')}</h4>
-                <LanguagePicker onSelectLanguage={handleSelectLanguage} />
-              </div>
-              <div className="dashboard__options__item">
-                <h4>{t('Spell Check')}</h4>
+                <h4>{t('Update Automatically')}</h4>
                 <Switch
-                  isOn={spellCheckAtFirstIsOn}
-                  handleToggle={() => {
-                    const newVal =
-                      settings.user.useSpellcheck === undefined
-                        ? false
-                        : !settings.user.useSpellcheck
-                    saveAppSetting('user.useSpellcheck', newVal)
-                  }}
-                  labelText={spellCheckText}
+                  isOn={!!settings.user.autoDownloadUpdate}
+                  handleToggle={() =>
+                    saveAppSetting('user.autoDownloadUpdate', !settings.user.autoDownloadUpdate)
+                  }
+                  labelText={t('Download updates automatically')}
                 />
-                <p>{t('Requires you to restart plottr')}</p>
               </div>
-            </Tab>
-            {!shouldBeInPro ? (
-              <Tab eventKey={2} title={t('Files')}>
-                <FileSettings />
-              </Tab>
             ) : null}
-            <Tab eventKey={3} title={t('Fonts')}>
-              <FontSettings />
+            <div className="dashboard__options__item">
+              <h4>{t('Appearance: Dark/Light')}</h4>
+              <DarkOptionsSelect />
+            </div>
+            <div className="dashboard__options__item">
+              <h4>{t('Language')}</h4>
+              <LanguagePicker onSelectLanguage={handleSelectLanguage} />
+            </div>
+            <div className="dashboard__options__item">
+              <h4>{t('Spell Check')}</h4>
+              <Switch
+                isOn={spellCheckAtFirstIsOn}
+                handleToggle={() => {
+                  const newVal =
+                    settings.user.useSpellcheck === undefined ? false : !settings.user.useSpellcheck
+                  saveAppSetting('user.useSpellcheck', newVal)
+                }}
+                labelText={spellCheckText}
+              />
+              <p>{t('Requires you to restart plottr')}</p>
+            </div>
+          </Tab>
+          {!shouldBeInPro ? (
+            <Tab eventKey={2} title={t('Files')}>
+              <FileSettings />
             </Tab>
-            <Tab eventKey={4} title={t('Dashboard')}>
+          ) : null}
+          <Tab eventKey={3} title={t('Fonts')}>
+            <FontSettings />
+          </Tab>
+          <Tab eventKey={4} title={t('Dashboard')}>
+            <div className="dashboard__options__item">
+              <h4>{t('Always Open Dashboard First')}</h4>
+              <Switch
+                isOn={dashboardAtFirstIsOn}
+                handleToggle={() => {
+                  const newVal =
+                    settings.user.openDashboardFirst === undefined
+                      ? false
+                      : !settings.user.openDashboardFirst
+                  saveAppSetting('user.openDashboardFirst', newVal)
+                }}
+                labelText={dashboardFirstText}
+              />
+            </div>
+            <div className="dashboard__options__item">
+              <h4>{t('Streaming Friendly')}</h4>
+              <Switch
+                isOn={settings.user.streamFriendly}
+                handleToggle={(event) => {
+                  event.stopPropagation()
+                  saveAppSetting('user.streamFriendly', !settings.user.streamFriendly)
+                }}
+                labelText={t('Hides sensitive info for when you are sharing your screen')}
+              />
+            </div>
+          </Tab>
+          <Tab eventKey={5} title={t('Backups')}>
+            <BackupSettings />
+          </Tab>
+          {!osIsUnknown && shouldBeInPro ? (
+            <Tab eventKey={6} title={t('Beta')}>
               <div className="dashboard__options__item">
-                <h4>{t('Always Open Dashboard First')}</h4>
+                <h4>{t('Offline Mode')}</h4>
                 <Switch
-                  isOn={dashboardAtFirstIsOn}
-                  handleToggle={() => {
-                    const newVal =
-                      settings.user.openDashboardFirst === undefined
-                        ? false
-                        : !settings.user.openDashboardFirst
-                    saveAppSetting('user.openDashboardFirst', newVal)
-                  }}
-                  labelText={dashboardFirstText}
+                  isOn={!!settings.user.enableOfflineMode}
+                  handleToggle={toggleEnableOfflineMode}
+                  labelText={t('Continue working when your connection goes down.')}
                 />
-              </div>
-              <div className="dashboard__options__item">
-                <h4>{t('Streaming Friendly')}</h4>
-                <Switch
-                  isOn={settings.user.streamFriendly}
-                  handleToggle={(event) => {
-                    event.stopPropagation()
-                    saveAppSetting('user.streamFriendly', !settings.user.streamFriendly)
-                  }}
-                  labelText={t('Hides sensitive info for when you are sharing your screen')}
-                />
-              </div>
-            </Tab>
-            <Tab eventKey={5} title={t('Backups')}>
-              <BackupSettings />
-            </Tab>
-            {!osIsUnknown && shouldBeInPro ? (
-              <Tab eventKey={6} title={t('Beta')}>
-                <div className="dashboard__options__item">
-                  <h4>{t('Offline Mode')}</h4>
-                  <Switch
-                    isOn={!!settings.user.enableOfflineMode}
-                    handleToggle={toggleEnableOfflineMode}
-                    labelText={t('Continue working when your connection goes down.')}
-                  />
+                <br />
+                <p>
+                  {t('To give feedback on this feature, please visit:')}
                   <br />
-                  <p>
-                    {t('To give feedback on this feature, please visit:')}
-                    <br />
-                    <Button bsStyle="link" onClick={() => openExternal('https://plottr.com/beta/')}>
-                      {t('plottr.com/beta')}
-                    </Button>
-                  </p>
-                </div>
-              </Tab>
-            ) : null}
-          </Tabs>
-        </div>
+                  <Button bsStyle="link" onClick={() => openExternal('https://plottr.com/beta/')}>
+                    {t('plottr.com/beta')}
+                  </Button>
+                </p>
+              </div>
+            </Tab>
+          ) : null}
+        </Tabs>
       </div>
-    )
-  }
-
-  OptionsHome.propTypes = {
-    settings: PropTypes.object.isRequired,
-    shouldBeInPro: PropTypes.bool,
-  }
-
-  const {
-    redux,
-    pltr: { selectors },
-  } = connector
-
-  if (redux) {
-    const { connect } = redux
-
-    return connect((state) => {
-      return {
-        settings: selectors.appSettingsSelector(state),
-        shouldBeInPro: selectors.shouldBeInProSelector(state),
-      }
-    })(OptionsHome)
-  }
-
-  throw new Error('Could not connect OptionsHome')
+    </div>
+  )
 }
 
-export default OptionsHomeConnector
+OptionsHome.propTypes = {
+  settings: PropTypes.object.isRequired,
+  shouldBeInPro: PropTypes.bool,
+}
+
+const mapStateToProps = (state) => {
+  return {
+    settings: selectors.appSettingsSelector(state),
+    shouldBeInPro: selectors.shouldBeInProSelector(state),
+  }
+}
+
+export default connect(mapStateToProps)(OptionsHome)

@@ -46,7 +46,7 @@ const TabContent = (props) => {
     props
 
   const getContext = (tabContainer) => {
-    var containerActiveKey = getContainerActiveKey(tabContainer)
+    const containerActiveKey = getContainerActiveKey(tabContainer)
     const key = activeKey || containerActiveKey
     const exiting = activeKey != null && activeKey !== containerActiveKey
 

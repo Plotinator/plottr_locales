@@ -1,86 +1,131 @@
-import React from 'react'
-import PropTypes from 'react-proptypes'
+import React, { useContext } from 'react'
+import PropTypes from 'prop-types'
+import { BiImport } from '@react-icons/all-files/bi/BiImport'
+import { FaSave } from '@react-icons/all-files/fa/FaSave'
+import { FiCopy } from '@react-icons/all-files/fi/FiCopy'
+import { connect } from 'react-redux'
 
 import { t } from 'plottr_locales'
+import { selectors } from 'wired-up-pltr'
 
 import NavItem from '../NavItem'
 import Button from '../Button'
-import { checkDependencies } from '../checkDependencies'
+import { PlottrComponentsContext } from '../../connections/pltrContext'
 
-const FileLocationConnector = (connector) => {
+const FileLocation = ({ fileURL, isLoggedIntoPro, isTemp }) => {
   const {
-    platform: { moveFromTemp, showItemInFolder, isMacOS, os, duplicateFile },
-  } = connector
-  checkDependencies({ moveFromTemp, showItemInFolder, isMacOS, os })
+    platform: {
+      moveFromTemp,
+      showItemInFolder,
+      isMacOS,
+      os,
+      duplicateFile,
+      importExistingFile,
+      showRecentFilesInImportModal,
+      basename,
+    },
+  } = useContext(PlottrComponentsContext)
 
-  const FileLocation = ({ fileURL, isLoggedIntoPro, isTemp }) => {
-    let showInMessage = t('Show in File Explorer')
-    if (isMacOS()) {
-      showInMessage = t('Show in Finder')
+  let showInMessage = t('Show in File Explorer')
+  if (isMacOS()) {
+    showInMessage = t('Show in Finder')
+  }
+  const osIsUnknown = os() === 'unknown'
+
+  const chooseLocation = moveFromTemp
+
+  if (osIsUnknown) return null
+
+  const handleClickImport = () => {
+    if (isLoggedIntoPro) {
+      showRecentFilesInImportModal()
+    } else {
+      importExistingFile(fileURL, ['openFile'])
     }
+  }
 
-    const osIsUnknown = os() === 'unknown'
+  const ImportButton = () => (
+    <Button bsSize="small" onClick={handleClickImport} className="file-location__button-with-icon">
+      <BiImport />
+      <div>{t('Import')}</div>
+    </Button>
+  )
 
-    const chooseLocation = moveFromTemp
-
-    if (osIsUnknown) return null
-    if (isLoggedIntoPro) return null
-
-    let button = (
+  let button = (
+    <div className="file-actions-wrapper">
+      <ImportButton />
+      <Button
+        bsSize="small"
+        onClick={() =>
+          basename(fileURL).then((name) => {
+            showItemInFolder(fileURL, name)
+          })
+        }
+      >
+        {showInMessage}
+      </Button>
+      <Button
+        className="file-location__button-with-icon"
+        bsSize="small"
+        onClick={() =>
+          basename(fileURL).then((name) => {
+            duplicateFile(fileURL, name, false)
+          })
+        }
+      >
+        <FiCopy />
+        {t('Duplicate')}
+      </Button>
+    </div>
+  )
+  if (isLoggedIntoPro)
+    button = (
       <div className="file-actions-wrapper">
-        <Button bsSize="small" onClick={() => showItemInFolder(fileURL)}>
-          {showInMessage}
-        </Button>
-        <Button bsSize="small" onClick={() => duplicateFile(fileURL)}>
-          {t('Duplicate')}
-        </Button>
+        <ImportButton />
       </div>
     )
-    if (isTemp) {
-      button = (
+
+  if (isTemp) {
+    button = (
+      <div className="file-actions-wrapper">
+        <ImportButton />
         <Button
           bsSize="small"
+          className="file-location__button-with-icon"
           onClick={() => {
             return chooseLocation()
           }}
           title={t('Choose where to save this file on your computer')}
         >
+          <FaSave />
           {t('Save File')}
         </Button>
-      )
-    }
-
-    return <NavItem>{button}</NavItem>
+      </div>
+    )
   }
 
-  FileLocation.propTypes = {
-    fileURL: PropTypes.string.isRequired,
-    isLoggedIntoPro: PropTypes.bool,
-    isTemp: PropTypes.bool,
-  }
-
-  const {
-    redux,
-    pltr: { selectors, actions },
-  } = connector
-  checkDependencies({ redux, actions, selectors })
-
-  if (redux) {
-    const { connect } = redux
-
-    return connect((state) => {
-      return {
-        fileURL: selectors.fileURLSelector(state),
-        isLoggedIntoPro: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
-        // NOTE: In other places we call this selector with a given
-        // prop for the fileURL selector.  That's why fileURL isn't
-        // *inside* isTempFileSelector.
-        isTemp: selectors.isTempFileSelector(state, selectors.fileURLSelector(state)),
-      }
-    })(FileLocation)
-  }
-
-  throw new Error('Could not connect FileLocation')
+  return <NavItem>{button}</NavItem>
 }
 
-export default FileLocationConnector
+FileLocation.propTypes = {
+  fileURL: PropTypes.string.isRequired,
+  isLoggedIntoPro: PropTypes.bool,
+  isTemp: PropTypes.bool,
+}
+
+const mapStateToProps = (state) => {
+  return {
+    fileURL: selectors.fileURLSelector(state),
+    isLoggedIntoPro: selectors.isLoggedIntoProWithActiveLicenseSelector(state),
+    // NOTE: In other places we call this selector with a given
+    // prop for the fileURL selector.  That's why fileURL isn't
+    // *inside* isTempFileSelector.
+    isTemp: selectors.isTempFileSelector(
+      state,
+      // @ts-ignore
+      selectors.fileURLSelector(state)
+    ),
+  }
+}
+
+export default connect(mapStateToProps)(FileLocation)

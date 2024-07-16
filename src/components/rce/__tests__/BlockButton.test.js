@@ -146,7 +146,12 @@ describe('BlockButton', () => {
 
     it('wraps a paragraph in a block quote', () => {
       handleBlockQuote(editor, 'block-quote')
-      expect(editor.children).toEqual([blockQuote([paragraph('Text')])])
+      expect(editor.children).toEqual([
+        blockQuote([
+          // @ts-ignore
+          paragraph('Text'),
+        ]),
+      ])
     })
 
     it('unwraps a paragraph', () => {
@@ -159,7 +164,12 @@ describe('BlockButton', () => {
       expect(editor.children).toEqual([headingOne('Text')])
 
       handleBlockQuote(editor, 'block-quote')
-      expect(editor.children).toEqual([blockQuote([headingOne('Text')])])
+      expect(editor.children).toEqual([
+        blockQuote([
+          // @ts-ignore
+          headingOne('Text'),
+        ]),
+      ])
     })
 
     it('unwraps a heading', () => {

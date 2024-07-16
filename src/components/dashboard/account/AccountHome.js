@@ -1,81 +1,59 @@
 import React, { useState } from 'react'
 import PropTypes from 'react-proptypes'
+import { connect } from 'react-redux'
 
-import UnconnectedAccount from './Account'
-import UnconnectedProOnboarding from './proOnboarding/index'
-import UnconnectedChoiceView from './ChoiceView'
-import { checkDependencies } from '../../checkDependencies'
+import { selectors, actions } from 'wired-up-pltr'
 
-const AccountHomeConnector = (connector) => {
-  const {
-    platform: { mpq },
-  } = connector
-  checkDependencies({ mpq })
+import Account from './Account'
+import ProOnboarding from './proOnboarding/index'
+import ChoiceView from './ChoiceView'
 
-  const Account = UnconnectedAccount(connector)
-  const ProOnboarding = UnconnectedProOnboarding(connector)
-  const ChoiceView = UnconnectedChoiceView(connector)
+const AccountHome = ({ isFirstTime, isOnboarding, startProOnboarding, finishProOnboarding }) => {
+  const [view, setView] = useState(
+    isOnboarding ? 'proOnboarding' : isFirstTime ? 'choice' : 'account'
+  )
 
-  const AccountHome = ({ isFirstTime, isOnboarding, startProOnboarding, finishProOnboarding }) => {
-    const [view, setView] = useState(
-      isOnboarding ? 'proOnboarding' : isFirstTime ? 'choice' : 'account'
-    )
-
-    const startOnboarding = () => {
-      startProOnboarding()
-      setView('proOnboarding')
-    }
-
-    const cancelOnboarding = () => {
-      finishProOnboarding()
-      setView('account')
-    }
-
-    let body
-    switch (view) {
-      case 'choice':
-        body = (
-          <ChoiceView goToAccount={() => setView('account')} startOnboarding={startProOnboarding} />
-        )
-        break
-      case 'proOnboarding':
-        body = <ProOnboarding cancel={cancelOnboarding} />
-        break
-      case 'account':
-        body = <Account startProOnboarding={startOnboarding} />
-        break
-    }
-
-    return <div className="dashboard__account">{body}</div>
+  const startOnboarding = () => {
+    startProOnboarding()
+    setView('proOnboarding')
   }
 
-  AccountHome.propTypes = {
-    isFirstTime: PropTypes.bool,
-    isOnboarding: PropTypes.bool,
-    startProOnboarding: PropTypes.func.isRequired,
-    finishProOnboarding: PropTypes.func.isRequired,
+  const cancelOnboarding = () => {
+    finishProOnboarding()
+    setView('account')
   }
 
-  const {
-    redux,
-    pltr: { selectors, actions },
-  } = connector
-
-  if (redux) {
-    const { connect } = redux
-    return connect(
-      (state) => ({
-        isFirstTime: selectors.isFirstTimeSelector(state),
-        isOnboarding: selectors.isOnboardingToProSelector(state),
-      }),
-      {
-        startProOnboarding: actions.applicationState.startProOnboarding,
-        finishProOnboarding: actions.applicationState.finishProOnboarding,
-      }
-    )(AccountHome)
+  let body
+  switch (view) {
+    case 'choice':
+      body = (
+        <ChoiceView goToAccount={() => setView('account')} startOnboarding={startProOnboarding} />
+      )
+      break
+    case 'proOnboarding':
+      body = <ProOnboarding cancel={cancelOnboarding} />
+      break
+    case 'account':
+      body = <Account startProOnboarding={startOnboarding} />
+      break
   }
 
-  throw new Error('Could not connect AccountHome')
+  return <div className="dashboard__account">{body}</div>
 }
 
-export default AccountHomeConnector
+AccountHome.propTypes = {
+  isFirstTime: PropTypes.bool,
+  isOnboarding: PropTypes.bool,
+  startProOnboarding: PropTypes.func.isRequired,
+  finishProOnboarding: PropTypes.func.isRequired,
+}
+
+const mapStateToProps = (state) => ({
+  isFirstTime: selectors.isFirstTimeSelector(state),
+  isOnboarding: selectors.isOnboardingToProSelector(state),
+})
+
+export default connect(mapStateToProps, {
+  startProOnboarding: actions.applicationState.startProOnboarding,
+  finishProOnboarding: actions.applicationState.finishProOnboarding,
+})(AccountHome)

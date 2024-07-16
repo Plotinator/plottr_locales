@@ -91,7 +91,6 @@ const UnMemoisedFontsButton = ({
       title={displayedFont}
       onSelect={changeFont}
       id="font-dropdown"
-      activeKey={activeFont}
       renderChildren={renderFonts}
     />
   )
@@ -110,10 +109,13 @@ UnMemoisedFontsButton.propTypes = {
 export const FontsButton = React.memo(UnMemoisedFontsButton)
 
 const getCurrentFont = (editor, logger, recentFonts, currentSetting) => {
+  // @ts-ignore
   if (Editor.validSelection(editor)) {
     try {
+      // @ts-ignore
       const [node] = Editor.nodes(editor, { match: (n) => n.font })
       if (node) {
+        // @ts-ignore
         return node[0].font
       } else {
         if (currentSetting) return currentSetting
@@ -129,17 +131,21 @@ const getCurrentFont = (editor, logger, recentFonts, currentSetting) => {
 }
 
 const getDisplayedFont = (editor, logger, recentFonts, currentSetting) => {
+  // @ts-ignore
   if (Editor.validSelection(editor)) {
     try {
       const nodes = Array.from(Editor.nodes(editor, { match: SlateText.isText }))
       const fonts = uniq(
         nodes.map(([node]) => {
+          // @ts-ignore
           return node.font
         })
       )
       if (fonts.length > 1) {
         return '--'
+        // @ts-ignore
       } else if (nodes[0]?.[0]?.font && typeof nodes[0]?.[0]?.font === 'string') {
+        // @ts-ignore
         return nodes[0]?.[0].font
       } else {
         if (currentSetting) {
@@ -161,6 +167,7 @@ const getDisplayedFont = (editor, logger, recentFonts, currentSetting) => {
 }
 
 const addFontMark = (editor, font) => {
+  // @ts-ignore
   if (Editor.validSelection(editor)) {
     Editor.addMark(editor, 'font', font)
   }

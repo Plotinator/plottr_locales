@@ -10,7 +10,6 @@ const Element = ({
   children,
   element,
   openExternal,
-  isStorageURL,
   imagePublicURL,
   imageCache,
   cacheImage,
@@ -59,7 +58,9 @@ const Element = ({
           target="_blank"
           onClick={(event) => {
             event.preventDefault()
-            openExternal(element.url)
+            if (typeof element?.url === 'string') {
+              openExternal(element.url)
+            }
           }}
         >
           {children}
@@ -69,7 +70,6 @@ const Element = ({
       return (
         <ImageFromLink
           attributes={attributes}
-          isStorageURL={isStorageURL}
           imagePublicURL={imagePublicURL}
           selected={selected}
           focused={focused}

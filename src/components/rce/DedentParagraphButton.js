@@ -24,7 +24,9 @@ const DedentParagraphButton = ({ editor, logger }) => {
         : bulletListIsActive
         ? 'bulleted-list'
         : null
+      // @ts-ignore
       if (newListType !== listType) {
+        // @ts-ignore
         setListType(newListType)
       }
     }, 100)
@@ -37,7 +39,7 @@ const DedentParagraphButton = ({ editor, logger }) => {
   const handleClick = useCallback(
     (event) => {
       event.preventDefault()
-      handleList(editor, listType, logger, true)
+      handleList(editor, listType, logger)
     },
     [editor, logger, listType]
   )

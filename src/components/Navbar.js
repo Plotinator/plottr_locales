@@ -125,7 +125,11 @@ class Navbar extends React.Component {
         bsClass,
         expanded,
         onToggle: this.handleToggle,
-        onSelect: createChainedFunction(onSelect, collapseOnSelect ? this.handleCollapse : null),
+        onSelect: createChainedFunction(
+          onSelect,
+          // @ts-ignore
+          collapseOnSelect ? this.handleCollapse : null
+        ),
       },
     }
   }
@@ -183,7 +187,10 @@ class Navbar extends React.Component {
     }
 
     return (
-      <NavbarContext.Provider value={this.getContext()}>
+      <NavbarContext.Provider
+        // @ts-ignore
+        value={this.getContext()}
+      >
         <Component {...elementProps} className={classNames(className, classes)}>
           <Grid fluid={fluid}>{children}</Grid>
         </Component>

@@ -27,8 +27,8 @@
       padding: 10px;
       position: relative;
       &.light {
-        background-color: $gray-9;  
-        color: #102A42;
+        background-color: $gray-9;
+        color: #102a42;
 
         p {
           @include rce-text-font;
@@ -268,14 +268,14 @@
 
     > :first-child {
       margin-right: 5px;
-    }  
+    }
   }
 
   &.light {
     .slate-editor__word-counter {
       background-color: #fff;
       border: 1px solid $new-item-border-color;
-      color: #102A42;
+      color: #102a42;
     }
   }
   &.darkmode {
@@ -286,7 +286,7 @@
     }
   }
 
-  [data-slate-editor="true"] p:only-child:has([data-slate-placeholder="true"]) {
+  [data-slate-editor='true'] p:only-child:has([data-slate-placeholder='true']) {
     display: flex;
     min-height: 22px;
     align-items: end;
@@ -315,7 +315,7 @@
       .slate-editor__word-counter {
         background-color: #fff;
         border: 1px solid $new-item-border-color;
-        color: #102A42;
+        color: #102a42;
       }
     }
     &.darkmode {
@@ -339,7 +339,7 @@
           &.active {
             background-color: $darkmode-v2-darker-background;
           }
-    
+
           &:focus,
           &:hover,
           &:active {
@@ -373,9 +373,9 @@
           background-color: $darkmode-v2-card-background;
 
           p {
-          @include rce-text-font;
-          @include rce-darkmode-font-color;
-}
+            @include rce-text-font;
+            @include rce-darkmode-font-color;
+          }
 
           h1 {
             @include header-font;
@@ -389,9 +389,9 @@
             @include rce-subtitle-darkmode-font-color;
           }
         }
-        
+
         &.light {
-          background-color: $gray-9;  
+          background-color: $gray-9;
           p,
           ul,
           ol {

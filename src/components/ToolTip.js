@@ -1,5 +1,5 @@
 import React from 'react'
-import { PropTypes } from 'prop-types'
+import PropTypes from 'prop-types'
 import Tooltip from 'rc-tooltip'
 
 import 'rc-tooltip/assets/bootstrap.css'

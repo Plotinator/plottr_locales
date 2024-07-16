@@ -47,9 +47,15 @@ class FormControlFeedback extends React.Component {
           }
 
           const child = React.Children.only(children)
+          // @ts-ignore
           return React.cloneElement(child, {
             ...elementProps,
-            className: classNames(child.props.className, className, classes),
+            className: classNames(
+              // @ts-ignore
+              child.props.className,
+              className,
+              classes
+            ),
           })
         }}
       </FormGroupContext.Consumer>

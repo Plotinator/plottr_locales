@@ -125,6 +125,7 @@ class Nav extends React.Component {
 
   getNextActiveChild(offset) {
     const { children } = this.props
+    // @ts-ignore
     const validChildren = children.filter(
       (child) => child.props.eventKey != null && !child.props.disabled
     )
@@ -267,6 +268,7 @@ class Nav extends React.Component {
               role={role}
               className={classNames(className, classes)}
             >
+              {/* @ts-ignore */}
               {ValidComponentChildren.map(children, (child) => {
                 const active = this.isActive(child, activeKey, activeHref)
                 const childOnSelect = createChainedFunction(

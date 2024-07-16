@@ -49,6 +49,10 @@
   position: absolute;
 }
 
+.no-scroll__modal {
+  overflow-y: hidden !important;
+}
+
 .darkmode {
   .ReactModal__Content--after-open {
     border-color: $darkmode-v2-border !important;

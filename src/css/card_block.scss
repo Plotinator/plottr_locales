@@ -413,13 +413,13 @@
   .slate-editor__editor {
     text-align: justify;
     @include rce-text-font;
-    
+
     .slate-editor__word-counter {
       bottom: 10px;
       right: 10px;
       background-color: #fff;
       border: 1px solid $new-item-border-color;
-      color: #102A42;
+      color: #102a42;
     }
   }
 }

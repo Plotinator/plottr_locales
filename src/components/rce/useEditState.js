@@ -56,18 +56,25 @@ export const useEditState = (
       clearTimeout(valueUpdateTimer.current)
     }
     deferredValuesToUpdate.current.value = value || deferredValuesToUpdate.current.value
+    // @ts-ignore
     deferredValuesToUpdate.current.selection = selection || deferredValuesToUpdate.current.selection
+    // @ts-ignore
     valueUpdateTimer.current = setTimeout(() => {
       updateWordCount()
-      onValueChanged(deferredValuesToUpdate.current.value, deferredValuesToUpdate.current.selection)
+      onValueChanged(
+        deferredValuesToUpdate.current.value,
+        // @ts-ignore
+        deferredValuesToUpdate.current.selection
+      )
       deferredValuesToUpdate.current.value = null
+      // @ts-ignore
       deferredValuesToUpdate.current.selection = null
       valueUpdateTimer.current = null
     }, 500)
   }
 
   // Handle local/client editor changed events
-  const onChange = (newValue, selection) => {
+  const onChange = (newValue, _selection) => {
     const valueChanged = !isEqual(newValue, value)
     const selectionChanged = !isEqual(editor.selection, currentSelection.current)
     // Update local state
@@ -79,7 +86,7 @@ export const useEditState = (
   }
 
   // It's possible for invalid RCE data to result from pasting.
-  const onPaste = (event) => {
+  const onPaste = (_event) => {
     // We're using operations rather than the actual value now...
   }
 
@@ -100,12 +107,12 @@ export const useEditState = (
   }
 
   // Add our cursor back in
-  const onFocus = (event) => {
+  const onFocus = (_event) => {
     focussed.current = true
   }
 
   // Remove our cursor
-  const onBlur = (event) => {
+  const onBlur = (_event) => {
     focussed.current = false
   }
 

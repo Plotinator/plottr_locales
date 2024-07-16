@@ -19,6 +19,7 @@ const propTypes = {
     let error = null
 
     if (!props.generateChildId) {
+      // @ts-ignore
       error = idPropType(props, ...args)
 
       if (!error && !props.id) {
@@ -86,7 +87,11 @@ class TabContainer extends React.Component {
 
     return (
       <TabContainerContext.Provider value={context}>
-        {React.cloneElement(React.Children.only(children), omit(props, ['activeKey']))}
+        {React.cloneElement(
+          // @ts-ignore
+          React.Children.only(children),
+          omit(props, ['activeKey'])
+        )}
       </TabContainerContext.Provider>
     )
   }

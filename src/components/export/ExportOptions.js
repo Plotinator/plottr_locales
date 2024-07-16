@@ -6,6 +6,7 @@ export function CheckOption({ children, checked, disabled, onChange, category, a
   const inputRef = useRef(null)
 
   const valueChange = () => {
+    // @ts-ignore
     onChange(inputRef.current.checked, category, attr)
   }
 
@@ -48,6 +49,7 @@ export function FilterCheckOption({
   const inputRef = useRef(null)
 
   const valueChange = () => {
+    // @ts-ignore
     onChange(inputRef.current.checked, category, attr, filterId)
   }
 
@@ -82,6 +84,7 @@ export function RadioOption({ children, checked, disabled, onChange, category, a
   const inputRef = useRef(null)
 
   const valueChange = () => {
+    // @ts-ignore
     if (inputRef.current.checked) onChange(value, category, attr)
   }
 

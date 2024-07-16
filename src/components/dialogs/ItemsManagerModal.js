@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useContext } from 'react'
 import PropTypes from 'react-proptypes'
 import cx from 'classnames'
 import { FaSave } from '@react-icons/all-files/fa/FaSave'
+import { connect } from 'react-redux'
 
 import { t } from 'plottr_locales'
 import { helpers } from 'pltr'
+import { selectors } from 'wired-up-pltr'
 
 import Glyphicon from '../Glyphicon'
 import ControlLabel from '../ControlLabel'
@@ -12,8 +14,8 @@ import FormGroup from '../FormGroup'
 import FormControl from '../FormControl'
 import Button from '../Button'
 import DeleteConfirmModal from './DeleteConfirmModal'
-import UnconnectedPlottrModal from '../PlottrModal'
-import { checkDependencies } from '../checkDependencies'
+import PlottrModal from '../PlottrModal'
+import { PlottrComponentsContext } from '../../connections/pltrContext'
 
 const modalStyles = {
   overlay: {
@@ -34,130 +36,114 @@ const modalStyles = {
   },
 }
 
-const ItemsManagerModelConnector = (connector) => {
-  const PlottrModal = UnconnectedPlottrModal(connector)
-
+function ItemsManagerModal({
+  title,
+  subtitle,
+  addLabel,
+  items,
+  darkMode,
+  showSaveAsTemplate = false,
+  itemType,
+  onAdd,
+  renderItem,
+  closeDialog,
+}) {
   const {
     platform: {
       template: { startSaveAsTemplate },
     },
-  } = connector
-  checkDependencies({ startSaveAsTemplate })
+  } = useContext(PlottrComponentsContext)
 
-  function ItemsManagerModal({
-    title,
-    subtitle,
-    addLabel,
-    items,
-    darkMode,
-    showSaveAsTemplate = false,
-    itemType,
-    onAdd,
-    renderItem,
-    closeDialog,
-  }) {
-    const [inputValue, setInputValue] = useState('')
-    const restrictedValues = useMemo(() => new Set(items.map(({ name }) => name)), [items])
+  const [inputValue, setInputValue] = useState('')
+  const restrictedValues = useMemo(() => new Set(items.map(({ name }) => name)), [items])
 
-    const saveAsTemplate = () => {
-      if (items.length) startSaveAsTemplate(itemType)
+  const saveAsTemplate = () => {
+    if (items.length) startSaveAsTemplate(itemType)
 
-      return false
+    return false
+  }
+
+  const handleEnterPressed = (e) => {
+    if (e.which !== 13) return
+    save()
+  }
+
+  const save = () => {
+    const value = inputValue.trim()
+    if (value !== '' && !restrictedValues.has(value)) {
+      onAdd(value)
     }
+    setInputValue('')
+  }
 
-    const handleEnterPressed = (e) => {
-      if (e.which !== 13) return
-      save()
-    }
+  if (darkMode) {
+    modalStyles.content.backgroundColor = '#666'
+  } else {
+    modalStyles.content.backgroundColor = '#fff'
+  }
 
-    const save = () => {
-      const value = inputValue.trim()
-      if (value !== '' && !restrictedValues.has(value)) {
-        onAdd(value)
-      }
-      setInputValue('')
-    }
-
-    if (darkMode) {
-      modalStyles.content.backgroundColor = '#666'
-    } else {
-      modalStyles.content.backgroundColor = '#fff'
-    }
-
-    return (
-      <PlottrModal isOpen={true} onRequestClose={closeDialog} style={modalStyles}>
-        <div className={cx('custom-attr__wrapper', { darkmode: darkMode })}>
-          <Button className="pull-right" onClick={closeDialog}>
-            {t('Close')}
+  return (
+    <PlottrModal isOpen={true} onRequestClose={closeDialog} style={modalStyles}>
+      <div className={cx('custom-attr__wrapper', { darkmode: darkMode })}>
+        <Button className="pull-right" onClick={closeDialog}>
+          {t('Close')}
+        </Button>
+        {showSaveAsTemplate ? (
+          <Button
+            className="pull-right custom-attr__save-as-template"
+            onClick={saveAsTemplate}
+            disabled={!items.length}
+          >
+            <FaSave className="svg-save-template" /> {t('Save as Template')}
           </Button>
-          {showSaveAsTemplate ? (
-            <Button
-              className="pull-right custom-attr__save-as-template"
-              onClick={saveAsTemplate}
-              disabled={!items.length}
-            >
-              <FaSave className="svg-save-template" /> {t('Save as Template')}
-            </Button>
-          ) : null}
-          <h3>{title}</h3>
-          <p className="sub-header">{subtitle}</p>
-          <div className="custom-attr__add-button">
-            <FormGroup>
-              <ControlLabel>{addLabel}</ControlLabel>
-              <FormControl
-                type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.currentTarget.value)}
-                onKeyDown={handleEnterPressed}
-                autoFocus
-              />
-            </FormGroup>
-            <Button bsStyle="success" onClick={save}>
-              {t('Add')}
-            </Button>
-          </div>
-          <div className="custom-attr__list-wrapper">
-            {items.map((item, i) => {
-              const element = renderItem(item, i)
-              if (element == null) return null
-              return React.cloneElement(element, { restrictedValues })
-            })}
-          </div>
+        ) : null}
+        <h3>{title}</h3>
+        <p className="sub-header">{subtitle}</p>
+        <div className="custom-attr__add-button">
+          <FormGroup>
+            <ControlLabel>{addLabel}</ControlLabel>
+            <FormControl
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.currentTarget.value)}
+              onKeyDown={handleEnterPressed}
+              autoFocus
+            />
+          </FormGroup>
+          <Button bsStyle="success" onClick={save}>
+            {t('Add')}
+          </Button>
         </div>
-      </PlottrModal>
-    )
-  }
-
-  ItemsManagerModal.propTypes = {
-    title: PropTypes.string.isRequired,
-    subtitle: PropTypes.string.isRequired,
-    addLabel: PropTypes.string.isRequired,
-    items: PropTypes.array.isRequired,
-    darkMode: PropTypes.bool,
-    showSaveAsTemplate: PropTypes.bool,
-    itemType: PropTypes.string.isRequired,
-    onAdd: PropTypes.func.isRequired,
-    renderItem: PropTypes.func.isRequired,
-    closeDialog: PropTypes.func.isRequired,
-  }
-
-  const {
-    redux,
-    pltr: { selectors },
-  } = connector
-
-  if (redux) {
-    const { connect } = redux
-
-    return connect((state) => ({
-      darkMode: selectors.isDarkModeSelector(state),
-    }))(ItemsManagerModal)
-  }
-
-  throw new Error('Could not connect ItemsManagerModal')
+        <div className="custom-attr__list-wrapper">
+          {items.map((item, i) => {
+            const element = renderItem(item, i)
+            if (element == null) return null
+            return React.cloneElement(element, { restrictedValues })
+          })}
+        </div>
+      </div>
+    </PlottrModal>
+  )
 }
 
-export default ItemsManagerModelConnector
+ItemsManagerModal.propTypes = {
+  title: PropTypes.string.isRequired,
+  subtitle: PropTypes.string.isRequired,
+  addLabel: PropTypes.string.isRequired,
+  items: PropTypes.array.isRequired,
+  darkMode: PropTypes.bool,
+  showSaveAsTemplate: PropTypes.bool,
+  itemType: PropTypes.string.isRequired,
+  onAdd: PropTypes.func.isRequired,
+  renderItem: PropTypes.func.isRequired,
+  closeDialog: PropTypes.func.isRequired,
+}
+
+const mapStateToProps = (state) => ({
+  darkMode: selectors.isDarkModeSelector(state),
+})
+
+export default connect(mapStateToProps)(ItemsManagerModal)
 
 export function ListItem({
   item,

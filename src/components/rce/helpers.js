@@ -40,7 +40,19 @@ const NOP = () => {}
 
 export function createEditor(log, addImage = NOP) {
   return withList(log)(
-    withNormalizer(withHTML(withImages(withLinks(withReact(createSlateEditor())), addImage)))
+    withNormalizer(
+      withHTML(
+        withImages(
+          withLinks(
+            withReact(
+              // @ts-ignore
+              createSlateEditor()
+            )
+          ),
+          addImage
+        )
+      )
+    )
   )
 }
 
@@ -63,6 +75,7 @@ export const countWords = (nodes) => {
 }
 
 // Gets the previous sibling node to the provided path at the same depth
+// @ts-ignore
 Editor.previousSibling = (editor, path) => {
   if (path == null) return null
 
@@ -75,6 +88,7 @@ Editor.previousSibling = (editor, path) => {
 }
 
 // Gets the next sibling node to the provided path at the same depth
+// @ts-ignore
 Editor.nextSibling = (editor, path) => {
   if (path == null) return null
   const last = path[path.length - 1]
@@ -88,8 +102,13 @@ Editor.nextSibling = (editor, path) => {
   }
 }
 
+// @ts-ignore
 Editor.isInBlock = (editor, types, givenSelection = null) => {
-  if (givenSelection || Editor.validSelection(editor)) {
+  if (
+    givenSelection ||
+    // @ts-ignore
+    Editor.validSelection(editor)
+  ) {
     const selection = givenSelection ?? editor.selection
     if (!(typeof selection?.anchor === 'object' && typeof selection?.focus === 'object')) {
       return false
@@ -97,7 +116,10 @@ Editor.isInBlock = (editor, types, givenSelection = null) => {
       const [match] = Array.from(
         Editor.nodes(editor, {
           match: (node) =>
-            !Editor.isEditor(node) && SlateElement.isElement(node) && types.includes(node.type),
+            !Editor.isEditor(node) &&
+            SlateElement.isElement(node) &&
+            // @ts-ignore
+            types.includes(node.type),
         })
       )
 
@@ -108,14 +130,19 @@ Editor.isInBlock = (editor, types, givenSelection = null) => {
   }
 }
 
+// @ts-ignore
 Editor.isInList = (editor) => {
+  // @ts-ignore
   return Editor.isInBlock(editor, LIST_TYPES)
 }
 
-Editor.isInHeading = (editor, path) => {
+// @ts-ignore
+Editor.isInHeading = (editor) => {
+  // @ts-ignore
   return Editor.isInBlock(editor, HEADING_TYPES)
 }
 
+// @ts-ignore
 Editor.parentOfType = (editor, path, { match }) => {
   try {
     const [parent, parentPath] = Editor.parent(editor, path)
@@ -123,13 +150,16 @@ Editor.parentOfType = (editor, path, { match }) => {
       return [parent, parentPath]
     }
 
+    // @ts-ignore
     return Editor.parentOfType(editor, parentPath, { match })
   } catch (err) {
     return []
   }
 }
 
+// @ts-ignore
 Editor.removePropertyOnSelectionOrCurrentElement = (editor, property) => {
+  // @ts-ignore
   if (Editor.validSelection(editor)) {
     const { selection } = editor
     if (typeof selection?.anchor === 'object' && typeof selection?.focus === 'object') {
@@ -160,7 +190,10 @@ const isValidPath = (node, path) => {
 }
 
 const validSelection = (editor) => {
-  if (!Array.isArray(editor?.selection?.anchor) || !Array.isArray(editor?.selection?.focus)) {
+  if (
+    !Array.isArray(editor?.selection?.anchor?.path) ||
+    !Array.isArray(editor?.selection?.focus?.path)
+  ) {
     return false
   } else {
     const { anchor, focus } = editor.selection
@@ -168,6 +201,7 @@ const validSelection = (editor) => {
   }
 }
 
+// @ts-ignore
 Editor.validSelection = (editor) => {
   return validSelection(editor)
 }

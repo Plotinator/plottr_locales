@@ -1,11 +1,14 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import PropTypes from 'react-proptypes'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import { isEqual } from 'lodash'
 import cx from 'classnames'
 import { FiCopy } from '@react-icons/all-files/fi/FiCopy'
 
 import { t } from 'plottr_locales'
 import { helpers } from 'pltr'
+import { selectors, actions } from 'wired-up-pltr'
 
 import Tab from '../Tab'
 import Glyphicon from '../Glyphicon'
@@ -13,670 +16,621 @@ import Tabs from '../Tabs'
 import ButtonToolbar from '../ButtonToolbar'
 import ControlLabel from '../ControlLabel'
 import FormGroup from '../FormGroup'
-import UnconnectedTextFormControl from '../TextFormControl'
+import TextFormControl from '../TextFormControl'
 import Button from '../Button'
 import DeleteConfirmModal from '../dialogs/DeleteConfirmModal'
-import UnconnectedCategoryPicker from '../CategoryPicker'
-import UnconnectedRichText from '../rce/RichText'
-import UnconnectedImagePicker from '../images/ImagePicker'
-import UnconnectedImage from '../images/Image'
-import UnconnectedEditAttribute from '../EditAttribute'
-import TemplatePickerConnector from '../templates/TemplatePicker'
-import { checkDependencies } from '../checkDependencies'
+import CategoryPicker from '../CategoryPicker'
+import RichText from '../rce/RichText'
+import ImagePicker from '../images/ImagePicker'
+import Image from '../images/Image'
+import EditAttribute from '../EditAttribute'
+import TemplatePicker from '../templates/TemplatePicker'
+import { PlottrComponentsContext } from '../../connections/pltrContext'
 
-const CharacterEditDetailsConnector = (connector) => {
-  const CategoryPicker = UnconnectedCategoryPicker(connector)
-  const RichText = UnconnectedRichText(connector)
-  const ImagePicker = UnconnectedImagePicker(connector)
-  const Image = UnconnectedImage(connector)
-  const EditAttribute = UnconnectedEditAttribute(connector)
-  const TemplatePicker = TemplatePickerConnector(connector)
-  const TextFormControl = UnconnectedTextFormControl(connector)
-
+const CharacterEditDetails = ({
+  characterAttributeMetadata,
+  finishEditing,
+  character,
+  actions,
+  uiActions,
+  undo,
+  attributes,
+  getTemplateById,
+  darkMode,
+  templateAttributeValue,
+  openAttributes,
+  deleting,
+  removing,
+  removeWhichTemplate,
+  activeTab,
+  showTemplatePicker,
+  foci,
+  attributeTabId,
+}) => {
   const {
     platform: { templatesDisabled, openExternal },
-  } = connector
+  } = useContext(PlottrComponentsContext)
 
-  checkDependencies({
-    templatesDisabled,
-    openExternal,
-  })
+  const [newTemplateTabPosition, setNewTemplateTabPosition] = useState(null)
 
-  const CharacterEditDetails = ({
-    characterAttributeMetadata,
-    finishEditing,
-    character,
-    actions,
-    uiActions,
-    undo,
-    attributes,
-    getTemplateById,
-    darkMode,
-    templateAttributeValue,
-    selection,
-    openAttributes,
-    charactersSearchTerm,
-    deleting,
-    removing,
-    removeWhichTemplate,
-    activeTab,
-    showTemplatePicker,
-    foci,
-    attributeTabId,
-  }) => {
-    const [newTemplateTabPosition, setNewTemplateTabPosition] = useState(null)
+  const shortDescriptionAttributeId = characterAttributeMetadata.find(({ name }) => {
+    return name === 'shortDescription'
+  })?.id
+  const descriptionAttributeId = characterAttributeMetadata.find(({ name }) => {
+    return name === 'description'
+  })?.id
 
-    const shortDescriptionAttributeId = characterAttributeMetadata.find(({ name }) => {
-      return name === 'shortDescription'
-    })?.id
-    const descriptionAttributeId = characterAttributeMetadata.find(({ name }) => {
-      return name === 'description'
-    })?.id
+  const selectionForMainNonChangingElement = (name) => {
+    const characterId = character.id
 
-    const selectionForMainNonChangingElement = (name) => {
-      const characterId = character.id
+    return foci?.find(({ path }) => {
+      return isEqual(path, ['character', characterId, name])
+    })?.selection
+  }
 
-      return foci?.find(({ path }) => {
-        return isEqual(path, ['character', characterId, name])
-      })?.selection
-    }
+  const selectionForMainChangingElement = (attributeId, legacyAttributeName) => {
+    const characterId = character.id
+    const bookId = attributeTabId
 
-    const selectionForMainChangingElement = (attributeId, legacyAttributeName) => {
-      const characterId = character.id
-      const bookId = attributeTabId
-
-      // The foci selector narrows down to the selected book already(!)
-      if (
-        foci[0] &&
-        (isEqual(foci[0].path, [
-          'character',
-          characterId,
-          'customAttribute',
-          attributeId,
-          bookId,
-        ]) ||
-          isEqual(foci[0].path, [
-            'character',
-            characterId,
-            'customAttribute',
-            legacyAttributeName,
-            bookId,
-          ]))
-      ) {
-        return foci[0].selection
-      }
-      return null
-    }
-
-    const shouldFocusMainChangingElement = (attributeId, legacyAttributeName) => {
-      const characterId = character.id
-      const bookId = attributeTabId
-
-      // The foci selector narrows down to the selected book already(!)
-      return (
-        foci[0] &&
-        (isEqual(foci[0].path, [
-          'character',
-          characterId,
-          'customAttribute',
-          attributeId,
-          bookId,
-        ]) ||
-          isEqual(foci[0].path, [
-            'character',
-            characterId,
-            'customAttribute',
-            legacyAttributeName,
-            bookId,
-          ]))
-      )
-    }
-
-    const selectionForCustomAttribute = (attributeId, attributeName) => {
-      const characterId = character.id
-      const bookId = attributeTabId
-      return foci?.find(({ path }) => {
-        return (
-          isEqual(path, ['character', characterId, 'customAttribute', attributeId, bookId]) ||
-          isEqual(path, ['character', characterId, 'customAttribute', attributeName, bookId])
-        )
-      })?.selection
-    }
-
-    const shouldFocusCustomAttribute = (attributeId, attributeName) => {
-      const characterId = character.id
-      const bookId = attributeTabId
-      return (
-        foci &&
-        foci[0] &&
-        (isEqual(foci[0].path, [
-          'character',
-          characterId,
-          'customAttribute',
-          attributeId,
-          bookId,
-        ]) ||
-          isEqual(foci[0].path, [
-            'character',
-            characterId,
-            'customAttribute',
-            attributeName,
-            bookId,
-          ]))
-      )
-    }
-
-    const selectionForTemplateAttribute = (templateId, attributeName) => {
-      const characterId = character.id
-      const bookId = attributeTabId
-      return foci?.find(({ path }) => {
-        return isEqual(path, [
-          'character',
-          characterId,
-          'template',
-          templateId,
-          attributeName,
-          bookId,
-        ])
-      })?.selection
-    }
-
-    const shouldFocusTemplateAttribute = (templateId, attributeName) => {
-      const characterId = character.id
-      const bookId = attributeTabId
-      return (
-        foci &&
-        foci[0] &&
+    // The foci selector narrows down to the selected book already(!)
+    if (
+      foci[0] &&
+      (isEqual(foci[0].path, ['character', characterId, 'customAttribute', attributeId, bookId]) ||
         isEqual(foci[0].path, [
           'character',
           characterId,
-          'template',
-          templateId,
-          attributeName,
+          'customAttribute',
+          legacyAttributeName,
           bookId,
-        ])
+        ]))
+    ) {
+      return foci[0].selection
+    }
+    return null
+  }
+
+  const shouldFocusMainChangingElement = (attributeId, legacyAttributeName) => {
+    const characterId = character.id
+    const bookId = attributeTabId
+
+    // The foci selector narrows down to the selected book already(!)
+    return (
+      foci[0] &&
+      (isEqual(foci[0].path, ['character', characterId, 'customAttribute', attributeId, bookId]) ||
+        isEqual(foci[0].path, [
+          'character',
+          characterId,
+          'customAttribute',
+          legacyAttributeName,
+          bookId,
+        ]))
+    )
+  }
+
+  const selectionForCustomAttribute = (attributeId, attributeName) => {
+    const characterId = character.id
+    const bookId = attributeTabId
+    return foci?.find(({ path }) => {
+      return (
+        isEqual(path, ['character', characterId, 'customAttribute', attributeId, bookId]) ||
+        isEqual(path, ['character', characterId, 'customAttribute', attributeName, bookId])
       )
-    }
+    })?.selection
+  }
 
-    const deleteCharacter = (e) => {
-      e.stopPropagation()
-      undo.batch(`Delete Character ${character.name}`, () => {
-        actions.deleteCharacter(character.id)
-        uiActions.finishDeletingCharacter()
-      })
-    }
+  const shouldFocusCustomAttribute = (attributeId, attributeName) => {
+    const characterId = character.id
+    const bookId = attributeTabId
+    return (
+      foci &&
+      foci[0] &&
+      (isEqual(foci[0].path, ['character', characterId, 'customAttribute', attributeId, bookId]) ||
+        isEqual(foci[0].path, ['character', characterId, 'customAttribute', attributeName, bookId]))
+    )
+  }
 
-    const cancelDelete = (e) => {
-      e.stopPropagation()
+  const selectionForTemplateAttribute = (templateId, attributeName) => {
+    const characterId = character.id
+    const bookId = attributeTabId
+    return foci?.find(({ path }) => {
+      return isEqual(path, [
+        'character',
+        characterId,
+        'template',
+        templateId,
+        attributeName,
+        bookId,
+      ])
+    })?.selection
+  }
+
+  const shouldFocusTemplateAttribute = (templateId, attributeName) => {
+    const characterId = character.id
+    const bookId = attributeTabId
+    return (
+      foci &&
+      foci[0] &&
+      isEqual(foci[0].path, [
+        'character',
+        characterId,
+        'template',
+        templateId,
+        attributeName,
+        bookId,
+      ])
+    )
+  }
+
+  const deleteCharacter = (e) => {
+    e.stopPropagation()
+    undo.batch(`Delete Character ${character.name}`, () => {
+      actions.deleteCharacter(character.id)
       uiActions.finishDeletingCharacter()
+    })
+  }
+
+  const cancelDelete = (e) => {
+    e.stopPropagation()
+    uiActions.finishDeletingCharacter()
+  }
+
+  const handleDelete = (e) => {
+    e.stopPropagation()
+    uiActions.startDeletingCharacter()
+  }
+
+  const beginRemoveTemplate = (templateId) => {
+    const templateName =
+      character.templates.find((template) => {
+        return templateId === template?.id
+      })?.name ?? ''
+    undo.batch(`Start Removing Template ${templateName}`, () => {
+      uiActions.startRemovingTemplateFromCharacter()
+      uiActions.setTemplateToRemoveFromCharacter(templateId)
+    })
+  }
+
+  const finishRemoveTemplate = (e) => {
+    e.stopPropagation()
+    const templateName =
+      character.templates.find((template) => {
+        return removeWhichTemplate === template?.id
+      })?.name ?? ''
+    undo.batch(`Finish Removing Template ${templateName}`, () => {
+      uiActions.setActiveCharacterTab(activeTab - 1)
+      actions.removeTemplateFromCharacter(character.id, removeWhichTemplate)
+      uiActions.finishRemovingTemplateFromCharacter()
+      uiActions.setTemplateToRemoveFromCharacter(null)
+    })
+  }
+
+  const cancelRemoveTemplate = (e) => {
+    e.stopPropagation()
+    const templateName =
+      character.templates.find((template) => {
+        return removeWhichTemplate === template?.id
+      })?.name ?? ''
+    undo.batch(`Cancel Removing Template ${templateName}`, () => {
+      uiActions.finishRemovingTemplateFromCharacter()
+      uiActions.setTemplateToRemoveFromCharacter(null)
+    })
+  }
+
+  const handleEnter = (event) => {
+    if (event.which === 13) {
+      finishEditing()
     }
+  }
 
-    const handleDelete = (e) => {
-      e.stopPropagation()
-      uiActions.startDeletingCharacter()
+  const handleEsc = (event) => {
+    if (event.which === 27) {
+      finishEditing()
     }
+  }
 
-    const beginRemoveTemplate = (templateId) => {
-      const templateName =
-        character.templates.find((template) => {
-          return templateId === template?.id
-        })?.name ?? ''
-      undo.batch(`Start Removing Template ${templateName}`, () => {
-        uiActions.startRemovingTemplateFromCharacter()
-        uiActions.setTemplateToRemoveFromCharacter(templateId)
-      })
+  const handleChooseTemplate = (templateData) => {
+    const numTemplates = character.templates.length
+    undo.batch(`Choose Template ${templateData.name}`, () => {
+      actions.addTemplateToCharacter(character.id, templateData)
+      uiActions.hideCharacterEditorTemplatePicker()
+      uiActions.setActiveCharacterTab(numTemplates + 3)
+    })
+  }
+
+  const handleNotesChanged = (value, selection) => {
+    actions.editDescription(character.id, value, selection)
+  }
+
+  const handleAttrChange = (attrId) => (value, selection) => {
+    actions.editCharacterAttributeValue(character.id, attrId, value, selection)
+  }
+
+  const handleTemplateAttrChange = (id, name) => (desc, selection) => {
+    actions.editCharacterTemplateAttribute(character.id, id, name, desc, selection)
+  }
+
+  const changeCategory = (val) => {
+    actions.editCategory(character.id, val)
+  }
+
+  const changeImage = (newImageId) => {
+    actions.editCharacterImage(character.id, newImageId)
+  }
+
+  const changeName = (newName, selection) => {
+    actions.editCharacterName(character.id, newName, selection)
+  }
+
+  const changeShortDescription = (newShortDescription, selection) => {
+    actions.editShortDescription(character.id, newShortDescription, selection)
+  }
+
+  const selectTab = (key) => {
+    // We could get a synthetic event back from React
+    if (typeof key === 'object') return
+
+    if (key == 'new') {
+      uiActions.showCharacterEditorTemplatePicker()
+    } else {
+      uiActions.setActiveCharacterTab(key)
     }
+  }
 
-    const finishRemoveTemplate = (e) => {
-      e.stopPropagation()
-      const templateName =
-        character.templates.find((template) => {
-          return removeWhichTemplate === template?.id
-        })?.name ?? ''
-      undo.batch(`Finish Removing Template ${templateName}`, () => {
-        uiActions.setActiveCharacterTab(activeTab - 1)
-        actions.removeTemplateFromCharacter(character.id, removeWhichTemplate)
-        uiActions.finishRemovingTemplateFromCharacter()
-        uiActions.setTemplateToRemoveFromCharacter(null)
-      })
+  const renderTemplatePicker = () => {
+    if (!showTemplatePicker) return null
+
+    return (
+      <TemplatePicker
+        modal={true}
+        types={['characters']}
+        isOpen={showTemplatePicker}
+        close={uiActions.hideCharacterEditorTemplatePicker}
+        onChooseTemplate={handleChooseTemplate}
+        canMakeCharacterTemplates={!!attributes.length}
+        templatesAlreadySelected={character.templates}
+      />
+    )
+  }
+
+  const renderRemoveTemplate = () => {
+    if (!removing) return null
+    let templateData = getTemplateById(removeWhichTemplate)
+    if (!templateData) {
+      templateData =
+        character.templates.find((template) => template.id == removeWhichTemplate) || {}
     }
+    return (
+      <DeleteConfirmModal
+        customText={t('Are you sure you want to remove the {template} template and all its data?', {
+          template: templateData?.name || t('Template'),
+        })}
+        onDelete={finishRemoveTemplate}
+        onCancel={cancelRemoveTemplate}
+      />
+    )
+  }
 
-    const cancelRemoveTemplate = (e) => {
-      e.stopPropagation()
-      const templateName =
-        character.templates.find((template) => {
-          return removeWhichTemplate === template?.id
-        })?.name ?? ''
-      undo.batch(`Cancel Removing Template ${templateName}`, () => {
-        uiActions.finishRemovingTemplateFromCharacter()
-        uiActions.setTemplateToRemoveFromCharacter(null)
-      })
-    }
+  const renderDelete = () => {
+    if (!deleting) return null
 
-    const handleEnter = (event) => {
-      if (event.which === 13) {
-        finishEditing()
-      }
-    }
+    return (
+      <DeleteConfirmModal
+        name={character.name || t('New Character')}
+        onDelete={deleteCharacter}
+        onCancel={cancelDelete}
+      />
+    )
+  }
 
-    const handleEsc = (event) => {
-      if (event.which === 27) {
-        finishEditing()
-      }
-    }
-
-    const handleChooseTemplate = (templateData) => {
-      const numTemplates = character.templates.length
-      undo.batch(`Choose Template ${templateData.name}`, () => {
-        actions.addTemplateToCharacter(character.id, templateData)
-        uiActions.hideCharacterEditorTemplatePicker()
-        uiActions.setActiveCharacterTab(numTemplates + 3)
-      })
-    }
-
-    const handleNotesChanged = (value, selection) => {
-      actions.editDescription(character.id, value, selection)
-    }
-
-    const handleAttrChange = (attrId) => (value, selection) => {
-      actions.editCharacterAttributeValue(character.id, attrId, value, selection)
-    }
-
-    const handleTemplateAttrChange = (id, name) => (desc, selection) => {
-      actions.editCharacterTemplateAttribute(character.id, id, name, desc, selection)
-    }
-
-    const changeCategory = (val) => {
-      actions.editCategory(character.id, val)
-    }
-
-    const changeImage = (newImageId) => {
-      actions.editCharacterImage(character.id, newImageId)
-    }
-
-    const changeName = (newName, selection) => {
-      actions.editCharacterName(character.id, newName, selection)
-    }
-
-    const changeShortDescription = (newShortDescription, selection) => {
-      actions.editShortDescription(character.id, newShortDescription, selection)
-    }
-
-    const selectTab = (key) => {
-      // We could get a synthetic event back from React
-      if (typeof key === 'object') return
-
-      if (key == 'new') {
-        uiActions.showCharacterEditorTemplatePicker()
-      } else {
-        uiActions.setActiveCharacterTab(key)
-      }
-    }
-
-    const renderTemplatePicker = () => {
-      if (!showTemplatePicker) return null
-
-      return (
-        <TemplatePicker
-          modal={true}
-          types={['characters']}
-          isOpen={showTemplatePicker}
-          close={uiActions.hideCharacterEditorTemplatePicker}
-          onChooseTemplate={handleChooseTemplate}
-          canMakeCharacterTemplates={!!attributes.length}
-          templatesAlreadySelected={character.templates}
-        />
-      )
-    }
-
-    const renderRemoveTemplate = () => {
-      if (!removing) return null
-      let templateData = getTemplateById(removeWhichTemplate)
-      if (!templateData) {
-        templateData = character.templates.find((t) => t.id == removeWhichTemplate) || {}
-      }
-      return (
-        <DeleteConfirmModal
-          customText={t(
-            'Are you sure you want to remove the {template} template and all its data?',
-            { template: templateData?.name || t('Template') }
-          )}
-          onDelete={finishRemoveTemplate}
-          onCancel={cancelRemoveTemplate}
-        />
-      )
-    }
-
-    const renderDelete = () => {
-      if (!deleting) return null
-
-      return (
-        <DeleteConfirmModal
-          name={character.name || t('New Character')}
-          onDelete={deleteCharacter}
-          onCancel={cancelDelete}
-        />
-      )
-    }
-
-    const renderEditingImage = () => {
-      return (
-        <FormGroup>
-          <ControlLabel>{t('Character Thumbnail')}</ControlLabel>
-          <div className="character-list__character__edit-image-wrapper">
-            <div className="character-list__character__edit-image">
-              <Image size="large" shape="circle" imageId={character.imageId} />
-            </div>
-            <div>
-              <ImagePicker selectedId={character.imageId} chooseImage={changeImage} deleteButton />
-            </div>
+  const renderEditingImage = () => {
+    return (
+      <FormGroup>
+        <ControlLabel>{t('Character Thumbnail')}</ControlLabel>
+        <div className="character-list__character__edit-image-wrapper">
+          <div className="character-list__character__edit-image">
+            <Image size="large" shape="circle" imageId={character.imageId} />
           </div>
-        </FormGroup>
-      )
-    }
+          <div>
+            <ImagePicker selectedId={character.imageId} chooseImage={changeImage} deleteButton />
+          </div>
+        </div>
+      </FormGroup>
+    )
+  }
 
-    const renderEditingCustomAttributes = () => {
-      return attributes.map((attr, index) => {
-        // Don't use the attr.key || attr.name alone for key here
-        // because legacy attribute names can overlap with new
-        // attribute ids.
+  const renderEditingCustomAttributes = () => {
+    return attributes.map((attr, index) => {
+      // Don't use the attr.key || attr.name alone for key here
+      // because legacy attribute names can overlap with new
+      // attribute ids.
+      return (
+        <React.Fragment key={`${index}-${attr.id || attr.name}`}>
+          <EditAttribute
+            index={index}
+            entity={character}
+            entityType="character"
+            value={attr.value}
+            onChange={handleAttrChange(attr.id || attr.name)}
+            onSave={finishEditing}
+            name={attr.name}
+            id={attr.id}
+            type={attr.type}
+            autoFocus={shouldFocusCustomAttribute(attr.id, attr.name)}
+            selection={selectionForCustomAttribute(attr.id, attr.name)}
+            inputId={`character-${character.id}-custom-attribute-${
+              attr.id || attr.name
+            }-book-${attributeTabId}`}
+          />
+        </React.Fragment>
+      )
+    })
+  }
+
+  const handleTabDragOver = (e) => {
+    if (e) {
+      e.preventDefault()
+      const newPosition = e.target?.getAttribute('position')
+      if (newPosition != newTemplateTabPosition) {
+        setNewTemplateTabPosition(newPosition)
+      }
+    }
+  }
+
+  const handleDropTab = (event) => {
+    event.stopPropagation()
+
+    const json = event.dataTransfer.getData('text/json')
+    const droppedTab = helpers.json.safeParseJSON(json)
+    if (droppedTab !== null) {
+      actions.reorderCharacterTemplateAttribute(
+        droppedTab.position,
+        Number(newTemplateTabPosition),
+        character.id
+      )
+      setNewTemplateTabPosition(null)
+    }
+  }
+
+  const renderEditingTemplates = () => {
+    return character.templates.map((template, idx) => {
+      const templateData = getTemplateById(template.id)
+      const handleDragStart = (e, idx) => {
+        e.dataTransfer.effectAllowed = 'move'
+        e.dataTransfer.setData('text/json', JSON.stringify({ ...template, position: idx }))
+      }
+
+      const attrs = template.attributes.map((attr, index) => {
         return (
-          <React.Fragment key={`${index}-${attr.id || attr.name}`}>
+          <React.Fragment key={index}>
             <EditAttribute
+              templateAttribute
               index={index}
               entity={character}
               entityType="character"
-              value={attr.value}
-              onChange={handleAttrChange(attr.id || attr.name)}
+              valueSelector={templateAttributeValue(template.id, attr.name)}
+              inputId={`character-${character.id}-template-${template.id}-attribute-${attr.name}-book-${attributeTabId}`}
+              onChange={handleTemplateAttrChange(template.id, attr.name)}
               onSave={finishEditing}
               name={attr.name}
               id={attr.id}
               type={attr.type}
-              autoFocus={shouldFocusCustomAttribute(attr.id, attr.name)}
-              selection={selectionForCustomAttribute(attr.id, attr.name)}
-              inputId={`character-${character.id}-custom-attribute-${
-                attr.id || attr.name
-              }-book-${attributeTabId}`}
+              description={attr.description}
+              link={attr.link}
+              autoFocus={shouldFocusTemplateAttribute(template.id, attr.name)}
+              selection={selectionForTemplateAttribute(template.id, attr.name)}
             />
           </React.Fragment>
         )
       })
-    }
-
-    const handleTabDragOver = (e) => {
-      if (e) {
-        e.preventDefault()
-        const newPosition = e.target?.getAttribute('position')
-        if (newPosition != newTemplateTabPosition) {
-          setNewTemplateTabPosition(newPosition)
-        }
-      }
-    }
-
-    const handleDropTab = (event) => {
-      event.stopPropagation()
-
-      var json = event.dataTransfer.getData('text/json')
-      var droppedTab = helpers.json.safeParseJSON(json)
-      if (droppedTab !== null) {
-        actions.reorderCharacterTemplateAttribute(
-          droppedTab.position,
-          Number(newTemplateTabPosition),
-          character.id
+      let link = null
+      if (templateData?.link) {
+        link = (
+          <a
+            className="template-picker__link"
+            title={templateData?.link}
+            onClick={() => openExternal(templateData?.link)}
+          >
+            <Glyphicon glyph="info-sign" />
+          </a>
         )
-        setNewTemplateTabPosition(null)
       }
-    }
-
-    const renderEditingTemplates = () => {
-      return character.templates.map((template, idx) => {
-        const templateData = getTemplateById(template.id)
-        const handleDragStart = (e, idx) => {
-          e.dataTransfer.effectAllowed = 'move'
-          e.dataTransfer.setData('text/json', JSON.stringify({ ...template, position: idx }))
-        }
-
-        const attrs = template.attributes.map((attr, index) => {
-          return (
-            <React.Fragment key={index}>
-              <EditAttribute
-                templateAttribute
-                index={index}
-                entity={character}
-                entityType="character"
-                valueSelector={templateAttributeValue(template.id, attr.name)}
-                inputId={`character-${character.id}-template-${template.id}-attribute-${attr.name}-book-${attributeTabId}`}
-                onChange={handleTemplateAttrChange(template.id, attr.name)}
-                onSave={finishEditing}
-                name={attr.name}
-                id={attr.id}
-                type={attr.type}
-                description={attr.description}
-                link={attr.link}
-                autoFocus={shouldFocusTemplateAttribute(template.id, attr.name)}
-                selection={selectionForTemplateAttribute(template.id, attr.name)}
-              />
-            </React.Fragment>
-          )
-        })
-        let link = null
-        if (templateData?.link) {
-          link = (
-            <a
-              className="template-picker__link"
-              title={templateData?.link}
-              onClick={() => openExternal(templateData?.link)}
+      return (
+        <Tab
+          eventKey={idx + 3}
+          title={templateData?.name || template.name || t('Template')}
+          key={`tab-${idx}`}
+          onDragStart={(evt) => handleDragStart(evt, idx)}
+          position={idx}
+          draggable
+          isDroppable={newTemplateTabPosition && idx === Number(newTemplateTabPosition)}
+        >
+          <div className="template-tab__details">
+            <p>
+              {templateData?.description}
+              {link}
+            </p>
+            <Button
+              bsStyle="link"
+              className="text-danger"
+              onClick={() => beginRemoveTemplate(template.id)}
             >
-              <Glyphicon glyph="info-sign" />
-            </a>
-          )
-        }
-        return (
-          <Tab
-            eventKey={idx + 3}
-            title={templateData?.name || template.name || t('Template')}
-            key={`tab-${idx}`}
-            onDragStart={(evt) => handleDragStart(evt, idx)}
-            position={idx}
-            draggable
-            isDroppable={newTemplateTabPosition && idx === Number(newTemplateTabPosition)}
-          >
-            <div className="template-tab__details">
-              <p>
-                {templateData?.description}
-                {link}
-              </p>
-              <Button
-                bsStyle="link"
-                className="text-danger"
-                onClick={() => beginRemoveTemplate(template.id)}
-              >
-                {t('Remove template')}
-              </Button>
-            </div>
-            {attrs}
-          </Tab>
-        )
-      })
-    }
-
-    const handleDuplicate = () => {
-      actions.duplicateCharacter(character.id)
-    }
-
-    return (
-      <div className="character-list__character-wrapper">
-        {renderDelete()}
-        {renderRemoveTemplate()}
-        {renderTemplatePicker()}
-        <div className={cx('character-list__character', 'editing', { darkmode: darkMode })}>
-          <div className="character-list__character__edit-form">
-            <div className="character-list__inputs__normal">
-              <FormGroup>
-                <ControlLabel>{t('Name')}</ControlLabel>
-                <TextFormControl
-                  id={`character-${character.id}-name`}
-                  type="text"
-                  onChange={changeName}
-                  autoFocus={foci && foci[0] && foci[0].path[2] === 'name'}
-                  selection={selectionForMainNonChangingElement('name')}
-                  onKeyDown={handleEsc}
-                  onKeyPress={handleEnter}
-                  value={character.name}
-                />
-              </FormGroup>
-              <FormGroup>
-                <ControlLabel>{t('Short Description')}</ControlLabel>
-                <TextFormControl
-                  id={`character-${character.id}-short-description`}
-                  type="text"
-                  onChange={changeShortDescription}
-                  autoFocus={shouldFocusMainChangingElement(
-                    shortDescriptionAttributeId,
-                    'description'
-                  )}
-                  selection={selectionForMainChangingElement(
-                    shortDescriptionAttributeId,
-                    'description'
-                  )}
-                  onSelection
-                  onKeyDown={handleEsc}
-                  onKeyPress={handleEnter}
-                  value={character.description}
-                />
-              </FormGroup>
-            </div>
-            <div className="character-list__inputs__custom">
-              <FormGroup>
-                <ControlLabel>{t('Category')}</ControlLabel>
-                <CategoryPicker
-                  type="characters"
-                  selectedId={character.categoryId}
-                  onChange={changeCategory}
-                />
-              </FormGroup>
-              {renderEditingImage()}
-            </div>
+              {t('Remove template')}
+            </Button>
           </div>
-          <Tabs
-            activeKey={activeTab}
-            id="tabs"
-            className="character-list__character__tabs"
-            onSelect={selectTab}
-            onDrop={handleDropTab}
-            onTabDragOver={handleTabDragOver}
-          >
-            <Tab eventKey={1} title={t('Notes')}>
-              <RichText
-                id={`character-${character.id}-notes-book-${attributeTabId}`}
-                description={character.notes}
-                onChange={handleNotesChanged}
-                autoFocus={shouldFocusMainChangingElement(descriptionAttributeId, 'notes')}
-                selection={selectionForMainChangingElement(descriptionAttributeId, 'notes')}
-                editable
+          {attrs}
+        </Tab>
+      )
+    })
+  }
+
+  const handleDuplicate = () => {
+    actions.duplicateCharacter(character.id)
+  }
+
+  return (
+    <div className="character-list__character-wrapper">
+      {renderDelete()}
+      {renderRemoveTemplate()}
+      {renderTemplatePicker()}
+      <div className={cx('character-list__character', 'editing', { darkmode: darkMode })}>
+        <div className="character-list__character__edit-form">
+          <div className="character-list__inputs__normal">
+            <FormGroup>
+              <ControlLabel>{t('Name')}</ControlLabel>
+              <TextFormControl
+                id={`character-${character.id}-name`}
+                onChange={changeName}
+                autoFocus={foci && foci[0] && foci[0].path[2] === 'name'}
+                selection={selectionForMainNonChangingElement('name')}
+                onKeyDown={handleEsc}
+                onKeyPress={handleEnter}
+                value={character.name}
               />
-            </Tab>
-            <Tab eventKey={2} title={t('Attributes')}>
-              <a
-                href="#"
-                className="card-dialog__custom-attributes-configuration-link"
-                onClick={openAttributes}
-              >
-                {t('Configure')}
-              </a>
-              {renderEditingCustomAttributes()}
-            </Tab>
-            {renderEditingTemplates()}
-            {!templatesDisabled && <Tab eventKey="new" title={t('+ Add Template')}></Tab>}
-          </Tabs>
-          <ButtonToolbar className="card-dialog__button-bar">
-            <Button onClick={finishEditing}>{t('Close')}</Button>
-            <Button className="card-dialog__duplicate" onClick={handleDuplicate}>
-              <FiCopy />
-              {' ' + t('Duplicate')}
-            </Button>
-            <Button onClick={handleDelete}>
-              <Glyphicon glyph="trash" />
-              {' ' + t('Delete')}
-            </Button>
-          </ButtonToolbar>
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>{t('Short Description')}</ControlLabel>
+              <TextFormControl
+                id={`character-${character.id}-short-description`}
+                onChange={changeShortDescription}
+                autoFocus={shouldFocusMainChangingElement(
+                  shortDescriptionAttributeId,
+                  'description'
+                )}
+                selection={selectionForMainChangingElement(
+                  shortDescriptionAttributeId,
+                  'description'
+                )}
+                onKeyDown={handleEsc}
+                onKeyPress={handleEnter}
+                value={character.description}
+              />
+            </FormGroup>
+          </div>
+          <div className="character-list__inputs__custom">
+            <FormGroup>
+              <ControlLabel>{t('Category')}</ControlLabel>
+              <CategoryPicker
+                type="characters"
+                selectedId={character.categoryId}
+                onChange={changeCategory}
+              />
+            </FormGroup>
+            {renderEditingImage()}
+          </div>
         </div>
+        <Tabs
+          activeKey={activeTab}
+          id="tabs"
+          className="character-list__character__tabs"
+          onSelect={selectTab}
+          onDrop={handleDropTab}
+          onTabDragOver={handleTabDragOver}
+        >
+          <Tab eventKey={1} title={t('Notes')}>
+            <RichText
+              id={`character-${character.id}-notes-book-${attributeTabId}`}
+              description={character.notes}
+              onChange={handleNotesChanged}
+              autoFocus={shouldFocusMainChangingElement(descriptionAttributeId, 'notes')}
+              selection={selectionForMainChangingElement(descriptionAttributeId, 'notes')}
+              editable
+            />
+          </Tab>
+          <Tab eventKey={2} title={t('Attributes')}>
+            <a
+              href="#"
+              className="card-dialog__custom-attributes-configuration-link"
+              onClick={openAttributes}
+            >
+              {t('Configure')}
+            </a>
+            {renderEditingCustomAttributes()}
+          </Tab>
+          {renderEditingTemplates()}
+          {!templatesDisabled && <Tab eventKey="new" title={t('+ Add Template')}></Tab>}
+        </Tabs>
+        <ButtonToolbar className="card-dialog__button-bar">
+          <Button onClick={finishEditing}>{t('Close')}</Button>
+          <Button className="card-dialog__duplicate" onClick={handleDuplicate}>
+            <FiCopy />
+            {' ' + t('Duplicate')}
+          </Button>
+          <Button onClick={handleDelete}>
+            <Glyphicon glyph="trash" />
+            {' ' + t('Delete')}
+          </Button>
+        </ButtonToolbar>
       </div>
-    )
-  }
-
-  CharacterEditDetails.propTypes = {
-    characterAttributeMetadata: PropTypes.array.isRequired,
-    characterId: PropTypes.number.isRequired,
-    openAttributes: PropTypes.func,
-    character: PropTypes.object.isRequired,
-    actions: PropTypes.object.isRequired,
-    uiActions: PropTypes.object.isRequired,
-    undo: PropTypes.object.isRequired,
-    attributes: PropTypes.array.isRequired,
-    darkMode: PropTypes.bool,
-    finishEditing: PropTypes.func.isRequired,
-    selection: PropTypes.object,
-    getTemplateById: PropTypes.func.isRequired,
-    templateAttributeValue: PropTypes.func.isRequired,
-    charactersSearchTerm: PropTypes.string,
-    deleting: PropTypes.bool,
-    removing: PropTypes.bool,
-    removeWhichTemplate: PropTypes.any,
-    activeTab: PropTypes.number,
-    showTemplatePicker: PropTypes.bool,
-    foci: PropTypes.array.isRequired,
-    attributeTabId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  }
-
-  const {
-    redux,
-    pltr: { selectors, actions },
-  } = connector
-
-  checkDependencies({ redux, selectors, actions })
-
-  if (redux) {
-    const { connect, bindActionCreators } = redux
-
-    return connect(
-      (state, ownProps) => {
-        return {
-          characterAttributeMetadata: selectors.allCharacterAttributesSelector(state),
-          character: selectors.displayedSingleCharacterSelector(state, ownProps.characterId),
-          attributes: selectors.characterAttributesSelector(state, ownProps.characterId),
-          darkMode: selectors.isDarkModeSelector(state),
-          getTemplateById: (templateId) => selectors.templateByIdSelector(state, templateId),
-          templateAttributeValue: (templateId, attributeName) => {
-            return (state) =>
-              selectors.characterTemplateAttributeValueSelector(
-                state,
-                ownProps.characterId,
-                templateId,
-                attributeName
-              )
-          },
-          charactersSearchTerm: selectors.charactersSearchTermSelector(state),
-          deleting: selectors.characterEditorIsDeletingSelector(state),
-          removing: selectors.characterEditorIsRemovingTemplateSelector(state),
-          removeWhichTemplate: selectors.characterEditorTemplateBeingRemovedSelector(state),
-          activeTab: selectors.characterEditorActiveTabSelector(state),
-          showTemplatePicker: selectors.characterEditorShowTemplatePickerSelector(state),
-          foci: selectors.characterCurrentFociSelector(state),
-          attributeTabId: selectors.characterAttributeTabSelector(state),
-        }
-      },
-      (dispatch) => {
-        return {
-          actions: bindActionCreators(actions.character, dispatch),
-          uiActions: bindActionCreators(actions.ui, dispatch),
-          undo: bindActionCreators(actions.undo, dispatch),
-        }
-      }
-    )(CharacterEditDetails)
-  }
-
-  throw new Error('Cannot connect CharacterEditDetails')
+    </div>
+  )
 }
 
-export default CharacterEditDetailsConnector
+CharacterEditDetails.propTypes = {
+  characterAttributeMetadata: PropTypes.array.isRequired,
+  characterId: PropTypes.number.isRequired,
+  openAttributes: PropTypes.func,
+  character: PropTypes.object.isRequired,
+  actions: PropTypes.object.isRequired,
+  uiActions: PropTypes.object.isRequired,
+  undo: PropTypes.object.isRequired,
+  attributes: PropTypes.array.isRequired,
+  darkMode: PropTypes.bool,
+  finishEditing: PropTypes.func.isRequired,
+  getTemplateById: PropTypes.func.isRequired,
+  templateAttributeValue: PropTypes.func.isRequired,
+  deleting: PropTypes.bool,
+  removing: PropTypes.bool,
+  removeWhichTemplate: PropTypes.any,
+  activeTab: PropTypes.number,
+  showTemplatePicker: PropTypes.bool,
+  foci: PropTypes.array.isRequired,
+  attributeTabId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+}
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+    characterAttributeMetadata: selectors.allCharacterAttributesSelector(state),
+    character: selectors.displayedSingleCharacterSelector(
+      state,
+      // @ts-ignore
+      ownProps.characterId
+    ),
+    attributes: selectors.characterAttributesSelector(
+      state,
+      // @ts-ignore
+      ownProps.characterId
+    ),
+    darkMode: selectors.isDarkModeSelector(state),
+    getTemplateById: (templateId) =>
+      selectors.templateByIdSelector(
+        state,
+        // @ts-ignore
+        templateId
+      ),
+    templateAttributeValue: (templateId, attributeName) => {
+      return (state) =>
+        selectors.characterTemplateAttributeValueSelector(
+          state,
+          // @ts-ignore
+          ownProps.characterId,
+          templateId,
+          attributeName
+        )
+    },
+    deleting: selectors.characterEditorIsDeletingSelector(state),
+    removing: selectors.characterEditorIsRemovingTemplateSelector(state),
+    removeWhichTemplate: selectors.characterEditorTemplateBeingRemovedSelector(state),
+    activeTab: selectors.characterEditorActiveTabSelector(state),
+    showTemplatePicker: selectors.characterEditorShowTemplatePickerSelector(state),
+    foci: selectors.characterCurrentFociSelector(state),
+    attributeTabId: selectors.characterAttributeTabSelector(state),
+  }
+}
+
+export default connect(mapStateToProps, (dispatch) => {
+  return {
+    actions: bindActionCreators(actions.character, dispatch),
+    uiActions: bindActionCreators(actions.ui, dispatch),
+    undo: bindActionCreators(actions.undo, dispatch),
+  }
+})(CharacterEditDetails)

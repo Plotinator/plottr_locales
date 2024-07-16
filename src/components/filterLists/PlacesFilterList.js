@@ -1,55 +1,41 @@
 import React, { Component } from 'react'
 import PropTypes from 'react-proptypes'
+import { connect } from 'react-redux'
+
 import { t as i18n } from 'plottr_locales'
+import { selectors } from 'wired-up-pltr'
+
 import GenericFilterList from './GenericFilterList'
 
-import { checkDependencies } from '../checkDependencies'
-
-const PlaceFilterListConnector = (connector) => {
-  class PlaceFilterList extends Component {
-    updateItems = (ids) => {
-      this.props.updateItems('place', ids)
-    }
-
-    render() {
-      return (
-        <GenericFilterList
-          items={this.props.places}
-          title={i18n('Places')}
-          singleItemTitle={i18n('Place')}
-          displayAttribute={'name'}
-          updateItems={this.updateItems}
-          filteredItems={this.props.filteredItems}
-        />
-      )
-    }
+class PlaceFilterList extends Component {
+  updateItems = (ids) => {
+    this.props.updateItems('place', ids)
   }
 
-  PlaceFilterList.propTypes = {
-    places: PropTypes.array.isRequired,
-    updateItems: PropTypes.func.isRequired,
-    filteredItems: PropTypes.array,
+  render() {
+    return (
+      <GenericFilterList
+        items={this.props.places}
+        title={i18n('Places')}
+        singleItemTitle={i18n('Place')}
+        displayAttribute={'name'}
+        updateItems={this.updateItems}
+        filteredItems={this.props.filteredItems}
+      />
+    )
   }
-
-  const {
-    redux,
-    pltr: {
-      selectors: { placesFilterItemsSelector },
-    },
-  } = connector
-  checkDependencies({ redux, placesFilterItemsSelector })
-
-  if (redux) {
-    const { connect } = redux
-
-    return connect((state) => {
-      return {
-        places: placesFilterItemsSelector(state),
-      }
-    })(PlaceFilterList)
-  }
-
-  throw new Error('Could not connect PlaceFilterListConnector')
 }
 
-export default PlaceFilterListConnector
+PlaceFilterList.propTypes = {
+  places: PropTypes.array.isRequired,
+  updateItems: PropTypes.func.isRequired,
+  filteredItems: PropTypes.array,
+}
+
+const mapStateToProps = (state) => {
+  return {
+    places: selectors.placesFilterItemsSelector(state),
+  }
+}
+
+export default connect(mapStateToProps)(PlaceFilterList)

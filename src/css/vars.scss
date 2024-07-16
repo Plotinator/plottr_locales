@@ -81,15 +81,15 @@ $new-item-border: 2px dashed $new-item-border-color;
 }
 
 @mixin medium-timeline-header-font-size {
-  font-size: calc(var(--timeline-header-font-size, '24px') * 14 / 24) !important; 
+  font-size: calc(var(--timeline-header-font-size, '24px') * 14 / 24) !important;
 }
 
 @mixin medium-plotline-font-size {
-  font-size: calc(var(--plotline-font-size, '20px') * 14 / 20) !important; 
+  font-size: calc(var(--plotline-font-size, '20px') * 14 / 20) !important;
 }
 
 @mixin medium-scenecard-title-font-size {
-  font-size: calc(var(--scenecard-title-font-size, '16px') * 14 / 16) !important; 
+  font-size: calc(var(--scenecard-title-font-size, '16px') * 14 / 16) !important;
 }
 
 @mixin body-text-font {

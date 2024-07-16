@@ -54,6 +54,7 @@ export const MarkButton = React.memo(UnMemoisedMarkButton, areEqual)
 
 const isMarkActive = (editor, mark, logger) => {
   try {
+    // @ts-ignore
     if (!Editor.validSelection(editor)) {
       return false
     } else {

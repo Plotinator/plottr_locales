@@ -15,10 +15,12 @@ export const withList = (log) => (editor) => {
 
     // if the parent node is not a list item we want to operate normally
     const [parentNode, parentPath] = parent
+    // @ts-ignore
     if (parentNode.type !== 'list-item') return void insertBreak()
 
     // only do custom insertBreak if the list item has empty text
     const [node] = Editor.node(editor, editor.selection)
+    // @ts-ignore
     if (node.text.length > 0) return void insertBreak()
 
     Transforms.liftNodes(editor, {
@@ -26,6 +28,7 @@ export const withList = (log) => (editor) => {
     })
 
     Transforms.setNodes(editor, {
+      // @ts-ignore
       type: 'paragraph',
     })
   }
@@ -42,10 +45,12 @@ export const withList = (log) => (editor) => {
 
     // if the parent node is not a list item we want to operate normally
     const [parentNode, parentPath] = parent
+    // @ts-ignore
     if (parentNode.type !== 'list-item') return void deleteBackward(unit)
 
     // if the node is not empty, operate normally
     const [node] = Editor.node(editor, editor.selection)
+    // @ts-ignore
     if (node.text.length > 0) return void deleteBackward(unit)
 
     Transforms.liftNodes(editor, {
@@ -53,6 +58,7 @@ export const withList = (log) => (editor) => {
     })
 
     Transforms.setNodes(editor, {
+      // @ts-ignore
       type: 'paragraph',
     })
   }

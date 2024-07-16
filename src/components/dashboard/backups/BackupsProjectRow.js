@@ -3,8 +3,7 @@ import PropTypes from 'react-proptypes'
 import { sortBy } from 'lodash'
 
 import Row from '../../Row'
-import UnconnectedBackupFileDisplay from './BackupFileDisplay'
-import BackupFilePlaceholder from './BackupFilePlaceholder'
+import BackupFileDisplay from './BackupFileDisplay'
 
 const isStartOfSession = (file) => {
   return file.storagePath
@@ -16,41 +15,34 @@ const isStartOfSession = (file) => {
     : 1
 }
 
-const BackupsProjectRowConnector = (connector) => {
-  const BackupFileDisplay = UnconnectedBackupFileDisplay(connector)
-
-  const BackupsProjectRow = ({ folder, groupName, files }) => {
-    const renderFiles = () => {
-      return sortBy(files, isStartOfSession).map((file, index) => {
-        return (
-          <BackupFileDisplay
-            folder={folder}
-            groupName={groupName}
-            file={file}
-            folderDate={folder.shortDateStr}
-            key={`${folder.shortDateStr}-${groupName}-${file.fileId}-${index}`}
-          />
-        )
-      })
-    }
-
-    return (
-      <Row key={groupName} className="dashboard__backups__project-row">
-        <div>
-          <h6>{groupName}</h6>
-        </div>
-        <div>{renderFiles()}</div>
-      </Row>
-    )
+const BackupsProjectRow = ({ folder, groupName, files }) => {
+  const renderFiles = () => {
+    return sortBy(files, isStartOfSession).map((file, index) => {
+      return (
+        <BackupFileDisplay
+          groupName={groupName}
+          file={file}
+          folderDate={folder.shortDateStr}
+          key={`${folder.shortDateStr}-${groupName}-${file.fileId}-${index}`}
+        />
+      )
+    })
   }
 
-  BackupsProjectRow.propTypes = {
-    folder: PropTypes.object.isRequired,
-    groupName: PropTypes.string.isRequired,
-    files: PropTypes.array.isRequired,
-  }
-
-  return BackupsProjectRow
+  return (
+    <Row key={groupName} className="dashboard__backups__project-row">
+      <div>
+        <h6>{groupName}</h6>
+      </div>
+      <div>{renderFiles()}</div>
+    </Row>
+  )
 }
 
-export default BackupsProjectRowConnector
+BackupsProjectRow.propTypes = {
+  folder: PropTypes.object.isRequired,
+  groupName: PropTypes.string.isRequired,
+  files: PropTypes.array.isRequired,
+}
+
+export default BackupsProjectRow

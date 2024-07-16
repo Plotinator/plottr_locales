@@ -6,16 +6,21 @@ const mathematicallySensibleOr = (x, y) => {
 }
 
 class Scrollable {
-  getElementRef = () => null
+  getElementRef = () => document.body
   currentAnimation = Promise.resolve()
   completedCallbacks = []
-  targetLeft = null
-  targetTop = null
-  _scrollTo = () => Promise.resolve()
+  _scrollTo = (_y, _options) => Promise.resolve(false)
+
+  // @type {number | null}
+  targetLeft
+  // @type {number | null}
+  targetTop
 
   constructor(getElementRef, scrollTo = animateScrollTo) {
     this.getElementRef = getElementRef
     this._scrollTo = scrollTo
+    this.targetLeft = null
+    this.targetTop = null
   }
 
   go(instant = false) {

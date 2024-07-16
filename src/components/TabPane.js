@@ -93,6 +93,7 @@ class TabPane extends React.Component {
     return (
       <TabContainerContext.Provider
         value={{
+          // @ts-ignore
           $bs_tabContainer: null,
         }}
       >

@@ -61,6 +61,7 @@ class ListGroupItem extends React.Component {
     // TODO: Deprecate `header` prop.
     if (header) {
       return (
+        // @ts-ignore
         <Component {...elementProps}>
           {this.renderHeader(header, prefix(bsProps, 'heading'))}
 
@@ -69,6 +70,7 @@ class ListGroupItem extends React.Component {
       )
     }
 
+    // @ts-ignore
     return <Component {...elementProps}>{children}</Component>
   }
 }

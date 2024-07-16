@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react'
-import { PropTypes } from 'prop-types'
+import PropTypes from 'prop-types'
 import isUrl from 'is-url'
 import { FaLink } from '@react-icons/all-files/fa/FaLink'
 import { Editor, Transforms, Range } from 'slate'
@@ -17,7 +17,9 @@ export const LinkButton = ({ editor, logger }) => {
       if (selection) {
         editor.apply({
           type: 'set_selection',
+          // @ts-ignore
           properties: { anchor: selection.anchor, focus: selection.focus },
+          // @ts-ignore
           newProperties: { anchor: selection.anchor, focus: selection.focus },
         })
       }
@@ -89,15 +91,22 @@ export const withLinks = (editor, logger) => {
 }
 
 const insertLink = (editor, url, logger) => {
+  // @ts-ignore
   if (Editor.validSelection(editor)) {
     wrapLink(editor, url, logger)
   }
 }
 
 const isLinkActive = (editor, logger) => {
+  // @ts-ignore
   if (Editor.validSelection(editor)) {
     try {
-      const [link] = Editor.nodes(editor, { match: (n) => n.type === 'link' })
+      const [link] = Array.from(
+        Editor.nodes(editor, {
+          // @ts-ignore
+          match: (n) => n.type === 'link',
+        })
+      )
       return !!link
     } catch (error) {
       if (logger) {
@@ -111,12 +120,17 @@ const isLinkActive = (editor, logger) => {
 }
 
 const unwrapLink = (editor) => {
+  // @ts-ignore
   if (Editor.validSelection(editor)) {
-    Transforms.unwrapNodes(editor, { match: (n) => n.type === 'link' })
+    Transforms.unwrapNodes(editor, {
+      // @ts-ignore
+      match: (n) => n.type === 'link',
+    })
   }
 }
 
 const wrapLink = (editor, url, logger) => {
+  // @ts-ignore
   if (Editor.validSelection(editor)) {
     if (isLinkActive(editor, logger)) {
       unwrapLink(editor)

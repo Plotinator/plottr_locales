@@ -1,5 +1,5 @@
 // Connections
-import connections from '../connections'
+import * as connections from '../connections'
 
 // Basic components (from react-bootstrap)
 import Button from './Button'
@@ -11,6 +11,10 @@ import Grid from './Grid'
 import Navbar from './Navbar'
 import Modal from './Modal'
 import Form from './Form'
+import FormGroup from './FormGroup'
+import ControlLabel from './ControlLabel'
+import Table from './Table'
+import FormControl from './FormControl'
 
 // Templates
 import CardTemplateDetails from './templates/CardTemplateDetails'
@@ -71,6 +75,7 @@ import BookList from './project/BookList'
 import EditSeries from './project/EditSeries'
 import FileLocation from './project/FileLocation'
 import BookChooser from './project/BookChooser'
+import ImportModal from './project/ImportModal'
 
 // Tag
 import TagView from './tag/TagView'
@@ -153,6 +158,10 @@ export {
   ModalTitle,
   ModalFooter,
   Form,
+  FormGroup,
+  ControlLabel,
+  Table,
+  FormControl,
   EditAttribute,
   FilterList,
   RichText,
@@ -226,6 +235,7 @@ export {
   NewProjectInputModal,
   SettingsWizard,
   RestructureTimelineModal,
+  ImportModal,
   UndoRedo,
   connections,
 }

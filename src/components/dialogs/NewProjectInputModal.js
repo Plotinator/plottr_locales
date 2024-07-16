@@ -1,73 +1,58 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 
 import { t as i18n } from 'plottr_locales'
+import { selectors, actions } from 'wired-up-pltr'
 
 import InputModal from './InputModal'
-import { checkDependencies } from '../checkDependencies'
+import { PlottrComponentsContext } from '../../connections/pltrContext'
 
-const NewProjectInputModalConnector = (connector) => {
+const NewProjectInputModal = ({ projectNamingModalIsVisible, actions, newProjectTemplate }) => {
   const {
     platform: {
       file: { createNew },
     },
-  } = connector
-  checkDependencies({ createNew })
+  } = useContext(PlottrComponentsContext)
 
-  const NewProjectInputModal = ({ projectNamingModalIsVisible, actions, newProjectTemplate }) => {
-    const handleNameInput = (value) => {
-      createNew(newProjectTemplate, value)
-      handleCloseModal()
-    }
-
-    const handleCloseModal = () => {
-      actions.finishCreatingNewProject()
-    }
-
-    if (!projectNamingModalIsVisible) {
-      return null
-    }
-
-    return (
-      <InputModal
-        title={i18n('Name Your Project:')}
-        getValue={handleNameInput}
-        isOpen={true}
-        cancel={handleCloseModal}
-        type="text"
-      />
-    )
+  const handleNameInput = (value) => {
+    createNew(newProjectTemplate, value)
+    handleCloseModal()
   }
 
-  NewProjectInputModal.propTypes = {
-    projectNamingModalIsVisible: PropTypes.bool,
-    actions: PropTypes.object,
-    newProjectTemplate: PropTypes.object,
+  const handleCloseModal = () => {
+    actions.finishCreatingNewProject()
   }
 
-  const { redux } = connector
-
-  if (redux) {
-    const {
-      pltr: { actions, selectors },
-    } = connector
-    const { connect, bindActionCreators } = redux
-    checkDependencies({ redux, actions, selectors })
-
-    return connect(
-      (state) => ({
-        projectNamingModalIsVisible: selectors.projectNamingModalIsVisibleSelector(state),
-        newProjectTemplate: selectors.newProjectTemplateSelector(state),
-      }),
-      (dispatch) => {
-        return {
-          actions: bindActionCreators(actions.project, dispatch),
-        }
-      }
-    )(NewProjectInputModal)
+  if (!projectNamingModalIsVisible) {
+    return null
   }
 
-  throw new Error('Could not connect NewProjectInputModal')
+  return (
+    <InputModal
+      title={i18n('Name Your Project:')}
+      getValue={handleNameInput}
+      isOpen={true}
+      cancel={handleCloseModal}
+      type="text"
+    />
+  )
 }
 
-export default NewProjectInputModalConnector
+NewProjectInputModal.propTypes = {
+  projectNamingModalIsVisible: PropTypes.bool,
+  actions: PropTypes.object,
+  newProjectTemplate: PropTypes.object,
+}
+
+const mapStateToProps = (state) => ({
+  projectNamingModalIsVisible: selectors.projectNamingModalIsVisibleSelector(state),
+  newProjectTemplate: selectors.newProjectTemplateSelector(state),
+})
+
+export default connect(mapStateToProps, (dispatch) => {
+  return {
+    actions: bindActionCreators(actions.project, dispatch),
+  }
+})(NewProjectInputModal)

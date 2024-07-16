@@ -12,7 +12,7 @@ const propTypes = {
 
   /**
    * Display block buttons; only useful when used with the "vertical" prop.
-   * @type {bool}
+   * @type {boolean}
    */
   block: all(PropTypes.bool, ({ block, vertical }) =>
     block && !vertical

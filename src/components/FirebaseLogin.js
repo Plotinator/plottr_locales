@@ -1,61 +1,46 @@
-import React from 'react'
-import { PropTypes } from 'prop-types'
+import React, { useContext } from 'react'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 
 import { t } from 'plottr_locales'
+import { selectors, actions } from 'wired-up-pltr'
 
 import Button from './Button'
-import { checkDependencies } from './checkDependencies'
+import { PlottrComponentsContext } from '../connections/pltrContext'
 
-const FirebaseLoginConnector = (connector) => {
+const FirebaseLogin = ({ startLoggingIn, loggingIn }) => {
   const {
     platform: {
       login: { launchLoginPopup },
       firebase: { logOut },
     },
-  } = connector
-  checkDependencies({ launchLoginPopup })
+  } = useContext(PlottrComponentsContext)
 
-  const FirebaseLogin = ({ startLoggingIn, loggingIn }) => {
-    const handleLogin = () => {
-      logOut().then(() => {
-        startLoggingIn()
-        launchLoginPopup()
-      })
-    }
-
-    return (
-      <div>
-        <Button onClick={handleLogin} disabled={loggingIn} bsStyle="success">
-          {t('Click here to log in')}
-        </Button>
-      </div>
-    )
+  const handleLogin = () => {
+    logOut().then(() => {
+      startLoggingIn()
+      launchLoginPopup()
+    })
   }
 
-  FirebaseLogin.propTypes = {
-    loggingIn: PropTypes.bool,
-    startLoggingIn: PropTypes.func.isRequired,
-  }
-
-  const {
-    redux,
-    pltr: { selectors, actions },
-  } = connector
-
-  if (redux) {
-    const { connect } = redux
-
-    return connect(
-      (state) => ({
-        loggingIn: selectors.isLoggingInSelector(state),
-      }),
-      {
-        startLoggingIn: actions.applicationState.startLoggingIn,
-      }
-    )(FirebaseLogin)
-  }
-
-  throw new Error('Could not connect FirebaseLogin')
+  return (
+    <div>
+      <Button onClick={handleLogin} disabled={loggingIn} bsStyle="success">
+        {t('Click here to log in')}
+      </Button>
+    </div>
+  )
 }
 
-export default FirebaseLoginConnector
+FirebaseLogin.propTypes = {
+  loggingIn: PropTypes.bool,
+  startLoggingIn: PropTypes.func.isRequired,
+}
+
+const mapStateToProps = (state) => ({
+  loggingIn: selectors.isLoggingInSelector(state),
+})
+
+export default connect(mapStateToProps, {
+  startLoggingIn: actions.applicationState.startLoggingIn,
+})(FirebaseLogin)

@@ -37,7 +37,7 @@ const propTypes = {
 
   /**
    * The children of a Dropdown may be a `<Dropdown.Toggle>` or a `<Dropdown.Menu>`.
-   * @type {node}
+   * @type {Node}
    */
   children: all(requiredRoles(TOGGLE_ROLE, MENU_ROLE), exclusiveRoles(MENU_ROLE)),
 
@@ -123,11 +123,13 @@ const Dropdown = ({
   const toggle = useRef()
 
   const focusNextOnOpen = () => {
+    // @ts-ignore
     if (typeof menu?.current?.focusNext !== 'function') {
       return
     }
 
     if (lastOpenEventType.current === 'keydown' || role === 'menuitem') {
+      // @ts-ignore
       menu.current.focusNext()
     }
   }
@@ -146,7 +148,9 @@ const Dropdown = ({
   }, [open])
 
   const focus = () => {
+    // @ts-ignore
     if (typeof toggle.current?.focus === 'function') {
+      // @ts-ignore
       toggle.current.focus()
     }
   }
@@ -176,7 +180,9 @@ const Dropdown = ({
       case keycode.codes.down:
         if (!open) {
           toggleOpen(event, { source: 'keydown' })
+          // @ts-ignore
         } else if (typeof menu.current?.focusNext === 'function') {
+          // @ts-ignore
           menu.current.focusNext()
         }
         event.preventDefault()
@@ -240,6 +246,7 @@ const Dropdown = ({
 
   return (
     <Component {...props} className={classNames(className, classes)}>
+      {/* @ts-ignore */}
       {ValidComponentChildren.map(children, (child) => {
         switch (child.props.bsRole) {
           case TOGGLE_ROLE:

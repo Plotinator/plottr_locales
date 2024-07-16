@@ -82,9 +82,16 @@ class Fade extends React.Component {
     return (
       <Transition {...props} onEnter={() => {}} onExited={() => {}}>
         {(status, innerProps) =>
+          // @ts-ignore
           React.cloneElement(children, {
             ...innerProps,
-            className: classNames('fade', className, children.props.className, fadeStyles[status]),
+            className: classNames(
+              'fade',
+              className,
+              // @ts-ignore
+              children.props.className,
+              fadeStyles[status]
+            ),
           })
         }
       </Transition>
