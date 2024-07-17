@@ -35,7 +35,7 @@ const makeDefaultLocationModule = (settings, fileModule, logger) => {
     })
   }
 
-  function saveToDefaultLocation(json, name) {
+  function saveToDefaultLocation(json, projectPath, name) {
     return readSettings().then((settings) => {
       if (settings.user.defaultFolder && settings.user.defaultFolderLocation) {
         return ensureDefaultFolderExists()
@@ -54,8 +54,8 @@ const makeDefaultLocationModule = (settings, fileModule, logger) => {
             })
           })
       } else {
-        // name is the full file path
-        const fileURL = helpers.file.filePathToFileURL(name)
+        // Use the `projectPath`
+        const fileURL = helpers.file.filePathToFileURL(projectPath)
         if (!fileURL) {
           const message = `Couldn't compute a file URL for temp file that we're trying to save to ${name}`
           logger.error(message)

@@ -407,8 +407,8 @@ function routeFunctions(suppliedPort, secret, logger) {
     return client.post('/knownFiles/name', { fileURL, newName }, { fileURL, newName })
   }
 
-  const saveToDefaultLocation = (json, name) => {
-    return client.put(`/defaultLocation/${name}`, { json }, { file: json.file })
+  const saveToDefaultLocation = (json, projectPath, name) => {
+    return client.put(`/defaultLocation/${name}`, { projectPath, json }, { file: json.file })
   }
 
   const removeFromKnownFiles = (fileURL) => {

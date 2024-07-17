@@ -521,9 +521,9 @@ const defaultLocationRoutes = (app, defaultLocationModule, logger, statusManager
   const saveToDefaultLocationPath = '/defaultLocation/:name'
   app.put(saveToDefaultLocationPath, (req, res) => {
     const { name } = req.params
-    const { json } = req.body.data
+    const { json, projectPath } = req.body.data
     replyRecordingBusy(
-      defaultLocationModule.saveToDefaultLocation(json, name),
+      defaultLocationModule.saveToDefaultLocation(json, projectPath, name),
       res,
       saveToDefaultLocationPath
     )

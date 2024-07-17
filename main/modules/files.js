@@ -38,8 +38,8 @@ export const makeFileModule = (
     return localClient.editKnownFilePath(oldPath, newPath)
   }
 
-  function saveToDefaultLocation(json, name) {
-    return localClient.saveToDefaultLocation(json, name)
+  function saveToDefaultLocation(json, projectPath, name) {
+    return localClient.saveToDefaultLocation(json, projectPath, name)
   }
 
   function newFileFromTemplate(template, name) {
@@ -72,7 +72,7 @@ export const makeFileModule = (
       }
 
       try {
-        const fileURL = await saveToDefaultLocation(fileJSON, name)
+        const fileURL = await saveToDefaultLocation(fileJSON, name, projectName)
         await knownFilesModule.addToKnownFiles(fileURL)
         await openFile(fileURL)
       } catch (error) {
