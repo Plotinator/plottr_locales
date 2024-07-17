@@ -8,7 +8,7 @@ export const isParentPath = (childPath, parentPath) => {
   const parentComponents = parentPath.split(sep)
   return (
     childComponents.length >= parentComponents.length &&
-    isEqual(childComponents, parentComponents.slice(0, childComponents.length))
+    isEqual(childComponents.slice(0, parentComponents.length), parentComponents)
   )
 }
 
