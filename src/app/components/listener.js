@@ -60,6 +60,7 @@ const Listener = ({
                   return localClient
                     .saveToDefaultLocation(
                       withoutSystemKeys,
+                      null,
                       `${name} [${backupText} ${backupDate}]`
                     )
                     .then((newFileURL) => {

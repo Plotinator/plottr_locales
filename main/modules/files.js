@@ -137,7 +137,7 @@ export const makeFileModule = (
           }
         })
       } else {
-        return saveToDefaultLocation(importedJson, storyName)
+        return saveToDefaultLocation(importedJson, null, storyName)
           .then((fileURL) => {
             return knownFilesModule.addToKnownFiles(fileURL).then(() => {
               return openFile(fileURL)
@@ -244,7 +244,7 @@ export const makeFileModule = (
             }
           })
         } else {
-          return saveToDefaultLocation(importedJson, storyName)
+          return saveToDefaultLocation(importedJson, null, storyName)
             .then((fileURL) => {
               return knownFilesModule.addToKnownFiles(fileURL).then(() => {
                 return openFile(fileURL)
@@ -342,7 +342,7 @@ export const makeFileModule = (
             }
           })
         } else {
-          return saveToDefaultLocation(importedJson, storyName)
+          return saveToDefaultLocation(importedJson, null, storyName)
             .then((fileURL) => {
               return knownFilesModule.addToKnownFiles(fileURL).then(() => {
                 return openFile(fileURL)
