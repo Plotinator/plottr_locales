@@ -40,6 +40,7 @@ module.exports = {
     'lib/pltr/template/**/*',
   ],
   rules: {
+    'consistent-return': 'warn',
     'no-shadow': 'warn',
     'no-var': 'error',
     'no-unused-vars': [
