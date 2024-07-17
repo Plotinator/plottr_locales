@@ -184,7 +184,8 @@ export const makeFileModule = (
       localClient.stat,
       localClient.extname,
       localClient.basename,
-      localClient.join
+      localClient.join,
+      localClient.listFilesRecursively
     )
 
     if (isLoggedIntoPro) {

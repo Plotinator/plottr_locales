@@ -483,6 +483,10 @@ function routeFunctions(suppliedPort, secret, logger) {
     })
   }
 
+  const listFilesRecursively = (path) => {
+    return client.get('/file/listRecursively', { path })
+  }
+
   const mkdir = (path) => {
     return client.post('/file/newDirectory', { path }, { path })
   }
@@ -795,6 +799,7 @@ function routeFunctions(suppliedPort, secret, logger) {
     resolvePath,
     readdir,
     stat,
+    listFilesRecursively,
     mkdir,
     close,
     inBadState,

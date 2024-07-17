@@ -220,6 +220,11 @@ const fileRoutes = (app, fileModule, logger, statusManager) => {
     replyWithResult(fileModule.stat(path), res)
   })
 
+  app.get('/file/listRecursively', (req, res) => {
+    const { path } = req.query
+    replyWithResult(fileModule.listFilesRecursively(path), res)
+  })
+
   app.get('/file/dir', (req, res) => {
     const { path } = req.query
     replyWithResult(fileModule.readdir(path), res)

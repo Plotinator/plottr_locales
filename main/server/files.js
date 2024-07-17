@@ -393,6 +393,30 @@ const fileModule = (userDataPath) => {
         })
     }
 
+    const listFilesRecursively = (rootPath) => {
+      function iter(currentPath) {
+        return readdir(currentPath).then((entries) => {
+          return Promise.all(
+            entries.map((entry) => {
+              const fullPath = path.join(currentPath, entry)
+              return Promise.all([stat(fullPath), extname(fullPath)]).then(([stats, extension]) => {
+                if (stats.isDirectory) {
+                  return iter(fullPath)
+                } else {
+                  const containingFolderPathComponents = currentPath.split(path.sep)
+                  return [{ fullPath, containingFolderPathComponents, fileName: entry, extension }]
+                }
+              })
+            })
+          ).then((hits) => {
+            return hits.flatMap((x) => x)
+          })
+        })
+      }
+
+      return iter(rootPath)
+    }
+
     const makeDirectory = (path) => {
       return mkdir(path, { recursive: true })
     }
@@ -464,6 +488,7 @@ const fileModule = (userDataPath) => {
       filePathAsArray,
       directoryIsWritable,
       convertDocxToHTML,
+      listFilesRecursively,
     }
   }
 }

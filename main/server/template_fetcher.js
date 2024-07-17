@@ -1,5 +1,8 @@
 import fetch from 'node-fetch-cjs'
 import semverGt from 'semver/functions/gt'
+
+import { helpers } from 'pltr'
+
 import { isDevelopment } from './isDevelopment'
 
 export const MANIFEST_ROOT = 'manifest'
@@ -7,17 +10,9 @@ const OLD_TEMPLATES_ROOT = 'templates'
 const DEPRECATED_TEMPLATE_IDS = ['pl6', 'pl12']
 const TEMPLATE_REQUEST_TIMEOUT = 1000
 
-const sequencePromises = (promiseThunks) => {
-  if (promiseThunks.length === 0) {
-    return Promise.resolve()
-  }
-
-  const currentPromise = promiseThunks[0]
-  const rest = promiseThunks.slice(1)
-  return currentPromise().then(() => {
-    return sequencePromises(rest)
-  })
-}
+const {
+  promise: { sequenceThunks },
+} = helpers
 
 const migrateTemplates = (templatesStore, manifestStore, log) => {
   // MIGRATE ONE TIME (needed after 2020.12.1 for the dashboard)
@@ -148,7 +143,7 @@ class TemplateFetcher {
   }
 
   removeDeprecatedTemplates = () => {
-    return sequencePromises(
+    return sequenceThunks(
       DEPRECATED_TEMPLATE_IDS.map((templateId) => {
         return () => {
           const manifestTemplates = this.manifestStore.get('manifest.templates')
