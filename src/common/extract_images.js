@@ -1,9 +1,14 @@
 import { cloneDeep } from 'lodash'
 import { v4 as uuid } from 'uuid'
 
+import { helpers } from 'pltr'
 import { saveImageToStorageFromURL } from 'wired-up-firebase'
 
 import { resizeImage } from './resizeImage'
+
+const {
+  promise: { sequenceThunks },
+} = helpers
 
 /** Places to look for image data:
  *
@@ -131,19 +136,9 @@ export const fileNameIndex = (file) => {
   return nameIndex
 }
 
-const sequentially = (promiseThunks) => {
-  return promiseThunks.reduce((accPromise, next) => {
-    return accPromise.then((acc) => {
-      return next().then((result) => {
-        return [...acc, result]
-      })
-    })
-  }, Promise.resolve([]))
-}
-
 export const uploadImages = (imageDataIndex, nameIndex, userId) => {
   const dataIdTuples = Object.entries(imageDataIndex)
-  return sequentially(
+  return sequenceThunks(
     dataIdTuples.map(([data, id]) => () => {
       const fileName = nameIndex[id] || `unnamed-${uuid()}`
       return fetch(data)

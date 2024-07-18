@@ -38,8 +38,8 @@ export const makeFileModule = (
     return localClient.editKnownFilePath(oldPath, newPath)
   }
 
-  function saveToDefaultLocation(json, name) {
-    return localClient.saveToDefaultLocation(json, name)
+  function saveToDefaultLocation(json, projectPath, name) {
+    return localClient.saveToDefaultLocation(json, projectPath, name)
   }
 
   function newFileFromTemplate(template, name) {
@@ -72,7 +72,7 @@ export const makeFileModule = (
       }
 
       try {
-        const fileURL = await saveToDefaultLocation(fileJSON, name)
+        const fileURL = await saveToDefaultLocation(fileJSON, name, projectName)
         await knownFilesModule.addToKnownFiles(fileURL)
         await openFile(fileURL)
       } catch (error) {
@@ -137,7 +137,7 @@ export const makeFileModule = (
           }
         })
       } else {
-        return saveToDefaultLocation(importedJson, storyName)
+        return saveToDefaultLocation(importedJson, null, storyName)
           .then((fileURL) => {
             return knownFilesModule.addToKnownFiles(fileURL).then(() => {
               return openFile(fileURL)
@@ -184,7 +184,8 @@ export const makeFileModule = (
       localClient.stat,
       localClient.extname,
       localClient.basename,
-      localClient.join
+      localClient.join,
+      localClient.listFilesRecursively
     )
 
     if (isLoggedIntoPro) {
@@ -243,7 +244,7 @@ export const makeFileModule = (
             }
           })
         } else {
-          return saveToDefaultLocation(importedJson, storyName)
+          return saveToDefaultLocation(importedJson, null, storyName)
             .then((fileURL) => {
               return knownFilesModule.addToKnownFiles(fileURL).then(() => {
                 return openFile(fileURL)
@@ -341,7 +342,7 @@ export const makeFileModule = (
             }
           })
         } else {
-          return saveToDefaultLocation(importedJson, storyName)
+          return saveToDefaultLocation(importedJson, null, storyName)
             .then((fileURL) => {
               return knownFilesModule.addToKnownFiles(fileURL).then(() => {
                 return openFile(fileURL)

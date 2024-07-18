@@ -197,7 +197,7 @@ const fileRoutes = (app, fileModule, logger, statusManager) => {
   })
 
   app.get('/file/separator', (req, res) => {
-    replyWithResultSync(fileModule.separator(), res)
+    replyWithResultSync(fileModule.separator, res)
   })
 
   app.get('/file/extname', (req, res) => {
@@ -218,6 +218,11 @@ const fileRoutes = (app, fileModule, logger, statusManager) => {
   app.get('/file/stat', (req, res) => {
     const { path } = req.query
     replyWithResult(fileModule.stat(path), res)
+  })
+
+  app.get('/file/listRecursively', (req, res) => {
+    const { path } = req.query
+    replyWithResult(fileModule.listFilesRecursively(path), res)
   })
 
   app.get('/file/dir', (req, res) => {
@@ -521,9 +526,9 @@ const defaultLocationRoutes = (app, defaultLocationModule, logger, statusManager
   const saveToDefaultLocationPath = '/defaultLocation/:name'
   app.put(saveToDefaultLocationPath, (req, res) => {
     const { name } = req.params
-    const { json } = req.body.data
+    const { json, projectPath } = req.body.data
     replyRecordingBusy(
-      defaultLocationModule.saveToDefaultLocation(json, name),
+      defaultLocationModule.saveToDefaultLocation(json, projectPath, name),
       res,
       saveToDefaultLocationPath
     )

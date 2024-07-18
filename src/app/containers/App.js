@@ -44,6 +44,7 @@ const App = ({
   setDashboardModalView,
   isImportModalOpen,
   shouldShowRecentFiles,
+  fileURL,
 }) => {
   const [showTemplateCreate, setShowTemplateCreate] = useState(false)
   const [type, setType] = useState(null)
@@ -55,26 +56,28 @@ const App = ({
   })
 
   useEffect(() => {
-    if (
-      !isResuming &&
-      !userId &&
-      isCloudFile &&
-      !userNeedsToLogin &&
-      !isOffline &&
-      sessionChecked &&
-      !isInProMode
-    ) {
-      log.warn(
-        "Window belongs to a pro file, but we're not logged in.  We could have just logged out."
-      )
-      showErrorBox(t('Error'), t('This appears to be a Plottr Pro file.  Please log in.'))
-    } else if (isInProMode && !isCloudFile && !dashboardModalView) {
-      log.warn("Window belongs to a Plottr file, but we're in Pro.")
-      showErrorBox(
-        t('Error'),
-        t('This appears to be a non-Plottr-Pro file.  Please save and close it.')
-      )
-      setDashboardModalView('files')
+    if (typeof fileURL === 'string') {
+      if (
+        !isResuming &&
+        !userId &&
+        isCloudFile &&
+        !userNeedsToLogin &&
+        !isOffline &&
+        sessionChecked &&
+        !isInProMode
+      ) {
+        log.warn(
+          "Window belongs to a pro file, but we're not logged in.  We could have just logged out."
+        )
+        showErrorBox(t('Error'), t('This appears to be a Plottr Pro file.  Please log in.'))
+      } else if (isInProMode && !isCloudFile && !dashboardModalView) {
+        log.warn("Window belongs to a Plottr file, but we're in Pro.")
+        showErrorBox(
+          t('Error'),
+          t('This appears to be a non-Plottr-Pro file.  Please save and close it.')
+        )
+        setDashboardModalView('files')
+      }
     }
   }, [
     isResuming,
@@ -85,6 +88,7 @@ const App = ({
     sessionChecked,
     isInProMode,
     dashboardModalView,
+    fileURL,
   ])
 
   useEffect(() => {
@@ -188,6 +192,7 @@ App.propTypes = {
   dashboardModalView: PropTypes.string,
   isImportModalOpen: PropTypes.bool,
   shouldShowRecentFiles: PropTypes.bool,
+  fileURL: PropTypes.bool,
 }
 
 function mapStateToProps(state) {
@@ -203,6 +208,7 @@ function mapStateToProps(state) {
     dashboardModalView: selectors.dashboardModalViewSelector(state),
     isImportModalOpen: selectors.isImportModalOpenSelector(state),
     shouldShowRecentFiles: selectors.shouldShowProAccountRecentFilesSelector(state),
+    fileURL: selectors.fileURLSelector(state),
   }
 }
 

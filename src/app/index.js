@@ -612,7 +612,6 @@ tellMeWhatOSImOn()
                   store().dispatch(actions.applicationState.finishScrivenerImporter())
                 }
 
-                closeDashboard()
                 return fileId
               })
               .catch((error) => {

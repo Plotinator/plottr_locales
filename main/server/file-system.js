@@ -11,6 +11,10 @@ import { helpers } from 'pltr'
 
 const { readdir, mkdir, lstat, cp, symlink, link } = fs.promises
 
+const {
+  promise: { sequenceThunks },
+} = helpers
+
 const TRIAL_LENGTH = 60
 const EXTENSIONS = 2
 
@@ -37,12 +41,6 @@ const BACKUP_WATCH_INTERVAL_MILLISECONDS = 10000
 
 function isOfflineFile(fileURL, offlineFileFilesPath) {
   return fileURL && helpers.file.withoutProtocol(fileURL).startsWith(offlineFileFilesPath)
-}
-
-const sequenceThunks = (thunks) => {
-  return thunks.reduce((acc, next) => {
-    return acc.then(next)
-  }, Promise.resolve())
 }
 
 const fileSystemModule = (userDataPath) => {
@@ -534,11 +532,13 @@ const fileSystemModule = (userDataPath) => {
                         const fileName = path.basename(file).replace(/\.pltr$/, '')
                         if (!hasFile) {
                           logger.info('Adding from watcher', file)
-                          knownFilesStore.setRawKey(fileURL, {
+                          return knownFilesStore.setRawKey(fileURL, {
                             fileURL,
                             fileName,
                             lastOpened: null,
                           })
+                        } else {
+                          return Promise.resolve()
                         }
                       })
                       sequenceThunks(thunks)

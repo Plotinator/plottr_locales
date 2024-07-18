@@ -95,7 +95,7 @@ export const messageRenameFile = (fileId) => {
   document.dispatchEvent(renameEvent)
 }
 
-export const saveFile = (localClient, fileURL, file) => {
+const saveFile = (localClient, fileURL, file) => {
   return localClient.saveFile(fileURL, file)
 }
 
@@ -216,7 +216,7 @@ export const deleteCloudBackupFile = (localClient, fileURL) => {
   })
 }
 
-export const migrateSaveAndOpen = (json, oldUrl, newFileURL) => {
+const migrateSaveAndOpen = (localClient, json, oldUrl, newFileURL) => {
   return getVersion().then((version) => {
     return new Promise((resolve, reject) => {
       migrateIfNeeded(version, json, oldUrl, null, (err, _didMigrate, migratedState) => {
@@ -224,7 +224,7 @@ export const migrateSaveAndOpen = (json, oldUrl, newFileURL) => {
           reject(err)
         } else {
           console.log('addMissingKeys(migratedState)', addMissingKeys(migratedState))
-          saveFile(newFileURL, addMissingKeys(migratedState)).then(() => {
+          saveFile(localClient, newFileURL, addMissingKeys(migratedState)).then(() => {
             addToKnownFilesAndOpen(newFileURL, true).then(resolve).catch(reject)
           })
         }
@@ -233,36 +233,41 @@ export const migrateSaveAndOpen = (json, oldUrl, newFileURL) => {
   })
 }
 
-export const createAndOpenCopy = (localClient, oldFilePathSegments, newFileName) => {
+export const createAndOpenCopy = (localClient, oldFilePathSegments, copiedFileName) => {
   return localClient.currentAppSettings().then((settings) => {
     return localClient.join(...oldFilePathSegments).then((oldFilePath) => {
       return localClient.readFile(oldFilePath).then((fileText) => {
         const fileJSON = JSON.parse(fileText)
         if (settings.user.defaultFolder && settings.user.defaultFolderLocation) {
           return localClient
-            .join(settings.user.defaultFolderLocation, helpers.file.ensureEndsInPltr(newFileName))
+            .join(
+              settings.user.defaultFolderLocation,
+              helpers.file.ensureEndsInPltr(copiedFileName)
+            )
             .then((newFullPath) => {
               return localClient.findUniqueNameInPath(newFullPath).then((uniquePath) => {
                 const newFileURL = helpers.file.filePathToFileURL(uniquePath)
-                return migrateSaveAndOpen(fileJSON, oldFilePath, newFileURL)
+                return migrateSaveAndOpen(localClient, fileJSON, oldFilePath, newFileURL)
               })
             })
         } else {
           return userDocumentsPath().then((docPath) => {
             return localClient
-              .join(docPath, helpers.file.ensureEndsInPltr(newFileName))
+              .join(docPath, helpers.file.ensureEndsInPltr(copiedFileName))
               .then((newFullPath) => {
-                const title = t('Where would you like to save this copy?')
-                const filters = [{ name: 'Plottr file', extensions: ['pltr'] }]
-                return showSaveDialog(filters, title, newFullPath).then((fileName) => {
+                return showSaveDialog(
+                  filters,
+                  t('Where would you like to save this copy?'),
+                  newFullPath
+                ).then((fileName) => {
                   if (fileName) {
                     const newFilePath = helpers.file.ensureEndsInPltr(fileName)
                     const newFileURL = helpers.file.filePathToFileURL(newFilePath)
-                    return migrateSaveAndOpen(fileJSON, oldFilePath, newFileURL)
+                    return migrateSaveAndOpen(localClient, fileJSON, oldFilePath, newFileURL)
                   } else {
                     return Promise.reject(
                       new Error(
-                        `Failed to create new file name for creating and opening a copy: ${newFileName}`
+                        `Failed to create new file name for creating and opening a copy: ${copiedFileName}`
                       )
                     )
                   }
@@ -284,7 +289,7 @@ export const userFilePickerDefaultFolder = () => {
   }
 }
 
-export const openExistingFile = (localClient) => {
+export const openExistingFile = (localClient, uploadToProAsDuplicate) => {
   const state = store().getState()
   const isInOfflineMode = selectors.isInOfflineModeSelector(state)
   if (!isInOfflineMode) {
@@ -297,26 +302,58 @@ export const openExistingFile = (localClient) => {
 
     store().dispatch(actions.project.showLoader(true))
     userFilePickerDefaultFolder().then((defaultPath) => {
-      _openExistingFile(localClient, isInProMode, userId, emailAddress, defaultPath)
-        .then(() => {
-          logger.info('Opened existing file')
-          store().dispatch(actions.project.showLoader(false))
-          if (isInProMode) {
-            store().dispatch(actions.applicationState.finishUploadingFileToCloud())
-          }
-        })
-        .catch((error) => {
-          logger.error('Error opening existing file', error)
-          getErrorReporterInstance().then((errorReporter) => {
-            errorReporter.error('Error opening existing file', error)
-          })
-          showErrorBox(t('Error'), t('There was an error doing that. Try again.')).then(() => {
-            store().dispatch(actions.project.showLoader(false))
-            if (isInProMode) {
-              store().dispatch(actions.applicationState.finishUploadingFileToCloud())
-            }
-          })
-        })
+      // ask user where it is
+      const properties = ['openFile', 'createDirectory']
+      showOpenDialog('', filters, properties, defaultPath).then((files) => {
+        if (files.length === 0) {
+          return Promise.resolve()
+        } else {
+          const filePath = files && files.length && files[0]
+          localClient
+            .isInBackupFolder(helpers.file.filePathToFileURL(filePath))
+            .then((isInBackupFolder) => {
+              if (isInBackupFolder) {
+                // Open as backup
+                return localClient.basename(filePath, '.pltr').then((name) => {
+                  const newName = helpers.file.genericBackupNameForToday(name)
+                  return localClient.pathSep().then((sep) => {
+                    const localFilePathSegments = ['/'].concat(filePath.split(sep))
+                    if (isInProMode) {
+                      uploadToProAsDuplicate(localFilePathSegments, newName).then(() => {
+                        store().dispatch(actions.applicationState.finishUploadingFileToCloud())
+                      })
+                    } else {
+                      createAndOpenCopy(localClient, localFilePathSegments, newName)
+                    }
+                  })
+                })
+              } else {
+                _openExistingFile(localClient, isInProMode, userId, emailAddress, defaultPath)
+                  .then(() => {
+                    logger.info('Opened existing file')
+                    store().dispatch(actions.project.showLoader(false))
+                    if (isInProMode) {
+                      store().dispatch(actions.applicationState.finishUploadingFileToCloud())
+                    }
+                  })
+                  .catch((error) => {
+                    logger.error('Error opening existing file', error)
+                    getErrorReporterInstance().then((errorReporter) => {
+                      errorReporter.error('Error opening existing file', error)
+                    })
+                    showErrorBox(t('Error'), t('There was an error doing that. Try again.')).then(
+                      () => {
+                        store().dispatch(actions.project.showLoader(false))
+                        if (isInProMode) {
+                          store().dispatch(actions.applicationState.finishUploadingFileToCloud())
+                        }
+                      }
+                    )
+                  })
+              }
+            })
+        }
+      })
     })
   }
 }
