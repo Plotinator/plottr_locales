@@ -18,12 +18,12 @@ const env = {
     ? // Uses the `main` branch of plottr_web
       'app.plottr.com'
     : isBeta
-    ? // Beta uses the latest release branch
-      'beta.plottr.com'
-    : isAlpha
-    ? 'alpha.plottr.com'
-    : // Default to alpha (staging branch)
-      'alpha.plottr.com',
+      ? // Beta uses the latest release branch
+        'beta.plottr.com'
+      : isAlpha
+        ? 'alpha.plottr.com'
+        : // Default to alpha (staging branch)
+          'alpha.plottr.com',
   FIREBASE_KEY: isProduction
     ? process.env.NEXT_PUBLIC_FIREBASE_KEY
     : process.env.NEXT_PUBLIC_CI_FIREBASE_KEY,

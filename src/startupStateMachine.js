@@ -14,8 +14,8 @@ function displayFileName(localClient, fileName, fileURL, displayFilePath) {
   const fileNamePromise = isOnCloud
     ? Promise.resolve(fileName)
     : withoutProtocol
-    ? localClient.basename(withoutProtocol)
-    : Promise.resolve('')
+      ? localClient.basename(withoutProtocol)
+      : Promise.resolve('')
   return fileNamePromise.then((computedFileName) => {
     const devMessage = process.env.NODE_ENV == 'development' ? ' - DEV' : ''
     const baseFileName = displayFilePath ? ` - ${computedFileName}` : ''

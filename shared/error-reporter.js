@@ -105,25 +105,25 @@ const ErrorReporter = (
       typeOfMessage === 'string'
         ? rawMessage
         : typeofError === 'string'
-        ? rawError
-        : typeof rawMessage?.toString === 'function'
-        ? rawMessage.toString()
-        : typeof rawError?.toString === 'function'
-        ? rawError.toString()
-        : 'No error or message supplied'
+          ? rawError
+          : typeof rawMessage?.toString === 'function'
+            ? rawMessage.toString()
+            : typeof rawError?.toString === 'function'
+              ? rawError.toString()
+              : 'No error or message supplied'
     const error = errorIsError
       ? rawError
       : messageIsError
-      ? rawMessage
-      : new Error(
-          `No error supplied.  Other args: message: ${
-            typeof rawMessage.toString === 'function'
-              ? rawMessage.toString()
-              : 'No message supplied'
-          }, error: ${
-            typeof rawError.toString === 'function' ? rawError.toString() : 'No error supplied'
-          }`
-        )
+        ? rawMessage
+        : new Error(
+            `No error supplied.  Other args: message: ${
+              typeof rawMessage.toString === 'function'
+                ? rawMessage.toString()
+                : 'No message supplied'
+            }, error: ${
+              typeof rawError.toString === 'function' ? rawError.toString() : 'No error supplied'
+            }`
+          )
 
     const messageWithContext = `${message}--${
       error?.message?.slice?.(0, 100) ?? 'no-extra-context'

@@ -53,11 +53,7 @@ const Listener = ({
                   const newName = helpers.file.genericBackupNameForToday(name)
                   const withoutSystemKeys = selectors.fullFileStateSelector(state)
                   return localClient
-                    .saveToDefaultLocation(
-                      withoutSystemKeys,
-                      null,
-                      newName
-                    )
+                    .saveToDefaultLocation(withoutSystemKeys, null, newName)
                     .then((newFileURL) => {
                       return pleaseOpenWindow(newFileURL)
                         .then(() => {
