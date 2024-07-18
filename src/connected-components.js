@@ -158,6 +158,45 @@ export const plottrComponentsContextObject = (localClient) => {
 
   const { checkForAndSaveLicense } = licenseServerAPIs.makeLicenseServerAPIs(localClient, logger)
 
+  const uploadToProAsDuplicate = (sourceFilePathSegments, newName) => {
+    const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(store().getState())
+    if (isInProMode) {
+      return localClient.join(...sourceFilePathSegments).then((sourceFilePath) => {
+        return localClient.readFile(sourceFilePath).then((fileData) => {
+          try {
+            const fileJSON = JSON.parse(fileData)
+            const state = store().getState()
+            const emailAddress = selectors.emailAddressSelector(state)
+            const userId = selectors.userIdSelector(state)
+            return uploadToFirebase(emailAddress, userId, fileJSON, newName).then((response) => {
+              const fileId = response.data.fileId
+              if (!fileId) {
+                const message = `Tried to create cloud file for ${sourceFilePath} but we didn't get a fileId back`
+                errorReportingLogger.error(
+                  message,
+                  new Error('Could not create cloud file as duplicate')
+                )
+                return Promise.reject(new Error(message))
+              }
+              const fileURL = helpers.file.fileIdToPlottrCloudFileURL(fileId)
+              return openFile(fileURL, false)
+            })
+          } catch (error) {
+            return Promise.reject(
+              new Error(
+                `Couldn't parse file data to upload backup at ${sourceFilePath} to Firebase ${error.message}`
+              )
+            )
+          }
+        })
+      })
+    } else {
+      return Promise.reject(
+        new Error("Tried to upload file to Pro as duplicate, but we're not in pro mode")
+      )
+    }
+  }
+
   const platform = {
     undo: () => {
       store().dispatch(actions.undo.undo())
@@ -210,7 +249,7 @@ export const plottrComponentsContextObject = (localClient) => {
         }
       },
       openExistingFile: () => {
-        openExistingFile(localClient)
+        openExistingFile(localClient, uploadToProAsDuplicate)
       },
       doesFileExist: (fileURL) => doesFileExist(localClient, fileURL),
       pathSep: () => {
@@ -628,44 +667,7 @@ export const plottrComponentsContextObject = (localClient) => {
       resizeImage,
       downloadStorageImage,
     },
-    uploadToProAsDuplicate: (sourceFilePathSegments, newName) => {
-      const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(store().getState())
-      if (isInProMode) {
-        return localClient.join(...sourceFilePathSegments).then((sourceFilePath) => {
-          return localClient.readFile(sourceFilePath).then((fileData) => {
-            try {
-              const fileJSON = JSON.parse(fileData)
-              const state = store().getState()
-              const emailAddress = selectors.emailAddressSelector(state)
-              const userId = selectors.userIdSelector(state)
-              return uploadToFirebase(emailAddress, userId, fileJSON, newName).then((response) => {
-                const fileId = response.data.fileId
-                if (!fileId) {
-                  const message = `Tried to create cloud file for ${sourceFilePath} but we didn't get a fileId back`
-                  errorReportingLogger.error(
-                    message,
-                    new Error('Could not create cloud file as duplicate')
-                  )
-                  return Promise.reject(new Error(message))
-                }
-                const fileURL = helpers.file.fileIdToPlottrCloudFileURL(fileId)
-                return openFile(fileURL, false)
-              })
-            } catch (error) {
-              return Promise.reject(
-                new Error(
-                  `Couldn't parse file data to upload backup at ${sourceFilePath} to Firebase ${error.message}`
-                )
-              )
-            }
-          })
-        })
-      } else {
-        return Promise.reject(
-          new Error("Tried to upload file to Pro as duplicate, but we're not in pro mode")
-        )
-      }
-    },
+    uploadToProAsDuplicate,
     deleteProBackup: (backupRecordId, storageProtocolURL) => {
       const state = store().getState()
       const userId = selectors.userIdSelector(state)

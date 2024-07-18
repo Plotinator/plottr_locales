@@ -50,18 +50,13 @@ const Listener = ({
                   return name.replace(/\.pltr$/, '')
                 })
                 .then((name) => {
-                  const backupText = t('Backup')
-                  const date = new Date()
-                  const month = date.getMonth() + 1
-                  const day = date.getDate()
-                  const year = date.getUTCFullYear()
-                  const backupDate = `${t('Resumed at')}:${month}-${day}-${year}`
+                  const newName = helpers.file.genericBackupNameForToday(name)
                   const withoutSystemKeys = selectors.fullFileStateSelector(state)
                   return localClient
                     .saveToDefaultLocation(
                       withoutSystemKeys,
                       null,
-                      `${name} [${backupText} ${backupDate}]`
+                      newName
                     )
                     .then((newFileURL) => {
                       return pleaseOpenWindow(newFileURL)
@@ -82,13 +77,8 @@ const Listener = ({
                 return name.replace(/\.pltr$/, '')
               })
               .then((name) => {
-                const backupText = t('Backup')
-                const date = new Date()
-                const month = date.getMonth() + 1
-                const day = date.getDate()
-                const year = date.getUTCFullYear()
-                const backupDate = `${t('Resumed at')}:${month}-${day}-${year}`
-                duplicateFile(fileURL, `${name} [${backupText} ${backupDate}].pltr`, true)
+                const newName = helpers.file.genericBackupNameForToday(name)
+                duplicateFile(fileURL, newName, true)
               })
           }
         }

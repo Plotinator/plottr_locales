@@ -197,7 +197,7 @@ const fileRoutes = (app, fileModule, logger, statusManager) => {
   })
 
   app.get('/file/separator', (req, res) => {
-    replyWithResultSync(fileModule.separator(), res)
+    replyWithResultSync(fileModule.separator, res)
   })
 
   app.get('/file/extname', (req, res) => {
