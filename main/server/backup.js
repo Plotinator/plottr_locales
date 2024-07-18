@@ -57,8 +57,8 @@ const BackupModule = (userDataPath) => (settings, logger) => {
             backupStrategy === 'never-delete'
               ? null
               : backupStrategy === 'days'
-                ? settings.user.backupDays
-                : settings.user.numberOfBackups
+              ? settings.user.backupDays
+              : settings.user.numberOfBackups
 
           // Don't involve deletion in the control flow of this function
           // because it'll slow things down and we don't really mind if it
