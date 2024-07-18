@@ -1,4 +1,4 @@
-import { cloneDeep, sortBy } from 'lodash'
+import { intersectionBy, cloneDeep, sortBy } from 'lodash'
 import { t } from 'plottr_locales'
 import {
   ADD_LINE,
@@ -124,7 +124,12 @@ const lines = (_dataRepairers) => (state, action) => {
           newLine.bookId = action.newBookId // add it to the new/current book
           return newLine
         })
-      return [...state, ...newLines]
+
+      if (intersectionBy(state, newLines, 'id').length > 0) {
+        return state
+      } else {
+        return [...state, ...newLines]
+      }
     }
 
     case EDIT_LINE:

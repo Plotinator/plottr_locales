@@ -312,17 +312,21 @@ const root = (dataRepairers) => {
         const beatsInNewBook = cloneDeep(action.beats)
         const copiedLines = cloneDeep(action.lines)
         const copiedCards = cloneDeep(
-          action.cards.filter((card) =>
-            Object.keys(beatsInNewBook.index).includes(String(card.beatId))
-          )
-        ).map((card) => {
-          return {
-            ...card,
-            imageId: !isEmpty(card.imageId)
-              ? String(action.images[String(card.imageId)]?.newId)
-              : null,
-          }
-        })
+          action.cards
+            .filter(
+              (card) =>
+                Object.keys(beatsInNewBook.index).includes(String(card.beatId)) ||
+                typeof card.beatId !== 'number'
+            )
+            .map((card) => {
+              return {
+                ...card,
+                imageId: !isEmpty(card.imageId)
+                  ? String(action.images[String(card.imageId)]?.newId)
+                  : null,
+              }
+            })
+        )
         return mainReducer(state, {
           ...action,
           newBookId: objectId(currentBooks.allIds),
@@ -343,7 +347,11 @@ const root = (dataRepairers) => {
         const beatsInNewBook = cloneDeep(beats[action.id])
         const cards = allCardsSelector(state)
         const copiedCards = cloneDeep(
-          cards.filter((card) => Object.keys(beatsInNewBook.index).includes(String(card.beatId)))
+          cards.filter(
+            (card) =>
+              Object.keys(beatsInNewBook.index).includes(String(card.beatId)) ||
+              typeof card.beatId !== 'number'
+          )
         )
         const lines = allLinesSelector(state)
         const copiedLines = cloneDeep(lines.filter((line) => action.id == line.bookId))

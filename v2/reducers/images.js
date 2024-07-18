@@ -27,14 +27,15 @@ const cards = (_dataRepairers) => (state, action) => {
 
     case ADD_IMAGE_FROM_PLTR: {
       const { newId, image } = action
-      if (newId) {
+      if (newId && !state[newId]) {
         const newImage = Object.assign({}, image, { id: newId })
         return {
           ...state,
           [newId]: newImage,
         }
+      } else {
+        return state
       }
-      return state
     }
 
     case RENAME_IMAGE:

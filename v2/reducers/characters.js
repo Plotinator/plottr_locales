@@ -778,12 +778,17 @@ const characters =
       }
 
       case ADD_CHARACTER_FROM_PLTR: {
-        const newCharacter = {
-          ...cloneDeep(action.character),
-          id: nextId(state),
-          isChecked: undefined,
+        if (
+          typeof action?.character?.id !== 'number' ||
+          state.find(({ id }) => {
+            return id === action.character.id
+          })
+        ) {
+          return state
+        } else {
+          const newCharacter = omit(cloneDeep(action.character), 'isChecked')
+          return [...state, newCharacter]
         }
-        return [...state, { ...newCharacter }]
       }
 
       case CREATE_CHARACTER_ATTRIBUTE: {

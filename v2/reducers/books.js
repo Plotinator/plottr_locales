@@ -101,17 +101,21 @@ const books =
       }
 
       case ADD_BOOK_FROM_PLTR: {
-        const newIds = [...state.allIds, action.newBookId]
+        if (action.newBookId && state[action.newBookId]) {
+          return state
+        } else {
+          const newIds = [...state.allIds, action.newBookId]
 
-        return {
-          ...state,
-          allIds: newIds,
-          [action.newBookId]: {
-            ...action.book,
-            id: action.newBookId,
-            imageId: action.imageId,
-            isChecked: undefined,
-          },
+          return {
+            ...state,
+            allIds: newIds,
+            [action.newBookId]: {
+              ...action.book,
+              id: action.newBookId,
+              imageId: action.imageId,
+              isChecked: undefined,
+            },
+          }
         }
       }
 

@@ -72,9 +72,13 @@ const hierarchy = (_dataRepairers) => (state, action) => {
     }
 
     case ADD_BOOK_FROM_PLTR: {
-      return {
-        ...state,
-        [action.newBookId]: action.hierarchyLevels || { 0: hierarchyLevel() },
+      if (typeof action.newBookId !== 'number' || state[action.newBookId]) {
+        return state
+      } else {
+        return {
+          ...state,
+          [action.newBookId]: action.hierarchyLevels || { 0: hierarchyLevel() },
+        }
       }
     }
 

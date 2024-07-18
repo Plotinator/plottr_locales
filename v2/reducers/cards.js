@@ -1,4 +1,4 @@
-import { cloneDeep } from 'lodash'
+import { intersectionBy, cloneDeep } from 'lodash'
 import {
   ADD_CARD,
   ADD_CARD_IN_BEAT,
@@ -137,7 +137,11 @@ const cards =
           return newCard
         })
 
-        return [...state, ...newCards]
+        if (intersectionBy(state, newCards, 'id').length > 0) {
+          return state
+        } else {
+          return [...state, ...newCards]
+        }
       }
 
       case ADD_TEMPLATE_TO_CARD:

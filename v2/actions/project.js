@@ -160,10 +160,12 @@ export const saveImportPltrData = () => (dispatch, getState) => {
   const newCharacters = characters
     .map((character, idx) => {
       if (character.isChecked) {
+        const newId = newCharacterId + idx
         dispatch({
           type: ADD_CHARACTER_FROM_PLTR,
           character: {
             ...character,
+            id: newId,
             bookIds: [],
             tags: [],
             attributes: [],
@@ -181,7 +183,7 @@ export const saveImportPltrData = () => (dispatch, getState) => {
 
         return {
           ...character,
-          newId: newCharacterId + idx,
+          newId,
         }
       }
     })
@@ -195,10 +197,12 @@ export const saveImportPltrData = () => (dispatch, getState) => {
   const newPlaces = places
     .map((place, idx) => {
       if (place.isChecked) {
+        const newId = newPlaceId + idx
         dispatch({
           type: ADD_PLACE_FROM_PLTR,
           place: {
             ...place,
+            id: newId,
             bookIds: [],
             tags: [],
             noteIds: [],
@@ -214,7 +218,7 @@ export const saveImportPltrData = () => (dispatch, getState) => {
 
         return {
           ...place,
-          newId: newPlaceId + idx,
+          newId,
         }
       }
     })
@@ -228,14 +232,18 @@ export const saveImportPltrData = () => (dispatch, getState) => {
   const newTags = tags
     .map((tag, idx) => {
       if (tag.isChecked) {
+        const newId = newTagId + idx
         dispatch({
           type: ADD_TAG_FROM_PLTR,
-          tag,
+          tag: {
+            ...tag,
+            id: newId,
+          },
         })
 
         return {
           ...tag,
-          newId: newTagId + idx,
+          newId,
         }
       }
     })
@@ -256,6 +264,8 @@ export const saveImportPltrData = () => (dispatch, getState) => {
           characters: [],
           templates: [],
           cards: [],
+          bookIds: [],
+          places: [],
           imageId:
             note.imageId && newImages[note.imageId]?.newId
               ? String(newImages[note.imageId].newId)
@@ -274,24 +284,33 @@ export const saveImportPltrData = () => (dispatch, getState) => {
         cards: cards.map((card) => {
           // replace old character, place and tag ids
           // inside the cards
-          const newCharacterIds = (card.characters || []).map((characterId) => {
-            if (String(characterId) === String(newCharacters[characterId]?.id)) {
-              return newCharacters[characterId].newId
-            }
-            return characterId
-          })
-          const newPlaceIds = (card.places || []).map((placeId) => {
-            if (String(placeId) === String(newPlaces[placeId]?.id)) {
-              return newPlaces[placeId].newId
-            }
-            return placeId
-          })
-          const newTagIds = (card.tags || []).map((tagId) => {
-            if (String(tagId) === String(newTags[tagId]?.id)) {
-              return newTags[tagId].newId
-            }
-            return tagId
-          })
+          const newCharacterIds = (card.characters || [])
+            .map((characterId) => {
+              if (String(characterId) === String(newCharacters[characterId]?.id)) {
+                return newCharacters[characterId].newId
+              } else {
+                return null
+              }
+            })
+            .filter(Boolean)
+          const newPlaceIds = (card.places || [])
+            .map((placeId) => {
+              if (String(placeId) === String(newPlaces[placeId]?.id)) {
+                return newPlaces[placeId].newId
+              } else {
+                return null
+              }
+            })
+            .filter(Boolean)
+          const newTagIds = (card.tags || [])
+            .map((tagId) => {
+              if (String(tagId) === String(newTags[tagId]?.id)) {
+                return newTags[tagId].newId
+              } else {
+                return null
+              }
+            })
+            .filter(Boolean)
 
           return {
             ...card,

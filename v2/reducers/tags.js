@@ -1,4 +1,4 @@
-import { cloneDeep } from 'lodash'
+import { cloneDeep, omit } from 'lodash'
 import {
   ADD_TAG,
   ADD_CREATED_TAG,
@@ -137,12 +137,17 @@ const tags =
       }
 
       case ADD_TAG_FROM_PLTR: {
-        const newTag = {
-          ...cloneDeep(action.tag),
-          id: nextId(state),
-          isChecked: undefined,
+        if (
+          typeof action?.tag?.id !== 'number' ||
+          state.find(({ id }) => {
+            return id === action.tag.id
+          })
+        ) {
+          return state
+        } else {
+          const newTag = omit(cloneDeep(action.tag), 'isChecked')
+          return [...state, newTag]
         }
-        return [...state, { ...newTag }]
       }
 
       case UNDO_N_TIMES:

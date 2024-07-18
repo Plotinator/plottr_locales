@@ -1,4 +1,4 @@
-import { cloneDeep, isNumber } from 'lodash'
+import { cloneDeep, isNumber, omit } from 'lodash'
 import {
   ADD_PLACE,
   EDIT_PLACE,
@@ -346,12 +346,17 @@ const places =
       }
 
       case ADD_PLACE_FROM_PLTR: {
-        const newPlace = {
-          ...cloneDeep(action.place),
-          id: nextId(state),
-          isChecked: undefined,
+        if (
+          typeof action?.place?.id !== 'number' ||
+          state.find(({ id }) => {
+            return id === action.place.id
+          })
+        ) {
+          return state
+        } else {
+          const newPlace = omit(cloneDeep(action.place), 'isChecked')
+          return [...state, newPlace]
         }
-        return [...state, { ...newPlace }]
       }
 
       case EDIT_PLACE_NAME: {
