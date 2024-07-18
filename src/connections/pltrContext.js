@@ -409,11 +409,9 @@ function userFilePickerDefaultFolder() {
  * project by presenting the user with a dialog to pick the file and a
  * dialog to choose what to import.
  *
- * @param {string} _fileUrl
- * @param {any} _properties
  * @returns Promise<void>
  */
-function importExistingFile(_fileUrl, _properties) {
+function importExistingFile() {
   return Promise.resolve()
 }
 

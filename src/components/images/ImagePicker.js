@@ -73,7 +73,7 @@ const ImagePicker = ({
       .reverse()
     let selected = null
     if (justAddedImage) selected = ids[0]
-    setTabId(tabId || '1')
+    if (!tabId) setTabId(tabId ?? '1')
     setStateSelectedId(selected || stateSelectedId || selectedId)
     setOpen(fromMenu || modalOnly || open || false)
     setEditing(editing || false)
@@ -256,7 +256,7 @@ const ImagePicker = ({
               id="fileUpload"
               type="file"
               onChange={uploadNewFile}
-              accept="image/png, image/jpeg image/webp"
+              accept="image/png, image/jpeg, image/webp"
             />
           </div>
         </Col>

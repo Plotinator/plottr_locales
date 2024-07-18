@@ -30,7 +30,7 @@ class BookChooser extends Component {
   }
 
   bookTitle = (book) => {
-    return book.title ? (
+    return book?.title ? (
       <span title={book.title}>{truncateTitle(book.title, 40)}</span>
     ) : (
       t('Untitled')

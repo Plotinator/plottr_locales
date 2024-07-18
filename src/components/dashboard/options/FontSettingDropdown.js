@@ -1,8 +1,7 @@
 import React from 'react'
 import PropTypes from 'react-proptypes'
 
-import DropdownButton from '../../DropdownButton'
-import MenuItem from '../../MenuItem'
+import DropdownButton from '../../DropdownButtonV2'
 
 const UnMemoisedFontSettingDropdown = ({
   activeFont,
@@ -19,27 +18,27 @@ const UnMemoisedFontSettingDropdown = ({
     onChange(font)
   }
 
-  const renderFont = (f, key) => {
-    return (
-      <MenuItem key={`${f}-${key}`} eventKey={f} style={{ fontFamily: f }} active={activeFont == f}>
-        {f}
-      </MenuItem>
-    )
+  const renderFont = (f, key, renderMenuItem) => {
+    return renderMenuItem(false, activeFont === f, f, { style: { fontFamily: f } }, f)
   }
 
-  const renderFonts = () => {
-    let fontItems = recentFonts.map((f) => renderFont(f, 'recents'))
+  const renderFonts = (renderMenuItem) => {
+    let fontItems = recentFonts.map((f) => renderFont(f, 'recents', renderMenuItem))
     if (fontItems.length) {
-      fontItems.push(<MenuItem divider key="divider" />)
+      fontItems.push(renderMenuItem(true))
     }
-    fontItems = [...fontItems, ...fonts.map((f) => renderFont(f, ''))]
+    fontItems = [...fontItems, ...fonts.map((f) => renderFont(f, '', renderMenuItem))]
     return fontItems
   }
 
   return (
-    <DropdownButton title={title} onSelect={changeFont} id="font-dropdown" onClick={onClick}>
-      {renderFonts()}
-    </DropdownButton>
+    <DropdownButton
+      title={title}
+      onSelect={changeFont}
+      id="font-dropdown"
+      renderChildren={renderFonts}
+      onClick={onClick}
+    />
   )
 }
 

@@ -18,7 +18,6 @@ const ImportModal = ({
   importData,
   actions,
   uiActions,
-  fileURL,
   shouldShowRecentFiles,
   isInProMode,
   open,
@@ -80,7 +79,7 @@ const ImportModal = ({
   }
 
   const handleImportExistingFile = () => {
-    importExistingFile(fileURL, ['openFile'])
+    importExistingFile()
   }
 
   const handleChangeFile = () => {
@@ -203,7 +202,6 @@ ImportModal.propTypes = {
   uiActions: PropTypes.object,
   importData: PropTypes.object,
   actions: PropTypes.object,
-  fileURL: PropTypes.object,
   shouldShowRecentFiles: PropTypes.bool,
   sortedKnownFiles: PropTypes.array,
   isInProMode: PropTypes.bool,
@@ -216,7 +214,6 @@ const ProjectActions = actions.project
 const mapStateToProps = (state) => {
   return {
     series: selectors.seriesSelector(state),
-    fileURL: selectors.fileURLSelector(state),
     importData: selectors.importPltrDataSelector(state),
     open: selectors.isImportModalOpenSelector(state),
     shouldShowRecentFiles: selectors.shouldShowProAccountRecentFilesSelector(state),

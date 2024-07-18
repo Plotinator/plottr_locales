@@ -36,7 +36,7 @@ MenuItem.propTypes = {
   onSelect: PropTypes.func,
 }
 
-const DropdownButton = ({ title, onSelect, id, renderChildren, className, disabled }) => {
+const DropdownButton = ({ title, onSelect, id, renderChildren, className, disabled, onClick }) => {
   const [isOpen, setIsOpen] = useState(false)
 
   const toggleOpen = useCallback(() => {
@@ -65,7 +65,7 @@ const DropdownButton = ({ title, onSelect, id, renderChildren, className, disabl
   )
 
   return (
-    <div className={cx(`dropdown btn-group ${className}`, { open: isOpen })}>
+    <div onClick={onClick} className={cx(`dropdown btn-group ${className}`, { open: isOpen })}>
       <button
         id={id}
         role="button"
@@ -108,6 +108,7 @@ DropdownButton.propTypes = {
   renderChildren: PropTypes.func.isRequired,
   className: PropTypes.string,
   disabled: PropTypes.bool,
+  onClick: PropTypes.func,
 }
 
 export default DropdownButton

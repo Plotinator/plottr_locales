@@ -1,14 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import DropdownButton from '../../DropdownButton'
-import MenuItem from '../../MenuItem'
+import DropdownButton from '../../DropdownButtonV2'
 
 const UnMemoisedFontSizeSettingDropdown = ({
+  onClick,
   defaultFontSize,
   onChange,
   isMultiplier,
-  onClick,
 }) => {
   const title = defaultFontSize || 20
 
@@ -16,20 +15,16 @@ const UnMemoisedFontSizeSettingDropdown = ({
     onChange(Number(size))
   }
 
-  const renderSizes = () => {
+  const renderSizes = (renderMenuItem) => {
     const maxfontSize = 96
     let sizeArray = []
     for (let size = 4; size <= maxfontSize; size++) {
-      sizeArray.push(
-        <MenuItem key={`fontSize-${size}`} eventKey={size} active={defaultFontSize == size}>
-          {size}
-        </MenuItem>
-      )
+      sizeArray.push(renderMenuItem(false, defaultFontSize === size, size, {}, size))
     }
     return sizeArray
   }
 
-  const renderMultiplier = () => {
+  const renderMultiplier = (renderMenuItem) => {
     const sizeArray = [
       {
         value: 1.6,
@@ -138,15 +133,7 @@ const UnMemoisedFontSizeSettingDropdown = ({
     ]
 
     return sizeArray.map((item) => {
-      return (
-        <MenuItem
-          key={`fontSize-${item.title}`}
-          eventKey={item.value}
-          active={defaultFontSize == item.value}
-        >
-          {item.title}
-        </MenuItem>
-      )
+      return renderMenuItem(false, defaultFontSize == item.value, item.title, {}, item.value)
     })
   }
 
@@ -156,18 +143,17 @@ const UnMemoisedFontSizeSettingDropdown = ({
       title={title}
       onSelect={changeSize}
       id="size-dropdown"
+      renderChildren={isMultiplier ? renderMultiplier : renderSizes}
       onClick={onClick}
-    >
-      {isMultiplier ? renderMultiplier() : renderSizes()}
-    </DropdownButton>
+    />
   )
 }
 
 UnMemoisedFontSizeSettingDropdown.propTypes = {
   defaultFontSize: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   onChange: PropTypes.func.isRequired,
-  onClick: PropTypes.func,
   isMultiplier: PropTypes.bool,
+  onClick: PropTypes.func,
 }
 
 export const FontSizeSettingDropdown = React.memo(UnMemoisedFontSizeSettingDropdown)

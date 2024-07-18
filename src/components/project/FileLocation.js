@@ -22,7 +22,7 @@ const FileLocation = ({ fileURL, isLoggedIntoPro, isTemp }) => {
       duplicateFile,
       importExistingFile,
       showRecentFilesInImportModal,
-      basename,
+      file: { basename },
     },
   } = useContext(PlottrComponentsContext)
 
@@ -40,7 +40,7 @@ const FileLocation = ({ fileURL, isLoggedIntoPro, isTemp }) => {
     if (isLoggedIntoPro) {
       showRecentFilesInImportModal()
     } else {
-      importExistingFile(fileURL, ['openFile'])
+      importExistingFile()
     }
   }
 
