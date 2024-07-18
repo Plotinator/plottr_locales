@@ -844,19 +844,6 @@ self.onmessage = (event) => {
         })
       return
     }
-    case WRITE_USER_OWNERSHIP_NOTE: {
-      const { userId, fileId, permission } = messagePayload
-      writeUserOwnershipNote(userId, fileId, permission)
-        .then(replyToPromise(WRITE_USER_OWNERSHIP_NOTE))
-        .catch((error) => {
-          logger.error(
-            `Error writing user ownership note for ${userId} file: ${fileId} with permission: ${permission}`,
-            error.message
-          )
-          replyToPromiseWithError(type, error.message)
-        })
-      return
-    }
     default: {
       logger.warn(`Unhandled firebase worker message: ${type}, with payload: ${messagePayload}`)
     }
