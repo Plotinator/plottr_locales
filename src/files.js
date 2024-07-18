@@ -305,50 +305,54 @@ export const openExistingFile = (localClient, uploadToProAsDuplicate) => {
       // ask user where it is
       const properties = ['openFile', 'createDirectory']
       showOpenDialog('', filters, properties, defaultPath).then((files) => {
-        const filePath = files && files.length && files[0]
-        localClient
-          .isInBackupFolder(helpers.file.filePathToFileURL(filePath))
-          .then((isInBackupFolder) => {
-            if (isInBackupFolder) {
-              // Open as backup
-              return localClient.basename(filePath, '.pltr').then((name) => {
-                const newName = helpers.file.genericBackupNameForToday(name)
-                return localClient.pathSep().then((sep) => {
-                  const localFilePathSegments = ['/'].concat(filePath.split(sep))
-                  if (isInProMode) {
-                    uploadToProAsDuplicate(localFilePathSegments, newName).then(() => {
-                      store().dispatch(actions.applicationState.finishUploadingFileToCloud())
-                    })
-                  } else {
-                    createAndOpenCopy(localClient, localFilePathSegments, newName)
-                  }
-                })
-              })
-            } else {
-              _openExistingFile(localClient, isInProMode, userId, emailAddress, defaultPath)
-                .then(() => {
-                  logger.info('Opened existing file')
-                  store().dispatch(actions.project.showLoader(false))
-                  if (isInProMode) {
-                    store().dispatch(actions.applicationState.finishUploadingFileToCloud())
-                  }
-                })
-                .catch((error) => {
-                  logger.error('Error opening existing file', error)
-                  getErrorReporterInstance().then((errorReporter) => {
-                    errorReporter.error('Error opening existing file', error)
-                  })
-                  showErrorBox(t('Error'), t('There was an error doing that. Try again.')).then(
-                    () => {
-                      store().dispatch(actions.project.showLoader(false))
-                      if (isInProMode) {
+        if (files.length === 0) {
+          return Promise.resolve()
+        } else {
+          const filePath = files && files.length && files[0]
+          localClient
+            .isInBackupFolder(helpers.file.filePathToFileURL(filePath))
+            .then((isInBackupFolder) => {
+              if (isInBackupFolder) {
+                // Open as backup
+                return localClient.basename(filePath, '.pltr').then((name) => {
+                  const newName = helpers.file.genericBackupNameForToday(name)
+                  return localClient.pathSep().then((sep) => {
+                    const localFilePathSegments = ['/'].concat(filePath.split(sep))
+                    if (isInProMode) {
+                      uploadToProAsDuplicate(localFilePathSegments, newName).then(() => {
                         store().dispatch(actions.applicationState.finishUploadingFileToCloud())
-                      }
+                      })
+                    } else {
+                      createAndOpenCopy(localClient, localFilePathSegments, newName)
                     }
-                  )
+                  })
                 })
-            }
-          })
+              } else {
+                _openExistingFile(localClient, isInProMode, userId, emailAddress, defaultPath)
+                  .then(() => {
+                    logger.info('Opened existing file')
+                    store().dispatch(actions.project.showLoader(false))
+                    if (isInProMode) {
+                      store().dispatch(actions.applicationState.finishUploadingFileToCloud())
+                    }
+                  })
+                  .catch((error) => {
+                    logger.error('Error opening existing file', error)
+                    getErrorReporterInstance().then((errorReporter) => {
+                      errorReporter.error('Error opening existing file', error)
+                    })
+                    showErrorBox(t('Error'), t('There was an error doing that. Try again.')).then(
+                      () => {
+                        store().dispatch(actions.project.showLoader(false))
+                        if (isInProMode) {
+                          store().dispatch(actions.applicationState.finishUploadingFileToCloud())
+                        }
+                      }
+                    )
+                  })
+              }
+            })
+        }
       })
     })
   }
