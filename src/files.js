@@ -95,7 +95,7 @@ export const messageRenameFile = (fileId) => {
   document.dispatchEvent(renameEvent)
 }
 
-const saveFile = (localClient, fileURL, file) => {
+export const saveFile = (localClient, fileURL, file) => {
   return localClient.saveFile(fileURL, file)
 }
 
