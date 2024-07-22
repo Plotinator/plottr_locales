@@ -328,7 +328,7 @@ export const openExistingFile = (localClient, uploadToProAsDuplicate) => {
                   })
                 })
               } else {
-                _openExistingFile(localClient, isInProMode, userId, emailAddress, defaultPath)
+                _openExistingFile(localClient, isInProMode, userId, emailAddress, filePath)
                   .then(() => {
                     logger.info('Opened existing file')
                     store().dispatch(actions.project.showLoader(false))
