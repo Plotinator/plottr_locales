@@ -318,7 +318,7 @@ export const plottrComponentsContextObject = (localClient) => {
           deleteFile(id, userId, clientId)
             .then(() => {
               if (currentFileURL === fileURL) {
-                store().dispatch(actions.project.selectFile(null))
+                store().dispatch(actions.project.selectEmptyFile())
               }
               logger.info(`Deleted file at path: ${fileURL}`)
               store().dispatch(actions.project.showLoader(false))

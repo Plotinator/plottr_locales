@@ -90,10 +90,10 @@ const loadFileIntoRedux = (data, fileId) => {
     )
   )
   store().dispatch(
-    actions.project.selectFile({
-      ...data.file,
-      id: fileId,
-    })
+    actions.project.selectFile(
+      data.file.permission,
+      helpers.file.fileIdToPlottrCloudFileURL(fileId)
+    )
   )
 }
 
