@@ -545,13 +545,7 @@ export function bootFile(
                         fileURL
                       )
                     )
-                    store().dispatch(
-                      actions.project.selectFile({
-                        ...state.file,
-                        fileURL,
-                        id: helpers.file.fileIdFromPlottrProFile(fileURL),
-                      })
-                    )
+                    store().dispatch(actions.project.selectFile('owner', fileURL))
 
                     MPQ.projectEventStats(
                       'open_file',
