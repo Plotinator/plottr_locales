@@ -140,7 +140,7 @@ const LineTitleCell = ({
     const ref = titleInputRef.current
     if (!ref) return
     // @ts-ignore
-    finalizeEdit(ref)
+    finalizeEdit(ref.value)
   }
 
   const finalizeEdit = (newVal) => {

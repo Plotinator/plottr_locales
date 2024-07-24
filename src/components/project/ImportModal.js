@@ -52,7 +52,10 @@ const ImportModal = ({
 
     return (
       <li key={`${sectionName}-${currentItem.id || currentItem.title || currentItem.name}`}>
-        <div className="import-dialog__item-title">
+        <div
+          onClick={() => toggleCheckbox(sectionName, currentItem.id, !isChecked)}
+          className="import-dialog__item-title"
+        >
           <Checkbox
             checked={isChecked}
             onChange={(checked) => toggleCheckbox(sectionName, currentItem.id, checked)}
@@ -132,18 +135,20 @@ const ImportModal = ({
         const isIndeterminate = !isSectionChecked && some(value, (i) => i.isChecked)
         return (
           <div className="list-wrapper" key={key}>
-            <div className="list-title">
+            <div
+              className="list-title"
+              onClick={(event) => {
+                event.stopPropagation()
+                uiActions.toggleAllSectionMarkedToImport(
+                  key,
+                  // deselect all if currently indeterminate
+                  isIndeterminate ? false : !isSectionChecked
+                )
+              }}
+            >
               <input
                 type="checkbox"
                 checked={!isIndeterminate ? isSectionChecked : undefined}
-                onClick={(event) => {
-                  event.stopPropagation()
-                  uiActions.toggleAllSectionMarkedToImport(
-                    key,
-                    // deselect all if currently indeterminate
-                    isIndeterminate ? false : !isSectionChecked
-                  )
-                }}
                 ref={(ref) => {
                   if (ref) {
                     if (isIndeterminate) {
@@ -154,11 +159,13 @@ const ImportModal = ({
                   }
                 }}
               />
-              {key === 'books'
-                ? i18n('Books')
-                : key === 'lines'
-                ? i18n('Plotlines')
-                : startCase(key)}
+              <span>
+                {key === 'books'
+                  ? i18n('Books')
+                  : key === 'lines'
+                  ? i18n('Plotlines')
+                  : startCase(key)}
+              </span>
             </div>
             <ul className="import-modal__category-body">
               {isPlainObject(value) && key !== 'images'

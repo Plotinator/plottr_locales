@@ -68,6 +68,7 @@ const UnMemoisedFontsButton = ({
       })
     } else {
       setActiveFont(font)
+      setDisplayedFont(font)
       addRecent(font)
       addFontMark(editor, font)
     }
@@ -103,7 +104,6 @@ UnMemoisedFontsButton.propTypes = {
   fonts: PropTypes.arrayOf(PropTypes.string),
   editor: PropTypes.object.isRequired,
   logger: PropTypes.object.isRequired,
-  onChange: PropTypes.func,
 }
 
 export const FontsButton = React.memo(UnMemoisedFontsButton)

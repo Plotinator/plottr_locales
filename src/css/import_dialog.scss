@@ -81,6 +81,7 @@
         padding-bottom: 8px;
         border-top-left-radius: 15px;
         border-top-right-radius: 15px;
+        cursor: pointer;
 
         .checkbox {
           margin: 0;
@@ -91,6 +92,10 @@
             top: 9.5px;
           }
         }
+
+        > span {
+          user-select: none;
+        }
       }
 
       ul {
@@ -98,6 +103,18 @@
         padding: 0 20px;
         font-size: 17px;
         color: $neutral-gray-3;
+
+        &.import-modal__category-body {
+          li {
+          .import-dialog__item-title {
+            .checkbox {
+              label {
+                user-select: none;
+              }
+            }
+          }
+        }
+        }
       }
 
       .checkbox input[type='checkbox'],

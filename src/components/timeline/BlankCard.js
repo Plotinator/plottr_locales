@@ -178,7 +178,7 @@ class BlankCard extends Component {
 
   showTemplatePicker = () => {
     if (this.props.readOnly) return
-    this.setState({ showTemplatePicker: true })
+    this.setState({ showTemplatePicker: true, templates: [] })
   }
 
   handleChooseTemplate = (template) => {

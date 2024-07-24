@@ -271,8 +271,11 @@ const TagView = ({
     body = renderTag()
   }
   let styles = {}
-  if (tag.color) styles = { border: `2px solid ${tag.color}` }
-  if (color) styles = { border: `2px solid ${color}` }
+  if (newTag && color) {
+    styles = { border: `2px solid ${color}` }
+  } else if (tag.color) {
+    styles = { border: `2px solid ${tag.color}` }
+  }
 
   return (
     <div className="tag-list__tag-wrapper" onMouseOver={startHovering} onMouseLeave={stopHovering}>

@@ -250,7 +250,8 @@
 
   .outline__minimap__dots {
     display: flex;
-    margin-left: 5px;
+    margin-left: 10px;
+    flex-wrap: wrap;
   }
 
   .outline__minimap__card-dot {
@@ -262,6 +263,16 @@
   &.dropping {
     border: 2px dashed $gray-8;
     padding: 2px;
+  }
+
+  > span:first-child {
+    display: flex;
+    white-space: nowrap;
+    margin-right: 5px;
+  }
+
+  .accented-text {
+    margin-left: 5px;
   }
 }
 

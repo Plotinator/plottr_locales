@@ -397,7 +397,7 @@ const ImagePicker = ({
 
   if (open) {
     return (
-      <PlottrModal isOpen={true} onRequestClose={close}>
+      <PlottrModal isOpen={true} onRequestClose={handleClose}>
         <div className={cx('image-picker__wrapper', { darkmode: darkMode })}>
           <div className="image-picker__header">
             <div className="pull-right">
@@ -406,7 +406,7 @@ const ImagePicker = ({
                   {i18n('Choose')}
                 </Button>
               )}
-              <Button onClick={close} style={{ marginLeft: '12px' }}>
+              <Button onClick={handleClose} style={{ marginLeft: '12px' }}>
                 {fromMenu ? i18n('Close') : i18n('Cancel')}
               </Button>
             </div>

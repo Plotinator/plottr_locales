@@ -19,9 +19,10 @@ const { reds, oranges, greens, blues, purples, grays, whites, browns, defaults }
 class ColorPicker extends Component {
   constructor(props) {
     super(props)
-    this.state = { color: this.props.color }
+    this.state = { color: this.props.color, validColor: true }
 
     this.hexRef = null
+    this.showColorRef = null
   }
 
   closeDialog = (color) => {
@@ -36,6 +37,18 @@ class ColorPicker extends Component {
       this.setState({ color: `#${matches[1]}` })
     } else {
       this.setState({ color: newColor })
+    }
+  }
+
+  componentDidUpdate() {
+    if (this.showColorRef !== null) {
+      const colorIsValid =
+        this.showColorRef?.style?.backgroundColor !== '' &&
+        (this.showColorRef?.style?.backgroundColor === this.state.color ||
+          this.state.color.startsWith('#'))
+      if (colorIsValid !== this.state.validColor) {
+        this.setState({ validColor: colorIsValid })
+      }
     }
   }
 
@@ -63,6 +76,9 @@ class ColorPicker extends Component {
                 <div
                   title={this.state.color}
                   style={{ backgroundColor: this.state.color, marginTop: '16px' }}
+                  ref={(ref) => {
+                    this.showColorRef = ref
+                  }}
                   className="color-picker__show-color"
                 ></div>
               </Col>
@@ -88,7 +104,11 @@ class ColorPicker extends Component {
               </Col>
               <Col xs={2}>
                 <div style={{ marginTop: '26px' }}>
-                  <Button bsStyle="success" onClick={() => this.closeDialog(this.state.color)}>
+                  <Button
+                    disabled={!this.state.validColor}
+                    bsStyle="success"
+                    onClick={() => this.closeDialog(this.state.color)}
+                  >
                     {i18n('Choose')}
                   </Button>
                 </div>

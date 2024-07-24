@@ -150,8 +150,8 @@ const RecentFiles = ({
     }
   }, [offlineModeEnabled, isInOfflineMode, resuming, searchTerm, sortedKnownFiles])
 
-  const openFile = (file) => {
-    return isImportView ? importExistingCloudFile(file) : openKnownFile(file.fileURL, true)
+  const openFile = (fileURL) => {
+    return isImportView ? importExistingCloudFile(fileURL) : openKnownFile(fileURL, true)
   }
 
   const renderRecents = () => {
@@ -203,7 +203,7 @@ const RecentFiles = ({
         <Row
           key={idx}
           onDoubleClick={() => {
-            if (!missing) openFile(f)
+            if (!missing) openFile(f.fileURL)
           }}
           onClick={() => selectFile(selected ? null : f.fileURL)}
           className={cx({ selected: selected })}

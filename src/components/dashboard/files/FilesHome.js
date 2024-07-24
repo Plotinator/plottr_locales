@@ -101,6 +101,7 @@ const FilesHome = ({
       mpq,
       userFilePickerDefaultFolder,
       showOpenDialog,
+      showSaveDialog,
       errorReporter: { getInstance },
     },
   } = useContext(PlottrComponentsContext)
@@ -199,7 +200,7 @@ const FilesHome = ({
           projectActions.startCreatingNewProject()
         }
       } else {
-        savePlottrProjectDialog().then((newFilePath) => {
+        savePlottrProjectDialog(userFilePickerDefaultFolder, showSaveDialog).then((newFilePath) => {
           if (newFilePath) {
             if (newFilePath.startsWith(settings.user.backupLocation)) {
               showErrorBox(
