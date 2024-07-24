@@ -612,7 +612,8 @@
       "templates": [],
       "tags": [],
       "imageId": "5",
-      "bookIds": []
+      "bookIds": [],
+      "categoryId": "1"
     },
     {
       "id": 2,
@@ -640,17 +641,20 @@
     {
       "id": 1,
       "title": "Theme: Stranger Danger",
-      "color": "MediumAquaMarine"
+      "color": "MediumAquaMarine",
+      "categoryId": "1"
     },
     {
       "id": 2,
       "title": "Theme: Trust",
-      "color": "MediumAquaMarine"
+      "color": "MediumAquaMarine",
+      "categoryId": "1"
     },
     {
       "id": 3,
       "title": "Theme: Greed",
-      "color": "MediumAquaMarine"
+      "color": "MediumAquaMarine",
+      "categoryId": "1"
     },
     {
       "id": 4,
@@ -735,7 +739,8 @@
       "lastEdited": 1597213167350,
       "templates": [],
       "imageId": null,
-      "bookIds": []
+      "bookIds": [],
+      "categoryId": "1"
     },
     {
       "id": 2,
@@ -810,6 +815,7 @@
       "lastEdited": 1597186957639,
       "templates": [],
       "imageId": null,
+      "categoryId": "1",
       "bookIds": []
     },
     {
@@ -937,9 +943,27 @@
         "position": 2
       }
     ],
-    "places": [],
-    "notes": [],
-    "tags": []
+    "places": [
+      {
+        "id": 1,
+        "name": "Main",
+        "position": 0
+      }
+    ],
+    "notes": [
+      {
+        "id": 1,
+        "name": "Main",
+        "position": 0
+      }
+    ],
+    "tags": [
+      {
+        "id": 1,
+        "name": "Main",
+        "position": 0
+      }
+    ]
   },
   "images": {
     "1": {

@@ -22,6 +22,8 @@ const {
   allBooksAsArraySelector,
   fullFileStateSelector,
   allCardsSelector,
+  allCustomAttributesSelector,
+  imagesSelector,
 } = selectors(pltrAdaptor)
 
 const wiredUpActions = actions(pltrAdaptor)
@@ -361,6 +363,9 @@ describe('saveImportPltrData', () => {
               const allBooksAfterSecondImport = allBooksAsArraySelector(
                 stateAfterSecondImportFileSaved
               )
+              const allCustomAttributes = allCustomAttributesSelector(
+                stateAfterSecondImportFileSaved
+              )
 
               it('should revert the import modal state to its initialState', () => {
                 expect(importModalDataAfterSecondImport).toEqual(uiState.importModal)
@@ -382,7 +387,17 @@ describe('saveImportPltrData', () => {
                 expect(allBooksAfterSecondImport.length).toEqual(3)
               })
 
-              it('should now have added the characters, places, notes, tags and books from the second imported file', () => {
+              it('should now have added the characters, places, notes, tags, custom attributes, and books from the second imported file', () => {
+                hamlet_with_attribute_mix.characters.forEach((importedCharacter) => {
+                  const isCharacterImported = allCharactersAfterSecondImport.some(
+                    (character) => character.name === importedCharacter.name
+                  )
+                  if (isCharacterImported) {
+                    expect(isCharacterImported).toBeTruthy()
+                  } else {
+                    throw new Error('Could not find the character imported')
+                  }
+                })
                 hamlet_with_attribute_mix.notes.forEach((importedNote) => {
                   const isNoteImported = allNotesAfterSecondImport.some(
                     (note) => note.title === importedNote.title
@@ -393,10 +408,38 @@ describe('saveImportPltrData', () => {
                     throw new Error('Could not find the note imported')
                   }
                 })
-                expect(allCharacters.length).toEqual(uniqBy(allCharacters, 'id').length)
-                expect(allPlaces.length).toEqual(uniqBy(allPlaces, 'id').length)
-                expect(allNotes.length).toEqual(uniqBy(allNotes, 'id').length)
-                expect(allTags.length).toEqual(uniqBy(allTags, 'id').length)
+                hamlet_with_attribute_mix.places.forEach((importedPlace) => {
+                  const isPlaceImported = allPlacesAfterSecondImport.some(
+                    (place) => place.name === importedPlace.name
+                  )
+                  if (isPlaceImported) {
+                    expect(isPlaceImported).toBeTruthy()
+                  } else {
+                    throw new Error('Could not find the place imported')
+                  }
+                })
+                hamlet_with_attribute_mix.tags.forEach((importedTag) => {
+                  const isTagImported = allTagsAfterSecondImport.some(
+                    (tag) => tag.title === importedTag.title
+                  )
+                  if (isTagImported) {
+                    expect(isTagImported).toBeTruthy()
+                  } else {
+                    throw new Error('Could not find the tag imported')
+                  }
+                })
+                const filteredCustomAttributes = omit(hamlet_with_attribute_mix.customAttributes, [
+                  'characters',
+                  'cards',
+                ])
+
+                Object.entries(filteredCustomAttributes).forEach(([sectionName, attribues]) => {
+                  expect(attribues.length).toEqual(Number(allCustomAttributes[sectionName]?.length))
+                })
+                expect(allCharacters.length).toEqual(Number(uniqBy(allCharacters, 'id').length))
+                expect(allPlaces.length).toEqual(Number(uniqBy(allPlaces, 'id').length))
+                expect(allNotes.length).toEqual(Number(uniqBy(allNotes, 'id').length))
+                expect(allTags.length).toEqual(Number(uniqBy(allTags, 'id').length))
 
                 allBooksAfterSecondImport.forEach((book) => {
                   const arrayedBooks = Object.values(
@@ -452,18 +495,14 @@ describe('saveImportPltrData', () => {
             describe('and import', () => {
               const fullSystemState = fullSystemStateSelector(secondStoreInitialState)
               it('should change the import modal state to open', async () => {
-                await secondStore.dispatch(
-                  showImportDataPicker(hamlet_with_attribute_mix, fullSystemState)
-                )
+                await secondStore.dispatch(showImportDataPicker(goldilocks, fullSystemState))
                 const stateBeforeImport = await secondStore.getState()
                 const isImportModalOpen = isImportModalOpenSelector(stateBeforeImport)
                 expect(isImportModalOpen).toBeTruthy()
               })
 
               it('should have `data` and `bookData` object', async () => {
-                await secondStore.dispatch(
-                  showImportDataPicker(hamlet_with_attribute_mix, fullSystemState)
-                )
+                await secondStore.dispatch(showImportDataPicker(goldilocks, fullSystemState))
                 const stateBeforeImport = await secondStore.getState()
 
                 const importModalData = importPltrModalSelector(stateBeforeImport)
@@ -476,9 +515,7 @@ describe('saveImportPltrData', () => {
               })
 
               it('should still have the same number of characters, notes, places, and tags after the first import', async () => {
-                await secondStore.dispatch(
-                  showImportDataPicker(hamlet_with_attribute_mix, fullSystemState)
-                )
+                await secondStore.dispatch(showImportDataPicker(goldilocks, fullSystemState))
                 const stateBeforeImport = await secondStore.getState()
 
                 const allCharactersBeforeImport = allCharactersSelector(stateBeforeImport)
@@ -498,6 +535,7 @@ describe('saveImportPltrData', () => {
                     const noteIdsToImport = [3, 4]
                     const placeIdsToImport = [1, 2]
                     const tagsIdsToImport = [1, 2]
+                    const bookIdsToImport = [1]
                     await secondStore.dispatch(toggleAllSectionMarkedToImport('characters', false))
                     await secondStore.dispatch(toggleAllSectionMarkedToImport('notes', false))
                     await secondStore.dispatch(toggleAllSectionMarkedToImport('places', false))
@@ -536,23 +574,61 @@ describe('saveImportPltrData', () => {
                       stateAfterSelectedImportFileSaved
                     )
                     const allTagsAfterImport = allTagsSelector(stateAfterSelectedImportFileSaved)
+                    const allBooksAfterImport = allTagsSelector(stateAfterSelectedImportFileSaved)
                     const allNotesAfterImport = allNotesSelector(stateAfterSelectedImportFileSaved)
-                    const newCharacters = hamlet_with_attribute_mix.characters.filter((i) =>
+                    const allImagesAfterImport = imagesSelector(stateAfterSelectedImportFileSaved)
+                    const newCharacters = goldilocks.characters.filter((i) =>
                       characterIdsToImport.includes(i.id)
                     )
-                    const newNotes = hamlet_with_attribute_mix.notes.filter((i) =>
-                      noteIdsToImport.includes(i.id)
-                    )
-                    const newPlaces = hamlet_with_attribute_mix.places.filter((i) =>
+                    const newNotes = goldilocks.notes.filter((i) => noteIdsToImport.includes(i.id))
+                    const newPlaces = goldilocks.places.filter((i) =>
                       placeIdsToImport.includes(i.id)
                     )
-                    const newTags = hamlet_with_attribute_mix.tags.filter((i) =>
-                      tagsIdsToImport.includes(i.id)
-                    )
+                    const newTags = goldilocks.tags.filter((i) => tagsIdsToImport.includes(i.id))
 
+                    expect(allCharactersAfterImport.length).toBe(characterIdsToImport.length)
                     expect(allNotesAfterImport.length).toBe(noteIdsToImport.length)
                     expect(allPlacesAfterImport.length).toBe(placeIdsToImport.length)
                     expect(allTagsAfterImport.length).toBe(tagsIdsToImport.length)
+                    expect(allImagesAfterImport).toBeDefined()
+                    expect(Object.keys(allImagesAfterImport).length).not.toEqual(
+                      Object.keys(goldilocks.images).length
+                    )
+                    const characterImageIds = allCharactersAfterImport
+                      .filter(({ id, imageId }) => characterIdsToImport.includes(id) && imageId)
+                      .map(({ imageId }) => imageId)
+                    const notesImageIds = allNotesAfterImport
+                      .filter(({ id, imageId }) => noteIdsToImport.includes(id) && imageId)
+                      .map(({ imageId }) => imageId)
+                    const placesImageIds = allPlacesAfterImport
+                      .filter(({ id, imageId }) => placeIdsToImport.includes(id) && imageId)
+                      .map(({ imageId }) => imageId)
+                    const bookdImageIds = Object.values(omit(allBooksAfterImport, ['allIds']))
+                      .filter(({ id, imageId }) => bookIdsToImport.includes(id) && imageId)
+                      .map(({ imageId }) => imageId)
+
+                    const allImageIds = [
+                      ...new Set([
+                        ...characterImageIds,
+                        ...notesImageIds,
+                        ...placesImageIds,
+                        ...bookdImageIds,
+                      ]),
+                    ]
+
+                    const allImageItems = Object.values(allImagesAfterImport).filter(({ id }) =>
+                      allImageIds.includes(String(id))
+                    )
+
+                    Object.values(goldilocks.images)
+                      .filter((goldilocksImg) => {
+                        return allImageItems.some(
+                          (img) => img.data == goldilocksImg.data || img.name == goldilocksImg.name
+                        )
+                      })
+                      .forEach((img) => {
+                        expect(Object.values(allImagesAfterImport)).not.toContain(img)
+                      })
 
                     allCharactersAfterImport.forEach((i) => {
                       const characterExists = newCharacters.findIndex((x) => x.name === i.name)
@@ -723,7 +799,7 @@ describe('saveImportPltrData', () => {
             }
           )
         )
-      }, 30000)
+      }, 60000)
     })
   })
 })

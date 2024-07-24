@@ -404,13 +404,6 @@ export const ERROR_ACTIONS = [
   SAVE_TEMP_FILE_ERROR,
 ]
 
-// permission actions
-export const SET_PERMISSION = 'SET_PERMISSION'
-// IMPORTANT: Please keep this up to date(!).  Impacts our ability to
-// track actual changes to the content of a file as apposed to system
-// data.
-export const PERMISSION_ACTIONS = [SET_PERMISSION]
-
 // project actions
 export const SET_FILE_LIST = 'SET_FILE_LIST'
 export const SELECT_FILE = 'SELECT_FILE'

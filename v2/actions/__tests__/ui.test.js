@@ -1028,7 +1028,7 @@ describe('toggleBookToImport', () => {
               })
             })
 
-            describe('given the user deselect a book (the book in this case)', () => {
+            describe('given the user deselect a section (a book in this case)', () => {
               const isChecked = true
               store.dispatch(toggleBookToImport(BOOKID_TO_TOGGLE, !isChecked))
               const stateAfterFirstToggle = store.getState()
@@ -1175,6 +1175,7 @@ describe('toggleAllSectionMarkedToImport', () => {
             const allTags = allTagsSelector(stateAfterSecondImport)
             const SECTION_TO_TOGGLE_1 = 'places'
             const SECTION_TO_TOGGLE_2 = 'tags'
+            const SECTION_TO_TOGGLE_3 = 'customAttributes'
 
             it('should change the import modal state to open', () => {
               const isImportModalOpen = isImportModalOpenSelector(stateAfterSecondImport)
@@ -1262,14 +1263,50 @@ describe('toggleAllSectionMarkedToImport', () => {
             describe('given the user deselect another section', () => {
               const isChecked = true
               store.dispatch(toggleAllSectionMarkedToImport(SECTION_TO_TOGGLE_2, !isChecked))
+              const stateAfterFirstToggle = store.getState()
+              const importDataAfterFirstToggle = importPltrDataSelector(stateAfterFirstToggle)
+
+              it('should change the `isChecked` prop to false for all the items on the section', () => {
+                const deselectedSection = importDataAfterFirstToggle[SECTION_TO_TOGGLE_2]
+                deselectedSection.forEach((i) => {
+                  expect(i.isChecked).toBe(!isChecked)
+                })
+              })
+
+              it('should not change the `isChecked` prop for other sections', () => {
+                Object.values(
+                  omit(importDataAfterFirstToggle, [
+                    'images',
+                    SECTION_TO_TOGGLE_1,
+                    SECTION_TO_TOGGLE_2,
+                  ])
+                ).forEach((section) => {
+                  if (Array.isArray(section)) {
+                    expect(section.every((i) => i.isChecked)).toBeTruthy()
+                  } else if (isPlainObject(section)) {
+                    expect(Object.values(section).every((i) => i.isChecked)).toBeTruthy()
+                  }
+                })
+              })
+            })
+
+            describe('given the user deselect 1 more section', () => {
+              const isChecked = true
+              store.dispatch(toggleAllSectionMarkedToImport(SECTION_TO_TOGGLE_3, !isChecked))
               const stateAfterSecondToggle = store.getState()
               const importDataAfterSecondToggle = importPltrDataSelector(stateAfterSecondToggle)
 
               it('should change the `isChecked` prop to false for all the items on the section', () => {
-                const deselectedSection2 = importDataAfterSecondToggle[SECTION_TO_TOGGLE_2]
-                deselectedSection2.forEach((i) => {
-                  expect(i.isChecked).toBe(!isChecked)
-                })
+                const deselectedSection3 = importDataAfterSecondToggle[SECTION_TO_TOGGLE_3]
+                if (isPlainObject(deselectedSection3)) {
+                  Object.values(deselectedSection3).forEach((i) => {
+                    expect(i.isChecked).toBe(!isChecked)
+                  })
+                } else {
+                  deselectedSection3.forEach((i) => {
+                    expect(i.isChecked).toBe(!isChecked)
+                  })
+                }
               })
 
               it('should not change the `isChecked` prop for other sections', () => {
@@ -1278,6 +1315,7 @@ describe('toggleAllSectionMarkedToImport', () => {
                     'images',
                     SECTION_TO_TOGGLE_1,
                     SECTION_TO_TOGGLE_2,
+                    SECTION_TO_TOGGLE_3,
                   ])
                 ).forEach((section) => {
                   if (Array.isArray(section)) {

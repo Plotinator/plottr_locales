@@ -533,6 +533,32 @@
   },
   "cards": [
     {
+      "id": 36,
+      "lineId": 13,
+      "beatId": 35,
+      "bookId": null,
+      "positionWithinLine": 0,
+      "positionInBeat": 0,
+      "title": "Card to remove",
+      "description": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "text": ""
+            }
+          ]
+        }
+      ],
+      "tags": [],
+      "characters": [],
+      "places": [],
+      "templates": [],
+      "imageId": null,
+      "fromTemplateId": null,
+      "color": null
+    },
+    {
       "id": 35,
       "lineId": 13,
       "beatId": 33,

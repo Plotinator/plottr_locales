@@ -18,6 +18,7 @@ import * as tree from '../tree'
 import { beatsByPosition } from '../../helpers/beats'
 import selectors from '../../selectors'
 import { lineFromTemplate } from '../../template'
+import { setHierarchyLevels } from '../../actions/hierarchy'
 
 const {
   sortedBeatsForAnotherBookSelector,
@@ -889,6 +890,206 @@ describe('rootReducer', () => {
                 expect(newBeatIds).toEqual(finalBeatIds)
               }
             )
+          )
+        })
+      })
+    })
+  })
+  describe('SET_HIERARCHY_LEVELS', () => {
+    const withoutChangesWeDontCareAbout = (state) => {
+      return omit(state, ['attributes', 'file.versionStamp'])
+    }
+    describe('given the zelda file', () => {
+      describe('given the same hierarchy levels', () => {
+        it('should not change the state', () => {
+          let state = zelda
+          const getState = () => {
+            return state
+          }
+          const dispatch = (action) => {
+            state = rootReducer(state, action)
+          }
+          setHierarchyLevels(Object.values(user_zelda.hierarchyLevels['7']))(dispatch, getState)
+          expect(withoutChangesWeDontCareAbout(getState().user)).toEqual(
+            withoutChangesWeDontCareAbout(user_zelda)
+          )
+        })
+      })
+    })
+    describe('given the multi-tier zelda', () => {
+      describe('when supplying the same number of hierarchy levels', () => {
+        it('should produce the same state', () => {
+          let state = multi_tier_zelda
+          const getState = () => {
+            return state
+          }
+          const dispatch = (action) => {
+            state = rootReducer(state, action)
+          }
+          setHierarchyLevels(Object.values(user_multi_tier_zelda.hierarchyLevels['7']))(
+            dispatch,
+            getState
+          )
+          expect(withoutChangesWeDontCareAbout(getState().user)).toEqual(
+            withoutChangesWeDontCareAbout(user_multi_tier_zelda)
+          )
+        })
+      })
+      describe('when supplying fewer hierarchy levels', () => {
+        it('should reduce the number of hierarchy levels and delete cards that belonged to the removed beats', () => {
+          let state = multi_tier_zelda
+          const getState = () => {
+            return state
+          }
+          const dispatch = (action) => {
+            state = rootReducer(state, action)
+          }
+          setHierarchyLevels(
+            Array.from(Object.values(user_multi_tier_zelda.hierarchyLevels['7'])).slice(2)
+          )(dispatch, getState)
+          const expectedFinalState = withoutChangesWeDontCareAbout(user_multi_tier_zelda)
+          expectedFinalState.cards = user_multi_tier_zelda.cards.filter(({ beatId }) => {
+            return ![35, 36, 37, 38, 39, 34].includes(beatId)
+          })
+          expectedFinalState.hierarchyLevels['7'] = {
+            0: {
+              name: 'Scene',
+              level: 0,
+              autoNumber: true,
+              textSize: 24,
+              borderStyle: 'NONE',
+              backgroundColor: 'none',
+              textColor: '#0b1117',
+              borderColor: '#6cace4',
+              dark: {
+                borderColor: '#c9e6ff',
+                textColor: '#c9e6ff',
+              },
+              light: {
+                borderColor: '#6cace4',
+                textColor: '#0b1117',
+              },
+            },
+          }
+          expectedFinalState.beats['7'] = {
+            children: {
+              20: [],
+              26: [],
+              27: [],
+              28: [],
+              29: [],
+              30: [],
+              31: [],
+              32: [],
+              33: [],
+              null: [26, 20, 27, 28, 31, 30, 29, 32, 33],
+            },
+            heap: {
+              20: null,
+              26: null,
+              27: null,
+              28: null,
+              29: null,
+              30: null,
+              31: null,
+              32: null,
+              33: null,
+            },
+            index: {
+              20: {
+                autoOutlineSort: true,
+                bookId: 7,
+                fromTemplateId: null,
+                id: 20,
+                position: 0,
+                time: 0,
+                title: 'auto',
+                expanded: true,
+              },
+              26: {
+                autoOutlineSort: true,
+                bookId: 7,
+                fromTemplateId: null,
+                id: 26,
+                position: 1,
+                time: 0,
+                title: 'auto',
+                expanded: true,
+              },
+              27: {
+                autoOutlineSort: true,
+                bookId: 7,
+                fromTemplateId: null,
+                id: 27,
+                position: 1,
+                time: 0,
+                title: 'auto',
+                expanded: true,
+              },
+              28: {
+                autoOutlineSort: true,
+                bookId: 7,
+                fromTemplateId: null,
+                id: 28,
+                position: 0,
+                time: 0,
+                title: 'auto',
+                expanded: true,
+              },
+              29: {
+                autoOutlineSort: true,
+                bookId: 7,
+                fromTemplateId: null,
+                id: 29,
+                position: 0,
+                time: 0,
+                title: 'auto',
+                expanded: true,
+              },
+              30: {
+                autoOutlineSort: true,
+                bookId: 7,
+                fromTemplateId: null,
+                id: 30,
+                position: 1,
+                time: 0,
+                title: 'auto',
+                expanded: true,
+              },
+              31: {
+                autoOutlineSort: true,
+                bookId: 7,
+                fromTemplateId: null,
+                id: 31,
+                position: 2,
+                time: 0,
+                title: 'auto',
+                expanded: true,
+              },
+              32: {
+                autoOutlineSort: true,
+                bookId: 7,
+                fromTemplateId: null,
+                id: 32,
+                position: 1,
+                time: 0,
+                title: 'auto',
+                expanded: true,
+              },
+              33: {
+                autoOutlineSort: true,
+                bookId: 7,
+                fromTemplateId: null,
+                id: 33,
+                position: 0,
+                time: 0,
+                title: 'auto',
+                expanded: true,
+              },
+            },
+          }
+          expect(withoutChangesWeDontCareAbout(getState().user)).toEqual(
+            withoutChangesWeDontCareAbout(expectedFinalState)
           )
         })
       })

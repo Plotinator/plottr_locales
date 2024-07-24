@@ -1855,7 +1855,20 @@
     ],
     "places": [],
     "cards": [],
-    "scenes": [],
+    "scenes": [
+      {
+        "name": "attr 1",
+        "type": "text"
+      },
+      {
+        "name": "attr2",
+        "type": "text"
+      },
+      {
+        "name": "att 3",
+        "type": "text"
+      }
+    ],
     "lines": []
   },
   "places": [

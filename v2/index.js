@@ -23,6 +23,7 @@ import * as characterHelpers from './helpers/characters'
 import * as uiHelpers from './helpers/ui'
 import * as textHelpers from './helpers/text'
 import * as jsonHelpers from './helpers/json'
+import * as promiseHelpers from './helpers/promise'
 
 import * as template from './template'
 
@@ -147,6 +148,7 @@ const helpers = {
   ui: uiHelpers,
   text: textHelpers,
   json: jsonHelpers,
+  promise: promiseHelpers,
 }
 
 const slate = {

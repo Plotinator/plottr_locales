@@ -1,4 +1,4 @@
-import { SET_PERMISSION } from '../constants/ActionTypes'
+import { SELECT_FILE } from '../constants/ActionTypes'
 
 const INITIAL_STATE = { permission: 'owner' }
 
@@ -6,7 +6,7 @@ const permissionReducer =
   (_dataRepairers) =>
   (state = INITIAL_STATE, action) => {
     switch (action.type) {
-      case SET_PERMISSION:
+      case SELECT_FILE:
         return {
           permission: action.permission,
         }

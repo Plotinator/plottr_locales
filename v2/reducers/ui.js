@@ -2545,7 +2545,7 @@ const updateUI = (state, action) => {
       const data = importModal.data ?? {}
       const allSectionData = data[section]
       const modifiedSection =
-        section === 'books' || isPlainObject(section)
+        section === 'books' || isPlainObject(allSectionData)
           ? mapValues(allSectionData, (val) => ({
               ...val,
               isChecked: checked,

@@ -1,4 +1,4 @@
-import { identity, isEmpty, mapValues } from 'lodash'
+import { identity, isEmpty, mapValues, omit } from 'lodash'
 
 import {
   SELECT_FILE,
@@ -24,7 +24,7 @@ import {
   ADD_IMAGE_FROM_PLTR,
 } from '../constants/ActionTypes'
 import selectors from '../selectors'
-import { addCardAttr, addLineAttr, addNoteAttr, addPlaceAttr } from './customAttributes'
+import { addCardAttr, addNoteAttr, addPlaceAttr } from './customAttributes'
 import { imageId, nextId } from '../store/newIds'
 import { newTree } from '../reducers/tree'
 const {
@@ -42,9 +42,10 @@ export const withFullFileState = (cb) => (dispatch, getState) => {
   cb(getState())
 }
 
-export const selectFile = (selectedFile) => ({
+export const selectFile = (permission, fileURL) => ({
   type: SELECT_FILE,
-  selectedFile,
+  permission,
+  fileURL,
 })
 
 export const selectEmptyFile = () => ({
@@ -140,14 +141,34 @@ export const saveImportPltrData = () => (dispatch, getState) => {
 
   const newImages = Object.values(images)
     .map((image, idx) => {
-      dispatch({
-        type: ADD_IMAGE_FROM_PLTR,
-        image,
-        newId: newImageId + idx,
-      })
-      return {
-        ...image,
-        newId: newImageId + idx,
+      const newId = newImageId + idx
+      const hasBookImageToSave = [...Object.values(omit(books, 'allIds'))].some(
+        (i) => i.isChecked && String(i.imageId) == String(image.id)
+      )
+      const hasCharacterImageToSave = characters.some(
+        (i) => i.isChecked && String(i.imageId) == String(image.id)
+      )
+      const hasNoteImageToSave = notes.some(
+        (i) => i.isChecked && String(i.imageId) == String(image.id)
+      )
+      const hasPlaceImageToSave = places.some(
+        (i) => i.isChecked && String(i.imageId) == String(image.id)
+      )
+      if (
+        hasBookImageToSave ||
+        hasCharacterImageToSave ||
+        hasNoteImageToSave ||
+        hasPlaceImageToSave
+      ) {
+        dispatch({
+          type: ADD_IMAGE_FROM_PLTR,
+          image,
+          newId,
+        })
+        return {
+          ...image,
+          newId,
+        }
       }
     })
     .reduce((acc, item) => {
@@ -161,28 +182,29 @@ export const saveImportPltrData = () => (dispatch, getState) => {
     .map((character, idx) => {
       if (character.isChecked) {
         const newId = newCharacterId + idx
+        const newCharacter = {
+          ...character,
+          id: newId,
+          bookIds: [],
+          tags: [],
+          attributes: [],
+          noteIds: [],
+          places: [],
+          cards: [],
+          templates: [],
+          categoryId: null,
+          imageId:
+            character.imageId && newImages[character.imageId]?.newId
+              ? String(newImages[character.imageId]?.newId)
+              : null,
+        }
         dispatch({
           type: ADD_CHARACTER_FROM_PLTR,
-          character: {
-            ...character,
-            id: newId,
-            bookIds: [],
-            tags: [],
-            attributes: [],
-            noteIds: [],
-            places: [],
-            cards: [],
-            templates: [],
-            categoryId: null,
-            imageId:
-              character.imageId && newImages[character.imageId]?.newId
-                ? String(newImages[character.imageId]?.newId)
-                : null,
-          },
+          character: newCharacter,
         })
 
         return {
-          ...character,
+          ...newCharacter,
           newId,
         }
       }
@@ -198,26 +220,28 @@ export const saveImportPltrData = () => (dispatch, getState) => {
     .map((place, idx) => {
       if (place.isChecked) {
         const newId = newPlaceId + idx
+        const newPlace = {
+          ...place,
+          id: newId,
+          bookIds: [],
+          tags: [],
+          noteIds: [],
+          characters: [],
+          templates: [],
+          cards: [],
+          categoryId: null,
+          imageId:
+            place.imageId && newImages[place.imageId]?.newId
+              ? String(newImages[place.imageId]?.newId)
+              : null,
+        }
         dispatch({
           type: ADD_PLACE_FROM_PLTR,
-          place: {
-            ...place,
-            id: newId,
-            bookIds: [],
-            tags: [],
-            noteIds: [],
-            characters: [],
-            templates: [],
-            cards: [],
-            imageId:
-              place.imageId && newImages[place.imageId]?.newId
-                ? String(newImages[place.imageId]?.newId)
-                : null,
-          },
+          place: newPlace,
         })
 
         return {
-          ...place,
+          ...newPlace,
           newId,
         }
       }
@@ -233,16 +257,18 @@ export const saveImportPltrData = () => (dispatch, getState) => {
     .map((tag, idx) => {
       if (tag.isChecked) {
         const newId = newTagId + idx
+        const newTag = {
+          ...tag,
+          categoryId: null,
+          id: newId,
+        }
         dispatch({
           type: ADD_TAG_FROM_PLTR,
-          tag: {
-            ...tag,
-            id: newId,
-          },
+          tag: newTag,
         })
 
         return {
-          ...tag,
+          ...newTag,
           newId,
         }
       }
@@ -266,6 +292,7 @@ export const saveImportPltrData = () => (dispatch, getState) => {
           cards: [],
           bookIds: [],
           places: [],
+          categoryId: null,
           imageId:
             note.imageId && newImages[note.imageId]?.newId
               ? String(newImages[note.imageId].newId)
@@ -332,23 +359,22 @@ export const saveImportPltrData = () => (dispatch, getState) => {
     }
   })
 
-  Object.values(customAttributes).forEach((sectionAttr) => {
-    switch (sectionAttr) {
-      case 'scenes':
-        addCardAttr(sectionAttr.attributes)
-        break
-      case 'places':
-        addPlaceAttr(sectionAttr.attributes)
-        break
-      case 'notes':
-        addNoteAttr(sectionAttr.attributes)
-        break
-      case 'lines':
-        addLineAttr(sectionAttr.attributes)
-        break
-      default:
-        break
-    }
+  Object.entries(customAttributes).forEach(([sectionName, attributeObject]) => {
+    attributeObject.attributes.forEach((attribute) => {
+      switch (sectionName) {
+        case 'scenes':
+          addCardAttr(attribute)(dispatch)
+          break
+        case 'places':
+          addPlaceAttr(attribute)(dispatch)
+          break
+        case 'notes':
+          addNoteAttr(attribute)(dispatch)
+          break
+        default:
+          break
+      }
+    })
   })
 
   dispatch({

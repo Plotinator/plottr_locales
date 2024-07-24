@@ -35,7 +35,7 @@ import { newFileBeats, newFileChapters } from '../store/newFileState'
 import { positionReset, nextPositionInBook, moveNextToSibling } from '../helpers/beats'
 import { associateWithBroadestScope } from '../helpers/lines'
 import * as tree from './tree'
-import { nextId, adjustHierarchyLevels } from '../helpers/beats'
+import { nextId } from '../helpers/beats'
 import { sortByHitPosition } from './sortByHitPosition'
 import { safeParseInt } from './safeParseInt'
 import { replacePlainTextHit, replaceInSlateDatastructure } from './replace'
@@ -187,7 +187,7 @@ const beats =
       }
 
       case SET_HIERARCHY_LEVELS: {
-        const { hierarchyLevels } = action
+        const { hierarchyLevels, newBeatTreeForCurrentTimeline } = action
         if (
           hierarchyLevels.length === action.existingHierarchyLevelCount ||
           hierarchyLevels.length > 3 ||
@@ -196,16 +196,9 @@ const beats =
           return state
         }
 
-        const targetHierarchyDepth = hierarchyLevels.length - 1
-        const adjustHierarchy = adjustHierarchyLevels(targetHierarchyDepth)
-
         return {
           ...state,
-          [action.timeline]: adjustHierarchy(
-            state[action.timeline],
-            nextId(state),
-            action.timeline
-          ),
+          [action.timeline]: newBeatTreeForCurrentTimeline,
         }
       }
 

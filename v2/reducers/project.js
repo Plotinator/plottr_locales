@@ -13,7 +13,6 @@ import {
   SET_BACKING_UP_OFFLINE_FILE,
   START_CREATING_NEW_PROJECT,
   FINISH_CREATING_NEW_PROJECT,
-  EDIT_FILENAME,
   FILE_LOADED,
   FILE_SAVED,
   SET_KNOWN_FILES,
@@ -27,7 +26,7 @@ import { urlPointsToPlottrCloud } from '../helpers/file'
 import { SYSTEM_REDUCER_ACTION_TYPES } from '../reducers/systemReducers'
 
 const INITIAL_STATE = {
-  selectedFile: null,
+  permission: null,
   fileURL: null,
   userNameSearchResults: [],
   fileLoaded: false,
@@ -51,8 +50,8 @@ const projectReducer = (state = INITIAL_STATE, action) => {
       // known files in the future.
       return {
         ...state,
-        selectedFile: action.selectedFile,
-        fileURL: action.selectedFile === null ? null : state.fileURL,
+        fileURL: action.fileURL,
+        permission: action.permission,
         fileLoaded: false,
       }
     }
@@ -60,7 +59,7 @@ const projectReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         fileURL: null,
-        selectedFile: null,
+        permission: null,
       }
     case SET_FILE_LOADED:
       return {
@@ -145,34 +144,10 @@ const projectReducer = (state = INITIAL_STATE, action) => {
         unsavedChanges: false,
       }
     }
-    case EDIT_FILENAME: {
-      return {
-        ...state,
-        selectedFile: {
-          // @ts-ignore
-          ...state.selectedFile,
-          fileName: action.newName,
-        },
-      }
-    }
     case FILE_SAVED: {
       return {
         ...state,
         unsavedChanges: false,
-      }
-    }
-    case SET_KNOWN_FILES: {
-      // @ts-ignore
-      const selectedFileURL = state.selectedFile?.fileURL
-      const foundInList =
-        (typeof selectedFileURL !== 'undefined' &&
-          action.knownFiles.find(({ fileURL }) => {
-            return fileURL === selectedFileURL
-          })) ||
-        null
-      return {
-        ...state,
-        selectedFile: foundInList,
       }
     }
 

@@ -43,7 +43,12 @@ import {
   ADD_BOOK_FROM_PLTR,
 } from '../constants/ActionTypes'
 import selectors from '../selectors'
-import { reduce, beatsByPosition, nextId as nextBeatId } from '../helpers/beats'
+import {
+  reduce,
+  beatsByPosition,
+  nextId as nextBeatId,
+  adjustHierarchyLevels,
+} from '../helpers/beats'
 import { nextId, objectId } from '../store/newIds'
 import * as tree from './tree'
 import { beat as defaultBeat } from '../store/initialState'
@@ -770,9 +775,25 @@ const root = (dataRepairers) => {
       }
 
       case SET_HIERARCHY_LEVELS: {
+        const targetHierarchyDepth = action.hierarchyLevels.length - 1
+        const adjustHierarchy = adjustHierarchyLevels(targetHierarchyDepth)
+        const bookId = action.timeline
+        const beatsForBook = beatsForAnotherBookSelector(
+          state,
+          // @ts-ignore
+          bookId
+        )
+        const allBeats = allBeatsSelector(state)
+        const newBeatTreeForCurrentTimeline = adjustHierarchy(
+          beatsForBook,
+          nextBeatId(allBeats),
+          bookId
+        )
         return mainReducer(state, {
           ...action,
           existingHierarchyLevelCount: hierarchyLevelCount(state),
+          newBeatTreeForCurrentTimeline,
+          oldBeatTree: beatsForBook,
         })
       }
 

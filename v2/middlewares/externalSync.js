@@ -24,7 +24,7 @@ export const sync = (selectState) => {
     isOfflineSelector,
     isResumingSelector,
     selectedFileIdSelector,
-    selectedFilePermissionSelector,
+    filePermissionSelector,
     fullFileStateSelector,
   } = selectors(selectState)
   return (previous, present, patch, deleteSingle, withData, store, action, updatedPaths) => {
@@ -34,7 +34,7 @@ export const sync = (selectState) => {
     const fileId = fileIdSelector(present)
     const clientId = clientIdSelector(present)
     const selectedFileId = selectedFileIdSelector(present)
-    const userPermission = selectedFilePermissionSelector(present)
+    const userPermission = filePermissionSelector(present)
     const notPermittedToChangeFile = userPermission !== 'owner' && userPermission !== 'collaborator'
     if (
       // We might not be allowed to change the file.
@@ -97,10 +97,10 @@ export const sync = (selectState) => {
 }
 
 export const computeNewPaths = (previous, state, wiredSelectors) => {
-  const { fullFileStateSelector, selectedFilePermissionSelector } = wiredSelectors
+  const { fullFileStateSelector, filePermissionSelector } = wiredSelectors
 
   const fullState = fullFileStateSelector(state)
-  const userPermission = selectedFilePermissionSelector(state)
+  const userPermission = filePermissionSelector(state)
 
   const resultPaths = []
   const fullStateKeys = Object.keys(fullState)

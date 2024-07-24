@@ -5,7 +5,7 @@
 import { createSelector } from 'reselect'
 import { difference } from 'lodash'
 
-import { isDeviceFileURL } from '../helpers/file'
+import { fileIdFromPlottrProFile, isDeviceFileURL } from '../helpers/file'
 import { emptyFile } from '../store/newFileState'
 import { SYSTEM_REDUCER_KEYS } from '../reducers/systemReducers'
 import { fullSystemStateSelector, fullFileStateSelector } from './fullFileFirstOrder'
@@ -13,10 +13,6 @@ import { fullSystemStateSelector, fullFileStateSelector } from './fullFileFirstO
 export const projectSelector = createSelector(
   fullSystemStateSelector,
   ({ project }) => project ?? {}
-)
-export const selectedFileSelector = createSelector(
-  projectSelector,
-  ({ selectedFile }) => selectedFile ?? {}
 )
 export const projectNamingModalIsVisibleSelector = createSelector(
   projectSelector,
@@ -26,9 +22,8 @@ export const newProjectTemplateSelector = createSelector(
   projectSelector,
   ({ template }) => template
 )
-export const selectedFileIdSelector = createSelector(selectedFileSelector, ({ id }) => id)
-export const selectedFilePermissionSelector = createSelector(
-  selectedFileSelector,
+export const filePermissionSelector = createSelector(
+  projectSelector,
   ({ permission }) => permission
 )
 export const fileLoadedSelector = createSelector(projectSelector, ({ fileLoaded }) => fileLoaded)
@@ -51,6 +46,13 @@ export const backingUpOfflineFileSelector = createSelector(
   ({ backingUpOfflineFile }) => backingUpOfflineFile
 )
 export const fileURLSelector = createSelector(projectSelector, ({ fileURL }) => fileURL)
+export const selectedFileIdSelector = createSelector(fileURLSelector, (fileURL) => {
+  if (fileURL && typeof fileURL === 'string') {
+    return fileIdFromPlottrProFile(fileURL)
+  } else {
+    return null
+  }
+})
 export const fileURLLoadedSelector = createSelector(fileURLSelector, (fileURL) => {
   return !!(fileURL && typeof fileURL === 'string' && fileURL.length && fileURL)
 })

@@ -153,9 +153,7 @@ describe('computeNewPaths', () => {
       user: hamlet,
       system: {
         project: {
-          selectedFile: {
-            permission: 'owner',
-          },
+          permission: 'owner',
           fileURL: 'plottr://123e',
           userNameSearchResults: [],
           fileLoaded: false,
@@ -300,9 +298,7 @@ describe('computeNewPaths', () => {
           user: hamlet,
           system: {
             project: {
-              selectedFile: {
-                permission: 'collaborator',
-              },
+              permission: 'collaborator',
               fileURL: 'plottr://123e',
               userNameSearchResults: [],
               fileLoaded: false,
@@ -336,9 +332,7 @@ describe('computeNewPaths', () => {
           user: hamlet,
           system: {
             project: {
-              selectedFile: {
-                permission: 'owner',
-              },
+              permission: 'owner',
               fileURL: 'plottr://123e',
               userNameSearchResults: [],
               fileLoaded: false,
@@ -404,9 +398,7 @@ describe('sync', () => {
         user: hamlet,
         system: {
           project: {
-            selectedFile: {
-              permission: 'collaborator',
-            },
+            permission: 'collaborator',
             fileURL: 'plottr://123e',
             userNameSearchResults: [],
             fileLoaded: false,
@@ -481,10 +473,7 @@ describe('sync', () => {
             currentAppState: null,
           },
           project: {
-            selectedFile: {
-              permission: 'owner',
-              id: '123e',
-            },
+            permission: 'owner',
             fileURL: 'plottr://123e',
             userNameSearchResults: [],
             fileLoaded: false,
@@ -730,10 +719,7 @@ describe('sync', () => {
               currentAppState: null,
             },
             project: {
-              selectedFile: {
-                permission: 'owner',
-                id: '123e',
-              },
+              permission: 'owner',
               fileURL: 'device:///tmp/123e',
               userNameSearchResults: [],
               fileLoaded: false,
@@ -807,11 +793,8 @@ describe('sync', () => {
               currentAppState: null,
             },
             project: {
-              selectedFile: {
-                permission: 'owner',
-                id: '123e',
-              },
-              fileURL: 'plottr:///tmp/123e',
+              permission: 'owner',
+              fileURL: 'plottr://123e',
               userNameSearchResults: [],
               fileLoaded: false,
               isLoading: false,
@@ -884,11 +867,8 @@ describe('sync', () => {
               currentAppState: null,
             },
             project: {
-              selectedFile: {
-                permission: 'owner',
-                id: '123e',
-              },
-              fileURL: 'plottr:///tmp/123e',
+              permission: 'owner',
+              fileURL: 'plottr://123e',
               userNameSearchResults: [],
               fileLoaded: false,
               isLoading: false,
@@ -961,11 +941,8 @@ describe('sync', () => {
               currentAppState: null,
             },
             project: {
-              selectedFile: {
-                permission: 'owner',
-                id: '123e',
-              },
-              fileURL: 'plottr:///tmp/123e',
+              permission: 'owner',
+              fileURL: 'plottr://123e',
               userNameSearchResults: [],
               fileLoaded: false,
               isLoading: false,
@@ -1038,11 +1015,8 @@ describe('sync', () => {
               currentAppState: null,
             },
             project: {
-              selectedFile: {
-                permission: 'owner',
-                id: '123e',
-              },
-              fileURL: 'plottr:///tmp/123e',
+              permission: 'owner',
+              fileURL: 'plottr://123e',
               userNameSearchResults: [],
               fileLoaded: false,
               isLoading: false,
@@ -1115,11 +1089,8 @@ describe('sync', () => {
               currentAppState: null,
             },
             project: {
-              selectedFile: {
-                permission: 'owner',
-                id: '123ezzz',
-              },
-              fileURL: 'plottr:///tmp/123e',
+              permission: 'owner',
+              fileURL: 'plottr://1234e',
               userNameSearchResults: [],
               fileLoaded: false,
               isLoading: false,
@@ -1192,11 +1163,8 @@ describe('sync', () => {
               currentAppState: null,
             },
             project: {
-              selectedFile: {
-                permission: 'owner',
-                id: '123e',
-              },
-              fileURL: 'plottr:///tmp/123e',
+              permission: 'owner',
+              fileURL: 'plottr://123e',
               userNameSearchResults: [],
               fileLoaded: false,
               isLoading: false,
@@ -1269,11 +1237,8 @@ describe('sync', () => {
             currentAppState: null,
           },
           project: {
-            selectedFile: {
-              permission: 'owner',
-              id: '123e',
-            },
-            fileURL: 'plottr:///tmp/123e',
+            permission: 'owner',
+            fileURL: 'plottr://123e',
             userNameSearchResults: [],
             fileLoaded: false,
             isLoading: false,
@@ -1752,11 +1717,8 @@ describe('sync', () => {
             currentAppState: null,
           },
           project: {
-            selectedFile: {
-              permission: 'owner',
-              id: '123e',
-            },
-            fileURL: 'plottr:///tmp/123e',
+            permission: 'owner',
+            fileURL: 'plottr://123e',
             userNameSearchResults: [],
             fileLoaded: false,
             isLoading: false,
@@ -1859,11 +1821,8 @@ describe('sync', () => {
             currentAppState: null,
           },
           project: {
-            selectedFile: {
-              permission: 'owner',
-              id: '123e',
-            },
-            fileURL: 'plottr:///tmp/123e',
+            permission: 'owner',
+            fileURL: 'plottr://123e',
             userNameSearchResults: [],
             fileLoaded: false,
             isLoading: false,
@@ -1995,11 +1954,8 @@ describe('sync', () => {
               currentAppState: null,
             },
             project: {
-              selectedFile: {
-                permission: 'owner',
-                id: '123e',
-              },
-              fileURL: 'plottr:///tmp/123e',
+              permission: 'owner',
+              fileURL: 'plottr://123e',
               userNameSearchResults: [],
               fileLoaded: false,
               isLoading: false,
@@ -2148,11 +2104,8 @@ describe('sync', () => {
               currentAppState: null,
             },
             project: {
-              selectedFile: {
-                permission: 'owner',
-                id: '123e',
-              },
-              fileURL: 'plottr:///tmp/123e',
+              permission: 'owner',
+              fileURL: 'plottr://123e',
               userNameSearchResults: [],
               fileLoaded: false,
               isLoading: false,
@@ -2274,11 +2227,8 @@ describe('sync', () => {
               currentAppState: null,
             },
             project: {
-              selectedFile: {
-                permission: 'owner',
-                id: '123e',
-              },
-              fileURL: 'plottr:///tmp/123e',
+              permission: 'owner',
+              fileURL: 'plottr://123e',
               userNameSearchResults: [],
               fileLoaded: false,
               isLoading: false,
@@ -2451,12 +2401,7 @@ describe('externalSync', () => {
       )
     )
     store.dispatch(setClientId('123323'))
-    store.dispatch(
-      selectFile({
-        permission: 'owner',
-        id: '123e',
-      })
-    )
+    store.dispatch(selectFile('owner', 'plottr://123e'))
     store.dispatch(setUserId('dummy-id'))
     const sync = externalSync(pltrAdaptor)
     let patchCalls = []

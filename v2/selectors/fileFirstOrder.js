@@ -31,3 +31,6 @@ export const originalVersionStampSelector = createSelector(
 export const currentVersionStampSelector = createSelector(fileSelector, ({ versionStamp }) => {
   return versionStamp
 })
+export const fileIsDeletedSelector = createSelector(fileSelector, ({ deleted }) => {
+  return !!deleted
+})

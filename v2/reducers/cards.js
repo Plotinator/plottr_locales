@@ -48,6 +48,7 @@ import {
   REORDER_CARD_TEMPLATE_ATTRIBUTES,
   REPLACE_MARKED_HITS,
   ADD_BOOK_FROM_PLTR,
+  SET_HIERARCHY_LEVELS,
   UNDO,
   REDO,
   UNDO_N_TIMES,
@@ -731,6 +732,15 @@ const cards =
             }
           })
         }, state)
+      }
+
+      case SET_HIERARCHY_LEVELS: {
+        const beats = action.newBeatTreeForCurrentTimeline
+        const oldBeatTree = action.oldBeatTree
+
+        return state.filter((card) => {
+          return !(oldBeatTree.index[card.beatId] && !beats.index[card.beatId])
+        })
       }
 
       case UNDO_N_TIMES:

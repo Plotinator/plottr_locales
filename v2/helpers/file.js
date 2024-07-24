@@ -1,3 +1,5 @@
+import { t } from 'plottr_locales'
+
 export const urlPointsToPlottrCloud = (fileURL) => fileURL && fileURL.startsWith('plottr://')
 
 export const fileIdToPlottrCloudFileURL = (fileId) => {
@@ -126,4 +128,14 @@ export const neitherPathContainsTheOther = (path1, path2) => {
     }
     return false
   }
+}
+
+export const genericBackupNameForToday = (name) => {
+  const date = new Date()
+  const month = date.getMonth() + 1
+  const day = date.getDate()
+  const year = date.getUTCFullYear()
+  const backupDate = `${t('Resumed at')}:${month}-${day}-${year}`
+  const backupText = t('Backup')
+  return `${name} [${backupText} ${backupDate}].pltr`
 }
