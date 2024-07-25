@@ -63,7 +63,7 @@ log.transports.file.level = 'info'
 
 // Check whether we're running from inside the DMG.
 const error = new Error('Where are we?')
-if (error?.stack?.[0]?.match(/AppTranslocation/)) {
+if (error?.stack?.match(/AppTranslocation/)) {
   dialog.showErrorBox(
     'Error',
     'Please install Plottr before running it by dragging it into Applications.'
