@@ -306,6 +306,9 @@ export const openExistingFile = (localClient, uploadToProAsDuplicate) => {
       const properties = ['openFile', 'createDirectory']
       showOpenDialog('', filters, properties, defaultPath).then((files) => {
         if (files.length === 0) {
+          if (isInProMode) {
+            store().dispatch(actions.applicationState.finishUploadingFileToCloud())
+          }
           return Promise.resolve()
         } else {
           const filePath = files && files.length && files[0]
