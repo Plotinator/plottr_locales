@@ -1,3 +1,3 @@
-import { plottrContextObject, PlottrComponentsContext } from './pltrContext'
+import { PlottrComponentsContext, plottrContextObject } from './pltrContext'
 
-export { plottrContextObject, PlottrComponentsContext }
+export { PlottrComponentsContext, plottrContextObject }

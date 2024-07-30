@@ -643,10 +643,10 @@ function saveCustomTemplate(_userId, _template) {
  * @param {string} _emailAddress
  * @param {string} _userId
  * @param {object} _fullState
- * @returns {Promise<string>}
+ * @returns {Promise<void>}
  */
 function uploadExisting(_emailAddress, _userId, _fullState) {
-  return Promise.resolve('unimplemented')
+  return Promise.resolve()
 }
 
 /**
