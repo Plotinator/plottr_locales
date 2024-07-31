@@ -36,7 +36,7 @@ function buildFileMenu(
         label: t('Create Blank Project'),
         accelerator: 'CmdOrCtrl+N',
         click: function (event, focusedWindow) {
-          if (focusedWindow?.webContents?.send === 'function') {
+          if (typeof focusedWindow?.webContents?.send === 'function') {
             focusedWindow && focusedWindow.webContents.send('new-project')
           }
         },
@@ -44,7 +44,7 @@ function buildFileMenu(
       {
         label: t('Create From Template'),
         click: function (event, focusedWindow) {
-          if (focusedWindow?.webContents?.send === 'function') {
+          if (typeof focusedWindow?.webContents?.send === 'function') {
             focusedWindow.webContents.send('from-template')
           }
         },
