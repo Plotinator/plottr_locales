@@ -629,7 +629,9 @@ body.darkmode {
   }
 
   .option-switch-label.checked {
-    background-color: #1e7623;
+    &:not(.disabled) {
+      background-color: #1e7623;
+    }
   }
 
   button#size-dropdown:hover {

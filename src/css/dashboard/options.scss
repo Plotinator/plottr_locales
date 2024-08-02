@@ -110,7 +110,14 @@ input.option-switch-checkbox {
   transition: background-color 0.2s;
 
   &.checked {
-    background-color: $green-5;
+    &:not(.disabled) {
+      background-color: $green-5;
+    }
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+    background-color: $gray-8;
   }
 }
 
