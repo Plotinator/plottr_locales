@@ -694,7 +694,7 @@ body.darkmode {
   }
 
   .subnav__container.navbar.navbar-default.darkmode {
-    background-color: #202123;
+    background-color: $darkmode-v2-darker-card-background;
     border-color: #333;
   }
 
@@ -753,7 +753,7 @@ body.darkmode {
   }
 
   .navbar-inverse {
-    background-color: #202123;
+    background-color: $darkmode-v2-darker-card-background;
 
     .nav.navbar-nav {
       li.dropdown {
