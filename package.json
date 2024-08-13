@@ -55,6 +55,7 @@
   },
   "dependencies": {
     "cryptr": "^6.3.0",
+    "react-to-print": "^2.15.1",
     "utf-8-validate": "^5.0.9"
   },
   "devDependencies": {
