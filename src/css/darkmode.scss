@@ -698,7 +698,7 @@ body.darkmode {
     border-color: #333;
   }
 
-  .subnav__container.navbar.navbar-default.darkmode button:not(.active):not(.navbar-toggle) {
+  .subnav__container.navbar.navbar-default.darkmode button:not(.active):not(.navbar-toggle):not(.chevron-btn) {
     border-color: #4d4d4f;
     background-color: $darkmode-v2-background;
     color: #aaa;
