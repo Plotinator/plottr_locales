@@ -55,7 +55,6 @@
   },
   "dependencies": {
     "cryptr": "^6.3.0",
-    "react-to-print": "^2.15.1",
     "utf-8-validate": "^5.0.9"
   },
   "devDependencies": {
@@ -171,6 +170,7 @@
     "react-sticky-table": "^5.1.11",
     "react-test-renderer": "^16.8.6",
     "react-tiny-popover": "^7.2.4",
+    "react-to-print": "^2.15.1",
     "react-transition-group": "^4.4.5",
     "react-waypoint": "^10.3.0",
     "react.pure.component": "^1.2.0",
