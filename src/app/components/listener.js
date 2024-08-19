@@ -15,8 +15,6 @@ const { pleaseOpenWindow, markProjectAsUnsaved } = makeMainProcessClient()
 
 const Listener = ({
   userId,
-  selectedFile,
-  setPermission,
   setFileLoaded,
   clientId,
   fileLoaded,
@@ -53,11 +51,7 @@ const Listener = ({
                   const newName = helpers.file.genericBackupNameForToday(name)
                   const withoutSystemKeys = selectors.fullFileStateSelector(state)
                   return localClient
-                    .saveToDefaultLocation(
-                      withoutSystemKeys,
-                      null,
-                      newName
-                    )
+                    .saveToDefaultLocation(withoutSystemKeys, null, newName)
                     .then((newFileURL) => {
                       return pleaseOpenWindow(newFileURL)
                         .then(() => {
@@ -101,7 +95,6 @@ const Listener = ({
       if (fileLoaded) {
         const fileId = helpers.file.fileIdFromPlottrProFile(fileURL)
         unsubscribeFunction = listen(store(), userId, fileId, clientId, fileVersion)
-        setPermission(selectedFile.permission)
       } else {
         setFileLoaded()
       }
@@ -110,7 +103,6 @@ const Listener = ({
   }, [
     offlineModeIsEnabled,
     fileVersion,
-    selectedFile,
     userId,
     clientId,
     fileLoaded,
@@ -119,17 +111,17 @@ const Listener = ({
     isInProMode,
   ])
 
+  // ===Detect Newer Plottr Opening and Migrating Current File===
+
   const selectedFileVersionRef = useRef(null)
   useEffect(() => {
     if (fileLoaded && fileVersion) {
       if (selectedFileVersionRef.current && selectedFileVersionRef.current !== fileVersion) {
         // The version changed.  We need to reload the window.
         showErrorBox(
-          t('We need to reboot Plottr'),
-          t('You wont lose any work. Sorry for the inconvenience.')
-        ).then(() => {
-          window.location.reload()
-        })
+          t('Version Conflict Detected'),
+          t('It seems that a newer Plottr opened this file elsewhere.')
+        )
         return
       } else {
         selectedFileVersionRef.current = fileVersion
@@ -154,8 +146,6 @@ const Listener = ({
 
 Listener.propTypes = {
   userId: PropTypes.string,
-  setPermission: PropTypes.func.isRequired,
-  selectedFile: PropTypes.object,
   setFileLoaded: PropTypes.func.isRequired,
   clientId: PropTypes.string,
   fileLoaded: PropTypes.bool,
@@ -176,7 +166,6 @@ Listener.propTypes = {
 }
 
 const mapStateToProps = (state) => ({
-  selectedFile: selectors.selectedFileSelector(state),
   userId: selectors.userIdSelector(state),
   clientId: selectors.clientIdSelector(state),
   fileLoaded: selectors.fileLoadedSelector(state),
@@ -193,7 +182,6 @@ const mapStateToProps = (state) => ({
 })
 
 export default connect(mapStateToProps, {
-  setPermission: actions.permission.setPermission,
   setFileLoaded: actions.project.setFileLoaded,
   withFullFileState: actions.project.withFullFileState,
   startCreatingNewProject: actions.project.startCreatingNewProject,

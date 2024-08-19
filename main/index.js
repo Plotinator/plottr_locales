@@ -60,6 +60,19 @@ log.transports.file.level = 'info'
 ////////////////////////////////
 ////     Startup Tasks    //////
 ////////////////////////////////
+
+// Check whether we're running from inside the DMG.
+const error = new Error('Where are we?')
+if (error?.stack?.match(/AppTranslocation/)) {
+  dialog.showErrorBox(
+    'Error',
+    'Please install Plottr before running it by dragging it into Applications.'
+  )
+  setTimeout(() => {
+    app.quit()
+  }, 5000)
+}
+
 const TEN_MEGABYTES = 10485760
 log.transports.file.maxSize = TEN_MEGABYTES
 log.info(`--------Init (${app.getVersion()})--------`)

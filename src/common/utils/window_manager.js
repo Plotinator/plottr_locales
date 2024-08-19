@@ -1,4 +1,3 @@
-import { t } from 'plottr_locales'
 import { helpers } from 'pltr'
 
 import logger from '../../../shared/logger'

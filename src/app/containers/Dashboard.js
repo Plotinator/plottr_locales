@@ -24,6 +24,7 @@ const Dashboard = ({
   openTo,
   latestExpiryDate,
   inTrialMode,
+  fileURL,
 }) => {
   const [activeView, setActiveView] = useState(openTo || 'files')
 
@@ -54,8 +55,10 @@ const Dashboard = ({
 
   useEffect(() => {
     const closeListener = document.addEventListener('close-dashboard', () => {
-      closeDashboard()
-      setCurrentAppStateToApplication()
+      if (fileURL) {
+        closeDashboard()
+        setCurrentAppStateToApplication()
+      }
     })
     const unsubscribeFromReload = onReload(() => {
       window.location.reload()
@@ -66,7 +69,7 @@ const Dashboard = ({
       document.removeEventListener('close-dashboard', closeListener)
       unsubscribeFromReload()
     }
-  }, [])
+  }, [fileURL])
 
   return (
     <div id="dashboard__react__root">
@@ -89,6 +92,7 @@ Dashboard.propTypes = {
   openTo: PropTypes.string,
   latestExpiryDate: PropTypes.object,
   inTrialMode: PropTypes.bool,
+  fileURL: PropTypes.string,
 }
 
 const mapStateToProps = (state) => ({
@@ -97,6 +101,7 @@ const mapStateToProps = (state) => ({
   latestExpiryDate: selectors.latestExpiryDateSelector(state),
   openTo: selectors.dashboardViewToOpenToSelector(state),
   inTrialMode: selectors.isInTrialModeSelector(state),
+  fileURL: selectors.fileURLSelector(state),
 })
 
 export default React.memo(

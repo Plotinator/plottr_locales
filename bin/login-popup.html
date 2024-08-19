@@ -34,6 +34,18 @@
                 padding: 10px;
                 border-radius: 2px;
             }
+
+            .centred {
+                height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            #react-root {
+                height: 316px !important;
+                width: 290px !important;
+            }
         </style>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -60,7 +72,9 @@
         </script>
     </head>
     <body>
-        <div id="react-root"></div>
+        <div class="centred">
+            <div id="react-root"></div>
+        </div>
         <script async src="loginApp.bundle.js"></script>
     </body>
 </html>

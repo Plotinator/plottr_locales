@@ -95,7 +95,7 @@ export const messageRenameFile = (fileId) => {
   document.dispatchEvent(renameEvent)
 }
 
-const saveFile = (localClient, fileURL, file) => {
+export const saveFile = (localClient, fileURL, file) => {
   return localClient.saveFile(fileURL, file)
 }
 
@@ -306,6 +306,9 @@ export const openExistingFile = (localClient, uploadToProAsDuplicate) => {
       const properties = ['openFile', 'createDirectory']
       showOpenDialog('', filters, properties, defaultPath).then((files) => {
         if (files.length === 0) {
+          if (isInProMode) {
+            store().dispatch(actions.applicationState.finishUploadingFileToCloud())
+          }
           return Promise.resolve()
         } else {
           const filePath = files && files.length && files[0]
@@ -328,7 +331,7 @@ export const openExistingFile = (localClient, uploadToProAsDuplicate) => {
                   })
                 })
               } else {
-                _openExistingFile(localClient, isInProMode, userId, emailAddress, defaultPath)
+                _openExistingFile(localClient, isInProMode, userId, emailAddress, filePath)
                   .then(() => {
                     logger.info('Opened existing file')
                     store().dispatch(actions.project.showLoader(false))
@@ -366,22 +369,24 @@ export const showRecentFilesInImportModal = () => {
   }
 }
 
-export const importExistingCloudFile = (file) => {
+export const importExistingCloudFile = (fileURL) => {
   const state = store().getState()
   store().dispatch(actions.applicationState.startProjectImporter())
   const isInProMode = selectors.isLoggedIntoProWithActiveLicenseSelector(state)
   const userId = selectors.userIdSelector(state)
   const clientId = selectors.clientIdSelector(state)
+  const isCloudFile = helpers.file.urlPointsToPlottrCloud(fileURL)
 
-  if (isInProMode && !!file?.isCloudFile) {
+  if (isInProMode && !!isCloudFile) {
+    const fileId = helpers.file.fileIdFromPlottrProFile(fileURL)
     return getVersion()
       .then((version) => {
-        return fetchFileJson(userId, file.id, clientId, version).then((fetchedFile) => {
+        return fetchFileJson(userId, fileId, clientId, version).then((fetchedFile) => {
           return new Promise((resolve, reject) => {
             migrateIfNeeded(
               version,
               fetchedFile,
-              file.fileUrl,
+              fileURL,
               null,
               (error, didMigrate, migratedState) => {
                 if (error) {
@@ -410,7 +415,7 @@ export const importExistingCloudFile = (file) => {
           return Promise.reject(error)
         })
       })
-  } else if (!isInProMode && !!file?.isCloudFile) {
+  } else if (!isInProMode && !!isCloudFile) {
     store().dispatch(actions.applicationState.finishProjectImporter())
     return showErrorBox(
       t('Error importing file'),

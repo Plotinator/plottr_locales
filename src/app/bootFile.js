@@ -90,10 +90,10 @@ const loadFileIntoRedux = (data, fileId) => {
     )
   )
   store().dispatch(
-    actions.project.selectFile({
-      ...data.file,
-      id: fileId,
-    })
+    actions.project.selectFile(
+      data.file.permission,
+      helpers.file.fileIdToPlottrCloudFileURL(fileId)
+    )
   )
 }
 
@@ -545,13 +545,7 @@ export function bootFile(
                         fileURL
                       )
                     )
-                    store().dispatch(
-                      actions.project.selectFile({
-                        ...state.file,
-                        fileURL,
-                        id: helpers.file.fileIdFromPlottrProFile(fileURL),
-                      })
-                    )
+                    store().dispatch(actions.project.selectFile('owner', fileURL))
 
                     MPQ.projectEventStats(
                       'open_file',

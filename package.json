@@ -1,6 +1,6 @@
 {
   "name": "plottr",
-  "version": "2024.7.23-alpha.2",
+  "version": "2024.8.1",
   "description": "A visual story-planning tool",
   "repository": "https://github.com/cameronsutter/plottr_electron.git",
   "homepage": "plottr.com",
@@ -29,8 +29,8 @@
     "install-sharp:macos-arm64": "cd node_modules/sharp && cross-env npm_config_arch=arm64 npm_config_platform=darwin npm install && cd ../.. && npm run clean:sharp-modules",
     "install-sharp:linux": "cd node_modules/sharp && cross-env npm_config_arch=x64 npm_config_platform=linux npm install && cd ../.. && npm run clean:sharp-modules",
     "dist:common": "npm run spit-out-version && node build/initEnv.js && npm run pack",
-    "dist:macos-x64": "npm run install-sharp:macos-x64 && cross-env DEBUG=electron-notarize* electron-builder -m --x64 --publish always",
-    "dist:macos-arm64": "npm run install-sharp:macos-arm64 && cross-env DEBUG=electron-notarize* electron-builder -m --arm64 --publish always",
+    "dist:macos-x64": "npm run install-sharp:macos-x64 && cross-env DEBUG=electron-notarize* electron-builder --mac default:x64 --publish always",
+    "dist:macos-arm64": "npm run install-sharp:macos-arm64 && cross-env DEBUG=electron-notarize* electron-builder --mac default:arm64 --publish always",
     "dist:linux": "npm run install-sharp:linux && electron-builder -l --x64 --publish always",
     "dist:macos-and-linux": "npm run dist:common && npm run dist:macos-x64 && npm run clean:sharp && npm run dist:macos-arm64 && npm run clean:sharp && npm run dist:linux",
     "dist:windows": "npm run spit-out-version && node build/initEnv.js && npm run pack:windows && electron-builder -w --publish always",
