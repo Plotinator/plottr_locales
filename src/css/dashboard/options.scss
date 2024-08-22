@@ -79,6 +79,21 @@
       }
     }
   }
+
+  &.appearance-section {
+    > div {
+      display: flex;
+
+      > * + * {
+        margin: 0px 10px;
+      }
+
+      select {
+        height: 100%;
+        align-self: center;
+      }
+    }
+  }
 }
 
 .dashboard__options-item-help {
