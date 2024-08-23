@@ -629,7 +629,9 @@ body.darkmode {
   }
 
   .option-switch-label.checked {
-    background-color: #1e7623;
+    &:not(.disabled) {
+      background-color: #1e7623;
+    }
   }
 
   button#size-dropdown:hover {
@@ -692,11 +694,11 @@ body.darkmode {
   }
 
   .subnav__container.navbar.navbar-default.darkmode {
-    background-color: #202123;
+    background-color: $darkmode-v2-darker-card-background;
     border-color: #333;
   }
 
-  .subnav__container.navbar.navbar-default.darkmode button:not(.active):not(.navbar-toggle) {
+  .subnav__container.navbar.navbar-default.darkmode button:not(.active):not(.navbar-toggle):not(.chevron-btn) {
     border-color: #4d4d4f;
     background-color: $darkmode-v2-background;
     color: #aaa;
@@ -751,7 +753,7 @@ body.darkmode {
   }
 
   .navbar-inverse {
-    background-color: #202123;
+    background-color: $darkmode-v2-darker-card-background;
 
     .nav.navbar-nav {
       li.dropdown {

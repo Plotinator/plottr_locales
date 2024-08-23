@@ -79,6 +79,21 @@
       }
     }
   }
+
+  &.appearance-section {
+    > div {
+      display: flex;
+
+      > * + * {
+        margin: 0px 10px;
+      }
+
+      select {
+        height: 100%;
+        align-self: center;
+      }
+    }
+  }
 }
 
 .dashboard__options-item-help {
@@ -110,7 +125,14 @@ input.option-switch-checkbox {
   transition: background-color 0.2s;
 
   &.checked {
-    background-color: $green-5;
+    &:not(.disabled) {
+      background-color: $green-5;
+    }
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+    background-color: $gray-8;
   }
 }
 
