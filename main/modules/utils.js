@@ -35,16 +35,16 @@ function makeBrowserWindow(settingsModule, fileURL) {
 
   let multiplier = 0.9
 
-  let stateKeeper = windowStateKeeper({
-    defaultWidth: width * multiplier,
-    defaultHeight: height * multiplier,
-    path: path.join(app.getPath('userData'), 'stateKeeper'),
-    file: stateKeeprFile.slice(-numFileLetters),
-  })
-
   return settingsModule
     .currentSettings()
     .then((settings) => {
+      const dashboardFirst = settings?.user?.openDashboardFirst
+      const stateKeeper = windowStateKeeper({
+        defaultWidth: width * multiplier,
+        defaultHeight: height * multiplier,
+        path: path.join(app.getPath('userData'), 'stateKeeper'),
+        file: dashboardFirst && !fileURL ? 'DASHBOARD' : stateKeeprFile.slice(-numFileLetters),
+      })
       const backgroundColor =
         (settings.user?.dark === 'system' && nativeTheme.shouldUseDarkColors) ||
         settings.user?.dark === 'dark'
