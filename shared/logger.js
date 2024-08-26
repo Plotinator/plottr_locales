@@ -33,9 +33,9 @@ const logger = {
       JSON.stringify(
         {
           extraArgs: args.slice(1).map((arg) => {
-            if (arg.stack) {
+            if (arg?.stack) {
               return {
-                message: arg.message,
+                message: arg?.message,
                 stack: arg.stack,
               }
             }
