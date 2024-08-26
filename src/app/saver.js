@@ -69,7 +69,6 @@ const Saver = (
   const lastStateBackedUp = { current: {} }
   const lastStateSaved = { current: {} }
 
-  // TODO: use setTimeout instead!
   /**
    * @param {{ current: null | number }} timeoutRef
    * @param {String} name
