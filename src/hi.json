@@ -1,0 +1,2948 @@
+{
+  "(If not, please email support@plottr.com)": {
+    "message": "(यदि नहीं, कृपया support@plottr.com पर ईमेल करें)"
+  },
+  "(Logout)": {
+    "message": "(लॉग आउट)"
+  },
+  "A verification code was sent to:": {
+    "message": "एक सत्यापन कोड को भेजा गया था:"
+  },
+  "About Plottr": {
+    "message": "Plottr के बारे में"
+  },
+  "Access to all the features": {
+    "message": "सभी फीचर्स तक पहुंच"
+  },
+  "Account Information": {
+    "message": "अकाउंट की जानकारी"
+  },
+  "Account": {
+    "message": "अकाउंट"
+  },
+  "Actions": {
+    "message": "कार्रवाई"
+  },
+  "Activate License": {
+    "message": "लाइसेंस सक्रिय करें"
+  },
+  "Add Chapter": {
+    "message": "अध्याय जोड़ें"
+  },
+  "Add attribute": {
+    "message": "एट्रिब्यूट जोड़ें"
+  },
+  "Add cards to the timeline so you can write notes about your scenes. Click on the card to add more details": {
+    "message": "टाइमलाइन में कार्ड जोड़ें ताकि आप अपने सीन यानि दृश्यों के बारे में नोट्स लिख सकें। अधिक विवरण जोड़ने के लिए कार्ड पर क्लिक करें"
+  },
+  "Add category": {
+    "message": "श्रेणी जोड़ें"
+  },
+  "Add more plotlines here": {
+    "message": "यहाँ और प्लॉटलाइन जोड़ें"
+  },
+  "Add new scenes or chapters here": {
+    "message": "यहाँ नए सीन या अध्याय जोड़ें"
+  },
+  "Add Scene": {
+    "message": "सीन जोड़ें"
+  },
+  "Add Another Scene": {
+    "message": "एक और दृश्य जोड़ें"
+  },
+  "Add": {
+    "message": "जोड़ें"
+  },
+  "Advanced Export Options": {
+    "message": "उन्नत एक्सपोर्ट विकल्प"
+  },
+  "After": {
+    "message": "पश्चात"
+  },
+  "All": {
+    "message": "सभी"
+  },
+  "App Version: {version}": {
+    "message": "ऍप वर्ज़न: { version }"
+  },
+  "Are you sure you want to clear everything in this timeline?": {
+    "message": "क्या आप वाकई इस टाइमलाइन में सब कुछ साफ़ करना चाहते हैं?"
+  },
+  "Are you sure you want to delete { thing }?": {
+    "message": "क्या आप वाकई {thing} को हटाना चाहते हैं?"
+  },
+  "Are you sure you want to delete {name}?": {
+    "message": "क्या आप वाकई \"{name}\" को हटाना चाहते हैं?"
+  },
+  "Are you sure you want to remove your license?": {
+    "message": "क्या आप वाकई अपना लाइसेंस हटाना चाहते हैं?"
+  },
+  "Are you sure?  (Removing levels may delete scene cards!)": {
+    "message": "क्या आप सुनिश्चित हैं? (स्तरों को हटाने से सीन कार्ड डिलीट हो सकते हैं!)"
+  },
+  "Attach Books": {
+    "message": "पुस्तकें जोड़ें"
+  },
+  "Attach Characters": {
+    "message": "पात्र जोड़ें"
+  },
+  "Attach Places": {
+    "message": "स्थान जोड़ें"
+  },
+  "Attach Tags": {
+    "message": "टैग जोड़ें"
+  },
+  "Attributes": {
+    "message": "एट्रिब्यूट"
+  },
+  "Auto-save": {
+    "message": "ऑटो-सेव"
+  },
+  "Auto-saving failed": {
+    "message": "ऑटो-सेव असफल"
+  },
+  "Auto-saving worked": {
+    "message": "ऑटो-सेव सफल"
+  },
+  "Automatically save daily backups": {
+    "message": "स्वचालित रूप से दैनिक बैकअप सेव करें"
+  },
+  "Awesome choice!": {
+    "message": "बढ़िया चयन!"
+  },
+  "Back": {
+    "message": "वापस"
+  },
+  "Backup Location": {
+    "message": "बैकअप लोकेशन"
+  },
+  "Backups older than this will be erased": {
+    "message": "इससे पुराने बैकअप मिटा दिए जाएंगे"
+  },
+  "Backups": {
+    "message": "बैकअप"
+  },
+  "Beat 1": {
+    "message": "बीट 1"
+  },
+  "Beat {number} title": {
+    "message": "बीट { number } शीर्षक"
+  },
+  "Beat {number}": {
+    "message": "बीट { number }"
+  },
+  "Beat": {
+    "message": "बीट"
+  },
+  "Before": {
+    "message": "पहले"
+  },
+  "Beginning": {
+    "message": "शुरुआत"
+  },
+  "Blues": {
+    "message": "ब्लूज़"
+  },
+  "Book #": {
+    "message": "पुस्तक #"
+  },
+  "Book Details": {
+    "message": "पुस्तक विवरण"
+  },
+  "Book": {
+    "message": "पुस्तक"
+  },
+  "Books": {
+    "message": "पुस्तकें"
+  },
+  "Browns": {
+    "message": "ब्रौन्ज़"
+  },
+  "Buy Full Version": {
+    "message": "पूर्ण वर्ज़न खरीदें"
+  },
+  "By default, use auto-save for projects": {
+    "message": "डिफ़ॉल्ट रूप से, प्रोजेक्ट्स के लिए ऑटो-सेव का उपयोग करें"
+  },
+  "By starting a mobile subscription, you agree to Plottr's": {
+    "message": "मोबाइल सब्सक्रिप्शन शुरू करके, आप Plottr से सहमत होते हैं"
+  },
+  "CHECK EMAIL": {
+    "message": "इ-मेल जाँचें"
+  },
+  "CHECKING...": {
+    "message": "जाँच की जा रही है..."
+  },
+  "CODE": {
+    "message": "कोड"
+  },
+  "CREATE NEW PROJECT": {
+    "message": "नया प्रोजेक्ट बनाएँ"
+  },
+  "CREATE PROJECT": {
+    "message": "प्रोजेक्ट बनाएँ"
+  },
+  "Can I have a few more days?": {
+    "message": "क्या मुझे कुछ और दिन मिल सकते हैं?"
+  },
+  "Cancel": {
+    "message": "रद्द करें"
+  },
+  "Card": {
+    "message": "कार्ड"
+  },
+  "Categories": {
+    "message": "श्रेणियाँ"
+  },
+  "Category": {
+    "message": "श्रेणी"
+  },
+  "Changelog": {
+    "message": "Changelog"
+  },
+  "Chapter {number} title": {
+    "message": "अध्याय { number } शीर्षक"
+  },
+  "Chapter {number}": {
+    "message": "Chapter {number}"
+  },
+  "Chapter": {
+    "message": "अध्याय"
+  },
+  "Chapters": {
+    "message": "अध्याय"
+  },
+  "Character Categories": {
+    "message": "पात्र श्रेणियाँ"
+  },
+  "Character Thumbnail": {
+    "message": "पात्र थंबनेल"
+  },
+  "Character list is filtered": {
+    "message": "पात्र सूची फ़िल्टर की गई है"
+  },
+  "Character": {
+    "message": "पात्र"
+  },
+  "Character: {name}": {
+    "message": "पात्र: { name }"
+  },
+  "Characters list": {
+    "message": "पात्र सूची"
+  },
+  "Characters": {
+    "message": "पात्र"
+  },
+  "Check for Updates": {
+    "message": "अपडेट के लिए जाँचें"
+  },
+  "Check": {
+    "message": "जाँच करें"
+  },
+  "Choose Color": {
+    "message": "रंग चुनें"
+  },
+  "Choose an image": {
+    "message": "एक इमेज चुनें"
+  },
+  "Choose an {platform} mobile subscription": {
+    "message": "एक {platform} मोबाइल सब्सक्रिप्शन चुनें"
+  },
+  "Choose what categories you want to put your characters into": {
+    "message": "आप अपने पात्रों को किन श्रेणियों में रखना चाहते हैं वह चुनें"
+  },
+  "Choose what you want to track about your { type }": {
+    "message": "चुनें कि आप अपने { type } के बारे में क्या ट्रैक करना चाहते हैं"
+  },
+  "Choose where to save this file on your computer": {
+    "message": "चुनें कि इस फ़ाइल को अपने कंप्यूटर पर कहाँ सेव करना है"
+  },
+  "Choose your Snowflake Pro file": {
+    "message": "अपनी Snowflake Pro फ़ाइल चुनें"
+  },
+  "Choose": {
+    "message": "चुनें"
+  },
+  "Choose...": {
+    "message": "चुनें..."
+  },
+  "Clear": {
+    "message": "क्लियर"
+  },
+  "Click on a color below or type it in": {
+    "message": "नीचे किसी रंग पर क्लिक करें या उसे टाइप करें"
+  },
+  "Click to Install": {
+    "message": "इनस्टॉल करने के लिए क्लिक करें"
+  },
+  "Close": {
+    "message": "क्लोज़ करें"
+  },
+  "Collapse": {
+    "message": "संक्षिप्त करें"
+  },
+  "Color Picker": {
+    "message": "कलर पिकर"
+  },
+  "Color": {
+    "message": "कलर"
+  },
+  "Coming Soon!": {
+    "message": "जल्द आ रहा है!"
+  },
+  "Configuration Options": {
+    "message": "कॉन्फ़िगरेशन विकल्प"
+  },
+  "Configure": {
+    "message": "कॉन्फ़िगर करें"
+  },
+  "Content": {
+    "message": "विषय"
+  },
+  "Congratulations": {
+    "message": "बधाई हो"
+  },
+  "Copy": {
+    "message": "कॉपी"
+  },
+  "Create Blank Project": {
+    "message": "ब्लैंक प्रोजेक्ट बनाएं"
+  },
+  "Create From Template": {
+    "message": "टेम्पलेट से बनाएँ"
+  },
+  "Create Report": {
+    "message": "रिपोर्ट बनाएं"
+  },
+  "Create a New Plottr Document": {
+    "message": "एक नया Plottr डॉक्यूमेंट बनाएँ"
+  },
+  "Create an Error Report": {
+    "message": "एक त्रुटि रिपोर्ट बनाएँ"
+  },
+  "Create unlimited project files": {
+    "message": "असीमित प्रोजेक्ट फ़ाइलें बनाएँ"
+  },
+  "Create": {
+    "message": "बनाएँ"
+  },
+  "Created By": {
+    "message": "के द्वारा बनाई गई"
+  },
+  "Current Color": {
+    "message": "वर्तमान रंग"
+  },
+  "Custom Attributes for { type }": {
+    "message": "{ type } के लिए कस्टम एट्रिब्यूट"
+  },
+  "Custom Attributes": {
+    "message": "कस्टम एट्रिब्यूट"
+  },
+  "Custom Template": {
+    "message": "कस्टम टेम्पलेट"
+  },
+  "Custom Templates": {
+    "message": "कस्टम टेम्पलेट्स"
+  },
+  "Cut": {
+    "message": "कट करें"
+  },
+  "Delete": {
+    "message": "डिलीट करें"
+  },
+  "Dark Mode": {
+    "message": "डार्क मोड"
+  },
+  "Dashboard": {
+    "message": "डैशबोर्ड"
+  },
+  "Days Left": {
+    "message": " दिन शेष"
+  },
+  "Days of Backup": {
+    "message": "बैकअप के दिन"
+  },
+  "Delete Book": {
+    "message": "पुस्तक डिलीट करें"
+  },
+  "Delete Book {name}?": {
+    "message": "\"{name}\" पुस्तक डिलीट करना है?"
+  },
+  "Number of Backups": {
+    "message": "बैकअप की संख्या"
+  },
+  "Never Delete Backups": {
+    "message": "बैकअप कभी डिलीट नहीं करें"
+  },
+  "Default Colors": {
+    "message": "डिफ़ॉल्ट रंग"
+  },
+  "Delete Chapter {name}?": {
+    "message": "अध्याय \"{name}\" डिलीट करें?"
+  },
+  "Delete Chapter": {
+    "message": "अध्याय डिलीट करें"
+  },
+  "Delete Chapter?": {
+    "message": "अध्याय डिलीट करना है?"
+  },
+  "Delete Character": {
+    "message": "पात्र डिलीट करना है?"
+  },
+  "Delete Plotline {name}?": {
+    "message": "प्लॉटलाइन \"{name}\" डिलीट करें?"
+  },
+  "Delete Plotline": {
+    "message": "प्लॉटलाइन डिलीट करें?"
+  },
+  "Delete Scene {name}?": {
+    "message": "सीन \"{name}\" डिलीट करें?"
+  },
+  "Delete Scene": {
+    "message": "सीन डिलीट करें?"
+  },
+  "Delete Tag": {
+    "message": "टैग डिलीट करें?"
+  },
+  "Delete {title} Tag?": {
+    "message": "टैग \"{name}\" डिलीट करें?"
+  },
+  "Demos": {
+    "message": "डेमो"
+  },
+  "Describe the scene": {
+    "message": "दृश्य का वर्णन करें"
+  },
+  "Description": {
+    "message": "वर्णन"
+  },
+  "Details": {
+    "message": "विवरण"
+  },
+  "Device ID": {
+    "message": "डिवाइस ID"
+  },
+  "Do you want to remove this image? It will NOT be deleted from your computer": {
+    "message": "क्या आप इस इमेज को डिलीट करना चाहते हैं? यह आपके कंप्यूटर से नहीं हटाया जाएगा"
+  },
+  "Do you want to delete tag {name}?": {
+    "message": "क्या आप टैग \"{name}\" डिलीट करना चाहते हैं?"
+  },
+  "Documentation": {
+    "message": "प्रलेखन"
+  },
+  "Don't have a license? Go to our website to learn more": {
+    "message": "लाइसेंस नहीं है? अधिक जानने के लिए हमारी वेबसाइट पर जाएं"
+  },
+  "Don't have a license?": {
+    "message": "लाइसेंस नहीं है?"
+  },
+  "Don't worry, all your work is saved in plottr_trial.pltr in your Documents folder": {
+    "message": "चिंता न करें, आपका सारा काम plottr_trial.pltr पर आपके डाक्यूमेंट्स फ़ोल्डर में सहेजा गया है"
+  },
+  "Don't worry, all your work is saved in your files": {
+    "message": "चिंता न करें, आपका सारा काम आपकी फाइलों में सहेजा गया है"
+  },
+  "Done": {
+    "message": "हो गया"
+  },
+  "Download Complete 🎉 (version {version})": {
+    "message": "डाउनलोड पूर्ण 🎉 (संस्करण { version })"
+  },
+  "Download Now!": {
+    "message": "अभी डाउनलोड करें!"
+  },
+  "Download updates automatically": {
+    "message": "स्वचालित रूप से अपडेट डाउनलोड करें"
+  },
+  "Downloading version {version}": {
+    "message": "वर्ज़न { version } डाउनलोड हो रहा है"
+  },
+  "Drop a File Here": {
+    "message": "एक फ़ाइल यहाँ ड्रॉप करें"
+  },
+  "Edit Plotline": {
+    "message": "प्लॉटलाइन एडिट करें"
+  },
+  "Edit": {
+    "message": "एडिट करें"
+  },
+  "Editor is currently locked by {name}.": {
+    "message": "एडिटर को वर्तमान में {name} द्वारा लॉक किया गया है।"
+  },
+  "Email": {
+    "message": "ईमेल"
+  },
+  "Email:": {
+    "message": "ईमेलl:"
+  },
+  "example@domain.com": {
+    "message": "example@domain.com"
+  },
+  "End": {
+    "message": "समाप्त"
+  },
+  "Ends After": {
+    "message": "के बाद समाप्त होता है"
+  },
+  "Enter Custom Attribute Title": {
+    "message": "कस्टम एट्रिब्यूट शीर्षक दर्ज करें"
+  },
+  "Enter a Customer Service Code": {
+    "message": "ग्राहक सेवा कोड दर्ज करें"
+  },
+  "Enter a new name for {chapter}": {
+    "message": "\"{chapter}\" के लिए एक नया नाम दर्ज करें"
+  },
+  "Enter Chapter's name or enter": {
+    "message": "अध्याय का नाम दर्ज करें या ऑटो नामकरण के लिए \"ऑटो\" \n(बिना उद्धरण चिह्न के) दर्ज करें।"
+  },
+  "Enter some text...": {
+    "message": "कुछ टेक्स्ट दर्ज करें..."
+  },
+  "Enter the URL of the link:": {
+    "message": "लिंक का URL दर्ज करें:"
+  },
+  "Enter the name of your project": {
+    "message": "अपने प्रोजेक्ट का नाम दर्ज करें"
+  },
+  "Enter your verification code to activate this device": {
+    "message": "इस डिवाइस को सक्रिय करने के लिए अपना सत्यापन कोड दर्ज करें"
+  },
+  "Enter your verification code": {
+    "message": "अपना सत्यापन कोड दर्ज करें"
+  },
+  "Error Creating Error Report": {
+    "message": "त्रुटि रिपोर्ट बनाने में त्रुटि"
+  },
+  "Error Report created": {
+    "message": "त्रुटि रिपोर्ट बनाई गई"
+  },
+  "Error reading file": {
+    "message": "फ़ाइल पढ़ने में त्रुटि"
+  },
+  "Error sending email! Check your email and Try again.": {
+    "message": "ईमेल भेजने में त्रुटि! अपना ईमेल जांचें और पुनः प्रयास करें।"
+  },
+  "Error sharing file": {
+    "message": "फ़ाइल शेयर करने में त्रुटि"
+  },
+  "Error: {error}": {
+    "message": "त्रुटि: { error }"
+  },
+  "Exit Without Saving": {
+    "message": "बिना सेव किये बाहर निकलें"
+  },
+  "Expand": {
+    "message": "विस्तार करें"
+  },
+  "Expires": {
+    "message": "समय-सीमा समाप्त होगी"
+  },
+  "Export": {
+    "message": "एक्सपोर्ट"
+  },
+  "FAQ": {
+    "message": "सामान्य प्रश्न"
+  },
+  "Facebook Group": {
+    "message": "फेसबुक ग्रूप"
+  },
+  "Fictional Devices LLC": {
+    "message": "Fictional Devices LLC"
+  },
+  "File Exported": {
+    "message": "फ़ाइल एक्सपोर्ट की गई"
+  },
+  "File can't be found. Did it move?": {
+    "message": "फ़ाइल नहीं मिली. क्या यह हट गया?"
+  },
+  "File": {
+    "message": "फ़ाइल"
+  },
+  "Files": {
+    "message": "फ़ाइलें"
+  },
+  "Filter by Plotline": {
+    "message": "प्लॉटलाइन द्वारा फ़िल्टर करें"
+  },
+  "Filter": {
+    "message": "फ़िल्टर"
+  },
+  "Flip": {
+    "message": "पलटें"
+  },
+  "Folder where backups are stored": {
+    "message": "फ़ोल्डर जहाँ बैकअप संग्रहीत हैं"
+  },
+  "Force Dark Mode": {
+    "message": "फोर्स डार्क मोड"
+  },
+  "Free Trial Information": {
+    "message": "फ्री ट्रायल सूचना"
+  },
+  "Free Trial": {
+    "message": "फ्री ट्रायल"
+  },
+  "From File": {
+    "message": "फाइल से"
+  },
+  "From Template": {
+    "message": "टेम्पलेट से"
+  },
+  "GET A LICENSE": {
+    "message": "एक लाइसेंस प्राप्त करें"
+  },
+  "GET STARTED!": {
+    "message": "शुरू करें!"
+  },
+  "Genre": {
+    "message": "शैली"
+  },
+  "Get access to all your projects": {
+    "message": "अपने सभी प्रोजेक्ट्स तक पहुँच प्राप्त करें"
+  },
+  "Links": {
+    "message": "लिंक"
+  },
+  "Give this tag a name": {
+    "message": "इस टैग को एक नाम दें"
+  },
+  "Give your scene a title": {
+    "message": "अपने सीन को एक शीर्षक दें"
+  },
+  "Go Back": {
+    "message": "वापस जाएँ"
+  },
+  "Go to our website to learn more:": {
+    "message": "अधिक जानने के लिए हमारी वेबसाइट पर जाएं:"
+  },
+  "Grays": {
+    "message": "स्लेटी"
+  },
+  "Greens": {
+    "message": "हरे"
+  },
+  "Help": {
+    "message": "सहायता"
+  },
+  "Hey, check out my Plottr project \"{project}\"": {
+    "message": "हेय, मेरा Plottr प्रोजेक्ट \"{project}\" देखें"
+  },
+  "Hide Others": {
+    "message": "अन्य छुपाएं"
+  },
+  "Hide Plottr": {
+    "message": "Plottr छुपाएं"
+  },
+  "Hierarchy Configuration": {
+    "message": "पदानुक्रम कॉन्फ़िगरेशन"
+  },
+  "Hmmmm. It looks like that's not a valid license key": {
+    "message": "अरे। ऐसा लगता है कि यह वैध लाइसेंस कुंजी नहीं है"
+  },
+  "Hold On!": {
+    "message": "ज़रा रुकिए!"
+  },
+  "I have a license key": {
+    "message": "मेरे पास एक लाइसेंस कुंजी है"
+  },
+  "I want to buy the full version!": {
+    "message": "मैं फुल वर्ज़न खरीदना चाहता हूँ!"
+  },
+  "I want to start the free trial": {
+    "message": "मैं फ्री ट्रायल शुरू करना चाहता हूँ"
+  },
+  "If you keep seeing this problem, email us at support@plottr.com": {
+    "message": "यदि आपको यह समस्या दिखाई दे रही है, तो हमें support@plottr.com पर ईमेल करें"
+  },
+  "Image Details": {
+    "message": "इमेज विवरण"
+  },
+  "Image Gallery": {
+    "message": "इमेज गैलरी"
+  },
+  "Images": {
+    "message": "इमेज"
+  },
+  "Import Snowflake Pro": {
+    "message": "Snowflake Pro इम्पोर्ट करें"
+  },
+  "Insert Chapter and a Card": {
+    "message": "एक अध्याय और एक कार्ड जोड़ें"
+  },
+  "Insert Chapter": {
+    "message": "अध्याय डालें"
+  },
+  "Insert from URL": {
+    "message": "URL से डालें"
+  },
+  "It looks like you have Plottr on the max number of computers already": {
+    "message": "ऐसा लगता है कि आपके पास पहले से ही अधिकतम कंप्यूटरों पर Plottr मौजूद है"
+  },
+  "It looks like you have Plottr on the max number of devices already": {
+    "message": "ऐसा लगता है कि आपके पास पहले से ही अधिकतम डिवाइस पर Plottr मौजूद है"
+  },
+  "It looks like you're not online. You don't always have to be online to user Plottr, but it can't verify your license offline": {
+    "message": "ऐसा लगता है कि आप ऑनलाइन नहीं हैं। Plottr का उपयोग करने के लिए आपको हमेशा ऑनलाइन रहने की आवश्यकता नहीं है, लेकिन यह आपके लाइसेंस को ऑफ़लाइन सत्यापित नहीं कर सकता है"
+  },
+  "Keep all your notes here (brainstorming, world-building, etc.)": {
+    "message": "अपने सभी नोट्स यहां रखें (विचारावेश, विश्व-निर्माण, आदि)"
+  },
+  "Keep info about your locations here": {
+    "message": "यहाँ अपने लोकेशन के बारे में जानकारी रखें"
+  },
+  "Keep your character sheets here": {
+    "message": "अपने पात्र पत्रक यहाँ रखें"
+  },
+  "Log Out": {
+    "message": "लॉग आउट"
+  },
+  "LOGOUT": {
+    "message": "लॉगआउट"
+  },
+  "LOOK OUT!": {
+    "message": "ध्यान रहे!"
+  },
+  "Language": {
+    "message": "भाषा"
+  },
+  "Last opened by you": {
+    "message": "आखिरी बार आपके द्वारा खोला गया"
+  },
+  "Learn": {
+    "message": "सीखें"
+  },
+  "Let's verify your license.": {
+    "message": "आइए आपका लाइसेंस सत्यापित करें।"
+  },
+  "Let's get you started": {
+    "message": "चलिए आपको शुरू करवाते हैं"
+  },
+  "Levels of hierarchy": {
+    "message": "पदानुक्रम के स्तर"
+  },
+  "License Key": {
+    "message": "लाइसेंस कुंजी"
+  },
+  "License Verified. Plottr will start momentarily. Thanks for being patient!": {
+    "message": "लाइसेंस सत्यापित। Plottr क्षण भर में शुरू हो जाएगा। धैर्य रखने के लिए धन्यवाद!"
+  },
+  "License": {
+    "message": "लाइसेंस"
+  },
+  "Long Synopsis": {
+    "message": "लंबा सार"
+  },
+  "MS Word": {
+    "message": "MS Word"
+  },
+  "Main Plot": {
+    "message": "मुख्य कथानक"
+  },
+  "Main": {
+    "message": "मुख्य"
+  },
+  "Manage the Categories you wish to place your characters in.": {
+    "message": "उन श्रेणियों को प्रबंधित करें जिनमें आप अपने पात्रों को रखना चाहते हैं।"
+  },
+  "Manually Sorted": {
+    "message": "मैन्युअल रूप से क्रमबद्ध"
+  },
+  "Manuscript": {
+    "message": "हस्तलिपि"
+  },
+  "Menu": {
+    "message": "मेनू"
+  },
+  "Middle": {
+    "message": "मध्य"
+  },
+  "My Character Template": {
+    "message": "मेरा पात्र टेम्पलेट"
+  },
+  "My Scene Template": {
+    "message": "मेरा सीन टेम्पलेट"
+  },
+  "My Templates": {
+    "message": "मेरे टेम्पलेट"
+  },
+  "My Timeline Template": {
+    "message": "मेरा टाइमलाइन टेम्पलेट"
+  },
+  "Name": {
+    "message": "नाम"
+  },
+  "Never": {
+    "message": "कभी नहीं"
+  },
+  "New Attribute": {
+    "message": "नया एट्रिब्यूट"
+  },
+  "New Book": {
+    "message": "नयी पुस्तक"
+  },
+  "New Character": {
+    "message": "नया पात्र"
+  },
+  "New Custom Attribute Title": {
+    "message": "नया कस्टम एट्रिब्यूट शीर्षक"
+  },
+  "New Note": {
+    "message": "नया नोट"
+  },
+  "New Place": {
+    "message": "नयी जगह"
+  },
+  "New Plotline": {
+    "message": "नया प्लॉटलाइन"
+  },
+  "New Project": {
+    "message": "नया प्रोजेक्ट"
+  },
+  "New Tag": {
+    "message": "नया टैग"
+  },
+  "New": {
+    "message": "नया"
+  },
+  "No Characters": {
+    "message": "कोई पात्र नहीं"
+  },
+  "No Documents Found": {
+    "message": "कोई डाक्यूमेंट्स नहीं मिला"
+  },
+  "No actions to undo": {
+    "message": "पूर्ववत करने के लिए कोई कार्रवाई नहीं"
+  },
+  "No color": {
+    "message": "कोई रंग नहीं"
+          },
+  "No": {
+    "message": "नहीं"
+  },
+  "No, Discard": {
+    "message": "नहीं, छोड़ दें"
+  },
+  "None to choose": {
+    "message": "चुनने के लिए कुछ नहीं"
+  },
+  "Not Receiving Updates": {
+    "message": "अपडेट प्राप्त नहीं हो रहा"
+  },
+  "NOT NOW": {
+    "message": "अभी नहीं"
+  },
+  "Note Details": {
+    "message": "नोट विवरण"
+  },
+  "Note Image": {
+    "message": "नोट इमेज"
+  },
+  "Note": {
+    "message": "Note"
+  },
+  "Note: {title}": {
+    "message": "नोट: { title }"
+  },
+  "Notes are filtered": {
+    "message": "नोट फ़िल्टर किए गए हैं"
+  },
+  "Notes": {
+    "message": "नोट"
+  },
+  "Now lets get you writing your next great plot!": {
+    "message": "चलिए अब हम आपसे आपकी\n अगली बड़ी कथानक लिखवाते हैं!"
+  },
+  "Number of Days of Rolling Backups to Keep": {
+    "message": "रखने के लिए रोलिंग बैकअप के दिनों की संख्या"
+  },
+  "OK": {
+    "message": "ठीक है"
+  },
+  "OVERWRITE": {
+    "message": "अधिलेखित करें"
+  },
+  "Once You Plot, the Fun Don't Stop": {
+    "message": "एक बार जब आप प्लॉट कर लेते हैं, तो मज़ा रुकता नहीं है"
+  },
+  "One Paragraph Summary": {
+    "message": "एक पैराग्राफ सारांश"
+  },
+  "One Sentence Summary": {
+    "message": "एक वाक्य सारांश"
+  },
+  "Open Dashboard": {
+    "message": "डैशबोर्ड खोलें"
+  },
+  "Open Existing": {
+    "message": "मौजूदा खोलें"
+  },
+  "Open a Plottr Document": {
+    "message": "Plottr डॉक्यूमेंट खोलें"
+  },
+  "Open one of your most recent projects": {
+    "message": "अपने सबसे हालिया प्रोजेक्ट्स में से एक खोलें"
+  },
+  "Open": {
+    "message": "खोलें"
+  },
+  "Or hover here to insert between scenes": {
+    "message": "या दृश्यों के बीच सम्मिलित करने के लिए यहाँ होवर करें"
+  },
+  "Oranges": {
+    "message": "नारंगी"
+  },
+  "Other": {
+    "message": "अन्य"
+  },
+  "Outline is filtered": {
+    "message": "रूपरेखा फ़िल्टर की गई है"
+  },
+  "Outline": {
+    "message": "रूपरेखा"
+  },
+  "Override your computer's setting and always use dark mode": {
+    "message": "अपने कंप्यूटर की सेटिंग को ओवरराइड करें और हमेशा डार्क मोड का उपयोग करें"
+  },
+  "Paragraph": {
+    "message": "अनुच्छेद"
+  },
+  "Paragraph?": {
+    "message": "अनुच्छेद?"
+  },
+  "Paste and Match Style": {
+    "message": "पेस्ट करें और शैली मैच करें"
+  },
+  "Paste": {
+    "message": "पेस्ट करें"
+  },
+  "Pick a color": {
+    "message": "एक रंग चुनें"
+  },
+  "Place Details": {
+    "message": "स्थान विवरण"
+  },
+  "Place Image": {
+    "message": "स्थान इमेज"
+  },
+  "Place list is filtered": {
+    "message": "स्थान सूची फ़िल्टर की गई है"
+  },
+  "Place": {
+    "message": "स्थान"
+  },
+  "Place: {name}": {
+    "message": "स्थान: { name }"
+  },
+  "Places list": {
+    "message": "स्थान सूची"
+  },
+  "Places": {
+    "message": "स्थान"
+  },
+  "Please choose a plotline": {
+    "message": "कृपया एक प्लॉटलाइन चुनें"
+  },
+  "Please contact us with any questions at support@plottr.com": {
+    "message": "किसी भी प्रश्न के लिए कृपया हमसे support@plottr.com पर संपर्क करें"
+  },
+  "Please select a valid Plottr file": {
+    "message": "कृपया एक वैध Plottr फ़ाइल चुनें।"
+  },
+  "Please verify your license": {
+    "message": "कृपया अपना लाइसेंस सत्यापित करें"
+  },
+  "Please verify your license in {time}": {
+    "message": "कृपया {time} में अपना लाइसेंस सत्यापित करें"
+  },
+  "Plotline Details": {
+    "message": "प्लॉटलाइन विवरण"
+  },
+  "Plotline Title:": {
+    "message": "प्लॉटलाइन शीर्षक:"
+  },
+  "Plotline name": {
+    "message": "प्लॉटलाइन नाम"
+  },
+  "Plotline": {
+    "message": "प्लॉटलाइन"
+  },
+  "Plotline: {title}": {
+    "message": "प्लॉटलाइन: { title }"
+  },
+  "Plotlines": {
+    "message": "प्लॉटलाइन"
+  },
+  "Plottr Mobile Monthly": {
+    "message": "Plottr मोबाइल मासिक"
+  },
+  "Plottr Mobile Yearly": {
+    "message": "Plottr मोबाइल वार्षिक"
+  },
+  "Plottr Mobile": {
+    "message": "Plottr मोबाइल"
+  },
+  "Plottr Support": {
+    "message": "Plottr सपोर्ट"
+  },
+  "Plottr created a file named {fileName} in your Documents folder": {
+    "message": "Plottr ने आपके डाक्यूमेंट्स फ़ोल्डर में {fileName} नाम की एक फ़ाइल बनाई है"
+  },
+  "Plottr project file": {
+    "message": "Plottr प्रोजेक्ट फाइल"
+  },
+  "Plottr ran into a problem. Try opening Plottr again.": {
+    "message": "Plottr में एक समस्या हुई। Plottr को फिर से खोलने का प्रयास करें।"
+  },
+  "Plottr": {
+    "message": "Plottr"
+  },
+  "PLOTTR PRO": {
+    "message": "PLOTTR PRO"
+  },
+  "PLOTTR CLASSIC": {
+    "message": "PLOTTR CLASSIC"
+  },
+  "Preferences": {
+    "message": "प्राथमिकता"
+  },
+  "Premise": {
+    "message": "आधार"
+  },
+  "Privacy Policy": {
+    "message": "गोपनीयता नीति"
+  },
+  "Project Templates": {
+    "message": "प्रोजेक्ट टेम्प्लेट"
+  },
+  "Project": {
+    "message": "प्रोजेक्ट"
+  },
+  "Prologue": {
+    "message": "प्रस्ताव"
+  },
+  "Purchase Email": {
+    "message": "ईमेल खरीदें"
+  },
+  "Purchase Pro": {
+    "message": "Pro खरीदें"
+  },
+  "Purples": {
+    "message": "बैंगनी"
+  },
+  "Quit": {
+    "message": "त्यागें"
+  },
+  "RESEND EMAIL": {
+    "message": "ईमेल पुन: भेजें"
+  },
+  "RESENDING...": {
+    "message": "फिर से भेजा जा रहा है..."
+  },
+  "Recent Projects": {
+    "message": "हालिया प्रोजेक्ट्स"
+  },
+  "Redo": {
+    "message": "फिर से करें"
+  },
+  "Reds": {
+    "message": "लाल"
+  },
+  "Reload from File": {
+    "message": "फ़ाइल से पुनः लोड करें"
+  },
+  "Reload": {
+    "message": "पुनः लोड करें"
+  },
+  "Deactivate License Key": {
+    "message": "लाइसेंस कुंजी निष्क्रिय करें"
+  },
+  "Remove from this list": {
+    "message": "इस सूची से हटा दें"
+  },
+  "Remove image": {
+    "message": "इमेज हटाएं"
+  },
+  "Remove": {
+    "message": "हटाएं"
+  },
+  "Rename Chapter": {
+    "message": "अध्याय का नाम बदलें"
+  },
+  "Rename": {
+    "message": "नाम बदलें"
+  },
+  "Contact Support": {
+    "message": "सपोर्ट टीम से संपर्क करें"
+  },
+  "Request a Feature": {
+    "message": "एक सुविधा का अनुरोध करें"
+  },
+  "Restore Purchase": {
+    "message": "परचेस रीस्टोर करें"
+  },
+  "Roadmap": {
+    "message": "रोडमैप"
+  },
+  "SELECT A PROJECT FILE": {
+    "message": "एक प्रोजेक्ट फ़ाइल का चयन करें"
+  },
+  "SELECT": {
+    "message": "चयन करें"
+  },
+  "Save Backups": {
+    "message": "बैकअप सहेजें"
+  },
+  "Save Changes?": {
+    "message": "परिवर्तनों को सहेजें?"
+  },
+  "Save Chapter": {
+    "message": "अध्याय सहेजें"
+  },
+  "Save File": {
+    "message": "फाइल सहेजें"
+  },
+  "Save Plotline": {
+    "message": "प्लॉटलाइन सहेजें"
+  },
+  "Save as Template": {
+    "message": "टेम्पलेट के रूप में सहेजें"
+  },
+  "Save as\nTemplate": {
+    "message": "\n टेम्पलेट के रूप में सहेजें"
+  },
+  "Save as": {
+    "message": "के रूप में सहेजें"
+  },
+  "Save before closing?": {
+    "message": "बंद करने से पहले सेव करें?"
+  },
+  "Save": {
+    "message": "सेव करें?"
+  },
+  "Saved": {
+    "message": "सेव किया गया"
+  },
+  "Saving failed": {
+    "message": "सहेजना विफल रहा"
+  },
+  "Saving worked this time 🎉": {
+    "message": "सहेजना इस बार सफल रही 🎉"
+  },
+  "Saving your file didn't work. Check where it's stored.": {
+    "message": "आपका फ़ाइल सहेजना सफल नहीं रहा। जाँचें कि यह कहाँ संग्रहीत है।"
+  },
+  "Saving your file didn't work. Try again.": {
+    "message": "आपका फ़ाइल सहेजना सफल नहीं रहा। पुनः प्रयास करें।"
+  },
+  "Scene Cards": {
+    "message": "सीन कार्ड्स"
+  },
+  "Scene Details": {
+    "message": "सीन विवरण"
+  },
+  "Scene Title": {
+    "message": "सीन शीर्षक"
+  },
+  "Scene {num}": {
+    "message": "सीन { num }"
+  },
+  "Scene": {
+    "message": "सीन"
+  },
+  "Scrivener Project": {
+    "message": "Scrivener प्रोजेक्ट"
+  },
+  "Scrivener": {
+    "message": "Scrivener"
+  },
+  "Scroll": {
+    "message": "स्क्रॉल"
+  },
+  "Search": {
+    "message": "खोजें"
+  },
+  "See What's New": {
+    "message": "देखें, क्या नया है"
+  },
+  "See the outline here": {
+    "message": "रूपरेखा यहाँ देखें"
+  },
+  "See More": {
+    "message": "और देखें"
+  },
+  "See Less": {
+    "message": "कम देखें"
+  },
+  "See that was painless": {
+    "message": "देखा, वह दर्द रहित था"
+  },
+  "Select All": {
+    "message": "सभी का चयन करे"
+  },
+  "Select a Category": {
+    "message": "एक श्रेणी चुनें"
+  },
+  "Select a Chapter": {
+    "message": "एक अध्याय चुनें"
+  },
+  "Select a File": {
+    "message": "एक फाइल चुनें"
+  },
+  "Select a Plotline": {
+    "message": "एक प्लॉटलाइन चुनें"
+  },
+  "Series Outline": {
+    "message": "श्रृंखला की रूपरेखा"
+  },
+  "Series View": {
+    "message": "श्रृंखला दृश्य"
+  },
+  "Series": {
+    "message": "श्रृंखला"
+  },
+  "Session Start": {
+    "message": "सत्र प्रारंभ"
+  },
+  "Settings": {
+    "message": "सेटिंग्स"
+  },
+  "Short Description": {
+    "message": "संक्षिप्त वर्णन"
+  },
+  "Short Synopsis": {
+    "message": "लघु सारांश"
+  },
+  "Show All": {
+    "message": "सभी दिखाएं"
+  },
+  "Show in File Explorer": {
+    "message": "फ़ाइल एक्सप्लोरर में दिखाएं"
+  },
+  "Show in Finder": {
+    "message": "फ़ाइंडर में दिखाएँ"
+  },
+  "Since this is your first time using Plottr, I'll give you a guided tour if you like.": {
+    "message": "चूँकि यह पहली बार आप Plottr का उपयोग कर रहे हैं, यदि आप चाहें तो मैं आपको एक निर्देशित यात्रा दूँगा।"
+  },
+  "Size: large": {
+    "message": "आकार: बड़ा"
+  },
+  "Size: medium": {
+    "message": "आकार: मध्यम"
+  },
+  "Size: small": {
+    "message": "आकार: छोटा"
+  },
+  "Something went wrong,": {
+    "message": "कुछ गलत हो गया,"
+  },
+  "Something went wrong.": {
+    "message": "कुछ गलत हो गया।"
+  },
+  "Sort": {
+    "message": "छांटें"
+  },
+  "Source Link": {
+    "message": "स्रोत लिंक"
+  },
+  "Start": {
+    "message": "प्रारंभ"
+  },
+  "Start Mobile Subscription": {
+    "message": "मोबाइल सब्सक्रिप्शन प्रारंभ करें"
+  },
+  "Start my Free Trial": {
+    "message": "मेरा फ्री ट्रायल प्रारंभ करें"
+  },
+  "Started On": {
+    "message": "को प्रारंभ हुआ"
+  },
+  "Starter Templates": {
+    "message": "स्टार्टर टेम्प्लेट"
+  },
+  "Start Plottr Pro": {
+    "message": "Plottr Pro शुरू करें"
+  },
+  "Plottr Pro Wizard": {
+    "message": "Plottr Pro विज़ार्ड"
+  },
+  "START PLOTTING": {
+    "message": "प्लॉटिंग शुरू करें"
+  },
+  "Step {number}": {
+    "message": "चरण {number}"
+  },
+  "Story line": {
+    "message": "कहानी"
+  },
+  "Story name": {
+    "message": "कहानी का नाम"
+  },
+  "Submit": {
+    "message": "सबमिट करें"
+  },
+  "Subscription Restored!": {
+    "message": "सब्सक्रिप्शन बहाल!"
+  },
+  "Subtitle": {
+    "message": "सबटाइटल"
+  },
+  "Success!": {
+    "message": "सफल!"
+  },
+  "Supporting": {
+    "message": "सहायक"
+  },
+  "Tag Details": {
+    "message": "टैग विवरण"
+  },
+  "Tag Name": {
+    "message": "टैग नाम"
+  },
+  "Tag": {
+    "message": "टैग"
+  },
+  "Tags can be used for organization": {
+    "message": "टैग का उपयोग संगठन के लिए किया जा सकता है"
+  },
+  "Tags list": {
+    "message": "टैग सूची"
+  },
+  "Tags": {
+    "message": "टैग"
+  },
+  "Take Screenshot": {
+    "message": "स्क्रीनशॉट लें"
+  },
+  "Template Saved": {
+    "message": "टेम्पलेट सहेजा गया"
+  },
+  "Template": {
+    "message": "टेम्पलेट"
+  },
+  "Templates": {
+    "message": "टेम्पलेट"
+  },
+  "Terms of Service": {
+    "message": "सेवा की शर्तें"
+  },
+  "Text Error": {
+    "message": "टेक्स्ट त्रुटि"
+  },
+  "Thanks for trying Plottr": {
+    "message": "Plottr आज़माने के लिए धन्यवाद"
+  },
+  "That code was invalid. Try again.": {
+    "message": "वह कोड अमान्य था. पुनः प्रयास करें।"
+  },
+  "That email didn't verify. Try again or try another email.": {
+    "message": "वह ईमेल सत्यापित नहीं हुआ. पुनः प्रयास करें या कोई अन्य ईमेल आज़माएं।"
+  },
+  "Theme": {
+    "message": "थीम"
+  },
+  "There was an error activating your license key on this device": {
+    "message": "इस डिवाइस पर आपकी लाइसेंस कुंजी को सक्रिय करने में त्रुटि हुई"
+  },
+  "There was an error doing that. Try again": {
+    "message": "ऐसा करने में त्रुटि हुई थी। पुनः प्रयास करें"
+  },
+  "There was an error while sharing your file. Try Again.": {
+    "message": "आपकी फ़ाइल साझा करते समय कोई गड़बड़ी हुई थी. पुनः प्रयास करें।"
+  },
+  "There was an error trying to sign you in. Ensure you password and email are correct.": {
+    "message": "आपको साइन इन करने का प्रयास करने में त्रुटि हुई थी। सुनिश्चित करें कि आपका पासवर्ड और ईमेल सही है।"
+  },
+  "This is a plotline": {
+    "message": "यह एक कथानक है"
+  },
+  "This is a scene or chapter. You can change its name by clicking on it": {
+    "message": "यह एक सीन या अध्याय है। आप उस पर क्लिक करके उसका नाम बदल सकते हैं"
+  },
+  "This will send you an email with a code": {
+    "message": "यह आपको एक कोड के साथ एक ईमेल भेजेगा"
+  },
+  "This will be quick and painless.": {
+    "message": "यह जल्दी और दर्द रहित होगा।"
+  },
+  "There are only ": {
+    "message": "इसमें केवल "
+  },
+  "{number} steps:": {
+    "message": "{number} चरण:"
+  },
+  "Timeline is filtered": {
+    "message": "समयरेखा फ़िल्टर की गई है"
+  },
+  "Timeline": {
+    "message": "समयरेखा"
+  },
+  "Title": {
+    "message": "शीर्षक"
+  },
+  "Toggle navigation": {
+    "message": "नेविगेशन टॉगल"
+  },
+  "Trash": {
+    "message": "कचरा"
+  },
+  "Try that again": {
+    "message": "इसे फिर से आज़माएँ"
+  },
+  "Try Plottr Pro today for a seamless cloud experience like you have never imagined.": {
+    "message": "एक सहज अभूतपूर्व क्लाउड अनुभव के लिए Plottr Pro को आज ही आज़माएँ।"
+  },
+  "Tutorials": {
+    "message": "ट्यूटोरियल"
+  },
+  "Type": {
+    "message": "प्रकार"
+  },
+  "UH-OH!": {
+    "message": "ओह!"
+  },
+  "URL": {
+    "message": "URL"
+  },
+  "Uncategorized": {
+    "message": "अवर्गीकृत"
+  },
+  "Undo": {
+    "message": "पूर्ववत करें"
+  },
+  "Untitled": {
+    "message": "शीर्षकहीन"
+  },
+  "Unknown": {
+    "message": "अज्ञात"
+  },
+  "Update Automatically": {
+    "message": "स्वचालित रूप से अपडेट करें"
+  },
+  "Update Available 🎉 (version {version})": {
+    "message": "अपडेट उपलब्ध 🎉 (संस्करण {version})"
+  },
+  "Update failed. Try again": {
+    "message": "अपडेट विफल रहा। पुनः प्रयास करें"
+  },
+  "Updates": {
+    "message": "अपडेट"
+  },
+  "Upload Files": {
+    "message": "फाइल अपलोड करें"
+  },
+  "Upload projects and templates": {
+    "message": "प्रोजेक्ट और टेम्प्लेट अपलोड करें"
+  },
+  "Uploading projects and templates": {
+    "message": "प्रोजेक्ट और टेम्प्लेट अपलोड हो रहा है"
+  },
+  "UPLOADING...": {
+    "message": "अपलोड हो रहा है..."
+  },
+  "Upload Projects": {
+    "message": "प्रोजेक्ट अपलोड करें"
+  },
+  "Use Template": {
+    "message": "टेम्पलेट का इस्तेमाल करें"
+  },
+  "Use Book\nTemplate": {
+    "message": "बुक\nटेम्प्लेट का प्रयोग करें"
+  },
+  "Use Scene\nTemplate": {
+    "message": "सीन\nटेम्प्लेट का प्रयोग करें"
+  },
+  "Use a different email": {
+    "message": "एक अलग ईमेल का प्रयोग करें"
+  },
+  "Use this to remove your license on this device": {
+    "message": "इस डिवाइस पर अपना लाइसेंस हटाने के लिए इसका इस्तेमाल करें"
+  },
+  "Use License Code Login": {
+    "message": "लाइसेंस कोड लॉगिन का प्रयोग करें"
+  },
+  "Use Plottr Pro Login": {
+    "message": "Plottr Pro लॉगिन का प्रयोग करें"
+  },
+  "VERIFY CODE": {
+    "message": "कोड सत्यापित करें"
+  },
+  "VERIFYING...": {
+    "message": "सत्यापन किया जा रहा है..."
+  },
+  "Verify": {
+    "message": "सत्यापित करें"
+  },
+  "Verifying with email: {email}": {
+    "message": "ईमेल से सत्यापित हो रहा है: { email }"
+  },
+  "Version": {
+    "message": "संस्करण"
+  },
+  "View Error": {
+    "message": "त्रुटि देखें"
+  },
+  "View Timeline": {
+    "message": "टाइमलाइन देखें"
+  },
+  "View": {
+    "message": "देखें"
+  },
+  "We found your user session but...": {
+    "message": "हमें आपका उपयोगकर्ता सत्र मिला लेकिन आपका लाइसेंस समाप्त हो गया है या निष्क्रिय है। जारी रखने के लिए कृपया नया लाइसेंस या मोबाइल सब्सक्रिप्शन खरीदें।"
+  },
+  "We had a problem creating a new project": {
+    "message": "नया प्रोजेक्ट बनाने में हमें समस्या हुई. सुनिश्चित करें कि Plottr के पास सही अनुमतियां हैं और आपके पास पर्याप्त स्टोरेज स्थान है।"
+  },
+  "We had a problem processing your file": {
+    "message": "आपकी फ़ाइल संसाधित करने में हमें समस्या हुई. सुनिश्चित करें कि Plottr के पास सही अनुमतियां हैं और फिर से कोशिश करें."
+  },
+  "We will email you a verification code.": {
+    "message": "हम आपको एक सत्यापन कोड ईमेल करेंगे।"
+  },
+  "Welcome to Plottr!": {
+    "message": "Plottr में आपका स्वागत है!"
+  },
+  "Welcome to Plottr": {
+    "message": "Plottr में आपका स्वागत है"
+  },
+  "Welcome to": {
+    "message": "आपका स्वागत है"
+  },
+  "What would you like to do?": {
+    "message": "आप क्या करना पसंद करेंगे?"
+  },
+  "Where would you like to save the export?": {
+    "message": "आप एक्सपोर्ट को कहाँ सेव करना चाहेंगे?"
+  },
+  "Where would you like to save this copy?": {
+    "message": "आप इस कॉपी को कहाँ सेव करना चाहेंगे?"
+  },
+  "Where would you like to save this file?": {
+    "message": "आप इस फ़ाइल को कहाँ सेव करना चाहेंगे?"
+  },
+  "Whites": {
+    "message": "सफ़ेद"
+  },
+  "Window": {
+    "message": "खिड़की"
+  },
+  "Word Document": {
+    "message": "Word डॉक्यूमेंट"
+  },
+  "Yes, Delete": {
+    "message": "हाँ, डिलीट करें"
+  },
+  "Yes, Save": {
+    "message": "हाँ, सेव करें"
+  },
+  "You already have a file named {file}": {
+    "message": "आपके पास {file} नाम की एक फ़ाइल पहले से है।\nक्या आप इसे ओवरराईट करना चाहते हैं?"
+  },
+  "You can change its name or color by hovering over it (disabled for the tour)": {
+    "message": "आप इसके ऊपर होवर करके इसका नाम या रंग बदल सकते हैं (दौरे के लिए अक्षम)"
+  },
+  "You can create an error report and report the problem to us at: ": {
+    "message": "आप एक त्रुटि रिपोर्ट बना सकते हैं और समस्या की रिपोर्ट हमें यहाँ कर सकते हैं: "
+  },
+  "You can export everything to a Word document": {
+    "message": "आप वर्ड डॉक्यूमेंट में सब कुछ एक्सपोर्ट कर सकते हैं"
+  },
+  "You can have 5 more days to try Plottr": {
+    "message": "Plottr आज़माने के लिए आपके पास 5 और दिन हैं"
+  },
+  "You cannot delete the last chapter.": {
+    "message": "आप अंतिम अध्याय को डिलीट नहीं कर सकते।"
+  },
+  "You cannot delete the last plotline.": {
+    "message": "आप अंतिम प्लॉटलाइन को डिलीट नहीं कर सकते।"
+  },
+  "You have unsaved changes": {
+    "message": "आपके परिवर्तन सहेजे नहीं गए हैं।\nक्या आप सहेजना चाहते हैं?"
+  },
+  "You have no {type}s": {
+    "message": "आपके पास कोई {type} नहीं है"
+  },
+  "You may create a new project": {
+    "message": "आप एक नया प्रोजेक्ट बना सकते हैं\n या शुरू करने के लिए एक प्रोजेक्ट फ़ाइल का चयन करें"
+  },
+  "You need to have an active Plottr Pro account to continue": {
+    "message": "जारी रखने के लिए आपके पास एक सक्रिय Plottr Pro अकाउंट होना चाहिए"
+  },
+  "Your email didn't verify. Try again or try another email.": {
+    "message": "आपका ईमेल सत्यापित नहीं हुआ\nपुन: प्रयास करें या कोई अन्य ईमेल आज़माएं."
+  },
+  "You currently have no available licenses for this email.": {
+    "message": "आपके पास वर्तमान में इस ईमेल के लिए कोई लाइसेंस उपलब्ध नहीं है।"
+  },
+  "Your selected license failed verification. Try another one.": {
+    "message": "आपका चयनित लाइसेंस सत्यापन असफल रहा। एक बार फिर कोशिश करें।"
+  },
+  "You should have received a license key after your purchase.": {
+    "message": "आपको अपनी खरीदारी के बाद लाइसेंस कुंजी प्राप्त हुई होगी।"
+  },
+  "You should have received an email with a code": {
+    "message": "आपको एक कोड के साथ एक ईमेल प्राप्त हुआ होगा"
+  },
+  "You'll have {trialDays} days": {
+    "message": "आपके पास {trialDays} दिन है"
+  },
+  "You're on the latest version": {
+    "message": "आप नवीनतम वर्ज़न पर हैं"
+  },
+  "Your Plottr file was exported to a .docx file": {
+    "message": "आपकी Plottr फ़ाइल को एक .docx फ़ाइल में निर्यात किया गया था"
+  },
+  "Your Plottr file was exported to a Scrivener project package": {
+    "message": "आपकी Plottr फ़ाइल को Scrivener प्रोजेक्ट पैकेज में निर्यात किया गया था"
+  },
+  "Your free trial has expired": {
+    "message": "आपका फ्री ट्रायल समाप्त हो चुका है"
+  },
+  "Your template has been saved and is ready to use": {
+    "message": "आपका टेम्प्लेट सहेज लिया गया है और उपयोग के लिए तैयार है"
+  },
+  "Your next great plot begins with Plottr.": {
+    "message": "आपका अगला शानदार प्लॉट Plottr से शुरू होता है।"
+  },
+  "Zoom": {
+    "message": "ज़ूम"
+  },
+  "[image]": {
+    "message": "[image]"
+  },
+  "a lot of scenes moved around": {
+    "message": "बहुत सारे सीन इधर-उधर किये गए"
+  },
+  "a lot of story lines moved around": {
+    "message": "बहुत सारे स्टोरीलाइन्स इधर-उधर किये गए"
+  },
+  "and": {
+    "message": "और"
+  },
+  "attach character {characterName} to card {cardName}": {
+    "message": "कार्ड {cardName} से पात्र {characterName} अटैच करें"
+  },
+  "attach character {characterName} to note {noteName}": {
+    "message": "नोट {noteName} से पात्र {characterName} अटैच करें"
+  },
+  "attach place {placeName} to card {cardName}": {
+    "message": "कार्ड {cardName} में स्थान {placeName} अटैच करें"
+  },
+  "attach place {placeName} to note {noteName}": {
+    "message": "नोट{noteName} में स्थान {placeName} अटैच करें"
+  },
+  "attach tag {tagName} to card {cardName}": {
+    "message": "कार्ड {cardName} में टैग {tagName} अटैच करें"
+  },
+  "attach tag {tagName} to note {noteName}": {
+    "message": "टैग {tagName} को नोट {noteName} में अटैच करें"
+  },
+  "blank": {
+    "message": "रिक्त"
+  },
+  "but don't worry!": {
+    "message": "लेकिन घबराना नहीं!"
+  },
+  "Character's Categories": {
+    "message": "पात्र की श्रेणियाँ"
+  },
+  "Checking licenses for {email}": {
+    "message": "लाइसेंस की जाँच की जा रही है {email} के लिए"
+  },
+  "custom character attribute": {
+    "message": "पात्र एट्रिब्यूट कस्टम करें"
+  },
+  "custom place attribute": {
+    "message": "स्थान एट्रिब्यूट कस्टम करें"
+  },
+  "hex code or name": {
+    "message": "हेक्स कोड या नाम"
+  },
+  "new card": {
+    "message": "नया कार्ड"
+  },
+  "new scene": {
+    "message": "नया सीन"
+  },
+  "new storyline": {
+    "message": "नई कहानी"
+  },
+  "no more to add": {
+    "message": "जोड़ने के लिए और नहीं"
+  },
+  "or": {
+    "message": "या"
+  },
+  "remove character {characterName} from card {cardName}": {
+    "message": "कार्ड {cardName} से पात्र {characterName} हटाएं"
+  },
+  "remove character {characterName} from note {noteName}": {
+    "message": "नोट{noteName} से पात्र {characterName} हटाएं"
+  },
+  "remove place {placeName} from card {cardName}": {
+    "message": "कार्ड {cardName} से स्थान {placeName} हटाएं"
+  },
+  "remove place {placeName} from note {noteName}": {
+    "message": "नोट {noteName} से स्थान {placeName} हटाएं"
+  },
+  "remove tag {tagName} from card {cardName}": {
+    "message": "कार्ड {cardName} से टैग {tagName} हटाएं"
+  },
+  "remove tag {tagName} from note {noteName}": {
+    "message": "नोट {noteName} से टैग {tagName} हटाएं"
+  },
+  "that best suits your style and needs.": {
+    "message": "जो आपकी शैली और आवश्यकताओं के अनुकूल हो।"
+  },
+  "to activate this device.": {
+    "message": "इस डिवाइस को सक्रिय करने के लिए।"
+  },
+  "with an iOS mobile subscription!": {
+    "message": "iOS मोबाइल सब्सक्रिप्शन के साथ!"
+  },
+  "{\n          count, plural,\n          one {1 character attached}\n          other {# characters attached}\n        }": {
+    "message": "{ count, plural,\n    one {1 character attached}\n  other {# characters attached}\n}"
+  },
+  "{\n          count, plural,\n          one {1 place attached}\n          other {# places attached}\n        }": {
+    "message": "{ count, plural,\n    one {1 place attached}\n  other {# places attached}\n}"
+  },
+  "{\n          count, plural,\n          one {1 tag attached}\n          other {# tags attached}\n        }": {
+    "message": "{ count, plural,\n    one {1 tag attached}\n  other {# tags attached}\n}"
+  },
+  "{amount} Lifetime": {
+    "message": "${amount}\nLifetime"
+  },
+  "{amount} Monthly": {
+    "message": "${amount}\nMonthly"
+  },
+  "{amount} Weekly": {
+    "message": "${amount}\nWeekly"
+  },
+  "{amount} Yearly": {
+    "message": "${amount}\nYearly"
+  },
+  "{date, date, long}": {
+    "message": "{ date, date, long }"
+  },
+  "{date, date, medium}": {
+    "message": "{ date, date, medium }"
+  },
+  "{date, date, monthDay}": {
+    "message": "{ date, date, monthDay }"
+  },
+  "{numOfDays, plural,\n      =0 {# days left}\n      one {# day left}\n      other {# days left}\n    }": {
+    "message": "{ numOfDays, plural,\n     =0 {# days left}\n    एक {# day left}\n  अन्य {# days left}\n}"
+  },
+  "{num} Scenes": {
+    "message": "{ num } सीन"
+  },
+  "{val, number, percent}": {
+    "message": "{ val, number, percent }"
+  },
+  "{wordCount,number} words": {
+    "message": "{ wordCount, number } शब्द"
+  },
+  "Add attributes": {
+    "message": "एट्रिब्यूट जोड़ें"
+  },
+  "Attached to": {
+    "message": "से जुड़ा"
+  },
+  "Bring All to Front": {
+    "message": "सबको आगे लाएं"
+  },
+  "Buy the Full Version": {
+    "message": "फुल वर्ज़न खरीदें"
+  },
+  "Card Title": {
+    "message": "कार्ड शीर्षक"
+  },
+  "character": {
+    "message": "पात्र"
+  },
+  "Choose color": {
+    "message": "रंग पसंद करें"
+  },
+  "Choose what you want to track about your characters": {
+    "message": "चुनें कि आप अपने पात्रों के बारे में क्या ट्रैक करना चाहते हैं"
+  },
+  "Choose what you want to track about your places": {
+    "message": "चुनें कि आप अपने स्थानों के बारे में क्या ट्रैक करना चाहते हैं"
+  },
+  "Click here to get the full version": {
+    "message": "फुल वर्ज़न पाने के लिए यहाँ क्लिक करें"
+  },
+  "Contact": {
+    "message": "संपर्क"
+  },
+  "Crafted in the Mountains of Utah by": {
+    "message": "द्वारा यूटा के पहाड़ों में तैयार किया गया"
+  },
+  "Create a new file": {
+    "message": "एक नई फ़ाइल बनाएँ"
+  },
+  "Creates a report to send me": {
+    "message": "मुझे भेजने के लिए एक रिपोर्ट बनाएं"
+  },
+  "Creating your file didn't work. Let's try again.": {
+    "message": "आपकी फ़ाइल बनाने का काम नहीं हुआ। चलो फिर से कोशिश करें।"
+  },
+  "Credits": {
+    "message": "क्रेडिट्स"
+  },
+  "Custom Attributes for Characters": {
+    "message": "पात्रों के लिए ऐट्रिब्यूट्स कस्टम करें"
+  },
+  "Custom Attributes for Places": {
+    "message": "स्थानों के लिए ऐट्रिब्यूट्स कस्टम करें"
+  },
+  "Do you want to delete this card: { title }?": {
+    "message": "क्या आप इस कार्ड: {title} को डिलीट करना चाहते हैं?"
+  },
+  "Do you want to delete this character: { character }?": {
+    "message": "क्या आप इस पात्र: { character } को डिलीट करना चाहते हैं?"
+  },
+  "Do you want to delete this note: { title }?": {
+    "message": "क्या आप इस नोट: {title} को डिलीट करना चाहते हैं?"
+  },
+  "Do you want to delete this place: { name }?": {
+    "message": "क्या आप इस स्थान: {name} को डिलीट करना चाहते हैं?"
+  },
+  "Do you want to delete this scene: { title }?": {
+    "message": "क्या आप इस सीन: { title } को डिलीट करना चाहते हैं?"
+  },
+  "Do you want to delete this story line: { title }?": {
+    "message": "क्या आप इस स्टोरी लाइन: { title } को डिलीट करना चाहते हैं?"
+  },
+  "Do you want to delete this tag: { title }?": {
+    "message": "क्या आप इस टैग: { title } को डिलीट करना चाहते हैं?"
+  },
+  "Enter License": {
+    "message": "लाइसेंस दर्ज करें"
+  },
+  "Filter by story line": {
+    "message": "स्टोरी लाइन द्वारा फ़िल्टर करें"
+  },
+  "Fit": {
+    "message": "फिट"
+  },
+  "Format with markdown!": {
+    "message": "मार्कडाउन के साथ फॉर्मेट!"
+  },
+  "Forums": {
+    "message": "फोरम"
+  },
+  "Give feedback": {
+    "message": "फीडबैक दें"
+  },
+  "If you keep seeing this problem, email me at support@plottr.com": {
+    "message": "यदि आपको यह समस्या दिखाई देना जारी रहता है, तो मुझे support@plottr.com पर ईमेल करें"
+  },
+  "It looks like you have Plottr on 5 computers already": {
+    "message": "ऐसा लगता है कि आपके पास पहले से ही 5 कंप्यूटरों पर Plottr है"
+  },
+  "It looks like you have an older file version. This could make things work funky or not at all. May Plottr update it for you?": {
+    "message": "ऐसा लगता है कि आपके पास फ़ाइल का पुराना वर्ज़न है. इससे शायद चीज़ें अजीब काम कर सकती हैं या बिल्कुल नहीं। क्या Plottr इसे आपके लिए अपडेट कर सकता है?"
+  },
+  "It looks like your file was saved with a newer version of Plottr than you're using now. That could cause problems. Try updating Plottr and starting it again.": {
+    "message": "ऐसा लगता है कि आपकी फ़ाइल Plottr के उस नए वर्ज़न के साथ सहेजी गई थी जिसका आप अभी उपयोग कर रहे हैं। इससे दिक्कत हो सकती है। Plottr को अपडेट करने और इसे फिर से शुरू करने का प्रयास करें।"
+  },
+  "It will save a backup first which will be saved to the same folder as this file": {
+    "message": "यह पहले एक बैकअप सेव करेगा जो इस फ़ाइल के समान फ़ोल्डर में सहेजा जाएगा"
+  },
+  "License verification failed": {
+    "message": "लाइसेंस सत्यापन विफल रहा"
+  },
+  "License verified! You're all set.": {
+    "message": "लाइसेंस सत्यापित! बस हो गया।"
+  },
+  "Line": {
+    "message": "लाइन"
+  },
+  "Loading...": {
+    "message": "लोड हो रहा है..."
+  },
+  "Minimize": {
+    "message": "मिनीमाइज करें"
+  },
+  "My awesome story": {
+    "message": "मेरी शानदार कहानी"
+  },
+  "Nope. Plottr tried again. But it didn't work. Plottr will ask you next time it opens, but you're verified. Enjoy": {
+    "message": "नहीं। Plottr ने फिर कोशिश की। लेकिन बात नहीं बनी। Plottr अगली बार खुलने पर आपसे पूछेगा, लेकिन आप सत्यापित हैं। आनंद लें"
+  },
+  "Now let's get to the good stuff": {
+    "message": "अब अच्छी चीज़ों पर आते हैं"
+  },
+  "Open the Tour": {
+    "message": "टूर खोलें"
+  },
+  "Or feel free to contact me with any questions": {
+    "message": "या किसी भी प्रश्न के लिए मुझसे बेझिझक संपर्क करें"
+  },
+  "place": {
+    "message": "जगह"
+  },
+  "Please upload the file named plottr_error_report.txt in your Documents folder": {
+    "message": "कृपया अपने डाक्यूमेंट्स फ़ोल्डर में plottr_error_report.txt नाम की फ़ाइल अपलोड करें"
+  },
+  "Plottr couldn't save a backup. It hasn't touched your file yet, so don't worry. Try quitting Plottr and starting it again.": {
+    "message": "Plottr बैकअप नहीं सेव कर सका। इसने अभी तक आपकी फ़ाइल को छुआ नहीं है, इसलिए चिंता न करें। Plottr से निकलने और इसे फिर से शुरू करने का प्रयास करें।"
+  },
+  "Plottr saved a backup just in case and now on with the show (To use the backup, remove '.backup' from the file name)": {
+    "message": "Plottr ने बैकअप सेव किया(बैकअप का उपयोग करने के लिए, फ़ाइल नाम से '.backup' हटाएं)"
+  },
+  "Plottr tried saving a backup just in case, but it didn't work. Try quitting Plottr and starting it again.": {
+    "message": "Plottr ने बैकअप को सेव करने की कोशिश की, लेकिन यह सफल नहीं हुआ। Plottr से बाहर निकलने और इसे फिर से शुरू करने का प्रयास करें।"
+  },
+  "Plottr updated your file without a problem. Don't forget to save your file.": {
+    "message": "Plottr ने बिना किसी समस्या के आपकी फाइल को अपडेट किया। अपनी फाइल को सेव करना न भूलें।"
+  },
+  "Plottr verified your license key successfully, but there was an error saving that. Let's try one more time": {
+    "message": "Plottr ने आपकी लाइसेंस कुंजी को सफलतापूर्वक सत्यापित किया, लेकिन उसे सेव करने में त्रुटि हुई। आइए एक बार और प्रयास करें"
+  },
+  "Problem saving backup": {
+    "message": "बैकअप सेव करने में समस्या"
+  },
+  "Report a problem": {
+    "message": "एक समस्या के बारे में बताएं"
+  },
+  "Request a feature": {
+    "message": "एक सुविधा का अनुरोध करें"
+  },
+  "Reset": {
+    "message": "रिसेट करें"
+  },
+  "Save & Close": {
+    "message": "सेव और क्लोज़ करें"
+  },
+  "Scene 1": {
+    "message": "सीन 1"
+  },
+  "Scene {number}": {
+    "message": "सीन {number}"
+  },
+  "Scene {number} name": {
+    "message": "सीन {number} naam"
+  },
+  "Story line name": {
+    "message": "स्टोरी लाइन नाम"
+  },
+  "TRIAL Version": {
+    "message": "ट्रायल वर्ज़न"
+  },
+  "Try again by clicking in the menu: Plottr > Verify License...": {
+    "message": "मेनू में क्लिक करके पुन: प्रयास करें: Plottr > लाइसेंस सत्यापित करें..."
+  },
+  "Update Plottr": {
+    "message": "Plottr अपडेट करें"
+  },
+  "Upload the file Plottr just exported": {
+    "message": "Plottr से अभी एक्सपोर्ट की गई फ़ाइल अपलोड करें"
+  },
+  "Use the code \"freetrial\" to get the secret discount": {
+    "message": "गुप्त डिस्काउंट प्राप्त करने के लिए \"freetrial\" कोड का उपयोग करें"
+  },
+  "Verifying your license. Please wait...": {
+    "message": "आपका लाइसेंस सत्यापित किया जा रहा है। कृपया प्रतीक्षा कीजिये..."
+  },
+  "Where would you like to start your new file?": {
+    "message": "आप अपनी नई फाइल कहाँ से शुरू करना चाहेंगे?"
+  },
+  "Would you like to open an existing file or start a new file?": {
+    "message": "क्या आप एक मौजूदा फाइल खोलना चाहेंगे या एक नई फाइल शुरू करना चाहेंगे?"
+  },
+  "Would you like to save before exiting?": {
+    "message": "क्या आप बाहर निकलने से पहले सेव करना चाहेंगे?"
+  },
+  "You should have received a license key from Gumroad.": {
+    "message": "आपको Gumroad से लाइसेंस कुंजी प्राप्त हुई होगी।"
+  },
+  "Your free trial has expired!": {
+    "message": "आपका फ्री ट्रायल एक्सपायर हो चुका है!"
+  },
+  "a new card": {
+    "message": "एक नया कार्ड"
+  },
+  "description": {
+    "message": "विवरण"
+  },
+  "learn how": {
+    "message": "सीखें कैसे"
+  },
+  "name": {
+    "message": "नाम"
+  },
+  "New Card": {
+    "message": "नया कार्ड"
+  },
+  "new character": {
+    "message": "नया पात्र"
+  },
+  "new note": {
+    "message": "नया नोट"
+  },
+  "new place": {
+    "message": "नयी जगह"
+  },
+  "new tag": {
+    "message": "नया टैग"
+  },
+  "no, just exit": {
+    "message": "नहीं, बस निकलें"
+  },
+  "no, open the file as-is": {
+    "message": "नहीं, फ़ाइल को इसी रूप में खोलें"
+  },
+  "ok": {
+    "message": "ओके"
+  },
+  "story line": {
+    "message": "स्टोरी लाइन"
+  },
+  "tag name": {
+    "message": "टैग नाम"
+  },
+  "title": {
+    "message": "शीर्षक"
+  },
+  "yes, save!": {
+    "message": "हाँ, सेव करें!"
+  },
+  "yes, update the file": {
+    "message": "हाँ, फाइल अपडेट करें"
+  },
+  "{\n      count, plural,\n        one {1 note}\n        other {# notes}\n    }": {
+    "message": "{\n      count, plural,\n        one {1 note}\n        other {# notes}\n    }"
+  },
+  "{days} days remaining": {
+    "message": "{days} दिन शेष"
+  },
+  "Are you sure you want to delete {template}?": {
+    "message": "क्या आप वाकई {template} डिलीट करना चाहते हैं?"
+  },
+  "Character Custom Attributes": {
+    "message": "पात्र कस्टम एट्रिब्यूट"
+  },
+  "Check for updates": {
+    "message": "अपडेट के लिए जांचें"
+  },
+  "Checking for updates": {
+    "message": "अपडेट्स के लिए जाँच हो रही है"
+  },
+  "Choose an image below or upload a new one": {
+    "message": "नीचे एक छवि चुनें या एक नया अपलोड करें"
+  },
+  "Could not display license key. Try again": {
+    "message": "लाइसेंस कुंजी प्रदर्शित नहीं कर सके। पुनः प्रयास करें"
+  },
+  "Crafted in the Mountains of Utah": {
+    "message": "यूटा के पहाड़ों में तैयार की गई"
+  },
+  "Create an error report": {
+    "message": "एक त्रुटि रिपोर्ट बनाएँ"
+  },
+  "Create unlimited story files": {
+    "message": "कहानियों की असीमित फ़ाइलें बनाएँ"
+  },
+  "Do you want to delete this book: { book }?": {
+    "message": "क्या आप इस पुस्तक: {book} को डिलीट करना चाहते हैं?"
+  },
+  "Do you want to delete this chapter: { title }?": {
+    "message": "क्या आप इस अध्याय: { title } को हटाना चाहते हैं?"
+  },
+  "Download Now": {
+    "message": "अभी डाउनलोड करें "
+  },
+  "Downloading ({percent}%)": {
+    "message": "({percent}%) डाउनलोड हो रहा है "
+  },
+  "Enter a customer service code": {
+    "message": "एक ग्राहक सेवा कोड दर्ज करें"
+  },
+  "Enter your code": {
+    "message": "अपना कोड दर्ज करें"
+  },
+  "Error": {
+    "message": "त्रुटि"
+  },
+  "Extending your trial didn't work. Let's try again.": {
+    "message": "आपके ट्रायल को एक्सटेंड करना असफ़ल रहा। चलो फिर से कोशिश करें।"
+  },
+  "Facebook Support Group": {
+    "message": "Facebook सपोर्ट ग्रूप"
+  },
+  "Here is your license key": {
+    "message": "यह रही आपकी लाइसेंस कुंजी"
+  },
+  "New File": {
+    "message": "नया फाइल"
+  },
+  "New from Template": {
+    "message": "टेम्पलेट से नया"
+  },
+  "No updates available": {
+    "message": "कोई अपडेट उपलब्ध नहीं"
+  },
+  "No more {type}s": {
+    "message": "और कोई {type} नहीं"
+  },
+  "Open File": {
+    "message": "फाइल खोलें"
+  },
+  "Plottr Trial": {
+    "message": "Plottr ट्रायल"
+  },
+  "Plottr created a file named plottr_error_report.txt in your Documents folder": {
+    "message": "Plottr ने आपके डाक्यूमेंट्स फोल्डर में plottr_error_report.txt नाम की फाइल बनाई"
+  },
+  "Quit and Install": {
+    "message": "छोड़ें और इनस्टॉल करें"
+  },
+  "See the Changelog": {
+    "message": "चेंजलॉग देखें"
+  },
+  "This is your Device ID": {
+    "message": "यह आपकी डिवाइस ID है"
+  },
+  "Try that again, but if it keeps happening, use the help menu to create an error report and report the problem.": {
+    "message": "दोबारा कोशिश करें, लेकिन अगर ऐसा होता रहता है, तो त्रुटि रिपोर्ट बनाने और समस्या की रिपोर्ट करने के लिए सहायता मेनू का उपयोग करें।"
+  },
+  "Update Ready": {
+    "message": "अपडेट तैयार"
+  },
+  "Update available!": {
+    "message": "अपडेट उपलब्ध!"
+  },
+  "Upload a new image": {
+    "message": "एक नई इमेज अपलोड करें"
+  },
+  "View Device ID": {
+    "message": "डिवाइस ID देखें"
+  },
+  "View License Key": {
+    "message": "लाइसेंस कुंजी देखें"
+  },
+  "View the Tour": {
+    "message": "टूर देखें"
+  },
+  "paragraph": {
+    "message": "अनुच्छेद"
+  },
+  "selected": {
+    "message": "चयनित"
+  },
+  "{\n      count, plural,\n        one {1 card}\n        other {# cards}\n    }": {
+    "message": "{\n      count, plural,\n        one {1 कार्ड}\n        other {# कार्ड}\n    }"
+  },
+  "(Series View)": {
+    "message": "(श्रृंखला दृश्य)"
+  },
+  ".docx": {
+    "message": ".docx"
+  },
+  ".scriv": {
+    "message": ".scriv"
+  },
+  "Act": {
+    "message": "एक्ट"
+  },
+  "Act Structure": {
+    "message": "एक्ट स्ट्रक्चर"
+  },
+  "Action": {
+    "message": "कार्य"
+  },
+  "Advanced...": {
+    "message": "उन्नत..."
+  },
+  "Appearance: Dark/Light": {
+    "message": "रूप: डार्क/लाइट"
+  },
+  "Are you sure? Removing a level will delete the timeline cards directly under this level's heading cards (from all books across the project).": {
+    "message": "क्या आप सुनिश्चित हैं? किसी स्तर को हटाने से इस स्तर के शीर्षक कार्ड के अंतर्गत सीधे टाइमलाइन कार्ड हट जाएंगे (प्रोजेक्ट की सभी पुस्तकों से)।"
+  },
+  "Auto Number": {
+    "message": "ऑटो नंबर"
+  },
+  "Auto-Save": {
+    "message": "ऑटो-सेव"
+  },
+  "Background Color": {
+    "message": "बैकग्राउंड का रंग"
+  },
+  "Backup Options": {
+    "message": "बैकअप विकल्प"
+  },
+  "Backups beyond this will be erased": {
+    "message": "इससे आगे के बैकअप मिटा दिए जाएंगे"
+  },
+  "Beats": {
+    "message": "बीट्स"
+  },
+  "Beta": {
+    "message": "बीटा"
+  },
+  "Black (default)": {
+    "message": "काला (डिफ़ॉल्ट)"
+  },
+  "Blue (default)": {
+    "message": "नीला (डिफ़ॉल्ट)"
+  },
+  "Body": {
+    "message": "बॉडी"
+  },
+  "Border Color": {
+    "message": "बॉर्डर रंग"
+  },
+  "Border Style": {
+    "message": "बॉर्डर स्टाइल"
+  },
+  "Character Image": {
+    "message": "पात्र छवि"
+  },
+  "Character Name": {
+    "message": "पात्र नाम"
+  },
+  "Choose what categories you want to put your notes into": {
+    "message": "चुनें कि आप अपने नोट्स को किन श्रेणियों में रखना चाहते हैं"
+  },
+  "Choose what categories you want to put your tags into": {
+    "message": "चुनें कि आप अपने टैग्स को किन श्रेणियों में रखना चाहते हैं"
+  },
+  "Choose your backup location": {
+    "message": "अपना बैकअप स्थान चुनें"
+  },
+  "Colors": {
+    "message": "रंग"
+  },
+  "Comedy": {
+    "message": "कॉमेडी"
+  },
+  "Create New Project": {
+    "message": "नया प्रोजेक्ट बनाएं"
+  },
+  "DELETE": {
+    "message": "डिलीट"
+  },
+  "Dark": {
+    "message": "डार्क"
+  },
+  "Days of Backups": {
+    "message": "बैकअप के दिन"
+  },
+  "Don't forget to make a backup of your files first.": {
+    "message": "पहले अपनी फाइलों का बैकअप बनाना न भूलें।"
+  },
+  "Edit {beatName}": {
+    "message": "एडिट करें {beatName}"
+  },
+  "Edit {lineName}": {
+    "message": "एडिट करें {lineName}"
+  },
+  "Export to:": {
+    "message": "को निर्यात करें:"
+  },
+  "General": {
+    "message": "सामान्य"
+  },
+  "Get a License": {
+    "message": "एक लाइसेंस प्राप्त करें"
+  },
+  "Give this file a new name": {
+    "message": "इस फ़ाइल को एक नया नाम दें"
+  },
+  "Green (default)": {
+    "message": "हरा (डिफ़ॉल्ट)"
+  },
+  "It looks like you've used all your license activations. Manage or upgrade here: <a>My Plottr Account</a>": {
+    "message": "ऐसा लगता है कि आपने अपने सभी लाइसेंस सक्रियणों का उपयोग कर लिया है। आप उन्हें यहाँ प्रबंधित या अपग्रेड करें: <a>मेरा Plottr अकाउंट</a>"
+  },
+  "Levels": {
+    "message": "स्तर"
+  },
+  "Light": {
+    "message": "लाइट"
+  },
+  "Mystery": {
+    "message": "रहस्य"
+  },
+  "Note Categories": {
+    "message": "नोट श्रेणियां"
+  },
+  "Note Title": {
+    "message": "नोट शीर्षक"
+  },
+  "Orange (default)": {
+    "message": "नारंगी (डिफ़ॉल्ट)"
+  },
+  "Organize your scene cards into Chapters and Acts": {
+    "message": "अपने सीन कार्डों को अध्यायों और अंकों में व्यवस्थित करें"
+  },
+  "Place Name": {
+    "message": "जगह का नाम"
+  },
+  "Put Description in:": {
+    "message": "डिस्क्रिप्शन में डालें:"
+  },
+  "Red (default)": {
+    "message": "लाल (डिफ़ॉल्ट)"
+  },
+  "Romance": {
+    "message": "रोमांस"
+  },
+  "Save these settings across projects?": {
+    "message": "इन सेटिंग को सभी प्रोजेक्ट में सेव करें?"
+  },
+  "Screenplay": {
+    "message": "पटकथा"
+  },
+  "Structure": {
+    "message": "संरचना"
+  },
+  "Synopsis": {
+    "message": "सार"
+  },
+  "System": {
+    "message": "प्रणाली"
+  },
+  "Tag Categories": {
+    "message": "टैग श्रेणियाँ"
+  },
+  "Tags / Characters / Places": {
+    "message": "टैग / पात्र / स्थान"
+  },
+  "Text Color": {
+    "message": "टेक्स्ट रंग"
+  },
+  "Text Size": {
+    "message": "टेक्स्ट आकार"
+  },
+  "Title Page": {
+    "message": "शीर्षक पेज"
+  },
+  "To give feedback on this feature, please visit:": {
+    "message": "इस सुविधा पर प्रतिक्रिया देने के लिए, कृपया विज़िट करें:"
+  },
+  "Use Templates": {
+    "message": "टेम्पलेट्स का प्रयोग करें"
+  },
+  "White (default)": {
+    "message": "सफेद (डिफ़ॉल्ट)"
+  },
+  "Yellow (default)": {
+    "message": "पीला (डिफ़ॉल्ट)"
+  },
+  "[Blank]": {
+    "message": "[Blank]"
+  },
+  "last edited": {
+    "message": "अंतिम संपादित समय"
+  },
+  "plottr.com/beta": {
+    "message": "plottr.com/beta"
+  },
+  "How to turn on Act Structure": {
+    "message": "एक्ट स्ट्रक्चर को कैसे चालू करें"
+  },
+  "On the top right corner of the app, click the 'Dashboard' button.": {
+    "message": "ऐप के ऊपरी दाएं कोने पर, 'डैशबोर्ड' बटन पर क्लिक करें।"
+  },
+  "From the 'Dashboard', click 'Settings' from the side menu.": {
+    "message": "'डैशबोर्ड' से, साइड मेनू से 'सेटिंग्स' पर क्लिक करें।"
+  },
+  "On the 'Settings' modal, click on the 'Beta tab.": {
+    "message": "'सेटिंग्स' मोडल पर, 'बीटा' टैब पर क्लिक करें।"
+  },
+  "Finally, toggle the switch to turn on/off Act Structure.": {
+    "message": "अंत में, एक्ट स्ट्रक्चर को चालू/बंद करने के लिए स्विच को टॉगल करें।"
+  },
+  "Import": {
+    "message": "इम्पोर्ट"
+  },
+  "Woohoo! Scene card moved to": {
+    "message": "वाह! सीन कार्ड को यहाँ ले जाया गया"
+  },
+  "Woohoo! Scene card duplicated": {
+    "message": "वाह! सीन कार्ड का डुप्लीकेट बन गया"
+  },
+  "Enter title": {
+    "message": "शीर्षक दर्ज करें"
+  },
+  "Duplicate": {
+    "message": "डुप्लीकेट"
+  },
+  "({ thing }).": {
+    "message": "({ thing })."
+  },
+  "+ Add Template": {
+    "message": "+ टेम्पलेट जोड़ें"
+  },
+  "Access all the features": {
+    "message": "सभी सुविधाओं तक पहुँचें"
+  },
+  "Active": {
+    "message": "सक्रीय"
+  },
+  "Advanced": {
+    "message": "एडवांस्ड"
+  },
+  "Also save backups on this device": {
+    "message": "इस डिवाइस पर बैकअप भी सेव करें"
+  },
+  "Always Open Dashboard First": {
+    "message": "हमेशा पहले डैशबोर्ड खोलें"
+  },
+  "Are you sure you want to deactivate your license key?": {
+    "message": "क्या आप वाकई अपनी लाइसेंस कुंजी निष्क्रिय करना चाहते हैं?"
+  },
+  "Are you sure you want to delete all chapters and their scene cards in \"{beatTitle}\".": {
+    "message": "क्या आप सुनिश्चित हैं कि आप \"{beatTitle}\" में सभी अध्याय और उनके सीन कार्ड डिलीट करना चाहते हैं।"
+  },
+  "Are you sure you want to delete all scene cards in \"{beatTitle}\".": {
+    "message": "क्या आप सुनिश्चित हैं कि आप \"{beatTitle}\" के सभी सीन कार्ड डिलीट करना चाहते हैं।"
+  },
+  "Are you sure you want to remove the {template} template and all its data?": {
+    "message": "क्या आप वाकई {template} टेम्प्लेट और उसके सभी डेटा को हटाना चाहते हैं?"
+  },
+  "At least two levels of hierarchy required to view as tabs": {
+    "message": "टैब के रूप में देखने के लिए पदानुक्रम के कम से कम दो स्तरों की आवश्यकता होती है"
+  },
+  "Browser": {
+    "message": "ब्राउज़र"
+  },
+  "Can't move card to empty book": {
+    "message": "खाली किताब में कार्ड नहीं ले जा सकते"
+  },
+  "Change book": {
+    "message": "किताब बदलें"
+  },
+  "Change color": {
+    "message": "रंग बदलें"
+  },
+  "Children": {
+    "message": "बच्चे"
+  },
+  "Choose what categories you want to put your places into": {
+    "message": "चुनें कि आप अपने स्थानों को किन श्रेणियों में रखना चाहते हैं"
+  },
+  "Choose what to upload": {
+    "message": "चुनें कि क्या अपलोड करना है"
+  },
+  "Choose your Scrivener project": {
+    "message": "अपना Scrivener प्रोजेक्ट चुनें"
+  },
+  "Clear Timeline": {
+    "message": "समयरेखा क्लियर करें"
+  },
+  "Click here to log in": {
+    "message": "लॉग इन करने के लिए यहाँ क्लिक करें"
+  },
+  "Collaborator": {
+    "message": "सहयोगी"
+  },
+  "Configure Pro settings": {
+    "message": "प्रो सेटिंग्स कॉन्फ़िगर करें"
+  },
+  "Confirm Placement": {
+    "message": "प्लेसमेंट की पुष्टि करें"
+  },
+  "Continue": {
+    "message": "जारी रखें"
+  },
+  "Continue working when your connection goes down.": {
+    "message": "जब आपका कनेक्शन डाउन हो जाए तब काम करना जारी रखें।"
+  },
+  "Create unlimited projects": {
+    "message": "असीमित प्रोजेक्ट बनाएं"
+  },
+  "Deactivate": {
+    "message": "निष्क्रिय करें"
+  },
+  "Default": {
+    "message": "डिफ़ॉल्ट"
+  },
+  "Default Placement": {
+    "message": "डिफ़ॉल्ट प्लेसमेंट"
+  },
+  "Delete plotline": {
+    "message": "प्लॉटलाइन हटाएं"
+  },
+  "Disabled": {
+    "message": "अक्षम"
+  },
+  "Done!": {
+    "message": "हो गया!"
+  },
+  "Duplicate plotline": {
+    "message": "डुप्लिकेट प्लॉटलाइन"
+  },
+  "Edit title": {
+    "message": "शीर्षक संपादित करें"
+  },
+  "Enabled": {
+    "message": "सक्रिय"
+  },
+  "Expand or collapse all stacks": {
+    "message": "सभी स्टैक्स को विस्तृत या संक्षिप्त करें"
+  },
+  "Expand or collapse stacks": {
+    "message": "स्टैक्स को विस्तृत या संक्षिप्त करें"
+  },
+  "Font Default: Text Editor": {
+    "message": "फ़ॉन्ट डिफ़ॉल्ट: टेक्स्ट संपादक"
+  },
+  "From the \"Dashboard\", click \"Settings\" from the side menu.": {
+    "message": "\"डैशबोर्ड\" से, साइड मेन्यू से \"सेटिंग्स\" पर क्लिक करें।"
+  },
+  "Give Feedback": {
+    "message": "प्रतिक्रिया दें"
+  },
+  "Go!": {
+    "message": "चलिए!"
+  },
+  "Hides sensitive info for when you are sharing your screen": {
+    "message": "जब आप अपनी स्क्रीन साझा कर रहे हों तो संवेदनशील जानकारी छुपाता है"
+  },
+  "Horror": {
+    "message": "हॉरर"
+  },
+  "I have Plottr Pro": {
+    "message": "मेरे पास Plottr Pro है"
+  },
+  "I have a<br/>License Key": {
+    "message": "मेरे पास <br/>लाइसेंस कुंजी है"
+  },
+  "I'm Done!": {
+    "message": "हो गया!"
+  },
+  "Import File": {
+    "message": "फाइल इम्पोर्ट करें"
+  },
+  "It doesn't look like you have a pro license.": {
+    "message": "ऐसा नहीं लगता कि आपके पास प्रो लाइसेंस है।"
+  },
+  "It looks like you already have an active trial.": {
+    "message": "ऐसा लगता है कि आपके पास पहले से ही एक सक्रिय ट्रायल है।"
+  },
+  "It looks like your version of Plottr is older than this project. Please update Plottr to avoid any issues": {
+    "message": "ऐसा लगता है कि Plottr का आपका वर्ज़न इस प्रोजेक्ट से पुराना है। किसी भी समस्या से बचने के लिए कृपया Plottr को अपडेट करें"
+  },
+  "Last step": {
+    "message": "अंतिम चरण"
+  },
+  "Let's set up your Pro account": {
+    "message": "चलिए आपका प्रो अकाउंट सेट करते हैं"
+  },
+  "License Information": {
+    "message": "लाइसेंस जानकारी"
+  },
+  "Move card to { bookTitle }": {
+    "message": "कार्ड को { bookTitle } में ले जाएं"
+  },
+  "Move plotline": {
+    "message": "प्लॉटलाइन हटाएँ"
+  },
+  "Name Your Project:": {
+    "message": "अपने प्रोजेक्ट को नाम दें:"
+  },
+  "No Matches": {
+    "message": "कोई मेल नही"
+  },
+  "No files found.": {
+    "message": "कोई फाईल नहीं मिली।"
+  },
+  "None": {
+    "message": "कोई भी नहीं"
+  },
+  "Not Active": {
+    "message": "अक्रिय"
+  },
+  "Not Now": {
+    "message": "अभी नहीं"
+  },
+  "Offline": {
+    "message": "ऑफ़लाइन"
+  },
+  "Offline Mode": {
+    "message": "ऑफ़लाइन मोड"
+  },
+  "Ok": {
+    "message": "ओके"
+  },
+  "On the \"Settings\" modal, click on the \"Beta\" tab.": {
+    "message": "\"सेटिंग्स\" मोडल पर, \"बीटा\" टैब पर क्लिक करें।"
+  },
+  "On the top right corner of the app, click the \"Dashboard\" button.": {
+    "message": "ऐप के ऊपरी दाएं कोने में, \"डैशबोर्ड\" बटन पर क्लिक करें।"
+  },
+  "Open Existing File": {
+    "message": "मौजूदा फ़ाइल खोलें"
+  },
+  "Owner": {
+    "message": "मालिक"
+  },
+  "Permission": {
+    "message": "अनुमति"
+  },
+  "Place Categories": {
+    "message": "स्थान श्रेणियां"
+  },
+  "Playwriting": {
+    "message": "नाटक लेखन"
+  },
+  "Plottr created a file named {filePath} in your Documents folder": {
+    "message": "Plottr ने आपके डाक्यूमेंट्स फ़ोल्डर में {filePath} नाम की फ़ाइल बनाई है"
+  },
+  "Plottr opens your most recent project at start": {
+    "message": "Plottr आपके सबसे हाल के प्रोजेक्ट को प्रारंभ में खोलता है"
+  },
+  "Plottr ran into a problem and can't start.  Please contact support.": {
+    "message": "Plottr को एक समस्या हुई और प्रारंभ नहीं हो रहा। कृपया सपोर्ट से संपर्क करें।"
+  },
+  "Plottr ran into an issue opening your project. Please check your backups or contact support about this project and we will get it running for you quickly.": {
+    "message": "Plottr को आपका प्रोजेक्ट खोलते समय एक समस्या हुई। कृपया अपने बैकअप की जाँच करें या इस प्रोजेक्ट के बारे में सपोर्ट से संपर्क करें और हम इसे आपके लिए ठीक कर देंगे।"
+  },
+  "Plottr ran into an issue opening your project. Please check your backups or contact support with this file and we will get it running for you quickly.": {
+    "message": "Plottr को आपका प्रोजेक्ट खोलते समय एक समस्या हुई। कृपया अपने बैकअप की जाँच करें या इस फ़ाइल के साथ सपोर्ट से संपर्क करें और हम इसे आपके लिए शीघ्रता से चालू कर देंगे।"
+  },
+  "Preview:": {
+    "message": "प्रीव्यू:"
+  },
+  "Pro Subscription": {
+    "message": "Pro सब्सक्रिप्शन"
+  },
+  "Product Name": {
+    "message": "उत्पाद का नाम"
+  },
+  "Projects": {
+    "message": "प्रोडक्ट"
+  },
+  "Remove template": {
+    "message": "टेम्प्लेट हटाएं"
+  },
+  "Requires you to restart plottr": {
+    "message": "आपको Plottr को पुनरारंभ करने की आवश्यकता है"
+  },
+  "Restore Default": {
+    "message": "डिफाल्ट रिस्टोर करें"
+  },
+  "Restore Defaults": {
+    "message": "डिफाल्ट रिस्टोर करें"
+  },
+  "Save and Open": {
+    "message": "सेव करें और खोलें"
+  },
+  "Save backups on this device": {
+    "message": "इस डिवाइस पर बैकअप सेव करें"
+  },
+  "Save backups to this device as well as in the cloud": {
+    "message": "इस डिवाइस के साथ-साथ क्लाउड में भी बैकअप सेव करें"
+  },
+  "Saved in the Cloud": {
+    "message": "क्लाउड में सेव किया गया"
+  },
+  "Scrivener file": {
+    "message": "Scrivener फाइल"
+  },
+  "Search Documentation": {
+    "message": "दस्तावेज़ीकरण खोजें"
+  },
+  "See? That was painless 😁": {
+    "message": "देखा? यह दर्द रहित था 😁"
+  },
+  "Short Story": {
+    "message": "लघु कथा"
+  },
+  "Show File": {
+    "message": "फ़ाइल दिखाएँ"
+  },
+  "Sign in": {
+    "message": "साइन इन करें"
+  },
+  "Sign in with your my.plottr.com account": {
+    "message": "अपने my.plottr.com खाते से साइन इन करें"
+  },
+  "Snowflake Pro": {
+    "message": "स्नोफ्लेक प्रो"
+  },
+  "Spell Check": {
+    "message": "स्पेलचेक"
+  },
+  "Stacked": {
+    "message": "स्टैक्ड"
+  },
+  "Start the<br/>Free Trial": {
+    "message": "<br/>फ्री ट्रायल शुरू करें"
+  },
+  "Start with Template": {
+    "message": "टेम्पलेट से प्रारंभ करें"
+  },
+  "Status": {
+    "message": "स्टेटस"
+  },
+  "Streaming Friendly": {
+    "message": "स्ट्रीमिंग अनुकूल"
+  },
+  "Stress test saving": {
+    "message": "स्ट्रेस टेस्ट सेविंग"
+  },
+  "Successfully resumed.": {
+    "message": "सफलतापूर्वक फिर से शुरू।"
+  },
+  "Tabbed": {
+    "message": "टैब्ड"
+  },
+  "Take Control": {
+    "message": "नियंत्रित करें"
+  },
+  "Testing utilities": {
+    "message": "उपयोगिताओं का परीक्षण"
+  },
+  "The cloud file is different from your local copy.  We created a duplicate of your local file and switched to the cloud file.": {
+    "message": "क्लाउड फ़ाइल आपकी लोकल कॉपी से अलग है। हमने आपकी लोकल फ़ाइल का डुप्लिकेट बनाया और क्लाउड फ़ाइल पर स्विच किया।"
+  },
+  "There was an error doing that. Try again.": {
+    "message": "ऐसा करने में त्रुटि हुई थी। पुनः प्रयास करें।"
+  },
+  "There was an error reconnecting.  Please save the file and restart Plottr.": {
+    "message": "पुन: कनेक्ट करने में त्रुटि हुई थी। कृपया फाइल को सेव करें और Plottr को रीस्टार्ट करें।"
+  },
+  "There was an error uploading your offline backup. Please exit and start again": {
+    "message": "आपके ऑफ़लाइन बैकअप को अपलोड करने में त्रुटि हुई थी। कृपया बाहर निकलें और फिर से शुरू करें"
+  },
+  "This appears to be a Plottr Pro file.  Please log in.": {
+    "message": "यह Plottr Pro फ़ाइल प्रतीत होती है। कृपया लॉगिन करें।"
+  },
+  "This will be quick and painless. There are only 3 steps:": {
+    "message": "यह जल्दी और दर्द रहित होगा। केवल 3 चरण हैं:"
+  },
+  "Timeline Structure": {
+    "message": "टाइमलाइन स्ट्रक्चर"
+  },
+  "To use \"{ thing }\" in Plottr Pro, you need to upload it first.": {
+    "message": "Plottr Pro में \"{ thing }\" का उपयोग करने के लिए, आपको इसे पहले अपलोड करना होगा।"
+  },
+  "Update failed. <b>Try again</b> or <a>install manually</a>": {
+    "message": "अपडेट विफल रहा। <b>फिर से प्रयास करें</b> या <a>मैन्युअल रूप से इंस्टॉल करें</a>"
+  },
+  "Upload": {
+    "message": "अपलोड करें"
+  },
+  "Upload ALL projects & templates": {
+    "message": "सभी प्रोजेक्ट और टेम्प्लेट अपलोड करें"
+  },
+  "Upload Existing Project": {
+    "message": "मौजूदा प्रोजेक्ट अपलोड करें"
+  },
+  "Upload to Plottr Pro?": {
+    "message": "Plottr Pro पर अपलोड करें?"
+  },
+  "Upload your projects and templates": {
+    "message": "अपने प्रोजेक्ट और टेम्प्लेट अपलोड करें"
+  },
+  "Uploading": {
+    "message": "अपलोड हो रहा है"
+  },
+  "Uploading...": {
+    "message": "अपलोड हो रहा है..."
+  },
+  "View Backups": {
+    "message": "बैकअप देखें"
+  },
+  "View timeline ith tabs for the highest level": {
+    "message": "उच्चतम स्तर के लिए टैब्स के साथ टाइमलाइन देखें"
+  },
+  "Viewer": {
+    "message": "दर्शक"
+  },
+  "We couldn't find a Pro account with that email": {
+    "message": "हमें उस ईमेल के साथ Pro खाता नहीं मिला"
+  },
+  "We ran into problems uploading some files": {
+    "message": "हमें कुछ फ़ाइलें अपलोड करने में समस्या हुई"
+  },
+  "Welcome to Plottr Pro": {
+    "message": "Plottr Pro में आपका स्वागत है"
+  },
+  "When Plottr opens, the first thing you'll see is the dashboard": {
+    "message": "जब Plottr खुलता है, तो सबसे पहली चीज जो आप देखेंगे वह है डैशबोर्ड"
+  },
+  "Wrong file format": {
+    "message": "गलत फ़ाइल फॉर्मेट"
+  },
+  "You can always change these later": {
+    "message": "आप इन्हें बाद में कभी भी बदल सकते हैं"
+  },
+  "You need to update Plottr": {
+    "message": "आपको Plottr को अपडेट करने की आवश्यकता है"
+  },
+  "Your changes were uploaded to the cloud.": {
+    "message": "आपके परिवर्तन क्लाउड पर अपलोड किए गए थे।"
+  },
+  "but don't panic, you haven't lost anything": {
+    "message": "लेकिन घबराइए नहीं, आपने कुछ नहीं खोया है"
+  },
+  "{type} template": {
+    "message": "{type} टेम्पलेट"
+  },
+  "Sharing": {
+    "message": "शेयरिंग"
+  },
+  "Send Invite": {
+    "message": "आमंत्रण भेजें"
+  },
+  "Email Address": {
+    "message": "ई-मेल एड्रेस"
+  },
+  "Permissions": {
+    "message": "अनुमतियां"
+  },
+  "Download": {
+    "message": "डाउनलोड करें"
+  },
+  "Import from Snowflake Pro": {
+    "message": "Snowflake Pro से आयात करें"
+  },
+  "See What’s New": {
+    "message": "देखें, क्या नया है"
+  },
+  "About": {
+    "message": "बारे में"
+  },
+  "Beta Information": {
+    "message": "बीटा जानकारी"
+  },
+  "Beta Email": {
+    "message": "बीटा ईमेलl"
+  },
+  "Admin": {
+    "message": "एडमिन"
+  },
+  "Remove Pro on this Device": {
+    "message": "इस डिवाइस पर Pro हटाएँ"
+  },
+  "Use this if you logged into Pro by accident": {
+    "message": "यदि आप गलती से Pro में लॉग इन हो गए हैं तो इसका उपयोग करें"
+  },
+  "Are you sure you want to delete {plotline}?": {
+    "message": "क्या आप वाकई {plotline} को डिलीट करना चाहते हैं?"
+  },
+  "Are you sure you want to delete {chapter #}?": {
+    "message": "क्या आप वाकई {chapter #} को डिलीट करना चाहते हैं?"
+  },
+  "Custom Attributes For Scenes": {
+    "message": "सीन के लिए कस्टम एट्रिब्यूट"
+  },
+  "Choose what you want to track about your scenes": {
+    "message": "चुनें कि आप अपने सीन के बारे में क्या ट्रैक करना चाहते हैं"
+  },
+  "Edit New Plotline": {
+    "message": "नई कथानक संपादित करें"
+  },
+  "Timeline Settings": {
+    "message": "टाइमलाइन सेटिंग्स"
+  },
+  "Dashed": {
+    "message": "डैशड"
+  },
+  "Solid": {
+    "message": "सॉलिड"
+  },
+  "Dotted": {
+    "message": "डॉटेड"
+  },
+  "Enter some text…": {
+    "message": "कुछ टेक्स्ट दर्ज करें…"
+  },
+  "Custom Attributes For Characters": {
+    "message": "पात्रों के लिए कस्टम एट्रिब्यूट"
+  },
+  "text": {
+    "message": "टेक्स्ट"
+  },
+  "Custom Attributes For Places": {
+    "message": "स्थानों के लिए कस्टम एट्रिब्यूट"
+  },
+  "scenes": {
+    "message": "सीन"
+  },
+  "Main plot": {
+    "message": "मुख्य कथानक"
+  },
+  "characters": {
+    "message": "पात्र"
+  },
+  "Download Complete ًںژ‰ (version {version})": {
+    "message": " पूर्ण (वर्ज़न {version}) डाउनलोड करें"
+  },
+  "Guided tours": {
+    "message": "गाइडेड टूर"
+  },
+  "Act structure": {
+    "message": "एक्ट स्ट्रक्चर"
+  },
+  "none": {
+    "message": "कोई भी नहीं"
+  },
+  "dashed": {
+    "message": "डैशड"
+  },
+  "solid": {
+    "message": "सॉलिड"
+  },
+  "dotted": {
+    "message": "डॉटेड"
+  },
+  "Saving worked this time": {
+    "message": "इस बार सेव करना सफल रहा"
+  },
+  "auto": {
+    "message": "ऑटो"
+  },
+  "untitled": {
+    "message": "शीर्षकहीन"
+  },
+  "Update Available (version {version})": {
+    "message": "अपडेट उपलब्ध (वर्ज़न {version})"
+  },
+  "App Version: { version }": {
+    "message": "ऐप वर्ज़न: { version }"
+  },
+  "{\n count, plural,\n one {1 place attached}\n  other {# places attached}\n }": {
+    "message": "{\n count, plural,\n one {1 संलग्न स्थान}\n  other {# संलग्न स्थान}\n }"
+  },
+  "{\n count, plural,\n one {1 tag attached}\n other {# tags attached}\n }": {
+    "message": "{\n count, plural,\n one {1 संलग्न टैग}\n other {# संलग्न टैग}\n }"
+  },
+  "{\n count, plural,\n one {1 card}\n other {# card}\n}": {
+    "message": "{\n count, plural,\n one {1 कार्ड}\n other {# कार्ड}\n}"
+  },
+  "{\n count, plural,\n one {1 note}\n other {# notes}\n}": {
+    "message": "{\n count, plural,\n one {1 नोट}\n other {# नोट}\n}"
+  },
+  "Please contact me with any questions at support@plottr.com": {
+    "message": "किसी भी प्रश्न के लिए कृपया मुझसे support@plottr.com पर संपर्क करें"
+  },
+  "{\n count, plural,\n one {1 character attached}\n other {# characters attached}\n        }": {
+    "message": "{\n count, plural,\n one {1 पात्र संलग्न}\n other {# पात्र संलग्न}\n        }"
+  },
+  "{\n      count, plural,\n        one {1 card}\n        other {# card}\n    }": {
+    "message": "{\n      count, plural,\n        one {1 कार्ड}\n        other {# कार्ड}\n    }"
+  },
+  "{\n count, plural,\n one {1 place attached}\n other {# places attached}\n }": {
+    "message": "{\n count, plural,\n one {1 संलग्न स्थान}\n other {# संलग्न स्थान}\n }"
+  },
+  "{\n count, plural,\n one {1 tag attached}\n other {# tags attached}\n}": {
+    "message": "{\n count, plural,\n one {1 संलग्न टैगattached}\n other {# संलग्न टैग}\n}"
+  },
+  "Filter by storyline": {
+    "message": "कहानी के अनुसार फ़िल्टर करें"
+  },
+  "Could not display the license key. Try again": {
+    "message": "लाइसेंस कुंजी प्रदर्शित नहीं हुआ। पुनः प्रयास करें"
+  }
+}

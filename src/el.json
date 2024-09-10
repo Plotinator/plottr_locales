@@ -1,0 +1,2948 @@
+{
+  "(If not, please email support@plottr.com)": {
+    "message": "(Εάν όχι, παρακαλούμε στείλτε μας email στο support@plottr.com)"
+  },
+  "(Logout)": {
+    "message": "(Αποσύνδεση)"
+  },
+  "A verification code was sent to:": {
+    "message": "Ένας κωδικός επαλήθευσης εστάλη στη διεύθυνση:"
+  },
+  "About Plottr": {
+    "message": "Σχετικά με το Plottr"
+  },
+  "Access to all the features": {
+    "message": "Πρόσβαση σε όλες τις λειτουργίες"
+  },
+  "Account Information": {
+    "message": "Πληροφορίες Λογαριασμού"
+  },
+  "Account": {
+    "message": "Λογαριασμός"
+  },
+  "Actions": {
+    "message": "Ενέργειες"
+  },
+  "Activate License": {
+    "message": "Ενεργοποίηση Άδειας Χρήσης"
+  },
+  "Add Chapter": {
+    "message": "Προσθήκη Κεφαλαίου"
+  },
+  "Add attribute": {
+    "message": "Προσθήκη Χαρακτηριστικών"
+  },
+  "Add cards to the timeline so you can write notes about your scenes. Click on the card to add more details": {
+    "message": "Προσθέστε κάρτες στο χρονοδιάγραμμα, ώστε να μπορείτε να κρατάτε σημειώσεις για τις σκηνές σας. Κάντε κλικ στην κάρτα για να προσθέσετε περισσότερες λεπτομέρειες"
+  },
+  "Add category": {
+    "message": "Προσθήκη κατηγορίας"
+  },
+  "Add more plotlines here": {
+    "message": "Προσθέστε περισσότερες γραμμές πλοκής εδώ"
+  },
+  "Add new scenes or chapters here": {
+    "message": "Προσθέστε νέες σκηνές ή κεφάλαια εδώ"
+  },
+  "Add": {
+    "message": "Προσθήκη"
+  },
+  "Advanced Export Options": {
+    "message": "Προχωρημένες Επιλογές Εξαγωγής"
+  },
+  "After": {
+    "message": "Μετά"
+  },
+  "All": {
+    "message": "Όλα"
+  },
+  "App Version: {version}": {
+    "message": "Έκδοση Εφαρμογής:{ version }"
+  },
+  "Are you sure you want to clear everything in this timeline?": {
+    "message": "Είστε βέβαιοι ότι θέλετε να διαγράψετε τα πάντα σε αυτό το χρονοδιάγραμμα;"
+  },
+  "Are you sure you want to delete { thing }?": {
+    "message": "Είστε βέβαιοι ότι θέλετε να διαγράψετε το { thing };"
+  },
+  "Are you sure you want to delete {name}?": {
+    "message": "Είστε βέβαιοι ότι θέλετε να διαγράψετε το \"{ name }\";"
+  },
+  "Are you sure you want to remove your license?": {
+    "message": "Είστε βέβαιοι ότι θέλετε να αφαιρέσετε την άδειά σας;"
+  },
+  "Are you sure?  (Removing levels may delete scene cards!)": {
+    "message": "Είστε βέβαιος; (Η αφαίρεση των επιπέδων μπορεί να διαγράψει τις κάρτες σκηνής!)"
+  },
+  "Attach Books": {
+    "message": "Επισύναψη Βιβλίων"
+  },
+  "Attach Characters": {
+    "message": "Επισύναψη Χαρακτήρων"
+  },
+  "Attach Places": {
+    "message": "Επισύναψη Θέσεων"
+  },
+  "Attach Tags": {
+    "message": "Επισύναψη Ετικετών"
+  },
+  "Attributes": {
+    "message": "Χαρακτηριστικά"
+  },
+  "Auto-save": {
+    "message": "Αυτόματη αποθήκευση"
+  },
+  "Auto-saving failed": {
+    "message": "Η αυτόματη αποθήκευση απέτυχε"
+  },
+  "Auto-saving worked": {
+    "message": "Η αυτόματη αποθήκευση λειτούργησε"
+  },
+  "Automatically save daily backups": {
+    "message": "Αυτόματη αποθήκευση των καθημερινών αντιγράφων ασφαλείας"
+  },
+  "Awesome choice!": {
+    "message": "Φοβερή επιλογή!"
+  },
+  "Back": {
+    "message": "Πίσω"
+  },
+  "Backup Location": {
+    "message": "Εφεδρική Τοποθεσία"
+  },
+  "Backups older than this will be erased": {
+    "message": "Τα αντίγραφα ασφαλείας παλαιότερα από αυτό θα διαγραφούν"
+  },
+  "Backups": {
+    "message": "Τα Αντίγραφα Ασφαλείας σας"
+  },
+  "Beat 1": {
+    "message": "Βήμα 1"
+  },
+  "Beat {number} title": {
+    "message": "Βήμα{ number } τίτλος"
+  },
+  "Beat {number}": {
+    "message": "Βήμα { number }"
+  },
+  "Beat": {
+    "message": "Βήμα"
+  },
+  "Before": {
+    "message": "Πριν"
+  },
+  "Beginning": {
+    "message": "Αρχή"
+  },
+  "Blues": {
+    "message": "Μπλε"
+  },
+  "Book #": {
+    "message": "Βιβλίο #"
+  },
+  "Book Details": {
+    "message": "Στοιχεία Βιβλίου"
+  },
+  "Book": {
+    "message": "Βιβλίο"
+  },
+  "Books": {
+    "message": "Βιβλία"
+  },
+  "Browns": {
+    "message": "Καφέ"
+  },
+  "Buy Full Version": {
+    "message": "Αγοράστε την Πλήρη Έκδοση"
+  },
+  "By default, use auto-save for projects": {
+    "message": "Κατά προεπιλογή, χρήση αυτόματης αποθήκευσης για τα έργα"
+  },
+  "By starting a mobile subscription, you agree to Plottr's": {
+    "message": "Ξεκινώντας μια συνδρομή για κινητά, συμφωνείτε με το Plottr's"
+  },
+  "CHECK EMAIL": {
+    "message": "ΕΛΕΓΞΤΕ ΤΟ EMAIL"
+  },
+  "CHECKING...": {
+    "message": "ΕΛΕΓΧΟΣ..."
+  },
+  "CODE": {
+    "message": "ΚΩΔΙΚΑΣ"
+  },
+  "CREATE NEW PROJECT": {
+    "message": "ΔΗΜΙΟΥΡΓΙΑ ΝΕΟΥ ΕΡΓΟΥ"
+  },
+  "CREATE PROJECT": {
+    "message": "ΔΗΜΙΟΥΡΓΙΑ ΕΡΓΟΥ"
+  },
+  "Can I have a few more days?": {
+    "message": "Μπορώ να έχω λίγες μέρες ακόμα;"
+  },
+  "Cancel": {
+    "message": "Ακύρωση"
+  },
+  "Card": {
+    "message": "Κάρτα"
+  },
+  "Categories": {
+    "message": "Κατηγορίες"
+  },
+  "Category": {
+    "message": "Κατηγορία"
+  },
+  "Changelog": {
+    "message": "Κατάλογος αλλαγών"
+  },
+  "Chapter {number} title": {
+    "message": "Κεφάλαιο{ number } τίτλος"
+  },
+  "Chapter {number}": {
+    "message": "Κεφάλαιο {number}"
+  },
+  "Chapter": {
+    "message": "Κεφάλαιο"
+  },
+  "Chapters": {
+    "message": "Κεφάλαια"
+  },
+  "Character Categories": {
+    "message": "Κατηγορίες Χαρακτήρων"
+  },
+  "Character Thumbnail": {
+    "message": "Μικρογραφία Χαρακτήρα"
+  },
+  "Character list is filtered": {
+    "message": "Η λίστα χαρακτήρων φιλτράρεται"
+  },
+  "Character": {
+    "message": "Χαρακτήρας"
+  },
+  "Character: {name}": {
+    "message": "Χαρακτήρας:{ name }"
+  },
+  "Characters list": {
+    "message": "Λίστα χαρακτήρων"
+  },
+  "Characters": {
+    "message": "Χαρακτήρες"
+  },
+  "Check for Updates": {
+    "message": "Ελεγχος για Ενημερώσεις"
+  },
+  "Check": {
+    "message": "Ελεγχος"
+  },
+  "Choose Color": {
+    "message": "Επιλέξτε Χρώμα"
+  },
+  "Choose an image": {
+    "message": "Επιλέξτε μια εικόνα"
+  },
+  "Choose an {platform} mobile subscription": {
+    "message": "Επιλέξτε μία{platform} συνδρομή κινητής συσκευής"
+  },
+  "Choose what categories you want to put your characters into": {
+    "message": "Επιλέξτε σε ποιες κατηγορίες θέλετε να τοποθετήσετε τους χαρακτήρες σας"
+  },
+  "Choose what you want to track about your { type }": {
+    "message": "Επιλέξτε τι θέλετε να παρακολουθείτε σχετικά με το{ type }"
+  },
+  "Choose where to save this file on your computer": {
+    "message": "Επιλέξτε πού θα αποθηκεύσετε αυτό το αρχείο στον υπολογιστή σας"
+  },
+  "Choose your Snowflake Pro file": {
+    "message": "Επιλέξτε το αρχείο Snowflake Pro"
+  },
+  "Choose": {
+    "message": "Επιλογή"
+  },
+  "Choose...": {
+    "message": "Επιλογή..."
+  },
+  "Clear": {
+    "message": "Εκκαθάριση"
+  },
+  "Click on a color below or type it in": {
+    "message": "Κάντε κλικ σε ένα χρώμα παρακάτω ή πληκτρολογήστε το"
+  },
+  "Click to Install": {
+    "message": "Κάντε κλικ για Εγκατάσταση"
+  },
+  "Close": {
+    "message": "Κλείσιμο"
+  },
+  "Collapse": {
+    "message": "Κατάρρευση"
+  },
+  "Color Picker": {
+    "message": "Επιλογέας Xρώματος"
+  },
+  "Color": {
+    "message": "Χρώμα"
+  },
+  "Coming Soon!": {
+    "message": "Σύντομα διαθέσιμο!"
+  },
+  "Configuration Options": {
+    "message": "Επιλογές Διαμόρφωσης"
+  },
+  "Configure": {
+    "message": "Ρύθμιση παραμέτρων"
+  },
+  "Content": {
+    "message": "Περιεχόμενο"
+  },
+  "Copy": {
+    "message": "Αντίγραφο"
+  },
+  "Create Blank Project": {
+    "message": "Δημιουργία Κενού Έργου"
+  },
+  "Create From Template": {
+    "message": "Δημιουργία Από Υπόδειγμα"
+  },
+  "Create Report": {
+    "message": "Δημιουργία Αναφοράς"
+  },
+  "Create a New Plottr Document": {
+    "message": "Δημιουργήστε ένα Νέο Έγγραφο Plottr"
+  },
+  "Create an Error Report": {
+    "message": "Δημιουργήστε μία Αναφορά Σφάλματος"
+  },
+  "Create unlimited project files": {
+    "message": "Δημιουργήστε απεριόριστα αρχεία έργου"
+  },
+  "Create": {
+    "message": "Δημιουργία"
+  },
+  "Created By": {
+    "message": "Δημιουργήθηκε Από"
+  },
+  "Current Color": {
+    "message": "Τρέχον Χρώμα"
+  },
+  "Custom Attributes for { type }": {
+    "message": "Προσαρμοσμένα Xαρακτηριστικά για { type }"
+  },
+  "Custom Attributes": {
+    "message": "Προσαρμοσμένα Xαρακτηριστικά"
+  },
+  "Custom Template": {
+    "message": "Προσαρμοσμένο Υπόδειγμα"
+  },
+  "Custom Templates": {
+    "message": "Προσαρμοσμένα Υποδείγματα"
+  },
+  "Cut": {
+    "message": "Αποκοπή"
+  },
+  "Delete": {
+    "message": "Διαγραφή"
+  },
+  "Dark Mode": {
+    "message": "Σκοτεινή Λειτουργία"
+  },
+  "Dashboard": {
+    "message": "Πίνακας Ελέγχου"
+  },
+  "Days Left": {
+    "message": "Ημέρες που Απομένουν"
+  },
+  "Days of Backup": {
+    "message": "Ημέρες Δημιουργίας Αντιγράφων Ασφαλείας"
+  },
+  "Number of Backups": {
+    "message": "Αριθμός Αντιγράφων Ασφαλείας"
+  },
+  "Never Delete Backups": {
+    "message": "Δεν Πρέπει Ποτέ να Διαγραφούν Αυτά τα Αντίγραφα Ασφαλείας"
+  },
+  "Default Colors": {
+    "message": "Προεπιλεγμένα Χρώματα"
+  },
+  "Delete Chapter {name}?": {
+    "message": "Διαγραφή Κεφαλαίου\"{name}\";"
+  },
+  "Delete Chapter": {
+    "message": "Διαγραφή Κεφαλαίου"
+  },
+  "Delete Character": {
+    "message": "Διαγραφή Χαρακτήρα"
+  },
+  "Delete Plotline {name}?": {
+    "message": "Διαγραφή Πλοκής\"{name}\";"
+  },
+  "Delete Plotline": {
+    "message": "Διαγραφή Πλοκής"
+  },
+  "Delete Scene {name}?": {
+    "message": "Διαγραφή Σκηνής \"{name}\";"
+  },
+  "Delete Scene": {
+    "message": "Διαγραφή Σκηνής"
+  },
+  "Delete Tag": {
+    "message": "Διαγραφή Ετικέτας"
+  },
+  "Delete {title} Tag?": {
+    "message": "Διαγραφή\"{title}\" Ετικέτας;"
+  },
+  "Demos": {
+    "message": "Demos"
+  },
+  "Describe the scene": {
+    "message": "Περιγράψτε τη σκηνή"
+  },
+  "Description": {
+    "message": "Περιγραφή"
+  },
+  "Details": {
+    "message": "Λεπτομέριες"
+  },
+  "Device ID": {
+    "message": "Αναγνωριστικό Συσκευής"
+  },
+  "Do you want to remove this image? It will NOT be deleted from your computer": {
+    "message": "Θέλετε να αφαιρέσετε αυτήν την εικόνα; ΔΕΝ θα διαγραφεί από τον υπολογιστή σας"
+  },
+  "Documentation": {
+    "message": "Τεκμηρίωση"
+  },
+  "Don't have a license? Go to our website to learn more": {
+    "message": "Δεν έχετε άδεια; Μεταβείτε στην ιστοσελίδα μας για να μάθετε περισσότερα"
+  },
+  "Don't have a license?": {
+    "message": "Δεν έχετε άδεια;"
+  },
+  "Don't worry, all your work is saved in plottr_trial.pltr in your Documents folder": {
+    "message": "Μην ανησυχείτε, όλη η εργασία σας αποθηκεύεται στο αρχείο plottr_trial.pltr στο φάκελο Έγγραφα"
+  },
+  "Don't worry, all your work is saved in your files": {
+    "message": "Μην ανησυχείτε, όλη η εργασία σας αποθηκεύεται στα αρχεία σας"
+  },
+  "Done": {
+    "message": "Έγινε"
+  },
+  "Download Complete 🎉 (version {version})": {
+    "message": "Η Λήψη Ολοκληρώθηκε🎉 (εκδοχή { version })"
+  },
+  "Download Now!": {
+    "message": "Λήψη Τώρα!"
+  },
+  "Download updates automatically": {
+    "message": "Αυτόματη λήψη ενημερώσεων"
+  },
+  "Downloading version {version}": {
+    "message": "Λήψη έκδοσης { version }"
+  },
+  "Drop a File Here": {
+    "message": "Τοποθετήστε ένα αρχείο εδώ"
+  },
+  "Edit Plotline": {
+    "message": "Επεξεργασία Πλοκής"
+  },
+  "Edit": {
+    "message": "Επεξεργασία"
+  },
+  "Email": {
+    "message": "Email"
+  },
+  "Email:": {
+    "message": "Email:"
+  },
+  "End": {
+    "message": "Τέλος"
+  },
+  "Ends After": {
+    "message": "Ολοκληρώνεται Μετά"
+  },
+  "Enter Chapter's name or enter": {
+    "message": "Εισαγάγετε το όνομα του Κεφαλαίου ή πληκτρολογήστε \"auto\" \n(without quotes) για αυτόματη ονομασία."
+  },
+  "Enter Custom Attribute Title": {
+    "message": "Εισαγωγή Προσαρμοσμένου Τίτλου Χαρακτηριστικών"
+  },
+  "Enter a Customer Service Code": {
+    "message": "Εισαγάγετε έναν Κωδικό Εξυπηρέτησης Πελατών"
+  },
+  "Enter a new name for {chapter}": {
+    "message": "Εισαγάγετε ένα νέο όνομα για \"{chapter}\""
+  },
+  "Enter some text...": {
+    "message": "Εισαγάγετε κάποιο κείμενο..."
+  },
+  "Enter the URL of the link:": {
+    "message": "Εισαγάγετε τη διεύθυνση URL του συνδέσμου:"
+  },
+  "Enter the name of your project": {
+    "message": "Εισαγάγετε το όνομα του έργου σας"
+  },
+  "Enter your verification code to activate this device": {
+    "message": "Εισαγάγετε τον κωδικό επαλήθευσης για να ενεργοποιήσετε αυτήν τη συσκευή"
+  },
+  "Enter your verification code": {
+    "message": "Εισαγάγετε τον κωδικό επαλήθευσης"
+  },
+  "Error Creating Error Report": {
+    "message": "Σφάλμα Κατά τη Δημιουργία Αναφοράς Σφάλματος"
+  },
+  "Error Report created": {
+    "message": "Δημιουργήθηκε η Αναφορά Σφάλματος"
+  },
+  "Error reading file": {
+    "message": "Σφάλμα κατά την ανάγνωση του αρχείου"
+  },
+  "Error sending email! Check your email and Try again.": {
+    "message": "Σφάλμα κατά την αποστολή email! Ελέγξτε το email σας και Δοκιμάστε ξανά."
+  },
+  "Error: {error}": {
+    "message": "Σφάλμα: { error }"
+  },
+  "Exit Without Saving": {
+    "message": "Εξοδος Χωρίς Αποθήκευση"
+  },
+  "Expand": {
+    "message": "Επέκταση"
+  },
+  "Expires": {
+    "message": "Λήγει"
+  },
+  "Export": {
+    "message": "Εξαγωγή"
+  },
+  "FAQ": {
+    "message": "ΣΥΧΝΕΣ ΕΡΩΤΗΣΕΙΣ"
+  },
+  "Facebook Group": {
+    "message": "Ομάδα Facebook"
+  },
+  "Fictional Devices LLC": {
+    "message": "Fictional Devices LLC"
+  },
+  "File Exported": {
+    "message": "Εξαγωγή Αρχείου"
+  },
+  "File can't be found. Did it move?": {
+    "message": "Το αρχείο δεν μπορεί να βρεθεί. Μετακινήθηκε;"
+  },
+  "File": {
+    "message": "Αρχείο"
+  },
+  "Files": {
+    "message": "Αρχεία"
+  },
+  "Filter by Plotline": {
+    "message": "Φιλτράρισμα κατά Πλοκή"
+  },
+  "Filter": {
+    "message": "Φίλτρο"
+  },
+  "Flip": {
+    "message": "Ανατροπή"
+  },
+  "Folder where backups are stored": {
+    "message": "Φάκελος όπου αποθηκεύονται τα αντίγραφα ασφαλείας"
+  },
+  "Force Dark Mode": {
+    "message": "Αναγκαστική Σκοτεινή Λειτουργία"
+  },
+  "Free Trial Information": {
+    "message": "Πληροφορίες Δωρεάν Δοκιμής"
+  },
+  "Free Trial": {
+    "message": "Δωρεάν Δοκιμή"
+  },
+  "GET A LICENSE": {
+    "message": "ΑΠΟΚΤΗΣΤΕ ΑΔΕΙΑ"
+  },
+  "GET STARTED!": {
+    "message": "ΞΕΚΙΝΗΣΤΕ!"
+  },
+  "Genre": {
+    "message": "Είδος"
+  },
+  "Get access to all your projects": {
+    "message": "Αποκτήστε πρόσβαση σε όλα τα έργα σας"
+  },
+  "Links": {
+    "message": "Σύνδεσμοι"
+  },
+  "Give this tag a name": {
+    "message": "Δώστε όνομα σε αυτήν την ετικέτα"
+  },
+  "Give your scene a title": {
+    "message": "Δώστε τίτλο στη σκηνή σας"
+  },
+  "Go Back": {
+    "message": "Πηγαίνετε πίσω"
+  },
+  "Go to our website to learn more:": {
+    "message": "Μεταβείτε στην ιστοσελίδα μας για να μάθετε περισσότερα:"
+  },
+  "Grays": {
+    "message": "Γκρι"
+  },
+  "Greens": {
+    "message": "Πράσινο"
+  },
+  "Help": {
+    "message": "Βοήθεια"
+  },
+  "Hide Others": {
+    "message": "Απόκρυψη Άλλων"
+  },
+  "Hide Plottr": {
+    "message": "Απόκρυψη Plottr"
+  },
+  "Hierarchy Configuration": {
+    "message": "Διαμόρφωση Ιεραρχίας"
+  },
+  "Hmmmm. It looks like that's not a valid license key": {
+    "message": "Χμμμ. Φαίνεται ότι αυτό δεν είναι έγκυρο κλειδί άδειας χρήσης"
+  },
+  "I have a license key": {
+    "message": "Έχω κλειδί άδειας χρήσης"
+  },
+  "I want to buy the full version!": {
+    "message": "Θέλω να αγοράσω την πλήρη έκδοση!"
+  },
+  "I want to start the free trial": {
+    "message": "Θέλω να ξεκινήσω τη δωρεάν δοκιμή"
+  },
+  "If you keep seeing this problem, email us at support@plottr.com": {
+    "message": "Εάν συνεχίζετε να αντιμετωπίζετε αυτό το πρόβλημα, στείλτε μας email στη διεύθυνση support@plottr.com"
+  },
+  "Image Details": {
+    "message": "Λεπτομέρειες Εικόνας"
+  },
+  "Image Gallery": {
+    "message": "Συλλογή Εικόνων"
+  },
+  "Images": {
+    "message": "Εικόνες"
+  },
+  "Import Snowflake Pro": {
+    "message": "Εισαγωγή Snowflake Pro"
+  },
+  "Insert Chapter and a Card": {
+    "message": "Εισαγωγή Κεφαλαίου και Κάρτας"
+  },
+  "Insert Chapter": {
+    "message": "Εισαγωγή Κεφαλαίου"
+  },
+  "Insert from URL": {
+    "message": "Εισαγωγή από τη διεύθυνση URL"
+  },
+  "It looks like you have Plottr on the max number of computers already": {
+    "message": "Φαίνεται ότι διαθέτετε ήδη το Plottr στον μέγιστο αριθμό υπολογιστών"
+  },
+  "It looks like you have Plottr on the max number of devices already": {
+    "message": "Φαίνεται ότι διαθέτετε ήδη το Plottr στον μέγιστο αριθμό συσκευών"
+  },
+  "It looks like you're not online. You don't always have to be online to user Plottr, but it can't verify your license offline": {
+    "message": "Φαίνεται ότι δεν είστε συνδεδεμένοι. Δεν χρειάζεται να είστε πάντα συνδεδεμένοι για να χρησιμοποιήσετε το Plottr, αλλά δεν μπορεί να επαληθεύσει την άδειά σας εκτός σύνδεσης"
+  },
+  "Keep all your notes here (brainstorming, world-building, etc.)": {
+    "message": "Κρατήστε όλες τις σημειώσεις σας εδώ(καταιγισμός ιδεών, οικοδόμηση κόσμου κ.λπ.)"
+  },
+  "Keep info about your locations here": {
+    "message": "Κρατήστε πληροφορίες για τις τοποθεσίες σας εδώ"
+  },
+  "Keep your character sheets here": {
+    "message": "Κρατήστε τα φύλλα χαρακτήρων σας εδώ"
+  },
+  "LOGOUT": {
+    "message": "ΑΠΟΣΥΝΔΕΣΗ"
+  },
+  "LOOK OUT!": {
+    "message": "ΠΡΟΣΟΧΗ!"
+  },
+  "Language": {
+    "message": "Γλώσσα"
+  },
+  "Last opened by you": {
+    "message": "Τελευταία άνοιξε από εσάς"
+  },
+  "Learn": {
+    "message": "Μαθαίνω"
+  },
+  "Let's verify your license.": {
+    "message": "Ας επαληθεύσουμε την άδειά σας."
+  },
+  "Levels of hierarchy": {
+    "message": "Επίπεδα ιεραρχίας"
+  },
+  "License Key": {
+    "message": "Κλειδί Άδειας Χρήσης"
+  },
+  "License Verified. Plottr will start momentarily. Thanks for being patient!": {
+    "message": "Η άδεια επαληθεύτηκε. Το Plottr θα ξεκινήσει σύντομα. Ευχαριστούμε για την υπομονή σας!"
+  },
+  "License": {
+    "message": "Αδεια"
+  },
+  "Long Synopsis": {
+    "message": "Μεγάλη Σύνοψη"
+  },
+  "MS Word": {
+    "message": "MS Word"
+  },
+  "Main Plot": {
+    "message": "Κύρια Πλοκή"
+  },
+  "Main": {
+    "message": "Κύρια"
+  },
+  "Manually Sorted": {
+    "message": "Χειροκίνητη Ταξινόμηση"
+  },
+  "Manuscript": {
+    "message": "Χειρόγραφο"
+  },
+  "Menu": {
+    "message": "Μενού"
+  },
+  "Middle": {
+    "message": "Μεσαία"
+  },
+  "My Character Template": {
+    "message": "Το υπόδειγμα του Χαρακτήρα μου"
+  },
+  "My Scene Template": {
+    "message": "Το υπόδειγμα της Σκηνής μου"
+  },
+  "My Templates": {
+    "message": "Τα Υποδείγματα μου"
+  },
+  "My Timeline Template": {
+    "message": "Το Υπόδειγμα του Χρονολογίου μου"
+  },
+  "Name": {
+    "message": "Ονομα"
+  },
+  "Never": {
+    "message": "Ποτέ"
+  },
+  "New Attribute": {
+    "message": "Νέο Χαρακτηριστικό"
+  },
+  "New Book": {
+    "message": "Καινούργιο Βιβλίο"
+  },
+  "New Character": {
+    "message": "Νέος Χαρακτήρας"
+  },
+  "New Custom Attribute Title": {
+    "message": "Νέος Προσαρμοσμένος Τίτλος Χαρακτηριστικών"
+  },
+  "New Note": {
+    "message": "Νέα Σημείωση"
+  },
+  "New Place": {
+    "message": "Νέο Μέρος"
+  },
+  "New Plotline": {
+    "message": "Νέα Πλοκή"
+  },
+  "New Project": {
+    "message": "Νέο Έργο"
+  },
+  "New Tag": {
+    "message": "Νέα Ετικέτα"
+  },
+  "New": {
+    "message": "Νέο"
+  },
+  "No Characters": {
+    "message": "Χωρίς Χαρακτήρες"
+  },
+  "No actions to undo": {
+    "message": "Δεν υπάρχουν ενέργειες για αναίρεση"
+  },
+  "No color": {
+    "message": "Χωρίς χρώμα"
+  },
+  "No": {
+    "message": "Οχι"
+  },
+  "No, Discard": {
+    "message": "Όχι, Απόρριψη"
+  },
+  "None to choose": {
+    "message": "Καμία επιλογή"
+  },
+  "Not Receiving Updates": {
+    "message": "Δεν Λαμβάνετε Ενημερώσεις"
+  },
+  "Note Details": {
+    "message": "Σημείωση Λεπτομεριών"
+  },
+  "Note Image": {
+    "message": "Σημείωση Εικόνας"
+  },
+  "Note": {
+    "message": "Σημείωση"
+  },
+  "Note: {title}": {
+    "message": "Σημείωση: { title }"
+  },
+  "Notes are filtered": {
+    "message": "Οι σημειώσεις φιλτράρονται"
+  },
+  "Notes": {
+    "message": "Σημειώσεις"
+  },
+  "Now lets get you writing your next great plot!": {
+    "message": "Τώρα ας ξεκινήσουμε να γράφουμε την επόμενη σπουδαία πλοκή σας!"
+  },
+  "Number of Days of Rolling Backups to Keep": {
+    "message": "Αριθμός Ημερών Διατήρησης Κυλιόμενων Αντιγράφων Ασφαλείας"
+  },
+  "OK": {
+    "message": "Εντάξει"
+  },
+  "OVERWRITE": {
+    "message": "ΑΝΤΙΓΡΑΦΗ"
+  },
+  "Once You Plot, the Fun Don't Stop": {
+    "message": "Μόλις Σχεδιάσεις, η Διασκέδαση Δεν Σταματά"
+  },
+  "One Paragraph Summary": {
+    "message": "Περίληψη Μας Παραγράφου"
+  },
+  "One Sentence Summary": {
+    "message": "Περίληψη Μίας Πρότασης"
+  },
+  "Open Dashboard": {
+    "message": "Άνοιγμα Πίνακα Ελέγχου"
+  },
+  "Open Existing": {
+    "message": "Άνοιγμα Υπαρχόντων"
+  },
+  "Open a Plottr Document": {
+    "message": "Άνοιγμα Εγγράφου Plottr"
+  },
+  "Open one of your most recent projects": {
+    "message": "Ανοίξτε ένα από τα πιο πρόσφατα έργα σας"
+  },
+  "Open": {
+    "message": "Άνοιγμα"
+  },
+  "Or hover here to insert between scenes": {
+    "message": "Εναλλακτικά, μετακινηθείτε εδώ για να παρεμβάλετε μεταξύ των σκηνών"
+  },
+  "Oranges": {
+    "message": "Πορτοκαλί"
+  },
+  "Other": {
+    "message": "Άλλο"
+  },
+  "Outline is filtered": {
+    "message": "Το περίγραμμα φιλτράρεται"
+  },
+  "Outline": {
+    "message": "Περίγραμμα"
+  },
+  "Override your computer's setting and always use dark mode": {
+    "message": "Παρακάμψτε τη ρύθμιση του υπολογιστή σας και χρησιμοποιείτε πάντα τη σκοτεινή λειτουργία"
+  },
+  "Paragraph": {
+    "message": "Παράγραφος"
+  },
+  "Paragraph?": {
+    "message": "Παράγραφος;"
+  },
+  "Paste and Match Style": {
+    "message": "Επικόλληση και Αντιστοίχιση στιλ"
+  },
+  "Paste": {
+    "message": "Επικόλληση"
+  },
+  "Pick a color": {
+    "message": "Επιλέξτε ένα χρώμα"
+  },
+  "Place Details": {
+    "message": "Τοποθεσία Λεπτομερειών"
+  },
+  "Place Image": {
+    "message": "Τοποθεσία Εικόνας"
+  },
+  "Place list is filtered": {
+    "message": "Η λίστα τοποθεσιών φιλτράρεται"
+  },
+  "Place": {
+    "message": "Τοποθεσία"
+  },
+  "Place: {name}": {
+    "message": "Τοποθεσία: { name }"
+  },
+  "Places list": {
+    "message": "Λίστα τοποθεσιών"
+  },
+  "Places": {
+    "message": "Τοποθεσίες"
+  },
+  "Please choose a plotline": {
+    "message": "Παρακαλούμε επιλέξτε μια γραμμή πλοκής"
+  },
+  "Please contact me with any questions at support@plottr.com": {
+    "message": "Παρακαλώ επικοινωνήστε μαζί μου για τυχόν ερωτήσεις στην διεύθυνση support@plottr.com"
+  },
+  "Please select a valid Plottr file": {
+    "message": "Παρακαλούμε επιλέξτε ένα έγκυρο αρχείο Plottr."
+  },
+  "Please verify your license": {
+    "message": "Παρακαλούμε επαληθεύστε την άδειά σας"
+  },
+  "Plotline Details": {
+    "message": "Λεπτομέρειες Πλοκής"
+  },
+  "Plotline Title:": {
+    "message": "Τίτλος Πλοκής:"
+  },
+  "Plotline name": {
+    "message": "Όνομα Πλοκής"
+  },
+  "Plotline": {
+    "message": "Πλοκή"
+  },
+  "Plotline: {title}": {
+    "message": "Πλοκή: {title}"
+  },
+  "Plotlines": {
+    "message": "Πλοκές"
+  },
+  "Plottr Mobile Monthly": {
+    "message": "Plottr για Κινητά Μηνιαία"
+  },
+  "Plottr Mobile Yearly": {
+    "message": "Plottr για Κινητά Eτήσια"
+  },
+  "Plottr Mobile": {
+    "message": "Plottr για Κινητά"
+  },
+  "Plottr Support": {
+    "message": "Υποστήριξη Plottr"
+  },
+  "Plottr created a file named {fileName} in your Documents folder": {
+    "message": "Το Plottr δημιούργησε ένα αρχείο με το όνομα {fileName} στον φάκελο Έγγραφα"
+  },
+  "Plottr project file": {
+    "message": "Αρχείο έργου Plottr"
+  },
+  "Plottr ran into a problem. Try opening Plottr again.": {
+    "message": "Το Plottr αντιμετώπισε πρόβλημα. Δοκιμάστε να ανοίξετε ξανά το Plottr."
+  },
+  "Plottr": {
+    "message": "Plottr"
+  },
+  "Preferences": {
+    "message": "Προτιμήσεις"
+  },
+  "Premise": {
+    "message": "Προϋποθέσεις"
+  },
+  "Privacy Policy": {
+    "message": "Πολιτική Απορρήτου"
+  },
+  "Project Templates": {
+    "message": "Υποδείγματα Έργων"
+  },
+  "Project": {
+    "message": "Έργο"
+  },
+  "Prologue": {
+    "message": "Πρόλογος"
+  },
+  "Purchase Email": {
+    "message": "Αγορά Μέσω Email"
+  },
+  "Purples": {
+    "message": "Μωβ"
+  },
+  "Quit": {
+    "message": "Εγκατάλειψη"
+  },
+  "RESEND EMAIL": {
+    "message": "ΕΠΑΝΑΠΟΣΤΟΛΗ EMAIL"
+  },
+  "RESENDING...": {
+    "message": "ΕΠΑΝΑΠΟΣΤΟΛΗ..."
+  },
+  "Recent Projects": {
+    "message": "Πρόσφατα Έργα"
+  },
+  "Redo": {
+    "message": "Επανάληψη"
+  },
+  "Reds": {
+    "message": "Κόκκινο"
+  },
+  "Reload from File": {
+    "message": "Επαναφόρτωση από το Αρχείο"
+  },
+  "Reload": {
+    "message": "Επαναφόρτωση"
+  },
+  "Deactivate License Key": {
+    "message": "Κατάργηση Άδειας"
+  },
+  "Remove from this list": {
+    "message": "Κατάργηση από αυτήν τη λίστα"
+  },
+  "Remove image": {
+    "message": "Αφαίρεση εικόνας"
+  },
+  "Remove": {
+    "message": "Αφαίρεση"
+  },
+  "Rename Chapter": {
+    "message": "Μετονομασία Κεφαλαίου"
+  },
+  "Rename": {
+    "message": "Μετονομασία"
+  },
+  "Contact Support": {
+    "message": "Αναφορά προβλήματος"
+  },
+  "Request a Feature": {
+    "message": "Αίτημα για Λειτουργία"
+  },
+  "Restore Purchase": {
+    "message": "Επαναφορά Αγοράς"
+  },
+  "Roadmap": {
+    "message": "Οδικός Χάρτης"
+  },
+  "SELECT A PROJECT FILE": {
+    "message": "ΕΠΙΛΟΓΗ ΑΡΧΕΙΟΥ ΕΡΓΟΥ"
+  },
+  "SELECT": {
+    "message": "ΕΠΙΛΟΓΗ"
+  },
+  "Save Backups": {
+    "message": "Αποθήκευση Αντιγράφων Ασφαλείας"
+  },
+  "Save Changes?": {
+    "message": "Αποθήκευση Αλλαγών;"
+  },
+  "Save Chapter": {
+    "message": "Αποθήκευση Κεφαλαίου"
+  },
+  "Save File": {
+    "message": "Αποθήκευση Αρχείου"
+  },
+  "Save Plotline": {
+    "message": "Αποθήκευση Πλοκής"
+  },
+  "Save as Template": {
+    "message": "Αποθήκευση ως Υπόδειγμα"
+  },
+  "Save as": {
+    "message": "Αποθήκευση ως"
+  },
+  "Save before closing?": {
+    "message": "Αποθήκευση πριν το κλείσιμο;"
+  },
+  "Save": {
+    "message": "Αποθήκευση"
+  },
+  "Saved": {
+    "message": "Αποθηκεύτηκε"
+  },
+  "Saving failed": {
+    "message": "Η αποθήκευση απέτυχε"
+  },
+  "Saving worked this time 🎉": {
+    "message": "Η αποθήκευση λειτούργησε αυτή τη φορά🎉"
+  },
+  "Saving your file didn't work. Check where it's stored.": {
+    "message": "Η αποθήκευση του αρχείου σας δεν λειτούργησε. Ελέγξτε πού είναι αποθηκευμένο."
+  },
+  "Saving your file didn't work. Try again.": {
+    "message": "Η αποθήκευση του αρχείου σας δεν λειτούργησε. Προσπάθησε ξανά."
+  },
+  "Scene Cards": {
+    "message": "Κάρτες Σκηνών"
+  },
+  "Scene Details": {
+    "message": "Λεπτομέρειες Σκηνής"
+  },
+  "Scene Title": {
+    "message": "Τίτλος Σκηνής"
+  },
+  "Scene {num}": {
+    "message": "Σκηνή {num}"
+  },
+  "Scene": {
+    "message": "Σκηνή"
+  },
+  "Scrivener Project": {
+    "message": "Έργο Scrivener"
+  },
+  "Scrivener": {
+    "message": "Scrivener"
+  },
+  "Scroll": {
+    "message": "Κύλιση"
+  },
+  "Search": {
+    "message": "Αναζήτηση"
+  },
+  "See What's New": {
+    "message": "Δείτε τι Νέο Υπάρχει"
+  },
+  "See the outline here": {
+    "message": "Δείτε το περίγραμμα εδώ"
+  },
+  "Select All": {
+    "message": "Επιλογή Όλων"
+  },
+  "Select a Category": {
+    "message": "Επιλέξτε μία Κατηγορία"
+  },
+  "Select a Chapter": {
+    "message": "Επιλέξτε ένα Κεφάλαιο"
+  },
+  "Select a File": {
+    "message": "Επιλέξτε ένα Αρχείο"
+  },
+  "Select a Plotline": {
+    "message": "Επιλέξτε μία Πλοκή"
+  },
+  "Series Outline": {
+    "message": "Περίγραμμα Σειράς"
+  },
+  "Series View": {
+    "message": "Προβολή Σειράς"
+  },
+  "Series": {
+    "message": "Σειρά"
+  },
+  "Session Start": {
+    "message": "Έναρξη Συνεδρίας"
+  },
+  "Settings": {
+    "message": "Ρυθμίσεις"
+  },
+  "Short Description": {
+    "message": "Σύντομη Περιγραφή"
+  },
+  "Short Synopsis": {
+    "message": "Σύντομη Σύνοψη"
+  },
+  "Show All": {
+    "message": "Προβολή Όλων"
+  },
+  "Show in File Explorer": {
+    "message": "Εμφάνιση στην Εξερεύνηση Αρχείων"
+  },
+  "Show in Finder": {
+    "message": "Εμφάνιση στην Αναζήτηση"
+  },
+  "Since this is your first time using Plottr, I'll give you a guided tour if you like.": {
+    "message": "Δεδομένου ότι χρησιμοποιείτε για πρώτη φορά το Plottr, θα σας ξεναγήσω στη χρήση του αν το επιθυμείτε."
+  },
+  "Size: large": {
+    "message": "Μέγεθος: μεγάλο"
+  },
+  "Size: medium": {
+    "message": "Μέγεθος: μεσαίο"
+  },
+  "Size: small": {
+    "message": "Μέγεθος: μικρό"
+  },
+  "Something went wrong,": {
+    "message": "Κάτι πήγε στραβά,"
+  },
+  "Something went wrong.": {
+    "message": "Κάτι πήγε στραβά."
+  },
+  "Sort": {
+    "message": "Ταξινόμηση"
+  },
+  "Source Link": {
+    "message": "Σύνδεσμος Πηγής"
+  },
+  "Start Mobile Subscription": {
+    "message": "Έναρξη Συνδρομής για Κινητά"
+  },
+  "Start my Free Trial": {
+    "message": "Έναρξη της Δωρεάν Δοκιμής μου"
+  },
+  "Started On": {
+    "message": "Ξεκίνησε στις"
+  },
+  "Starter Templates": {
+    "message": "Πρότυπα Εκκίνησης"
+  },
+  "Story line": {
+    "message": "Ιστορία"
+  },
+  "Story name": {
+    "message": "Όνομα Ιστορίας"
+  },
+  "Submit": {
+    "message": "Υποβολή"
+  },
+  "Subscription Restored!": {
+    "message": "Η Συνδρομή Αποκαταστάθηκε!"
+  },
+  "Subtitle": {
+    "message": "Υπότιτλος"
+  },
+  "Success!": {
+    "message": "Επιτυχία!"
+  },
+  "Supporting": {
+    "message": "Υποστήριξη"
+  },
+  "Tag Details": {
+    "message": "Λεπτομέρειες Ετικέτας"
+  },
+  "Tag Name": {
+    "message": "Όνομα Ετικέτας"
+  },
+  "Tag": {
+    "message": "Ετικέτα"
+  },
+  "Tags can be used for organization": {
+    "message": "Οι ετικέτες μπορούν να χρησιμοποιηθούν για οργάνωση"
+  },
+  "Tags list": {
+    "message": "Λίστα Ετικετών"
+  },
+  "Tags": {
+    "message": "Ετικέτες"
+  },
+  "Take Screenshot": {
+    "message": "Λήψη Στιγμιότυπου Οθόνης"
+  },
+  "Template Saved": {
+    "message": "Το Υπόδειγμα Αποθηκεύτηκε"
+  },
+  "Terms of Service": {
+    "message": "Όροι Χρήσης"
+  },
+  "Text Error": {
+    "message": "Σφάλμα Κειμένου"
+  },
+  "Thanks for trying Plottr": {
+    "message": "Ευχαριστούμε που δοκιμάσατε το Plottr"
+  },
+  "That code was invalid. Try again.": {
+    "message": "Αυτός ο κωδικός δεν ήταν έγκυρος.\nΔοκιμάστε ξανά."
+  },
+  "That email didn't verify. Try again or try another email.": {
+    "message": "Αυτό το email δεν επαληθεύτηκε.\nΔοκιμάστε ξανά ή δοκιμάστε άλλο email."
+  },
+  "Theme": {
+    "message": "Θέμα"
+  },
+  "There was an error activating your license key on this device": {
+    "message": "Παρουσιάστηκε σφάλμα κατά την ενεργοποίηση του κλειδιού άδειας χρήσης σε αυτήν τη συσκευή"
+  },
+  "There was an error doing that. Try again": {
+    "message": "Παρουσιάστηκε σφάλμα κατά την εκτέλεση αυτής της ενέργειας. Προσπάθησε ξανά"
+  },
+  "This is a plotline": {
+    "message": "Αυτή είναι μία πλοκή"
+  },
+  "This is a scene or chapter. You can change its name by clicking on it": {
+    "message": "Αυτή είναι μια σκηνή ή ένα κεφάλαιο. Μπορείτε να αλλάξετε το όνομά του κάνοντας κλικ πάνω του"
+  },
+  "This will send you an email with a code": {
+    "message": "Αυτό θα σας στείλει ένα email με έναν κωδικό"
+  },
+  "Timeline is filtered": {
+    "message": "Το χρονολόγιο φιλτράρεται"
+  },
+  "Timeline": {
+    "message": "Χρονολόγιο"
+  },
+  "Title": {
+    "message": "Τίτλος"
+  },
+  "Toggle navigation": {
+    "message": "Εναλλαγή πλοήγησης"
+  },
+  "Trash": {
+    "message": "Απορρίμματα"
+  },
+  "Try that again": {
+    "message": "Δοκιμάστε ξανά"
+  },
+  "Tutorials": {
+    "message": "Βοηθήματα"
+  },
+  "Type": {
+    "message": "Τύπος"
+  },
+  "UH-OH!": {
+    "message": "ΩΧ!"
+  },
+  "URL": {
+    "message": "URL"
+  },
+  "Uncategorized": {
+    "message": "Χωρίς Κατηγοριοποίηση"
+  },
+  "Undo": {
+    "message": "Αναίρεση"
+  },
+  "Untitled": {
+    "message": "Χωρίς Τίτλο"
+  },
+  "Update Automatically": {
+    "message": "Αυτόματη Ενημέρωση"
+  },
+  "Update Available 🎉 (version {version})": {
+    "message": "Διαθέσιμη Ενημέρωση 🎉 (έκδοση {version})"
+  },
+  "Update failed. Try again": {
+    "message": "Η ενημέρωση απέτυχε. Προσπαθήστε ξανά"
+  },
+  "Updates": {
+    "message": "Ενημερώσεις"
+  },
+  "Upload Files": {
+    "message": "Μεταφόρτωση Αρχείων"
+  },
+  "Use Template": {
+    "message": "Χρήση Υποδείγματος"
+  },
+  "Use a different email": {
+    "message": "Χρήση διαφορετικού email"
+  },
+  "Use this to remove your license on this device": {
+    "message": "Χρησιμοποιήστε το για να καταργήσετε την άδεια χρήσης σε αυτήν τη συσκευή"
+  },
+  "VERIFY CODE": {
+    "message": "ΕΠΑΛΗΘΕΥΣΗ ΚΩΔΙΚΟΥ"
+  },
+  "VERIFYING...": {
+    "message": "ΕΠΑΛΗΘΕΥΣΗ…"
+  },
+  "Verify": {
+    "message": "Επαλήθευση"
+  },
+  "Verifying with email: {email}": {
+    "message": "Επαλήθευση με email: {email}"
+  },
+  "Version": {
+    "message": "Έκδοση"
+  },
+  "View Error": {
+    "message": "Προβολή Σφάλματος"
+  },
+  "View Timeline": {
+    "message": "Προβολή Χρονολογίου"
+  },
+  "View": {
+    "message": "Προβολή"
+  },
+  "We found your user session but...": {
+    "message": "Βρήκαμε τη συνεδρία χρήστη σας, αλλά η άδειά σας έχει λήξει ή είναι ανενεργή. Αγοράστε μια νέα άδεια χρήσης ή μια νέα συνδρομή για κινητά για να συνεχίσετε."
+  },
+  "We had a problem creating a new project": {
+    "message": " Είχαμε πρόβλημα με τη δημιουργία ενός νέου έργου. Βεβαιωθείτε ότι το Plottr έχει τα σωστά δικαιώματα και ότι έχετε αρκετό χώρο αποθήκευσης Είχαμε πρόβλημα με τη δημιουργία ενός νέου έργου."
+  },
+  "We had a problem processing your file": {
+    "message": "Αντιμετωπίσαμε πρόβλημα με την επεξεργασία του αρχείου σας. Βεβαιωθείτε ότι το Plottr έχει τα σωστά δικαιώματα και δοκιμάστε ξανά."
+  },
+  "We will email you a verification code.": {
+    "message": "Θα σας στείλουμε έναν κωδικό επαλήθευσης μέσω email."
+  },
+  "Welcome to Plottr!": {
+    "message": "Καλώς ήρθατε στο Plottr!"
+  },
+  "Welcome to Plottr": {
+    "message": "Καλώς ήρθατε στο Plottr"
+  },
+  "Welcome to": {
+    "message": "Καλώς ήρθατε στο"
+  },
+  "What would you like to do?": {
+    "message": "Τι θα θέλατε να κάνετε;"
+  },
+  "Where would you like to save the export?": {
+    "message": "Πού θα θέλατε να αποθηκεύσετε την εξαγωγή;"
+  },
+  "Where would you like to save this copy?": {
+    "message": "Πού θα θέλατε να αποθηκεύσετε αυτό το αντίγραφο;"
+  },
+  "Where would you like to save this file?": {
+    "message": "Πού θα θέλατε να αποθηκεύσετε αυτό το αρχείο;"
+  },
+  "Whites": {
+    "message": "Λευκό"
+  },
+  "Window": {
+    "message": "Παράθυρο"
+  },
+  "Word Document": {
+    "message": "Έγγραφο Word"
+  },
+  "Yes, Delete": {
+    "message": "Ναι, Διαγραφή"
+  },
+  "Yes, Save": {
+    "message": "Ναι, Αποθήκευση"
+  },
+  "You already have a file named {file}": {
+    "message": "Έχετε ήδη ένα αρχείο με το όνομα \n{file}.\nΘέλετε να το αντικαταστήσετε?"
+  },
+  "You can change its name or color by hovering over it (disabled for the tour)": {
+    "message": "Μπορείτε να αλλάξετε το όνομα ή το χρώμα του περνώντας από πάνω του (απενεργοποιημένο για την παρουσίαση)"
+  },
+  "You can create an error report and report the problem to us at: ": {
+    "message": "Μπορείτε να δημιουργήσετε μια αναφορά σφάλματος και να μας αναφέρετε το πρόβλημα στη διεύθυνση:"
+  },
+  "You can export everything to a Word document": {
+    "message": "Μπορείτε να εξαγάγετε τα πάντα σε ένα έγγραφο Word"
+  },
+  "You can have 5 more days to try Plottr": {
+    "message": "Μπορείτε να έχετε 5 ακόμη ημέρες για να δοκιμάσετε το Plottr"
+  },
+  "You have unsaved changes": {
+    "message": "Έχετε μη αποθηκευμένες αλλαγές"
+  },
+  "You may create a new project": {
+    "message": "Μπορείτε να δημιουργήσετε ένα νέο έργο"
+  },
+  "Your email didn't verify. Try again or try another email.": {
+    "message": "Το email σας δεν επαληθεύτηκε.\n Δοκιμάστε ξανά ή δοκιμάστε άλλο email."
+  },
+  "Your selected license failed verification. Try another one.": {
+    "message": "Η επαλήθευση της επιλεγμένης άδειας χρήσης απέτυχε. Δοκιμάστε μία άλλη."
+  },
+  "You should have received a license key after your purchase.": {
+    "message": "Θα πρέπει να έχετε λάβει ένα κλειδί άδειας χρήσης μετά την αγορά σας."
+  },
+  "You should have received an email with a code": {
+    "message": "Θα πρέπει να έχετε λάβει ένα email με έναν κωδικό"
+  },
+  "You'll have {trialDays} days": {
+    "message": "Θα έχετε {trialDays} ημέρες"
+  },
+  "You're on the latest version": {
+    "message": "Βρίσκεστε στην πιο πρόσφατη έκδοση"
+  },
+  "Your Plottr file was exported to a .docx file": {
+    "message": "Το αρχείο Plottr εξήχθη σε αρχείο .docx"
+  },
+  "Your Plottr file was exported to a Scrivener project package": {
+    "message": "Το αρχείο Plottr εξήχθη σε ένα πακέτο έργου Scrivener"
+  },
+  "Your free trial has expired": {
+    "message": "Η περίοδος της δωρεάν δοκιμής σας έχει λήξει"
+  },
+  "Your template has been saved and is ready to use": {
+    "message": "Το υπόδειγμα σας έχει αποθηκευτεί και είναι έτοιμο για χρήση"
+  },
+  "Zoom": {
+    "message": "Μεγέθυνση"
+  },
+  "[image]": {
+    "message": "[εικόνα]"
+  },
+  "a lot of scenes moved around": {
+    "message": "πολλές σκηνές μετακινήθηκαν"
+  },
+  "a lot of story lines moved around": {
+    "message": "πολλές ιστορίες μετακινήθηκαν"
+  },
+  "and": {
+    "message": "και"
+  },
+  "attach character {characterName} to card {cardName}": {
+    "message": "επισύναψη χαρακτήρα {characterName} στην κάρτα {cardName}"
+  },
+  "attach character {characterName} to note {noteName}": {
+    "message": "επισύναψη χαρακτήρα {characterName} στην σημείωση{noteName}"
+  },
+  "attach place {placeName} to card {cardName}": {
+    "message": "επισύναψη τοποθεσίας {placeName} στην κάρτα {cardName}"
+  },
+  "attach place {placeName} to note {noteName}": {
+    "message": "επισύναψη τοποθεσίας {placeName} στην σημείωση {noteName}"
+  },
+  "attach tag {tagName} to card {cardName}": {
+    "message": "επισύναψη ετικέτας {tagName} στην κάρτα {cardName}"
+  },
+  "attach tag {tagName} to note {noteName}": {
+    "message": "επισύναψη ετικέτας {tagName} στην σημείωση { noteName }"
+  },
+  "blank": {
+    "message": "κενό"
+  },
+  "but don't worry!": {
+    "message": "αλλά μην ανησυχείτε!"
+  },
+  "custom character attribute": {
+    "message": "προσαρμοσμένο χαρακτηριστικό χαρακτήρα"
+  },
+  "custom place attribute": {
+    "message": "προσαρμοσμένο χαρακτηριστικό τοποθεσίας"
+  },
+  "hex code or name": {
+    "message": "δεκαεξαδικός κωδικός ή όνομα"
+  },
+  "new card": {
+    "message": "νέα κάρτα"
+  },
+  "new scene": {
+    "message": "νέα σκηνή"
+  },
+  "new storyline": {
+    "message": "νέα ιστορία"
+  },
+  "no more to add": {
+    "message": "δεν υπάρχει κάτι άλλο για προσθήκη"
+  },
+  "or": {
+    "message": "ή"
+  },
+  "remove character {characterName} from card {cardName}": {
+    "message": "αφαίρεση χαρακτήρα {characterName} από την κάρτα {cardName}"
+  },
+  "remove character {characterName} from note {noteName}": {
+    "message": "αφαίρεση χαρακτήρα {characterName} από την σημείωση {noteName}"
+  },
+  "remove place {placeName} from card {cardName}": {
+    "message": "αφαίρεση τοποθεσίας {placeName} από την κάρτα {cardName}"
+  },
+  "remove place {placeName} from note {noteName}": {
+    "message": "αφαίρεση τοποθεσίας {placeName} από την σημείωση{noteName}"
+  },
+  "remove tag {tagName} from card {cardName}": {
+    "message": "αφαίρεση ετικέτας {tagName} από την κάρτα {cardName}"
+  },
+  "remove tag {tagName} from note {noteName}": {
+    "message": "αφαίρεση ετικέτας {tagName} από την σημείωση {noteName}"
+  },
+  "that best suits your style and needs.": {
+    "message": "που ταιριάζει καλύτερα στο στιλ και τις ανάγκες σας."
+  },
+  "to activate this device.": {
+    "message": "για να ενεργοποιήσετε αυτήν τη συσκευή."
+  },
+  "with an iOS mobile subscription!": {
+    "message": "με συνδρομή για κινητά iOS!"
+  },
+  "{\n          count, plural,\n          one {1 character attached}\n          other {# characters attached}\n        }": {
+    "message": "{\n          count, plural,\n          one {επισυνάπτεται 1 χαρακτήρας}\n          other {# επισυνάπτονται χαρακτήρες}\n        }"
+  },
+  "{\n          count, plural,\n          one {1 place attached}\n          other {# places attached}\n        }": {
+    "message": "{\n          count, plural,\n          one {επισυνάπτεται 1 τοποθεσία}\n          other {# επισυνάπτονται τοποθεσίες}\n}"
+  },
+  "{\n          count, plural,\n          one {1 tag attached}\n          other {# tags attached}\n        }": {
+    "message": "{\n          count, plural,\n          one {επισυνάπτεται 1 ετικέτα}\n          other {# επισυνάπτονται ετικέτες}\n        }"
+  },
+  "{amount} Lifetime": {
+    "message": "${amount}\n Διάρκεια ζωής"
+  },
+  "{amount} Monthly": {
+    "message": "${amount}\n Μηνιαία"
+  },
+  "{amount} Weekly": {
+    "message": "${amount}\n Εβδομαδιαία"
+  },
+  "{amount} Yearly": {
+    "message": "${amount}\n Ετησίως"
+  },
+  "{date, date, long}": {
+    "message": "{date, date, long}"
+  },
+  "{date, date, medium}": {
+    "message": "{date, date, medium}"
+  },
+  "{date, date, monthDay}": {
+    "message": "{date, date, monthDay}"
+  },
+  "{numOfDays, plural,\n      =0 {# days left}\n      one {# day left}\n      other {# days left}\n    }": {
+    "message": "{ numOfDays, plural,\n      =0 {# ημέρες που απομένουν}\n      one {Απομένει # ημέρα}\n      other {# ημέρες που απομένουν}\n    }"
+  },
+  "{num} Scenes": {
+    "message": "{num} Σκηνές"
+  },
+  "{val, number, percent}": {
+    "message": "{val, number, percent}"
+  },
+  "{wordCount,number} words": {
+    "message": "{wordCount, number} λέξεις"
+  },
+  "Add attributes": {
+    "message": "Προσθήκη χαρακτηριστικών"
+  },
+  "Attached to": {
+    "message": "Επισυνάπτεται στο"
+  },
+  "Bring All to Front": {
+    "message": "Φέρτε τα Όλα στο Προσκήνιο"
+  },
+  "Buy the Full Version": {
+    "message": "Αγοράστε την Πλήρη Έκδοση"
+  },
+  "Card Title": {
+    "message": "Τίτλος Κάρτας"
+  },
+  "character": {
+    "message": "χαρακτήρας"
+  },
+  "Choose color": {
+    "message": "Επιλέξτε χρώμα"
+  },
+  "Choose what you want to track about your characters": {
+    "message": "Επιλέξτε τι θέλετε να παρακολουθείτε για τους χαρακτήρες σας"
+  },
+  "Choose what you want to track about your places": {
+    "message": "Επιλέξτε τι θέλετε να παρακολουθείτε για τις τοποθεσίες σας"
+  },
+  "Click here to get the full version": {
+    "message": "Κάντε κλικ εδώ για να λάβετε την πλήρη έκδοση"
+  },
+  "Contact": {
+    "message": "Επικοινωνία"
+  },
+  "Create a new file": {
+    "message": "Δημιουργήστε ένα νέο αρχείο"
+  },
+  "Creates a report to send me": {
+    "message": "Δημιουργεί μια αναφορά για αποστολή"
+  },
+  "Creating your file didn't work. Let's try again.": {
+    "message": "Η δημιουργία του αρχείου σας δεν λειτούργησε. Ας δοκιμάσουμε ξανά."
+  },
+  "Credits": {
+    "message": "Πιστώσεις"
+  },
+  "Custom Attributes for Characters": {
+    "message": "Προσαρμοσμένα Χαρακτηριστικά για τους Χαρακτήρες"
+  },
+  "Custom Attributes for Places": {
+    "message": "Προσαρμοσμένα Χαρακτηριστικά για τις Τοποθεσίες"
+  },
+  "Do you want to delete this card: { title }?": {
+    "message": "Θέλετε να διαγράψετε αυτήν την κάρτα: { title };"
+  },
+  "Do you want to delete this character: { character }?": {
+    "message": "Θέλετε να διαγράψετε αυτόν τον χαρακτήρα: { character };"
+  },
+  "Do you want to delete this note: { title }?": {
+    "message": "Θέλετε να διαγράψετε αυτή την σημείωση: { title };"
+  },
+  "Do you want to delete this place: { name }?": {
+    "message": "Θέλετε να διαγράψετε αυτή την τοποθεσία:{ name };"
+  },
+  "Do you want to delete this scene: { title }?": {
+    "message": "Θέλετε να διαγράψετε αυτή την σκηνή: { title };"
+  },
+  "Do you want to delete this story line: { title }?": {
+    "message": "Θέλετε να διαγράψετε αυτή την ιστορία: { title };"
+  },
+  "Do you want to delete this tag: { title }?": {
+    "message": "Θέλετε να διαγράψετε αυτή την ετικέτα:{ title };"
+  },
+  "Enter License": {
+    "message": "Εισάγετε την Άδεια Χρήσης"
+  },
+  "Filter by story line": {
+    "message": "Φιλτράρισμα κατά ιστορία"
+  },
+  "Fit": {
+    "message": "Εφαρμογή"
+  },
+  "Format with markdown!": {
+    "message": "Μορφοποίηση με σήμανση!"
+  },
+  "Forums": {
+    "message": "Φόρουμ"
+  },
+  "Give feedback": {
+    "message": "Υποβολή σχολίων"
+  },
+  "If you keep seeing this problem, email me at support@plottr.com": {
+    "message": "Αν συνεχίσετε να αντιμετωπίζετε αυτό το πρόβλημα, στείλτε μου email στη διεύθυνση support@plottr.com"
+  },
+  "It looks like you have Plottr on 5 computers already": {
+    "message": "Φαίνεται ότι έχετε το Plottr σε 5 υπολογιστές ήδη"
+  },
+  "It looks like you have an older file version. This could make things work funky or not at all. May Plottr update it for you?": {
+    "message": "Φαίνεται ότι έχετε μια παλαιότερη έκδοση αρχείου. Αυτό θα μπορούσε να κάνει τα πράγματα να λειτουργούν περίεργα ή καθόλου. Μπορεί το Plottr να πραγματοποιήσει την ενημέρωση για εσάς;"
+  },
+  "It looks like your file was saved with a newer version of Plottr than you're using now. That could cause problems. Try updating Plottr and starting it again.": {
+    "message": "Φαίνεται ότι το αρχείο σας αποθηκεύτηκε με μια νεότερη έκδοση του Plottr από αυτή που χρησιμοποιείτε τώρα. Αυτό μπορεί να προκαλέσει προβλήματα. Δοκιμάστε να ενημερώσετε το Plottr και να το εκκινήσετε ξανά."
+  },
+  "It will save a backup first which will be saved to the same folder as this file": {
+    "message": "Θα αποθηκεύσει πρώτα ένα αντίγραφο ασφαλείας το οποίο θα αποθηκευτεί στον ίδιο φάκελο με αυτό το αρχείο"
+  },
+  "License verification failed": {
+    "message": "Η επαλήθευση άδειας χρήσης απέτυχε"
+  },
+  "License verified! You're all set.": {
+    "message": "Επαληθεύτηκε η άδεια χρήσης! Είστε έτοιμοι."
+  },
+  "Line": {
+    "message": "Γραμμή"
+  },
+  "Loading...": {
+    "message": "Φόρτωση..."
+  },
+  "Minimize": {
+    "message": "Ελαχιστοποίηση"
+  },
+  "My awesome story": {
+    "message": "Η φοβερή ιστορία μου"
+  },
+  "Nope. Plottr tried again. But it didn't work. Plottr will ask you next time it opens, but you're verified. Enjoy": {
+    "message": "Οχι. Το Plottr προσπάθησε ξανά. Αλλά δεν λειτούργησε. Το Plottr θα σας ρωτήσει την επόμενη φορά που θα ανοίξει, αλλά έχετε επαληθευτεί. Καλή διασκέδαση"
+  },
+  "Now let's get to the good stuff": {
+    "message": "Τώρα ας πάμε στα καλά πράγματα"
+  },
+  "Open the Tour": {
+    "message": "Ανοίξτε την Περιήγηση"
+  },
+  "Or feel free to contact me with any questions": {
+    "message": "Ή μη διστάσετε να επικοινωνήσετε μαζί μου για τυχόν ερωτήσεις"
+  },
+  "place": {
+    "message": "τοποθεσία"
+  },
+  "Please upload the file named plottr_error_report.txt in your Documents folder": {
+    "message": "Παρακαλούμε μεταφορτώστε το αρχείο με το όνομα plottr_error_report.txt στον φάκελο Έγγραφα"
+  },
+  "Plottr couldn't save a backup. It hasn't touched your file yet, so don't worry. Try quitting Plottr and starting it again.": {
+    "message": "Το Plottr δεν μπόρεσε να αποθηκεύσει ένα αντίγραφο ασφαλείας. Δεν έχει πειράξει ακόμα το αρχείο σας, οπότε μην ανησυχείτε. Δοκιμάστε να εγκαταλείψετε το Plottr και να το εκκινήσετε ξανά."
+  },
+  "Plottr saved a backup just in case and now on with the show (To use the backup, remove '.backup' from the file name)": {
+    "message": "To Plottr αποθήκευσε ένα αντίγραφο ασφαλείας για παν ενδεχόμενο και τώρα ας προχωρήσουμε (Για να χρησιμοποιήσετε το αντίγραφο ασφαλείας, αφαιρέστε το '.backup' από το όνομα του αρχείου)"
+  },
+  "Plottr tried saving a backup just in case, but it didn't work. Try quitting Plottr and starting it again.": {
+    "message": "To Plottr προσπάθησε να αποθηκεύσει ένα αντίγραφο ασφαλείας για παν ενδεχόμενο, αλλά δεν λειτούργησε. Δοκιμάστε να εγκαταλείψετε το Plottr και να το εκκινήσετε ξανά."
+  },
+  "Plottr updated your file without a problem. Don't forget to save your file.": {
+    "message": "Το Plottr ενημέρωσε το αρχείο σας χωρίς πρόβλημα. Μην ξεχάσετε να αποθηκεύσετε το αρχείο σας."
+  },
+  "Plottr verified your license key successfully, but there was an error saving that. Let's try one more time": {
+    "message": "Το Plottr επαλήθευσε το κλειδί άδειας χρήσης με επιτυχία, αλλά παρουσιάστηκε σφάλμα κατά την αποθήκευση του. Ας προσπαθήσουμε άλλη μια φορά"
+  },
+  "Problem saving backup": {
+    "message": "Πρόβλημα με την αποθήκευση αντιγράφων ασφαλείας"
+  },
+  "Report a problem": {
+    "message": "Αναφορά προβλήματος"
+  },
+  "Request a feature": {
+    "message": "Αίτηση για μία λειτουργία"
+  },
+  "Reset": {
+    "message": "Επαναφορά"
+  },
+  "Save & Close": {
+    "message": "Αποθήκευση & Κλείσιμο"
+  },
+  "Scene 1": {
+    "message": "Σκηνή 1"
+  },
+  "Scene {number}": {
+    "message": "Σκηνή {number}"
+  },
+  "Scene {number} name": {
+    "message": "Σκηνή {number} όνομα"
+  },
+  "Story line name": {
+    "message": "Όνομα ιστορίας"
+  },
+  "TRIAL Version": {
+    "message": "ΔΟΚΙΜΑΣΤΙΚΗ Έκδοση"
+  },
+  "Try again by clicking in the menu: Plottr > Verify License...": {
+    "message": "Δοκιμάστε ξανά κάνοντας κλικ στο μενού: Plottr > Επαλήθευση Άδειας Χρήσης..."
+  },
+  "Update Plottr": {
+    "message": "Ενημέρωση Plottr"
+  },
+  "Upload the file Plottr just exported": {
+    "message": "Μεταφορτώστε το αρχείο που μόλις εξήγαγε το Plottr"
+  },
+  "Use the code \"freetrial\" to get the secret discount": {
+    "message": "Χρησιμοποιήστε τον κωδικό \"freetrial\" για να λάβετε τη μυστική έκπτωση"
+  },
+  "Verifying your license. Please wait...": {
+    "message": "Επαλήθευση της άδειας σας. Παρακαλώ περιμένετε..."
+  },
+  "Where would you like to start your new file?": {
+    "message": "Από πού θα θέλατε να ξεκινήσετε το νέο σας αρχείο;"
+  },
+  "Would you like to open an existing file or start a new file?": {
+    "message": "Θα θέλατε να ανοίξετε ένα υπάρχον αρχείο ή να ξεκινήσετε ένα νέο αρχείο;"
+  },
+  "Would you like to save before exiting?": {
+    "message": "Θα θέλατε να κάνετε αποθήκευση πριν την έξοδο;"
+  },
+  "You should have received a license key from Gumroad.": {
+    "message": "Θα έπρεπε να έχετε λάβει ένα κλειδί άδειας χρήσης από το Gumroad."
+  },
+  "Your free trial has expired!": {
+    "message": "Η δωρεάν δοκιμή σας έχει λήξει!"
+  },
+  "a new card": {
+    "message": "μια νέα κάρτα"
+  },
+  "description": {
+    "message": "περιγραφή"
+  },
+  "learn how": {
+    "message": "Μάθετε πως"
+  },
+  "name": {
+    "message": "όνομα"
+  },
+  "New Card": {
+    "message": "Νέα Κάρτα"
+  },
+  "new character": {
+    "message": "νέος χαρακτήρας"
+  },
+  "new note": {
+    "message": "νέα σημείωση"
+  },
+  "new place": {
+    "message": "νέα τοποθεσία"
+  },
+  "new tag": {
+    "message": "νέα ετικέτα"
+  },
+  "no, just exit": {
+    "message": "όχι, απλά έξοδος"
+  },
+  "no, open the file as-is": {
+    "message": "όχι, άνοιγμα του αρχείου ως έχει"
+  },
+  "ok": {
+    "message": "εντάξει"
+  },
+  "story line": {
+    "message": "ιστορία"
+  },
+  "tag name": {
+    "message": "όνομα ετικέτας"
+  },
+  "title": {
+    "message": "τίτλος"
+  },
+  "yes, save!": {
+    "message": "ναι, αποθήκευση!"
+  },
+  "yes, update the file": {
+    "message": "ναι, ενημέρωση του αρχείου"
+  },
+  "{\n      count, plural,\n        one {1 card}\n        other {# card}\n    }": {
+    "message": "{\n      count, plural,\n        one {1 κάρτα}\n        other {# κάρτα}\n    }"
+  },
+  "{\n      count, plural,\n        one {1 note}\n        other {# notes}\n    }": {
+    "message": "{\n      count, plural,\n        one {1 σημείωση}\n        other {# σημειώσεις}\n    }"
+  },
+  "{days} days remaining": {
+    "message": "{days} ημέρες που απομένουν"
+  },
+  "Are you sure you want to delete {template}?": {
+    "message": "Είστε βέβαιοι ότι θέλετε να διαγράψετε το {template};"
+  },
+  "Character Custom Attributes": {
+    "message": "Προσαρμοσμένα Χαρακτηριστικά Χαρακτήρων"
+  },
+  "Check for updates": {
+    "message": "Ελεγχος για ενημερώσεις"
+  },
+  "Checking for updates": {
+    "message": "Ελεγχος για ενημερώσεις"
+  },
+  "Choose an image below or upload a new one": {
+    "message": "Επιλέξτε μια εικόνα παρακάτω ή μεταφορτώστε μια νέα"
+  },
+  "Could not display license key. Try again": {
+    "message": "Δεν ήταν δυνατή η εμφάνιση του κλειδιού άδειας χρήσης. Προσπαθήστε ξανά"
+  },
+  "Crafted in the Mountains of Utah": {
+    "message": "Κατασκευασμένο στα βουνά της Γιούτα"
+  },
+  "Create an error report": {
+    "message": "Δημιουργία αναφοράς σφάλματος"
+  },
+  "Create unlimited story files": {
+    "message": "Δημιουργία απεριόριστων αρχείων ιστορίας"
+  },
+  "Do you want to delete this book: { book }?": {
+    "message": "Θέλετε να διαγράψετε αυτό το βιβλίο: { book };"
+  },
+  "Do you want to delete this chapter: { title }?": {
+    "message": "Θέλετε να διαγράψετε αυτό το κεφάλαιο: { title };"
+  },
+  "Download Now": {
+    "message": "Λήψη Τώρα"
+  },
+  "Downloading ({percent}%)": {
+    "message": "Λήψη ({percent}%)"
+  },
+  "Enter a customer service code": {
+    "message": "Εισαγάγετε έναν κωδικό εξυπηρέτησης πελατών"
+  },
+  "Enter your code": {
+    "message": "Εισάγετε τον κωδικό σας"
+  },
+  "Error": {
+    "message": "Σφάλμα"
+  },
+  "Extending your trial didn't work. Let's try again.": {
+    "message": "Η παράταση της δοκιμαστικής περιόδου δεν λειτούργησε. Ας προσπαθήσουμε ξανά."
+  },
+  "Facebook Support Group": {
+    "message": "Ομάδα Υποστήριξης Facebook"
+  },
+  "Here is your license key": {
+    "message": "Εδώ είναι το κλειδί άδειας χρήσης σας"
+  },
+  "New File": {
+    "message": "Νέο Αρχείο"
+  },
+  "New from Template": {
+    "message": "Νέο από Υπόδειγμα"
+  },
+  "No updates available": {
+    "message": "Δεν υπάρχουν διαθέσιμες ενημερώσεις"
+  },
+  "Open File": {
+    "message": "Ανοιγμα Αρχείου"
+  },
+  "Plottr Trial": {
+    "message": "Δοκιμαστική περίοδος Plottr"
+  },
+  "Plottr created a file named plottr_error_report.txt in your Documents folder": {
+    "message": "Το Plottr δημιούργησε ένα αρχείο με το όνομα plottr_error_report.txt στο φάκελο Έγγραφα"
+  },
+  "Quit and Install": {
+    "message": "Έξοδος και Εγκατάσταση"
+  },
+  "See the Changelog": {
+    "message": "Προβολή του Καταλόγου Αλλαγών"
+  },
+  "This is your Device ID": {
+    "message": "Αυτό είναι το Αναγνωριστικό Συσκευής σας"
+  },
+  "Try that again, but if it keeps happening, use the help menu to create an error report and report the problem.": {
+    "message": "Προσπαθήστε το ξανά, αλλά αν συνεχίσει να συμβαίνει, χρησιμοποιήστε το μενού βοηθείας για να δημιουργήσετε μια αναφορά σφάλματος και να αναφέρετε το πρόβλημα."
+  },
+  "Update Ready": {
+    "message": "Ενημέρωση Έτοιμη"
+  },
+  "Update available!": {
+    "message": "Διαθέσιμη ενημέρωση!"
+  },
+  "Upload a new image": {
+    "message": "Μεταφόρτωση νέας εικόνας"
+  },
+  "View Device ID": {
+    "message": "Προβολή Αναγνωριστικού Συσκευής"
+  },
+  "View License Key": {
+    "message": "Προβολή Κλειδιού Άδειας Χρήσης"
+  },
+  "View the Tour": {
+    "message": "Προβολή της Περιήγησης"
+  },
+  "paragraph": {
+    "message": "παράγραφος"
+  },
+  "selected": {
+    "message": "επιλεγμένο"
+  },
+  "{\n      count, plural,\n        one {1 card}\n        other {# cards}\n    }": {
+    "message": "{\n      count, plural,\n        one {1 κάρτα}\n        other {# κάρτες}\n    }"
+  },
+  "Text Color": {
+    "message": "Χρώμα Κειμένου"
+  },
+  "Text Size": {
+    "message": "Text Size"
+  },
+  "Border Color": {
+    "message": "Χρώμα Πλαισίου"
+  },
+  "Border Style": {
+    "message": "Στυλ Πλαισίου"
+  },
+  "Background Color": {
+    "message": "Χρώμα Φόντου"
+  },
+  "None": {
+    "message": "Κανένα"
+  },
+  "Dotted": {
+    "message": "Διακεκομμένη"
+  },
+  "Dashed": {
+    "message": "Συνεχής Διαγράμμιση"
+  },
+  "Solid": {
+    "message": "Συμπαγής Διαγράμμιση"
+  },
+  "(Series View)": {
+    "message": "(Series View)"
+  },
+  "({ thing }).": {
+    "message": "({ thing })."
+  },
+  "+ Add Template": {
+    "message": "+ Add Template"
+  },
+  ".docx": {
+    "message": ".docx"
+  },
+  ".scriv": {
+    "message": ".scriv"
+  },
+  "Access all the features": {
+    "message": "Access all the features"
+  },
+  "Act": {
+    "message": "Act"
+  },
+  "Act Structure": {
+    "message": "Act Structure"
+  },
+  "Action": {
+    "message": "Action"
+  },
+  "Active": {
+    "message": "Active"
+  },
+  "Advanced": {
+    "message": "Advanced"
+  },
+  "Advanced...": {
+    "message": "Advanced..."
+  },
+  "Also save backups on this device": {
+    "message": "Also save backups on this device"
+  },
+  "Always Open Dashboard First": {
+    "message": "Always Open Dashboard First"
+  },
+  "Appearance: Dark/Light": {
+    "message": "Appearance: Dark/Light"
+  },
+  "Are you sure you want to deactivate your license key?": {
+    "message": "Are you sure you want to deactivate your license key?"
+  },
+  "Are you sure you want to delete all chapters and their scene cards in \"{beatTitle}\".": {
+    "message": "Are you sure you want to delete all chapters and their scene cards in \"{beatTitle}\"."
+  },
+  "Are you sure you want to delete all scene cards in \"{beatTitle}\".": {
+    "message": "Are you sure you want to delete all scene cards in \"{beatTitle}\"."
+  },
+  "Are you sure you want to remove the {template} template and all its data?": {
+    "message": "Are you sure you want to remove the {template} template and all its data?"
+  },
+  "Are you sure? Removing a level will delete the timeline cards directly under this level's heading cards.": {
+    "message": "Are you sure? Removing a level will delete the timeline cards directly under this level's heading cards."
+  },
+  "At least two levels of hierarchy required to view as tabs": {
+    "message": "At least two levels of hierarchy required to view as tabs"
+  },
+  "Backup Options": {
+    "message": "Backup Options"
+  },
+  "Backups beyond this will be erased": {
+    "message": "Backups beyond this will be erased"
+  },
+  "Beats": {
+    "message": "Beats"
+  },
+  "Beta": {
+    "message": "Beta"
+  },
+  "Black (default)": {
+    "message": "Black (default)"
+  },
+  "Blue (default)": {
+    "message": "Blue (default)"
+  },
+  "Body": {
+    "message": "Body"
+  },
+  "Browser": {
+    "message": "Browser"
+  },
+  "Can't move card to empty book": {
+    "message": "Can't move card to empty book"
+  },
+  "Change book": {
+    "message": "Change book"
+  },
+  "Change color": {
+    "message": "Change color"
+  },
+  "Character Image": {
+    "message": "Character Image"
+  },
+  "Character Name": {
+    "message": "Character Name"
+  },
+  "Children": {
+    "message": "Children"
+  },
+  "Choose what categories you want to put your notes into": {
+    "message": "Choose what categories you want to put your notes into"
+  },
+  "Choose what categories you want to put your places into": {
+    "message": "Choose what categories you want to put your places into"
+  },
+  "Choose what categories you want to put your tags into": {
+    "message": "Choose what categories you want to put your tags into"
+  },
+  "Choose what to upload": {
+    "message": "Choose what to upload"
+  },
+  "Choose your Scrivener project": {
+    "message": "Choose your Scrivener project"
+  },
+  "Choose your backup location": {
+    "message": "Choose your backup location"
+  },
+  "Clear Timeline": {
+    "message": "Clear Timeline"
+  },
+  "Click here to log in": {
+    "message": "Click here to log in"
+  },
+  "Collaborator": {
+    "message": "Collaborator"
+  },
+  "Colors": {
+    "message": "Colors"
+  },
+  "Comedy": {
+    "message": "Comedy"
+  },
+  "Configure Pro settings": {
+    "message": "Configure Pro settings"
+  },
+  "Confirm Placement": {
+    "message": "Confirm Placement"
+  },
+  "Continue": {
+    "message": "Continue"
+  },
+  "Continue working when your connection goes down.": {
+    "message": "Continue working when your connection goes down."
+  },
+  "Create New Project": {
+    "message": "Create New Project"
+  },
+  "Create unlimited projects": {
+    "message": "Create unlimited projects"
+  },
+  "DELETE": {
+    "message": "DELETE"
+  },
+  "Dark": {
+    "message": "Dark"
+  },
+  "Days of Backups": {
+    "message": "Days of Backups"
+  },
+  "Deactivate": {
+    "message": "Deactivate"
+  },
+  "Default": {
+    "message": "Default"
+  },
+  "Default Placement": {
+    "message": "Default Placement"
+  },
+  "Delete plotline": {
+    "message": "Delete plotline"
+  },
+  "Disabled": {
+    "message": "Disabled"
+  },
+  "Don't forget to make a backup of your files first.": {
+    "message": "Don't forget to make a backup of your files first."
+  },
+  "Done!": {
+    "message": "Done!"
+  },
+  "Duplicate": {
+    "message": "Duplicate"
+  },
+  "Duplicate plotline": {
+    "message": "Duplicate plotline"
+  },
+  "Edit title": {
+    "message": "Edit title"
+  },
+  "Edit {beatName}": {
+    "message": "Edit {beatName}"
+  },
+  "Edit {lineName}": {
+    "message": "Edit {lineName}"
+  },
+  "Enabled": {
+    "message": "Enabled"
+  },
+  "Enter title": {
+    "message": "Enter title"
+  },
+  "Expand or collapse all stacks": {
+    "message": "Expand or collapse all stacks"
+  },
+  "Expand or collapse stacks": {
+    "message": "Expand or collapse stacks"
+  },
+  "Export to:": {
+    "message": "Export to:"
+  },
+  "Finally, toggle the switch to turn on/off Act Structure.": {
+    "message": "Finally, toggle the switch to turn on/off Act Structure."
+  },
+  "Font Default: Text Editor": {
+    "message": "Font Default: Text Editor"
+  },
+  "From the \"Dashboard\", click \"Settings\" from the side menu.": {
+    "message": "From the \"Dashboard\", click \"Settings\" from the side menu."
+  },
+  "General": {
+    "message": "General"
+  },
+  "Get a License": {
+    "message": "Get a License"
+  },
+  "Give Feedback": {
+    "message": "Give Feedback"
+  },
+  "Give this file a new name": {
+    "message": "Give this file a new name"
+  },
+  "Go!": {
+    "message": "Go!"
+  },
+  "Green (default)": {
+    "message": "Green (default)"
+  },
+  "Hides sensitive info for when you are sharing your screen": {
+    "message": "Hides sensitive info for when you are sharing your screen"
+  },
+  "Horror": {
+    "message": "Horror"
+  },
+  "How to turn on Act Structure": {
+    "message": "How to turn on Act Structure"
+  },
+  "I have Plottr Pro": {
+    "message": "I have Plottr Pro"
+  },
+  "I have a<br/>License Key": {
+    "message": "I have a<br/>License Key"
+  },
+  "I'm Done!": {
+    "message": "I'm Done!"
+  },
+  "Import File": {
+    "message": "Import File"
+  },
+  "It doesn't look like you have a pro license.": {
+    "message": "It doesn't look like you have a pro license."
+  },
+  "It looks like you already have an active trial.": {
+    "message": "It looks like you already have an active trial."
+  },
+  "It looks like you've used all your license activations. Manage or upgrade here: <a>My Plottr Account</a>": {
+    "message": "It looks like you've used all your license activations. Manage or upgrade here: <a>My Plottr Account</a>"
+  },
+  "It looks like your version of Plottr is older than this project. Please update Plottr to avoid any issues": {
+    "message": "It looks like your version of Plottr is older than this project. Please update Plottr to avoid any issues"
+  },
+  "Last step": {
+    "message": "Last step"
+  },
+  "Let's set up your Pro account": {
+    "message": "Let's set up your Pro account"
+  },
+  "Levels": {
+    "message": "Levels"
+  },
+  "License Information": {
+    "message": "License Information"
+  },
+  "Light": {
+    "message": "Light"
+  },
+  "Log Out": {
+    "message": "Log Out"
+  },
+  "Move card to { bookTitle }": {
+    "message": "Move card to { bookTitle }"
+  },
+  "Move plotline": {
+    "message": "Move plotline"
+  },
+  "Mystery": {
+    "message": "Mystery"
+  },
+  "Name Your Project:": {
+    "message": "Name Your Project:"
+  },
+  "No Matches": {
+    "message": "No Matches"
+  },
+  "No files found.": {
+    "message": "No files found."
+  },
+  "Not Active": {
+    "message": "Not Active"
+  },
+  "Not Now": {
+    "message": "Not Now"
+  },
+  "Note Categories": {
+    "message": "Note Categories"
+  },
+  "Note Title": {
+    "message": "Note Title"
+  },
+  "Offline": {
+    "message": "Offline"
+  },
+  "Offline Mode": {
+    "message": "Offline Mode"
+  },
+  "Ok": {
+    "message": "Ok"
+  },
+  "On the \"Settings\" modal, click on the \"Beta\" tab.": {
+    "message": "On the \"Settings\" modal, click on the \"Beta\" tab."
+  },
+  "On the top right corner of the app, click the \"Dashboard\" button.": {
+    "message": "On the top right corner of the app, click the \"Dashboard\" button."
+  },
+  "Open Existing File": {
+    "message": "Open Existing File"
+  },
+  "Orange (default)": {
+    "message": "Orange (default)"
+  },
+  "Organize your scene cards into Chapters and Acts": {
+    "message": "Organize your scene cards into Chapters and Acts"
+  },
+  "Owner": {
+    "message": "Owner"
+  },
+  "Permission": {
+    "message": "Permission"
+  },
+  "Place Categories": {
+    "message": "Place Categories"
+  },
+  "Place Name": {
+    "message": "Place Name"
+  },
+  "Playwriting": {
+    "message": "Playwriting"
+  },
+  "Please contact us with any questions at support@plottr.com": {
+    "message": "Please contact us with any questions at support@plottr.com"
+  },
+  "Plottr created a file named {filePath} in your Documents folder": {
+    "message": "Plottr created a file named {filePath} in your Documents folder"
+  },
+  "Plottr opens your most recent project at start": {
+    "message": "Plottr opens your most recent project at start"
+  },
+  "Plottr ran into a problem and can't start.  Please contact support.": {
+    "message": "Plottr ran into a problem and can't start.  Please contact support."
+  },
+  "Plottr ran into an issue opening your project. Please check your backups or contact support about this project and we will get it running for you quickly.": {
+    "message": "Plottr ran into an issue opening your project. Please check your backups or contact support about this project and we will get it running for you quickly."
+  },
+  "Plottr ran into an issue opening your project. Please check your backups or contact support with this file and we will get it running for you quickly.": {
+    "message": "Plottr ran into an issue opening your project. Please check your backups or contact support with this file and we will get it running for you quickly."
+  },
+  "Preview:": {
+    "message": "Preview:"
+  },
+  "Pro Subscription": {
+    "message": "Pro Subscription"
+  },
+  "Product Name": {
+    "message": "Product Name"
+  },
+  "Projects": {
+    "message": "Projects"
+  },
+  "Put Description in:": {
+    "message": "Put Description in:"
+  },
+  "Red (default)": {
+    "message": "Red (default)"
+  },
+  "Remove template": {
+    "message": "Remove template"
+  },
+  "Requires you to restart plottr": {
+    "message": "Requires you to restart plottr"
+  },
+  "Restore Default": {
+    "message": "Restore Default"
+  },
+  "Restore Defaults": {
+    "message": "Restore Defaults"
+  },
+  "Romance": {
+    "message": "Romance"
+  },
+  "Save and Open": {
+    "message": "Save and Open"
+  },
+  "Save backups on this device": {
+    "message": "Save backups on this device"
+  },
+  "Save backups to this device as well as in the cloud": {
+    "message": "Save backups to this device as well as in the cloud"
+  },
+  "Save these settings across projects?": {
+    "message": "Save these settings across projects?"
+  },
+  "Saved in the Cloud": {
+    "message": "Saved in the Cloud"
+  },
+  "Screenplay": {
+    "message": "Screenplay"
+  },
+  "Scrivener file": {
+    "message": "Scrivener file"
+  },
+  "Search Documentation": {
+    "message": "Search Documentation"
+  },
+  "See? That was painless 😁": {
+    "message": "See? That was painless 😁"
+  },
+  "Short Story": {
+    "message": "Short Story"
+  },
+  "Show File": {
+    "message": "Show File"
+  },
+  "Sign in": {
+    "message": "Sign in"
+  },
+  "Sign in with your my.plottr.com account": {
+    "message": "Sign in with your my.plottr.com account"
+  },
+  "Snowflake Pro": {
+    "message": "Snowflake Pro"
+  },
+  "Spell Check": {
+    "message": "Spell Check"
+  },
+  "Stacked": {
+    "message": "Stacked"
+  },
+  "Start Plottr Pro": {
+    "message": "Start Plottr Pro"
+  },
+  "Start the<br/>Free Trial": {
+    "message": "Start the<br/>Free Trial"
+  },
+  "Start with Template": {
+    "message": "Start with Template"
+  },
+  "Status": {
+    "message": "Status"
+  },
+  "Step {number}": {
+    "message": "Step {number}"
+  },
+  "Streaming Friendly": {
+    "message": "Streaming Friendly"
+  },
+  "Stress test saving": {
+    "message": "Stress test saving"
+  },
+  "Structure": {
+    "message": "Structure"
+  },
+  "Successfully resumed.": {
+    "message": "Successfully resumed."
+  },
+  "Synopsis": {
+    "message": "Synopsis"
+  },
+  "System": {
+    "message": "System"
+  },
+  "Tabbed": {
+    "message": "Tabbed"
+  },
+  "Tag Categories": {
+    "message": "Tag Categories"
+  },
+  "Tags / Characters / Places": {
+    "message": "Tags / Characters / Places"
+  },
+  "Take Control": {
+    "message": "Take Control"
+  },
+  "Template": {
+    "message": "Template"
+  },
+  "Templates": {
+    "message": "Templates"
+  },
+  "Testing utilities": {
+    "message": "Testing utilities"
+  },
+  "The cloud file is different from your local copy.  We created a duplicate of your local file and switched to the cloud file.": {
+    "message": "The cloud file is different from your local copy.  We created a duplicate of your local file and switched to the cloud file."
+  },
+  "There was an error doing that. Try again.": {
+    "message": "There was an error doing that. Try again."
+  },
+  "There was an error reconnecting.  Please save the file and restart Plottr.": {
+    "message": "There was an error reconnecting.  Please save the file and restart Plottr."
+  },
+  "There was an error uploading your offline backup. Please exit and start again": {
+    "message": "There was an error uploading your offline backup. Please exit and start again"
+  },
+  "This appears to be a Plottr Pro file.  Please log in.": {
+    "message": "This appears to be a Plottr Pro file.  Please log in."
+  },
+  "This will be quick and painless. There are only 3 steps:": {
+    "message": "This will be quick and painless. There are only 3 steps:"
+  },
+  "Timeline Structure": {
+    "message": "Timeline Structure"
+  },
+  "Title Page": {
+    "message": "Title Page"
+  },
+  "To give feedback on this feature, please visit:": {
+    "message": "To give feedback on this feature, please visit:"
+  },
+  "To use \"{ thing }\" in Plottr Pro, you need to upload it first.": {
+    "message": "To use \"{ thing }\" in Plottr Pro, you need to upload it first."
+  },
+  "Update failed. <b>Try again</b> or <a>install manually</a>": {
+    "message": "Update failed. <b>Try again</b> or <a>install manually</a>"
+  },
+  "Upload": {
+    "message": "Upload"
+  },
+  "Upload ALL projects & templates": {
+    "message": "Upload ALL projects & templates"
+  },
+  "Upload Existing Project": {
+    "message": "Upload Existing Project"
+  },
+  "Upload to Plottr Pro?": {
+    "message": "Upload to Plottr Pro?"
+  },
+  "Upload your projects and templates": {
+    "message": "Upload your projects and templates"
+  },
+  "Uploading": {
+    "message": "Uploading"
+  },
+  "Uploading...": {
+    "message": "Uploading..."
+  },
+  "View Backups": {
+    "message": "View Backups"
+  },
+  "View timeline ith tabs for the highest level": {
+    "message": "View timeline ith tabs for the highest level"
+  },
+  "Viewer": {
+    "message": "Viewer"
+  },
+  "We couldn't find a Pro account with that email": {
+    "message": "We couldn't find a Pro account with that email"
+  },
+  "We ran into problems uploading some files": {
+    "message": "We ran into problems uploading some files"
+  },
+  "Welcome to Plottr Pro": {
+    "message": "Welcome to Plottr Pro"
+  },
+  "When Plottr opens, the first thing you'll see is the dashboard": {
+    "message": "When Plottr opens, the first thing you'll see is the dashboard"
+  },
+  "White (default)": {
+    "message": "White (default)"
+  },
+  "Woohoo! Scene card duplicated": {
+    "message": "Woohoo! Scene card duplicated"
+  },
+  "Wrong file format": {
+    "message": "Wrong file format"
+  },
+  "Yellow (default)": {
+    "message": "Yellow (default)"
+  },
+  "You can always change these later": {
+    "message": "You can always change these later"
+  },
+  "You need to update Plottr": {
+    "message": "You need to update Plottr"
+  },
+  "Your changes were uploaded to the cloud.": {
+    "message": "Your changes were uploaded to the cloud."
+  },
+  "[Blank]": {
+    "message": "[Blank]"
+  },
+  "but don't panic, you haven't lost anything": {
+    "message": "but don't panic, you haven't lost anything"
+  },
+  "last edited": {
+    "message": "last edited"
+  },
+  "plottr.com/beta": {
+    "message": "plottr.com/beta"
+  },
+  "{type} template": {
+    "message": "{type} template"
+  },
+  "Add Scene": {
+    "message": "Add Scene"
+  },
+  "Add Another Scene": {
+    "message": "Add Another Scene"
+  },
+  "Congratulations": {
+    "message": "Congratulations"
+  },
+  "Delete Book": {
+    "message": "Delete Book"
+  },
+  "Delete Book {name}?": {
+    "message": "Delete Book {name}?"
+  },
+  "Delete Chapter?": {
+    "message": "Delete Chapter?"
+  },
+  "Do you want to delete tag {name}?": {
+    "message": "Do you want to delete tag {name}?"
+  },
+  "Editor is currently locked by {name}.": {
+    "message": "Editor is currently locked by {name}."
+  },
+  "example@domain.com": {
+    "message": "example@domain.com"
+  },
+  "Error sharing file": {
+    "message": "Error sharing file"
+  },
+  "From File": {
+    "message": "From File"
+  },
+  "From Template": {
+    "message": "From Template"
+  },
+  "Hey, check out my Plottr project \"{project}\"": {
+    "message": "Hey, check out my Plottr project \"{project}\""
+  },
+  "Hold On!": {
+    "message": "Hold On!"
+  },
+  "Let's get you started": {
+    "message": "Let's get you started"
+  },
+  "Manage the Categories you wish to place your characters in.": {
+    "message": "Manage the Categories you wish to place your characters in."
+  },
+  "No Documents Found": {
+    "message": "No Documents Found"
+  },
+  "NOT NOW": {
+    "message": "NOT NOW"
+  },
+  "Please verify your license in {time}": {
+    "message": "Please verify your license in {time}"
+  },
+  "PLOTTR PRO": {
+    "message": "PLOTTR PRO"
+  },
+  "PLOTTR CLASSIC": {
+    "message": "PLOTTR CLASSIC"
+  },
+  "Purchase Pro": {
+    "message": "Purchase Pro"
+  },
+  "Save as\nTemplate": {
+    "message": "Save as\nTemplate"
+  },
+  "See More": {
+    "message": "See More"
+  },
+  "See Less": {
+    "message": "See Less"
+  },
+  "See that was painless": {
+    "message": "See that was painless"
+  },
+  "Start": {
+    "message": "Start"
+  },
+  "Plottr Pro Wizard": {
+    "message": "Plottr Pro Wizard"
+  },
+  "START PLOTTING": {
+    "message": "START PLOTTING"
+  },
+  "There was an error while sharing your file. Try Again.": {
+    "message": "There was an error while sharing your file. Try Again."
+  },
+  "There was an error trying to sign you in. Ensure you password and email are correct.": {
+    "message": "There was an error trying to sign you in. Ensure you password and email are correct."
+  },
+  "This will be quick and painless.": {
+    "message": "This will be quick and painless."
+  },
+  "There are only ": {
+    "message": "There are only "
+  },
+  "{number} steps:": {
+    "message": "{number} steps:"
+  },
+  "Try Plottr Pro today for a seamless cloud experience like you have never imagined.": {
+    "message": "Try Plottr Pro today for a seamless cloud experience like you have never imagined."
+  },
+  "Unknown": {
+    "message": "Unknown"
+  },
+  "Upload projects and templates": {
+    "message": "Upload projects and templates"
+  },
+  "Uploading projects and templates": {
+    "message": "Uploading projects and templates"
+  },
+  "UPLOADING...": {
+    "message": "UPLOADING..."
+  },
+  "Upload Projects": {
+    "message": "Upload Projects"
+  },
+  "Use Book\nTemplate": {
+    "message": "Use Book\nTemplate"
+  },
+  "Use Scene\nTemplate": {
+    "message": "Use Scene\nTemplate"
+  },
+  "Use License Code Login": {
+    "message": "Use License Code Login"
+  },
+  "Use Plottr Pro Login": {
+    "message": "Use Plottr Pro Login"
+  },
+  "You cannot delete the last chapter.": {
+    "message": "You cannot delete the last chapter."
+  },
+  "You cannot delete the last plotline.": {
+    "message": "You cannot delete the last plotline."
+  },
+  "You have no {type}s": {
+    "message": "You have no {type}s"
+  },
+  "You need to have an active Plottr Pro account to continue": {
+    "message": "You need to have an active Plottr Pro account to continue"
+  },
+  "You currently have no available licenses for this email.": {
+    "message": "You currently have no available licenses for this email."
+  },
+  "Your next great plot begins with Plottr.": {
+    "message": "Your next great plot begins with Plottr."
+  },
+  "Character's Categories": {
+    "message": "Character's Categories"
+  },
+  "Checking licenses for {email}": {
+    "message": "Checking licenses for {email}"
+  },
+  "{\n      count, plural,\n        one {1 carte}\n        other {# cartes}\n    }": {
+    "message": "{\n      count, plural,\n        one {1 carte}\n        other {# cartes}\n    }"
+  },
+  "No more {type}s": {
+    "message": "No more {type}s"
+  },
+  "Auto Number": {
+    "message": "Auto Number"
+  },
+  "Auto-Save": {
+    "message": "Auto-Save"
+  },
+  "Use Templates": {
+    "message": "Use Templates"
+  },
+  "On the top right corner of the app, click the 'Dashboard' button.": {
+    "message": "On the top right corner of the app, click the 'Dashboard' button."
+  },
+  "From the 'Dashboard', click 'Settings' from the side menu.": {
+    "message": "From the 'Dashboard', click 'Settings' from the side menu."
+  },
+  "On the 'Settings' modal, click on the 'Beta tab.": {
+    "message": "On the 'Settings' modal, click on the 'Beta tab."
+  },
+  "Import": {
+    "message": "Import"
+  },
+  "Woohoo! Scene card moved to": {
+    "message": "Woohoo! Scene card moved to"
+  },
+  "Sharing": {
+    "message": "Sharing"
+  },
+  "Send Invite": {
+    "message": "Send Invite"
+  },
+  "Email Address": {
+    "message": "Email Address"
+  },
+  "Permissions": {
+    "message": "Permissions"
+  },
+  "Download": {
+    "message": "Download"
+  },
+  "Import from Snowflake Pro": {
+    "message": "Import from Snowflake Pro"
+  },
+  "See What’s New": {
+    "message": "See What’s New"
+  },
+  "About": {
+    "message": "About"
+  },
+  "Beta Information": {
+    "message": "Beta Information"
+  },
+  "Beta Email": {
+    "message": "Beta Email"
+  },
+  "Admin": {
+    "message": "Admin"
+  },
+  "Remove Pro on this Device": {
+    "message": "Remove Pro on this Device"
+  },
+  "Use this if you logged into Pro by accident": {
+    "message": "Use this if you logged into Pro by accident"
+  },
+  "Are you sure you want to delete {plotline}?": {
+    "message": "Are you sure you want to delete {plotline}?"
+  },
+  "Are you sure you want to delete {chapter #}?": {
+    "message": "Are you sure you want to delete {chapter #}?"
+  },
+  "Custom Attributes For Scenes": {
+    "message": "Custom Attributes For Scenes"
+  },
+  "Choose what you want to track about your scenes": {
+    "message": "Choose what you want to track about your scenes"
+  },
+  "Edit New Plotline": {
+    "message": "Edit New Plotline"
+  },
+  "Timeline Settings": {
+    "message": "Timeline Settings"
+  },
+  "Enter some text…": {
+    "message": "Enter some text…"
+  },
+  "Custom Attributes For Characters": {
+    "message": "Custom Attributes For Characters"
+  },
+  "text": {
+    "message": "text"
+  },
+  "Custom Attributes For Places": {
+    "message": "Custom Attributes For Places"
+  },
+  "scenes": {
+    "message": "scenes"
+  },
+  "Main plot": {
+    "message": "Main plot"
+  },
+  "characters": {
+    "message": "characters"
+  },
+  "Download Complete ًںژ‰ (version {version})": {
+    "message": "Download Complete ًںژ‰ (version {version})"
+  },
+  "Guided tours": {
+    "message": "Guided tours"
+  },
+  "Act structure": {
+    "message": "Act structure"
+  },
+  "none": {
+    "message": "none"
+  },
+  "dashed": {
+    "message": "dashed"
+  },
+  "solid": {
+    "message": "solid"
+  },
+  "dotted": {
+    "message": "dotted"
+  },
+  "Saving worked this time": {
+    "message": "Saving worked this time"
+  },
+  "auto": {
+    "message": "auto"
+  },
+  "untitled": {
+    "message": "untitled"
+  },
+  "Update Available (version {version})": {
+    "message": "Update Available (version {version})"
+  },
+  "App Version: { version }": {
+    "message": "App Version: { version }"
+  },
+  "{\n count, plural,\n one {1 place attached}\n  other {# places attached}\n }": {
+    "message": "{\n count, plural,\n one {1 place attached}\n  other {# places attached}\n }"
+  },
+  "{\n count, plural,\n one {1 tag attached}\n other {# tags attached}\n }": {
+    "message": "{\n count, plural,\n one {1 tag attached}\n other {# tags attached}\n }"
+  },
+  "{\n count, plural,\n one {1 card}\n other {# card}\n}": {
+    "message": "{\n count, plural,\n one {1 card}\n other {# card}\n}"
+  },
+  "{\n count, plural,\n one {1 note}\n other {# notes}\n}": {
+    "message": "{\n count, plural,\n one {1 note}\n other {# notes}\n}"
+  },
+  "{\n count, plural,\n one {1 character attached}\n other {# characters attached}\n        }": {
+    "message": "{\n count, plural,\n one {1 character attached}\n other {# characters attached}\n        }"
+  },
+  "{\n count, plural,\n one {1 place attached}\n other {# places attached}\n }": {
+    "message": "{\n count, plural,\n one {1 place attached}\n other {# places attached}\n }"
+  },
+  "{\n count, plural,\n one {1 tag attached}\n other {# tags attached}\n}": {
+    "message": "{\n count, plural,\n one {1 tag attached}\n other {# tags attached}\n}"
+  },
+  "Filter by storyline": {
+    "message": "Filter by storyline"
+  },
+  "Could not display the license key. Try again": {
+    "message": "Could not display the license key. Try again"
+  }
+}

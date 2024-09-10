@@ -1,0 +1,2945 @@
+{
+  "(If not, please email support@plottr.com)": {
+    "message": "(إذا لم يكن الأمر كذلك، يرجى إرسال بريد إلكتروني إلى support@plottr.com)"
+  },
+  "(Logout)": {
+    "message": "(تسجيل الخروج)"
+  },
+  "A verification code was sent to:": {
+    "message": "لقد تم إرسال رمز التحقق إلى:"
+  },
+  "About Plottr": {
+    "message": "حول Plottr"
+  },
+  "Access to all the features": {
+    "message": "الاستفادة من جميع الميزات"
+  },
+  "Account Information": {
+    "message": "معلومات الحساب"
+  },
+  "Account": {
+    "message": "الحساب"
+  },
+  "Actions": {
+    "message": "الأوامر"
+  },
+  "Activate License": {
+    "message": "تفعيل الاشتراك"
+  },
+  "Add Chapter": {
+    "message": "إضافة فصل"
+  },
+  "Add attribute": {
+    "message": "إضافة صفة"
+  },
+  "Add cards to the timeline so you can write notes about your scenes. Click on the card to add more details": {
+    "message": "أضف بطاقات إلى الجدول الزمني لكي تتمكن من كتابة ملاحظات حول مشاهدك. اضغط على البطاقة لإضافة تفاصيل أكثر"
+  },
+  "Add category": {
+    "message": "أضف فئة"
+  },
+  "Add more plotlines here": {
+    "message": "أضف المزيد من خطوط الحبكة"
+  },
+  "Add new scenes or chapters here": {
+    "message": "أضف مشاهدًا أو فصولًا جديدة هنا"
+  },
+  "Add Scene": {
+    "message": "أضف مشهدًا"
+  },
+  "Add Another Scene": {
+    "message": "أضف مشهدًا آخر"
+  },
+  "Add": {
+    "message": "أضف"
+  },
+  "Advanced Export Options": {
+    "message": "خيارات تصدير متقدمة"
+  },
+  "After": {
+    "message": "بعد"
+  },
+  "All": {
+    "message": "الكل"
+  },
+  "App Version: {version}": {
+    "message": "نسخة التطبيق: { version }"
+  },
+  "Are you sure you want to clear everything in this timeline?": {
+    "message": "هل أنت متأكد من أنك ترغب في حذف كل شيء على هذا الجدول الزمني؟"
+  },
+  "Are you sure you want to delete { thing }?": {
+    "message": "هل أنت متأكد من أنك ترغب في حذف { thing }؟"
+  },
+  "Are you sure you want to delete {name}?": {
+    "message": "هل أنت متأكد من أنك ترغب في حذف \"{ name }\"?"
+  },
+  "Are you sure you want to remove your license?": {
+    "message": "هل أنت متأكد من أنك ترغب في إلغاء اشتراكك؟"
+  },
+  "Are you sure?  (Removing levels may delete scene cards!)": {
+    "message": "هل أنت متأكد؟  (قد يؤدي حذف المستويات إلى حذف بطاقات المشهد!)"
+  },
+  "Attach Books": {
+    "message": "إرفاق كتب"
+  },
+  "Attach Characters": {
+    "message": "إرفاق شخصيات"
+  },
+  "Attach Places": {
+    "message": "إرفاق رسالة"
+  },
+  "Attach Tags": {
+    "message": "إرفاق علامات"
+  },
+  "Attributes": {
+    "message": "صفات"
+  },
+  "Auto-save": {
+    "message": "الحفظ التلقائي"
+  },
+  "Auto-saving failed": {
+    "message": "فشل الحفظ التلقائي"
+  },
+  "Auto-saving worked": {
+    "message": "نجح الحفظ التلقائي"
+  },
+  "Automatically save daily backups": {
+    "message": "حفظ النسخ الاحتياطية اليومية تلقائيًا"
+  },
+  "Awesome choice!": {
+    "message": "اختيار رائع!"
+  },
+  "Back": {
+    "message": "العودة"
+  },
+  "Backup Location": {
+    "message": "موقع النسخ الاحتياطية"
+  },
+  "Backups older than this will be erased": {
+    "message": "سيتم حذف النسخ الاحتياطية الأقدم من هذا"
+  },
+  "Backups": {
+    "message": "النسخ الاحتياطية"
+  },
+  "Beat 1": {
+    "message": "الإيقاع الأول"
+  },
+  "Beat {number} title": {
+    "message": "عنوان الإيقاع { number }"
+  },
+  "Beat {number}": {
+    "message": "إيقاع { number }"
+  },
+  "Beat": {
+    "message": "إيقاع"
+  },
+  "Before": {
+    "message": "قبل"
+  },
+  "Beginning": {
+    "message": "البداية"
+  },
+  "Blues": {
+    "message": "الأزرق"
+  },
+  "Book #": {
+    "message": "كتاب #"
+  },
+  "Book Details": {
+    "message": "تفاصيل الكتاب"
+  },
+  "Book": {
+    "message": "كتاب"
+  },
+  "Books": {
+    "message": "كتب"
+  },
+  "Browns": {
+    "message": "البني"
+  },
+  "Buy Full Version": {
+    "message": "اشتر النسخة الكاملة"
+  },
+  "By default, use auto-save for projects": {
+    "message": "استخدم الحفظ التلقائي للمشاريع تلقائيًا"
+  },
+  "By starting a mobile subscription, you agree to Plottr's": {
+    "message": "عبر تفعيل اشتراك الهاتف المحمول، فإنك توافق على شروط Plottr"
+  },
+  "CHECK EMAIL": {
+    "message": "تفقد البريد الإلكتروني"
+  },
+  "CHECKING...": {
+    "message": "يجري التحقق…"
+  },
+  "CODE": {
+    "message": "الرمز"
+  },
+  "CREATE NEW PROJECT": {
+    "message": "أنشئ مشروعًا جديدًا"
+  },
+  "CREATE PROJECT": {
+    "message": "أنشئ مشروعًا"
+  },
+  "Can I have a few more days?": {
+    "message": "هل بإمكاني الحصول على بضعة أيام أخرى؟"
+  },
+  "Cancel": {
+    "message": "إلغاء"
+  },
+  "Card": {
+    "message": "بطاقة"
+  },
+  "Categories": {
+    "message": "الفئات"
+  },
+  "Category": {
+    "message": "فئة"
+  },
+  "Changelog": {
+    "message": "سجل التغييرات"
+  },
+  "Chapter {number} title": {
+    "message": "عنوان الفصل { number }"
+  },
+  "Chapter {number}": {
+    "message": "فصل {number}"
+  },
+  "Chapter": {
+    "message": "فصل"
+  },
+  "Chapters": {
+    "message": "الفصول"
+  },
+  "Character Categories": {
+    "message": "فئات الشخصية"
+  },
+  "Character Thumbnail": {
+    "message": "الصورة المصغرة للشخصية"
+  },
+  "Character list is filtered": {
+    "message": "تتم فلترة قائمة الشخصية"
+  },
+  "Character": {
+    "message": "شخصية"
+  },
+  "Character: {name}": {
+    "message": "شخصية: { name }"
+  },
+  "Characters list": {
+    "message": "قائمة الشخصيات"
+  },
+  "Characters": {
+    "message": "الشخصيات"
+  },
+  "Check for Updates": {
+    "message": "تحقق من وجود تحديثات"
+  },
+  "Check": {
+    "message": "تحقق"
+  },
+  "Choose Color": {
+    "message": "اختر اللون"
+  },
+  "Choose an image": {
+    "message": "اختر صورة"
+  },
+  "Choose an {platform} mobile subscription": {
+    "message": "اختر {platform} اشتراك الهاتف النقال"
+  },
+  "Choose what categories you want to put your characters into": {
+    "message": "اختر الفئات التي ترغب بوضع شخصياتك فيها"
+  },
+  "Choose what you want to track about your { type }": {
+    "message": "اختر ما ترغب بتتبعه بخصوص { type }"
+  },
+  "Choose where to save this file on your computer": {
+    "message": "اختر مكان حفظ هذا الملف على حاسوبك"
+  },
+  "Choose your Snowflake Pro file": {
+    "message": "اختر ملف Snowflake Pro الخاص بك"
+  },
+  "Choose": {
+    "message": "اختر"
+  },
+  "Choose...": {
+    "message": "اختر…"
+  },
+  "Clear": {
+    "message": "إخلاء"
+  },
+  "Click on a color below or type it in": {
+    "message": "انقر فوق اللون أدناه أو اكتبه"
+  },
+  "Click to Install": {
+    "message": "انقر للتثبيت"
+  },
+  "Close": {
+    "message": "إغلاق"
+  },
+  "Collapse": {
+    "message": "تصغير"
+  },
+  "Color Picker": {
+    "message": "أداة انتقاء الألوان"
+  },
+  "Color": {
+    "message": "لون"
+  },
+  "Coming Soon!": {
+    "message": "قريبا!"
+  },
+  "Configuration Options": {
+    "message": "خيارات الإعداد"
+  },
+  "Configure": {
+    "message": "إعداد"
+  },
+  "Content": {
+    "message": "محتوى"
+  },
+  "Congratulations": {
+    "message": "هنيئًا"
+  },
+  "Copy": {
+    "message": "نسخ"
+  },
+  "Create Blank Project": {
+    "message": "أنشئ مشروعًا فارغًا"
+  },
+  "Create From Template": {
+    "message": "أنشئ عبر القوالب"
+  },
+  "Create Report": {
+    "message": "أنشئ تقريرًا"
+  },
+  "Create a New Plottr Document": {
+    "message": "أنشئ وثيقة Plottr جديدة"
+  },
+  "Create an Error Report": {
+    "message": "أنشئ تقرير عطل"
+  },
+  "Create unlimited project files": {
+    "message": "أنشئ ملفات مشروع غير محدودة"
+  },
+  "Create": {
+    "message": "أنشئ"
+  },
+  "Created By": {
+    "message": "تم إنشاءه من طرف"
+  },
+  "Current Color": {
+    "message": "اللون الحالي"
+  },
+  "Custom Attributes for { type }": {
+    "message": "صفات تخص { type }"
+  },
+  "Custom Attributes": {
+    "message": "صفات مخصصة"
+  },
+  "Custom Template": {
+    "message": "قالب مخصص"
+  },
+  "Custom Templates": {
+    "message": "قوالب مخصصة"
+  },
+  "Cut": {
+    "message": "قص"
+  },
+  "Delete": {
+    "message": "حذف"
+  },
+  "Dark Mode": {
+    "message": "الوضع الداكن"
+  },
+  "Dashboard": {
+    "message": "لوحة القيادة"
+  },
+  "Days Left": {
+    "message": "الأيام المتبقية"
+  },
+  "Days of Backup": {
+    "message": "أيام النسخ الإحتياطية"
+  },
+  "Delete Book": {
+    "message": "حذف كتاب"
+  },
+  "Delete Book {name}?": {
+    "message": "حذف كتاب \"{name}\"?"
+  },
+  "Number of Backups": {
+    "message": "عدد النسخ الاحتياطية"
+  },
+  "Never Delete Backups": {
+    "message": "لا تحذف النسخ الاحتياطية أبدًا"
+  },
+  "Default Colors": {
+    "message": "الألوان التلقائية"
+  },
+  "Delete Chapter {name}?": {
+    "message": "حذف فصل \"{name}\"؟"
+  },
+  "Delete Chapter": {
+    "message": "حذف فصل"
+  },
+  "Delete Chapter?": {
+    "message": "حذف فصل؟"
+  },
+  "Delete Character": {
+    "message": "حذف شخصية"
+  },
+  "Delete Plotline {name}?": {
+    "message": "حذف خط الحبكة\"{name}\"؟"
+  },
+  "Delete Plotline": {
+    "message": "حذف خط الحبكة"
+  },
+  "Delete Scene {name}?": {
+    "message": "حذف مشهد \"{name}\"؟"
+  },
+  "Delete Scene": {
+    "message": "حذف مشهد"
+  },
+  "Delete Tag": {
+    "message": "حذف علامة"
+  },
+  "Delete {title} Tag?": {
+    "message": "حذف علامة \"{title}\"؟"
+  },
+  "Demos": {
+    "message": "العروض"
+  },
+  "Describe the scene": {
+    "message": "صف المشهد"
+  },
+  "Description": {
+    "message": "الوصف"
+  },
+  "Details": {
+    "message": "التفاصيل"
+  },
+  "Device ID": {
+    "message": "رقم تعريف الجهاز"
+  },
+  "Do you want to remove this image? It will NOT be deleted from your computer": {
+    "message": "هل ترغب بإزالة هذه الصورة؟ لن يتم حذفها من حاسوبك"
+  },
+  "Do you want to delete tag {name}?": {
+    "message": "هل ترغب بحذف علامة \"{name}\"؟"
+  },
+  "Documentation": {
+    "message": "الوثائق"
+  },
+  "Don't have a license? Go to our website to learn more": {
+    "message": "ليس لديك اشتراك؟ تصفح موقعنا لمعرفة المزيد"
+  },
+  "Don't have a license?": {
+    "message": "ليس لديك اشتراك؟"
+  },
+  "Don't worry, all your work is saved in plottr_trial.pltr in your Documents folder": {
+    "message": "لا تقلق، سيتم حفظ كل عملك في plottr_trial.pltr في ملف الوثائق"
+  },
+  "Don't worry, all your work is saved in your files": {
+    "message": "لا تقلق، سيتم حفظ كل عملك في ملفاتك"
+  },
+  "Done": {
+    "message": "تم"
+  },
+  "Download Complete 🎉 (version {version})": {
+    "message": "تم التحميل 🎉 (إصدار { version })"
+  },
+  "Download Now!": {
+    "message": "حمله الآن!"
+  },
+  "Download updates automatically": {
+    "message": "حمل التحديثات تلقائيًا"
+  },
+  "Downloading version {version}": {
+    "message": "تحميل إصدار { version }"
+  },
+  "Drop a File Here": {
+    "message": "ضع ملفًا هنا"
+  },
+  "Edit Plotline": {
+    "message": "عدل خط الحبكة"
+  },
+  "Edit": {
+    "message": "عدل"
+  },
+  "Editor is currently locked by {name}.": {
+    "message": "المحرر مغلق حاليًا بواسطة {name}."
+  },
+  "Email": {
+    "message": "بريد إلكتروني"
+  },
+  "Email:": {
+    "message": "بريد إلكتروني:"
+  },
+  "example@domain.com": {
+    "message": "example@domain.com"
+  },
+  "End": {
+    "message": "نهاية"
+  },
+  "Ends After": {
+    "message": "نهاية بعد"
+  },
+  "Enter Custom Attribute Title": {
+    "message": "أدخل عنوان صفة مخصصة"
+  },
+  "Enter a Customer Service Code": {
+    "message": "أدخل رمز خدمة العملاء"
+  },
+  "Enter a new name for {chapter}": {
+    "message": "أدخل اسما جديدا ل \"{chapter}\""
+  },
+  "Enter Chapter's name or enter": {
+    "message": "أدخل اسم الفصل أو أدخل \"auto\" \n(without quotes) التسمية التلقائية."
+  },
+  "Enter some text...": {
+    "message": "أدخل نصًا..."
+  },
+  "Enter the URL of the link:": {
+    "message": "أدخل عنوان URL للرابط:"
+  },
+  "Enter the name of your project": {
+    "message": "أدخل اسم مشروعك"
+  },
+  "Enter your verification code to activate this device": {
+    "message": "أدخل رمز التحقق الخاص بك لتفعيل هذا الجهاز"
+  },
+  "Enter your verification code": {
+    "message": "أدخل رمز التحقق الخاص بك"
+  },
+  "Error Creating Error Report": {
+    "message": "خطأ في الإنشاء تقرير الخطأ"
+  },
+  "Error Report created": {
+    "message": "تم إنشاء تقرير الخطأ"
+  },
+  "Error reading file": {
+    "message": "خطأ في قراءة الملف"
+  },
+  "Error sending email! Check your email and Try again.": {
+    "message": "خطأ في إرسال البريد الإلكتروني! تحقق من بريدك الإلكتروني وحاول مجددًا."
+  },
+  "Error sharing file": {
+    "message": "خطأ في مشاركة الملف"
+  },
+  "Error: {error}": {
+    "message": "خطأ: { error }"
+  },
+  "Exit Without Saving": {
+    "message": "الخروج دون الحفظ"
+  },
+  "Expand": {
+    "message": "توسيع"
+  },
+  "Expires": {
+    "message": "إنتهاء"
+  },
+  "Export": {
+    "message": "تصدير"
+  },
+  "FAQ": {
+    "message": "الأسئلة الشائعة"
+  },
+  "Facebook Group": {
+    "message": "مجموعة الفيسبوك"
+  },
+  "Fictional Devices LLC": {
+    "message": "الأجهزة الخيالية ذ م م"
+  },
+  "File Exported": {
+    "message": "تم تصدير الملف"
+  },
+  "File can't be found. Did it move?": {
+    "message": "لا يمكن العثور على الملف. هل تم نقله"
+  },
+  "File": {
+    "message": "ملف"
+  },
+  "Files": {
+    "message": "ملفات"
+  },
+  "Filter by Plotline": {
+    "message": "فلترة عبر خط الحبكة"
+  },
+  "Filter": {
+    "message": "فلترة"
+  },
+  "Flip": {
+    "message": "قلب"
+  },
+  "Folder where backups are stored": {
+    "message": "المجلد حيث يتم تخزين النسخ الاحتياطية"
+  },
+  "Force Dark Mode": {
+    "message": "فرض الوضع الداكن"
+  },
+  "Free Trial Information": {
+    "message": "معلومات التجريب المجاني"
+  },
+  "Free Trial": {
+    "message": "التجريب المجاني"
+  },
+  "From File": {
+    "message": "من الملف"
+  },
+  "From Template": {
+    "message": "من القالب"
+  },
+  "GET A LICENSE": {
+    "message": "تحصل على اشتراك"
+  },
+  "GET STARTED!": {
+    "message": "ابدأ!"
+  },
+  "Genre": {
+    "message": "النوع"
+  },
+  "Get access to all your projects": {
+    "message": "تحصل على إمكانية الوصول إلى جميع مشاريعك"
+  },
+  "Links": {
+    "message": "الروابط"
+  },
+  "Give this tag a name": {
+    "message": "أعط هذه العلامة اسمًا"
+  },
+  "Give your scene a title": {
+    "message": "أعط هذا المشهد عنوانًا"
+  },
+  "Go Back": {
+    "message": "العودة"
+  },
+  "Go to our website to learn more:": {
+    "message": "انتقل إلى موقعنا لمعرفة المزيد:"
+  },
+  "Grays": {
+    "message": "الرمادي"
+  },
+  "Greens": {
+    "message": "الأخضر"
+  },
+  "Help": {
+    "message": "المساعدة"
+  },
+  "Hey, check out my Plottr project \"{project}\"": {
+    "message": "مرحبًا ، تحقق من مشروع Plottr الخاص بي \"{project}\""
+  },
+  "Hide Others": {
+    "message": "إخفاء الآخرين"
+  },
+  "Hide Plottr": {
+    "message": "إخفاء Plottr"
+  },
+  "Hierarchy Configuration": {
+    "message": "التكوين الهرمي"
+  },
+  "Hmmmm. It looks like that's not a valid license key": {
+    "message": "هممم. يبدو أن هذا ليس رمز اشتراك صالح"
+  },
+  "Hold On!": {
+    "message": "مهلا!"
+  },
+  "I have a license key": {
+    "message": "لديّ رمز اشتراك"
+  },
+  "I want to buy the full version!": {
+    "message": "أرغب في شراء النسخة الكاملة!"
+  },
+  "I want to start the free trial": {
+    "message": "أرغب في بدأ التجريب المجاني"
+  },
+  "If you keep seeing this problem, email us at support@plottr.com": {
+    "message": "إذا استمر ظهور هذه المشكلة، راسلنا على support@plottr.com"
+  },
+  "Image Details": {
+    "message": "تفاصيل الصورة"
+  },
+  "Image Gallery": {
+    "message": "معرض الصور"
+  },
+  "Images": {
+    "message": "الصور"
+  },
+  "Import Snowflake Pro": {
+    "message": "تصدير Snowflake Pro"
+  },
+  "Insert Chapter and a Card": {
+    "message": "أدخل الفصل والبطاقة"
+  },
+  "Insert Chapter": {
+    "message": "أدخل الفصل"
+  },
+  "Insert from URL": {
+    "message": "إدخال من URL"
+  },
+  "It looks like you have Plottr on the max number of computers already": {
+    "message": "يبدو أن لديك Plottr على الحد الأقصى لعدد أجهزة الحاسوب المتاح"
+  },
+  "It looks like you have Plottr on the max number of devices already": {
+    "message": "يبدو أن لديك Plottr على الحد الأقصى لعدد الأجهزة المتاح"
+  },
+  "It looks like you're not online. You don't always have to be online to user Plottr, but it can't verify your license offline": {
+    "message": "يبدو أنك لست متصلاً بالإنترنت. ليس عليك دائمًا أن تكون متصلاً بالإنترنت لاستخدام Plottr ، لكن لا يمكنه التحقق من ترخيصك في وضع عدم الاتصال"
+  },
+  "Keep all your notes here (brainstorming, world-building, etc.)": {
+    "message": "احتفظ بجميع ملاحظاتك هنا (العصف الذهني ، بناء العالم ، إلخ.)"
+  },
+  "Keep info about your locations here": {
+    "message": "احتفظ بالمعلومات حول أماكنك هنا"
+  },
+  "Keep your character sheets here": {
+    "message": "احتفظ بأوراق شخصيتك هنا"
+  },
+  "Log Out": {
+    "message": "تسجيل الخروج"
+  },
+  "LOGOUT": {
+    "message": "تسجيل الخروج"
+  },
+  "LOOK OUT!": {
+    "message": "احذر!"
+  },
+  "Language": {
+    "message": "اللغة"
+  },
+  "Last opened by you": {
+    "message": "تم فتحه آخر مرة بواسطتك"
+  },
+  "Learn": {
+    "message": "تعلم"
+  },
+  "Let's verify your license.": {
+    "message": "فلنتحقق من اشتراكك."
+  },
+  "Let's get you started": {
+    "message": "لنبدأ"
+  },
+  "Levels of hierarchy": {
+    "message": "مستويات التسلسل الهرمي"
+  },
+  "License Key": {
+    "message": "رمز الاشتراك"
+  },
+  "License Verified. Plottr will start momentarily. Thanks for being patient!": {
+    "message": "تم التحقق من الاشتراك. سيبدأ Plottr بعد لحظات. شكرا على التحلي بالصبر!"
+  },
+  "License": {
+    "message": "الاشتراك"
+  },
+  "Long Synopsis": {
+    "message": "ملخص طويل"
+  },
+  "MS Word": {
+    "message": "MS Word"
+  },
+  "Main Plot": {
+    "message": "الحبكة الرئيسية"
+  },
+  "Main": {
+    "message": "الرئيسي"
+  },
+  "Manage the Categories you wish to place your characters in.": {
+    "message": "إدارة الفئات التي ترغب بوضع شخصياتك فيها."
+  },
+  "Manually Sorted": {
+    "message": "تم الفرز يدويًا"
+  },
+  "Manuscript": {
+    "message": "المخطوطة"
+  },
+  "Menu": {
+    "message": "قائمة"
+  },
+  "Middle": {
+    "message": "وسط"
+  },
+  "My Character Template": {
+    "message": "قالب شخصيتي"
+  },
+  "My Scene Template": {
+    "message": "قالب مشهدي"
+  },
+  "My Templates": {
+    "message": "قوالبي"
+  },
+  "My Timeline Template": {
+    "message": "قالب جدولي الزمني"
+  },
+  "Name": {
+    "message": "اسم"
+  },
+  "Never": {
+    "message": "أبدًا"
+  },
+  "New Attribute": {
+    "message": "صفة جديدة"
+  },
+  "New Book": {
+    "message": "كتاب جديد"
+  },
+  "New Character": {
+    "message": "شخصية جديدة"
+  },
+  "New Custom Attribute Title": {
+    "message": "عنوان صفة مخصصة جديدة"
+  },
+  "New Note": {
+    "message": "ملاحظة جديدة"
+  },
+  "New Place": {
+    "message": "مكان جديد"
+  },
+  "New Plotline": {
+    "message": "خط حبكة جديدة"
+  },
+  "New Project": {
+    "message": "مشروع جديد"
+  },
+  "New Tag": {
+    "message": "علامة جديدة"
+  },
+  "New": {
+    "message": "جديد"
+  },
+  "No Characters": {
+    "message": "لا وجود للشخصيات"
+  },
+  "No Documents Found": {
+    "message": "لم يتم العثور على مستندات"
+  },
+  "No actions to undo": {
+    "message": "لا توجد إجراءات للتراجع عنها"
+  },
+  "No color": {
+    "message": "لا وجود للون"
+  },
+  "No": {
+    "message": "لا"
+  },
+  "No, Discard": {
+    "message": "لا، تجاهل"
+  },
+  "None to choose": {
+    "message": "لا شيء للاختيار"
+  },
+  "Not Receiving Updates": {
+    "message": "لا يتم تلقي التحديثات"
+  },
+  "NOT NOW": {
+    "message": "ليس الآن"
+  },
+  "Note Details": {
+    "message": "تفاصيل الملاحظة"
+  },
+  "Note Image": {
+    "message": "صورة الملاحظة"
+  },
+  "Note": {
+    "message": "ملاحظة"
+  },
+  "Note: {title}": {
+    "message": "ملاحظة: { title }"
+  },
+  "Notes are filtered": {
+    "message": "يتم فلترة الملاحظات"
+  },
+  "Notes": {
+    "message": "ملاحظات"
+  },
+  "Now lets get you writing your next great plot!": {
+    "message": "الآن دعنا نساعدك على كتابة حبكتك الرائعة التالية!"
+  },
+  "Number of Days of Rolling Backups to Keep": {
+    "message": "عدد أيام الاحتفاظ بنسخ احتياطية"
+  },
+  "OK": {
+    "message": "حسنا"
+  },
+  "OVERWRITE": {
+    "message": "استبدال"
+  },
+  "Once You Plot, the Fun Don't Stop": {
+    "message": "ما إن تبدأ في إعداد الحبكة، فإن المرح لا يتوقف"
+  },
+  "One Paragraph Summary": {
+    "message": "ملخص فقرة واحدة"
+  },
+  "One Sentence Summary": {
+    "message": "ملخص في جملة واحدة"
+  },
+  "Open Dashboard": {
+    "message": "افتح لوحة القيادة"
+  },
+  "Open Existing": {
+    "message": "فتح الموجود"
+  },
+  "Open a Plottr Document": {
+    "message": "افتح مستند Plottr"
+  },
+  "Open one of your most recent projects": {
+    "message": "افتح أحد أحدث مشاريعك"
+  },
+  "Open": {
+    "message": "افتح"
+  },
+  "Or hover here to insert between scenes": {
+    "message": "أو حرك الفأرة هنا للإدراج بين المشاهد"
+  },
+  "Oranges": {
+    "message": "البرتقالي"
+  },
+  "Other": {
+    "message": "آخر"
+  },
+  "Outline is filtered": {
+    "message": "يتم فلترة المخطط التفصيلي"
+  },
+  "Outline": {
+    "message": "المخطط التفصيلي"
+  },
+  "Override your computer's setting and always use dark mode": {
+    "message": "تجاوز إعدادات الحاسوب واستخدم الوضع الداكن دائمًا"
+  },
+  "Paragraph": {
+    "message": "فقرة"
+  },
+  "Paragraph?": {
+    "message": "فقرة؟"
+  },
+  "Paste and Match Style": {
+    "message": "لصق ومطابقة الأسلوب"
+  },
+  "Paste": {
+    "message": "لصق"
+  },
+  "Pick a color": {
+    "message": "اختر لونًا"
+  },
+  "Place Details": {
+    "message": "تفاصيل المكان"
+  },
+  "Place Image": {
+    "message": "صورة المكان"
+  },
+  "Place list is filtered": {
+    "message": "تتم فلترة قائمة الأماكن"
+  },
+  "Place": {
+    "message": "مكان"
+  },
+  "Place: {name}": {
+    "message": "مكان: { name }"
+  },
+  "Places list": {
+    "message": "قائمة الأماكن"
+  },
+  "Places": {
+    "message": "الأماكن"
+  },
+  "Please choose a plotline": {
+    "message": "يرجى اختيار خط حبكة"
+  },
+  "Please contact us with any questions at support@plottr.com": {
+    "message": "يرجى الاتصال بنا لطرح أي أسئلة على support@plottr.com"
+  },
+  "Please select a valid Plottr file": {
+    "message": "الرجاء تحديد ملف Plottr صالح."
+  },
+  "Please verify your license": {
+    "message": "يرجى التحقق من الاشتراك الخاص بك"
+  },
+  "Please verify your license in {time}": {
+    "message": "يرجى التحقق من الاشتراك الخاص بك في {time}"
+  },
+  "Plotline Details": {
+    "message": "تفاصيل خط الحبكة"
+  },
+  "Plotline Title:": {
+    "message": "عنوان خط الحبكة:"
+  },
+  "Plotline name": {
+    "message": "اسم خط الحبكة"
+  },
+  "Plotline": {
+    "message": "خط الحبكة"
+  },
+  "Plotline: {title}": {
+    "message": "خط الحبكة: { title }"
+  },
+  "Plotlines": {
+    "message": "خطوط الحبكة"
+  },
+  "Plottr Mobile Monthly": {
+    "message": "اشتراك Plottr الشهري للهاتف النقال"
+  },
+  "Plottr Mobile Yearly": {
+    "message": "اشتراك Plottr السنوي للهاتف النقال"
+  },
+  "Plottr Mobile": {
+    "message": "الهاتف النقال Plottr"
+  },
+  "Plottr Support": {
+    "message": "دعم Plottr"
+  },
+  "Plottr created a file named {fileName} in your Documents folder": {
+    "message": "أنشأ Plottr ملفًا باسم { fileName } في مجلد المستندات الخاص بك"
+  },
+  "Plottr project file": {
+    "message": "ملف مشروع Plottr"
+  },
+  "Plottr ran into a problem. Try opening Plottr again.": {
+    "message": "واجه Plottr مشكلة. حاول فتح Plottr مرة أخرى."
+  },
+  "Plottr": {
+    "message": "Plottr"
+  },
+  "PLOTTR PRO": {
+    "message": "PLOTTR PRO"
+  },
+  "PLOTTR CLASSIC": {
+    "message": "PLOTTR CLASSIC"
+  },
+  "Preferences": {
+    "message": "التفضيلات"
+  },
+  "Premise": {
+    "message": "ملخص"
+  },
+  "Privacy Policy": {
+    "message": "سياسة الخصوصية"
+  },
+  "Project Templates": {
+    "message": "قوالب المشروع"
+  },
+  "Project": {
+    "message": "مشروع"
+  },
+  "Prologue": {
+    "message": "مقدمة"
+  },
+  "Purchase Email": {
+    "message": "شراء البريد الإلكتروني"
+  },
+  "Purchase Pro": {
+    "message": "شراء Pro"
+  },
+  "Purples": {
+    "message": "البنفسجي"
+  },
+  "Quit": {
+    "message": "خروج"
+  },
+  "RESEND EMAIL": {
+    "message": "إعادة إرسال البريد الإلكتروني"
+  },
+  "RESENDING...": {
+    "message": "إعادة الإرسال..."
+  },
+  "Recent Projects": {
+    "message": "مشاريع حديثة"
+  },
+  "Redo": {
+    "message": "إعادة"
+  },
+  "Reds": {
+    "message": "الأحمر"
+  },
+  "Reload from File": {
+    "message": "إعادة التحميل من ملف"
+  },
+  "Reload": {
+    "message": "إعادة تحميل"
+  },
+  "Deactivate License Key": {
+    "message": "إلغاء رمز الإشتراك"
+  },
+  "Remove from this list": {
+    "message": "حذف من هذه القائمة"
+  },
+  "Remove image": {
+    "message": "حذف الصورة"
+  },
+  "Remove": {
+    "message": "حذف"
+  },
+  "Rename Chapter": {
+    "message": "إعادة تسمية الفصل"
+  },
+  "Rename": {
+    "message": "إعادة التسمية"
+  },
+  "Contact Support": {
+    "message": "اتصل بالدعم"
+  },
+  "Request a Feature": {
+    "message": "اطلب ميزة"
+  },
+  "Restore Purchase": {
+    "message": "استعادة شراء"
+  },
+  "Roadmap": {
+    "message": "خارطة الطريق"
+  },
+  "SELECT A PROJECT FILE": {
+    "message": "اختر ملف المشروع"
+  },
+  "SELECT": {
+    "message": "اختيار"
+  },
+  "Save Backups": {
+    "message": "حفظ النسخ الاحتياطية"
+  },
+  "Save Changes?": {
+    "message": "حفظ التغييرات؟"
+  },
+  "Save Chapter": {
+    "message": "حفظ الفصل"
+  },
+  "Save File": {
+    "message": "حفظ الملف"
+  },
+  "Save Plotline": {
+    "message": "حفظ خط الحبكة"
+  },
+  "Save as Template": {
+    "message": "حفظ كقالب"
+  },
+  "Save as\nTemplate": {
+    "message": "حفظ كقالب"
+  },
+  "Save as": {
+    "message": "حفظ كـ"
+  },
+  "Save before closing?": {
+    "message": "هل تريد الحفظ قبل الإغلاق؟"
+  },
+  "Save": {
+    "message": "حفظ"
+  },
+  "Saved": {
+    "message": "تم الحفظ"
+  },
+  "Saving failed": {
+    "message": "فشل الحفظ"
+  },
+  "Saving worked this time 🎉": {
+    "message": "نجح الحفظ هذه المرة 🎉"
+  },
+  "Saving your file didn't work. Check where it's stored.": {
+    "message": "حفظ ملفك لم ينجح. تحقق من مكان تخزينه."
+  },
+  "Saving your file didn't work. Try again.": {
+    "message": "حفظ ملفك لم ينجح. حاول مرة أخرى."
+  },
+  "Scene Cards": {
+    "message": "بطاقات المشهد"
+  },
+  "Scene Details": {
+    "message": "تفاصل المشهد"
+  },
+  "Scene Title": {
+    "message": "عنوان المشهد"
+  },
+  "Scene {num}": {
+    "message": "مشهد { num }"
+  },
+  "Scene": {
+    "message": "مشهد"
+  },
+  "Scrivener Project": {
+    "message": "مشروع Scrivener"
+  },
+  "Scrivener": {
+    "message": "Scrivener"
+  },
+  "Scroll": {
+    "message": "انتقل"
+  },
+  "Search": {
+    "message": "البحث"
+  },
+  "See What's New": {
+    "message": "تفقد ما هو الجديد"
+  },
+  "See the outline here": {
+    "message": "انظر إلى الخطوط العريضة هنا"
+  },
+  "See More": {
+    "message": "شاهد المزيد"
+  },
+  "See Less": {
+    "message": "شاهد أقل"
+  },
+  "See that was painless": {
+    "message": "ترى أن هذا كان غير مؤلم"
+  },
+  "Select All": {
+    "message": "اختر الكل"
+  },
+  "Select a Category": {
+    "message": "اختر فئة"
+  },
+  "Select a Chapter": {
+    "message": "اختر فصلًا"
+  },
+  "Select a File": {
+    "message": "اختر ملفًا"
+  },
+  "Select a Plotline": {
+    "message": "اختر خط حبكة"
+  },
+  "Series Outline": {
+    "message": "مخطط السلسلة"
+  },
+  "Series View": {
+    "message": "عرض السلسلة"
+  },
+  "Series": {
+    "message": "سلسلة"
+  },
+  "Session Start": {
+    "message": "بدء الجلسة"
+  },
+  "Settings": {
+    "message": "الإعدادات"
+  },
+  "Short Description": {
+    "message": "وصف قصير"
+  },
+  "Short Synopsis": {
+    "message": "موجز قصير"
+  },
+  "Show All": {
+    "message": "عرض الكل"
+  },
+  "Show in File Explorer": {
+    "message": "عرض في مستكشف الملفات"
+  },
+  "Show in Finder": {
+    "message": "أظهر في الباحث"
+  },
+  "Since this is your first time using Plottr, I'll give you a guided tour if you like.": {
+    "message": "نظرًا لأن هذه هي المرة الأولى التي تستخدم فيها Plottr ، سأقدم لك جولة إرشادية إذا أردت."
+  },
+  "Size: large": {
+    "message": "الحجم: كبير"
+  },
+  "Size: medium": {
+    "message": "حجم: متوسط"
+  },
+  "Size: small": {
+    "message": "حجم: صغير"
+  },
+  "Something went wrong,": {
+    "message": "هناك خطأ ما،"
+  },
+  "Something went wrong.": {
+    "message": "هناك خطأ ما."
+  },
+  "Sort": {
+    "message": "فرز"
+  },
+  "Source Link": {
+    "message": "رابط المصدر"
+  },
+  "Start": {
+    "message": "بدأ"
+  },
+  "Start Mobile Subscription": {
+    "message": "ابدأ اشتراك الهاتف المحمول"
+  },
+  "Start my Free Trial": {
+    "message": "ابدأ الإصدار التجريبي المجاني"
+  },
+  "Started On": {
+    "message": "بدأت في"
+  },
+  "Starter Templates": {
+    "message": "قوالب المبتدئين"
+  },
+  "Start Plottr Pro": {
+    "message": "ابدأ Plottr Pro"
+  },
+  "Plottr Pro Wizard": {
+    "message": "مساعد Plottr Pro"
+  },
+  "START PLOTTING": {
+    "message": "ابدأ في إعداد الحبكة"
+  },
+  "Step {number}": {
+    "message": "الخطوة {number}"
+  },
+  "Story line": {
+    "message": "حبكة القصة"
+  },
+  "Story name": {
+    "message": "اسم القصة"
+  },
+  "Submit": {
+    "message": "إرسال"
+  },
+  "Subscription Restored!": {
+    "message": "تم إستعادة الاشتراك!"
+  },
+  "Subtitle": {
+    "message": "العنوان الفرعي"
+  },
+  "Success!": {
+    "message": "نجاح!"
+  },
+  "Supporting": {
+    "message": "دعم"
+  },
+  "Tag Details": {
+    "message": "تفاصيل العلامة"
+  },
+  "Tag Name": {
+    "message": "اسم العلامة"
+  },
+  "Tag": {
+    "message": "العلامة"
+  },
+  "Tags can be used for organization": {
+    "message": "يمكن استخدام العلامات للتنظيم"
+  },
+  "Tags list": {
+    "message": "قائمة العلامات"
+  },
+  "Tags": {
+    "message": "العلامات"
+  },
+  "Take Screenshot": {
+    "message": "خذ لقطة للشاشة"
+  },
+  "Template Saved": {
+    "message": "تم حفظ القالب"
+  },
+  "Template": {
+    "message": "قالب"
+  },
+  "Templates": {
+    "message": "قوالب"
+  },
+  "Terms of Service": {
+    "message": "شروط الخدمة"
+  },
+  "Text Error": {
+    "message": "خطأ نصي"
+  },
+  "Thanks for trying Plottr": {
+    "message": "شكرا لتجريب Plottr"
+  },
+  "That code was invalid. Try again.": {
+    "message": "هذا الرمز غير صالح حاول مرة أخرى."
+  },
+  "That email didn't verify. Try again or try another email.": {
+    "message": "لم يتم التحقق من هذا البريد الإلكتروني، حاول مرة أخرى أو جرّب بريدًا إلكترونيًا آخر."
+  },
+  "Theme": {
+    "message": "الموضوع"
+  },
+  "There was an error activating your license key on this device": {
+    "message": "حدث خطأ أثناء تفعيل رمز الاشتراك الخاص بك على هذا الجهاز"
+  },
+  "There was an error doing that. Try again": {
+    "message": "حصل خطأ في القيام بذلك. حاول مرة أخرى"
+  },
+  "There was an error while sharing your file. Try Again.": {
+    "message": "حصل خطأ أثناء مشاركة ملفك. حاول مرة أخرى."
+  },
+  "There was an error trying to sign you in. Ensure you password and email are correct.": {
+    "message": "حصل خطأ أثناء محاولة تسجيل الدخول. تأكد من صحة كلمة المرور والبريد الإلكتروني."
+  },
+  "This is a plotline": {
+    "message": "هذا خط حبكة"
+  },
+  "This is a scene or chapter. You can change its name by clicking on it": {
+    "message": "هذا مشهد أو فصل. يمكنك تغيير اسمه بالضغط عليه"
+  },
+  "This will send you an email with a code": {
+    "message": "سيرسل لك هذا بريدًا إلكترونيًا يحتوي على رمز"
+  },
+  "This will be quick and painless.": {
+    "message": "سيكون هذا سريعًا وغير مؤلم."
+  },
+  "There are only ": {
+    "message": "لا يوجد سوى"
+  },
+  "{number} steps:": {
+    "message": "{number} الخطوات:"
+  },
+  "Timeline is filtered": {
+    "message": "تم فلترة الجدول الزمني"
+  },
+  "Timeline": {
+    "message": "الجدول الزمني"
+  },
+  "Title": {
+    "message": "العنوان"
+  },
+  "Toggle navigation": {
+    "message": "تبديل التنقل"
+  },
+  "Trash": {
+    "message": "سلة المهملات"
+  },
+  "Try that again": {
+    "message": "حاول مرة أخرى"
+  },
+  "Try Plottr Pro today for a seamless cloud experience like you have never imagined.": {
+    "message": "جرب Plottr Pro اليوم للحصول على تجربة سحابية سلسة كما لم تتخيلها من قبل."
+  },
+  "Tutorials": {
+    "message": "دروس"
+  },
+  "Type": {
+    "message": "النمط"
+  },
+  "UH-OH!": {
+    "message": "أوه- آه!"
+  },
+  "URL": {
+    "message": "URL"
+  },
+  "Uncategorized": {
+    "message": "غير مصنف"
+  },
+  "Undo": {
+    "message": "تراجع"
+  },
+  "Untitled": {
+    "message": "غير معنون"
+  },
+  "Unknown": {
+    "message": "مجهول"
+  },
+  "Update Automatically": {
+    "message": "تحديث تلقائيا"
+  },
+  "Update Available 🎉 (version {version})": {
+    "message": "التحديث متوفر🎉 (إصدار { version })"
+  },
+  "Update failed. Try again": {
+    "message": "فشل التحديث. حاول مرة أخرى"
+  },
+  "Updates": {
+    "message": "التحديثات"
+  },
+  "Upload Files": {
+    "message": "تحميل الملفات"
+  },
+  "Upload projects and templates": {
+    "message": "تحميل المشاريع والقوالب"
+  },
+  "Uploading projects and templates": {
+    "message": "يتم تحميل المشاريع والقوالب"
+  },
+  "UPLOADING...": {
+    "message": "يتم التحميل..."
+  },
+  "Upload Projects": {
+    "message": "تحميل المشاريع"
+  },
+  "Use Template": {
+    "message": "استخدم القالب"
+  },
+  "Use Book\nTemplate": {
+    "message": "استخدم قالب الكتاب"
+  },
+  "Use Scene\nTemplate": {
+    "message": "استخدام قالب المشهد"
+  },
+  "Use a different email": {
+    "message": "استخدم بريدًا إلكترونيًا مختلفًا"
+  },
+  "Use this to remove your license on this device": {
+    "message": "استخدم هذا لحذف اشتراكك على هذا الجهاز"
+  },
+  "Use License Code Login": {
+    "message": "استخدم رمز الاشتراك تسجيل الدخول"
+  },
+  "Use Plottr Pro Login": {
+    "message": "استخدم Plottr Pro تسجيل الدخول"
+  },
+  "VERIFY CODE": {
+    "message": "تحقق من الرمز"
+  },
+  "VERIFYING...": {
+    "message": "يتم التحقق..."
+  },
+  "Verify": {
+    "message": "تحقق"
+  },
+  "Verifying with email: {email}": {
+    "message": "التحقق من خلال البريد الإلكتروني: { email }"
+  },
+  "Version": {
+    "message": "إصدار"
+  },
+  "View Error": {
+    "message": "عرض الخطأ"
+  },
+  "View Timeline": {
+    "message": "عرض الجدول الزمني"
+  },
+  "View": {
+    "message": "عرض"
+  },
+  "We found your user session but...": {
+    "message": "وجدنا جلسة المستخدم الخاصة بك ولكن اشتراكك قد انتهى أو أنه غير فعال. يرجى شراء اشتراك جديد أو اشتراك الهاتف المحمول للمتابعة."
+  },
+  "We had a problem creating a new project": {
+    "message": "واجهنا مشكلة في إنشاء مشروع جديد. تأكد من أن Plottr لديه الأذونات الصحيحة وأن لديك مساحة تخزين كافية."
+  },
+  "We had a problem processing your file": {
+    "message": "واجهنا مشكلة في معالجة ملفك. تأكد من أن Plottr لديه الأذونات الصحيحة وحاول مرة أخرى."
+  },
+  "We will email you a verification code.": {
+    "message": "سنرسل لك رمز التحقق عبر البريد الإلكتروني."
+  },
+  "Welcome to Plottr!": {
+    "message": "مرحبا بك إلى Plottr!"
+  },
+  "Welcome to Plottr": {
+    "message": "مرحبا بك إلى Plottr"
+  },
+  "Welcome to": {
+    "message": "مرحبا بك إلى"
+  },
+  "What would you like to do?": {
+    "message": "ماذا تريد أن تفعل؟"
+  },
+  "Where would you like to save the export?": {
+    "message": "أين تريد حفظ التصدير؟"
+  },
+  "Where would you like to save this copy?": {
+    "message": "أين تريد حفظ هذه النسخة؟"
+  },
+  "Where would you like to save this file?": {
+    "message": "أين تريد حفظ هذا الملف؟"
+  },
+  "Whites": {
+    "message": "الأبيض"
+  },
+  "Window": {
+    "message": "نافذة"
+  },
+  "Word Document": {
+    "message": "ملف Word"
+  },
+  "Yes, Delete": {
+    "message": "نعم، احذف"
+  },
+  "Yes, Save": {
+    "message": "نعم، احفظ"
+  },
+  "You already have a file named {file}": {
+    "message": "لديك بالفعل ملف اسمه {file} هل ترغب في استبداله؟"
+  },
+  "You can change its name or color by hovering over it (disabled for the tour)": {
+    "message": "يمكنك تغيير اسمه أو لونه بالمرور فوقه (معطل للجولة)"
+  },
+  "You can create an error report and report the problem to us at: ": {
+    "message": "يمكنك إنشاء تقرير خطأ وإبلاغنا بالمشكلة على: "
+  },
+  "You can export everything to a Word document": {
+    "message": "يمكنك تصدير كل شيء إلى مستند Word"
+  },
+  "You can have 5 more days to try Plottr": {
+    "message": "يمكنك الحصول على 5 أيام أخرى لتجربة Plottr"
+  },
+  "You cannot delete the last chapter.": {
+    "message": "لا يمكنك حذف الفصل الأخير."
+  },
+  "You cannot delete the last plotline.": {
+    "message": "لا يمكنك حذف خط الحبكة الأخير"
+  },
+  "You have unsaved changes": {
+    "message": "لديك تغييرات غير محفوظة. هل تريد حفظها"
+  },
+  "You have no {type}s": {
+    "message": "ليس لديك {type}"
+  },
+  "You may create a new project": {
+    "message": "يمكنك إنشاء مشروع جديد أو تحديد ملف مشروع للبدء"
+  },
+  "You need to have an active Plottr Pro account to continue": {
+    "message": "يجب أن يكون لديك حساب Plottr Pro نشط للمتابعة"
+  },
+  "Your email didn't verify. Try again or try another email.": {
+    "message": "لم يتم التحقق من بريدك الإلكتروني. حاول مرة أخرى أو جرب بريد إلكتروني آخر."
+  },
+  "You currently have no available licenses for this email.": {
+    "message": "ليس لديك حاليا أي اشتراكات متاحة لهذا البريد الإلكتروني."
+  },
+  "Your selected license failed verification. Try another one.": {
+    "message": "فشل التحقق من الاشتراك المحدد. جرب اشتراكًا آخر."
+  },
+  "You should have received a license key after your purchase.": {
+    "message": "يجب أن تكون قد تلقيت رمز اشتراك بعد الشراء."
+  },
+  "You should have received an email with a code": {
+    "message": "يجب أن تكون قد تلقيت بريدًا إلكترونيًا يحتوي على رمز"
+  },
+  "You'll have {trialDays} days": {
+    "message": "سيكون لديك {trialDays} يومًا"
+  },
+  "You're on the latest version": {
+    "message": "أنت تستخدم أحدث إصدار"
+  },
+  "Your Plottr file was exported to a .docx file": {
+    "message": "تم تصدير ملف Plottr الخاص بك إلى ملف .docx"
+  },
+  "Your Plottr file was exported to a Scrivener project package": {
+    "message": "تم تصدير ملف Plottr الخاص بك إلى حزمة مشروع Scrivener"
+  },
+  "Your free trial has expired": {
+    "message": "انتهت الفترة المجانية"
+  },
+  "Your template has been saved and is ready to use": {
+    "message": "تم حفظ القالب الخاص بك وهو جاهز للاستخدام"
+  },
+  "Your next great plot begins with Plottr.": {
+    "message": "تبدأ حبكة القصة العظيمة الخاصة بك مع Plottr."
+  },
+  "Zoom": {
+    "message": "تكبير"
+  },
+  "[image]": {
+    "message": "[صورة]"
+  },
+  "a lot of scenes moved around": {
+    "message": "تم نقل الكثير من المشاهد"
+  },
+  "a lot of story lines moved around": {
+    "message": "تم نقل الكثير من خطوط القصة"
+  },
+  "and": {
+    "message": "و"
+  },
+  "attach character {characterName} to card {cardName}": {
+    "message": "إرفاق شخصية { characterName } إلى البطاقة { cardName }"
+  },
+  "attach character {characterName} to note {noteName}": {
+    "message": "إرفاق شخصية { characterName } إلى الملاحظة { noteName }"
+  },
+  "attach place {placeName} to card {cardName}": {
+    "message": "إرفاق مكان { placeName } إلى البطاقة { cardName }"
+  },
+  "attach place {placeName} to note {noteName}": {
+    "message": "إرفاق مكان { placeName } إلى الملاحظة { noteName }"
+  },
+  "attach tag {tagName} to card {cardName}": {
+    "message": "إرفاق العلامة { tagName } إلى البطاقة { cardName }"
+  },
+  "attach tag {tagName} to note {noteName}": {
+    "message": "إرفاق العلامة { tagName } إلى الملاحظة { noteName }"
+  },
+  "blank": {
+    "message": "فارغ"
+  },
+  "but don't worry!": {
+    "message": "لكن لا تقلق!"
+  },
+  "Character's Categories": {
+    "message": "فئات الشخصيات"
+  },
+  "Checking licenses for {email}": {
+    "message": "التحقق من التراخيص لـ {email}"
+  },
+  "custom character attribute": {
+    "message": "صفة شخصية مخصصة"
+  },
+  "custom place attribute": {
+    "message": "صفة المكان المخصص"
+  },
+  "hex code or name": {
+    "message": "رمز أو اسم"
+  },
+  "new card": {
+    "message": "بطاقة جديدة"
+  },
+  "new scene": {
+    "message": "مشهد جديد"
+  },
+  "new storyline": {
+    "message": "خط قصة جديد"
+  },
+  "no more to add": {
+    "message": "لا مزيد من الإضافة"
+  },
+  "or": {
+    "message": "أو"
+  },
+  "remove character {characterName} from card {cardName}": {
+    "message": "حذف شخصية { characterName } من بطاقة { cardName }"
+  },
+  "remove character {characterName} from note {noteName}": {
+    "message": "حذف شخصية { characterName } من ملاحظة { noteName }"
+  },
+  "remove place {placeName} from card {cardName}": {
+    "message": "حذف مكان { placeName } من بطاقة { cardName }"
+  },
+  "remove place {placeName} from note {noteName}": {
+    "message": "حذف مكان { placeName } من ملاحظة { noteName }"
+  },
+  "remove tag {tagName} from card {cardName}": {
+    "message": "حذف علامة { tagName } من بطاقة { cardName }"
+  },
+  "remove tag {tagName} from note {noteName}": {
+    "message": "حذف علامة { tagName } من ملاحظة { noteName }"
+  },
+  "that best suits your style and needs.": {
+    "message": "الذي يناسب أسلوبك واحتياجاتك."
+  },
+  "to activate this device.": {
+    "message": "لتفعيل هذا الجهاز."
+  },
+  "with an iOS mobile subscription!": {
+    "message": "مع اشتراك هاتف جوال iOS!"
+  },
+  "{\n          count, plural,\n          one {1 character attached}\n          other {# characters attached}\n        }": {
+    "message": "{ count, plural,\n    one {تم إرفاق شخصية واحدة}\n  other {# شخصيات مرفقة}\n}"
+  },
+  "{\n          count, plural,\n          one {1 place attached}\n          other {# places attached}\n        }": {
+    "message": "{ count, plural,\n    one {تم إرفاق مكان واحد}\n  other {# أماكن مرفقة}\n}"
+  },
+  "{\n          count, plural,\n          one {1 tag attached}\n          other {# tags attached}\n        }": {
+    "message": "{ count, plural,\n    one {تم إرفاق علامة واحدة}\n  other {# علامات مرفقة}\n}"
+  },
+  "{amount} Lifetime": {
+    "message": "${amount}\nمدى الحياة"
+  },
+  "{amount} Monthly": {
+    "message": "${amount}\nشهريا"
+  },
+  "{amount} Weekly": {
+    "message": "${amount}\nأسبوعيا"
+  },
+  "{amount} Yearly": {
+    "message": "${amount}\nسنويا"
+  },
+  "{date, date, long}": {
+    "message": "{date, date, long}"
+  },
+  "{date, date, medium}": {
+    "message": "{date, date, medium}"
+  },
+  "{date, date, monthDay}": {
+    "message": "{date, date, monthDay}"
+  },
+  "{numOfDays, plural,\n      =0 {# days left}\n      one {# day left}\n      other {# days left}\n    }": {
+    "message": "{ numOfDays, plural,\n     =0 {# أيام متبقية}\n    one {# يوم متبقي}\n  other {# أيام متبقية}\n}"
+  },
+  "{num} Scenes": {
+    "message": "{ num } مشاهد"
+  },
+  "{val, number, percent}": {
+    "message": "{ val, number, percent }"
+  },
+  "{wordCount,number} words": {
+    "message": "{ wordCount, number } كلمات"
+  },
+  "Add attributes": {
+    "message": "أضف الصفات"
+  },
+  "Attached to": {
+    "message": "مرفق إلى"
+  },
+  "Bring All to Front": {
+    "message": "إحضار الكل إلى المقدمة"
+  },
+  "Buy the Full Version": {
+    "message": "شراء النسخة الكاملة"
+  },
+  "Card Title": {
+    "message": "عنوان البطاقة"
+  },
+  "character": {
+    "message": "شخصية"
+  },
+  "Choose color": {
+    "message": "اختر اللون"
+  },
+  "Choose what you want to track about your characters": {
+    "message": "اختر ما تريد تتبعه حول شخصياتك"
+  },
+  "Choose what you want to track about your places": {
+    "message": "اختر ما تريد تتبعه حول أماكنك"
+  },
+  "Click here to get the full version": {
+    "message": "انقر هنا للحصول على النسخة الكاملة"
+  },
+  "Contact": {
+    "message": "التواصل"
+  },
+  "Create a new file": {
+    "message": "أنشئ ملفًا جديدًا"
+  },
+  "Creates a report to send me": {
+    "message": "أنشئ تقريرًا ليتم إرساله إليّ"
+  },
+  "Creating your file didn't work. Let's try again.": {
+    "message": "إنشاء ملفك لم ينجح. لنجرب مجددا."
+  },
+  "Credits": {
+    "message": "الاعتمادات"
+  },
+  "Custom Attributes for Characters": {
+    "message": "الصفات المخصصة للشخصيات"
+  },
+  "Custom Attributes for Places": {
+    "message": "الصفات المخصصة للأماكن"
+  },
+  "Do you want to delete this card: { title }?": {
+    "message": "هل ترغب في حذف هذه البطاقة: { title }؟"
+  },
+  "Do you want to delete this character: { character }?": {
+    "message": "هل ترغب في حذف هذه الشخصية: { character }؟"
+  },
+  "Do you want to delete this note: { title }?": {
+    "message": "هل ترغب في حذف هذه الملاحظة: { title }؟"
+  },
+  "Do you want to delete this place: { name }?": {
+    "message": "هل ترغب في حذف هذا المكان: { name }؟"
+  },
+  "Do you want to delete this scene: { title }?": {
+    "message": "هل ترغب في حذف هذا المشهد: { title }؟"
+  },
+  "Do you want to delete this story line: { title }?": {
+    "message": "هل ترغب في حذف خط القصة هذا: { title }؟"
+  },
+  "Do you want to delete this tag: { title }?": {
+    "message": "هل ترغب في حذف هذا العنوان { title }؟"
+  },
+  "Enter License": {
+    "message": "أدخل الاشتراك"
+  },
+  "Filter by story line": {
+    "message": "فلترة عبر خط القصة"
+  },
+  "Fit": {
+    "message": "ملائم"
+  },
+  "Format with markdown!": {
+    "message": "تنسيق مع تخفيض السعر!"
+  },
+  "Forums": {
+    "message": "المنتديات"
+  },
+  "Give feedback": {
+    "message": "قدم تقييمًا"
+  },
+  "If you keep seeing this problem, email me at support@plottr.com": {
+    "message": "إذا استمر ظهور هذه المشكلة، أرسل لي بريدًا إلكترونيًا على support@plottr.com"
+  },
+  "It looks like you have Plottr on 5 computers already": {
+    "message": "يبدو أن لديك Plottr على 5 أجهزة حاسوب بالفعل"
+  },
+  "It looks like you have an older file version. This could make things work funky or not at all. May Plottr update it for you?": {
+    "message": "يبدو أن لديك نسخة ملف أقدم. هذا قد يجعل الأشياء تعمل بشكل غريب أو لا تعمل على الإطلاق. هل تطلب من Plottr تحديثه لك؟"
+  },
+  "It looks like your file was saved with a newer version of Plottr than you're using now. That could cause problems. Try updating Plottr and starting it again.": {
+    "message": "يبدو أنه قد تم حفظ ملفك بإصدار أحدث من إصدار Plottr الذي تستخدمه الآن. يمكن لهذا أن يسبب مشاكلًا. حاول تحديث Plottr وبدء تشغيله مرة أخرى."
+  },
+  "It will save a backup first which will be saved to the same folder as this file": {
+    "message": "سيحفظ نسخة احتياطية أولًا ويتم حفظها في نفس المجلد مثل هذا الملف"
+  },
+  "License verification failed": {
+    "message": "فشل التحقق من الاشتراك"
+  },
+  "License verified! You're all set.": {
+    "message": "تم التحقق من الاشتراك! أنت جاهز."
+  },
+  "Line": {
+    "message": "خط"
+  },
+  "Loading...": {
+    "message": "يتم التحميل..."
+  },
+  "Minimize": {
+    "message": "تصغير"
+  },
+  "My awesome story": {
+    "message": "قصتي الرائعة"
+  },
+  "Nope. Plottr tried again. But it didn't work. Plottr will ask you next time it opens, but you're verified. Enjoy": {
+    "message": "لا. حاول Plottr مجددًا. لكن لم ينجح الأمر. سوف يسألك Plottr في المرة القادمة التي يفتح فيها، لكن تم التحقق منك. استمتع"
+  },
+  "Now let's get to the good stuff": {
+    "message": "الآن دعنا نذهب إلى الأشياء الجيدة"
+  },
+  "Open the Tour": {
+    "message": "افتح الجولة"
+  },
+  "Or feel free to contact me with any questions": {
+    "message": "أو لا تتردد في الاتصال بي لطرح أي أسئلة"
+  },
+  "place": {
+    "message": "مكان"
+  },
+  "Please upload the file named plottr_error_report.txt in your Documents folder": {
+    "message": "يرجى تحميل الملف المسمى plottr_error_report.txt في مجلد المستندات"
+  },
+  "Plottr couldn't save a backup. It hasn't touched your file yet, so don't worry. Try quitting Plottr and starting it again.": {
+    "message": "لم يتمكن بلوتر من حفظ نسخة احتياطية. لا يزال ملفك بخير، فلا تقلق. حاول الخروج من Plottr والبدء مرة أخرى."
+  },
+  "Plottr saved a backup just in case and now on with the show (To use the backup, remove '.backup' from the file name)": {
+    "message": "قام Plottr بحفظ نسخة احتياطية تحسبًا، فلنواصل العمل (لاستخدام النسخة الاحتياطية ، قم بإزالة '.backup' من اسم الملف)"
+  },
+  "Plottr tried saving a backup just in case, but it didn't work. Try quitting Plottr and starting it again.": {
+    "message": "حاول بلوتر حفظ نسخة احتياطية تحسبًا، لكنها لم تنجح. حاول الخروج من Plottr والبدء مرة أخرى."
+  },
+  "Plottr updated your file without a problem. Don't forget to save your file.": {
+    "message": "قام Plottr بتحديث ملفك دون مشكلة. لا تنس حفظ ملفك."
+  },
+  "Plottr verified your license key successfully, but there was an error saving that. Let's try one more time": {
+    "message": "تحقق Plottr من مفتاح الاشتراك الخاص بك بنجاح، ولكن حدث خطأ أثناء حفظه. فلنجرب مرة أخرى"
+  },
+  "Problem saving backup": {
+    "message": "مشكلة في حفظ النسخة الاحتياطية"
+  },
+  "Report a problem": {
+    "message": "أبلغ عن مشكلة"
+  },
+  "Request a feature": {
+    "message": "أطلب ميزة"
+  },
+  "Reset": {
+    "message": "إعادة ضبط"
+  },
+  "Save & Close": {
+    "message": "حفظ وخروج"
+  },
+  "Scene 1": {
+    "message": "المشهد الأول"
+  },
+  "Scene {number}": {
+    "message": "مشهد {number}"
+  },
+  "Scene {number} name": {
+    "message": "اسم المشهد {number}"
+  },
+  "Story line name": {
+    "message": "اسم خط القصة"
+  },
+  "TRIAL Version": {
+    "message": "الإصدار التجريبي"
+  },
+  "Try again by clicking in the menu: Plottr > Verify License...": {
+    "message": "حاول مرة أخرى بالنقر في القائمة: Plottr> التحقق من الاشتراك ..."
+  },
+  "Update Plottr": {
+    "message": "تحديث Plottr"
+  },
+  "Upload the file Plottr just exported": {
+    "message": "قم بتحميل الملف الذي صدره Plottr "
+  },
+  "Verifying your license. Please wait...": {
+    "message": "يجري التحقق من اشتراكك. يرجى الإنتظار..."
+  },
+  "Where would you like to start your new file?": {
+    "message": "أين تريد أن تبدأ ملفك الجديد؟"
+  },
+  "Would you like to open an existing file or start a new file?": {
+    "message": "هل ترغب في فتح ملف موجود أم بدء ملف جديد؟"
+  },
+  "Would you like to save before exiting?": {
+    "message": "هل تريد الحفظ قبل الخروج؟"
+  },
+  "You should have received a license key from Gumroad.": {
+    "message": "يجب أن تكون قد تلقيت مفتاح ترخيص من Gumroad."
+  },
+  "Your free trial has expired!": {
+    "message": "انتهت الفترة المجانية!"
+  },
+  "a new card": {
+    "message": "بطاقة جديدة"
+  },
+  "description": {
+    "message": "وصف"
+  },
+  "learn how": {
+    "message": "تعلم كيف"
+  },
+  "name": {
+    "message": "اسم"
+  },
+  "New Card": {
+    "message": "بطاقة جديدة"
+  },
+  "new character": {
+    "message": "شخصية جديدة"
+  },
+  "new note": {
+    "message": "ملاحظة جديدة"
+  },
+  "new place": {
+    "message": "مكان جديد"
+  },
+  "new tag": {
+    "message": "علامة جديدة"
+  },
+  "no, just exit": {
+    "message": "لا، فقط اخرج"
+  },
+  "no, open the file as-is": {
+    "message": "لا، افتح الملف كما هو"
+  },
+  "ok": {
+    "message": "حسنًا"
+  },
+  "story line": {
+    "message": "خط القصة"
+  },
+  "tag name": {
+    "message": "اسم العلامة"
+  },
+  "title": {
+    "message": "العنوان"
+  },
+  "yes, save!": {
+    "message": "نعم، احفظ!"
+  },
+  "yes, update the file": {
+    "message": "نعم، حدّث الملف"
+  },
+  "{\n      count, plural,\n        one {1 carte}\n        other {# cartes}\n    }": {
+    "message": "{\n      count, plural,\n        one {بطاقة واحدة}\n        other {# بطاقات}\n    }"
+  },
+  "{\n      count, plural,\n        one {1 note}\n        other {# notes}\n    }": {
+    "message": "{\n      count, plural,\n        one {ملاحظة واحدة}\n        other {# ملاحظات}\n    }"
+  },
+  "{days} days remaining": {
+    "message": "{days} الأيام المتبقية"
+  },
+  "Are you sure you want to delete {template}?": {
+    "message": "هل أنت متأكد من أنك ترغب في حذف {template}؟"
+  },
+  "Character Custom Attributes": {
+    "message": "الصفات المخصصة للشخصية"
+  },
+  "Check for updates": {
+    "message": "تحقق من وجود التحديثات"
+  },
+  "Checking for updates": {
+    "message": "يتم البحث عن التحديثات"
+  },
+  "Choose an image below or upload a new one": {
+    "message": "اختر صورة أدناه أو قم بتحميل صورة جديدة"
+  },
+  "Could not display license key. Try again": {
+    "message": "تعذر عرض رمز الاشتراك. حاول مرة أخرى"
+  },
+  "Crafted in the Mountains of Utah": {
+    "message": "صنع في جبال يوتا"
+  },
+  "Create an error report": {
+    "message": "قم بإنشاء تقرير خطأ"
+  },
+  "Create unlimited story files": {
+    "message": "إنشاء ملفات غير محدودة للقصة"
+  },
+  "Do you want to delete this book: { book }?": {
+    "message": "هل تريد حذف هذا الكتاب: { book }؟"
+  },
+  "Do you want to delete this chapter: { title }?": {
+    "message": "هل تريد حذف هذا الفصل: { title }؟"
+  },
+  "Download Now": {
+    "message": "التحميل الآن"
+  },
+  "Downloading ({percent}%)": {
+    "message": "يتم التحميل ({percent}%)"
+  },
+  "Enter a customer service code": {
+    "message": "أدخل رمز خدمة العملاء"
+  },
+  "Enter your code": {
+    "message": "أدخل رمزك"
+  },
+  "Error": {
+    "message": "خطأ"
+  },
+  "Extending your trial didn't work. Let's try again.": {
+    "message": "تمديد الفترة التجريبية الخاصة بك لم ينجح. لنجرب مجددا."
+  },
+  "Facebook Support Group": {
+    "message": "مجموعة دعم فيسبوك"
+  },
+  "Here is your license key": {
+    "message": "هذا هو رمز اشتراكك"
+  },
+  "New File": {
+    "message": "ملف جديد"
+  },
+  "New from Template": {
+    "message": "جديد من قالب"
+  },
+  "No updates available": {
+    "message": "لا تحديثات متوفرة"
+  },
+  "No more {type}s": {
+    "message": "لا يوجد {type}"
+  },
+  "Open File": {
+    "message": "افتح ملف"
+  },
+  "Plottr Trial": {
+    "message": "تجريب Plottr"
+  },
+  "Plottr created a file named plottr_error_report.txt in your Documents folder": {
+    "message": "أنشأ Plottr ملفًا باسم plottr_error_report.txt في مجلد المستندات"
+  },
+  "Quit and Install": {
+    "message": "إنهاء وتثبيت"
+  },
+  "See the Changelog": {
+    "message": "عرض سجل التغييرات"
+  },
+  "This is your Device ID": {
+    "message": "هذا هو رقم تعريف جهازك"
+  },
+  "Try that again, but if it keeps happening, use the help menu to create an error report and report the problem.": {
+    "message": "حاول ذلك مرة أخرى، ولكن إذا استمر حدوث ذلك، فاستخدم قائمة المساعدة لإنشاء تقرير عن الخطأ والإبلاغ عن المشكلة."
+  },
+  "Update Ready": {
+    "message": "التحديث جاهز"
+  },
+  "Update available!": {
+    "message": "التحديث جاهز!"
+  },
+  "Upload a new image": {
+    "message": "ارفع صورة جديدة"
+  },
+  "View Device ID": {
+    "message": "عرض رقم تعريف الجهاز"
+  },
+  "View License Key": {
+    "message": "عرض رمز الاشتراك"
+  },
+  "View the Tour": {
+    "message": "عرض الجولة"
+  },
+  "paragraph": {
+    "message": "فقرة"
+  },
+  "selected": {
+    "message": "المحدد"
+  },
+  "{\n      count, plural,\n        one {1 card}\n        other {# cards}\n    }": {
+    "message": "{\n      count, plural,\n        one {بطاقة واحدة}\n        other {# بطاقات}\n    }"
+  },
+  "(Series View)": {
+    "message": "(عرض السلسلة)"
+  },
+  ".docx": {
+    "message": ".docx"
+  },
+  ".scriv": {
+    "message": ".scriv"
+  },
+  "Act": {
+    "message": "فصل"
+  },
+  "Act Structure": {
+    "message": "بنية الفصل"
+  },
+  "Action": {
+    "message": "إجراء"
+  },
+  "Advanced...": {
+    "message": "متقدم..."
+  },
+  "Appearance: Dark/Light": {
+    "message": "المظهر: داكن / فاتح"
+  },
+  "Are you sure? Removing a level will delete the timeline cards directly under this level's heading cards (from all books across the project).": {
+    "message": "هل أنت واثق؟ ستؤدي إزالة المستوى إلى حذف بطاقات الجدول الزمني الموجودة أسفل بطاقات عنوان هذا المستوى مباشرةً (من جميع الكتب عبر المشروع)."
+  },
+  "Auto Number": {
+    "message": "رقم تلقائي"
+  },
+  "Auto-Save": {
+    "message": "الحفظ التلقائي"
+  },
+  "Background Color": {
+    "message": "لون الخلفية"
+  },
+  "Backup Options": {
+    "message": "خيارات النسخ الاحتياطي"
+  },
+  "Backups beyond this will be erased": {
+    "message": "سيتم حذف النسخ الاحتياطية بعد ذلك"
+  },
+  "Beats": {
+    "message": "الإيقاعات"
+  },
+  "Beta": {
+    "message": "بيتا"
+  },
+  "Black (default)": {
+    "message": "أسود (تلقائي)"
+  },
+  "Blue (default)": {
+    "message": "أزرق (تلقائي)"
+  },
+  "Body": {
+    "message": "الجسد"
+  },
+  "Border Color": {
+    "message": "لون الحدود"
+  },
+  "Border Style": {
+    "message": "نمط الحدود"
+  },
+  "Character Image": {
+    "message": "صورة الشخصية"
+  },
+  "Character Name": {
+    "message": "اسم الشخصية"
+  },
+  "Choose what categories you want to put your notes into": {
+    "message": "اختر الفئات التي ترغب بوضع ملاحظاتك فيها"
+  },
+  "Choose what categories you want to put your tags into": {
+    "message": "اختر الفئات التي تريد وضع العلامات الخاصة بك فيها"
+  },
+  "Choose your backup location": {
+    "message": "اختر موقعك للنسخ الاحتياطي"
+  },
+  "Colors": {
+    "message": "الألوان"
+  },
+  "Comedy": {
+    "message": "كوميديا"
+  },
+  "Create New Project": {
+    "message": "إنشاء مشروع جديد"
+  },
+  "DELETE": {
+    "message": "حذف"
+  },
+  "Dark": {
+    "message": "داكن"
+  },
+  "Days of Backups": {
+    "message": "أيام النسخ الاحتياطي"
+  },
+  "Don't forget to make a backup of your files first.": {
+    "message": "لا تنس إنشاء نسخة احتياطية من ملفاتك أولًا."
+  },
+  "Edit {beatName}": {
+    "message": "تعديل {beatName}"
+  },
+  "Edit {lineName}": {
+    "message": "تعديل {lineName}"
+  },
+  "Export to:": {
+    "message": "تصدير إلى:"
+  },
+  "General": {
+    "message": "عام"
+  },
+  "Get a License": {
+    "message": "تحصل على اشتراك"
+  },
+  "Give this file a new name": {
+    "message": "أعط هذا الملف اسمًا جديدًا"
+  },
+  "Green (default)": {
+    "message": "أخضر (تلقائي)"
+  },
+  "It looks like you've used all your license activations. Manage or upgrade here: <a>My Plottr Account</a>": {
+    "message": "يبدو أنك استنفذت كافة عمليات تفعيل الاشتراك. يمكنك الإدارة أو الترقية هنا: <a> حسابي </a>"
+  },
+  "Levels": {
+    "message": "مستويات"
+  },
+  "Light": {
+    "message": "فاتح"
+  },
+  "Mystery": {
+    "message": "ألغاز"
+  },
+  "Note Categories": {
+    "message": "فئات الملاحظات"
+  },
+  "Note Title": {
+    "message": "عنوان الملاحظة"
+  },
+  "Orange (default)": {
+    "message": "برتقالي (تلقائي)"
+  },
+  "Organize your scene cards into Chapters and Acts": {
+    "message": "تنظيم بطاقات المشهد الخاصة بك في فصول وأعمال"
+  },
+  "Place Name": {
+    "message": "اسم المكان"
+  },
+  "Put Description in:": {
+    "message": "ضع الوصف في:"
+  },
+  "Red (default)": {
+    "message": "أحمر (تلقائي)"
+  },
+  "Romance": {
+    "message": "رومانسية"
+  },
+  "Save these settings across projects?": {
+    "message": "حفظ هذه الإعدادات عبر المشاريع؟"
+  },
+  "Screenplay": {
+    "message": "سيناريو"
+  },
+  "Structure": {
+    "message": "بنية"
+  },
+  "Synopsis": {
+    "message": "ملخص"
+  },
+  "System": {
+    "message": "نظام"
+  },
+  "Tag Categories": {
+    "message": "فئات العلامات"
+  },
+  "Tags / Characters / Places": {
+    "message": "علامات / شخصيات/ أماكن"
+  },
+  "Text Color": {
+    "message": "لون النص"
+  },
+  "Text Size": {
+    "message": "حجم النص"
+  },
+  "Title Page": {
+    "message": "عنوان الصفحة"
+  },
+  "To give feedback on this feature, please visit:": {
+    "message": "لتقديم تقييم حول هذه الميزة، يرجى زيارة:"
+  },
+  "Use Templates": {
+    "message": "استعمل القوالب"
+  },
+  "White (default)": {
+    "message": "أبيض (تلقائي)"
+  },
+  "Yellow (default)": {
+    "message": "أصفر (تلقائي)"
+  },
+  "[Blank]": {
+    "message": "[فارغ]"
+  },
+  "last edited": {
+    "message": "آخر تحرير"
+  },
+  "plottr.com/beta": {
+    "message": "plottr.com/beta"
+  },
+  "How to turn on Act Structure": {
+    "message": "كيفية تشغيل بنية الفصل"
+  },
+  "On the top right corner of the app, click the 'Dashboard' button.": {
+    "message": "في الزاوية العلوية اليمنى من التطبيق، انقر فوق الزر 'لوحة التحكم'."
+  },
+  "From the 'Dashboard', click 'Settings' from the side menu.": {
+    "message": "من 'لوحة التحكم الرئيسية'، انقر فوق 'الإعدادات' من القائمة الجانبية."
+  },
+  "On the 'Settings' modal, click on the 'Beta tab.": {
+    "message": "في نموذج 'الإعدادات'، انقر فوق علامة التبويب 'بيتا'."
+  },
+  "Finally, toggle the switch to turn on/off Act Structure.": {
+    "message": "أخيرًا، قم بتبديل المفتاح لتشغيل / إيقاف تشغيل بنية الفصل."
+  },
+  "Import": {
+    "message": "استيراد"
+  },
+  "Woohoo! Scene card moved to": {
+    "message": "رائع! تم نقل بطاقة المشهد إلى"
+  },
+  "Woohoo! Scene card duplicated": {
+    "message": "رائع! تم نسخ بطاقة المشهد"
+  },
+  "Enter title": {
+    "message": "أدخل العنوان"
+  },
+  "Duplicate": {
+    "message": "نسخ"
+  },
+  "({ thing }).": {
+    "message": "({ شيء})."
+  },
+  "+ Add Template": {
+    "message": "+ أضف قالبًا"
+  },
+  "Access all the features": {
+    "message": "الوصول إلى جميع الميزات"
+  },
+  "Active": {
+    "message": "نشط"
+  },
+  "Advanced": {
+    "message": "متقدم"
+  },
+  "Also save backups on this device": {
+    "message": "احفظ أيضًا النسخ الاحتياطية على هذا الجهاز"
+  },
+  "Always Open Dashboard First": {
+    "message": "دائمًا افتح لوحة التحكم أولًا"
+  },
+  "Are you sure you want to deactivate your license key?": {
+    "message": "هل أنت متأكد أنك تريد إلغاء تفعيل رمز الاشتراك الخاص بك؟"
+  },
+  "Are you sure you want to delete all chapters and their scene cards in \"{beatTitle}\".": {
+    "message": "هل تريد بالتأكيد حذف جميع الفصول وبطاقات مشاهدها في \"{beatTitle}\"."
+  },
+  "Are you sure you want to delete all scene cards in \"{beatTitle}\".": {
+    "message": "هل أنت متأكد أنك تريد حذف كافة بطاقات المشهد في \"{beatTitle}\"."
+  },
+  "Are you sure you want to remove the {template} template and all its data?": {
+    "message": "هل أنت متأكد أنك ترغب في حذف {template} القالب وجميع بياناته؟"
+  },
+  "At least two levels of hierarchy required to view as tabs": {
+    "message": "مطلوب مستويين على الأقل من التسلسل الهرمي لعرضهما كعلامات تبويب"
+  },
+  "Browser": {
+    "message": "المتصفح"
+  },
+  "Can't move card to empty book": {
+    "message": "لا يمكن نقل البطاقة إلى كتاب فارغ"
+  },
+  "Change book": {
+    "message": "تغيير الكتاب"
+  },
+  "Change color": {
+    "message": "تغيير اللون"
+  },
+  "Children": {
+    "message": "الأطفال"
+  },
+  "Choose what categories you want to put your places into": {
+    "message": "اختر الفئات التي تريد وضع أماكنك فيها"
+  },
+  "Choose what to upload": {
+    "message": "اختر ما تريد رفعه"
+  },
+  "Choose your Scrivener project": {
+    "message": "اختر مشروع Scrivener الخاص بك"
+  },
+  "Clear Timeline": {
+    "message": "حذف الجدول الزمني"
+  },
+  "Click here to log in": {
+    "message": "انقر هنا لتسجيل الدخول"
+  },
+  "Collaborator": {
+    "message": "متعاون"
+  },
+  "Configure Pro settings": {
+    "message": "تكوين إعدادات Pro"
+  },
+  "Confirm Placement": {
+    "message": "تأكيد المكان"
+  },
+  "Continue": {
+    "message": "متابعة"
+  },
+  "Continue working when your connection goes down.": {
+    "message": "استمر في العمل عندما ينقطع الاتصال."
+  },
+  "Create unlimited projects": {
+    "message": "إنشاء مشاريع غير محدودة"
+  },
+  "Deactivate": {
+    "message": "إبطال"
+  },
+  "Default": {
+    "message": "تلقائي"
+  },
+  "Default Placement": {
+    "message": "المكان التلقائي"
+  },
+  "Delete plotline": {
+    "message": "حذف خط الحبكة"
+  },
+  "Disabled": {
+    "message": "معطل"
+  },
+  "Done!": {
+    "message": "تم!"
+  },
+  "Duplicate plotline": {
+    "message": "نسخ خط الحبكة"
+  },
+  "Edit title": {
+    "message": "تعديل العنوان"
+  },
+  "Enabled": {
+    "message": "مفعل"
+  },
+  "Expand or collapse all stacks": {
+    "message": "توسيع أو تصغير كل الحزم"
+  },
+  "Expand or collapse stacks": {
+    "message": "توسيع أو تصغير كل الحزم"
+  },
+  "Font Default: Text Editor": {
+    "message": "الخط التلقائي: محرر النص"
+  },
+  "From the \"Dashboard\", click \"Settings\" from the side menu.": {
+    "message": "من \"لوحة التحكم \" ، انقر فوق \"الإعدادات \" من القائمة الجانبية."
+  },
+  "Give Feedback": {
+    "message": "إعطاء تقييم"
+  },
+  "Go!": {
+    "message": "اذهب!"
+  },
+  "Hides sensitive info for when you are sharing your screen": {
+    "message": "إخفاء المعلومات الحساسة عندما تشارك شاشتك"
+  },
+  "Horror": {
+    "message": "الرعب"
+  },
+  "I have Plottr Pro": {
+    "message": "لديّ Plottr Pro"
+  },
+  "I have a<br/>License Key": {
+    "message": "لديّ <br/> رمز اشتراك"
+  },
+  "I'm Done!": {
+    "message": "انتهيت!"
+  },
+  "Import File": {
+    "message": "استيراد ملف"
+  },
+  "It doesn't look like you have a pro license.": {
+    "message": "لا يبدو أن لديك اشتراك pro."
+  },
+  "It looks like you already have an active trial.": {
+    "message": "يبدو أن لديك بالفعل نسخة تجريبية نشطة."
+  },
+  "It looks like your version of Plottr is older than this project. Please update Plottr to avoid any issues": {
+    "message": "يبدو أن نسختك من Plottr أقدم من هذا المشروع. يرجى تحديث Plottr لتجنب أي مشاكل"
+  },
+  "Last step": {
+    "message": "آخر خطوة"
+  },
+  "Let's set up your Pro account": {
+    "message": "لنقم بإعداد حساب Pro الخاص بك"
+  },
+  "License Information": {
+    "message": "معلومات الاشتراك"
+  },
+  "Move card to { bookTitle }": {
+    "message": "انقل البطاقة إلى { bookTitle }"
+  },
+  "Move plotline": {
+    "message": "نقل خط الحبكة"
+  },
+  "Name Your Project:": {
+    "message": "أعط اسمًا لمشروعك:"
+  },
+  "No Matches": {
+    "message": "لا توجد مطابقات"
+  },
+  "No files found.": {
+    "message": "لا توجد ملفات."
+  },
+  "None": {
+    "message": "لا يوجد"
+  },
+  "Not Active": {
+    "message": "غير نشط"
+  },
+  "Not Now": {
+    "message": "ليس الآن"
+  },
+  "Offline": {
+    "message": "غير متصل"
+  },
+  "Offline Mode": {
+    "message": "وضع غير متصل"
+  },
+  "Ok": {
+    "message": "حسنًا"
+  },
+  "On the \"Settings\" modal, click on the \"Beta\" tab.": {
+    "message": "في \"الإعدادات \" ، انقر فوق علامة التبويب \"بيتا \"."
+  },
+  "On the top right corner of the app, click the \"Dashboard\" button.": {
+    "message": "في الزاوية العلوية اليمنى من التطبيق، انقر فوق زر \"لوحة التحكم \"."
+  },
+  "Open Existing File": {
+    "message": "افتح ملف موجود"
+  },
+  "Owner": {
+    "message": "المالك"
+  },
+  "Permission": {
+    "message": "الإذن"
+  },
+  "Place Categories": {
+    "message": "فئات الأماكن"
+  },
+  "Playwriting": {
+    "message": "الكتابة المسرحية"
+  },
+  "Plottr created a file named {filePath} in your Documents folder": {
+    "message": "أنشأ Plottr ملفًا باسم {filePath} في مجلد المستندات الخاص بك"
+  },
+  "Plottr opens your most recent project at start": {
+    "message": "يفتح Plottr أحدث مشروع لك في البداية"
+  },
+  "Plottr ran into a problem and can't start.  Please contact support.": {
+    "message": "واجه Plottr مشكلة ولا يمكنه البدء. يرجى الاتصال بالدعم."
+  },
+  "Plottr ran into an issue opening your project. Please check your backups or contact support about this project and we will get it running for you quickly.": {
+    "message": "واجه Plottr مشكلة في فتح مشروعك. يرجى التحقق من النسخ الاحتياطية الخاصة بك أو الاتصال بالدعم حول هذا المشروع وسنعمل على تشغيله لك بسرعة."
+  },
+  "Plottr ran into an issue opening your project. Please check your backups or contact support with this file and we will get it running for you quickly.": {
+    "message": "واجه Plottr مشكلة في فتح مشروعك. يرجى التحقق من النسخ الاحتياطية الخاصة بك أو الاتصال بالدعم بشأن هذا الملف وسنقوم بتشغيله لك بسرعة."
+  },
+  "Preview:": {
+    "message": "معاينة:"
+  },
+  "Pro Subscription": {
+    "message": "اشتراك Pro"
+  },
+  "Product Name": {
+    "message": "اسم المنتج"
+  },
+  "Projects": {
+    "message": "المشاريع"
+  },
+  "Remove template": {
+    "message": "حذف القالب"
+  },
+  "Requires you to restart plottr": {
+    "message": "يتطلب منك إعادة تشغيل plottr"
+  },
+  "Restore Default": {
+    "message": "استعادة الإعداد التلقائي"
+  },
+  "Restore Defaults": {
+    "message": "استعادة الإعداد التلقائي"
+  },
+  "Save and Open": {
+    "message": "حفظ وفتح"
+  },
+  "Save backups on this device": {
+    "message": "حفظ النسخ الاحتياطية على هذا الجهاز"
+  },
+  "Save backups to this device as well as in the cloud": {
+    "message": "حفظ النسخ الاحتياطية على هذا الجهاز وكذلك في السحابة"
+  },
+  "Saved in the Cloud": {
+    "message": "تم الحفظ في السحابة"
+  },
+  "Scrivener file": {
+    "message": "ملف Scrivener"
+  },
+  "Search Documentation": {
+    "message": "البحث في الوثائق"
+  },
+  "See? That was painless 😁": {
+    "message": "هل رأيت؟ كان ذلك غير مؤلم 😁"
+  },
+  "Short Story": {
+    "message": "قصة قصيرة"
+  },
+  "Show File": {
+    "message": "إظهار الملف"
+  },
+  "Sign in": {
+    "message": "تسجيل الدخول"
+  },
+  "Sign in with your my.plottr.com account": {
+    "message": "قم بتسجيل الدخول باستخدام حساب my.plottr.com الخاص بك"
+  },
+  "Snowflake Pro": {
+    "message": "Snowflake Pro"
+  },
+  "Spell Check": {
+    "message": "التدقيق الإملائي"
+  },
+  "Stacked": {
+    "message": "مكدس"
+  },
+  "Start the<br/>Free Trial": {
+    "message": "ابدأ <br/> الإصدار التجريبي المجاني"
+  },
+  "Start with Template": {
+    "message": "ابدأ بالقالب"
+  },
+  "Status": {
+    "message": "الحالة"
+  },
+  "Streaming Friendly": {
+    "message": "بث بودية"
+  },
+  "Stress test saving": {
+    "message": "حفظ اختبار الإجهاد"
+  },
+  "Successfully resumed.": {
+    "message": "تم الاستئناف بنجاح."
+  },
+  "Tabbed": {
+    "message": "مبوب"
+  },
+  "Take Control": {
+    "message": "السيطرة"
+  },
+  "Testing utilities": {
+    "message": "اختبار المرافق"
+  },
+  "The cloud file is different from your local copy.  We created a duplicate of your local file and switched to the cloud file.": {
+    "message": "ملف السحابة مختلف عن نسختك المحلية. أنشأنا نسخة من ملفك المحلي وقمنا بالتبديل إلى ملف السحابة."
+  },
+  "There was an error doing that. Try again.": {
+    "message": "كان هناك خطأ في القيام بذلك. حاول مرة أخرى."
+  },
+  "There was an error reconnecting.  Please save the file and restart Plottr.": {
+    "message": "حدث خطأ في إعادة الاتصال. يرجى حفظ الملف وإعادة تشغيل Plottr."
+  },
+  "There was an error uploading your offline backup. Please exit and start again": {
+    "message": "حدث خطأ أثناء تحميل النسخة الاحتياطية دون اتصال. يرجى الخروج والبدء من جديد"
+  },
+  "This appears to be a Plottr Pro file.  Please log in.": {
+    "message": "يبدو أن هذا ملف Plottr Pro. الرجاء تسجيل الدخول."
+  },
+  "This will be quick and painless. There are only 3 steps:": {
+    "message": "سيكون هذا سريعًا وغير مؤلم. هناك ثلاث خطوات فقط:"
+  },
+  "Timeline Structure": {
+    "message": "بنية الجدول الزمني"
+  },
+  "To use \"{ thing }\" in Plottr Pro, you need to upload it first.": {
+    "message": "لاستخدام \"{thing}\" في Plottr Pro، يجب تحميله أولًا."
+  },
+  "Update failed. <b>Try again</b> or <a>install manually</a>": {
+    "message": "فشل التحديث. <b> حاول مرة أخرى </ b> أو <a> التثبيت يدويًا </a>"
+  },
+  "Upload": {
+    "message": "رفع"
+  },
+  "Upload ALL projects & templates": {
+    "message": "تحميل جميع المشاريع والقوالب"
+  },
+  "Upload Existing Project": {
+    "message": "تحميل المشروع الحالي"
+  },
+  "Upload to Plottr Pro?": {
+    "message": "الرفع إلى Plottr Pro؟"
+  },
+  "Upload your projects and templates": {
+    "message": "قم بتحميل المشاريع والقوالب الخاصة بك"
+  },
+  "Uploading": {
+    "message": "رفع"
+  },
+  "Uploading...": {
+    "message": "يجري الرفع..."
+  },
+  "View Backups": {
+    "message": "عرض النسخ الاحتياطية"
+  },
+  "View timeline ith tabs for the highest level": {
+    "message": "عرض الجدول الزمني مع علامات التبويب لأعلى مستوى"
+  },
+  "Viewer": {
+    "message": "مشاهد"
+  },
+  "We couldn't find a Pro account with that email": {
+    "message": "لم نتمكن من العثور على حساب Pro بهذا البريد الإلكتروني"
+  },
+  "We ran into problems uploading some files": {
+    "message": "واجهنا مشاكل في تحميل بعض الملفات"
+  },
+  "Welcome to Plottr Pro": {
+    "message": "مرحبا بك إلى Plottr Pro"
+  },
+  "When Plottr opens, the first thing you'll see is the dashboard": {
+    "message": "عندما يفتح Plottr، فإن أول شيء ستراه هو لوحة القيادة"
+  },
+  "Wrong file format": {
+    "message": "تنسيق ملف خاطئ"
+  },
+  "You can always change these later": {
+    "message": "يمكنك دائمًا تغيير هذه لاحقًا"
+  },
+  "You need to update Plottr": {
+    "message": "أنت بحاجة إلى Plottr"
+  },
+  "Your changes were uploaded to the cloud.": {
+    "message": "تم تحميل التغييرات الخاصة بك إلى السحابة."
+  },
+  "but don't panic, you haven't lost anything": {
+    "message": "لكن لا داعي للذعر، فأنت لم تفقد أي شيء"
+  },
+  "{type} template": {
+    "message": "{type} قالب"
+  },
+  "Sharing": {
+    "message": "مشاركة"
+  },
+  "Send Invite": {
+    "message": "أرسل دعوة"
+  },
+  "Email Address": {
+    "message": "عنوان البريد الإلكتروني"
+  },
+  "Permissions": {
+    "message": "الأذونات"
+  },
+  "Download": {
+    "message": "تحميل"
+  },
+  "Import from Snowflake Pro": {
+    "message": "الاستيراد من Snowflake Pro"
+  },
+  "See What’s New": {
+    "message": "شاهد ما هو الجديد"
+  },
+  "About": {
+    "message": "حول"
+  },
+  "Beta Information": {
+    "message": "معلومات بيتا"
+  },
+  "Beta Email": {
+    "message": "بيتا البريد الإلكتروني"
+  },
+  "Admin": {
+    "message": "مسؤول"
+  },
+  "Remove Pro on this Device": {
+    "message": "قم بإزالة Pro على هذا الجهاز"
+  },
+  "Use this if you logged into Pro by accident": {
+    "message": "استخدم هذا إذا قمت بتسجيل الدخول إلى Pro عن طريق الخطأ"
+  },
+  "Are you sure you want to delete {plotline}?": {
+    "message": "هل أنت متأكد أنك تريد حذف {plotline}؟"
+  },
+  "Are you sure you want to delete {chapter #}?": {
+    "message": "هل أنت متأكد أنك تريد حذف {chapter #}؟"
+  },
+  "Custom Attributes For Scenes": {
+    "message": "الصفات المخصصة للمشاهد"
+  },
+  "Choose what you want to track about your scenes": {
+    "message": "اختر ما تريد تتبعه حول المشاهد الخاصة بك"
+  },
+  "Edit New Plotline": {
+    "message": "تحرير خط حبكة جديد"
+  },
+  "Timeline Settings": {
+    "message": "إعدادات الجدول الزمني"
+  },
+  "Dashed": {
+    "message": "متقطع"
+  },
+  "Solid": {
+    "message": "ثابت"
+  },
+  "Dotted": {
+    "message": "منقط"
+  },
+  "Enter some text…": {
+    "message": "أدخل بعض النص…"
+  },
+  "Custom Attributes For Characters": {
+    "message": "الصفات المخصصة للشخصيات"
+  },
+  "text": {
+    "message": "نص"
+  },
+  "Custom Attributes For Places": {
+    "message": "الصفات المخصصة للأماكن"
+  },
+  "scenes": {
+    "message": "المشاهد"
+  },
+  "Main plot": {
+    "message": "الحبكة الرئيسية"
+  },
+  "characters": {
+    "message": "الشخصيات"
+  },
+  "Download Complete ًںژ‰ (version {version})": {
+    "message": "تم التحميل (إصدار {version})"
+  },
+  "Guided tours": {
+    "message": "جولات تعليمية"
+  },
+  "Act structure": {
+    "message": "بنية الفصل"
+  },
+  "none": {
+    "message": "لا شيء"
+  },
+  "dashed": {
+    "message": "متقطع"
+  },
+  "solid": {
+    "message": "ثابت"
+  },
+  "dotted": {
+    "message": "منقط"
+  },
+  "Saving worked this time": {
+    "message": "الحفظ نجح هذه المرة"
+  },
+  "auto": {
+    "message": "تلقائي"
+  },
+  "untitled": {
+    "message": "غير معنون"
+  },
+  "Update Available (version {version})": {
+    "message": "التحديث متاح (إصدار {version})"
+  },
+  "App Version: { version }": {
+    "message": "إصدار التطبيق: { version }"
+  },
+  "{\n count, plural,\n one {1 place attached}\n  other {# places attached}\n }": {
+    "message": "{\n count, plural,\n one {تم إرفاق مكان واحد}\n  other {# الأماكن المرفقة}\n }"
+  },
+  "{\n count, plural,\n one {1 tag attached}\n other {# tags attached}\n }": {
+    "message": "{\n count, plural,\n one {تم إرفاق علامة واحدة}\n other {# العلامات المرفقة}\n }"
+  },
+  "{\n count, plural,\n one {1 card}\n other {# card}\n}": {
+    "message": "{\n count, plural,\n one {بطاقة واحدة}\n other {# بطاقة}\n}"
+  },
+  "{\n count, plural,\n one {1 note}\n other {# notes}\n}": {
+    "message": "{\n count, plural,\n one {ملاحظة واحدة}\n other {# ملاحظات}\n}"
+  },
+  "Please contact me with any questions at support@plottr.com": {
+    "message": "الرجاء الاتصال بي إذا كان لديك أي أسئلة على support@plottr.com"
+  },
+  "{\n count, plural,\n one {1 character attached}\n other {# characters attached}\n        }": {
+    "message": "{\n count, plural,\n one {تم إرفاق شخصية واحدة}\n other {# الشخصيات المرفقة}\n        }"
+  },
+  "{\n      count, plural,\n        one {1 card}\n        other {# card}\n    }": {
+    "message": "{\n      count, plural,\n        one {بطاقة واحدة}\n        other {# بطاقة}\n    }"
+  },
+  "{\n count, plural,\n one {1 place attached}\n other {# places attached}\n }": {
+    "message": "{\n count, plural,\n one {تم إرفاق مكان واحد}\n other {# الأماكن المرفقة}\n }"
+  },
+  "{\n count, plural,\n one {1 tag attached}\n other {# tags attached}\n}": {
+    "message": "{\n count, plural,\n one {تم إرفاق علامة واحدة}\n other {# العلامات المرفقة}\n}"
+  },
+  "Filter by storyline": {
+    "message": "فلترة حسب خط القصة"
+  },
+  "Could not display the license key. Try again": {
+    "message": "تعذر عرض رمز الاشتراك. حاول مرة أخرى"
+  }
+}
