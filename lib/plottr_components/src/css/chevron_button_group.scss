@@ -1,0 +1,284 @@
+@import 'vars';
+
+// source: https://codepen.io/javasteve99/pen/ExPPYR
+
+/* ================================================== */
+/* Variables ======================================== */
+/* ================================================== */
+$button-background-color:       $gray-7;
+$button-background-color-hover: $gray-9;
+$button-background-color-active: #fff;
+$button-text-color:             #fff;
+$button-border-color:           none;
+$button-border-color-hover:     #000;
+$button-border-width:           0.5px;
+$button-border-radius:          3px;
+$button-separation:             0.5px;
+$button-height:                 44px;
+$button-horizontal-padding:     10px;
+$button-chevron-skew:           30deg;
+$button-chevron-edge-tweak:     5px; 
+
+$darkmode-button-background-color:       $darkmode-v2-darker-background;
+$darkmode-button-background-color-hover: $darkmode-v2-background;
+$darkmode-button-background-color-active: $darkmode-v2-card-background;
+$darkmode-button-text-color:             $darkmode-v2-text;
+$darkmode-button-border-color:           none;
+/*  adjust $button-chevron-edge-tweak as you change 
+    $button-chevron-skew in order to render the rounded 
+    corners properly. There doesn't appear to be a (simple)
+    consistent mathematical relationship between the two 
+    that could be used to change it automatically. */
+
+/* ================================================== */
+/* Button Styles ==================================== */
+/* ================================================== */
+.chevron__btn-group {
+
+  background: none; //just to show that container backgrounds work as expected
+  position: relative;
+  
+   &::after {
+    clear: both;
+    content: "";
+    display: block;
+  }
+}
+
+.chevron-btn {
+  display: block;
+  float: left;
+  background-color: $button-background-color;
+  // border: $button-border-width solid $button-border-color;
+  margin: 0 calc($button-separation/2);
+  padding: 0 $button-horizontal-padding;
+  height: $button-height;
+  line-height: $button-height;
+  border-radius: $button-border-radius;
+  outline: none;
+   // fix blur on hi-dip displays caused by drop-shadow filter
+  
+  &:first-child { margin-left: 5px; }
+  &:last-child { margin-right: 0; }
+  
+  &:hover {
+    // filter: drop-shadow(0 1px 1px rgba(#000, 0.25));
+    // -webkit-filter: drop-shadow(0 1px 1px rgba(#000, 0.25));
+  }
+  
+  &.active,
+  &:hover,
+  &:focus {
+    // filter: drop-shadow(0 0 2px rgba(blue, 0.5)); // need to work on this, as drop-shadow filter won't work in most browsers
+    // -webkit-filter: drop-shadow(0 0 2px rgba(blue, 0.5)); // need to work on this, as drop-shadow filter won't work in most browsers
+    background-color: $button-background-color-active;
+    box-shadow: none;
+  }
+  
+  .chevron__btn-group & {
+    background: none;
+    border: none;
+    position: relative;
+    margin-top: $button-border-width;
+    margin-bottom: $button-border-width;
+    height: $button-height - ($button-border-width * 2);
+    line-height: $button-height - ($button-border-width * 2);
+    z-index: 1; // make psuedo element backgrounds sit above parent background
+
+    &:before,
+    &:after {
+      content: "";
+      position: absolute;
+      background-color: $button-background-color;
+      left: 0;
+      right: 0;
+      z-index: -1; // make psuedo element backgrounds sit behind button content
+      border: $button-border-width solid $button-border-color;
+    }
+    &.active {
+      &:before,
+      &:after {
+        background-color: $button-background-color-active;
+      }
+    }
+
+    &:focus,
+    &:hover {
+      &:before,
+      &:after {
+        background-color: $button-background-color-hover;
+      }
+    }
+
+
+    &:before {
+      top: -$button-border-width;
+      bottom: 50%;
+      border-bottom: none;
+      border-radius: $button-border-radius $button-border-radius 0 0;
+      transform: skewX($button-chevron-skew);
+      -webkit-transform: skewX($button-chevron-skew);
+    }
+
+    &:after {
+      top: 50%;
+      bottom: -#{$button-border-width};
+      border-top: none;
+      border-radius: 0 0 $button-border-radius $button-border-radius;
+      transform: skewX(-$button-chevron-skew);
+      -webkit-transform: skewX(-$button-chevron-skew);
+    }
+
+    &:first-child {
+      border-left: $button-border-width solid $button-border-color !important;
+
+
+      &:before, &:after {
+        // margin-left: $button-chevron-edge-tweak;
+        border-left: none;
+      }
+    }
+
+    &:last-child {
+      border-right: $button-border-width solid $button-border-color;
+
+
+      &:before, &:after {
+        margin-right: -$button-chevron-edge-tweak;
+        border-right: none;
+      }
+    }
+    
+    &:first-child:hover {
+      border-left-color: $button-border-color-hover;
+     
+    }
+    
+    &:last-child:hover {
+      border-right-color: $button-border-color-hover;
+      
+      &:before, &:after {
+      }
+    }
+  
+    &:only-child {
+      background-color: $button-background-color;
+      background-image: none;
+      border: $button-border-width solid $button-border-color;
+      margin: 0;
+      height: $button-height;
+      line-height: $button-height;
+      
+      &:before,
+      &:after {
+        display: none;
+      }
+      
+      &:hover {
+        border-color: $button-border-color-hover;
+        background-color: $button-background-color-active;
+        background-image: none;
+      }
+    }
+  }
+}
+
+  .darkmode.chevron__btn-group {
+    background: transparent; //just to show that container backgrounds work as expected
+  }
+
+
+  .chevron-btn {
+    // background-color: transparent;
+    // outline: none;
+    // color: $darkmode-v2-text;
+
+    // &:hover {
+    // }
+    
+    // &.active,
+    // &:hover,
+    // &:focus {
+    //   background-color: $darkmode-button-background-color-active;
+    //   color: #fff;
+    // }
+    
+    .chevron__btn-group.darkmode & {
+      &:before,
+      &:after {
+        background-color: $darkmode-button-background-color;
+        border: $button-border-width solid $darkmode-button-border-color;
+      }
+      &.active {
+        &:before,
+        &:after {
+          background-color: $darkmode-button-background-color-active;
+        }
+      }
+
+      &:focus,
+      &:hover {
+        &:before,
+        &:after {
+          background-color: $darkmode-button-background-color-hover;
+        }
+      }
+
+      &:first-child {
+        border-left: $button-border-width solid $darkmode-button-border-color !important;
+      }
+
+      &:last-child {
+        border-right: $button-border-width solid $darkmode-button-border-color;
+      }
+      
+      &:first-child:hover {
+        border-left-color: $darkmode-button-border-color;
+      
+      }
+      
+      &:last-child:hover {
+        border-right-color: $darkmode-button-border-color;
+        
+        &:before, &:after {
+        }
+      }
+    
+      &:only-child {
+        border: $button-border-width solid $darkmode-button-border-color;
+        
+        &:before,
+        &:after {
+          display: none;
+        }
+        
+        &:hover {
+          border-color: $darkmode-button-border-color;
+          background-color: $darkmode-button-background-color-active;
+        }
+      }
+    }
+  }
+
+/* ================================================== */
+/* Demo styles ====================================== */
+/* ================================================== */
+
+/**
+
+* { 
+  box-sizing: border-box;
+}
+.container { 
+  width: 800px; 
+  margin: 0 auto; 
+  padding: 50px; 
+  background-color: #eee;  //just show that container backgrounds work as expected
+}
+*/
+
+/*
+*, *:before, *:after { //debug
+  outline: 1px solid red !important;
+} 
+*/
