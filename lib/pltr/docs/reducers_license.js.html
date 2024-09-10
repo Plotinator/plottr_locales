@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>reducers/license.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav class="wrap">
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Actions.html">Actions</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-Actions.html#.addCreatedTag">addCreatedTag</a></li><li data-type='method' style='display: none;'><a href="module-Actions.html#.addTag">addTag</a></li><li data-type='method' style='display: none;'><a href="module-Actions.html#.addTagWithValues">addTagWithValues</a></li><li data-type='method' style='display: none;'><a href="module-Actions.html#.changeColor">changeColor</a></li><li data-type='method' style='display: none;'><a href="module-Actions.html#.deleteTag">deleteTag</a></li><li data-type='method' style='display: none;'><a href="module-Actions.html#.duplicateTag">duplicateTag</a></li><li data-type='method' style='display: none;'><a href="module-Actions.html#.editTag">editTag</a></li><li data-type='method' style='display: none;'><a href="module-Actions.html#.load">load</a></li></ul></li><li></li><li><a href="module-Reducers.html">Reducers</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-Reducers.html#~root">root</a></li></ul></li><li></li><li></li><li><a href="module-Selectors.html">Selectors</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-Selectors.html#~allBookIdsSelector">allBookIdsSelector</a></li><li data-type='method' style='display: none;'><a href="module-Selectors.html#~allBooksSelector">allBooksSelector</a></li></ul></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">reducers/license.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/** @module Reducers */
+
+import {
+  SET_LICENSE_INFO,
+  SET_TRIAL_INFO,
+  SET_PRO_LICENSE_INFO,
+  RESET_PRO_LICENSE_INFO,
+} from '../constants/ActionTypes'
+
+/** Example pro license info:
+ * {
+ *   "id": "9999",
+ *   "customer_id": "999",
+ *   "period": "year",
+ *   "initial_amount": "0.00",
+ *   "initial_tax_rate": "",
+ *   "initial_tax": "",
+ *   "recurring_amount": "0.00",
+ *   "recurring_tax_rate": "",
+ *   "recurring_tax": "",
+ *   "bill_times": "0",
+ *   "transaction_id": "",
+ *   "parent_payment_id": "99999",
+ *   "product_id": "104900", &lt;- NOTE: this is the "Pro" product id.
+ *   "price_id": "2",
+ *   "created": "2021-09-30 07:43:21",
+ *   "expiration": "2022-09-30 23:59:59",
+ *   "trial_period": "",
+ *   "status": "active",
+ *   "profile_id": "999",
+ *   "gateway": "manual",
+ *   "customer": {
+ *     "id": "999",
+ *     "purchase_count": 1,
+ *     "purchase_value": 0,
+ *     "email": "emailaddress@email.com",
+ *     "emails": [
+ *       "emailaddress@email.com"
+ *     ],
+ *     "name": "John Doe",
+ *     "date_created": "2020-02-28 00:41:27",
+ *     "payment_ids": "9999,99999",
+ *     "user_id": "999"
+ *   },
+ *   "notes": ""
+ * }
+ */
+const INITIAL_STATE = {
+  trialInfo: {
+    startsAt: null,
+    endsAt: null,
+    extensions: null,
+  },
+  licenseInfo: {
+    expires: null,
+    item_name: null,
+    customer_email: null,
+    licenseKey: null,
+    item_id: null,
+    activations_left: null,
+    site_count: null,
+    license: null,
+  },
+  proLicenseInfo: {
+    expiration: null,
+    admin: false,
+    id: null,
+    customer_id: null,
+    period: null,
+    initial_amount: null,
+    initial_tax_rate: null,
+    initial_tax: null,
+    recurring_amount: null,
+    recurring_tax_rate: null,
+    recurring_tax: null,
+    bill_times: null,
+    transaction_id: null,
+    parent_payment_id: null,
+    product_id: null,
+    price_id: null,
+    created: null,
+    trial_period: null,
+    status: null,
+    profile_id: null,
+    gateway: null,
+    customer: {
+      id: null,
+      purchase_count: null,
+      purchase_value: null,
+      email: null,
+      emails: [],
+      name: null,
+      date_created: null,
+      payment_ids: null,
+      user_id: null,
+    },
+    notes: '',
+  },
+}
+
+const licenseReducer = (state = INITIAL_STATE, action) => {
+  switch (action.type) {
+    case SET_TRIAL_INFO: {
+      return {
+        ...state,
+        trialInfo: action.trialInfo,
+      }
+    }
+    case SET_LICENSE_INFO: {
+      return {
+        ...state,
+        licenseInfo: action.licenseInfo,
+      }
+    }
+    case SET_PRO_LICENSE_INFO: {
+      return {
+        ...state,
+        proLicenseInfo: action.proLicenseInfo,
+      }
+    }
+    case RESET_PRO_LICENSE_INFO: {
+      return {
+        ...state,
+        proLicenseInfo: INITIAL_STATE.proLicenseInfo,
+      }
+    }
+    default: {
+      return state
+    }
+  }
+}
+
+export default licenseReducer
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.2</a> on Mon Sep 25 2023 15:29:40 GMT-0500 (Central Daylight Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>
