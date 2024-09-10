@@ -1,0 +1,134 @@
+.plottr-popover {
+  max-width: 600px;
+  max-height: calc(100vh - 35px);
+
+  // So reset our font and text properties to avoid inheriting weird values.
+  @include reset-text;
+  font-size: $font-size-base;
+
+  background-color: $popover-bg;
+  background-clip: padding-box;
+  border-radius: $border-radius-large;
+  @include box-shadow(0 5px 10px rgba(0, 0, 0, 0.2));
+}
+
+@media (max-width: 800px) {
+  .popover-arrow-container.resize {
+    max-height: 70vh;
+    max-width: calc(70vw - 50px);
+  }
+}
+
+@media (min-width: 1200px) {
+  .plottr-popover.no-max-width {
+    max-width: none;
+  }
+}
+
+.darkmode .plottr-popover {
+  background-color: $darkmode-background;
+
+  ul,
+  ol {
+    color: inherit;
+  }
+
+  .slate-editor__editor {
+    div > * {
+      color: inherit;
+    }
+  }
+
+  .popover-title {
+    background-color: $darkmode-darker-background;
+    border-bottom: 1px solid #444;
+  }
+}
+
+.darkmode .react-tiny-popover-container {
+  .btn-group__list-group-item .btn {
+    background-color: $darkmode-darker-border;
+  }
+
+  .btn-group__list-group-item .btn:hover {
+    background-color: $darkmode-background;
+  }
+}
+
+.darkmode {
+  .popover-content {
+    background: $darkmode-v2-background;
+
+    .select-list__item-select-list {
+      li {
+        &:hover {
+          background-color: $darkmode-v2-card-background;
+        }
+      }
+    }
+
+    .filter-list {
+      p:hover,
+      li:hover {
+        background-color: $darkmode-v2-card-background;
+      }
+
+      .filter-list__list {
+        p,
+        li,
+        .secondary-text {
+          color: $darkmode-v2-darker-text;
+        }
+      }
+    }
+  }
+
+  .popover-arrow-container.left {
+    .popover-arrow {
+      border-bottom: 10px solid transparent !important;
+      border-left: 10px solid $darkmode-v2-background !important;
+    }
+  }
+
+  .popover-arrow-container.bottom {
+    .popover-arrow {
+      border-right: 10px solid transparent !important;
+      border-bottom: 10px solid $darkmode-v2-background !important;
+    }
+  }
+
+  .popover-arrow-container.right {
+    .popover-arrow {
+      border-top: 10px solid transparent !important;
+      border-right: 10px solid $darkmode-v2-background !important;
+    }
+  }
+
+  .popover-arrow-container.top {
+    .popover-arrow {
+      border-left: 10px solid transparent !important;
+      border-top: 10px solid $darkmode-v2-background !important;
+    }
+  }
+
+  .plottr-popover {
+    background-color: $darkmode-v2-background;
+
+    .popover-title {
+      border-bottom: 1px solid $darkmode-v2-border;
+      background-color: $darkmode-v2-background;
+    }
+
+    .popover-content {
+      li {
+        color: #bbb;
+      }
+
+      small {
+        i {
+          color: #bbb;
+        }
+      }
+    }
+  }
+}

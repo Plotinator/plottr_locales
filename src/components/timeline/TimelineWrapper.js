@@ -1,0 +1,850 @@
+import React, { useEffect, useState, useRef, useCallback, useContext } from 'react'
+import PropTypes from 'react-proptypes'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import { StickyTable } from 'react-sticky-table'
+import cx from 'classnames'
+import { VscSymbolStructure } from '@react-icons/all-files/vsc/VscSymbolStructure'
+import { CgArrowLongRight } from '@react-icons/all-files/cg/CgArrowLongRight'
+import { CgArrowLongDown } from '@react-icons/all-files/cg/CgArrowLongDown'
+import { HiOutlineChevronDoubleRight } from '@react-icons/all-files/hi/HiOutlineChevronDoubleRight'
+import { HiOutlineChevronDoubleLeft } from '@react-icons/all-files/hi/HiOutlineChevronDoubleLeft'
+import { HiOutlineChevronLeft } from '@react-icons/all-files/hi/HiOutlineChevronLeft'
+import { HiOutlineChevronRight } from '@react-icons/all-files/hi/HiOutlineChevronRight'
+import { HiOutlineChevronUp } from '@react-icons/all-files/hi/HiOutlineChevronUp'
+import { HiOutlineChevronDown } from '@react-icons/all-files/hi/HiOutlineChevronDown'
+import { HiOutlineChevronDoubleDown } from '@react-icons/all-files/hi/HiOutlineChevronDoubleDown'
+import { HiOutlineChevronDoubleUp } from '@react-icons/all-files/hi/HiOutlineChevronDoubleUp'
+
+import { t } from 'plottr_locales'
+import { helpers } from 'pltr'
+import { selectors, actions } from 'wired-up-pltr'
+
+import Floater from '../PlottrFloater'
+import Popover from '../PlottrPopover'
+import MenuItem from '../MenuItem'
+import Dropdown from '../Dropdown'
+import Alert from '../Alert'
+import NavItem from '../NavItem'
+import Nav from '../Nav'
+import ButtonGroup from '../ButtonGroup'
+import Glyphicon from '../Glyphicon'
+import Button from '../Button'
+import FormControl from '../FormControl'
+import TimelineTable from './TimelineTable'
+import ActsConfigModal from '../dialogs/ActsConfigModal'
+import CustomAttributeModal from '../dialogs/CustomAttributeModal'
+import DeleteConfirmModal from '../dialogs/DeleteConfirmModal'
+import CustomAttrFilterList from '../CustomAttrFilterList'
+import ExportNavItem from '../export/ExportNavItem'
+import { FunSpinner } from '../Spinner'
+import SubNav from '../containers/SubNav'
+import { withEventTargetValue } from '../withEventTargetValue'
+import Scrollable from '../../utils/scrollable'
+import CardDialog from './CardDialog'
+import TimelineTabs from './TimelineTabs'
+import DropdownButton from '../DropdownButton'
+import ToolTip from '../ToolTip'
+import RestructureTimelineModal from '../dialogs/RestructureTimelineModal'
+import { PlottrComponentsContext } from '../../connections/pltrContext'
+
+const BREAKPOINT = 890
+
+// takes into account spacing
+const SCENE_CELL_WIDTH = 175 + 17
+const SCENE_CELL_HEIGHT = 74 + 40
+const SMALL_SCENE_CELL_WIDTH = 19
+const SMALL_SCENE_CELL_HEIGHT = 45
+const NAV_HEIGHT = 50
+const SUB_NAV_HEIGHT = 48
+
+const TimelineWrapper = ({
+  recentlyUndidOrRedid,
+  timelineBundle,
+  bookId,
+  actions,
+  testingAndDiagnosisEnabled,
+  projectActions,
+  isOnWeb,
+  timelineSearchTerm,
+  timelineView,
+  activeTab,
+  timelineViewIsStacked,
+  timelineViewIsTabbed,
+  hierarchyLevels,
+  isCardDialogVisible,
+  cardDialogBeatId,
+  cardDialogCardId,
+  cardDialogLineId,
+  actConfigIsOpen,
+  stickyHeaderCount,
+  stickyLeftColumnCount,
+  restructureModalOpen,
+  canOpenRestructureModal,
+  toast,
+  books,
+  notificationActions,
+}) => {
+  const {
+    platform: {
+      file: { saveFile },
+      exportDisabled,
+      template,
+    },
+  } = useContext(PlottrComponentsContext)
+  const saveAsTemplate = template.startSaveAsTemplate
+
+  const [mounted, setMounted] = useState(false)
+  const [clearing, setClearing] = useState(false)
+  const [isSmallerThanToolbar, setIsSmallerThanToolbar] = useState(false)
+  const [filterIsOpen, setFilterIsOpen] = useState(false)
+
+  const orientationIsSmallRef = useRef(false)
+  const scrollTimeoutRef = useRef(null)
+  const tableRef = useRef(null)
+  const scrollableRef = useRef(
+    new Scrollable(() => {
+      return timelineBundle.isSmall
+        ? // @ts-ignore
+          tableRef.current.parentElement
+        : tableRef.current
+    })
+  )
+
+  const recentlyUndidOrRedidRef = useRef(false)
+  useEffect(() => {
+    recentlyUndidOrRedidRef.current = !!recentlyUndidOrRedid
+  }, [recentlyUndidOrRedid])
+
+  useEffect(() => {
+    if (
+      !orientationIsSmallRef.current ||
+      orientationIsSmallRef.current !== timelineBundle.isSmall
+    ) {
+      scrollableRef.current = new Scrollable(() => {
+        return timelineBundle.isSmall
+          ? // @ts-ignore
+            tableRef.current.parentElement
+          : tableRef.current
+      })
+      orientationIsSmallRef.current = timelineBundle.isSmall
+    }
+  }, [timelineBundle.isSmall])
+
+  useEffect(() => {
+    if (tableRef.current) {
+      // @ts-ignore
+      tableRef.current.onscroll = scrollHandler
+    }
+
+    setTimeout(() => {
+      setMounted(true)
+      if (timelineBundle.timelineScrollPosition == null) return
+      if (tableRef.current) {
+        scrollableRef.current.scrollTo(
+          timelineBundle.timelineScrollPosition.x,
+          timelineBundle.timelineScrollPosition.y,
+          true
+        )
+      }
+    }, 10)
+
+    window.addEventListener('resize', handleResize)
+    if (window.innerWidth < BREAKPOINT) setIsSmallerThanToolbar(true)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      if (tableRef.current) {
+        // @ts-ignore
+        tableRef.current.onScroll = null
+        tableRef.current = null
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    setMounted(false)
+    setTimeout(() => setMounted(true), 10)
+  }, [timelineBundle.currentTimeline, timelineBundle.orientation, timelineBundle.timelineSize])
+
+  useEffect(() => {
+    if (mounted) {
+      if (timelineBundle.timelineScrollPosition == null) return
+      if (tableRef.current) {
+        scrollableRef.current.scrollTo(
+          timelineBundle.timelineScrollPosition.x,
+          timelineBundle.timelineScrollPosition.y,
+          true
+        )
+      }
+    }
+  }, [mounted])
+
+  useEffect(() => {
+    const { visible } = toast
+
+    if (visible) {
+      setTimeout(() => {
+        handleCloseToast()
+      }, 5000)
+    }
+  }, [toast?.visible])
+
+  const handleResize = () => {
+    setIsSmallerThanToolbar(window.innerWidth < BREAKPOINT)
+  }
+
+  const clearTimeline = (e) => {
+    e.stopPropagation()
+    setClearing(false)
+    actions.resetTimeline(bookId)
+  }
+
+  // ////////////////
+  //   Searching   //
+  // ////////////////
+
+  const insertSpace = (event) => {
+    const currentValue = event.target.value
+    const start = event.target.selectionStart
+    const end = event.target.selectionEnd
+    if (event.key === ' ') {
+      actions.setTimelineSearchTerm(
+        currentValue.slice(0, start) + ' ' + currentValue.slice(end + 1)
+      )
+    }
+    event.preventDefault()
+    event.stopPropagation()
+  }
+
+  // ////////////////
+  //  Stress Test  //
+  // ////////////////
+
+  const spamSave = () => {
+    for (let i = 0; i < 1000; ++i) {
+      projectActions.withFullFileState((state) => {
+        // FIXME: this is dated, but we don't need it so much so I
+        // left it untouched when doing the knownFiles refactor.
+        // @ts-ignore
+        saveFile(helpers.file.filePathToFileURL(state.file.fileName), state)
+      })
+    }
+  }
+
+  // ////////////////
+  //  hierarchies  //
+  // ////////////////
+
+  const closeBeatConfig = () => {
+    actions.setActConfigIsOpen(false)
+  }
+
+  const openBeatConfig = () => {
+    actions.setActConfigIsOpen(true)
+  }
+
+  // ///////////////
+  //  attributes  //
+  // ///////////////
+
+  const openCustomAttributesDialog = () => {
+    actions.openAttributesDialog()
+  }
+
+  // //////////////
+  //  filtering  //
+  // //////////////
+
+  const clearFilter = () => {
+    actions.setTimelineFilter({ tag: [], character: [], place: [], color: [] })
+  }
+
+  // //////////////
+  //  scrolling  //
+  // //////////////
+
+  const scrollTo = (position) => {
+    const options = {}
+
+    if (timelineBundle.orientation === 'vertical') {
+      options.top = position
+    } else {
+      options.left = position
+    }
+
+    scrollableRef.current.scrollTo(options.left, options.top)
+  }
+
+  const scrollBy = (position) => {
+    const options = {}
+
+    if (timelineBundle.orientation === 'vertical') {
+      options.top = position
+    } else {
+      options.left = position
+    }
+
+    scrollableRef.current.scrollBy(options.left, options.top)
+  }
+
+  const scrollDistance = () => {
+    return timelineBundle?.orientation === 'vertical'
+      ? 2 * (timelineBundle.isSmall ? SMALL_SCENE_CELL_HEIGHT : SCENE_CELL_HEIGHT)
+      : 2 * (timelineBundle.isSmall ? SMALL_SCENE_CELL_WIDTH : SCENE_CELL_WIDTH)
+  }
+
+  const scrollLeft = () => {
+    if (!tableRef.current) return
+    // mpq.push('btn_scroll_left')
+    scrollBy(-scrollDistance())
+  }
+
+  const scrollRight = () => {
+    if (!tableRef.current) return
+    // mpq.push('btn_scroll_right')
+    scrollBy(scrollDistance())
+  }
+
+  const scrollBeginning = () => {
+    // mpq.push('btn_scroll_beginning')
+    scrollTo(0)
+  }
+
+  const scrollMiddle = () => {
+    if (!tableRef.current) return
+    // mpq.push('btn_scroll_middle')
+    const element = timelineBundle.isSmall
+      ? // @ts-ignore
+        tableRef.current.parentElement
+      : tableRef.current
+    const target =
+      timelineBundle?.orientation === 'vertical'
+        ? element.scrollHeight / 2 - window.innerHeight / 2
+        : element.scrollWidth / 2 - window.innerWidth / 2
+    scrollTo(target)
+  }
+
+  const scrollEnd = () => {
+    // mpq.push('btn_scroll_end')
+    const element = timelineBundle.isSmall
+      ? // @ts-ignore
+        tableRef.current.parentElement
+      : tableRef.current
+    const subNavHeight =
+      document.querySelector('.subnav__container')?.getBoundingClientRect?.()?.height ??
+      SUB_NAV_HEIGHT
+    const navHeight =
+      document.querySelector('.project-nav')?.getBoundingClientRect?.()?.height ?? NAV_HEIGHT
+    const target =
+      timelineBundle.orientation === 'vertical'
+        ? element.scrollHeight - (window.innerHeight - navHeight - subNavHeight)
+        : element.scrollWidth - window.innerWidth
+
+    if (tableRef.current) scrollTo(target)
+  }
+
+  const scrollHandler = (e) => {
+    if (
+      typeof e?.currentTarget?.scrollLeft === 'number' &&
+      typeof e?.currentTarget?.scrollTop === 'number'
+    ) {
+      const position = {
+        x: e.currentTarget.scrollLeft,
+        y: e.currentTarget.scrollTop,
+      }
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current)
+      }
+      if (!recentlyUndidOrRedidRef.current) {
+        // @ts-ignore
+        scrollTimeoutRef.current = setTimeout(() => {
+          if (!recentlyUndidOrRedidRef.current) {
+            actions.recordTimelineScrollPosition(position)
+          }
+        }, 500)
+      }
+    }
+  }
+
+  const setTableRef = useCallback(
+    (ref) => {
+      tableRef.current = ref
+    },
+    [tableRef]
+  )
+
+  // ////////
+  // flip  //
+  // ////////
+
+  const flipOrientation = () => {
+    let orientation = timelineBundle.orientation === 'horizontal' ? 'vertical' : 'horizontal'
+    actions.changeOrientation(orientation)
+  }
+
+  // ///////////////
+  //  exporting   //
+  // //////////////
+
+  const startSaveAsTemplate = () => {
+    saveAsTemplate('plotlines')
+  }
+
+  // ///////////////
+  //  rendering   //
+  // //////////////
+
+  const renderDelete = () => {
+    if (!clearing) return null
+
+    const text = t('Are you sure you want to clear everything in this timeline?')
+    return (
+      <DeleteConfirmModal
+        onDelete={clearTimeline}
+        onCancel={() => setClearing(false)}
+        customText={text}
+        notSubmit
+      />
+    )
+  }
+
+  const handleCloseToast = () => {
+    notificationActions.showToastNotification(false)
+  }
+
+  const getBookTitle = (book) => {
+    return book.title || t('Untitled')
+  }
+
+  const getToastMessage = (cardAction, newBookId, lineAction) => {
+    if ((cardAction === 'move' || lineAction === 'move') && newBookId) {
+      const bookTitle = newBookId === 'series' ? t('Series') : getBookTitle(books[newBookId])
+      const entityType = cardAction ? 'Scene card' : 'Plotline'
+
+      // if card is moved to another book, create the book link
+      return (
+        <div className="toast-message-with-anchor">
+          {t(`Woohoo! ${entityType} moved to`)}
+          <a href="#" onClick={() => actions.changeCurrentTimeline(newBookId)}>
+            {` ${bookTitle}`}
+          </a>
+        </div>
+      )
+    } else {
+      return t('Woohoo! Scene card duplicated')
+    }
+  }
+
+  const renderToastMessage = () => {
+    return (
+      <div
+        className={cx('update-notifier scene-card-update-toast alert alert-info alert-dismissible')}
+        role="alert"
+      >
+        {getToastMessage(toast.cardAction, toast.newBookId, toast.lineAction)}
+        <button className="close" onClick={() => handleCloseToast()}>
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    )
+  }
+
+  const renderSubNav = () => {
+    let glyph = <CgArrowLongDown style={{ marginBottom: -2, marginRight: -2 }} />
+    let scrollDirectionFirst = <HiOutlineChevronLeft style={{ marginBottom: -2 }} />
+    let scrollDirectionFirstEnd = <HiOutlineChevronDoubleLeft style={{ marginBottom: -2 }} />
+    let scrollDirectionSecond = <HiOutlineChevronRight style={{ marginBottom: -2 }} />
+    let scrollDirectionSecondEnd = <HiOutlineChevronDoubleRight style={{ marginBottom: -2 }} />
+    if (timelineBundle.orientation === 'vertical') {
+      glyph = <CgArrowLongRight style={{ marginBottom: -2 }} />
+      scrollDirectionFirst = <HiOutlineChevronUp style={{ marginBottom: -2 }} />
+      scrollDirectionFirstEnd = <HiOutlineChevronDoubleUp style={{ marginBottom: -2 }} />
+      scrollDirectionSecond = <HiOutlineChevronDown style={{ marginBottom: -2 }} />
+      scrollDirectionSecondEnd = <HiOutlineChevronDoubleDown style={{ marginBottom: -2 }} />
+    }
+    const renderPopover = () => (
+      <Popover id="filter" noMaxWidth>
+        {/* @ts-ignore */}
+        <CustomAttrFilterList type="cards" showColor={true} />
+      </Popover>
+    )
+    let filterDeclaration = (
+      <Alert onClick={clearFilter} bsStyle="warning">
+        <Glyphicon glyph="remove-sign" />
+        {'  '}
+        {t('Timeline is filtered')}
+      </Alert>
+    )
+    if (timelineBundle.filterIsEmpty) {
+      filterDeclaration = <span></span>
+    }
+
+    const rightItems = [
+      <NavItem key="right-1">
+        <Button bsSize="small" onClick={openBeatConfig}>
+          <VscSymbolStructure
+            size={16}
+            style={{ verticalAlign: 'text-bottom', marginRight: '4px' }}
+          />
+          {t('Structure')}
+        </Button>
+      </NavItem>,
+      exportDisabled ? null : (
+        <React.Fragment key="export-nav-item">
+          <ExportNavItem noLabel />
+        </React.Fragment>
+      ),
+      <NavItem key="right-2">
+        <Dropdown id="moar-dropdown">
+          <Dropdown.Toggle noCaret bsSize="small">
+            <Glyphicon glyph="option-vertical" />
+          </Dropdown.Toggle>
+          <Dropdown.Menu>
+            <MenuItem onSelect={startSaveAsTemplate}>{t('Save as Template')}</MenuItem>
+            {canOpenRestructureModal ? (
+              <MenuItem onSelect={actions.openRestructureTimelineModal}>
+                {t('Restructure Timeline')}
+              </MenuItem>
+            ) : (
+              <ToolTip
+                id="flip-tooltip"
+                text={t('Add another heading (e.g. Chapter or Beat) to use this control')}
+              >
+                {/* @ts-ignore */}
+                <MenuItem disabled={true}>{t('Restructure Timeline')}</MenuItem>
+              </ToolTip>
+            )}
+            <MenuItem divider />
+            <MenuItem onSelect={() => setClearing(true)}>{t('Clear Timeline')}</MenuItem>
+          </Dropdown.Menu>
+        </Dropdown>
+      </NavItem>,
+    ]
+
+    return (
+      <SubNav>
+        <Nav bsStyle="pills">
+          <NavItem>
+            <Floater
+              positionLeftMost
+              open={filterIsOpen}
+              placement="bottom"
+              component={renderPopover}
+              onClose={() => {
+                setFilterIsOpen(false)
+              }}
+              rootClose
+            >
+              <Button
+                bsSize="small"
+                onClick={() => {
+                  setFilterIsOpen(!filterIsOpen)
+                }}
+              >
+                <Glyphicon glyph="filter" /> {t('Filter')}
+              </Button>
+            </Floater>
+            {filterDeclaration}
+          </NavItem>
+          <NavItem>
+            <Button bsSize="small" onClick={openCustomAttributesDialog}>
+              <Glyphicon glyph="list" /> {t('Attributes')}
+            </Button>
+          </NavItem>
+          <NavItem>
+            {timelineViewIsStacked && !timelineBundle.isSmall ? (
+              <ToolTip id="flip-tooltip" text={t("Stacked view can't be flipped.")}>
+                {/* @ts-ignore */}
+                <Button bsSize="small" className="disabled">
+                  {glyph} {t('Flip')}
+                </Button>
+              </ToolTip>
+            ) : (
+              <Button bsSize="small" onClick={flipOrientation}>
+                {glyph} {t('Flip')}
+              </Button>
+            )}
+          </NavItem>
+          <NavItem>
+            <DropdownButton
+              id="select-timeline-view"
+              className="toolbar__selecet_view"
+              title={
+                hierarchyLevels.length < 2 || timelineBundle.isSmall ? 'Default' : timelineView
+              }
+            >
+              <MenuItem key={'default'} onSelect={() => actions.setTimelineView('default')}>
+                <div className="toolbar__timeline-view-selector">{t('Default')}</div>
+              </MenuItem>
+              {hierarchyLevels.length > 1 ? (
+                <MenuItem
+                  disabled={hierarchyLevels.length < 2}
+                  key={'tabbed'}
+                  onSelect={() => actions.setTimelineView('tabbed')}
+                  title={
+                    hierarchyLevels.length < 2
+                      ? t('At least two levels of hierarchy required to view as tabs')
+                      : t('View timeline ith tabs for the highest level')
+                  }
+                >
+                  <div className="toolbar__timeline-view-selector">{t('Tabbed')}</div>
+                </MenuItem>
+              ) : null}
+              {hierarchyLevels.length > 1 && !timelineBundle.isSmall ? (
+                <MenuItem key={'stacked'} onSelect={() => actions.setTimelineView('stacked')}>
+                  <div className="toolbar__timeline-view-selector">{t('Stacked')}</div>
+                </MenuItem>
+              ) : null}
+            </DropdownButton>
+          </NavItem>
+          <NavItem>
+            <ButtonGroup>
+              <Button
+                bsSize="small"
+                className={cx({ active: timelineBundle.isLarge })}
+                onClick={() => actions.setTimelineSize('large')}
+                title={t('Size: large')}
+              >
+                L
+              </Button>
+              <Button
+                bsSize="small"
+                className={cx({ active: timelineBundle.isMedium })}
+                onClick={() => actions.setTimelineSize('medium')}
+                title={t('Size: medium')}
+              >
+                M
+              </Button>
+              <Button
+                bsSize="small"
+                className={cx({ active: timelineBundle.isSmall })}
+                onClick={() => actions.setTimelineSize('small')}
+                title={t('Size: small')}
+              >
+                S
+              </Button>
+            </ButtonGroup>
+          </NavItem>
+          <NavItem>
+            <ButtonGroup bsSize="small">
+              <Button onClick={scrollBeginning}>{scrollDirectionFirstEnd}</Button>
+              <Button onClick={scrollLeft}>{scrollDirectionFirst}</Button>
+              <Button onClick={scrollMiddle}>{t('Mid')}</Button>
+              <Button onClick={scrollRight}>{scrollDirectionSecond}</Button>
+              <Button onClick={scrollEnd}>{scrollDirectionSecondEnd}</Button>
+            </ButtonGroup>
+          </NavItem>
+          {testingAndDiagnosisEnabled ? (
+            <NavItem key="testing-utilities">
+              <Dropdown id="moar-dropdown">
+                <Dropdown.Toggle noCaret bsSize="small">
+                  <Glyphicon glyph="option-vertical" /> {t('Testing utilities')}
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <MenuItem disabled={isOnWeb} onSelect={spamSave}>
+                    {t('Stress test saving')}
+                  </MenuItem>
+                </Dropdown.Menu>
+              </Dropdown>
+            </NavItem>
+          ) : null}
+          <NavItem draggable="false">
+            <FormControl
+              onChange={withEventTargetValue(actions.setTimelineSearchTerm)}
+              onKeyUp={insertSpace}
+              value={timelineSearchTerm || ''}
+              type="text"
+              placeholder="Search"
+              className="toolbar__search"
+            />
+          </NavItem>
+          {isSmallerThanToolbar ? rightItems : null}
+        </Nav>
+        {!isSmallerThanToolbar ? <Nav pullRight>{rightItems}</Nav> : null}
+      </SubNav>
+    )
+  }
+
+  const closeDialog = () => {
+    actions.setCardDialogClose()
+  }
+
+  const renderCardDialog = () => {
+    if (isCardDialogVisible) {
+      return (
+        <CardDialog
+          cardId={cardDialogCardId}
+          beatId={cardDialogBeatId}
+          lineId={cardDialogLineId}
+          closeDialog={closeDialog}
+        />
+      )
+    }
+    return null
+  }
+
+  const renderBody = () => {
+    if (timelineBundle.isSmall) {
+      if (timelineView === 'tabbed') {
+        return (
+          <TimelineTabs
+            setTableRef={setTableRef}
+            // @ts-ignore
+            tableRef={tableRef.current}
+            mounted={mounted}
+          />
+        )
+      } else {
+        return (
+          <TimelineTable
+            setTableRef={(ref) => {
+              tableRef.current = ref
+            }}
+            tableRef={tableRef.current}
+            activeTab={activeTab}
+          />
+        )
+      }
+    } else {
+      if (timelineView === 'tabbed') {
+        return (
+          <TimelineTabs setTableRef={setTableRef} tableRef={tableRef.current} mounted={mounted} />
+        )
+      } else {
+        return (
+          <StickyTable
+            leftColumnZ={5}
+            headerZ={5}
+            wrapperRef={(ref) => (tableRef.current = ref)}
+            stickyHeaderCount={stickyHeaderCount}
+            leftStickyColumnCount={stickyLeftColumnCount}
+            className={cx({
+              darkmode: timelineBundle.darkMode,
+              vertical: timelineBundle.orientation == 'vertical',
+            })}
+          >
+            {mounted ? (
+              <TimelineTable
+                // @ts-ignore
+                tableRef={tableRef.current}
+                activeTab={0}
+              />
+            ) : (
+              <FunSpinner />
+            )}
+          </StickyTable>
+        )
+      }
+    }
+  }
+
+  const closeCustomAttributesDialog = () => {
+    actions.closeAttributesDialog()
+  }
+
+  const renderCustomAttributes = () => {
+    if (!timelineBundle.attributesDialogIsOpen) return null
+
+    return <CustomAttributeModal type="scenes" closeDialog={closeCustomAttributesDialog} />
+  }
+
+  const renderBeatConfig = () => {
+    if (!actConfigIsOpen) return null
+
+    return <ActsConfigModal isDarkMode={timelineBundle.darkMode} closeDialog={closeBeatConfig} />
+  }
+
+  const renderRestructureModal = () => {
+    if (!restructureModalOpen) {
+      return null
+    }
+
+    return <RestructureTimelineModal />
+  }
+
+  return (
+    <div
+      id="timelineview__container"
+      className={cx('container-with-sub-nav', { darkmode: timelineBundle.darkMode })}
+    >
+      {renderSubNav()}
+      {renderCustomAttributes()}
+      {renderBeatConfig()}
+      {renderRestructureModal()}
+      {renderDelete()}
+      {renderCardDialog()}
+      {toast.visible ? renderToastMessage() : null}
+      <div
+        id="timelineview__root"
+        className={cx('tab-body', { 'timeline-tabbed-view-body': timelineViewIsTabbed })}
+      >
+        {renderBody()}
+      </div>
+    </div>
+  )
+}
+
+TimelineWrapper.propTypes = {
+  recentlyUndidOrRedid: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]).isRequired,
+  bookId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  timelineBundle: PropTypes.object.isRequired,
+  actions: PropTypes.object.isRequired,
+  testingAndDiagnosisEnabled: PropTypes.bool,
+  projectActions: PropTypes.object.isRequired,
+  isOnWeb: PropTypes.bool,
+  timelineSearchTerm: PropTypes.string,
+  timelineView: PropTypes.string.isRequired,
+  timelineViewIsStacked: PropTypes.bool,
+  timelineViewIsTabbed: PropTypes.bool,
+  hierarchyLevels: PropTypes.array.isRequired,
+  cardDialogCardId: PropTypes.number,
+  cardDialogLineId: PropTypes.number,
+  cardDialogBeatId: PropTypes.number,
+  isCardDialogVisible: PropTypes.bool,
+  activeTab: PropTypes.number.isRequired,
+  actConfigIsOpen: PropTypes.bool,
+  stickyHeaderCount: PropTypes.number,
+  stickyLeftColumnCount: PropTypes.number,
+  restructureModalOpen: PropTypes.bool,
+  canOpenRestructureModal: PropTypes.bool,
+  toast: PropTypes.object,
+  message: PropTypes.string,
+  books: PropTypes.object.isRequired,
+  notificationActions: PropTypes.object,
+}
+
+const mapStateToProps = (state) => {
+  return {
+    recentlyUndidOrRedid: selectors.recentlyUndidOrRedidSelector(state),
+    bookId: selectors.currentTimelineSelector(state),
+    timelineBundle: selectors.timelineBundleSelector(state),
+    testingAndDiagnosisEnabled: selectors.testingAndDiagnosisEnabledSelector(state),
+    isOnWeb: selectors.isOnWebSelector(state),
+    timelineSearchTerm: selectors.timelineSearchTermSelector(state),
+    timelineView: selectors.timelineViewSelector(state),
+    timelineViewIsStacked: selectors.timelineViewIsStackedSelector(state),
+    timelineViewIsTabbed: selectors.timelineViewIsTabbedSelector(state),
+    hierarchyLevels: selectors.sortedHierarchyLevels(state),
+    cardDialogCardId: selectors.cardDialogCardIdSelector(state),
+    cardDialogLineId: selectors.cardDialogLineIdSelector(state),
+    cardDialogBeatId: selectors.cardDialogBeatIdSelector(state),
+    isCardDialogVisible: selectors.isCardDialogVisibleSelector(state),
+    activeTab: selectors.timelineActiveTabSelector(state),
+    actConfigIsOpen: selectors.actConfigModalIsOpenSelector(state),
+    stickyHeaderCount: selectors.stickyHeaderCountSelector(state),
+    stickyLeftColumnCount: selectors.stickyLeftColumnCountSelector(state),
+    restructureModalOpen: selectors.restructureModalOpenSelector(state),
+    canOpenRestructureModal: selectors.canOpenRestructureModalSelector(state),
+    toast: selectors.toastNotificationSelector(state),
+    message: selectors.messageSelector(state),
+    books: selectors.allBooksSelector(state),
+  }
+}
+
+export default connect(mapStateToProps, (dispatch) => {
+  return {
+    actions: bindActionCreators(actions.ui, dispatch),
+    projectActions: bindActionCreators(actions.project, dispatch),
+    notificationActions: bindActionCreators(actions.notifications, dispatch),
+  }
+})(TimelineWrapper)
