@@ -1,44 +1,5 @@
-# For editors
-.dir-locals.el
-.dumbjump
-setup.el
-
-# Built/bundled
-bin/*LICENSE.txt
-bin/3bd4d476bb1e0e985412
-bin/c0f60a30d0e6cd83c6a1.exe
-bin/glyphicons-halflings-regular.woff2
-*.bundle.js
-*.bundle.js.map
-*.map
-
-# For testing
-.test-output/
-
-# Temp version for building
-build/version.js
-
-# New examples (use git add with force flag to add another)
-examples/**/*
-
-# Dependencies
 node_modules
-
-# Per machine
 .env
-
-# Misc
-screenshots/*
 .DS_Store
-data/*
-.prev
-dist/
-lib/plottr_components/src/css/components.css.map
 
-/bin/294.bundle.js.LICENSE.txt
-/bin/74.bundle.js.LICENSE.txt
-/bin/443.bundle.js.LICENSE.txt
-/bin/486.bundle.js.LICENSE.txt
-/bin/stats.json
-/bin/preload.js
-/bin/electron_main.js
+src/en-extracted.json
