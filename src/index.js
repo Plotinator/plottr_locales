@@ -26,6 +26,8 @@ const locales = {
   // @ts-ignore
   ru: require('./ru.json'),
   // @ts-ignore
+  se: require('./se.json'),
+  // @ts-ignore
   flipped: require('./flipped.json'),
 }
 
@@ -42,6 +44,7 @@ const localeNames = {
   fa: 'فارسی',
   ru: 'русский язык',
   ar: 'العربية',
+  se: 'Svenska',
 }
 
 // The purpose of the flipped locale is to easily see if there are any strings

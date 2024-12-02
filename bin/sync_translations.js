@@ -14,6 +14,7 @@ const ptTranslations = JSON.parse(fs.readFileSync('./src/pt.json').toString('utf
 const elTranslations = JSON.parse(fs.readFileSync('./src/el.json').toString('utf8'))
 const zhTranslations = JSON.parse(fs.readFileSync('./src/zh.json').toString('utf8'))
 const hiTranslations = JSON.parse(fs.readFileSync('./src/hi.json').toString('utf8'))
+const seTranslations = JSON.parse(fs.readFileSync('./src/se.json').toString('utf8'))
 
 const enKeys = new Set(Object.keys(enTranslations))
 const frKeys = new Set(Object.keys(frTranslations))
@@ -26,6 +27,7 @@ const ptKeys = new Set(Object.keys(ptTranslations))
 const elKeys = new Set(Object.keys(elTranslations))
 const zhKeys = new Set(Object.keys(zhTranslations))
 const hiKeys = new Set(Object.keys(hiTranslations))
+const seKeys = new Set(Object.keys(hiTranslations))
 
 const all_keys = new Set(
   Object.keys(enTranslationsExtracted)
@@ -40,6 +42,7 @@ const all_keys = new Set(
     .concat(Object.keys(elTranslations))
     .concat(Object.keys(zhTranslations))
     .concat(Object.keys(hiTranslations))
+    .concat(Object.keys(seTranslations))
 )
 
 const newEnTranslations = Object.assign({}, enTranslations)
@@ -53,6 +56,7 @@ const newPtTranslations = Object.assign({}, ptTranslations)
 const newElTranslations = Object.assign({}, elTranslations)
 const newZhTranslations = Object.assign({}, zhTranslations)
 const newHiTranslations = Object.assign({}, hiTranslations)
+const newSeTranslations = Object.assign({}, seTranslations)
 
 all_keys.forEach((key) => {
   if (!enKeys.has(key)) {
@@ -110,6 +114,11 @@ all_keys.forEach((key) => {
       message: key,
     }
   }
+  if (!seKeys.has(key)) {
+    newSeTranslations[key] = {
+      message: key,
+    }
+  }
 })
 
 fs.writeFileSync('./src/fr.json', JSON.stringify(newFrTranslations, null, 2))
@@ -123,3 +132,4 @@ fs.writeFileSync('./src/pt.json', JSON.stringify(newPtTranslations, null, 2))
 fs.writeFileSync('./src/el.json', JSON.stringify(newElTranslations, null, 2))
 fs.writeFileSync('./src/zh.json', JSON.stringify(newZhTranslations, null, 2))
 fs.writeFileSync('./src/hi.json', JSON.stringify(newHiTranslations, null, 2))
+fs.writeFileSync('./src/se.json', JSON.stringify(newSeTranslations, null, 2))

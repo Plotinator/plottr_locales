@@ -1,0 +1,2948 @@
+{
+  "(If not, please email support@plottr.com)": {
+    "message": "(Om inte, e-posta support@plottr.com)"
+  },
+  "(Logout)": {
+    "message": "(Logga ut)"
+  },
+  "A verification code was sent to:": {
+    "message": "En verifieringskod har skickats till:"
+  },
+  "About Plottr": {
+    "message": "Om Plottr"
+  },
+  "Access to all the features": {
+    "message": "Åtkomst till alla funktioner"
+  },
+  "Account Information": {
+    "message": "Kontoinformation"
+  },
+  "Account": {
+    "message": "Konto"
+  },
+  "Actions": {
+    "message": "Åtgärder"
+  },
+  "Activate License": {
+    "message": "Aktivera licens"
+  },
+  "Add Chapter": {
+    "message": "Lägg till kapitel"
+  },
+  "Add attribute": {
+    "message": "Lägg till attribut"
+  },
+  "Add cards to the timeline so you can write notes about your scenes. Click on the card to add more details": {
+    "message": "Lägg till kort på tidslinjen så att du kan göra anteckningar om dina scener. Klicka på kortet för att lägga till mer information"
+  },
+  "Add category": {
+    "message": "Lägg till kategori"
+  },
+  "Add more plotlines here": {
+    "message": "Lägg till fler plottlinjer här"
+  },
+  "Add new scenes or chapters here": {
+    "message": "Lägg till nya scener och kapitel här"
+  },
+  "Add Scene": {
+    "message": "Lägg till en scen"
+  },
+  "Add Another Scene": {
+    "message": "Lägg till ännu en scen"
+  },
+  "Add": {
+    "message": "Lägg till"
+  },
+  "Advanced Export Options": {
+    "message": "Avancerade exportalternativ"
+  },
+  "After": {
+    "message": "Efter"
+  },
+  "All": {
+    "message": "Alla"
+  },
+  "App Version: {version}": {
+    "message": "Appversion: { version }"
+  },
+  "Are you sure you want to clear everything in this timeline?": {
+    "message": "Är du säker på att du vill ta bort allt från den här tidslinjen?"
+  },
+  "Are you sure you want to delete { thing }?": {
+    "message": "Är du säker på att du vill ta bort { thing }?"
+  },
+  "Are you sure you want to delete {name}?": {
+    "message": "Är du säker på att du vill ta bort \"{ name }\"?"
+  },
+  "Are you sure you want to remove your license?": {
+    "message": "Är du säker på att du vill inaktivera din licens?"
+  },
+  "Are you sure?  (Removing levels may delete scene cards!)": {
+    "message": "Är du säker?  (Att ta bort nivåer kan ta bort scenkort!)"
+  },
+  "Attach Books": {
+    "message": "Bifoga böcker"
+  },
+  "Attach Characters": {
+    "message": "Bifoga karaktärer"
+  },
+  "Attach Places": {
+    "message": "Bifoga platser"
+  },
+  "Attach Tags": {
+    "message": "Bifoga taggar"
+  },
+  "Attributes": {
+    "message": "Attribut"
+  },
+  "Auto-save": {
+    "message": "Spara automatiskt"
+  },
+  "Auto-saving failed": {
+    "message": "Kunde inte spara automatiskt"
+  },
+  "Auto-saving worked": {
+    "message": "Har sparat automatiskt"
+  },
+  "Automatically save daily backups": {
+    "message": "Gör automatiskt dagliga säkerhetskopior"
+  },
+  "Awesome choice!": {
+    "message": "Utmärkt val!"
+  },
+  "Back": {
+    "message": "Tillbaka"
+  },
+  "Backup Location": {
+    "message": "Plats att säkerhetskopiera till"
+  },
+  "Backups older than this will be erased": {
+    "message": "Äldre säkerhetskopior kommer att raderas"
+  },
+  "Backups": {
+    "message": "Säkerhetskopia"
+  },
+  "Beat 1": {
+    "message": "Anslag 1"
+  },
+  "Beat {number} title": {
+    "message": "Anslag { number } titel"
+  },
+  "Beat {number}": {
+    "message": "Anslag { number }"
+  },
+  "Beat": {
+    "message": "Anslag"
+  },
+  "Before": {
+    "message": "Före"
+  },
+  "Beginning": {
+    "message": "Början"
+  },
+  "Blues": {
+    "message": "Blå"
+  },
+  "Book #": {
+    "message": "Bok #"
+  },
+  "Book Details": {
+    "message": "Information om boken"
+  },
+  "Book": {
+    "message": "Bok"
+  },
+  "Books": {
+    "message": "Böcker"
+  },
+  "Browns": {
+    "message": "Bruna"
+  },
+  "Buy Full Version": {
+    "message": "Köp fullversionen"
+  },
+  "By default, use auto-save for projects": {
+    "message": "Spara automatiskt som standard för projekt"
+  },
+  "By starting a mobile subscription, you agree to Plottr's": {
+    "message": "Genom att aktivera en mobil prenumeration accepterar du Plottrs"
+  },
+  "CHECK EMAIL": {
+    "message": "KONTROLLERA E-POST"
+  },
+  "CHECKING...": {
+    "message": "KONTROLLERAR ..."
+  },
+  "CODE": {
+    "message": "KOD"
+  },
+  "CREATE NEW PROJECT": {
+    "message": "SKAPA NYTT PROJEKT"
+  },
+  "CREATE PROJECT": {
+    "message": "SKAPA PROJEKT"
+  },
+  "Can I have a few more days?": {
+    "message": "Kan jag få några dagar till?"
+  },
+  "Cancel": {
+    "message": "Avbryt"
+  },
+  "Card": {
+    "message": "Kort"
+  },
+  "Categories": {
+    "message": "Kategorier"
+  },
+  "Category": {
+    "message": "Kategori"
+  },
+  "Changelog": {
+    "message": "Ändringslogg"
+  },
+  "Chapter {number} title": {
+    "message": "Kapitel {number} titel"
+  },
+  "Chapter {number}": {
+    "message": "Kapitel {number}"
+  },
+  "Chapter": {
+    "message": "Kapitel"
+  },
+  "Chapters": {
+    "message": "Kapitel"
+  },
+  "Character Categories": {
+    "message": "Karaktärskategorier"
+  },
+  "Character Thumbnail": {
+    "message": "Karaktär minibild"
+  },
+  "Character list is filtered": {
+    "message": "Karaktärslistan är filtrerad"
+  },
+  "Character": {
+    "message": "Karaktär"
+  },
+  "Character: {name}": {
+    "message": "Karaktär: { name }"
+  },
+  "Characters list": {
+    "message": "Karaktärslista"
+  },
+  "Characters": {
+    "message": "Karaktärer"
+  },
+  "Check for Updates": {
+    "message": "Sök efter uppdateringar"
+  },
+  "Check": {
+    "message": "Sök"
+  },
+  "Choose Color": {
+    "message": "Välj färg"
+  },
+  "Choose an image": {
+    "message": "Välj en bild"
+  },
+  "Choose an {platform} mobile subscription": {
+    "message": "Välj en mobilprenumeration för {platform}"
+  },
+  "Choose what categories you want to put your characters into": {
+    "message": "Välj i vilka kategorier du vill placera dina karaktärer i"
+  },
+  "Choose what you want to track about your { type }": {
+    "message": "Välj vad du vill spåra om din { type }"
+  },
+  "Choose where to save this file on your computer": {
+    "message": "Välj var filen ska sparas på din dator"
+  },
+  "Choose your Snowflake Pro file": {
+    "message": "Välj din Snowflake Pro-fil"
+  },
+  "Choose": {
+    "message": "Välj"
+  },
+  "Choose...": {
+    "message": "Välj ..."
+  },
+  "Clear": {
+    "message": "Rensa"
+  },
+  "Click on a color below or type it in": {
+    "message": "Klicka på en färg nedan för att använda den när du skriver"
+  },
+  "Click to Install": {
+    "message": "Klicka för att installera"
+  },
+  "Close": {
+    "message": "Stäng"
+  },
+  "Collapse": {
+    "message": "Minimera"
+  },
+  "Color Picker": {
+    "message": "Färgväljare"
+  },
+  "Color": {
+    "message": "Färg"
+  },
+  "Coming Soon!": {
+    "message": "Kommer snart!"
+  },
+  "Configuration Options": {
+    "message": "Konfigureringsalternativ"
+  },
+  "Configure": {
+    "message": "Konfigurera"
+  },
+  "Content": {
+    "message": "Innehåll"
+  },
+  "Congratulations": {
+    "message": "Grattis"
+  },
+  "Copy": {
+    "message": "Kopia"
+  },
+  "Create Blank Project": {
+    "message": "Skapa tomt projekt"
+  },
+  "Create From Template": {
+    "message": "Skapa från mall"
+  },
+  "Create Report": {
+    "message": "Skapa rapport"
+  },
+  "Create a New Plottr Document": {
+    "message": "Skapa ett nytt Plottr-dokument"
+  },
+  "Create an Error Report": {
+    "message": "Skapa en felrapport"
+  },
+  "Create unlimited project files": {
+    "message": "Skapa ett obegränsat antal projektfiler"
+  },
+  "Create": {
+    "message": "Skapa"
+  },
+  "Created By": {
+    "message": "Skapad av"
+  },
+  "Current Color": {
+    "message": "Nuvarande färg"
+  },
+  "Custom Attributes for { type }": {
+    "message": "Anpassade attribut för { type }"
+  },
+  "Custom Attributes": {
+    "message": "Anpassade attribut"
+  },
+  "Custom Template": {
+    "message": "Anpassad mall"
+  },
+  "Custom Templates": {
+    "message": "Anpassade mallar"
+  },
+  "Cut": {
+    "message": "Klipp ut"
+  },
+  "Delete": {
+    "message": "Ta bort"
+  },
+  "Dark Mode": {
+    "message": "Mörkt läge"
+  },
+  "Dashboard": {
+    "message": "Instrumentpanel"
+  },
+  "Days Left": {
+    "message": "Dagar kvar"
+  },
+  "Days of Backup": {
+    "message": "Dagars säkerhetskopiering"
+  },
+  "Delete Book": {
+    "message": "Ta bort bok"
+  },
+  "Delete Book {name}?": {
+    "message": "Ta bort boken \"{name}\"?"
+  },
+  "Number of Backups": {
+    "message": "Antal säkerhetskopior"
+  },
+  "Never Delete Backups": {
+    "message": "Ta aldrig bort säkerhetskopior"
+  },
+  "Default Colors": {
+    "message": "Standardfärger"
+  },
+  "Delete Chapter {name}?": {
+    "message": "Ta bort kapitlet \"{name}\"?"
+  },
+  "Delete Chapter": {
+    "message": "Ta bort kapitel"
+  },
+  "Delete Chapter?": {
+    "message": "Ta bort kapitlet?"
+  },
+  "Delete Character": {
+    "message": "Ta bort karaktär"
+  },
+  "Delete Plotline {name}?": {
+    "message": "Ta bort plott-linjen \"{name}\"?"
+  },
+  "Delete Plotline": {
+    "message": "Ta bort plott-linje"
+  },
+  "Delete Scene {name}?": {
+    "message": "Ta bort scenen \"{name}\"?"
+  },
+  "Delete Scene": {
+    "message": "Ta bort scen"
+  },
+  "Delete Tag": {
+    "message": "Ta bort tagg"
+  },
+  "Delete {title} Tag?": {
+    "message": "Ta bort taggen \"{title}\"?"
+  },
+  "Demos": {
+    "message": "Demnstrationer"
+  },
+  "Describe the scene": {
+    "message": "Beskriv scenen"
+  },
+  "Description": {
+    "message": "Beskrivning"
+  },
+  "Details": {
+    "message": "Detaljer"
+  },
+  "Device ID": {
+    "message": "Enhets-ID"
+  },
+  "Do you want to remove this image? It will NOT be deleted from your computer": {
+    "message": "Vill du ta bort den här bilden? Den kommer INTE att tas bort från din dator"
+  },
+  "Do you want to delete tag {name}?": {
+    "message": "Vill du ta bort taggen \"{name}\"?"
+  },
+  "Documentation": {
+    "message": "Dokumentation"
+  },
+  "Don't have a license? Go to our website to learn more": {
+    "message": "Ingen licens? Gå till vår webbplats för att läsa mer"
+  },
+  "Don't have a license?": {
+    "message": "Ingen licens?"
+  },
+  "Don't worry, all your work is saved in plottr_trial.pltr in your Documents folder": {
+    "message": "Lugn. Allt ditt arbete har sparats i plottr_trial.pltr i mappen Dokument"
+  },
+  "Don't worry, all your work is saved in your files": {
+    "message": "Lugn. Allt ditt arbete har sparats i dina filer"
+  },
+  "Done": {
+    "message": "Klar"
+  },
+  "Download Complete 🎉 (version {version})": {
+    "message": "Nedladdning klar 🎉 (version { version })"
+  },
+  "Download Now!": {
+    "message": "Hämta nu!"
+  },
+  "Download updates automatically": {
+    "message": "Nedladdningar uppdateras automatiskt"
+  },
+  "Downloading version {version}": {
+    "message": "Hämtar version { version }"
+  },
+  "Drop a File Here": {
+    "message": "Släpp en fil här"
+  },
+  "Edit Plotline": {
+    "message": "Redigera plott-linje"
+  },
+  "Edit": {
+    "message": "Redigera"
+  },
+  "Editor is currently locked by {name}.": {
+    "message": "Just nu är redigeraren låst av {name}."
+  },
+  "Email": {
+    "message": "E-post"
+  },
+  "Email:": {
+    "message": "E-post:"
+  },
+  "example@domain.com": {
+    "message": "example@domain.com"
+  },
+  "End": {
+    "message": "Slut"
+  },
+  "Ends After": {
+    "message": "Slutar efter"
+  },
+  "Enter Custom Attribute Title": {
+    "message": "Ange titel på anpassat attribut"
+  },
+  "Enter a Customer Service Code": {
+    "message": "Ange en kundservicekod"
+  },
+  "Enter a new name for {chapter}": {
+    "message": "Ange ett namn på \"{chapter}\""
+  },
+  "Enter Chapter's name or enter": {
+    "message": "Ange kapitlets namn eller \"auto\" \n(utan citattecken) för automatisk namngivning."
+  },
+  "Enter some text...": {
+    "message": "Skriv lite text..."
+  },
+  "Enter the URL of the link:": {
+    "message": "Ange länkens URL:"
+  },
+  "Enter the name of your project": {
+    "message": "Ange namnet på ditt projekt"
+  },
+  "Enter your verification code to activate this device": {
+    "message": "Ange verifieringskoden för att aktivera den är enheten"
+  },
+  "Enter your verification code": {
+    "message": "Ange din verifieringskod"
+  },
+  "Error Creating Error Report": {
+    "message": "Kunde inte skapa felrapport"
+  },
+  "Error Report created": {
+    "message": "Felrapport har skapats"
+  },
+  "Error reading file": {
+    "message": "Kunde inte läsa filen"
+  },
+  "Error sending email! Check your email and Try again.": {
+    "message": "Kunde inte skicka e-post! Kontrollera e-postadressen och försök igen."
+  },
+  "Error sharing file": {
+    "message": "Kunde inte dela filen"
+  },
+  "Error: {error}": {
+    "message": "Fel: { error }"
+  },
+  "Exit Without Saving": {
+    "message": "Avsluta utan att spara"
+  },
+  "Expand": {
+    "message": "Expandera"
+  },
+  "Expires": {
+    "message": "Upphör"
+  },
+  "Export": {
+    "message": "Exportera"
+  },
+  "FAQ": {
+    "message": "Vanliga frågor"
+  },
+  "Facebook Group": {
+    "message": "Facebook-grupp"
+  },
+  "Fictional Devices LLC": {
+    "message": "Fictional Devices LLC"
+  },
+  "File Exported": {
+    "message": "Filen har exporterats"
+  },
+  "File can't be found. Did it move?": {
+    "message": "Kunde inte hitta filen. Har den flyttats?"
+  },
+  "File": {
+    "message": "Fil"
+  },
+  "Files": {
+    "message": "Filer"
+  },
+  "Filter by Plotline": {
+    "message": "Filtrera på Plott-linje"
+  },
+  "Filter": {
+    "message": "Filtrera"
+  },
+  "Flip": {
+    "message": "Vänd"
+  },
+  "Folder where backups are stored": {
+    "message": "Mapp där säkerhetskopior sparas"
+  },
+  "Force Dark Mode": {
+    "message": "Tvinga mörkt läge"
+  },
+  "Free Trial Information": {
+    "message": "Information om gratis provperiod"
+  },
+  "Free Trial": {
+    "message": "Gratis provperiod"
+  },
+  "From File": {
+    "message": "Från fil"
+  },
+  "From Template": {
+    "message": "Från mall"
+  },
+  "GET A LICENSE": {
+    "message": "SKAFFA EN LICENS"
+  },
+  "GET STARTED!": {
+    "message": "KOM IGÅNG!"
+  },
+  "Genre": {
+    "message": "Genre"
+  },
+  "Get access to all your projects": {
+    "message": "Få åtkomst till alla dina projekt"
+  },
+  "Links": {
+    "message": "Länkar"
+  },
+  "Give this tag a name": {
+    "message": "Ge den här taggen ett namn"
+  },
+  "Give your scene a title": {
+    "message": "Ge din scen en titel"
+  },
+  "Go Back": {
+    "message": "Tillbaka"
+  },
+  "Go to our website to learn more:": {
+    "message": "Gå till vår webbplats för mer information:"
+  },
+  "Grays": {
+    "message": "Grå"
+  },
+  "Greens": {
+    "message": "Gröna"
+  },
+  "Help": {
+    "message": "Hjälp"
+  },
+  "Hey, check out my Plottr project \"{project}\"": {
+    "message": "Kolla in mitt Plottr-projekt \"{project}\""
+  },
+  "Hide Others": {
+    "message": "Dölj övriga"
+  },
+  "Hide Plottr": {
+    "message": "Dölj Plottr"
+  },
+  "Hierarchy Configuration": {
+    "message": "Konfigurering av hierarki"
+  },
+  "Hmmmm. It looks like that's not a valid license key": {
+    "message": "Hmmmm. Det verkar inte vara en giltig licensnyckel"
+  },
+  "Hold On!": {
+    "message": "Vänta!"
+  },
+  "I have a license key": {
+    "message": "Jag har en licensnyckel"
+  },
+  "I want to buy the full version!": {
+    "message": "Jag vill köpa fullversionen!"
+  },
+  "I want to start the free trial": {
+    "message": "Jag vill starta den gratis provperioden"
+  },
+  "If you keep seeing this problem, email us at support@plottr.com": {
+    "message": "Om detta problem kvarstår, e-posta oss på support@plottr.com"
+  },
+  "Image Details": {
+    "message": "Bildinformation"
+  },
+  "Image Gallery": {
+    "message": "Bildgalleri"
+  },
+  "Images": {
+    "message": "Bilder"
+  },
+  "Import Snowflake Pro": {
+    "message": "Importera Snowflake Pro"
+  },
+  "Insert Chapter and a Card": {
+    "message": "Infoga ett kapitel och kort"
+  },
+  "Insert Chapter": {
+    "message": "Infoga kapitel"
+  },
+  "Insert from URL": {
+    "message": "Infoga från URL"
+  },
+  "It looks like you have Plottr on the max number of computers already": {
+    "message": "Du verkar ha Plottr på maxantalet datorer redan"
+  },
+  "It looks like you have Plottr on the max number of devices already": {
+    "message": "Du verkar ha Plottr på maxantalet enheter redan"
+  },
+  "It looks like you're not online. You don't always have to be online to user Plottr, but it can't verify your license offline": {
+    "message": "Du verkar inte vara online. Du behöver inte alltid vara online för att använda Plottr, men det går inte att verifiera din licens offline"
+  },
+  "Keep all your notes here (brainstorming, world-building, etc.)": {
+    "message": "Ha alla dina anteckningar här (brainstorming, uppbyggnad av världar osv.)"
+  },
+  "Keep info about your locations here": {
+    "message": "Ha information om dina platser här"
+  },
+  "Keep your character sheets here": {
+    "message": "Ha dina karaktärsblad här"
+  },
+  "Log Out": {
+    "message": "Logga ut"
+  },
+  "LOGOUT": {
+    "message": "LOGGA UT"
+  },
+  "LOOK OUT!": {
+    "message": "SE UPP!"
+  },
+  "Language": {
+    "message": "Språk"
+  },
+  "Last opened by you": {
+    "message": "Senast öppnat av dig"
+  },
+  "Learn": {
+    "message": "Lär dig"
+  },
+  "Let's verify your license.": {
+    "message": "Låt oss verifiera din licens."
+  },
+  "Let's get you started": {
+    "message": "Dags att komma igång"
+  },
+  "Levels of hierarchy": {
+    "message": "Hierarkinivåer"
+  },
+  "License Key": {
+    "message": "Licensnyckel"
+  },
+  "License Verified. Plottr will start momentarily. Thanks for being patient!": {
+    "message": "Licensen har verifierats. Plottr kommer att starta strax. Tack för ditt tålamod!"
+  },
+  "License": {
+    "message": "Licens"
+  },
+  "Long Synopsis": {
+    "message": "Lång synopsis"
+  },
+  "MS Word": {
+    "message": "MS Word"
+  },
+  "Main Plot": {
+    "message": "Huvudplott"
+  },
+  "Main": {
+    "message": "Huvudsaklig"
+  },
+  "Manage the Categories you wish to place your characters in.": {
+    "message": "Hantera de kategorier du vill placera dina karaktärer i."
+  },
+  "Manually Sorted": {
+    "message": "Sorterad manuellt"
+  },
+  "Manuscript": {
+    "message": "Manus"
+  },
+  "Menu": {
+    "message": "Meny"
+  },
+  "Middle": {
+    "message": "Mitten"
+  },
+  "My Character Template": {
+    "message": "Min karaktärsmall"
+  },
+  "My Scene Template": {
+    "message": "Min scenmall"
+  },
+  "My Templates": {
+    "message": "Mina mallar"
+  },
+  "My Timeline Template": {
+    "message": "Min tidslinjemall"
+  },
+  "Name": {
+    "message": "Namn"
+  },
+  "Never": {
+    "message": "Aldrig"
+  },
+  "New Attribute": {
+    "message": "Nytt attribut"
+  },
+  "New Book": {
+    "message": "Ny bok"
+  },
+  "New Character": {
+    "message": "Ny karaktär"
+  },
+  "New Custom Attribute Title": {
+    "message": "Titel på nytt anpassat attribut"
+  },
+  "New Note": {
+    "message": "Ny anteckning"
+  },
+  "New Place": {
+    "message": "Ny plats"
+  },
+  "New Plotline": {
+    "message": "Ny plott-linje"
+  },
+  "New Project": {
+    "message": "Nytt projekt"
+  },
+  "New Tag": {
+    "message": "Ny tagg"
+  },
+  "New": {
+    "message": "Ny"
+  },
+  "No Characters": {
+    "message": "Inga karaktärer"
+  },
+  "No Documents Found": {
+    "message": "Inga dokument hittades"
+  },
+  "No actions to undo": {
+    "message": "Inga åtgärder att ångra"
+  },
+  "No color": {
+    "message": "Ingen färg"
+  },
+  "No": {
+    "message": "Nej"
+  },
+  "No, Discard": {
+    "message": "Nej, kassera"
+  },
+  "None to choose": {
+    "message": "Inget att välja"
+  },
+  "Not Receiving Updates": {
+    "message": "Tar inte emot uppdateringar"
+  },
+  "NOT NOW": {
+    "message": "INTE NU"
+  },
+  "Note Details": {
+    "message": "Information om anteckning"
+  },
+  "Note Image": {
+    "message": "Anteckningsbild"
+  },
+  "Note": {
+    "message": "Anteckning"
+  },
+  "Note: {title}": {
+    "message": "Anteckning: { title }"
+  },
+  "Notes are filtered": {
+    "message": "Anteckningar filtreras"
+  },
+  "Notes": {
+    "message": "Anteckningar"
+  },
+  "Now lets get you writing your next great plot!": {
+    "message": "Dags att börja skriva\n nästa fantastiska plott!"
+  },
+  "Number of Days of Rolling Backups to Keep": {
+    "message": "Antal dagar bakåt att behålla säkerhetskopior från"
+  },
+  "OK": {
+    "message": "OK"
+  },
+  "OVERWRITE": {
+    "message": "SKRIV ÖVER"
+  },
+  "Once You Plot, the Fun Don't Stop": {
+    "message": "Med en plott, har du nåt"
+  },
+  "One Paragraph Summary": {
+    "message": "Sammanfattning, en paragraf"
+  },
+  "One Sentence Summary": {
+    "message": "Sammanfattning, en mening"
+  },
+  "Open Dashboard": {
+    "message": "Öppna instrumentpanelen"
+  },
+  "Open Existing": {
+    "message": "Öppna befintlig"
+  },
+  "Open a Plottr Document": {
+    "message": "Öppna ett Plottr-dokument"
+  },
+  "Open one of your most recent projects": {
+    "message": "Öppna ett av dina senaste projekt"
+  },
+  "Open": {
+    "message": "Öppna"
+  },
+  "Or hover here to insert between scenes": {
+    "message": "eller håll pekaren över här för att infoga mellan scener"
+  },
+  "Oranges": {
+    "message": "Orange"
+  },
+  "Other": {
+    "message": "Andra"
+  },
+  "Outline is filtered": {
+    "message": "Översikten är filtrerad"
+  },
+  "Outline": {
+    "message": "Översikt"
+  },
+  "Override your computer's setting and always use dark mode": {
+    "message": "Åsidosätt datorns inställning och använd alltid mörkt läge"
+  },
+  "Paragraph": {
+    "message": "Paragraf"
+  },
+  "Paragraph?": {
+    "message": "Paragraf?"
+  },
+  "Paste and Match Style": {
+    "message": "Klistra in och matcha stil"
+  },
+  "Paste": {
+    "message": "Klistra in"
+  },
+  "Pick a color": {
+    "message": "Välj en färg"
+  },
+  "Place Details": {
+    "message": "Placera detaljer"
+  },
+  "Place Image": {
+    "message": "Placera bild"
+  },
+  "Place list is filtered": {
+    "message": "Platslistan är filtrerad"
+  },
+  "Place": {
+    "message": "Plats"
+  },
+  "Place: {name}": {
+    "message": "Plats: { name }"
+  },
+  "Places list": {
+    "message": "Platslista"
+  },
+  "Places": {
+    "message": "Platser"
+  },
+  "Please choose a plotline": {
+    "message": "Välj en plott-linje"
+  },
+  "Please contact us with any questions at support@plottr.com": {
+    "message": "Kontakta oss med frågor på support@plottr.com"
+  },
+  "Please select a valid Plottr file": {
+    "message": "Välj en giltig Plottr-fil."
+  },
+  "Please verify your license": {
+    "message": "Verifiera din licens"
+  },
+  "Please verify your license in {time}": {
+    "message": "Verifiera din licens om {time}"
+  },
+  "Plotline Details": {
+    "message": "Information, plott-linje"
+  },
+  "Plotline Title:": {
+    "message": "Titel på plott-linje:"
+  },
+  "Plotline name": {
+    "message": "Namn på plott-linje"
+  },
+  "Plotline": {
+    "message": "Plott-linje"
+  },
+  "Plotline: {title}": {
+    "message": "Plott-linje: { title }"
+  },
+  "Plotlines": {
+    "message": "Plott-linjer"
+  },
+  "Plottr Mobile Monthly": {
+    "message": "Plottr Mobile månadsvis"
+  },
+  "Plottr Mobile Yearly": {
+    "message": "Plottr Mobile årsvis"
+  },
+  "Plottr Mobile": {
+    "message": "Plottr Mobile"
+  },
+  "Plottr Support": {
+    "message": "Plottr support"
+  },
+  "Plottr created a file named {fileName} in your Documents folder": {
+    "message": "Plottr skapade en fil som heter { fileName } i din mapp Dokument"
+  },
+  "Plottr project file": {
+    "message": "Plottr projektfil"
+  },
+  "Plottr ran into a problem. Try opening Plottr again.": {
+    "message": "Plottr stötte på ett problem. Försök att öppna Plottr igen."
+  },
+  "Plottr": {
+    "message": "Plottr"
+  },
+  "PLOTTR PRO": {
+    "message": "PLOTTR PRO"
+  },
+  "PLOTTR CLASSIC": {
+    "message": "PLOTTR CLASSIC"
+  },
+  "Preferences": {
+    "message": "Preferenser"
+  },
+  "Premise": {
+    "message": "Utgångspunkt"
+  },
+  "Privacy Policy": {
+    "message": "Sekretesspolicy"
+  },
+  "Project Templates": {
+    "message": "Projektmallar"
+  },
+  "Project": {
+    "message": "Projekt"
+  },
+  "Prologue": {
+    "message": "Prolog"
+  },
+  "Purchase Email": {
+    "message": "E-post om köp"
+  },
+  "Purchase Pro": {
+    "message": "Köp Pro"
+  },
+  "Purples": {
+    "message": "Lila"
+  },
+  "Quit": {
+    "message": "Avsluta"
+  },
+  "RESEND EMAIL": {
+    "message": "SKICKA E-POST IGEN"
+  },
+  "RESENDING...": {
+    "message": "SKICKAR IGEN..."
+  },
+  "Recent Projects": {
+    "message": "De senaste projekten"
+  },
+  "Redo": {
+    "message": "Gör om"
+  },
+  "Reds": {
+    "message": "Röda"
+  },
+  "Reload from File": {
+    "message": "Läs in igen från fil"
+  },
+  "Reload": {
+    "message": "Läs in igen"
+  },
+  "Deactivate License Key": {
+    "message": "Inaktivera licensnyckel"
+  },
+  "Remove from this list": {
+    "message": "Ta bort från den här listan"
+  },
+  "Remove image": {
+    "message": "Ta bort bild"
+  },
+  "Remove": {
+    "message": "Ta bort"
+  },
+  "Rename Chapter": {
+    "message": "Byt namn på kapitel"
+  },
+  "Rename": {
+    "message": "Byt namn"
+  },
+  "Contact Support": {
+    "message": "Kontakta supporten"
+  },
+  "Request a Feature": {
+    "message": "Begär en funktion"
+  },
+  "Restore Purchase": {
+    "message": "Återställ köp"
+  },
+  "Roadmap": {
+    "message": "Vägkarta"
+  },
+  "SELECT A PROJECT FILE": {
+    "message": "VÄLJ EN PROJEKTFIL"
+  },
+  "SELECT": {
+    "message": "VÄLJ"
+  },
+  "Save Backups": {
+    "message": "Spara säkerhetskopior"
+  },
+  "Save Changes?": {
+    "message": "Spara ändringar?"
+  },
+  "Save Chapter": {
+    "message": "Spara kapitel"
+  },
+  "Save File": {
+    "message": "Spara fil"
+  },
+  "Save Plotline": {
+    "message": "Spara plott-linje"
+  },
+  "Save as Template": {
+    "message": "Spara som mall"
+  },
+  "Save as\nTemplate": {
+    "message": "Spara som\nmall"
+  },
+  "Save as": {
+    "message": "Spara som"
+  },
+  "Save before closing?": {
+    "message": "Spara innan du stänger?"
+  },
+  "Save": {
+    "message": "Spara"
+  },
+  "Saved": {
+    "message": "Sparad"
+  },
+  "Saving failed": {
+    "message": "Kunde inte spara"
+  },
+  "Saving worked this time 🎉": {
+    "message": "Den här gången gick det att spara 🎉"
+  },
+  "Saving your file didn't work. Check where it's stored.": {
+    "message": "Det gick inte att spara filen. Kontrollera var den sparas."
+  },
+  "Saving your file didn't work. Try again.": {
+    "message": "Det gick inte att spara filen. Försök igen."
+  },
+  "Scene Cards": {
+    "message": "Scenkort"
+  },
+  "Scene Details": {
+    "message": "Sceninformation"
+  },
+  "Scene Title": {
+    "message": "Scentitel"
+  },
+  "Scene {num}": {
+    "message": "Scen { num }"
+  },
+  "Scene": {
+    "message": "Scen"
+  },
+  "Scrivener Project": {
+    "message": "Scrivener-projekt"
+  },
+  "Scrivener": {
+    "message": "Scrivener"
+  },
+  "Scroll": {
+    "message": "Bläddra"
+  },
+  "Search": {
+    "message": "Sök"
+  },
+  "See What's New": {
+    "message": "Se vad som är nytt"
+  },
+  "See the outline here": {
+    "message": "Se översikten här"
+  },
+  "See More": {
+    "message": "Visa mer"
+  },
+  "See Less": {
+    "message": "Visa mindre"
+  },
+  "See that was painless": {
+    "message": "Det gick ju smärtfritt"
+  },
+  "Select All": {
+    "message": "Välj alla"
+  },
+  "Select a Category": {
+    "message": "Välj en kategori"
+  },
+  "Select a Chapter": {
+    "message": "Välj ett kapitel"
+  },
+  "Select a File": {
+    "message": "Välj en fil"
+  },
+  "Select a Plotline": {
+    "message": "Välj en plott-linje"
+  },
+  "Series Outline": {
+    "message": "Serieöversikt"
+  },
+  "Series View": {
+    "message": "Serievy"
+  },
+  "Series": {
+    "message": "Serier"
+  },
+  "Session Start": {
+    "message": "Sessionens början"
+  },
+  "Settings": {
+    "message": "Inställningar"
+  },
+  "Short Description": {
+    "message": "Kort beskrivning"
+  },
+  "Short Synopsis": {
+    "message": "Kort synopsis"
+  },
+  "Show All": {
+    "message": "Visa alla"
+  },
+  "Show in File Explorer": {
+    "message": "Visa i utforskaren"
+  },
+  "Show in Finder": {
+    "message": "Visa i sökaren"
+  },
+  "Since this is your first time using Plottr, I'll give you a guided tour if you like.": {
+    "message": "Eftersom det är första gången du använder Plottr kan jag ge dig en guidad tur om du vill."
+  },
+  "Size: large": {
+    "message": "Storlek: stor"
+  },
+  "Size: medium": {
+    "message": "Storlek: medium"
+  },
+  "Size: small": {
+    "message": "Storlek: liten"
+  },
+  "Something went wrong,": {
+    "message": "Något gick fel,"
+  },
+  "Something went wrong.": {
+    "message": "Något gick fel."
+  },
+  "Sort": {
+    "message": "Sortera"
+  },
+  "Source Link": {
+    "message": "Länk till källa"
+  },
+  "Start": {
+    "message": "STARTA"
+  },
+  "Start Mobile Subscription": {
+    "message": "Starta mobilprenumeration"
+  },
+  "Start my Free Trial": {
+    "message": "Starta gratis provperiod"
+  },
+  "Started On": {
+    "message": "Startad"
+  },
+  "Starter Templates": {
+    "message": "Startmallar"
+  },
+  "Start Plottr Pro": {
+    "message": "Starta Plottr Pro"
+  },
+  "Plottr Pro Wizard": {
+    "message": "Plottr Pro-vägledning"
+  },
+  "START PLOTTING": {
+    "message": "BÖRJA PLOTTA"
+  },
+  "Step {number}": {
+    "message": "Steg {number}"
+  },
+  "Story line": {
+    "message": "Handling"
+  },
+  "Story name": {
+    "message": "Berättelsens namn"
+  },
+  "Submit": {
+    "message": "Skicka"
+  },
+  "Subscription Restored!": {
+    "message": "Prenumeration återställd!"
+  },
+  "Subtitle": {
+    "message": "Undertext"
+  },
+  "Success!": {
+    "message": "Lyckades!"
+  },
+  "Supporting": {
+    "message": "Stöd"
+  },
+  "Tag Details": {
+    "message": "Tagginformation"
+  },
+  "Tag Name": {
+    "message": "Taggnamn"
+  },
+  "Tag": {
+    "message": "Tagg"
+  },
+  "Tags can be used for organization": {
+    "message": "Med taggar kan man organisera"
+  },
+  "Tags list": {
+    "message": "Tagglista"
+  },
+  "Tags": {
+    "message": "Taggar"
+  },
+  "Take Screenshot": {
+    "message": "Ta skärmbild"
+  },
+  "Template Saved": {
+    "message": "Mallen har sparats"
+  },
+  "Template": {
+    "message": "Mall"
+  },
+  "Templates": {
+    "message": "Mallar"
+  },
+  "Terms of Service": {
+    "message": "Användningsvillkor"
+  },
+  "Text Error": {
+    "message": "Textfel"
+  },
+  "Thanks for trying Plottr": {
+    "message": "Tack för att du provar Plottr"
+  },
+  "That code was invalid. Try again.": {
+    "message": "Den koden var ogiltig.\nFörsök igen."
+  },
+  "That email didn't verify. Try again or try another email.": {
+    "message": "Den e-postadressen verifierades inte.\nProva med en annan e-postadress."
+  },
+  "Theme": {
+    "message": "Tema"
+  },
+  "There was an error activating your license key on this device": {
+    "message": "Din licens kunde inte aktiveras på den här enheten"
+  },
+  "There was an error doing that. Try again": {
+    "message": "Ett fel inträffade när åtgärden skulle utföras. Försök igen"
+  },
+  "There was an error while sharing your file. Try Again.": {
+    "message": "Ett fel inträffade när filen skulle delas. Försök igen."
+  },
+  "There was an error trying to sign you in. Ensure you password and email are correct.": {
+    "message": "Kunde inte logga in. Se till att ditt lösenord och din e-post är korrekta."
+  },
+  "This is a plotline": {
+    "message": "Detta är en plott-linje"
+  },
+  "This is a scene or chapter. You can change its name by clicking on it": {
+    "message": "Detta är en scen eller ett kapitel. Du kan ändra dess namn genom att klicka på den"
+  },
+  "This will send you an email with a code": {
+    "message": "Detta skickar ett e-postmeddelande med en kod"
+  },
+  "This will be quick and painless.": {
+    "message": "Det kommer att gå snabbt och smärtfritt."
+  },
+  "There are only ": {
+    "message": "Det är bara "
+  },
+  "{number} steps:": {
+    "message": "{number} steg:"
+  },
+  "Timeline is filtered": {
+    "message": "Tidslinjen är filtrerad"
+  },
+  "Timeline": {
+    "message": "Tidslinje"
+  },
+  "Title": {
+    "message": "Titel"
+  },
+  "Toggle navigation": {
+    "message": "växla navigering"
+  },
+  "Trash": {
+    "message": "Papperskorg"
+  },
+  "Try that again": {
+    "message": "Försök igen"
+  },
+  "Try Plottr Pro today for a seamless cloud experience like you have never imagined.": {
+    "message": "Prova Plottr Pro i dag för en smidigare molnupplevelse än du kunnat tänka dig."
+  },
+  "Tutorials": {
+    "message": "Vägledningar"
+  },
+  "Type": {
+    "message": "Typ"
+  },
+  "UH-OH!": {
+    "message": "OJ DÅ!"
+  },
+  "URL": {
+    "message": "URL"
+  },
+  "Uncategorized": {
+    "message": "Inte kategoriserad"
+  },
+  "Undo": {
+    "message": "Ånga"
+  },
+  "Untitled": {
+    "message": "Namnlös"
+  },
+  "Unknown": {
+    "message": "Okänd"
+  },
+  "Update Automatically": {
+    "message": "Uppdatera automatiskt"
+  },
+  "Update Available 🎉 (version {version})": {
+    "message": "Uppdatering tillgänglig 🎉 (version { version })"
+  },
+  "Update failed. Try again": {
+    "message": "Uppdateringen misslyckades. Försök igen"
+  },
+  "Updates": {
+    "message": "Uppdateringar"
+  },
+  "Upload Files": {
+    "message": "Ladda upp filer"
+  },
+  "Upload projects and templates": {
+    "message": "Ladda upp projekt och mallar"
+  },
+  "Uploading projects and templates": {
+    "message": "Laddar upp projekt och mallar"
+  },
+  "UPLOADING...": {
+    "message": "LADDAR UPP..."
+  },
+  "Upload Projects": {
+    "message": "Ladda upp projekt"
+  },
+  "Use Template": {
+    "message": "Använd mall"
+  },
+  "Use Book\nTemplate": {
+    "message": "Använd\nbokmall"
+  },
+  "Use Scene\nTemplate": {
+    "message": "Använd\nscenmall"
+  },
+  "Use a different email": {
+    "message": "Använd en annan e-postadress"
+  },
+  "Use this to remove your license on this device": {
+    "message": "Använd för att ta bort licensen från den här enheten"
+  },
+  "Use License Code Login": {
+    "message": "Använd inloggning med licenskod"
+  },
+  "Use Plottr Pro Login": {
+    "message": "Använd Plottr Pro-inloggning"
+  },
+  "VERIFY CODE": {
+    "message": "VERIFIERA KOD"
+  },
+  "VERIFYING...": {
+    "message": "VERIFIERAR..."
+  },
+  "Verify": {
+    "message": "Verifiera"
+  },
+  "Verifying with email: {email}": {
+    "message": "Verifierar med e-post: { email }"
+  },
+  "Version": {
+    "message": "Version"
+  },
+  "View Error": {
+    "message": "Visa fel"
+  },
+  "View Timeline": {
+    "message": "Visa tidslinje"
+  },
+  "View": {
+    "message": "Visa"
+  },
+  "We found your user session but...": {
+    "message": "Vi har hittat din användarsession, men din licens har upphört att gälla eller är inaktiv. Köp en ny licens eller mobilprenumeration för att fortsätta."
+  },
+  "We had a problem creating a new project": {
+    "message": "Vi kunde inte skapa ditt projekt. Säkerställ att Plottr har rätt behörigheter och att du har tillräckligt mycket lagringsutrymme."
+  },
+  "We had a problem processing your file": {
+    "message": "Vi kunde inte bearbeta din fil. Säkerställ att Plottr har rätt behörigheter och försök igen."
+  },
+  "We will email you a verification code.": {
+    "message": "Vi kommer att e-posta din verifieringskod."
+  },
+  "Welcome to Plottr!": {
+    "message": "Välkommen till Plottr!"
+  },
+  "Welcome to Plottr": {
+    "message": "Välkommen till Plottr"
+  },
+  "Welcome to": {
+    "message": "Välkommen till"
+  },
+  "What would you like to do?": {
+    "message": "Vad vill du göra?"
+  },
+  "Where would you like to save the export?": {
+    "message": "Var vill du spara exporten?"
+  },
+  "Where would you like to save this copy?": {
+    "message": "Var vill du spara den här kopian?"
+  },
+  "Where would you like to save this file?": {
+    "message": "Var vill du spara den här filen?"
+  },
+  "Whites": {
+    "message": "Vita"
+  },
+  "Window": {
+    "message": "Fönster"
+  },
+  "Word Document": {
+    "message": "Word-dokument"
+  },
+  "Yes, Delete": {
+    "message": "Ja, ta bort"
+  },
+  "Yes, Save": {
+    "message": "Ja, spara"
+  },
+  "You already have a file named {file}": {
+    "message": "Det finns redan en fil som heter \n{file}.\nVill du skriva över den?"
+  },
+  "You can change its name or color by hovering over it (disabled for the tour)": {
+    "message": "Du kan byta namn eller färg på den genom att hålla markören över den (inaktiverat under vägledningen)"
+  },
+  "You can create an error report and report the problem to us at: ": {
+    "message": "Du kan skapa en felrapport och rapportera felet till oss på: "
+  },
+  "You can export everything to a Word document": {
+    "message": "Du kan exportera allt till ett Word-dokument"
+  },
+  "You can have 5 more days to try Plottr": {
+    "message": "Du kan få prova Plottr i fem dagar till"
+  },
+  "You cannot delete the last chapter.": {
+    "message": "Du kan inte ta bort det sista kapitlet."
+  },
+  "You cannot delete the last plotline.": {
+    "message": "Du kan inte ta bort den sista plottlinjen."
+  },
+  "You have unsaved changes": {
+    "message": "Du har ändringar som inte har sparats.\nVill du spara?"
+  },
+  "You have no {type}s": {
+    "message": "Du har inga {type}r"
+  },
+  "You may create a new project": {
+    "message": "Du kan skapa ett nytt projekt\neller välja en projektfil för att börja"
+  },
+  "You need to have an active Plottr Pro account to continue": {
+    "message": "Du behöver ett aktivt  Plottr Pro-konto för att fortsätta"
+  },
+  "Your email didn't verify. Try again or try another email.": {
+    "message": "Din e-postadress kunde inte verifieras.\nFörsök igen eller välj en annan e-postadress."
+  },
+  "You currently have no available licenses for this email.": {
+    "message": "Du har för närvarande inga aktiva licenser för denna e-postadress."
+  },
+  "Your selected license failed verification. Try another one.": {
+    "message": "Den valda licensen kunde inte verifieras. Prova med en annan."
+  },
+  "You should have received a license key after your purchase.": {
+    "message": "Du ska ha fått en licensnyckel efter ditt köp."
+  },
+  "You should have received an email with a code": {
+    "message": "Du ska ha fått ett e-postmeddelande med en kod"
+  },
+  "You'll have 30 days": {
+    "message": "Du har 30 dagar på dig"
+  },
+  "You're on the latest version": {
+    "message": "Du har den senaste versionen"
+  },
+  "Your Plottr file was exported to a .docx file": {
+    "message": "Din Plottr-fil exporterades till en .docx-fil"
+  },
+  "Your Plottr file was exported to a Scrivener project package": {
+    "message": "Din Plottr-fil exporterades till ett Scrivener-projektpaket"
+  },
+  "Your free trial has expired": {
+    "message": "Din gratis provperiod har upphört"
+  },
+  "Your template has been saved and is ready to use": {
+    "message": "Din mall har sparats och är klar att användas"
+  },
+  "Your next great plot begins with Plottr.": {
+    "message": "Din nästa stora plott börjar med Plottr."
+  },
+  "Zoom": {
+    "message": "Zooma"
+  },
+  "[image]": {
+    "message": "[image]"
+  },
+  "a lot of scenes moved around": {
+    "message": "många scener flyttades runt"
+  },
+  "a lot of story lines moved around": {
+    "message": "a lot of story lines moved around"
+  },
+  "and": {
+    "message": "och"
+  },
+  "attach character {characterName} to card {cardName}": {
+    "message": "koppla karaktär { characterName } till kortet { cardName }"
+  },
+  "attach character {characterName} to note {noteName}": {
+    "message": "koppla karaktär { characterName } till anteckningen { noteName }"
+  },
+  "attach place {placeName} to card {cardName}": {
+    "message": "koppla plats { placeName } till kortet { cardName }"
+  },
+  "attach place {placeName} to note {noteName}": {
+    "message": "koppla plats { placeName } till anteckningen { noteName }"
+  },
+  "attach tag {tagName} to card {cardName}": {
+    "message": "koppla tagg { tagName } till kortet { cardName }"
+  },
+  "attach tag {tagName} to note {noteName}": {
+    "message": "koppla tagg { tagName } till anteckningen { noteName }"
+  },
+  "blank": {
+    "message": "tom"
+  },
+  "but don't worry!": {
+    "message": "men oroa dig inte!"
+  },
+  "Character's Categories": {
+    "message": "Karaktärskategorier"
+  },
+  "Checking licenses for {email}": {
+    "message": "Kollar licenser för\n{email}"
+  },
+  "custom character attribute": {
+    "message": "anpassa karaktärsattribut"
+  },
+  "custom place attribute": {
+    "message": "anpassa platsattribut"
+  },
+  "hex code or name": {
+    "message": "hex-kod eller namn"
+  },
+  "new card": {
+    "message": "nytt kort"
+  },
+  "new scene": {
+    "message": "ny scen"
+  },
+  "new storyline": {
+    "message": "ny handlingslinje"
+  },
+  "no more to add": {
+    "message": "inget mer att lägga till"
+  },
+  "or": {
+    "message": "eller"
+  },
+  "remove character {characterName} from card {cardName}": {
+    "message": "ta bort karaktären { characterName } från kortet { cardName }"
+  },
+  "remove character {characterName} from note {noteName}": {
+    "message": "ta bort karaktären { characterName } från anteckningen { noteName }"
+  },
+  "remove place {placeName} from card {cardName}": {
+    "message": "ta bort platsen { placeName } från kortet { cardName }"
+  },
+  "remove place {placeName} from note {noteName}": {
+    "message": "ta bort platsen { placeName } från anteckningen { noteName }"
+  },
+  "remove tag {tagName} from card {cardName}": {
+    "message": "ta bort taggen { tagName } från kortet { cardName }"
+  },
+  "remove tag {tagName} from note {noteName}": {
+    "message": "ta bort taggen { tagName } från anteckningen { noteName }"
+  },
+  "that best suits your style and needs.": {
+    "message": "som bäst passar din stil och dina behov."
+  },
+  "to activate this device.": {
+    "message": "för att aktivera denna enhet."
+  },
+  "with an iOS mobile subscription!": {
+    "message": "med en prenumeration för iOS-mobil!"
+  },
+  "{\n          count, plural,\n          one {1 character attached}\n          other {# characters attached}\n        }": {
+    "message": "{ count, plural,\n    one {1 karaktär tillagd}\n  other {# karaktärer tillagda}\n}"
+  },
+  "{\n          count, plural,\n          one {1 place attached}\n          other {# places attached}\n        }": {
+    "message": "{ count, plural,\n    one {1 plats tillagd}\n  other {# platser tillagda}\n}"
+  },
+  "{\n          count, plural,\n          one {1 tag attached}\n          other {# tags attached}\n        }": {
+    "message": "{ count, plural,\n    one {1 tagg tillagd}\n  other {# taggar tillagda}\n}"
+  },
+  "{amount} Lifetime": {
+    "message": "${amount}\nLivstid"
+  },
+  "{amount} Monthly": {
+    "message": "${amount}\nper månad"
+  },
+  "{amount} Weekly": {
+    "message": "${amount}\nper vecka"
+  },
+  "{amount} Yearly": {
+    "message": "${amount}\nper år"
+  },
+  "{date, date, long}": {
+    "message": "{ datum, datum, lång }"
+  },
+  "{date, date, medium}": {
+    "message": "{ datum, datum, medium }"
+  },
+  "{date, date, monthDay}": {
+    "message": "{ datum, datum, månadDag }"
+  },
+  "{numOfDays, plural,\n      =0 {# days left}\n      one {# day left}\n      other {# days left}\n    }": {
+    "message": "{ numOfDays, plural,\n     =0 {# dagar kvar}\n    one {# dag kvar}\n  other {# dagar kvar}\n}"
+  },
+  "{num} Scenes": {
+    "message": "{ num } scener"
+  },
+  "{val, number, percent}": {
+    "message": "{ värde, siffra, procent }"
+  },
+  "{wordCount,number} words": {
+    "message": "{ antal ord, siffra} words"
+  },
+  "Add attributes": {
+    "message": "Lägg till attribut"
+  },
+  "Attached to": {
+    "message": "Tillagd i"
+  },
+  "Bring All to Front": {
+    "message": "Flytta fram alla"
+  },
+  "Buy the Full Version": {
+    "message": "Köp fullversionen"
+  },
+  "Card Title": {
+    "message": "Kortets titel"
+  },
+  "character": {
+    "message": "karaktär"
+  },
+  "Choose color": {
+    "message": "Välj färg"
+  },
+  "Choose what you want to track about your characters": {
+    "message": "Välj vad du vill spåra om dina karaktärer"
+  },
+  "Choose what you want to track about your places": {
+    "message": "Välj vad du vill spåra om dina platser"
+  },
+  "Click here to get the full version": {
+    "message": "Klicka här för att få fullversionen"
+  },
+  "Contact": {
+    "message": "Kontakt"
+  },
+  "Create a new file": {
+    "message": "Skapa en ny fil"
+  },
+  "Creates a report to send me": {
+    "message": "Skapar en rapport att skicka till mig"
+  },
+  "Creating your file didn't work. Let's try again.": {
+    "message": "Det gick inte att skapa filen. Låt oss försöka igen."
+  },
+  "Credits": {
+    "message": "Tack till"
+  },
+  "Custom Attributes for Characters": {
+    "message": "Anpassade attribut för karaktär"
+  },
+  "Custom Attributes for Places": {
+    "message": "Anpassade attribut för platser"
+  },
+  "Do you want to delete this card: { title }?": {
+    "message": "Vill du ta bort det här kortet: { title }?"
+  },
+  "Do you want to delete this character: { character }?": {
+    "message": "Vill du ta bort den här karaktären: { character }?"
+  },
+  "Do you want to delete this note: { title }?": {
+    "message": "Vill du ta bort den här anteckningen: { title }?"
+  },
+  "Do you want to delete this place: { name }?": {
+    "message": "Vill du ta bort den här platsen: { name }?"
+  },
+  "Do you want to delete this scene: { title }?": {
+    "message": "Vill du ta bort den här scenen: { title }?"
+  },
+  "Do you want to delete this story line: { title }?": {
+    "message": "Vill du ta bort den här handlingslinjen: { title }?"
+  },
+  "Do you want to delete this tag: { title }?": {
+    "message": "Vill du ta bort den här taggen: { title }?"
+  },
+  "Enter License": {
+    "message": "Ange licens"
+  },
+  "Filter by story line": {
+    "message": "Filtrera på handlingslinje"
+  },
+  "Fit": {
+    "message": "Passa in"
+  },
+  "Format with markdown!": {
+    "message": "Format med markdown!"
+  },
+  "Forums": {
+    "message": "Forum"
+  },
+  "Give feedback": {
+    "message": "Ge feedback"
+  },
+  "If you keep seeing this problem, email me at support@plottr.com": {
+    "message": "Om detta problem kvarstår, e-posta mig på support@plottr.com"
+  },
+  "It looks like you have Plottr on 5 computers already": {
+    "message": "Du verkar redan ha Plottr på 5 datorer"
+  },
+  "It looks like you have an older file version. This could make things work funky or not at all. May Plottr update it for you?": {
+    "message": "Du verkar ha en äldre filversion. Detta kan göra att saker fungerar sämre eller inte alls. Får Plottr uppdatera den åt dig?"
+  },
+  "It looks like your file was saved with a newer version of Plottr than you're using now. That could cause problems. Try updating Plottr and starting it again.": {
+    "message": "Det verkar som att filen har sparats med en nyare version av Plottr än den du använder nu. Det kan orsaka problem. Prova att uppdatera Plottr och starta om."
+  },
+  "It will save a backup first which will be saved to the same folder as this file": {
+    "message": "Den sparar först en säkerhetskopia som sparas i samma mapp som den här filen"
+  },
+  "License verification failed": {
+    "message": "Licensverifieringen misslyckades"
+  },
+  "License verified! You're all set.": {
+    "message": "Licensen är verifierad! Du är redo."
+  },
+  "Line": {
+    "message": "Rad"
+  },
+  "Loading...": {
+    "message": "Läser in..."
+  },
+  "Minimize": {
+    "message": "Minimera"
+  },
+  "My awesome story": {
+    "message": "Min otroliga historia"
+  },
+  "Nope. Plottr tried again. But it didn't work. Plottr will ask you next time it opens, but you're verified. Enjoy": {
+    "message": "Nää. Plottr försökte igen, men det fungerade inte. Plottr kommer att fråga igen nästa gång det startar, men du är verifierad. Mycket nöje"
+  },
+  "Now let's get to the good stuff": {
+    "message": "Låt oss sätta igång med de goda grejerna"
+  },
+  "Open the Tour": {
+    "message": "Öppna genomgången"
+  },
+  "Or feel free to contact me with any questions": {
+    "message": "Eller kontakta mig med eventuella frågor"
+  },
+  "place": {
+    "message": "plats"
+  },
+  "Please upload the file named plottr_error_report.txt in your Documents folder": {
+    "message": "Ladda upp filen som heter plottr_error_report.txt i din dokumentmapp"
+  },
+  "Plottr couldn't save a backup. It hasn't touched your file yet, so don't worry. Try quitting Plottr and starting it again.": {
+    "message": "Plottr kunde inte spara någon säkerhetskopia. Den har inte rört din fil än, så var lugn. Prova med att stänga av Plottr och starta om den."
+  },
+  "Plottr saved a backup just in case and now on with the show (To use the backup, remove '.backup' from the file name)": {
+    "message": "Plottr sparade en säkerhetskopia för säkerhets skull och nu kör vi vidare (För att använda säkerhetskopian, ta bort ‘säkerhetskopia’ från filnamnet)"
+  },
+  "Plottr tried saving a backup just in case, but it didn't work. Try quitting Plottr and starting it again.": {
+    "message": "Plottr försökte att spara en säkerhetskopia för säkerhets skull, men det fungerade inte. Prova att stänga Plottr och starta om de."
+  },
+  "Plottr updated your file without a problem. Don't forget to save your file.": {
+    "message": "Plottr uppdaterade din fil utan problem. Kom ihåg att spara din fil."
+  },
+  "Plottr verified your license key successfully, but there was an error saving that. Let's try one more time": {
+    "message": "Plottr verifierade din licensnyckel, men den kunde inte sparas. Vi försöker en gång till"
+  },
+  "Problem saving backup": {
+    "message": "Problem med att spara säkerhetskopia"
+  },
+  "Report a problem": {
+    "message": "Rapportera ett problem"
+  },
+  "Request a feature": {
+    "message": "Begär en funktion"
+  },
+  "Reset": {
+    "message": "Återställ"
+  },
+  "Save & Close": {
+    "message": "Spara och stäng"
+  },
+  "Scene 1": {
+    "message": "Scen 1"
+  },
+  "Scene {number}": {
+    "message": "Scen {number}"
+  },
+  "Scene {number} name": {
+    "message": "Namn på scen {number}"
+  },
+  "Story line name": {
+    "message": "Namn på händelselinje"
+  },
+  "TRIAL Version": {
+    "message": "PROVversion"
+  },
+  "Try again by clicking in the menu: Plottr > Verify License...": {
+    "message": "Prova igen genom att klicka i menyn: Plottr > Verifiera licens..."
+  },
+  "Update Plottr": {
+    "message": "Uppdatera Plottr"
+  },
+  "Upload the file Plottr just exported": {
+    "message": "Ladda upp filen som Plottr precis exporterade"
+  },
+  "Use the code \"freetrial\" to get the secret discount": {
+    "message": "Använd koden \"freetrial\" för att få den hemliga rabatten"
+  },
+  "Verifying your license. Please wait...": {
+    "message": "Verifierar din licens. Vänta..."
+  },
+  "Where would you like to start your new file?": {
+    "message": "Var vill du påbörja din nya fil?"
+  },
+  "Would you like to open an existing file or start a new file?": {
+    "message": "Vill du öppna en befintlig fil eller påbörja en ny?"
+  },
+  "Would you like to save before exiting?": {
+    "message": "Vill du spara innan du avslutar?"
+  },
+  "You should have received a license key from Gumroad.": {
+    "message": "Du ska ha fått en licensnyckel från Gumroad."
+  },
+  "Your free trial has expired!": {
+    "message": "Din gratis provperiod har upphört!"
+  },
+  "a new card": {
+    "message": "ett nytt kort"
+  },
+  "description": {
+    "message": "beskrivning"
+  },
+  "learn how": {
+    "message": "lär dig hur"
+  },
+  "name": {
+    "message": "namn"
+  },
+  "New Card": {
+    "message": "Nytt kort"
+  },
+  "new character": {
+    "message": "ny karaktär"
+  },
+  "new note": {
+    "message": "ny anteckning"
+  },
+  "new place": {
+    "message": "ny plats"
+  },
+  "new tag": {
+    "message": "ny tagg"
+  },
+  "no, just exit": {
+    "message": "nej, avsluta bara"
+  },
+  "no, open the file as-is": {
+    "message": "nej, öppna filen som den är"
+  },
+  "ok": {
+    "message": "okej"
+  },
+  "story line": {
+    "message": "händelselinje"
+  },
+  "tag name": {
+    "message": "taggens namn"
+  },
+  "title": {
+    "message": "titel"
+  },
+  "yes, save!": {
+    "message": "ja, spara!"
+  },
+  "yes, update the file": {
+    "message": "ja, uppdatera filen"
+  },
+  "{\n      count, plural,\n        one {1 carte}\n        other {# cartes}\n    }": {
+    "message": "{\n      count, plural,\n        one {1 kort}\n        other {# kort}\n    }"
+  },
+  "{\n      count, plural,\n        one {1 note}\n        other {# notes}\n    }": {
+    "message": "{\n      count, plural,\n        one {1 anteckning}\n        other {# anteckningar}\n    }"
+  },
+  "{days} days remaining": {
+    "message": "{days} dagar kvar"
+  },
+  "Are you sure you want to delete {template}?": {
+    "message": "Är du säker på att du vill ta bort {template}?"
+  },
+  "Character Custom Attributes": {
+    "message": "Anpassade attribut för karaktär"
+  },
+  "Check for updates": {
+    "message": "Sök efter uppdateringar"
+  },
+  "Checking for updates": {
+    "message": "Söker efter uppdateringar"
+  },
+  "Choose an image below or upload a new one": {
+    "message": "Välj en bild nedan eller ladda upp en ny"
+  },
+  "Could not display license key. Try again": {
+    "message": "Kunde inte visa licensnyckel. Försök igen"
+  },
+  "Crafted in the Mountains of Utah": {
+    "message": "Skapad i bergen i Utah"
+  },
+  "Create an error report": {
+    "message": "Skapa en felrapport"
+  },
+  "Create unlimited story files": {
+    "message": "Skapa ett obegränsat antal berättelsefiler"
+  },
+  "Do you want to delete this book: { book }?": {
+    "message": "Vill du ta bort denna bok: { book }?"
+  },
+  "Do you want to delete this chapter: { title }?": {
+    "message": "Vill du ta bort detta kapitel: { title }?"
+  },
+  "Download Now": {
+    "message": "Ladda ned nu"
+  },
+  "Downloading ({percent}%)": {
+    "message": "Laddar ner ({percent}%)"
+  },
+  "Enter a customer service code": {
+    "message": "Ange en ärendekod"
+  },
+  "Enter your code": {
+    "message": "Ange din kod"
+  },
+  "Error": {
+    "message": "Fel"
+  },
+  "Extending your trial didn't work. Let's try again.": {
+    "message": "Det gick inte att förlänga din provperiod. Låt oss försöka igen."
+  },
+  "Facebook Support Group": {
+    "message": "Supportgrupp på Facebook"
+  },
+  "Here is your license key": {
+    "message": "Här är din licensnyckel"
+  },
+  "New File": {
+    "message": "Ny fil"
+  },
+  "New from Template": {
+    "message": "Ny från mall"
+  },
+  "No updates available": {
+    "message": "Inga uppdateringar tillgängliga"
+  },
+  "No more {type}s": {
+    "message": "Inga fler {type}er"
+  },
+  "Open File": {
+    "message": "Öppna fil"
+  },
+  "Plottr Trial": {
+    "message": "Plottr provversion"
+  },
+  "Plottr created a file named plottr_error_report.txt in your Documents folder": {
+    "message": "Plottr skapade en fil som heter plottr_error_report.txt i din dokumentmapp"
+  },
+  "Quit and Install": {
+    "message": "Avsluta och installera"
+  },
+  "See the Changelog": {
+    "message": "Se ändringsloggen"
+  },
+  "This is your Device ID": {
+    "message": "Detta är ditt enhets-ID"
+  },
+  "Try that again, but if it keeps happening, use the help menu to create an error report and report the problem.": {
+    "message": "Försök igen. Använd hjälpmenyn för att skapa en felrapport och rapportera problemet om det fortsätter att inträffa."
+  },
+  "Update Ready": {
+    "message": "Uppdatering klar"
+  },
+  "Update available!": {
+    "message": "Uppdatering tillgänglig!"
+  },
+  "Upload a new image": {
+    "message": "Ladda upp ny bild"
+  },
+  "View Device ID": {
+    "message": "Visa enhets-ID"
+  },
+  "View License Key": {
+    "message": "Visa licensnyckel"
+  },
+  "View the Tour": {
+    "message": "Visa genomgången"
+  },
+  "paragraph": {
+    "message": "paragraf"
+  },
+  "selected": {
+    "message": "vald"
+  },
+  "{\n      count, plural,\n        one {1 card}\n        other {# cards}\n    }": {
+    "message": "{\n      count, plural,\n        one {1 kort}\n        other {# kort}\n    }"
+  },
+  "(Series View)": {
+    "message": "(Serievy)"
+  },
+  ".docx": {
+    "message": ".docx"
+  },
+  ".scriv": {
+    "message": ".scriv"
+  },
+  "Act": {
+    "message": "Akt"
+  },
+  "Act Structure": {
+    "message": "Aktstruktur"
+  },
+  "Action": {
+    "message": "Åtgärd"
+  },
+  "Advanced...": {
+    "message": "Avancerad..."
+  },
+  "Appearance: Dark/Light": {
+    "message": "Utseende: mörkt/ljust"
+  },
+  "Are you sure? Removing a level will delete the timeline cards directly under this level's heading cards (from all books across the project).": {
+    "message": "Är du säker? Om denna nivå tas bort försvinner alla tidslinjekort som finns under rubrikkorten på denna nivå (från alla böcker i projektet)."
+  },
+  "Auto Number": {
+    "message": "Automatisk numrering"
+  },
+  "Auto-Save": {
+    "message": "Spara automatiskt"
+  },
+  "Background Color": {
+    "message": "Bakgrundsfärg"
+  },
+  "Backup Options": {
+    "message": "Alternativ för säkerhetskopiering"
+  },
+  "Backups beyond this will be erased": {
+    "message": "Säkerhetskopior utöver denna raderas"
+  },
+  "Beats": {
+    "message": "Slag"
+  },
+  "Beta": {
+    "message": "Beta"
+  },
+  "Black (default)": {
+    "message": "Svart (standard)"
+  },
+  "Blue (default)": {
+    "message": "Blå (standard)"
+  },
+  "Body": {
+    "message": "Huvudtext"
+  },
+  "Border Color": {
+    "message": "Kantfärg"
+  },
+  "Border Style": {
+    "message": "Kantstil"
+  },
+  "Character Image": {
+    "message": "Bild på karaktär"
+  },
+  "Character Name": {
+    "message": "Karaktärens namn"
+  },
+  "Choose what categories you want to put your notes into": {
+    "message": "Välj i vilka kategorier du vill lägga anteckningarna"
+  },
+  "Choose what categories you want to put your tags into": {
+    "message": "Välj i vilka kategorier du vill lägga taggarna"
+  },
+  "Choose your backup location": {
+    "message": "Välj plats för säkeretskopiering"
+  },
+  "Colors": {
+    "message": "Färger"
+  },
+  "Comedy": {
+    "message": "Komedi"
+  },
+  "Create New Project": {
+    "message": "Skapa nytt projekt"
+  },
+  "DELETE": {
+    "message": "TA BORT"
+  },
+  "Dark": {
+    "message": "Mörk"
+  },
+  "Days of Backups": {
+    "message": "Dagars säkerhetskopiering"
+  },
+  "Don't forget to make a backup of your files first.": {
+    "message": "Kom ihåg att säkerhetskopiera dina filer först."
+  },
+  "Edit {beatName}": {
+    "message": "Redigera {beatName}"
+  },
+  "Edit {lineName}": {
+    "message": "Redigera {lineName}"
+  },
+  "Export to:": {
+    "message": "Exportera till:"
+  },
+  "General": {
+    "message": "Allmän"
+  },
+  "Get a License": {
+    "message": "Skaffa en licens"
+  },
+  "Give this file a new name": {
+    "message": "Ge den här filen ett namn"
+  },
+  "Green (default)": {
+    "message": "Grön (standard)"
+  },
+  "It looks like you've used all your license activations. Manage or upgrade here: <a>My Plottr Account</a>": {
+    "message": "Du verkar ha använt alla licensaktiveringar. Hantera eller uppgradera här: <a>Mitt Plottr-konto</a>"
+  },
+  "Levels": {
+    "message": "Nivåer"
+  },
+  "Light": {
+    "message": "Ljus"
+  },
+  "Mystery": {
+    "message": "Mystik"
+  },
+  "Note Categories": {
+    "message": "Anteckningskategorier"
+  },
+  "Note Title": {
+    "message": "Anteckningstitel"
+  },
+  "Orange (default)": {
+    "message": "Orange (standard)"
+  },
+  "Organize your scene cards into Chapters and Acts": {
+    "message": "Organisera dina scenkort i kapitel och akter"
+  },
+  "Place Name": {
+    "message": "Platsens namn"
+  },
+  "Put Description in:": {
+    "message": "Lägg beskrivning i:"
+  },
+  "Red (default)": {
+    "message": "Röd (standard)"
+  },
+  "Romance": {
+    "message": "Romance"
+  },
+  "Save these settings across projects?": {
+    "message": "Spara dessa inställningar för alla projekt?"
+  },
+  "Screenplay": {
+    "message": "Filmmanus"
+  },
+  "Structure": {
+    "message": "Struktur"
+  },
+  "Synopsis": {
+    "message": "Synopsis"
+  },
+  "System": {
+    "message": "System"
+  },
+  "Tag Categories": {
+    "message": "Taggkategorier"
+  },
+  "Tags / Characters / Places": {
+    "message": "Taggar/karaktärer/platser"
+  },
+  "Text Color": {
+    "message": "Textfärg"
+  },
+  "Text Size": {
+    "message": "Textstorlek"
+  },
+  "Title Page": {
+    "message": "Titelblad"
+  },
+  "To give feedback on this feature, please visit:": {
+    "message": "För att ge feedback om denna funktion, gå till:"
+  },
+  "Use Templates": {
+    "message": "Använd mallar"
+  },
+  "White (default)": {
+    "message": "Vit (standard)"
+  },
+  "Yellow (default)": {
+    "message": "Gul (standard)"
+  },
+  "[Blank]": {
+    "message": "[tom]"
+  },
+  "last edited": {
+    "message": "senast redigerad"
+  },
+  "plottr.com/beta": {
+    "message": "plottr.com/beta"
+  },
+  "How to turn on Act Structure": {
+    "message": "Aktivera aktstruktur"
+  },
+  "On the top right corner of the app, click the 'Dashboard' button.": {
+    "message": "I övre högra hörnet på appen klickar du på knappen ‘Instrumentpanel’."
+  },
+  "From the 'Dashboard', click 'Settings' from the side menu.": {
+    "message": "På ‘Instrumentpanel’ klickar du på ‘Inställningar’ i sidomenyn."
+  },
+  "On the 'Settings' modal, click on the 'Beta tab.": {
+    "message": "I ‘Inställningar’ klickar du på fliken 'Beta'."
+  },
+  "Finally, toggle the switch to turn on/off Act Structure.": {
+    "message": "Använd sedan reglaget för att aktivera/inaktivera Aktstruktur."
+  },
+  "Import": {
+    "message": "Importera"
+  },
+  "Woohoo! Scene card moved to": {
+    "message": "Woohoo! Scenkortet är flyttat till"
+  },
+  "Woohoo! Scene card duplicated": {
+    "message": "Woohoo! Scenkortet har duplicerats"
+  },
+  "Enter title": {
+    "message": "Ange titel"
+  },
+  "Duplicate": {
+    "message": "Duplicera"
+  },
+  "({ thing }).": {
+    "message": "({ sak })."
+  },
+  "+ Add Template": {
+    "message": "+ Lägg till mall"
+  },
+  "Access all the features": {
+    "message": "Kom åt alla funktioner"
+  },
+  "Active": {
+    "message": "Aktiv"
+  },
+  "Advanced": {
+    "message": "Avancerad"
+  },
+  "Also save backups on this device": {
+    "message": "Spara också säkerhetskopior på den här enheten"
+  },
+  "Always Open Dashboard First": {
+    "message": "Öppna alltid instrumentpanelen först"
+  },
+  "Are you sure you want to deactivate your license key?": {
+    "message": "Är du säker på att du vill inaktivera din licensnyckel?"
+  },
+  "Are you sure you want to delete all chapters and their scene cards in \"{beatTitle}\".": {
+    "message": "Är du säker på att du vill ta bort alla kapitel och deras scenkort från \"{beatTitle}\"."
+  },
+  "Are you sure you want to delete all scene cards in \"{beatTitle}\".": {
+    "message": "Är du säker på att du vill ta bort alla scenkort från \"{beatTitle}\"."
+  },
+  "Are you sure you want to remove the {template} template and all its data?": {
+    "message": "Är du säker på att du vill ta bort mallen {template} och alla dess data?"
+  },
+  "At least two levels of hierarchy required to view as tabs": {
+    "message": "Minst två hierarkinivåer krävs för att visa som flikar"
+  },
+  "Browser": {
+    "message": "Webbläsare"
+  },
+  "Can't move card to empty book": {
+    "message": "Kan inte flytta ort till en tom bok"
+  },
+  "Change book": {
+    "message": "Byt bok"
+  },
+  "Change color": {
+    "message": "Byt färg"
+  },
+  "Children": {
+    "message": "Barn"
+  },
+  "Choose what categories you want to put your places into": {
+    "message": "Välj i vilka kategorier du vill lägga dina platser"
+  },
+  "Choose what to upload": {
+    "message": "Välj vad som ska laddas upp"
+  },
+  "Choose your Scrivener project": {
+    "message": "Välj ditt Scrivener-projekt"
+  },
+  "Clear Timeline": {
+    "message": "Rensa tidslinje"
+  },
+  "Click here to log in": {
+    "message": "Klicka här för att logga in"
+  },
+  "Collaborator": {
+    "message": "Samarbetspartner"
+  },
+  "Configure Pro settings": {
+    "message": "Konfigurera Pro-inställningar"
+  },
+  "Confirm Placement": {
+    "message": "Bekräfta placering"
+  },
+  "Continue": {
+    "message": "Fortsätt"
+  },
+  "Continue working when your connection goes down.": {
+    "message": "Fortsätt att arbeta när uppkopplingen försvinner."
+  },
+  "Create unlimited projects": {
+    "message": "Skapa ett obegränsat antal projekt"
+  },
+  "Deactivate": {
+    "message": "Inaktivera"
+  },
+  "Default": {
+    "message": "Standard"
+  },
+  "Default Placement": {
+    "message": "Standardplacering"
+  },
+  "Delete plotline": {
+    "message": "Ta bort plottlinje"
+  },
+  "Disabled": {
+    "message": "Inaktiverad"
+  },
+  "Done!": {
+    "message": "Klar!"
+  },
+  "Duplicate plotline": {
+    "message": "Duplicera plottlinje"
+  },
+  "Edit title": {
+    "message": "Redigera titel"
+  },
+  "Enabled": {
+    "message": "Aktiverad"
+  },
+  "Expand or collapse all stacks": {
+    "message": "Visa eller minimera alla staplar"
+  },
+  "Expand or collapse stacks": {
+    "message": "Visa eller minimera staplar"
+  },
+  "Font Default: Text Editor": {
+    "message": "Standardtypsnitt: textredigerare"
+  },
+  "From the \"Dashboard\", click \"Settings\" from the side menu.": {
+    "message": "På \"Instrumentpanelen\" klickar du på \"Inställningar\" i sidomenyn."
+  },
+  "Give Feedback": {
+    "message": "Ge feedback"
+  },
+  "Go!": {
+    "message": "Go!"
+  },
+  "Hides sensitive info for when you are sharing your screen": {
+    "message": "Döljer känslig information när du delar din skärm"
+  },
+  "Horror": {
+    "message": "Skräck"
+  },
+  "I have Plottr Pro": {
+    "message": "Jag har Plottr Pro"
+  },
+  "I have a<br/>License Key": {
+    "message": "Jag har en<br/>licensnyckel"
+  },
+  "I'm Done!": {
+    "message": "Jag är klar!"
+  },
+  "Import File": {
+    "message": "Importera fil"
+  },
+  "It doesn't look like you have a pro license.": {
+    "message": "Du verkar inte ha en pro-licens."
+  },
+  "It looks like you already have an active trial.": {
+    "message": "Du verkar redan ha en aktiv provversion."
+  },
+  "It looks like your version of Plottr is older than this project. Please update Plottr to avoid any issues": {
+    "message": "Din version av Plottr verkar vara äldre än det här projektet. Uppdatera Plottr för att undvika problem"
+  },
+  "Last step": {
+    "message": "Sista steget"
+  },
+  "Let's set up your Pro account": {
+    "message": "Låt oss skapa ditt Pro-konto"
+  },
+  "License Information": {
+    "message": "Licensinformation"
+  },
+  "Move card to { bookTitle }": {
+    "message": "Flytta kort till { bookTitle }"
+  },
+  "Move plotline": {
+    "message": "Flytta plottlinje"
+  },
+  "Name Your Project:": {
+    "message": "Namnge ditt projekt:"
+  },
+  "No Matches": {
+    "message": "Inga matchningar"
+  },
+  "No files found.": {
+    "message": "Inga filer hittades."
+  },
+  "None": {
+    "message": "Inga"
+  },
+  "Not Active": {
+    "message": "Inte aktiv"
+  },
+  "Not Now": {
+    "message": "Inte nu"
+  },
+  "Offline": {
+    "message": "Offline"
+  },
+  "Offline Mode": {
+    "message": "Offlineläge"
+  },
+  "Ok": {
+    "message": "Okej"
+  },
+  "On the \"Settings\" modal, click on the \"Beta\" tab.": {
+    "message": "I läget \"Inställningar\" klickar du på fliken \"Beta\"."
+  },
+  "On the top right corner of the app, click the \"Dashboard\" button.": {
+    "message": "I appens övre högra hörn klickar du på knappen \"Instrumentpanel\"."
+  },
+  "Open Existing File": {
+    "message": "Öppna befintlig fil"
+  },
+  "Owner": {
+    "message": "Ägare"
+  },
+  "Permission": {
+    "message": "Behörighet"
+  },
+  "Place Categories": {
+    "message": "Platskategorier"
+  },
+  "Playwriting": {
+    "message": "Skriva pjäs"
+  },
+  "Plottr created a file named {filePath} in your Documents folder": {
+    "message": "Plottr skapade en fil som heter {filePath} i din dokumentmapp"
+  },
+  "Plottr opens your most recent project at start": {
+    "message": "Plottr öppnar ditt senaste projekt vid start"
+  },
+  "Plottr ran into a problem and can't start.  Please contact support.": {
+    "message": "Ett problem inträffade och Plottr kan inte starta. Kontakta supporten."
+  },
+  "Plottr ran into an issue opening your project. Please check your backups or contact support about this project and we will get it running for you quickly.": {
+    "message": "Ett problem inträffade när Plottr skulle öppna projektet. Se dina säkerhetskopior eller kontakta supporten om projektet så ska vi snabbt få igång det åt dig."
+  },
+  "Plottr ran into an issue opening your project. Please check your backups or contact support with this file and we will get it running for you quickly.": {
+    "message": "Ett problem inträffade när Plottr skulle öppna projektet. Se dina säkerhetskopior eller kontakta supporten med filen så ska vi snabbt få igång det åt dig."
+  },
+  "Preview:": {
+    "message": "Förhandsgranska:"
+  },
+  "Pro Subscription": {
+    "message": "Pro-prenumeration"
+  },
+  "Product Name": {
+    "message": "Produktnamn"
+  },
+  "Projects": {
+    "message": "Projekt"
+  },
+  "Remove template": {
+    "message": "Ta bort mall"
+  },
+  "Requires you to restart plottr": {
+    "message": "Kräver att du startar om plottr"
+  },
+  "Restore Default": {
+    "message": "Återställ standard"
+  },
+  "Restore Defaults": {
+    "message": "Återställ standarder"
+  },
+  "Save and Open": {
+    "message": "Spara och öppna"
+  },
+  "Save backups on this device": {
+    "message": "Spara säkerhetskopior på denna enhet"
+  },
+  "Save backups to this device as well as in the cloud": {
+    "message": "Spara säkerhetskopior på denna enhet och i molnet"
+  },
+  "Saved in the Cloud": {
+    "message": "Sparad i molnet"
+  },
+  "Scrivener file": {
+    "message": "Scrivener-fil"
+  },
+  "Search Documentation": {
+    "message": "Sökdokumentation"
+  },
+  "See? That was painless 😁": {
+    "message": "Se? Det gick ju smärtfritt 😁"
+  },
+  "Short Story": {
+    "message": "Novell"
+  },
+  "Show File": {
+    "message": "Visa fil"
+  },
+  "Sign in": {
+    "message": "Logga  in"
+  },
+  "Sign in with your my.plottr.com account": {
+    "message": "Logga in med ditt my.plottr.com account"
+  },
+  "Snowflake Pro": {
+    "message": "Snowflake Pro"
+  },
+  "Spell Check": {
+    "message": "Stavningskontroll"
+  },
+  "Stacked": {
+    "message": "Staplade"
+  },
+  "Start the<br/>Free Trial": {
+    "message": "Starta<br/>gratis provperiod"
+  },
+  "Start with Template": {
+    "message": "Starta med mall"
+  },
+  "Status": {
+    "message": "Status"
+  },
+  "Streaming Friendly": {
+    "message": "Streamingvänlig"
+  },
+  "Stress test saving": {
+    "message": "Stresstest-sparande"
+  },
+  "Successfully resumed.": {
+    "message": "Har återupptagits."
+  },
+  "Tabbed": {
+    "message": "Tabbad"
+  },
+  "Take Control": {
+    "message": "Ta kontroll"
+  },
+  "Testing utilities": {
+    "message": "Testenheter"
+  },
+  "The cloud file is different from your local copy.  We created a duplicate of your local file and switched to the cloud file.": {
+    "message": "Molnfilen skiljer sig från din lokala kopia. Vi skapade en dubblett av den lokala filen och växlade till molnfilen."
+  },
+  "There was an error doing that. Try again.": {
+    "message": "Något gick fel när vi skulle göra det. Försök igen."
+  },
+  "There was an error reconnecting.  Please save the file and restart Plottr.": {
+    "message": "Kunde inte ansluta.  Spara filen och starta om Plottr."
+  },
+  "There was an error uploading your offline backup. Please exit and start again": {
+    "message": "Kunde inte ladda upp din offline-säkerhetskopia. Avsluta och starta om"
+  },
+  "This appears to be a Plottr Pro file.  Please log in.": {
+    "message": "Detta verkar vara en Plottr Pro-fil.  Logga in."
+  },
+  "This will be quick and painless. There are only 3 steps:": {
+    "message": "Detta går snabbt och smärtfritt. Det är bara 3 steg:"
+  },
+  "Timeline Structure": {
+    "message": "Timeline Structure"
+  },
+  "To use \"{ thing }\" in Plottr Pro, you need to upload it first.": {
+    "message": "För att använda \"{ thing }\" i Plottr Pro måste du ladda upp den först."
+  },
+  "Update failed. <b>Try again</b> or <a>install manually</a>": {
+    "message": "Uppdateringen misslyckades. <b>Försök igen</b> eller <a>installera manuellt</a>"
+  },
+  "Upload": {
+    "message": "Ladda upp"
+  },
+  "Upload ALL projects & templates": {
+    "message": "Ladda upp ALLA projekt och mallar"
+  },
+  "Upload Existing Project": {
+    "message": "Ladda upp befintligt projekt"
+  },
+  "Upload to Plottr Pro?": {
+    "message": "Upload to Plottr Pro?"
+  },
+  "Upload your projects and templates": {
+    "message": "Ladda upp dina projekt och mallar"
+  },
+  "Uploading": {
+    "message": "Laddar upp"
+  },
+  "Uploading...": {
+    "message": "Ladda upp..."
+  },
+  "View Backups": {
+    "message": "Visa säkerhetskopior"
+  },
+  "View timeline ith tabs for the highest level": {
+    "message": "Visa tidslinje med flikar för högsta nivån"
+  },
+  "Viewer": {
+    "message": "Visningsprogram"
+  },
+  "We couldn't find a Pro account with that email": {
+    "message": "Vi kunde inte hitta något Pro-konto med den e-postadressen"
+  },
+  "We ran into problems uploading some files": {
+    "message": "Vi stötte på problem när några filer skulle laddas upp"
+  },
+  "Welcome to Plottr Pro": {
+    "message": "Välkommen till Plottr Pro"
+  },
+  "When Plottr opens, the first thing you'll see is the dashboard": {
+    "message": "När Plottr öppnas är det första du ser en instrumentpanel"
+  },
+  "Wrong file format": {
+    "message": "Fel filformat"
+  },
+  "You can always change these later": {
+    "message": "Du kan alltid ändra de här senare"
+  },
+  "You need to update Plottr": {
+    "message": "Du måste uppdatera Plottr"
+  },
+  "Your changes were uploaded to the cloud.": {
+    "message": "Dina ändringar har laddats upp i molnet."
+  },
+  "but don't panic, you haven't lost anything": {
+    "message": "men lugn, du har inte förlorat något"
+  },
+  "{type} template": {
+    "message": "{type}-mall"
+  },
+  "Sharing": {
+    "message": "Delning"
+  },
+  "Send Invite": {
+    "message": "Skicka inbjudan"
+  },
+  "Email Address": {
+    "message": "E-postadress"
+  },
+  "Permissions": {
+    "message": "Behörigheter"
+  },
+  "Download": {
+    "message": "Ladda ner"
+  },
+  "Import from Snowflake Pro": {
+    "message": "Importera från Snowflake Pro"
+  },
+  "See What’s New": {
+    "message": "Se vad som är nytt"
+  },
+  "About": {
+    "message": "Om"
+  },
+  "Beta Information": {
+    "message": "Beta-information"
+  },
+  "Beta Email": {
+    "message": "Beta-mejladress"
+  },
+  "Admin": {
+    "message": "Admin"
+  },
+  "Remove Pro on this Device": {
+    "message": "Ta bort Pro från denna enhet"
+  },
+  "Use this if you logged into Pro by accident": {
+    "message": "Använd denna om du loggade in på Pro av misstag"
+  },
+  "Are you sure you want to delete {plotline}?": {
+    "message": "Är du säker på att du vill ta bort {plotline}?"
+  },
+  "Are you sure you want to delete {chapter #}?": {
+    "message": "Är du säker på att du vill ta bort {chapter #}?"
+  },
+  "Custom Attributes For Scenes": {
+    "message": "Anpassade attribut för scener"
+  },
+  "Choose what you want to track about your scenes": {
+    "message": "Välj vad du vill spåra om dina scener"
+  },
+  "Edit New Plotline": {
+    "message": "Redigera ny plottlinje"
+  },
+  "Timeline Settings": {
+    "message": "Inställningar för tidslinje"
+  },
+  "Dashed": {
+    "message": "Streckad"
+  },
+  "Solid": {
+    "message": "Heldragen"
+  },
+  "Dotted": {
+    "message": "Punkter"
+  },
+  "Enter some text…": {
+    "message": "Skriv text…"
+  },
+  "Custom Attributes For Characters": {
+    "message": "Anpassade attribut för karaktärer"
+  },
+  "text": {
+    "message": "text"
+  },
+  "Custom Attributes For Places": {
+    "message": "Anpassade attribut för platser"
+  },
+  "scenes": {
+    "message": "scener"
+  },
+  "Main plot": {
+    "message": "Huvudberättelse"
+  },
+  "characters": {
+    "message": "karaktärer"
+  },
+  "Download Complete ًںژ‰ (version {version})": {
+    "message": "Nedladdning klar ًںژ‰ (version {version})"
+  },
+  "Guided tours": {
+    "message": "Genomgångar"
+  },
+  "Act structure": {
+    "message": "Aktstruktur"
+  },
+  "none": {
+    "message": "ingen"
+  },
+  "dashed": {
+    "message": "streckad"
+  },
+  "solid": {
+    "message": "heldragen"
+  },
+  "dotted": {
+    "message": "punkter"
+  },
+  "Saving worked this time": {
+    "message": "Den här gången fungerade det att spara"
+  },
+  "auto": {
+    "message": "automatisk"
+  },
+  "untitled": {
+    "message": "ingen titel"
+  },
+  "Update Available (version {version})": {
+    "message": "Uppdatering tillgänglig (version {version})"
+  },
+  "App Version: { version }": {
+    "message": "App Version: { version }"
+  },
+  "{\n count, plural,\n one {1 place attached}\n  other {# places attached}\n }": {
+    "message": "{\n count, plural,\n one {1 tillagd plats}\n  other {# tillagda platser}\n }"
+  },
+  "{\n count, plural,\n one {1 tag attached}\n other {# tags attached}\n }": {
+    "message": "{\n count, plural,\n one {1 tillagd tagg}\n other {# tillagda taggar}\n }"
+  },
+  "{\n count, plural,\n one {1 card}\n other {# card}\n}": {
+    "message": "{\n count, plural,\n one {1 kort}\n other {# kort}\n}"
+  },
+  "{\n count, plural,\n one {1 note}\n other {# notes}\n}": {
+    "message": "{\n count, plural,\n one {1 anteckning}\n other {# anteckningar}\n}"
+  },
+  "Please contact me with any questions at support@plottr.com": {
+    "message": "Kontakta mig med eventuella frågor på support@plottr.com"
+  },
+  "{\n count, plural,\n one {1 character attached}\n other {# characters attached}\n        }": {
+    "message": "{\n count, plural,\n one {1 tillagd karaktär}\n other {# tillagda karaktärer}\n        }"
+  },
+  "{\n      count, plural,\n        one {1 card}\n        other {# card}\n    }": {
+    "message": "{\n      count, plural,\n        one {1 kort}\n        other {# kort}\n    }"
+  },
+  "{\n count, plural,\n one {1 place attached}\n other {# places attached}\n }": {
+    "message": "{\n count, plural,\n one {1 tillagd plats}\n other {# tillagda platser}\n }"
+  },
+  "{\n count, plural,\n one {1 tag attached}\n other {# tags attached}\n}": {
+    "message": "{\n count, plural,\n one {1 tillagd tagg}\n other {# tillagda taggar}\n}"
+  },
+  "Filter by storyline": {
+    "message": "Filtrera på handlingslinje"
+  },
+  "Could not display the license key. Try again": {
+    "message": "Kunde inte visa licensnyckeln. Försök igen"
+  }
+}
