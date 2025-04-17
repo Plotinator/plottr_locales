@@ -1626,13 +1626,13 @@
     "message": "با اشتراک موبایل iOS!"
   },
   "{\n          count, plural,\n          one {1 character attached}\n          other {# characters attached}\n        }": {
-    "message": "{ شمارش، جمع،\n    یک {1 شخصیت پیوست شده}\n  دیگر {# شخصیت پیوست شده}\n}"
+    "message": "{count, plural،\n    one {1 شخصیت پیوست شده}\n  other {# شخصیت پیوست شده}\n}"
   },
   "{\n          count, plural,\n          one {1 place attached}\n          other {# places attached}\n        }": {
-    "message": "{ شمارش، جمع،\n    یک {1 مکان پیوست شده}\n  دیگر {# مکان پیوست شده}\n}"
+    "message": "{count, plural،\n   one  {1 مکان پیوست شده}\n other {# مکان پیوست شده}\n}"
   },
   "{\n          count, plural,\n          one {1 tag attached}\n          other {# tags attached}\n        }": {
-    "message": "{ شمارش، جمع\n    یک {1 برچسب پیوست شده}\n  دیگر {# برچسب پیوست شده}\n}"
+    "message": "{count, plural,\n    one  {1 برچسب پیوست شده}\n other {# برچسب پیوست شده}\n}"
   },
   "{amount} Lifetime": {
     "message": "${amount}\nمادام‌العمر"
@@ -1647,22 +1647,22 @@
     "message": "${amount}\nسالانه"
   },
   "{date, date, long}": {
-    "message": "{ تاریخ، تاریخ، طولانی }"
+    "message": "{date, date, long}"
   },
   "{date, date, medium}": {
-    "message": "{ تاریخ، تاریخ، متوسط }"
+    "message": "{date, date, medium}"
   },
   "{date, date, monthDay}": {
-    "message": "{ تاریخ، تاریخ، روز ماه }"
+    "message": "{date, date, monthDay}"
   },
   "{numOfDays, plural,\n      =0 {# days left}\n      one {# day left}\n      other {# days left}\n    }": {
-    "message": "{ تعداد روزها، جمع،\n     =0 {# روز باقیمانده}\n    یک {# روز باقیمانده}\n  دیگر {# روز باقیمانده}\n}"
+    "message": "{numOfDays, plural,\n      =0 {# days left}\n      one {# day left}\n      other {# days left}\n    }"
   },
   "{num} Scenes": {
     "message": "{num} صحنه"
   },
   "{val, number, percent}": {
-    "message": "{ مقدار، عدد، درصد }"
+    "message": "{val, number, percent}"
   },
   "{wordCount,number} words": {
     "message": "{wordCount, number} کلمه"
@@ -1941,10 +1941,10 @@
     "message": "بله، فایل به روز رسانی شود"
   },
   "{\n      count, plural,\n        one {1 carte}\n        other {# cartes}\n    }": {
-    "message": "{\n      شمارش، جمع\n        یک {1 کارت}\n        دیگر {# کارت}\n    }"
+    "message": "{\n count, plural \n one ک {1 کارت}\n        other {# کارت}\n    }"
   },
   "{\n      count, plural,\n        one {1 note}\n        other {# notes}\n    }": {
-    "message": "{\n      شمارش، جمع\n        یک {1 یادداشت}\n        دیگر {# یادداشت}\n    }"
+    "message": "{\n count, plural \n one ک {1 یادداشت}\n        other {# یادداشت}\n    }"
   },
   "{days} days remaining": {
     "message": "{days} روز باقی مانده"
@@ -2061,7 +2061,7 @@
     "message": "انتخاب شده"
   },
   "{\n      count, plural,\n        one {1 card}\n        other {# cards}\n    }": {
-    "message": "{\n      شمارش، جمع\n        یک {1 کارت}\n        دیگر {# کارت}\n    }"
+    "message": "{\n count, plural \n        یک {1 کارت}\n        other {# کارت}\n    }"
   },
   "Import": {
     "message": "وارد کردن"
