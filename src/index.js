@@ -1,5 +1,9 @@
 const i18n = require('format-message')
 
+/**
+ * @typedef {keyof typeof localeNames} Locale
+ */
+
 const locales = {
   // @ts-ignore
   en: require('./en.json'),
@@ -53,6 +57,20 @@ if (process.env.NODE_ENV === 'dev') {
   localeNames.flipped = 'Flipped'
 }
 
+/**
+ * @typedef HasLocale
+ * @property {Locale} locale
+ */
+
+/**
+ * @typedef MightHaveLocale
+ * @property {Locale | Null} locale
+ */
+
+/**
+ * @param {MightHaveLocale} settings
+ * @param {HasLocale} platform
+ */
 function setupI18n(settings, platform) {
   i18n.setup({
     translations: locales,
@@ -66,6 +84,11 @@ function setupI18n(settings, platform) {
   })
 }
 
+/**
+ * @param {MightHaveLocale} settings
+ * @param {HasLocale} platform
+ * @return {String}
+ */
 function getCurrentLocale(settings, platform) {
   const userSetLocale = settings ? settings.locale : null
 
